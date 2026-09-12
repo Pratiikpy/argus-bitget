@@ -1,0 +1,243 @@
+{
+  "generated_at": "2026-09-12T09:03:24.136148+00:00",
+  "window_days": 90,
+  "round_trip_fee_bps": "12",
+  "symbols_tested": 12,
+  "symbols_failed": {},
+  "headline": {
+    "beat_buy_and_hold_sharpe": "11/12",
+    "survived_dsr_all_trials": "0/12",
+    "survived_dsr_candidates_only": "7/12",
+    "most_frequent_winner": "weekend_only",
+    "variant_win_counts": {
+      "weekend_only": 4,
+      "rtoken_attenuation_carry": 1,
+      "execution_aware_low_turnover": 4,
+      "hold_through_closure": 2,
+      "rtoken_session_boundary": 1
+    },
+    "subtheme_win_counts": {
+      "t1-afopen (session_alpha)": 6,
+      "t1-rtokenfactor": 2,
+      "t1-afopen": 4
+    }
+  },
+  "per_symbol": [
+    {
+      "symbol": "NVDAUSDT",
+      "bars": 2159,
+      "days": 89.9,
+      "baseline_sharpe": 0.847,
+      "best_variant": "weekend_only",
+      "best_net_sharpe": 1.813,
+      "best_net_return_pct": 3.392,
+      "beats_baseline": true,
+      "dsr_all_trials": 0.0,
+      "dsr_candidates_only": 1.0,
+      "out_of_sample_decay": {
+        "in_sample_sharpe": 1.767,
+        "out_of_sample_sharpe": 2.145,
+        "retention_ratio": 1.214,
+        "breaches_half_alert": false
+      }
+    },
+    {
+      "symbol": "TSLAUSDT",
+      "bars": 2159,
+      "days": 89.9,
+      "baseline_sharpe": -0.826,
+      "best_variant": "rtoken_attenuation_carry",
+      "best_net_sharpe": 1.065,
+      "best_net_return_pct": 5.977,
+      "beats_baseline": true,
+      "dsr_all_trials": 0.0,
+      "dsr_candidates_only": 1.0,
+      "out_of_sample_decay": {
+        "in_sample_sharpe": 0.441,
+        "out_of_sample_sharpe": 1.937,
+        "retention_ratio": 4.39,
+        "breaches_half_alert": false
+      }
+    },
+    {
+      "symbol": "AAPLUSDT",
+      "bars": 2159,
+      "days": 89.9,
+      "baseline_sharpe": 1.922,
+      "best_variant": "execution_aware_low_turnover",
+      "best_net_sharpe": 2.088,
+      "best_net_return_pct": 10.55,
+      "beats_baseline": true,
+      "dsr_all_trials": 0.0,
+      "dsr_candidates_only": 0.9995,
+      "out_of_sample_decay": {
+        "in_sample_sharpe": 1.061,
+        "out_of_sample_sharpe": 4.119,
+        "retention_ratio": 3.883,
+        "breaches_half_alert": false
+      }
+    },
+    {
+      "symbol": "MSFTUSDT",
+      "bars": 2159,
+      "days": 89.9,
+      "baseline_sharpe": 2.766,
+      "best_variant": "execution_aware_low_turnover",
+      "best_net_sharpe": 2.734,
+      "best_net_return_pct": 20.807,
+      "beats_baseline": false,
+      "dsr_all_trials": 0.0,
+      "dsr_candidates_only": 1.0,
+      "out_of_sample_decay": {
+        "in_sample_sharpe": 2.958,
+        "out_of_sample_sharpe": 2.461,
+        "retention_ratio": 0.832,
+        "breaches_half_alert": false
+      }
+    },
+    {
+      "symbol": "METAUSDT",
+      "bars": 2159,
+      "days": 89.9,
+      "baseline_sharpe": 1.292,
+      "best_variant": "hold_through_closure",
+      "best_net_sharpe": 2.809,
+      "best_net_return_pct": 27.581,
+      "beats_baseline": true,
+      "dsr_all_trials": 0.0,
+      "dsr_candidates_only": 0.0,
+      "out_of_sample_decay": {
+        "in_sample_sharpe": 2.185,
+        "out_of_sample_sharpe": 4.208,
+        "retention_ratio": 1.926,
+        "breaches_half_alert": false
+      }
+    },
+    {
+      "symbol": "GOOGLUSDT",
+      "bars": 2159,
+      "days": 89.9,
+      "baseline_sharpe": -0.711,
+      "best_variant": "execution_aware_low_turnover",
+      "best_net_sharpe": 1.425,
+      "best_net_return_pct": 8.624,
+      "beats_baseline": true,
+      "dsr_all_trials": 0.0,
+      "dsr_candidates_only": 0.0,
+      "out_of_sample_decay": {
+        "in_sample_sharpe": 1.915,
+        "out_of_sample_sharpe": -0.206,
+        "retention_ratio": -0.108,
+        "breaches_half_alert": true
+      }
+    },
+    {
+      "symbol": "AMZNUSDT",
+      "bars": 2159,
+      "days": 89.9,
+      "baseline_sharpe": 0.934,
+      "best_variant": "weekend_only",
+      "best_net_sharpe": 2.303,
+      "best_net_return_pct": 3.357,
+      "beats_baseline": true,
+      "dsr_all_trials": 0.0,
+      "dsr_candidates_only": 1.0,
+      "out_of_sample_decay": {
+        "in_sample_sharpe": 4.417,
+        "out_of_sample_sharpe": -2.796,
+        "retention_ratio": -0.633,
+        "breaches_half_alert": true
+      }
+    },
+    {
+      "symbol": "COINUSDT",
+      "bars": 2159,
+      "days": 89.9,
+      "baseline_sharpe": 0.801,
+      "best_variant": "hold_through_closure",
+      "best_net_sharpe": 1.553,
+      "best_net_return_pct": 20.199,
+      "beats_baseline": true,
+      "dsr_all_trials": 0.0,
+      "dsr_candidates_only": 0.0,
+      "out_of_sample_decay": {
+        "in_sample_sharpe": -0.641,
+        "out_of_sample_sharpe": 5.998,
+        "retention_ratio": -9.359,
+        "breaches_half_alert": true
+      }
+    },
+    {
+      "symbol": "MSTRUSDT",
+      "bars": 2159,
+      "days": 89.9,
+      "baseline_sharpe": 0.554,
+      "best_variant": "execution_aware_low_turnover",
+      "best_net_sharpe": 2.655,
+      "best_net_return_pct": 38.858,
+      "beats_baseline": true,
+      "dsr_all_trials": 0.0,
+      "dsr_candidates_only": 1.0,
+      "out_of_sample_decay": {
+        "in_sample_sharpe": 1.936,
+        "out_of_sample_sharpe": 3.72,
+        "retention_ratio": 1.921,
+        "breaches_half_alert": false
+      }
+    },
+    {
+      "symbol": "QQQUSDT",
+      "bars": 2159,
+      "days": 89.9,
+      "baseline_sharpe": -0.159,
+      "best_variant": "weekend_only",
+      "best_net_sharpe": 0.826,
+      "best_net_return_pct": 1.089,
+      "beats_baseline": true,
+      "dsr_all_trials": 0.0,
+      "dsr_candidates_only": 0.0,
+      "out_of_sample_decay": {
+        "in_sample_sharpe": 1.61,
+        "out_of_sample_sharpe": -1.422,
+        "retention_ratio": -0.883,
+        "breaches_half_alert": true
+      }
+    },
+    {
+      "symbol": "TQQQUSDT",
+      "bars": 2159,
+      "days": 89.9,
+      "baseline_sharpe": -0.343,
+      "best_variant": "weekend_only",
+      "best_net_sharpe": 2.687,
+      "best_net_return_pct": 9.674,
+      "beats_baseline": true,
+      "dsr_all_trials": 0.0,
+      "dsr_candidates_only": 1.0,
+      "out_of_sample_decay": {
+        "in_sample_sharpe": 4.117,
+        "out_of_sample_sharpe": -1.075,
+        "retention_ratio": -0.261,
+        "breaches_half_alert": true
+      }
+    },
+    {
+      "symbol": "SQQQUSDT",
+      "bars": 2159,
+      "days": 89.9,
+      "baseline_sharpe": 0.269,
+      "best_variant": "rtoken_session_boundary",
+      "best_net_sharpe": 0.778,
+      "best_net_return_pct": 6.009,
+      "beats_baseline": true,
+      "dsr_all_trials": 0.0,
+      "dsr_candidates_only": 0.0,
+      "out_of_sample_decay": {
+        "in_sample_sharpe": 1.406,
+        "out_of_sample_sharpe": -0.972,
+        "retention_ratio": -0.692,
+        "breaches_half_alert": true
+      }
+    }
+  ]
+}

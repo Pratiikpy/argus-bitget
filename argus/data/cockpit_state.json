@@ -1,0 +1,92 @@
+{
+  "phase": "weekend",
+  "asleep": true,
+  "hours": 51.9,
+  "tickers": [
+    {
+      "symbol": "NVDAUSDT",
+      "last": "219.34",
+      "spread": 0.46,
+      "chg": "-0.00472",
+      "anchor": "NVDA"
+    },
+    {
+      "symbol": "TSLAUSDT",
+      "last": "365.02",
+      "spread": 0.27,
+      "chg": "-0.00008",
+      "anchor": "TSLA"
+    },
+    {
+      "symbol": "AAPLUSDT",
+      "last": "333.43",
+      "spread": 0.3,
+      "chg": "0.02367",
+      "anchor": "AAPL"
+    },
+    {
+      "symbol": "MSFTUSDT",
+      "last": "495.24",
+      "spread": 0.2,
+      "chg": "0.00371",
+      "anchor": "MSFT"
+    },
+    {
+      "symbol": "METAUSDT",
+      "last": "648.14",
+      "spread": 0.15,
+      "chg": "0.00002",
+      "anchor": "META"
+    },
+    {
+      "symbol": "GOOGLUSDT",
+      "last": "339.63",
+      "spread": 0.59,
+      "chg": "0.0167",
+      "anchor": "GOOGL"
+    },
+    {
+      "symbol": "AMZNUSDT",
+      "last": "256.55",
+      "spread": 0.39,
+      "chg": "0.01195",
+      "anchor": "AMZN"
+    },
+    {
+      "symbol": "COINUSDT",
+      "last": "176.26",
+      "spread": 0.57,
+      "chg": "0.02097",
+      "anchor": "COIN"
+    },
+    {
+      "symbol": "MSTRUSDT",
+      "last": "131.3",
+      "spread": 0.76,
+      "chg": "0.01854",
+      "anchor": "MSTR"
+    },
+    {
+      "symbol": "QQQUSDT",
+      "last": "716.01",
+      "spread": 0.14,
+      "chg": "0.00352",
+      "anchor": "QQQ"
+    },
+    {
+      "symbol": "TQQQUSDT",
+      "last": "71.17",
+      "spread": 1.4,
+      "chg": "0.00979",
+      "anchor": "TQQQ"
+    },
+    {
+      "symbol": "SQQQUSDT",
+      "last": "38.81",
+      "spread": 2.58,
+      "chg": "-0.01071",
+      "anchor": "SQQQ"
+    }
+  ],
+  "as_of": "2026-09-12T09:38:08.720128+00:00"
+}

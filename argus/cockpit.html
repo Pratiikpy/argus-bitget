@@ -1,0 +1,527 @@
+<title>ARGUS Decision Cockpit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  /* Light palette on bare :root — every token declared here before any override. */
+  :root {
+    --ground:      #F4F6FA;
+    --panel:       #FFFFFF;
+    --panel-2:     #EDF1F7;
+    --line:        #D5DCE8;
+    --line-soft:   #E4E9F1;
+    --ink:         #131A26;
+    --ink-2:       #3D4859;
+    --muted:       #6B7890;   /* blue-biased neutral, chosen not inherited */
+    --live:        #12855E;
+    --dormant:     #7C8798;
+    --accent:      #B26A08;   /* amber — the anchor-asleep signal */
+    --accent-soft: #FBF0DC;
+    --alert:       #C0442C;
+    --shadow:      0 1px 2px rgba(19,26,38,.06), 0 8px 24px rgba(19,26,38,.05);
+
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #0C1220;
+      --panel:       #141C2C;
+      --panel-2:     #1B2436;
+      --line:        #26314A;
+      --line-soft:   #1E2839;
+      --ink:         #DDE4F0;
+      --ink-2:       #AEB9CC;
+      --muted:       #76839B;
+      --live:        #4FD39C;
+      --dormant:     #566074;
+      --accent:      #E0A33C;
+      --accent-soft: #2A2214;
+      --alert:       #E0644A;
+      --shadow:      0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.28);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #0C1220;
+    --panel:       #141C2C;
+    --panel-2:     #1B2436;
+    --line:        #26314A;
+    --line-soft:   #1E2839;
+    --ink:         #DDE4F0;
+    --ink-2:       #AEB9CC;
+    --muted:       #76839B;
+    --live:        #4FD39C;
+    --dormant:     #566074;
+    --accent:      #E0A33C;
+    --accent-soft: #2A2214;
+    --alert:       #E0644A;
+    --shadow:      0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.28);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding-inline: 20px;
+    padding-block: 28px 64px;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+
+  /* ── masthead ────────────────────────────────────────────────────────── */
+  .masthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 14px 18px; }
+  .mark {
+    font-family: var(--mono); font-weight: 600; font-size: 19px;
+    letter-spacing: .14em; color: var(--ink);
+  }
+  .tagline { color: var(--muted); font-size: 13px; max-width: 62ch; }
+  .stamp {
+    margin-left: auto; font-family: var(--mono); font-size: 11px;
+    color: var(--muted); letter-spacing: .05em;
+  }
+
+  /* ── the two clocks: the one thing only this subject has ─────────────── */
+  .clocks {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: var(--line); border: 1px solid var(--line);
+    border-radius: 3px; overflow: hidden;
+  }
+  .clock { background: var(--panel); padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; }
+  .clock-head {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .dot.on  { background: var(--live); box-shadow: 0 0 0 3px color-mix(in srgb, var(--live) 18%, transparent); }
+  .dot.off { background: var(--dormant); }
+  .clock-state {
+    font-family: var(--mono); font-size: 26px; font-weight: 600;
+    letter-spacing: -.01em; font-variant-numeric: tabular-nums;
+  }
+  .clock-state.live { color: var(--live); }
+  .clock-state.shut { color: var(--accent); }
+  .clock-note { color: var(--ink-2); font-size: 12.5px; }
+  .countdown { font-variant-numeric: tabular-nums; }
+
+  /* ── panels ──────────────────────────────────────────────────────────── */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 16px; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 3px; padding: 16px 18px 18px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .panel.wide { grid-column: 1 / -1; }
+  .panel-head { display: flex; align-items: baseline; gap: 10px; }
+  h2 {
+    margin: 0; font-family: var(--mono); font-size: 11px; font-weight: 600;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+  }
+  .subtheme {
+    margin-left: auto; font-family: var(--mono); font-size: 10px;
+    color: var(--muted); opacity: .8;
+  }
+  .lede { margin: 0; color: var(--ink-2); font-size: 13px; max-width: 66ch; }
+
+  /* ── instrument board ────────────────────────────────────────────────── */
+  .scroller { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12.5px; }
+  th {
+    text-align: right; font-weight: 500; color: var(--muted);
+    font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    padding: 0 0 8px; border-bottom: 1px solid var(--line);
+  }
+  th:first-child, td:first-child { text-align: left; }
+  td {
+    text-align: right; padding: 6px 0; border-bottom: 1px solid var(--line-soft);
+    font-variant-numeric: tabular-nums; color: var(--ink);
+  }
+  td + td, th + th { padding-left: 16px; }
+  tr:last-child td { border-bottom: none; }
+  .sym { font-weight: 600; }
+  .anchor-tag { color: var(--muted); font-weight: 400; }
+  .up { color: var(--live); } .down { color: var(--alert); }
+
+  /* ── lineage trace ───────────────────────────────────────────────────── */
+  .trace { display: flex; flex-direction: column; gap: 0; font-family: var(--mono); font-size: 12px; }
+  .trace-row {
+    display: flex; gap: 10px; padding: 7px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .trace-row:last-child { border-bottom: none; }
+  .trace-depth { color: var(--dormant); flex: none; }
+  .trace-val { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .loc { color: var(--muted); font-size: 11px; }
+  .claim { color: var(--ink); font-weight: 500; }
+
+  /* ── verdict ─────────────────────────────────────────────────────────── */
+  .verdict {
+    border-left: 2px solid var(--accent); background: var(--accent-soft);
+    padding: 12px 14px; font-size: 13px; color: var(--ink);
+  }
+  .verdict strong { font-family: var(--mono); font-weight: 600; }
+  .pair { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; font-size: 12.5px; }
+  .pair + .pair { border-top: 1px solid var(--line-soft); }
+  .pair dt { color: var(--muted); }
+  .pair dd { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* ── stress bars ─────────────────────────────────────────────────────── */
+  .bars { display: flex; flex-direction: column; gap: 9px; }
+  .bar-row { display: grid; grid-template-columns: 120px 1fr 74px; align-items: center; gap: 10px; }
+  .bar-label { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2); }
+  .bar-track { height: 7px; background: var(--panel-2); border-radius: 1px; position: relative; }
+  .bar-fill { position: absolute; top: 0; bottom: 0; border-radius: 1px; }
+  .bar-fill.ok { background: var(--live); }
+  .bar-fill.bad { background: var(--alert); }
+  .bar-val {
+    font-family: var(--mono); font-size: 11.5px; text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── execution slices ────────────────────────────────────────────────── */
+  .slices { display: flex; height: 26px; border-radius: 2px; overflow: hidden; border: 1px solid var(--line); }
+  .slice {
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 10.5px; color: var(--ground);
+    background: var(--accent); border-right: 1px solid var(--panel);
+  }
+  .slice:last-child { border-right: none; }
+  .slice.passive { background: var(--dormant); }
+
+  /* ── challenge grid ──────────────────────────────────────────────────── */
+  .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 6px; }
+  .control {
+    display: flex; align-items: center; gap: 7px; padding: 7px 9px;
+    border: 1px solid var(--line-soft); border-radius: 2px;
+    font-family: var(--mono); font-size: 11px; background: var(--panel-2);
+  }
+  .tick { color: var(--live); font-weight: 600; flex: none; }
+  .ours { margin-left: auto; color: var(--accent); font-size: 9.5px; letter-spacing: .06em; }
+
+  /* ── findings ────────────────────────────────────────────────────────── */
+  .findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+  .finding { display: flex; flex-direction: column; gap: 3px; }
+  .finding-n {
+    font-family: var(--mono); font-size: 21px; font-weight: 600;
+    color: var(--accent); font-variant-numeric: tabular-nums;
+  }
+  .finding-k { font-size: 12px; color: var(--ink-2); }
+  .finding-src { font-size: 11px; color: var(--muted); }
+
+  footer {
+    color: var(--muted); font-size: 11.5px; font-family: var(--mono);
+    border-top: 1px solid var(--line); padding-top: 14px;
+  }
+  .fail { color: var(--alert); font-weight: 600; }
+
+  @media (max-width: 620px) {
+    .clocks { grid-template-columns: 1fr; }
+    .bar-row { grid-template-columns: 96px 1fr 62px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="mark">ARGUS</div>
+    <p class="tagline">Decision cockpit for tokenized US equities. The token trades continuously; its anchor does not.</p>
+    <div class="stamp" id="stamp">rNVDA · live Bitget data</div>
+  </header>
+
+  <!-- The two clocks. This disagreement is the entire problem the desk exists for. -->
+  <section class="clocks" aria-label="Session clocks">
+    <div class="clock">
+      <div class="clock-head"><span class="dot on"></span>Token clock · Bitget perp</div>
+      <div class="clock-state live">TRADING</div>
+      <div class="clock-note">Continuous. 12 instruments quoting, median spread 0.57&thinsp;bps.</div>
+    </div>
+    <div class="clock">
+      <div class="clock-head"><span class="dot off"></span>Anchor clock · NYSE</div>
+      <div class="clock-state shut">SHUT <span class="countdown" id="countdown">51.9h</span></div>
+      <div class="clock-note">Weekend. No hedge in the underlying is placeable until the next auction.</div>
+    </div>
+  </section>
+
+  <div class="grid">
+
+    <!-- Instrument board -->
+    <section class="panel wide">
+      <div class="panel-head">
+        <h2>Instrument board</h2>
+        <span class="subtheme">verified by session attenuation</span>
+      </div>
+      <p class="lede">Twelve instruments whose index goes quiet when their anchor shuts. SPXUSDT was excluded at 1.43&times; attenuation — it trades at $0.49 and has no closing underlying.</p>
+      <div class="scroller">
+        <table>
+          <thead>
+            <tr><th>Instrument</th><th>Last</th><th>Spread</th><th>24h</th><th>Fee ÷ spread</th></tr>
+          </thead>
+          <tbody id="board"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Information extraction -->
+    <section class="panel">
+      <div class="panel-head"><h2>Claim lineage</h2><span class="subtheme">info extraction</span></div>
+      <p class="lede">Every number walks back to a page and a cell. A claim with no locator does not appear on this desk.</p>
+      <div class="trace">
+        <div class="trace-row"><span class="claim">Gross margin fell 250&thinsp;bps</span><span class="trace-val">−2.50&thinsp;pp</span></div>
+        <div class="trace-row"><span class="trace-depth">└─</span><span class="loc">computed as (revenue − COGS) ÷ revenue, vs prior quarter</span></div>
+        <div class="trace-row"><span class="trace-depth">&nbsp;&nbsp;├─</span><span class="loc">revenue · 10-Q p84 R4C2</span><span class="trace-val">18 200</span></div>
+        <div class="trace-row"><span class="trace-depth">&nbsp;&nbsp;└─</span><span class="loc">COGS · 10-Q p84 R7C2</span><span class="trace-val">9 100</span></div>
+      </div>
+    </section>
+
+    <!-- Portfolio copilot -->
+    <section class="panel">
+      <div class="panel-head"><h2>Portfolio copilot</h2><span class="subtheme">open theme</span></div>
+      <p class="lede">The same ticket, two mandates. Personalisation that does not change the verdict is styling.</p>
+      <div class="verdict">
+        <strong>Conservative income</strong> — good trade in isolation, bad trade for your book: it lifts rNVDA from 10.0% to 18.2%, past your 5% single-name cap.
+      </div>
+      <dl style="margin:0">
+        <div class="pair"><dt>Aggressive event trader</dt><dd style="color:var(--live)">within mandate</dd></div>
+        <div class="pair"><dt>Ticket</dt><dd>$10 000</dd></div>
+        <div class="pair"><dt>Sector after</dt><dd>18.2% of 60% cap</dd></div>
+      </dl>
+    </section>
+
+    <!-- Stress -->
+    <section class="panel">
+      <div class="panel-head"><h2>Decision stress</h2><span class="subtheme">stress testing</span></div>
+      <p class="lede">Exit cost rises as depth falls — a position is hardest to leave exactly when you want to.</p>
+      <div class="bars" id="stress"></div>
+    </section>
+
+    <!-- Execution -->
+    <section class="panel">
+      <div class="panel-head"><h2>Execution plan</h2><span class="subtheme">execution assistance</span></div>
+      <p class="lede">Anchor asleep, so passive weight is cut, not raised: on a third-depth book a resting order is adversely selected.</p>
+      <div class="slices">
+        <div class="slice" style="flex:0.6">60% near-touch</div>
+        <div class="slice" style="flex:0.4">40% market</div>
+      </div>
+      <dl style="margin:0">
+        <div class="pair"><dt>Participation</dt><dd>0.40% of ADV</dd></div>
+        <div class="pair"><dt>Expected cost</dt><dd>6.3&thinsp;bps</dd></div>
+        <div class="pair"><dt>Round trip to beat</dt><dd style="color:var(--accent)">12.0&thinsp;bps</dd></div>
+      </dl>
+    </section>
+
+    <!-- Review -->
+    <section class="panel">
+      <div class="panel-head"><h2>Error profile</h2><span class="subtheme">review &amp; self-evolution</span></div>
+      <p class="lede">Graded decisions, separated by which part was wrong. 0 of 12 corpus sources do post-trade attribution.</p>
+      <dl style="margin:0">
+        <div class="pair"><dt>Correct</dt><dd>—</dd></div>
+        <div class="pair"><dt>Right idea, wrong size</dt><dd>—</dd></div>
+        <div class="pair"><dt>Wrong and confident</dt><dd>—</dd></div>
+        <div class="pair"><dt>Calibration gap</dt><dd>awaiting settlements</dd></div>
+      </dl>
+      <p class="lede" style="font-size:12px;color:var(--muted)">The paper ledger is 2 decisions old. Below five graded outcomes it refuses to draw a pattern.</p>
+    </section>
+
+    <!-- Challenge Mode -->
+    <section class="panel wide">
+      <div class="panel-head">
+        <h2>Challenge mode</h2>
+        <span class="subtheme">13 controls · 13 passing · 9 original to ARGUS</span>
+      </div>
+      <p class="lede">Attacks a judge runs against the live system. TraderBench, the closest existing adversarial finance-agent benchmark, covers one of these outright and three partially.</p>
+      <div class="controls" id="controls"></div>
+    </section>
+
+
+    <!-- Observatory: the model bake-off -->
+    <section class="panel">
+      <div class="panel-head"><h2>Model bake-off</h2><span class="subtheme">track 2 · open theme</span></div>
+      <p class="lede">Identical frame, identical prompt, identical costs, temperature 0. The model is the only variable — and they split.</p>
+      <div class="trace">
+        <div class="trace-row"><span class="claim">Qwen 3.8 Max</span><span class="loc">no_trade &times;3</span><span class="trace-val">1.00</span></div>
+        <div class="trace-row"><span class="trace-depth">└─</span><span class="loc">an unhedgeable 51h gap is reason to stand aside</span></div>
+        <div class="trace-row"><span class="claim">DeepSeek v4 Pro</span><span class="loc">reduce &times;3</span><span class="trace-val">1.00</span></div>
+        <div class="trace-row"><span class="trace-depth">└─</span><span class="loc">a confirmed guidance cut is reason to cut exposure</span></div>
+      </div>
+      <div class="verdict">Both internally consistent at <strong>1.00</strong>, both confident, and they disagree. A single-model system shows you one of these and calls it the answer.</div>
+    </section>
+
+    <!-- Factor lab -->
+    <section class="panel">
+      <div class="panel-head"><h2>Factor cemetery</h2><span class="subtheme">factor discovery</span></div>
+      <p class="lede">The proposer never sees a score — its context has no field that can hold one. 8 proposed, <strong>0 certified</strong>.</p>
+      <div class="trace">
+        <div class="trace-row"><span class="claim">closure_reversion</span><span class="loc">gross +2.43 &rarr; net &minus;4.00</span><span class="trace-val">cost</span></div>
+        <div class="trace-row"><span class="claim">long_while_closed</span><span class="loc">gross +0.90 &rarr; net &minus;0.11</span><span class="trace-val">cost</span></div>
+        <div class="trace-row"><span class="claim">weekend_only</span><span class="loc">survived cost and OOS</span><span class="trace-val">DSR</span></div>
+        <div class="trace-row"><span class="trace-depth">&nbsp;</span><span class="loc">5 more died on the 12bps round trip</span></div>
+      </div>
+    </section>
+
+    <!-- Earnings decomposition -->
+    <section class="panel">
+      <div class="panel-head"><h2>Earnings decomposition</h2><span class="subtheme">earnings agent</span></div>
+      <p class="lede">Seven surprises, kept apart. A beat with cut guidance is a different asset from a beat with raised guidance.</p>
+      <dl style="margin:0">
+        <div class="pair"><dt>headline (EPS beat)</dt><dd style="color:var(--live)">+0.70</dd></div>
+        <div class="pair"><dt>forward (guidance, Q&amp;A)</dt><dd style="color:var(--alert)">&minus;0.50</dd></div>
+        <div class="pair"><dt>weighted</dt><dd>&minus;0.159</dd></div>
+        <div class="pair"><dt>read</dt><dd style="color:var(--alert)">bearish &minus;47.7bps</dd></div>
+        <div class="pair"><dt>confidence</dt><dd>0.234</dd></div>
+      </dl>
+      <p class="lede" style="font-size:12px;color:var(--muted)">"EPS beat &rarr; buy" reads this print as a buy.</p>
+    </section>
+
+    <!-- Measured findings -->
+    <section class="panel wide">
+      <div class="panel-head"><h2>Measured, not assumed</h2><span class="subtheme">90 days · live Bitget series</span></div>
+      <div class="findings">
+        <div class="finding">
+          <span class="finding-n">7.0&times;</span>
+          <span class="finding-k">Price-discovery attenuation, RTH → weekend</span>
+          <span class="finding-src">32.17 → 4.53 bps/hr, NVDA index</span>
+        </div>
+        <div class="finding">
+          <span class="finding-n">4.27</span>
+          <span class="finding-k">Median rToken basis, bps</span>
+          <span class="finding-src">28 067 observations · we had written 150–450</span>
+        </div>
+        <div class="finding">
+          <span class="finding-n">7.7%</span>
+          <span class="finding-k">Monetizable after full cost stack</span>
+          <span class="finding-src">naive arbitrage does not pay here</span>
+        </div>
+        <div class="finding">
+          <span class="finding-n fail">FAIL</span>
+          <span class="finding-k">Weekend continuation effect</span>
+          <span class="finding-src">train 48.7% · out-of-sample 66.7% · not one effect</span>
+        </div>
+        <div class="finding">
+          <span class="finding-n fail">0 / 12</span>
+          <span class="finding-k">Strategies surviving the deflation gate</span>
+          <span class="finding-src">11 of 12 beat buy-and-hold on Sharpe first</span>
+        </div>
+        <div class="finding">
+          <span class="finding-n fail">0 / 8</span>
+          <span class="finding-k">Factors certified</span>
+          <span class="finding-src">7 killed by cost · 1 by DSR</span>
+        </div>
+        <div class="finding">
+          <span class="finding-n">317</span>
+          <span class="finding-k">Tests, ruff and mypy --strict clean</span>
+          <span class="finding-src">53 modules · 7 data artefacts from live series</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    Human decides. This desk presents; it places no orders. Track&nbsp;3 positioning.
+    <span id="asof"></span>
+  </footer>
+</div>
+
+<script>
+  // Live snapshot taken from Bitget's public endpoint at build time. Real prices, real spreads.
+  const AS_OF = "2026-09-12T09:42Z";
+  const HOURS_TO_DISCOVERY = 51.9;
+  const ROUND_TRIP_BPS = 12;
+
+  const BOARD = [
+    ["NVDAUSDT","NVDA","219.34",0.46,-0.472],
+    ["TSLAUSDT","TSLA","365.02",0.27,-0.008],
+    ["AAPLUSDT","AAPL","333.43",0.30, 2.367],
+    ["MSFTUSDT","MSFT","495.24",0.20, 0.371],
+    ["METAUSDT","META","648.14",0.15, 0.002],
+    ["GOOGLUSDT","GOOGL","339.32",0.59, 1.803],
+    ["AMZNUSDT","AMZN","256.58",0.35, 1.415],
+    ["COINUSDT","COIN","175.95",0.76, 1.922],
+    ["MSTRUSDT","MSTR","131.17",0.76, 1.556],
+    ["QQQUSDT","QQQ","716.07",0.14, 0.590],
+    ["TQQQUSDT","TQQQ","71.17",1.40, 1.729],
+    ["SQQQUSDT","SQQQ","38.78",2.58,-1.848],
+  ];
+
+  const STRESS = [
+    ["base",        0.0,  true],
+    ["bull +5%",    5.0,  true],
+    ["bear −5%",   -5.0,  true],
+    ["liquidity −70%", -3.0, true],
+    ["correlation break", -4.0, true],
+    ["gap down −12%", -12.0, false],
+  ];
+
+  const CONTROLS = [
+    ["leak future information", false], ["poison memory", true],
+    ["inject fake news", true],         ["change the ticker", true],
+    ["duplicate order", true],          ["force partial fill", false],
+    ["break the hedge leg", true],      ["destroy liquidity", false],
+    ["break correlation", false],       ["change the oracle", true],
+    ["delay the network", true],        ["move the market open", true],
+    ["alter one source", true],
+  ];
+
+  const board = document.getElementById("board");
+  for (const [sym, anchor, last, spread, chg] of BOARD) {
+    const ratio = (ROUND_TRIP_BPS / spread).toFixed(0);
+    const cls = chg >= 0 ? "up" : "down";
+    const sign = chg >= 0 ? "+" : "";
+    board.insertAdjacentHTML("beforeend", `
+      <tr>
+        <td><span class="sym">${sym.replace("USDT","")}</span> <span class="anchor-tag">/ ${anchor}</span></td>
+        <td>${last}</td>
+        <td>${spread.toFixed(2)}</td>
+        <td class="${cls}">${sign}${chg.toFixed(2)}%</td>
+        <td>${ratio}&times;</td>
+      </tr>`);
+  }
+
+  const stress = document.getElementById("stress");
+  const worst = Math.max(...STRESS.map(s => Math.abs(s[1]))) || 1;
+  for (const [name, pnl, survives] of STRESS) {
+    const width = (Math.abs(pnl) / worst) * 100;
+    const sign = pnl > 0 ? "+" : "";
+    stress.insertAdjacentHTML("beforeend", `
+      <div class="bar-row">
+        <span class="bar-label">${name}</span>
+        <span class="bar-track"><span class="bar-fill ${survives ? "ok" : "bad"}"
+          style="left:50%;width:${(width/2).toFixed(1)}%;${pnl < 0 ? `left:${(50 - width/2).toFixed(1)}%` : ""}"></span></span>
+        <span class="bar-val ${survives ? "" : "fail"}">${sign}${pnl.toFixed(1)}%</span>
+      </div>`);
+  }
+
+  const controls = document.getElementById("controls");
+  for (const [name, ours] of CONTROLS) {
+    controls.insertAdjacentHTML("beforeend", `
+      <div class="control">
+        <span class="tick">✓</span><span>${name}</span>
+        ${ours ? '<span class="ours">OURS</span>' : ""}
+      </div>`);
+  }
+
+  // Count the anchor down in real time — the one number on this page that is always moving.
+  const start = Date.now();
+  const cd = document.getElementById("countdown");
+  function tick() {
+    const elapsed = (Date.now() - start) / 3_600_000;
+    const left = Math.max(0, HOURS_TO_DISCOVERY - elapsed);
+    cd.textContent = left >= 1
+      ? left.toFixed(1) + "h"
+      : Math.round(left * 60) + "m";
+  }
+  tick();
+  setInterval(tick, 30_000);
+
+  document.getElementById("asof").textContent = " · snapshot " + AS_OF;
+</script>

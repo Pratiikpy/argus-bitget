@@ -1,0 +1,11 @@
+frame 7ce44b6d4566bac8 · 3 replays each
+
+  qwen           ['reduce', 'reduce', 'reduce']               consistency 1.0 stable=True tokens 4565
+  deepseek_nim   ['reduce', 'reduce', 'reduce']               consistency 1.0 stable=True tokens 0
+
+  models agree: True {'qwen': 'reduce', 'deepseek_nim': 'reduce'}
+  full report -> argus\data\bakeoff.json
+)', 'replay 1: could not obtain valid JSON after 3 attempts — last: invalid JSON (Expecting value: line 1 column 1 (char 0))', 'replay 2: could not obtain valid JSON after 3 attempts — last: invalid JSON (Expecting value: line 1 column 1 (char 0))']
+
+  models agree: True {'qwen': 'reduce', 'deepseek_nim': None}
+  full report -> argus\data\bakeoff.json

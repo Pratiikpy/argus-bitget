@@ -1,0 +1,179 @@
+{
+  "generated_at": "2026-09-12T08:09:18.590942+00:00",
+  "days": 90,
+  "round_trip_fee_bps": "12",
+  "total_observations": 28067,
+  "symbols_studied": 13,
+  "symbols_failed": {},
+  "headline": {
+    "monetizable_pct": 7.72,
+    "median_apparent_bps": "4.27"
+  },
+  "by_session_phase": {
+    "rth": {
+      "observations": 5070,
+      "apparent_bps_median": "6.51",
+      "monetizable_pct": 8.68
+    },
+    "extended": {
+      "observations": 8450,
+      "apparent_bps_median": "6.64",
+      "monetizable_pct": 10.0
+    },
+    "overnight": {
+      "observations": 6760,
+      "apparent_bps_median": "3.07",
+      "monetizable_pct": 7.44
+    },
+    "weekend": {
+      "observations": 7787,
+      "apparent_bps_median": "2.13",
+      "monetizable_pct": 4.87
+    }
+  },
+  "per_symbol": {
+    "NVDAUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "3.18",
+      "apparent_bps_p95": "11.28",
+      "apparent_bps_max": "33.19",
+      "clears_fee_pct": 3.57,
+      "monetizable_pct": 1.44,
+      "median_executable_bps_when_monetizable": "2.39"
+    },
+    "TSLAUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "3.10",
+      "apparent_bps_p95": "10.54",
+      "apparent_bps_max": "45.55",
+      "clears_fee_pct": 3.29,
+      "monetizable_pct": 1.11,
+      "median_executable_bps_when_monetizable": "2.81"
+    },
+    "AAPLUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "3.20",
+      "apparent_bps_p95": "11.14",
+      "apparent_bps_max": "73.86",
+      "clears_fee_pct": 3.57,
+      "monetizable_pct": 1.3,
+      "median_executable_bps_when_monetizable": "1.70"
+    },
+    "MSFTUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "3.17",
+      "apparent_bps_p95": "13.15",
+      "apparent_bps_max": "32.35",
+      "clears_fee_pct": 6.53,
+      "monetizable_pct": 3.2,
+      "median_executable_bps_when_monetizable": "2.31"
+    },
+    "METAUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "3.57",
+      "apparent_bps_p95": "13.87",
+      "apparent_bps_max": "37.52",
+      "clears_fee_pct": 8.34,
+      "monetizable_pct": 3.8,
+      "median_executable_bps_when_monetizable": "1.82"
+    },
+    "GOOGLUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "3.87",
+      "apparent_bps_p95": "15.79",
+      "apparent_bps_max": "43.44",
+      "clears_fee_pct": 13.11,
+      "monetizable_pct": 6.67,
+      "median_executable_bps_when_monetizable": "2.20"
+    },
+    "AMZNUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "3.25",
+      "apparent_bps_p95": "12.20",
+      "apparent_bps_max": "43.31",
+      "clears_fee_pct": 5.19,
+      "monetizable_pct": 2.55,
+      "median_executable_bps_when_monetizable": "1.73"
+    },
+    "COINUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "5.62",
+      "apparent_bps_p95": "17.58",
+      "apparent_bps_max": "36.81",
+      "clears_fee_pct": 18.02,
+      "monetizable_pct": 10.51,
+      "median_executable_bps_when_monetizable": "2.52"
+    },
+    "MSTRUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "5.18",
+      "apparent_bps_p95": "18.21",
+      "apparent_bps_max": "57.23",
+      "clears_fee_pct": 15.19,
+      "monetizable_pct": 9.12,
+      "median_executable_bps_when_monetizable": "3.45"
+    },
+    "QQQUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "2.92",
+      "apparent_bps_p95": "10.83",
+      "apparent_bps_max": "28.49",
+      "clears_fee_pct": 2.32,
+      "monetizable_pct": 0.56,
+      "median_executable_bps_when_monetizable": "1.20"
+    },
+    "SPXUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "9.52",
+      "apparent_bps_p95": "34.02",
+      "apparent_bps_max": "107.60",
+      "clears_fee_pct": 40.2,
+      "monetizable_pct": 31.68,
+      "median_executable_bps_when_monetizable": "6.45"
+    },
+    "TQQQUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "5.46",
+      "apparent_bps_p95": "18.71",
+      "apparent_bps_max": "59.86",
+      "clears_fee_pct": 18.48,
+      "monetizable_pct": 10.65,
+      "median_executable_bps_when_monetizable": "3.24"
+    },
+    "SQQQUSDT": {
+      "observations": 2159,
+      "from": "2026-06-14T09:00:00+00:00",
+      "to": "2026-09-12T07:00:00+00:00",
+      "apparent_bps_median": "6.58",
+      "apparent_bps_p95": "23.37",
+      "apparent_bps_max": "64.55",
+      "clears_fee_pct": 25.06,
+      "monetizable_pct": 17.79,
+      "median_executable_bps_when_monetizable": "4.23"
+    }
+  }
+}

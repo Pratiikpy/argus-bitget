@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-09-12T08:25:49.834193+00:00",
+  "days": 90,
+  "round_trip_fee_bps": "12",
+  "total_closed_sessions": 832,
+  "symbols_failed": {},
+  "headline": {
+    "continuation_rate_pct": 51.9,
+    "coin_flip_is": 50.0,
+    "median_reopen_move_bps": "58.26",
+    "reopen_clears_fee_pct": 89.3
+  },
+  "by_phase": {
+    "weekend": {
+      "sessions": 156,
+      "median_hours_closed": 66.0,
+      "median_closed_move_bps": "119.44",
+      "median_reopen_move_bps": "55.40",
+      "continuation_rate_pct": 57.7,
+      "reopen_clears_fee_pct": 84.6,
+      "median_net_of_fee_bps": "43.40"
+    },
+    "overnight": {
+      "sessions": 676,
+      "median_hours_closed": 18.0,
+      "median_closed_move_bps": "122.61",
+      "median_reopen_move_bps": "58.44",
+      "continuation_rate_pct": 50.6,
+      "reopen_clears_fee_pct": 90.4,
+      "median_net_of_fee_bps": "46.44"
+    }
+  }
+}

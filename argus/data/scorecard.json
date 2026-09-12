@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-09-12T11:01:43.804501+00:00",
+  "model": "argus/qwen3.8-max",
+  "ledger": {
+    "entries": 6,
+    "settled": 0,
+    "abstentions": 6,
+    "ungradeable": 6,
+    "chain_intact": true
+  },
+  "graded_predictions": 0,
+  "note": "0 graded outcomes \u2014 below the floor of 5. Calibration on fewer is noise, so none is reported."
+}

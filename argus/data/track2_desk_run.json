@@ -1,0 +1,228 @@
+{
+  "symbol": "NVDAUSDT",
+  "as_of": "2026-09-12T10:49:07.271501+00:00",
+  "panel": {
+    "views": [
+      {
+        "analyst": "event",
+        "signal": "neutral",
+        "magnitude_bps": 0,
+        "confidence": 0.95,
+        "clears_round_trip": false,
+        "actionable": false,
+        "reasoning": "A 7% downward guidance revision is unambiguously bearish for NVDA equity, but the anchor session is weekend with 50.7 hours until genuine price discovery and the market is asleep. The move is certain in direction but cannot be expressed on this venue until Monday open; by then it will be fully priced into the token.",
+        "counter_case": "If the 8-K is synthetic or erroneous (the tag says [SYNTHETIC]), the guidance revision may not be real, and the token could gap up or remain flat when discovery resumes.",
+        "source_ids": [
+          "e1"
+        ]
+      },
+      {
+        "analyst": "sentiment",
+        "signal": "insufficient_evidence",
+        "magnitude_bps": 0,
+        "confidence": 0.95,
+        "clears_round_trip": false,
+        "actionable": false,
+        "reasoning": "The single narrative is explicitly flagged as synthetic, carries a credibility score of 0.18, and has no independent source backing it. Social volume is at baseline (z-score 0.00), providing no corroborating organic interest.",
+        "counter_case": "If the 20% cut claim were to be independently confirmed by a credible source in the near term, it could move price, but acting on an unsourced synthetic signal before confirmation would be pure speculation.",
+        "source_ids": []
+      },
+      {
+        "analyst": "earnings",
+        "signal": "bearish",
+        "magnitude_bps": 15,
+        "confidence": 0.62,
+        "clears_round_trip": true,
+        "actionable": true,
+        "reasoning": "EPS beat is offset by a revenue miss versus consensus and, more critically, management's refusal to answer three separate questions on datacentre orders\u2014a core demand driver for NVDA\u2014which signals deteriorating forward visibility and undermines the headline beat.",
+        "counter_case": "The EPS beat of +12% vs +8% consensus is substantial and could reflect margin expansion or cost discipline that the market rewards, especially if investors interpret the Q&A evasion as standard competitive discretion rather than a red flag.",
+        "source_ids": [
+          "f1",
+          "t1"
+        ]
+      },
+      {
+        "analyst": "cross_asset",
+        "signal": "neutral",
+        "magnitude_bps": 0,
+        "confidence": 0.95,
+        "clears_round_trip": false,
+        "actionable": false,
+        "reasoning": "The hedge menu is empty because the anchor session is weekend with 50.7 hours until discovery; no hedge can be placed in the underlying. Declining to hedge is the correct action when nothing is placeable.",
+        "counter_case": "If a correlated cross-asset venue were open and offered a proxy hedge with edge exceeding the 12bp round-trip cost, one could argue for a substitute \u2014 but no such instrument appears on the menu.",
+        "source_ids": []
+      }
+    ],
+    "agreement": {
+      "neutral": 2,
+      "insufficient_evidence": 1,
+      "bearish": 1
+    },
+    "distinct_sources": 3,
+    "analysts": 4,
+    "independence_ratio": 0.75,
+    "consensus_signal": "neutral",
+    "provenance_discounted_confidence": 0.712
+  },
+  "decision": {
+    "decision_id": "t2-demo",
+    "as_of": "2026-09-12T10:49:07.271501+00:00",
+    "market_state_hash": "dda1812778abd4c4",
+    "llm_original_intent": {
+      "symbol": "NVDAUSDT",
+      "side": "sell",
+      "quantity": "0",
+      "verdict": "no_trade",
+      "stated_confidence": "0.82",
+      "thesis": "The credible evidence is bearish, but the anchor market is asleep for ~50.7 hours and no hedge is placeable, so any attempt to express the view now cannot be reliably priced or executed against genuine discovery. The expected edge is therefore not demonstrably above the 12 bps round-trip cost.",
+      "invalidation": "('Anchor market reopens or a liquid hedge becomes placeable before the adverse guidance revision is reflected in price.', 'Independent high-credibility evidence confirms the 20% cut rather than only the 7% revision.', 'Token trades at a level implying the bad news is not yet priced despite the weekend gap.')",
+      "required_hedge": "()",
+      "hash": "87db6e5c6f966375"
+    },
+    "llm_original_reasoning": "The credible evidence is bearish, but the anchor market is asleep for ~50.7 hours and no hedge is placeable, so any attempt to express the view now cannot be reliably priced or executed against genuine discovery. The expected edge is therefore not demonstrably above the 12 bps round-trip cost. Counter-case: If the token can still trade meaningfully before Monday, the high-credibility 8-K and evasive transcript may justify selling now rather than waiting.",
+    "constitution": {
+      "verdict": "allow",
+      "binding_constraint": "none",
+      "reason": "no exposure proposed; nothing to narrow",
+      "resulting_quantity": "0"
+    },
+    "llm_revised_intent": {
+      "hash": "c2596cb61f5fb41f",
+      "quantity": "0",
+      "verdict": "no_trade"
+    },
+    "llm_revised_reasoning": "The credible 7% guidance revision is bearish, but with the anchor market asleep for ~51 hours and no hedge placeable, the expected move will likely be fully priced before executable discovery; paying 12 bps now without a placeable hedge is not justified. Counter-case: If the token venue continues trading thin but real through the weekend, the 7% downward revision may not be fully reflected yet, and selling now could capture a gap before Monday.",
+    "approved_intent_hash": "c2596cb61f5fb41f",
+    "submitted_order_id": "",
+    "venue_order_id": "",
+    "fills": [],
+    "reconciliation_state": "",
+    "attestations": {
+      "constitution_intervened": false,
+      "constitution_only_reduced": true,
+      "llm_changed_its_mind": true
+    }
+  },
+  "order": null,
+  "notes": [
+    "causal chain: 8 links stated, gradable at the next price discovery",
+    "hedge menu empty: nothing placeable for 50.7h; 100% of risk carried as priced residual",
+    "panel: 4 analysts, 3 distinct sources, independence 0.75 -> neutral at 0.71 after provenance discount",
+    "no order: final verdict no_trade with quantity 0"
+  ],
+  "causal_chain": {
+    "event": "[SYNTHETIC] SEC 8-K: FY guidance revised down 7%.",
+    "as_of": "2026-09-12T10:49:07.271501+00:00",
+    "chain": [
+      {
+        "step": "what changed",
+        "claim": "SEC 8-K filed: FY guidance revised down 7%",
+        "falsifier": "",
+        "grade": "unsupported",
+        "evidence": [
+          "e1"
+        ]
+      },
+      {
+        "step": "economic mechanism",
+        "claim": "Consensus expectations were for prior guidance; 7% cut is a material miss vs. street",
+        "falsifier": "",
+        "grade": "unsupported",
+        "evidence": [
+          "e1"
+        ]
+      },
+      {
+        "step": "affected variable",
+        "claim": "High surprise magnitude \u2014 guidance cuts of this size are rare for NVDA",
+        "falsifier": "",
+        "grade": "unsupported",
+        "evidence": [
+          "e1"
+        ]
+      },
+      {
+        "step": "affected asset",
+        "claim": "Variable that moves: forward EPS estimates and terminal value assumptions",
+        "falsifier": "",
+        "grade": "unsupported",
+        "evidence": [
+          "e1"
+        ]
+      },
+      {
+        "step": "already priced?",
+        "claim": "Asset that prices it: NVDA common equity (and by extension the NVDAUSDT token)",
+        "falsifier": "",
+        "grade": "unsupported",
+        "evidence": [
+          "e1"
+        ]
+      },
+      {
+        "step": "expected magnitude",
+        "claim": "Cannot price it right now: weekend session, market asleep, no genuine price discovery for ~50.7h",
+        "falsifier": "",
+        "grade": "unsupported",
+        "evidence": [
+          "e1"
+        ]
+      },
+      {
+        "step": "link 7",
+        "claim": "Expected magnitude on open: large (likely several percent), but will be fully absorbed before any actionable trade",
+        "falsifier": "",
+        "grade": "unsupported",
+        "evidence": [
+          "e1"
+        ]
+      },
+      {
+        "step": "link 8",
+        "claim": "Already priced by the time you can act: yes \u2014 the gap will occur at open",
+        "falsifier": "",
+        "grade": "unsupported",
+        "evidence": [
+          "e1"
+        ]
+      }
+    ],
+    "predicted": {
+      "direction": "bearish",
+      "magnitude_bps": 0
+    },
+    "realised": {
+      "direction": "",
+      "magnitude_bps": 0
+    },
+    "direction_correct": false,
+    "chain_accuracy": 0.0,
+    "links_correct": "0/8",
+    "magnitude_error_bps": 0,
+    "verdict": "pending",
+    "weakest_link": "what changed"
+  },
+  "earnings": {
+    "symbol": "NVDAUSDT",
+    "surprises": {
+      "reported": "0",
+      "consensus": "0",
+      "guidance": "0",
+      "narrative": "0",
+      "valuation": "0",
+      "management_credibility": "0",
+      "qa": "0"
+    },
+    "headline": "0.000",
+    "forward": "0.000",
+    "weighted": "0.000",
+    "contradictory": false,
+    "dispersion": "0.000",
+    "dominant": "reported",
+    "expected_move_bps": "0.0",
+    "clears_round_trip": false,
+    "direction": "neutral",
+    "confidence": 0.85,
+    "explanation": "reported dominates; headline and forward view agree"
+  }
+}

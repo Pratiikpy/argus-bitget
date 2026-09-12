@@ -1,0 +1,238 @@
+{
+  "generated_at": "2026-09-12T08:33:42.176041+00:00",
+  "days": 90,
+  "test_1_significance": {
+    "weekend": {
+      "label": "weekend, full sample",
+      "trials": 156,
+      "successes": 90,
+      "rate_pct": 57.7,
+      "p_value": 0.0326,
+      "ci95": [
+        49.8,
+        65.2
+      ],
+      "significant": false
+    },
+    "overnight_control": {
+      "label": "overnight, full sample (control)",
+      "trials": 676,
+      "successes": 342,
+      "rate_pct": 50.6,
+      "p_value": 0.3939,
+      "ci95": [
+        46.8,
+        54.3
+      ],
+      "significant": false
+    }
+  },
+  "test_2_train_test_split": {
+    "train": {
+      "label": "weekend, first half (train)",
+      "trials": 78,
+      "successes": 38,
+      "rate_pct": 48.7,
+      "p_value": 1.0,
+      "ci95": [
+        37.9,
+        59.6
+      ],
+      "significant": false
+    },
+    "out_of_sample": {
+      "label": "weekend, second half (out-of-sample)",
+      "trials": 78,
+      "successes": 52,
+      "rate_pct": 66.7,
+      "p_value": 0.0022,
+      "ci95": [
+        55.6,
+        76.1
+      ],
+      "significant": true
+    },
+    "survives_split": false
+  },
+  "test_3_per_symbol": {
+    "symbols_tested": 13,
+    "symbols_above_coin_flip": 8,
+    "detail": {
+      "AAPLUSDT": {
+        "label": "AAPLUSDT",
+        "trials": 12,
+        "successes": 7,
+        "rate_pct": 58.3,
+        "p_value": 0.3872,
+        "ci95": [
+          32.0,
+          80.7
+        ],
+        "significant": false
+      },
+      "AMZNUSDT": {
+        "label": "AMZNUSDT",
+        "trials": 12,
+        "successes": 10,
+        "rate_pct": 83.3,
+        "p_value": 0.0193,
+        "ci95": [
+          55.2,
+          95.3
+        ],
+        "significant": true
+      },
+      "COINUSDT": {
+        "label": "COINUSDT",
+        "trials": 12,
+        "successes": 3,
+        "rate_pct": 25.0,
+        "p_value": 1.0,
+        "ci95": [
+          8.9,
+          53.2
+        ],
+        "significant": false
+      },
+      "GOOGLUSDT": {
+        "label": "GOOGLUSDT",
+        "trials": 12,
+        "successes": 7,
+        "rate_pct": 58.3,
+        "p_value": 0.3872,
+        "ci95": [
+          32.0,
+          80.7
+        ],
+        "significant": false
+      },
+      "METAUSDT": {
+        "label": "METAUSDT",
+        "trials": 12,
+        "successes": 6,
+        "rate_pct": 50.0,
+        "p_value": 1.0,
+        "ci95": [
+          25.4,
+          74.6
+        ],
+        "significant": false
+      },
+      "MSFTUSDT": {
+        "label": "MSFTUSDT",
+        "trials": 12,
+        "successes": 7,
+        "rate_pct": 58.3,
+        "p_value": 0.3872,
+        "ci95": [
+          32.0,
+          80.7
+        ],
+        "significant": false
+      },
+      "MSTRUSDT": {
+        "label": "MSTRUSDT",
+        "trials": 12,
+        "successes": 8,
+        "rate_pct": 66.7,
+        "p_value": 0.1938,
+        "ci95": [
+          39.1,
+          86.2
+        ],
+        "significant": false
+      },
+      "NVDAUSDT": {
+        "label": "NVDAUSDT",
+        "trials": 12,
+        "successes": 8,
+        "rate_pct": 66.7,
+        "p_value": 0.1938,
+        "ci95": [
+          39.1,
+          86.2
+        ],
+        "significant": false
+      },
+      "QQQUSDT": {
+        "label": "QQQUSDT",
+        "trials": 12,
+        "successes": 6,
+        "rate_pct": 50.0,
+        "p_value": 1.0,
+        "ci95": [
+          25.4,
+          74.6
+        ],
+        "significant": false
+      },
+      "SPXUSDT": {
+        "label": "SPXUSDT",
+        "trials": 12,
+        "successes": 8,
+        "rate_pct": 66.7,
+        "p_value": 0.1938,
+        "ci95": [
+          39.1,
+          86.2
+        ],
+        "significant": false
+      },
+      "SQQQUSDT": {
+        "label": "SQQQUSDT",
+        "trials": 12,
+        "successes": 6,
+        "rate_pct": 50.0,
+        "p_value": 1.0,
+        "ci95": [
+          25.4,
+          74.6
+        ],
+        "significant": false
+      },
+      "TQQQUSDT": {
+        "label": "TQQQUSDT",
+        "trials": 12,
+        "successes": 6,
+        "rate_pct": 50.0,
+        "p_value": 1.0,
+        "ci95": [
+          25.4,
+          74.6
+        ],
+        "significant": false
+      },
+      "TSLAUSDT": {
+        "label": "TSLAUSDT",
+        "trials": 12,
+        "successes": 8,
+        "rate_pct": 66.7,
+        "p_value": 0.1938,
+        "ci95": [
+          39.1,
+          86.2
+        ],
+        "significant": false
+      }
+    },
+    "leave_one_out_rates_pct": {
+      "without_AAPLUSDT": 57.6,
+      "without_AMZNUSDT": 55.6,
+      "without_COINUSDT": 60.4,
+      "without_GOOGLUSDT": 57.6,
+      "without_METAUSDT": 58.3,
+      "without_MSFTUSDT": 57.6,
+      "without_MSTRUSDT": 56.9,
+      "without_NVDAUSDT": 56.9,
+      "without_QQQUSDT": 58.3,
+      "without_SPXUSDT": 56.9,
+      "without_SQQQUSDT": 58.3,
+      "without_TQQQUSDT": 58.3,
+      "without_TSLAUSDT": 56.9
+    }
+  },
+  "economics": {
+    "median_net_of_fee_bps": "43.40",
+    "round_trip_fee_bps": "12"
+  }
+}

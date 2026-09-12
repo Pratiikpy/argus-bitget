@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-09-12T10:38:40.014328+00:00",
+  "symbol": "NVDAUSDT",
+  "market_state_hash": "8a63e6b6773c1fcb",
+  "replays_per_model": 3,
+  "providers_reachable": [
+    "qwen",
+    "deepseek_nim"
+  ],
+  "providers_unreachable": [],
+  "models": [
+    {
+      "provider": "qwen",
+      "decisions": 3,
+      "verdicts": [
+        "no_trade",
+        "no_trade",
+        "no_trade"
+      ],
+      "quantities": [
+        "0",
+        "0",
+        "0"
+      ],
+      "mean_confidence": 0.72,
+      "verdict_consistency": 1.0,
+      "size_dispersion": 0.0,
+      "stable": true,
+      "tokens": 4897,
+      "errors": [],
+      "first_thesis": "The only actionable signal is a synthetic 8-K claiming a 7% guidance cut, but with the anchor market closed for ~51 hours, no hedge placeable, and no reliable way to validate or price the event, expected edge is too unce"
+    },
+    {
+      "provider": "deepseek_nim",
+      "decisions": 3,
+      "verdicts": [
+        "reduce",
+        "reduce",
+        "reduce"
+      ],
+      "quantities": [
+        "200",
+        "200",
+        "200"
+      ],
+      "mean_confidence": 0.7,
+      "verdict_consistency": 1.0,
+      "size_dispersion": 0.0,
+      "stable": true,
+      "tokens": 0,
+      "errors": [],
+      "first_thesis": "SEC 8-K filed 29 minutes ago shows FY guidance revised down 7%, a material negative. With anchor market closed and no hedge placeable, reducing exposure avoids downside risk."
+    }
+  ],
+  "cross_model": {
+    "modal_verdicts": {
+      "qwen": "no_trade",
+      "deepseek_nim": "reduce"
+    },
+    "models_agree": false,
+    "models_reporting": 2,
+    "agreement_undefined": false,
+    "note": "identical frame, identical prompt contract, identical cost model, temperature 0; the model is the only variable"
+  }
+}
