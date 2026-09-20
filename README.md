@@ -36,7 +36,7 @@ Nothing above needs a credential.
 | | |
 |---|---|
 | Tests | **5,100 tests collected**, 33 skipped — run `pytest -q` |
-| Type checking | **`mypy --strict` clean on 267 source files** |
+| Type checking | **`mypy --strict` clean on 272 source files** |
 | Lint | `ruff` clean |
 | Module health | **131/131 modules importable**, checked by `python -m argus.status` |
 | Sub-theme coverage | **18/18 sub-themes**, resolved by import at runtime — not claimed in prose |
@@ -99,6 +99,9 @@ barely, and the overnight horizon at 51.2% does not exclude one at all. The deci
 other one: **the median decision forgave −7.9bps of net edge after the 12bps round trip.** The
 typical refusal was not caution costing money — it was the trade being unprofitable. An empty ledger
 is the result here, not the gap.
+
+
+**What the register says about itself, after it started checking.** ARGUS keeps a capability standing register with four states and thirteen conditions for OWNED. Until 2026-09-20 its audit checked that a file existed and that a test function's name appeared inside it — so *"same-input comparison run"*, *"out-of-sample test"* and *"ablation"* were each satisfied by a filename, and 23 of 24 entries carried the top grade. It now opens the artefacts. **16 of 24 capabilities are OWNED**; seven were demoted the first time it ran, because they claimed a condition their own artefact records nothing about. Three of the thirteen — whether the *best* implementation and the *best* method were studied, and whether a specialist still beats us — are judgements about a field rather than properties of a file, so they are reported as **attested** and name where somebody looked, instead of being dressed up as machine-checked (`python -m argus.eval.standing`).
 
 ---
 

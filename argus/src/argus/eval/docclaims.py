@@ -46,6 +46,13 @@ DOCS = {
     # `pytest -q` code block, eight lines above, said 5,100. Now kept here and synced outward, so
     # the most-read file is the most-checked one.
     "public-readme": ROOT / "README.md",
+    # The two remaining public documents, added 2026-09-20. Between them they are **78% of all
+    # prose in the public repository** — the PRD alone is 145 KB against the front page's 6 KB —
+    # and the front page sends a reader straight to them ("including every measurement and every
+    # retraction"). Not one of their numbers was pinned. The gate had 76 checked instances inside
+    # the files nobody opens and 0 inside the file a judge is pointed at.
+    "prd": ROOT / "ARGUS-MASTER-PRD.md",
+    "architecture": ROOT / "ARGUS-ARCHITECTURE.md",
     "submission": ROOT / "SUBMISSION-DRAFT.md",
     "explained": ROOT / "ARGUS-EXPLAINED.md",
     "master-plan": ROOT / "ARGUS-MASTER-PLAN.md",
@@ -59,6 +66,48 @@ _WORDS = {
 }
 
 Number = int | float
+
+
+
+SEEN_PATH = DATA / "doc_claims_seen.json"
+"""Every (claim, document) pair that has ever matched, committed to the repository.
+
+**Because deleting a pinned sentence used to disarm its guard silently, by design.** An ABSENT
+finding is skipped in the reporting loop and excluded from the exit code, on the correct reasoning
+that a document which never made a claim is not making a false one. The gap is the word *never*:
+once a document HAS made a claim, the same silence means something entirely different — the
+sentence was reworded or deleted, and the check that used to cover it is now covering nothing, with
+no signal anywhere. A stale number is loud and a vanished number is quiet, which is exactly the
+wrong way round.
+
+So the pairs are remembered. A pair in this file that no longer matches is reported **DELETED** and
+fails the run. The fix is either to restore the sentence or to remove the claim deliberately — both
+are fine, and both are a decision somebody made rather than a guard that evaporated.
+"""
+
+
+def _seen() -> dict[str, int]:
+    if not SEEN_PATH.exists():
+        return {}
+    try:
+        loaded: dict[str, int] = json.loads(SEEN_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return loaded
+
+
+def _remember(report: Report) -> None:
+    """Record every pair that matched this run, and keep every pair remembered before.
+
+    Never forgets on its own: a pair leaves this file only when a person deletes it, which is the
+    deliberate act the whole mechanism exists to require.
+    """
+    seen = _seen()
+    for finding in report.findings:
+        if finding.status in {"OK", "STALE"} and finding.line is not None:
+            seen[f"{finding.claim}|{finding.doc}"] = finding.line
+    payload = json.dumps(dict(sorted(seen.items())), indent=2) + chr(10)
+    SEEN_PATH.write_text(payload, encoding="utf-8")
 
 
 def parse_number(text: str) -> Number:
@@ -140,7 +189,7 @@ class Finding:
     line: int | None
     quoted: tuple[str, ...]
     live: tuple[Number, ...] | None
-    status: str                      # OK | STALE | ABSENT | UNCHECKED
+    status: str          # OK | STALE | ABSENT | DELETED | UNCHECKED
     excerpt: str = ""
 
     def as_dict(self) -> dict[str, Any]:
@@ -184,6 +233,7 @@ class Report:
             "ok": self.count("OK"),
             "stale": self.count("STALE"),
             "absent": self.count("ABSENT"),
+            "deleted": self.count("DELETED"),
             "unchecked": self.count("UNCHECKED"),
             "findings": [f.as_dict() for f in self.findings],
         }
@@ -329,6 +379,21 @@ def _refusal_row() -> dict[str, Any]:
     raise KeyError("refusal_alpha.json has no about_2h horizon")
 
 
+def standing_counts() -> tuple[Number, Number]:
+    """Capabilities whose evidence checks out, and the register's total.
+
+    **Pinned because the register and its own artefact disagreed by 23.** `data/standing.json`
+    shipped 14 capabilities and 0 owned while the source computed 24 and 23, and no claim in this
+    module covered either figure — so the project's headline claim about itself was the one number
+    nothing was checking. `earned` rather than `owned` deliberately: the first is what survives
+    `standing.verify()` opening the artefacts, the second is what the register declares.
+    """
+    from argus.eval.standing import audit
+
+    report = audit()
+    return len(report.earned), len(report.capabilities)
+
+
 def module_count() -> int:
     from argus.status import MODULES
     return len(MODULES)
@@ -419,7 +484,9 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("register_claims",
           r"(?P<q>[\d,]+) (?:falsifiable )?claims? "
           r"(?:across|about|committed|pre-registered|on the register)",
-          register_claims, ("readme", "submission", "explained", "master-plan"), mode="lagging"),
+          register_claims,
+          ("readme", "public-readme", "submission", "explained", "master-plan", "architecture"),
+          mode="lagging"),
     # Registered 2026-09-20. `eval/refusal.py` existed and ran, and appeared in no document, no
     # command list and no panel — the single strongest answer to the obvious attack on an
     # all-refusal ledger was invisible. A number that is not quoted cannot go stale, which is why
@@ -433,6 +500,8 @@ CLAIMS: tuple[Claim, ...] = (
           refusal_accuracy_2h, ("readme", "public-readme")),
     Claim("refusal_forgone_2h", rf"forgave\s+(?P<q>[-{chr(0x2212)}]?[\d.]+)\s*bps of net edge",
           refusal_forgone_2h, ("readme", "public-readme")),
+    Claim("standing_owned", r"(?P<q1>\d+) of (?P<q2>\d+) capabilities are OWNED",
+          standing_counts, ("readme", "public-readme", "submission", "explained")),
     Claim("settled_trades", r"(?P<q>\d+) settled trades?",
           settled_trades, ("readme", "submission", "explained")),
     # Registered the day the anchor claims were found to be false. The documents said the register
@@ -514,7 +583,7 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("hurdle_qqq_rth", r"QQQ[^.\n]{0,60}?(?P<q>\d+\.\d)%",
           lambda: hurdle_rth()["QQQUSDT"], ("submission", "master-plan")),
     Claim("teardowns", r"(?P<q>\d+) code-level teardowns", teardown_count,
-          ("readme", "explained")),
+          ("readme", "explained", "prd")),
 
     # --- the overfitting study and the restatement ---------------------------------------------
     # These are the newest headline numbers and the ones most likely to be quoted back at us, so
@@ -615,6 +684,8 @@ def audit(
         name: path.read_text(encoding="utf-8") if path.exists() else None
         for name, path in docs.items()
     }
+    # Loaded once. A pair here that no longer matches is a removed sentence, not an absent claim.
+    seen_before = _seen()
     report = Report()
     for claim in claims:
         if claim.name in overrides:
@@ -635,7 +706,14 @@ def audit(
                 continue
             matches = list(re.finditer(claim.pattern, text, claim.flags))
             if not matches:
-                report.findings.append(Finding(claim.name, doc, None, (), live_tuple, "ABSENT"))
+                # Silence means "this document never made the claim" only if it never did.
+                # See SEEN_PATH: once it has, the same silence means the sentence was removed.
+                was_seen = f"{claim.name}|{doc}" in seen_before
+                report.findings.append(Finding(
+                    claim.name, doc, None, (), live_tuple,
+                    "DELETED" if was_seen else "ABSENT",
+                    f"last seen at line {seen_before[f'{claim.name}|{doc}']}" if was_seen else "",
+                ))
                 continue
             for match in matches:
                 quoted = _groups(match)
@@ -821,6 +899,7 @@ def main(argv: list[str] | None = None) -> int:
         if repaired:
             report = audit(include_expensive=include_expensive)
     REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8")
+    _remember(report)
     for finding in report.findings:
         if finding.status == "ABSENT":
             continue
@@ -828,8 +907,17 @@ def main(argv: list[str] | None = None) -> int:
         live = "/".join(str(v) for v in (finding.live or ()))
         print(f"{finding.status:9} {finding.claim:28} {where:22} quoted "
               f"{'/'.join(finding.quoted):10} live {live:10} | {finding.excerpt}")
+    deleted = [f for f in report.findings if f.status == "DELETED"]
+    for gone in deleted:
+        print(
+            f"DELETED   {gone.claim:28} {gone.doc:22} — the sentence this guard covered is no "
+            f"longer in the document ({gone.excerpt}). Restore it, or remove the claim on purpose."
+        )
     print(json.dumps(summary(report), indent=2))
-    return 1 if (report.stale or disagreements(report)) else 0
+    # DELETED fails for the same reason STALE does: in both cases a published figure and the
+    # artefact behind it have stopped agreeing. Silence is the harder one to notice, so it is the
+    # one that most needs an exit code.
+    return 1 if (report.stale or deleted or disagreements(report)) else 0
 
 
 if __name__ == "__main__":

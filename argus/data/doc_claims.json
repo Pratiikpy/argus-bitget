@@ -1,9 +1,10 @@
 {
-  "total": 82,
-  "checked": 82,
-  "ok": 82,
+  "total": 86,
+  "checked": 86,
+  "ok": 86,
   "stale": 0,
-  "absent": 21,
+  "absent": 24,
+  "deleted": 0,
   "unchecked": 0,
   "findings": [
     {
@@ -14,7 +15,7 @@
         "5,100"
       ],
       "live": [
-        5123
+        5726
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -27,7 +28,7 @@
         "5,100"
       ],
       "live": [
-        5123
+        5726
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -40,7 +41,7 @@
         "5,100"
       ],
       "live": [
-        5123
+        5726
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -48,12 +49,12 @@
     {
       "claim": "tests_passing",
       "doc": "submission",
-      "line": 178,
+      "line": 180,
       "quoted": [
         "5,100"
       ],
       "live": [
-        5123
+        5726
       ],
       "status": "OK",
       "excerpt": "5,100 tests"
@@ -61,12 +62,12 @@
     {
       "claim": "tests_passing",
       "doc": "submission",
-      "line": 322,
+      "line": 324,
       "quoted": [
         "5,100"
       ],
       "live": [
-        5123
+        5726
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -79,7 +80,7 @@
         "5,100"
       ],
       "live": [
-        5123
+        5726
       ],
       "status": "OK",
       "excerpt": "5,100 tests"
@@ -92,7 +93,7 @@
         "5,100"
       ],
       "live": [
-        5123
+        5726
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -105,7 +106,7 @@
         "5,100"
       ],
       "live": [
-        5123
+        5726
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -115,65 +116,65 @@
       "doc": "readme",
       "line": 61,
       "quoted": [
-        "267"
+        "272"
       ],
       "live": [
-        267
+        272
       ],
       "status": "OK",
-      "excerpt": "strict clean on 267 source files"
+      "excerpt": "strict clean on 272 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 39,
       "quoted": [
-        "267"
+        "272"
       ],
       "live": [
-        267
+        272
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 267 source files"
+      "excerpt": "strict` clean on 272 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
-      "line": 178,
+      "line": 180,
       "quoted": [
-        "267"
+        "272"
       ],
       "live": [
-        267
+        272
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 267 files"
+      "excerpt": "strict` clean on 272 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
-      "line": 322,
+      "line": 324,
       "quoted": [
-        "267"
+        "272"
       ],
       "live": [
-        267
+        272
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 267 source files"
+      "excerpt": "strict` clean across 272 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 1942,
       "quoted": [
-        "267"
+        "272"
       ],
       "live": [
-        267
+        272
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 267 source files"
+      "excerpt": "strict` clean on 272 source files"
     },
     {
       "claim": "register_claims",
@@ -203,8 +204,19 @@
     },
     {
       "claim": "register_claims",
+      "doc": "public-readme",
+      "line": null,
+      "quoted": [],
+      "live": [
+        156
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "register_claims",
       "doc": "submission",
-      "line": 81,
+      "line": 83,
       "quoted": [
         "156"
       ],
@@ -231,6 +243,19 @@
       "claim": "register_claims",
       "doc": "master-plan",
       "line": 410,
+      "quoted": [
+        "156"
+      ],
+      "live": [
+        156
+      ],
+      "status": "OK",
+      "excerpt": "156 claims across"
+    },
+    {
+      "claim": "register_claims",
+      "doc": "architecture",
+      "line": 171,
       "quoted": [
         "156"
       ],
@@ -295,6 +320,60 @@
       ],
       "status": "OK",
       "excerpt": "forgave \u22127.9bps of net edge"
+    },
+    {
+      "claim": "standing_owned",
+      "doc": "readme",
+      "line": 437,
+      "quoted": [
+        "16",
+        "24"
+      ],
+      "live": [
+        16,
+        24
+      ],
+      "status": "OK",
+      "excerpt": "16 of 24 capabilities are OWNED"
+    },
+    {
+      "claim": "standing_owned",
+      "doc": "public-readme",
+      "line": 104,
+      "quoted": [
+        "16",
+        "24"
+      ],
+      "live": [
+        16,
+        24
+      ],
+      "status": "OK",
+      "excerpt": "16 of 24 capabilities are OWNED"
+    },
+    {
+      "claim": "standing_owned",
+      "doc": "submission",
+      "line": null,
+      "quoted": [],
+      "live": [
+        16,
+        24
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "standing_owned",
+      "doc": "explained",
+      "line": null,
+      "quoted": [],
+      "live": [
+        16,
+        24
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
     },
     {
       "claim": "settled_trades",
@@ -425,7 +504,7 @@
     {
       "claim": "modules_importable",
       "doc": "submission",
-      "line": 323,
+      "line": 325,
       "quoted": [
         "131",
         "131"
@@ -470,7 +549,7 @@
     {
       "claim": "subthemes",
       "doc": "submission",
-      "line": 178,
+      "line": 180,
       "quoted": [
         "18",
         "18"
@@ -511,7 +590,7 @@
     {
       "claim": "ledger_entries",
       "doc": "submission",
-      "line": 299,
+      "line": 301,
       "quoted": [
         "447"
       ],
@@ -794,7 +873,7 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "submission",
-      "line": 123,
+      "line": 125,
       "quoted": [
         "10",
         "11"
@@ -867,7 +946,7 @@
     {
       "claim": "aapl_beta_open",
       "doc": "submission",
-      "line": 123,
+      "line": 125,
       "quoted": [
         "0.675"
       ],
@@ -917,7 +996,7 @@
     {
       "claim": "aapl_beta_shut",
       "doc": "submission",
-      "line": 124,
+      "line": 126,
       "quoted": [
         "0.105"
       ],
@@ -1087,7 +1166,7 @@
     {
       "claim": "hurdle_qqq_rth",
       "doc": "submission",
-      "line": 314,
+      "line": 316,
       "quoted": [
         "48.3"
       ],
@@ -1125,6 +1204,19 @@
       "claim": "teardowns",
       "doc": "explained",
       "line": 569,
+      "quoted": [
+        "61"
+      ],
+      "live": [
+        61
+      ],
+      "status": "OK",
+      "excerpt": "61 code-level teardowns"
+    },
+    {
+      "claim": "teardowns",
+      "doc": "prd",
+      "line": 468,
       "quoted": [
         "61"
       ],

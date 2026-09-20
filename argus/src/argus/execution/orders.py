@@ -36,6 +36,8 @@ from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 
+from argus.decision.verdicts import Authorised
+
 
 class OrderState(StrEnum):
     """Order lifecycle. Values mirror Nautilus's ``OrderStatus`` except where noted."""
@@ -363,7 +365,21 @@ class OrderBook:
         self._orders[order.client_order_id] = order
         return order
 
-    def submit(self, order: Order, *, at: datetime) -> Order:
+    def submit(self, authorised: Authorised, *, at: datetime) -> Order:
+        """Send an order the Constitution approved. There is no other overload.
+
+        **The signature is the control.** This used to take a bare :class:`Order`, and the
+        may-only-reduce guarantee therefore held only for callers who remembered to obtain a ruling
+        first — which every production path did, and two evaluation paths in this repository did
+        not. A capability cannot be forgotten: an order that never met the Constitution cannot be
+        expressed here, because :class:`Authorised` cannot be constructed without one.
+
+        See :class:`argus.decision.verdicts.Authorised` for why the capability is also bound to the
+        order's symbol, side and quantity rather than to the mere fact that some ruling existed.
+        """
+        order = authorised.order
+        if not isinstance(order, Order):  # pragma: no cover - structural guard
+            raise TypeError(f"an Authorised must carry an Order, not {type(order).__name__}")
         if order.client_order_id in self._orders:
             raise DuplicateOrder(
                 f"{order.client_order_id} already submitted — a replayed authorisation must not "

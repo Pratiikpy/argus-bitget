@@ -168,7 +168,7 @@ window it was built to be watched during. `horizon_coverage()` measures exactly 
 **0 resolving inside the window, 0 still pending when it opens**; the cadence fixes it, and a test
 pins the failure shape so it cannot return unnoticed.
 
-**Live:** 61 claims across the twelve rTokens (`data/register.jsonl`), chain intact. The anchored head `bc36478291a06bc3` is claim 36 of 61 — the head at the moment of anchoring, so the timestamp proof covers the first 36 claims and not the 25 registered since. Anchored to
+**Live:** 156 claims across the twelve rTokens (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — the head at the moment of that anchoring, so that proof covers the first 36 claims and not the 120 registered since; each scheduled cycle appends and re-anchors, and 38 of the 48 proofs carry a Bitcoin block-header attestation (`python -m argus.register.anchorcheck`). Anchored to
 `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The resolver runs on
 every scheduled cycle.

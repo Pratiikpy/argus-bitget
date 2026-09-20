@@ -750,7 +750,11 @@ class TradingDesk:
             if ruling.verdict is ConstitutionVerdict.REJECT:
                 self.book.deny(order, at=session.as_of, reason=ruling.reason)
             else:
-                self.book.submit(order, at=session.as_of)
+                # `authorise` re-checks that this order is the one the Constitution approved —
+                # same symbol, same side, same quantity — and refuses otherwise. That is the
+                # type-level form of the seq-264 defect, where a ruling of quantity 0 was obtained
+                # and an order of quantity 1 was recorded anyway.
+                self.book.submit(ruling.authorise(order), at=session.as_of)
         else:
             notes.append(f"no order: final verdict {final.verdict} with quantity {final.quantity}")
 

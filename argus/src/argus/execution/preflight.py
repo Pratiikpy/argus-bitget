@@ -30,6 +30,13 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
+from argus.decision.verdicts import (
+    ConstitutionVerdict,
+    Intent,
+    Side,
+    Verdict,
+    apply_constraint,
+)
 from argus.execution.bitget_client import (
     DEMO_PRODUCT_TYPE,
     BitgetAuthError,
@@ -125,12 +132,29 @@ def _order_round_trip(client: BitgetTradingClient, *, symbol: str, size: Decimal
         symbol=symbol, side="BUY", quantity=size,
         approved_intent_hash="preflight-probe",
     )
+    # **Even the infrastructure probe goes through the Constitution.** This is the one place in the
+    # codebase that puts a real order on a real venue, and until 2026-09-20 it did so with a bare
+    # `Order` carrying the literal string "preflight-probe" as its approval — which passed the
+    # old non-blank-hash check exactly as well as a genuine authorisation would have. That is the
+    # precise reason the check became a type. A probe is still a probe, so the ruling below is
+    # honest about what it is rather than pretending a desk decided it.
+    authorised = apply_constraint(
+        Intent(
+            symbol=symbol, side=Side.BUY, quantity=size, verdict=Verdict.TRADE,
+            stated_confidence=0.5,
+            thesis="preflight: smallest sensible order, to prove the signed path round-trips",
+            invalidation=("the probe completes",),
+        ),
+        verdict=ConstitutionVerdict.ALLOW,
+        binding_constraint="none",
+        reason="infrastructure probe on the demo environment; no economic thesis is claimed",
+    ).authorise(order)
     try:
-        placed = client.place_order(order, order_type="market")
+        placed = client.place_order(authorised, order_type="market")
     except BitgetOrderError as exc:
         return Step("order_round_trip", False, f"place failed: {exc}")
 
-    book.submit(order, at=datetime.now(UTC))
+    book.submit(authorised, at=datetime.now(UTC))
     try:
         state, filled = client.reconcile(order, symbol=symbol)
     except BitgetOrderError as exc:

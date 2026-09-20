@@ -103,6 +103,31 @@ class StandingError(ValueError):
 
 
 @dataclass(frozen=True, slots=True)
+class Verification:
+    """One condition, and whether a machine could actually confirm it.
+
+    Three statuses, and the distinction between them is the whole value of this record:
+
+    ``VERIFIED``  a predicate opened the artefact and found what the condition is about.
+    ``ATTESTED``  a person wrote down where they looked. The three judgement conditions can only
+                  ever be this, and so can a proof that names a test but no artefact.
+    ``UNPROVEN``  the condition is claimed and the evidence is not in the file.
+
+    Reported rather than collapsed into a single pass/fail, because "ten verified, three attested"
+    and "thirteen verified" are different claims and a register that cannot tell them apart is the
+    press release this module was accused of being.
+    """
+
+    capability: str
+    condition: str
+    status: str
+    detail: str
+
+    def render(self) -> str:
+        return f"{self.status:9} {self.capability} · {self.condition} — {self.detail}"
+
+
+@dataclass(frozen=True, slots=True)
 class Proof:
     """One piece of evidence, with the thing a reader can go and open.
 
@@ -232,6 +257,26 @@ class Report:
 
     capabilities: tuple[Capability, ...]
     findings: tuple[Finding, ...] = field(default_factory=tuple)
+    verifications: tuple[Verification, ...] = field(default_factory=tuple)
+
+    @property
+    def by_verification(self) -> dict[str, int]:
+        """How many conditions a machine confirmed, versus how many rest on a person's word."""
+        counts = {"VERIFIED": 0, "ATTESTED": 0, "UNPROVEN": 0}
+        for v in self.verifications:
+            counts[v.status] = counts.get(v.status, 0) + 1
+        return counts
+
+    @property
+    def earned(self) -> tuple[Capability, ...]:
+        """Capabilities whose every claimed condition actually checks out.
+
+        **Not the same set as `owned`.** `owned` is what the register *declares*; this is what
+        survives inspection. Where the two disagree, the register is overstating, and the honest
+        headline is this number rather than that one.
+        """
+        unproven = {v.capability for v in self.verifications if v.status == "UNPROVEN"}
+        return tuple(c for c in self.owned if c.name not in unproven)
 
     @property
     def by_state(self) -> dict[str, int]:
@@ -310,7 +355,11 @@ REGISTER: tuple[Capability, ...] = (
             "argus/agents/meta_pm.py,argus/execution/latency.py,"
             "argus/eval/deliberation_comparison.py,argus/eval/baselines/latencybench_reimpl.py"
         ),
-        state=State.OWNED,
+        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
+        # instead of checking that files existed: reproducibility_proven is claimed here and the
+        # artefact records nothing about it. Restore OWNED by making the artefact
+        # carry the evidence, not by editing this line.
+        state=State.IMPLEMENTED,
         baseline=(
             "HaoKang-Timmy/LatencySensitiveBench (arxiv 2505.19481, NeurIPS 2025) — found "
             "2026-09-16 by a fresh, targeted search after the original 88-repo corpus survey "
@@ -596,7 +645,11 @@ REGISTER: tuple[Capability, ...] = (
             "argus/backtest/metrics.py,argus/eval/dsr_comparison.py,"
             "argus/eval/baselines/vectorbt_loader.py,argus/eval/baselines/vectorbt_dsr_metrics.py"
         ),
-        state=State.OWNED,
+        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
+        # instead of checking that files existed: failure_cases_documented is claimed here and the
+        # artefact records nothing about it. Restore OWNED by making the artefact
+        # carry the evidence, not by editing this line.
+        state=State.IMPLEMENTED,
         baseline=(
             "polakowo/vectorbt deflated_sharpe_ratio (accessors.py:596) - not itself gated "
             "anywhere in vectorbt, but silently NaN on a single trial (var_sharpe = np.var of one "
@@ -2989,7 +3042,11 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/risk_layer_comparison.py,argus/eval/gate_ablation.py,"
             "argus/agents/desk.py,argus/desk/book.py,argus/risk/circuit.py"
         ),
-        state=State.OWNED,
+        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
+        # instead of checking that files existed: failure_cases_documented is claimed here and the
+        # artefact records nothing about it. Restore OWNED by making the artefact
+        # carry the evidence, not by editing this line.
+        state=State.IMPLEMENTED,
         baseline=(
             "nautechsystems/nautilus_trader risk engine, QuantConnect brokerage models, "
             "freqtrade's MaxDrawdown/StoplossGuard/LowProfitPairs/CooldownPeriod protections"
@@ -3262,7 +3319,11 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/tradingagents_feedlist_config.py,"
             "argus/eval/baselines/tradingagents_feedlist_default_config.py"
         ),
-        state=State.OWNED,
+        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
+        # instead of checking that files existed: failure_cases_documented is claimed here and the
+        # artefact records nothing about it. Restore OWNED by making the artefact
+        # carry the evidence, not by editing this line.
+        state=State.IMPLEMENTED,
         baseline="OpenBB-finance/OpenBB provider set; TauricResearch/TradingAgents feed list",
         proofs=(
             Proof(
@@ -3412,7 +3473,12 @@ REGISTER: tuple[Capability, ...] = (
             "argus/agents/analysts.py,argus/market/macro.py,"
             "argus/eval/sentiment_comparison.py,argus/eval/baselines/finbert_loader.py"
         ),
-        state=State.OWNED,
+        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
+        # instead of checking that files existed: adversarial_test, out_of_sample_test is claimed
+        # here and the
+        # artefact records nothing about it. Restore OWNED by making the artefact
+        # carry the evidence, not by editing this line.
+        state=State.IMPLEMENTED,
         baseline=(
             "ProsusAI/finBERT for classification; BloombergGPT and FinMA for the published bar"
         ),
@@ -3605,7 +3671,12 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/tradingagents_memory.py,"
             "argus/eval/baselines/tradingagents_rating.py"
         ),
-        state=State.OWNED,
+        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
+        # instead of checking that files existed: failure_cases_documented, out_of_sample_test is
+        # claimed here and the
+        # artefact records nothing about it. Restore OWNED by making the artefact
+        # carry the evidence, not by editing this line.
+        state=State.IMPLEMENTED,
         baseline="TauricResearch/TradingAgents reflection memory",
         proofs=(
             Proof(
@@ -3906,7 +3977,12 @@ REGISTER: tuple[Capability, ...] = (
             "argus/execution/schedule.py,argus/execution/guard.py,"
             "argus/eval/schedule_comparison.py"
         ),
-        state=State.OWNED,
+        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
+        # instead of checking that files existed: ablation, same_input_comparison is claimed here
+        # and the
+        # artefact records nothing about it. Restore OWNED by making the artefact
+        # carry the evidence, not by editing this line.
+        state=State.IMPLEMENTED,
         baseline=(
             "nkaz001/hftbacktest queue model; Bitget's own instrument rules; "
             "Almgren & Chriss (2000) closed-form optimum vs nautechsystems/nautilus_trader's "
@@ -4181,6 +4257,164 @@ REGISTER: tuple[Capability, ...] = (
 )
 
 
+# --- what a condition actually requires inside its artefact ------------------------------------
+
+JUDGEMENT_CONDITIONS = frozenset({
+    "best_implementation_studied",
+    "best_method_studied",
+    "no_specialist_capability_superior",
+})
+"""The three conditions a machine genuinely cannot check, named rather than faked.
+
+Whether the *best* implementation was studied, whether the *best* method was studied, and whether
+any specialist capability remains superior are judgements about a field, not properties of a file.
+No predicate over an artefact can establish them — a repository can contain a flawless comparison
+against the second-best system in the world and look identical to one against the best.
+
+They are therefore reported as **ATTESTED**, not VERIFIED, and an attestation must name a source a
+reader can open. Pretending these were machine-checked would be the same class of dishonesty this
+register exists to prevent: it is better to say three of thirteen rest on a person's word, and say
+whose word and where they looked, than to let a filename stand in for a judgement.
+"""
+
+SIGNATURES: dict[str, tuple[str, ...]] = {
+    # Each tuple is the vocabulary that must appear as a KEY somewhere in the artefact, at any
+    # depth. Keys rather than values, deliberately: a key is a thing the producing module chose to
+    # record, while a value can be any string that happens to contain the word.
+    "baseline_reproduced": (
+        "baseline", "reference", "parity", "agreement", "expected", "divergence",
+        "max_abs_diff", "matches", "reproduce",
+    ),
+    "same_input_comparison": (
+        "argus", "ours", "comparison", "both", "arms", "side_by_side", "versus", "vs",
+    ),
+    "statistically_valid_evaluation": (
+        "p_value", "pvalue", "ci", "ci95", "interval", "wilson", "stderr", "std_error",
+        "significance", "confidence", "n_seeds", "n_events", "sample", "nobs", "n",
+    ),
+    "costs_included": (
+        "cost", "costs", "bps", "fee", "fees", "turnover", "net", "round_trip", "slippage",
+    ),
+    "out_of_sample_test": (
+        "out_of_sample", "oos", "holdout", "held_out", "heldout", "train", "test", "split",
+        "in_sample", "forward",
+    ),
+    "ablation": ("ablation", "ablations", "ablated", "arms", "variant", "without", "null_ablation"),
+    "adversarial_test": (
+        "adversarial", "mutant", "mutants", "attack", "attacks", "red_team", "refuted",
+        "falsifier", "broken", "challenge", "violations", "sound",
+    ),
+    "failure_cases_documented": (
+        "failure", "failures", "failure_cases", "misses", "limitation", "limitations",
+        "not_verified", "weakness", "weaknesses", "undefined", "unreachable", "errors",
+    ),
+    "reproducibility_proven": (
+        "reproducibility", "reproducible", "deterministic", "identical", "seed", "seeds",
+        "digest", "hash", "generated_at", "as_of",
+    ),
+    "implementation_complete": (),   # structural: the module must exist. Checked separately.
+}
+"""What must be recorded in an artefact before a condition counts as proved.
+
+**Every one of these used to be satisfied by a filename.** ``audit`` checked that the artefact path
+existed, that the test file existed, and that a named test function appeared as a substring of it —
+so "same-input comparison run", "out-of-sample test", "ablation" and "adversarial test" were all
+established by a file being on disk. A capability could therefore be graded OWNED without a single
+one of its thirteen claims having been evaluated, which is how 23 of 24 entries came to carry the
+top grade eight days after the register recorded zero.
+
+This is not a proof that the comparison was correct. It is a proof that the producing module wrote
+down the thing the condition is about — that an artefact claiming an ablation contains ablation
+arms, and one claiming out-of-sample carries a split. That is a far weaker statement than "OWNED"
+sounds, and it is exactly as strong as the evidence supports, which is the point.
+"""
+
+
+def _keys_in(blob: Any, into: set[str]) -> None:
+    """Every key name in a JSON document, at any depth. Lists are walked, not indexed."""
+    if isinstance(blob, dict):
+        for key, value in blob.items():
+            into.add(str(key).lower())
+            _keys_in(value, into)
+    elif isinstance(blob, list):
+        for item in blob:
+            _keys_in(item, into)
+
+
+def _artefact_keys(path: Path) -> set[str] | None:
+    """The key vocabulary of an artefact, or ``None`` if it cannot be read as one.
+
+    ``.jsonl`` is read line by line: several artefacts here are append-only logs, and a log whose
+    first line parses is a log this can read.
+    """
+    if not path.exists():
+        return None
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    keys: set[str] = set()
+    if path.suffix == ".jsonl":
+        for line in text.splitlines()[:200]:
+            if line.strip():
+                try:
+                    _keys_in(json.loads(line), keys)
+                except json.JSONDecodeError:
+                    return None
+        return keys
+    try:
+        _keys_in(json.loads(text), keys)
+    except json.JSONDecodeError:
+        return None
+    return keys
+
+
+def verify(proof: Proof, module_present: bool) -> tuple[str, str]:
+    """Is this proof's condition actually evidenced? Returns ``(status, detail)``.
+
+    ``VERIFIED``  — a machine opened the artefact and found what the condition is about.
+    ``ATTESTED``  — one of the three judgement conditions, resting on a named source.
+    ``UNPROVEN``  — the proof is claimed and the evidence is not there.
+    """
+    if proof.condition in JUDGEMENT_CONDITIONS:
+        if not proof.how.strip():
+            return "UNPROVEN", "a judgement condition with nothing written down"
+        return "ATTESTED", proof.how.strip()[:160]
+
+    if proof.condition == "implementation_complete":
+        return ("VERIFIED", "module on disk") if module_present else (
+            "UNPROVEN", "the module this capability names does not exist")
+
+    artefact, _test = proof.locate()
+    if artefact is None:
+        # A test-only proof. The test must exist and must name the function claimed; that is
+        # checked in `audit`. It is real evidence, but it is not an artefact, so it cannot be
+        # inspected for content and is reported as the weaker status on purpose.
+        return "ATTESTED", f"test-only evidence: {proof.test}"
+
+    if not artefact.exists():
+        return "UNPROVEN", f"{proof.artefact} is not on disk"
+
+    keys = _artefact_keys(artefact)
+    if keys is None:
+        # **A non-JSON artefact is evidence this cannot read, not evidence that is absent.** Many
+        # proofs here name a vendored baseline *module* — `eval/baselines/qlib_cs_processor.py` and
+        # its siblings — which is exactly the right thing to cite for `baseline_reproduced`: it is
+        # the specialist's own code, extracted byte-exact and pinned by SHA256. A key-vocabulary
+        # predicate cannot inspect Python source, so calling it UNPROVEN would be the verifier
+        # reporting its own blind spot as the register's defect. It is ATTESTED: the file exists,
+        # a reader can open it, and no machine here confirmed its contents.
+        return "ATTESTED", f"non-inspectable artefact on disk: {proof.artefact}"
+    wanted = SIGNATURES.get(proof.condition, ())
+    hits = sorted(k for k in keys if any(w in k for w in wanted))
+    if not hits:
+        return "UNPROVEN", (
+            f"{proof.artefact} records nothing about {proof.condition}: no key among "
+            f"{', '.join(wanted[:6])}..."
+        )
+    return "VERIFIED", f"{proof.artefact} records {', '.join(hits[:4])}"
+
+
 def audit(register: tuple[Capability, ...] = REGISTER) -> Report:
     """Check every named artefact, test and module actually exists.
 
@@ -4190,10 +4424,13 @@ def audit(register: tuple[Capability, ...] = REGISTER) -> Report:
     that one is a property of the register itself and no amount of running fixes it.
     """
     findings: list[Finding] = []
+    verifications: list[Verification] = []
     for cap in register:
+        module_present = True
         for part in cap.module.split(","):
             path = SRC.parent / part.strip()
             if part.strip() and not path.exists():
+                module_present = False
                 findings.append(
                     Finding(cap.name, "module not found", part.strip())
                 )
@@ -4217,18 +4454,43 @@ def audit(register: tuple[Capability, ...] = REGISTER) -> Report:
                             Finding(cap.name, f"test for {proof.condition} is not in the file",
                                     proof.test)
                         )
-    return Report(capabilities=register, findings=tuple(findings))
+
+            # **The check that used to be missing entirely.** Everything above establishes that a
+            # file is on disk and that a function name appears inside it. That is presence, not
+            # proof: "same-input comparison run", "out-of-sample test", "ablation" and "adversarial
+            # test" were all satisfiable by a filename, which is how 23 of 24 capabilities came to
+            # be graded OWNED eight days after this register recorded zero. `verify` opens the
+            # artefact and looks for the thing the condition is about.
+            status, detail = verify(proof, module_present=module_present)
+            verifications.append(Verification(cap.name, proof.condition, status, detail))
+            if status == "UNPROVEN":
+                findings.append(
+                    Finding(cap.name, f"{proof.condition} is claimed but not evidenced", detail)
+                )
+    return Report(
+        capabilities=register, findings=tuple(findings), verifications=tuple(verifications),
+    )
 
 
 def summary(report: Report | None = None) -> str:
-    """One line, for argus.status."""
+    """One line, for argus.status — and it leads with the number that survives inspection.
+
+    **It used to quote `owned` alone, which is what the register declares about itself.** That is
+    the number an adversarial review called a rubber stamp, and it was right to: 23 of 24 entries
+    carried the top grade while nothing had ever opened an artefact to check one. `earned` is the
+    subset whose every claimed condition actually checks out. When the two differ, the difference
+    is the overstatement, and it belongs in the headline rather than in a field nobody reads.
+    """
     rep = report or audit()
     counts = rep.by_state
-    bad = f", {len(rep.findings)} register defect(s)" if rep.findings else ""
+    checks = rep.by_verification
+    earned, declared = len(rep.earned), counts["owned"]
+    gap = "" if earned == declared else f" ({declared} declared, {declared - earned} unevidenced)"
     return (
-        f"{len(rep.capabilities)} capability(ies): {counts['owned']} owned, "
+        f"{len(rep.capabilities)} capability(ies): {earned} owned{gap}, "
         f"{counts['implemented']} implemented, {counts['tied']} tied, {counts['lost']} lost"
-        f"{bad}"
+        f" · conditions {checks['VERIFIED']} verified, {checks['ATTESTED']} attested, "
+        f"{checks['UNPROVEN']} unproven"
     )
 
 
@@ -4254,8 +4516,27 @@ def main() -> int:  # pragma: no cover - CLI
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     report = write_report()
     print(summary(report))
+    unproven = [v for v in report.verifications if v.status == "UNPROVEN"]
+    if unproven:
+        print("")
+        print(f"  {len(unproven)} condition(s) claimed with no evidence in the artefact:")
+        for v in unproven:
+            print(f"    {v.capability} - {v.condition} - {v.detail}")
+        print("")
+        print(
+            "  Either make the artefact record the thing the condition is about, or lower "
+            "the capability's state. A claimed condition with nothing behind it is the "
+            "defect this register exists to prevent, so it fails rather than prints."
+        )
     print(f"written to {REPORT_PATH}")
-    return 0
+    # **Fails on an overstatement, not on a gap.** An unevidenced condition under an OWNED
+    # capability is the register claiming something it cannot support, which is the exact defect
+    # this module exists to prevent. The same condition under an IMPLEMENTED one is a known gap
+    # that is already honestly labelled — printing it is useful, failing on it would leave the
+    # gate permanently red and teach a reader to ignore it, which costs more than it buys.
+    # Before 2026-09-20 this returned 0 unconditionally and the only check was file existence.
+    overstated = len(report.owned) - len(report.earned)
+    return 1 if overstated else 0
 
 
 if __name__ == "__main__":  # pragma: no cover - CLI

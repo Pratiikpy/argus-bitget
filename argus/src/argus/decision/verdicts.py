@@ -27,6 +27,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import StrEnum
+from typing import Final, Protocol
 
 
 class Verdict(StrEnum):
@@ -159,6 +160,108 @@ class ConstitutionRuling:
     binding_constraint: str
     reason: str
     resulting_intent: Intent
+
+    def authorise(self, order: Submittable) -> Authorised:
+        """Mint the capability that lets an order reach :meth:`OrderBook.submit`.
+
+        The only way to construct an :class:`Authorised`, anywhere. See its docstring for why that
+        matters. Raises rather than returning a refusal, because a caller that ignores a returned
+        ``None`` is exactly the failure this replaces.
+        """
+        if self.verdict is ConstitutionVerdict.REJECT:
+            raise ConstitutionViolation(
+                f"{order.symbol}: the Constitution returned REJECT ({self.binding_constraint}); "
+                f"a rejected ruling cannot authorise an order"
+            )
+        intent = self.resulting_intent
+        if order.symbol != intent.symbol:
+            raise ConstitutionViolation(
+                f"authorisation is for {intent.symbol}, order is for {order.symbol}"
+            )
+        if order.side.strip().lower() != str(intent.side).strip().lower():
+            raise ConstitutionViolation(
+                f"{order.symbol}: the Constitution approved {intent.side}, the order says "
+                f"{order.side}"
+            )
+        if order.quantity != intent.quantity:
+            raise ConstitutionViolation(
+                f"{order.symbol}: the Constitution approved quantity {intent.quantity}, the order "
+                f"carries {order.quantity} — an authorisation is for a size, not a direction"
+            )
+        return Authorised(order, self, _token=_AUTHORISATION)
+
+
+class Submittable(Protocol):
+    """The parts of an order this module needs to check an authorisation against.
+
+    A structural type rather than an import of :class:`argus.execution.orders.Order`, so the
+    decision layer stays free of the execution layer. Execution obeys decision; the dependency runs
+    that way and not the other.
+    """
+
+    @property
+    def symbol(self) -> str: ...
+    @property
+    def side(self) -> str: ...
+    @property
+    def quantity(self) -> Decimal: ...
+
+
+_AUTHORISATION: Final = object()
+"""The capability. Module-private, held by nothing outside this file.
+
+An object identity rather than a string or a flag, because a string can be guessed, copied out of a
+traceback, or arrived at by accident; a private object cannot be obtained without already having a
+reference to it, and the only code holding one is :meth:`ConstitutionRuling.authorise`."""
+
+
+class Authorised:
+    """An order the Constitution actually approved. Unconstructable by hand.
+
+    **The asymmetry used to be true only because every caller remembered to check.** The invariants
+    — never increase, never reverse a side, never turn an abstention into a trade — are enforced in
+    :func:`apply_constraint` and proved across 2,177,280 swept states, and all of that binds only if
+    you go *through* ``apply_constraint``. Nothing forced you to. ``OrderBook.submit`` accepted a
+    bare ``Order``, and two call sites in this repository already built one and submitted it having
+    never consulted the Constitution at all. A new code path that forgot the check was a naked
+    directional order, and the sweep would not have caught it, because the sweep drives
+    ``ConstitutionPolicy`` and not ``OrderBook``.
+
+    So the check moved from discipline into the type system. ``submit`` now accepts only this, this
+    can only be minted by :meth:`ConstitutionRuling.authorise`, and that method holds the sole
+    reference to a module-private sentinel. Forgetting the Constitution is no longer a bug that
+    reaches the venue; it is a ``TypeError`` at the call site.
+
+    **And the authorisation is bound to the content, not merely to the act.** ``authorise`` refuses
+    unless the order's symbol, side and quantity match the ruling's ``resulting_intent`` exactly.
+    That is deliberately stricter than a token alone: on 2026-09-20 this project found two live
+    ledger rows recording ``quantity: 1`` against a ruling of ``quantity_after: 0``. A bare
+    capability would have waved those through, because a ruling *was* obtained — it simply was not
+    the one the order carried.
+
+    Read from Ritapossible/Ballast's ``ballast/enforcer.py``, which is where the pattern was taken
+    from: a module-private ``_ADMISSION`` sentinel, an ``Admitted`` whose ``__init__`` raises unless
+    it is handed that object, and an executor that accepts nothing else. What is added here is the
+    content binding above, and the fact that the same property is asserted inside the whole-domain
+    sweep rather than only in unit tests.
+    """
+
+    __slots__ = ("order", "ruling")
+
+    def __init__(self, order: Submittable, ruling: ConstitutionRuling, *, _token: object) -> None:
+        if _token is not _AUTHORISATION:
+            raise ConstitutionViolation(
+                "an Authorised order cannot be constructed directly; it is minted only by "
+                "ConstitutionRuling.authorise(), which is the whole point of the type"
+            )
+        self.order = order
+        self.ruling = ruling
+
+    def __repr__(self) -> str:
+        return (
+            f"Authorised({self.order.symbol} {self.order.side} {self.order.quantity} "
+            f"under {self.ruling.verdict})"
+        )
 
 
 def apply_constraint(

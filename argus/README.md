@@ -58,7 +58,7 @@ Product requirements: [`../ARGUS-MASTER-PRD.md`](../ARGUS-MASTER-PRD.md)
 ## Status, measured on 2026-09-20
 
 ```
-5,100 tests collected   ruff clean   mypy --strict clean on 267 source files
+5,100 tests collected   ruff clean   mypy --strict clean on 272 source files
 131/131 modules importable           18/18 sub-themes resolve to a symbol and a test file
 447 decisions in the paper ledger (as of 2026-09-20)  chain verifies, head anchor agrees, no truncation
 0 settled trades (2 rows VOID — see the correction above)      100.0% abstention rate
@@ -432,6 +432,9 @@ Several test modules are regression fixtures for defects found in **this** syste
 `test_claims.py` keeps the hallucinated thesis from ledger entry 41 verbatim, and
 `test_runner_notes.py` pins each check's own wording so a reworded check fails a test instead of
 silently ceasing to be reported.
+
+
+**What the register says about itself, after it started checking.** ARGUS keeps a capability standing register with four states and thirteen conditions for OWNED. Until 2026-09-20 its audit checked that a file existed and that a test function's name appeared inside it — so *"same-input comparison run"*, *"out-of-sample test"* and *"ablation"* were each satisfied by a filename, and 23 of 24 entries carried the top grade. It now opens the artefacts. **16 of 24 capabilities are OWNED**; seven were demoted the first time it ran, because they claimed a condition their own artefact records nothing about. Three of the thirteen — whether the *best* implementation and the *best* method were studied, and whether a specialist still beats us — are judgements about a field rather than properties of a file, so they are reported as **attested** and name where somebody looked, instead of being dressed up as machine-checked (`python -m argus.eval.standing`).
 
 ---
 

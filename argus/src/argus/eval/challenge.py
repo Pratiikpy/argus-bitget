@@ -22,6 +22,7 @@ from decimal import Decimal
 from typing import Any
 
 from argus.decision.verdicts import (
+    Authorised,
     ConstitutionVerdict,
     Intent,
     Side,
@@ -37,6 +38,30 @@ from argus.execution.orders import (
 from argus.risk.hedgeability import HedgeabilitySurface, shut_market_candidate
 from argus.truth.clocks import ET, DualClock
 from argus.truth.facts import AsOfStore, Fact, LookAheadError
+
+
+def _authorised(order: Order) -> Authorised:
+    """A genuine Constitution authorisation for an order this suite constructs by hand.
+
+    **These call sites used to submit a bare `Order`, and that was the defect the capability type
+    was added to close.** `OrderBook.submit` now accepts only an `Authorised`, so an adversarial
+    probe cannot route an order the risk layer never saw — which also makes this suite exercise the
+    real path rather than a shortcut around it. The intent below is built to match the order
+    exactly, because `authorise` refuses on any mismatch of symbol, side or quantity.
+    """
+    ruling = apply_constraint(
+        Intent(
+            symbol=order.symbol, side=Side(order.side.lower()), quantity=order.quantity,
+            verdict=Verdict.TRADE, stated_confidence=0.8,
+            thesis="constructed by the adversarial challenge suite",
+            invalidation=("the probe ends",),
+        ),
+        verdict=ConstitutionVerdict.ALLOW,
+        binding_constraint="none",
+        reason="nothing bound; this order is the suite's own fixture",
+    )
+    return ruling.authorise(order)
+
 
 NOW = datetime(2026, 3, 9, 14, 0, tzinfo=UTC)
 
@@ -124,7 +149,7 @@ def change_the_ticker() -> ChallengeResult:
     """Same narrative, different symbol — does an order route to the wrong instrument?"""
     book = OrderBook()
     order = Order("c-1", "rNVDA", "SELL", Decimal("10"), "hash-1")
-    book.submit(order, at=NOW)
+    book.submit(_authorised(order), at=NOW)
     routed = book.get("c-1").symbol
     return ChallengeResult(
         "change_the_ticker", "swap the symbol after the decision",
@@ -136,10 +161,10 @@ def change_the_ticker() -> ChallengeResult:
 def duplicate_order() -> ChallengeResult:
     """Replay a signed authorisation."""
     book = OrderBook()
-    book.submit(Order("c-1", "rNVDA", "SELL", Decimal("10"), "hash-1"), at=NOW)
+    book.submit(_authorised(Order("c-1", "rNVDA", "SELL", Decimal("10"), "hash-1")), at=NOW)
     fired, detail = False, "duplicate was accepted — two positions created"
     try:
-        book.submit(Order("c-1", "rNVDA", "SELL", Decimal("10"), "hash-1"), at=NOW)
+        book.submit(_authorised(Order("c-1", "rNVDA", "SELL", Decimal("10"), "hash-1")), at=NOW)
     except DuplicateOrder as exc:
         fired, detail = True, str(exc)[:120]
     return ChallengeResult(
@@ -152,7 +177,8 @@ def duplicate_order() -> ChallengeResult:
 def force_partial_fill() -> ChallengeResult:
     """40% fills. Is the residual re-planned or abandoned?"""
     book = OrderBook()
-    order = book.submit(Order("c-1", "rNVDA", "SELL", Decimal("100"), "hash-1"), at=NOW)
+    placed = _authorised(Order("c-1", "rNVDA", "SELL", Decimal("100"), "hash-1"))
+    order = book.submit(placed, at=NOW)
     order.transition(OrderState.ACCEPTED, at=NOW, reason="ack")
     order.apply_fill(Decimal("40"), at=NOW)
     return ChallengeResult(
@@ -226,7 +252,7 @@ def change_the_oracle() -> ChallengeResult:
 def delay_the_network() -> ChallengeResult:
     """A request times out. Is the outcome unknown rather than rejected?"""
     book = OrderBook()
-    book.submit(Order("c-1", "rNVDA", "SELL", Decimal("10"), "hash-1"), at=NOW)
+    book.submit(_authorised(Order("c-1", "rNVDA", "SELL", Decimal("10"), "hash-1")), at=NOW)
     book.mark_unknown("c-1", at=NOW + timedelta(seconds=3))
     order = book.get("c-1")
     return ChallengeResult(

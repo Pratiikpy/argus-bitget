@@ -361,7 +361,7 @@ class Violation:
 def check_invariants(
     original: Intent, ruling: ConstitutionRuling, state: State
 ) -> list[Violation]:
-    """The six properties that make this a risk layer rather than a strategy.
+    """The seven properties that make this a risk layer rather than a strategy.
 
     **Four of these were here from the start and two were added on 2026-09-13, because an external
     review found that the phrase "the risk layer may only reduce" was running three different
@@ -436,6 +436,67 @@ def check_invariants(
             state.label(), "risk_monotonicity",
             f"net directional exposure rose from {_net_exposure(original)} to "
             f"{_net_exposure(result)} under {ruling.verdict}",
+        ))
+
+    # --- authorisation: what the ruling permits to reach a venue ---
+    #
+    # **The six properties above are about what the Constitution DID. This one is about what can
+    # be done with its answer**, and it is the property this prover previously could not see at
+    # all: it drives `ConstitutionPolicy`, so a caller that never consulted the Constitution was
+    # outside the swept domain by construction. Adding the check here means the capability is not
+    # merely unit-tested on a handful of fixtures — it is asserted on every one of the swept
+    # states, which is the combination Ritapossible/Ballast's capability-token design does not
+    # have and ours now does.
+    #
+    # Two things are asserted. A REJECT must be unable to mint an authorisation at all; and any
+    # other ruling must authorise *its own* resulting intent and refuse a tampered one. The
+    # tampered order used below is the live seq-264 shape: the same decision, one unit larger.
+    out.extend(_authorisation_violations(state, ruling))
+    return out
+
+
+@dataclass(frozen=True, slots=True)
+class _ProbeOrder:
+    """The minimum an authorisation is checked against. Structural, so the prover stays in the
+    decision layer and never imports execution."""
+
+    symbol: str
+    side: str
+    quantity: Decimal
+
+
+def _authorisation_violations(state: State, ruling: ConstitutionRuling) -> list[Violation]:
+    approved = ruling.resulting_intent
+    faithful = _ProbeOrder(approved.symbol, str(approved.side), approved.quantity)
+    tampered = _ProbeOrder(approved.symbol, str(approved.side), approved.quantity + Decimal("1"))
+    out: list[Violation] = []
+
+    if ruling.verdict is ConstitutionVerdict.REJECT:
+        try:
+            ruling.authorise(faithful)
+        except ConstitutionViolation:
+            return out
+        return [Violation(
+            state.label(), "authorisation_is_required",
+            "a REJECT ruling minted an authorisation, so a refused order could reach a venue",
+        )]
+
+    try:
+        ruling.authorise(faithful)
+    except ConstitutionViolation as exc:
+        out.append(Violation(
+            state.label(), "authorisation_is_required",
+            f"the ruling refused to authorise its own resulting intent: {exc}",
+        ))
+    try:
+        ruling.authorise(tampered)
+    except ConstitutionViolation:
+        pass
+    else:
+        out.append(Violation(
+            state.label(), "authorisation_is_required",
+            f"an order of {tampered.quantity} was authorised by a ruling for "
+            f"{approved.quantity} — the capability is not bound to the size it approved",
         ))
     return out
 
@@ -517,11 +578,12 @@ class RiskProof:
             )
         else:
             lines.append(
-                "[riskproof] no invariant violated across all six properties: the layer never "
+                "[riskproof] no invariant violated across all seven properties: the layer never "
                 "increased exposure, reversed a side, turned an abstention into a trade, altered "
-                "an ALLOW, originated a leg of its own, or raised net directional exposure — "
-                "anywhere in the domain. Gross notional is deliberately not asserted monotone, "
-                "because a hedge leg raises it while lowering net risk"
+                "an ALLOW, originated a leg of its own, raised net directional exposure, or "
+                "authorised an order it had not approved — anywhere in the domain. Gross notional "
+                "is deliberately not asserted monotone, because a hedge leg raises it while "
+                "lowering net risk"
             )
         lines.extend(f"[riskproof] error: {e}" for e in self.errors)
         return lines

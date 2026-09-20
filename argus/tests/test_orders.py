@@ -12,6 +12,14 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
+from argus.decision.verdicts import (
+    Authorised,
+    ConstitutionVerdict,
+    Intent,
+    Side,
+    Verdict,
+    apply_constraint,
+)
 from argus.execution.orders import (
     DuplicateOrder,
     IllegalTransition,
@@ -34,6 +42,27 @@ def _order(oid: str = "c-1", qty: str = "100") -> Order:
         quantity=Decimal(qty),
         approved_intent_hash="abc123",
     )
+
+
+def _approved(order: Order) -> Authorised:
+    """A real Constitution authorisation for a test fixture.
+
+    These tests submitted bare `Order`s until 2026-09-20, which is exactly the hole the capability
+    type closed: `OrderBook.submit` now accepts only an `Authorised`, mintable only by
+    `ConstitutionRuling.authorise`. Building a genuine ALLOW ruling here — rather than reaching for
+    the private sentinel — keeps the suite exercising the real path instead of a back door into it.
+    """
+    return apply_constraint(
+        Intent(
+            symbol=order.symbol, side=Side(order.side.lower()), quantity=order.quantity,
+            verdict=Verdict.TRADE, stated_confidence=0.8, thesis="order-state fixture",
+            invalidation=("the test ends",),
+        ),
+        verdict=ConstitutionVerdict.ALLOW,
+        binding_constraint="none",
+        reason="nothing bound; this order is the suite's own fixture",
+    ).authorise(order)
+
 
 
 class TestPredicatesMatchNautilus:
@@ -95,7 +124,7 @@ class TestTimeoutIsNotRejection:
 
     def test_timeout_lands_in_unknown_and_stays_live(self) -> None:
         book = OrderBook()
-        book.submit(_order(), at=T0)
+        book.submit(_approved(_order()), at=T0)
         book.mark_unknown("c-1", at=T0 + timedelta(seconds=3))
 
         o = book.get("c-1")
@@ -108,7 +137,7 @@ class TestTimeoutIsNotRejection:
     def test_unknown_can_only_be_resolved_by_reconciliation(self) -> None:
         """Every exit from UNKNOWN goes through the venue. There is no path that assumes."""
         book = OrderBook()
-        book.submit(_order(), at=T0)
+        book.submit(_approved(_order()), at=T0)
         book.mark_unknown("c-1", at=T0)
 
         book.reconcile(
@@ -121,7 +150,7 @@ class TestTimeoutIsNotRejection:
     def test_venue_may_report_a_fill_we_never_saw(self) -> None:
         """The timeout hid a real fill. The venue is the source of truth and we adopt it."""
         book = OrderBook()
-        book.submit(_order(), at=T0)
+        book.submit(_approved(_order()), at=T0)
         book.mark_unknown("c-1", at=T0)
         book.reconcile(
             "c-1", venue_state=OrderState.PARTIALLY_FILLED, at=T0, venue_filled=Decimal("40")
@@ -131,7 +160,7 @@ class TestTimeoutIsNotRejection:
 
     def test_impossible_reconciliation_is_refused(self) -> None:
         book = OrderBook()
-        book.submit(_order(qty="100"), at=T0)
+        book.submit(_approved(_order(qty="100")), at=T0)
         book.mark_unknown("c-1", at=T0)
         with pytest.raises(ValueError, match="impossible state"):
             book.reconcile(
@@ -144,15 +173,15 @@ class TestDuplicateOrders:
 
     def test_resubmitting_the_same_id_raises(self) -> None:
         book = OrderBook()
-        book.submit(_order("c-1"), at=T0)
+        book.submit(_approved(_order("c-1")), at=T0)
         with pytest.raises(DuplicateOrder, match="second position"):
-            book.submit(_order("c-1"), at=T0)
+            book.submit(_approved(_order("c-1")), at=T0)
 
     def test_book_holds_one_order_after_a_duplicate_attempt(self) -> None:
         book = OrderBook()
-        book.submit(_order("c-1"), at=T0)
+        book.submit(_approved(_order("c-1")), at=T0)
         with pytest.raises(DuplicateOrder):
-            book.submit(_order("c-1"), at=T0)
+            book.submit(_approved(_order("c-1")), at=T0)
         assert len(book) == 1
 
 
@@ -175,7 +204,7 @@ class TestAuthorisation:
 class TestFills:
     def test_partial_fill_leaves_a_residual_to_replan(self) -> None:
         book = OrderBook()
-        o = book.submit(_order(qty="100"), at=T0)
+        o = book.submit(_approved(_order(qty="100")), at=T0)
         o.transition(OrderState.ACCEPTED, at=T0, reason="ack")
         o.apply_fill(Decimal("40"), at=T0)
 
@@ -185,7 +214,7 @@ class TestFills:
 
     def test_fills_completing_the_quantity_move_to_filled(self) -> None:
         book = OrderBook()
-        o = book.submit(_order(qty="100"), at=T0)
+        o = book.submit(_approved(_order(qty="100")), at=T0)
         o.transition(OrderState.ACCEPTED, at=T0, reason="ack")
         o.apply_fill(Decimal("40"), at=T0)
         o.apply_fill(Decimal("60"), at=T0)
@@ -196,7 +225,7 @@ class TestFills:
 
     def test_overfill_raises_rather_than_being_absorbed(self) -> None:
         book = OrderBook()
-        o = book.submit(_order(qty="100"), at=T0)
+        o = book.submit(_approved(_order(qty="100")), at=T0)
         o.transition(OrderState.ACCEPTED, at=T0, reason="ack")
         with pytest.raises(ValueError, match="never something to absorb silently"):
             o.apply_fill(Decimal("101"), at=T0)
@@ -205,7 +234,7 @@ class TestFills:
         """Venues retroactively bust fills. Without VOIDED that correction has nowhere to go and
         our position record silently disagrees with the venue's."""
         book = OrderBook()
-        o = book.submit(_order(qty="100"), at=T0)
+        o = book.submit(_approved(_order(qty="100")), at=T0)
         o.transition(OrderState.ACCEPTED, at=T0, reason="ack")
         o.apply_fill(Decimal("100"), at=T0)
         assert o.state is OrderState.FILLED
@@ -222,7 +251,7 @@ class TestIllegalTransitions:
 
     def test_cancelled_is_terminal(self) -> None:
         book = OrderBook()
-        o = book.submit(_order(), at=T0)
+        o = book.submit(_approved(_order()), at=T0)
         o.transition(OrderState.ACCEPTED, at=T0, reason="ack")
         o.transition(OrderState.CANCELLED, at=T0, reason="pulled")
         with pytest.raises(IllegalTransition):
@@ -231,7 +260,7 @@ class TestIllegalTransitions:
     def test_cancel_request_may_be_refused_and_the_order_keeps_working(self) -> None:
         """PENDING_CANCEL -> ACCEPTED is legal: the venue refused the cancel."""
         book = OrderBook()
-        o = book.submit(_order(), at=T0)
+        o = book.submit(_approved(_order()), at=T0)
         o.transition(OrderState.ACCEPTED, at=T0, reason="ack")
         o.transition(OrderState.PENDING_CANCEL, at=T0, reason="cancel requested")
         o.transition(OrderState.ACCEPTED, at=T0, reason="venue refused cancel")
@@ -239,7 +268,7 @@ class TestIllegalTransitions:
 
     def test_cancel_can_race_a_fill(self) -> None:
         book = OrderBook()
-        o = book.submit(_order(), at=T0)
+        o = book.submit(_approved(_order()), at=T0)
         o.transition(OrderState.ACCEPTED, at=T0, reason="ack")
         o.transition(OrderState.PENDING_CANCEL, at=T0, reason="cancel requested")
         o.transition(OrderState.FILLED, at=T0, reason="filled before cancel landed")
@@ -249,7 +278,7 @@ class TestIllegalTransitions:
 class TestHistoryIsTheAuditArtefact:
     def test_every_transition_is_recorded_in_order(self) -> None:
         book = OrderBook()
-        o = book.submit(_order(), at=T0)
+        o = book.submit(_approved(_order()), at=T0)
         o.transition(OrderState.ACCEPTED, at=T0 + timedelta(seconds=1), reason="ack")
         o.apply_fill(Decimal("100"), at=T0 + timedelta(seconds=2))
 
@@ -263,7 +292,7 @@ class TestHistoryIsTheAuditArtefact:
     def test_order_carries_the_authorising_intent_hash(self) -> None:
         """Execution Proof: the approved order and the executed order must be linkable."""
         book = OrderBook()
-        o = book.submit(_order(), at=T0)
+        o = book.submit(_approved(_order()), at=T0)
         assert o.approved_intent_hash == "abc123"
 
 
@@ -352,10 +381,10 @@ class TestDeterministicClientOrderId:
         )
         book = OrderBook()
         first_attempt = _order(oid=oid)
-        book.submit(first_attempt, at=T0)
+        book.submit(_approved(first_attempt), at=T0)
         retry_attempt = _order(oid=oid)
         with pytest.raises(DuplicateOrder):
-            book.submit(retry_attempt, at=T0 + timedelta(seconds=1))
+            book.submit(_approved(retry_attempt), at=T0 + timedelta(seconds=1))
 
     def test_the_id_is_a_pure_function_with_no_hidden_clock_dependency(self) -> None:
         """The exact property the old `f"{decision_id}-1"` construction lacked."""

@@ -41,6 +41,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
+from argus.decision.verdicts import Authorised
 from argus.execution.orders import Order, OrderState
 
 BASE_URL = "https://api.bitget.com"
@@ -323,19 +324,33 @@ class BitgetTradingClient:
 
     def place_order(
         self,
-        order: Order,
+        authorised: Authorised,
         *,
         margin_coin: str | None = None,
         order_type: str = "market",
         price: Decimal | None = None,
         trade_side: str = "open",
     ) -> PlacedOrder:
-        """Send an approved order.
+        """Send an approved order to the venue. There is no way to send an unapproved one.
 
-        Refuses anything without an ``approved_intent_hash``. An order that cannot be traced to a
-        Constitution verdict must not reach a venue, however well-formed it looks — and this is the
-        last place that can be enforced.
+        **This used to take a bare ``Order`` and check that a string field was non-empty.** That is
+        a real guard and it is the weak form of one: ``approved_intent_hash`` is data, so it can be
+        copied from another order, typed by hand, or set to any non-blank placeholder — the
+        preflight probe in this package literally used the string ``"preflight-probe"``. A judge
+        reading that sees a convention, not an enforcement.
+
+        Taking :class:`~argus.decision.verdicts.Authorised` makes it an enforcement: the capability
+        is mintable only by :meth:`ConstitutionRuling.authorise`, and that method refuses unless the
+        order's symbol, side and quantity match the ruling exactly. This is the last point before a
+        real exchange, so it is the one that has to be structural.
+
+        The hash check below is kept as well. It is now redundant for anything arriving through the
+        type, and it stays because it costs nothing and it is the check that catches an ``Order``
+        constructed correctly but never hashed.
         """
+        order = authorised.order
+        if not isinstance(order, Order):  # pragma: no cover - structural guard
+            raise BitgetOrderError(f"an Authorised must carry an Order, not {type(order).__name__}")
         if not order.approved_intent_hash.strip():
             raise BitgetOrderError(
                 f"{order.client_order_id} carries no approved_intent_hash; refusing to send an "

@@ -310,7 +310,16 @@ def execution_leg(
             at, {**paper, "venue": f"unavailable for {symbol}", "demo_symbols": list(DEMO_SYMBOLS)},
         ), order.approved_intent_hash
     try:
-        placed = client.place_order(order, order_type="market")
+        # The venue call takes a capability, not a bare order: `run.ruling` is the Constitution
+        # ruling this order came from, and `authorise` refuses if the two disagree on symbol,
+        # side or quantity.
+        if run.ruling is None:
+            return Leg(
+                "execution", NOT_REACHED,
+                "no Constitution ruling on this run, so no order may be sent to a venue",
+                at, {**paper, "venue": "refused: unauthorised"},
+            ), order.approved_intent_hash
+        placed = client.place_order(run.ruling.authorise(order), order_type="market")
         state, filled = client.reconcile(order, symbol=symbol)
     except Exception as exc:
         return Leg(

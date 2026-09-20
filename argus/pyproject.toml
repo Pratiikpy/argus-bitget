@@ -59,6 +59,35 @@ dev = [
     # vendor" reasoning as stumpy/finBERT above), the reference ARGUS's own real `adf()` already
     # reproduces to 1e-9 per `tests/test_cointegration.py`.
     "statsmodels>=0.15",
+    # Needed for `eval/regime_comparison.py`: the real, published `ruptures` PyPI package
+    # (`deepcharles/ruptures`, BSD-2-Clause, cloned at `research/repos/ruptures` and never run
+    # until that module existed), its own real `Pelt`/`KernelCPD` public API run directly — same
+    # "real, published library, no code to vendor" reasoning as stumpy/statsmodels/finBERT above.
+    # Same "eval-only, never imported by argus's own src/ code" reasoning as pandas/scipy above.
+    "ruptures>=1.1.10",
+    # Needed for `eval/allocation_comparison.py`: the real, published `riskfolio-lib` PyPI package
+    # (`dcajasn/Riskfolio-Lib`, BSD-3-Clause, cloned at `research/repos-t2/dcajasn~riskfolio-lib`
+    # and never run until that module existed), its own real `HCPortfolio.optimization()` public
+    # API run directly — same "real, published library, no code to vendor" reasoning as
+    # ruptures/stumpy/statsmodels above.
+    "riskfolio-lib>=7.3",
+    # Needed for `eval/allocation_comparison.py`: the real, published `cvxportfolio` PyPI package
+    # (`cvxgrp/cvxportfolio`, cloned at `research/repos-t2/cvxgrp~cvxportfolio`), the convex
+    # reference for the rebalance decision. **GPL-3.0**, which is why it is imported at call time
+    # inside one eval function rather than at module import: no part of it is copied into this
+    # repository and nothing in argus's shipped import graph reaches it. That is the same
+    # "eval-only, never imported by argus's own src/ code" boundary as pandas/scipy above, with
+    # the licence making it non-negotiable rather than a convention.
+    "cvxportfolio>=1.5",
+    # Needed only by `eval/hedge_tradeable.py`'s baseline, Modemola/BITGET_HACK "Blackout Desk".
+    # The real `src/blackout/hedges.py` that comparison runs imports their real
+    # `src/blackout/clock.py`, whose own unmodified line is `import exchange_calendars as xc`.
+    # The Blackout source itself is deliberately NOT vendored into this repository: that repo
+    # publishes no licence at all (the GitHub API reports `license: null` and there is no LICENSE
+    # file), so redistribution is not ours to do and `eval/baselines/blackout_hedges_loader.py`
+    # loads it from a local clone instead. Same "eval-only, never imported by argus's own src/
+    # code" reasoning as pandas/scipy above.
+    "exchange_calendars>=4.5",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -184,4 +213,26 @@ ignore_missing_imports = true
 # eval/cointegration_comparison.py's own docstring) ships no type stubs either.
 [[tool.mypy.overrides]]
 module = ["statsmodels", "statsmodels.*"]
+ignore_missing_imports = true
+
+# `blackout` — Modemola/BITGET_HACK's real `src/blackout/*`, loaded from a local clone rather than
+# vendored because that repository publishes no licence (see eval/baselines/blackout_hedges_loader
+# .py). No stubs, no py.typed, and not on PyPI at all. Same as the others: this relaxes only
+# mypy's view INTO their code, never the strict checking of ours that calls it.
+[[tool.mypy.overrides]]
+module = ["blackout", "blackout.*"]
+ignore_missing_imports = true
+
+# `ruptures` (the real, published PyPI package, not vendored — see
+# eval/regime_comparison.py's own docstring) ships no type stubs and no py.typed marker either.
+[[tool.mypy.overrides]]
+module = ["ruptures", "ruptures.*"]
+ignore_missing_imports = true
+
+# `riskfolio-lib` and `cvxportfolio` (both real, published PyPI packages, neither vendored — see
+# eval/allocation_comparison.py's own docstring) ship no type stubs and no py.typed marker. Same
+# as the four above, this relaxes only mypy's view INTO those libraries, never the strict checking
+# of our own code that calls them.
+[[tool.mypy.overrides]]
+module = ["riskfolio", "riskfolio.*", "cvxportfolio", "cvxportfolio.*"]
 ignore_missing_imports = true
