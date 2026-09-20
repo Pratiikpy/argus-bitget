@@ -199,8 +199,32 @@ class Entry:
         return self.settled_at is not None
 
     @property
+    def is_void(self) -> bool:
+        """This row records something the system did not do — see `paper/corrections.py`."""
+        from argus.paper.corrections import is_voided
+
+        return is_voided(self.seq)
+
+    @property
     def is_abstention(self) -> bool:
-        return Decimal(self.quantity) == 0
+        """No exposure was taken — including rows whose stored quantity is a defect.
+
+        **A voided row IS an abstention, and saying so here rather than in each consumer is the
+        point.** Ledger seq 264 and 265 store `quantity: 1` because `paper/runner.py` recorded the
+        model's unconstrained intent instead of the Constitution's ruling (fixed 2026-09-20). What
+        the desk actually did on those two decisions was refuse: the risk record holds
+        `quantity_after: 0, binding_constraint: no_exposure` and the desk notes read *"no order:
+        final verdict human_review with quantity 0"*. The stored `1` is the bug's fingerprint, not
+        a position.
+
+        This property is read by `eval/performance.py`, `eval/themeaudit.py`,
+        `eval/decisioncard.py`, `eval/autopsy.py`, `eval/scorecard.py`, `eval/episodes.py`,
+        `eval/selfaudit.py`, `agents/recall.py` and `demo/cockpit.py`. Correcting it at each of
+        those call sites was tried first and was the wrong shape: two were patched and the rest
+        kept reporting "2 settled position(s)" beside "zero positions have settled" in the same
+        output. One definition, every consumer.
+        """
+        return self.is_void or Decimal(self.quantity) == 0
 
 
 @dataclass

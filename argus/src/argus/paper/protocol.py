@@ -718,7 +718,42 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.show:
-        print(json.dumps({"digest": STANDING.digest, "protocol": STANDING.body()}, indent=2))
+        # **Show what actually governs, not what the source file happens to hold.** Until
+        # 2026-09-20 this printed the module-level `STANDING` constant unconditionally. The
+        # committed chain had been amended twice since that constant was last edited, so `--show`
+        # reported v1 (digest a194a27e…, declared 2026-09-13) while `--audit`, one README line
+        # below, reported v3 governing 216 of the record's decisions. A judge copying the digest
+        # out of `--show` to verify our central pre-registration claim was checking a superseded
+        # document, and the two adjacent commands contradicted each other.
+        #
+        # The drift itself is the finding and is printed rather than resolved silently: a
+        # committed protocol is frozen by design, so when the source constant no longer matches
+        # the governing commitment, that is a fact a reader needs, not something to paper over by
+        # quietly preferring one of them.
+        commitments = load()
+        governing_commitment = commitments[-1] if commitments else None
+        payload: dict[str, object] = {
+            "digest": STANDING.digest,
+            "protocol": STANDING.body(),
+            "source": "the protocol as declared in source (paper/protocol.py::STANDING)",
+        }
+        if governing_commitment is not None:
+            payload["governing"] = {
+                "digest": governing_commitment.protocol.digest,
+                "version": governing_commitment.protocol.version,
+                "declared_at": governing_commitment.protocol.declared_at,
+                "governs_ledger_seq_from": governing_commitment.governs_from_seq,
+                "protocol": governing_commitment.protocol.body(),
+            }
+            if governing_commitment.protocol.digest != STANDING.digest:
+                payload["DRIFT"] = (
+                    "the in-source STANDING protocol is NOT the one governing the live record. "
+                    "The committed chain has been amended since the source constant was last "
+                    "edited. VERIFY AGAINST `governing.digest` — it is what the ledger was "
+                    "actually judged by; `digest` above is the source declaration only. Run "
+                    "`--audit` for the full chain."
+                )
+        print(json.dumps(payload, indent=2))
         return 0
 
     if args.commit:

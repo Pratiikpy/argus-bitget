@@ -3,78 +3,78 @@
     {
       "symbol": "AAPLUSDT",
       "weight_before": 0.083333,
-      "weight_after": 0.237745,
-      "delta": 0.154412
+      "weight_after": 0.238214,
+      "delta": 0.15488
     },
     {
       "symbol": "AMZNUSDT",
       "weight_before": 0.083333,
-      "weight_after": 0.072827,
-      "delta": -0.010506
+      "weight_after": 0.072728,
+      "delta": -0.010605
     },
     {
       "symbol": "COINUSDT",
       "weight_before": 0.083333,
-      "weight_after": 0.021321,
-      "delta": -0.062012
+      "weight_after": 0.021296,
+      "delta": -0.062038
     },
     {
       "symbol": "GOOGLUSDT",
       "weight_before": 0.083333,
-      "weight_after": 0.095807,
-      "delta": 0.012473
+      "weight_after": 0.095616,
+      "delta": 0.012282
     },
     {
       "symbol": "METAUSDT",
       "weight_before": 0.083333,
-      "weight_after": 0.098396,
-      "delta": 0.015063
+      "weight_after": 0.098364,
+      "delta": 0.01503
     },
     {
       "symbol": "MSFTUSDT",
       "weight_before": 0.083333,
-      "weight_after": 0.09498,
-      "delta": 0.011646
+      "weight_after": 0.094993,
+      "delta": 0.01166
     },
     {
       "symbol": "MSTRUSDT",
       "weight_before": 0.083333,
-      "weight_after": 0.01343,
-      "delta": -0.069903
+      "weight_after": 0.013386,
+      "delta": -0.069948
     },
     {
       "symbol": "QQQUSDT",
       "weight_before": 0.083333,
-      "weight_after": 0.168903,
-      "delta": 0.085569
+      "weight_after": 0.168909,
+      "delta": 0.085575
     },
     {
       "symbol": "SQQQUSDT",
       "weight_before": 0.083333,
-      "weight_after": 0.061008,
-      "delta": -0.022325
+      "weight_after": 0.061052,
+      "delta": -0.022281
     },
     {
       "symbol": "TQQQUSDT",
       "weight_before": 0.083333,
-      "weight_after": 0.019018,
-      "delta": -0.064315
+      "weight_after": 0.019004,
+      "delta": -0.06433
     },
     {
       "symbol": "TSLAUSDT",
       "weight_before": 0.083333,
-      "weight_after": 0.042881,
-      "delta": -0.040452
+      "weight_after": 0.042883,
+      "delta": -0.040451
     }
   ],
-  "vol_before_bps": 21.7132,
-  "vol_after_bps": 16.1763,
-  "variance_reduction": 0.444976,
-  "turnover": 0.548677,
-  "cost_bps": 3.2921,
-  "break_even_bars": 41.46,
+  "vol_before_bps": 21.742,
+  "vol_after_bps": 16.1833,
+  "variance_reduction": 0.445963,
+  "turnover": 0.54908,
+  "cost_bps": 3.2945,
+  "break_even_bars": 41.29,
   "assumed_sharpe_per_bar": 0.010684346079267205,
   "horizon_bars": 168,
   "worth_doing": true,
-  "verdict": "11 leg(s) (AAPLUSDT 8.3%->23.8%, AMZNUSDT 8.3%->7.3%, COINUSDT 8.3%->2.1%, GOOGLUSDT 8.3%->9.6%...), turnover 54.9% costing 3.3bps. Portfolio volatility 22 -> 16bps per bar, +44.5% of variance. It repays in 41 bars, inside the 168-bar horizon, at an assumed annualised Sharpe of 1.0. Worth doing"
+  "verdict": "11 leg(s) (AAPLUSDT 8.3%->23.8%, AMZNUSDT 8.3%->7.3%, COINUSDT 8.3%->2.1%, GOOGLUSDT 8.3%->9.6%...), turnover 54.9% costing 3.3bps. Portfolio volatility 22 -> 16bps per bar, variance down 44.6%. It repays in 41 bars, inside the 168-bar horizon, at an assumed annualised Sharpe of 1.0. Worth doing"
 }

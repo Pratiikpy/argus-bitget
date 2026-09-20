@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-09-20T02:24:52.243449+00:00",
+  "generated_at": "2026-09-20T05:35:38.672445+00:00",
   "probes": 20,
-  "runs": 18,
+  "runs": 17,
   "weak": 2,
-  "undefined": 0,
+  "undefined": 1,
   "absent": 0,
-  "verdict": "18/20 probes met their bar. 2 did not and are named rather than averaged away: t2-open-evaluation (WEAK), t2-risk-control (WEAK). The plan's vocabulary calls a probe that runs IMPLEMENTED, never OWNED \u2014 OWNED needs a named baseline reproduced and beaten, and no probe here claims one. The Track 2 shortfalls are one shortfall: the desk has never proposed a position, so nothing settles (no Sharpe, no drawdown), nothing is offered to the risk layer (its gates are proven over the swept domain but unexercised live), and nothing reaches the venue (no takeover rate). The confidence floor is not the cause and has never run \u2014 the desk returns on quantity<=0 before reaching it, so every risk record names the no-exposure gate (365 record(s) on the current log). The desk HAS been offered tradeable sessions: 217 of 447 decisions were taken in one, and 213 of those carried a directional lean rather than declining to call the direction \u2014 yet none opened exposure. That is a statement about the desk, not about the sampling, and it is the pre-registered hypothesis in data/protocol_commitments.jsonl being tested: the commitment says that if the desk abstains through a full RTH week, the deliberation-cost hurdle is too high to trade this universe at all, and that is the finding to publish rather than a lowered bar.",
+  "verdict": "17/20 probes met their bar. 3 did not and are named rather than averaged away: t2-sharpe-mdd-winrate (UNDEFINED), t2-open-evaluation (WEAK), t2-risk-control (WEAK). The plan's vocabulary calls a probe that runs IMPLEMENTED, never OWNED \u2014 OWNED needs a named baseline reproduced and beaten, and no probe here claims one. The Track 2 shortfalls are one shortfall: the desk has never proposed a position, so nothing settles (no Sharpe, no drawdown), nothing is offered to the risk layer (its gates are proven over the swept domain but unexercised live), and nothing reaches the venue (no takeover rate). The confidence floor is not the cause and has never run \u2014 the desk returns on quantity<=0 before reaching it, so every risk record names the no-exposure gate (365 record(s) on the current log). The desk HAS been offered tradeable sessions: 217 of 447 decisions were taken in one, and 213 of those carried a directional lean rather than declining to call the direction \u2014 yet none opened exposure. That is a statement about the desk, not about the sampling, and it is the pre-registered hypothesis in data/protocol_commitments.jsonl being tested: the commitment says that if the desk abstains through a full RTH week, the deliberation-cost hurdle is too high to trade this universe at all, and that is the finding to publish rather than a lowered bar.",
   "common_cause": "The Track 2 shortfalls are one shortfall: the desk has never proposed a position, so nothing settles (no Sharpe, no drawdown), nothing is offered to the risk layer (its gates are proven over the swept domain but unexercised live), and nothing reaches the venue (no takeover rate). The confidence floor is not the cause and has never run \u2014 the desk returns on quantity<=0 before reaching it, so every risk record names the no-exposure gate (365 record(s) on the current log). The desk HAS been offered tradeable sessions: 217 of 447 decisions were taken in one, and 213 of those carried a directional lean rather than declining to call the direction \u2014 yet none opened exposure. That is a statement about the desk, not about the sampling, and it is the pre-registered hypothesis in data/protocol_commitments.jsonl being tested: the commitment says that if the desk abstains through a full RTH week, the deliberation-cost hurdle is too high to trade this universe at all, and that is the finding to publish rather than a lowered bar.",
   "results": [
     {
@@ -74,9 +74,9 @@
       "kind": "judging",
       "question": "Paper trading Sharpe, max drawdown, win rate",
       "bar": "all three computed from settled positions",
-      "status": "RUNS",
-      "evidence": "2 settled position(s); performance() computes the three",
-      "artefact": null
+      "status": "UNDEFINED",
+      "evidence": "Sharpe, max drawdown and win rate are computed from settled trades and **zero positions have settled** across 447 decisions, every one an abstention. performance() returns null and the reason rather than 0.0, which would read as a flat result. This is the single largest gap against Track 2's 50% quantitative half, it is structural rather than a defect, and no amount of judged quality substitutes for it.",
+      "artefact": "data/paper_ledger.jsonl"
     },
     {
       "key": "t2-explainability",
@@ -105,7 +105,7 @@
       "question": "Agent architecture quality",
       "bar": "the structural claims are facts about the import graph, and are checked",
       "status": "RUNS",
-      "evidence": "265 modules, 698 internal imports. 0 contract violation(s); 0 cycle(s) able to break at import out of 4 total \u2014 the rest are broken at load by a deferred import and are reported as coupling rather than scored as clean. The deterministic core (truth, cost, risk, decision, backtest) reaches no model-facing module at any depth. 4 foundation package(s) carry high fan-in at zero instability. 2 authorisation chokepoint(s) that raise rather than warn: orders.py:317, bitget_client.py:340",
+      "evidence": "266 modules, 701 internal imports. 0 contract violation(s); 0 cycle(s) able to break at import out of 4 total \u2014 the rest are broken at load by a deferred import and are reported as coupling rather than scored as clean. The deterministic core (truth, cost, risk, decision, backtest) reaches no model-facing module at any depth. 4 foundation package(s) carry high fan-in at zero instability. 2 authorisation chokepoint(s) that raise rather than warn: orders.py:317, bitget_client.py:340",
       "artefact": "data/architecture.json"
     },
     {

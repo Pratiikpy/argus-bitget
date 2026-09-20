@@ -90,7 +90,8 @@ class TestTheLedgerRecordsWhatTheRiskLayerDecided:
     def test_a_revision_still_wins_when_the_model_was_re_asked(self) -> None:
         """The revised intent remains authoritative — the fix narrows the fallback only."""
         revised = _intent(Verdict.TRADE, "3")
-        got = governed_intent(_run(_intent(Verdict.TRADE, "9"), revised, _intent(Verdict.TRADE, "5")))
+        run = _run(_intent(Verdict.TRADE, "9"), revised, _intent(Verdict.TRADE, "5"))
+        got = governed_intent(run)
         assert got is revised
 
     def test_an_allowed_position_is_recorded_unchanged(self) -> None:

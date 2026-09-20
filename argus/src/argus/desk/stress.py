@@ -314,8 +314,17 @@ STRUCTURAL: tuple[StructuralScenario, ...] = (
     StructuralScenario(
         "venue_outage", "the exchange stops accepting orders while the position is open",
         Decimal("0"), Decimal("0.01"),
-        "ASSUMPTION, NOT MEASURED: near-zero depth stands for 'no orders accepted'. The exit test "
-        "should fail; that failing is the finding, not a defect",
+        "ASSUMPTION, NOT MEASURED, AND THE PROXY IS KNOWN NOT TO BITE. Thin depth stands in for "
+        "'no orders accepted', and that substitution does not hold: a rejected order fills "
+        "NEVER, while a thin book still fills a small position cheaply. This scenario therefore "
+        "PASSES for any position small enough to clear the remaining depth, and it passed here. "
+        "Its previous wording said 'the exit test should fail; that failing is the finding' — it "
+        "did not fail, and an adversarial audit found this exit reported at 12.2bps, CHEAPER than "
+        "the normal-market baseline, i.e. the report implied an outage is a good moment to exit. "
+        "The flooring that made the book un-thinnable is fixed (sim/market.py seeds scale with "
+        "depth_multiplier), but the proxy itself is still the wrong mechanism: modelling "
+        "rejection needs an order path that can refuse, which this simulator does not have. "
+        "TREAT THIS SCENARIO AS UNTESTED, and do not read 'survives' here as evidence",
     ),
     StructuralScenario(
         "stale_evidence", "the evidence behind the thesis is hours old and no longer true",
@@ -492,9 +501,28 @@ class StressReport:
             Decimal(len(self.empirical)) / Decimal(total) * Decimal("100") if total else _ZERO
         )
 
+    UNTESTED_SCENARIOS = ("venue_outage",)
+    """Scenarios whose stated proxy is known not to exercise what they name.
+
+    `venue_outage` substitutes thin depth for 'no orders accepted'. A rejected order never fills;
+    a thin book still fills a small position. The scenario therefore cannot fail for a position
+    small enough to clear the residual depth, and reporting its pass as evidence would be
+    counting a test that cannot fail. Named here rather than deleted, because the failure mode is
+    real even though this proxy does not reach it.
+    """
+
     @property
     def survives_all(self) -> bool:
-        return bool(self.results) and not self.failures
+        """True only if every scenario that CAN fail did not.
+
+        **Excludes `UNTESTED_SCENARIOS`, and that exclusion is the point.** Before 2026-09-20 this
+        counted `venue_outage`'s unearned pass toward an all-clear, so the headline safety claim of
+        the risk tool rested partly on a check that could not fail.
+        """
+        testable = [r for r in self.results if r.scenario not in self.UNTESTED_SCENARIOS]
+        if not testable:
+            return False
+        return not [r for r in self.failures if r.scenario not in self.UNTESTED_SCENARIOS]
 
     def render(self) -> list[str]:
         lines = [

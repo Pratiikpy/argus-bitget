@@ -221,8 +221,14 @@ def main() -> int:
     out.write_text(json.dumps(result, indent=2, default=str), encoding="utf-8")
 
     led = result["ledger"]
-    print(f"entries {led['entries']} | settled {led['settled']} | "
-          f"abstentions {led['abstentions']} · chain intact {led['chain_intact']}")
+    # **Both counts are subsets of `entries`, and the old labels did not say so.** This printed
+    # "entries 447 | settled 388 | abstentions 445", which reads as 833 items inside a 447-item
+    # ledger. `settled` counts every row whose outcome is known — almost all of them settled
+    # ABSTENTIONS — while two lines below, the performance reasons use "settled trade(s)" to mean
+    # the non-abstention subset. Same word, two meanings, no label. Disambiguated rather than
+    # renamed in the JSON, which other artefacts read by key.
+    print(f"entries {led['entries']} ({led['abstentions']} abstentions) | "
+          f"outcome known {led['settled']} · chain intact {led['chain_intact']}")
     perf = result.get("performance")
     if perf:
         def show(key: str, label: str, pct: bool = False) -> str:

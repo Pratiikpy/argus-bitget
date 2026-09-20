@@ -347,7 +347,15 @@ class TradePlan:
             f"{len(self.trades)} leg(s) ({moved}{'...' if len(self.trades) > 4 else ''}), "
             f"turnover {self.turnover:.1%} costing {self.cost_bps:.1f}bps. Portfolio volatility "
             f"{self.vol_before * 10_000:.0f} -> {self.vol_after * 10_000:.0f}bps per bar, "
-            f"{self.variance_reduction:+.1%} of variance."
+            # **`{:+.1%}` on a REDUCTION printed a plus sign onto a fall.** The property is
+            # `variance_reduction` — "share of portfolio variance the rebalance removes" — so
+            # 0.446 means variance is removed by 44.6%. Formatted with a forced sign it read
+            # "+44.6% of variance" in the same sentence as "volatility 22 -> 16bps", i.e.
+            # volatility down and variance up, which is arithmetically impossible and was the
+            # first thing an adversarial audit flagged here. The direction is now named in words
+            # so the sign cannot be misread, and a genuine increase says so explicitly.
+            f"variance {'down' if self.variance_reduction >= 0 else 'UP'} "
+            f"{abs(self.variance_reduction):.1%}."
         )
         payback = self.break_even_bars
         if payback is None:
@@ -486,8 +494,10 @@ def main() -> int:  # pragma: no cover - CLI
     else:
         book = dict.fromkeys(columns, 1.0 / len(columns))
 
+    min_leg = 0.01
     plan = optimize_trade(
         book, columns, horizon_bars=args.horizon, assumed_sharpe_annual=args.sharpe,
+        min_leg=min_leg,
     )
     names = sorted(columns)
     from argus.desk.portfolio import covariance_matrix
@@ -496,6 +506,18 @@ def main() -> int:  # pragma: no cover - CLI
     print(f"HIERARCHICAL RISK PARITY — {len(names)} instruments, {len(stamps)} hourly bars\n")
     for trade in plan.trades:
         print(f"  {trade.symbol:12} {trade.weight_before:7.2%} -> {trade.weight_after:7.2%}")
+    # **Name the instruments that were considered but produced no leg.** The header counts the
+    # universe and the table lists only trades above `min_leg`, so a symbol whose target move is
+    # under the threshold vanished silently: the header said "12 instruments" above an 11-row
+    # table whose columns summed to 92.6% rather than 100%, and the missing name appeared nowhere.
+    # A reader could only conclude the allocation did not add up. Holding a weight unchanged is a
+    # decision, and an unprinted decision is indistinguishable from a dropped one.
+    held = [n for n in names if n not in {t.symbol for t in plan.trades}]
+    if held:
+        print(
+            f"\n  held unchanged (move below the {min_leg:.0%} minimum leg): "
+            f"{', '.join(held)}"
+        )
     if built is not None:
         matrix_names, cov = built
         before = diversification_ratio(book, matrix_names, cov)

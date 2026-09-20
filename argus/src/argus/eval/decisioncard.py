@@ -124,11 +124,42 @@ class Card:
             f"{'right' if correct else 'wrong' if correct is not None else 'ungraded'}"
         )
 
+    def _void_banner(self) -> list[str]:
+        """Say so, at the top, when this card describes a row that records a fill never taken.
+
+        **This card is how the defect was found**, so it is the last place that should render the
+        contradiction without naming it. Before 2026-09-20 seq 264 printed `verdict: trade`,
+        `Size 1 SELL`, `no order: final verdict human_review with quantity 0` and `net 9.6521` on
+        one page, and left the reader to notice. The fields below are still shown verbatim — the
+        row is not edited and not hidden — but the banner states which of them are the defect.
+        """
+        from argus.paper.corrections import VOIDED
+
+        void = next((v for v in VOIDED if v.seq == self.seq), None)
+        if void is None:
+            return []
+        return [
+            "> ⚠️ **VOID — this decision was never taken.** The fields below are reproduced "
+            "verbatim from the ledger and are NOT corrected in place; the row stays in the hash "
+            "chain unedited. What is wrong with them is stated here instead.",
+            ">",
+            f"> {void.reason}",
+            ">",
+            f"> Evidence: {void.evidence}",
+            ">",
+            "> The stored `verdict`, `quantity`, `entry_price` and every P&L figure on this card "
+            "are artefacts of a `paper/runner.py` defect fixed on 2026-09-20 "
+            "(`paper/runner.py::governed_intent`). The desk refused this position. Every derived "
+            "figure excludes it — see `paper/corrections.py`.",
+            "",
+        ]
+
     def render(self) -> str:
         e = self.entry
         lines = [
             f"# Decision {self.seq} — {self.symbol} — {e.get('verdict', ABSENT)}",
             "",
+            *self._void_banner(),
             f"**Decided** {e.get('decided_at', ABSENT)} during the "
             f"{e.get('session_phase', ABSENT)} session, "
             f"{e.get('hours_to_discovery', ABSENT)}h from the next price discovery.",

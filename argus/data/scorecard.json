@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-09-20T03:48:20.846604+00:00",
+  "generated_at": "2026-09-20T06:02:03.610744+00:00",
   "model": "argus/qwen3.8-max",
   "ledger": {
     "entries": 447,
     "settled": 388,
-    "abstentions": 445,
-    "ungradeable": 59,
+    "abstentions": 447,
+    "ungradeable": 61,
     "chain_intact": true
   },
-  "graded_predictions": 2,
+  "graded_predictions": 0,
   "performance": {
     "window_days": 8,
     "first_day": "2026-09-12",
@@ -17,7 +17,7 @@
     "periods_per_year": 365,
     "trades": 0,
     "open_positions": 0,
-    "abstentions": 445,
+    "abstentions": 447,
     "flat_days": 8,
     "net_pnl": "0",
     "total_return_pct": 0.0,
@@ -734,7 +734,7 @@
         "decisions": 1,
         "restatements": 0,
         "mean_confidence": 0.72,
-        "mean_net_pnl": "9.6521",
+        "mean_net_pnl": null,
         "mean_counterfactual_bps": null,
         "invalidation_agreement": null
       },
@@ -747,7 +747,7 @@
         "decisions": 1,
         "restatements": 0,
         "mean_confidence": 0.72,
-        "mean_net_pnl": "5.3339",
+        "mean_net_pnl": null,
         "mean_counterfactual_bps": null,
         "invalidation_agreement": null
       },
@@ -992,7 +992,7 @@
       }
     ]
   },
-  "note": "2 graded outcomes \u2014 below the floor of 5. Calibration on fewer is noise, so none is reported.",
+  "note": "0 graded outcomes \u2014 below the floor of 5. Calibration on fewer is noise, so none is reported.",
   "abstention": {
     "abstentions": 386,
     "correct_pct": 57.0,

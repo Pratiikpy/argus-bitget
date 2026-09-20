@@ -136,11 +136,30 @@ def build_session(config: SessionConfig | None = None) -> SimulatedSession:
         )
 
     # Seed one quote per side so a mid exists.
+    #
+    # **The seed is scaled by `depth_multiplier`, and it was not until 2026-09-20.** A flat 10
+    # units per side is not "enough to establish a mid" when the caller has asked for a book at 1%
+    # of normal depth — it is a floor that silently refills the book the scenario was trying to
+    # empty. Together with `max(ladder, 1)` and `max(1, noise_agents * multiplier)` below, a
+    # `depth_multiplier` of 0.01 still left roughly 19% of full depth standing.
+    #
+    # That made `desk/stress.py`'s `venue_outage` scenario unable to fail. Its own stated
+    # assumption reads *"near-zero depth stands for no orders accepted. The exit test should fail;
+    # that failing is the finding, not a defect."* It did not fail — it exited at 12.22bps, the
+    # CHEAPEST of all nine scenarios and cheaper than the 12.45bps normal-market baseline, so the
+    # report told a reader that a total venue outage is the best moment to get out, and
+    # `survives_all: true` was unearned. Found by an adversarial audit, not by a test.
+    #
+    # The seed still never rounds to zero, because a book with no quote has no mid and the
+    # simulation cannot start at all — but at 0.01x it is now 1 unit a side rather than 10.
     half_spread = cfg.tick_size
+    seed_size = max(
+        (Decimal("10") * cfg.depth_multiplier).to_integral_value(), Decimal("1")
+    )
     book.submit(Order(agent_id="seed", side=Side.BUY,
-                      price=reference - half_spread, quantity=Decimal("10")))
+                      price=reference - half_spread, quantity=seed_size))
     book.submit(Order(agent_id="seed", side=Side.SELL,
-                      price=reference + half_spread, quantity=Decimal("10")))
+                      price=reference + half_spread, quantity=seed_size))
 
     ladder = (cfg.base_ladder_size * cfg.depth_multiplier).to_integral_value()
     agents: list[Agent] = [

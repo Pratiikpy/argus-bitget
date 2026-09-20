@@ -34,7 +34,26 @@ def sweep() -> dict:
 
 @pytest.fixture(scope="module")
 def ablation() -> dict:
-    return run_null_ablation(n_seeds=12, n_events=120)
+    """**n_seeds=40, not 12, and the difference is the test being able to mean anything.**
+
+    This asserted a statistical claim — that testing at the real measured base rate produces a
+    materially lower false-positive rate than the fixed 0.50 null whale-signals uses — on twelve
+    placebo draws. Twelve is not enough to carry it: the false-positive rate over overlapping
+    24h-forward windows is itself serially correlated (the exact phenomenon this capability
+    exists to measure), so the estimate is noisy and the assertion flipped to False on a live
+    run on 2026-09-20 with nothing wrong in the code.
+
+    Measured the same day at n_seeds=60: fixed-null 0.217 against true-rate 0.050 — the effect is
+    large and unambiguous when the sample can show it. 40 is the compromise between that and the
+    real runtime cost of each additional seed, and it is above the n where the claim was observed
+    to be stable.
+
+    The claim itself was NOT weakened again to keep this green. It had already been weakened once,
+    from "the true rate is the exact argmin among swept candidates" to this directional form;
+    weakening it a second time to fit an underpowered sample would be fitting the claim to the
+    test rather than the test to the claim.
+    """
+    return run_null_ablation(n_seeds=40, n_events=120)
 
 
 @pytest.fixture(scope="module")
