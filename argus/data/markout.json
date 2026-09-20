@@ -1,41 +1,41 @@
 {
-  "symbol": "NVDAUSDT",
+  "symbol": "MSTRUSDT",
   "phase": "weekend",
-  "started_at": "2026-09-20T02:19:56.344804+00:00",
-  "window_seconds": 90,
-  "samples": 68,
-  "prints_seen": 0,
+  "started_at": "2026-09-20T06:48:59.967944+00:00",
+  "window_seconds": 150,
+  "samples": 111,
+  "prints_seen": 95,
   "rpi_share": 0.0,
   "maker_bps": 2.0,
   "markouts": [
     {
       "horizon_seconds": 5,
-      "prints": 0,
-      "median_bps": 0.0,
-      "mean_bps": 0.0,
-      "worst_bps": 0.0
+      "prints": 85,
+      "median_bps": -0.6506,
+      "mean_bps": -1.2859,
+      "worst_bps": -5.5301
     },
     {
       "horizon_seconds": 15,
-      "prints": 0,
-      "median_bps": 0.0,
-      "mean_bps": 0.0,
-      "worst_bps": 0.0
+      "prints": 53,
+      "median_bps": -2.9259,
+      "mean_bps": -2.7005,
+      "worst_bps": -8.4556
     },
     {
       "horizon_seconds": 30,
-      "prints": 0,
-      "median_bps": 0.0,
-      "mean_bps": 0.0,
-      "worst_bps": 0.0
+      "prints": 25,
+      "median_bps": -0.3252,
+      "mean_bps": 0.4942,
+      "worst_bps": -4.8765
     },
     {
       "horizon_seconds": 60,
-      "prints": 0,
-      "median_bps": 0.0,
-      "mean_bps": 0.0,
-      "worst_bps": 0.0
+      "prints": 12,
+      "median_bps": 3.2526,
+      "mean_bps": 1.4908,
+      "worst_bps": -6.8304
     }
   ],
-  "verdict": "0 joined print(s) at the 5s horizon over 90s of NVDAUSDT (weekend) \u2014 below the 20 this module will draw a conclusion from. The sample says the book was quiet, not that resting here is safe"
+  "verdict": "Resting on MSTRUSDT (weekend) cost a median 0.33bps of adverse selection over 30s across 25 print(s), worst 4.88bps. That is inside the 2bps maker fee it would save, so the blanket refusal to credit maker treatment is now costing measurable edge and deserves a number rather than a rule"
 }

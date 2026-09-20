@@ -52,7 +52,7 @@ Plan and evidence: [`../ARGUS-MASTER-PLAN.md`](../ARGUS-MASTER-PLAN.md)
 ## Status, measured on 2026-09-20
 
 ```
-4,276 tests collected (33 skipped)   ruff clean   mypy --strict clean on 266 source files
+5,100 tests collected   ruff clean   mypy --strict clean on 266 source files
 131/131 modules importable           18/18 sub-themes resolve to a symbol and a test file
 447 decisions in the paper ledger (as of 2026-09-20)  chain verifies, head anchor agrees, no truncation
 2 settled trades, both directionally correct, +14.99 net after costs   99.6% abstention rate

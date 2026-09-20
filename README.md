@@ -24,7 +24,7 @@ Built for the Bitget AI Base Camp / Genesis Hackathon Season 2, across all three
 cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module + sub-theme coverage, resolved by import
-pytest -q                       # 490 passed, 11 skipped
+pytest -q                       # 5,100 tests collected
 ```
 
 Nothing above needs a credential.

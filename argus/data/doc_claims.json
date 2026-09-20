@@ -11,78 +11,78 @@
       "doc": "readme",
       "line": 55,
       "quoted": [
-        "4,276"
+        "5,100"
       ],
       "live": [
         5100
       ],
       "status": "OK",
-      "excerpt": "4,276 tests collected"
+      "excerpt": "5,100 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "submission",
       "line": 178,
       "quoted": [
-        "4,276"
+        "5,100"
       ],
       "live": [
         5100
       ],
       "status": "OK",
-      "excerpt": "4,276 tests"
+      "excerpt": "5,100 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "submission",
       "line": 322,
       "quoted": [
-        "4,276"
+        "5,100"
       ],
       "live": [
         5100
       ],
       "status": "OK",
-      "excerpt": "4,276 tests collected"
+      "excerpt": "5,100 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 654,
       "quoted": [
-        "4,276"
+        "5,100"
       ],
       "live": [
         5100
       ],
       "status": "OK",
-      "excerpt": "4,276 tests"
+      "excerpt": "5,100 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1696,
       "quoted": [
-        "4,276"
+        "5,100"
       ],
       "live": [
         5100
       ],
       "status": "OK",
-      "excerpt": "4,276 tests collected"
+      "excerpt": "5,100 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1945,
       "quoted": [
-        "4,276"
+        "5,100"
       ],
       "live": [
         5100
       ],
       "status": "OK",
-      "excerpt": "4,276 tests collected"
+      "excerpt": "5,100 tests collected"
     },
     {
       "claim": "source_files",

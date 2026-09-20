@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-09-20T02:25:14.860177+00:00",
+  "generated_at": "2026-09-20T06:48:16.652524+00:00",
   "decisions": 447,
   "gate_population": 365,
-  "proposed_exposure": 2,
+  "proposed_exposure": 0,
   "session_coverage": {
     "by_phase": {
       "extended": 1,
@@ -172,6 +172,6 @@
   "confidence_mean": 0.7454,
   "confidence_min": 0.42,
   "confidence_would_have_bound": true,
-  "verdict": "2 of 447 decision(s) proposed exposure, so the risk chain has live inputs and its outcomes below are exercised rather than unreached",
-  "falsifier": "the next session with price discovery is 35.1h away, and the committed cycle schedule (13:30/15:30/17:30/19:30 UTC) sits inside US regular hours. If the desk abstains through a full session of those, the cause is the desk and this conclusion is refuted"
+  "verdict": "0 of 447 decision(s) proposed exposure. The first gate (no_exposure) returned on every one, so 14 downstream gate(s) never executed at all: min_confidence, oracle_stale, unhedgeable_gap, gross_exposure, signed_exposure, hedge_integrity, margin_usage, factor_exposure, scenario_loss, liquidation_cost, per_symbol_underperformance, risk_budget, session_volatility, max_position. Their permissiveness is unmeasured, not demonstrated. The funnel is computed over the 365 decision(s) carrying a risk record, which is fewer than the 447 on the ledger because the risk log began later; the session finding below covers all 447. Stated confidence runs a median 0.72 and never below 0.42, so the 0.55 floor would not have bound either \u2014 but that is a second fact, not the reason: the reason is that it was never evaluated. 447 decision(s) across 3 session phase(s): extended=1, rth=216, weekend=230. 216 were taken while the anchor market had price discovery **The sampling explanation this module published is REFUTED.** 216 decision(s) were taken with the anchor market open \u2014 the session it claimed the desk had never been offered \u2014 and the desk proposed nothing on any of them. The cause is the desk's own conviction about direction, not when it was asked. Whether that refusal is *correct* is still UNDEFINED: eval/shadow.py has 0 scored calls against a floor of 20, and the first decisions carrying a directional lean have not settled yet.",
+  "falsifier": "**FIRED.** 216 decision(s) were taken with the anchor market open and the desk proposed nothing on any of them. The sampling explanation this module published is refuted, and the rewritten conclusion is above \u2014 not a defence of the old one"
 }
