@@ -1,7 +1,7 @@
 {
-  "total": 76,
-  "checked": 76,
-  "ok": 76,
+  "total": 78,
+  "checked": 78,
+  "ok": 78,
   "stale": 0,
   "absent": 21,
   "unchecked": 0,
@@ -14,7 +14,7 @@
         "5,100"
       ],
       "live": [
-        5113
+        5123
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -27,7 +27,7 @@
         "5,100"
       ],
       "live": [
-        5113
+        5123
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -40,7 +40,7 @@
         "5,100"
       ],
       "live": [
-        5113
+        5123
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -53,7 +53,7 @@
         "5,100"
       ],
       "live": [
-        5113
+        5123
       ],
       "status": "OK",
       "excerpt": "5,100 tests"
@@ -66,7 +66,7 @@
         "5,100"
       ],
       "live": [
-        5113
+        5123
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -79,7 +79,7 @@
         "5,100"
       ],
       "live": [
-        5113
+        5123
       ],
       "status": "OK",
       "excerpt": "5,100 tests"
@@ -92,7 +92,7 @@
         "5,100"
       ],
       "live": [
-        5113
+        5123
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -105,7 +105,7 @@
         "5,100"
       ],
       "live": [
-        5113
+        5123
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -115,65 +115,65 @@
       "doc": "readme",
       "line": 61,
       "quoted": [
-        "266"
+        "267"
       ],
       "live": [
-        266
+        267
       ],
       "status": "OK",
-      "excerpt": "strict clean on 266 source files"
+      "excerpt": "strict clean on 267 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 39,
       "quoted": [
-        "266"
+        "267"
       ],
       "live": [
-        266
+        267
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 266 source files"
+      "excerpt": "strict` clean on 267 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 178,
       "quoted": [
-        "266"
+        "267"
       ],
       "live": [
-        266
+        267
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 266 files"
+      "excerpt": "strict` clean on 267 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 322,
       "quoted": [
-        "266"
+        "267"
       ],
       "live": [
-        266
+        267
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 266 source files"
+      "excerpt": "strict` clean across 267 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 1942,
       "quoted": [
-        "266"
+        "267"
       ],
       "live": [
-        266
+        267
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 266 source files"
+      "excerpt": "strict` clean on 267 source files"
     },
     {
       "claim": "register_claims",
@@ -274,6 +274,32 @@
       ],
       "status": "ABSENT",
       "excerpt": ""
+    },
+    {
+      "claim": "anchors_confirmed",
+      "doc": "readme",
+      "line": 169,
+      "quoted": [
+        "38"
+      ],
+      "live": [
+        38
+      ],
+      "status": "OK",
+      "excerpt": "38 of the 48 proofs carry a Bitcoin"
+    },
+    {
+      "claim": "anchors_confirmed",
+      "doc": "explained",
+      "line": 2537,
+      "quoted": [
+        "38"
+      ],
+      "live": [
+        38
+      ],
+      "status": "OK",
+      "excerpt": "38 of the 48 carry a Bitcoin"
     },
     {
       "claim": "ledger_decisions",
@@ -590,7 +616,7 @@
     {
       "claim": "t1_dsr_survivors",
       "doc": "explained",
-      "line": 2844,
+      "line": 2853,
       "quoted": [
         "Zero"
       ],

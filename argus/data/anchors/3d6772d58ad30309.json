@@ -8,28 +8,44 @@
       "calendar": "https://a.pool.opentimestamps.org",
       "proof_hex": "f0081306782bbe43f7c308f010956933c5d3bc2f714f05f074c3038d7408f020cfc132309a80e30dfa51ff2dcc0ffeb19c91850d1990dde17459d211e4689a6d08f020d540184d7e85d142cc602b51e3796f753884c67eced60a6514e16a7d8d59ffc108f1046aaabfa8f0089ddcc484fc7ef5fb0083dfe30d2ef90c8e2e2d68747470733a2f2f616c6963652e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
       "proof_bytes": 172,
-      "submitted_at": "2026-09-16T16:11:16.911177+00:00"
+      "submitted_at": "2026-09-16T16:11:16.911177+00:00",
+      "bitcoin_block_heights": [],
+      "format": "opentimestamps detached proof (ots verify)"
     },
     {
       "calendar": "https://b.pool.opentimestamps.org",
       "proof_hex": "f008b3f22f1c1aa96db008f120eed5ff4dc9f31ba1533f74a64077b1eda72de2d54cd7e642f3f7e8cf7160a34c08f010e1b1629e4fef85916471f0c6c52db3d408f12005c97fbe1ff7a0af183377645511b817dfe12a1472dd91288cfa347c5180d17c08f12070ade80ee176450d373463dfa9cff9fdef04e30149b16cbad39044bba26096e508f020fd8efebad0a8098a46339cdd63f7a2191c54483984d88a1a9fce6b1941d88f7b08f1046aaabfa9f008dc3b0723902438410083dfe30d2ef90c8e2c2b68747470733a2f2f626f622e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
       "proof_bytes": 240,
-      "submitted_at": "2026-09-16T16:11:16.911177+00:00"
+      "submitted_at": "2026-09-16T16:11:16.911177+00:00",
+      "bitcoin_block_heights": [
+        967305
+      ],
+      "format": "opentimestamps detached proof (ots verify)"
     },
     {
       "calendar": "https://alice.btc.calendar.opentimestamps.org",
       "proof_hex": "f0083f207fb64af533b808f01059211e2850a986b841c9f1df9809bac008f0206c8851210f7b35117d5d227092d7a7f7efa98f02ff77b9f9faf211d6f9cad29f08f120fb1783779521e166ea850d20b3f9535ba3836294980c4c00d497a73a62c6cd1e08f1046aaabfabf008fca7a0513fc264710083dfe30d2ef90c8e2e2d68747470733a2f2f616c6963652e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
       "proof_bytes": 172,
-      "submitted_at": "2026-09-16T16:11:16.911177+00:00"
+      "submitted_at": "2026-09-16T16:11:16.911177+00:00",
+      "bitcoin_block_heights": [],
+      "format": "opentimestamps detached proof (ots verify)"
     },
     {
       "calendar": "https://finney.calendar.eternitywall.com",
       "proof_hex": "f0102eb63d92d5635655842015cc9bc1727908f120310143d04edf2726d1843a20dddfe614839c39d49582d3ae104aba22daa54d0008f120351302b8c00500cd253998e3d1a27e13bf9276ea39dad7e738eeef961747182b08f020e02fa3928b2e9593d2d9c17aa23edf1859a2293213943d805d7ea1a1ed42a12508f1046aaabfacf008b3a74bc8905dc7ec0083dfe30d2ef90c8e292868747470733a2f2f66696e6e65792e63616c656e6461722e657465726e69747977616c6c2e636f6d",
       "proof_bytes": 191,
-      "submitted_at": "2026-09-16T16:11:16.911177+00:00"
+      "submitted_at": "2026-09-16T16:11:16.911177+00:00",
+      "bitcoin_block_heights": [
+        967330
+      ],
+      "format": "opentimestamps detached proof (ots verify)"
     }
   ],
   "failures": [],
   "status": "pending-bitcoin-confirmation",
-  "note": ""
+  "note": "",
+  "bitcoin_block_heights": [
+    967305,
+    967330
+  ]
 }

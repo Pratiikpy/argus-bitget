@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-15T02:58:30.211109+00:00",
+  "as_of": "2026-09-20T09:37:55.172156+00:00",
   "note": "The hosted console runs without a model key by design, so this measures the path a judge actually meets. TUNED is the corpus the patterns were widened against and measures fit; HELDOUT was written before the patterns were touched and measures fluency.",
   "tuned": {
     "corpus": "tuned",

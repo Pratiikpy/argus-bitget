@@ -394,6 +394,13 @@ CLAIMS: tuple[Claim, ...] = (
           register_claims, ("readme", "submission", "explained", "master-plan"), mode="lagging"),
     Claim("settled_trades", r"(?P<q>\d+) settled trades?",
           settled_trades, ("readme", "submission", "explained")),
+    # Registered the day the anchor claims were found to be false. The documents said the register
+    # was "anchored to Bitcoin" and verifiable "with the reference OpenTimestamps client" while all
+    # 48 proofs were raw calendar receipts carrying only a pending attestation — unreadable by that
+    # client, and not anchored to anything yet. Both are now true, and both are now checked.
+    Claim("anchors_confirmed", r"(?P<q>\d+) of the 48(?:\*\*)? (?:proofs )?carry a Bitcoin",
+          lambda: __import__("argus.register.anchorcheck", fromlist=["x"]).confirmed_anchors(),
+          ("readme", "explained"), mode="lagging"),
     Claim("ledger_decisions",
           r"(?P<q>[\d,]+) decisions? in the paper ledger",
           ledger_decisions, ("readme", "submission", "explained"), mode="lagging"),

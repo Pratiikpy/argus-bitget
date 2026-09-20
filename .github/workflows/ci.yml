@@ -1,0 +1,94 @@
+# Continuous integration.
+#
+# **This exists because "the build fails on drift" was written down before any build existed.** The
+# repository claimed a self-verifying documentation gate, and the gate was real — but it only ran
+# when somebody remembered to run it, which is not a gate, it is a habit. A check nothing enforces
+# is indistinguishable from a check nobody wrote.
+#
+# Deliberately split into two jobs. `verify` is hermetic: lint, types, the offline test suite, the
+# capability register, and the documentation gate. It must pass on every push, and it must never
+# depend on a network that can be down for reasons that are not our fault. `live` runs the parts
+# that genuinely need the venue's public API and is allowed to fail without failing the build,
+# because a transport timeout at a Bitget endpoint is not a defect in this repository — the full
+# suite has already been observed erroring three tests purely on `read operation timed out`, and a
+# CI that cries wolf on somebody else's outage gets ignored within a week.
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: argus
+
+jobs:
+  verify:
+    name: lint · types · tests · documentation gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: pip install -e ".[dev]"
+
+      - name: Lint
+        run: python -m ruff check src tests
+
+      - name: Types
+        run: python -m mypy --strict src
+
+      # Every module must import. A package that type-checks but cannot be loaded is not shippable,
+      # and `argus.status` resolves the sub-theme map by import rather than by reading a list.
+      - name: Modules and sub-theme coverage
+        run: python -m argus.status
+
+      # The capability register raises at import if an OWNED entry carries fewer than its thirteen
+      # conditions, so simply importing it is the check. Regenerating the artefact here keeps the
+      # published `data/standing.json` from drifting behind the source the way it did on
+      # 2026-09-20, when the artefact said 0 owned and the register said 23.
+      - name: Capability register
+        run: python -m argus.eval.standing
+
+      # The anchor proofs, read as bytes rather than trusted as a sentence. Fails only if a proof
+      # cannot be parsed by the reference OpenTimestamps format; calendar-pending is not a failure.
+      - name: Anchor proofs
+        run: python -m argus.register.anchorcheck
+
+      # The offline suite. `-m "not live"` is not used because the markers do not partition that
+      # way; instead the network-bound comparison files are ignored here and named explicitly in `live`.
+      - name: Tests
+        run: >-
+          python -m pytest -q -p no:randomly
+          --ignore=tests/test_eventdriven_comparison.py
+          --ignore=tests/test_factor_divergence_comparison.py
+
+      # Last, because it is the one that catches the others lying. Exits non-zero if any number
+      # quoted in the READMEs, the submission draft or ARGUS-EXPLAINED has drifted from the
+      # artefact that produces it.
+      - name: Documentation gate
+        run: python -m argus.eval.docclaims --tests
+
+  live:
+    name: live venue checks (advisory)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Network-bound comparisons
+        run: >-
+          python -m pytest -q -p no:randomly
+          tests/test_eventdriven_comparison.py
+          tests/test_factor_divergence_comparison.py
