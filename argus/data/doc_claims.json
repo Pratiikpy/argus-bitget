@@ -15,7 +15,7 @@
         "5,100"
       ],
       "live": [
-        5837
+        5843
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -28,7 +28,7 @@
         "5,100"
       ],
       "live": [
-        5837
+        5843
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -41,7 +41,7 @@
         "5,100"
       ],
       "live": [
-        5837
+        5843
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -54,7 +54,7 @@
         "5,100"
       ],
       "live": [
-        5837
+        5843
       ],
       "status": "OK",
       "excerpt": "5,100 tests"
@@ -67,7 +67,7 @@
         "5,100"
       ],
       "live": [
-        5837
+        5843
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -80,7 +80,7 @@
         "5,100"
       ],
       "live": [
-        5837
+        5843
       ],
       "status": "OK",
       "excerpt": "5,100 tests"
@@ -93,7 +93,7 @@
         "5,100"
       ],
       "live": [
-        5837
+        5843
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -106,7 +106,7 @@
         "5,100"
       ],
       "live": [
-        5837
+        5843
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -116,65 +116,65 @@
       "doc": "readme",
       "line": 61,
       "quoted": [
-        "276"
+        "277"
       ],
       "live": [
-        276
+        277
       ],
       "status": "OK",
-      "excerpt": "strict clean on 276 source files"
+      "excerpt": "strict clean on 277 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 39,
       "quoted": [
-        "276"
+        "277"
       ],
       "live": [
-        276
+        277
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 276 source files"
+      "excerpt": "strict` clean on 277 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 180,
       "quoted": [
-        "276"
+        "277"
       ],
       "live": [
-        276
+        277
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 276 files"
+      "excerpt": "strict` clean on 277 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 324,
       "quoted": [
-        "276"
+        "277"
       ],
       "live": [
-        276
+        277
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 276 source files"
+      "excerpt": "strict` clean across 277 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 1942,
       "quoted": [
-        "276"
+        "277"
       ],
       "live": [
-        276
+        277
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 276 source files"
+      "excerpt": "strict` clean on 277 source files"
     },
     {
       "claim": "register_claims",
@@ -444,7 +444,7 @@
         "447"
       ],
       "live": [
-        447
+        449
       ],
       "status": "OK",
       "excerpt": "447 decisions in the paper ledger"
@@ -455,7 +455,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        447
+        449
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -466,7 +466,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        447
+        449
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -569,7 +569,7 @@
         "447"
       ],
       "live": [
-        447
+        449
       ],
       "status": "OK",
       "excerpt": "447 decisions"
@@ -582,7 +582,7 @@
         "447"
       ],
       "live": [
-        447
+        449
       ],
       "status": "OK",
       "excerpt": "447 ledger entries"
@@ -595,7 +595,7 @@
         "447"
       ],
       "live": [
-        447
+        449
       ],
       "status": "OK",
       "excerpt": "447 decisions"
@@ -608,7 +608,7 @@
         "447"
       ],
       "live": [
-        447
+        449
       ],
       "status": "OK",
       "excerpt": "paper-trading log has 447 decisions"
@@ -619,7 +619,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        386
+        398
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -630,7 +630,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        386
+        398
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -643,7 +643,7 @@
         "386"
       ],
       "live": [
-        386
+        398
       ],
       "status": "OK",
       "excerpt": "386 have settled as abstentions"
@@ -656,7 +656,7 @@
         "282"
       ],
       "live": [
-        282
+        284
       ],
       "status": "OK",
       "excerpt": "282 decisions carry a lean"
@@ -667,7 +667,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        282
+        284
       ],
       "status": "ABSENT",
       "excerpt": ""
