@@ -1,0 +1,105 @@
+{
+  "generated_from": "C:\\Users\\prate\\bitget\\argus\\data\\risk_records.jsonl",
+  "rows_read": 150,
+  "dimensions": {
+    "order_size": {
+      "component": "order_size",
+      "frames": 1,
+      "changed": 0,
+      "share_changed": 0.0,
+      "inert": true,
+      "changes": [],
+      "risk_violations": 0,
+      "violation_rate": 0.0,
+      "status": "INERT"
+    },
+    "gross_exposure": {
+      "component": "gross_exposure",
+      "frames": 1,
+      "changed": 0,
+      "share_changed": 0.0,
+      "inert": true,
+      "changes": [],
+      "risk_violations": 0,
+      "violation_rate": 0.0,
+      "status": "INERT"
+    },
+    "signed_exposure": {
+      "component": "signed_exposure",
+      "frames": 1,
+      "changed": 0,
+      "share_changed": 0.0,
+      "inert": true,
+      "changes": [],
+      "risk_violations": 0,
+      "violation_rate": 0.0,
+      "status": "INERT"
+    },
+    "hedge_integrity": {
+      "component": "hedge_integrity",
+      "frames": 1,
+      "changed": 0,
+      "share_changed": 0.0,
+      "inert": true,
+      "changes": [],
+      "risk_violations": 0,
+      "violation_rate": 0.0,
+      "status": "INERT"
+    },
+    "margin_usage": {
+      "component": "margin_usage",
+      "frames": 1,
+      "changed": 0,
+      "share_changed": 0.0,
+      "inert": true,
+      "changes": [],
+      "risk_violations": 0,
+      "violation_rate": 0.0,
+      "status": "INERT"
+    },
+    "factor_exposure": {
+      "component": "factor_exposure",
+      "frames": 1,
+      "changed": 0,
+      "share_changed": 0.0,
+      "inert": true,
+      "changes": [],
+      "risk_violations": 0,
+      "violation_rate": 0.0,
+      "status": "INERT"
+    },
+    "scenario_loss": {
+      "component": "scenario_loss",
+      "frames": 1,
+      "changed": 0,
+      "share_changed": 0.0,
+      "inert": true,
+      "changes": [],
+      "risk_violations": 0,
+      "violation_rate": 0.0,
+      "status": "INERT"
+    },
+    "liquidation_cost": {
+      "component": "liquidation_cost",
+      "frames": 1,
+      "changed": 0,
+      "share_changed": 0.0,
+      "inert": true,
+      "changes": [],
+      "risk_violations": 0,
+      "violation_rate": 0.0,
+      "status": "INERT"
+    },
+    "per_symbol_underperformance": {
+      "component": "per_symbol_underperformance",
+      "frames": 0,
+      "changed": 0,
+      "share_changed": 0.0,
+      "inert": true,
+      "changes": [],
+      "risk_violations": 0,
+      "violation_rate": 0.0,
+      "status": "UNTESTED"
+    }
+  }
+}

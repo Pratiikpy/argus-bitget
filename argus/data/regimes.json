@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-09-20T02:23:35.555517+00:00",
+  "symbol": "NVDAUSDT",
+  "window": 24,
+  "bars": 1439,
+  "boundaries": [
+    "2026-07-31T10:00:00+00:00",
+    "2026-08-28T10:00:00+00:00"
+  ],
+  "threshold_agrees": true,
+  "segments": [
+    {
+      "start": "2026-07-22T03:00:00+00:00",
+      "end": "2026-07-31T09:00:00+00:00",
+      "bars": 223,
+      "volatility_bps": 19.06,
+      "drift_pct": -3.9156,
+      "arc_value": null
+    },
+    {
+      "start": "2026-07-31T10:00:00+00:00",
+      "end": "2026-08-28T09:00:00+00:00",
+      "bars": 672,
+      "volatility_bps": 10.213,
+      "drift_pct": 14.2294,
+      "arc_value": 0.9714
+    },
+    {
+      "start": "2026-08-28T10:00:00+00:00",
+      "end": "2026-09-20T01:00:00+00:00",
+      "bars": 544,
+      "volatility_bps": 8.343,
+      "drift_pct": -2.0539,
+      "arc_value": 0.9793
+    }
+  ],
+  "verdict": "3 regime(s) in 1439 bar(s) of NVDAUSDT. The loudest runs at 19.1bps a bar against 8.3 in the quietest (2.3x), and the incumbent fast-vs-slow volatility rule flips at the same places"
+}

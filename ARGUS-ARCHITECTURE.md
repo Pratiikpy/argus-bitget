@@ -1,464 +1,434 @@
 # ARGUS — System Architecture
 
-## Three products · one engine · all eighteen sub-themes
+## The technical reference: structures, invariants, algorithms, and what enforces them
 
-**Status:** build specification, 2026-09-12. Supersedes `ARGUS-TRACK2-ARCHITECTURE.md`.
-**Grounded in:** 25 code-level architecture teardowns (`research/architecture/`, 160,411 words) ·
-the consolidated build ledger (129 mechanisms, 103 defects, 24 absent capabilities) · 922-source
-research corpus · `ARGUS-MASTER-PRD.md` (18,900 words).
+**Status: built and running.** Every figure below was produced by running something on this machine,
+and `python -m argus.eval.docclaims` checks the ones quoted in these documents against the artefact
+that produced them.
 
----
-
-## 0. The shape of the whole thing
-
-```text
-                         ONE ENGINE
-   Truth · Evidence · Intelligence · Risk · Execution · Learning · Authority
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        │                     │                     │
-   ALPHA FACTORY       TRADING GOVERNOR       RESEARCH OS
-     (Track 1)            (Track 2)            (Track 3)
-        │                     │                     │
-  strongest            strongest             strongest
-  STATISTICAL          AUTONOMOUS            RESEARCH
-  MACHINE              DECISION-MAKER        EXPERIENCE
-        │                     │                     │
-  scored 100%          scored 50/50          scored by judges;
-  quantitatively       quant/judge           human decides
-```
-
-**The engine is shared. The products are not.** Track 1 submits a strategy whose Sharpe must survive
-costs. Track 2 submits an agent whose decisions must be provably its own. Track 3 submits a
-workspace whose every number must be traceable in one click. Building one and re-pointing it at the
-other two is the most likely way to lose all three.
-
-### The six levels — universal across all three products
-
-| Level | Question | Who answers it |
-|---|---|---|
-| **1 — Trust** | What was knowable at this instant? | Temporal Truth Fabric. A gate, not a feature |
-| **2 — Intelligence** | What does it mean? | Six intelligence engines |
-| **3 — Decision** | What should be done? | Track 1: the optimiser. Track 2: the LLM. Track 3: the human |
-| **4 — Execution** | What actually happened? | Execution Truth Engine |
-| **5 — Learning** | Was I right, and *why* — thesis, timing, execution or luck? | Autopsy and attribution |
-| **6 — Authority** | Do I deserve to do this again? | Capital authority state machine |
-
-Three invariants, enforced in code:
-
-1. **Level 2 may never write into Level 1.** No intelligence module can revise a timestamp, promote
-   a source's credibility, or restate what was knowable — otherwise every leakage defence is one
-   prompt injection away from being switched off.
-2. **Level 6 is derived, never self-asserted.** An agent cannot argue its way into a larger
-   position. It can only be *measured* into one.
-3. **A Level 1 failure halts the pipeline.** `DATA_INSUFFICIENT` is a distinct verdict from
-   `NO_TRADE`: the first says the evidence was inadequate, the second says it was adequate and the
-   answer was no. Conflating them hides the system's most important failure mode.
-
----
-
-## 1. The shared engine
-
-### 1.1 Level 1 — the Temporal Truth Fabric
-
-Every fact carries five times, not one: `event_time`, `publish_time`, `ingest_time`,
-`available_at`, and a revision chain. Retrieval is bounded by `as_of` **at the storage interface**,
-not by caller discipline — a caller that omits the bound gets an error, never a silent leak.
-
-**This is the most violated rule in the field**, and the teardowns proved it with `file:line`.
-FinMem populates `temp_date_list` at `memorydb.py:169` and `195` and never checks it before ranking,
-so a decision on date *t* can retrieve memories from *t+100*. FinAgent does an unbounded
-`similarity_search` (`memory/basic_memory.py:62`) and — worse — computes `days_future = now + 14`,
-putting future state directly into the observation. Both are widely cited architectures.
-
-**The two-clock model is ours.** Every PIT implementation found across 922 sources assumes a single
-market clock. A tokenized equity has two, and they disagree for 65.5 hours a week: a fact can be
-tradeable on the token's clock while unpriceable on the anchor's. A single-clock design cannot
-represent that.
-
-*Taken:* Qlib's `P` operator for expression-level forward-reference blocking (`pit.py:24–49`);
-TradingAgents' FRED vintage-pinning and centralised UTC-normalised date-window filter — genuinely
-good, and the correction to our earlier note, which called v0.4.0 leakage-prone when five of its
-seven sources are properly protected. Its one real gap is Polymarket, which is real-time only; we
-must not reproduce that shape.
-
-### 1.2 Level 1 — Session State Machine
-
-Per instrument, per venue: session phase, NAV freshness, oracle age, hours to next genuine price
-discovery, and the live hedgeability surface.
-
-**The fact that justifies the entire system:** Bastion — an autonomous AI fund for tokenized stocks,
-the closest thing to ARGUS that exists — has **zero** session awareness. No market hours, no NAV
-staleness, no oracle freshness, no gap risk; every on-chain price is treated as fresh 24/7. Its
-advertised risk machinery is also largely dormant: CVaR is computed and never enforced in sizing,
-the circuit breaker never fires, the sentiment agent is wired to no news source, and execution is
-stubbed.
-
-### 1.3 Level 1 — Evidence validity
-
-Every extracted number keeps a locator to its exact position in the source. Docling preserves
-cell-level `BoundingBox {l,t,r,b}` in page coordinates (`table_structure_model.py:143–150`, MIT) —
-adopted directly, and the foundation for Track 3's evidence lineage.
-
-Citations are **bound, not self-reported**. Agent-Rita builds them from the data actually injected
-during the loop, tracked in a `citedWidgets` map keyed by widget UUID plus args
-(`round-trip.ts:743–754`, MIT): the model physically cannot cite outside that set. LLM
-self-reported citations are the failure mode we refuse.
-
-*Correction to a widely repeated claim:* Docling's "chart understanding" yields **descriptions, not
-numeric extraction**. A chart may never sit on an evidence path terminating in a number.
-
-### 1.4 The spine — `DecisionContext`
-
-One append-only object threads every level, in all three products. It is also the audit artefact: a
-third party replaying a decision needs this and nothing else.
-
-```text
-DecisionContext
-├── identity      decision_id · parent_id · created_at · schema_version
-├── clocks        TWO always — token_clock, anchor_clock — plus as_of
-├── session       per instrument: phase · nav_state · oracle_age · hours_to_discovery
-├── evidence[]    claim · source · event/publish/ingest/available_at · credibility
-│                 · locator (page, bbox) · lineage_hash
-├── hypotheses[]  thesis · evidence_ids · return DISTRIBUTION · falsifier (mandatory)
-├── dissent[]     the strongest surviving counter-case, carried intact
-├── hedgeability  ranked hedge menu · priced residual · Risk Neutralisation Efficiency
-├── risk          marginal VaR/CVaR of THIS trade · gap risk · concentration deltas
-├── decision      verdict ∈ {TRADE, REDUCE, HEDGE, DELAY, NO_TRADE,
-│                            HUMAN_REVIEW, DATA_INSUFFICIENT}
-│                 · size · stated_confidence · invalidation_conditions[]
-├── authority     granted envelope · regime · expiry
-├── constitution  verdict ∈ {ALLOW, RESIZE, REQUIRE_HEDGE, DELAY, REJECT, FLATTEN}
-│                 · binding constraint · machine-readable reason · signature
-├── execution     plan · orders[] · fills[] · shortfall · reconciliation state
-├── trust         fused: contamination · evidence quality · PIT integrity
-│                 · calibration · consistency
-└── outcome       interval score · per-link causal grades
-                  · edge decomposition {information, timing, execution, luck}
-```
-
-Rules: append-only within a decision — a module adds fields, never rewrites another's. Every numeric
-field carries the id of the code path that computed it, because *"the LLM interprets, code
-calculates"* is only enforceable if you can point at the calculator. The object is content-hashed at
-each level boundary, so a divergent replay tells you *which level* diverged.
-
-### 1.5 Levels 4–6 — shared by all three products
-
-**Execution Truth Engine.** A formal order state machine where **a timeout is not a rejection** and
-`UNKNOWN` is first-class. Nautilus is the reference — **LGPLv3, so we link the compiled library and
-never vendor it**, rebuilding the state machine in simplified form. Fill realism from hftbacktest
-(MIT, copy freely): its exact condition for a resting buy limit — best ask drops below the order
-price, *or* a trade prints below it, *or* a trade prints at it **and** the queue model shows
-`front_qty <= 0` — is the standard we hold ourselves to, with its `ProbQueueModel` family and
-`IntpOrderLatency`.
-
-**Two production traps to avoid, both found in shipped engines.** Nautilus backtests at **zero fees**
-unless configured, silently overstating P&L. Qlib measures turnover as **gross notional, not net
-delta**, overstating cost 2–3× on mean-reversion, and its defaults are A-share shaped (open 0.15%,
-close 0.25%, `exchange.py:48–51`) — they must be replaced with Bitget's 0.12% round-trip, never
-inherited. **Across 103 catalogued defects, cost-blindness is the single most widespread failure
-class in the field** — ahead of leakage, ahead of self-scoring. Our cost model is
-*constructed-mandatory*: a zero-fee backtest must be impossible to instantiate.
-
-**Learning.** Post-trade autopsy grading thesis, timing, execution, risk-model correctness, per-link
-causal accuracy, agent contribution, calibration and repeated-error detection.
-
-**Authority is probabilistic, not a score.** Not *"agent score = 87"* but *"probability this agent is
-competent in this regime = 0.84, from n observations"* — small samples mean wide uncertainty means
-low authority, resolving as evidence accumulates. Clawock's beta-binomial shrinkage of stated versus
-realised confidence, grouped by driver and regime (`decision/settlement.py`, MIT), is the estimator.
-
----
-
-## 2. TRACK 2 — the Autonomous Trading Governor
-
-> The AI decides. ARGUS proves whether it should be trusted.
-
-### 2.1 The positioning test, and why most of the field fails it
-
-Bitget's rule: *the LLM is the primary trading decision-maker, not just an assistant; the Agent must
-sense the environment, make independent judgments, and autonomously place orders with risk
-controls.* Three requirements — **sense**, **judge independently**, **place orders under risk
-control**. Most of the recognised field satisfies at most two.
-
-| System | LLM decides? | Evidence | Track 2 |
-|---|---|---|---|
-| AI-Trader (HKUDS) | **No** | LLM writes market-summary prose; the trading path never consults it (`routes_signals.py`) | **Fails**, despite advertising "100% fully-automated agent-native" |
-| Vibe-Trading (HKUDS) | **No** | System prompt forbids recommendations; orders human-gated | **Fails** — a research platform |
-| inalpha | **No, by design** | LLM deliberately off the order path; execution needs a separate approval token (`trade-plan.ts:74–303`) | **Fails**, and is honest about it |
-| FinRobot | **No** | Verified by grep — no broker client, no order path, no execution | **Fails** — a report generator |
-| Bastion | Partial | Council votes; execution stubbed, CVaR unenforced | **Incomplete** |
-| TradingAgents | **Yes** | Genuine multi-agent decision, emitted as a recommendation | **Partial** — no autonomous placement |
-| **atrx-demo** | **Yes** | Three-tier LLM validation on a live account, 600+ trades since Nov 2025 | **Passes** — our most serious rival on this test |
-
-These systems are not weak — several are far more mature than us. They answer a *different question*
-than this track asks. That is the honest framing, and the only defensible one.
-
-### 2.2 The Constitution asymmetry — how both halves of the rule hold at once
-
-Typed intent → policy (OPA) → feasibility (Z3/CVXPY) → signed authorisation. Verdicts: `ALLOW`,
-`RESIZE`, `REQUIRE_HEDGE`, `DELAY`, `REJECT`, `FLATTEN`.
-
-**The Constitution may only ever reduce.** It can shrink a trade, demand a hedge, delay it, or
-refuse it. It can never create one, never flip a side, never size up. So the economic choice stays
-the LLM's and the risk layer stays non-negotiable — simultaneously. Every alternative design either
-lets risk logic quietly become the real trader, or leaves risk arguable by prompt.
-
-Risk rules live in versioned configuration, never in prompts — inalpha enforces this at an HTTP
-boundary with DB-backed locks (`risk_guard.py:87–153`), and vibe-trading's mandate gate
-(`sdk_order_gate.py:62–182`) is fail-closed with the audit write *before* the broker call.
-
-**Licence-driven build decision:** cvxportfolio is **GPL**, as is open-trading-platform — vendoring
-either forces our stack open. The Kernel is built on raw CVXPY (Apache). We rebuild two cvxportfolio
-ideas: `SimulatorCost` (`costs.py:347–451`), which evaluates the *same* expression with forecast
-parameters for the optimiser and realised parameters for the simulator — structurally closing the
-optimizer/simulator gap; and γ = 1.5 market impact with convexity enforced at ≥ 1.0
-(`costs.py:826`, `845–848`), the classical square-root law.
-
-### 2.3 The six sub-theme engines
-
-Each consumes one `DecisionContext` and returns structured intelligence. **None of them decides.**
-
-| Sub-theme | ARGUS engine | Strongest prior art | Genuinely ours |
-|---|---|---|---|
-| **Event-driven** | **Event-to-Position Transmission Engine** — event → mechanism → affected variable → industry → asset → magnitude → horizon → *already priced?* → alternative explanation → trade. Each link graded independently afterwards | EventEdge — 12 event classes, correct MacKinlay machinery (*proprietary, all rights reserved: rebuild from MacKinlay 1997*) | Per-link causal grading. A correct call reached through three wrong links is a **failure** our scorer catches and a P&L scorer records as success. EventEdge's LLM is advisory-only and runs once daily |
-| **Sentiment** | **Sentiment Integrity Graph** — author, source, account age, historical accuracy, bot probability, coordination, novelty, independent-source count, market confirmation, persistence | FinBERT (baseline); TradingAgents v0.4.0, rewritten upstream after its analyst fabricated Reddit content it never fetched | We do not try to own the best sentiment *model*. We own the best sentiment **trust system**: separating "people are bullish" from "new independent information credibly changed expectations." **Incremental Sentiment Value** is the metric, and if it does not beat raw sentiment after fees, this subsystem is demoted |
-| **Earnings** | **Expectation Surface** — seven independent surprises (reported, consensus, guidance, narrative, valuation, management credibility, Q&A) mapped to a forward return *distribution*. Plus the **Earnings Contradiction Detector** | CARAG; VerumTrade peer read-through (`peer_read_through.py:62–146`) | The contradiction test is the killer feature: *EPS +12%, revenue +4%, guidance −7%, margins −250bps, management confidence +2%, consensus expected +8%* must resolve to **"headline beat, fundamental deterioration"** — not "beat → buy" |
-| **Cross-asset execution** | **Hedge Optimizer Under Unavailable Markets.** Given rNVDA long, NYSE shut, BTC open, QQQ/SOXX/NVDA all unavailable: what is the cheapest *available* instrument that removes the most relevant risk right now? | hftbacktest · ABIDES · Nautilus · JAX-LOB · RL-LOB · Hummingbot · Almgren-Chriss | The agent's chosen hedge is scored against the **mathematical optimum over the feasible set**. That turns "did the LLM choose well?" into a measurable question — which is exactly what Track 2 is scored on |
-| **Factor discovery** | **Factor Lineage Graph** + the 16-state lifecycle ending in `RETIRE`, with a **Factor Cemetery** | RD-Agent · Alpha-Jungle MCTS · FactorMiner | See §2.4 |
-| **Open Theme** | **The Observatory** — §2.6 | TraderBench · live-trade-bench · StockBench · KTD-Fin | Eight capabilities absent from every harness torn down |
-
-### 2.4 Search/evaluation separation, and the Factor Cemetery
-
-Three independent instances of the same contamination, in code:
-
-- `mcts-llm-alpha` computes a real IS/OOS overfitting score at `qlib_evaluator.py:143`, then
-  **unconditionally overwrites it** with the generating LLM's self-judgment (`comprehensive.py:90–98`).
-- **RD-Agent** — Microsoft's, the strongest factor machinery in existence — uses a single
-  `APIBackend()` to both propose and judge. No independent evaluator. **No purged CV, no embargo, no
-  deflated Sharpe, no PBO, no trial counter.** Capacity, decay and retirement absent. It also shows
-  `without_cost` numbers to both proposer and evaluator while feedback reads `with_cost`.
-- **FactorForge** feeds the generator the IC of the top 3 factors each round and asks for variations
-  (`evolution_engine.py:95–99`).
-
-**FactorMiner is the counter-example and gets the credit**: its generator sees only syntax errors,
-never scores (`factor_generator.py:91–112`). We cite it as prior art rather than claiming separation
-as ours.
-
-What remains ours: the **trial counter** and **cost-aware IC gating**, which none has. A search that
-runs hundreds of trials, reports the best, and never records how many it ran is not a result — the
-trial count *is* part of the result, and our DSR gate consumes it.
-
-**The Factor Cemetery makes this demonstrable rather than rhetorical.** The reportable artefact is a
-funnel, not a headline:
-
-```text
-10,000 discovered → 1,843 failed formalisation → 211 survived OOS
-    → 17 survived capacity → 4 deployed → 2 decayed → 1 retired
-```
-
-That is far harder to fake than *"our AI generated 5,000 alphas."*
-
-### 2.5 The Five Proof Systems
-
-The architecture is already large enough. What it needs is not more features but **five artefacts
-that convert claims into machine-checkable evidence**. These are Track 2's headline deliverables.
-
-#### A. Autonomy Proof — *did the LLM actually decide this trade?*
-
-Every trade emits a signed chain:
-
-```text
-market_state_hash
-llm_original_intent        ← the model's unconstrained economic choice
-constitution_modification  ← what the risk layer changed, and which constraint bound
-llm_revised_intent         ← the model's response to being constrained
-approved_intent            ← signed
-submitted_order
-exchange_order_id
-fills[]
-reconciliation_state
-```
-
-The `llm_original_intent` / `llm_revised_intent` pair is the load-bearing part: it shows the model
-making an economic choice *and* responding to a constraint, which no amount of architecture diagram
-can demonstrate. A judge gets a machine-verifiable answer, not a narrative.
-
-#### B. Counterfactual Twin — *does the LLM add value?*
-
-Every decision runs in **five worlds on identical state**:
-
-| World | Decision-maker |
+| | |
 |---|---|
-| A | ARGUS LLM |
-| B | Deterministic ARGUS, no LLM |
-| C | Human |
-| D | A different LLM |
-| E | No trade |
+| Source | **147 modules**, 20 packages, 59,069 lines |
+| Import graph | **162 modules**, 0 layering violations, 0 forbidden imports, 4 cycles (**0 at import time**) |
+| Registered and importable at runtime | **129/129** (`python -m argus.status`) |
+| Tests | **118 files, 3,543 collected**, 33 skipped |
+| Static analysis | `ruff` clean; `mypy --strict` clean on **162 source files** |
+| Artefacts | **66** under `argus/data/`, each written by a named module |
+| External systems torn down at code level | **62** reports under `research/architecture/`, each citing `file:line` |
+| Runtime dependencies | **two** — `pydantic`, `python-dateutil` |
 
-**Incremental Agent Value = outcome(A) − outcome(best counterfactual).** World B is the one that
-matters: if the LLM does not beat its own deterministic twin on identical data, we report that. An
-honest negative on B is more credible than an unexplained positive on A — and it is the only real
-proof that the LLM is the decision-maker, which is precisely what §2.1 demands.
+That last row is the constraint that shaped everything else. Every statistic here — OLS, augmented
+Dickey–Fuller, Engle–Granger, hierarchical clustering, matrix profiles, Fisher intervals, binomial
+tests, Ederington effectiveness — is implemented in pure Python, and each one that has a reference
+implementation is **checked against it numerically** rather than trusted.
 
-#### C. Execution Proof — *is the executed order the approved order?*
-
-Approved intent hash ↔ submitted order ↔ exchange acknowledgement ↔ fills ↔ position delta, with
-every mismatch surfaced rather than reconciled away. Partial fills re-plan the residual; a failed
-hedge leg resizes the position rather than leaving it naked.
-
-#### D. Competence Proof — *is authority earned?*
-
-The promotion/demotion ledger: every authority change with the evidence that caused it, the regime
-it applies to, its expiry, and the posterior competence estimate with its sample size.
-
-#### E. Benchmark Proof — *is it actually better?*
-
-§2.6.
-
-### 2.6 The Observatory (Track 2 Open Theme)
-
-Eight capabilities are **absent from every finance-agent harness torn down** — Microsoft's
-FinanceBenchmark, Trata's Hedge-Bench, SUFE's FinEval: probabilistic calibration (ECE / Brier /
-reliability), decision consistency under replay, abstention quality, agent-contribution attribution,
-point-in-time integrity testing, adversarial resistance, cost-aware evaluation, and live streaming
-evaluation. Microsoft's additionally grades with **gpt-52 regardless of the model under test** — an
-unguarded LLM judge; Trata at least uses a different family.
-
-**Nine baselines**, D being decisive: buy-and-hold · risk parity · fixed rule · **deterministic
-ARGUS** · single LLM · multi-agent without Constitution · full ARGUS · human + ARGUS.
-
-**Model-versus-model, on identical state.** GPT, Claude, Qwen, Gemini and DeepSeek run the same data,
-environment, costs, constraints and portfolio — compared on return, Sharpe, max drawdown,
-calibration, consistency, abstention quality, risk violations, latency, cost, evidence grounding and
-authority progression. That makes ARGUS a **neutral operating system for evaluating trading
-intelligence**, which is a much larger claim than being one more agent.
-
-**The Synthetic Market Challenge** removes the "the model already knew what happened" objection
-entirely: generated markets no model has seen — bull, bear, sideways, high-volatility, jump risk,
-liquidity collapse, correlation breakdown, fake news, delayed news, oracle failure. This is the
-direction the literature is moving (KTD-Fin on separating memorised knowledge from skill; SynthFin
-on contamination-free sequential evaluation).
-
-**Abstention is scored economically.** A `NO_TRADE` is not automatically good — we compute what would
-have happened and report **Abstention Value**: *avoided loss +$412*, or *missed opportunity −$183*.
-
-### 2.7 Decide — the mechanics
-
-**Hypotheses, not directions.** Each carries a thesis, evidence ids, a return *distribution*, and a
-mandatory **falsifier**. Levkila's exit-plan schema is the working shape.
-
-**Debate scored on quality.** TradingAgents' bull/bear structure with TraderBench's far better
-instrumentation — hallucination, contradiction, concession and new-evidence detection
-(`debate.py:150–423`).
-
-**The Source Independence Graph is ours.** Five agents saying "bullish" after reading the same
-Reuters article is five opinions and **one** independent source. The system displays and weights it
-that way. Nothing in the corpus does this; it is the difference between a debate and an echo.
-
-**Stress runs before the decision.** Hypothesis → stress → *revised* decision, so a CVaR blow-up
-under a −10% BTC shock changes the position rather than appearing in a report beneath it.
-
-**Cost discipline on the model itself.** atrx-demo's three-tier validation — cheap pre-filter, full
-analysis, portfolio veto — adopted because our Qwen hackathon key has a limited balance and most
-candidates never deserve a full analysis.
-
-### 2.8 Challenge Mode
-
-Thirteen attacks as controls a judge presses against the live system on the current decision — not a
-CI suite nobody sees. TraderBench is the closest prior art and covers **one** outright (destroy
-liquidity), three partially. **Nine are ours.**
-
-ABIDES answers feasibility: **yes**, two `ExchangeAgent`s with independent `mkt_open`/`mkt_close` can
-model a live token against a shut equity venue. Two gaps are our build work — it models **no fees at
-all**, and shocks must be **pre-configured; there is no mid-run injection**, which is exactly what a
-judge pressing a button requires. Midnight wrapping is untested and overnight/weekend is our case,
-so it is the first thing to prove.
+This document supersedes the 2026-09-12 build specification. That was a plan; this is what exists.
 
 ---
 
-## 3. TRACK 1 — the Autonomous Alpha Factory
-
-> ARGUS does not merely discover strategies. It discovers, falsifies, costs, stress-tests,
-> capacity-tests and retires them.
-
-**Track 1 is scored 100% quantitatively** — Sharpe, Sortino, max drawdown, turnover, OOS decay,
-rolling 30-day stability. It does not care how elegant the system is. This section is therefore
-about producing *numbers that survive costs*, not about architecture.
-
-### 3.1 Six alpha engines
-
-| Cell | Engine | The design decision that matters | Honest grade |
-|---|---|---|---|
-| **Arbitrage** | **Net Executable Arbitrage** — a signal exists only if `theoretical spread − taker fee − spread crossing − slippage − impact − latency − funding − failed-leg risk − hedge cost > required margin`, multiplied by an **Expected Arbitrage Capture Probability** | 300bps theoretical is not 300bps opportunity; it may be **38bps expected executable edge**. Our own research shows the economics are hostile and Weinberg shows the ordinary-holder redemption channel is structurally absent | **C today.** A only if genuine net executable edge appears. We publish the decomposition either way — that is the contribution |
-| **After-hours pricing** | **Overnight Information Absorption Model** — predicts `P(next-open return │ information state)` from after-hours return, volume, spread, order imbalance, event type and surprise, sector and macro state, BTC state, volatility, liquidity, weekday-vs-weekend, NAV distance and time-to-open | Results **must** be split by Monday / Tue–Fri / earnings / macro / geopolitical / crypto-led / low-liquidity / high-volatility. This is what stops one giant Monday effect masquerading as a strategy | **A+** |
-| **Cross-market correlation** | **Tradable Cross-Market Hedge Ratio** — not a correlation. *"0.71 ± 0.13 this regime; after session-overlap and stale-print correction, the economically usable ratio is 0.34"* | Clean ablation ladder: raw → session-corrected → DCC → DCC+regime → full ARGUS | **A** |
-| **rToken factors** | **rToken State Factor Library** — NAV distance, time-to-open, time since last native price, crypto beta, weekend state, liquidity degradation, spread expansion, oracle state, underlying vol, close-to-open gap history, event intensity, mint/redeem constraints | **Not 1,000 generic factors.** Factors specifically about a *continuous token market with a discontinuous anchor* — a genuinely distinctive research problem, and the thinnest theme in our corpus | **A+ if the dataset is excellent** |
-| **Cross-asset rotation** | **Execution-Aware Regime Allocation** — the optimiser sees expected return, risk, correlation, liquidity, cost, capacity, hedgeability and regime | A position with high expected return but an **empty hedge menu is penalised**. This is where Track 2's hedgeability work becomes Track 1 alpha | **A** |
-| **Open Theme** | **Execution-aware alpha** — optimise `gross alpha − commissions − spread − impact − slippage − funding − turnover − capacity penalty − regime instability` | Optimise for **real executable P&L**, not predicted return. The handbook names execution-aware alpha explicitly | **S — our strongest Track 1 candidate** |
-
-### 3.2 The Alpha Certification Protocol
-
-Every strategy walks one path, and gets a **certificate**, not a Sharpe:
+## 0. The shape
 
 ```text
-IDEA → FORMALIZE → BASELINE → BACKTEST → COST → PURGED CV → OOS → DSR → PBO
-  → CAPACITY → REGIMES → WALK-FORWARD → PAPER → CERTIFY → DEPLOY → MONITOR
-  → DECAY → DEMOTE → RETIRE
+                              ONE ENGINE
+   Truth · Evidence · Intelligence · Risk · Execution · Record · Evaluation
+                                  │
+        ┌─────────────────────────┼─────────────────────────┐
+        │                         │                         │
+   ALPHA FACTORY           TRADING GOVERNOR            RESEARCH OS
+     (Track 1)                (Track 2)                 (Track 3)
+   scored 100%              scored 50/50              scored by judges
+   quantitatively           quant / judge             human decides
 ```
 
-The certificate records the trial count, the cost assumptions, the OOS window and when it was
-unsealed, the DSR with its trial adjustment, PBO, capacity, regime coverage, and the decay curve.
-A Sharpe without those is a number; a Sharpe with them is a result. This directly attacks the
-field-wide search/evaluation contamination documented in §2.4.
+The engine is shared; the products are not. Track 1 submits a strategy whose Sharpe must survive
+costs. Track 2 submits an agent whose decisions must be provably its own. Track 3 submits a
+workspace whose every number must be traceable in one click.
 
 ---
 
-## 4. TRACK 3 — the AI Trading Research OS
+## 1. The layer rule, and the code that enforces it
 
-> A natural-language research question becomes a source-grounded, reproducible, decision-ready
-> workspace.
+Seven layers. Each may import only from those below.
 
-**The warning that governs this track:** Track 3 is now the most competitive of the three. Financial
-research agents with SEC and earnings RAG, portfolio dashboards, AI-native wealth workstations and
-live agent tool execution already exist, and OpenAI launched a financial-services ChatGPT on
-2026-09-10. **A "chat with your stock" product loses immediately.** Our differentiator cannot be data
-breadth — it must be *decision quality and evidence lineage*.
+```
+  7  demo, lui, eval            human surfaces, and the judges of everything below
+  6  agents, paper, register    the model, the Constitution, the record, the public commitments
+  5  desk, research, strategies tools and studies
+  4  execution, sim, backtest   orders, simulation, engine
+  3  market                     everything that fetches
+  2  cost, decision, risk       vocabulary and limits
+  1  truth                      time, and what was knowable
+```
 
-| Cell | Product | The mechanism |
+`eval/architecture.py` builds the graph with `ast`, computes transitive reachability, and fails on
+violation. Three contracts:
+
+| contract | rule | where |
 |---|---|---|
-| **Information extraction** | **Claim → Evidence → Signal Graph** | A claim like *"margins are deteriorating"* is clickable down to: 10-Q page 84 → revenue → COGS → computed gross margin → prior quarter → consensus → expected margin → signal impact. Not citations — **lineage**. Built on docling's cell-level bboxes and Agent-Rita's bound-citation pattern |
-| **Review & self-evolution** | **Research Autopsy** → **Personal Error Profile** | After every decision: what did I believe, what supported it, what did I ignore, what changed, which assumption failed, was it the analysis / execution / timing / information? Accumulates into *"you are consistently early on semiconductor reversals; you overweight management commentary; you are overconfident in high-volatility regimes."* This is **0/12 in our corpus** — open territory |
-| **Stress testing** | **Decision Simulator** | Not "here are three similar historical examples." A live distribution — bull, base, bear, liquidity shock, BTC shock, correlation breakdown, earnings surprise, valuation compression — answering *"at what price and size does this thesis stop making sense?"* |
-| **Personalised workbench** | **Portfolio-aware verdicts** | Same stock, same market, **different verdict** for two users, because the profile binds the Constitution: risk budget, horizon, holdings, sector concentration, preferred evidence, style, authority. The proof sentence a generic desk cannot produce: *"good trade in isolation, bad trade for your book — it lifts your semiconductor concentration from 22% to 31% against a 25% mandate cap"* |
-| **Execution assistance** | **Execution Copilot** | Not "buy 100 shares?" — *urgency: low · recommended participation 8% · expected slippage X · expected cost Y · estimated completion Z · alternatives TWAP / liquidity-seeking · risk if delayed*. Track 2's execution engine surfaced as a desk feature |
-| **Open Theme** | **Decision Cockpit** | One workspace: question → research → evidence → thesis → counter-thesis → historical analogues → stress → portfolio impact → execution → **human decision**. Every number clickable back to its source |
+| **Deterministic core** | `truth`, `cost`, `risk`, `decision`, `backtest` may never reach `argus.llm` or `argus.agents`, **at any depth** | `architecture.py:60,69` |
+| **Producer before consumer** | `market` may not import `agents` | `architecture.py:73` |
+| **Cycles** | permitted only when broken at load by a deferred import in one direction | `architecture.py:102` |
 
-**Track 3 gets easier once Track 2 is mature**, because almost all of Track 2's hard infrastructure
-becomes the desk's backend. That is the sequencing argument, not a reason to defer the design.
+**Instability** is Martin's `I = Ce / (Ca + Ce)`, computed per package. `truth` sits at 0.00 (39
+modules depend on it, it depends on nothing) — which is what a foundation should look like.
 
----
+### A blind spot in our own checker, found and closed
 
-## 5. Build order
-
-Truth before intelligence, intelligence before authority — each stage is meaningless without the one
-beneath it.
-
-1. **Foundation (all tracks)** — Temporal Truth Fabric with two clocks · Session State Machine ·
-   evidence graph with bound citations · `DecisionContext` · the cost model that cannot be zero.
-2. **Execution truth (all tracks)** — order state machine · fill engine · reconciliation.
-   Deliberately early: an intelligence layer that cannot be executed honestly is decoration.
-3. **Track 1 alpha engines** — the quantitative cells, because they need the longest data runway and
-   are scored on numbers that take time to accumulate.
-4. **Track 2 intelligence** — event · sentiment · earnings · cross-asset · factor lab.
-5. **Track 2 decision** — hypotheses · source-independence graph · debate · stress · Constitution ·
-   the Five Proof Systems.
-6. **Track 3 surfaces** — cockpit · lineage · autopsy · simulator · copilot, on the Track 2 backend.
-7. **Observatory, Challenge Mode, Synthetic Market Challenge** — the proof surface for all three.
+The parser accepted only `node.level == 0`, so **every relative import was silently dropped** from
+the graph — invisible to the cycle detector, the deterministic-core rule and the coupling metrics
+alike. It was latent rather than live: this codebase uses absolute imports throughout, so the graph
+was complete *by convention* rather than by construction. `_absolute()` now resolves the leading dots
+against the importer's package. A checker that is correct only while a convention holds is a checker
+that stops being correct without telling anyone.
 
 ---
 
-## 6. What we refuse to build
+## 2. The core data structures
+
+### `truth.facts.Fact` — five times, not one
+
+Every fact carries: when the event **happened**, when it was **published**, when we **ingested** it,
+when it became **available** to us, and a **revision number** so a restatement supersedes rather than
+overwrites. A query without an as-of date is a type error. There is no "latest".
+
+### `truth.clocks` — the dual clock
+
+The token's clock never stops. The anchor equity's has four phases (regular, extended, overnight,
+weekend) plus holidays. `SessionState` carries the phase, `hours_to_next_discovery`, and staleness
+thresholds that **differ by phase** — the same age means different things at 2pm and at 2am.
+
+The consequence the rest of the system is built around: a fact can be **knowable and unpriceable at
+the same instant**.
+
+### `decision.verdicts.Intent` → `ConstitutionRuling`
+
+An `Intent` carries side, quantity, verdict, stated confidence, thesis, and — mandatory —
+`invalidation`: what would make the thesis wrong. A position with no falsifier cannot be monitored,
+only hoped over.
+
+`apply_constraint()` is the **single function** through which the risk layer may alter an intent, and
+it can only narrow. The ruling names the binding constraint in machine-readable form, because "which
+constraint bound, how often" is the evidence that the risk layer does real work, and free text cannot
+be aggregated.
+
+### `paper.ledger.Entry` — the hash chain
+
+Append-only, each entry hashing the previous. An order is bound to the exact `approved_intent_hash`
+that authorised it — not to a correlation id, which could be reused. The head is anchored
+(`paper/anchor.py`) so truncation is detectable, and `data/anchors/` holds OpenTimestamps proofs
+submitted to live Bitcoin calendar servers.
+
+### `cost.model.CostModel` — no zero-fee constructor
+
+Commission, spread, square-root impact (γ = 1.5, cvxportfolio's `costs.py:826`), borrow, and
+**perpetual funding charged per 8-hour settlement** with the venue's ±0.5% cap enforced at
+construction — a rate outside it is a unit error, not a large cost.
+
+There is deliberately **no `CostModel.zero()`**. A frictionless model exists only via
+`frictionless_for_research(reason)`, which stamps it so `assert_gateable()` refuses to let it justify
+a decision. Cost-blindness was the most widespread defect across the 62 systems torn down, so it is
+prevented structurally rather than by review.
+
+---
+
+## 3. The Register — claims committed before their outcomes
+
+The only part of this system whose value comes from elapsed time rather than from code, which is why
+it was opened before it was finished.
+
+| module | what it holds |
+|---|---|
+| `claims` | The `Claim` schema, the **refuse-at-registration** validator, and the hash chain. A claim whose resolution predicate cannot execute against a named point-in-time source is rejected with the reason — that single rule is what separates a register from a comment section. |
+| `resolve` | The auto-resolver and the scoreboard. Checks the horizon **before** it fetches a price, grades on the last bar at or before the horizon, and returns UNRESOLVABLE — never FALSE — when a source will not answer. |
+| `open_register` | Opens the register: builds a mechanical batch, commits it, and submits the head hash to four Bitcoin calendars. |
+| `cadence` | **Continuous registration on every cycle**, across a ladder of horizons — 24h, 72h, 7d, 14d, 30d — so something is always pending and something has always just resolved. |
+
+**The invariants, each enforced rather than intended:**
+
+- **Append-only.** There is no update and no delete. A resolution is a *new line* naming the claim it
+  resolves, so nothing already written is ever rewritten and a stranger can verify the file from byte
+  zero without trusting the process that wrote it.
+- **The digest covers the claim, not its outcome.** `content()` drops status, resolution and
+  observation before hashing, so the commitment is checkable *before* anyone knows the answer — which
+  is the entire point of committing it.
+- **It cannot resolve early.** The horizon check happens before the fetch. There is no code path in
+  which the resolver has seen the outcome and then decided not to use it.
+- **A minimum horizon.** A claim must resolve at least an hour after registration, far outside any
+  plausible clock skew between this host and the venue's stamps, so a claim can never be registered
+  about a bar that has already printed.
+- **Brier, not hit rate.** Hit rate is improved by only making easy claims. Brier charges for
+  confidence, so the same accuracy stated loudly scores worse than stated honestly. Both directions
+  are pinned by test, because "fixing" this into rewarding timidity would invert the incentive the
+  register exists to create.
+
+**A defect in the register's own opening, found and fixed the same day.** All 36 founding claims
+were committed at a single 24-hour horizon, so every one resolved the next morning — while the
+handbook puts judge review at **9/22 to 10/7**. The record would have been frozen for the entire
+window it was built to be watched during. `horizon_coverage()` measures exactly this and reported
+**0 resolving inside the window, 0 still pending when it opens**; the cadence fixes it, and a test
+pins the failure shape so it cannot return unnoticed.
+
+**Live:** 61 claims across the twelve rTokens (`data/register.jsonl`), chain intact. The anchored head `bc36478291a06bc3` is claim 36 of 61 — the head at the moment of anchoring, so the timestamp proof covers the first 36 claims and not the 25 registered since. Anchored to
+`a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
+`alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The resolver runs on
+every scheduled cycle.
+
+**The confidences are set by a written rule, not chosen.** Volatility claims at 0.60, because
+`risk/session_risk.py` measured that the reopen bar carries 1.5–2.2× a regular-hours bar and every
+horizon crosses one. Direction claims at exactly **0.50**, because `desk/analogue.py`,
+`desk/shapematch.py` and `research/cointegration.py` each measured that we have no directional edge
+on these instruments — and claiming one we had disproved ourselves would be precisely the dishonesty
+this register exists to price.
+
+## 4. The Constitution — the gate chain in source order
+
+`agents/desk.py:ConstitutionPolicy.rule()`. Each gate may only narrow; the first that binds returns.
+
+| # | gate | binds when |
+|---|---|---|
+| 1 | `no_exposure` | the verdict carries no quantity |
+| 2 | `min_confidence` | stated confidence below the floor |
+| 3 | `oracle_stale` | NAV stale **while the anchor is shut** |
+| 4 | `unhedgeable_gap` | no hedge placeable and size above the unhedged cap |
+| 5 | `risk_budget` | the position exceeds the book's risk budget — calibration-gated fraction x the breaker's drawdown ladder |
+| 6 | `session_volatility` | measured path volatility above the regular-hours baseline |
+| 7 | `max_position` | size above the absolute cap |
+
+The ordering is load-bearing. Gate 5 reacts to **our** drawdown, gate 6 to **the market's** clock —
+separate arguments rather than one multiplier, because a single number could not be attributed. Gate
+7 is an absolute ceiling and must bind **last**, so it is never diluted by a multiplier.
+
+**Gate 5 was added on 2026-09-14 to close a gap between two modules that both already existed.**
+`risk/circuit.py` (the breaker) and `risk/sizing.py` (Kelly, gated on calibration) were complete and
+tested, and **neither was ever called on a live decision**: `sizing.size()` had no caller anywhere in
+`src/argus`, and `sizing.py:149` documented `risk_multiplier` as coming from `circuit.risk_multiplier`
+while nothing connected them. The breaker's own docstring set the bar — *"the test for this module is
+not 'does it run' but 'inject a 3-sigma adverse move mid-cycle and confirm the desk produces a
+different answer, and says why'"* — and until this gate existed it could not.
+
+The budget is `equity x fraction`, where `fraction` comes from `sizing.size()`:
+
+| the record | fraction | on a 100,000 book |
+|---|---|---|
+| fewer than 20 graded outcomes, or ECE above 0.15 | `FIXED_FRACTION` = 5% | 5,000 |
+| calibrated: >= 20 graded, ECE <= 0.15 | half-Kelly on stated confidence, capped at 25% | up to 25,000 |
+| drawdown >= 4% / 6% / 10% | x0.75 / x0.5 / **x0** of the above | tightens, then halts |
+
+**Live today that is a 10x tightening.** The record holds 183 decisions, 69 settled, and **zero**
+gradeable outcomes — no settled trade, no settled lean — so the calibration gate refuses and the cap
+is 5% of the book. Before gate 5 the only size limit was the flat 50,000 notional of gate 7. An
+unproven desk is now sized as an unproven desk, and **proving calibration is the only thing that
+lifts it**: `test_risk_budget_gate.py` pins that twenty well-calibrated outcomes earn more size and
+that a lower stated confidence earns less, so the gate cannot degenerate into a constant.
+
+The session throttle is deliberately passed to `size()` as 1 and applied by gate 6 instead. Folding
+it in would charge the market's clock twice and make the binding constraint unattributable: gate 5
+reacts to **our** drawdown and our proven calibration, gate 6 to **the market's** clock.
+
+`book_state` is injected exactly as `session_risk` is; absent, the gate does not fire. It returned
+`None` on an empty ledger for one revision, which was over-cautious and wrong in the dangerous
+direction — a paper book that has closed nothing has realised equity of exactly the starting book
+and a drawdown of exactly zero, both measurements, and returning `None` disabled the position cap on
+precisely the book that has proven nothing.
+
+**Reachability, not just firing.** `eval/autopsy.py` walks this chain in source order and subtracts
+each gate's hits before considering the next, so every gate is reported as FIRED, PASSED or
+**UNREACHED**. A gate that never executed has unmeasured permissiveness — it has not been shown to
+be safe, and reporting it as "passed" would be a claim nobody earned.
+
+**The chain is now known to be reachable, and that is new.** Across all 170 recorded decisions gate
+1 returned every time — `no exposure proposed; nothing to narrow` — so gates 2 to 6 had never
+executed and a chain that is never entered cannot be said to work. The cause was never the risk
+layer: every directional study here measured no edge, so the desk correctly proposed nothing.
+
+`desk/carrydesk.py` supplies the missing input. A funding payment is collected for *holding* a side,
+not for being right about direction, so a carry basket carries a quantity without claiming a
+forecast our own measurements refuse. Live, on the surviving basket from `research/carry.py`:
+
+| gate | status | why |
+|---|---|---|
+| 1 `no_exposure` | **PASSED** | first time on record — the proposal carries a quantity |
+| 2 `min_confidence` | **FIRED** | stated confidence 0.371 is below the 0.55 floor |
+| 3–7 | UNREACHED | the chain short-circuits at 2, and they are reported as unreached |
+
+This is an assessment against the real `ConstitutionPolicy`, **not a ledger entry**: the trade was
+refused, so nothing was booked and the ledger still holds zero settled positions.
+
+The confidence is a Wilson lower bound on the share of profitable holding windows, computed against
+the **independent** window count. The study replays 1,823 overlapping 14-day windows drawn from 90
+days of history; those are about 6 independent holds. At 6 the bound is 0.371 and the floor refuses
+it; at 1,823 it would be 0.72 and the position would have been sized on a sample that does not
+exist. Gate 1 was cleared by supplying an honest proposal, never by loosening the gate — and the
+first gate that actually ran then refused the trade. `test_carrydesk.py` pins both halves, including
+one test proving a sufficiently confident proposal *does* reach past gate 2, so UNREACHED stays a
+fact about this proposal rather than about the code.
+
+**The asymmetry.** The Constitution may reduce exposure and may never originate a thesis. The one
+apparent exception is documented precisely: `REQUIRE_HEDGE` attaches a hedge leg, which lowers net
+risk while raising gross notional (`decision/verdicts.py:178-185`). Three invariants, not one.
+
+---
+
+## 5. The numerical kernels, and what each was checked against
+
+This is the section that distinguishes a system from a demo. Every kernel below is pure Python and
+every one with a reference was validated against it numerically.
+
+| kernel | module | reference | agreement |
+|---|---|---|---|
+| OLS, ADF, Engle–Granger, MacKinnon tables | `research/cointegration.py` | statsmodels 0.14.6 | **1e-12** on 10 unit-root + 3 cointegration tests over real hourly closes, including lag selection, sample sizes, and its unexplained `nobs − 1` Stata quirk |
+| Hierarchical risk parity | `desk/allocation.py` | PyPortfolioOpt | **3.6e-16** on 12 instruments, cluster order included |
+| z-normalised shape distance | `desk/shapematch.py` | stumpy `core.py:1118` | identity `d = √(2(1−ρ))` asserted by test; flat-vs-structured = 1.0 matches stumpy's `D² = m` special case by construction |
+| Matrix profile + FLUSS arc curve | `desk/regime.py` | matrixprofile `regimes.py`, stumpy `floss.py` | follows each where it is better: matrixprofile's analytic parabola, stumpy's 5× head/tail pin |
+| Ederington hedging effectiveness, Fisher interval | `risk/effectiveness.py` | Ederington 1979 | textbook interval reproduced (r = 0.5, n = 100 → 0.337–0.634) |
+| Benjamini–Hochberg, Bonferroni | `backtest/validation.py` | — | single implementation, **imported** by the pairs scanner rather than copied |
+| Queue-position fills, latency | `execution/queue.py`, `latency.py` | hftbacktest `queue.rs`, `latency.rs` | ported with citations |
+| Order state machine | `execution/orders.py` | nautilus `enums.rs:1304-1388` | 15 states, read from source after a from-memory version had 11 |
+| Multi-level matching | `sim/book.py` | abides-jpmc-public | rebuilt |
+| Memorisation probe | `eval/leakage.py` | barj28 `vr_C_api.py:124-137` | multipliers and deterministic shuffle copied exactly; parser **deliberately stricter** (the reference's `[A-E]` matches the "C" in "cannot") |
+| Injection defence | `agents/quarantine.py` | AgentDojo `agent_pipeline.py:220-276` | spotlighting + replace-don't-drop taken; its 440MB transformer detector not taken |
+
+### Complexity, where it matters
+
+- Matrix profile is brute force `O(n²m)`: 1,079 bars at a 24-bar window ≈ 24M multiply-adds,
+  **10 seconds**. The inner loop uses the correlation identity so each comparison is one dot product.
+- Shape-match null calibration is 50 full rescans ≈ 6 seconds on 1,438 bars.
+- Single-linkage clustering is naive `O(n³)` — 12 instruments is 66 pairs, and the readable algorithm
+  costs less than one HTTP round trip.
+
+Each is a deliberate trade: numpy plus numba would save those seconds and cost two dependencies.
+
+---
+
+## 6. Measurement → artefact → consumer, with staleness as absence
+
+Four measurements run **before** each cycle and write files the cycle then reads:
+
+| measurement | artefact | consumed by | stale rule |
+|---|---|---|---|
+| `market/markout.py` | `markout.json` | cost-model maker decision (advisory) | per-run |
+| `market/depth.py` | `depth.json` | the executable spread charged on **both legs** of every fill | per-run |
+| `risk/session_risk.py` | `session_risk.json` | Constitution gate 5 | **36h → absent** |
+| `risk/effectiveness.py` | `hedge_effectiveness.json` | the hedge surface's three factors | **36h → absent** |
+| `eval/leakage.py` | `leakage.json` | `eval/shadow.py` via `check_window()` | control must pass, else **UNMEASURED** |
+
+**Staleness is absence, never a weaker number.** A correlation measured three weeks ago is not a
+worse estimate of today's — it is a statement about a different market. When a measurement is
+missing, the consumer says so in the record: the hedge candidate is stamped `ASSUMED` instead of
+`MEASURED`, the session gate goes inert and the autopsy records it UNREACHED, and the leakage gate
+returns UNMEASURED — which **never reads as clean**, because an instrument that cannot fire certifies
+nothing.
+
+---
+
+## 7. The execution-realism stack
+
+| layer | what it models | source of truth |
+|---|---|---|
+| `execution/guard.py` | the venue's published instrument rules | fetched from Bitget, not assumed |
+| `execution/preflight.py` | the checks before an order is allowed to exist | — |
+| `market/depth.py` | **live L2**, sweep cost by size, executable size within a slippage budget | `GET /api/v3/market/orderbook`, 200 levels |
+| `execution/queue.py` | queue position, partial fills | hftbacktest — **12 of 13 OWNED conditions**, see below |
+| `eval/bookcalib.py` | the real book's level sizes and turnover | `GET /api/v3/market/orderbook`, appended every cycle |
+| `execution/latency.py` + `latency_probe.py` | round-trip latency, **measured** | live probes |
+| `market/markout.py` | adverse selection after other people's prints | `GET /api/v3/market/fills` |
+| `sim/book.py` | multi-level matching for backtests | ABIDES |
+
+**What the depth measurement changed.** The ledger charged the quoted touch on entry and a flat
+0.6bps on every exit. Measured live, taking $25,000 costs **0.82bps of QQQUSDT and 19.43bps of
+SQQQUSDT** against quotes of 0.14 and 4.96 — the quote understates by a factor that varies five-fold
+between instruments, which is worse than understating by a constant because it **reorders which
+instruments look cheap**.
+
+**The queue model is the closest thing here to OWNED, and it stops one condition short.**
+`eval/queueproof.py` is the evidence package, and every line of it is produced by running something:
+
+* **The port is exact.** All 8 probability-function/parameter combinations reproduce
+  `queue.rs:221-330` to **1.1e-16** on 9 (front, back) pairs spanning both extremes.
+* **What `prob()` claims was read, not assumed.** The first draft scored it as P(fill) and nearly
+  published a negative result about the wrong quantity. `queue.rs:183-204` settles it: `prob` is
+  **P(a cancelled unit came from behind the order)** — attribution, not outcome.
+* **Ground truth by construction.** An explicit order-by-order queue generates the history; each
+  model sees only the L2 view (level total before and after, printed trade size) and its estimate of
+  the quantity ahead is scored against the queue that actually produced those totals.
+* **The generative rule is swept, not chosen.** Five regimes. A probability function beats the best
+  constant in **3 of 5** in sample and the same 3 held out — with the in-sample winner *carried
+  over* rather than rechosen, and every margin's whole 95% paired interval above zero.
+* **It loses 2 of 5, and they are reported.** Where the front of the queue never cancels, "every
+  cancellation is behind you" is not a naive assumption but the exact truth (error 0.0000), and no
+  member of the family can express it.
+* **One result cuts against the model.** In one regime it estimates the queue better and still costs
+  more (−0.020bps): queue accuracy and execution cost are not the same objective.
+
+**The thirteenth condition is not met and is named rather than argued away.** hftbacktest validates
+this model against recorded real market data including market-by-order feeds; ARGUS validates it
+against a simulator whose attribution rule we stated. Bitget's public API publishes L2 only, and
+which side of a resting order a cancellation came from is **not recoverable from L2 at any sample
+rate**. Closing it needs our own orders resting in the real book — elapsed time, not more code. So
+the capability stays IMPLEMENTED at 12/13, and `eval/standing.py` raises at import if anyone writes
+otherwise.
+
+What *is* being closed meanwhile: `eval/bookcalib.py` appends a real order-book snapshot per
+instrument on every cycle, so the simulator's parameters stop being ours. The first tape already
+disagreed with them sharply — a near-touch rToken level holds a **median 1.95 contracts** and moves
+a **median 70% of itself per minute**, nothing like the large, slow levels the experiment assumed.
+
+---
+
+## 8. The evaluation layer — 35 modules whose job is to find us wrong
+
+The largest package in the system, deliberately.
+
+| module | what it can prove false |
+|---|---|
+| `docclaims` | that a number quoted in our documents matches the artefact that produced it |
+| `architecture` | that the layer rules hold |
+| `standing` | that a capability claimed OWNED meets all **13 conditions** — raises at import otherwise |
+| `autopsy` | which risk gate bound, and which were never reached |
+| `shadow` | whether the desk's directional view beats the break-even accuracy, while it refuses to trade |
+| `leakage` | whether the model had already read the period being evaluated |
+| `riskproof` | invariants across an exhaustive state-space sweep |
+| `consistency` | same state, same answer (lean 100%, action 80%, verbatim 20%) |
+| `cyclecheck` | nine checks per scheduled cycle, with a named falsifier |
+| `themeaudit` | every named sub-theme, run rather than asserted |
+| `luibench` | whether the language interface is fluent, including refusal in **both** directions |
+| `ablation`, `ablations`, `incremental` | whether each component actually adds value |
+| `forecasts`, `forecastbench` | calibration, Brier decomposition, restatement handling |
+| `overfit`, `overfitting_study` | CPCV, deflated Sharpe, PBO |
+
+**The capability ladder** is enforced in code: LOST → TIED → IMPLEMENTED → OWNED, with OWNED requiring
+thirteen conditions including a reproduced baseline, same-input comparison, out-of-sample test,
+ablation and adversarial test. Live: **14 capabilities registered, 11 IMPLEMENTED, 3 TIED, 0 OWNED.** (`data/standing.json`)
+
+---
+
+## 9. Known architectural debt
+
+Published rather than hidden, because a document that lists only strengths is a brochure.
+
+- **Two orphan modules.** `market/validation.py` and `paper/chains.py` are imported by nothing —
+  both masked by name collisions with well-tested modules of similar name.
+- **`risk/circuit.py` and `risk/sizing.py`** describe an integration with each other in their own
+  docstrings that was never coded.
+- ~~**The external anchors are not attached.**~~ **Fixed.** Both live commitments had been submitted
+  to four Bitcoin calendars and recorded `external_anchor: None`, so the record claimed less than it
+  could prove. `paper/protocol.py:attach_anchors` links them, and the digests still verify — the
+  anchor is evidence *about* a commitment, not part of it, which is what made it safe to add
+  afterwards and also why it was easy to forget.
+- **Duplicated statistics that can disagree.** Four z-normalisation implementations split between
+  population and sample variance; correlation computed on simple returns in one module and log
+  changes in another (ratio-based hedge ratio diverges ~1.3% at stress volatility); two different
+  volatility estimators used for the same fast/slow regime comparison.
+- **A median that was wrong.** `research/gap_study.py` returned the upper of the two middles on every
+  even-length input, biasing published figures upward. **Fixed, tested, and the artefact
+  regenerated** — and the test file that would have caught it now exists, because that module had
+  none.
+- **`paper/runner.py` is the change-risk hotspot**: fan-in 16, fan-out 36, and all sixteen importers
+  want only three path constants. A small `paths` module would cut it.
+
+---
+
+## 10. What we refuse to build
 
 Each is easy to build, impossible to defend, and present in the field:
 
@@ -466,19 +436,18 @@ Each is easy to build, impossible to defend, and present in the field:
 - Sentiment score → LLM decision. The edge is the same size as the fees.
 - EPS beat → buy.
 - "AI discovered a factor" after 20,000 trials with no trial count, DSR, PBO or capacity.
-- Backtests without transaction costs — **the most widespread defect class in the entire corpus**.
-- LLM arithmetic on financial values. FinRobot's shipped form of this rule is adopted: code computes
-  every number, and prompts carry an explicit *"do not estimate"* instruction.
+- Backtests without transaction costs — the most widespread defect class in the entire corpus.
+- LLM arithmetic on financial values. Code computes every number; prompts carry an explicit
+  *"do not estimate"* instruction.
 - Memory without `available_at`.
 - Production self-editing.
 - Fake or backfilled paper trading.
 - A Track 3 chatbot that answers questions instead of grounding decisions.
-- Competing on counts — most agents, most integrations, most charts, most papers read. All saturated.
-  The only remaining differentiator is measured superiority.
+- Competing on counts — most agents, most integrations, most charts. All saturated.
 
 ---
 
-## 7. The claim this architecture has to earn
+## 11. The claim this architecture has to earn
 
 Not *"ARGUS has twenty-one innovations."* That is a count, and the rule above bans it.
 
@@ -486,18 +455,14 @@ Not *"ARGUS has twenty-one innovations."* That is a count, and the rule above ba
 > the exact metric where it improves, the ablation showing our component caused it, the attack it
 > survived, the out-of-sample result, the replay, and the paper-trading evidence.
 
-**Current status, measured 2026-09-12: built and running.** 53 modules, 317 tests, ruff and mypy
-`--strict` clean, seven data artefacts from live Bitget series. Run `python -m argus.status` for a
-runtime check rather than a claim.
+**What that has produced is mostly negatives, and they are the point.** 0 of 8 factors certified.
+0 of 12 symbols surviving the strict deflation gate. 0 of 66 instrument pairs cointegrated after
+multiple-testing correction. 22 of 24 shape-retrieval cells indistinguishable from reordered noise.
+A weekend effect that failed its own train/test split. A system that reports those is worth more than
+one that reports a Sharpe.
 
-What that has produced is mostly **negatives, and they are the point**: 0 of 8 factors certified,
-0 of 12 symbols surviving the strict deflation gate, and a weekend effect that failed its own
-train/test split. A system that reports those is worth more than one that reports a Sharpe.
-
-One step cannot be taken from here: **no order has reached a venue**, because that needs a Bitget
-API key. The signed path is built, tested, and probed live — the venue answered `40037 Apikey does
-not exist`, confirming request, path, headers and demo routing are correct and only the key is
-missing. `STATUS.md` carries the four steps.
-
-The next work is not more design. It is converting §2.5's five proof systems and §3.2's certification
-protocol into running acceptance tests.
+**The honest gap:** the venue has verified a signed order round-trip, and **no position has ever been
+opened** — every one of the 183 recorded decisions is a refusal, and all of them fall in weekend
+sessions with no price discovery. `eval/autopsy.py` says so in its own words and names the falsifier
+that would overturn its explanation. That is the single largest open item, and it is stated here
+rather than left for a judge to find.

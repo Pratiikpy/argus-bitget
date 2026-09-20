@@ -1,0 +1,271 @@
+{
+  "baseline_reproduced": {
+    "symbols_checked": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "NVDAUSDT",
+      "XAUUSDT"
+    ],
+    "symbols_skipped_no_history": [],
+    "results": [
+      {
+        "symbol": "BTCUSDT",
+        "real_score": 0.7445517502236605,
+        "argus_score": 0.7445517502236605,
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "ETHUSDT",
+        "real_score": 1.6932445870638801,
+        "argus_score": 1.6932445870638801,
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "real_score": 0.40376760986359983,
+        "argus_score": 0.40376760986359983,
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "XAUUSDT",
+        "real_score": null,
+        "argus_score": null,
+        "real_is_nan": true,
+        "argus_refused": true,
+        "agree": true
+      }
+    ],
+    "all_agree": true
+  },
+  "silent_data_loss": {
+    "cases": [
+      {
+        "label": "one_risk_asset_negative",
+        "is_neg": 1,
+        "expected_safe_weight": 0.25,
+        "real_safe_weight_received": 0.0,
+        "real_total_allocated": 0.75,
+        "real_fraction_vanished": 0.25,
+        "argus_refused": true
+      },
+      {
+        "label": "three_risk_assets_negative",
+        "is_neg": 3,
+        "expected_safe_weight": 0.75,
+        "real_safe_weight_received": 0.0,
+        "real_total_allocated": 0.25,
+        "real_fraction_vanished": 0.75,
+        "argus_refused": true
+      }
+    ],
+    "every_case_the_real_function_silently_underallocates": true,
+    "every_case_argus_refuses": true
+  },
+  "missing_weight_sweep": {
+    "points": [
+      {
+        "is_neg": 1,
+        "allocated": 0.75,
+        "vanished": 0.25,
+        "closed_form_predicted_vanished": 0.25,
+        "closed_form_matches": true
+      },
+      {
+        "is_neg": 2,
+        "allocated": 0.5,
+        "vanished": 0.5,
+        "closed_form_predicted_vanished": 0.5,
+        "closed_form_matches": true
+      },
+      {
+        "is_neg": 3,
+        "allocated": 0.25,
+        "vanished": 0.75,
+        "closed_form_predicted_vanished": 0.75,
+        "closed_form_matches": true
+      },
+      {
+        "is_neg": 4,
+        "allocated": 0.0,
+        "vanished": 1.0,
+        "closed_form_predicted_vanished": 1.0,
+        "closed_form_matches": true
+      },
+      {
+        "is_neg": 5,
+        "allocated": 0.0,
+        "vanished": 1.0,
+        "closed_form_predicted_vanished": 1.0,
+        "closed_form_matches": true
+      }
+    ],
+    "closed_form_confirmed_at_every_point": true,
+    "closed_form": "vanished_fraction == min(1, step * is_neg) whenever the ranked safe asset's score is unusable"
+  },
+  "failure_cases": {
+    "empty_safe_assets": {
+      "real_raised": false,
+      "real_total_allocated": 0.75,
+      "real_silently_drops_a_quarter_with_zero_safe_assets_defined": true,
+      "argus_refused": true
+    },
+    "all_scores_nan": {
+      "real_raised": false,
+      "real_total_allocated": 0.0,
+      "real_returns_a_silent_all_zero_book": true,
+      "argus_refused": true
+    },
+    "one_day_of_real_history": {
+      "real_score_is_nan": true,
+      "real_raised": false,
+      "argus_refused": true
+    }
+  },
+  "boundary_check": {
+    "boundary": 13,
+    "results": {
+      "one_below_minimum": {
+        "n_points": 12,
+        "real_is_nan": true,
+        "argus_refused": true,
+        "agree": true
+      },
+      "exactly_minimum": {
+        "n_points": 13,
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      "one_above_minimum": {
+        "n_points": 14,
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      }
+    },
+    "boundary_confirmed_exact": true
+  },
+  "costs": {
+    "repeats": 200,
+    "real_pandas_signal_seconds_per_call": 0.001982489000001806,
+    "argus_pure_python_seconds_per_call": 8.325000089826062e-07,
+    "argus_faster_by_factor": 2381.368142475572
+  },
+  "oos_wider_universe": {
+    "held_out_symbols": [
+      "TSLAUSDT",
+      "AAPLUSDT",
+      "MSFTUSDT",
+      "METAUSDT",
+      "GOOGLUSDT",
+      "AMZNUSDT",
+      "COINUSDT",
+      "MSTRUSDT",
+      "QQQUSDT",
+      "TQQQUSDT",
+      "SQQQUSDT",
+      "SOLUSDT",
+      "XRPUSDT",
+      "XAGUSDT"
+    ],
+    "symbols_skipped_no_history": [],
+    "results": [
+      {
+        "symbol": "TSLAUSDT",
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "METAUSDT",
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "COINUSDT",
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "QQQUSDT",
+        "real_is_nan": true,
+        "argus_refused": true,
+        "agree": true
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "real_is_nan": true,
+        "argus_refused": true,
+        "agree": true
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "real_is_nan": true,
+        "argus_refused": true,
+        "agree": true
+      },
+      {
+        "symbol": "SOLUSDT",
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "XRPUSDT",
+        "real_is_nan": false,
+        "argus_refused": false,
+        "agree": true
+      },
+      {
+        "symbol": "XAGUSDT",
+        "real_is_nan": true,
+        "argus_refused": true,
+        "agree": true
+      }
+    ],
+    "all_agree": true,
+    "n_checked": 14
+  },
+  "reproducibility": {
+    "identical": true
+  },
+  "scope_statement": "argus.desk.rotation reproduces pytaa's real, vendored VAA momentum score and breadth rule to floating-point identity on live Bitget cross-asset data (rTokens + crypto majors + gold/silver tokens), verified across a wider real universe than the four symbols the module was designed against. The real vendored vigilant_allocation() has three distinct, measured silent-failure shapes: a NaN safe-asset score drops exactly min(1, step*is_neg) of the book unallocated (a closed form confirmed at five real points), an empty safe_assets list still reserves and drops a phantom safe share, and an all-NaN input returns a silent all-zero book with no exception. argus.desk.rotation refuses in every one of these cases instead. The comparison is a data-availability and failure-mode measurement, not a forecast or a backtest Sharpe \u2014 no return or edge claim is made for the rotation rule itself, only for how it fails when it cannot be computed. ARGUS's own real cross-asset history is currently only ~13 months deep on every instrument tested (recent Bitget rToken/commodity-token listings), which is why a disjoint in-sample/out-of-sample time split was not attempted \u2014 stated here rather than faked with an unvalidated shorter lookback."
+}

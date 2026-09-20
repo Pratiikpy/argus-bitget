@@ -1,0 +1,122 @@
+{
+  "generated_at": "2026-09-14T12:31:19.122390+00:00",
+  "basket": "short 1.000 TQQQUSDT + short 0.969 SQQQUSDT",
+  "notional": "1000",
+  "stated_confidence": 0.3714,
+  "independent_windows": 6.43,
+  "confidence_workings": "74% of 1823 overlapping 14-day windows were profitable, but ninety days of history holds about 6 independent ones. The Wilson bound at 6 trials is 0.37; at 1823 it would be 0.72. The smaller number is the one the floor sees.",
+  "legs": [
+    {
+      "symbol": "TQQQUSDT",
+      "side": "sell",
+      "quantity": "1000.00",
+      "stated_confidence": 0.3714,
+      "verdict": "reject",
+      "binding_constraint": "min_confidence",
+      "reason": "stated confidence 0.37 is below the 0.55 floor",
+      "gates": [
+        {
+          "order": 1,
+          "name": "no_exposure",
+          "status": "PASSED",
+          "detail": ""
+        },
+        {
+          "order": 2,
+          "name": "min_confidence",
+          "status": "FIRED",
+          "detail": "stated confidence 0.37 is below the 0.55 floor"
+        },
+        {
+          "order": 3,
+          "name": "oracle_stale",
+          "status": "UNREACHED",
+          "detail": ""
+        },
+        {
+          "order": 4,
+          "name": "unhedgeable_gap",
+          "status": "UNREACHED",
+          "detail": ""
+        },
+        {
+          "order": 5,
+          "name": "risk_budget",
+          "status": "UNREACHED",
+          "detail": ""
+        },
+        {
+          "order": 6,
+          "name": "session_volatility",
+          "status": "UNREACHED",
+          "detail": ""
+        },
+        {
+          "order": 7,
+          "name": "max_position",
+          "status": "UNREACHED",
+          "detail": ""
+        }
+      ],
+      "reached_beyond_exposure": true
+    },
+    {
+      "symbol": "SQQQUSDT",
+      "side": "sell",
+      "quantity": "968.80",
+      "stated_confidence": 0.3714,
+      "verdict": "reject",
+      "binding_constraint": "min_confidence",
+      "reason": "stated confidence 0.37 is below the 0.55 floor",
+      "gates": [
+        {
+          "order": 1,
+          "name": "no_exposure",
+          "status": "PASSED",
+          "detail": ""
+        },
+        {
+          "order": 2,
+          "name": "min_confidence",
+          "status": "FIRED",
+          "detail": "stated confidence 0.37 is below the 0.55 floor"
+        },
+        {
+          "order": 3,
+          "name": "oracle_stale",
+          "status": "UNREACHED",
+          "detail": ""
+        },
+        {
+          "order": 4,
+          "name": "unhedgeable_gap",
+          "status": "UNREACHED",
+          "detail": ""
+        },
+        {
+          "order": 5,
+          "name": "risk_budget",
+          "status": "UNREACHED",
+          "detail": ""
+        },
+        {
+          "order": 6,
+          "name": "session_volatility",
+          "status": "UNREACHED",
+          "detail": ""
+        },
+        {
+          "order": 7,
+          "name": "max_position",
+          "status": "UNREACHED",
+          "detail": ""
+        }
+      ],
+      "reached_beyond_exposure": true
+    }
+  ],
+  "gates_reached_beyond_exposure": [
+    "min_confidence"
+  ],
+  "verdict": "Gate one passed for the first time on record: a carry basket carries a quantity without claiming a direction, so ``no exposure proposed`` no longer short-circuits the chain. 1 gate(s) beyond it executed. The first gate to actually run refused it: **min_confidence** \u2014 stated confidence 0.37 is below the 0.55 floor. 74% of 1823 overlapping 14-day windows were profitable, but ninety days of history holds about 6 independent ones. The Wilson bound at 6 trials is 0.37; at 1823 it would be 0.72. The smaller number is the one the floor sees. That is the floor doing its job on a real proposal rather than never being consulted. The gates after it (max_position, oracle_stale, risk_budget, session_volatility, unhedgeable_gap) are still unreached, and are reported as unreached rather than as passed."
+}

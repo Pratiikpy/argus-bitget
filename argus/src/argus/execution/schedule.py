@@ -319,11 +319,128 @@ def twap(*, quantity: Decimal, horizon: Decimal, intervals: int) -> Trajectory:
     )
 
 
+@dataclass(frozen=True, slots=True)
+class QuantizedTrajectory:
+    """A :class:`Trajectory` re-cut to real, tradeable lot sizes.
+
+    Closes two real gaps `eval.schedule_comparison` found reading
+    ``nautechsystems/nautilus_trader``'s real ``TwapAlgorithm`` (``crates/trading/src/algorithm/
+    twap.rs``), not silently: (1) it floors every child order to the instrument's size increment
+    and schedules the shortfall as an extra final slice (``twap.rs:220-309``) — generalised here
+    from TWAP's equal slices to Almgren-Chriss's unequal ones; (2) when a slice would floor to
+    **zero or below the venue's own minimum order size**, it does not schedule an unplaceable
+    order — it merges that quantity forward rather than emitting it (``twap.rs``'s own tests name
+    this exactly: ``test_twap_submits_entire_size_when_qty_per_interval_below_size_increment``,
+    ``..._below_min_quantity``). **Found by testing an extreme case, not assumed away**: an early
+    version of this function passed every unit test yet still emitted 18 zero-quantity "slices"
+    for a heavily front-loaded, high-risk-aversion schedule — a nonsensical, unplaceable order
+    that summed correctly but was not a real answer. Fixed with the carry-forward merge below.
+    """
+
+    slices: tuple[Decimal, ...]
+    """Tradeable quantities. Every entry is an exact multiple of ``quantity_multiplier`` and
+    (when ``min_order_qty`` is supplied) at or above it — never zero, never emitted."""
+
+    quantity_multiplier: Decimal
+    min_order_qty: Decimal
+    remainder_slice_added: bool
+    """Whether the final slice is a carried-forward merge of quantity that could not stand on its
+    own, rather than the trajectory's own last interval unchanged."""
+
+    @property
+    def total(self) -> Decimal:
+        return sum(self.slices, _ZERO)
+
+    def as_dict(self) -> dict[str, object]:
+        return {
+            "slices": [str(s) for s in self.slices],
+            "quantity_multiplier": str(self.quantity_multiplier),
+            "min_order_qty": str(self.min_order_qty),
+            "remainder_slice_added": self.remainder_slice_added,
+            "total": str(self.total),
+        }
+
+
+def quantise_trajectory(
+    traj: Trajectory, *, quantity_multiplier: Decimal, min_order_qty: Decimal = _ZERO,
+) -> QuantizedTrajectory:
+    """Floor every slice to a real tradeable size, carrying forward anything too small to stand
+    on its own — matching Nautilus's real TWAP algorithm's own approach (see
+    :class:`QuantizedTrajectory`'s docstring for the two gaps this closes and the file:line each
+    is read from), generalised from TWAP's equal slices to Almgren-Chriss's unequal ones.
+
+    Requires ``traj.total_quantity`` to already be an exact multiple of ``quantity_multiplier``.
+    That is not a limitation invented for this function: a real order's own TOTAL size is
+    validated against the same instrument rule (``execution.guard.validate``) before it is ever
+    scheduled, so a total that is not already a clean multiple is a bug further up the pipeline,
+    not something this function should silently repair by inventing a rounding rule nobody asked
+    for. Raising here is what makes that upstream bug visible instead of absorbed.
+
+    **The algorithm, in words — and the bug an earlier version of it had.** A first draft floored
+    each raw slice independently, *then* carried the floored (already-truncated) values forward to
+    consolidate too-small ones. That silently discarded each slice's own fractional remainder at
+    the moment it was floored, before the carry ever saw it — caught by testing the total-
+    preservation property on the SAME extreme case that exposed the zero-slice bug, not by
+    inspection. The fix tracks the running RAW (un-truncated) cumulative total instead: at each
+    interval, ``available`` is however much has accumulated since the last emitted slice, at full
+    precision; it is floored to ``quantity_multiplier`` only at the moment of checking whether it
+    now reaches ``min_order_qty``. Emitting resets what counts as "since the last slice", but never
+    discards the fractional part that was not emitted — it simply stays inside ``available`` for
+    the next interval to pick up. A run of intervals too small to trade on their own therefore
+    becomes exactly one correctly-sized order once their sum crosses the floor, and nothing is
+    ever lost to a truncation nobody carried forward. If nothing in the whole trajectory ever
+    reaches the floor, the entire order goes out as a single slice — Nautilus's own stated
+    fallback for both cases its test suite names.
+    """
+    from argus.execution.guard import quantise_down
+
+    if quantity_multiplier <= 0:
+        raise ScheduleError(f"quantity_multiplier={quantity_multiplier} must be positive")
+    if min_order_qty < 0:
+        raise ScheduleError(f"min_order_qty={min_order_qty} cannot be negative")
+    floored_total = quantise_down(traj.total_quantity, quantity_multiplier)
+    if floored_total != traj.total_quantity:
+        raise ScheduleError(
+            f"total_quantity={traj.total_quantity} is not an exact multiple of "
+            f"quantity_multiplier={quantity_multiplier}; a real order's own total size must "
+            f"already be quantised (execution.guard.validate) before it reaches a schedule"
+        )
+
+    floor = max(quantity_multiplier, min_order_qty)
+    slices: list[Decimal] = []
+    cumulative_raw = _ZERO
+    cumulative_emitted = _ZERO
+    for s in traj.slices:
+        cumulative_raw += s.quantity
+        available = quantise_down(cumulative_raw - cumulative_emitted, quantity_multiplier)
+        if available >= floor:
+            slices.append(available)
+            cumulative_emitted += available
+
+    # Whatever never crossed the floor — trailing too-small intervals, or the last slice's own
+    # flooring shortfall. Guaranteed an exact multiple of `quantity_multiplier`: the total is
+    # (checked above) and `cumulative_emitted` is a sum of quantities that were each already a
+    # multiple, so their difference must be too.
+    final_remainder = traj.total_quantity - cumulative_emitted
+    if final_remainder > 0:
+        if slices:
+            slices[-1] = slices[-1] + final_remainder
+        else:
+            slices.append(final_remainder)
+
+    return QuantizedTrajectory(
+        slices=tuple(slices), quantity_multiplier=quantity_multiplier,
+        min_order_qty=min_order_qty, remainder_slice_added=len(slices) < len(traj.slices),
+    )
+
+
 __all__ = [
     "ImpactParameters",
+    "QuantizedTrajectory",
     "ScheduleError",
     "Slice",
     "Trajectory",
+    "quantise_trajectory",
     "trajectory",
     "twap",
 ]

@@ -70,9 +70,46 @@ class TestHeaders:
         for key in ("ACCESS-KEY", "ACCESS-SIGN", "ACCESS-PASSPHRASE", "ACCESS-TIMESTAMP"):
             assert key in h
 
-    def test_paper_trading_header_is_set_on_private_requests(self, client) -> None:
-        """rest-client.ts:274-280 — demo environment routing."""
-        assert client._headers("GET", "/x", "", private=True)["paptrading"] == "1"
+    def test_paper_trading_routes_by_product_type_not_header(self, client) -> None:
+        """Corrected against the venue, not the SDK docs.
+
+        `rest-client.ts:274-280` sends `paptrading: 1` for demo, and that is Bitget's *classic*
+        mechanism. On a v2 account it returns **40099 "exchange environment is incorrect"** — three
+        separate real keys were probed and all three behaved identically, while the public endpoint
+        showed demo living at `productType=SUSDT-FUTURES`. So paper mode routes by productType and
+        sends no header.
+        """
+        from argus.execution.bitget_client import DEMO_PRODUCT_TYPE
+
+        assert client.product_type == DEMO_PRODUCT_TYPE
+        assert "paptrading" not in client._headers("GET", "/x", "", private=True)
+        assert client.trades_real_money is False
+
+    def test_the_classic_header_is_available_but_must_be_asked_for(self, monkeypatch) -> None:
+        """Kept for any account still on the classic mechanism — off unless named."""
+        for k, v in CREDS.items():
+            monkeypatch.setenv(k, v)
+        legacy = BitgetTradingClient(paper_trading=True, legacy_paptrading=True)
+        assert legacy._headers("GET", "/x", "", private=True)["paptrading"] == "1"
+
+    def test_live_mode_trades_real_money_and_paper_does_not(self, monkeypatch) -> None:
+        """One property, so a caller never has to reason about two flags agreeing."""
+        for k, v in CREDS.items():
+            monkeypatch.setenv(k, v)
+        assert BitgetTradingClient(paper_trading=False).trades_real_money is True
+        assert BitgetTradingClient(paper_trading=True).trades_real_money is False
+
+    def test_demo_carries_no_rtokens(self, monkeypatch) -> None:
+        """A venue property with a real consequence for Track 2.
+
+        Demo has three crypto perpetuals and no tokenized equities, so a demo order can never be
+        an rToken order. The hash-chained internal ledger stays the system of record, and this
+        test exists so that stops being a surprise.
+        """
+        from argus.execution.bitget_client import DEMO_SYMBOLS
+
+        assert DEMO_SYMBOLS == ("SBTCSUSDT", "SETHSUSDT", "SXRPSUSDT")
+        assert not any("NVDA" in s or "TSLA" in s for s in DEMO_SYMBOLS)
 
     def test_paper_trading_header_is_absent_on_public_requests(self, client) -> None:
         """Public endpoints 404 when it is present — the SDK documents this explicitly."""
@@ -155,6 +192,26 @@ class TestCredentialDetection:
         assert credentials_present() is True
 
 
+def _router(*, paper: bool = True):
+    """A client whose only purpose is to expose the error router.
+
+    `_raise_for_code` became an instance method when it gained the 40099 branch: telling a live key
+    from a demo one requires knowing which environment *this client* is configured for, and a
+    staticmethod cannot know that.
+    """
+    import os
+
+    from argus.execution.bitget_client import BitgetTradingClient
+
+    for name, value in (
+        ("BITGET_API_KEY", "probe-key"),
+        ("BITGET_SECRET_KEY", "probe-secret"),
+        ("BITGET_PASSPHRASE", "probe-pass"),
+    ):
+        os.environ[name] = value
+    return BitgetTradingClient(paper_trading=paper)
+
+
 class TestVenueErrorRouting:
     """Bitget's own code is more informative than the HTTP status, and the distinction decides
     where someone looks when their setup fails.
@@ -166,10 +223,10 @@ class TestVenueErrorRouting:
 
     def test_an_unknown_key_is_not_reported_as_a_signing_problem(self) -> None:
         """40037 means signing was never reached, so pointing at the digest is wrong."""
-        from argus.execution.bitget_client import BitgetAuthError, BitgetTradingClient
+        from argus.execution.bitget_client import BitgetAuthError
 
         with pytest.raises(BitgetAuthError) as exc:
-            BitgetTradingClient._raise_for_code(
+            _router()._raise_for_code(
                 {"code": "40037", "msg": "Apikey does not exist"}, http_status=400
             )
         text = str(exc.value)
@@ -179,27 +236,54 @@ class TestVenueErrorRouting:
 
     def test_a_signature_rejection_does_point_at_the_digest(self) -> None:
         """40009 means the key exists and the signature did not match — now it IS the signing."""
-        from argus.execution.bitget_client import BitgetAuthError, BitgetTradingClient
+        from argus.execution.bitget_client import BitgetAuthError
 
         with pytest.raises(BitgetAuthError, match="base64"):
-            BitgetTradingClient._raise_for_code({"code": "40009", "msg": "sign error"})
+            _router()._raise_for_code({"code": "40009", "msg": "sign error"})
 
     def test_a_clock_or_permission_error_is_named_as_such(self) -> None:
-        from argus.execution.bitget_client import BitgetAuthError, BitgetTradingClient
+        from argus.execution.bitget_client import BitgetAuthError
 
         with pytest.raises(BitgetAuthError, match="clock is in sync"):
-            BitgetTradingClient._raise_for_code({"code": "40010", "msg": "timestamp expired"})
+            _router()._raise_for_code({"code": "40010", "msg": "timestamp expired"})
 
     def test_success_codes_pass_through(self) -> None:
-        from argus.execution.bitget_client import BitgetTradingClient
 
         for code in ("00000", "0", ""):
-            BitgetTradingClient._raise_for_code({"code": code})
+            _router()._raise_for_code({"code": code})
 
     def test_an_unrecognised_code_keeps_the_status_and_message(self) -> None:
-        from argus.execution.bitget_client import BitgetOrderError, BitgetTradingClient
+        from argus.execution.bitget_client import BitgetOrderError
 
         with pytest.raises(BitgetOrderError, match="43012"):
-            BitgetTradingClient._raise_for_code(
+            _router()._raise_for_code(
                 {"code": "43012", "msg": "insufficient balance"}, http_status=400
             )
+
+    def test_a_live_key_on_demo_routing_names_the_environment(self) -> None:
+        """40099, found by live probe: two real keys returned it under `paptrading: 1`.
+
+        That is what proved they were live keys rather than demo ones — and without this branch the
+        message would have been a bare "venue code 40099" and the diagnosis a guess.
+        """
+        from argus.execution.bitget_client import BitgetAuthError
+
+        with pytest.raises(BitgetAuthError, match="belongs to the live environment"):
+            _router(paper=True)._raise_for_code(
+                {"code": "40099", "msg": "exchange environment is incorrect"}
+            )
+
+    def test_a_demo_key_on_live_routing_names_it_the_other_way(self) -> None:
+        from argus.execution.bitget_client import BitgetAuthError
+
+        with pytest.raises(BitgetAuthError, match="belongs to the demo environment"):
+            _router(paper=False)._raise_for_code(
+                {"code": "40099", "msg": "exchange environment is incorrect"}
+            )
+
+    def test_40099_says_a_demo_key_is_a_separate_key(self) -> None:
+        """The misconception that cost real time: it is not a toggle on a live key."""
+        from argus.execution.bitget_client import BitgetAuthError
+
+        with pytest.raises(BitgetAuthError, match="not a permission toggle"):
+            _router(paper=True)._raise_for_code({"code": "40099", "msg": "wrong env"})

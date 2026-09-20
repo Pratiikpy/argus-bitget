@@ -103,8 +103,19 @@ Return ONLY a JSON object:
   "confidence": <number between 0 and 1>,
   "thesis": "<why, in one or two sentences>",
   "invalidation": ["<what would prove this wrong>", ...],
-  "counter_case": "<the strongest argument against your own decision>"
-}"""
+  "counter_case": "<the strongest argument against your own decision>",
+  "lean": "UP" | "DOWN" | "NONE",
+  "lean_confidence": <number between 0 and 1>
+}
+
+About "lean". When you decline to trade, you are saying the edge does not clear the hurdle — you
+are NOT saying you have no view about direction. State the view anyway: if you were forced to take
+a position at this instant, which way would it be? "NONE" is a legitimate answer and means you
+genuinely cannot call the direction, not that the trade is unattractive.
+
+This costs you nothing and it is the only way your judgement can be scored while you are correctly
+standing aside. It is recorded, settled against the move that actually followed, and graded. Answer
+it as carefully as you answer the verdict."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -124,6 +135,40 @@ class MarketFrame:
     round_trip_bps: Decimal
     hedge_menu: tuple[dict[str, Any], ...] = ()
     evidence: tuple[str, ...] = ()
+    debate_block: str = ""
+    """The bull case, the bear case, and whether they were resolved.
+
+    Placed after the evidence and before the decision, because a debate is a reading OF the
+    evidence and must not be mistaken for more evidence. An unresolved debate reaches the PM as an
+    unresolved disagreement rather than as an average of two views that neither side holds — see
+    :mod:`argus.agents.debate`."""
+
+    memory_block: str = ""
+    """What this desk did on this symbol before, and what it cost.
+
+    Arithmetic over the hash-chained ledger, never a model's recollection — see
+    :mod:`argus.agents.recall`. It sits *after* the mandate and *before* the market state so the
+    reasoning reads it as history rather than as instruction, and every line in it is a number a
+    reader can recompute from ``data/paper_ledger.jsonl``.
+
+    Empty when the desk has not seen this symbol before, and the frame then says so explicitly
+    rather than omitting the section. An absent heading reads as "no memory exists"; a heading
+    saying "first look" reads as "memory exists and is empty", and only the second is true."""
+
+    mandate_block: str = ""
+    """Whose money this is, stated to the decision-maker **before** it reasons.
+
+    The audit against Vibe-Trading (`research/architecture/personalisation-audit.md`) found the
+    difference that matters: Vibe-Trading injects the user's mandate into the model's context so the
+    reasoning is shaped by it, while ARGUS applied the profile *after* the model had already decided
+    and merely narrowed the result. Both produce a compliant position; only one produces a
+    *personalised thesis*, which is what this track scores. A constraint applied afterwards is
+    invisible in the sentence a judge reads.
+
+    It stays a constraint, not a suggestion: `agents/mandate.py` still enforces every limit in code
+    after the fact, so a model that ignores this block is still bound. Telling it first means the
+    reasoning is about the right question; checking it after means the answer is still correct."""
+
     deliberation_bps: Decimal = Decimal("0")
     """Expected adverse move over the time this decision takes to make.
 
@@ -151,8 +196,29 @@ class MarketFrame:
         evidence = (
             "\n".join(f"  - {e}" for e in self.evidence) if self.evidence else "  (none)"
         )
+        mandate = self.mandate_block or (
+            "  (none stated — decide for a general mandate, and say so in the thesis)"
+        )
+        memory = self.memory_block or (
+            "  (no prior decision on this symbol — this is the first look)"
+        )
+        debate = self.debate_block or "  (no debate was held for this decision)"
         return f"""SYMBOL: {self.symbol}
 AS OF: {self.as_of.isoformat()}
+
+WHOSE MONEY THIS IS
+{mandate}
+  Your thesis must say how this mandate shaped the decision. A recommendation that would read
+  identically for any trader has not been personalised, it has merely been filtered afterwards.
+
+WHAT THIS DESK ALREADY LEARNED HERE
+{memory}
+
+THE ARGUMENT ON BOTH SIDES
+{debate}
+  This is a reading of the evidence above, not additional evidence. Where the two sides did not
+  converge, say which one you are siding with and why — an answer that splits the difference has
+  adopted a view neither analyst holds.
 
 SESSION STATE (anchor market)
   phase: {self.session.phase}
@@ -194,9 +260,16 @@ EVIDENCE (each item was available at or before AS OF)
 class MetaPM:
     """The decision-maker. Produces an intent, then responds to being constrained."""
 
-    def __init__(self, client: ChatModel, *, max_tokens: int = 1024) -> None:
+    def __init__(
+        self, client: ChatModel, *, max_tokens: int = 1024, thinking: Thinking = Thinking.FULL
+    ) -> None:
         self._client = client
         self._max_tokens = max_tokens
+        # The budget is a *cost*, priced by `deliberation_cost_bps`: off-hours a FULL budget
+        # costs 15.2bps against a 12bps round trip, and a desk quoted that hurdle correctly
+        # abstains every cycle. Routine paper cycles run LOW so the record is scoreable; FULL is
+        # reserved for decisions where the extra reasoning has a chance of paying for itself.
+        self.thinking = thinking
 
     def decide(self, frame: MarketFrame, *, decision_id: str) -> AutonomyProof:
         """First pass: the model's unconstrained economic choice."""
@@ -206,10 +279,11 @@ class MetaPM:
                 {"role": "user", "content": frame.to_prompt_block()},
             ],
             required_keys=("verdict", "side", "quantity", "confidence", "thesis"),
+            validate=_complain_about,
             max_tokens=self._max_tokens,
             # The decision that matters gets the full reasoning budget, and streams so it stays
             # under the endpoint's 120s gateway timeout.
-            thinking=Thinking.FULL,
+            thinking=self.thinking,
         )
         intent = _to_intent(response, frame.symbol)
         return AutonomyProof(
@@ -260,7 +334,7 @@ abstaining entirely because the reduced size no longer justifies the cost."""
             ],
             required_keys=("verdict", "side", "quantity", "confidence", "thesis"),
             max_tokens=self._max_tokens,
-            thinking=Thinking.FULL,
+            thinking=self.thinking,
         )
         revised = _to_intent(response, frame.symbol)
 
@@ -292,8 +366,48 @@ def _reasoning_of(response: dict[str, Any]) -> str:
     return " ".join(p for p in parts if p)
 
 
+def _complain_about(response: dict[str, Any]) -> str:
+    """What is wrong with this decision object, or "" if nothing is.
+
+    Fed to `complete_json`, which retries with the complaint attached. The model puts a *side* in
+    the verdict field — ``"verdict": "sell"`` — on roughly one call in five of the decision prompt,
+    measured across five replays of one state (`data/consistency.json`). Presence of the key is not
+    validity of its value, and `required_keys` only ever checked presence.
+
+    Retrying with the specific failure is the mechanism `complete_json` was built around; routing a
+    malformed verdict to HUMAN_REVIEW stays as the last resort after the retries are spent, not the
+    first answer to a typo.
+    """
+    raw = str(response.get("verdict", "")).strip().lower()
+    allowed = [v.value for v in Verdict]
+    if raw not in allowed:
+        side_like = raw in {"buy", "sell", "long", "short"}
+        hint = (
+            " That is a SIDE, not a verdict — put it in the \"side\" field and choose a verdict."
+            if side_like else ""
+        )
+        return f"verdict {raw!r} is not one of {allowed}.{hint}"
+    return ""
+
+
 def _to_intent(response: dict[str, Any], symbol: str) -> Intent:
-    verdict = Verdict(str(response["verdict"]).strip().lower())
+    # A verdict outside the enum is not a decision, and it must not be a crash either. The live
+    # model returned ``"verdict": "sell"`` — a *side* in the verdict field — and the raw
+    # ``Verdict(...)`` call raised ValueError straight out of the decision path, taking the whole
+    # cycle with it. Nothing downstream can repair that: a malformed answer is unactionable however
+    # confident it reads.
+    #
+    # Routed to HUMAN_REVIEW rather than guessed at, which is the same choice this function already
+    # makes for exposure opened without a falsifier. Mapping "sell" onto TRADE would be inventing a
+    # decision the model did not make, and mapping it to NO_TRADE would record a refusal it did not
+    # make either. The raw value is carried into the thesis so the trail says what arrived.
+    raw_verdict = str(response.get("verdict", "")).strip().lower()
+    unparseable = ""
+    try:
+        verdict = Verdict(raw_verdict)
+    except ValueError:
+        verdict = Verdict.HUMAN_REVIEW
+        unparseable = raw_verdict or "(empty)"
     side = Side(str(response.get("side", "buy")).strip().lower())
     quantity = Decimal(str(response.get("quantity", 0)))
     invalidation = tuple(
@@ -306,11 +420,23 @@ def _to_intent(response: dict[str, Any], symbol: str) -> Intent:
         verdict = Verdict.HUMAN_REVIEW
         quantity = Decimal("0")
 
+    if unparseable:
+        quantity = Decimal("0")
+
     # A verdict that acts with size but names none is not actionable either. REDUCE 0 is a
     # sentiment, not an instruction.
     if verdict.carries_quantity and quantity <= 0:
         verdict = Verdict.HUMAN_REVIEW
         quantity = Decimal("0")
+
+    # The lean is normalised here rather than trusted: an unknown value becomes "none", which is
+    # the honest reading of an answer nobody can grade.
+    raw_lean = str(response.get("lean", "none")).strip().lower()
+    lean = raw_lean if raw_lean in {"up", "down", "none"} else "none"
+    try:
+        lean_confidence = float(response.get("lean_confidence", 0.0))
+    except (TypeError, ValueError):
+        lean_confidence = 0.0
 
     return Intent(
         symbol=symbol,
@@ -318,6 +444,13 @@ def _to_intent(response: dict[str, Any], symbol: str) -> Intent:
         quantity=quantity if verdict.carries_quantity else Decimal("0"),
         verdict=verdict,
         stated_confidence=float(response.get("confidence", 0.0)),
-        thesis=str(response.get("thesis", "")).strip() or "(no thesis given)",
+        thesis=(
+            f"[unparseable verdict {unparseable!r}; routed to human review] "
+            + (str(response.get("thesis", "")).strip() or "(no thesis given)")
+            if unparseable
+            else str(response.get("thesis", "")).strip() or "(no thesis given)"
+        ),
         invalidation=invalidation,
+        lean=lean,
+        lean_confidence=max(0.0, min(1.0, lean_confidence)),
     )

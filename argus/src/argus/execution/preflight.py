@@ -9,7 +9,7 @@ signature error:
 2. **public reachability** — is it the network, before blaming the signature
 3. **signature accepted** — a private read (``/api/v2/mix/account/accounts``); this is the step
    that proves base64 digest + query-string-inclusive signing are both right
-4. **demo routing** — confirms ``paptrading: 1`` reached the demo environment
+4. **demo routing** — confirms the client is pointed at the demo ``productType``
 5. **order round trip** — place the smallest possible order, read it back, cancel it
 
 Step 5 places a real order **on the demo environment**. It is gated behind an explicit flag and
@@ -31,6 +31,7 @@ from decimal import Decimal
 from typing import Any
 
 from argus.execution.bitget_client import (
+    DEMO_PRODUCT_TYPE,
     BitgetAuthError,
     BitgetOrderError,
     BitgetTradingClient,
@@ -95,13 +96,21 @@ def _signature(client: BitgetTradingClient) -> Step:
 
 
 def _demo_routing(client: BitgetTradingClient) -> Step:
-    headers = client._headers("GET", "/api/v2/mix/account/accounts", "", private=True)
-    on = headers.get("paptrading") == "1"
+    """Is this client actually pointed at the demo environment?
+
+    **Corrected against the venue.** This step used to assert the ``paptrading: 1`` header, which
+    is Bitget's *classic* demo mechanism. Three separate real keys were probed and every one
+    returned **40099 "exchange environment is incorrect"** under that header, while the public
+    endpoint showed demo living at ``productType=SUSDT-FUTURES`` with three simulated instruments.
+    The header was never the switch on a v2 account; the productType is.
+    """
+    demo = client.product_type == DEMO_PRODUCT_TYPE
+    ok = demo if client.is_paper else not demo
     return Step(
         "demo_routing",
-        on if client.is_paper else not on,
-        f"paptrading header {'set' if on else 'absent'} in "
-        f"{'paper' if client.is_paper else 'live'} mode",
+        ok,
+        f"productType={client.product_type} in {'paper' if client.is_paper else 'live'} mode "
+        f"(real money: {client.trades_real_money})",
     )
 
 

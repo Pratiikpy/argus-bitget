@@ -15,6 +15,7 @@ import os
 import pytest
 
 from argus.llm.qwen import (
+    MAX_COMPLETION_TOKENS,
     BudgetExhausted,
     Completion,
     QwenClient,
@@ -23,6 +24,7 @@ from argus.llm.qwen import (
     Usage,
     _parse,
     _strip_fences,
+    extract_json_object,
 )
 
 LIVE = os.environ.get("ARGUS_LIVE_LLM") == "1" and bool(os.environ.get("BITGET_QWEN_API_KEY"))
@@ -188,6 +190,139 @@ class TestCaching:
         assert client.cache_hits == 1
 
 
+class TestJsonObjectExtraction:
+    """The outermost balanced object, found without a regex."""
+
+    def test_clean_json_is_returned_unchanged(self) -> None:
+        assert extract_json_object('{"a": 1}') == '{"a": 1}'
+
+    def test_json_wrapped_in_prose_is_recovered(self) -> None:
+        got = extract_json_object('Here is my analysis: {"a": 1} Hope that helps!')
+        assert got == '{"a": 1}'
+
+    def test_nested_objects_are_not_cut_at_the_first_brace(self) -> None:
+        assert extract_json_object('x {"a": {"b": 2}} y') == '{"a": {"b": 2}}'
+
+    def test_a_brace_inside_a_string_does_not_end_the_object(self) -> None:
+        raw = '{"thesis": "a } inside prose", "x": 1}'
+        assert extract_json_object("noise " + raw) == raw
+
+    def test_an_escaped_quote_does_not_flip_string_state(self) -> None:
+        raw = '{"t": "he said \\" and } too", "y": 2}'
+        assert extract_json_object(raw) == raw
+
+    def test_fences_are_removed_before_matching(self) -> None:
+        assert extract_json_object('```json\n{"a": 1}\n```') == '{"a": 1}'
+
+    def test_text_with_no_object_is_handed_back_for_the_real_error(self) -> None:
+        """Returning the original keeps the caller's parse error truthful."""
+        assert extract_json_object("no object here") == "no object here"
+
+    def test_an_unbalanced_object_is_not_silently_closed(self) -> None:
+        """A truncated object must stay truncated: closing it here would invent content."""
+        assert extract_json_object('{"a": 1, "b": "unterm') == '{"a": 1, "b": "unterm'
+
+
+class TestTruncationIsDetectedFromTheWire:
+    """`finish_reason` says the answer was cut off. A parse error only says it did not parse."""
+
+    def _client(self, monkeypatch, replies):  # type: ignore[no-untyped-def]
+        monkeypatch.setenv("BITGET_QWEN_API_KEY", "k")
+        monkeypatch.setenv("BITGET_QWEN_BASE_URL", "https://example.invalid/v1")
+        client = QwenClient()
+        seen: list[dict] = []
+
+        def fake_post(payload):  # type: ignore[no-untyped-def]
+            seen.append(payload)
+            return replies[min(len(seen) - 1, len(replies) - 1)]
+
+        monkeypatch.setattr(client, "_post", fake_post)
+        return client, seen
+
+    def test_a_cut_off_answer_retries_with_a_bigger_budget(self, monkeypatch) -> None:
+        cut = Completion('{"verdict": "tr', "", Usage(10, 300, 0, 310), "length")
+        whole = Completion('{"verdict": "no_trade"}', "", Usage(10, 50, 0, 60), "stop")
+        client, seen = self._client(monkeypatch, [cut, whole])
+        got = client.complete_json([{"role": "user", "content": "q"}],
+                                   required_keys=("verdict",), max_tokens=300)
+        assert got == {"verdict": "no_trade"}
+        assert seen[1]["max_tokens"] > seen[0]["max_tokens"]
+
+    def test_the_truncated_text_is_not_fed_back_into_the_prompt(self, monkeypatch) -> None:
+        """Appending the cut-off answer is what makes the retry larger than the attempt that
+        already did not fit. Every repository surveyed does exactly that."""
+        cut = Completion('{"verdict": "tr', "", Usage(10, 300, 0, 310), "length")
+        whole = Completion('{"verdict": "no_trade"}', "", Usage(10, 50, 0, 60), "stop")
+        client, seen = self._client(monkeypatch, [cut, whole])
+        client.complete_json([{"role": "user", "content": "q"}],
+                             required_keys=("verdict",), max_tokens=300)
+        assert len(seen[1]["messages"]) == 1
+        assert all(m.get("role") != "assistant" for m in seen[1]["messages"])
+
+    def test_a_truncated_answer_is_never_repaired_into_a_decision(self, monkeypatch) -> None:
+        """A completed thesis the model never wrote is worse than no decision."""
+        cut = Completion('{"verdict": "trade", "thesis": "NVDA looks',
+                         "", Usage(10, 8192, 0, 8202), "length")
+        client, _ = self._client(monkeypatch, [cut])
+        with pytest.raises(QwenError, match="not repaired"):
+            client.complete_json([{"role": "user", "content": "q"}],
+                                 required_keys=("verdict", "thesis"),
+                                 max_tokens=MAX_COMPLETION_TOKENS)
+
+    def test_growth_stops_at_the_ceiling_and_says_so(self, monkeypatch) -> None:
+        cut = Completion('{"a": "x', "", Usage(10, 8192, 0, 8202), "length")
+        client, seen = self._client(monkeypatch, [cut])
+        with pytest.raises(QwenError, match="ceiling"):
+            client.complete_json([{"role": "user", "content": "q"}],
+                                 required_keys=("a",), max_tokens=MAX_COMPLETION_TOKENS)
+        assert len(seen) == 1
+
+    def test_empty_content_with_reasoning_is_still_treated_as_truncation(
+        self, monkeypatch
+    ) -> None:
+        """Measured on DeepSeek-via-NIM: the budget went entirely on reasoning."""
+        spent = Completion("", "long reasoning", Usage(10, 900, 900, 910), "stop")
+        whole = Completion('{"verdict": "no_trade"}', "", Usage(10, 50, 0, 60), "stop")
+        client, seen = self._client(monkeypatch, [spent, whole])
+        got = client.complete_json([{"role": "user", "content": "q"}],
+                                   required_keys=("verdict",), max_tokens=300)
+        assert got == {"verdict": "no_trade"}
+        assert seen[1]["max_tokens"] > seen[0]["max_tokens"]
+
+    def test_a_complete_but_malformed_answer_does_feed_the_error_back(self, monkeypatch) -> None:
+        """The opposite branch: the model finished and got it wrong, so tell it what was wrong."""
+        bad = Completion("not json at all", "", Usage(10, 20, 0, 30), "stop")
+        whole = Completion('{"verdict": "no_trade"}', "", Usage(10, 50, 0, 60), "stop")
+        client, seen = self._client(monkeypatch, [bad, whole])
+        client.complete_json([{"role": "user", "content": "q"}],
+                             required_keys=("verdict",), max_tokens=300)
+        assert len(seen[1]["messages"]) == 3
+        assert "failed validation" in seen[1]["messages"][-1]["content"]
+        assert seen[1]["max_tokens"] == seen[0]["max_tokens"]
+
+    def test_a_missing_required_key_is_never_defaulted(self, monkeypatch) -> None:
+        partial = Completion('{"verdict": "trade"}', "", Usage(10, 20, 0, 30), "stop")
+        client, _ = self._client(monkeypatch, [partial])
+        with pytest.raises(QwenError, match="missing required keys"):
+            client.complete_json([{"role": "user", "content": "q"}],
+                                 required_keys=("verdict", "quantity"), max_tokens=300)
+
+    def test_a_json_array_is_not_accepted_as_a_decision(self, monkeypatch) -> None:
+        arr = Completion('[{"verdict": "trade"}]', "", Usage(10, 20, 0, 30), "stop")
+        client, _ = self._client(monkeypatch, [arr])
+        with pytest.raises(QwenError, match="expected a JSON object"):
+            client.complete_json([{"role": "user", "content": "q"}],
+                                 required_keys=("verdict",), max_tokens=300)
+
+    def test_prose_wrapped_json_is_accepted_without_a_retry(self, monkeypatch) -> None:
+        wrapped = Completion('Sure! {"verdict": "no_trade"} Done.', "",
+                             Usage(10, 20, 0, 30), "stop")
+        client, seen = self._client(monkeypatch, [wrapped])
+        got = client.complete_json([{"role": "user", "content": "q"}],
+                                   required_keys=("verdict",), max_tokens=300)
+        assert got == {"verdict": "no_trade"} and len(seen) == 1
+
+
 # --- live tests, opt-in ----------------------------------------------------------------------
 
 @live_only
@@ -239,3 +374,58 @@ class TestLive:
         )
         assert got.wants_tool_call
         assert got.tool_calls[0]["function"]["name"] == "get_session_state"
+
+
+class TestUnmeasuredSpendIsNotFreeSpend:
+    """`usage_block.get("prompt_tokens", 0)` made a response with no `usage` block report **zero
+    tokens spent**, and nothing distinguished that from a genuinely free call.
+
+    On a finite hackathon key that drifts in the one direction a budget must never drift: the burn
+    looks smaller than it is, and `eval/cyclecheck.cumulative_tokens` inherits the understatement.
+    A measurement that fails toward *"cheaper than reality"* on a budget is the worst way for it to
+    fail.
+    """
+
+    def test_a_venue_reported_zero_is_measured_but_not_a_spend(self) -> None:
+        from argus.llm.qwen import Usage
+
+        got = Usage(0, 0, 0, 0)
+        assert got.reported is True, "the venue did answer"
+        assert got.is_measured is False, "but zero total is not a measurement of spend"
+
+    def test_an_absent_usage_block_is_unmeasured(self) -> None:
+        from argus.llm.qwen import Usage
+
+        got = Usage(0, 0, 0, 0, reported=False)
+        assert got.reported is False
+        assert got.is_measured is False
+
+    def test_a_real_call_is_measured(self) -> None:
+        from argus.llm.qwen import Usage
+
+        assert Usage(100, 50, 20, 150).is_measured is True
+
+    def test_the_budget_does_not_count_an_unreported_call_as_free(self) -> None:
+        from argus.llm.qwen import TokenBudget, Usage
+
+        budget = TokenBudget(limit=1_000)
+        budget.record(Usage(10, 5, 2, 15))
+        budget.record(Usage(0, 0, 0, 0, reported=False))
+        budget.record(Usage(20, 10, 4, 30))
+        assert budget.spent == 45
+        assert budget.unreported_calls == 1, "the call the budget cannot see must still be counted"
+
+    def test_no_estimate_is_invented_for_an_unreported_call(self) -> None:
+        """The tokens really are unknown. Guessing a number here would put a fabricated figure into
+        the one measurement that guards a finite key."""
+        from argus.llm.qwen import TokenBudget, Usage
+
+        budget = TokenBudget(limit=1_000)
+        before = budget.spent
+        budget.record(Usage(0, 0, 0, 0, reported=False))
+        assert budget.spent == before, "spend must not move on an unmeasured call"
+
+    def test_unreported_calls_start_at_zero(self) -> None:
+        from argus.llm.qwen import TokenBudget
+
+        assert TokenBudget(limit=10).unreported_calls == 0

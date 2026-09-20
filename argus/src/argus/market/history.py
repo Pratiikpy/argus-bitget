@@ -110,12 +110,53 @@ class BasisPoint:
 
 
 def _dec(value: Any) -> Decimal:
+    """A quantity whose zero is a real reading — volume, and nothing else here."""
     if value in (None, "", "null"):
         return Decimal("0")
     try:
         return Decimal(str(value))
-    except Exception:
+    except (ArithmeticError, ValueError, TypeError):
         return Decimal("0")
+
+
+def _number(value: Any, *, field: str, symbol: str) -> Decimal:
+    """A candle figure that must be *present*, whatever its sign.
+
+    Absence and unparseability still raise — that half of the rule holds for every series. What this
+    does not do is require positivity, because not every candle series is a price.
+    """
+    if value in (None, "", "null"):
+        raise HistoryError(f"{symbol}: candle has no {field}; a missing figure is not zero")
+    try:
+        return Decimal(str(value))
+    except (ArithmeticError, ValueError, TypeError) as exc:
+        raise HistoryError(f"{symbol}: candle {field}={value!r} is not a number") from exc
+
+
+def _px(value: Any, *, field: str, symbol: str) -> Decimal:
+    """A candle **price**, or an exception. Never zero, never negative.
+
+    Same defect, same reasoning as `market/bitget.py:_price`: a bar whose close parsed to zero
+    looked present and made every return computed from it meaningless. The tell was already in the
+    codebase — ``if prev <= 0: continue`` appears in `market/validation.py`, `research/carry.py`
+    and `register/cadence.py`, each of them a caller defending itself against a price this parser
+    was allowed to invent.
+
+    **Applies to MARKET, INDEX and MARK only — and that restriction was learned the hard way.** The
+    first version of this guard was applied to every series, including PREMIUM, which is a *signed
+    fraction* and is negative whenever the token trades below its index (see :class:`CandleType`).
+    It raised on all twelve instruments, `fetch_basis` returned nothing, and the scheduled cycle's
+    hedge-effectiveness step exited 1 with "no basis history" for the whole universe. Live premium
+    candles carry negative opens, highs, lows and closes — two of ten closes on NVDAUSDT were
+    non-positive when this was checked.
+
+    The rule "absence is not zero" is right. "A number must be positive" is a fact about prices, not
+    about candles, and conflating the two turned a correctness fix into an outage.
+    """
+    got = _number(value, field=field, symbol=symbol)
+    if got <= 0:
+        raise HistoryError(f"{symbol}: candle {field}={got} is not a positive price")
+    return got
 
 
 def _get(params: dict[str, str], *, timeout: float = 30.0) -> list[list[str]]:
@@ -154,13 +195,21 @@ def fetch(
     if end is not None:
         params["endTime"] = str(int(end.timestamp() * 1000))
 
+    # PREMIUM is a signed fraction, not a price: it is negative whenever the token trades below its
+    # index, so the positivity guard does not apply to it. Every series still refuses an absent or
+    # unparseable figure.
+    parse = _number if candle_type is CandleType.PREMIUM else _px
+
     out: list[Candle] = []
     for row in _get(params):
         if len(row) < 5:
             continue
         out.append(Candle(
             ts=datetime.fromtimestamp(int(row[0]) / 1000, tz=UTC),
-            open=_dec(row[1]), high=_dec(row[2]), low=_dec(row[3]), close=_dec(row[4]),
+            open=parse(row[1], field="open", symbol=symbol),
+            high=parse(row[2], field="high", symbol=symbol),
+            low=parse(row[3], field="low", symbol=symbol),
+            close=parse(row[4], field="close", symbol=symbol),
             volume=_dec(row[5]) if len(row) > 5 else Decimal("0"),
         ))
     out.sort(key=lambda c: c.ts)

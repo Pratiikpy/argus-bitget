@@ -1,0 +1,85 @@
+﻿=== ARGUS paper cycle 2026-09-15_1900 ===
+sampling MSTRUSDT for 90s (rth)...
+
+MARKOUT ΓÇö MSTRUSDT, 90s of rth, 68 book sample(s), 82 print(s), 0% flagged RPI
+
+   horizon  prints    median      mean     worst
+        5s      29   -17.707    -0.122   -30.102
+       15s       0    +0.000    +0.000    +0.000
+       30s       0    +0.000    +0.000    +0.000
+       60s       0    +0.000    +0.000    +0.000
+
+  Resting on MSTRUSDT (rth) cost a median 17.71bps of adverse selection over 5s across 29 print(s), worst 30.10bps. That exceeds the 2bps maker fee it would save, so passive execution is not free money here and `cost/model.py`'s refusal to credit the maker side stands
+
+written to argus\data\markout.json
+markout_exit=0
+EXECUTABLE COST ΓÇö slippage in bps against mid, taking the ask
+
+symbol         quoted      $1000      $5000     $25000    $100000
+-----------------------------------------------------------------
+NVDAUSDT         0.47       0.85       1.74       5.64      11.82
+TSLAUSDT         5.89       3.19       3.22       3.56      13.87
+AAPLUSDT         2.11       1.47       4.20      12.29      21.31
+MSFTUSDT         7.97       4.55       6.31       8.92      24.15
+METAUSDT         7.54       8.44      13.75      20.36      28.71
+GOOGLUSDT        2.89       2.21       3.79       7.94      18.95
+AMZNUSDT         4.36       4.36       5.44       9.08      16.49
+COINUSDT        13.77       8.20      17.29      25.94          ΓÇö
+MSTRUSDT         1.51       3.02       5.06      10.45      21.78
+QQQUSDT          0.14       0.07       0.07       0.74       3.35
+TQQQUSDT         1.45       2.10       4.26      12.08      21.23
+SQQQUSDT         4.99       4.59       7.37      20.80      37.78
+
+12 book(s) written to argus\data\depth.json
+depth_exit=0
+recorded 12 snapshot(s) to argus\data\book_tape.jsonl
+
+  168 snapshots over 26.614h: a near-touch level holds a median 2.335 contracts. **Change is reported per horizon, not pooled** ΓÇö a level moves a very different share of itself over 30 seconds than over an hour, and one median over both is a number about the sampling schedule rather than about the book. The shortest horizon with at least 100 observations is `under_30s`, where a level moves a median 24.0% of itself ΓÇö that is the figure the simulator should take, being nearest the per-event timescale it models. The attribution rule ΓÇö which side of a resting order a decrease came from ΓÇö is not in this data and cannot be, so it stays a swept assumption rather than a measurement.
+
+written to argus\data\book_calibration.json
+bookcalib_exit=0
+  NVDAUSDT: extended=14.1 overnight=12.8 rth=31.5 weekend=5.2 | reopen=52.6 (1.7x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 22.2bps per bar against a 31.5bps regular-hours bar; no reduction, and this layer may not size up
+  TSLAUSDT: extended=15.1 overnight=12.6 rth=37.3 weekend=6.4 | reopen=76.1 (2.0x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 27.0bps per bar against a 37.3bps regular-hours bar; no reduction, and this layer may not size up
+  AAPLUSDT: extended=10.8 overnight=8.0 rth=23.7 weekend=5.3 | reopen=43.8 (1.8x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 16.9bps per bar against a 23.7bps regular-hours bar; no reduction, and this layer may not size up
+  MSFTUSDT: extended=13.5 overnight=9.3 rth=26.4 weekend=5.9 | reopen=40.6 (1.5x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 18.5bps per bar against a 26.4bps regular-hours bar; no reduction, and this layer may not size up
+  METAUSDT: extended=14.8 overnight=10.1 rth=34.0 weekend=6.4 | reopen=68.4 (2.0x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 24.5bps per bar against a 34.0bps regular-hours bar; no reduction, and this layer may not size up
+  GOOGLUSDT: extended=13.6 overnight=9.3 rth=23.4 weekend=5.6 | reopen=50.1 (2.1x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 18.4bps per bar against a 23.4bps regular-hours bar; no reduction, and this layer may not size up
+  AMZNUSDT: extended=12.9 overnight=8.1 rth=23.6 weekend=4.9 | reopen=40.1 (1.7x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 17.0bps per bar against a 23.6bps regular-hours bar; no reduction, and this layer may not size up
+  COINUSDT: extended=29.0 overnight=19.5 rth=61.8 weekend=13.9 | reopen=95.1 (1.5x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 42.1bps per bar against a 61.8bps regular-hours bar; no reduction, and this layer may not size up
+  MSTRUSDT: extended=38.9 overnight=30.8 rth=66.4 weekend=18.8 | reopen=101.4 (1.5x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 49.1bps per bar against a 66.4bps regular-hours bar; no reduction, and this layer may not size up
+  QQQUSDT: extended=9.4 overnight=10.2 rth=15.5 weekend=4.0 | reopen=28.3 (1.8x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 12.7bps per bar against a 15.5bps regular-hours bar; no reduction, and this layer may not size up
+  TQQQUSDT: extended=26.2 overnight=30.4 rth=47.5 weekend=8.5 | reopen=90.3 (1.9x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 38.3bps per bar against a 47.5bps regular-hours bar; no reduction, and this layer may not size up
+  SQQQUSDT: extended=26.6 overnight=31.5 rth=49.4 weekend=8.1 | reopen=88.8 (1.8x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 39.2bps per bar against a 49.4bps regular-hours bar; no reduction, and this layer may not size up
+
+12 profile(s) written to argus\data\session_risk.json
+session_risk_exit=0
+symbol        RTH bps/h  wknd bps/h  attenuation  anchor
+NVDAUSDT          32.44        4.52         7.17  OK
+TSLAUSDT          37.48        6.35         5.91  OK
+AAPLUSDT          25.67        4.36         5.88  OK
+MSFTUSDT          25.57        4.70         5.44  OK
+METAUSDT          34.26        5.56         6.16  OK
+GOOGLUSDT         24.36        5.41         4.50  OK
+AMZNUSDT          24.29        3.80         6.39  OK
+COINUSDT          63.22       12.34         5.12  OK
+MSTRUSDT          67.69       17.86         3.79  OK
+QQQUSDT           15.72        3.63         4.34  OK
+TQQQUSDT          48.94        7.12         6.88  OK
+SQQQUSDT          46.95        5.48         8.57  OK
+
+  all 12 shipped instruments still attenuate past 2.5x when the anchor market shuts
+
+written to argus\data\universe_validation.json
+universe_exit=0

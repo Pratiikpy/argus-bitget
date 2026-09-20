@@ -1,0 +1,146 @@
+﻿=== ARGUS paper cycle 2026-09-13_0652 ===
+{
+  "ran_at": "2026-09-13T01:22:03.015248+00:00",
+  "decisions_written": [
+    {
+      "seq": 70,
+      "symbol": "NVDAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.82,
+      "attests_llm_decided": true,
+      "notes_written": 11,
+      "flags": [
+        "[conflict:conviction] event (neutral) vs earnings (neutral), gap 0.47 \u2014 event dominates: confidence 0.82 against 0.35",
+        "[conflict:conviction] earnings (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+      ]
+    },
+    {
+      "seq": 71,
+      "symbol": "TSLAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.82,
+      "attests_llm_decided": true,
+      "notes_written": 10,
+      "flags": [
+        "[conflict:conviction] earnings (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+      ]
+    },
+    {
+      "seq": 72,
+      "symbol": "AAPLUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.92,
+      "attests_llm_decided": true,
+      "notes_written": 10,
+      "flags": []
+    },
+    {
+      "seq": 73,
+      "symbol": "MSFTUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.92,
+      "attests_llm_decided": true,
+      "notes_written": 9,
+      "flags": []
+    },
+    {
+      "seq": 74,
+      "symbol": "METAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.92,
+      "attests_llm_decided": true,
+      "notes_written": 9,
+      "flags": []
+    },
+    {
+      "seq": 75,
+      "symbol": "GOOGLUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.88,
+      "attests_llm_decided": true,
+      "notes_written": 10,
+      "flags": []
+    },
+    {
+      "seq": 77,
+      "symbol": "AMZNUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.89,
+      "attests_llm_decided": true,
+      "notes_written": 10,
+      "flags": []
+    },
+    {
+      "seq": 78,
+      "symbol": "COINUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.78,
+      "attests_llm_decided": true,
+      "notes_written": 10,
+      "flags": []
+    },
+    {
+      "seq": 79,
+      "symbol": "MSTRUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.83,
+      "attests_llm_decided": true,
+      "notes_written": 10,
+      "flags": []
+    },
+    {
+      "seq": 80,
+      "symbol": "QQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.92,
+      "attests_llm_decided": true,
+      "notes_written": 13,
+      "flags": [
+        "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 0.89",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 81,
+      "symbol": "TQQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.95,
+      "attests_llm_decided": true,
+      "notes_written": 11,
+      "flags": []
+    },
+    {
+      "seq": 82,
+      "symbol": "SQQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.95,
+      "attests_llm_decided": true,
+      "notes_written": 11,
+      "flags": []
+    }
+  ],
+  "settled_this_cycle": [],
+  "tokens_spent": 137192,
+  "chain": {
+    "entries": 82,
+    "chain_intact": true,
+    "links_intact": true,
+    "first_break_at": null,
+    "truncated": false,
+    "anchor": "anchor agrees with the log",
+    "head_hash": "35fb3bb17b3c1bdb"
+  }
+}
+exit=0

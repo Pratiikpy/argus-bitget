@@ -1,0 +1,95 @@
+{
+  "generated_at": "2026-09-14T07:02:02.457985+00:00",
+  "model": "qwen",
+  "kind": "tight",
+  "probes": 42,
+  "overall": {
+    "label": "all",
+    "probes": 42,
+    "hits": 32,
+    "capacity": 0.7619,
+    "chance": 0.2,
+    "p_value": 0.0,
+    "above_chance": true,
+    "counted": true
+  },
+  "boundary": "2026H2",
+  "control_probes": 12,
+  "control_hits": 12,
+  "control_rate": 1.0,
+  "instrument_is_sensitive": true,
+  "buckets": [
+    {
+      "label": "2010H2",
+      "probes": 4,
+      "hits": 4,
+      "capacity": 1.0,
+      "chance": 0.2,
+      "p_value": 0.0016,
+      "above_chance": false,
+      "counted": false
+    },
+    {
+      "label": "2011H1",
+      "probes": 2,
+      "hits": 2,
+      "capacity": 1.0,
+      "chance": 0.2,
+      "p_value": 0.04,
+      "above_chance": false,
+      "counted": false
+    },
+    {
+      "label": "2018H1",
+      "probes": 2,
+      "hits": 2,
+      "capacity": 1.0,
+      "chance": 0.2,
+      "p_value": 0.04,
+      "above_chance": false,
+      "counted": false
+    },
+    {
+      "label": "2018H2",
+      "probes": 10,
+      "hits": 9,
+      "capacity": 0.9,
+      "chance": 0.2,
+      "p_value": 4e-06,
+      "above_chance": true,
+      "counted": true
+    },
+    {
+      "label": "2025H2",
+      "probes": 8,
+      "hits": 5,
+      "capacity": 0.625,
+      "chance": 0.2,
+      "p_value": 0.010406,
+      "above_chance": true,
+      "counted": true
+    },
+    {
+      "label": "2026H1",
+      "probes": 8,
+      "hits": 4,
+      "capacity": 0.5,
+      "chance": 0.2,
+      "p_value": 0.056282,
+      "above_chance": false,
+      "counted": true
+    },
+    {
+      "label": "2026H2",
+      "probes": 8,
+      "hits": 6,
+      "capacity": 0.75,
+      "chance": 0.2,
+      "p_value": 0.001231,
+      "above_chance": true,
+      "counted": true
+    }
+  ],
+  "verdict": "qwen answered 32/42 tight probes correctly (76%) against a 20% chance level (p=0.0000). Recall is above chance in 3 of 4 periods with enough probes to count, including the most recent (2026H2). 2026H1 sits below the line, so recall is uneven rather than universal \u2014 this instrument located **no upper boundary**, and the model's knowledge extends at least that far. Any evaluation over a window in that range is contaminated: the model has demonstrably read facts published inside it, and a good result may be recall rather than judgement. What it does not show is that the recall becomes trading skill \u2014 barj28's own finding is that the two come apart, and that question is `eval/shadow.py`'s, not this module's",
+  "verdict_replayed_at": "2026-09-14T18:19:57.893104+00:00"
+}

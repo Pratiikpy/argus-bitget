@@ -1,0 +1,49 @@
+{
+  "as_of": "2026-09-15T01:17:25.358157+00:00",
+  "round_trip_bps": 12.0,
+  "min_directional_for_a_rate": 30,
+  "total_marks": 0,
+  "outside_buckets": 0,
+  "horizons": [
+    {
+      "horizon": "about_2h",
+      "marks": 0,
+      "directional": 0,
+      "correct": 0,
+      "coverage_pct": null,
+      "accuracy_pct": null,
+      "accuracy_ci95": null,
+      "beats_a_coin": null,
+      "hurdle_clearance_pct": null,
+      "median_forgone_bps": null,
+      "enough_for_a_rate": false
+    },
+    {
+      "horizon": "4h_to_12h",
+      "marks": 0,
+      "directional": 0,
+      "correct": 0,
+      "coverage_pct": null,
+      "accuracy_pct": null,
+      "accuracy_ci95": null,
+      "beats_a_coin": null,
+      "hurdle_clearance_pct": null,
+      "median_forgone_bps": null,
+      "enough_for_a_rate": false
+    },
+    {
+      "horizon": "overnight_12h_plus",
+      "marks": 0,
+      "directional": 0,
+      "correct": 0,
+      "coverage_pct": null,
+      "accuracy_pct": null,
+      "accuracy_ci95": null,
+      "beats_a_coin": null,
+      "hurdle_clearance_pct": null,
+      "median_forgone_bps": null,
+      "enough_for_a_rate": false
+    }
+  ],
+  "verdict": "No mark has been recorded yet, so refusal quality is UNDEFINED \u2014 not zero, and not poor. Marks began under protocol v3 and cannot be back-filled onto decisions taken before it, because choosing a new measurement after the outcomes are visible is the thing pre-registration exists to prevent. The number becomes computable as cycles run, and not before."
+}

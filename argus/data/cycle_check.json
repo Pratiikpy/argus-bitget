@@ -1,0 +1,66 @@
+{
+  "generated_at": "2026-09-19T20:13:21.635078+00:00",
+  "log": "cycle_2026-09-20_0100.log",
+  "sound": false,
+  "saw_price_discovery": false,
+  "proposed_exposure": 0,
+  "falsifier_fired": false,
+  "checks": [
+    {
+      "check": "exit_code",
+      "status": "PASS",
+      "detail": "process exited 0"
+    },
+    {
+      "check": "symbols_decided",
+      "status": "FAIL",
+      "detail": "11 of 12 symbols produced a decision"
+    },
+    {
+      "check": "ran_to_completion",
+      "status": "FAIL",
+      "detail": "stopped after 11 of 12 symbol(s): 13314 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
+    },
+    {
+      "check": "token_budget",
+      "status": "PASS",
+      "detail": "316,686 of 330,000 spent (96%)"
+    },
+    {
+      "check": "cumulative_tokens",
+      "status": "PASS",
+      "detail": "7,851,335 token(s) across 28 recorded cycle(s), 280,405 per cycle \u2014 roughly 1,121,619/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
+    },
+    {
+      "check": "budget_not_exhausted",
+      "status": "PASS",
+      "detail": "the guard did not fire"
+    },
+    {
+      "check": "chain_intact",
+      "status": "PASS",
+      "detail": "the hash chain verified after the write"
+    },
+    {
+      "check": "leans_recorded",
+      "status": "PASS",
+      "detail": "11 of 11 row(s) carry a lean and a lean_confidence"
+    },
+    {
+      "check": "leans_gradeable",
+      "status": "PASS",
+      "detail": "11 of 11 decision(s) state a direction (11 up, 0 down, 0 none)"
+    },
+    {
+      "check": "verdicts_parsed",
+      "status": "PASS",
+      "detail": "every verdict parsed"
+    },
+    {
+      "check": "session",
+      "status": "PASS",
+      "detail": "session phase(s) seen: weekend  (anchor market shut)"
+    }
+  ],
+  "verdict": "9/11 checks passed. FAILED \u2014 symbols_decided: 11 of 12 symbols produced a decision; ran_to_completion: stopped after 11 of 12 symbol(s): 13314 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.. The cycle ran with the anchor market shut, so it says nothing about whether this desk trades"
+}

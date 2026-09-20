@@ -1,0 +1,206 @@
+{
+  "generated_at": "2026-09-15T02:35:23.588498+00:00",
+  "answers": "Track 3 judging focus: 'data sources / Skill integration count AND effectiveness'",
+  "count": {
+    "data_feeds": 12,
+    "bitget_skills": 5,
+    "total_integrated": 17,
+    "feeds_live": 12,
+    "skills_answering": 1
+  },
+  "effectiveness": {
+    "decisions_examined": 150,
+    "skills_reaching_a_decision": 1,
+    "skills_integrated_but_never_reaching": 4,
+    "note": "A source that answers every probe and never reaches a decision is integrated and worthless. Both numbers are reported because only the pair means anything."
+  },
+  "sources": [
+    {
+      "name": "Bitget rToken tickers",
+      "kind": "feed",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": null,
+      "decisions_seen": 150,
+      "effectiveness_pct": null,
+      "verdict": "unmeasured \u2014 no decision record carries it yet",
+      "exclusion_reason": "no decision on the record carries evidence provenance yet; recording began 2026-09-15 and this is measurable only forward"
+    },
+    {
+      "name": "Bitget market candles",
+      "kind": "feed",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": null,
+      "decisions_seen": 150,
+      "effectiveness_pct": null,
+      "verdict": "unmeasured \u2014 no decision record carries it yet",
+      "exclusion_reason": "no decision on the record carries evidence provenance yet; recording began 2026-09-15 and this is measurable only forward"
+    },
+    {
+      "name": "Bitget index candles",
+      "kind": "feed",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": null,
+      "decisions_seen": 150,
+      "effectiveness_pct": null,
+      "verdict": "unmeasured \u2014 no decision record carries it yet",
+      "exclusion_reason": "no decision on the record carries evidence provenance yet; recording began 2026-09-15 and this is measurable only forward"
+    },
+    {
+      "name": "SEC EDGAR filings",
+      "kind": "feed",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": null,
+      "decisions_seen": 150,
+      "effectiveness_pct": null,
+      "verdict": "unmeasured \u2014 no decision record carries it yet",
+      "exclusion_reason": "no decision on the record carries evidence provenance yet; recording began 2026-09-15 and this is measurable only forward"
+    },
+    {
+      "name": "US Treasury curve",
+      "kind": "feed",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": null,
+      "decisions_seen": 150,
+      "effectiveness_pct": null,
+      "verdict": "unmeasured \u2014 no decision record carries it yet",
+      "exclusion_reason": "no decision on the record carries evidence provenance yet; recording began 2026-09-15 and this is measurable only forward"
+    },
+    {
+      "name": "Crypto Fear & Greed",
+      "kind": "feed",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": null,
+      "decisions_seen": 150,
+      "effectiveness_pct": null,
+      "verdict": "unmeasured \u2014 no decision record carries it yet",
+      "exclusion_reason": "no decision on the record carries evidence provenance yet; recording began 2026-09-15 and this is measurable only forward"
+    },
+    {
+      "name": "CBOE VIX",
+      "kind": "feed",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": null,
+      "decisions_seen": 150,
+      "effectiveness_pct": null,
+      "verdict": "unmeasured \u2014 no decision record carries it yet",
+      "exclusion_reason": "no decision on the record carries evidence provenance yet; recording began 2026-09-15 and this is measurable only forward"
+    },
+    {
+      "name": "FINRA short volume",
+      "kind": "feed",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": null,
+      "decisions_seen": 150,
+      "effectiveness_pct": null,
+      "verdict": "unmeasured \u2014 no decision record carries it yet",
+      "exclusion_reason": "no decision on the record carries evidence provenance yet; recording began 2026-09-15 and this is measurable only forward"
+    },
+    {
+      "name": "Nasdaq halts",
+      "kind": "feed",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": null,
+      "decisions_seen": 150,
+      "effectiveness_pct": null,
+      "verdict": "unmeasured \u2014 no decision record carries it yet",
+      "exclusion_reason": "no decision on the record carries evidence provenance yet; recording began 2026-09-15 and this is measurable only forward"
+    },
+    {
+      "name": "Yahoo consensus estimates",
+      "kind": "feed",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": null,
+      "decisions_seen": 150,
+      "effectiveness_pct": null,
+      "verdict": "unmeasured \u2014 no decision record carries it yet",
+      "exclusion_reason": "no decision on the record carries evidence provenance yet; recording began 2026-09-15 and this is measurable only forward"
+    },
+    {
+      "name": "SEC XBRL fundamentals",
+      "kind": "feed",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": null,
+      "decisions_seen": 150,
+      "effectiveness_pct": null,
+      "verdict": "unmeasured \u2014 no decision record carries it yet",
+      "exclusion_reason": "no decision on the record carries evidence provenance yet; recording began 2026-09-15 and this is measurable only forward"
+    },
+    {
+      "name": "Bitget Skill server (last probe)",
+      "kind": "feed",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": null,
+      "decisions_seen": 150,
+      "effectiveness_pct": null,
+      "verdict": "unmeasured \u2014 no decision record carries it yet",
+      "exclusion_reason": "no decision on the record carries evidence provenance yet; recording began 2026-09-15 and this is measurable only forward"
+    },
+    {
+      "name": "macro-analyst",
+      "kind": "skill",
+      "integrated": true,
+      "available": "empty",
+      "reached_decisions": 0,
+      "decisions_seen": 150,
+      "effectiveness_pct": 0.0,
+      "verdict": "integrated and never reached a decision",
+      "exclusion_reason": "2 of 4 tool(s) returned an empty payload for a tokenized equity; the Skill is called and has nothing to give"
+    },
+    {
+      "name": "market-intel",
+      "kind": "skill",
+      "integrated": true,
+      "available": "empty",
+      "reached_decisions": 0,
+      "decisions_seen": 150,
+      "effectiveness_pct": 0.0,
+      "verdict": "integrated and never reached a decision",
+      "exclusion_reason": "2 of 3 tool(s) returned an empty payload for a tokenized equity; the Skill is called and has nothing to give"
+    },
+    {
+      "name": "news-briefing",
+      "kind": "skill",
+      "integrated": true,
+      "available": "empty",
+      "reached_decisions": 0,
+      "decisions_seen": 150,
+      "effectiveness_pct": 0.0,
+      "verdict": "integrated and never reached a decision",
+      "exclusion_reason": "2 of 2 tool(s) returned an empty payload for a tokenized equity; the Skill is called and has nothing to give"
+    },
+    {
+      "name": "sentiment-analyst",
+      "kind": "skill",
+      "integrated": true,
+      "available": "empty",
+      "reached_decisions": 0,
+      "decisions_seen": 150,
+      "effectiveness_pct": 0.0,
+      "verdict": "integrated and never reached a decision",
+      "exclusion_reason": "4 of 4 tool(s) returned an empty payload for a tokenized equity; the Skill is called and has nothing to give"
+    },
+    {
+      "name": "technical-analysis",
+      "kind": "skill",
+      "integrated": true,
+      "available": "ok",
+      "reached_decisions": 135,
+      "decisions_seen": 150,
+      "effectiveness_pct": 90.0,
+      "verdict": "reaches decisions",
+      "exclusion_reason": ""
+    }
+  ]
+}

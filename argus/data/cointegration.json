@@ -1,0 +1,2259 @@
+{
+  "tests": 66,
+  "reported": 66,
+  "q": 0.05,
+  "expected_false_positives_at_5pct": 3.3,
+  "bonferroni_threshold": 0.000758,
+  "survivors_fdr": [],
+  "survivors_bonferroni": [],
+  "tradeable": [],
+  "pairs": [
+    {
+      "pair": "AAPLUSDT/AMZNUSDT",
+      "in_sample": {
+        "statistic": -2.454448,
+        "pvalue": 0.29952,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.646008,
+        "intercept": 485.163553,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.370481,
+        "pvalue": 0.158426,
+        "usedlag": 4,
+        "nobs": 571,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 48.16,
+      "z_now": 0.993,
+      "required_z_to_clear_costs": 0.185,
+      "extreme_share": 0.86739,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AAPLUSDT/COINUSDT",
+      "in_sample": {
+        "statistic": -1.025761,
+        "pvalue": 0.897852,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 1.102894,
+        "intercept": 146.533864,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.016098,
+        "pvalue": 0.281672,
+        "usedlag": 2,
+        "nobs": 573,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 161.77,
+      "z_now": 1.403,
+      "required_z_to_clear_costs": 0.075,
+      "extreme_share": 0.97248,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AAPLUSDT/GOOGLUSDT",
+      "in_sample": {
+        "statistic": -2.389312,
+        "pvalue": 0.329934,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.424571,
+        "intercept": 465.87641,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.85885,
+        "pvalue": 0.060068,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 70.24,
+      "z_now": 1.001,
+      "required_z_to_clear_costs": 0.124,
+      "extreme_share": 0.91159,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AAPLUSDT/METAUSDT",
+      "in_sample": {
+        "statistic": -1.940772,
+        "pvalue": 0.559194,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.172818,
+        "intercept": 215.597604,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -2.260676,
+        "pvalue": 0.02287,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": true
+      },
+      "half_life_bars": 87.47,
+      "z_now": 0.971,
+      "required_z_to_clear_costs": 0.119,
+      "extreme_share": 0.96831,
+      "cost_bps": 24.0,
+      "tradeable": true
+    },
+    {
+      "pair": "AAPLUSDT/MSFTUSDT",
+      "in_sample": {
+        "statistic": -3.1385,
+        "pvalue": 0.080829,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.223603,
+        "intercept": 419.068381,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.049608,
+        "pvalue": 0.667533,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 104.65,
+      "z_now": 1.1,
+      "required_z_to_clear_costs": 0.12,
+      "extreme_share": 0.90575,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AAPLUSDT/MSTRUSDT",
+      "in_sample": {
+        "statistic": -1.560187,
+        "pvalue": 0.737398,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.245228,
+        "intercept": 342.23013,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": 0.041682,
+        "pvalue": 0.697972,
+        "usedlag": 4,
+        "nobs": 571,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 196.51,
+      "z_now": 0.989,
+      "required_z_to_clear_costs": 0.075,
+      "extreme_share": 0.97832,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AAPLUSDT/NVDAUSDT",
+      "in_sample": {
+        "statistic": -2.036541,
+        "pvalue": 0.509539,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.778951,
+        "intercept": 483.510894,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.475594,
+        "pvalue": 0.506128,
+        "usedlag": 4,
+        "nobs": 571,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 108.65,
+      "z_now": -0.13,
+      "required_z_to_clear_costs": 0.118,
+      "extreme_share": 0.93328,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AAPLUSDT/QQQUSDT",
+      "in_sample": {
+        "statistic": -2.645073,
+        "pvalue": 0.219952,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.479471,
+        "intercept": 657.660454,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.822587,
+        "pvalue": 0.361051,
+        "usedlag": 4,
+        "nobs": 571,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 60.26,
+      "z_now": 0.546,
+      "required_z_to_clear_costs": 0.191,
+      "extreme_share": 0.89658,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AAPLUSDT/SQQQUSDT",
+      "in_sample": {
+        "statistic": -2.290379,
+        "pvalue": 0.378363,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 2.641495,
+        "intercept": 211.141923,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.046589,
+        "pvalue": 0.26583,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 59.93,
+      "z_now": 0.597,
+      "required_z_to_clear_costs": 0.127,
+      "extreme_share": 0.91076,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AAPLUSDT/TQQQUSDT",
+      "in_sample": {
+        "statistic": -2.579088,
+        "pvalue": 0.245345,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -1.658485,
+        "intercept": 434.725885,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.119874,
+        "pvalue": 0.238534,
+        "usedlag": 4,
+        "nobs": 571,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 57.37,
+      "z_now": 0.492,
+      "required_z_to_clear_costs": 0.128,
+      "extreme_share": 0.94245,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AAPLUSDT/TSLAUSDT",
+      "in_sample": {
+        "statistic": -1.382302,
+        "pvalue": 0.803515,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.087084,
+        "intercept": 289.217935,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.283732,
+        "pvalue": 0.183781,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 151.67,
+      "z_now": 1.238,
+      "required_z_to_clear_costs": 0.085,
+      "extreme_share": 0.95246,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AMZNUSDT/COINUSDT",
+      "in_sample": {
+        "statistic": -1.617999,
+        "pvalue": 0.713233,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -1.382243,
+        "intercept": 473.509882,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.795461,
+        "pvalue": 0.372424,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 174.55,
+      "z_now": -1.042,
+      "required_z_to_clear_costs": 0.056,
+      "extreme_share": 0.97331,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AMZNUSDT/GOOGLUSDT",
+      "in_sample": {
+        "statistic": -2.824248,
+        "pvalue": 0.158091,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.909583,
+        "intercept": -57.736902,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.98454,
+        "pvalue": 0.294321,
+        "usedlag": 4,
+        "nobs": 571,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 52.07,
+      "z_now": -0.34,
+      "required_z_to_clear_costs": 0.164,
+      "extreme_share": 0.90659,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AMZNUSDT/METAUSDT",
+      "in_sample": {
+        "statistic": -1.670525,
+        "pvalue": 0.690227,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.144816,
+        "intercept": 344.211296,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -2.16019,
+        "pvalue": 0.029523,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": true
+      },
+      "half_life_bars": 151.48,
+      "z_now": 0.061,
+      "required_z_to_clear_costs": 0.068,
+      "extreme_share": 0.97081,
+      "cost_bps": 24.0,
+      "tradeable": true
+    },
+    {
+      "pair": "AMZNUSDT/MSFTUSDT",
+      "in_sample": {
+        "statistic": -2.5555,
+        "pvalue": 0.255155,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.301578,
+        "intercept": 122.349624,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": 0.081593,
+        "pvalue": 0.710754,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 116.54,
+      "z_now": -0.558,
+      "required_z_to_clear_costs": 0.108,
+      "extreme_share": 0.94162,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AMZNUSDT/MSTRUSDT",
+      "in_sample": {
+        "statistic": -1.543299,
+        "pvalue": 0.744217,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.913589,
+        "intercept": 169.606999,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.110059,
+        "pvalue": 0.646482,
+        "usedlag": 2,
+        "nobs": 573,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 469.25,
+      "z_now": 1.474,
+      "required_z_to_clear_costs": 0.045,
+      "extreme_share": 0.97331,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AMZNUSDT/NVDAUSDT",
+      "in_sample": {
+        "statistic": -1.725978,
+        "pvalue": 0.664931,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.8929,
+        "intercept": 68.83647,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.344019,
+        "pvalue": 0.165892,
+        "usedlag": 8,
+        "nobs": 567,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 159.63,
+      "z_now": 1.832,
+      "required_z_to_clear_costs": 0.091,
+      "extreme_share": 0.94329,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AMZNUSDT/QQQUSDT",
+      "in_sample": {
+        "statistic": -1.738852,
+        "pvalue": 0.658921,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.600856,
+        "intercept": -167.037015,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.520338,
+        "pvalue": 0.120526,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 120.64,
+      "z_now": 2.162,
+      "required_z_to_clear_costs": 0.167,
+      "extreme_share": 0.94662,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AMZNUSDT/SQQQUSDT",
+      "in_sample": {
+        "statistic": -1.710361,
+        "pvalue": 0.672155,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -3.333883,
+        "intercept": 393.485848,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.272515,
+        "pvalue": 0.187244,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 113.81,
+      "z_now": 2.011,
+      "required_z_to_clear_costs": 0.098,
+      "extreme_share": 0.97581,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "AMZNUSDT/TQQQUSDT",
+      "in_sample": {
+        "statistic": -1.763126,
+        "pvalue": 0.647454,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 2.084517,
+        "intercept": 111.90504,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -2.200514,
+        "pvalue": 0.026677,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": true
+      },
+      "half_life_bars": 117.4,
+      "z_now": 2.369,
+      "required_z_to_clear_costs": 0.096,
+      "extreme_share": 0.96664,
+      "cost_bps": 24.0,
+      "tradeable": true
+    },
+    {
+      "pair": "AMZNUSDT/TSLAUSDT",
+      "in_sample": {
+        "statistic": -1.583412,
+        "pvalue": 0.72784,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.025367,
+        "intercept": 266.506408,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -2.221009,
+        "pvalue": 0.025323,
+        "usedlag": 5,
+        "nobs": 570,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": true
+      },
+      "half_life_bars": 244.9,
+      "z_now": -0.662,
+      "required_z_to_clear_costs": 0.05,
+      "extreme_share": 0.97081,
+      "cost_bps": 24.0,
+      "tradeable": true
+    },
+    {
+      "pair": "COINUSDT/GOOGLUSDT",
+      "in_sample": {
+        "statistic": -2.412965,
+        "pvalue": 0.318739,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.220871,
+        "intercept": 232.595215,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.760273,
+        "pvalue": 0.387219,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 166.8,
+      "z_now": -1.092,
+      "required_z_to_clear_costs": 0.043,
+      "extreme_share": 0.98332,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "COINUSDT/METAUSDT",
+      "in_sample": {
+        "statistic": -0.67094,
+        "pvalue": 0.949684,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.096725,
+        "intercept": 98.332889,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.903837,
+        "pvalue": 0.327259,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 208.98,
+      "z_now": -1.062,
+      "required_z_to_clear_costs": 0.039,
+      "extreme_share": 0.98165,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "COINUSDT/MSFTUSDT",
+      "in_sample": {
+        "statistic": -1.587194,
+        "pvalue": 0.726265,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.10831,
+        "intercept": 204.640999,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.582531,
+        "pvalue": 0.461925,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 243.41,
+      "z_now": -1.096,
+      "required_z_to_clear_costs": 0.033,
+      "extreme_share": 0.97998,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "COINUSDT/MSTRUSDT",
+      "in_sample": {
+        "statistic": -1.840196,
+        "pvalue": 0.61,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.914807,
+        "intercept": 67.447372,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.698278,
+        "pvalue": 0.413336,
+        "usedlag": 2,
+        "nobs": 573,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 110.37,
+      "z_now": 0.443,
+      "required_z_to_clear_costs": 0.092,
+      "extreme_share": 0.9558,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "COINUSDT/NVDAUSDT",
+      "in_sample": {
+        "statistic": -1.673262,
+        "pvalue": 0.689002,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.273692,
+        "intercept": 213.906665,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.693042,
+        "pvalue": 0.415541,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 210.33,
+      "z_now": -1.275,
+      "required_z_to_clear_costs": 0.036,
+      "extreme_share": 0.96997,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "COINUSDT/QQQUSDT",
+      "in_sample": {
+        "statistic": -1.926444,
+        "pvalue": 0.566537,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.158641,
+        "intercept": 268.145687,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.714744,
+        "pvalue": 0.406398,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 185.43,
+      "z_now": -1.263,
+      "required_z_to_clear_costs": 0.046,
+      "extreme_share": 0.96163,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "COINUSDT/SQQQUSDT",
+      "in_sample": {
+        "statistic": -1.910135,
+        "pvalue": 0.574858,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.893247,
+        "intercept": 119.624391,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.705527,
+        "pvalue": 0.410282,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 187.69,
+      "z_now": -1.267,
+      "required_z_to_clear_costs": 0.033,
+      "extreme_share": 0.97081,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "COINUSDT/TQQQUSDT",
+      "in_sample": {
+        "statistic": -1.956085,
+        "pvalue": 0.551316,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.525738,
+        "intercept": 192.772233,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.733402,
+        "pvalue": 0.398536,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 179.84,
+      "z_now": -1.273,
+      "required_z_to_clear_costs": 0.034,
+      "extreme_share": 0.96914,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "COINUSDT/TSLAUSDT",
+      "in_sample": {
+        "statistic": -1.354594,
+        "pvalue": 0.812653,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.10106,
+        "intercept": 121.938753,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.736845,
+        "pvalue": 0.397085,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 189.5,
+      "z_now": -1.065,
+      "required_z_to_clear_costs": 0.038,
+      "extreme_share": 0.995,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "GOOGLUSDT/METAUSDT",
+      "in_sample": {
+        "statistic": -1.991212,
+        "pvalue": 0.533143,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.038142,
+        "intercept": 324.380523,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.884549,
+        "pvalue": 0.335235,
+        "usedlag": 2,
+        "nobs": 573,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 107.88,
+      "z_now": -0.442,
+      "required_z_to_clear_costs": 0.073,
+      "extreme_share": 0.96997,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "GOOGLUSDT/MSFTUSDT",
+      "in_sample": {
+        "statistic": -2.999173,
+        "pvalue": 0.110402,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.171257,
+        "intercept": 270.076951,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.186794,
+        "pvalue": 0.618782,
+        "usedlag": 4,
+        "nobs": 571,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 78.8,
+      "z_now": -0.268,
+      "required_z_to_clear_costs": 0.086,
+      "extreme_share": 0.9608,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "GOOGLUSDT/MSTRUSDT",
+      "in_sample": {
+        "statistic": -1.911826,
+        "pvalue": 0.573997,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.599961,
+        "intercept": 289.062843,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": 0.095068,
+        "pvalue": 0.714996,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 186.95,
+      "z_now": 0.94,
+      "required_z_to_clear_costs": 0.056,
+      "extreme_share": 0.98916,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "GOOGLUSDT/NVDAUSDT",
+      "in_sample": {
+        "statistic": -2.163546,
+        "pvalue": 0.443234,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.365885,
+        "intercept": 269.590998,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.685672,
+        "pvalue": 0.418646,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 98.67,
+      "z_now": 0.721,
+      "required_z_to_clear_costs": 0.082,
+      "extreme_share": 0.96997,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "GOOGLUSDT/QQQUSDT",
+      "in_sample": {
+        "statistic": -2.117883,
+        "pvalue": 0.467023,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.362399,
+        "intercept": 90.754136,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.712327,
+        "pvalue": 0.407416,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 96.1,
+      "z_now": 0.673,
+      "required_z_to_clear_costs": 0.128,
+      "extreme_share": 0.93912,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "GOOGLUSDT/SQQQUSDT",
+      "in_sample": {
+        "statistic": -2.171462,
+        "pvalue": 0.439125,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -1.97912,
+        "intercept": 427.539203,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.66694,
+        "pvalue": 0.426532,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 93.44,
+      "z_now": 0.584,
+      "required_z_to_clear_costs": 0.089,
+      "extreme_share": 0.97081,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "GOOGLUSDT/TQQQUSDT",
+      "in_sample": {
+        "statistic": -2.067529,
+        "pvalue": 0.493346,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 1.319134,
+        "intercept": 254.658128,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.89677,
+        "pvalue": 0.330178,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 93.55,
+      "z_now": 0.814,
+      "required_z_to_clear_costs": 0.094,
+      "extreme_share": 0.96997,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "GOOGLUSDT/TSLAUSDT",
+      "in_sample": {
+        "statistic": -1.84109,
+        "pvalue": 0.609557,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.135934,
+        "intercept": 301.370018,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.557114,
+        "pvalue": 0.472511,
+        "usedlag": 4,
+        "nobs": 571,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 116.19,
+      "z_now": -0.311,
+      "required_z_to_clear_costs": 0.077,
+      "extreme_share": 0.99333,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "METAUSDT/MSFTUSDT",
+      "in_sample": {
+        "statistic": -2.286481,
+        "pvalue": 0.380318,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.339057,
+        "intercept": 747.976365,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.066895,
+        "pvalue": 0.661585,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 137.37,
+      "z_now": 0.698,
+      "required_z_to_clear_costs": 0.062,
+      "extreme_share": 0.98916,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "METAUSDT/MSTRUSDT",
+      "in_sample": {
+        "statistic": -2.46165,
+        "pvalue": 0.296239,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.623186,
+        "intercept": 655.774726,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": 0.028142,
+        "pvalue": 0.693563,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 159.56,
+      "z_now": 0.515,
+      "required_z_to_clear_costs": 0.049,
+      "extreme_share": 0.995,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "METAUSDT/NVDAUSDT",
+      "in_sample": {
+        "statistic": -2.265758,
+        "pvalue": 0.390758,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.268092,
+        "intercept": 652.285301,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.70943,
+        "pvalue": 0.408637,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 124.35,
+      "z_now": 0.597,
+      "required_z_to_clear_costs": 0.052,
+      "extreme_share": 0.98332,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "METAUSDT/QQQUSDT",
+      "in_sample": {
+        "statistic": -2.221155,
+        "pvalue": 0.413483,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.022666,
+        "intercept": 579.464219,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.772192,
+        "pvalue": 0.382203,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 125.23,
+      "z_now": 0.713,
+      "required_z_to_clear_costs": 0.049,
+      "extreme_share": 0.99333,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "METAUSDT/SQQQUSDT",
+      "in_sample": {
+        "statistic": -2.251376,
+        "pvalue": 0.39805,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.251992,
+        "intercept": 585.254311,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.761447,
+        "pvalue": 0.386725,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 122.89,
+      "z_now": 0.687,
+      "required_z_to_clear_costs": 0.048,
+      "extreme_share": 0.99083,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "METAUSDT/TQQQUSDT",
+      "in_sample": {
+        "statistic": -2.162998,
+        "pvalue": 0.443519,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.501684,
+        "intercept": 560.342419,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.745731,
+        "pvalue": 0.393342,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 130.69,
+      "z_now": 0.766,
+      "required_z_to_clear_costs": 0.05,
+      "extreme_share": 0.99583,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "METAUSDT/TSLAUSDT",
+      "in_sample": {
+        "statistic": -0.886824,
+        "pvalue": 0.922297,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.922542,
+        "intercept": 285.18205,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.454951,
+        "pvalue": 0.136157,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 117.08,
+      "z_now": 0.885,
+      "required_z_to_clear_costs": 0.085,
+      "extreme_share": 0.97915,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "MSFTUSDT/MSTRUSDT",
+      "in_sample": {
+        "statistic": -1.124051,
+        "pvalue": 0.876684,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 2.925192,
+        "intercept": 166.776592,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.597039,
+        "pvalue": 0.455865,
+        "usedlag": 2,
+        "nobs": 573,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 329.16,
+      "z_now": 1.451,
+      "required_z_to_clear_costs": 0.046,
+      "extreme_share": 0.97915,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "MSFTUSDT/NVDAUSDT",
+      "in_sample": {
+        "statistic": -1.830283,
+        "pvalue": 0.614899,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 3.295343,
+        "intercept": -248.316353,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.198118,
+        "pvalue": 0.211281,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 101.59,
+      "z_now": 1.822,
+      "required_z_to_clear_costs": 0.098,
+      "extreme_share": 0.9558,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "MSFTUSDT/QQQUSDT",
+      "in_sample": {
+        "statistic": -2.325932,
+        "pvalue": 0.360687,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 1.969305,
+        "intercept": -943.255812,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.17335,
+        "pvalue": 0.623712,
+        "usedlag": 2,
+        "nobs": 573,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 92.6,
+      "z_now": 2.574,
+      "required_z_to_clear_costs": 0.152,
+      "extreme_share": 0.93161,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "MSFTUSDT/SQQQUSDT",
+      "in_sample": {
+        "statistic": -2.369376,
+        "pvalue": 0.339493,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -10.796,
+        "intercept": 888.539697,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.151613,
+        "pvalue": 0.631614,
+        "usedlag": 2,
+        "nobs": 573,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 86.11,
+      "z_now": 2.809,
+      "required_z_to_clear_costs": 0.079,
+      "extreme_share": 0.97498,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "MSFTUSDT/TQQQUSDT",
+      "in_sample": {
+        "statistic": -2.316125,
+        "pvalue": 0.365535,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 6.748646,
+        "intercept": -23.183457,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.054081,
+        "pvalue": 0.666,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 107.59,
+      "z_now": 2.785,
+      "required_z_to_clear_costs": 0.069,
+      "extreme_share": 0.9583,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "MSFTUSDT/TSLAUSDT",
+      "in_sample": {
+        "statistic": -0.764551,
+        "pvalue": 0.939206,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.438841,
+        "intercept": 597.328608,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": 0.104635,
+        "pvalue": 0.717985,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 597.69,
+      "z_now": -0.64,
+      "required_z_to_clear_costs": 0.034,
+      "extreme_share": 0.98916,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "MSTRUSDT/NVDAUSDT",
+      "in_sample": {
+        "statistic": -0.530102,
+        "pvalue": 0.962118,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.109,
+        "intercept": 73.636182,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.070371,
+        "pvalue": 0.660382,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 621.02,
+      "z_now": -1.271,
+      "required_z_to_clear_costs": 0.021,
+      "extreme_share": 0.99249,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "MSTRUSDT/QQQUSDT",
+      "in_sample": {
+        "statistic": -0.34705,
+        "pvalue": 0.973602,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.064393,
+        "intercept": 51.176896,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.06414,
+        "pvalue": 0.662537,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 650.43,
+      "z_now": -1.273,
+      "required_z_to_clear_costs": 0.024,
+      "extreme_share": 0.98916,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "MSTRUSDT/SQQQUSDT",
+      "in_sample": {
+        "statistic": -0.369422,
+        "pvalue": 0.972431,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.35331,
+        "intercept": 111.085988,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.065908,
+        "pvalue": 0.661926,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 646.76,
+      "z_now": -1.273,
+      "required_z_to_clear_costs": 0.02,
+      "extreme_share": 0.995,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "MSTRUSDT/TQQQUSDT",
+      "in_sample": {
+        "statistic": -0.297685,
+        "pvalue": 0.975988,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.222474,
+        "intercept": 81.135539,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.054953,
+        "pvalue": 0.6657,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 659.03,
+      "z_now": -1.266,
+      "required_z_to_clear_costs": 0.02,
+      "extreme_share": 0.99583,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "MSTRUSDT/TSLAUSDT",
+      "in_sample": {
+        "statistic": -0.38831,
+        "pvalue": 0.971397,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.030857,
+        "intercept": 86.345716,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.088491,
+        "pvalue": 0.654073,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 590.35,
+      "z_now": -1.296,
+      "required_z_to_clear_costs": 0.019,
+      "extreme_share": 0.99416,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "NVDAUSDT/QQQUSDT",
+      "in_sample": {
+        "statistic": -3.136091,
+        "pvalue": 0.081281,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.54587,
+        "intercept": -174.292602,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.14362,
+        "pvalue": 0.230053,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 62.66,
+      "z_now": -1.228,
+      "required_z_to_clear_costs": 0.303,
+      "extreme_share": 0.82902,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "NVDAUSDT/SQQQUSDT",
+      "in_sample": {
+        "statistic": -3.079133,
+        "pvalue": 0.092571,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -2.888583,
+        "intercept": 329.23577,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.223094,
+        "pvalue": 0.203006,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 62.5,
+      "z_now": -1.251,
+      "required_z_to_clear_costs": 0.169,
+      "extreme_share": 0.8824,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "NVDAUSDT/TQQQUSDT",
+      "in_sample": {
+        "statistic": -3.203362,
+        "pvalue": 0.069367,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 1.960271,
+        "intercept": 74.461316,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -0.883937,
+        "pvalue": 0.335488,
+        "usedlag": 3,
+        "nobs": 572,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 77.53,
+      "z_now": -1.115,
+      "required_z_to_clear_costs": 0.151,
+      "extreme_share": 0.91827,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "NVDAUSDT/TSLAUSDT",
+      "in_sample": {
+        "statistic": -1.080958,
+        "pvalue": 0.886386,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.042707,
+        "intercept": 197.458334,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.034207,
+        "pvalue": 0.274483,
+        "usedlag": 0,
+        "nobs": 575,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 192.25,
+      "z_now": -1.623,
+      "required_z_to_clear_costs": 0.056,
+      "extreme_share": 0.97832,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "QQQUSDT/SQQQUSDT",
+      "in_sample": {
+        "statistic": -3.350661,
+        "pvalue": 0.048134,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -5.27567,
+        "intercept": 921.781493,
+        "nobs": 863,
+        "cointegrated_at_5pct": true
+      },
+      "out_of_sample": {
+        "statistic": -1.511853,
+        "pvalue": 0.122476,
+        "usedlag": 2,
+        "nobs": 573,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 14.66,
+      "z_now": -1.191,
+      "required_z_to_clear_costs": 1.733,
+      "extreme_share": 0.19349,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "QQQUSDT/TQQQUSDT",
+      "in_sample": {
+        "statistic": -2.660928,
+        "pvalue": 0.213945,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 3.627742,
+        "intercept": 453.134402,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": 0.357059,
+        "pvalue": 0.789975,
+        "usedlag": 4,
+        "nobs": 571,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 53.69,
+      "z_now": 2.293,
+      "required_z_to_clear_costs": 1.067,
+      "extreme_share": 0.46956,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "QQQUSDT/TSLAUSDT",
+      "in_sample": {
+        "statistic": -1.372409,
+        "pvalue": 0.806814,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.198402,
+        "intercept": 640.605691,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.819306,
+        "pvalue": 0.065524,
+        "usedlag": 2,
+        "nobs": 573,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 151.4,
+      "z_now": -1.926,
+      "required_z_to_clear_costs": 0.135,
+      "extreme_share": 0.95746,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "SQQQUSDT/TQQQUSDT",
+      "in_sample": {
+        "statistic": -2.650421,
+        "pvalue": 0.217915,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.681957,
+        "intercept": 88.433792,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": 0.262777,
+        "pvalue": 0.764642,
+        "usedlag": 4,
+        "nobs": 571,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 74.4,
+      "z_now": -2.081,
+      "required_z_to_clear_costs": 0.356,
+      "extreme_share": 0.80984,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "SQQQUSDT/TSLAUSDT",
+      "in_sample": {
+        "statistic": -1.455842,
+        "pvalue": 0.777733,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": -0.033167,
+        "intercept": 51.803325,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -1.51237,
+        "pvalue": 0.122357,
+        "usedlag": 2,
+        "nobs": 573,
+        "critical_values": {
+          "1%": -2.5697,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": false
+      },
+      "half_life_bars": 161.01,
+      "z_now": 2.103,
+      "required_z_to_clear_costs": 0.047,
+      "extreme_share": 0.98832,
+      "cost_bps": 24.0,
+      "tradeable": false
+    },
+    {
+      "pair": "TQQQUSDT/TSLAUSDT",
+      "in_sample": {
+        "statistic": -1.238214,
+        "pvalue": 0.847608,
+        "critical_values": {
+          "1%": -3.9092,
+          "5%": -3.3432,
+          "10%": -3.0494
+        },
+        "hedge_ratio": 0.064474,
+        "intercept": 48.386129,
+        "nobs": 863,
+        "cointegrated_at_5pct": false
+      },
+      "out_of_sample": {
+        "statistic": -2.112112,
+        "pvalue": 0.033252,
+        "usedlag": 1,
+        "nobs": 574,
+        "critical_values": {
+          "1%": -2.5696,
+          "5%": -1.9415,
+          "10%": -1.6164
+        },
+        "stationary_at_5pct": true
+      },
+      "half_life_bars": 135.14,
+      "z_now": -2.032,
+      "required_z_to_clear_costs": 0.059,
+      "extreme_share": 0.97915,
+      "cost_bps": 24.0,
+      "tradeable": true
+    }
+  ],
+  "median_required_z": 0.0762,
+  "binding_constraint": "Costs are not the binding constraint: the median pair needs only |z| >= 0.08 to clear 24bps, because these spreads are wide. What fails is stationarity \u2014 a wide spread that does not revert is divergence risk, not edge",
+  "verdict": "66 pair(s) tested. 1 reached p <= 0.05 naively, against 3.3 expected by chance alone at that level. 0 survive Benjamini-Hochberg at q=0.05 and 0 survive Bonferroni (p <= 0.00076). None is tradeable: after a four-leg round trip of 24bps, no surviving pair has both a stationary out-of-sample spread and a history of reaching the entry that pays for it. Reported as no opportunity rather than as the best of a bad list. Costs are not the binding constraint: the median pair needs only |z| >= 0.08 to clear 24bps, because these spreads are wide. What fails is stationarity \u2014 a wide spread that does not revert is divergence risk, not edge"
+}

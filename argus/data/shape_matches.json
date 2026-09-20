@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-09-20T02:24:02.704047+00:00",
+  "symbol": "NVDAUSDT",
+  "window": 24,
+  "horizon": 24,
+  "searched": 1368,
+  "has_precedent": false,
+  "null_trials": 50,
+  "null_p": 1.0,
+  "null_median_distance": 0.3614,
+  "median_outcome_pct": -0.0399,
+  "upside_share": 0.4,
+  "analogues": [
+    {
+      "ends_at": "2026-08-06T20:00:00+00:00",
+      "distance": 0.863,
+      "forward_pct": 2.0539
+    },
+    {
+      "ends_at": "2026-09-08T11:00:00+00:00",
+      "distance": 0.9107,
+      "forward_pct": -2.9074
+    },
+    {
+      "ends_at": "2026-08-19T17:00:00+00:00",
+      "distance": 0.9579,
+      "forward_pct": -1.0356
+    },
+    {
+      "ends_at": "2026-08-14T19:00:00+00:00",
+      "distance": 0.9939,
+      "forward_pct": -0.0399
+    },
+    {
+      "ends_at": "2026-08-03T11:00:00+00:00",
+      "distance": 1.005,
+      "forward_pct": 5.9963
+    }
+  ],
+  "verdict": "No precedent: the nearest match is at distance 0.86, but reordering this series' own returns produces a match at least that close in 100% of 50 scans (median 0.36). The shape is not distinguishable from chance, so what followed these 5 window(s) is not evidence about what follows now"
+}

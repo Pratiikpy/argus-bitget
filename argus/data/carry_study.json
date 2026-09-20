@@ -1,0 +1,331 @@
+{
+  "generated_at": "2026-09-14T11:13:14.232097+00:00",
+  "source": "https://api.bitget.com/api/v3/market/history-fund-rate",
+  "settlements_per_day": 3,
+  "holding_days": 14,
+  "profiles": [
+    {
+      "symbol": "AAPLUSDT",
+      "settlements": 270,
+      "span_days": 89.7,
+      "zero_share": 0.8519,
+      "positive_share": 0.1333,
+      "negative_share": 0.0148,
+      "mean_bps": 0.2204,
+      "median_bps": 0.0,
+      "mean_ci95_bps": [
+        0.1156,
+        0.3296
+      ],
+      "annualised_pct": 2.413,
+      "interval_excludes_zero": true
+    },
+    {
+      "symbol": "AMZNUSDT",
+      "settlements": 270,
+      "span_days": 89.7,
+      "zero_share": 0.837,
+      "positive_share": 0.163,
+      "negative_share": 0.0,
+      "mean_bps": 0.1786,
+      "median_bps": 0.0,
+      "mean_ci95_bps": [
+        0.1239,
+        0.2406
+      ],
+      "annualised_pct": 1.956,
+      "interval_excludes_zero": true
+    },
+    {
+      "symbol": "COINUSDT",
+      "settlements": 270,
+      "span_days": 89.7,
+      "zero_share": 0.7074,
+      "positive_share": 0.2926,
+      "negative_share": 0.0,
+      "mean_bps": 0.6155,
+      "median_bps": 0.0,
+      "mean_ci95_bps": [
+        0.4826,
+        0.7574
+      ],
+      "annualised_pct": 6.74,
+      "interval_excludes_zero": true
+    },
+    {
+      "symbol": "GOOGLUSDT",
+      "settlements": 270,
+      "span_days": 89.7,
+      "zero_share": 0.6667,
+      "positive_share": 0.3333,
+      "negative_share": 0.0,
+      "mean_bps": 1.225,
+      "median_bps": 0.0,
+      "mean_ci95_bps": [
+        0.9663,
+        1.4887
+      ],
+      "annualised_pct": 13.414,
+      "interval_excludes_zero": true
+    },
+    {
+      "symbol": "METAUSDT",
+      "settlements": 270,
+      "span_days": 89.7,
+      "zero_share": 0.7963,
+      "positive_share": 0.2,
+      "negative_share": 0.0037,
+      "mean_bps": 0.4862,
+      "median_bps": 0.0,
+      "mean_ci95_bps": [
+        0.3395,
+        0.645
+      ],
+      "annualised_pct": 5.324,
+      "interval_excludes_zero": true
+    },
+    {
+      "symbol": "MSFTUSDT",
+      "settlements": 270,
+      "span_days": 89.7,
+      "zero_share": 0.8778,
+      "positive_share": 0.1222,
+      "negative_share": 0.0,
+      "mean_bps": 0.1313,
+      "median_bps": 0.0,
+      "mean_ci95_bps": [
+        0.0815,
+        0.1879
+      ],
+      "annualised_pct": 1.438,
+      "interval_excludes_zero": true
+    },
+    {
+      "symbol": "MSTRUSDT",
+      "settlements": 270,
+      "span_days": 89.7,
+      "zero_share": 0.8111,
+      "positive_share": 0.1704,
+      "negative_share": 0.0185,
+      "mean_bps": 0.2267,
+      "median_bps": 0.0,
+      "mean_ci95_bps": [
+        0.1317,
+        0.3276
+      ],
+      "annualised_pct": 2.482,
+      "interval_excludes_zero": true
+    },
+    {
+      "symbol": "NVDAUSDT",
+      "settlements": 270,
+      "span_days": 89.7,
+      "zero_share": 0.8593,
+      "positive_share": 0.137,
+      "negative_share": 0.0037,
+      "mean_bps": 0.2021,
+      "median_bps": 0.0,
+      "mean_ci95_bps": [
+        0.1311,
+        0.2762
+      ],
+      "annualised_pct": 2.214,
+      "interval_excludes_zero": true
+    },
+    {
+      "symbol": "QQQUSDT",
+      "settlements": 270,
+      "span_days": 89.7,
+      "zero_share": 0.7037,
+      "positive_share": 0.2963,
+      "negative_share": 0.0,
+      "mean_bps": 0.5513,
+      "median_bps": 0.0,
+      "mean_ci95_bps": [
+        0.4249,
+        0.6814
+      ],
+      "annualised_pct": 6.037,
+      "interval_excludes_zero": true
+    },
+    {
+      "symbol": "SQQQUSDT",
+      "settlements": 270,
+      "span_days": 89.7,
+      "zero_share": 0.9481,
+      "positive_share": 0.0222,
+      "negative_share": 0.0296,
+      "mean_bps": -0.0213,
+      "median_bps": 0.0,
+      "mean_ci95_bps": [
+        -0.0689,
+        0.0141
+      ],
+      "annualised_pct": -0.233,
+      "interval_excludes_zero": false
+    },
+    {
+      "symbol": "TQQQUSDT",
+      "settlements": 270,
+      "span_days": 89.7,
+      "zero_share": 0.8259,
+      "positive_share": 0.1259,
+      "negative_share": 0.0481,
+      "mean_bps": 0.2237,
+      "median_bps": 0.0,
+      "mean_ci95_bps": [
+        0.0981,
+        0.3569
+      ],
+      "annualised_pct": 2.45,
+      "interval_excludes_zero": true
+    },
+    {
+      "symbol": "TSLAUSDT",
+      "settlements": 270,
+      "span_days": 89.7,
+      "zero_share": 0.8481,
+      "positive_share": 0.137,
+      "negative_share": 0.0148,
+      "mean_bps": 0.1784,
+      "median_bps": 0.0,
+      "mean_ci95_bps": [
+        0.0846,
+        0.2763
+      ],
+      "annualised_pct": 1.954,
+      "interval_excludes_zero": true
+    }
+  ],
+  "unavailable": [],
+  "pairs": [
+    {
+      "position": "short 1.000 QQQUSDT + long 0.328 TQQQUSDT",
+      "legs": [
+        {
+          "symbol": "QQQUSDT",
+          "weight": -1.0
+        },
+        {
+          "symbol": "TQQQUSDT",
+          "weight": 0.3282
+        }
+      ],
+      "structure": "same index at nominal 1x and 3x",
+      "replay": {
+        "holding_days": 14,
+        "windows": 1823,
+        "mean_total_pct": -0.0824,
+        "median_total_pct": -0.0965,
+        "mean_funding_pct": 0.1603,
+        "mean_price_pct": -0.1226,
+        "share_positive": 0.2441,
+        "worst_pct": -0.7386,
+        "best_pct": 0.4904,
+        "funding_survives_the_price": false
+      },
+      "hedge_ratio": 0.3282,
+      "r_squared": 0.9414,
+      "correlation_low": 0.9677,
+      "observations": 2158,
+      "gross_notional": 1.3282,
+      "net_bps_per_settlement": 0.4779,
+      "net_ci95_bps": [
+        0.3478,
+        0.6184
+      ],
+      "annualised_pct": 3.939,
+      "round_trip_bps": 15.94,
+      "breakeven_days": 11.1,
+      "unhedged_variance": 0.0586,
+      "carry_survives_its_interval": true
+    },
+    {
+      "position": "short 1.000 QQQUSDT + short 0.322 SQQQUSDT",
+      "legs": [
+        {
+          "symbol": "QQQUSDT",
+          "weight": -1.0
+        },
+        {
+          "symbol": "SQQQUSDT",
+          "weight": -0.322
+        }
+      ],
+      "structure": "same index at nominal 1x and -3x",
+      "replay": {
+        "holding_days": 14,
+        "windows": 1823,
+        "mean_total_pct": 0.0828,
+        "median_total_pct": 0.0784,
+        "mean_funding_pct": 0.1835,
+        "mean_price_pct": 0.0193,
+        "share_positive": 0.6599,
+        "worst_pct": -1.2144,
+        "best_pct": 1.0814,
+        "funding_survives_the_price": true
+      },
+      "hedge_ratio": -0.322,
+      "r_squared": 0.9169,
+      "correlation_low": -0.9609,
+      "observations": 2158,
+      "gross_notional": 1.322,
+      "net_bps_per_settlement": 0.5445,
+      "net_ci95_bps": [
+        0.4204,
+        0.6801
+      ],
+      "annualised_pct": 4.51,
+      "round_trip_bps": 15.86,
+      "breakeven_days": 9.7,
+      "unhedged_variance": 0.0831,
+      "carry_survives_its_interval": true
+    },
+    {
+      "position": "short 1.000 TQQQUSDT + short 0.969 SQQQUSDT",
+      "legs": [
+        {
+          "symbol": "TQQQUSDT",
+          "weight": -1.0
+        },
+        {
+          "symbol": "SQQQUSDT",
+          "weight": -0.9688
+        }
+      ],
+      "structure": "same index at nominal 3x and -3x",
+      "replay": {
+        "holding_days": 14,
+        "windows": 1823,
+        "mean_total_pct": 0.2214,
+        "median_total_pct": 0.2018,
+        "mean_funding_pct": 0.046,
+        "mean_price_pct": 0.2954,
+        "share_positive": 0.7449,
+        "worst_pct": -3.3008,
+        "best_pct": 2.6305,
+        "funding_survives_the_price": true
+      },
+      "hedge_ratio": -0.9688,
+      "r_squared": 0.9498,
+      "correlation_low": -0.9766,
+      "observations": 2158,
+      "gross_notional": 1.9688,
+      "net_bps_per_settlement": 0.2031,
+      "net_ci95_bps": [
+        0.0662,
+        0.34
+      ],
+      "annualised_pct": 1.13,
+      "round_trip_bps": 23.63,
+      "breakeven_days": 38.8,
+      "unhedged_variance": 0.0502,
+      "carry_survives_its_interval": true
+    }
+  ],
+  "tradeable": [
+    "short 1.000 QQQUSDT + short 0.322 SQQQUSDT",
+    "short 1.000 TQQQUSDT + short 0.969 SQQQUSDT"
+  ],
+  "verdict": "Across 12 instruments the median funding settlement is exactly zero on 12 of them, 81% of all settlements pay nothing, and 12 settle negative less than 5% of the time \u2014 funding here is one-sided and sparse, so a mean is a tail statistic and carries a bootstrap interval rather than being annualised on its own. Of 3 delta-neutral baskets, 3 have a funding rate whose 95% interval excludes zero \u2014 and that is the number this study exists to distrust. **short 1.000 QQQUSDT + long 0.328 TQQQUSDT is a carry that loses money.** It pays +3.94% a year in funding with an interval clear of zero, and held through the real series over 14-day windows it returns -0.082%, positive in only 24% of them: the funding arrives (+0.160%) and the price leg gives back more (-0.123%). A funding table alone would have recommended precisely this trade, which is why there is a replay. 2 of 3 pay when actually held. The best is short 1.000 TQQQUSDT + short 0.969 SQQQUSDT at +0.221% per 14-day hold net of its 24bps round trip, positive in 74% of 1823 overlapping windows \u2014 which is about 6 independent holds, not 1823, and the win rate should be read against that. **It should not be called a carry.** Only 21% of that return is funding (+0.046%); the rest is the price leg (+0.295%), which for a basket short both a leveraged token and its inverse is volatility decay. That is a short-gamma position \u2014 74%-style win rates with a -3.30% worst window are the shape of one \u2014 and selling it as funding carry would misdescribe both the source of the return and the risk being run. 5.0% of the basket's variance is unhedged, and that residual is what the position is actually paid for bearing."
+}

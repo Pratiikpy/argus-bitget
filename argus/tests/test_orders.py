@@ -19,6 +19,7 @@ from argus.execution.orders import (
     OrderBook,
     OrderState,
     UnauthorisedOrder,
+    deterministic_client_order_id,
 )
 
 UTC = ZoneInfo("UTC")
@@ -264,3 +265,109 @@ class TestHistoryIsTheAuditArtefact:
         book = OrderBook()
         o = book.submit(_order(), at=T0)
         assert o.approved_intent_hash == "abc123"
+
+
+class TestDeterministicClientOrderId:
+    """The idempotency key that closes the gap this module's own docstring names: *"treating a
+    timeout as a rejection and retrying is how duplicate exposure is created."* Before this
+    function, `client_order_id` was built from wall-clock time at the call site, so a genuine
+    retry of the same decision — exactly the case `OrderState.UNKNOWN` exists for — minted a fresh
+    id every attempt and no duplicate guard on either side could ever catch it.
+    """
+
+    def test_the_same_decision_produces_the_same_id(self) -> None:
+        """The whole point: a real retry must collide, not slip past the duplicate guard."""
+        first = deterministic_client_order_id(
+            market_state_hash="m1", approved_intent_hash="a1", side="LONG",
+            quantity=Decimal("100"),
+        )
+        retry = deterministic_client_order_id(
+            market_state_hash="m1", approved_intent_hash="a1", side="LONG",
+            quantity=Decimal("100"),
+        )
+        assert first == retry
+
+    def test_a_different_market_state_produces_a_different_id(self) -> None:
+        """A later cycle with fresh evidence is a genuinely new decision, not a retry."""
+        a = deterministic_client_order_id(
+            market_state_hash="m1", approved_intent_hash="a1", side="LONG",
+            quantity=Decimal("100"),
+        )
+        b = deterministic_client_order_id(
+            market_state_hash="m2", approved_intent_hash="a1", side="LONG",
+            quantity=Decimal("100"),
+        )
+        assert a != b
+
+    def test_a_different_approved_intent_produces_a_different_id(self) -> None:
+        a = deterministic_client_order_id(
+            market_state_hash="m1", approved_intent_hash="a1", side="LONG",
+            quantity=Decimal("100"),
+        )
+        b = deterministic_client_order_id(
+            market_state_hash="m1", approved_intent_hash="a2", side="LONG",
+            quantity=Decimal("100"),
+        )
+        assert a != b
+
+    def test_a_different_side_produces_a_different_id(self) -> None:
+        long = deterministic_client_order_id(
+            market_state_hash="m1", approved_intent_hash="a1", side="LONG",
+            quantity=Decimal("100"),
+        )
+        short = deterministic_client_order_id(
+            market_state_hash="m1", approved_intent_hash="a1", side="SHORT",
+            quantity=Decimal("100"),
+        )
+        assert long != short
+
+    def test_a_mandate_narrowed_quantity_produces_a_different_id_from_the_original(self) -> None:
+        """The reason the final (post-mandate) quantity is hashed, not the pre-mandate approval:
+        two different mandates can narrow the same approved intent to two different final sizes,
+        and those are legitimately different orders that must not collide."""
+        original = deterministic_client_order_id(
+            market_state_hash="m1", approved_intent_hash="a1", side="LONG",
+            quantity=Decimal("100"),
+        )
+        narrowed = deterministic_client_order_id(
+            market_state_hash="m1", approved_intent_hash="a1", side="LONG",
+            quantity=Decimal("40"),
+        )
+        assert original != narrowed
+
+    def test_the_id_fits_bitgets_64_character_clientoid_limit(self) -> None:
+        """Verified against Bitget's own SDK catalogue, not assumed."""
+        got = deterministic_client_order_id(
+            market_state_hash="m" * 64, approved_intent_hash="a" * 64, side="LONG",
+            quantity=Decimal("123456.789012"),
+        )
+        assert len(got) <= 64
+
+    def test_two_retries_are_caught_as_duplicates_by_the_order_book(self) -> None:
+        """End to end: the deterministic id is what makes `OrderBook.submit`'s own guard actually
+        work across a retry, not just within one call."""
+        oid = deterministic_client_order_id(
+            market_state_hash="m1", approved_intent_hash="a1", side="LONG",
+            quantity=Decimal("100"),
+        )
+        book = OrderBook()
+        first_attempt = _order(oid=oid)
+        book.submit(first_attempt, at=T0)
+        retry_attempt = _order(oid=oid)
+        with pytest.raises(DuplicateOrder):
+            book.submit(retry_attempt, at=T0 + timedelta(seconds=1))
+
+    def test_the_id_is_a_pure_function_with_no_hidden_clock_dependency(self) -> None:
+        """The exact property the old `f"{decision_id}-1"` construction lacked."""
+        import time
+
+        first = deterministic_client_order_id(
+            market_state_hash="m1", approved_intent_hash="a1", side="LONG",
+            quantity=Decimal("100"),
+        )
+        time.sleep(0.01)
+        later = deterministic_client_order_id(
+            market_state_hash="m1", approved_intent_hash="a1", side="LONG",
+            quantity=Decimal("100"),
+        )
+        assert first == later

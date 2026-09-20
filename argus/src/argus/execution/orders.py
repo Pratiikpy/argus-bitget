@@ -30,6 +30,7 @@ forever.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
@@ -237,6 +238,47 @@ class DuplicateOrder(RuntimeError):
 
 class UnauthorisedOrder(RuntimeError):
     """No approved-intent hash, or one matching no Constitution verdict."""
+
+
+def deterministic_client_order_id(
+    *, market_state_hash: str, approved_intent_hash: str, side: str, quantity: Decimal
+) -> str:
+    """The idempotency key that closes the gap this module's own docstring names.
+
+    **The defect, verified in source before this function existed.** `client_order_id` was built
+    as ``f"{decision_id}-1"`` where ``decision_id`` came from ``f"paper-{symbol}-{int(now.
+    timestamp())}"`` (`paper/runner.py`) — wall-clock at the moment of the call. This module's own
+    docstring already names the exact consequence: *"treating a timeout as a rejection and
+    retrying is how duplicate exposure is created."* :class:`OrderState.UNKNOWN` exists precisely
+    because a request can time out with the venue's outcome unresolved — and the next cycle, or a
+    restarted process, would re-evaluate the same market state and propose the same order under a
+    **freshly wall-clock-stamped, therefore different**, ``client_order_id``. Neither
+    :class:`OrderBook`'s own duplicate guard below nor Bitget's server-side ``clientOid`` dedup
+    (`agent-sdk/src/generated/catalog.ts`, confirmed live) can catch a duplicate whose id changes
+    on every attempt.
+
+    **The fix is determinism, not detection.** Two calls that are genuinely the same decision must
+    produce the identical id; two calls that are genuinely different decisions must not collide.
+    The four inputs are chosen for exactly that:
+
+    * ``market_state_hash`` — which market instant this decision was made for
+      (``MarketFrame.state_hash()``). Identical on a true retry of the same cycle; different on a
+      later cycle with fresh evidence.
+    * ``approved_intent_hash`` — the Constitution-approved intent's content
+      (``proof.approved_intent_hash``).
+    * ``side`` and ``quantity`` **after** mandate narrowing, not before — `agents/desk.py` computes
+      ``approved_intent_hash`` prior to applying a trader mandate, and two different mandates can
+      narrow the same approved intent to two different final sizes. Hashing only the pre-mandate
+      approval would collide two orders that are legitimately different, which `OrderBook.submit`
+      would then wrongly refuse as a duplicate.
+
+    Bitget's own ``clientOid`` is documented at 64 characters maximum
+    (`agent-sdk/src/generated/catalog.ts`, e.g. the transfer endpoints); the digest below is well
+    inside that bound by construction.
+    """
+    payload = f"{market_state_hash}:{approved_intent_hash}:{side}:{quantity}"
+    digest = hashlib.sha256(payload.encode()).hexdigest()[:24]
+    return f"argus-{digest}"
 
 
 @dataclass(frozen=True, slots=True)

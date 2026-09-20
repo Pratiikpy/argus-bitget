@@ -45,6 +45,33 @@ from argus.execution.orders import Order, OrderState
 
 BASE_URL = "https://api.bitget.com"
 
+LIVE_PRODUCT_TYPE = "USDT-FUTURES"
+DEMO_PRODUCT_TYPE = "SUSDT-FUTURES"
+"""Bitget's demo environment is a separate **productType**, not a header.
+
+Found by probe, not by documentation: `GET /api/v2/mix/market/tickers?productType=SUSDT-FUTURES`
+returns `SBTCSUSDT`, `SETHSUSDT`, `SXRPSUSDT` — three simulated instruments settling in `SUSDT`,
+which is exactly what the web simulator trades. The `paptrading: 1` header belongs to Bitget's
+*classic* demo mechanism and returns **40099 "exchange environment is incorrect"** on a v2 account:
+three separate live keys were probed and all three behaved identically.
+
+**The consequence for this project is not small.** Demo carries three crypto perpetuals and **no
+rTokens**, so a demo order can never be a tokenized-equity order. Track 2's paper-trading log
+therefore cannot be produced by routing real rToken decisions to this venue, and the hash-chained
+internal ledger stays the system of record. That is a property of the venue, not a gap in the
+build, and it is recorded here rather than discovered at submission.
+"""
+
+DEMO_SYMBOLS = ("SBTCSUSDT", "SETHSUSDT", "SXRPSUSDT")
+
+MARGIN_COIN = {LIVE_PRODUCT_TYPE: "USDT", DEMO_PRODUCT_TYPE: "SUSDT"}
+"""The demo environment settles in **SUSDT**, not USDT.
+
+Found the same way as the productType: a demo order with `marginCoin=USDT` is refused with
+**40778 "SBTCSUSDT does not support USDT currency as margin"**. Defaulting the margin coin to USDT
+everywhere is the kind of hardcode that passes every unit test and fails the one live call.
+"""
+
 
 class BitgetAuthError(RuntimeError):
     """Credentials are absent or rejected. Never contains the secret."""
@@ -82,7 +109,8 @@ class BitgetTradingClient:
         paper_trading: bool = True,
         base_url: str = BASE_URL,
         timeout: float = 30.0,
-        product_type: str = "USDT-FUTURES",
+        product_type: str | None = None,
+        legacy_paptrading: bool = False,
     ) -> None:
         self._key = _from_env("BITGET_API_KEY")
         self._secret = _from_env("BITGET_SECRET_KEY", "BITGET_API_SECRET")
@@ -105,11 +133,40 @@ class BitgetTradingClient:
         self._base_url = base_url.rstrip("/")
         self._timeout = timeout
         self._paper = paper_trading
-        self._product_type = product_type
+        # Demo is selected by productType. `legacy_paptrading` re-enables the classic header for
+        # an account that still uses it; on a v2 account it produces 40099, so it is off by
+        # default and turning it on is a deliberate, named choice.
+        self._legacy_paptrading = legacy_paptrading
+        self._product_type = product_type or (
+            DEMO_PRODUCT_TYPE if paper_trading else LIVE_PRODUCT_TYPE
+        )
+        self._pos_mode: str | None = None
 
     def __repr__(self) -> str:
         mode = "PAPER" if self._paper else "LIVE"
         return f"BitgetTradingClient(mode={mode}, product_type={self._product_type!r})"
+
+    @property
+    def product_type(self) -> str:
+        return self._product_type
+
+    @property
+    def margin_coin(self) -> str:
+        """The settlement currency this environment actually uses.
+
+        Derived from the productType rather than defaulted, because the two must agree and a
+        caller should not have to know that demo settles in SUSDT.
+        """
+        return MARGIN_COIN.get(self._product_type, "USDT")
+
+    @property
+    def trades_real_money(self) -> bool:
+        """The single question that matters before any order goes out.
+
+        True only when the client is live *and* pointed at a real productType. Kept as one
+        property so a caller never has to reason about two flags agreeing.
+        """
+        return not self._paper and self._product_type != DEMO_PRODUCT_TYPE
 
     @property
     def is_paper(self) -> bool:
@@ -128,7 +185,7 @@ class BitgetTradingClient:
 
         # Paper trading routes to the demo environment via this header, and ONLY on private
         # endpoints — public market data 404s when it is present.
-        if self._paper:
+        if self._paper and self._legacy_paptrading:
             headers["paptrading"] = "1"
 
         timestamp = str(int(time.time() * 1000))
@@ -181,8 +238,7 @@ class BitgetTradingClient:
         self._raise_for_code(payload)
         return payload.get("data")
 
-    @staticmethod
-    def _raise_for_code(payload: dict[str, Any], *, http_status: int | None = None) -> None:
+    def _raise_for_code(self, payload: dict[str, Any], *, http_status: int | None = None) -> None:
         """Route on Bitget's own error code, which is more informative than the HTTP status.
 
         The distinction that matters when diagnosing a failed setup:
@@ -191,9 +247,17 @@ class BitgetTradingClient:
           fine; the key itself is unknown. Signing was never reached.
         * **40009** signature error — the key exists and the signature did not match. *This* is the
           one that means the digest encoding or the signed path is wrong.
+        * **40099** "exchange environment is incorrect" — the key is real and the signature was
+          never even consulted; the key simply belongs to the *other* environment. A live key sent
+          with ``paptrading: 1``, or a demo key sent without it.
 
-        Collapsing both into "auth failed" sends someone hunting a signing bug when they have a
+        Collapsing these into "auth failed" sends someone hunting a signing bug when they have a
         typo'd key, or the reverse.
+
+        **40099 was found by live probe, not by reading the docs.** Two real live keys returned
+        ``40012`` against production and ``40099`` against demo routing, which is what proved they
+        were live keys rather than demo ones. Without this branch the message would have been the
+        generic "venue code 40099" and the diagnosis would have been a guess.
         """
         code = str(payload.get("code", ""))
         if code in ("00000", "0", ""):
@@ -212,6 +276,15 @@ class BitgetTradingClient:
                 f"itself: the digest must be base64 (not hex) and the signed path must include "
                 f"the query string."
             )
+        if code == "40099":
+            wanted = "a DEMO key" if self._paper else "a LIVE key"
+            got = "live" if self._paper else "demo"
+            raise BitgetAuthError(
+                f"wrong environment for this key ({code}: {msg}). The key is real and reached the "
+                f"venue, but it belongs to the {got} environment. This client is configured for "
+                f"{wanted}. A demo key is a separate key created while the account is in Demo "
+                f"mode — it is not a permission toggle on a live key."
+            )
         if code in ("40010", "40014"):
             raise BitgetAuthError(
                 f"timestamp or permission rejected ({code}: {msg}). Check the clock is in sync "
@@ -222,21 +295,40 @@ class BitgetTradingClient:
 
     # --- the operations the desk needs -------------------------------------------------------
 
-    def account(self, margin_coin: str = "USDT") -> dict[str, Any]:
+    def account(self, margin_coin: str | None = None) -> dict[str, Any]:
         """Account state. The first call to make — it proves the signature works."""
         got = self._request(
             "GET", "/api/v2/mix/account/accounts",
-            params={"productType": self._product_type.lower(), "marginCoin": margin_coin},
+            params={"productType": self._product_type.lower(),
+                    "marginCoin": margin_coin or self.margin_coin},
         )
         return {"accounts": got, "mode": "paper" if self._paper else "live"}
+
+    def position_mode(self, symbol: str) -> str:
+        """``one_way_mode`` or ``hedge_mode``, read from the venue and cached.
+
+        **Asked rather than assumed.** A hedge-mode account refuses an order with no ``tradeSide``
+        (**40774** "The order type for unilateral position must also be the unilateral position
+        type"), and a one-way account refuses one that has it. Hardcoding either is a coin flip
+        that only fails on the live call, which is exactly how it was found here.
+        """
+        if self._pos_mode is None:
+            got = self._request(
+                "GET", "/api/v2/mix/account/account",
+                params={"symbol": symbol, "productType": self._product_type.lower(),
+                        "marginCoin": self.margin_coin},
+            ) or {}
+            self._pos_mode = str(got.get("posMode") or "one_way_mode")
+        return self._pos_mode
 
     def place_order(
         self,
         order: Order,
         *,
-        margin_coin: str = "USDT",
+        margin_coin: str | None = None,
         order_type: str = "market",
         price: Decimal | None = None,
+        trade_side: str = "open",
     ) -> PlacedOrder:
         """Send an approved order.
 
@@ -256,7 +348,7 @@ class BitgetTradingClient:
             "symbol": order.symbol,
             "productType": self._product_type.lower(),
             "marginMode": "isolated",
-            "marginCoin": margin_coin,
+            "marginCoin": margin_coin or self.margin_coin,
             "size": str(order.quantity),
             "side": order.side.lower(),
             "orderType": order_type,
@@ -264,6 +356,15 @@ class BitgetTradingClient:
         }
         if price is not None:
             body["price"] = str(price)
+
+        # Hedge mode needs to be told whether this opens or closes; one-way mode refuses the field
+        # outright. The venue is the authority on which this account is.
+        if self.position_mode(order.symbol) == "hedge_mode":
+            if trade_side not in ("open", "close"):
+                raise BitgetOrderError(
+                    f"trade_side={trade_side!r} must be 'open' or 'close' on a hedge-mode account"
+                )
+            body["tradeSide"] = trade_side
 
         got = self._request("POST", "/api/v2/mix/order/place-order", body=body) or {}
         return PlacedOrder(

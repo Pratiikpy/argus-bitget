@@ -1,0 +1,125 @@
+{
+  "netting_cases": [
+    {
+      "label": "ghost_service.py's own documented example",
+      "ghost_net_usd": 2179.0,
+      "ghost_headline_saved_usd": 0.0,
+      "ghost_loss_avoided_usd": 30788.0,
+      "ghost_upside_blocked_usd": 32967.0,
+      "argus_total_value_bps": 28.0,
+      "argus_avoided_loss_bps": 524.0,
+      "argus_missed_gain_bps": -496.0,
+      "ghost_headline_hides_a_nonzero_net": true,
+      "argus_headline_shows_the_true_net": true
+    },
+    {
+      "label": "a larger, still-near-offsetting pair",
+      "ghost_net_usd": -500.0,
+      "ghost_headline_saved_usd": 500.0,
+      "ghost_loss_avoided_usd": 91000.0,
+      "ghost_upside_blocked_usd": 90500.0,
+      "argus_total_value_bps": 29.0,
+      "argus_avoided_loss_bps": 922.0,
+      "argus_missed_gain_bps": -893.0,
+      "ghost_headline_hides_a_nonzero_net": false,
+      "argus_headline_shows_the_true_net": true
+    },
+    {
+      "label": "pure avoided loss, no offsetting upside (the floor should not matter here)",
+      "ghost_net_usd": -15000.0,
+      "ghost_headline_saved_usd": 15000.0,
+      "ghost_loss_avoided_usd": 15000.0,
+      "ghost_upside_blocked_usd": 0,
+      "argus_total_value_bps": 162.0,
+      "argus_avoided_loss_bps": 162.0,
+      "argus_missed_gain_bps": 0.0,
+      "ghost_headline_hides_a_nonzero_net": false,
+      "argus_headline_shows_the_true_net": true
+    }
+  ],
+  "swept_ratios": [
+    {
+      "ratio": 0.0,
+      "net_usd": -50000.0,
+      "headline_saved_usd": 50000.0,
+      "hides_nonzero_net": false
+    },
+    {
+      "ratio": 0.2,
+      "net_usd": -40000.0,
+      "headline_saved_usd": 40000.0,
+      "hides_nonzero_net": false
+    },
+    {
+      "ratio": 0.5,
+      "net_usd": -25000.0,
+      "headline_saved_usd": 25000.0,
+      "hides_nonzero_net": false
+    },
+    {
+      "ratio": 0.8,
+      "net_usd": -10000.0,
+      "headline_saved_usd": 10000.0,
+      "hides_nonzero_net": false
+    },
+    {
+      "ratio": 0.95,
+      "net_usd": -2500.0,
+      "headline_saved_usd": 2500.0,
+      "hides_nonzero_net": false
+    },
+    {
+      "ratio": 0.99,
+      "net_usd": -500.0,
+      "headline_saved_usd": 500.0,
+      "hides_nonzero_net": false
+    },
+    {
+      "ratio": 1.0,
+      "net_usd": 0.0,
+      "headline_saved_usd": 0.0,
+      "hides_nonzero_net": false
+    },
+    {
+      "ratio": 1.01,
+      "net_usd": 500.0,
+      "headline_saved_usd": 0.0,
+      "hides_nonzero_net": true
+    },
+    {
+      "ratio": 1.05,
+      "net_usd": 2500.0,
+      "headline_saved_usd": 0.0,
+      "hides_nonzero_net": true
+    },
+    {
+      "ratio": 1.2,
+      "net_usd": 10000.0,
+      "headline_saved_usd": 0.0,
+      "hides_nonzero_net": true
+    },
+    {
+      "ratio": 1.5,
+      "net_usd": 25000.0,
+      "headline_saved_usd": 0.0,
+      "hides_nonzero_net": true
+    },
+    {
+      "ratio": 2.0,
+      "net_usd": 50000.0,
+      "headline_saved_usd": 0.0,
+      "hides_nonzero_net": true
+    }
+  ],
+  "defect_appears_only_near_full_offset": true,
+  "ablation": {
+    "unfloored_net_would_show_the_true_value": true,
+    "real_headline_floors_it_to_zero": true,
+    "the_floor_is_the_defect": true
+  },
+  "costs": {
+    "ghost_reimpl_us_per_call": 5.040670000016689,
+    "argus_us_per_call": 5.509880000317935
+  },
+  "scope_statement": "Claimed: on the exact adversarial scenario AutonomousTradeAgents' own real code comment describes (a vetoed bucket holding $30,788 of avoided losses and $32,967 of blocked gains, netting to +$2,179), their real headline `saved_usd` computation (`round(max(0.0, -net), 2)`, `ghost_service.py:278`) produces exactly $0.00 \u2014 confirmed by running their own real, unmodified aggregation function, not assumed from the comment. This is not a fixed historical bug: the split fields their comment introduces (`loss_avoided_usd`/`upside_blocked_usd`) exist ALONGSIDE the still-flawed headline, not instead of it. ARGUS's real `abstention_quality()`, run on the structurally identical scenario, reports `total_value_bps` as the true unfloored net at every point checked. A sweep across the ratio of avoided-loss to blocked-upside confirms the defect fires precisely where the net crosses near zero and nowhere else \u2014 exactly the shape the real floor formula predicts, not a coincidence of one chosen example.\n\nNOT claimed: that AutonomousTradeAgents' overall Ghost P&L design is unsound \u2014 the underlying aggregation (`GhostBucket`, the split fields, the trading-day-aware finalization horizon, the \"marked so far\" partial-value reporting) is a genuinely well-considered design, and this comparison exercises only the one headline-number computation where a real defect was found. NOT claimed that ARGUS's abstention scoring is otherwise richer than theirs \u2014 their trading-day-aware horizon and partial-mark visibility are real, useful properties this comparison does not attempt to show ARGUS's own `HOLD_HOURS`-based, calendar-hour horizon matches or beats, since ARGUS's own venue (continuously-traded tokenized equities, confirmed by `truth.clocks.SessionPhase` modelling WEEKEND and OVERNIGHT as thin-but-open regimes, not closures) has a different real trading calendar than Alpaca's own real options market that a trading-day convention exists to respect \u2014 comparing the two horizon conventions directly would not be a fair, same-venue test.\n"
+}

@@ -1,0 +1,77 @@
+def compute_hit_rates(events_df: pd.DataFrame) -> dict:
+    """
+    Compute hit rates: how often did the whale's action match price direction?
+
+    - Exchange deposit (sell signal): hit = price went DOWN afterward
+    - Exchange withdrawal (buy signal): hit = price went UP afterward
+    - DeFi interaction: treated as buy signal (deploying capital)
+
+    A hit rate of 50% = random. Above 50% = smart money. Below 50% = dumb money.
+
+    Uses a binomial test to determine if the hit rate is significantly
+    different from 50% (random chance).
+
+    Parameters
+    ----------
+    events_df : pd.DataFrame
+        Output of compute_event_returns().
+
+    Returns
+    -------
+    dict
+        results[category][horizon] = {
+            'n': int, 'hits': int, 'hit_rate': float,
+            'pvalue': float, 'direction': str
+        }
+    """
+    # Define what counts as a "hit" for each category
+    # Deposit = sell signal, so a hit is price going DOWN (return < 0)
+    # Withdrawal = buy signal, so a hit is price going UP (return > 0)
+    category_directions = {
+        "exchange_deposit": "down",      # selling before a drop = smart
+        "exchange_withdrawal": "up",     # buying before a rise = smart
+        "defi_interaction": "up",        # deploying capital = bullish bet
+    }
+
+    results = {}
+
+    for cat, expected_dir in category_directions.items():
+        cat_data = events_df[events_df["tx_category"] == cat]
+
+        if len(cat_data) < 30:
+            print(f"  Skipping {cat}: only {len(cat_data)} events")
+            continue
+
+        results[cat] = {}
+
+        for h in HORIZONS:
+            col = f"fwd_return_{h}h"
+            returns = cat_data[col].values
+
+            if expected_dir == "down":
+                # Hit = price dropped (return < 0)
+                hits = int((returns < 0).sum())
+            else:
+                # Hit = price rose (return > 0)
+                hits = int((returns > 0).sum())
+
+            n = len(returns)
+            hit_rate = hits / n
+
+            # Binomial test: is hit rate significantly different from 50%?
+            # binom_test tests if the number of successes in n trials
+            # differs from what we'd expect under p=0.5 (random)
+            p_value = stats.binomtest(hits, n, p=0.5).pvalue
+
+            results[cat][h] = {
+                "n": n,
+                "hits": hits,
+                "hit_rate": hit_rate,
+                "pvalue": p_value,
+                "expected_direction": expected_dir,
+                "mean_return": np.mean(returns),
+            }
+
+    return results
+
+

@@ -87,7 +87,7 @@ class TestOrderGating:
 
 
 class TestDemoRouting:
-    def test_paper_mode_sets_the_header(self, monkeypatch) -> None:
+    def test_paper_mode_points_at_the_demo_product_type(self, monkeypatch) -> None:
         for k, v in CREDS.items():
             monkeypatch.setenv(k, v)
         from argus.execution.bitget_client import BitgetTradingClient
@@ -95,4 +95,5 @@ class TestDemoRouting:
 
         got = _demo_routing(BitgetTradingClient(paper_trading=True))
         assert got.passed is True
-        assert "set" in got.detail
+        assert "SUSDT-FUTURES" in got.detail
+        assert "real money: False" in got.detail

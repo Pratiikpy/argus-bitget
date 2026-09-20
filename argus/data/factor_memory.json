@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "runs": 2,
+  "dropped": 0,
+  "duplicates_suppressed": 8,
+  "trials": [
+    {
+      "canonical": "long_while_closed@24",
+      "name": "long_while_closed",
+      "trial_number": 1,
+      "terminal_state": "rejected",
+      "rejection_reason": "net Sharpe -0.095 after the 12bps round trip (gross was 0.915)",
+      "rejection": "performance",
+      "at": "2026-09-12T17:52:24.042356+00:00"
+    },
+    {
+      "canonical": "long_while_open@24",
+      "name": "long_while_open",
+      "trial_number": 2,
+      "terminal_state": "rejected",
+      "rejection_reason": "net Sharpe -1.437 after the 12bps round trip (gross was 0.096)",
+      "rejection": "performance",
+      "at": "2026-09-12T17:52:24.042356+00:00"
+    },
+    {
+      "canonical": "weekend_only@24",
+      "name": "weekend_only",
+      "trial_number": 3,
+      "terminal_state": "rejected",
+      "rejection_reason": "DSR 0.0 over 8 trials \u2014 not distinguishable from the best of a random search",
+      "rejection": "performance",
+      "at": "2026-09-12T17:52:24.042356+00:00"
+    },
+    {
+      "canonical": "closure_momentum@24",
+      "name": "closure_momentum",
+      "trial_number": 4,
+      "terminal_state": "rejected",
+      "rejection_reason": "net Sharpe -9.000 after the 12bps round trip (gross was -2.681)",
+      "rejection": "performance",
+      "at": "2026-09-12T17:52:24.042356+00:00"
+    },
+    {
+      "canonical": "closure_reversion@24",
+      "name": "closure_reversion",
+      "trial_number": 5,
+      "terminal_state": "rejected",
+      "rejection_reason": "net Sharpe -3.746 after the 12bps round trip (gross was 2.681)",
+      "rejection": "performance",
+      "at": "2026-09-12T17:52:24.042356+00:00"
+    },
+    {
+      "canonical": "near_reopen@24",
+      "name": "near_reopen",
+      "trial_number": 6,
+      "terminal_state": "rejected",
+      "rejection_reason": "net Sharpe -1.625 after the 12bps round trip (gross was -0.369)",
+      "rejection": "performance",
+      "at": "2026-09-12T17:52:24.042356+00:00"
+    },
+    {
+      "canonical": "slow_trend@24",
+      "name": "slow_trend",
+      "trial_number": 7,
+      "terminal_state": "rejected",
+      "rejection_reason": "net Sharpe -0.310 after the 12bps round trip (gross was 0.850)",
+      "rejection": "performance",
+      "at": "2026-09-12T17:52:24.042356+00:00"
+    },
+    {
+      "canonical": "slow_fade@24",
+      "name": "slow_fade",
+      "trial_number": 8,
+      "terminal_state": "rejected",
+      "rejection_reason": "net Sharpe -2.111 after the 12bps round trip (gross was -0.420)",
+      "rejection": "performance",
+      "at": "2026-09-12T17:52:24.042356+00:00"
+    }
+  ]
+}

@@ -6,9 +6,26 @@ to be right — and in the corpus we tore down, they frequently were not.
 
 Specific defects these functions exist to avoid, each found by reading real code:
 
-* **vectorbt's Deflated Sharpe silently returns NaN.** A gate that returns NaN and is compared with
-  ``>`` passes everything. Here :func:`deflated_sharpe` raises rather than returning a value that
-  cannot be compared.
+* **vectorbt's Deflated Sharpe silently returns NaN on the single-strategy case.** Corrected here
+  after an external review questioned the original wording, which was imprecise in two ways —
+  checked against vectorbt's own source (`vectorbt/returns/accessors.py:596`,
+  `vectorbt/returns/metrics.py:19-36`) rather than left as an assertion:
+
+  1. **vectorbt has no gate at all.** `deflated_sharpe_ratio` is wired into the stats accessor only
+     — grep of the whole package finds no `>` or `<` comparison against it anywhere in vectorbt's
+     own code. The risk is in how a *caller* gates on the number, not in vectorbt itself.
+  2. **The operator claim was backwards.** ``NaN > threshold`` is ``False`` in Python and numpy, so
+     a gate written the natural way — *admit if metric > threshold* — fails **closed** on NaN, not
+     open. The failure mode that actually admits everything is the inverted form: *reject if
+     metric < threshold*, negated — because ``NaN < threshold`` is also ``False``, so `not (...)`
+     is ``True`` and the row survives. That is a real and common filtering anti-pattern; it is not
+     the shape our first sentence described.
+
+  NaN itself is real and easy to hit: `var_sharpe = np.var(sharpe_ratio, ddof=ddof)` is NaN with a
+  single trial (`ddof=1` on one observation divides by zero), which propagates through
+  `approx_exp_max_sharpe` into `norm.cdf(NaN) = NaN` — silently, on the single-backtest case any
+  first-time user would run. :func:`deflated_sharpe` raises rather than returning a value that
+  cannot be safely compared by either gate shape.
 * **Qlib measures turnover as gross notional, not net delta**, overstating cost 2-3x on
   mean-reversion. :func:`turnover` takes the net change in position.
 * **Annualisation is where Sharpe is quietly inflated.** The factor must match the sampling
@@ -72,6 +89,13 @@ def sharpe(returns: list[float], *, periods_per_year: int, risk_free: float = 0.
 
     ``periods_per_year`` is required. Defaulting it is how an hourly series gets annualised as if
     it were daily and the ratio comes out roughly five times too large.
+
+    **``risk_free`` is an annual rate and is de-annualised here.** empyrical and vectorbt take a
+    per-period rate instead, so the same number means different things in the two interfaces: pass
+    0.04 here for 4% a year, and passing 0.04 to empyrical would mean 4% *per period*. The
+    convention is stated because it is silent when wrong — every call in this repository passes
+    0.0, where the two agree exactly, so nothing would reveal the difference until someone set a
+    rate. Verified against `research/architecture/metrics-audit.md`.
     """
     if len(returns) < 2:
         raise MetricError("Sharpe needs at least two returns")
@@ -103,7 +127,12 @@ def sortino(returns: list[float], *, periods_per_year: int, target: float = 0.0)
 
 
 def max_drawdown(equity: list[float]) -> float:
-    """Largest peak-to-trough decline as a positive fraction.
+    """Largest peak-to-trough decline as a **positive** fraction.
+
+    Sign convention: positive, so a 25% fall reads as ``0.25``. empyrical and pyfolio return a
+    negative number for the same event. Positive is used here because the value is reported to a
+    reader as "max drawdown 25%", and a minus sign in front of a quantity already named as a
+    drawdown invites a double negative.
 
     Denominator is the running peak, not the starting value. Using the start understates drawdown
     for any strategy that made money before losing it.
@@ -140,6 +169,17 @@ def probabilistic_sharpe(
     """
     if n < 2:
         raise MetricError("probabilistic Sharpe needs at least two observations")
+    # `x != x` is true only for NaN (IEEE 754) — checked on both inputs up front, at the same
+    # spot as every other input-validity check, rather than relying on it corrupting `denom` or
+    # `z` downstream and hoping a later comparison happens to catch it. It would not have: `skew
+    # * observed` is itself NaN whenever `observed` is NaN (0.0 * nan == nan, not 0.0), so a NaN
+    # `observed` reaches `denom <= 0` as NaN too, and `nan <= 0` is False — the same
+    # fails-every-comparison behaviour that makes NaN silent in vectorbt's own gate (this
+    # module's own docstring), now checked directly instead of assumed caught downstream.
+    if observed != observed or benchmark != benchmark:
+        raise MetricError(
+            "probabilistic Sharpe cannot be computed from a NaN observed or benchmark"
+        )
     denom = sqrt(1 - skew * observed + (kurtosis - 1) / 4 * observed ** 2)
     if denom <= 0:
         raise MetricError("probabilistic Sharpe denominator is non-positive")
@@ -162,8 +202,16 @@ def deflated_sharpe(
     """
     if trials < 1:
         raise MetricError("trials must be at least 1 — an unrecorded trial count voids the gate")
-    if variance_of_trials < 0:
-        raise MetricError("variance of trial Sharpes cannot be negative")
+    # `variance_of_trials != variance_of_trials` is true only for NaN (IEEE 754) — caught
+    # separately from `< 0` because NaN fails EVERY ordering comparison, including `< 0`, so a
+    # NaN slips straight past a bare `< 0` guard exactly the way it slips past vectorbt's own
+    # `>`/`<` gate shapes (see this module's docstring). Found empirically while building the
+    # comparison against vectorbt's real vendored math — `eval/dsr_comparison.py` — which passes
+    # a genuinely NaN `variance_of_trials` (vectorbt's own `np.var(x, ddof=1)` on one trial) and
+    # would otherwise have reached `sqrt(variance_of_trials)` below and returned NaN silently,
+    # the exact defect this function's own docstring promises never to allow through.
+    if variance_of_trials < 0 or variance_of_trials != variance_of_trials:
+        raise MetricError("variance of trial Sharpes cannot be negative or NaN")
     if n < 2:
         raise MetricError("deflated Sharpe needs at least two observations")
 
@@ -236,6 +284,107 @@ def evaluate(
         turnover=turnover(weights),
         win_rate=wins / active if active else 0.0,
         trades=active,
+    )
+
+
+@dataclass(frozen=True, slots=True)
+class RollingStability:
+    """How steady a Sharpe ratio is across rolling windows, not merely how high it ends up.
+
+    The handbook scores "rolling 30-day Sharpe stability" as its own criterion, and it is a
+    different question from the headline Sharpe. A strategy whose full-sample Sharpe is 2.0
+    because one fortnight carried it, and which was negative in every other window, has the same
+    headline number as one that earned 2.0 steadily — and is a completely different asset. The
+    fraction of windows that were positive, and the spread between the best and worst, are what
+    separate them.
+    """
+
+    windows: int
+    skipped: int
+    """Windows whose returns had no variation, so no Sharpe could be formed.
+
+    Reported because it is often the whole story. A series that is flat for 380 periods and then
+    jumps produces 20 scorable windows out of 371 and a flattering mean, and the only thing that
+    reveals it is the number that were skipped."""
+
+    window_periods: int
+    mean: float
+    stdev: float
+    minimum: float
+    maximum: float
+    positive_share: float
+    """Fraction of windows with a Sharpe above zero. The clearest single stability number."""
+
+    @property
+    def spread(self) -> float:
+        return self.maximum - self.minimum
+
+    def as_dict(self) -> dict[str, float | int]:
+        return {
+            "windows": self.windows,
+            "skipped_flat_windows": self.skipped,
+            "scorable_share": (
+                round(self.windows / (self.windows + self.skipped), 3)
+                if self.windows + self.skipped else 0.0
+            ),
+            "window_periods": self.window_periods,
+            "mean": round(self.mean, 3),
+            "stdev": round(self.stdev, 3),
+            "min": round(self.minimum, 3),
+            "max": round(self.maximum, 3),
+            "spread": round(self.spread, 3),
+            "positive_share": round(self.positive_share, 3),
+        }
+
+
+def rolling_sharpe(
+    returns: list[float], *, window: int, periods_per_year: int, risk_free: float = 0.0
+) -> list[float]:
+    """Sharpe over each rolling window of ``window`` periods.
+
+    Windows whose standard deviation is negligible are skipped rather than reported as zero or
+    infinite: a flat window is an absence of information about risk-adjusted return, and giving it
+    a number would drag the mean toward whatever that number was.
+    """
+    if window < 2:
+        raise MetricError("a rolling window needs at least two periods")
+    if len(returns) < window:
+        raise MetricError(
+            f"{len(returns)} return(s) is fewer than the {window}-period window; a rolling "
+            f"statistic over a single partial window is not a rolling statistic"
+        )
+    out: list[float] = []
+    for i in range(window, len(returns) + 1):
+        chunk = returns[i - window:i]
+        try:
+            out.append(sharpe(chunk, periods_per_year=periods_per_year, risk_free=risk_free))
+        except MetricError:
+            continue
+    return out
+
+
+def stability(
+    returns: list[float], *, window: int, periods_per_year: int
+) -> RollingStability:
+    """Summarise the rolling Sharpe series into the stability the handbook asks about."""
+    series = rolling_sharpe(returns, window=window, periods_per_year=periods_per_year)
+    attempted = len(returns) - window + 1
+    if not series:
+        raise MetricError(
+            "no rolling window had enough variation to produce a Sharpe; stability is undefined "
+            "rather than zero"
+        )
+    mean = _mean(series)
+    sd = _stdev(series) if len(series) > 1 else 0.0
+    return RollingStability(
+        windows=len(series),
+        skipped=max(0, attempted - len(series)),
+        window_periods=window,
+        mean=mean,
+        stdev=sd,
+        minimum=min(series),
+        maximum=max(series),
+        positive_share=sum(1 for x in series if x > 0) / len(series),
     )
 
 

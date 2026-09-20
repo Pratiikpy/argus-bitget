@@ -1,0 +1,115 @@
+{
+  "generated_at": "2026-09-13T14:25:05.025363+00:00",
+  "instants": 42,
+  "effective_instants": 25,
+  "symbols": [
+    "COINUSDT",
+    "MSFTUSDT",
+    "MSTRUSDT",
+    "NVDAUSDT",
+    "TSLAUSDT"
+  ],
+  "desk": {
+    "name": "desk",
+    "trades": 0,
+    "instants": 42,
+    "total_bps": 0.0,
+    "mean_bps": 0.0,
+    "win_rate": null
+  },
+  "baselines": [
+    {
+      "name": "always_flat",
+      "trades": 0,
+      "instants": 42,
+      "total_bps": 0.0,
+      "mean_bps": 0.0,
+      "win_rate": null
+    },
+    {
+      "name": "always_long",
+      "trades": 42,
+      "instants": 42,
+      "total_bps": -618.21,
+      "mean_bps": -14.719,
+      "win_rate": 0.3571
+    },
+    {
+      "name": "momentum",
+      "trades": 42,
+      "instants": 42,
+      "total_bps": -1780.06,
+      "mean_bps": -42.382,
+      "win_rate": 0.4286
+    },
+    {
+      "name": "reversion",
+      "trades": 42,
+      "instants": 42,
+      "total_bps": 200.86,
+      "mean_bps": 4.782,
+      "win_rate": 0.5238
+    },
+    {
+      "name": "volatility_gated",
+      "trades": 39,
+      "instants": 42,
+      "total_bps": -1132.88,
+      "mean_bps": -26.973,
+      "win_rate": 0.4615
+    }
+  ],
+  "comparisons": [
+    {
+      "baseline": "always_flat",
+      "wins": 0,
+      "losses": 0,
+      "ties": 42,
+      "differing": 0,
+      "mean_difference_bps": 0.0,
+      "p_value": 1.0,
+      "verdict": "IDENTICAL to always_flat on every instant. The two policies made the same call each time, so there is nothing to test and no value was added either way"
+    },
+    {
+      "baseline": "always_long",
+      "wins": 27,
+      "losses": 15,
+      "ties": 0,
+      "differing": 42,
+      "mean_difference_bps": 14.719,
+      "p_value": 0.08843,
+      "verdict": "INCONCLUSIVE against always_long: 27 wins, 15 losses over 42 differing instant(s), p=0.088"
+    },
+    {
+      "baseline": "momentum",
+      "wins": 24,
+      "losses": 18,
+      "ties": 0,
+      "differing": 42,
+      "mean_difference_bps": 42.382,
+      "p_value": 0.440799,
+      "verdict": "INCONCLUSIVE against momentum: 24 wins, 18 losses over 42 differing instant(s), p=0.441"
+    },
+    {
+      "baseline": "reversion",
+      "wins": 20,
+      "losses": 22,
+      "ties": 0,
+      "differing": 42,
+      "mean_difference_bps": -4.782,
+      "p_value": 0.877614,
+      "verdict": "INCONCLUSIVE against reversion: 20 wins, 22 losses over 42 differing instant(s), p=0.878"
+    },
+    {
+      "baseline": "volatility_gated",
+      "wins": 21,
+      "losses": 18,
+      "ties": 3,
+      "differing": 39,
+      "mean_difference_bps": 26.973,
+      "p_value": 0.749259,
+      "verdict": "INCONCLUSIVE against volatility_gated: 21 wins, 18 losses over 39 differing instant(s), p=0.749"
+    }
+  ],
+  "verdict": "Over 42 instant(s) (25 effective), the desk opened 0 position(s) for +0bps. The best fixed rule was reversion at +201bps over 42 trade(s), and it is the best of 5 rules tried, which is itself a selection. NO INCREMENTAL VALUE DEMONSTRATED, and none disproved either: no baseline is separated from the desk at 5% on this sample. With 25 effective instant(s) this record can notice a large difference and cannot settle a small one."
+}

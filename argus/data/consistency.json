@@ -1,0 +1,77 @@
+{
+  "generated_at": "2026-09-13T23:00:46.216726+00:00",
+  "states": 1,
+  "unanimity": 0.0,
+  "verdict": "1 state(s), 5 replays each with the cache disabled. Lean agreement 100%-100%, action 80%-80%, view 80%-80%, verbatim 20%-20%. The desk's directional view is identical on every replay while its action is not: it knows what it thinks and wavers on what to do about it. 1 state(s) took more than one action across replays and are named rather than averaged away: sleeping-anchor. On identical evidence, that is the decision-maker and not the market",
+  "replays": [
+    {
+      "label": "sleeping-anchor",
+      "runs": 5,
+      "cache_enabled": false,
+      "lean_agreement": 1.0,
+      "action_agreement": 0.8,
+      "view_agreement": 0.8,
+      "verbatim_agreement": 0.2,
+      "unanimous_action": false,
+      "distinct_actions": [
+        [
+          "human_review",
+          "sell",
+          "0"
+        ],
+        [
+          "reduce",
+          "sell",
+          "2"
+        ]
+      ],
+      "decisions": [
+        {
+          "verdict": "reduce",
+          "side": "sell",
+          "quantity": "2",
+          "lean": "down",
+          "lean_confidence": 0.78,
+          "intent_hash": "e8b92e02f2fa2a4c",
+          "thesis": "Under a general mandate prioritizing capital preservation during illiquid windows, the 8-K filing (credibility 1.00) confirms a 7% downward revision to FY revenue guidance citing d"
+        },
+        {
+          "verdict": "human_review",
+          "side": "sell",
+          "quantity": "0",
+          "lean": "down",
+          "lean_confidence": 0.78,
+          "intent_hash": "76cf7b3ecaf5cc4c",
+          "thesis": "Under a general mandate with no stated constraints, the 8-K filing (credibility 1.00) confirms a 7% downward revision to FY revenue guidance \u2014 a material negative surprise for a st"
+        },
+        {
+          "verdict": "reduce",
+          "side": "sell",
+          "quantity": "2",
+          "lean": "down",
+          "lean_confidence": 0.8,
+          "intent_hash": "4758de0c0ff39a50",
+          "thesis": "A credible SEC 8-K (credibility 1.00) revised FY revenue guidance down 7% citing delayed data-centre orders \u2014 this is a material fundamental deterioration for a stock whose premium"
+        },
+        {
+          "verdict": "reduce",
+          "side": "sell",
+          "quantity": "2",
+          "lean": "down",
+          "lean_confidence": 0.85,
+          "intent_hash": "5b9c247c21a7dcff",
+          "thesis": "A credible SEC 8-K filing (credibility 1.00) confirms a 7% downward revision to FY revenue guidance citing delayed data-centre orders \u2014 a material negative surprise for a stock who"
+        },
+        {
+          "verdict": "reduce",
+          "side": "sell",
+          "quantity": "2",
+          "lean": "down",
+          "lean_confidence": 0.78,
+          "intent_hash": "ee2e8587d9d91ff2",
+          "thesis": "Under a general mandate with no specific risk tolerance stated, capital preservation takes priority over holding a position into a known negative catalyst with no hedge available. "
+        }
+      ]
+    }
+  ]
+}

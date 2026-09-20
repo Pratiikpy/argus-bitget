@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-09-13T01:33:30.746166+00:00",
+  "what": "Bitget official technical-analysis Skill RSI(14) vs RSI recomputed by ARGUS from Bitget 4H candles",
+  "tolerance_points": 5.0,
+  "symbols": 6,
+  "agreed": 6,
+  "max_gap": 2.1899999999999977,
+  "rows": [
+    {
+      "symbol": "NVDAUSDT",
+      "skill_rsi": 28.64,
+      "our_rsi": 30.83,
+      "agrees": true,
+      "note": "gap 2.19 points against a 5.0 tolerance; agrees with our own computation on Bitget candles",
+      "bars": 239
+    },
+    {
+      "symbol": "TSLAUSDT",
+      "skill_rsi": 57.87,
+      "our_rsi": 57.43,
+      "agrees": true,
+      "note": "gap 0.44 points against a 5.0 tolerance; agrees with our own computation on Bitget candles",
+      "bars": 239
+    },
+    {
+      "symbol": "MSFTUSDT",
+      "skill_rsi": 54.58,
+      "our_rsi": 54.17,
+      "agrees": true,
+      "note": "gap 0.41 points against a 5.0 tolerance; agrees with our own computation on Bitget candles",
+      "bars": 239
+    },
+    {
+      "symbol": "COINUSDT",
+      "skill_rsi": 45.61,
+      "our_rsi": 46.68,
+      "agrees": true,
+      "note": "gap 1.07 points against a 5.0 tolerance; agrees with our own computation on Bitget candles",
+      "bars": 239
+    },
+    {
+      "symbol": "MSTRUSDT",
+      "skill_rsi": 40.81,
+      "our_rsi": 40.1,
+      "agrees": true,
+      "note": "gap 0.71 points against a 5.0 tolerance; agrees with our own computation on Bitget candles",
+      "bars": 239
+    },
+    {
+      "symbol": "QQQUSDT",
+      "skill_rsi": 46.67,
+      "our_rsi": 48.36,
+      "agrees": true,
+      "note": "gap 1.69 points against a 5.0 tolerance; agrees with our own computation on Bitget candles",
+      "bars": 239
+    }
+  ]
+}

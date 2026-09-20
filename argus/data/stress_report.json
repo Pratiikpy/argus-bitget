@@ -1,0 +1,201 @@
+{
+  "symbol": "NVDAUSDT",
+  "quantity": "500",
+  "entry_price": "213.34",
+  "loss_tolerance_pct": "5",
+  "generated_at": "2026-09-15T13:30:55.563011+00:00",
+  "horizon_bars": 2,
+  "phase": "rth",
+  "measured_share_pct": "44.44444444444444444444444444",
+  "survives_all": true,
+  "empirical": [
+    {
+      "name": "typical_rth",
+      "severity": "typical",
+      "percentile": "50",
+      "shock_pct": "-0.01787310098302055406613047364",
+      "observations": 382,
+      "occurrences": 191,
+      "frequency_pct": "50.0",
+      "last_seen": "2026-09-14T19:00:00+00:00",
+      "phase": "rth",
+      "horizon_bars": 2,
+      "measured": true
+    },
+    {
+      "name": "adverse_rth",
+      "severity": "adverse",
+      "percentile": "10",
+      "shock_pct": "-1.011605217212693848207866899",
+      "observations": 382,
+      "occurrences": 39,
+      "frequency_pct": "10.20942408376963350785340314",
+      "last_seen": "2026-09-08T15:00:00+00:00",
+      "phase": "rth",
+      "horizon_bars": 2,
+      "measured": true
+    },
+    {
+      "name": "severe_rth",
+      "severity": "severe",
+      "percentile": "5",
+      "shock_pct": "-1.487408319228599271682822998",
+      "observations": 382,
+      "occurrences": 20,
+      "frequency_pct": "5.235602094240837696335078534",
+      "last_seen": "2026-09-08T14:00:00+00:00",
+      "phase": "rth",
+      "horizon_bars": 2,
+      "measured": true
+    },
+    {
+      "name": "extreme_rth",
+      "severity": "extreme",
+      "percentile": "1",
+      "shock_pct": "-2.576242863110987327670240914",
+      "observations": 382,
+      "occurrences": 4,
+      "frequency_pct": "1.047120418848167539267015707",
+      "last_seen": "2026-08-28T16:00:00+00:00",
+      "phase": "rth",
+      "horizon_bars": 2,
+      "measured": true
+    }
+  ],
+  "structural": [
+    {
+      "name": "anchor_shut",
+      "description": "the underlying market closes while the position is open",
+      "shock_pct": "0",
+      "liquidity_multiplier": "0.33",
+      "assumption": "liquidity multiplier 0.33 from the measured off-hours depth ratio used throughout (agents/meta_pm.py:56-63); no price shock is asserted because closure is not itself directional",
+      "measured": false
+    },
+    {
+      "name": "hedge_unavailable",
+      "description": "the anchor hedge cannot be reached, so the position is naked",
+      "shock_pct": "0",
+      "liquidity_multiplier": "0.5",
+      "assumption": "ASSUMPTION, NOT MEASURED: hedge failure is modelled as halved depth. The real cost is the residual risk the hedgeability surface prices, which this scenario does not attempt",
+      "measured": false
+    },
+    {
+      "name": "spread_treble",
+      "description": "the quoted spread widens to three times its normal width",
+      "shock_pct": "0",
+      "liquidity_multiplier": "0.33",
+      "assumption": "ASSUMPTION, NOT MEASURED: a trebled spread is represented as a third of the depth, which is a proxy for cost rather than a model of the book",
+      "measured": false
+    },
+    {
+      "name": "venue_outage",
+      "description": "the exchange stops accepting orders while the position is open",
+      "shock_pct": "0",
+      "liquidity_multiplier": "0.01",
+      "assumption": "ASSUMPTION, NOT MEASURED: near-zero depth stands for 'no orders accepted'. The exit test should fail; that failing is the finding, not a defect",
+      "measured": false
+    },
+    {
+      "name": "stale_evidence",
+      "description": "the evidence behind the thesis is hours old and no longer true",
+      "shock_pct": "0",
+      "liquidity_multiplier": "1",
+      "assumption": "no price or liquidity effect is asserted. Listed so a stress report cannot omit the failure mode that has no market shock at all",
+      "measured": false
+    }
+  ],
+  "results": [
+    {
+      "scenario": "typical_rth",
+      "pnl_pct": "-0.01787310098302055406613049592",
+      "exit_cost_bps": "12.77262072198781059540553211",
+      "survives": true,
+      "exitable": true,
+      "exit_measured": true,
+      "unfilled_quantity": "0"
+    },
+    {
+      "scenario": "adverse_rth",
+      "pnl_pct": "-1.011605217212693848207866879",
+      "exit_cost_bps": "12.78037692963348801969883512",
+      "survives": true,
+      "exitable": true,
+      "exit_measured": true,
+      "unfilled_quantity": "0"
+    },
+    {
+      "scenario": "severe_rth",
+      "pnl_pct": "-1.487408319228599271682823006",
+      "exit_cost_bps": "12.78412713517628586382452301",
+      "survives": true,
+      "exitable": true,
+      "exit_measured": true,
+      "unfilled_quantity": "0"
+    },
+    {
+      "scenario": "extreme_rth",
+      "pnl_pct": "-2.576242863110987327670240930",
+      "exit_cost_bps": "12.79291762894534257120862202",
+      "survives": true,
+      "exitable": true,
+      "exit_measured": true,
+      "unfilled_quantity": "0"
+    },
+    {
+      "scenario": "anchor_shut",
+      "pnl_pct": "0",
+      "exit_cost_bps": "12.87555659714084837122099836",
+      "survives": true,
+      "exitable": true,
+      "exit_measured": true,
+      "unfilled_quantity": "0"
+    },
+    {
+      "scenario": "hedge_unavailable",
+      "pnl_pct": "0",
+      "exit_cost_bps": "12.88497234461423080528733477",
+      "survives": true,
+      "exitable": true,
+      "exit_measured": true,
+      "unfilled_quantity": "0"
+    },
+    {
+      "scenario": "spread_treble",
+      "pnl_pct": "0",
+      "exit_cost_bps": "12.87555659714084837122099836",
+      "survives": true,
+      "exitable": true,
+      "exit_measured": true,
+      "unfilled_quantity": "0"
+    },
+    {
+      "scenario": "venue_outage",
+      "pnl_pct": "0",
+      "exit_cost_bps": "12.68992992899158679196644091",
+      "survives": true,
+      "exitable": true,
+      "exit_measured": true,
+      "unfilled_quantity": "0"
+    },
+    {
+      "scenario": "stale_evidence",
+      "pnl_pct": "0",
+      "exit_cost_bps": "12.77247586012937095715758883",
+      "survives": true,
+      "exitable": true,
+      "exit_measured": true,
+      "unfilled_quantity": "0"
+    }
+  ],
+  "reverse_stress": {
+    "price_shock_pct": "-2.576242863110987327670240914",
+    "breaking_liquidity_multiplier": null,
+    "always_breaks": false,
+    "searched_floor": "0.01",
+    "searched_ceiling": "1.0",
+    "iterations": 0
+  },
+  "notes": [
+    "2159 hourly bar(s) over 90 day(s)"
+  ]
+}

@@ -10,9 +10,11 @@ from decimal import Decimal
 
 import pytest
 
+from argus.paper.runner import _hedge_surface
 from argus.risk.hedgeability import (
     HedgeabilitySurface,
     HedgeCandidate,
+    open_market_candidate,
     shut_market_candidate,
 )
 
@@ -163,3 +165,58 @@ class TestScoringTheAgentsChoice:
     def test_residual_reflects_the_hedge_actually_chosen(self) -> None:
         assert self.surface.residual_after(self.best) < Decimal("1")
         assert self.surface.residual_after(self.worse) > self.surface.residual_after(self.best)
+
+
+class TestTheOpenMarketCandidate:
+    """The regular-hours branch used to hand the desk an empty surface.
+
+    That put a false sentence into the record of every regular-hours decision — "no hedge
+    placeable" — when what was true is narrower: the venue is open, the liquidity is there, and
+    ARGUS has no equity broker. The distinction matters in the direction that flatters us, so it is
+    pinned here: "the market gave me no hedge" excuses an unhedged position and "I have not built
+    the connection" does not.
+    """
+
+    def test_an_open_anchor_is_carried_on_the_surface(self) -> None:
+        surface = _hedge_surface(False, "NVDAUSDT")
+        assert len(surface.candidates) == 1
+
+    def test_it_is_not_placeable_because_we_have_no_broker(self) -> None:
+        """No capability is invented: the menu is still empty, for the true reason."""
+        surface = _hedge_surface(False, "NVDAUSDT")
+        assert surface.is_empty
+        assert surface.candidates[0].execution_probability == Decimal("0")
+
+    def test_the_liquidity_is_recorded_as_present(self) -> None:
+        """Zero liquidity would say the market had none, which is false while it is open."""
+        assert _hedge_surface(False, "NVDAUSDT").candidates[0].liquidity_availability == Decimal(
+            "1"
+        )
+
+    def test_the_note_names_the_capability_limit_not_a_market_state(self) -> None:
+        note = _hedge_surface(False, "NVDAUSDT").session_note
+        assert "no equity broker" in note
+        assert "capability limit, not a market state" in note
+
+    def test_the_shut_branch_still_says_the_market_is_shut(self) -> None:
+        surface = _hedge_surface(True, "NVDAUSDT")
+        assert surface.is_empty
+        assert "anchor shut" in surface.session_note
+        assert surface.candidates[0].liquidity_availability == Decimal("0")
+
+    def test_the_two_states_do_not_share_a_reason(self) -> None:
+        assert (
+            _hedge_surface(True, "NVDAUSDT").session_note
+            != _hedge_surface(False, "NVDAUSDT").session_note
+        )
+
+    def test_the_underlying_is_named_not_the_token(self) -> None:
+        assert _hedge_surface(False, "NVDAUSDT").candidates[0].instrument == "NVDA"
+
+    def test_a_broker_route_would_make_the_menu_live_with_no_other_change(self) -> None:
+        """The day an execution route exists, one argument turns the candidate on."""
+        live = open_market_candidate("NVDA", Decimal("0.98"), execution_probability=Decimal("0.9"))
+        assert HedgeabilitySurface((live,)).menu
+
+    def test_the_open_hedge_carries_a_real_cost_rather_than_a_flattering_zero(self) -> None:
+        assert open_market_candidate("NVDA", Decimal("0.98")).execution_cost_bps > 0

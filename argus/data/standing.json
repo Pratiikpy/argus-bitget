@@ -1,0 +1,842 @@
+{
+  "capabilities": [
+    {
+      "name": "Deliberation priced as a trading cost",
+      "subtheme": "t2-agentic",
+      "module": "argus/agents/meta_pm.py",
+      "state": "implemented",
+      "baseline": "no baseline exists: every finance-agent harness in the 88-repo corpus treats model latency as free, so there is nothing to reproduce",
+      "conditions_met": [
+        "best_implementation_studied",
+        "implementation_complete",
+        "costs_included"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "failure_cases_documented",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "88 repos read for a priced deliberation budget; none prices it",
+          "artefact": "../research/architecture/_CONSOLIDATED-LEDGER.md",
+          "test": ""
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "THINKING_MS and DEPTH_MULTIPLIER feed the hurdle the PM must clear",
+          "artefact": "",
+          "test": "test_meta_pm.py"
+        },
+        {
+          "condition": "costs_included",
+          "how": "the deliberation charge is added to the fee hurdle, not reported beside it",
+          "artefact": "",
+          "test": "test_cost.py"
+        }
+      ],
+      "blockers": [
+        "no competitor prices deliberation, so 'better than the specialist' has no referent; this is unusual rather than demonstrated-superior until the cost is shown to change realised outcomes"
+      ],
+      "note": ""
+    },
+    {
+      "name": "Abstention scored as a decision",
+      "subtheme": "t2-riskcontrol",
+      "module": "argus/paper/ledger.py, argus/eval/observatory.py",
+      "state": "implemented",
+      "baseline": "nothing in the corpus records the move that would have happened after a pass",
+      "conditions_met": [
+        "implementation_complete",
+        "reproducibility_proven"
+      ],
+      "conditions_missing": [
+        "best_implementation_studied",
+        "best_method_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "failure_cases_documented",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "implementation_complete",
+          "how": "settle_abstention records counterfactual_move_bps against the live tape",
+          "artefact": "",
+          "test": "test_ledger.py"
+        },
+        {
+          "condition": "reproducibility_proven",
+          "how": "the ledger is hash-chained; any entry can be recomputed from its predecessor",
+          "artefact": "data/paper_ledger.jsonl",
+          "test": ""
+        }
+      ],
+      "blockers": [
+        "the abstention record is large and the traded record is small, so abstention quality is measured far better than trade quality"
+      ],
+      "note": ""
+    },
+    {
+      "name": "Overfitting gates that raise instead of returning NaN",
+      "subtheme": "t1-validation",
+      "module": "argus/backtest/metrics.py",
+      "state": "tied",
+      "baseline": "polakowo/vectorbt deflated_sharpe (returns NaN, so NaN > threshold passes)",
+      "conditions_met": [
+        "best_implementation_studied",
+        "best_method_studied",
+        "implementation_complete",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "failure_cases_documented"
+      ],
+      "conditions_missing": [
+        "baseline_reproduced",
+        "same_input_comparison",
+        "ablation",
+        "adversarial_test",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "vectorbt, empyrical and Bailey & Lopez de Prado read line by line",
+          "artefact": "../research/architecture/metrics-audit.md",
+          "test": ""
+        },
+        {
+          "condition": "best_method_studied",
+          "how": "deflated and probabilistic Sharpe taken from the source papers",
+          "artefact": "../research/architecture/metrics-audit.md",
+          "test": ""
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "DSR, PSR, OOS decay, rolling stability all computed and reported",
+          "artefact": "",
+          "test": "test_metrics.py"
+        },
+        {
+          "condition": "statistically_valid_evaluation",
+          "how": "the gate is applied to all trials, not only to the surviving candidates",
+          "artefact": "data/track1_study.json",
+          "test": ""
+        },
+        {
+          "condition": "costs_included",
+          "how": "every reported Sharpe is net of the 12bps round-trip taker fee",
+          "artefact": "data/track1_study.json",
+          "test": ""
+        },
+        {
+          "condition": "out_of_sample_test",
+          "how": "out_of_sample_decay alerts when OOS falls below half of in-sample",
+          "artefact": "",
+          "test": "test_metrics.py"
+        },
+        {
+          "condition": "failure_cases_documented",
+          "how": "0 of 12 symbols survive DSR on either gate, and that is what is reported",
+          "artefact": "data/track1_study.json",
+          "test": ""
+        }
+      ],
+      "blockers": [
+        "TIED and not better: the formulas agree with the references, so the advantage is that ours refuses to pass silently \u2014 a design difference, not a measured one"
+      ],
+      "note": ""
+    },
+    {
+      "name": "Typed factor grammar with no execution surface",
+      "subtheme": "t1-alphafactory",
+      "module": "argus/research/grammar.py",
+      "state": "implemented",
+      "baseline": "microsoft/RD-Agent and Qlib expression handlers (158-360 features)",
+      "conditions_met": [
+        "best_implementation_studied",
+        "adversarial_test",
+        "reproducibility_proven"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "baseline_reproduced",
+        "implementation_complete",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "failure_cases_documented",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "RD-Agent, Alpha Jungle, Qlib and the 101 Formulaic Alphas read for operators",
+          "artefact": "../research/architecture/factor-discovery-audit.md",
+          "test": ""
+        },
+        {
+          "condition": "adversarial_test",
+          "how": "the grammar cannot reach attributes or call arbitrary code, pinned by test",
+          "artefact": "",
+          "test": "test_grammar.py"
+        },
+        {
+          "condition": "reproducibility_proven",
+          "how": "every expression has a canonical form, so a factor cannot be paid for twice",
+          "artefact": "",
+          "test": "test_grammar.py"
+        }
+      ],
+      "blockers": [
+        "Still narrower than Qlib: ~30 of the 101 Formulaic Alphas need an `open` price and a further handful need `vwap` and `adv20`, none of which this grammar carries (research/architecture/alpha101-port.md)",
+        "The nine expanded factors are measured but not proven: six of twelve symbols are now won by one of them and two clear the candidates-only DSR gate, while the all-trials gate \u2014 the honest one \u2014 still reports 0 of 12"
+      ],
+      "note": ""
+    },
+    {
+      "name": "Cross-sectional factor evaluation",
+      "subtheme": "t1-alphafactory",
+      "module": "argus/research/panel.py, argus/research/crosssection.py",
+      "state": "implemented",
+      "baseline": "microsoft/qlib, which groups a (datetime, instrument) frame by datetime and ranks within each group",
+      "conditions_met": [
+        "best_method_studied",
+        "implementation_complete",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "adversarial_test",
+        "failure_cases_documented"
+      ],
+      "conditions_missing": [
+        "best_implementation_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "ablation",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_method_studied",
+          "how": "all 101 Formulaic Alphas read and scored against our grammar; 46 blocked here",
+          "artefact": "../research/architecture/alpha101-port.md",
+          "test": ""
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "crossrank and crossscale, aligned on shared timestamps, innermost-first",
+          "artefact": "",
+          "test": "test_panel.py"
+        },
+        {
+          "condition": "adversarial_test",
+          "how": "truncating the future must not move a past value \u2014 the standard invisible leak in cross-sectional operators, pinned for rank, scale and the nested case",
+          "artefact": "",
+          "test": "test_panel.py::test_truncating_the_future_does_not_change_the_past"
+        },
+        {
+          "condition": "failure_cases_documented",
+          "how": "a one-symbol universe and a single-symbol evaluation both raise rather than returning the neutral 0.5 that would silently change the factor",
+          "artefact": "",
+          "test": "test_panel.py"
+        },
+        {
+          "condition": "costs_included",
+          "how": "charged per unit of weight moved at the venue's own 6bps per side",
+          "artefact": "",
+          "test": "test_crosssection.py::test_the_per_side_rate_comes_from_the_venue_model"
+        },
+        {
+          "condition": "statistically_valid_evaluation",
+          "how": "80 trials deflated; phases averaged rather than selected; spread published",
+          "artefact": "data/crosssection_study.json",
+          "test": ""
+        },
+        {
+          "condition": "out_of_sample_test",
+          "how": "chronological half-split decay computed for every rule",
+          "artefact": "data/crosssection_study.json",
+          "test": ""
+        }
+      ],
+      "blockers": [
+        "Measured and negative. 8 factors over 10 trading rules is 80 trials, run at every phase of each rebalance cycle for 1,336 backtests: 31 rules are positive before cost, 4 after, 0 survive either Deflated Sharpe gate, and NOT ONE produces net Sharpes that agree on sign across its own phases",
+        "The phase sweep killed this module's own best result. Phase 0 alone reported +2.28 for a 72-hour cross-sectional reversal; every phase of the same rule on the same data spans -3.84 to +4.36. The Deflated Sharpe gate cannot see that selection, because phases are not trials \u2014 which is why the sweep exists"
+      ],
+      "note": "The capability is proven correct and the factors are proven worthless on this universe over this window. Both halves are the result."
+    },
+    {
+      "name": "Per-profile mandate that changes the verdict",
+      "subtheme": "t3-personalisation",
+      "module": "argus/agents/mandate.py, argus/desk/workbench.py",
+      "state": "tied",
+      "baseline": "hkuds/vibe-trading agent/src/live/enforcement.py:458-609, the only one of 16 systems with a per-user mandate that changes a verdict on identical state and is tested",
+      "conditions_met": [
+        "best_implementation_studied",
+        "implementation_complete",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "failure_cases_documented"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "baseline_reproduced",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "16 systems read; only vibe-trading diverges on identical state with tests",
+          "artefact": "../research/architecture/personalisation-audit.md",
+          "test": ""
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "the mandate is rendered before reasoning, not applied as a resize afterwards",
+          "artefact": "",
+          "test": "test_mandate.py"
+        },
+        {
+          "condition": "same_input_comparison",
+          "how": "two profiles, one market frame, different verdicts",
+          "artefact": "",
+          "test": "test_personalisation.py"
+        },
+        {
+          "condition": "failure_cases_documented",
+          "how": "the desk reports when personalisation did NOT bind, which vibe-trading omits",
+          "artefact": "",
+          "test": "test_personalisation.py"
+        },
+        {
+          "condition": "statistically_valid_evaluation",
+          "how": "measured over every distinct (symbol, horizon) the desk actually faced - 195 frames from 231 recorded decisions - and decomposed, because the pooled headline was an artefact: the first run read 83.3% and every rung came back at exactly 0% or 100%, so the real frames moved nothing. Reported as 84.6% headline against 1.3% attributable to a real dimension, with 1 of 6 declared rungs discriminating",
+          "artefact": "data/profile_divergence.json",
+          "test": "test_profilestudy.py"
+        }
+      ],
+      "blockers": [
+        "The divergence rate IS now measured over real frames (eval/profilestudy.py, 2026-09-15) and the answer is weaker than the headline: 84.6% of proposals diverge, but only 1.3% for a reason that turns on a dimension the record supplies. The size and the conceded bad-case loss are declared by the study, because every one of the 231 recorded decisions carries quantity 0 and the log holds no proposed size to read. So 'the mandate binds often enough to matter' is measured, and what it is measured to be is: mostly on inputs we chose.",
+        "Only the symbol exclusion separates one real frame from another. Horizon contributes nothing - every horizon the desk has faced (0.0h to 52.0h) sits under even the tighter mandate's 72h ceiling, so the holding-period limit has never once bound on live data.",
+        "The study also found that desk/personalisation.judge() had never checked excluded_symbols at all, and reported the conservative mandate's two forbidden instruments as TAKEN. Fixed 2026-09-15. The measurement above is post-fix; any divergence figure quoted before that date was computed with the exclusion inert."
+      ],
+      "note": ""
+    },
+    {
+      "name": "Episodic memory across decisions",
+      "subtheme": "t2-agentic",
+      "module": "argus/agents/recall.py",
+      "state": "tied",
+      "baseline": "TauricResearch/TradingAgents reflection log, which stores a model's prose lesson rather than a graded outcome",
+      "conditions_met": [
+        "best_implementation_studied",
+        "implementation_complete",
+        "statistically_valid_evaluation",
+        "adversarial_test"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "failure_cases_documented",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "TradingAgents, RD-Agent, FinMem and LangGraph memory paths read",
+          "artefact": "../research/architecture/agent-architecture-audit.md",
+          "test": ""
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "rendered in the PM frame before reasoning, not applied to the answer after",
+          "artefact": "",
+          "test": "test_panel_parallel.py::test_the_model_is_shown_the_memory_before_it_decides"
+        },
+        {
+          "condition": "adversarial_test",
+          "how": "truncating the future must not change what the past knew: an episode that settles after the recall instant contributes its decision and not its outcome",
+          "artefact": "",
+          "test": "test_recall.py"
+        },
+        {
+          "condition": "statistically_valid_evaluation",
+          "how": "no pattern is stated below 5 graded episodes, matching the calibration floor",
+          "artefact": "",
+          "test": "test_recall.py"
+        }
+      ],
+      "blockers": [
+        "Only 1 of 31 NVDA decisions is graded so far, so the memory is currently a list of observations and states no pattern \u2014 which is what it should do, and also means the lesson path has not been exercised on live data"
+      ],
+      "note": "The advantage over the baseline is falsifiability, not richness: every line is arithmetic over data/paper_ledger.jsonl and can be recomputed by a reader."
+    },
+    {
+      "name": "Risk layer proved by domain sweep",
+      "subtheme": "t2-riskcontrol",
+      "module": "argus/eval/riskproof.py",
+      "state": "implemented",
+      "baseline": "nautechsystems/nautilus_trader risk engine, QuantConnect brokerage models",
+      "conditions_met": [
+        "best_implementation_studied",
+        "implementation_complete",
+        "adversarial_test",
+        "reproducibility_proven"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "failure_cases_documented",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "Nautilus, QuantConnect, freqtrade and Hummingbot risk paths read",
+          "artefact": "../research/architecture/riskcontrol-audit.md",
+          "test": ""
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "6,720 states swept, zero invariant violations, all five rules reachable",
+          "artefact": "data/risk_proof.json",
+          "test": ""
+        },
+        {
+          "condition": "adversarial_test",
+          "how": "three mutant policies are injected and the prover must catch all three",
+          "artefact": "",
+          "test": "test_riskproof.py"
+        },
+        {
+          "condition": "reproducibility_proven",
+          "how": "the sweep is exhaustive over the declared domain, not sampled",
+          "artefact": "",
+          "test": "test_riskproof.py"
+        }
+      ],
+      "blockers": [
+        "the sweep proves the rules hold over the modelled domain; it does not prove the domain matches the venue"
+      ],
+      "note": ""
+    },
+    {
+      "name": "Pre-registered trading protocol, hash-committed",
+      "subtheme": "t2-agentic",
+      "module": "argus/paper/protocol.py",
+      "state": "implemented",
+      "baseline": "serenity-guardrails (Apache-2.0) hash-chained journal with a head anchor",
+      "conditions_met": [
+        "implementation_complete",
+        "adversarial_test",
+        "reproducibility_proven"
+      ],
+      "conditions_missing": [
+        "best_implementation_studied",
+        "best_method_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "failure_cases_documented",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "implementation_complete",
+          "how": "committed against ledger head 4c382231cf77e3d3 at 94 entries, governs 95+",
+          "artefact": "data/protocol_commitments.jsonl",
+          "test": ""
+        },
+        {
+          "condition": "adversarial_test",
+          "how": "enforcement runs last in the cycle and may only reduce, never enlarge",
+          "artefact": "",
+          "test": "test_protocol.py"
+        },
+        {
+          "condition": "reproducibility_proven",
+          "how": "the commitment digest is recomputable from the protocol text alone",
+          "artefact": "",
+          "test": "test_protocol.py"
+        }
+      ],
+      "blockers": [
+        "the protocol governs from entry 95, so the entries before it are outside the pre-registration and must never be quoted as if they were inside it"
+      ],
+      "note": ""
+    },
+    {
+      "name": "Perception layer: what the desk can see",
+      "subtheme": "t3-datasources",
+      "module": "argus/market/evidence.py, argus/market/volatility.py, argus/market/macro.py",
+      "state": "implemented",
+      "baseline": "OpenBB-finance/OpenBB provider set; TauricResearch/TradingAgents feed list",
+      "conditions_met": [
+        "best_implementation_studied",
+        "implementation_complete",
+        "ablation",
+        "adversarial_test",
+        "failure_cases_documented"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "every free source OpenBB and TradingAgents use, counted and probed live",
+          "artefact": "../research/architecture/datasource-audit.md",
+          "test": ""
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "13 distinct sources reached the panel on a live cycle; Treasury curve at credibility 1.0, CBOE VIX at 0.9, crypto risk appetite at 0.35",
+          "artefact": "data/desk_notes.jsonl",
+          "test": ""
+        },
+        {
+          "condition": "failure_cases_documented",
+          "how": "each feed's outage is a status line the decision carries, and four of five official Bitget Skills are recorded as dead upstream rather than omitted",
+          "artefact": "data/bitget_skills_health.json",
+          "test": ""
+        },
+        {
+          "condition": "adversarial_test",
+          "how": "the SEC agent string is pinned by test after breaking twice: www.sec.gov 403s a bare agent while data.sec.gov accepts it, so the CIK lookup failed while the submissions feed kept answering",
+          "artefact": "",
+          "test": "test_evidence.py::test_the_fallback_carries_a_contact_token"
+        },
+        {
+          "condition": "ablation",
+          "how": "the deterministic components replayed over 11 live frames: analyst selection changes the panel on every one, the as-of gate on none",
+          "artefact": "data/ablations.json",
+          "test": ""
+        }
+      ],
+      "blockers": [
+        "The as-of evidence gate is INERT on live data: across 11 live frames it dropped nothing, so its protection against future-dated evidence is real in code and untested in production (data/ablations.json). That is a different statement from 'the gate is working'",
+        "Per-feed effect is still untested. Ablating a feed changes what a model reasons over, so it needs the paired protocol and a budget of real cycles; only the deterministic components have been measured",
+        "Four of five official Bitget Skills remain dead upstream and only technical-analysis answers"
+      ],
+      "note": ""
+    },
+    {
+      "name": "Market sentiment",
+      "subtheme": "t2-sentiment",
+      "module": "argus/agents/analysts.py, argus/market/macro.py",
+      "state": "implemented",
+      "baseline": "ProsusAI/finBERT for classification; BloombergGPT and FinMA for the published bar",
+      "conditions_met": [
+        "best_implementation_studied",
+        "failure_cases_documented"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "baseline_reproduced",
+        "implementation_complete",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "FinBERT, BloombergGPT, FinMA, FinMem and TradingAgents read for the feed",
+          "artefact": "../research/architecture/sentiment-audit.md",
+          "test": ""
+        },
+        {
+          "condition": "failure_cases_documented",
+          "how": "feed probed live 2026-09-13: StockTwits 403 to four User-Agents, CNN Fear & Greed 418, only alternative.me answers and it is crypto-wide, not per-symbol",
+          "artefact": "../research/architecture/sentiment-audit.md",
+          "test": ""
+        }
+      ],
+      "blockers": [
+        "DEMOTED. The Bitget social Skill was empty in 93% of live cycles and the free replacements are blocked from this network, so the analyst usually reasons over no evidence at all.",
+        "The one working feed is a crypto-wide risk-appetite index. It is carried at credibility 0.35 and labelled as venue-wide rather than as a view on any equity, because a crypto number presented as a stock signal inflates the evidence count without adding information.",
+        "Published evidence is against it: BloombergGPT trails an always-neutral predictor on two of its own five sentiment tasks, and FinMA is at chance. An analyst that costs deliberation and adds no measured edge is not kept on the assumption it helps."
+      ],
+      "note": "PROMOTION GATE: 30 differing paired frames through argus.eval.ablation.paired, scored on realised basis points. HELPS promotes it; NO_EFFECT removes it from the panel. Kept in the code rather than deleted so the gate can actually be run \u2014 a deletion would hide the finding, and an unmarked analyst would let a dead feed count as a data source."
+    },
+    {
+      "name": "Self-evolving review rules",
+      "subtheme": "t3-review",
+      "module": "argus/desk/review.py",
+      "state": "implemented",
+      "baseline": "TauricResearch/TradingAgents reflection memory",
+      "conditions_met": [
+        "implementation_complete",
+        "statistically_valid_evaluation",
+        "failure_cases_documented"
+      ],
+      "conditions_missing": [
+        "best_implementation_studied",
+        "best_method_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "implementation_complete",
+          "how": "rules are replayed over real decisions and must earn a place by performance",
+          "artefact": "data/review_report.json",
+          "test": ""
+        },
+        {
+          "condition": "failure_cases_documented",
+          "how": "replayed over 40 real decisions, none of the five standing rules earned one",
+          "artefact": "data/review_report.json",
+          "test": ""
+        },
+        {
+          "condition": "statistically_valid_evaluation",
+          "how": "a rule is promoted on measured precision, never on having been written down",
+          "artefact": "",
+          "test": "test_review.py"
+        }
+      ],
+      "blockers": [
+        "DEMOTED. The checklist is honest and currently empty: no rule has earned promotion, so this is a mechanism for learning rules rather than a set of learned rules, and it is described that way everywhere it appears."
+      ],
+      "note": ""
+    },
+    {
+      "name": "Session-aware execution that refuses to solve through a boundary",
+      "subtheme": "t2-execution",
+      "module": "argus/execution/schedule.py, argus/execution/guard.py",
+      "state": "implemented",
+      "baseline": "nkaz001/hftbacktest queue model; Bitget's own instrument rules",
+      "conditions_met": [
+        "best_implementation_studied",
+        "implementation_complete",
+        "costs_included",
+        "adversarial_test"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "out_of_sample_test",
+        "ablation",
+        "failure_cases_documented",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "hftbacktest and Nautilus execution paths read for fill realism",
+          "artefact": "../research/architecture/riskcontrol-audit.md",
+          "test": ""
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "787 live instruments loaded; precision, notional, band, balance and rate",
+          "artefact": "",
+          "test": "test_guard.py"
+        },
+        {
+          "condition": "costs_included",
+          "how": "the venue's own published fee confirms the 12bps round-trip model",
+          "artefact": "",
+          "test": "test_guard.py"
+        },
+        {
+          "condition": "adversarial_test",
+          "how": "quantities quantise down, never up, so rounding can never enlarge an order",
+          "artefact": "",
+          "test": "test_guard.py"
+        }
+      ],
+      "blockers": [
+        "no live fills exist to compare against, so execution realism is argued from the venue's rules rather than measured against our own fills"
+      ],
+      "note": ""
+    },
+    {
+      "name": "Queue-position modelling ported from hftbacktest and measured against it",
+      "subtheme": "t2-execution",
+      "module": "argus/execution/queue.py",
+      "state": "implemented",
+      "baseline": "nkaz001/hftbacktest, backtest/models/queue.rs",
+      "conditions_met": [
+        "best_implementation_studied",
+        "best_method_studied",
+        "baseline_reproduced",
+        "implementation_complete",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "failure_cases_documented",
+        "reproducibility_proven"
+      ],
+      "conditions_missing": [
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "queue.rs:44-330 read in full; the five probability functions transcribed and the ProbQueue update rule quoted in the port's own docstring",
+          "artefact": "../research/architecture/_CONSOLIDATED-LEDGER.md",
+          "test": "test_queueproof.py::TestReproduction"
+        },
+        {
+          "condition": "best_method_studied",
+          "how": "prob() is P(a cancellation came from behind), not P(fill) \u2014 read off queue.rs:183-204 after a first draft scored the wrong quantity",
+          "artefact": "",
+          "test": "test_queueproof.py::TestTheGroundTruthIsGroundTruth"
+        },
+        {
+          "condition": "baseline_reproduced",
+          "how": "8 model/parameter combinations reproduce the Rust formulas to 1.1e-16 on 9 (front, back) pairs spanning both extremes",
+          "artefact": "data/queue_proof.json",
+          "test": "test_queueproof.py::TestReproduction"
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "all five probability functions, RiskAdverse, ProbQueue and the L3 FIFO queue, including the cum_trade_qty double-count guard and the min() clamp",
+          "artefact": "",
+          "test": "test_queue.py"
+        },
+        {
+          "condition": "same_input_comparison",
+          "how": "every model sees byte-identical episodes and the identical L2 view of them; the reproduction grid is shared between ours and the transcribed reference",
+          "artefact": "data/queue_proof.json",
+          "test": "test_queueproof.py::TestTheAblation"
+        },
+        {
+          "condition": "statistically_valid_evaluation",
+          "how": "paired 95% interval on per-episode error differences; a win needs the whole interval above zero, and a zero-centred pair is pinned as a non-win",
+          "artefact": "",
+          "test": "test_queueproof.py::TestTheStatistics"
+        },
+        {
+          "condition": "costs_included",
+          "how": "fill overstatement converted at the 4bps gap between our own MAKER_BPS and TAKER_BPS; one regime is won on accuracy and lost on cost, and says so",
+          "artefact": "data/queue_proof.json",
+          "test": "test_queueproof.py::TestCosts"
+        },
+        {
+          "condition": "out_of_sample_test",
+          "how": "the in-sample winner is carried over to unseen seeds rather than rechosen, so the selection is not re-run as part of the test; 3 of 5 regimes survive",
+          "artefact": "data/queue_proof.json",
+          "test": "test_queueproof.py::TestTheHeldOutRun"
+        },
+        {
+          "condition": "ablation",
+          "how": "the probability function is replaced by four constants (always behind, always ahead, coin, trades-only); it beats the best of them in 3 of 5 regimes",
+          "artefact": "data/queue_proof.json",
+          "test": "test_queueproof.py::TestTheAblation"
+        },
+        {
+          "condition": "adversarial_test",
+          "how": "a front-sticky queue that replenishes behind \u2014 the model loses it, and the loss is the reported result rather than a tuned-away one",
+          "artefact": "data/queue_proof.json",
+          "test": "test_queueproof.py::TestTheHarnessCanReportALoss"
+        },
+        {
+          "condition": "failure_cases_documented",
+          "how": "2 of 5 regimes are losses, both named in the verdict; plus the finding that the most accurate model is not the cheapest",
+          "artefact": "data/queue_proof.json",
+          "test": "test_queueproof.py::TestTheHarnessCanReportALoss"
+        },
+        {
+          "condition": "reproducibility_proven",
+          "how": "pure Python, one seeded generator, no wall clock in the scoring path; the same seed reproduces episodes and scores exactly",
+          "artefact": "",
+          "test": "test_queueproof.py::TestReproducibility"
+        }
+      ],
+      "blockers": [
+        "no_specialist_capability_superior is NOT established, and it is the thirteenth. The gap is narrower than this entry used to claim, and the correction is recorded rather than quietly applied: it previously read 'hftbacktest validates this model against recorded real market data including market-by-order feeds', and that overstates the baseline. Read at source: examples/Level-3 Backtesting.ipynb cell 6 builds L2 from L3 'for the purpose of comparing backtesting results between Level-3 and Level-2', so it is a backtest-against-backtest comparison, not a comparison with observed fills; cell 13 concedes 'it is still crucial to validate backtesting results against live trading results'; and docs/debugging_backtesting_and_live_discrepancies.rst:24-27 hands live validation to the user. No script, test or notebook in that repo measures queue-model error against real observed fills.",
+        "So the real remaining difference, stated exactly: both systems score a probability model against a ground truth they hold, and neither validates against live fills. Theirs is real CME market-by-order data (DataBento, paid, glbx-mdp3-*.mbo.dbn.zst); ours is a simulator whose attribution rule we stated and sweep. Real ground truth beats constructed ground truth, so the condition still fails \u2014 but on the quality of the reference book, not on a live-fill validation that neither side has.",
+        "That difference cannot be closed with crypto data by either party. docs/order_fill.rst:97-99: 'If an exchange doesn't provide Market-By-Order, you have to guess it by modeling. HftBacktest currently only supports Market-By-Price that is most crypto exchanges provide.' Bitget is no exception \u2014 its own SDK catalogue lists 16 market endpoints (agent-sdk/src/generated/catalog.ts), the deepest being getOrderbook at L2 with at most 200 levels, plus a public tape; there is no order-level feed and the SDK carries no websocket at all. Which side of a resting order a cancellation came from is not recoverable from L2 at any sample rate.",
+        "Two routes remain, and both are outside code: real CME MBO data through a paid vendor, which would let our port run hftbacktest's own protocol on their own class of reference data; or our own orders resting in a real book, which is elapsed time and the owner \u2b50's decision, not more building."
+      ],
+      "note": "Twelve of thirteen. The book recorder is running so the simulator's parameters stop being ours \u2014 and as of 2026-09-15 that calibration is read per elapsed-time horizon rather than pooled, which moved the near-touch turnover figure the book actually supports from 71.3% to 24.0% at the horizon nearest the per-event timescale (data/book_calibration.json). That narrows the gap; it does not close it, and the state stays IMPLEMENTED until a real-MBO reference or live fills exist."
+    }
+  ],
+  "by_state": {
+    "lost": 0,
+    "tied": 3,
+    "implemented": 11,
+    "owned": 0
+  },
+  "findings": [],
+  "clean": true,
+  "owned_conditions": [
+    "best_implementation_studied",
+    "best_method_studied",
+    "baseline_reproduced",
+    "implementation_complete",
+    "same_input_comparison",
+    "statistically_valid_evaluation",
+    "costs_included",
+    "out_of_sample_test",
+    "ablation",
+    "adversarial_test",
+    "failure_cases_documented",
+    "reproducibility_proven",
+    "no_specialist_capability_superior"
+  ]
+}

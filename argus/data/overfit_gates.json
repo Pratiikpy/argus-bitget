@@ -1,0 +1,477 @@
+{
+  "measured_at": "2026-09-14T19:15:05.011423+00:00",
+  "instrument": "NVDAUSDT",
+  "bars": 2159,
+  "interval": "1H",
+  "fee_bps": 12.0,
+  "period_bars": 55,
+  "rejected_as_noise": [
+    "long_while_closed",
+    "long_while_open",
+    "weekend_only",
+    "closure_momentum",
+    "closure_reversion",
+    "near_reopen"
+  ],
+  "not_proven_insufficient_data": [
+    "slow_trend",
+    "slow_fade"
+  ],
+  "net_negative_after_fees": [
+    "long_while_closed",
+    "long_while_open",
+    "weekend_only",
+    "closure_momentum",
+    "closure_reversion",
+    "near_reopen",
+    "slow_trend",
+    "slow_fade"
+  ],
+  "cleared_every_gate": [],
+  "cleared_but_unprofitable_after_fees": [],
+  "finding": "6 of 8 primitives are rejected by the anti-overfit gates as indistinguishable from shuffled data, and 2 return no verdict at all for want of data \u2014 which is not a pass. 0 clear every gate, of which 0 still lose money after the 12bps round trip. 8 of 8 are net-negative after fees regardless of gate. Statistical structure and tradeable edge are different things, and on this venue the difference is the fee.",
+  "detail": [
+    {
+      "factor": "long_while_closed",
+      "anti_overfit": {
+        "verdict": "rejected: indistinguishable from shuffled data",
+        "passed": 1,
+        "failed": 2,
+        "inconclusive": 1,
+        "tests": [
+          {
+            "test": "ic_stability",
+            "outcome": "fail",
+            "mean_ic": 0.0114,
+            "positive_rate": 0.6389,
+            "slice_means": [
+              0.0544,
+              -0.028,
+              0.0076,
+              0.0116
+            ],
+            "sign_reversals": [
+              -0.028
+            ],
+            "why": "mean IC below floor"
+          },
+          {
+            "test": "subsample_stress",
+            "outcome": "pass",
+            "overall_sign": 1,
+            "slice_ic": {
+              "up": 0.0056,
+              "down": 0.0172,
+              "quiet": 0.0429,
+              "volatile": -0.0602
+            },
+            "consistency": 0.75
+          },
+          {
+            "test": "placebo",
+            "outcome": "fail",
+            "real_ic": 0.0114,
+            "placebo_p95_abs_ic": 0.0417,
+            "permutations": 200,
+            "beats_null": false
+          },
+          {
+            "test": "half_life",
+            "outcome": "inconclusive",
+            "horizons_measured": 1,
+            "needed": 3
+          }
+        ]
+      },
+      "gross_sharpe": 0.0036,
+      "net_sharpe": -0.0175,
+      "observations": 2158
+    },
+    {
+      "factor": "long_while_open",
+      "anti_overfit": {
+        "verdict": "rejected: indistinguishable from shuffled data",
+        "passed": 1,
+        "failed": 2,
+        "inconclusive": 1,
+        "tests": [
+          {
+            "test": "ic_stability",
+            "outcome": "fail",
+            "mean_ic": -0.0114,
+            "positive_rate": 0.3611,
+            "slice_means": [
+              -0.0544,
+              0.028,
+              -0.0076,
+              -0.0116
+            ],
+            "sign_reversals": [
+              0.028
+            ],
+            "why": "mean IC below floor"
+          },
+          {
+            "test": "subsample_stress",
+            "outcome": "pass",
+            "overall_sign": -1,
+            "slice_ic": {
+              "up": -0.0056,
+              "down": -0.0172,
+              "quiet": -0.0429,
+              "volatile": 0.0602
+            },
+            "consistency": 0.75
+          },
+          {
+            "test": "placebo",
+            "outcome": "fail",
+            "real_ic": -0.0114,
+            "placebo_p95_abs_ic": 0.0417,
+            "permutations": 200,
+            "beats_null": false
+          },
+          {
+            "test": "half_life",
+            "outcome": "inconclusive",
+            "horizons_measured": 1,
+            "needed": 3
+          }
+        ]
+      },
+      "gross_sharpe": 0.003,
+      "net_sharpe": -0.0291,
+      "observations": 2158
+    },
+    {
+      "factor": "weekend_only",
+      "anti_overfit": {
+        "verdict": "rejected: indistinguishable from shuffled data",
+        "passed": 0,
+        "failed": 3,
+        "inconclusive": 1,
+        "tests": [
+          {
+            "test": "ic_stability",
+            "outcome": "fail",
+            "mean_ic": 0.0231,
+            "positive_rate": 0.5217,
+            "slice_means": [
+              -0.02,
+              0.0633,
+              0.0673,
+              0.0948
+            ],
+            "sign_reversals": [
+              -0.02
+            ],
+            "why": "positive rate too low"
+          },
+          {
+            "test": "subsample_stress",
+            "outcome": "fail",
+            "overall_sign": 1,
+            "slice_ic": {
+              "up": -0.039,
+              "down": 0.0801,
+              "quiet": -0.025,
+              "volatile": 0.1332
+            },
+            "consistency": 0.5
+          },
+          {
+            "test": "placebo",
+            "outcome": "fail",
+            "real_ic": 0.0231,
+            "placebo_p95_abs_ic": 0.0576,
+            "permutations": 200,
+            "beats_null": false
+          },
+          {
+            "test": "half_life",
+            "outcome": "inconclusive",
+            "horizons_measured": 1,
+            "needed": 3
+          }
+        ]
+      },
+      "gross_sharpe": 0.0045,
+      "net_sharpe": -0.0135,
+      "observations": 2158
+    },
+    {
+      "factor": "closure_momentum",
+      "anti_overfit": {
+        "verdict": "rejected: indistinguishable from shuffled data",
+        "passed": 1,
+        "failed": 2,
+        "inconclusive": 1,
+        "tests": [
+          {
+            "test": "ic_stability",
+            "outcome": "fail",
+            "mean_ic": -0.0348,
+            "positive_rate": 0.375,
+            "slice_means": [
+              -0.0979,
+              -0.0406,
+              0.024,
+              -0.0248
+            ],
+            "sign_reversals": [
+              0.024
+            ],
+            "why": "a sub-period reverses the sign"
+          },
+          {
+            "test": "subsample_stress",
+            "outcome": "pass",
+            "overall_sign": -1,
+            "slice_ic": {
+              "up": -0.0623,
+              "down": -0.0074,
+              "quiet": -0.0416,
+              "volatile": -0.0191
+            },
+            "consistency": 1.0
+          },
+          {
+            "test": "placebo",
+            "outcome": "fail",
+            "real_ic": -0.0348,
+            "placebo_p95_abs_ic": 0.047,
+            "permutations": 200,
+            "beats_null": false
+          },
+          {
+            "test": "half_life",
+            "outcome": "inconclusive",
+            "horizons_measured": 1,
+            "needed": 3
+          }
+        ]
+      },
+      "gross_sharpe": -0.0263,
+      "net_sharpe": -0.1575,
+      "observations": 2158
+    },
+    {
+      "factor": "closure_reversion",
+      "anti_overfit": {
+        "verdict": "rejected: indistinguishable from shuffled data",
+        "passed": 1,
+        "failed": 2,
+        "inconclusive": 1,
+        "tests": [
+          {
+            "test": "ic_stability",
+            "outcome": "fail",
+            "mean_ic": 0.0348,
+            "positive_rate": 0.625,
+            "slice_means": [
+              0.0979,
+              0.0406,
+              -0.024,
+              0.0248
+            ],
+            "sign_reversals": [
+              -0.024
+            ],
+            "why": "a sub-period reverses the sign"
+          },
+          {
+            "test": "subsample_stress",
+            "outcome": "pass",
+            "overall_sign": 1,
+            "slice_ic": {
+              "up": 0.0623,
+              "down": 0.0074,
+              "quiet": 0.0416,
+              "volatile": 0.0191
+            },
+            "consistency": 1.0
+          },
+          {
+            "test": "placebo",
+            "outcome": "fail",
+            "real_ic": 0.0348,
+            "placebo_p95_abs_ic": 0.047,
+            "permutations": 200,
+            "beats_null": false
+          },
+          {
+            "test": "half_life",
+            "outcome": "inconclusive",
+            "horizons_measured": 1,
+            "needed": 3
+          }
+        ]
+      },
+      "gross_sharpe": 0.0263,
+      "net_sharpe": -0.1094,
+      "observations": 2158
+    },
+    {
+      "factor": "near_reopen",
+      "anti_overfit": {
+        "verdict": "rejected: indistinguishable from shuffled data",
+        "passed": 1,
+        "failed": 2,
+        "inconclusive": 1,
+        "tests": [
+          {
+            "test": "ic_stability",
+            "outcome": "fail",
+            "mean_ic": -0.024,
+            "positive_rate": 0.4474,
+            "slice_means": [
+              0.0349,
+              -0.0318,
+              -0.0151,
+              -0.0447
+            ],
+            "sign_reversals": [
+              0.0349
+            ],
+            "why": "a sub-period reverses the sign"
+          },
+          {
+            "test": "subsample_stress",
+            "outcome": "pass",
+            "overall_sign": -1,
+            "slice_ic": {
+              "up": 0.0099,
+              "down": -0.0579,
+              "quiet": -0.0217,
+              "volatile": -0.0296
+            },
+            "consistency": 0.75
+          },
+          {
+            "test": "placebo",
+            "outcome": "fail",
+            "real_ic": -0.024,
+            "placebo_p95_abs_ic": 0.0463,
+            "permutations": 200,
+            "beats_null": false
+          },
+          {
+            "test": "half_life",
+            "outcome": "inconclusive",
+            "horizons_measured": 1,
+            "needed": 3
+          }
+        ]
+      },
+      "gross_sharpe": -0.0044,
+      "net_sharpe": -0.0309,
+      "observations": 2158
+    },
+    {
+      "factor": "slow_trend",
+      "anti_overfit": {
+        "verdict": "not proven: insufficient data for a verdict",
+        "passed": 3,
+        "failed": 0,
+        "inconclusive": 1,
+        "tests": [
+          {
+            "test": "ic_stability",
+            "outcome": "pass",
+            "mean_ic": -0.0778,
+            "positive_rate": 0.3103,
+            "slice_means": [
+              -0.0582,
+              -0.0543,
+              -0.0691,
+              -0.1198
+            ],
+            "sign_reversals": []
+          },
+          {
+            "test": "subsample_stress",
+            "outcome": "pass",
+            "overall_sign": -1,
+            "slice_ic": {
+              "up": -0.1137,
+              "down": -0.0442,
+              "quiet": -0.0677,
+              "volatile": -0.097
+            },
+            "consistency": 1.0
+          },
+          {
+            "test": "placebo",
+            "outcome": "pass",
+            "real_ic": -0.0778,
+            "placebo_p95_abs_ic": 0.0491,
+            "permutations": 200,
+            "beats_null": true
+          },
+          {
+            "test": "half_life",
+            "outcome": "inconclusive",
+            "horizons_measured": 1,
+            "needed": 3
+          }
+        ]
+      },
+      "gross_sharpe": 0.0099,
+      "net_sharpe": -0.0143,
+      "observations": 2158
+    },
+    {
+      "factor": "slow_fade",
+      "anti_overfit": {
+        "verdict": "not proven: insufficient data for a verdict",
+        "passed": 3,
+        "failed": 0,
+        "inconclusive": 1,
+        "tests": [
+          {
+            "test": "ic_stability",
+            "outcome": "pass",
+            "mean_ic": 0.0778,
+            "positive_rate": 0.6897,
+            "slice_means": [
+              0.0582,
+              0.0543,
+              0.0691,
+              0.1198
+            ],
+            "sign_reversals": []
+          },
+          {
+            "test": "subsample_stress",
+            "outcome": "pass",
+            "overall_sign": 1,
+            "slice_ic": {
+              "up": 0.1137,
+              "down": 0.0442,
+              "quiet": 0.0677,
+              "volatile": 0.097
+            },
+            "consistency": 1.0
+          },
+          {
+            "test": "placebo",
+            "outcome": "pass",
+            "real_ic": 0.0778,
+            "placebo_p95_abs_ic": 0.0491,
+            "permutations": 200,
+            "beats_null": true
+          },
+          {
+            "test": "half_life",
+            "outcome": "inconclusive",
+            "horizons_measured": 1,
+            "needed": 3
+          }
+        ]
+      },
+      "gross_sharpe": -0.0098,
+      "net_sharpe": -0.0448,
+      "observations": 2158
+    }
+  ]
+}

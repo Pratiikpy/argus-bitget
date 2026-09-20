@@ -36,6 +36,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
 
+from argus.risk.effectiveness import HedgeEffectiveness, Provenance
+
 _ZERO = Decimal("0")
 _ONE = Decimal("1")
 
@@ -78,7 +80,25 @@ class HedgeCandidate:
     """A penalty for the estimate itself being shaky. Charged in bps so it competes with real
     costs on the same scale rather than being argued about qualitatively."""
 
+    provenance: Provenance = Provenance.ASSUMED
+    """Whether the three statistical factors above were measured or asserted.
+
+    Defaults to ASSUMED, which is the pessimistic label and therefore the safe one: a caller that
+    forgets to say where its numbers came from is recorded as having asserted them. The fields were
+    asserted for the whole life of this module before `risk/effectiveness.py` existed — three
+    constants typed into the source of a risk layer whose project rule is *never guess* — and this
+    field is what makes the difference visible in the record instead of only in the diff.
+    """
+
+    evidence: str = ""
+    """One line naming the sample behind a MEASURED candidate: phase, observations, window."""
+
     def __post_init__(self) -> None:
+        if self.provenance is Provenance.MEASURED and not self.evidence:
+            raise ValueError(
+                "a measured candidate must name its sample; an unattributed measurement is an "
+                "assertion with a better label"
+            )
         _unit("risk_reduction", self.risk_reduction)
         _unit("correlation_confidence", self.correlation_confidence)
         _unit("liquidity_availability", self.liquidity_availability)
@@ -188,13 +208,102 @@ class HedgeabilitySurface:
         return min(_ONE, ratio)
 
 
-def shut_market_candidate(instrument: str, risk_reduction: Decimal) -> HedgeCandidate:
+def open_market_candidate(
+    instrument: str,
+    risk_reduction: Decimal = _ZERO,
+    *,
+    execution_probability: Decimal = _ZERO,
+    execution_cost_bps: Decimal = Decimal("5"),
+    measured: HedgeEffectiveness | None = None,
+) -> HedgeCandidate:
+    """The anchor equity while its market is open: reachable by somebody, not by us.
+
+    This exists because the runner used to hand the desk an *empty* surface whenever the anchor was
+    awake, which put a false sentence into the record of every regular-hours decision: "no hedge
+    placeable". During regular hours the hedge plainly is placeable — by somebody. What is true is
+    narrower and more interesting: **ARGUS has no equity broker**, so the hedge exists, the venue is
+    open, the liquidity is there, and we personally have no route to it.
+
+    Those are different facts and a risk record that conflates them is misleading in the direction
+    that flatters us: "the market gave me no hedge" excuses an unhedged position, while "I have not
+    built the connection" does not.
+
+    So the candidate is constructed with full liquidity and a real cost, and
+    ``execution_probability`` defaults to zero for the honest reason rather than the convenient one.
+    Supply a non-zero probability the day a broker route exists, and the menu becomes live with no
+    other change.
+
+    ``execution_cost_bps`` defaults to 5bps as a plausible all-in retail equity cost. It is
+    **NOT VERIFIED** against a broker we have integrated, because we have not integrated one; it is
+    here so the menu's arithmetic is exercised with a non-zero number rather than a flattering zero.
+
+    **``measured`` is how the three statistical factors stop being guesses.** Pass a fresh
+    :class:`~argus.risk.effectiveness.HedgeEffectiveness` for this instrument's regular-hours phase
+    and the risk reduction becomes Ederington's R², the correlation confidence becomes the Fisher
+    lower bound, and the basis stability becomes the unit-ratio effectiveness — each with the sample
+    that produced it recorded on the candidate. Without it the caller must supply
+    ``risk_reduction`` itself and the candidate is stamped ASSUMED.
+    """
+    if measured is not None:
+        return HedgeCandidate(
+            instrument=instrument,
+            risk_reduction=measured.risk_reduction,
+            correlation_confidence=measured.correlation_confidence,
+            liquidity_availability=_ONE,
+            execution_probability=execution_probability,
+            basis_stability=measured.basis_stability,
+            execution_cost_bps=execution_cost_bps,
+            provenance=Provenance.MEASURED,
+            evidence=(
+                f"{measured.phase}, n={measured.observations}, {measured.window_days}d, "
+                f"measured {measured.measured_at:%Y-%m-%d %H:%MZ}"
+            ),
+        )
+    return HedgeCandidate(
+        instrument=instrument,
+        risk_reduction=risk_reduction,
+        # Asserted, and labelled as asserted. The anchor is the thing the token tracks and while the
+        # anchor trades the relationship is observed rather than assumed — but *this constructor*
+        # has observed nothing, and 0.98 was a number somebody found plausible.
+        correlation_confidence=Decimal("0.98"),
+        liquidity_availability=_ONE,
+        execution_probability=execution_probability,
+        basis_stability=Decimal("0.95"),
+        execution_cost_bps=execution_cost_bps,
+        provenance=Provenance.ASSUMED,
+    )
+
+
+def shut_market_candidate(
+    instrument: str, risk_reduction: Decimal = _ZERO, *,
+    measured: HedgeEffectiveness | None = None,
+) -> HedgeCandidate:
     """A hedge whose venue is closed: theoretically ideal, practically unavailable.
 
     Constructing these explicitly matters. The alternative — omitting shut instruments from the
     menu — loses the fact that a perfectly good hedge exists and cannot be reached, which is
     precisely the information the Sleeping-Anchor problem turns on.
+
+    A measurement may be supplied here too, and it changes only what the record says: with
+    ``execution_probability`` and ``liquidity_availability`` both zero the effective reduction is
+    zero however good the statistics are. That is the point of keeping the factors separate — "this
+    hedge would work and cannot be placed" is a different sentence from "this hedge would not work".
     """
+    if measured is not None:
+        return HedgeCandidate(
+            instrument=instrument,
+            risk_reduction=measured.risk_reduction,
+            correlation_confidence=measured.correlation_confidence,
+            liquidity_availability=_ZERO,
+            execution_probability=_ZERO,
+            basis_stability=measured.basis_stability,
+            execution_cost_bps=_ZERO,
+            provenance=Provenance.MEASURED,
+            evidence=(
+                f"{measured.phase}, n={measured.observations}, {measured.window_days}d, "
+                f"measured {measured.measured_at:%Y-%m-%d %H:%MZ}"
+            ),
+        )
     return HedgeCandidate(
         instrument=instrument,
         risk_reduction=risk_reduction,
@@ -203,4 +312,5 @@ def shut_market_candidate(instrument: str, risk_reduction: Decimal) -> HedgeCand
         execution_probability=_ZERO,
         basis_stability=Decimal("0.9"),
         execution_cost_bps=_ZERO,
+        provenance=Provenance.ASSUMED,
     )

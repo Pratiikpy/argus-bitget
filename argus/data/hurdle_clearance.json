@@ -1,0 +1,141 @@
+{
+  "measured_at": "2026-09-14T18:54:04.575079+00:00",
+  "source": "https://api.bitget.com/api/v2/mix/market/candles productType=USDT-FUTURES granularity=1H limit=1000",
+  "note": "|close[i]-close[i-2]|/close[i-2] in bps; RTH = weekday 14:00-20:00 UTC",
+  "fee_bps": 12.0,
+  "hurdle_bps": 18.8,
+  "symbols": {
+    "NVDAUSDT": {
+      "bars": 1007,
+      "span_days": 41,
+      "median_2h_bps": 13.88,
+      "p75": 33.65,
+      "p90": 69.93,
+      "pct_gt_hurdle_all": 42.5,
+      "pct_gt_fee_all": 54.2,
+      "pct_gt_hurdle_rth": 74.7,
+      "rth_bars": 178
+    },
+    "TSLAUSDT": {
+      "bars": 1007,
+      "span_days": 41,
+      "median_2h_bps": 16.1,
+      "p75": 37.89,
+      "p90": 81.32,
+      "pct_gt_hurdle_all": 45.7,
+      "pct_gt_fee_all": 59.7,
+      "pct_gt_hurdle_rth": 73.0,
+      "rth_bars": 178
+    },
+    "AAPLUSDT": {
+      "bars": 1007,
+      "span_days": 41,
+      "median_2h_bps": 9.99,
+      "p75": 23.79,
+      "p90": 50.97,
+      "pct_gt_hurdle_all": 31.1,
+      "pct_gt_fee_all": 44.2,
+      "pct_gt_hurdle_rth": 65.7,
+      "rth_bars": 178
+    },
+    "MSFTUSDT": {
+      "bars": 1007,
+      "span_days": 41,
+      "median_2h_bps": 11.35,
+      "p75": 24.95,
+      "p90": 54.25,
+      "pct_gt_hurdle_all": 33.7,
+      "pct_gt_fee_all": 48.4,
+      "pct_gt_hurdle_rth": 64.6,
+      "rth_bars": 178
+    },
+    "METAUSDT": {
+      "bars": 1007,
+      "span_days": 41,
+      "median_2h_bps": 13.37,
+      "p75": 34.24,
+      "p90": 74.12,
+      "pct_gt_hurdle_all": 40.5,
+      "pct_gt_fee_all": 53.0,
+      "pct_gt_hurdle_rth": 73.6,
+      "rth_bars": 178
+    },
+    "GOOGLUSDT": {
+      "bars": 1007,
+      "span_days": 41,
+      "median_2h_bps": 11.48,
+      "p75": 24.74,
+      "p90": 52.34,
+      "pct_gt_hurdle_all": 32.3,
+      "pct_gt_fee_all": 48.3,
+      "pct_gt_hurdle_rth": 61.2,
+      "rth_bars": 178
+    },
+    "AMZNUSDT": {
+      "bars": 1007,
+      "span_days": 41,
+      "median_2h_bps": 11.15,
+      "p75": 26.56,
+      "p90": 53.23,
+      "pct_gt_hurdle_all": 35.3,
+      "pct_gt_fee_all": 47.5,
+      "pct_gt_hurdle_rth": 67.4,
+      "rth_bars": 178
+    },
+    "COINUSDT": {
+      "bars": 1007,
+      "span_days": 41,
+      "median_2h_bps": 29.89,
+      "p75": 72.74,
+      "p90": 137.35,
+      "pct_gt_hurdle_all": 63.8,
+      "pct_gt_fee_all": 75.6,
+      "pct_gt_hurdle_rth": 88.8,
+      "rth_bars": 178
+    },
+    "MSTRUSDT": {
+      "bars": 1007,
+      "span_days": 41,
+      "median_2h_bps": 38.67,
+      "p75": 87.82,
+      "p90": 174.89,
+      "pct_gt_hurdle_all": 69.2,
+      "pct_gt_fee_all": 79.2,
+      "pct_gt_hurdle_rth": 83.1,
+      "rth_bars": 178
+    },
+    "QQQUSDT": {
+      "bars": 1007,
+      "span_days": 41,
+      "median_2h_bps": 9.57,
+      "p75": 20.81,
+      "p90": 36.05,
+      "pct_gt_hurdle_all": 27.9,
+      "pct_gt_fee_all": 42.5,
+      "pct_gt_hurdle_rth": 48.3,
+      "rth_bars": 178
+    },
+    "TQQQUSDT": {
+      "bars": 1007,
+      "span_days": 41,
+      "median_2h_bps": 26.34,
+      "p75": 60.77,
+      "p90": 106.29,
+      "pct_gt_hurdle_all": 61.3,
+      "pct_gt_fee_all": 72.7,
+      "pct_gt_hurdle_rth": 80.3,
+      "rth_bars": 178
+    },
+    "SQQQUSDT": {
+      "bars": 1007,
+      "span_days": 41,
+      "median_2h_bps": 25.64,
+      "p75": 60.27,
+      "p90": 109.76,
+      "pct_gt_hurdle_all": 58.4,
+      "pct_gt_fee_all": 72.4,
+      "pct_gt_hurdle_rth": 77.5,
+      "rth_bars": 178
+    }
+  }
+}

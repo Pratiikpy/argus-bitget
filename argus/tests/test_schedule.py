@@ -16,6 +16,7 @@ import pytest
 from argus.execution.schedule import (
     ImpactParameters,
     ScheduleError,
+    quantise_trajectory,
     trajectory,
     twap,
 )
@@ -194,3 +195,141 @@ class TestTwapBaseline:
         assert payload["intervals"] == 10
         assert len(payload["slices"]) == 10  # type: ignore[arg-type]
         assert payload["is_twap"] is False
+
+
+class TestQuantiseTrajectory:
+    """Closes two real gaps found reading Nautilus's actual TWAP algorithm (`twap.rs`): (1) it
+    floors every child order to the instrument's tradeable size and carries the shortfall forward
+    rather than losing it (`twap.rs:220-309`); (2) it never schedules an order below the venue's
+    own minimum size — it merges that quantity into a real order instead
+    (`twap.rs`'s own `..._below_size_increment`/`..._below_min_quantity` tests). `Trajectory`
+    stays in exact, continuous `Decimal` quantities that a real venue would reject on both counts
+    — this generalises Nautilus's own approach from TWAP's equal slices to Almgren-Chriss's
+    unequal ones.
+
+    **A real bug in the first version of this function was caught by these tests, not by
+    inspection.** Flooring each slice independently before carrying anything forward silently
+    discarded every slice's own fractional remainder at the moment it was floored — the total
+    stopped matching. Fixed by tracking the running RAW cumulative total instead of the
+    already-truncated per-slice values; see `quantise_trajectory`'s own docstring for the exact
+    fix."""
+
+    def test_the_quantised_total_exactly_matches_the_original(self) -> None:
+        """The one property that matters most: no shares invented, none lost. This is the exact
+        property the first, buggy version of the function silently violated."""
+        t = _run("2", quantity="1000", intervals=7)
+        qt = quantise_trajectory(t, quantity_multiplier=D("1"))
+        assert qt.total == t.total_quantity
+
+    def test_every_slice_is_an_exact_multiple_of_the_step(self) -> None:
+        t = _run("2", quantity="1000", intervals=7)
+        qt = quantise_trajectory(t, quantity_multiplier=D("5"))
+        assert all(s % D("5") == 0 for s in qt.slices)
+        assert qt.total == t.total_quantity
+
+    def test_no_slice_is_ever_zero_or_below_the_floor(self) -> None:
+        """The extreme case that exposed the original bug: a heavily front-loaded, high-risk-
+        aversion schedule whose late intervals round to near-nothing. A first version emitted 18
+        zero-quantity "slices" here — a nonsensical, unplaceable order that still summed
+        correctly, caught by testing this case directly rather than trusting the summary property
+        alone."""
+        t = trajectory(
+            quantity=D("100"), horizon=D("1"), intervals=20, impact=IMPACT,
+            risk_aversion=D("1000"),
+        )
+        qt = quantise_trajectory(t, quantity_multiplier=D("1"))
+        assert all(s > 0 for s in qt.slices)
+        assert qt.total == t.total_quantity
+
+    def test_the_fractional_shortfall_merges_into_the_last_slice_not_a_new_one(self) -> None:
+        """A flooring shortfall that never falls below the trading floor on its own is folded
+        into the schedule's own last interval — fewer real orders than a separate trailing
+        remainder would need, and still an exact multiple of the step."""
+        t = _run("2", quantity="1000", intervals=7)
+        qt = quantise_trajectory(t, quantity_multiplier=D("1"))
+        assert len(qt.slices) == len(t.slices)
+        assert not qt.remainder_slice_added
+
+    def test_remainder_slice_added_is_true_when_intervals_genuinely_consolidate(self) -> None:
+        """The flag names a REAL consolidation — fewer output slices than the trajectory itself
+        had — using the same extreme schedule that exposed the original zero-slice bug."""
+        t = trajectory(
+            quantity=D("100"), horizon=D("1"), intervals=20, impact=IMPACT,
+            risk_aversion=D("1000"),
+        )
+        qt = quantise_trajectory(t, quantity_multiplier=D("1"))
+        assert qt.remainder_slice_added
+        assert len(qt.slices) < len(t.slices)
+
+    def test_min_order_qty_consolidates_every_slice_below_it(self) -> None:
+        """Nautilus's second named case: a slice below the venue's own minimum, not just below
+        the size increment, must never be scheduled on its own."""
+        t = trajectory(
+            quantity=D("100"), horizon=D("1"), intervals=20, impact=IMPACT,
+            risk_aversion=D("1000"),
+        )
+        qt = quantise_trajectory(t, quantity_multiplier=D("1"), min_order_qty=D("5"))
+        assert all(s >= D("5") for s in qt.slices)
+        assert qt.total == t.total_quantity
+
+    def test_when_nothing_reaches_the_floor_the_whole_order_goes_out_as_one_slice(self) -> None:
+        """Nautilus's own stated fallback, verbatim: "submit entire size directly (no
+        scheduling)"."""
+        t = trajectory(
+            quantity=D("10"), horizon=D("1"), intervals=20, impact=IMPACT,
+            risk_aversion=D("1000"),
+        )
+        qt = quantise_trajectory(t, quantity_multiplier=D("1"), min_order_qty=D("1000"))
+        assert len(qt.slices) == 1
+        assert qt.slices[0] == t.total_quantity
+
+    def test_no_remainder_slice_when_a_single_interval_already_holds_the_whole_clean_total(
+        self,
+    ) -> None:
+        t = trajectory(
+            quantity=D("1000"), horizon=D("1"), intervals=1, impact=IMPACT, risk_aversion=D("0"),
+        )
+        qt = quantise_trajectory(t, quantity_multiplier=D("1"))
+        assert not qt.remainder_slice_added
+        assert len(qt.slices) == 1
+
+    def test_a_total_that_is_not_a_clean_multiple_of_the_step_raises(self) -> None:
+        """A real order's own total size is validated (execution.guard.validate) before it ever
+        reaches a schedule — a dirty total here means a bug further up the pipeline, and this
+        function must not silently repair it by inventing a rounding rule nobody asked for."""
+        t = _run("2", quantity="1000.5", intervals=7)
+        with pytest.raises(ScheduleError):
+            quantise_trajectory(t, quantity_multiplier=D("1"))
+
+    def test_a_non_positive_multiplier_raises(self) -> None:
+        t = _run("2", quantity="1000", intervals=7)
+        with pytest.raises(ScheduleError):
+            quantise_trajectory(t, quantity_multiplier=D("0"))
+        with pytest.raises(ScheduleError):
+            quantise_trajectory(t, quantity_multiplier=D("-1"))
+
+    def test_a_negative_min_order_qty_raises(self) -> None:
+        t = _run("2", quantity="1000", intervals=7)
+        with pytest.raises(ScheduleError):
+            quantise_trajectory(t, quantity_multiplier=D("1"), min_order_qty=D("-1"))
+
+    def test_it_matches_a_real_instrument_multiplier_via_execution_guard(self) -> None:
+        """Reuses `execution.guard.quantise_down` directly rather than a local reimplementation —
+        the same function 787 live instruments are validated through."""
+        from argus.execution.guard import quantise_down
+
+        t = _run("2", quantity="1000", intervals=7)
+        step = D("0.01")  # a realistic quantityMultiplier for a live instrument
+        qt = quantise_trajectory(t, quantity_multiplier=step)
+        for slice_qty in qt.slices:
+            assert quantise_down(slice_qty, step) == slice_qty
+
+    def test_as_dict_serialises(self) -> None:
+        t = trajectory(
+            quantity=D("100"), horizon=D("1"), intervals=20, impact=IMPACT,
+            risk_aversion=D("1000"),
+        )
+        qt = quantise_trajectory(t, quantity_multiplier=D("1"))
+        payload = qt.as_dict()
+        assert payload["remainder_slice_added"] is True
+        assert Decimal(str(payload["total"])) == qt.total

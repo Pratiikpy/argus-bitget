@@ -1,0 +1,137 @@
+{
+  "generated_at": "2026-09-15T04:05:24.943616+00:00",
+  "benchmark": "QQQUSDT",
+  "interval": "1H",
+  "lookback_days": 30,
+  "min_session_bars": 20,
+  "symbols_compared": 11,
+  "symbols_higher_open": 10,
+  "shut_bar_share_pct": 82.5,
+  "finding": "open-session beta exceeds shut-session beta on 10 of 11 rTokens; the blended figure is dominated by the ~82% of bars that fall while the anchor market is shut, so a single beta understates open-session risk",
+  "rows": [
+    {
+      "symbol": "NVDAUSDT",
+      "observations": 718,
+      "beta_blended": 1.4035,
+      "beta_open": 1.7397,
+      "n_open": 126,
+      "beta_shut": 1.2752,
+      "n_shut": 592,
+      "leverage": null
+    },
+    {
+      "symbol": "TSLAUSDT",
+      "observations": 718,
+      "beta_blended": 1.056,
+      "beta_open": 1.4655,
+      "n_open": 126,
+      "beta_shut": 0.8887,
+      "n_shut": 592,
+      "leverage": null
+    },
+    {
+      "symbol": "AAPLUSDT",
+      "observations": 718,
+      "beta_blended": 0.2697,
+      "beta_open": 0.6755,
+      "n_open": 126,
+      "beta_shut": 0.1052,
+      "n_shut": 592,
+      "leverage": null
+    },
+    {
+      "symbol": "MSFTUSDT",
+      "observations": 718,
+      "beta_blended": 0.3795,
+      "beta_open": 0.6333,
+      "n_open": 126,
+      "beta_shut": 0.2762,
+      "n_shut": 592,
+      "leverage": null
+    },
+    {
+      "symbol": "METAUSDT",
+      "observations": 718,
+      "beta_blended": 0.7342,
+      "beta_open": 1.2836,
+      "n_open": 126,
+      "beta_shut": 0.5143,
+      "n_shut": 592,
+      "leverage": null
+    },
+    {
+      "symbol": "GOOGLUSDT",
+      "observations": 718,
+      "beta_blended": 0.5579,
+      "beta_open": 0.7835,
+      "n_open": 126,
+      "beta_shut": 0.4643,
+      "n_shut": 592,
+      "leverage": null
+    },
+    {
+      "symbol": "AMZNUSDT",
+      "observations": 718,
+      "beta_blended": 0.66,
+      "beta_open": 0.8545,
+      "n_open": 126,
+      "beta_shut": 0.5777,
+      "n_shut": 592,
+      "leverage": null
+    },
+    {
+      "symbol": "COINUSDT",
+      "observations": 718,
+      "beta_blended": 1.3034,
+      "beta_open": 1.589,
+      "n_open": 126,
+      "beta_shut": 1.1915,
+      "n_shut": 592,
+      "leverage": null
+    },
+    {
+      "symbol": "MSTRUSDT",
+      "observations": 718,
+      "beta_blended": 1.5907,
+      "beta_open": 1.7289,
+      "n_open": 126,
+      "beta_shut": 1.5309,
+      "n_shut": 592,
+      "leverage": null
+    },
+    {
+      "symbol": "TQQQUSDT",
+      "observations": 718,
+      "beta_blended": 2.9118,
+      "beta_open": 2.9255,
+      "n_open": 126,
+      "beta_shut": 2.9059,
+      "n_shut": 592,
+      "leverage": {
+        "symbol": "TQQQUSDT",
+        "declared": "3",
+        "measured": 2.9118,
+        "difference": 0.0882,
+        "within_tolerance": true,
+        "daily_reset": true
+      }
+    },
+    {
+      "symbol": "SQQQUSDT",
+      "observations": 718,
+      "beta_blended": -2.8977,
+      "beta_open": -2.9412,
+      "n_open": 126,
+      "beta_shut": -2.8788,
+      "n_shut": 592,
+      "leverage": {
+        "symbol": "SQQQUSDT",
+        "declared": "-3",
+        "measured": -2.8977,
+        "difference": 0.1023,
+        "within_tolerance": true,
+        "daily_reset": true
+      }
+    }
+  ]
+}

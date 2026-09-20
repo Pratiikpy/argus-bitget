@@ -1,0 +1,160 @@
+{
+  "question": "Should I add NVDAUSDT to this book?",
+  "symbol": "NVDAUSDT",
+  "asked_at": "2026-09-14T18:40:15.446877+00:00",
+  "verdict": "add_smaller",
+  "rationale": "4 step(s) argue for less than was proposed: historical analogue \u2014 history went the other way 78% of the time after states like this; path shape \u2014 the present has no precedent here that noise on this same series does not also produce; allocation \u2014 a different book is materially better: +16% of variance for 2.6bps, repaying in 110 bars",
+  "coverage": "11/11",
+  "findings": [
+    {
+      "step": "evidence",
+      "available": true,
+      "headline": "6 item(s) across 1 channel(s): news",
+      "source": "market/evidence.py:gather + agents/novelty.py:cluster",
+      "detail": {
+        "items": 6,
+        "channels": [
+          "news"
+        ],
+        "distinct_stories": 6,
+        "duplication_ratio": 1.0
+      },
+      "concern": ""
+    },
+    {
+      "step": "expectation gap",
+      "available": true,
+      "headline": [
+        "[expectation] 42 analysts expect eps_diluted of 2.4727 for the quarter ending 2026-10-31",
+        "[expectation] that implies +90.2% against the 1.3000 actually delivered for the quarter ending 2025-10-26",
+        "[expectation] delivered growth, newest first: +127.8%, +214.5%, +66.7%",
+        "[expectation] the growth being expected is decelerating against the growth recently delivered",
+        "[expectation] estimates revised up: 35 up / 1 down in 30 days",
+        "[expectation] analysts are raising their numbers while the growth rate they expect is slowing \u2014 the two are published in different places and rarely read together",
+        "[expectation] no consensus is published for an already-reported quarter by any keyless source we could reach, so a reported-against-expected surprise is unavailable rather than zero"
+      ],
+      "source": "desk/expectation.py:detect",
+      "detail": {},
+      "concern": ""
+    },
+    {
+      "step": "historical analogue",
+      "available": true,
+      "headline": "50 comparable state(s); the move that followed was in the same direction 22% of the time",
+      "source": "desk/analogue.py:find",
+      "detail": {
+        "matches": 50,
+        "hit_rate": 0.22
+      },
+      "concern": "history went the other way 78% of the time after states like this"
+    },
+    {
+      "step": "path shape",
+      "available": true,
+      "headline": "No precedent: the nearest match is at distance 0.34, but reordering this series' own returns produces a match at least that close in 22% of 50 scans (median 0.42). The shape is not distinguishable from chance, so what followed these 5 window(s) is not evidence about what follows now",
+      "source": "desk/shapematch.py:find",
+      "detail": {
+        "analogues": 5,
+        "has_precedent": false,
+        "null_p": 0.22
+      },
+      "concern": "the present has no precedent here that noise on this same series does not also produce"
+    },
+    {
+      "step": "cointegration",
+      "available": true,
+      "headline": "66 partner(s) tested, 0 significant naively against 3.3 expected by chance; none survives multiple-testing correction, so no pair trade is available here",
+      "source": "research/cointegration.py:scan",
+      "detail": {
+        "tests": 66,
+        "survivors": 0
+      },
+      "concern": ""
+    },
+    {
+      "step": "allocation",
+      "available": true,
+      "headline": "3 leg(s) (AAPLUSDT 45.5%->39.8%, MSFTUSDT 45.5%->29.0%, NVDAUSDT 9.1%->31.1%), turnover 44.1% costing 2.6bps. Portfolio volatility 26 -> 23bps per bar, +15.6% of variance. It repays in 110 bars, inside the 168-bar horizon, at an assumed annualised Sharpe of 1.0. Worth doing",
+      "source": "desk/allocation.py:optimize_trade",
+      "detail": {
+        "legs": 3,
+        "turnover": 0.4407834595508251,
+        "cost_bps": 2.6447007573049506,
+        "variance_reduction": 0.15552842391073718,
+        "worth_doing": true
+      },
+      "concern": "a different book is materially better: +16% of variance for 2.6bps, repaying in 110 bars"
+    },
+    {
+      "step": "session beta",
+      "available": true,
+      "headline": "open-session beta 0.314 \u2192 0.395",
+      "source": "desk/portfolio.py:assess (session=OPEN)",
+      "detail": {
+        "beta_before": 0.3144243236159143,
+        "beta_after": 0.3948524027961061
+      },
+      "concern": "open-session beta rises from 0.314 to 0.395, a material increase in directional exposure during the only session that prices the underlying"
+    },
+    {
+      "step": "portfolio impact",
+      "available": true,
+      "headline": "2.10 effective position(s) after; most correlated with MSFTUSDT at 0.10",
+      "source": "desk/portfolio.py:assess",
+      "detail": {
+        "risk_share_after": 0.03509795114808309,
+        "effective_positions_after": 2.10302298789459
+      },
+      "concern": ""
+    },
+    {
+      "step": "diversification",
+      "available": true,
+      "headline": "2.42 effective bet(s) across 3 position(s); minimum torsion reads 2.26; best hedge QQQUSDT at -0.395 removes 13% of the variance",
+      "source": "desk/diversification.py:effective_bets",
+      "detail": {
+        "effective_bets": 2.419,
+        "torsion_bets": 2.2631,
+        "disagreement": 0.1559,
+        "positions": 3,
+        "concentration_ratio": 0.8063,
+        "largest_direction_share": 0.5969,
+        "distribution": [
+          0.596896,
+          0.316994,
+          0.086109
+        ],
+        "verdict": "2.42 effective bet(s) across 3 position(s): the names are close to independent risks. Minimum torsion reads 2.26 on the same book; where the two disagree the book is correlated, and the lower number is the one to plan against."
+      },
+      "concern": ""
+    },
+    {
+      "step": "stress",
+      "available": true,
+      "headline": "9 scenario(s) tested, 0 breached the loss tolerance",
+      "source": "desk/stress.py:assess",
+      "detail": {
+        "scenarios": 9,
+        "failures": 0
+      },
+      "concern": ""
+    },
+    {
+      "step": "execution cost",
+      "available": true,
+      "headline": "round trip plus deliberation costs 12bps",
+      "source": "cost/model.py + agents/meta_pm.py:deliberation_cost_bps",
+      "detail": {
+        "cost_bps": "12"
+      },
+      "concern": ""
+    }
+  ],
+  "concerns": [
+    "historical analogue",
+    "path shape",
+    "allocation",
+    "session beta"
+  ],
+  "missing": []
+}

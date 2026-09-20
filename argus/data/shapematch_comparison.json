@@ -1,0 +1,70 @@
+{
+  "distance_cases": [
+    {
+      "name": "general",
+      "argus_value": 0.5434932306,
+      "stumpy_value": 0.5434932306,
+      "diff": 1.1102230246251565e-16,
+      "agrees": true
+    },
+    {
+      "name": "left_constant",
+      "argus_value": 1.0,
+      "stumpy_value": 1.0,
+      "diff": 0.0,
+      "agrees": true
+    },
+    {
+      "name": "both_constant",
+      "argus_value": 0.0,
+      "stumpy_value": 0.0,
+      "diff": 0.0,
+      "agrees": true
+    }
+  ],
+  "all_distance_cases_agree": true,
+  "lookahead": {
+    "n_bars": 200,
+    "window": 24,
+    "queries_checked": 177,
+    "queries_with_future_neighbour": 75,
+    "stumpy_leaks_the_future": true
+  },
+  "exclusion_zone_sweep": {
+    "window": 24,
+    "horizon": 1,
+    "queries_checked": 150,
+    "queries_diverged": 65,
+    "divergence_rate": 0.4333,
+    "example": {
+      "query_start": 25,
+      "argus_neighbour_start": 0,
+      "argus_offset": 25,
+      "stumpy_neighbour_start": 11,
+      "stumpy_offset": 14
+    }
+  },
+  "significance_scan": {
+    "terms_searched": [
+      "shuffl",
+      "permutation_test",
+      "null_hypothesis",
+      "p_value",
+      "p-value",
+      "significance_test"
+    ],
+    "files_matched": [],
+    "stumpy_has_no_significance_machinery": true
+  },
+  "costs": {
+    "stumpy_squared_distance_seconds_per_call": 4.667999892262742e-07,
+    "argus_distance_seconds_per_call": 0.00016710419999435545,
+    "stumpy_full_profile_seconds_for_n_bars": 0.003482399995846208,
+    "n_bars": 200.0
+  },
+  "reproducibility": {
+    "argus_reproducible": true,
+    "stumpy_reproducible": true
+  },
+  "scope_statement": "Claimed: ARGUS's real distance() matches STUMPY's real _calculate_squared_distance to float precision on a general case and on both constant-window edge cases, run not assumed. Claimed: STUMPY's real, default stump() self-join returns a look-ahead neighbour (index after the query) for real interior query points, demonstrated by running it on a real series, not inferred from its docs; ARGUS's real find() cannot construct such a candidate by its own construction (checked by reading _scan's candidate-generation range, which the AST/logic guarantees ends before the query for every candidate it ever scores). Claimed: on a constructed high-persistence series chosen to isolate the effect, a real, measured share of causal query points diverge between STUMPY's real default m/4 exclusion and ARGUS's own stricter rule, with STUMPY's pick the more temporally-adjacent one. Claimed: STUMPY's real source contains no statistical-significance machinery anywhere (exhaustive grep, zero matches).\n\nNOT claimed: that STUMPY is a defective library \u2014 it is a general-purpose time-series similarity tool; a naive self-join genuinely computing neighbours in both directions is its documented, intended behaviour for the general matrix-profile problem, not a bug, and the burden of avoiding look-ahead when applying it to a point-in-time trading question is the CALLER's, which is exactly what this finding is about \u2014 a specialist system built for that question should not leave that burden to the caller, and ARGUS's own find() does not. NOT claimed: that STUMPY should have built-in significance testing \u2014 that is outside its stated scope, not an omission. NOT claimed: that every real-market query diverges on the exclusion-zone-width axis \u2014 the divergence rate is reported as measured, on a series deliberately constructed to make the effect checkable, not asserted as universal.\n"
+}

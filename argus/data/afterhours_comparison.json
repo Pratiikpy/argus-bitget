@@ -1,0 +1,264 @@
+{
+  "base_case": {
+    "days": 90,
+    "real_holiday_dates_in_calendar": 293,
+    "without_holiday_calendar_has_holiday_phase": false,
+    "with_holiday_calendar_has_holiday_phase": true,
+    "with_holiday_calendar_by_phase_holiday": {
+      "sessions": 24,
+      "median_hours_closed": 90.0,
+      "median_closed_move_bps": "133.41",
+      "median_reopen_move_bps": "105.73",
+      "continuation_rate_pct": 41.7,
+      "reopen_clears_fee_pct": 91.7,
+      "median_net_of_fee_bps": "93.73"
+    },
+    "total_real_closed_sessions": 720,
+    "real_holiday_sessions_found": 24,
+    "phases_present_without_holiday_calendar": [
+      "overnight",
+      "weekend"
+    ],
+    "symbols_failed": {},
+    "blind_long_backtest": {
+      "n_sessions": 24,
+      "n_profitable_gross": 13,
+      "win_rate_gross_pct": 54.2,
+      "n_profitable_net_of_fee": 13,
+      "win_rate_net_of_fee_pct": 54.2,
+      "coin_flip_is_pct": 50.0,
+      "sessions": [
+        {
+          "symbol": "NVDAUSDT",
+          "start": "2026-06-18T19:00:00+00:00",
+          "real_closed_move_bps": 135.85407562226868,
+          "net_of_real_fee_bps": 123.85407562226868,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "NVDAUSDT",
+          "start": "2026-07-02T19:00:00+00:00",
+          "real_closed_move_bps": 88.32742772043342,
+          "net_of_real_fee_bps": 76.32742772043342,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "TSLAUSDT",
+          "start": "2026-06-18T19:00:00+00:00",
+          "real_closed_move_bps": 157.0850606862794,
+          "net_of_real_fee_bps": 145.0850606862794,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "TSLAUSDT",
+          "start": "2026-07-02T19:00:00+00:00",
+          "real_closed_move_bps": 215.28607376153317,
+          "net_of_real_fee_bps": 203.28607376153317,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "AAPLUSDT",
+          "start": "2026-06-18T19:00:00+00:00",
+          "real_closed_move_bps": 114.41417259428265,
+          "net_of_real_fee_bps": 102.41417259428265,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "AAPLUSDT",
+          "start": "2026-07-02T19:00:00+00:00",
+          "real_closed_move_bps": 35.986383530556004,
+          "net_of_real_fee_bps": 23.986383530556004,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "MSFTUSDT",
+          "start": "2026-06-18T19:00:00+00:00",
+          "real_closed_move_bps": 15.788227245217483,
+          "net_of_real_fee_bps": 3.7882272452174828,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "MSFTUSDT",
+          "start": "2026-07-02T19:00:00+00:00",
+          "real_closed_move_bps": -109.72108285479902,
+          "net_of_real_fee_bps": -121.72108285479902,
+          "profitable_gross": false,
+          "profitable_net_of_fee": false,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "METAUSDT",
+          "start": "2026-06-18T19:00:00+00:00",
+          "real_closed_move_bps": -47.07185380035996,
+          "net_of_real_fee_bps": -59.07185380035996,
+          "profitable_gross": false,
+          "profitable_net_of_fee": false,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "METAUSDT",
+          "start": "2026-07-02T19:00:00+00:00",
+          "real_closed_move_bps": -6.341371450117401,
+          "net_of_real_fee_bps": -18.3413714501174,
+          "profitable_gross": false,
+          "profitable_net_of_fee": false,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "GOOGLUSDT",
+          "start": "2026-06-18T19:00:00+00:00",
+          "real_closed_move_bps": -372.94203802652635,
+          "net_of_real_fee_bps": -384.94203802652635,
+          "profitable_gross": false,
+          "profitable_net_of_fee": false,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "GOOGLUSDT",
+          "start": "2026-07-02T19:00:00+00:00",
+          "real_closed_move_bps": -52.552552552552555,
+          "net_of_real_fee_bps": -64.55255255255256,
+          "profitable_gross": false,
+          "profitable_net_of_fee": false,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "AMZNUSDT",
+          "start": "2026-06-18T19:00:00+00:00",
+          "real_closed_move_bps": -208.37589376915219,
+          "net_of_real_fee_bps": -220.37589376915219,
+          "profitable_gross": false,
+          "profitable_net_of_fee": false,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "AMZNUSDT",
+          "start": "2026-07-02T19:00:00+00:00",
+          "real_closed_move_bps": -24.31886566918099,
+          "net_of_real_fee_bps": -36.318865669180994,
+          "profitable_gross": false,
+          "profitable_net_of_fee": false,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "COINUSDT",
+          "start": "2026-06-18T19:00:00+00:00",
+          "real_closed_move_bps": 762.0329031863495,
+          "net_of_real_fee_bps": 750.0329031863495,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "COINUSDT",
+          "start": "2026-07-02T19:00:00+00:00",
+          "real_closed_move_bps": -88.13763960156957,
+          "net_of_real_fee_bps": -100.13763960156957,
+          "profitable_gross": false,
+          "profitable_net_of_fee": false,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "start": "2026-06-18T19:00:00+00:00",
+          "real_closed_move_bps": 558.6641797672972,
+          "net_of_real_fee_bps": 546.6641797672972,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "MSTRUSDT",
+          "start": "2026-07-02T19:00:00+00:00",
+          "real_closed_move_bps": -163.64177328176137,
+          "net_of_real_fee_bps": -175.64177328176137,
+          "profitable_gross": false,
+          "profitable_net_of_fee": false,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "QQQUSDT",
+          "start": "2026-06-18T19:00:00+00:00",
+          "real_closed_move_bps": 58.68069607446378,
+          "net_of_real_fee_bps": 46.68069607446378,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "QQQUSDT",
+          "start": "2026-07-02T19:00:00+00:00",
+          "real_closed_move_bps": 130.95604918905292,
+          "net_of_real_fee_bps": 118.95604918905292,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "TQQQUSDT",
+          "start": "2026-06-18T19:00:00+00:00",
+          "real_closed_move_bps": 221.7669037001326,
+          "net_of_real_fee_bps": 209.7669037001326,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "TQQQUSDT",
+          "start": "2026-07-02T19:00:00+00:00",
+          "real_closed_move_bps": 387.02643772145,
+          "net_of_real_fee_bps": 375.02643772145,
+          "profitable_gross": true,
+          "profitable_net_of_fee": true,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "SQQQUSDT",
+          "start": "2026-06-18T19:00:00+00:00",
+          "real_closed_move_bps": -220.40816326530611,
+          "net_of_real_fee_bps": -232.40816326530611,
+          "profitable_gross": false,
+          "profitable_net_of_fee": false,
+          "real_decision_went_long": true
+        },
+        {
+          "symbol": "SQQQUSDT",
+          "start": "2026-07-02T19:00:00+00:00",
+          "real_closed_move_bps": -390.6836964688204,
+          "net_of_real_fee_bps": -402.6836964688204,
+          "profitable_gross": false,
+          "profitable_net_of_fee": false,
+          "real_decision_went_long": true
+        }
+      ]
+    }
+  },
+  "failure_cases": {
+    "liquidates_when_already_long_and_no_holiday": true,
+    "holds_when_already_long_and_holiday_still_near": true,
+    "stays_flat_when_no_holiday_and_not_invested": true
+  },
+  "costs": {
+    "repeats": 50,
+    "quantconnect_decision_seconds_per_call": 0.00017321200008154846,
+    "argus_property_seconds_per_call": 8.340000931639225e-07
+  },
+  "reproducibility": {
+    "identical": true
+  },
+  "scope_statement": "argus.research.gap_study.study() has never been given a real holiday calendar: it constructs DualClock() with no holidays argument, so the SessionPhase.HOLIDAY branch its own _closed_sessions() already classifies for had never once fired in a real run \u2014 real market holidays were silently absorbed into whichever other phase the day's hours happened to match. Wiring in a real US equity holiday calendar (QuantConnect/Lean's own real market-hours database) unlocks real holiday-session measurement for the first time and finds a close-to-coin-flip win rate for a blind long-before-any-holiday strategy \u2014 exactly the real, published QuantConnect/Tutorials Pre-Holiday Effect logic \u2014 on ARGUS's own real tradable universe, both before and after the real 12bps round-trip fee. NOT claimed this disproves the pre-holiday effect on SPY (the real strategy's own stated instrument) or over a longer historical sample \u2014 only that it does not hold on the small, real, live sample currently inside ARGUS's own trailing window. NOT claimed the real calendar LOOKUP (TradingCalendar.GetDaysByType) was run \u2014 it needs a full Lean engine; the real, same-source calendar DATA was substituted for it, and the real decision LOGIC runs unmodified."
+}

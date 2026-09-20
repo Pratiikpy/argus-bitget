@@ -1,0 +1,80 @@
+{
+  "trades": [
+    {
+      "symbol": "AAPLUSDT",
+      "weight_before": 0.083333,
+      "weight_after": 0.237745,
+      "delta": 0.154412
+    },
+    {
+      "symbol": "AMZNUSDT",
+      "weight_before": 0.083333,
+      "weight_after": 0.072827,
+      "delta": -0.010506
+    },
+    {
+      "symbol": "COINUSDT",
+      "weight_before": 0.083333,
+      "weight_after": 0.021321,
+      "delta": -0.062012
+    },
+    {
+      "symbol": "GOOGLUSDT",
+      "weight_before": 0.083333,
+      "weight_after": 0.095807,
+      "delta": 0.012473
+    },
+    {
+      "symbol": "METAUSDT",
+      "weight_before": 0.083333,
+      "weight_after": 0.098396,
+      "delta": 0.015063
+    },
+    {
+      "symbol": "MSFTUSDT",
+      "weight_before": 0.083333,
+      "weight_after": 0.09498,
+      "delta": 0.011646
+    },
+    {
+      "symbol": "MSTRUSDT",
+      "weight_before": 0.083333,
+      "weight_after": 0.01343,
+      "delta": -0.069903
+    },
+    {
+      "symbol": "QQQUSDT",
+      "weight_before": 0.083333,
+      "weight_after": 0.168903,
+      "delta": 0.085569
+    },
+    {
+      "symbol": "SQQQUSDT",
+      "weight_before": 0.083333,
+      "weight_after": 0.061008,
+      "delta": -0.022325
+    },
+    {
+      "symbol": "TQQQUSDT",
+      "weight_before": 0.083333,
+      "weight_after": 0.019018,
+      "delta": -0.064315
+    },
+    {
+      "symbol": "TSLAUSDT",
+      "weight_before": 0.083333,
+      "weight_after": 0.042881,
+      "delta": -0.040452
+    }
+  ],
+  "vol_before_bps": 21.7132,
+  "vol_after_bps": 16.1763,
+  "variance_reduction": 0.444976,
+  "turnover": 0.548677,
+  "cost_bps": 3.2921,
+  "break_even_bars": 41.46,
+  "assumed_sharpe_per_bar": 0.010684346079267205,
+  "horizon_bars": 168,
+  "worth_doing": true,
+  "verdict": "11 leg(s) (AAPLUSDT 8.3%->23.8%, AMZNUSDT 8.3%->7.3%, COINUSDT 8.3%->2.1%, GOOGLUSDT 8.3%->9.6%...), turnover 54.9% costing 3.3bps. Portfolio volatility 22 -> 16bps per bar, +44.5% of variance. It repays in 41 bars, inside the 168-bar horizon, at an assumed annualised Sharpe of 1.0. Worth doing"
+}

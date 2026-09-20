@@ -1,0 +1,228 @@
+{
+  "baseline_reproduced": {
+    "symbols_checked": [
+      "NVDA",
+      "TSLA",
+      "AAPL",
+      "MSFT",
+      "META",
+      "GOOGL",
+      "AMZN",
+      "COIN",
+      "MSTR"
+    ],
+    "symbols_skipped": [],
+    "results": [
+      {
+        "symbol": "NVDA",
+        "real_sue": 2.8407407533816267,
+        "argus_sue": 2.8407407533816267,
+        "agree": true
+      },
+      {
+        "symbol": "TSLA",
+        "real_sue": 0.8280047455157966,
+        "argus_sue": 0.8280047455157967,
+        "agree": true
+      },
+      {
+        "symbol": "AAPL",
+        "real_sue": 0.5395856752901315,
+        "argus_sue": 0.5395856752901316,
+        "agree": true
+      },
+      {
+        "symbol": "MSFT",
+        "real_sue": 2.313575954062263,
+        "argus_sue": 2.313575954062263,
+        "agree": true
+      },
+      {
+        "symbol": "META",
+        "real_sue": -0.09917219359060742,
+        "argus_sue": -0.0991721935906074,
+        "agree": true
+      },
+      {
+        "symbol": "GOOGL",
+        "real_sue": 3.3741168442007763,
+        "argus_sue": 3.3741168442007767,
+        "agree": true
+      },
+      {
+        "symbol": "AMZN",
+        "real_sue": 3.7083133663304775,
+        "argus_sue": 3.7083133663304766,
+        "agree": true
+      },
+      {
+        "symbol": "COIN",
+        "real_sue": -0.6437811670899574,
+        "argus_sue": -0.6437811670899574,
+        "agree": true
+      },
+      {
+        "symbol": "MSTR",
+        "real_sue": -0.3789067533796619,
+        "argus_sue": -0.3789067533796619,
+        "agree": true
+      }
+    ],
+    "all_agree": true
+  },
+  "silent_failure_cases": {
+    "linear_growth_zero_variance": {
+      "real_sue": Infinity,
+      "real_is_infinite": true,
+      "real_warnings": [
+        "divide by zero encountered in scalar divide"
+      ],
+      "real_raised": false,
+      "argus_refused": true
+    },
+    "all_flat_eps": {
+      "real_sue": NaN,
+      "real_is_nan": true,
+      "real_warnings": [
+        "invalid value encountered in scalar divide"
+      ],
+      "real_raised": false,
+      "argus_refused": true
+    }
+  },
+  "ranking_case": {
+    "universe_size": 10,
+    "real_top_symbol": "CONSTRUCTED_LINEAR",
+    "real_top_is_the_constructed_artifact": true,
+    "real_ranking": [
+      {
+        "symbol": "CONSTRUCTED_LINEAR",
+        "sue": Infinity
+      },
+      {
+        "symbol": "AMZN",
+        "sue": 3.7083133663304775
+      },
+      {
+        "symbol": "GOOGL",
+        "sue": 3.3741168442007763
+      },
+      {
+        "symbol": "NVDA",
+        "sue": 2.8407407533816267
+      },
+      {
+        "symbol": "MSFT",
+        "sue": 2.313575954062263
+      },
+      {
+        "symbol": "TSLA",
+        "sue": 0.8280047455157966
+      },
+      {
+        "symbol": "AAPL",
+        "sue": 0.5395856752901315
+      },
+      {
+        "symbol": "META",
+        "sue": -0.09917219359060742
+      },
+      {
+        "symbol": "MSTR",
+        "sue": -0.3789067533796619
+      },
+      {
+        "symbol": "COIN",
+        "sue": -0.6437811670899574
+      }
+    ],
+    "argus_ranked": [
+      {
+        "symbol": "AMZN",
+        "sue": 3.708313,
+        "eps_change": 4.16,
+        "eps_std": 1.121804,
+        "quarters_used": 12
+      },
+      {
+        "symbol": "GOOGL",
+        "sue": 3.374117,
+        "eps_change": 6.3,
+        "eps_std": 1.867155,
+        "quarters_used": 12
+      },
+      {
+        "symbol": "NVDA",
+        "sue": 2.840741,
+        "eps_change": 1.7,
+        "eps_std": 0.598435,
+        "quarters_used": 12
+      },
+      {
+        "symbol": "MSFT",
+        "sue": 2.313576,
+        "eps_change": 1.04,
+        "eps_std": 0.449521,
+        "quarters_used": 12
+      },
+      {
+        "symbol": "TSLA",
+        "sue": 0.828005,
+        "eps_change": 0.2,
+        "eps_std": 0.241545,
+        "quarters_used": 12
+      },
+      {
+        "symbol": "AAPL",
+        "sue": 0.539586,
+        "eps_change": 0.37,
+        "eps_std": 0.685711,
+        "quarters_used": 12
+      },
+      {
+        "symbol": "META",
+        "sue": -0.099172,
+        "eps_change": -0.25,
+        "eps_std": 2.520868,
+        "quarters_used": 12
+      },
+      {
+        "symbol": "MSTR",
+        "sue": -0.378907,
+        "eps_change": -7.96,
+        "eps_std": 21.007807,
+        "quarters_used": 12
+      },
+      {
+        "symbol": "COIN",
+        "sue": -0.643781,
+        "eps_change": -1.6,
+        "eps_std": 2.485317,
+        "quarters_used": 12
+      }
+    ],
+    "argus_top_symbol": "AMZN",
+    "argus_excludes_the_constructed_artifact": true,
+    "argus_skipped": {
+      "CONSTRUCTED_LINEAR": "the eight real year-over-year EPS deltas have zero (or float-noise) variance; SUE is undefined, not infinite \u2014 the real reference silently returns inf/nan here instead of refusing"
+    }
+  },
+  "failure_cases": {
+    "insufficient_history": {
+      "n_quarters": 4,
+      "real_raised": "IndexError: list index out of range",
+      "real_raised_indexerror": true,
+      "argus_refused_with_sueerror": true
+    }
+  },
+  "costs": {
+    "repeats": 200,
+    "real_vendored_seconds_per_call": 2.0731000004161614e-05,
+    "argus_pure_python_seconds_per_call": 5.0353999977232885e-05,
+    "argus_faster_by_factor": 0.4117051279647089
+  },
+  "reproducibility": {
+    "identical": true
+  },
+  "scope_statement": "argus.research.sue reproduces QuantConnect's real, vendored Standardized Unexpected Earnings formula to floating-point identity on real, live SEC EDGAR quarterly EPS for every real rToken anchor tested. The real vendored formula's denominator has no guard: a constructed-but-plausible linearly-growing EPS path produces a real, silent inf (with only a RuntimeWarning), an all-flat path a real, silent nan, and mixed into a real cross-sectional ranking alongside every real anchor, the real code's own sorted() puts the constructed inf case first unconditionally. argus.research.sue refuses in every one of these cases instead, and crashes with the same typed SueError (not a bare IndexError) on insufficient history where the real reference raises an untyped IndexError. NOT claimed the SUE factor has validated forecasting value as a trading signal \u2014 this measures the real reference's numerical robustness, not its edge. NOT claimed the real anchor SUE values are fixed constants \u2014 SEC EDGAR is fetched live and the exact numbers will move as new quarters are filed."
+}

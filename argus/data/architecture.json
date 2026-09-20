@@ -1,0 +1,181 @@
+{
+  "generated_at": "2026-09-14T14:51:54.881053+00:00",
+  "modules": 167,
+  "internal_imports": 493,
+  "sound": true,
+  "violations": [],
+  "cycles": [
+    {
+      "members": [
+        "argus.eval.collect",
+        "argus.eval.incremental"
+      ],
+      "import_time": false
+    },
+    {
+      "members": [
+        "argus.lui.phrasebook",
+        "argus.lui.question"
+      ],
+      "import_time": false
+    },
+    {
+      "members": [
+        "argus.paper.protocol",
+        "argus.paper.runner"
+      ],
+      "import_time": false
+    },
+    {
+      "members": [
+        "argus.research.factor_lab",
+        "argus.research.memory"
+      ],
+      "import_time": false
+    }
+  ],
+  "import_time_cycles": 0,
+  "packages": [
+    {
+      "package": "agents",
+      "modules": 16,
+      "afferent": 12,
+      "efferent": 8,
+      "instability": 0.4
+    },
+    {
+      "package": "backtest",
+      "modules": 5,
+      "afferent": 15,
+      "efferent": 2,
+      "instability": 0.118
+    },
+    {
+      "package": "cost",
+      "modules": 2,
+      "afferent": 22,
+      "efferent": 0,
+      "instability": 0.0
+    },
+    {
+      "package": "decision",
+      "modules": 3,
+      "afferent": 11,
+      "efferent": 0,
+      "instability": 0.0
+    },
+    {
+      "package": "demo",
+      "modules": 3,
+      "afferent": 1,
+      "efferent": 7,
+      "instability": 0.875
+    },
+    {
+      "package": "desk",
+      "modules": 15,
+      "afferent": 6,
+      "efferent": 11,
+      "instability": 0.647
+    },
+    {
+      "package": "eval",
+      "modules": 36,
+      "afferent": 5,
+      "efferent": 15,
+      "instability": 0.75
+    },
+    {
+      "package": "execution",
+      "modules": 10,
+      "afferent": 10,
+      "efferent": 2,
+      "instability": 0.167
+    },
+    {
+      "package": "llm",
+      "modules": 4,
+      "afferent": 12,
+      "efferent": 0,
+      "instability": 0.0
+    },
+    {
+      "package": "lui",
+      "modules": 8,
+      "afferent": 1,
+      "efferent": 3,
+      "instability": 0.75
+    },
+    {
+      "package": "market",
+      "modules": 15,
+      "afferent": 37,
+      "efferent": 2,
+      "instability": 0.051
+    },
+    {
+      "package": "paper",
+      "modules": 8,
+      "afferent": 21,
+      "efferent": 10,
+      "instability": 0.323
+    },
+    {
+      "package": "proof",
+      "modules": 2,
+      "afferent": 2,
+      "efferent": 1,
+      "instability": 0.333
+    },
+    {
+      "package": "register",
+      "modules": 5,
+      "afferent": 0,
+      "efferent": 2,
+      "instability": 1.0
+    },
+    {
+      "package": "research",
+      "modules": 16,
+      "afferent": 4,
+      "efferent": 7,
+      "instability": 0.636
+    },
+    {
+      "package": "risk",
+      "modules": 6,
+      "afferent": 9,
+      "efferent": 4,
+      "instability": 0.308
+    },
+    {
+      "package": "sim",
+      "modules": 4,
+      "afferent": 1,
+      "efferent": 0,
+      "instability": 0.0
+    },
+    {
+      "package": "status",
+      "modules": 1,
+      "afferent": 1,
+      "efferent": 2,
+      "instability": 0.667
+    },
+    {
+      "package": "strategies",
+      "modules": 3,
+      "afferent": 1,
+      "efferent": 2,
+      "instability": 0.667
+    },
+    {
+      "package": "truth",
+      "modules": 4,
+      "afferent": 40,
+      "efferent": 0,
+      "instability": 0.0
+    }
+  ],
+  "verdict": "167 modules, 493 internal imports. every declared contract holds: the deterministic core reaches no model-facing module at any depth, and no producer imports its consumer. 4 dependency cycle(s), each broken at load by a deferred import in one direction \u2014 real coupling, safe ordering, and reported rather than scored as clean."
+}

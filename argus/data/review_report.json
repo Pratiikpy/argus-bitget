@@ -1,0 +1,266 @@
+{
+  "generated_at": "2026-09-13T05:48:08.757600+00:00",
+  "decisions": 40,
+  "clean_rate": 0.625,
+  "defects_by_kind": {
+    "grounding": 10,
+    "conflict": 18
+  },
+  "recurring": [
+    {
+      "kind": "conflict",
+      "count": 18
+    },
+    {
+      "kind": "grounding",
+      "count": 10
+    }
+  ],
+  "checklist": [],
+  "rejected": [
+    {
+      "rule": "narrow-evidence-base",
+      "prompt": "If the panel read fewer than 6 distinct sources, ask where each number in the thesis came from before accepting it.",
+      "status": "misleading",
+      "decisions": 40,
+      "fired": 12,
+      "caught": 4,
+      "false_alarms": 8,
+      "missed": 1,
+      "fire_rate": 0.3,
+      "precision": 0.3333333333333333,
+      "recall": 0.8,
+      "note": "right 33% of the times it fires; below 50% it sends the reader to the wrong place more often than the right one"
+    },
+    {
+      "rule": "low-independence-panel",
+      "prompt": "If panel independence is under 2.5, treat agreement as one opinion, not several.",
+      "status": "misleading",
+      "decisions": 40,
+      "fired": 10,
+      "caught": 1,
+      "false_alarms": 9,
+      "missed": 9,
+      "fire_rate": 0.25,
+      "precision": 0.1,
+      "recall": 0.1,
+      "note": "right 10% of the times it fires; below 50% it sends the reader to the wrong place more often than the right one"
+    },
+    {
+      "rule": "thin-panel",
+      "prompt": "If fewer than three analysts ran, ask what the silent ones would have read.",
+      "status": "misleading",
+      "decisions": 40,
+      "fired": 14,
+      "caught": 6,
+      "false_alarms": 8,
+      "missed": 9,
+      "fire_rate": 0.35,
+      "precision": 0.42857142857142855,
+      "recall": 0.4,
+      "note": "right 43% of the times it fires; below 50% it sends the reader to the wrong place more often than the right one"
+    },
+    {
+      "rule": "sequential-agreement",
+      "prompt": "When analysts agree, check whether they ran independently or one after another.",
+      "status": "proposed",
+      "decisions": 40,
+      "fired": 30,
+      "caught": 0,
+      "false_alarms": 30,
+      "missed": 0,
+      "fire_rate": 0.75,
+      "precision": 0.0,
+      "recall": null,
+      "note": "no defect of the kind(s) this rule targets has been observed yet, so firing neither confirms nor refutes it; it cannot be graded on this record"
+    },
+    {
+      "rule": "unhedged-risk-is-stated-not-assumed",
+      "prompt": "If the hedge menu is empty, confirm the residual risk was priced, not ignored.",
+      "status": "proposed",
+      "decisions": 40,
+      "fired": 40,
+      "caught": 0,
+      "false_alarms": 40,
+      "missed": 0,
+      "fire_rate": 1.0,
+      "precision": 0.0,
+      "recall": null,
+      "note": "no defect of the kind(s) this rule targets has been observed yet, so firing neither confirms nor refutes it; it cannot be graded on this record"
+    }
+  ],
+  "unassessable": [
+    "any rule whose target is an OUTCOME defect: no decision has settled, so being right is not yet observable. These rules are reported on their process behaviour only.",
+    "rules targeting risk interventions: the Constitution has never bound on this record, so nothing has tested them"
+  ],
+  "defects": [
+    {
+      "seq": 64,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: -0.055%"
+    },
+    {
+      "seq": 64,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 65,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: +0.24%"
+    },
+    {
+      "seq": 65,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 68,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 2 figure(s) do not resolve to anything the desk was given: +16bps"
+    },
+    {
+      "seq": 68,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 70,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs earnings (neutral), gap 0.47 \u2014 event dominates: confidence 0.82 against 0.35"
+    },
+    {
+      "seq": 70,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+    },
+    {
+      "seq": 71,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+    },
+    {
+      "seq": 76,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs sentiment (neutral), gap 0.47 \u2014 event dominates: confidence 0.82 against 0.35"
+    },
+    {
+      "seq": 76,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.65 \u2014 cross_asset dominates: confidence 1.00 against 0.35"
+    },
+    {
+      "seq": 80,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 0.89"
+    },
+    {
+      "seq": 80,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 83,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: -3.5bps"
+    },
+    {
+      "seq": 83,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 84,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+    },
+    {
+      "seq": 86,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs earnings (neutral), gap 0.37 \u2014 event dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 86,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+    },
+    {
+      "seq": 87,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs sentiment (neutral), gap 0.47 \u2014 event dominates: confidence 0.82 against 0.35"
+    },
+    {
+      "seq": 87,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+    },
+    {
+      "seq": 87,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (neutral) vs cross_asset (neutral), gap 0.40 \u2014 cross_asset dominates: confidence 0.95 against 0.55"
+    },
+    {
+      "seq": 88,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs earnings (neutral), gap 0.37 \u2014 sentiment dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 88,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+    },
+    {
+      "seq": 89,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+    },
+    {
+      "seq": 95,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs sentiment (neutral), gap 0.37 \u2014 event dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 95,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+    },
+    {
+      "seq": 96,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs earnings (neutral), gap 0.47 \u2014 event dominates: confidence 0.82 against 0.35"
+    },
+    {
+      "seq": 96,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+    }
+  ]
+}

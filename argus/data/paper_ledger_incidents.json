@@ -1,0 +1,215 @@
+[
+  {
+    "at": "2026-09-12T18:03:08.058887+00:00",
+    "reason": "two paper cycles ran concurrently on 2026-09-12 (the 22:52 scheduled task and a manually started run); each computed seq and prev_hash from the same stale head, producing seven duplicated sequence numbers from 41 onward. Fixed at source by an exclusive lock and an on-disk head re-read in argus.paper.ledger.",
+    "archive": "paper_ledger.corrupted-20260912T180308Z.jsonl",
+    "archive_sha256": "fba057d5c41d5f33c65e08b750cfac76e1869e14a8de503a98db8987c3bf9016",
+    "repaired_sha256": "ff64091a56771984a0ccd3051c68b2d055bbac081f038737b5b42a37567d006f",
+    "repaired_head_hash": "0936e7955df17f26",
+    "plan": {
+      "entries_before": 62,
+      "entries_after": 62,
+      "duplicate_seqs": [
+        41,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52
+      ],
+      "source_digest": "fba057d5c41d5f33c65e08b750cfac76e1869e14a8de503a98db8987c3bf9016",
+      "changes": [
+        {
+          "old_seq": 41,
+          "new_seq": 42,
+          "decided_at": "2026-09-12T17:23:00.860039+00:00",
+          "symbol": "NVDAUSDT",
+          "old_prev_hash": "2375629f8efac607",
+          "new_prev_hash": "2a1c51d0dd2f8be9",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 42,
+          "new_seq": 43,
+          "decided_at": "2026-09-12T17:22:02.660396+00:00",
+          "symbol": "TSLAUSDT",
+          "old_prev_hash": "2a1c51d0dd2f8be9",
+          "new_prev_hash": "21a8343ae7df9bb1",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 43,
+          "new_seq": 44,
+          "decided_at": "2026-09-12T17:22:02.660396+00:00",
+          "symbol": "AAPLUSDT",
+          "old_prev_hash": "8a17f0bb3d6e0b0f",
+          "new_prev_hash": "a66f06eb114b5786",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 44,
+          "new_seq": 45,
+          "decided_at": "2026-09-12T17:22:02.660396+00:00",
+          "symbol": "MSFTUSDT",
+          "old_prev_hash": "6390c6d3183f9308",
+          "new_prev_hash": "d52000b3ec315c99",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 45,
+          "new_seq": 46,
+          "decided_at": "2026-09-12T17:22:02.660396+00:00",
+          "symbol": "METAUSDT",
+          "old_prev_hash": "65d4ae8cadc29706",
+          "new_prev_hash": "7e1d3e77cb71a90c",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 46,
+          "new_seq": 47,
+          "decided_at": "2026-09-12T17:22:02.660396+00:00",
+          "symbol": "GOOGLUSDT",
+          "old_prev_hash": "557727babcc6946d",
+          "new_prev_hash": "6fabb1ef62d3cca1",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 47,
+          "new_seq": 48,
+          "decided_at": "2026-09-12T17:34:25.939757+00:00",
+          "symbol": "NVDAUSDT",
+          "old_prev_hash": "557727babcc6946d",
+          "new_prev_hash": "dc190b5c35b339b3",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 48,
+          "new_seq": 49,
+          "decided_at": "2026-09-12T17:34:25.939757+00:00",
+          "symbol": "TSLAUSDT",
+          "old_prev_hash": "d04c95b2c5383a3a",
+          "new_prev_hash": "579a80c35403ad75",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 47,
+          "new_seq": 50,
+          "decided_at": "2026-09-12T17:22:02.660396+00:00",
+          "symbol": "AMZNUSDT",
+          "old_prev_hash": "b415c00a0ae36ef2",
+          "new_prev_hash": "30d2c13ea4ac876a",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 49,
+          "new_seq": 51,
+          "decided_at": "2026-09-12T17:34:25.939757+00:00",
+          "symbol": "AAPLUSDT",
+          "old_prev_hash": "904712a123e0d222",
+          "new_prev_hash": "e296a2d5ef2f7ece",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 50,
+          "new_seq": 52,
+          "decided_at": "2026-09-12T17:34:25.939757+00:00",
+          "symbol": "MSFTUSDT",
+          "old_prev_hash": "64123659b7d382f7",
+          "new_prev_hash": "db041e6968580551",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 48,
+          "new_seq": 53,
+          "decided_at": "2026-09-12T17:22:02.660396+00:00",
+          "symbol": "COINUSDT",
+          "old_prev_hash": "e6254a9ceb0bca1f",
+          "new_prev_hash": "e01fbb960b2b0606",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 51,
+          "new_seq": 54,
+          "decided_at": "2026-09-12T17:34:25.939757+00:00",
+          "symbol": "METAUSDT",
+          "old_prev_hash": "1586ad697c1229fd",
+          "new_prev_hash": "15d52a66efaad9ad",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 49,
+          "new_seq": 55,
+          "decided_at": "2026-09-12T17:22:02.660396+00:00",
+          "symbol": "MSTRUSDT",
+          "old_prev_hash": "dbbf564b794f28e1",
+          "new_prev_hash": "b120ca74aa00e4f3",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 50,
+          "new_seq": 56,
+          "decided_at": "2026-09-12T17:22:02.660396+00:00",
+          "symbol": "QQQUSDT",
+          "old_prev_hash": "ec35807c7cd2a8ae",
+          "new_prev_hash": "ad08b8ac7cee2c96",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 52,
+          "new_seq": 57,
+          "decided_at": "2026-09-12T17:34:25.939757+00:00",
+          "symbol": "GOOGLUSDT",
+          "old_prev_hash": "b5a41b9782efd535",
+          "new_prev_hash": "0f2b854ad7b6bffc",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 51,
+          "new_seq": 58,
+          "decided_at": "2026-09-12T17:22:02.660396+00:00",
+          "symbol": "TQQQUSDT",
+          "old_prev_hash": "3b60c8bbd365c65c",
+          "new_prev_hash": "0167f28b4ea71342",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 52,
+          "new_seq": 59,
+          "decided_at": "2026-09-12T17:22:02.660396+00:00",
+          "symbol": "SQQQUSDT",
+          "old_prev_hash": "fd1c82d460522fb9",
+          "new_prev_hash": "46afaca16f4b86c6",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 53,
+          "new_seq": 60,
+          "decided_at": "2026-09-12T17:34:25.939757+00:00",
+          "symbol": "AMZNUSDT",
+          "old_prev_hash": "8e88027e95521bd3",
+          "new_prev_hash": "34e5e07d441af611",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 61,
+          "new_seq": 61,
+          "decided_at": "2026-09-12T17:53:40.330969+00:00",
+          "symbol": "NVDAUSDT",
+          "old_prev_hash": "fb27354e0711a19c",
+          "new_prev_hash": "eefc1345425dda32",
+          "content_preserved": true
+        },
+        {
+          "old_seq": 62,
+          "new_seq": 62,
+          "decided_at": "2026-09-12T17:53:40.330969+00:00",
+          "symbol": "TSLAUSDT",
+          "old_prev_hash": "a6e0cd9a18e7efef",
+          "new_prev_hash": "7baee6540b364427",
+          "content_preserved": true
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,228 @@
+﻿=== ARGUS paper cycle 2026-09-14_0100 ===
+{
+  "ran_at": "2026-09-13T19:30:02.618017+00:00",
+  "decisions_written": [
+    {
+      "seq": 167,
+      "symbol": "NVDAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 14,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 3.00 \u2014 earnings dominates: 8 distinct sources against 4",
+        "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 20.8bps",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 168,
+      "symbol": "TSLAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.88,
+      "attests_llm_decided": true,
+      "notes_written": 14,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": []
+    },
+    {
+      "seq": 169,
+      "symbol": "AAPLUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.82,
+      "attests_llm_decided": true,
+      "notes_written": 14,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": []
+    },
+    {
+      "seq": 170,
+      "symbol": "MSFTUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.88,
+      "attests_llm_decided": true,
+      "notes_written": 13,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": []
+    },
+    {
+      "seq": 171,
+      "symbol": "METAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.82,
+      "attests_llm_decided": true,
+      "notes_written": 14,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 8.00 \u2014 earnings dominates: confidence 0.62 against 0.45",
+        "[grounding] 3 of 4 figure(s) do not resolve to anything the desk was given: 20.80 bps, 35 bps, 8",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 172,
+      "symbol": "GOOGLUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.88,
+      "attests_llm_decided": true,
+      "notes_written": 13,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": []
+    },
+    {
+      "seq": 173,
+      "symbol": "AMZNUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.88,
+      "attests_llm_decided": true,
+      "notes_written": 13,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 14.00 \u2014 earnings dominates: confidence 0.62 against 0.45",
+        "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 20.80bps",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 174,
+      "symbol": "COINUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.87,
+      "attests_llm_decided": true,
+      "notes_written": 14,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 70.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+      ]
+    },
+    {
+      "seq": 175,
+      "symbol": "MSTRUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.82,
+      "attests_llm_decided": true,
+      "notes_written": 15,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] event (bearish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.62 against 0.35",
+        "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.62 against 0.45",
+        "[grounding] 3 of 7 figure(s) do not resolve to anything the desk was given: -3bps, 0.40, 120bps",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record",
+        "[claim] conviction: \"l hurdle of 20.80bps requires high conviction on both direction and magnitu\" is contradicted by form4-0001193125-26-385183-S (conviction=False) \u2014 the thesis treats the transaction as a conviction signal; only an unplanned open-market purchase qualifies, and this is not one",
+        "[claim] a thesis that contradicts its own evidence is a defect in the reasoning, not a difference of opinion"
+      ]
+    },
+    {
+      "seq": 176,
+      "symbol": "QQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.92,
+      "attests_llm_decided": true,
+      "notes_written": 16,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: -9.4bps",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 177,
+      "symbol": "TQQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.95,
+      "attests_llm_decided": true,
+      "notes_written": 17,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[grounding] 3 of 4 figure(s) do not resolve to anything the desk was given: 241bps, 3",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 178,
+      "symbol": "SQQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.95,
+      "attests_llm_decided": true,
+      "notes_written": 16,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": []
+    }
+  ],
+  "settled_this_cycle": [],
+  "tokens_spent": 313029,
+  "token_budget": 330000,
+  "stopped_early": "",
+  "chain": {
+    "entries": 178,
+    "chain_intact": true,
+    "links_intact": true,
+    "first_break_at": null,
+    "truncated": false,
+    "anchor": "anchor agrees with the log",
+    "head_hash": "99251a399733c586"
+  },
+  "protocol": "argus-paper-v1 v2 (sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1)"
+}
+exit=0

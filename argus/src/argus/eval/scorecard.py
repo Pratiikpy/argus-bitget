@@ -27,6 +27,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+from argus.eval.episodes import summarise
 from argus.eval.observatory import (
     AbstentionOutcome,
     ModelScorecard,
@@ -36,6 +37,7 @@ from argus.eval.observatory import (
     expected_calibration_error,
     reliability_curve,
 )
+from argus.eval.performance import evaluate_ledger
 from argus.paper.ledger import Entry, PaperLedger
 
 ROUND_TRIP_BPS = Decimal("12")
@@ -84,7 +86,13 @@ def _abstention_from(
     Without a counterfactual it is ungradeable, and counting it as correct is the exact flattery
     this metric exists to prevent.
     """
-    if not entry.is_abstention or realised_move_bps is None:
+    if not entry.is_abstention:
+        return None
+    if realised_move_bps is None and entry.counterfactual_move_bps is not None:
+        # Recorded by the runner at settlement. Preferred over anything reconstructed later from a
+        # price series, which may since have been revised.
+        realised_move_bps = Decimal(entry.counterfactual_move_bps)
+    if realised_move_bps is None:
         return None
     return AbstentionOutcome(
         decision_id=str(entry.seq),
@@ -100,8 +108,10 @@ def score_ledger(
     """Convert a ledger into gradeable records.
 
     ``counterfactuals`` maps an abstention's sequence number to the move that actually happened
-    over its horizon. Supplying it is what makes abstentions scoreable; omitting it leaves them
-    counted but ungraded, which is the honest default.
+    over its horizon, and **overrides** whatever the ledger recorded — for replaying a scorecard
+    against a corrected price history. Omitted, each abstention uses the counterfactual the runner
+    wrote at settlement. An abstention with neither is counted but ungraded, which remains the
+    honest default.
     """
     cf = counterfactuals or {}
     predictions: list[Prediction] = []
@@ -139,6 +149,7 @@ def scorecard(
     *,
     model: str = "argus/qwen3.8-max",
     counterfactuals: dict[int, Decimal] | None = None,
+    capital: Decimal = Decimal("10000"),
 ) -> dict[str, Any]:
     """The Observatory scorecard, computed from real recorded decisions."""
     score = score_ledger(ledger, counterfactuals=counterfactuals)
@@ -161,6 +172,17 @@ def scorecard(
         # produce numbers that look exactly like honest ones.
         base["error"] = "hash chain is broken; refusing to score a ledger that may be edited"
         return base
+
+    # The three numbers the handbook names for Track 2's quantitative half are reported whatever
+    # the calibration floor says, because they answer a different question and have a different
+    # minimum. Calibration needs a run of graded predictions; Sharpe needs a return series. Each
+    # is withheld on its own terms, and `performance.undefined` says which and why.
+    base["performance"] = evaluate_ledger(ledger, capital=capital).as_dict()
+
+    # Both the per-decision and per-episode counts, side by side. A desk that restates one correct
+    # refusal six times has made one good call, not six, and any rate computed per decision is
+    # overstating its denominator by the ratio reported here.
+    base["episodes"] = summarise(ledger.entries).as_dict()
 
     if not score.has_enough_to_judge:
         base["note"] = (
@@ -199,10 +221,28 @@ def main() -> int:
     out.write_text(json.dumps(result, indent=2, default=str), encoding="utf-8")
 
     led = result["ledger"]
-    print(f"entries {led['entries']} · settled {led['settled']} · "
+    print(f"entries {led['entries']} | settled {led['settled']} | "
           f"abstentions {led['abstentions']} · chain intact {led['chain_intact']}")
+    perf = result.get("performance")
+    if perf:
+        def show(key: str, label: str, pct: bool = False) -> str:
+            value = perf.get(key)
+            if value is None:
+                return f"{label} n/a"
+            return f"{label} {value}{'%' if pct else ''}"
+        print(f"{show('sharpe', 'Sharpe')} | {show('max_drawdown_pct', 'maxDD', pct=True)} | "
+              f"{show('win_rate_pct', 'win rate', pct=True)} | "
+              f"over {perf['trades']} trade(s) in a {perf['window_days']}-day window")
+        for stat, why in (perf.get("undefined") or {}).items():
+            print(f"  {stat}: {why}")
+    eps = result.get("episodes")
+    if eps and eps["episodes"]:
+        print(f"episodes {eps['episodes']} from {eps['decisions']} decision(s) "
+              f"({eps['decisions_per_episode']} per episode, "
+              f"{eps['restatements']} restatement(s))")
+
     if "ece" in result:
-        print(f"ECE {result['ece']} · Brier {result['brier']} · "
+        print(f"ECE {result['ece']} | Brier {result['brier']} | "
               f"accuracy {result.get('accuracy_pct')}%")
     else:
         print(result.get("note") or result.get("error"))

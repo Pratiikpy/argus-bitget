@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-09-13T18:33:14.575323+00:00",
+  "symbol": "NVDAUSDT",
+  "bars": 1487,
+  "budget": 400,
+  "budget_was_equal": true,
+  "results": [
+    {
+      "name": "random",
+      "evaluated": 400,
+      "distinct": 327,
+      "picked": {
+        "canonical": "rank(48,sum(1,zscore(6,neg(hours_to_discovery))))",
+        "in_sample": 0.02397,
+        "out_of_sample": -0.00102,
+        "decay": 0.02499
+      }
+    },
+    {
+      "name": "beam",
+      "evaluated": 400,
+      "distinct": 354,
+      "picked": {
+        "canonical": "std(48,rank(6,delay(2,delay(2,add(min(1,hours_to_discovery),mul(basis_bps,return_1))))))",
+        "in_sample": 0.0398,
+        "out_of_sample": 0.00891,
+        "decay": 0.03089
+      }
+    },
+    {
+      "name": "evolutionary",
+      "evaluated": 400,
+      "distinct": 334,
+      "picked": {
+        "canonical": "sum(1,std(12,mul(delay(3,-0.779),max(24,return_1))))",
+        "in_sample": 0.02489,
+        "out_of_sample": -0.019,
+        "decay": 0.04389
+      }
+    },
+    {
+      "name": "novelty",
+      "evaluated": 400,
+      "distinct": 344,
+      "picked": {
+        "canonical": "rank(48,ret(24))",
+        "in_sample": 0.0269,
+        "out_of_sample": 0.01303,
+        "decay": 0.01387
+      }
+    },
+    {
+      "name": "anneal",
+      "evaluated": 400,
+      "distinct": 352,
+      "picked": {
+        "canonical": "mul(abs(sub(volume,hours_to_discovery)),delay(6,delay(48,sub(range_bps,hours_to_discovery))))",
+        "in_sample": 0.03201,
+        "out_of_sample": 0.02085,
+        "decay": 0.01116
+      }
+    }
+  ],
+  "verdict": "anneal picked the best out-of-sample candidate at 0.0209 per-observation Sharpe on NVDAUSDT, from 400 evaluations. It beats uniform random by +0.0219. One dataset and one seed, so this ranks the strategies on this run and does not establish a general ordering."
+}

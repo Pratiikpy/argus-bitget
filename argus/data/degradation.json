@@ -1,0 +1,30 @@
+{
+  "label": "track 1 winner: TQQQUSDT weekend_only",
+  "observations": 3991,
+  "in_sample_fraction": 0.7,
+  "severity": "clean",
+  "signals": [
+    {
+      "name": "sharpe_collapse",
+      "severity": "clean",
+      "in_sample": 2.24408,
+      "out_of_sample": 2.67876,
+      "message": "Sharpe went from 2.24 to 2.68; the drop of -0.43 does not reach the warning threshold of 1.0"
+    },
+    {
+      "name": "drawdown_widening",
+      "severity": "clean",
+      "in_sample": -0.0645,
+      "out_of_sample": -0.04724,
+      "message": "maximum drawdown went from -6.45% to -4.72%, which does not clear the widening threshold"
+    },
+    {
+      "name": "calibration_drift",
+      "severity": "clean",
+      "in_sample": 0.0159,
+      "out_of_sample": 0.01342,
+      "message": "expected calibration error went from 0.0159 to 0.0134, which stays inside both thresholds"
+    }
+  ],
+  "verdict": "NO DEGRADATION DETECTED over 3991 observation(s). This is weak evidence and is reported as such: a strategy with no edge at all also fails to degrade, so a clean result here rules something out rather than establishing anything"
+}

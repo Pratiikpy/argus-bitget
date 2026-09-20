@@ -1,0 +1,206 @@
+{
+  "base_case": {
+    "days": 90,
+    "market_failures": {},
+    "index_failures": {},
+    "n_symbols_market": 12,
+    "n_symbols_index": 12,
+    "n_market_ic_readings": 89,
+    "n_index_ic_readings": 89,
+    "market_mean_ic": -0.06702142149118348,
+    "index_mean_ic": -0.07548107198877066,
+    "market_naive_significance": {
+      "ic_mean": -0.06702142149118348,
+      "t_stat": -1.9010880921243496,
+      "p_value": 0.060563268380571994,
+      "naive_significant_at_5pct": false
+    },
+    "index_naive_significance": {
+      "ic_mean": -0.07548107198877066,
+      "t_stat": -2.1291062772485128,
+      "p_value": 0.03603894106691862,
+      "naive_significant_at_5pct": true
+    },
+    "ic_difference": {
+      "n": 89,
+      "mean": 0.008459650497587179,
+      "ci_low": -0.020719873804803845,
+      "ci_high": 0.03891298109123247,
+      "excludes_zero": false,
+      "resamples": 2000,
+      "block_length": 1.0
+    },
+    "ic_difference_naive_significance": {
+      "ic_mean": 0.008459650497587188,
+      "t_stat": 0.5516284344152677,
+      "p_value": 0.5826010365156555,
+      "naive_significant_at_5pct": false
+    }
+  },
+  "oos_check": {
+    "days": 60,
+    "market_failures": {},
+    "index_failures": {},
+    "first_window": {
+      "n_symbols_market": 12,
+      "n_symbols_index": 12,
+      "n_market_ic_readings": 29,
+      "n_index_ic_readings": 29,
+      "market_mean_ic": -0.05644390421067801,
+      "index_mean_ic": -0.05796655946924631,
+      "market_naive_significance": {
+        "ic_mean": -0.05644390421067801,
+        "t_stat": -1.028788830525146,
+        "p_value": 0.31238458162272953,
+        "naive_significant_at_5pct": false
+      },
+      "index_naive_significance": {
+        "ic_mean": -0.05796655946924631,
+        "t_stat": -1.023832118249262,
+        "p_value": 0.31467920451161274,
+        "naive_significant_at_5pct": false
+      },
+      "ic_difference": {
+        "n": 29,
+        "mean": 0.0015226552585683038,
+        "ci_low": null,
+        "ci_high": null,
+        "excludes_zero": null,
+        "resamples": 0,
+        "block_length": null
+      },
+      "ic_difference_naive_significance": {
+        "ic_mean": 0.0015226552585683078,
+        "t_stat": 0.06103542164222344,
+        "p_value": 0.9517645861334971,
+        "naive_significant_at_5pct": false
+      }
+    },
+    "second_window": {
+      "n_symbols_market": 12,
+      "n_symbols_index": 12,
+      "n_market_ic_readings": 29,
+      "n_index_ic_readings": 28,
+      "market_mean_ic": 0.12168935801845537,
+      "index_mean_ic": 0.11092410970632469,
+      "market_naive_significance": {
+        "ic_mean": 0.12168935801845537,
+        "t_stat": 1.625512792487391,
+        "p_value": 0.11525787492051841,
+        "naive_significant_at_5pct": false
+      },
+      "index_naive_significance": {
+        "ic_mean": 0.11092410970632469,
+        "t_stat": 1.5668984031185076,
+        "p_value": 0.12878499593213802,
+        "naive_significant_at_5pct": false
+      },
+      "ic_difference": {
+        "n": 28,
+        "mean": 0.02914850510089809,
+        "ci_low": null,
+        "ci_high": null,
+        "excludes_zero": null,
+        "resamples": 0,
+        "block_length": null
+      },
+      "ic_difference_naive_significance": {
+        "ic_mean": 0.029148505100898097,
+        "t_stat": 1.3449694452744667,
+        "p_value": 0.1898245371863148,
+        "naive_significant_at_5pct": false
+      }
+    },
+    "sign_agrees": true
+  },
+  "ablation": {
+    "days": 90,
+    "market_failures": {},
+    "index_failures": {},
+    "gated_alpha23": {
+      "n_symbols_market": 12,
+      "n_symbols_index": 12,
+      "n_market_ic_readings": 89,
+      "n_index_ic_readings": 89,
+      "market_mean_ic": -0.06702142149118348,
+      "index_mean_ic": -0.07548107198877066,
+      "market_naive_significance": {
+        "ic_mean": -0.06702142149118348,
+        "t_stat": -1.9010880921243496,
+        "p_value": 0.060563268380571994,
+        "naive_significant_at_5pct": false
+      },
+      "index_naive_significance": {
+        "ic_mean": -0.07548107198877066,
+        "t_stat": -2.1291062772485128,
+        "p_value": 0.03603894106691862,
+        "naive_significant_at_5pct": true
+      },
+      "ic_difference": {
+        "n": 89,
+        "mean": 0.008459650497587179,
+        "ci_low": -0.020719873804803845,
+        "ci_high": 0.03891298109123247,
+        "excludes_zero": false,
+        "resamples": 2000,
+        "block_length": 1.0
+      },
+      "ic_difference_naive_significance": {
+        "ic_mean": 0.008459650497587188,
+        "t_stat": 0.5516284344152677,
+        "p_value": 0.5826010365156555,
+        "naive_significant_at_5pct": false
+      }
+    },
+    "ungated_high_delta": {
+      "n_symbols_market": 12,
+      "n_symbols_index": 12,
+      "n_market_ic_readings": 89,
+      "n_index_ic_readings": 89,
+      "market_mean_ic": -0.039920512386204886,
+      "index_mean_ic": -0.00895733480003143,
+      "market_naive_significance": {
+        "ic_mean": -0.039920512386204886,
+        "t_stat": -1.4501202806902675,
+        "p_value": 0.15057988077747053,
+        "naive_significant_at_5pct": false
+      },
+      "index_naive_significance": {
+        "ic_mean": -0.00895733480003143,
+        "t_stat": -0.33424761782149226,
+        "p_value": 0.7389879934466582,
+        "naive_significant_at_5pct": false
+      },
+      "ic_difference": {
+        "n": 89,
+        "mean": -0.030963177586173448,
+        "ci_low": -0.055944055944055944,
+        "ci_high": -0.00586010116383738,
+        "excludes_zero": true,
+        "resamples": 2000,
+        "block_length": 1.0
+      },
+      "ic_difference_naive_significance": {
+        "ic_mean": -0.03096317758617346,
+        "t_stat": -2.4385571603513685,
+        "p_value": 0.0167552024348066,
+        "naive_significant_at_5pct": true
+      }
+    },
+    "gate_changes_the_sign": true
+  },
+  "failure_cases": {
+    "constant_high_series_produces_all_zero_factor": true,
+    "single_symbol_panel_ic_is_all_nan": true,
+    "empty_panel_produces_empty_ic": true
+  },
+  "costs": {
+    "repeats": 5,
+    "argus_grammar_seconds_per_symbol": 0.035047299999860115,
+    "alphalens_ic_seconds_per_call": 1.9533683000001474
+  },
+  "reproducibility": {
+    "identical": true
+  },
+  "scope_statement": "WorldQuant's real, published Alpha#101 formula #23 (delta(high,2) if mean(high,20) < high else 0), evaluated via ARGUS's own real grammar engine and scored with Alphalens' real, vendored Spearman-rank Information Coefficient, is run on the SAME real, live 90-day Bitget window for the full real rToken universe -- once on the rToken's own MARKET candles, once on Bitget's real INDEX candles (its published native-stock reference). Claimed: this measures, with a real and standard factor-quality metric, whatever real divergence exists between the two on the day this module runs -- a genuine empirical instance of Track 1's 'rToken Factor Strategies' claim that traditional factors behave differently under rToken's structure. NOT claimed that Froot & Dabora (1999)'s twin-shares result is reproduced -- no open-source implementation of their own test exists anywhere found, and it is cited only as the literature explaining why a divergence would be expected, never as a run baseline. NOT claimed this validates 'factor divergence arbitrage' as a tradeable strategy -- no cost, execution, or capacity model is applied here, only the descriptive factor-quality measurement itself. NOT claimed the measured direction or magnitude is a fixed, permanent property -- the real IC values are fetched and computed live and will move with the venue's own real market conditions the next time this module runs."
+}

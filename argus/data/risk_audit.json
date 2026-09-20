@@ -1,0 +1,14 @@
+{
+  "decisions": 365,
+  "positions_offered": 2,
+  "interventions": 0,
+  "intervention_rate": 0.0,
+  "exercise": "untested",
+  "healthy": false,
+  "by_constraint": {},
+  "model_responded": 0,
+  "asymmetry_violations": [],
+  "outcome_effect": null,
+  "outcome_effect_note": "outcome effect is computable over 388 settled trade(s) and is not yet implemented; it is reported as undefined rather than guessed",
+  "detail": []
+}

@@ -1,0 +1,10 @@
+﻿=== ARGUS paper cycle 2026-09-13_0852 ===
+python : LLM unavailable: token budget exhausted: 150239/150000 spent. Raise the limit deliberately rather than by 
+accident.
+At argus\run_paper_cycle.ps1:23 char:1
++ python -m argus.paper.runner --once --symbols NVDAUSDT,TSLAUSDT,AAPLU ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (LLM unavailable...an by accident.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+exit=1

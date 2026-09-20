@@ -26,7 +26,7 @@ trying to capture, so a model that omits it is not approximate — it is inverte
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from decimal import Decimal
+from decimal import ROUND_FLOOR, Decimal
 from enum import StrEnum
 
 
@@ -56,6 +56,22 @@ class Fill:
     """Fraction of average daily volume this slice represents. Drives the impact term."""
 
 
+FUNDING_INTERVAL_HOURS = Decimal("8")
+"""How often a Bitget perpetual settles funding. Read from the venue, not assumed.
+
+`GET /api/v2/mix/market/current-fund-rate` returns ``fundingRateInterval: "8"`` for every rToken
+checked on 2026-09-14.
+"""
+
+MAX_FUNDING_BPS = Decimal("500")
+"""The venue's own per-settlement cap: ``minFundingRate: -0.005``, ``maxFundingRate: 0.005``.
+
+A rate outside this is not a large cost, it is a unit error — the API returns a fraction (0.000341)
+and this field wants basis points (3.41). Catching that at construction is the difference between a
+3.41bps charge and a 34,100bps one.
+"""
+
+
 @dataclass(frozen=True, slots=True)
 class CostBreakdown:
     """Every component, kept separate. A single total hides which assumption is load-bearing."""
@@ -64,10 +80,25 @@ class CostBreakdown:
     spread: Decimal
     impact: Decimal
     borrow: Decimal
+    funding: Decimal = Decimal("0")
+    """Perpetual funding paid (positive) or received (negative) while the position was held.
+
+    A separate channel from ``borrow`` on purpose. Borrow is an annualised rate on a short; funding
+    settles on a fixed clock every ``FUNDING_INTERVAL_HOURS`` regardless of side, and its sign flips
+    with the market rather than with your direction. Adding them would make a long paying funding
+    indistinguishable from a short paying borrow, and only one of those is a function of the side
+    you chose."""
 
     @property
     def total(self) -> Decimal:
-        return self.commission + self.spread + self.impact + self.borrow
+        """Every channel, funding included.
+
+        Funding was added to this dataclass and left out of this sum on the first pass: the charge
+        was computed correctly and then discarded, so a position paying it looked identical to one
+        that did not. A cost channel that exists but is not summed is worse than one that does not
+        exist, because the number looks complete.
+        """
+        return self.commission + self.spread + self.impact + self.borrow + self.funding
 
     def bps_of(self, notional: Decimal) -> Decimal:
         if notional <= 0:
@@ -91,6 +122,20 @@ class CostModel:
     gamma: Decimal = Decimal("1.5")
     borrow_bps_annual: Decimal = Decimal("0")
 
+    funding_bps_per_interval: Decimal = Decimal("0")
+    """Funding charged per settlement, in bps of notional. Pass the venue's live rate.
+
+    Zero is the honest default and **not** a frictionless one: Bitget's rTokens settle at exactly
+    zero most of the time. Measured from the venue's own history on 2026-09-14, 100 settlements per
+    symbol: NVDAUSDT non-zero on 14, TSLAUSDT on 23, COINUSDT on 30, with means of 0.23, 0.36 and
+    0.58 bps and a worst single settlement of 5.8bps. Over a 24-hour hold — three settlements — that
+    is roughly 0.7 to 1.7bps typically and about 17bps at the tail, against an 18.8bps total hurdle.
+
+    Small on average, and the tail is the whole hurdle. It was missing entirely until a competitive
+    sweep flagged it and the venue's history was pulled to check: `Ticker.funding_rate` was already
+    being fetched (`market/bitget.py:82`) and then thrown away before it reached any cost.
+    """
+
     _frictionless: bool = False
     """Set only by :func:`frictionless_for_research`. Poisons any gating use of this model."""
 
@@ -108,13 +153,42 @@ class CostModel:
             raise ValueError("gamma must be >= 1 for the impact term to stay convex")
         if self.impact_coefficient < 0:
             raise ValueError("impact_coefficient must be non-negative")
+        # Funding may be negative — a short is paid when the rate is positive, and pinning it to
+        # non-negative would silently delete the only cost channel in this model that can be a
+        # credit.
+        if abs(self.funding_bps_per_interval) > MAX_FUNDING_BPS:
+            raise ValueError(
+                f"funding of {self.funding_bps_per_interval}bps per interval exceeds the venue cap "
+                f"of {MAX_FUNDING_BPS}bps; check the units — the API returns a fraction, not bps"
+            )
 
     @classmethod
-    def bitget_perp(cls) -> CostModel:
-        """The measured Bitget round-trip: 0.06% per side taker, 0.12% round trip."""
-        return cls(taker_bps=Decimal("6"), maker_bps=Decimal("2"))
+    def bitget_perp(cls, *, funding_rate: Decimal | None = None) -> CostModel:
+        """The measured Bitget round-trip: 0.06% per side taker, 0.12% round trip.
 
-    def charge(self, fill: Fill, *, holding_days: Decimal = Decimal("0")) -> CostBreakdown:
+        ``funding_rate`` is the venue's rate **as a fraction** — exactly what
+        ``/api/v2/mix/market/current-fund-rate`` returns and what `Ticker.funding_rate` already
+        carries — and is converted to bps here. Passing it is how a caller stops paying an
+        unmodelled cost; omitting it keeps the historical behaviour of charging none, which is
+        correct for the majority of settlements on these instruments and wrong in the tail.
+        """
+        return cls(
+            taker_bps=Decimal("6"), maker_bps=Decimal("2"),
+            funding_bps_per_interval=(
+                Decimal("0") if funding_rate is None else funding_rate * Decimal("10000")
+            ),
+        )
+
+    def charge(
+        self, fill: Fill, *, holding_days: Decimal = Decimal("0"), long: bool = True,
+    ) -> CostBreakdown:
+        """Every cost channel for one fill and the position it leaves behind.
+
+        ``long`` sets the sign of funding only. It is a parameter here rather than a field on
+        :class:`Fill` because a fill is one execution while funding is a property of the position
+        that survives it — and because the sign flips a *cost* into a *credit*, which is not
+        something a caller should be able to set by accident.
+        """
         rate = self.taker_bps if fill.liquidity is Liquidity.TAKER else self.maker_bps
         commission = fill.notional * rate / Decimal("10000")
 
@@ -144,7 +218,24 @@ class CostModel:
             else Decimal("0")
         )
 
-        return CostBreakdown(commission=commission, spread=spread, impact=impact, borrow=borrow)
+        # Funding accrues per settlement, not per day: a position opened and closed inside one
+        # interval pays nothing, and one held 24 hours crosses three. Floor division is deliberate —
+        # charging a fraction of a settlement would invent a cost the venue never takes.
+        settlements = (
+            (holding_days * Decimal("24") / FUNDING_INTERVAL_HOURS).to_integral_value(
+                rounding=ROUND_FLOOR
+            )
+            if holding_days > 0
+            else Decimal("0")
+        )
+        funding = (
+            fill.notional * self.funding_bps_per_interval / Decimal("10000") * settlements
+            * (Decimal("1") if long else Decimal("-1"))
+        )
+
+        return CostBreakdown(
+            commission=commission, spread=spread, impact=impact, borrow=borrow, funding=funding,
+        )
 
     def round_trip_bps(self) -> Decimal:
         """Commission-only round trip, the number every edge must clear before anything else."""

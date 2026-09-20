@@ -1,0 +1,131 @@
+{
+  "generated_at": "2026-09-15T00:08:26.564658+00:00",
+  "session_phase": "overnight",
+  "deliberation_bps": "15.20",
+  "frames": 12,
+  "symbols": [
+    "NVDAUSDT",
+    "TSLAUSDT",
+    "AAPLUSDT",
+    "MSFTUSDT",
+    "METAUSDT",
+    "GOOGLUSDT",
+    "AMZNUSDT",
+    "COINUSDT",
+    "MSTRUSDT",
+    "QQQUSDT",
+    "TQQQUSDT",
+    "SQQQUSDT"
+  ],
+  "evidence_per_frame": {
+    "NVDAUSDT": 10,
+    "TSLAUSDT": 10,
+    "AAPLUSDT": 10,
+    "MSFTUSDT": 10,
+    "METAUSDT": 10,
+    "GOOGLUSDT": 10,
+    "AMZNUSDT": 12,
+    "COINUSDT": 10,
+    "MSTRUSDT": 12,
+    "QQQUSDT": 10,
+    "TQQQUSDT": 6,
+    "SQQQUSDT": 5
+  },
+  "macro": {
+    "expected": [
+      "treasury_curve",
+      "fear_greed",
+      "implied_volatility"
+    ],
+    "obtained": [
+      "treasury_curve",
+      "fear_greed",
+      "implied_volatility"
+    ],
+    "failed": [],
+    "complete": true
+  },
+  "dropped": [],
+  "empty": [],
+  "note": "Deterministic components only. Ablating an analyst needs the paired protocol in argus.eval.ablation.paired and a budget of real cycles, because a model's answer differs between two runs on the same input.",
+  "frame_completeness": "Each frame carries the RSS and EDGAR evidence for its symbol. It does NOT carry the Bitget Skills, consensus estimates, Form 4 insider records or XBRL fundamentals, each of which costs a live call per instrument, so a frame here is a lower bound on what the desk sees and a component shown to change a decision here would change it at least as often in production. All three instrument-independent macro items the runner gives every panel (treasury_curve, fear_greed, implied_volatility) were present in this run.",
+  "results": [
+    {
+      "component": "analyst selection (agents/selection.py)",
+      "frames": 12,
+      "changed": 12,
+      "share_changed": 1.0,
+      "inert": false,
+      "changes": [
+        {
+          "frame_id": "NVDAUSDT",
+          "with": "('event',)",
+          "without": "('earnings', 'event', 'sentiment')"
+        },
+        {
+          "frame_id": "TSLAUSDT",
+          "with": "()",
+          "without": "('earnings', 'event', 'sentiment')"
+        },
+        {
+          "frame_id": "AAPLUSDT",
+          "with": "('event',)",
+          "without": "('earnings', 'event', 'sentiment')"
+        },
+        {
+          "frame_id": "MSFTUSDT",
+          "with": "()",
+          "without": "('earnings', 'event', 'sentiment')"
+        },
+        {
+          "frame_id": "METAUSDT",
+          "with": "()",
+          "without": "('earnings', 'event', 'sentiment')"
+        },
+        {
+          "frame_id": "GOOGLUSDT",
+          "with": "()",
+          "without": "('earnings', 'event', 'sentiment')"
+        },
+        {
+          "frame_id": "AMZNUSDT",
+          "with": "('event',)",
+          "without": "('earnings', 'event', 'sentiment')"
+        },
+        {
+          "frame_id": "COINUSDT",
+          "with": "('event',)",
+          "without": "('earnings', 'event', 'sentiment')"
+        },
+        {
+          "frame_id": "MSTRUSDT",
+          "with": "('event',)",
+          "without": "('earnings', 'event', 'sentiment')"
+        },
+        {
+          "frame_id": "QQQUSDT",
+          "with": "()",
+          "without": "('earnings', 'event', 'sentiment')"
+        },
+        {
+          "frame_id": "TQQQUSDT",
+          "with": "('event',)",
+          "without": "('earnings', 'event', 'sentiment')"
+        },
+        {
+          "frame_id": "SQQQUSDT",
+          "with": "()",
+          "without": "('earnings', 'event', 'sentiment')"
+        }
+      ]
+    },
+    {
+      "component": "as-of evidence gate",
+      "frames": 12,
+      "changed": 0,
+      "share_changed": 0.0,
+      "inert": true,
+      "changes": []
+    }
+  ]
+}

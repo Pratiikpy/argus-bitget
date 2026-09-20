@@ -1,0 +1,97 @@
+{
+  "generated_at": "2026-09-13T13:27:27.158872+00:00",
+  "instants": 39,
+  "effective_instants": 25,
+  "icc": 0.74585,
+  "sources": {
+    "live": 9,
+    "replay": 30
+  },
+  "actual_hurdle_bps": 18.8,
+  "median_abs_move_bps": 136.79,
+  "mean_abs_move_bps": 157.85,
+  "max_abs_move_bps": 397.27,
+  "binding_constraint": "THE CONFIDENCE GATE BINDS, NOT THE HURDLE \u2014 the median absolute move of 137bps is 7x the 19bps hurdle, and 95% of instants clear it. Trading would beat abstaining at 56.0% directional accuracy. The desk's abstentions are therefore a statement about its conviction, not about its costs, and any explanation that blames the fee is wrong",
+  "frontier": [
+    {
+      "hurdle_bps": 0.0,
+      "clearing_rate": 1.0,
+      "oracle_net_bps": 157.85,
+      "oracle_total_bps": 6156.08,
+      "break_even_accuracy": 0.5,
+      "coin_flip_net_bps": -0.0
+    },
+    {
+      "hurdle_bps": 6.0,
+      "clearing_rate": 1.0,
+      "oracle_net_bps": 151.85,
+      "oracle_total_bps": 5922.08,
+      "break_even_accuracy": 0.519,
+      "coin_flip_net_bps": -6.0
+    },
+    {
+      "hurdle_bps": 12.0,
+      "clearing_rate": 0.9487,
+      "oracle_net_bps": 146.07,
+      "oracle_total_bps": 5696.54,
+      "break_even_accuracy": 0.538,
+      "coin_flip_net_bps": -12.0
+    },
+    {
+      "hurdle_bps": 18.8,
+      "clearing_rate": 0.9487,
+      "oracle_net_bps": 139.61,
+      "oracle_total_bps": 5444.94,
+      "break_even_accuracy": 0.5596,
+      "coin_flip_net_bps": -18.8
+    },
+    {
+      "hurdle_bps": 19.0,
+      "clearing_rate": 0.9487,
+      "oracle_net_bps": 139.42,
+      "oracle_total_bps": 5437.54,
+      "break_even_accuracy": 0.5602,
+      "coin_flip_net_bps": -19.0
+    },
+    {
+      "hurdle_bps": 30.0,
+      "clearing_rate": 0.9487,
+      "oracle_net_bps": 128.99,
+      "oracle_total_bps": 5030.54,
+      "break_even_accuracy": 0.595,
+      "coin_flip_net_bps": -30.0
+    },
+    {
+      "hurdle_bps": 50.0,
+      "clearing_rate": 0.8974,
+      "oracle_net_bps": 110.68,
+      "oracle_total_bps": 4316.49,
+      "break_even_accuracy": 0.6584,
+      "coin_flip_net_bps": -50.0
+    },
+    {
+      "hurdle_bps": 100.0,
+      "clearing_rate": 0.5897,
+      "oracle_net_bps": 75.99,
+      "oracle_total_bps": 2963.48,
+      "break_even_accuracy": 0.8168,
+      "coin_flip_net_bps": -100.0
+    },
+    {
+      "hurdle_bps": 200.0,
+      "clearing_rate": 0.359,
+      "oracle_net_bps": 26.11,
+      "oracle_total_bps": 1018.34,
+      "break_even_accuracy": null,
+      "coin_flip_net_bps": -200.0
+    },
+    {
+      "hurdle_bps": 400.0,
+      "clearing_rate": 0.0,
+      "oracle_net_bps": 0.0,
+      "oracle_total_bps": 0.0,
+      "break_even_accuracy": null,
+      "coin_flip_net_bps": -400.0
+    }
+  ]
+}

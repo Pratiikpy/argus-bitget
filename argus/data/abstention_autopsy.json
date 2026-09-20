@@ -1,0 +1,96 @@
+{
+  "generated_at": "2026-09-15T03:18:38.507638+00:00",
+  "decisions": 231,
+  "gate_population": 149,
+  "proposed_exposure": 0,
+  "session_coverage": {
+    "by_phase": {
+      "rth": 48,
+      "weekend": 183
+    },
+    "with_price_discovery": 48,
+    "median_hours_to_discovery": 28.13,
+    "min_hours_to_discovery": 0.0,
+    "single_phase_only": false,
+    "note": "231 decision(s) across 2 session phase(s): rth=48, weekend=183. 48 were taken while the anchor market had price discovery"
+  },
+  "gates": [
+    {
+      "order": 1,
+      "name": "no_exposure",
+      "checks": "verdict carries no quantity, or quantity <= 0",
+      "status": "FIRED",
+      "reached": 149,
+      "fired": 149,
+      "note": "bound on 149 of 149 decision(s) that reached it"
+    },
+    {
+      "order": 2,
+      "name": "min_confidence",
+      "checks": "stated confidence below the 0.55 floor",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 149 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 3,
+      "name": "oracle_stale",
+      "checks": "NAV stale while the anchor is shut",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 149 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 4,
+      "name": "unhedgeable_gap",
+      "checks": "no hedge placeable and size above the unhedged cap",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 149 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 5,
+      "name": "risk_budget",
+      "checks": "circuit breaker's drawdown ladder sizes the book below the request",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 149 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 6,
+      "name": "session_volatility",
+      "checks": "measured path volatility above the regular-hours baseline",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 149 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 7,
+      "name": "max_position",
+      "checks": "size above the position cap",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 149 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    }
+  ],
+  "unreached_gates": [
+    "min_confidence",
+    "oracle_stale",
+    "unhedgeable_gap",
+    "risk_budget",
+    "session_volatility",
+    "max_position"
+  ],
+  "confidence_median": 0.85,
+  "confidence_mean": 0.8377,
+  "confidence_min": 0.58,
+  "confidence_would_have_bound": false,
+  "verdict": "0 of 231 decision(s) proposed exposure. The first gate (no_exposure) returned on every one, so 6 downstream gate(s) never executed at all: min_confidence, oracle_stale, unhedgeable_gap, risk_budget, session_volatility, max_position. Their permissiveness is unmeasured, not demonstrated. The funnel is computed over the 149 decision(s) carrying a risk record, which is fewer than the 231 on the ledger because the risk log began later; the session finding below covers all 231. Stated confidence runs a median 0.85 and never below 0.58, so the 0.55 floor would not have bound either \u2014 but that is a second fact, not the reason: the reason is that it was never evaluated. 231 decision(s) across 2 session phase(s): rth=48, weekend=183. 48 were taken while the anchor market had price discovery **The sampling explanation this module published is REFUTED.** 48 decision(s) were taken with the anchor market open \u2014 the session it claimed the desk had never been offered \u2014 and the desk proposed nothing on any of them. The cause is the desk's own conviction about direction, not when it was asked. Whether that refusal is *correct* is still UNDEFINED: eval/shadow.py has 0 scored calls against a floor of 20, and the first decisions carrying a directional lean have not settled yet.",
+  "falsifier": "**FIRED.** 48 decision(s) were taken with the anchor market open and the desk proposed nothing on any of them. The sampling explanation this module published is refuted, and the rewritten conclusion is above \u2014 not a defence of the old one"
+}

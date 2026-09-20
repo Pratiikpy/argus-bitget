@@ -150,3 +150,86 @@ class TestCharging:
         got = self.model.charge(Fill(Decimal("100000"), Liquidity.TAKER))
         with pytest.raises(ValueError, match="positive"):
             got.bps_of(Decimal("0"))
+
+
+class TestFundingIsChargedPerSettlement:
+    """Perpetual funding was fetched from the venue and thrown away before it reached a cost.
+
+    `Ticker.funding_rate` has existed since the beginning (`market/bitget.py:82`) and no cost model
+    read it. Measured from Bitget's own history on 2026-09-14 over 100 settlements per symbol:
+    NVDAUSDT non-zero on 14, TSLAUSDT 23, COINUSDT 30; means 0.23/0.36/0.58bps, worst single
+    settlement 5.8bps. A 24-hour hold crosses three of them.
+    """
+
+    @staticmethod
+    def _model(rate_bps: str = "0.36") -> CostModel:
+        return CostModel(
+            taker_bps=Decimal("6"), maker_bps=Decimal("2"),
+            funding_bps_per_interval=Decimal(rate_bps),
+        )
+
+    @staticmethod
+    def _fill() -> Fill:
+        return Fill(notional=Decimal("10000"), liquidity=Liquidity.TAKER, spread_bps=Decimal("9"))
+
+    def test_a_hold_shorter_than_one_interval_pays_nothing(self) -> None:
+        """Funding settles on a clock, not by the hour. Charging a fraction would invent a cost the
+        venue never takes."""
+        got = self._model().charge(self._fill(), holding_days=Decimal("0.1"))
+        assert got.funding == Decimal("0")
+
+    def test_twenty_four_hours_crosses_three_settlements(self) -> None:
+        got = self._model().charge(self._fill(), holding_days=Decimal("1"))
+        assert got.funding == Decimal("10000") * Decimal("0.36") / Decimal("10000") * 3
+
+    def test_a_short_receives_funding_rather_than_paying_it(self) -> None:
+        long = self._model().charge(self._fill(), holding_days=Decimal("1"), long=True)
+        short = self._model().charge(self._fill(), holding_days=Decimal("1"), long=False)
+        assert long.funding > 0 > short.funding
+        assert long.funding == -short.funding
+
+    def test_funding_reaches_the_total(self) -> None:
+        """The bug this class exists for: the field was added and left out of `total`, so the
+        charge was computed correctly and then discarded."""
+        priced = self._model().charge(self._fill(), holding_days=Decimal("1"))
+        free = self._model("0").charge(self._fill(), holding_days=Decimal("1"))
+        assert priced.total > free.total
+        assert priced.total - free.total == priced.funding
+
+    def test_it_reaches_the_bps_figure_too(self) -> None:
+        notional = Decimal("10000")
+        priced = self._model().charge(self._fill(), holding_days=Decimal("1"))
+        free = self._model("0").charge(self._fill(), holding_days=Decimal("1"))
+        assert priced.bps_of(notional) > free.bps_of(notional)
+
+    def test_zero_is_the_default_and_is_honest_not_frictionless(self) -> None:
+        """Most rToken settlements really are zero, so a zero default is accurate — and it must not
+        trip the frictionless guard, which exists for a different failure."""
+        model = CostModel(taker_bps=Decimal("6"), maker_bps=Decimal("2"))
+        assert model.funding_bps_per_interval == Decimal("0")
+        model.assert_gateable()
+
+    def test_a_rate_passed_as_a_fraction_is_refused(self) -> None:
+        """The API returns 0.000341; this field wants 3.41. Passing 500+ means the units are wrong,
+        and the difference is a 3.41bps charge versus a 34,100bps one."""
+        with pytest.raises(ValueError, match="check the units"):
+            CostModel(
+                taker_bps=Decimal("6"), maker_bps=Decimal("2"),
+                funding_bps_per_interval=Decimal("600"),
+            )
+
+    def test_a_negative_rate_is_allowed(self) -> None:
+        """Funding is the one channel here that can be a credit; clamping it would delete that."""
+        model = CostModel(
+            taker_bps=Decimal("6"), maker_bps=Decimal("2"),
+            funding_bps_per_interval=Decimal("-0.4"),
+        )
+        got = model.charge(self._fill(), holding_days=Decimal("1"), long=True)
+        assert got.funding < 0
+
+    def test_the_venue_factory_converts_the_fraction_for_you(self) -> None:
+        model = CostModel.bitget_perp(funding_rate=Decimal("0.000036"))
+        assert model.funding_bps_per_interval == Decimal("0.36")
+
+    def test_the_venue_factory_defaults_to_no_funding(self) -> None:
+        assert CostModel.bitget_perp().funding_bps_per_interval == Decimal("0")

@@ -1,0 +1,148 @@
+{
+  "generated_at": "2026-09-13T16:00:41.412181+00:00",
+  "instants": 4528,
+  "symbols": [
+    "AAPLUSDT",
+    "AMZNUSDT",
+    "COINUSDT",
+    "GOOGLUSDT",
+    "METAUSDT",
+    "MSFTUSDT",
+    "MSTRUSDT",
+    "NVDAUSDT",
+    "QQQUSDT",
+    "SQQQUSDT",
+    "TQQQUSDT",
+    "TSLAUSDT"
+  ],
+  "break_even_accuracy": 0.5475,
+  "any_profitable": false,
+  "results": [
+    {
+      "name": "always_flat",
+      "instants": 4528,
+      "trades": 0,
+      "total_bps": 0.0,
+      "mean_bps": 0.0,
+      "accuracy": null,
+      "interval": {
+        "available": false,
+        "why": "only 0 traded instant(s)"
+      },
+      "profitable": null
+    },
+    {
+      "name": "always_long",
+      "instants": 4528,
+      "trades": 4528,
+      "total_bps": -69562.84,
+      "mean_bps": -15.3628,
+      "accuracy": 0.5004,
+      "interval": {
+        "available": true,
+        "traded": 4528,
+        "hac": {
+          "sharpe": -0.05248,
+          "low": -0.10201,
+          "high": -0.00295,
+          "eta": 2.8874,
+          "widening": 1.6992,
+          "excludes_zero": true
+        },
+        "bootstrap": {
+          "sharpe": -0.05248,
+          "low": -0.10494,
+          "high": -0.00185,
+          "block_length": 16.91,
+          "excludes_zero": true
+        }
+      },
+      "profitable": false
+    },
+    {
+      "name": "momentum",
+      "instants": 4528,
+      "trades": 4528,
+      "total_bps": -69546.38,
+      "mean_bps": -15.3592,
+      "accuracy": 0.506,
+      "interval": {
+        "available": true,
+        "traded": 4528,
+        "hac": {
+          "sharpe": -0.05247,
+          "low": -0.08974,
+          "high": -0.0152,
+          "eta": 1.6352,
+          "widening": 1.2788,
+          "excludes_zero": true
+        },
+        "bootstrap": {
+          "sharpe": -0.05247,
+          "low": -0.08829,
+          "high": -0.01626,
+          "block_length": 9.92,
+          "excludes_zero": true
+        }
+      },
+      "profitable": false
+    },
+    {
+      "name": "reversion",
+      "instants": 4528,
+      "trades": 4528,
+      "total_bps": -100706.42,
+      "mean_bps": -22.2408,
+      "accuracy": 0.4936,
+      "interval": {
+        "available": true,
+        "traded": 4528,
+        "hac": {
+          "sharpe": -0.07598,
+          "low": -0.11328,
+          "high": -0.03868,
+          "eta": 1.6352,
+          "widening": 1.2788,
+          "excludes_zero": true
+        },
+        "bootstrap": {
+          "sharpe": -0.07598,
+          "low": -0.11217,
+          "high": -0.04197,
+          "block_length": 9.92,
+          "excludes_zero": true
+        }
+      },
+      "profitable": false
+    },
+    {
+      "name": "volatility_gated",
+      "instants": 4528,
+      "trades": 4091,
+      "total_bps": -60303.47,
+      "mean_bps": -13.3179,
+      "accuracy": 0.506,
+      "interval": {
+        "available": true,
+        "traded": 4091,
+        "hac": {
+          "sharpe": -0.04843,
+          "low": -0.08788,
+          "high": -0.00898,
+          "eta": 1.6555,
+          "widening": 1.2866,
+          "excludes_zero": true
+        },
+        "bootstrap": {
+          "sharpe": -0.04843,
+          "low": -0.08546,
+          "high": -0.00663,
+          "block_length": 9.84,
+          "excludes_zero": true
+        }
+      },
+      "profitable": false
+    }
+  ],
+  "verdict": "Five fixed rules over 4,528 tradeable instant(s) across 12 rToken(s). Best directional accuracy 50.6% against a break-even of 54.7%. NO RULE IS PROFITABLE once the interval accounts for overlapping horizons: every one covers zero or is negative. A desk declining to trade this universe with these rules is declining something that does not pay, which is the strongest available defence of abstention short of the desk trading and showing it."
+}

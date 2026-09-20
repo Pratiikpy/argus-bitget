@@ -341,3 +341,220 @@ class TestDeliberationIsInTheHurdle:
             self._frame(SessionPhase.OVERNIGHT, Decimal("0")).session,
             thinking=Thinking.FULL, annualised_vol=Decimal("0.45"),
         )
+
+
+class TestPmThinkingBudgetIsThreaded:
+    """The budget is a cost. A desk quoted the FULL-budget hurdle (27.2bps off-hours) correctly
+    abstains every cycle, which produced 12 no_trades and an undefined paper-trading Sharpe —
+    half of the Track-2 score. LOW drops the hurdle to 18.8bps. This test pins that the budget
+    reaches both the PM call and the hurdle the PM is told about, so they cannot drift apart."""
+
+    def test_desk_prices_the_hurdle_at_its_own_pm_budget(self) -> None:
+        from argus.agents.desk import TradingDesk
+
+        class _Silent:
+            def complete_json(self, *a, **k):  # pragma: no cover - never reached
+                raise AssertionError("no model call expected")
+
+        low = TradingDesk(_Silent(), pm_thinking=Thinking.LOW)  # type: ignore[arg-type]
+        full = TradingDesk(_Silent(), pm_thinking=Thinking.FULL)  # type: ignore[arg-type]
+        assert low.pm.thinking is Thinking.LOW
+        assert full.pm.thinking is Thinking.FULL
+
+        session = SessionState(
+            as_of=datetime(2026, 9, 13, 3, 0, tzinfo=UTC),
+            phase=SessionPhase.WEEKEND, hours_to_next_discovery=30.5,
+        )
+        vol = Decimal("0.45")
+        h_low = deliberation_cost_bps(session, thinking=low.pm_thinking, annualised_vol=vol)
+        h_full = deliberation_cost_bps(session, thinking=full.pm_thinking, annualised_vol=vol)
+        assert h_low < h_full
+        assert Decimal("12") + h_low < Decimal("20"), "LOW must bring the weekend hurdle under 20"
+        assert Decimal("12") + h_full > Decimal("27"), "FULL weekend hurdle exceeds the fee"
+
+    def test_the_runner_uses_low_for_routine_cycles(self) -> None:
+        import pathlib
+
+        src = pathlib.Path(__file__).resolve().parents[1] / "src/argus/paper/runner.py"
+        assert "pm_thinking=Thinking.LOW" in src.read_text(encoding="utf-8")
+
+
+class TestTheLeanIsAskedForAndParsed:
+    """A view the desk states while refusing to act on it.
+
+    The `side` field looked like this and was not: over the 53 settled abstentions on the live
+    ledger it was BUY in all 53, directionally right 3.8% of the time against a base rate of
+    up-moves of exactly 3.8%. That is a schema being filled in, not a judgement — so the lean is
+    asked for separately, normalised here rather than trusted, and graded by `argus.eval.shadow`.
+    """
+
+    def test_an_abstention_still_carries_a_direction(self) -> None:
+        """The point of the field. A refusal that states no view can never be scored, and a desk
+        that cannot be scored while abstaining cannot show its abstentions were right."""
+        got = _to_intent(
+            {"verdict": "NO_TRADE", "side": "BUY", "quantity": 0, "confidence": 0.3,
+             "thesis": "edge does not clear the hurdle", "lean": "DOWN", "lean_confidence": 0.62},
+            "rNVDA",
+        )
+        assert got.verdict.is_abstention
+        assert got.quantity == Decimal("0")
+        assert got.lean == "down"
+        assert got.lean_confidence == pytest.approx(0.62)
+
+    def test_a_response_with_no_lean_declines_rather_than_defaulting_to_a_direction(self) -> None:
+        got = _to_intent(
+            {"verdict": "NO_TRADE", "side": "BUY", "quantity": 0, "confidence": 0.3,
+             "thesis": "no view"},
+            "rNVDA",
+        )
+        assert got.lean == "none"
+        assert got.lean_confidence == 0.0
+
+    def test_an_unrecognised_lean_becomes_none_rather_than_being_guessed(self) -> None:
+        """'sideways', 'flat', 'neutral' and a hallucinated fourth option all mean the same thing
+        for grading: nothing to score. Mapping any of them onto up or down would invent a call."""
+        for raw in ("sideways", "flat", "neutral", "BUY", ""):
+            assert _to_intent(
+                {"verdict": "NO_TRADE", "quantity": 0, "thesis": "x", "lean": raw}, "rNVDA"
+            ).lean == "none"
+
+    def test_case_and_whitespace_are_normalised(self) -> None:
+        assert _to_intent(
+            {"verdict": "NO_TRADE", "quantity": 0, "thesis": "x", "lean": "  Up  "}, "rNVDA"
+        ).lean == "up"
+
+    def test_a_confidence_outside_the_unit_interval_is_clamped(self) -> None:
+        """A model that answers 85 when asked for a probability has answered 0.85 in the wrong
+        units, or has not answered at all. Either way it must not enter the record as 85."""
+        high = _to_intent(
+            {"verdict": "NO_TRADE", "quantity": 0, "thesis": "x", "lean": "up",
+             "lean_confidence": 85}, "rNVDA",
+        )
+        low = _to_intent(
+            {"verdict": "NO_TRADE", "quantity": 0, "thesis": "x", "lean": "up",
+             "lean_confidence": -2}, "rNVDA",
+        )
+        assert high.lean_confidence == 1.0
+        assert low.lean_confidence == 0.0
+
+    def test_a_non_numeric_confidence_is_zero_rather_than_a_crash(self) -> None:
+        got = _to_intent(
+            {"verdict": "NO_TRADE", "quantity": 0, "thesis": "x", "lean": "up",
+             "lean_confidence": "quite sure"}, "rNVDA",
+        )
+        assert got.lean_confidence == 0.0
+
+    def test_a_trade_carries_a_lean_too(self) -> None:
+        got = _to_intent(
+            {"verdict": "TRADE", "side": "SELL", "quantity": 100, "confidence": 0.8,
+             "thesis": "guidance cut not priced", "invalidation": ["reaffirmed at the open"],
+             "lean": "down", "lean_confidence": 0.8},
+            "rNVDA",
+        )
+        assert got.verdict is Verdict.TRADE
+        assert got.lean == "down"
+
+    def test_the_prompt_asks_for_it_and_says_why(self) -> None:
+        """If the field is in the schema but the prompt never explains that declining to trade is
+        not declining to have a view, the model fills it in the way it filled in `side`."""
+        from argus.agents.meta_pm import SYSTEM_PROMPT
+
+        assert '"lean"' in SYSTEM_PROMPT
+        assert "lean_confidence" in SYSTEM_PROMPT
+        assert "NOT saying you have no view" in SYSTEM_PROMPT
+
+
+class TestTheLeanCannotBeEditedAfterTheFact:
+    """A directional call that could be rewritten once the move is known is worth nothing.
+
+    The ledger does not hash the lean directly — adding a field to `Entry.content_hash` would rehash
+    all 161 existing rows and break a chain already anchored. It does not need to: `hash_intent`
+    hashes the whole Intent through `asdict`, and that hash *is* in the row's payload. These tests
+    assert the claim rather than repeating it.
+    """
+
+    def test_changing_the_lean_changes_the_intent_hash(self) -> None:
+        up = Intent(
+            symbol="rNVDA", side=Side.BUY, quantity=Decimal("0"), verdict=Verdict.NO_TRADE,
+            stated_confidence=0.3, thesis="x", invalidation=(), lean="up", lean_confidence=0.6,
+        )
+        down = Intent(
+            symbol="rNVDA", side=Side.BUY, quantity=Decimal("0"), verdict=Verdict.NO_TRADE,
+            stated_confidence=0.3, thesis="x", invalidation=(), lean="down", lean_confidence=0.6,
+        )
+        assert hash_intent(up) != hash_intent(down)
+
+    def test_changing_only_the_lean_confidence_changes_it_too(self) -> None:
+        base = Intent(
+            symbol="rNVDA", side=Side.BUY, quantity=Decimal("0"), verdict=Verdict.NO_TRADE,
+            stated_confidence=0.3, thesis="x", invalidation=(), lean="up", lean_confidence=0.6,
+        )
+        louder = Intent(
+            symbol="rNVDA", side=Side.BUY, quantity=Decimal("0"), verdict=Verdict.NO_TRADE,
+            stated_confidence=0.3, thesis="x", invalidation=(), lean="up", lean_confidence=0.9,
+        )
+        assert hash_intent(base) != hash_intent(louder)
+
+    def test_an_intent_written_before_the_lean_existed_still_hashes(self) -> None:
+        """Defaults exist so the 161 rows already on the chain keep loading. If this ever raised,
+        the whole history would be unreadable."""
+        legacy = Intent(
+            symbol="rNVDA", side=Side.BUY, quantity=Decimal("0"), verdict=Verdict.NO_TRADE,
+            stated_confidence=0.3, thesis="x", invalidation=(),
+        )
+        assert legacy.lean == "none"
+        assert len(hash_intent(legacy)) == 16
+
+
+class TestAMalformedVerdictIsADecisionNotACrash:
+    """The live model put a *side* in the verdict field and took the whole cycle down.
+
+    `_to_intent` called `Verdict("sell")` directly and `ValueError: 'sell' is not a valid Verdict`
+    propagated out of `MetaPM.decide`, out of `desk.run`, and killed the run. In the paper runner
+    that is a lost symbol; in the flow demo it was a lost demonstration. A malformed answer is
+    unactionable, which is a decision outcome the system already has a state for.
+    """
+
+    def test_an_unknown_verdict_routes_to_human_review(self) -> None:
+        got = _to_intent(
+            {"verdict": "sell", "side": "SELL", "quantity": 2, "confidence": 0.8,
+             "thesis": "guidance cut", "invalidation": ["reaffirmed"]},
+            "NVDAUSDT",
+        )
+        assert got.verdict is Verdict.HUMAN_REVIEW
+
+    def test_it_carries_no_quantity(self) -> None:
+        """An unparseable verdict must not reach the risk layer carrying size."""
+        got = _to_intent(
+            {"verdict": "sell", "side": "SELL", "quantity": 999, "thesis": "x",
+             "invalidation": ["y"]},
+            "NVDAUSDT",
+        )
+        assert got.quantity == Decimal("0")
+
+    def test_the_raw_value_is_recorded_rather_than_swallowed(self) -> None:
+        """A trail that shows HUMAN_REVIEW without saying why cannot be debugged."""
+        got = _to_intent({"verdict": "sell", "thesis": "guidance cut"}, "NVDAUSDT")
+        assert "unparseable verdict" in got.thesis
+        assert "'sell'" in got.thesis
+        assert "guidance cut" in got.thesis
+
+    def test_a_missing_verdict_is_handled_the_same_way(self) -> None:
+        got = _to_intent({"thesis": "no verdict key at all"}, "NVDAUSDT")
+        assert got.verdict is Verdict.HUMAN_REVIEW
+        assert "(empty)" in got.thesis
+
+    def test_it_is_not_guessed_into_a_trade_or_a_refusal(self) -> None:
+        """Mapping "sell" to TRADE invents a decision; mapping it to NO_TRADE invents a refusal.
+        Neither is what the model said, and HUMAN_REVIEW is the honest third answer."""
+        got = _to_intent({"verdict": "sell", "side": "SELL", "quantity": 2}, "NVDAUSDT")
+        assert got.verdict not in {Verdict.TRADE, Verdict.NO_TRADE, Verdict.DATA_INSUFFICIENT}
+
+    def test_every_real_verdict_still_parses(self) -> None:
+        for verdict in Verdict:
+            got = _to_intent(
+                {"verdict": verdict.value, "side": "BUY", "quantity": 1, "thesis": "t",
+                 "invalidation": ["i"]},
+                "NVDAUSDT",
+            )
+            assert "unparseable" not in got.thesis, verdict

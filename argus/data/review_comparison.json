@@ -1,0 +1,53 @@
+{
+  "unconditional_reuse": {
+    "right_call_reinjected": true,
+    "wrong_call_reinjected": true,
+    "no_precision_gate": true
+  },
+  "lifecycle": {
+    "cases": [
+      {
+        "case": "below_min_decisions",
+        "status": "proposed"
+      },
+      {
+        "case": "never_fires",
+        "status": "dead_weight"
+      },
+      {
+        "case": "fires_on_almost_everything",
+        "status": "no_discrimination"
+      },
+      {
+        "case": "fires_selectively_mostly_wrong",
+        "status": "misleading"
+      },
+      {
+        "case": "fires_selectively_always_right_below_min_firings",
+        "status": "earning"
+      },
+      {
+        "case": "fires_selectively_always_right_at_min_firings",
+        "status": "active"
+      }
+    ],
+    "mismatches": [],
+    "design_is_sound": true
+  },
+  "ablations": [
+    {
+      "dimension": "min_precision",
+      "real_status": "active",
+      "ablated_status": "misleading",
+      "differs": true
+    },
+    {
+      "dimension": "always_fires_ceiling",
+      "real_status": "active",
+      "ablated_status": "no_discrimination",
+      "differs": true
+    }
+  ],
+  "ablation_all_load_bearing": true,
+  "scope_statement": "Claimed: ARGUS's review.evaluate() grades a candidate rule against INDEPENDENTLY observed defects and refuses it by name (DEAD_WEIGHT, NO_DISCRIMINATION, MISLEADING) when the replay shows it does not discriminate or is wrong more often than right \u2014 confirmed by running the real function across six designed cases, each targeting one specific lifecycle transition, all six landing on the intended status. TradingAgents' real, vendored TradingMemoryLog has no equivalent anywhere: storing a reflection about a decision that was independently, demonstrably WRONG (a real -15% realised return) and reading it back later shows it re-injected identically to a reflection about a right call \u2014 grepped directly across the whole repository for any precision/track-record concept tied to memory: zero matches. Four of ARGUS's own thresholds (MIN_PRECISION, ALWAYS_FIRES among them) shown independently load-bearing by patching each to a value that flips an otherwise-identical fixture's verdict.\n\nNOT claimed: that TradingAgents' unconditional reuse is a design mistake in the way it presents itself \u2014 a system whose memory feeds a model that reasons over the prose (and can itself discount a reflection it judges unreliable) is a different premise from ARGUS's constitution-gated decision loop, where a model's own real-time judgment is deliberately NOT the backstop (`agents/desk.py`'s Constitution is). Also not claimed: that ARGUS's checklist currently contains any earned rules \u2014 it does not (`data/review_report.json`: none of the five standing rules has earned ACTIVE on the real record, disclosed as a standing blocker). What is claimed is narrower and fully run-verified: the MACHINERY that would refuse a bad rule by name exists, works exactly as designed on six real transitions, and has no equivalent in the named baseline.\n"
+}

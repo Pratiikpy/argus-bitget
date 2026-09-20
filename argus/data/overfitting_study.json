@@ -1,0 +1,2622 @@
+{
+  "generated_at": "2026-09-13T16:00:32.021404+00:00",
+  "days": 180,
+  "groups": 8,
+  "splits_per_symbol": 70,
+  "confidence": 0.95,
+  "fdr": 0.05,
+  "symbols": [
+    {
+      "symbol": "NVDAUSDT",
+      "bars": 4319,
+      "strategies_all": 25,
+      "strategies_candidates": 23,
+      "pbo_all_trials": 0.12857,
+      "pbo_candidates_only": 0.17143,
+      "median_rank_all": 0.70833,
+      "selection_churn": 0.12857,
+      "dominant_share": 0.52857,
+      "verdict_all": "the selection survives out of sample on this evidence",
+      "winner": "weekend_only",
+      "winner_net_sharpe": 1.9194,
+      "min_track_record_bars": 6496.6,
+      "min_track_record_years": 0.742,
+      "track_record_note": "6,497 hourly bars at 95% confidence"
+    },
+    {
+      "symbol": "TSLAUSDT",
+      "bars": 4319,
+      "strategies_all": 25,
+      "strategies_candidates": 23,
+      "pbo_all_trials": 0.38571,
+      "pbo_candidates_only": 0.4,
+      "median_rank_all": 0.625,
+      "selection_churn": 0.11429,
+      "dominant_share": 0.37143,
+      "verdict_all": "the selection carries real information but degrades substantially out of sample",
+      "winner": "rotation_regime_switch",
+      "winner_net_sharpe": 0.9712,
+      "min_track_record_bars": 24864.6,
+      "min_track_record_years": 2.838,
+      "track_record_note": "24,865 hourly bars at 95% confidence"
+    },
+    {
+      "symbol": "AAPLUSDT",
+      "bars": 4319,
+      "strategies_all": 25,
+      "strategies_candidates": 23,
+      "pbo_all_trials": 0.15714,
+      "pbo_candidates_only": 0.17143,
+      "median_rank_all": 0.77083,
+      "selection_churn": 0.14286,
+      "dominant_share": 0.32857,
+      "verdict_all": "the selection survives out of sample on this evidence",
+      "winner": "low_turnover_carry",
+      "winner_net_sharpe": 1.7416,
+      "min_track_record_bars": 7926.3,
+      "min_track_record_years": 0.905,
+      "track_record_note": "7,926 hourly bars at 95% confidence"
+    },
+    {
+      "symbol": "MSFTUSDT",
+      "bars": 4319,
+      "strategies_all": 25,
+      "strategies_candidates": 23,
+      "pbo_all_trials": 0.2,
+      "pbo_candidates_only": 0.27143,
+      "median_rank_all": 0.625,
+      "selection_churn": 0.12857,
+      "dominant_share": 0.37143,
+      "verdict_all": "the selection survives out of sample on this evidence",
+      "winner": "execution_aware_alpha",
+      "winner_net_sharpe": 1.7894,
+      "min_track_record_bars": 6746.3,
+      "min_track_record_years": 0.77,
+      "track_record_note": "6,746 hourly bars at 95% confidence"
+    },
+    {
+      "symbol": "METAUSDT",
+      "bars": 4319,
+      "strategies_all": 25,
+      "strategies_candidates": 23,
+      "pbo_all_trials": 0.22857,
+      "pbo_candidates_only": 0.3,
+      "median_rank_all": 0.625,
+      "selection_churn": 0.11429,
+      "dominant_share": 0.25714,
+      "verdict_all": "the selection survives out of sample on this evidence",
+      "winner": "crossmarket_stale_corrected",
+      "winner_net_sharpe": 1.7043,
+      "min_track_record_bars": 6357.6,
+      "min_track_record_years": 0.726,
+      "track_record_note": "6,358 hourly bars at 95% confidence"
+    },
+    {
+      "symbol": "GOOGLUSDT",
+      "bars": 4319,
+      "strategies_all": 25,
+      "strategies_candidates": 23,
+      "pbo_all_trials": 0.52857,
+      "pbo_candidates_only": 0.61429,
+      "median_rank_all": 0.45833,
+      "selection_churn": 0.14286,
+      "dominant_share": 0.24286,
+      "verdict_all": "the selection procedure is picking noise: the in-sample best lands below the out-of-sample median at least half the time, which is what choosing at random would do",
+      "winner": "execution_aware_low_turnover",
+      "winner_net_sharpe": 1.3234,
+      "min_track_record_bars": 13379.1,
+      "min_track_record_years": 1.527,
+      "track_record_note": "13,379 hourly bars at 95% confidence"
+    },
+    {
+      "symbol": "AMZNUSDT",
+      "bars": 4319,
+      "strategies_all": 25,
+      "strategies_candidates": 23,
+      "pbo_all_trials": 0.67143,
+      "pbo_candidates_only": 0.75714,
+      "median_rank_all": 0.41667,
+      "selection_churn": 0.12857,
+      "dominant_share": 0.25714,
+      "verdict_all": "the selection procedure is picking noise: the in-sample best lands below the out-of-sample median at least half the time, which is what choosing at random would do",
+      "winner": "execution_aware_low_turnover",
+      "winner_net_sharpe": 0.9717,
+      "min_track_record_bars": 23855.5,
+      "min_track_record_years": 2.723,
+      "track_record_note": "23,855 hourly bars at 95% confidence"
+    },
+    {
+      "symbol": "COINUSDT",
+      "bars": 4319,
+      "strategies_all": 25,
+      "strategies_candidates": 23,
+      "pbo_all_trials": 0.51429,
+      "pbo_candidates_only": 0.57143,
+      "median_rank_all": 0.45833,
+      "selection_churn": 0.14286,
+      "dominant_share": 0.28571,
+      "verdict_all": "the selection procedure is picking noise: the in-sample best lands below the out-of-sample median at least half the time, which is what choosing at random would do",
+      "winner": "weekend_only",
+      "winner_net_sharpe": 0.9129,
+      "min_track_record_bars": 28360.8,
+      "min_track_record_years": 3.238,
+      "track_record_note": "28,361 hourly bars at 95% confidence"
+    },
+    {
+      "symbol": "MSTRUSDT",
+      "bars": 4319,
+      "strategies_all": 25,
+      "strategies_candidates": 23,
+      "pbo_all_trials": 0.65714,
+      "pbo_candidates_only": 0.64286,
+      "median_rank_all": 0.33333,
+      "selection_churn": 0.18571,
+      "dominant_share": 0.24286,
+      "verdict_all": "the selection procedure is picking noise: the in-sample best lands below the out-of-sample median at least half the time, which is what choosing at random would do",
+      "winner": "volume_confirmed_trend",
+      "winner_net_sharpe": 0.8714,
+      "min_track_record_bars": 30856.0,
+      "min_track_record_years": 3.522,
+      "track_record_note": "30,856 hourly bars at 95% confidence"
+    },
+    {
+      "symbol": "QQQUSDT",
+      "bars": 4319,
+      "strategies_all": 25,
+      "strategies_candidates": 23,
+      "pbo_all_trials": 0.11429,
+      "pbo_candidates_only": 0.14286,
+      "median_rank_all": 0.75,
+      "selection_churn": 0.1,
+      "dominant_share": 0.34286,
+      "verdict_all": "the selection survives out of sample on this evidence",
+      "winner": "execution_aware_low_turnover",
+      "winner_net_sharpe": 1.716,
+      "min_track_record_bars": 8057.6,
+      "min_track_record_years": 0.92,
+      "track_record_note": "8,058 hourly bars at 95% confidence"
+    },
+    {
+      "symbol": "TQQQUSDT",
+      "bars": 3992,
+      "strategies_all": 25,
+      "strategies_candidates": 23,
+      "pbo_all_trials": 0.77143,
+      "pbo_candidates_only": 0.85714,
+      "median_rank_all": 0.375,
+      "selection_churn": 0.17143,
+      "dominant_share": 0.3,
+      "verdict_all": "the selection procedure is picking noise: the in-sample best lands below the out-of-sample median at least half the time, which is what choosing at random would do",
+      "winner": "weekend_only",
+      "winner_net_sharpe": 2.3577,
+      "min_track_record_bars": 4099.7,
+      "min_track_record_years": 0.468,
+      "track_record_note": "4,100 hourly bars at 95% confidence"
+    },
+    {
+      "symbol": "SQQQUSDT",
+      "bars": 3992,
+      "strategies_all": 25,
+      "strategies_candidates": 23,
+      "pbo_all_trials": 0.27143,
+      "pbo_candidates_only": 0.3,
+      "median_rank_all": 0.89583,
+      "selection_churn": 0.11429,
+      "dominant_share": 0.61429,
+      "verdict_all": "the selection carries real information but degrades substantially out of sample",
+      "winner": "fitted_trend",
+      "winner_net_sharpe": 1.0782,
+      "min_track_record_bars": 20578.8,
+      "min_track_record_years": 2.349,
+      "track_record_note": "20,579 hourly bars at 95% confidence"
+    }
+  ],
+  "failures": {},
+  "grid": {
+    "trials": 300,
+    "survivors_benjamini_hochberg": 0,
+    "survivors_bonferroni": 0,
+    "rows": [
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "afterhours_attenuation_fade",
+        "net_sharpe": -1.7006,
+        "p_value": 0.88537236,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "afterhours_discovery_countdown",
+        "net_sharpe": 0.4953,
+        "p_value": 0.3641233,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "calm_tape_trend",
+        "net_sharpe": -3.6212,
+        "p_value": 0.99433277,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "closure_momentum",
+        "net_sharpe": -7.632,
+        "p_value": 0.99999998,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "closure_reversion",
+        "net_sharpe": -4.2372,
+        "p_value": 0.99806821,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "crossmarket_basis_reversion",
+        "net_sharpe": -3.7585,
+        "p_value": 0.99457181,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "crossmarket_stale_corrected",
+        "net_sharpe": -2.5332,
+        "p_value": 0.94587063,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "delta_momentum",
+        "net_sharpe": -1.4725,
+        "p_value": 0.85068457,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "execution_aware_alpha",
+        "net_sharpe": -1.5137,
+        "p_value": 0.85736048,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "execution_aware_low_turnover",
+        "net_sharpe": -0.2434,
+        "p_value": 0.56783751,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "fitted_trend",
+        "net_sharpe": -0.5239,
+        "p_value": 0.64327628,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "hold_through_closure",
+        "net_sharpe": 0.1753,
+        "p_value": 0.45102888,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "low_turnover_carry",
+        "net_sharpe": 0.315,
+        "p_value": 0.41252117,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "overnight_volume_shock",
+        "net_sharpe": -3.6523,
+        "p_value": 0.99624646,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "range_breakout",
+        "net_sharpe": 0.4359,
+        "p_value": 0.37927649,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "rotation_hedgeability_weighted",
+        "net_sharpe": -1.2866,
+        "p_value": 0.81625528,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "rotation_regime_switch",
+        "net_sharpe": 0.9671,
+        "p_value": 0.24803251,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "rtoken_attenuation_carry",
+        "net_sharpe": -0.3102,
+        "p_value": 0.58610508,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "rtoken_session_boundary",
+        "net_sharpe": -1.1393,
+        "p_value": 0.789204,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "stale_high_fade",
+        "net_sharpe": -1.6748,
+        "p_value": 0.88234831,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "trade_only_when_open",
+        "net_sharpe": -1.3399,
+        "p_value": 0.82709255,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "vol_adjusted_momentum",
+        "net_sharpe": -0.0494,
+        "p_value": 0.51381961,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "vol_adjusted_reversion",
+        "net_sharpe": -2.267,
+        "p_value": 0.94513507,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "volume_confirmed_trend",
+        "net_sharpe": -2.5911,
+        "p_value": 0.97467477,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "variant": "weekend_only",
+        "net_sharpe": 1.9194,
+        "p_value": 0.08997107,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "afterhours_attenuation_fade",
+        "net_sharpe": -0.4166,
+        "p_value": 0.61491202,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "afterhours_discovery_countdown",
+        "net_sharpe": -0.5909,
+        "p_value": 0.66082221,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "calm_tape_trend",
+        "net_sharpe": -4.2536,
+        "p_value": 0.99858159,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "closure_momentum",
+        "net_sharpe": -2.3203,
+        "p_value": 0.94655173,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "closure_reversion",
+        "net_sharpe": -8.2722,
+        "p_value": 1.0,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "crossmarket_basis_reversion",
+        "net_sharpe": -2.2439,
+        "p_value": 0.934521,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "crossmarket_stale_corrected",
+        "net_sharpe": -0.8127,
+        "p_value": 0.71128016,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "delta_momentum",
+        "net_sharpe": -0.6161,
+        "p_value": 0.66714843,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "execution_aware_alpha",
+        "net_sharpe": -0.4332,
+        "p_value": 0.61940521,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "execution_aware_low_turnover",
+        "net_sharpe": -0.1277,
+        "p_value": 0.53570546,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "fitted_trend",
+        "net_sharpe": -2.6536,
+        "p_value": 0.96919016,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "hold_through_closure",
+        "net_sharpe": -1.2101,
+        "p_value": 0.80301443,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "low_turnover_carry",
+        "net_sharpe": -0.3128,
+        "p_value": 0.58690794,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "overnight_volume_shock",
+        "net_sharpe": 0.7929,
+        "p_value": 0.28857066,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "range_breakout",
+        "net_sharpe": -1.8004,
+        "p_value": 0.90020648,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "rotation_hedgeability_weighted",
+        "net_sharpe": -0.567,
+        "p_value": 0.65370944,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "rotation_regime_switch",
+        "net_sharpe": 0.9712,
+        "p_value": 0.2465498,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "rtoken_attenuation_carry",
+        "net_sharpe": -0.2737,
+        "p_value": 0.57600333,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "rtoken_session_boundary",
+        "net_sharpe": -1.2536,
+        "p_value": 0.81105458,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "stale_high_fade",
+        "net_sharpe": -0.7769,
+        "p_value": 0.706359,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "trade_only_when_open",
+        "net_sharpe": -1.0282,
+        "p_value": 0.76262633,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "vol_adjusted_momentum",
+        "net_sharpe": -1.4555,
+        "p_value": 0.8482611,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "vol_adjusted_reversion",
+        "net_sharpe": -1.6307,
+        "p_value": 0.87007116,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "volume_confirmed_trend",
+        "net_sharpe": -2.026,
+        "p_value": 0.92852474,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "variant": "weekend_only",
+        "net_sharpe": -0.7259,
+        "p_value": 0.6962603,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "afterhours_attenuation_fade",
+        "net_sharpe": -4.7501,
+        "p_value": 0.99994502,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "afterhours_discovery_countdown",
+        "net_sharpe": 1.5465,
+        "p_value": 0.14099037,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "calm_tape_trend",
+        "net_sharpe": -6.3996,
+        "p_value": 0.99999385,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "closure_momentum",
+        "net_sharpe": -12.0366,
+        "p_value": 1.0,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "closure_reversion",
+        "net_sharpe": -7.2154,
+        "p_value": 0.99999966,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "crossmarket_basis_reversion",
+        "net_sharpe": -0.914,
+        "p_value": 0.73530493,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "crossmarket_stale_corrected",
+        "net_sharpe": -0.6107,
+        "p_value": 0.6688809,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "delta_momentum",
+        "net_sharpe": -1.7844,
+        "p_value": 0.89069248,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "execution_aware_alpha",
+        "net_sharpe": -1.6265,
+        "p_value": 0.86931336,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "execution_aware_low_turnover",
+        "net_sharpe": -0.4475,
+        "p_value": 0.62294581,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "fitted_trend",
+        "net_sharpe": -1.578,
+        "p_value": 0.86213941,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "hold_through_closure",
+        "net_sharpe": 1.4963,
+        "p_value": 0.14648025,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "low_turnover_carry",
+        "net_sharpe": 1.7416,
+        "p_value": 0.1123777,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "overnight_volume_shock",
+        "net_sharpe": -1.0945,
+        "p_value": 0.77605395,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "range_breakout",
+        "net_sharpe": -5.2031,
+        "p_value": 0.99980495,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "rotation_hedgeability_weighted",
+        "net_sharpe": -2.999,
+        "p_value": 0.98228817,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "rotation_regime_switch",
+        "net_sharpe": 1.4747,
+        "p_value": 0.15410852,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "rtoken_attenuation_carry",
+        "net_sharpe": 0.2767,
+        "p_value": 0.42311568,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "rtoken_session_boundary",
+        "net_sharpe": 1.5137,
+        "p_value": 0.14617781,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "stale_high_fade",
+        "net_sharpe": -2.7976,
+        "p_value": 0.97725531,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "trade_only_when_open",
+        "net_sharpe": -2.4775,
+        "p_value": 0.96583152,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "vol_adjusted_momentum",
+        "net_sharpe": -4.1861,
+        "p_value": 0.99815018,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "vol_adjusted_reversion",
+        "net_sharpe": -1.9454,
+        "p_value": 0.91730554,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "volume_confirmed_trend",
+        "net_sharpe": -2.0257,
+        "p_value": 0.9217406,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "variant": "weekend_only",
+        "net_sharpe": -0.529,
+        "p_value": 0.64500296,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "afterhours_attenuation_fade",
+        "net_sharpe": -4.1789,
+        "p_value": 0.99934245,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "afterhours_discovery_countdown",
+        "net_sharpe": 0.7911,
+        "p_value": 0.2881342,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "calm_tape_trend",
+        "net_sharpe": -6.8838,
+        "p_value": 0.9999991,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "closure_momentum",
+        "net_sharpe": -7.7867,
+        "p_value": 0.99999927,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "closure_reversion",
+        "net_sharpe": -6.9343,
+        "p_value": 0.99999982,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "crossmarket_basis_reversion",
+        "net_sharpe": -2.4211,
+        "p_value": 0.95284132,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "crossmarket_stale_corrected",
+        "net_sharpe": -1.2942,
+        "p_value": 0.81385635,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "delta_momentum",
+        "net_sharpe": 1.6545,
+        "p_value": 0.11268506,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "execution_aware_alpha",
+        "net_sharpe": 1.7894,
+        "p_value": 0.09410695,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "execution_aware_low_turnover",
+        "net_sharpe": 1.0738,
+        "p_value": 0.22390766,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "fitted_trend",
+        "net_sharpe": 0.6098,
+        "p_value": 0.33329043,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "hold_through_closure",
+        "net_sharpe": 1.1231,
+        "p_value": 0.211631,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "low_turnover_carry",
+        "net_sharpe": 0.7407,
+        "p_value": 0.30016956,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "overnight_volume_shock",
+        "net_sharpe": -3.2362,
+        "p_value": 0.98881281,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "range_breakout",
+        "net_sharpe": 0.1306,
+        "p_value": 0.4632983,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "rotation_hedgeability_weighted",
+        "net_sharpe": -0.7132,
+        "p_value": 0.690668,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "rotation_regime_switch",
+        "net_sharpe": -1.9518,
+        "p_value": 0.9149988,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "rtoken_attenuation_carry",
+        "net_sharpe": -1.0757,
+        "p_value": 0.77257095,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "rtoken_session_boundary",
+        "net_sharpe": -0.2488,
+        "p_value": 0.569075,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "stale_high_fade",
+        "net_sharpe": 0.0753,
+        "p_value": 0.47892934,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "trade_only_when_open",
+        "net_sharpe": -2.8949,
+        "p_value": 0.97837383,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "vol_adjusted_momentum",
+        "net_sharpe": 0.7631,
+        "p_value": 0.29088612,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "vol_adjusted_reversion",
+        "net_sharpe": -3.4833,
+        "p_value": 0.99717071,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "volume_confirmed_trend",
+        "net_sharpe": -1.8026,
+        "p_value": 0.87881556,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "variant": "weekend_only",
+        "net_sharpe": 1.5108,
+        "p_value": 0.14125586,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "afterhours_attenuation_fade",
+        "net_sharpe": -2.9168,
+        "p_value": 0.98068269,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "afterhours_discovery_countdown",
+        "net_sharpe": -0.1537,
+        "p_value": 0.54299524,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "calm_tape_trend",
+        "net_sharpe": -2.4473,
+        "p_value": 0.94106241,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "closure_momentum",
+        "net_sharpe": -5.3997,
+        "p_value": 0.99984382,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "closure_reversion",
+        "net_sharpe": -7.1841,
+        "p_value": 0.99999989,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "crossmarket_basis_reversion",
+        "net_sharpe": -2.9347,
+        "p_value": 0.98820255,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "crossmarket_stale_corrected",
+        "net_sharpe": 1.7043,
+        "p_value": 0.08762561,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "delta_momentum",
+        "net_sharpe": -0.5564,
+        "p_value": 0.65035032,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "execution_aware_alpha",
+        "net_sharpe": -0.3434,
+        "p_value": 0.59460685,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "execution_aware_low_turnover",
+        "net_sharpe": -0.0207,
+        "p_value": 0.50578697,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "fitted_trend",
+        "net_sharpe": 1.5769,
+        "p_value": 0.12946569,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "hold_through_closure",
+        "net_sharpe": 1.1616,
+        "p_value": 0.20515871,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "low_turnover_carry",
+        "net_sharpe": -0.1587,
+        "p_value": 0.54438841,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "overnight_volume_shock",
+        "net_sharpe": -0.2637,
+        "p_value": 0.57321383,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "range_breakout",
+        "net_sharpe": -0.91,
+        "p_value": 0.73269566,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "rotation_hedgeability_weighted",
+        "net_sharpe": -2.1425,
+        "p_value": 0.92056372,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "rotation_regime_switch",
+        "net_sharpe": -0.0208,
+        "p_value": 0.50583807,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "rtoken_attenuation_carry",
+        "net_sharpe": 1.0589,
+        "p_value": 0.22298198,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "rtoken_session_boundary",
+        "net_sharpe": -0.0379,
+        "p_value": 0.51060226,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "stale_high_fade",
+        "net_sharpe": -1.1044,
+        "p_value": 0.78180338,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "trade_only_when_open",
+        "net_sharpe": -3.2885,
+        "p_value": 0.99424264,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "vol_adjusted_momentum",
+        "net_sharpe": -0.4504,
+        "p_value": 0.62276134,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "vol_adjusted_reversion",
+        "net_sharpe": -1.5203,
+        "p_value": 0.86818728,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "volume_confirmed_trend",
+        "net_sharpe": -2.0448,
+        "p_value": 0.91259684,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "METAUSDT",
+        "variant": "weekend_only",
+        "net_sharpe": 1.1595,
+        "p_value": 0.20504496,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "afterhours_attenuation_fade",
+        "net_sharpe": -4.7621,
+        "p_value": 0.9999032,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "afterhours_discovery_countdown",
+        "net_sharpe": 0.2428,
+        "p_value": 0.43227978,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "calm_tape_trend",
+        "net_sharpe": -3.8421,
+        "p_value": 0.99651609,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "closure_momentum",
+        "net_sharpe": -7.7359,
+        "p_value": 0.99999993,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "closure_reversion",
+        "net_sharpe": -7.7442,
+        "p_value": 0.99999997,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "crossmarket_basis_reversion",
+        "net_sharpe": -3.3218,
+        "p_value": 0.99465379,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "crossmarket_stale_corrected",
+        "net_sharpe": -3.0601,
+        "p_value": 0.99960856,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "delta_momentum",
+        "net_sharpe": -0.135,
+        "p_value": 0.53765044,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "execution_aware_alpha",
+        "net_sharpe": -0.1452,
+        "p_value": 0.54048864,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "execution_aware_low_turnover",
+        "net_sharpe": 1.3234,
+        "p_value": 0.17505533,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "fitted_trend",
+        "net_sharpe": 0.7278,
+        "p_value": 0.30517639,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "hold_through_closure",
+        "net_sharpe": -0.1738,
+        "p_value": 0.54850626,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "low_turnover_carry",
+        "net_sharpe": 0.3821,
+        "p_value": 0.39414019,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "overnight_volume_shock",
+        "net_sharpe": -2.651,
+        "p_value": 0.96524644,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "range_breakout",
+        "net_sharpe": -1.5534,
+        "p_value": 0.85838445,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "rotation_hedgeability_weighted",
+        "net_sharpe": -0.171,
+        "p_value": 0.54737298,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "rotation_regime_switch",
+        "net_sharpe": 0.4713,
+        "p_value": 0.37056598,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "rtoken_attenuation_carry",
+        "net_sharpe": -0.8402,
+        "p_value": 0.72071776,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "rtoken_session_boundary",
+        "net_sharpe": -0.9057,
+        "p_value": 0.73561655,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "stale_high_fade",
+        "net_sharpe": 1.0003,
+        "p_value": 0.24233827,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "trade_only_when_open",
+        "net_sharpe": -1.6713,
+        "p_value": 0.87685519,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "vol_adjusted_momentum",
+        "net_sharpe": -0.7167,
+        "p_value": 0.69100556,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "vol_adjusted_reversion",
+        "net_sharpe": -3.1126,
+        "p_value": 0.98949714,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "volume_confirmed_trend",
+        "net_sharpe": 0.2631,
+        "p_value": 0.42665095,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "GOOGLUSDT",
+        "variant": "weekend_only",
+        "net_sharpe": -0.0728,
+        "p_value": 0.52037655,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "afterhours_attenuation_fade",
+        "net_sharpe": -3.703,
+        "p_value": 0.99064171,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "afterhours_discovery_countdown",
+        "net_sharpe": 0.5737,
+        "p_value": 0.34263019,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "calm_tape_trend",
+        "net_sharpe": -3.7029,
+        "p_value": 0.99190073,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "closure_momentum",
+        "net_sharpe": -4.781,
+        "p_value": 0.99968438,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "closure_reversion",
+        "net_sharpe": -9.2686,
+        "p_value": 1.0,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "crossmarket_basis_reversion",
+        "net_sharpe": -1.8858,
+        "p_value": 0.96399983,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "crossmarket_stale_corrected",
+        "net_sharpe": -0.6666,
+        "p_value": 0.71351142,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "delta_momentum",
+        "net_sharpe": -0.4243,
+        "p_value": 0.61610847,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "execution_aware_alpha",
+        "net_sharpe": -0.3114,
+        "p_value": 0.58597641,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "execution_aware_low_turnover",
+        "net_sharpe": 0.9717,
+        "p_value": 0.24204656,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "fitted_trend",
+        "net_sharpe": 0.1587,
+        "p_value": 0.45557913,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "hold_through_closure",
+        "net_sharpe": 0.6789,
+        "p_value": 0.31649855,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "low_turnover_carry",
+        "net_sharpe": 0.6818,
+        "p_value": 0.31474892,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "overnight_volume_shock",
+        "net_sharpe": 0.6558,
+        "p_value": 0.32614061,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "range_breakout",
+        "net_sharpe": -1.5104,
+        "p_value": 0.85861872,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "rotation_hedgeability_weighted",
+        "net_sharpe": -1.5277,
+        "p_value": 0.83149099,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "rotation_regime_switch",
+        "net_sharpe": 0.7129,
+        "p_value": 0.30795794,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "rtoken_attenuation_carry",
+        "net_sharpe": 0.3037,
+        "p_value": 0.41547401,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "rtoken_session_boundary",
+        "net_sharpe": -0.9565,
+        "p_value": 0.74992273,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "stale_high_fade",
+        "net_sharpe": -0.8437,
+        "p_value": 0.72326843,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "trade_only_when_open",
+        "net_sharpe": -1.9237,
+        "p_value": 0.88906519,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "vol_adjusted_momentum",
+        "net_sharpe": -0.6506,
+        "p_value": 0.67315345,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "vol_adjusted_reversion",
+        "net_sharpe": -1.8418,
+        "p_value": 0.8948495,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "volume_confirmed_trend",
+        "net_sharpe": -0.9302,
+        "p_value": 0.7413055,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "AMZNUSDT",
+        "variant": "weekend_only",
+        "net_sharpe": 0.8897,
+        "p_value": 0.26651605,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "afterhours_attenuation_fade",
+        "net_sharpe": -1.0138,
+        "p_value": 0.76482581,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "afterhours_discovery_countdown",
+        "net_sharpe": -0.5864,
+        "p_value": 0.659611,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "calm_tape_trend",
+        "net_sharpe": -3.0426,
+        "p_value": 0.98211019,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "closure_momentum",
+        "net_sharpe": -4.6158,
+        "p_value": 0.99925093,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "closure_reversion",
+        "net_sharpe": -2.5438,
+        "p_value": 0.96367483,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "crossmarket_basis_reversion",
+        "net_sharpe": -3.0674,
+        "p_value": 0.98409546,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "crossmarket_stale_corrected",
+        "net_sharpe": 0.4939,
+        "p_value": 0.35850053,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "delta_momentum",
+        "net_sharpe": -1.3171,
+        "p_value": 0.82235063,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "execution_aware_alpha",
+        "net_sharpe": -1.1639,
+        "p_value": 0.79299638,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "execution_aware_low_turnover",
+        "net_sharpe": -0.0212,
+        "p_value": 0.50593099,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "fitted_trend",
+        "net_sharpe": -0.8995,
+        "p_value": 0.73642476,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "hold_through_closure",
+        "net_sharpe": -0.1833,
+        "p_value": 0.55117022,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "low_turnover_carry",
+        "net_sharpe": -0.5292,
+        "p_value": 0.64477232,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "overnight_volume_shock",
+        "net_sharpe": -1.6761,
+        "p_value": 0.88202944,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "range_breakout",
+        "net_sharpe": -1.2424,
+        "p_value": 0.80708421,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "rotation_hedgeability_weighted",
+        "net_sharpe": -1.7853,
+        "p_value": 0.8964026,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "rotation_regime_switch",
+        "net_sharpe": -0.3967,
+        "p_value": 0.60955988,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "rtoken_attenuation_carry",
+        "net_sharpe": -2.4649,
+        "p_value": 0.95828043,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "rtoken_session_boundary",
+        "net_sharpe": -0.9444,
+        "p_value": 0.74561703,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "stale_high_fade",
+        "net_sharpe": -3.5211,
+        "p_value": 0.99557536,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "trade_only_when_open",
+        "net_sharpe": -1.4915,
+        "p_value": 0.85267585,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "vol_adjusted_momentum",
+        "net_sharpe": -0.8803,
+        "p_value": 0.73096256,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "vol_adjusted_reversion",
+        "net_sharpe": 0.2675,
+        "p_value": 0.42554818,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "volume_confirmed_trend",
+        "net_sharpe": 0.8651,
+        "p_value": 0.2701324,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "COINUSDT",
+        "variant": "weekend_only",
+        "net_sharpe": 0.9129,
+        "p_value": 0.26051729,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "afterhours_attenuation_fade",
+        "net_sharpe": -1.6455,
+        "p_value": 0.89180808,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "afterhours_discovery_countdown",
+        "net_sharpe": -0.3735,
+        "p_value": 0.6033174,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "calm_tape_trend",
+        "net_sharpe": -1.3024,
+        "p_value": 0.81687492,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "closure_momentum",
+        "net_sharpe": -1.2484,
+        "p_value": 0.80812975,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "closure_reversion",
+        "net_sharpe": -4.6007,
+        "p_value": 0.99946403,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "crossmarket_basis_reversion",
+        "net_sharpe": -4.4141,
+        "p_value": 0.99924084,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "crossmarket_stale_corrected",
+        "net_sharpe": -2.0915,
+        "p_value": 0.95317218,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "delta_momentum",
+        "net_sharpe": -0.4651,
+        "p_value": 0.62734953,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "execution_aware_alpha",
+        "net_sharpe": -0.3774,
+        "p_value": 0.6040361,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "execution_aware_low_turnover",
+        "net_sharpe": -0.1576,
+        "p_value": 0.54401171,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "fitted_trend",
+        "net_sharpe": -0.0364,
+        "p_value": 0.51019567,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "hold_through_closure",
+        "net_sharpe": -0.2259,
+        "p_value": 0.56294264,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "low_turnover_carry",
+        "net_sharpe": -0.3315,
+        "p_value": 0.59192342,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "overnight_volume_shock",
+        "net_sharpe": -0.7106,
+        "p_value": 0.69205494,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "range_breakout",
+        "net_sharpe": 0.4335,
+        "p_value": 0.37929772,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "rotation_hedgeability_weighted",
+        "net_sharpe": -0.7003,
+        "p_value": 0.68810938,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "rotation_regime_switch",
+        "net_sharpe": -1.1383,
+        "p_value": 0.78727774,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "rtoken_attenuation_carry",
+        "net_sharpe": -1.1031,
+        "p_value": 0.78164596,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "rtoken_session_boundary",
+        "net_sharpe": -1.1765,
+        "p_value": 0.79336197,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "stale_high_fade",
+        "net_sharpe": -1.7971,
+        "p_value": 0.90026737,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "trade_only_when_open",
+        "net_sharpe": -1.0234,
+        "p_value": 0.76398182,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "vol_adjusted_momentum",
+        "net_sharpe": 0.7322,
+        "p_value": 0.30183542,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "vol_adjusted_reversion",
+        "net_sharpe": -0.601,
+        "p_value": 0.66507752,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "volume_confirmed_trend",
+        "net_sharpe": 0.8714,
+        "p_value": 0.2691929,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "MSTRUSDT",
+        "variant": "weekend_only",
+        "net_sharpe": 0.7151,
+        "p_value": 0.30690363,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "afterhours_attenuation_fade",
+        "net_sharpe": -5.1245,
+        "p_value": 0.99988402,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "afterhours_discovery_countdown",
+        "net_sharpe": 0.7497,
+        "p_value": 0.29973501,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "calm_tape_trend",
+        "net_sharpe": -6.8858,
+        "p_value": 0.99999556,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "closure_momentum",
+        "net_sharpe": -11.5286,
+        "p_value": 1.0,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "closure_reversion",
+        "net_sharpe": -8.654,
+        "p_value": 0.99999999,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "crossmarket_basis_reversion",
+        "net_sharpe": -3.25,
+        "p_value": 0.98938866,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "crossmarket_stale_corrected",
+        "net_sharpe": -0.1634,
+        "p_value": 0.54506281,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "delta_momentum",
+        "net_sharpe": -1.7755,
+        "p_value": 0.89678112,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "execution_aware_alpha",
+        "net_sharpe": -1.7072,
+        "p_value": 0.88770417,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "execution_aware_low_turnover",
+        "net_sharpe": 1.716,
+        "p_value": 0.11428643,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "fitted_trend",
+        "net_sharpe": 0.9266,
+        "p_value": 0.25839257,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "hold_through_closure",
+        "net_sharpe": -0.0006,
+        "p_value": 0.50016807,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "low_turnover_carry",
+        "net_sharpe": 0.7265,
+        "p_value": 0.30531492,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "overnight_volume_shock",
+        "net_sharpe": -5.2811,
+        "p_value": 0.99994776,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "range_breakout",
+        "net_sharpe": -3.4743,
+        "p_value": 0.99089965,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "rotation_hedgeability_weighted",
+        "net_sharpe": -1.6295,
+        "p_value": 0.8783941,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "rotation_regime_switch",
+        "net_sharpe": 1.2222,
+        "p_value": 0.19534537,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "rtoken_attenuation_carry",
+        "net_sharpe": -1.3608,
+        "p_value": 0.83690817,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "rtoken_session_boundary",
+        "net_sharpe": -2.0475,
+        "p_value": 0.92731694,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "stale_high_fade",
+        "net_sharpe": -1.8431,
+        "p_value": 0.90609997,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "trade_only_when_open",
+        "net_sharpe": -2.2441,
+        "p_value": 0.94289936,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "vol_adjusted_momentum",
+        "net_sharpe": -2.2628,
+        "p_value": 0.94796862,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "vol_adjusted_reversion",
+        "net_sharpe": -5.1505,
+        "p_value": 0.99917938,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "volume_confirmed_trend",
+        "net_sharpe": -0.9195,
+        "p_value": 0.74096428,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "QQQUSDT",
+        "variant": "weekend_only",
+        "net_sharpe": 1.2445,
+        "p_value": 0.18825418,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "afterhours_attenuation_fade",
+        "net_sharpe": -1.4847,
+        "p_value": 0.8426837,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "afterhours_discovery_countdown",
+        "net_sharpe": 1.9286,
+        "p_value": 0.09833341,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "calm_tape_trend",
+        "net_sharpe": -0.8907,
+        "p_value": 0.72335111,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "closure_momentum",
+        "net_sharpe": -5.0828,
+        "p_value": 0.99976466,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "closure_reversion",
+        "net_sharpe": -2.7694,
+        "p_value": 0.96679001,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "crossmarket_basis_reversion",
+        "net_sharpe": -0.4604,
+        "p_value": 0.62203833,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "crossmarket_stale_corrected",
+        "net_sharpe": 1.3818,
+        "p_value": 0.16161828,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "delta_momentum",
+        "net_sharpe": 1.7929,
+        "p_value": 0.11762252,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "execution_aware_alpha",
+        "net_sharpe": 1.455,
+        "p_value": 0.16714925,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "execution_aware_low_turnover",
+        "net_sharpe": 0.9608,
+        "p_value": 0.26035103,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "fitted_trend",
+        "net_sharpe": 1.7696,
+        "p_value": 0.11679543,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "hold_through_closure",
+        "net_sharpe": 1.404,
+        "p_value": 0.17311658,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "low_turnover_carry",
+        "net_sharpe": 1.6868,
+        "p_value": 0.12886672,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "overnight_volume_shock",
+        "net_sharpe": -4.6068,
+        "p_value": 0.99945632,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "range_breakout",
+        "net_sharpe": 1.5506,
+        "p_value": 0.14331566,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "rotation_hedgeability_weighted",
+        "net_sharpe": 1.268,
+        "p_value": 0.20357968,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "rotation_regime_switch",
+        "net_sharpe": 2.234,
+        "p_value": 0.06647817,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "rtoken_attenuation_carry",
+        "net_sharpe": 1.4743,
+        "p_value": 0.16822551,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "rtoken_session_boundary",
+        "net_sharpe": -0.4821,
+        "p_value": 0.62826619,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "stale_high_fade",
+        "net_sharpe": -3.1371,
+        "p_value": 0.9804095,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "trade_only_when_open",
+        "net_sharpe": 0.408,
+        "p_value": 0.39166581,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "vol_adjusted_momentum",
+        "net_sharpe": 0.9642,
+        "p_value": 0.26018326,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "vol_adjusted_reversion",
+        "net_sharpe": -2.5855,
+        "p_value": 0.94973265,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "volume_confirmed_trend",
+        "net_sharpe": -0.774,
+        "p_value": 0.7002884,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "TQQQUSDT",
+        "variant": "weekend_only",
+        "net_sharpe": 2.3577,
+        "p_value": 0.05230644,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "afterhours_attenuation_fade",
+        "net_sharpe": -1.6681,
+        "p_value": 0.87043807,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "afterhours_discovery_countdown",
+        "net_sharpe": -2.4471,
+        "p_value": 0.94818803,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "calm_tape_trend",
+        "net_sharpe": -4.2547,
+        "p_value": 0.99729877,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "closure_momentum",
+        "net_sharpe": -3.7232,
+        "p_value": 0.99476206,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "closure_reversion",
+        "net_sharpe": -3.6558,
+        "p_value": 0.99165476,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "crossmarket_basis_reversion",
+        "net_sharpe": -3.796,
+        "p_value": 0.99600252,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "crossmarket_stale_corrected",
+        "net_sharpe": -2.5778,
+        "p_value": 0.98311175,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "delta_momentum",
+        "net_sharpe": -1.9259,
+        "p_value": 0.90273638,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "execution_aware_alpha",
+        "net_sharpe": -2.001,
+        "p_value": 0.91112046,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "execution_aware_low_turnover",
+        "net_sharpe": -1.4009,
+        "p_value": 0.8267793,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "fitted_trend",
+        "net_sharpe": 1.0782,
+        "p_value": 0.2344432,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "hold_through_closure",
+        "net_sharpe": -2.3618,
+        "p_value": 0.9414394,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "low_turnover_carry",
+        "net_sharpe": -2.0887,
+        "p_value": 0.91843319,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "overnight_volume_shock",
+        "net_sharpe": -2.5396,
+        "p_value": 0.95486445,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "range_breakout",
+        "net_sharpe": -3.0269,
+        "p_value": 0.98513127,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "rotation_hedgeability_weighted",
+        "net_sharpe": -1.2496,
+        "p_value": 0.79966532,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "rotation_regime_switch",
+        "net_sharpe": -2.7326,
+        "p_value": 0.96631952,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "rtoken_attenuation_carry",
+        "net_sharpe": -2.5388,
+        "p_value": 0.94184421,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "rtoken_session_boundary",
+        "net_sharpe": -1.1874,
+        "p_value": 0.78331166,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "stale_high_fade",
+        "net_sharpe": -0.8375,
+        "p_value": 0.71593752,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "trade_only_when_open",
+        "net_sharpe": -2.5887,
+        "p_value": 0.95776652,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "vol_adjusted_momentum",
+        "net_sharpe": -2.0773,
+        "p_value": 0.92247926,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "vol_adjusted_reversion",
+        "net_sharpe": -0.5505,
+        "p_value": 0.6443801,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "volume_confirmed_trend",
+        "net_sharpe": -1.848,
+        "p_value": 0.88799696,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      },
+      {
+        "symbol": "SQQQUSDT",
+        "variant": "weekend_only",
+        "net_sharpe": -2.5864,
+        "p_value": 0.96166468,
+        "survives_benjamini_hochberg": false,
+        "survives_bonferroni": false
+      }
+    ]
+  }
+}

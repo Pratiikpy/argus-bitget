@@ -644,12 +644,12 @@ Estimates the latent native price **distribution** during closure — never a po
 | ID | Feature | Behaviour | Source | Disposition |
 |---|---|---|---|---|
 | CE-1 | Mandatory fee model | Construction fails without it | hftbacktest | COPY (**MIT**) |
-| CE-2 | Queue-position fill model | Tiered: risk-adverse / probabilistic / L3 FIFO | hftbacktest | COPY (**MIT**) |
-| CE-3 | Recorded-latency interpolation | Latency drawn from a *recorded* real round-trip series, not a guessed constant | hftbacktest | COPY (**MIT**) |
+| CE-2 | Queue-position fill model | Tiered: risk-adverse / probabilistic / L3 FIFO | hftbacktest | COPY (**MIT**) — **BUILT**, `argus.execution.queue`; all five probability functions, 55 tests |
+| CE-3 | Recorded-latency interpolation | Latency drawn from a *recorded* real round-trip series, not a guessed constant | hftbacktest | COPY (**MIT**) — **BUILT**, `argus.execution.latency`; series recorded live, 30/30 rows (§3.4) |
 | CE-4 | Depth-weighted fills with slippage cap | Orderbook-depth-weighted dry-run fill, 5% cap; fee defaults to `max(taker, maker)` | freqtrade (`exchange.py:1251-1296`) | **REBUILD** — GPL, viral |
 | CE-5 | Square-root impact law | Power-law decay kernel, τ₀ calibrated (~30s crypto vs 15min+ illiquid equity) | Gatheral (`gpt-066`) | REBUILD from paper |
 | CE-6 | Implementation-shortfall decomposition | Delay / temporary / permanent / opportunity cost — matches the brief's own language | Kissell & Glantz TCA handbook (`gpt-067`) | REBUILD from book |
-| CE-7 | Almgren-Chriss scheduling | Optimal execution trading impact against volatility risk | Almgren & Chriss 2000; extended with OU order-flow term by Almgren & Li 2016 (`gpt-194`) | REBUILD from papers |
+| CE-7 | Almgren-Chriss scheduling | Optimal execution trading impact against volatility risk | Almgren & Chriss 2000; extended with OU order-flow term by Almgren & Li 2016 (`gpt-194`) | REBUILD from papers — **BUILT**, `argus.execution.schedule`; closed-form sinh trajectory, verified at both limits (λ=0 gives exact TWAP, λ→∞ gives immediate) with a monotone mean/variance frontier between. Almgren & Li's OU term is **not** built |
 | CE-8 | **Tide-aware participation** | Participation rate conditioned on session state — the gap IBKR's algos explicitly refuse to cover. **Verified original:** AlphaTrade hardcodes continuous NASDAQ hours (`base_env.py:53-54`) and RL-LOB's three market regimes are fixed per-episode, not time-of-day driven. Nothing models a thin-overnight/deep-at-open liquidity tide | ORIGINAL | ORIGINAL |
 | CE-14 | **Execution action space** | The schema behind "execute 40% now, 35% passively, 25% opportunistically": a 4-tier price-level space (far-touch / mid / near-touch / deep-passive) combined with a simplex over {market, limit-per-level, hold} | AlphaTrade `exec_env.py:104-341`; RL-LOB `utils.py:36-55` | **REBUILD** — both are unlicensed. **Neither models fees at all** (exhaustive grep), so the cost layer is entirely ours |
 | CE-9 | Multi-venue adapter shape | Per-venue order-sync rebuilding local state from exchange truth | nofx-real | STUDY (take the shape; its SL/TP handling is broken) |
@@ -1164,7 +1164,8 @@ is the direct empirical justification for the constructed-mandatory cost model (
 
 #### 8.2b-iii Corrections to our own earlier claims
 
-Honesty requires retracting two things this document previously asserted.
+Honesty requires retracting three things this document previously asserted, and recording one
+defect we shipped and then found in our own code.
 
 **TradingAgents v0.4.0 does not leak the way we said.** Verified per source: FRED is vintage-pinned
 to `curr_date`; social and news retrieval is date-windowed through a centralised UTC-normalised
@@ -1178,6 +1179,29 @@ loop uses a single `APIBackend()` to both propose factors and judge them — no 
 It has **no purged cross-validation, no embargo, no deflated Sharpe, no PBO, and no trial counter at
 all**. Capacity, decay and retirement are absent. It also displays `without_cost` numbers to both
 proposer and evaluator while feedback reads `with_cost` — the same bug class found in `alphaagent`.
+
+**We shipped the cost-blindness defect we spent this whole document criticising.** `plan_execution`
+in the Track-3 workbench labelled slices "passive limit" and charged `maker_bps` on them, with no
+book data behind the claim and no fill simulation anywhere near it. That is exactly the defect
+class §8.2b-ii names as the most widespread in the corpus — *"cost-blindness, ahead of leakage and
+ahead of self-scoring"* — and we had it in our own Track-3 execution planner while the Track-1
+backtest engine was refusing the same thing outright.
+
+It was found by auditing our 18 sub-themes against the goal file, not by a test, and the reason no
+test caught it is instructive: every test asserted the planner's *shape* — three slices, correct
+fractions, the right style labels — and none asserted that a quoted fee was **earned**. A test
+suite can be complete against an interface and blind to the claim the interface is making.
+
+Fixed: a passive slice is now priced through `argus.execution.passive`, and with no book supplied it
+is quoted at the **taker** rate with the label saying so. Four tests were added, including one
+asserting the un-evidenced case produces an upper bound rather than a forecast.
+
+**The general lesson, which is the part worth keeping.** A defect our own architecture explicitly
+forbids can still ship, in a module written before the enforcement existed, because nothing
+re-audits old code when a new invariant arrives. The engine gained the rule; the planner predated
+it. That is now a standing check rather than a hope: `argus.status.subtheme_coverage()` resolves
+every sub-theme by import at runtime, so the sub-themes are at least enumerated in one place where
+a sweep like this one can start.
 
 **Search/evaluation contamination is a field-wide pattern, now with three citations:**
 `mcts-llm-alpha` (`qlib_evaluator.py:143` computes a real overfitting score, `comprehensive.py:90–98`

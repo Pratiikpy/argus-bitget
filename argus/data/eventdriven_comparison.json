@@ -1,0 +1,95 @@
+{
+  "base_rate_case": {
+    "n_events": 200,
+    "real_base_rate_24h": 0.5672131147540984,
+    "whale_signals": {
+      "hit_rate": 0.535,
+      "p_value_vs_fixed_null": 0.35800309062450253,
+      "edge_over_true_base_rate": -0.03221311475409838,
+      "would_be_called_smart_money": false
+    },
+    "argus": {
+      "average_car_bps": 0.9181799108561605,
+      "verdict": "NO EFFECT ESTABLISHED across 200 event(s). The average cumulative abnormal return is +0.9bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
+      "statistics": {
+        "patell": {
+          "statistic": 0.5754,
+          "adjusted": 0.5754,
+          "p_value": 0.56503,
+          "adjusted_p_value": 0.56503,
+          "clustering_adjusted": true
+        },
+        "bmp": {
+          "statistic": 0.4518,
+          "adjusted": 0.4518,
+          "p_value": 0.651442,
+          "adjusted_p_value": 0.651442,
+          "clustering_adjusted": true
+        },
+        "corrado_rank": {
+          "statistic": 0.4607,
+          "adjusted": 0.4607,
+          "p_value": 0.645012,
+          "adjusted_p_value": 0.645012,
+          "clustering_adjusted": false
+        },
+        "generalised_sign": {
+          "statistic": 0.4236,
+          "adjusted": 0.4236,
+          "p_value": 0.671879,
+          "adjusted_p_value": 0.671879,
+          "clustering_adjusted": false
+        }
+      }
+    }
+  },
+  "false_positive_sweep": {
+    "n_seeds": 20,
+    "n_events_per_draw": 150,
+    "whale_signals_false_positive_rate": 0.55,
+    "whale_signals_called_smart": 11,
+    "whale_signals_called_wrong": 0,
+    "argus_effect_established": 0,
+    "argus_partial": 4,
+    "argus_no_effect": 16,
+    "argus_full_agreement_rate": 0.0,
+    "nominal_rate_at_5pct": 0.05
+  },
+  "null_ablation": {
+    "n_seeds": 20,
+    "real_base_rate": 0.5672131147540984,
+    "false_positive_rate_by_assumed_null": {
+      "0.5": 0.55,
+      "0.55": 0.15,
+      "0.567": 0.05,
+      "0.6": 0.05
+    },
+    "minimized_near_the_true_rate": true
+  },
+  "failure_cases": {
+    "n_29_events": {
+      "category_present_in_results": false,
+      "real_raised": false
+    },
+    "n_30_events": {
+      "category_present_in_results": true,
+      "real_raised": false
+    },
+    "empty_condition_mask": {
+      "real_base_rate_returned": 0.5,
+      "real_raised": false,
+      "silently_reports_exactly_0_5_with_zero_real_observations": true
+    }
+  },
+  "costs": {
+    "repeats": 8,
+    "n_events": 150,
+    "whale_signals_seconds_per_call": 0.003126062500086846,
+    "argus_seconds_per_call": 1.1836208374998023,
+    "argus_slower_by_factor": 378.6299338119183
+  },
+  "reproducibility": {
+    "identical": true
+  },
+  "scope_statement": "whale-signals' real, vendored compute_hit_rates() tests every hit rate against a FIXED null of 50%, while the SAME real file's compute_base_rate() computes the actual empirical base rate and is never wired into the significance test. On real, live ETHUSDT/BTCUSDT candle history, genuinely uninformed placebo events (real timestamps, zero true edge by construction) get called significant 'smart money' by the fixed-null test at a rate far above the nominal 5% false-positive rate an independent-events test at the 5% level should show, because the real market's own drift departs from 50%. A null-probability ablation confirms this is the mechanism: the false-positive rate is minimized almost exactly at the real base rate and rises on both sides of it. ARGUS's existing research/eventstudy.py (Patell/BMP/Corrado-rank/generalised-sign, Kolari-Pynnonen clustering correction, no fixed null anywhere) does not share this bias on the identical placebo draws. NOT claimed that whale-signals' underlying arithmetic is wrong, or that ARGUS's abnormal-return test and whale-signals' raw hit-rate test measure the same effect \u2014 they can and do disagree in either direction on the same input, because one is market-relative and the other is not. NOT claimed whale-signals' own published, real-data results (results/published_yearly_edges.csv) are reproduced here \u2014 this comparison runs their real code on ARGUS's own real candle history with constructed placebo events, since the real 646,442-transaction Dune dataset needs a paid API key this session does not have."
+}

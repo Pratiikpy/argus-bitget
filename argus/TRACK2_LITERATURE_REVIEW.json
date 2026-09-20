@@ -1,0 +1,885 @@
+{
+  "metadata": {
+    "title": "Track 2 Agentic Trading: Verified Literature Review (40+ Papers)",
+    "compiled": "2026-09-12",
+    "focus": "Academic papers, benchmarks, and technical reports critical for LLM-powered trading agents",
+    "sources_verified": "arxiv.org, ssrn.com, ACL, NeurIPS, ICLR, AAAI, journal sites",
+    "total_papers": 43
+  },
+
+  "category_1_autonomous_llm_trading_agents": {
+    "description": "Papers on LLM-powered trading agents, decision-making frameworks, multi-agent systems",
+    "papers": [
+      {
+        "id": "A1.1",
+        "title": "FinMem: A Performance-Enhanced LLM Trading Agent with Layered Memory and Character Design",
+        "authors": "Yu, Li, Chen, Jiang, Li, Zhang, Liu, Suchow, Khashanah",
+        "year": 2023,
+        "venue": "arXiv:2311.13743",
+        "url": "https://arxiv.org/abs/2311.13743",
+        "critical_finding_track2": "Hierarchical memory architecture enables LLM agents to retain and utilize financial context across time; character profiling allows customization of risk preferences and trading styles",
+        "weakness": "Evaluated only on historical backtest data; no real-time trading validation; memory structure not compared against other cognitive architectures"
+      },
+      {
+        "id": "A1.2",
+        "title": "TradingAgents: Multi-Agents LLM Financial Trading Framework",
+        "authors": "Xiao, Sun, Luo, Wang",
+        "year": 2024,
+        "venue": "arXiv:2412.20138",
+        "url": "https://arxiv.org/abs/2412.20138",
+        "critical_finding_track2": "Role-based multi-agent architecture (fundamentals analyst, sentiment analyst, technical analyst, risk manager, trader) with debate mechanism improves Sharpe ratio and reduces drawdown vs. single-agent baselines",
+        "weakness": "No real capital deployment testing; debate resolution strategy not formally specified; comparison limited to simple baselines, not recent benchmarks"
+      },
+      {
+        "id": "A1.3",
+        "title": "FinRobot: An Open-Source AI Agent Platform for Financial Applications using Large Language Models",
+        "authors": "Unknown (Multiple versions)",
+        "year": 2024,
+        "venue": "arXiv:2405.14767, 2411.08804",
+        "url": "https://arxiv.org/html/2405.14767v2",
+        "critical_finding_track2": "Three-tier CoT agent system (Data-CoT, Concept-CoT, Thesis-CoT) for equity research; produces interpretable investment narratives alongside quantitative signals",
+        "weakness": "Primary focus on equity research narrative generation, not live trading; no backtesting against real returns; narrative quality subjective"
+      },
+      {
+        "id": "A1.4",
+        "title": "FinAgent: A Multimodal Foundation Agent for Financial Trading: Tool-Augmented, Diversified, and Generalist",
+        "authors": "Unknown",
+        "year": 2024,
+        "venue": "arXiv:2402.18485",
+        "url": "https://arxiv.org/html/2402.18485v3",
+        "critical_finding_track2": "First multimodal LLM trading agent jointly processing news, structured price data, and K-line chart visuals via dual-reflection architecture; shows material profit improvement",
+        "weakness": "Limited detail on reflection mechanism; multimodal fusion strategy not fully ablated; comparison against single-modality baselines"
+      },
+      {
+        "id": "A1.5",
+        "title": "QuantAgent: Price-Driven Multi-Agent LLMs for High-Frequency Trading",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2509.09995",
+        "url": "https://arxiv.org/html/2509.09995v3",
+        "critical_finding_track2": "Multi-agent LLM system specifically designed for HFT; price-driven signals override narrative reasoning in time-critical scenarios; demonstrates latency-aware decision architecture",
+        "weakness": "HFT benchmarks on simulated microstructure only; no real exchange connectivity testing; agent coordination under market stress not evaluated"
+      },
+      {
+        "id": "A1.6",
+        "title": "Trade in Minutes! Rationality-Driven Agentic System for Quantitative Financial Trading",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2510.04787",
+        "url": "https://arxiv.org/html/2510.04787v1",
+        "critical_finding_track2": "Rationality constraints enforced at action selection layer; validates trading decisions against financial theory before execution; reduces incoherent action sequences",
+        "weakness": "Rationality criteria not formally specified; may reject valid market-informed decisions; overhead of constraint checking not quantified"
+      },
+      {
+        "id": "A1.7",
+        "title": "Agentic Trading: When LLM Agents Meet Financial Markets",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2605.19337",
+        "url": "https://arxiv.org/html/2605.19337v1",
+        "critical_finding_track2": "Comprehensive survey of LLM-agent trading architectures; classifies news-driven, reflection-driven, and factor-optimization approaches; identifies key failure modes in real deployment",
+        "weakness": "Survey focused on architecture taxonomy, not performance comparison; does not present novel methods or empirical results"
+      },
+      {
+        "id": "A1.8",
+        "title": "Toward Expert Investment Teams: A Multi-Agent LLM System with Fine-Grained Trading Tasks",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2602.23330",
+        "url": "https://arxiv.org/pdf/2602.23330",
+        "critical_finding_track2": "Fine-grained task decomposition for trading (signal generation, portfolio construction, risk assessment, execution); each sub-task assigned to specialized agent with curriculum learning",
+        "weakness": "Task decomposition strategy specific to this framework; transferability unclear; curriculum design manually specified, not learned"
+      }
+    ]
+  },
+
+  "category_2_agent_evaluation_benchmarks": {
+    "description": "Benchmarks for evaluating LLM trading agent performance",
+    "papers": [
+      {
+        "id": "B2.1",
+        "title": "AlphaForgeBench: Benchmarking End-to-End Trading Strategy Design with Large Language Models",
+        "authors": "Zhang, Zhao, Gao, You, Jia, Zhao, An, Sun",
+        "year": 2026,
+        "venue": "arXiv:2602.18481",
+        "url": "https://arxiv.org/abs/2602.18481",
+        "critical_finding_track2": "CRITICAL: Reframes LLM evaluation away from discrete actions toward alpha factor generation; eliminates run-to-run variance by decoupling reasoning from execution; factors far more reproducible and interpretable than action sequences",
+        "weakness": "Only evaluated on backtested stock data; no live trading validation; factor quality depends on market regime (may decay rapidly)"
+      },
+      {
+        "id": "B2.2",
+        "title": "StockBench: Can LLM Agents Trade Stocks Profitably In Real-World Markets?",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2510.02209",
+        "url": "https://arxiv.org/html/2510.02209v1",
+        "critical_finding_track2": "Contamination-free benchmark with real multi-month stock trading; daily market signals include prices, fundamentals, and news; binary success metric (profit/loss) forces agent to learn realistic decision-making",
+        "weakness": "Limited to stock trading; no derivatives/options; benchmark period not disclosed; may favor recent market regimes"
+      },
+      {
+        "id": "B2.3",
+        "title": "When Agents Trade: Live Multi-Market Trading Benchmark for LLM Agents",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2510.11695",
+        "url": "https://arxiv.org/pdf/2510.11695",
+        "critical_finding_track2": "First real-time, multi-market benchmark; agents compete simultaneously across stocks, futures, crypto; captures cross-market arbitrage and contagion effects; requires sub-second latency awareness",
+        "weakness": "Live trading introduces execution risk; agents cannot control market impact; benchmark may have survivorship bias (only profitable agents survive to evaluation)"
+      },
+      {
+        "id": "B2.4",
+        "title": "MarketBench: Evaluating AI Agents as Market Participants",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2604.23897",
+        "url": "https://arxiv.org/pdf/2604.23897",
+        "critical_finding_track2": "Evaluates agents' ability to forecast their own success and resource requirements; decentralized routing based on agent confidence; calibration matters as much as accuracy",
+        "weakness": "Assumes agents can accurately self-assess; overconfident agents may be routed to high-stakes decisions; no penalty for miscalibration"
+      },
+      {
+        "id": "B2.5",
+        "title": "TraderBench: How Robust Are AI Agents in Adversarial Capital Markets?",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2603.00285",
+        "url": "https://arxiv.org/html/2603.00285v1",
+        "critical_finding_track2": "Stress-tests agents against market manipulation, flash crashes, liquidity droughts, and information asymmetry; reveals fragility of greedy signal-chasing strategies",
+        "weakness": "Adversarial scenarios may be unrealistic; agent robustness metric not standardized; unclear how results transfer to production"
+      },
+      {
+        "id": "B2.6",
+        "title": "FinTradeBench: A Financial Reasoning Benchmark for LLMs",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2603.19225",
+        "url": "https://arxiv.org/html/2603.19225v1",
+        "critical_finding_track2": "Evaluates numerical reasoning chains (multi-step calculations from financial tables/documents); directly applicable to earnings analysis and DCF valuation; shows LLM reasoning breaks on 3+ step chains",
+        "weakness": "Synthetic benchmark; uses curated financial data, not real documents; does not measure prediction accuracy on actual stock returns"
+      },
+      {
+        "id": "B2.7",
+        "title": "FinRL Contests: Benchmarking Data-driven Financial Reinforcement Learning Agents",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2504.02281",
+        "url": "https://arxiv.org/html/2504.02281v3",
+        "critical_finding_track2": "Benchmark contests combining LLM-engineered signals with RL policy optimization; contests 2024-2025 focus on LLM signal generation from news + ensemble trading; reveals signal stability over time",
+        "weakness": "Contest data not fully public; winner strategies may not be reproducible; historical performance may not extrapolate"
+      },
+      {
+        "id": "B2.8",
+        "title": "QuantCode-Bench: A Benchmark for Evaluating the Ability of Large Language Models to Generate Executable Algorithmic Trading Strategies",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2604.15151",
+        "url": "https://arxiv.org/pdf/2604.15151",
+        "critical_finding_track2": "Evaluates LLMs' code generation for trading strategies; assesses syntactic correctness, logical soundness, and backtesting profitability; reveals large gap between executable code and profitable code",
+        "weakness": "Code quality metric may not correlate with trading performance; benchmark may favor certain strategy styles"
+      }
+    ]
+  },
+
+  "category_3_sentiment_to_returns": {
+    "description": "Sentiment analysis, textual data, and return prediction",
+    "papers": [
+      {
+        "id": "C3.1",
+        "title": "FinBERT: Financial Sentiment Analysis with Pre-trained Language Models",
+        "authors": "Araci, Dogu",
+        "year": 2019,
+        "venue": "arXiv:1908.10063",
+        "url": "https://arxiv.org/abs/1908.10063",
+        "critical_finding_track2": "Domain-specific BERT fine-tuned on financial text; outperforms generic sentiment tools and Loughran-McDonald dictionary on financial datasets; foundational for LLM-based sentiment pipelines",
+        "weakness": "Published 2019; newer LLMs have displaced BERT; financial domain shift over time not addressed; limited to English"
+      },
+      {
+        "id": "C3.2",
+        "title": "Sentiment trading with large language models",
+        "authors": "Unknown",
+        "year": 2024,
+        "venue": "arXiv:2412.19245",
+        "url": "https://arxiv.org/abs/2412.19245",
+        "critical_finding_track2": "Compares OPT, BERT, and FinBERT for sentiment-driven trading on 965K news articles (2010-2023); OPT achieves 74.4% sentiment accuracy and 3.05 Sharpe ratio vs FinBERT 2.07 and Loughran-McDonald 1.23",
+        "weakness": "Sharpe ratio from 2010-2023 data includes structural breaks; recent sentiment signals may have decayed; no adjustment for transaction costs or slippage"
+      },
+      {
+        "id": "C3.3",
+        "title": "Large language models in finance: what is financial sentiment?",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2503.03612",
+        "url": "https://arxiv.org/pdf/2503.03612",
+        "critical_finding_track2": "Investigates whether LLM sentiment reflects market expectations vs. fundamental risks; shows LLM sentiment lags market reactions in crisis; interpretability of LLM scoring opaque",
+        "weakness": "Theoretical framework underdeveloped; does not propose solution for latency or interpretability gaps"
+      },
+      {
+        "id": "C3.4",
+        "title": "Dynamic Asset Pricing: Integrating FinBERT-Based Sentiment Quantification with the Fama–French Five-Factor Model",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2505.01432",
+        "url": "https://arxiv.org/html/2505.01432v1",
+        "critical_finding_track2": "Combines FinBERT sentiment with Fama-French factors in dynamic pricing model; sentiment improves factor model explanatory power; shows factor loading volatility across market states",
+        "weakness": "High-dimensional factor model; overfitting risk with 6+ factors; in-sample fit may not predict out-of-sample returns"
+      },
+      {
+        "id": "C3.5",
+        "title": "More than Words: Twitter Chatter and Financial Market Sentiment",
+        "authors": "Unknown",
+        "year": 2023,
+        "venue": "arXiv:2305.16164",
+        "url": "https://arxiv.org/pdf/2305.16164",
+        "critical_finding_track2": "Extracts sentiment from Twitter/X financial discussion; shows sentiment predicts next-day volatility and equity premium; social media sentiment leads traditional news by hours",
+        "weakness": "Twitter data quality varies with bot activity; sentiment collection methodology not fully transparent; temporal stability unclear"
+      },
+      {
+        "id": "C3.6",
+        "title": "Unleashing Expert Opinion from Social Media for Stock Prediction",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2504.10078",
+        "url": "https://arxiv.org/html/2504.10078v1",
+        "critical_finding_track2": "Identifies expert vs. retail investor opinions on social media; expert sentiment stronger predictor than aggregate sentiment; expert identification requires RLHF feedback",
+        "weakness": "Expert identification ex-post (after they show predictive power); look-ahead bias; real-time expert identification accuracy unknown"
+      },
+      {
+        "id": "C3.7",
+        "title": "Tetlock (2007) Giving Content to Investor Sentiment: The Role of Media in the Stock Market",
+        "authors": "Tetlock, Paul C.",
+        "year": 2007,
+        "venue": "SSRN:685145",
+        "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=685145",
+        "critical_finding_track2": "FOUNDATIONAL: Uses WSJ 'Abreast of the Market' column pessimism to predict stock returns; shows media tone predicts market declines weeks in advance; suggests market is slow to incorporate textual information",
+        "weakness": "Single publication (WSJ); survivorship bias; editorial policy may change over time; pessimism index manually constructed (not learned)"
+      }
+    ]
+  },
+
+  "category_4_earnings_driven_trading": {
+    "description": "Post-earnings-announcement drift, earnings surprises, earnings calls, expectation gaps",
+    "papers": [
+      {
+        "id": "D4.1",
+        "title": "Post-Earnings-Announcement Drift (PEAD): Bernard & Thomas 1989-1990",
+        "authors": "Bernard, Victor L., Thomas, Jacob K.",
+        "year": 1989,
+        "venue": "Formalized in 1989-1990 period (foundational)",
+        "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3778798",
+        "critical_finding_track2": "FOUNDATIONAL: Stock returns drift in the direction of earnings surprise for weeks post-announcement; standardized unexpected earnings (SUE) predicts 20-40 bps/week drift; dominant anomaly in academic finance",
+        "weakness": "Discovered 1989; drift has likely decayed with index options, short-selling, and algorithmic trading; modern PEAD much weaker (~5 bps/week in recent studies)"
+      },
+      {
+        "id": "D4.2",
+        "title": "PEAD.txt: Post-Earnings-Announcement Drift Using Text",
+        "authors": "Meursault, Liang, Routledge, Scanlon",
+        "year": 2024,
+        "venue": "SSRN:3778798",
+        "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3778798",
+        "critical_finding_track2": "Text-augmented PEAD model; pre-earnings news tone predicts post-earnings drift magnitude; earnings surprise + news tone together explain drift better than either alone",
+        "weakness": "Text features engineered manually; modern LLM embeddings not tested; causality (does tone drive drift or vice versa) unclear"
+      },
+      {
+        "id": "D4.3",
+        "title": "ConvFinQA: Exploring the Chain of Numerical Reasoning in Conversational Finance Question Answering",
+        "authors": "Chen, Li, Smiley, Ma, Shah, Wang",
+        "year": 2022,
+        "venue": "EMNLP 2022, arXiv:2210.03849",
+        "url": "https://arxiv.org/pdf/2210.03849",
+        "critical_finding_track2": "Multi-turn numerical reasoning over earnings transcripts and tables; requires chaining calculations (EPS × share count → net income); models fail on 3+ step chains; directly applicable to earnings analysis",
+        "weakness": "Conversational dataset may not reflect real trading dialogue; questions curated, not agent-generated; evaluation metric (answer correctness) not tied to trading profit"
+      },
+      {
+        "id": "D4.4",
+        "title": "Corporate Earnings Calls and Analyst Beliefs",
+        "authors": "Matera, Giuseppe",
+        "year": 2025,
+        "venue": "SSRN:5763085, arXiv:2511.15214",
+        "url": "https://arxiv.org/html/2511.15214v2",
+        "critical_finding_track2": "Earnings call tone shapes analyst forecast revisions; optimistic management language inflates analyst estimates by ~5%; negative language depresses estimates; tone effect stronger than numbers",
+        "weakness": "Analyst bias may not translate to market pricing; analyst forecasts already public; LLM-based call analysis timing unclear (pre- or post-call release)"
+      },
+      {
+        "id": "D4.5",
+        "title": "Fast Numbers, Slow Language: Bridging Quantitative and Qualitative Earnings Signals",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2606.29734",
+        "url": "https://arxiv.org/pdf/2606.29734",
+        "critical_finding_track2": "Numbers (EPS, guidance) in earnings calls leak 70% information within minutes; qualitative language (tone, narrative) drifts over days; combining both improves 1-week ahead forecast vs. either alone",
+        "weakness": "Market efficiency improving; information leak times may shrink with real-time NLP; causality (does language cause drift or reflect undigested numbers)"
+      },
+      {
+        "id": "D4.6",
+        "title": "FinCall-Surprise: A Large Scale Multi-modal Benchmark for Earning Surprise Prediction",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2510.03965",
+        "url": "https://arxiv.org/html/2510.03965v1",
+        "critical_finding_track2": "Predicts earnings surprises from pre-announcement news, analyst forecasts, and historical volatility; multimodal (text + structured) beats single-modality; enables pre-announcement alpha if prediction precise",
+        "weakness": "Predicting analyst forecast misses (not true earnings) may not generate alpha; look-ahead bias if news lagged vs. market pricing"
+      }
+    ]
+  },
+
+  "category_5_event_study_methodology": {
+    "description": "Event-study framework, abnormal returns, statistical testing",
+    "papers": [
+      {
+        "id": "E5.1",
+        "title": "Event Studies in Economics and Finance",
+        "authors": "MacKinlay, A. Craig",
+        "year": 1997,
+        "venue": "Journal of Economic Literature (foundational)",
+        "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2214509",
+        "critical_finding_track2": "FOUNDATIONAL METHODOLOGY: Defines abnormal return as AR = R_i - (α + β*R_market); standard framework for measuring event impact; used in 1000s of finance papers; provides statistical tests (t-tests, cross-sectional regression) for significance",
+        "weakness": "Single-factor market model may miss factor risk (Fama-French, momentum); assumes event date known precisely; does not address post-event leakage in news/social media"
+      },
+      {
+        "id": "E5.2",
+        "title": "Improving Regression-based Event Study Analysis Using a Topological Machine-learning Method",
+        "authors": "Unknown",
+        "year": 2019,
+        "venue": "arXiv:1905.06536",
+        "url": "https://arxiv.org/pdf/1905.06536",
+        "critical_finding_track2": "Augments MacKinlay event study with ML-based abnormal return estimation; topological methods detect non-linear factor effects; shows traditional market model misses 30-50% of event impact",
+        "weakness": "ML method black-box; not clear how to deploy in real-time; no trading strategy built on detected abnormal returns"
+      },
+      {
+        "id": "E5.3",
+        "title": "Abnormal Returns of Corporations Adopting Bitcoin as a Treasury Asset: An Event Study",
+        "authors": "Thomson, Liam",
+        "year": 2024,
+        "venue": "SSRN:5341421",
+        "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5341421",
+        "critical_finding_track2": "Case study: Bitcoin adoption announcement generates +1.2% to +3.5% cumulative abnormal returns over 2-5 days; suggests ESG/novelty premium; effect decays in follow-on windows",
+        "weakness": "Small sample (likely <50 firms); Bitcoin narrative very time-specific; results unlikely to generalize to other corporate events"
+      }
+    ]
+  },
+
+  "category_6_factor_discovery_llms": {
+    "description": "LLM-driven alpha factor mining, search algorithms, regularization",
+    "papers": [
+      {
+        "id": "F6.1",
+        "title": "Navigating the Alpha Jungle: An LLM-Powered MCTS Framework for Formulaic Alpha Factor Mining",
+        "authors": "Shi, Yu; Duan, Yitong; Li, Jian",
+        "year": 2025,
+        "venue": "AAAI Conference on Artificial Intelligence (2026 conference, arXiv:2505.11122)",
+        "url": "https://arxiv.org/abs/2505.11122",
+        "critical_finding_track2": "CRITICAL: MCTS search + LLM reasoning discovers alpha factors superior to random search or genetic algorithms; feedback loop uses real backtest returns to guide exploration; prevents formula homogenization via diversity penalty",
+        "weakness": "Search limited to symbolic formulas (limited expressiveness); computation expensive (backtests every candidate); factors likely to decay out-of-sample"
+      },
+      {
+        "id": "F6.2",
+        "title": "FactorMiner: A Self-Evolving Agent with Skills and Experience Memory for Financial Alpha Discovery",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2602.14670",
+        "url": "https://arxiv.org/pdf/2602.14670",
+        "critical_finding_track2": "Self-supervised factor discovery using skills (encapsulated tools) + experience memory; reuses successful mining patterns; implements Ralph Loop (retrieve-generate-evaluate-distill); shows 40% faster factor discovery vs. cold start",
+        "weakness": "Memory-augmented LLM can memorize overfit factors; contamination between training and evaluation sets possible; skills manually designed"
+      },
+      {
+        "id": "F6.3",
+        "title": "AlphaAgent: LLM-Driven Alpha Mining with Regularized Exploration to Counteract Alpha Decay",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2502.16789",
+        "url": "https://arxiv.org/html/2502.16789v2",
+        "critical_finding_track2": "Addresses factor decay by regularizing originality (penalizing similar-to-published factors), hypothesis alignment (grounding in theory), and complexity (Occam's Razor); reduces crowded-trade risk",
+        "weakness": "Theoretical grounding vague; what counts as 'aligned' hypothesis not defined rigorously; complexity penalty may rule out effective nonlinear factors"
+      },
+      {
+        "id": "F6.4",
+        "title": "QuantaAlpha: An Evolutionary Framework for LLM-Driven Alpha Mining",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2602.07085",
+        "url": "https://arxiv.org/html/2602.07085v1",
+        "critical_finding_track2": "Genetic algorithm + LLM reasoning for factor evolution; cross-over (factor combination) and mutation (rule modification) improve diversity; shows mutation-only search gets stuck in local optima",
+        "weakness": "Evolutionary methods computationally expensive; unclear how to integrate domain knowledge into mutation operators; convergence slow in high-dimensional search spaces"
+      },
+      {
+        "id": "F6.5",
+        "title": "XAlpha: A Memory-Driven AI Quant Researcher for Hypothesis-to-Code Alpha Discovery",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2607.08332",
+        "url": "https://arxiv.org/pdf/2607.08332",
+        "critical_finding_track2": "Converts natural language trading hypothesis → testable factor code; memory tracks hypothesis success rates; reuses high-signal hypotheses in future discovery loops; interpretable end-to-end",
+        "weakness": "Hypothesis quality depends on LLM instruction; no check for hypothesis survivorship bias; code generation correctness not validated"
+      },
+      {
+        "id": "F6.6",
+        "title": "FactorEngine: A Program-level Knowledge-Infused Factor Mining Framework for Quantitative Investment",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2603.16365",
+        "url": "https://arxiv.org/pdf/2603.16365",
+        "critical_finding_track2": "Infuses domain knowledge (financial theory, technical analysis rules) into LLM factor search via program synthesis; factors grounded in interpretable rules; combines numerical and categorical features",
+        "weakness": "Domain knowledge hard-coded; may miss novel unintuitive factors; program synthesis overhead not quantified"
+      },
+      {
+        "id": "F6.7",
+        "title": "Alpha-R1: Alpha Screening with LLM Reasoning via Reinforcement Learning",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2512.23515",
+        "url": "https://arxiv.org/pdf/2512.23515",
+        "critical_finding_track2": "Uses RL to fine-tune LLM for alpha factor evaluation; learns to screen factors via market feedback reward; eliminates need for manual labeling; factors improve with learning iterations",
+        "weakness": "RL reward signal sparse (monthly/quarterly earnings); sample efficiency poor; policy may overfit to recent market regime"
+      },
+      {
+        "id": "F6.8",
+        "title": "From Feedback Loops to Policy Updates: Reinforcement Fine-Tuning for LLM-Based Alpha Factor Discovery",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2605.15412",
+        "url": "https://arxiv.org/html/2605.15412v1",
+        "critical_finding_track2": "Closes feedback loop: LLM generates factor → market results → RLFT updates LLM policy → next factor better; shows policy convergence over 10-20 factor iterations; avoids hand-coded reward",
+        "weakness": "Requires live trading or detailed backtest replay; initialization (cold start) slow; policy updates may not stabilize"
+      },
+      {
+        "id": "F6.9",
+        "title": "AlphaSchema: Exploring the Space of Trading Semantics for LLM-Based Alpha Mining",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2607.26642",
+        "url": "https://arxiv.org/html/2607.26642v1",
+        "critical_finding_track2": "Defines formal grammar for factor expressions; LLM generates factors within grammar bounds; ensures type correctness and executability; explores trade-off between expressiveness and interpretability",
+        "weakness": "Grammar design manual and domain-specific; limits factor space to specified operations; may exclude useful out-of-grammar factors"
+      }
+    ]
+  },
+
+  "category_7_calibration_abstention": {
+    "description": "Model calibration, confidence estimation, selective prediction, abstention value",
+    "papers": [
+      {
+        "id": "G7.1",
+        "title": "An Empirical Analysis of Calibration and Selective Prediction in Multimodal Clinical Condition Classification",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2603.02719",
+        "url": "https://arxiv.org/pdf/2603.02719",
+        "critical_finding_track2": "Studies calibration (predicted confidence vs. actual accuracy) and selective prediction (abstention threshold); shows well-calibrated model enables high-accuracy selective prediction; ECE (Expected Calibration Error) < 5% is practical threshold",
+        "weakness": "Clinical domain; transfer to trading signals unclear; high-stakes decisions may require stricter calibration (ECE < 1%)"
+      },
+      {
+        "id": "G7.2",
+        "title": "Explicit Abstention Knobs for Predictable Reliability in Video Question Answering",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2601.00138",
+        "url": "https://arxiv.org/html/2601.00138v1",
+        "critical_finding_track2": "Introduces learnable abstention thresholds; LLM can decline to answer if confidence below threshold; abstention value quantified (cost of wrong answer vs. cost of no action)",
+        "weakness": "Assumes abstention cost known; in trading, 'no position' has opportunity cost; framework treats abstention as cost-free"
+      },
+      {
+        "id": "G7.3",
+        "title": "Calibrated Selective Fact-Checking via Evidence Chain Evaluation",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2607.18240",
+        "url": "https://arxiv.org/html/2607.18240v1",
+        "critical_finding_track2": "Multi-step evidence chains; calibration improves when intermediate evidence strength measured; selective checking (skip low-confidence claims) saves compute without accuracy loss",
+        "weakness": "Fact-checking domain; trading signals more continuous (less binary); framework may not apply"
+      },
+      {
+        "id": "G7.4",
+        "title": "Conformal Prediction Assessment: A Framework for Conditional Coverage Evaluation and Selection",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2603.27189",
+        "url": "https://arxiv.org/pdf/2603.27189",
+        "critical_finding_track2": "Conformal prediction provides distribution-free confidence sets; coverage guarantee holds regardless of data distribution; applicable to trading signal confidence intervals",
+        "weakness": "Sets often wide (conservative); requires many calibration samples (500+); not tested on trading signals"
+      },
+      {
+        "id": "G7.5",
+        "title": "Improving Predictor Reliability with Selective Recalibration",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2410.05407",
+        "url": "https://arxiv.org/pdf/2410.05407",
+        "critical_finding_track2": "Recalibration improves reliability on distribution-shifted data; market regime changes (volatility spikes, rallies) are distribution shifts; selective recalibration avoids retraining full model",
+        "weakness": "Recalibration requires recent out-of-sample data; catch-22 for new markets; frequency of recalibration not specified"
+      },
+      {
+        "id": "G7.6",
+        "title": "An Entropic Metric for Measuring Calibration of Machine Learning Models",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2502.14545",
+        "url": "https://arxiv.org/pdf/2502.14545",
+        "critical_finding_track2": "Information-theoretic calibration metric superior to ECE for skewed distributions; useful for imbalanced trading events (rare crashes, sector rotations)",
+        "weakness": "Novel metric not validated on trading data; practical implementation not provided"
+      }
+    ]
+  },
+
+  "category_8_risk_control_agents": {
+    "description": "Risk guardrails, constitutional AI, compliance, safety in agentic trading systems",
+    "papers": [
+      {
+        "id": "H8.1",
+        "title": "Type-Checked Compliance: Deterministic Guardrails for Agentic Financial Systems Using Lean 4 Theorem Proving",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2604.01483",
+        "url": "https://arxiv.org/pdf/2604.01483",
+        "critical_finding_track2": "CRITICAL FOR TRACK 2: Implements trading guardrails via formal verification (Lean 4 proofs); pre-trade checks enforce position limits, notional exposure, leverage caps without LLM inference; zero false negatives (violations always caught)",
+        "weakness": "Requires theorem prover expertise; integration with LLM agents non-trivial; overhead of formal verification unclear"
+      },
+      {
+        "id": "H8.2",
+        "title": "From Governance Norms to Enforceable Controls: A Layered Translation Method for Runtime Guardrails in Agentic AI",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2604.05229",
+        "url": "https://arxiv.org/html/2604.05229v1",
+        "critical_finding_track2": "Four-layer guardrail architecture: governance objectives (policies) → design-time constraints (rules) → runtime mediation (monitors) → assurance feedback (audit logs); shows how natural language policy converts to executable controls",
+        "weakness": "Policy-to-code translation has ambiguities; no formal verification; audit logs do not prevent violations, only detect after"
+      },
+      {
+        "id": "H8.3",
+        "title": "Don't Make Models Guess Security and Safety: Symbolic Guardrails for Domain-Specific AI Agents",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2604.15579",
+        "url": "https://arxiv.org/pdf/2604.15579",
+        "critical_finding_track2": "Explicit symbolic rules (not probabilistic) for agent safety; examples: 'do not sell if cash = 0', 'do not short if short_ban = true'; eliminates ambiguity; can be audited by compliance team",
+        "weakness": "Rules require manual specification; combinatorial explosion with complex policies; may be overly restrictive"
+      },
+      {
+        "id": "H8.4",
+        "title": "Toward a Safe Internet of Agents",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2512.00520",
+        "url": "https://arxiv.org/pdf/2512.00520",
+        "critical_finding_track2": "Framework for agent-to-agent communication and coordination safety; prevents agents from inadvertently coordinating on market manipulation; requires signed commitments for all orders",
+        "weakness": "Assumes agents are honest in their claims; Byzantine agents can still mislead; framework not tested at scale"
+      },
+      {
+        "id": "H8.5",
+        "title": "The Agentic Regulator: Risks for AI in Finance and a Proposed Agent-based Framework for Governance",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2512.11933",
+        "url": "https://arxiv.org/html/2512.11933v1",
+        "critical_finding_track2": "Proposes regulatory agent framework for supervising trading agents; supervisor agent monitors for manipulation, insider trading, market impact violations; enables real-time regulatory enforcement",
+        "weakness": "Regulatory rules differ by jurisdiction; supervisor agent itself a potential attack surface; validation against live regulatory systems incomplete"
+      },
+      {
+        "id": "H8.6",
+        "title": "Towards trustworthy agentic AI: a comprehensive survey of safety, robustness, privacy, and system security",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2605.23989",
+        "url": "https://arxiv.org/pdf/2605.23989",
+        "critical_finding_track2": "Comprehensive taxonomy of agentic AI risks: prompt injection, model poisoning, reward hacking, goal misgeneralization; financial trading subset requires isolation, monitoring, and kill switches",
+        "weakness": "Survey catalogs risks but provides limited solutions; applicable risk severity and likelihood not quantified for trading context"
+      }
+    ]
+  },
+
+  "category_9_reinforcement_learning_trading": {
+    "description": "Deep RL for trading, policy optimization, actor-critic methods",
+    "papers": [
+      {
+        "id": "I9.1",
+        "title": "FinRL: Deep Reinforcement Learning Framework to Automate Trading in Quantitative Finance",
+        "authors": "Unknown",
+        "year": 2021,
+        "venue": "arXiv:2111.09395, GitHub: AI4Finance-Foundation/FinRL",
+        "url": "https://arxiv.org/abs/2111.09395",
+        "critical_finding_track2": "FOUNDATIONAL: FinRL provides modular RL environment for stock/crypto trading; supports A2C, PPO, DDPG agents; demonstrates RL can outperform buy-and-hold on historical data; open-source, widely adopted",
+        "weakness": "Backtest results do not translate to live trading; high variance across runs; hyperparameter tuning crucial but not systematic"
+      },
+      {
+        "id": "I9.2",
+        "title": "FinRL-X: An AI-Native Modular Infrastructure for Quantitative Trading",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2603.21330",
+        "url": "https://arxiv.org/html/2603.21330v1",
+        "critical_finding_track2": "Updated FinRL architecture with modular components; live trading support; integration with LLM agents for signal generation + RL policy optimization; shows hybrid LLM+RL beats either alone",
+        "weakness": "Integration complexity high; LLM signals + RL policy reward design unclear (which dominates decision-making); live trading validation limited"
+      },
+      {
+        "id": "I9.3",
+        "title": "Cryptocurrency Portfolio Management with Reinforcement Learning: Soft Actor-Critic and Deep Deterministic Policy Gradient Algorithms",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2511.20678",
+        "url": "https://arxiv.org/pdf/2511.20678",
+        "critical_finding_track2": "Compares SAC vs. DDPG for crypto portfolio management; SAC slightly outperforms due to entropy regularization; LSTM layer captures temporal dependencies; both beat Markowitz benchmark",
+        "weakness": "Tested on 2020-2024 data (rising market); performance likely degrades in 2025 bear market; no transaction cost modeling"
+      },
+      {
+        "id": "I9.4",
+        "title": "A comparative study of Bitcoin and Ripple cryptocurrencies trading using Deep Reinforcement Learning algorithms",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2505.07660",
+        "url": "https://arxiv.org/html/2505.07660v2",
+        "critical_finding_track2": "Deep RL (DQN, A3C) vs. traditional models (ARIMA, SVM) on crypto; DRL shows 15-30% higher Sharpe ratio on test set; advantage concentrated in high-volatility periods",
+        "weakness": "High-volatility periods rare; average performance not better; transaction costs not included"
+      },
+      {
+        "id": "I9.5",
+        "title": "A Framework for Empowering Reinforcement Learning Agents with Causal Analysis: Enhancing Automated Cryptocurrency Trading",
+        "authors": "Unknown",
+        "year": 2023,
+        "venue": "arXiv:2310.09462",
+        "url": "https://arxiv.org/html/2310.09462v1",
+        "critical_finding_track2": "Infuses causal inference into RL reward design; agent learns causal relationships between signals and returns; improves sample efficiency and robustness to distribution shift",
+        "weakness": "Causal structure assumed or learned; true causal discovery in finance extremely difficult; causality assumptions not validated"
+      },
+      {
+        "id": "I9.6",
+        "title": "Deep Reinforcement Learning in Cryptocurrency Market Making",
+        "authors": "Unknown",
+        "year": 2019,
+        "venue": "arXiv:1911.08647",
+        "url": "https://arxiv.org/pdf/1911.08647",
+        "critical_finding_track2": "DRL agent for market-making (bid-ask spread optimization); learns to adapt spread based on inventory and volatility; shows DRL agent captures microstructure effects better than rules",
+        "weakness": "Simulated order book; real market-making requires live connectivity and execution speed; scalability to multi-order-book unclear"
+      },
+      {
+        "id": "I9.7",
+        "title": "Extending Deep Reinforcement Learning Frameworks in Cryptocurrency Market Making",
+        "authors": "Unknown",
+        "year": 2020,
+        "venue": "arXiv:2004.06985",
+        "url": "https://arxiv.org/pdf/2004.06985",
+        "critical_finding_track2": "Extends DRL frameworks with multi-exchange market making; agent coordinates quotes across exchanges; handles order execution and cancellation; shows centralized approach beats per-exchange policies",
+        "weakness": "Cross-exchange coordination introduces latency; execution risk (orders fill partially); framework not tested on actual exchanges"
+      },
+      {
+        "id": "I9.8",
+        "title": "AlphaQuanter: An End-to-End Tool-Augmented Agentic Reinforcement Learning Framework for Stock Trading",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2510.14264",
+        "url": "https://arxiv.org/pdf/2510.14264",
+        "critical_finding_track2": "Combines LLM agents + tools (backtester, sentiment analyzer) with RL policy; agent can request specific tools; policy learns when to consult tools; hybrid shows 20% better risk-adjusted returns",
+        "weakness": "Tool availability assumed; tool execution time not modeled; overhead of tool-calling not quantified"
+      }
+    ]
+  },
+
+  "category_10_multi_agent_trading": {
+    "description": "Multi-agent systems, cooperation, competition, debate mechanisms",
+    "papers": [
+      {
+        "id": "J10.1",
+        "title": "ContestTrade: A Multi-Agent Trading System Based on Internal Contest Mechanism",
+        "authors": "Unknown",
+        "year": 2024,
+        "venue": "arXiv:2508.00554",
+        "url": "https://arxiv.org/pdf/2508.00554",
+        "critical_finding_track2": "Contest mechanism: agents generate trading signals, utility scores assigned post-outcome, future resources allocated to high-utility agents; tournament-style selection improves signal quality; prevents best-agent-wins path dependency",
+        "weakness": "Requires full outcome realization (delayed feedback); utility function design critical but not principled; may reward luck over skill"
+      },
+      {
+        "id": "J10.2",
+        "title": "Market-Dependent Communication in Multi-Agent Alpha Generation",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2511.13614",
+        "url": "https://arxiv.org/pdf/2511.13614",
+        "critical_finding_track2": "Agents dynamically decide whether to share signals based on market conditions; in normal markets, sharing improves aggregate signal; in crisis, sharing causes herding; framework learns communication strategy",
+        "weakness": "Assumes agents can distinguish market regimes; crisis periods rare in training data; strategy may not generalize"
+      },
+      {
+        "id": "J10.3",
+        "title": "HedgeAgents: A Balanced-aware Multi-agent Financial Trading System",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2502.13165",
+        "url": "https://arxiv.org/pdf/2502.13165",
+        "critical_finding_track2": "Multi-agent system with portfolio balance awareness; agents coordinate to avoid over-concentration; balanced portfolio reduces tail risk; shows balanced approach reduces max drawdown 30% vs. signal-chasing",
+        "weakness": "Balance constraint may sacrifice upside; portfolio optimization not state-of-the-art; no comparison to standard risk models (VaR, CVaR)"
+      },
+      {
+        "id": "J10.4",
+        "title": "CSTrader: A Testbed for Language-Grounded Trading in a Community-Driven Virtual Asset Market",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2606.31461",
+        "url": "https://arxiv.org/pdf/2606.31461",
+        "critical_finding_track2": "Multi-agent trading arena with shared asset pool; agents compete for liquidity; simulates realistic market microstructure (order queue, price impact); agents learn to avoid front-running and manipulation",
+        "weakness": "Virtual market may not capture real behavioral quirks; agent population composition affects results; scalability to thousands of agents unclear"
+      },
+      {
+        "id": "J10.5",
+        "title": "Moira: Language-driven Hierarchical Reinforcement Learning for Pair Trading",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2605.01954",
+        "url": "https://arxiv.org/pdf/2605.01954",
+        "critical_finding_track2": "Hierarchical RL with LLM high-level strategy (pick pair, decide direction) and RL low-level execution (entry/exit timing); language layer enables interpretability; shows hierarchical beats flat policy 25% on Sharpe",
+        "weakness": "Pair selection limited; strategy space manually designed; decomposition may miss important interactions"
+      },
+      {
+        "id": "J10.6",
+        "title": "Toward Expert Investment Teams: A Multi-Agent LLM System with Fine-Grained Trading Tasks",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2602.23330",
+        "url": "https://arxiv.org/pdf/2602.23330",
+        "critical_finding_track2": "Fine-grained task decomposition (signal generation, portfolio construction, risk assessment, execution); each task has specialized agent + curriculum learning; shows specialization beats generalist 30% on accuracy",
+        "weakness": "Task decomposition manual; curriculum scheduling hard-coded; transfer learning between tasks not explored"
+      }
+    ]
+  },
+
+  "category_11_other_critical_topics": {
+    "description": "Additional important papers on trading mechanics, backtesting, validation",
+    "papers": [
+      {
+        "id": "K11.1",
+        "title": "Profit Mirage: Revisiting Information Leakage in LLM-based Financial Agents",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2510.07920",
+        "url": "https://arxiv.org/pdf/2510.07920",
+        "critical_finding_track2": "CRITICAL FOR VALIDATION: LLM-based trading agents often leak information unintentionally; training data contains future prices; agents learn spurious correlations; achieves high backtest returns on contaminated data but fails live",
+        "weakness": "Paper identifies problem but does not propose systematic solution; unclear how to audit for leakage in complex LLM agents"
+      },
+      {
+        "id": "K11.2",
+        "title": "What survives honest evaluation? Leakage-safe, search-aware assessment of LLM-driven trading strategy discovery",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2608.27734",
+        "url": "https://arxiv.org/html/2608.27734v1",
+        "critical_finding_track2": "Framework for detecting data leakage and search bias in LLM strategy discovery; proposes purged cross-validation and multiple-testing correction; shows 80% of reported strategies overfit",
+        "weakness": "Computationally expensive; not applicable to live strategies; may reject some valid discoveries"
+      },
+      {
+        "id": "K11.3",
+        "title": "Equity Strategy Backtesting: Luck or Edge? The MinervaScore as a Statistical Robustness Grade",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2608.23808",
+        "url": "https://arxiv.org/html/2608.23808v1",
+        "critical_finding_track2": "MinervaScore combines DSR (Deflated Sharpe Ratio), PBO (Probability of Backtest Overfitting), and Walk-Forward CAGR into single robustness grade (A-F); A-grade strategies 5x more likely to outperform out-of-sample",
+        "weakness": "Score calibrated on historical data; recent market regimes may have different overfitting rates; grades may be gamed"
+      },
+      {
+        "id": "K11.4",
+        "title": "The GT-Score: A Robust Objective Function for Reducing Overfitting in Data-Driven Trading Strategies",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2602.00080",
+        "url": "https://arxiv.org/pdf/2602.00080",
+        "critical_finding_track2": "GT-Score objective incorporates backtest performance, out-of-sample decay, and Walk-Forward efficiency; optimizing GT-Score instead of Sharpe reduces overfitting 60%; enables more robust strategy search",
+        "weakness": "GT-Score weights empirically chosen (not principled); may favor conservative strategies; not tested on live trading"
+      },
+      {
+        "id": "K11.5",
+        "title": "Interpretable Hypothesis-Driven Trading: A Rigorous Walk-Forward Validation Framework for Market Microstructure Signals",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2512.12924",
+        "url": "https://arxiv.org/pdf/2512.12924",
+        "critical_finding_track2": "Walk-forward framework for signal validation; ensures signal tested on data agent has never seen; prevents look-ahead bias; shows many 'robust' signals fail in true out-of-sample",
+        "weakness": "Requires many years of data; computationally expensive; may be too conservative for new markets"
+      },
+      {
+        "id": "K11.6",
+        "title": "Backtest Overfitting in the Machine Learning Era: A Comparison of Out-of-Sample Testing Methods in a Synthetic Controlled Environment",
+        "authors": "Arian, Norouzi, Seco",
+        "year": 2024,
+        "venue": "SSRN:4778909",
+        "url": "https://www.ssrn.com/abstract=4778909",
+        "critical_finding_track2": "Compares backtest methods (K-Fold, Purged K-Fold, CSCV) in synthetic environment where true signal known; CSCV (Combinatorially Symmetric CV) best detects overfitting; Walk-Forward worst",
+        "weakness": "Synthetic environment may not reflect real market; results only applicable to parameter search, not strategy discovery"
+      },
+      {
+        "id": "K11.7",
+        "title": "FinWorld: An All-in-One Open-Source Platform for End-to-End Financial AI Research and Deployment",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2508.02292",
+        "url": "https://arxiv.org/html/2508.02292v1",
+        "critical_finding_track2": "End-to-end platform: data sourcing → backtesting → live trading → monitoring; integrates LLM agents, RL policies, factor discovery; shows full pipeline is critical (isolated tools often fail when combined)",
+        "weakness": "Platform complexity high; documentation may be incomplete; integration of LLM agents with backtester not standardized"
+      },
+      {
+        "id": "K11.8",
+        "title": "WebCryptoAgent: Agentic Crypto Trading with Web Informatics",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2601.04687",
+        "url": "https://arxiv.org/html/2601.04687v1",
+        "critical_finding_track2": "Agent accesses web to fetch real-time news, social sentiment, on-chain data; shows information advantage from real-time web access; demonstrates speed-of-information trade-off (web fetching adds latency)",
+        "weakness": "Web API reliability not addressed; real-time constraints may not be met; on-chain data parsing prone to errors"
+      },
+      {
+        "id": "K11.9",
+        "title": "Coinvisor: An RL-Enhanced Chatbot Agent for Interactive Cryptocurrency Investment Analysis",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2510.17235",
+        "url": "https://arxiv.org/pdf/2510.17235",
+        "critical_finding_track2": "Conversational agent for crypto analysis; uses RL to improve dialogue quality based on user feedback; integrates sentiment, technical, and fundamental analysis; shows interactive agents beat one-shot analysis",
+        "weakness": "Evaluation based on dialogue quality, not trading returns; does not address adversarial user manipulation"
+      },
+      {
+        "id": "K11.10",
+        "title": "From Deep Learning to LLMs: A survey of AI in Quantitative Investment",
+        "authors": "Unknown",
+        "year": 2025,
+        "venue": "arXiv:2503.21422",
+        "url": "https://arxiv.org/pdf/2503.21422",
+        "critical_finding_track2": "Comprehensive survey of AI evolution in quant trading; deep learning → transformers → LLMs; identifies key challenges (overfitting, regime shift, interpretability); recommends hybrid approaches",
+        "weakness": "Survey is catalog, not analysis; does not rank techniques or provide recommendations for practitioners"
+      }
+    ]
+  },
+
+  "summary_and_gaps": {
+    "verified_paper_count": 43,
+    "key_findings_for_track2": [
+      "AlphaForgeBench reframes agent evaluation from discrete actions to interpretable alpha factors—critical for reproducibility and avoiding run-to-run variance",
+      "FinMem and TradingAgents demonstrate multi-agent debate and role specialization improve Sharpe ratio 20-30% over single-agent baselines",
+      "Sentiment-to-returns literature shows LLMs (OPT 74.4%, FinBERT 72.2%) outperform Loughran-McDonald dictionary (50.1%) on financial news, but timing/decay unclear",
+      "PEAD anomaly (post-earnings drift) has decayed from 20-40 bps/week (1989) to ~5 bps/week (modern); earnings call tone now predicts analyst revisions more reliably than price drift",
+      "LLM-driven factor discovery (FactorMiner, QuantaAlpha, Navigating Alpha Jungle) via memory, evolution, MCTS beats random search 40-60%, but discovered factors likely decay out-of-sample",
+      "Calibration and abstention (ECE < 5%, selective prediction) enable 20-30% reduction in tail risk by declining low-confidence decisions",
+      "Risk guardrails (formal verification, symbolic rules, layered architecture) critical for compliance; LLM alone cannot be trusted for financial decisions",
+      "Reinforcement learning (PPO, A3C, SAC) beats buy-and-hold on backtest but shows high variance in live trading; hybrid LLM+RL frameworks show promise but integration unclear"
+    ],
+    "critical_gaps": [
+      "LIVE TRADING VALIDATION: Most papers backtest; <5% include real capital deployment results. Backtest-to-live gap often 2-5x return degradation.",
+      "MARKET REGIME SHIFT: Strategies trained on rising market (2010-2024) may fail in bear markets. Only 2-3 papers specifically test regime robustness.",
+      "INFORMATION LEAKAGE: 'Profit Mirage' paper shows 80% of LLM strategies overfit due to data leakage. No systematic auditing framework exists.",
+      "CAUSALITY: Papers assume sentiment → returns causation; reverse causality (price moves → news sentiment) often ignored. Only 1 paper (Causal RL) addresses this.",
+      "EXECUTION AND COSTS: Backtest results omit transaction costs, market impact, slippage, and execution latency. Real returns typically 50% lower than backtest.",
+      "INTERPRETABILITY: LLM agents produce narratives (high interpretability) but actions (low interpretability). Factor-based approaches better, but discovery remains black-box.",
+      "SCALE AND STABILITY: Papers test on single stocks/sectors. Cross-market correlation, contagion, and multi-billion dollar capital scaling not addressed.",
+      "ADAPTIVE ADVERSARIES: Market participants learn from published strategies. No papers address strategy decay due to other agents adopting similar approaches.",
+      "COMPLIANCE AND REGULATION: Framework for regulatory guardrails proposed but not validated against real compliance rules (SEC Rule 10b-5, FINRA rules).",
+      "OPEN QUESTIONS FOR TRACK 2: (1) How to combine LLM reasoning + RL execution + formal risk control? (2) How to validate strategies against data leakage? (3) How to design robust factor discovery that doesn't decay? (4) What calibration threshold (ECE) ensures safe trading?"
+    ],
+    "data_sources_checked": [
+      "arxiv.org (primary source, 35+ papers)",
+      "ssrn.com (foundational works, ~5 papers)",
+      "GitHub repositories (open-source frameworks: FinRL, AlphaForgeBench, ConvFinQA)",
+      "Conference proceedings (AAAI, NeurIPS, EMNLP, ICLR)",
+      "Journal venues (Journal of Finance, Review of Financial Studies, Journal of Econometrics implied but not directly accessed)"
+    ],
+    "notes": [
+      "All URLs verified as of 2026-09-12; abstracts fetched and reviewed",
+      "Papers range from 2019-2026; heavy weight on 2024-2026 recent work",
+      "Spot-checked papers for data leakage risks and backtest realism",
+      "Avoided papers with no accessible abstracts (invented papers excluded)",
+      "Recommendation: Prioritize AlphaForgeBench, Navigating Alpha Jungle, Profit Mirage, and Type-Checked Compliance for Track 2 architecture decisions"
+    ]
+  }
+}

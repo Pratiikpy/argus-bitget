@@ -1,0 +1,15 @@
+{
+  "opened_at": "2026-09-14T09:22:05.496232+00:00",
+  "claims": 36,
+  "head": "bc36478291a06bc3d715f2ce5b1b7368d6c927e209973a0539a544a64116e51e",
+  "chain": "36 claim(s), chain intact, head bc36478291a06bc3",
+  "chain_intact": true,
+  "anchored": true,
+  "calendars": [
+    "https://a.pool.opentimestamps.org",
+    "https://b.pool.opentimestamps.org",
+    "https://alice.btc.calendar.opentimestamps.org",
+    "https://finney.calendar.eternitywall.com"
+  ],
+  "anchor_failures": []
+}

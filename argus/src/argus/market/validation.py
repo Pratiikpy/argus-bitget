@@ -37,11 +37,17 @@ a fitted one.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
+from datetime import UTC, datetime
+from pathlib import Path
 from statistics import median
+from typing import Any
 
-from argus.market.history import CandleType, fetch_range
+from argus.market.history import CandleType, HistoryError, fetch_range
 from argus.truth.clocks import DualClock, SessionPhase
+
+REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "universe_validation.json"
 
 # Chosen from the observed gap: genuine instruments >= 3.60, impostor 1.43. Any threshold in
 # (1.5, 3.5) separates them identically, so the exact value carries no fitted information.
@@ -144,7 +150,12 @@ def verify_universe(
     for symbol in symbols:
         try:
             got = measure_anchor(symbol, days=days)
-        except Exception as exc:
+        except (NoAnchorError, HistoryError) as exc:
+            # Narrowed from `except Exception`. A bare catch here would record a TypeError or an
+            # AttributeError in our own code as "this instrument has no anchor" — turning a bug
+            # into a finding about the market, which is the one way this check could be wrong
+            # without anybody noticing. Only "the venue would not answer" and "the sample cannot
+            # support the judgement" are absence; everything else is a defect and must propagate.
             evidence[symbol] = {"symbol": symbol, "error": str(exc)[:120], "has_anchor": False}
             continue
         evidence[symbol] = got.as_dict()
@@ -152,3 +163,85 @@ def verify_universe(
             verified.append(symbol)
 
     return tuple(verified), evidence
+
+
+def audit_shipped_universe(*, days: int = 90) -> dict[str, Any]:
+    """Re-verify the universe this system actually trades, and report any symbol that fails.
+
+    **This exists because the check was written and never run.** `market/bitget.py:41` says
+    membership "is now verified behaviourally by session attenuation: see argus.market.validation"
+    — and nothing called this module from anywhere in the live path, so that sentence described an
+    intention rather than the code. A hardcoded list is still the right shape (a regex over ticker
+    names swept in FARTCOINUSDT on the first attempt), but a hardcoded list that is never rechecked
+    is exactly how SPXUSDT got in and produced a 179% backtest on memecoin drift.
+
+    The list stays explicit and this re-measures it, so a symbol whose anchor disappears — delisted,
+    relisted against something else, or a ticker quietly reassigned — is reported rather than
+    silently traded.
+    """
+    from argus.market.bitget import RTOKEN_SYMBOLS
+
+    verified, evidence = verify_universe(tuple(RTOKEN_SYMBOLS), days=days)
+    failed = [s for s in RTOKEN_SYMBOLS if s not in verified]
+    return {
+        "generated_at": datetime.now(UTC).isoformat(),
+        "threshold": ATTENUATION_THRESHOLD,
+        "shipped": list(RTOKEN_SYMBOLS),
+        "verified": list(verified),
+        "failed": failed,
+        "evidence": evidence,
+        "verdict": (
+            f"all {len(verified)} shipped instruments still attenuate past "
+            f"{ATTENUATION_THRESHOLD}x when the anchor market shuts"
+            if not failed else
+            f"{len(failed)} shipped instrument(s) no longer show an anchor: {', '.join(failed)}. "
+            f"Either the venue changed what the ticker refers to, or the sample is too short to "
+            f"judge — both need a human before the next cycle trades them."
+        ),
+    }
+
+
+def main() -> int:  # pragma: no cover - CLI
+    import argparse
+    import sys
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+    parser = argparse.ArgumentParser(description="re-verify the shipped rToken universe")
+    parser.add_argument("--days", type=int, default=90)
+    args = parser.parse_args()
+
+    report = audit_shipped_universe(days=args.days)
+    print(f"{'symbol':12} {'RTH bps/h':>10} {'wknd bps/h':>11} {'attenuation':>12}  anchor")
+    for symbol in report["shipped"]:
+        row = report["evidence"].get(symbol, {})
+        if "error" in row:
+            print(f"{symbol:12} {row['error']}")
+            continue
+        mark = "OK" if row.get("has_anchor") else "FAIL"
+        print(
+            f"{symbol:12} {row['rth_bps_per_hour']:10.2f} {row['weekend_bps_per_hour']:11.2f} "
+            f"{row['attenuation']:12.2f}  {mark}"
+        )
+    print(f"\n  {report['verdict']}")
+    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    REPORT_PATH.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    print(f"\nwritten to {REPORT_PATH}")
+    return 1 if report["failed"] else 0
+
+
+if __name__ == "__main__":  # pragma: no cover - CLI
+    raise SystemExit(main())
+
+
+__all__ = [
+    "ATTENUATION_THRESHOLD",
+    "MIN_OBSERVATIONS",
+    "REPORT_PATH",
+    "AnchorEvidence",
+    "NoAnchorError",
+    "audit_shipped_universe",
+    "measure_anchor",
+    "verify_universe",
+]

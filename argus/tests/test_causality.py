@@ -162,3 +162,85 @@ class TestLedger:
         led = CausalLedger()
         led.add(CausalChain(event="e", as_of=T0))
         assert "no outcomes resolved" in led.summary()["note"]
+
+
+class TestUngradedIsNotZeroPercent:
+    """`chain_accuracy` returned **0.0** when nothing had been graded — indistinguishable from a
+    chain that was graded and got every link wrong.
+
+    The consequence was not cosmetic. `was_lucky` is `direction_correct and chain_accuracy < 0.5`,
+    so **every ungraded chain that happened to call the direction right was labelled a lucky win** —
+    the exact accusation this module exists to make carefully, made automatically against decisions
+    nobody had examined. `summary` then averaged those zeros into `mean_chain_accuracy_pct`.
+    """
+
+    @staticmethod
+    def _chain(direction: str = "up") -> CausalChain:
+        from datetime import UTC, datetime
+
+        return CausalChain(
+            event="probe", as_of=datetime(2026, 6, 1, tzinfo=UTC),
+            predicted_direction=direction, predicted_magnitude_bps=50,
+        )
+
+    def test_an_ungraded_chain_reports_none_not_zero(self) -> None:
+        assert self._chain().chain_accuracy is None
+
+    def test_an_ungraded_chain_is_not_called_lucky(self) -> None:
+        chain = self._chain()
+        chain.realised_direction = "up"
+        assert chain.was_lucky is False, "unmeasured is not the same as reasoning that broke"
+
+    def test_an_ungraded_chain_is_not_called_unlucky_either(self) -> None:
+        """Symmetrical: unmeasured is not a defence."""
+        chain = self._chain()
+        chain.realised_direction = "down"
+        assert chain.was_unlucky is False
+
+    def test_as_dict_carries_none_rather_than_a_rounded_zero(self) -> None:
+        assert self._chain().as_dict()["chain_accuracy"] is None
+
+
+class TestAnAbsentMagnitudeIsNotAPredictionOfNoMove:
+    """`int(float(response.get("magnitude_bps", 0) or 0))` turned a missing field into a confident
+    prediction — *"this event moves the price not at all"* — attributed to a model that never said
+    it, then scored that invention against the realised move."""
+
+    def test_a_missing_magnitude_parses_to_none(self) -> None:
+        from argus.agents.causality import _magnitude
+
+        assert _magnitude(None) is None
+        assert _magnitude("") is None
+
+    def test_an_unparseable_magnitude_is_unknown_not_zero(self) -> None:
+        from argus.agents.causality import _magnitude
+
+        assert _magnitude("about fifty") is None
+
+    def test_a_real_magnitude_still_parses(self) -> None:
+        from argus.agents.causality import _magnitude
+
+        assert _magnitude("50") == 50
+        assert _magnitude(50.7) == 50
+
+    def test_grading_an_absent_magnitude_is_uncertain_not_wrong(self) -> None:
+        """Grading our own default is not grading the model."""
+        from argus.agents.causality import LinkGrade, grade_magnitude
+
+        assert grade_magnitude(None, 300) is LinkGrade.UNCERTAIN
+
+    def test_a_real_magnitude_still_grades(self) -> None:
+        from argus.agents.causality import LinkGrade, grade_magnitude
+
+        assert grade_magnitude(50, 60) is LinkGrade.CORRECT
+        assert grade_magnitude(50, 400) is LinkGrade.WRONG
+
+    def test_magnitude_error_is_none_when_nothing_was_predicted(self) -> None:
+        from datetime import UTC, datetime
+
+        chain = CausalChain(
+            event="probe", as_of=datetime(2026, 6, 1, tzinfo=UTC),
+            predicted_direction="up", predicted_magnitude_bps=None,
+        )
+        chain.realised_magnitude_bps = 300
+        assert chain.magnitude_error_bps() is None

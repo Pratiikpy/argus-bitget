@@ -112,6 +112,25 @@ class Intent:
 
     required_hedge: tuple[str, ...] = ()
 
+    lean: str = "none"
+    """The direction the desk would take if forced, stated even when it declines to trade.
+
+    **This exists because the desk had no gradeable directional view and we proved it rather than
+    assuming it.** `side` is a required field of the decision contract, so it looked like a view;
+    measured over the 53 settled abstentions carrying a counterfactual it was **BUY in all 53**,
+    directionally right 3.8% of the time against a base rate of up-moves of exactly 3.8%. A field
+    that agrees with the base rate to the decimal carries no information: on a decision it has
+    declined to make, the model fills `side` in because the schema demands it.
+
+    An abstention says the edge does not clear the hurdle. It does not say the desk has no view
+    about direction, and the hurdle frontier put a number on why that matters: trading beats
+    abstaining at 56% directional accuracy, and nothing on record says whether this desk clears it.
+    The lean costs no risk and makes the question answerable. ``none`` is a legitimate answer and
+    means the direction genuinely cannot be called.
+    """
+
+    lean_confidence: float = 0.0
+
     def __post_init__(self) -> None:
         if self.quantity < 0:
             raise ValueError("quantity may not be negative")

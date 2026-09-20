@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-09-12T10:14:56.757973+00:00",
+  "generated_at": "2026-09-12T17:52:24.042356+00:00",
   "separation": "the proposer receives ProposerContext, which has no field for performance; evaluation is deterministic Python and no model grades a factor",
   "funnel": {
     "proposed": 8,
     "by_final_state": {
-      "rejected": 7,
-      "oos_tested": 1
+      "rejected": 8
     },
     "certified": 0,
-    "rejected": 7
+    "rejected": 8,
+    "duplicates_suppressed": 0
   },
   "gate": {
     "trials": 8,
-    "variance_of_trial_sharpes": 9.8372,
+    "variance_of_trial_sharpes": 10.3274,
     "certified": []
   },
   "factors": [
@@ -21,11 +21,12 @@
       "expression": "long_while_closed",
       "trial": 1,
       "state": "rejected",
-      "gross_sharpe": 0.898,
-      "net_sharpe": -0.112,
+      "gross_sharpe": 0.915,
+      "net_sharpe": -0.095,
       "oos_sharpe": null,
       "dsr": null,
-      "rejection_reason": "net Sharpe -0.112 after the 12bps round trip (gross was 0.898)",
+      "overfit": null,
+      "rejection_reason": "net Sharpe -0.095 after the 12bps round trip (gross was 0.915)",
       "path": [
         "proposed->formalized",
         "formalized->backtested",
@@ -42,6 +43,7 @@
       "net_sharpe": -1.437,
       "oos_sharpe": null,
       "dsr": null,
+      "overfit": null,
       "rejection_reason": "net Sharpe -1.437 after the 12bps round trip (gross was 0.096)",
       "path": [
         "proposed->formalized",
@@ -55,10 +57,11 @@
       "expression": "weekend_only",
       "trial": 3,
       "state": "rejected",
-      "gross_sharpe": 2.449,
-      "net_sharpe": 1.573,
-      "oos_sharpe": 2.186,
+      "gross_sharpe": 2.532,
+      "net_sharpe": 1.653,
+      "oos_sharpe": 2.236,
       "dsr": 0.0,
+      "overfit": null,
       "rejection_reason": "DSR 0.0 over 8 trials \u2014 not distinguishable from the best of a random search",
       "path": [
         "proposed->formalized",
@@ -74,11 +77,12 @@
       "expression": "closure_momentum",
       "trial": 4,
       "state": "rejected",
-      "gross_sharpe": -2.433,
-      "net_sharpe": -8.774,
+      "gross_sharpe": -2.681,
+      "net_sharpe": -9.0,
       "oos_sharpe": null,
       "dsr": null,
-      "rejection_reason": "net Sharpe -8.774 after the 12bps round trip (gross was -2.433)",
+      "overfit": null,
+      "rejection_reason": "net Sharpe -9.000 after the 12bps round trip (gross was -2.681)",
       "path": [
         "proposed->formalized",
         "formalized->backtested",
@@ -91,11 +95,12 @@
       "expression": "closure_reversion",
       "trial": 5,
       "state": "rejected",
-      "gross_sharpe": 2.433,
-      "net_sharpe": -4.003,
+      "gross_sharpe": 2.681,
+      "net_sharpe": -3.746,
       "oos_sharpe": null,
       "dsr": null,
-      "rejection_reason": "net Sharpe -4.003 after the 12bps round trip (gross was 2.433)",
+      "overfit": null,
+      "rejection_reason": "net Sharpe -3.746 after the 12bps round trip (gross was 2.681)",
       "path": [
         "proposed->formalized",
         "formalized->backtested",
@@ -112,6 +117,7 @@
       "net_sharpe": -1.625,
       "oos_sharpe": null,
       "dsr": null,
+      "overfit": null,
       "rejection_reason": "net Sharpe -1.625 after the 12bps round trip (gross was -0.369)",
       "path": [
         "proposed->formalized",
@@ -125,11 +131,12 @@
       "expression": "slow_trend",
       "trial": 7,
       "state": "rejected",
-      "gross_sharpe": 0.625,
-      "net_sharpe": -0.521,
+      "gross_sharpe": 0.85,
+      "net_sharpe": -0.31,
       "oos_sharpe": null,
       "dsr": null,
-      "rejection_reason": "net Sharpe -0.521 after the 12bps round trip (gross was 0.625)",
+      "overfit": null,
+      "rejection_reason": "net Sharpe -0.310 after the 12bps round trip (gross was 0.850)",
       "path": [
         "proposed->formalized",
         "formalized->backtested",
@@ -142,11 +149,12 @@
       "expression": "slow_fade",
       "trial": 8,
       "state": "rejected",
-      "gross_sharpe": -0.111,
-      "net_sharpe": -1.789,
+      "gross_sharpe": -0.42,
+      "net_sharpe": -2.111,
       "oos_sharpe": null,
       "dsr": null,
-      "rejection_reason": "net Sharpe -1.789 after the 12bps round trip (gross was -0.111)",
+      "overfit": null,
+      "rejection_reason": "net Sharpe -2.111 after the 12bps round trip (gross was -0.420)",
       "path": [
         "proposed->formalized",
         "formalized->backtested",
@@ -159,7 +167,7 @@
     {
       "name": "long_while_closed",
       "died_at": "rejected",
-      "reason": "net Sharpe -0.112 after the 12bps round trip (gross was 0.898)"
+      "reason": "net Sharpe -0.095 after the 12bps round trip (gross was 0.915)"
     },
     {
       "name": "long_while_open",
@@ -174,12 +182,12 @@
     {
       "name": "closure_momentum",
       "died_at": "rejected",
-      "reason": "net Sharpe -8.774 after the 12bps round trip (gross was -2.433)"
+      "reason": "net Sharpe -9.000 after the 12bps round trip (gross was -2.681)"
     },
     {
       "name": "closure_reversion",
       "died_at": "rejected",
-      "reason": "net Sharpe -4.003 after the 12bps round trip (gross was 2.433)"
+      "reason": "net Sharpe -3.746 after the 12bps round trip (gross was 2.681)"
     },
     {
       "name": "near_reopen",
@@ -189,12 +197,12 @@
     {
       "name": "slow_trend",
       "died_at": "rejected",
-      "reason": "net Sharpe -0.521 after the 12bps round trip (gross was 0.625)"
+      "reason": "net Sharpe -0.310 after the 12bps round trip (gross was 0.850)"
     },
     {
       "name": "slow_fade",
       "died_at": "rejected",
-      "reason": "net Sharpe -1.789 after the 12bps round trip (gross was -0.111)"
+      "reason": "net Sharpe -2.111 after the 12bps round trip (gross was -0.420)"
     }
   ]
 }

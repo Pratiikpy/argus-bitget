@@ -22,20 +22,29 @@ source ids behind its view so agreement can be discounted by shared provenance.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
 from decimal import Decimal
 from typing import Any
 
 from argus.agents.causality import CausalChain, chain_from_response
 from argus.agents.earnings import EarningsRead
 from argus.agents.earnings import from_response as earnings_from_response
+from argus.agents.quarantine import STANDING_INSTRUCTION, render_for_prompt
 from argus.llm.base import ChatModel
 from argus.llm.qwen import Thinking
 from argus.truth.clocks import SessionState
+from argus.truth.evidence import Evidence
 
-COST_PREAMBLE = """A round trip on this venue costs 12 basis points. Measured edges here are
-frequently smaller than that, so an effect you cannot size above 12bps is not a small opportunity —
-it is a loss. Say so when that is the honest answer.
+COST_PREAMBLE = """You are measuring, not deciding. Report the move you actually see, with its
+direction and its size in basis points, however small. A 4bps move is a 4bps move: say "bullish,
+4bps", not "neutral".
+
+Do NOT withhold a signal because it looks too small to trade. The desk prices transaction cost and
+the cost of its own deliberation separately, once, at the decision — a round trip is 12bps and the
+full hurdle is higher. If you also suppress small moves, that cost is charged twice and the
+decision-maker never learns the move existed.
+
+Use "neutral" when the evidence genuinely points no way, and "insufficient_evidence" when it does
+not let you tell. Neither is a comment on whether the move is worth trading.
 
 Every number below was computed by code. Do NOT recompute, estimate or adjust any figure."""
 
@@ -48,21 +57,12 @@ SCHEMA_NOTE = """Return ONLY a JSON object with exactly these keys:
   "source_ids": array of the evidence ids you actually relied on"""
 
 
-@dataclass(frozen=True, slots=True)
-class Evidence:
-    """One piece of evidence with the provenance the independence graph needs."""
+ACTIONABLE_CONFIDENCE = 0.5
+"""The line between a view the desk may act on and one it may only note.
 
-    id: str
-    claim: str
-    source: str
-    available_at: datetime
-    credibility: float = 1.0
-
-    def render(self) -> str:
-        return (
-            f"[{self.id}] ({self.source}, credibility {self.credibility:.2f}, "
-            f"available {self.available_at.isoformat()}) {self.claim}"
-        )
+Named because `argus.agents.conflict` has to reason about the same boundary: two analysts on
+opposite sides of it disagree about whether to trade at all, however close their numbers look.
+"""
 
 
 @dataclass(frozen=True, slots=True)
@@ -91,7 +91,7 @@ class AnalystView:
         return (
             self.signal in ("bullish", "bearish")
             and self.clears_round_trip
-            and self.confidence > 0.5
+            and self.confidence > ACTIONABLE_CONFIDENCE
         )
 
     def as_dict(self) -> dict[str, Any]:
@@ -123,6 +123,12 @@ def _parse_view(analyst: str, raw: dict[str, Any]) -> AnalystView:
         confidence = 0.0
 
     # A directional call with no magnitude is not a signal. Downgraded rather than guessed at.
+    #
+    # This stays, but note what it must NOT be used for: it exists because "bullish, 0bps" is
+    # self-contradictory, not to filter small moves. Every analyst signal in the first 105 live
+    # decisions came back `neutral`, and the cause was the preamble telling analysts that an
+    # effect under 12bps "is a loss" — so they reported a real move as no move, and the desk
+    # charged its own cost twice: once by never hearing the signal, once by applying the hurdle.
     if signal in ("bullish", "bearish") and magnitude == 0:
         signal = "neutral"
 
@@ -151,7 +157,13 @@ class Analyst:
     def _ask(self, body: str, *, max_tokens: int = 700) -> AnalystView:
         raw = self._client.complete_json(
             [
-                {"role": "system", "content": f"{self.role}\n\n{COST_PREAMBLE}\n\n{SCHEMA_NOTE}"},
+                {
+                    "role": "system",
+                    "content": (
+                        f"{self.role}\n\n{COST_PREAMBLE}\n\n{SCHEMA_NOTE}\n\n"
+                        f"{STANDING_INSTRUCTION}"
+                    ),
+                },
                 {"role": "user", "content": body},
             ],
             required_keys=("signal", "confidence", "reasoning"),
@@ -188,7 +200,7 @@ ANCHOR SESSION: {session.phase} (asleep: {session.is_anchor_asleep},
   {session.hours_to_next_discovery:.1f}h to genuine price discovery)
 
 EVENTS AND EVIDENCE (each was available at or before the decision instant):
-{chr(10).join('  ' + e.render() for e in evidence) or '  (none)'}"""
+{render_for_prompt(evidence)}"""
         return self._ask(body)
 
     def analyse_with_chain(
@@ -215,6 +227,33 @@ class SentimentAnalyst(Analyst):
 
     The manipulation attack is real and quantified at roughly 50% profit uplift against a naive
     consumer, and no defence exists anywhere in the 922-source corpus.
+
+    **The feed problem this docstring described is fixed; the caveat about the underlying
+    literature is not.** Bitget's social Skill returned nothing in 93% of live cycles, and the
+    free replacements the sentiment audit recommended were probed directly on 2026-09-13:
+    StockTwits answers 403 to four different User-Agents, CNN's Fear & Greed endpoint answers
+    418. Only ``alternative.me`` answered, with a crypto-wide risk-appetite index carried at
+    credibility 0.35 and labelled for what it measures — that source is still real and still
+    used. **Re-checked 2026-09-16, not carried forward**: ``agent-reach doctor --json`` now
+    reports Twitter/X reachable (``twitter-cli``), a real change in this machine's own network
+    access since the note above was written.
+    ``market.evidence.TwitterSource`` is wired into the real live desk cycle
+    (``paper/runner.py``, opt-in, LIVE ONLY) and a real sweep of the full twelve-symbol rToken
+    universe found 0 of 12 empty — a real reversal of the 93%-empty figure. One real end-to-end
+    call (real Twitter evidence for NVDAUSDT, this analyst, the real Qwen client) produced a
+    sensible, source-aware read that explicitly discounted the evidence for being
+    "low-credibility social posts." ``market.evidence.RedditSource`` followed the same day, same
+    pattern, also 0 of 12 empty after fixing two real Windows-encoding crashes inside the real
+    ``rdt-cli`` dependency itself. The published literature caveat is unrelated to either feed
+    and still holds: BloombergGPT trails an always-neutral predictor on two of its own five
+    sentiment tasks and FinMA sits at chance.
+
+    It stays in the code at its honest standing rather than being deleted, because the promotion
+    gate is a real experiment that can still be run: 30 differing paired frames through
+    :func:`argus.eval.ablation.paired`, scored on realised basis points. HELPS promotes it;
+    NO_EFFECT removes it from the panel. Deleting it now would hide the finding, and leaving it
+    unmarked would let a dead feed count as a data source. Recorded in
+    :data:`argus.eval.standing.REGISTER`.
     """
 
     name = "sentiment"
@@ -235,7 +274,7 @@ one source. Say "insufficient_evidence" when a narrative is unsourced, however s
 SOCIAL VOLUME (z-score vs 30d): {social_volume_z:+.2f}
 
 NARRATIVES:
-{chr(10).join('  ' + e.render() for e in evidence) or '  (none)'}"""
+{render_for_prompt(evidence)}"""
         return self._ask(body)
 
 
@@ -262,7 +301,7 @@ is the single most common error in this field."""
         body = f"""SYMBOL: {symbol}
 
 EARNINGS MATERIAL:
-{chr(10).join('  ' + e.render() for e in evidence) or '  (none)'}"""
+{render_for_prompt(evidence)}"""
         return self._ask(body, max_tokens=900)
 
     def analyse_decomposed(

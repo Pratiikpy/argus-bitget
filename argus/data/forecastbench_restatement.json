@@ -1,0 +1,125 @@
+{
+  "count": 49142,
+  "effective_count": 32196,
+  "distinct_instants": 4150,
+  "icc": 0.04855,
+  "bins": 10,
+  "base_rate": 0.53657,
+  "brier": 0.23267,
+  "brier_index": 51.764,
+  "climatology_brier": 0.24866,
+  "persistence_brier": 0.34745,
+  "skill_vs_coin_flip": 0.0693,
+  "skill_vs_climatology": 0.0643,
+  "skill_vs_persistence": 0.33034,
+  "reliability": 0.000289,
+  "resolution": 0.015617,
+  "uncertainty": 0.248663,
+  "within_bin": -0.00066159,
+  "murphy_identity_residual": 1.4765966227514582e-14,
+  "ece": 0.012794,
+  "mce": 0.304422,
+  "occupied_bins": [
+    {
+      "range": [
+        0.1,
+        0.2
+      ],
+      "count": 14,
+      "mean_probability": 0.19558,
+      "observed_rate": 0.5,
+      "gap": 0.30442,
+      "within_term": 0.0119655
+    },
+    {
+      "range": [
+        0.2,
+        0.3
+      ],
+      "count": 1217,
+      "mean_probability": 0.27067,
+      "observed_rate": 0.30813,
+      "gap": 0.03746,
+      "within_term": -0.54894591
+    },
+    {
+      "range": [
+        0.3,
+        0.4
+      ],
+      "count": 8199,
+      "mean_probability": 0.35959,
+      "observed_rate": 0.38383,
+      "gap": 0.02423,
+      "within_term": -0.15904811
+    },
+    {
+      "range": [
+        0.4,
+        0.5
+      ],
+      "count": 12005,
+      "mean_probability": 0.45194,
+      "observed_rate": 0.45356,
+      "gap": 0.00162,
+      "within_term": -7.96458376
+    },
+    {
+      "range": [
+        0.5,
+        0.6
+      ],
+      "count": 10808,
+      "mean_probability": 0.54338,
+      "observed_rate": 0.53803,
+      "gap": 0.00535,
+      "within_term": -9.46076396
+    },
+    {
+      "range": [
+        0.6,
+        0.7
+      ],
+      "count": 9269,
+      "mean_probability": 0.65339,
+      "observed_rate": 0.64085,
+      "gap": 0.01254,
+      "within_term": -7.69163297
+    },
+    {
+      "range": [
+        0.7,
+        0.8
+      ],
+      "count": 6138,
+      "mean_probability": 0.74142,
+      "observed_rate": 0.71652,
+      "gap": 0.0249,
+      "within_term": -5.54717693
+    },
+    {
+      "range": [
+        0.8,
+        0.9
+      ],
+      "count": 1340,
+      "mean_probability": 0.84788,
+      "observed_rate": 0.82687,
+      "gap": 0.02101,
+      "within_term": -1.14931095
+    },
+    {
+      "range": [
+        0.9,
+        1.0
+      ],
+      "count": 152,
+      "mean_probability": 0.91216,
+      "observed_rate": 0.875,
+      "gap": 0.03716,
+      "within_term": -0.00240953
+    }
+  ],
+  "verdict": "SKILL ESTABLISHED over climatology (+6.4%), with resolution 0.0156 against reliability 0.0003 \u2014 the forecasts discriminate, and the discrimination is larger than the miscalibration",
+  "comparability": "These metrics are computed the way ForecastBench, FinBench and Foresight Arena compute them, over a record of one narrow mechanical question \u2014 whether a move clears a cost hurdle \u2014 not over the open-ended world questions those benchmarks ask. A Brier score on an easier or harder question set is not a rival score, so no leaderboard figure is quoted here. What the restatement does establish is that this record can be read by anyone who reads those benchmarks, and that its skill is stated against three references rather than the most flattering one."
+}

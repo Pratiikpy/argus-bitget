@@ -1,0 +1,19 @@
+{
+  "escalations": 0,
+  "actionable_decisions": 0,
+  "total_decisions": 57,
+  "rate": null,
+  "by_trigger": {},
+  "verdict": "UNDEFINED over 57 decision(s): none would have reached the venue, so there was nothing a human could have been asked about. This is the state of a desk that has not yet traded, and it is not a takeover rate of zero",
+  "note": "Computed over the recorded ledger rows. A ledger row carries fewer signals than a live desk run, so this is a lower bound on what the escalation policy would raise in production, not a measurement of it.",
+  "reachability": {
+    "available": true,
+    "cycles_examined": 88,
+    "conditions_observed": {
+      "ungrounded_figure": 21,
+      "unresolved_conflict": 12
+    },
+    "observed": 2,
+    "total_conditions": 5
+  }
+}

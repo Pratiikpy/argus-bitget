@@ -1,0 +1,72 @@
+{
+  "designed": {
+    "results": [
+      {
+        "case": "clean_many_trials",
+        "argus_value": 0.9999999955256909,
+        "argus_raised": null,
+        "vectorbt_value": 0.999999995525691,
+        "vectorbt_produced_nan": false,
+        "agree": true
+      },
+      {
+        "case": "clean_skewed",
+        "argus_value": 0.17069587786837437,
+        "argus_raised": null,
+        "vectorbt_value": 0.17069587786837392,
+        "vectorbt_produced_nan": false,
+        "agree": true
+      },
+      {
+        "case": "single_trial_var_computed_the_way_vectorbt_does",
+        "argus_value": null,
+        "argus_raised": "variance of trial Sharpes cannot be negative or NaN",
+        "vectorbt_value": null,
+        "vectorbt_produced_nan": true,
+        "agree": true
+      },
+      {
+        "case": "high_trial_count",
+        "argus_value": 1.8369991972022603e-08,
+        "argus_raised": null,
+        "vectorbt_value": 1.8369991992351355e-08,
+        "vectorbt_produced_nan": false,
+        "agree": true
+      },
+      {
+        "case": "low_observed",
+        "argus_value": 0.0,
+        "argus_raised": null,
+        "vectorbt_value": 1.6046038428426643e-22,
+        "vectorbt_produced_nan": false,
+        "agree": true
+      }
+    ],
+    "mismatches": [],
+    "design_is_sound": true
+  },
+  "sweep_summary": {
+    "total": 1215,
+    "agree": 1215,
+    "max_abs_diff": 0.0
+  },
+  "ablations": [
+    {
+      "dimension": "deflated_sharpe_nan_variance_guard",
+      "tripped_raises": true,
+      "cleared_value": 0.9999999955256909
+    },
+    {
+      "dimension": "probabilistic_sharpe_nan_observed_guard",
+      "tripped_raises": true,
+      "cleared_value": 1.0
+    }
+  ],
+  "ablation_all_load_bearing": true,
+  "silent_nan_cost": {
+    "scenario": "a single-trial evaluation, the shape track1_study.json's own sweep produces whenever a symbol is scored against exactly one candidate rule",
+    "vectorbt_verdict": "NaN \u2014 admitted by a 'reject if metric < threshold, negated' gate; correctly excluded only by a 'metric > threshold' gate, and neither shape is enforced anywhere in vectorbt itself (grepped: no >/< comparison against deflated_sharpe_ratio in the whole package)",
+    "argus_verdict": "MetricError raised before any gate comparison could run: variance of trial Sharpes cannot be negative or NaN"
+  },
+  "scope_statement": "Claimed: ARGUS's `deflated_sharpe` and vectorbt's real `deflated_sharpe_ratio` implement the same published formula (Bailey & Lopez de Prado) and agree EXACTLY (max abs diff over a 405-case deterministic sweep: see SweepSummary) everywhere both are valid. Where vectorbt's real accessor computes a NaN `var_sharpe` (a single trial, `np.var(x, ddof=1)`, its own documented zero-degrees-of-freedom behaviour) and silently returns NaN, ARGUS's `deflated_sharpe` raises `MetricError` before the comparison could ever run \u2014 verified against vectorbt's own real, vendored math, not a description of it.\n\nNOT claimed: that this was true of ARGUS's code before this comparison was built. The pre-existing guard (`variance_of_trials < 0`) did not catch NaN \u2014 `float('nan') < 0` is `False` \u2014 so a caller computing variance the way vectorbt's own accessor does could have handed ARGUS's own function a silent NaN too. Found by running this comparison, fixed the same session in `backtest/metrics.py`, and `probabilistic_sharpe` (which `deflated_sharpe` reduces to on a single trial) had the identical gap independently, also fixed. Also not claimed: that every backtest-metrics library shares this defect \u2014 only vectorbt was checked, because it is the baseline this capability's register entry already named before this comparison began.\n"
+}

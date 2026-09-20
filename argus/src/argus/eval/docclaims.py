@@ -1,0 +1,761 @@
+"""Documentation self-verification — every number a document quotes, checked against its source.
+
+Exists because the documents drifted within a day of being written. The README said the hurdle was
+cleared on "nine of twelve" symbols while ``data/hurdle_clearance.json`` said eleven; the submission
+draft quoted 1,410 tests and 63 modules against a tree with 1,470 and 65. Each of those is a claim
+a judge could check and find wrong. This module makes the check ours: a registry of the figures the
+documents quote, each paired with the computation or artefact that produces the live value, and a
+comparison at the precision the document used. A quoted "0.67" against a live 0.6677 is OK; a quoted
+"nine" against a live 11 is STALE, by name and line.
+
+Design, taken from ``argus.status``: the document is never the source of truth for itself. Every
+``Claim.live`` reads the artefact or counts the tree; nothing here reads a number from one document
+to check another. Two modes exist because two kinds of number exist — ``exact`` for things that
+are what they are (symbols beating the baseline), and ``at_least`` for counters that only grow
+between edits (ledger entries), where the document is allowed to lag but never to overstate.
+
+Not a claim that the prose is true; a claim that the numbers in the prose match the artefacts on
+disk at the moment of the check. A wrong artefact passes. That is what the tests behind each
+artefact are for.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+import subprocess
+import sys
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parents[4]          # the workspace directory above argus/
+PACKAGE = Path(__file__).resolve().parents[3]       # .../bitget/argus
+DATA = PACKAGE / "data"
+SRC = PACKAGE / "src" / "argus"
+TESTS = PACKAGE / "tests"
+REPORT_PATH = DATA / "doc_claims.json"
+
+DOCS = {
+    "readme": PACKAGE / "README.md",
+    "submission": ROOT / "SUBMISSION-DRAFT.md",
+    "explained": ROOT / "ARGUS-EXPLAINED.md",
+    "master-plan": ROOT / "ARGUS-MASTER-PLAN.md",
+}
+
+_WORDS = {
+    "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7,
+    "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13,
+    "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
+    "nineteen": 19, "twenty": 20,
+}
+
+Number = int | float
+
+
+def parse_number(text: str) -> Number:
+    """'eleven' -> 11, '1,470' -> 1470, '7.72' -> 7.72. Raises on anything else."""
+    cleaned = text.strip().lower().replace(",", "")
+    if cleaned in _WORDS:
+        return _WORDS[cleaned]
+    if re.fullmatch(r"-?\d+", cleaned):
+        return int(cleaned)
+    if re.fullmatch(r"-?\d+\.\d+", cleaned):
+        return float(cleaned)
+    raise ValueError(f"not a number: {text!r}")
+
+
+def decimals_of(text: str) -> int:
+    """How many decimal places the document used; the live value is rounded to match."""
+    cleaned = text.strip().replace(",", "")
+    return len(cleaned.split(".", 1)[1]) if "." in cleaned else 0
+
+
+LAG_TOLERANCE = 0.20
+"""How far a ``lagging`` figure may fall behind its live value before it is STALE.
+
+**Neither existing mode fits a counter that grows every cycle.** ``exact`` fails the gate every time
+a scheduled run appends a row — the lean count moved 11 to 13 during a single test run — which
+trains a reader to ignore the check. ``at_least`` fails the other way: it passes whenever the
+document quotes *less* than the live value, so "0 decisions carry a lean" would keep passing forever
+after the first lean was written, and understating the evidence is precisely the defect that made
+the README claim two settled abstentions when there were 53.
+
+So a lagging figure may trail by this fraction and no more. A README a few cycles behind is
+tolerable; one that is an order of magnitude behind is describing a different system.
+"""
+
+
+def agrees(quoted_text: str, live: Number, mode: str) -> bool:
+    quoted = parse_number(quoted_text)
+    rounded = round(float(live), decimals_of(quoted_text))
+    if mode == "exact":
+        return abs(rounded - float(quoted)) < 1e-9
+    if mode == "at_least":
+        return float(quoted) <= float(live) + 1e-9
+    if mode == "lagging":
+        # Overstating is never tolerated; only falling behind is, and only by LAG_TOLERANCE.
+        if float(quoted) > float(live) + 1e-9:
+            return False
+        if float(live) == 0.0:
+            return float(quoted) == 0.0
+        return (float(live) - float(quoted)) / abs(float(live)) <= LAG_TOLERANCE + 1e-9
+    raise ValueError(f"unknown mode {mode!r}")
+
+
+@dataclass(frozen=True)
+class Claim:
+    """One figure the documents quote.
+
+    ``pattern`` must carry named groups ``q`` (or ``q1``, ``q2``, ...) around the quoted number(s);
+    ``live`` returns the matching number or tuple. ``docs`` names which documents are expected to
+    make the claim — a document that never mentions it is ABSENT, not wrong.
+    """
+
+    name: str
+    pattern: str
+    live: Callable[[], Any]
+    docs: tuple[str, ...]
+    mode: str = "exact"
+    flags: int = re.IGNORECASE | re.DOTALL
+
+
+@dataclass
+class Finding:
+    claim: str
+    doc: str
+    line: int | None
+    quoted: tuple[str, ...]
+    live: tuple[Number, ...] | None
+    status: str                      # OK | STALE | ABSENT | UNCHECKED
+    excerpt: str = ""
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "claim": self.claim, "doc": self.doc, "line": self.line,
+            "quoted": list(self.quoted), "live": list(self.live) if self.live else None,
+            "status": self.status, "excerpt": self.excerpt,
+        }
+
+
+@dataclass
+class Report:
+    findings: list[Finding] = field(default_factory=list)
+
+    def count(self, status: str) -> int:
+        return sum(1 for f in self.findings if f.status == status)
+
+    @property
+    def stale(self) -> list[Finding]:
+        return [f for f in self.findings if f.status == "STALE"]
+
+    @property
+    def total(self) -> int:
+        """Every claim under the gate, whichever mode produced this report.
+
+        ``checked`` depends on the invocation: the test-count claims can only be verified with
+        ``--tests``, so a plain run verifies six fewer and reports them UNCHECKED instead. Anything
+        quoting a headline figure wants **this** number, which does not move between modes.
+
+        The cockpit page quoted ``checked``, and its own staleness test therefore failed whenever a
+        plain run and a ``--tests`` run were interleaved — the page said 67 and the fresh artefact
+        said 61. A self-verification gate that fails depending on which flag last ran is worse than
+        no gate, because it teaches a reader to re-run until green.
+        """
+        return self.count("OK") + self.count("STALE") + self.count("UNCHECKED")
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "total": self.total,
+            "checked": self.count("OK") + self.count("STALE"),
+            "ok": self.count("OK"),
+            "stale": self.count("STALE"),
+            "absent": self.count("ABSENT"),
+            "unchecked": self.count("UNCHECKED"),
+            "findings": [f.as_dict() for f in self.findings],
+        }
+
+
+# ---- live values -------------------------------------------------------------------------------
+
+def _json(name: str) -> Any:
+    return json.loads((DATA / name).read_text(encoding="utf-8"))
+
+
+def _ratio(text: str) -> int:
+    """'11/12' -> 11."""
+    return int(text.split("/", 1)[0])
+
+
+def tests_collected() -> int:
+    """Count tests exactly as pytest will run them; nothing cheaper agrees with pytest.
+
+    **Restored 2026-09-15 after I deleted it by accident and replaced it with something worse.**
+    A static `def test_` count returns 3,845 against pytest's 4,104 — parametrised tests multiply at
+    collection time and no source scan can see them. I removed this exact provider, substituted the
+    static count, watched it report four *correct* documents as stale, and concluded the claim was
+    uncheckable. It was not: this implementation had already solved it, and its own first line says
+    so. The lesson is the standing rule, failed on my own codebase — **read the source before
+    replacing it.**
+    """
+    proc = subprocess.run(
+        [sys.executable, "-m", "pytest", "--collect-only", "-q", str(TESTS)],
+        capture_output=True, text=True, cwd=PACKAGE, check=False,
+    )
+    # pyproject adds -q, so the output is one "path: N" line per file rather than node ids.
+    per_file = re.findall(r"^\S+\.py: (\d+)$", proc.stdout, re.MULTILINE)
+    if per_file:
+        return sum(int(n) for n in per_file)
+    return sum(1 for line in proc.stdout.splitlines() if "::" in line)
+
+
+def source_files() -> int:
+    return sum(1 for _ in SRC.rglob("*.py"))
+
+
+def register_claims() -> int:
+    """Claims committed to the public register.
+
+    **A growing count, which is exactly why it must be checked rather than typed.** Two documents
+    stated this figure and disagreed — ARGUS-EXPLAINED said 36, ARGUS-ARCHITECTURE said 41 — and
+    both were wrong; the file held 56. An hour after they were corrected by hand it held 61.
+    A number that moves on its own cannot live in prose unless something watches it.
+    """
+    path = DATA / "register.jsonl"
+    if not path.exists():
+        return 0
+    return sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
+
+
+class ClaimError(RuntimeError):
+    """Raised rather than reporting a claim this checker cannot evaluate.
+
+    A provider that cannot produce its number must say why. Returning a plausible substitute would
+    let a document quote a figure nothing stands behind — which is the failure this whole module
+    exists to catch, committed by the module itself.
+    """
+
+
+def break_even_at_the_actual_hurdle() -> float:
+    """Break-even directional accuracy at the hurdle the desk actually faces, as a percentage.
+
+    **Two latent crashes, both inside the honesty tooling.** This was
+    ``100.0 * next(f["break_even_accuracy"] for f in frontier if ...)``:
+
+    * ``break_even_accuracy`` is **nullable by design** — `eval/hurdle.py` returns ``None`` when the
+      hurdle is at or above the mean move, because the required accuracy is then >= 1.0 and
+      *"reporting 1.4 would imply a 140% hit rate is a thing that could be attempted"*. Two of the
+      ten frontier points already carry null. ``100.0 * None`` raises `TypeError`.
+    * ``next()`` with no default raises `StopIteration` if no point matches the actual hurdle.
+
+    Neither fires today, only because the actual hurdle (18.8bps) happens to sit far below the
+    median move (136.8bps). A claim-checker that crashes on a legitimate value is a claim-checker
+    that stops running on the day the market changes — and this one is the thing that keeps every
+    other number honest.
+    """
+    blob = _json("hurdle_frontier.json")
+    actual = blob["actual_hurdle_bps"]
+    for point in blob["frontier"]:
+        if abs(point["hurdle_bps"] - actual) < 1e-9:
+            value = point["break_even_accuracy"]
+            if value is None:
+                raise ClaimError(
+                    f"no directional accuracy clears the {actual}bps hurdle — the required rate is "
+                    f"at or above 100%. The document should say so rather than quote a percentage"
+                )
+            return 100.0 * float(value)
+    raise ClaimError(
+        f"hurdle_frontier.json carries no frontier point at the actual hurdle of {actual}bps, so "
+        f"the break-even accuracy quoted in the documents cannot be checked against anything"
+    )
+
+
+def ledger_decisions() -> int:
+    """Decisions on the paper ledger. The number the status block quotes."""
+    path = DATA / "paper_ledger.jsonl"
+    if not path.exists():
+        return 0
+    return sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
+
+
+def module_count() -> int:
+    from argus.status import MODULES
+    return len(MODULES)
+
+
+def subtheme_count() -> int:
+    from argus.status import SUBTHEMES
+    return len(SUBTHEMES)
+
+
+def ledger_entries() -> int:
+    path = DATA / "paper_ledger.jsonl"
+    return sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
+
+
+def settled_abstentions() -> int:
+    """How many abstentions have a counterfactual attached.
+
+    Tracked because the README carried "two have settled as abstentions" while the live figure was
+    53. `ledger_entries` is deliberately ``at_least`` — a growing log must not fail the gate every
+    cycle — and that tolerance is exactly why a second, exact number beside it was needed: the count
+    of *settled* rows is the one a reader uses to judge whether anything has been graded, and a
+    stale one understates the evidence rather than overstating it.
+    """
+    path = DATA / "paper_ledger.jsonl"
+    rows = [json.loads(x) for x in path.read_text(encoding="utf-8").splitlines() if x.strip()]
+    return sum(1 for r in rows if r.get("counterfactual_move_bps") is not None)
+
+
+def leans_recorded() -> int:
+    """Decisions carrying a directional lean. Zero until a cycle runs with the field.
+
+    Published so the shadow record's UNDEFINED verdict can be read against a number rather than
+    taken on trust: if this is 0, there is nothing to grade and the absence of an accuracy is the
+    honest state, not a missing measurement.
+    """
+    path = DATA / "paper_ledger.jsonl"
+    rows = [json.loads(x) for x in path.read_text(encoding="utf-8").splitlines() if x.strip()]
+    return sum(1 for r in rows if str(r.get("lean", "none")).lower() in {"up", "down"})
+
+
+def hurdle_rth() -> dict[str, float]:
+    return {s: v["pct_gt_hurdle_rth"] for s, v in _json("hurdle_clearance.json")["symbols"].items()}
+
+
+def hurdle_clearing_symbols() -> int:
+    return sum(1 for pct in hurdle_rth().values() if pct >= 50)
+
+
+def hurdle_clearing_range() -> tuple[int, int]:
+    clearing = [pct for pct in hurdle_rth().values() if pct >= 50]
+    return round(min(clearing)), round(max(clearing))
+
+
+def teardown_count() -> int:
+    """Code-level teardowns in `research/architecture/`, excluding the consolidated ledger.
+
+    Added after the number drifted from 29 to 32 unnoticed: every count a document quotes has to
+    have a producer here, or it silently rots the moment the tree grows.
+    """
+    folder = ROOT / "research" / "architecture"
+    return sum(
+        1 for path in folder.glob("*.md") if not path.name.startswith("_")
+    ) if folder.exists() else 0
+
+
+def overfit_counts() -> tuple[int, int]:
+    gates = _json("overfit_gates.json")
+    return len(gates["cleared_but_unprofitable_after_fees"]), len(gates["rejected_as_noise"])
+
+
+def session_beta_aapl(key: str) -> float:
+    rows = _json("session_beta.json")["rows"]
+    return float(next(r for r in rows if r["symbol"] == "AAPLUSDT")[key])
+
+
+CLAIMS: tuple[Claim, ...] = (
+    # Four digits or a thousands comma, so a per-module count ("30 tests", "22 tests") in a prose
+    # cell is not mistaken for the suite total. Both are legitimate sentences; only one is this
+    # claim, and matching both made the checker report a disagreement between a document and
+    # itself.
+    Claim("tests_passing", r"(?P<q>\d{1,3},\d{3}|\d{4,}) tests(?: passing| collected)?",
+          tests_collected, ("readme", "submission", "explained"), mode="at_least"),
+    Claim("source_files", r"strict\W{0,3}clean (?:on|across) (?P<q>\d+) (?:source )?files",
+          source_files, ("readme", "submission", "explained")),
+    Claim("register_claims",
+          r"(?P<q>[\d,]+) claims (?:across|committed|pre-registered|on the register)",
+          register_claims, ("readme", "submission", "explained", "master-plan"), mode="lagging"),
+    Claim("ledger_decisions",
+          r"(?P<q>[\d,]+) decisions? in the paper ledger",
+          ledger_decisions, ("readme", "submission", "explained"), mode="lagging"),
+    Claim("modules_importable", r"(?P<q>\d+)/(?P<q2>\d+) modules importable",
+          lambda: (module_count(), module_count()), ("readme", "submission")),
+    Claim("subthemes", r"(?P<q>\d+)/(?P<q2>\d+) sub-themes",
+          lambda: (subtheme_count(), subtheme_count()), ("readme", "submission")),
+    Claim("ledger_entries",
+          r"(?P<q>\d+) (?:decisions(?= in the paper ledger|, 20\d\d|\. Every one|, 0 settled)"
+          r"|ledger entries)|paper-trading log has (?P<q1>\d+) decisions", ledger_entries,
+          ("readme", "submission", "explained"), mode="at_least"),
+    Claim("settled_abstentions",
+          r"(?P<q>[\d,]+) (?:have settled as abstentions|settled abstentions)",
+          settled_abstentions, ("readme", "submission", "explained"), mode="lagging"),
+    Claim("leans_recorded", r"(?P<q>[\d,]+) decisions? carr(?:y|ies) a lean",
+          leans_recorded, ("readme", "explained"), mode="lagging"),
+    Claim("t1_beat_buy_and_hold",
+          r"(?P<q>\w+) of (?:twelve|12) symbols (?:have a strategy that )?beats? buy",
+          lambda: _ratio(_json("track1_study.json")["headline"]["beat_buy_and_hold_sharpe"]),
+          ("submission", "explained", "master-plan")),
+    Claim("t1_dsr_candidates", r"(?P<q>\w+) of 12 survive that softer gate",
+          lambda: _ratio(_json("track1_study.json")["headline"]["survived_dsr_candidates_only"]),
+          ("explained",)),
+    # Bound to MSTRUSDT because that is the symbol the document now quotes: one of the two
+    # soft-gate survivors, and scorable in only half its windows. Rebinding the claim rather than
+    # changing the sentence keeps the checker pointed at the number actually written down.
+    Claim("t1_rolling_scorable", r"(?P<q>[\d,]+) of (?P<q2>[\d,]+) windows",
+          lambda: (
+              (lambda st: (st["windows"], st["windows"] + st["skipped_flat_windows"]))(
+                  next(r["rolling_sharpe_stability"]
+                       for r in _json("track1_study.json")["per_symbol"]
+                       if r["symbol"] == "MSTRUSDT")
+              )
+          ),
+          ("explained",)),
+    Claim("t1_rolling_scorable_worst", r"scorable in only (?P<q>[\d,]+) windows",
+          lambda: min(
+              r["rolling_sharpe_stability"]["windows"]
+              for r in _json("track1_study.json")["per_symbol"]
+          ),
+          ("explained",)),
+    Claim("t1_dsr_survivors", r"(?P<q>\w+) of twelve[^.]{0,60}survive[sd]? (?:the )?(?:search|dsr)",
+          lambda: _ratio(_json("track1_study.json")["headline"]["survived_dsr_all_trials"]),
+          ("explained", "master-plan")),
+    Claim("t1_oos_breaches", r"(?P<q>\w+) of twelve breach",
+          lambda: sum(1 for r in _json("track1_study.json")["per_symbol"]
+                      if r["out_of_sample_decay"]["breaches_half_alert"]),
+          ("explained", "master-plan")),
+    Claim("arbitrage_monetisable", r"monetis?z?able \**(?P<q>\d+\.\d+)%",
+          lambda: _json("arbitrage_study.json")["headline"]["monetizable_pct"],
+          ("submission", "explained", "master-plan")),
+    Claim("weekend_continuation", r"(?P<q>\d+\.\d)% continuation",
+          lambda: _json("weekend_significance.json")["test_1_significance"]["weekend"]["rate_pct"],
+          ("explained", "master-plan")),
+    Claim("session_beta_higher_open", r"on (?P<q>\w+) of (?P<q2>\w+) rTokens",
+          lambda: (_json("session_beta.json")["symbols_higher_open"],
+                   _json("session_beta.json")["symbols_compared"]),
+          ("readme", "submission", "explained", "master-plan")),
+    Claim("aapl_beta_open", r"AAPL (?:reads|is) \**(?P<q>0\.\d+)",
+          lambda: session_beta_aapl("beta_open"),
+          ("readme", "submission", "explained", "master-plan")),
+    Claim("aapl_beta_shut", r"against (?P<q>0\.\d+) shut",
+          lambda: session_beta_aapl("beta_shut"),
+          ("readme", "submission", "explained", "master-plan")),
+    Claim("hurdle_symbols_clearing_rth", r"regular hours on\s+(?P<q>\w+) of twelve symbols",
+          hurdle_clearing_symbols, ("readme", "submission", "explained", "master-plan")),
+    Claim("hurdle_clearing_range",
+          r"(?P<q>\d+)[–-](?P<q2>\d+)% (?:of\s+the time )?(?:during|in) US regular",  # noqa: RUF001 — the documents write ranges with an en dash
+          hurdle_clearing_range, ("readme", "submission", "explained", "master-plan")),
+    Claim("hurdle_qqq_rth", r"QQQ[^.\n]{0,60}?(?P<q>\d+\.\d)%",
+          lambda: hurdle_rth()["QQQUSDT"], ("submission", "master-plan")),
+    Claim("teardowns", r"(?P<q>\d+) code-level teardowns", teardown_count,
+          ("readme", "explained")),
+
+    # --- the overfitting study and the restatement ---------------------------------------------
+    # These are the newest headline numbers and the ones most likely to be quoted back at us, so
+    # each is bound to the artefact that produced it. The PBO range in particular is a pair: a
+    # document quoting only the low end would be reporting the flattering half of a result whose
+    # whole point is the spread.
+    Claim("pbo_range", r"(?P<q>0\.\d+) to \*\*(?P<q2>0\.\d+)\*\* across twelve symbols",
+          lambda: (
+              min(r["pbo_all_trials"] for r in _json("overfitting_study.json")["symbols"]),
+              max(r["pbo_all_trials"] for r in _json("overfitting_study.json")["symbols"]),
+          ),
+          ("explained",)),
+    Claim("pbo_worst", r"overfitting is \*\*(?P<q>0\.\d+)\*\* .{0,20}the\s+worst of the twelve",
+          lambda: max(r["pbo_all_trials"] for r in _json("overfitting_study.json")["symbols"]),
+          ("explained",)),
+    Claim("fdr_trials", r"(?P<q>\d+) of (?P<q2>\d+) \(symbol, variant\) trials",
+          lambda: (
+              _json("overfitting_study.json")["grid"]["survivors_benjamini_hochberg"],
+              _json("overfitting_study.json")["grid"]["trials"],
+          ),
+          ("explained",)),
+    Claim("mintrl_range",
+          r"(?P<q>\d\.\d+) to \*\*(?P<q2>\d\.\d+) years\*\* of live hourly",
+          lambda: (
+              min(r["min_track_record_years"] for r in _json("overfitting_study.json")["symbols"]
+                  if r["min_track_record_years"] is not None),
+              max(r["min_track_record_years"] for r in _json("overfitting_study.json")["symbols"]
+                  if r["min_track_record_years"] is not None),
+          ),
+          ("explained",)),
+    Claim("brier_index", r"Brier Index (?:of )?\*{0,2}(?P<q>\d+\.\d)\*{0,2}",
+          lambda: _json("forecastbench_restatement.json")["brier_index"], ("explained",)),
+    Claim("skill_vs_climatology", r"\*\*\+(?P<q>\d+\.\d)% against climatology\*\*",
+          lambda: 100.0 * _json("forecastbench_restatement.json")["skill_vs_climatology"],
+          ("explained",)),
+    Claim("hurdle_break_even",
+          r"directional accuracy of \**(?P<q>\d+\.\d)%",
+          break_even_at_the_actual_hurdle,
+          ("explained",)),
+    Claim("hurdle_median_move", r"median absolute\s+24-hour move is (?P<q>\d+)bps",
+          lambda: _json("hurdle_frontier.json")["median_abs_move_bps"], ("explained",)),
+
+    # --- the cross-sectional study -----------------------------------------------------------
+    # Five claims rather than one because each is a different kind of number, and the pair that
+    # matters most is `xs_backtests` against `xs_trials`: a document that quoted the larger number
+    # as the trial count would be overstating the multiple-testing penalty, and one that quoted the
+    # smaller as the work done would be understating the phase sweep. Both are wrong in ways a
+    # reader cannot detect, so both are checked.
+    Claim("xs_trials", r"Trials \(factors .{1,3} trading rules\) \| (?P<q>[\d,]+)",
+          lambda: _json("crosssection_study.json")["trials"], ("explained",)),
+    Claim("xs_backtests", r"Backtests actually run \(every phase\) \| (?P<q>[\d,]+)",
+          lambda: _json("crosssection_study.json")["backtests_run"], ("explained",)),
+    Claim("xs_positive_gross", r"positive \*\*before\*\* cost \| (?P<q>\d+)",
+          lambda: _json("crosssection_study.json")["headline"]["positive_mean_gross_sharpe"],
+          ("explained",)),
+    Claim("xs_positive_net", r"positive \*\*after\*\* cost \| (?P<q>\d+)",
+          lambda: _json("crosssection_study.json")["headline"]["positive_mean_net_sharpe"],
+          ("explained",)),
+    Claim("xs_phase_agreement", r"phases agree on sign \| \*\*(?P<q>\d+)\*\*",
+          lambda: _json("crosssection_study.json")["headline"][
+              "profitable_and_phase_consistent"],
+          ("explained",)),
+    Claim("overfit_noise_primitives",
+          r"(?P<q>\w+) (?:of eight (?:factors|primitives) are noise|are indistinguishable from)",
+          lambda: overfit_counts()[1], ("readme", "explained")),
+)
+
+# Claims whose live value is expensive to compute; skipped unless asked for.
+EXPENSIVE = frozenset({"tests_passing"})
+
+
+# ---- the audit ---------------------------------------------------------------------------------
+
+def _groups(match: re.Match[str]) -> tuple[str, ...]:
+    named = match.groupdict()
+    keys = sorted(k for k in named if re.fullmatch(r"q\d*", k))
+    return tuple(named[k] for k in keys if named[k] is not None)
+
+
+def _line_of(text: str, offset: int) -> int:
+    return text.count("\n", 0, offset) + 1
+
+
+def audit(
+    claims: tuple[Claim, ...] = CLAIMS,
+    docs: dict[str, Path] | None = None,
+    include_expensive: bool = False,
+    live_overrides: dict[str, Any] | None = None,
+) -> Report:
+    """Check every claim against every document that is expected to make it.
+
+    ``live_overrides`` lets a test supply values without touching disk; it maps claim name to the
+    value ``live`` would have returned.
+    """
+    docs = DOCS if docs is None else docs
+    overrides = live_overrides or {}
+    texts = {
+        name: path.read_text(encoding="utf-8") if path.exists() else None
+        for name, path in docs.items()
+    }
+    report = Report()
+    for claim in claims:
+        if claim.name in overrides:
+            live_value: Any = overrides[claim.name]
+        elif claim.name in EXPENSIVE and not include_expensive:
+            live_value = None
+        else:
+            live_value = claim.live()
+        live_tuple = (
+            None if live_value is None
+            else tuple(live_value) if isinstance(live_value, tuple) else (live_value,)
+        )
+        for doc in claim.docs:
+            text = texts.get(doc)
+            if text is None:
+                report.findings.append(Finding(claim.name, doc, None, (), live_tuple, "ABSENT",
+                                               "document not found"))
+                continue
+            matches = list(re.finditer(claim.pattern, text, claim.flags))
+            if not matches:
+                report.findings.append(Finding(claim.name, doc, None, (), live_tuple, "ABSENT"))
+                continue
+            for match in matches:
+                quoted = _groups(match)
+                excerpt = " ".join(match.group(0).split())[:120]
+                line = _line_of(text, match.start())
+                if live_tuple is None:
+                    status = "UNCHECKED"
+                elif len(quoted) != len(live_tuple):
+                    status = "STALE"
+                else:
+                    status = "OK" if all(
+                        agrees(q, v, claim.mode) for q, v in zip(quoted, live_tuple, strict=True)
+                    ) else "STALE"
+                report.findings.append(Finding(claim.name, doc, line, quoted, live_tuple,
+                                               status, excerpt))
+    return report
+
+
+def summary(report: Report) -> dict[str, Any]:
+    """The compact form ``argus.status`` embeds: counts plus the stale lines by name."""
+    return {
+        "total": report.total,
+        "checked": report.count("OK") + report.count("STALE"),
+        "stale": report.count("STALE"),
+        "unchecked": report.count("UNCHECKED"),
+        "stale_detail": [
+            f"{f.doc}:{f.line} {f.claim} quotes {'/'.join(f.quoted)}, live "
+            f"{'/'.join(str(v) for v in (f.live or ()))}"
+            for f in report.stale
+        ],
+    }
+
+
+@dataclass(frozen=True, slots=True)
+class Disagreement:
+    """One claim quoted with different values in different documents."""
+
+    claim: str
+    values: tuple[tuple[str, str], ...]
+    """(document, quoted value) for each distinct value found."""
+
+    def render(self) -> str:
+        return f"{self.claim}: " + ", ".join(f"{doc} says {value}" for doc, value in self.values)
+
+
+def _is_number(text: str) -> bool:
+    try:
+        float(text)
+    except ValueError:
+        return False
+    return True
+
+
+def disagreements(report: Report) -> list[Disagreement]:
+    """Claims where two documents quote different numbers for the same fact.
+
+    **The hole this closes.** ``at_least`` mode exists for counters that only grow — a document is
+    allowed to lag the ledger between edits — and it is the right rule for one document. Applied
+    across several it hid a real defect: the README said 93 decisions, the submission draft said
+    86, and the ledger held 126. Every one passed, because each was at most the live value.
+
+    Three documents disagreeing by forty is a defect whatever the mode, and a judge reading two of
+    them will see it before we do. This finds it without weakening ``at_least``, because it
+    compares the documents to *each other* rather than to the artefact.
+    """
+    by_claim: dict[str, dict[str, str]] = {}
+    for finding in report.findings:
+        if finding.status not in ("OK", "STALE") or not finding.quoted:
+            continue
+        # Normalised before comparing, or the check cries wolf: "0.67" and "0.668" are the same
+        # figure at two precisions, and "Four" and "four" are the same word. Only a genuine
+        # difference in value is a disagreement.
+        parts: list[str] = []
+        for raw in finding.quoted:
+            try:
+                parts.append(f"{float(parse_number(raw)):.6g}")
+            except ValueError:
+                parts.append(raw.strip().casefold())
+        quoted = "/".join(parts)
+        by_claim.setdefault(finding.claim, {}).setdefault(quoted, finding.doc)
+    out: list[Disagreement] = []
+    for claim, values in sorted(by_claim.items()):
+        numeric = [v for v in values if _is_number(v)]
+        if len(numeric) == len(values) and len(values) > 1:
+            # Two numbers that agree once rounded to the coarser of the two precisions are the
+            # same figure written differently.
+            places = min(len(v.split(".")[1]) if "." in v else 0 for v in values)
+            rounded = {f"{float(v):.{places}f}" for v in values}
+            if len(rounded) == 1:
+                continue
+        if len(values) > 1:
+            out.append(Disagreement(
+                claim=claim,
+                values=tuple(sorted((doc, value) for value, doc in values.items())),
+            ))
+    return out
+
+
+def repair(report: Report) -> list[str]:
+    """Rewrite every STALE figure in place, to the value its own artefact reports.
+
+    Added after the fourth manual pass over the same five numbers in one session. A counter that
+    only ever grows — source files, modules, tests — makes a document stale on every commit, and a
+    checker that can find the drift but not close it turns an automated guard back into a chore.
+
+    Three properties keep this safe to run unattended:
+
+    * **It only ever writes the live value.** The replacement is computed from the artefact, so a
+      repair cannot introduce a number that was not already true when the check ran.
+    * **It rewrites one line, at the exact quoted text.** The regex that found the figure supplies
+      its span, so nothing outside the matched digits is touched and a sentence cannot be reshaped.
+    * **It refuses anything but STALE.** An ABSENT claim means a document does not make that claim
+      at all, and inserting one would be writing prose rather than correcting a figure.
+
+    Returns a line per repair, for the caller to print. Never silent.
+    """
+    done: list[str] = []
+    by_doc: dict[str, list[Finding]] = {}
+    for finding in report.stale:
+        by_doc.setdefault(finding.doc, []).append(finding)
+    for doc, findings in by_doc.items():
+        path = DOCS.get(doc)
+        if path is None or not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        for finding in findings:
+            if finding.live is None or len(finding.quoted) != len(finding.live):
+                continue
+            if not finding.excerpt or finding.excerpt not in text:
+                continue
+            # Every captured group is rewritten inside ONE copy of the excerpt, and the excerpt is
+            # substituted once at the end.
+            #
+            # The first version of this rewrote the document per group, which turned "81/81
+            # modules importable" into "82/81" and then stopped: after the first substitution the
+            # excerpt no longer matched the document, so the second group silently did nothing.
+            # A repair that half-applies is worse than one that does not run, because the check
+            # that follows it reports a number nobody ever wrote.
+            fixed_excerpt = finding.excerpt
+            changes: list[str] = []
+            cursor = 0
+            for quoted, live in zip(finding.quoted, finding.live, strict=True):
+                fresh = _format_like(quoted, live)
+                at = fixed_excerpt.find(quoted, cursor)
+                if at < 0:
+                    continue
+                if quoted != fresh:
+                    fixed_excerpt = (
+                        fixed_excerpt[:at] + fresh + fixed_excerpt[at + len(quoted):]
+                    )
+                    changes.append(f"{doc}:{finding.line} {finding.claim} {quoted} -> {fresh}")
+                cursor = at + len(fresh)
+            if fixed_excerpt != finding.excerpt:
+                text = text.replace(finding.excerpt, fixed_excerpt, 1)
+                done.extend(changes)
+        path.write_text(text, encoding="utf-8", newline="")
+    return done
+
+
+def _format_like(quoted: str, live: Number) -> str:
+    """The live value, written the way the document writes numbers.
+
+    Thousands separators and decimal places are preserved from the quoted text: replacing "1,470"
+    with "2286" would fix the number and break the prose.
+    """
+    places = decimals_of(quoted)
+    value = round(float(live), places)
+    rendered = f"{value:,.{places}f}" if "," in quoted else f"{value:.{places}f}"
+    return rendered
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = sys.argv[1:] if argv is None else argv
+    include_expensive = "--tests" in args
+    report = audit(include_expensive=include_expensive)
+    clashes = disagreements(report)
+    for clash in clashes:
+        print(f"DISAGREE  {clash.render()}")
+    if "--fix" in args:
+        repaired = repair(report)
+        for line in repaired:
+            print(f"FIXED     {line}")
+        if repaired:
+            report = audit(include_expensive=include_expensive)
+    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8")
+    for finding in report.findings:
+        if finding.status == "ABSENT":
+            continue
+        where = f"{finding.doc}:{finding.line}" if finding.line else finding.doc
+        live = "/".join(str(v) for v in (finding.live or ()))
+        print(f"{finding.status:9} {finding.claim:28} {where:22} quoted "
+              f"{'/'.join(finding.quoted):10} live {live:10} | {finding.excerpt}")
+    print(json.dumps(summary(report), indent=2))
+    return 1 if (report.stale or disagreements(report)) else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

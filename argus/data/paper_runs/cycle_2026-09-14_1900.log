@@ -1,0 +1,784 @@
+﻿=== ARGUS paper cycle 2026-09-14_1900 ===
+sampling MSTRUSDT for 90s (rth)...
+
+MARKOUT ΓÇö MSTRUSDT, 90s of rth, 61 book sample(s), 85 print(s), 0% flagged RPI
+
+   horizon  prints    median      mean     worst
+        5s       0    +0.000    +0.000    +0.000
+       15s       0    +0.000    +0.000    +0.000
+       30s       0    +0.000    +0.000    +0.000
+       60s       0    +0.000    +0.000    +0.000
+
+  0 joined print(s) at the 5s horizon over 90s of MSTRUSDT (rth) ΓÇö below the 20 this module will draw a conclusion from. The sample says the book was quiet, not that resting here is safe
+
+written to argus\data\markout.json
+markout_exit=0
+EXECUTABLE COST ΓÇö slippage in bps against mid, taking the ask
+
+symbol         quoted      $1000      $5000     $25000    $100000
+-----------------------------------------------------------------
+NVDAUSDT         0.48       0.52       2.14       4.31       7.59
+TSLAUSDT         5.76       3.78       6.85      10.42          ΓÇö
+AAPLUSDT         0.30       0.79       5.37      13.99      19.36
+MSFTUSDT         7.00       6.17       7.80      14.13      26.37
+METAUSDT         4.55       4.60      12.52      18.50          ΓÇö
+GOOGLUSDT        3.78       3.95       6.88      11.76      13.61
+AMZNUSDT         3.57       1.79       1.79       5.29      13.83
+COINUSDT         6.54       9.02      17.55      24.50          ΓÇö
+MSTRUSDT         2.27       2.67       5.65      11.25      17.78
+QQQUSDT          0.14       0.20       0.84       2.30       3.08
+TQQQUSDT         2.96       2.73       4.84      13.98      26.84
+SQQQUSDT         7.36       5.99       6.10      26.62      46.58
+
+12 book(s) written to argus\data\depth.json
+depth_exit=0
+recorded 12 snapshot(s) to argus\data\book_tape.jsonl
+
+  120 snapshots over 2.616h: a near-touch level holds a median 1.835 contracts and moves a median 69.8% of itself between snapshots, growing 49% of the time. The attribution rule ΓÇö which side of a resting order a decrease came from ΓÇö is not in this data and cannot be, so it stays a swept assumption rather than a measurement.
+
+written to argus\data\book_calibration.json
+bookcalib_exit=0
+  NVDAUSDT: extended=14.1 overnight=12.9 rth=31.5 weekend=5.2 | reopen=52.6 (1.7x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 22.2bps per bar against a 31.5bps regular-hours bar; no reduction, and this layer may not size up
+  TSLAUSDT: extended=15.4 overnight=12.7 rth=36.9 weekend=6.4 | reopen=76.1 (2.1x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 26.9bps per bar against a 36.9bps regular-hours bar; no reduction, and this layer may not size up
+  AAPLUSDT: extended=10.8 overnight=8.0 rth=23.7 weekend=5.3 | reopen=48.5 (2.0x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 17.4bps per bar against a 23.7bps regular-hours bar; no reduction, and this layer may not size up
+  MSFTUSDT: extended=13.8 overnight=9.1 rth=26.4 weekend=5.9 | reopen=46.1 (1.7x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 19.0bps per bar against a 26.4bps regular-hours bar; no reduction, and this layer may not size up
+  METAUSDT: extended=14.7 overnight=10.1 rth=34.0 weekend=6.4 | reopen=67.5 (2.0x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 24.4bps per bar against a 34.0bps regular-hours bar; no reduction, and this layer may not size up
+  GOOGLUSDT: extended=13.7 overnight=9.3 rth=23.4 weekend=5.6 | reopen=50.8 (2.2x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 18.5bps per bar against a 23.4bps regular-hours bar; no reduction, and this layer may not size up
+  AMZNUSDT: extended=13.0 overnight=8.1 rth=23.2 weekend=4.9 | reopen=41.2 (1.8x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 17.0bps per bar against a 23.2bps regular-hours bar; no reduction, and this layer may not size up
+  COINUSDT: extended=28.8 overnight=19.4 rth=61.8 weekend=13.9 | reopen=95.1 (1.5x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 42.1bps per bar against a 61.8bps regular-hours bar; no reduction, and this layer may not size up
+  MSTRUSDT: extended=38.7 overnight=30.6 rth=67.6 weekend=18.8 | reopen=103.0 (1.5x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 49.6bps per bar against a 67.6bps regular-hours bar; no reduction, and this layer may not size up
+  QQQUSDT: extended=9.5 overnight=10.2 rth=15.3 weekend=4.0 | reopen=28.3 (1.9x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 12.7bps per bar against a 15.3bps regular-hours bar; no reduction, and this layer may not size up
+  TQQQUSDT: extended=26.3 overnight=30.4 rth=47.5 weekend=8.5 | reopen=90.3 (1.9x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 38.4bps per bar against a 47.5bps regular-hours bar; no reduction, and this layer may not size up
+  SQQQUSDT: extended=27.4 overnight=31.3 rth=48.8 weekend=8.1 | reopen=88.8 (1.8x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 39.1bps per bar against a 48.8bps regular-hours bar; no reduction, and this layer may not size up
+
+12 profile(s) written to argus\data\session_risk.json
+session_risk_exit=0
+symbol        RTH bps/h  wknd bps/h  attenuation  anchor
+NVDAUSDT          32.44        4.52         7.17  OK
+TSLAUSDT          35.53        6.35         5.60  OK
+AAPLUSDT          25.03        4.36         5.74  OK
+MSFTUSDT          25.57        4.70         5.44  OK
+METAUSDT          34.26        5.56         6.16  OK
+GOOGLUSDT         24.36        5.41         4.50  OK
+AMZNUSDT          24.11        3.80         6.34  OK
+COINUSDT          62.75       12.34         5.09  OK
+MSTRUSDT          67.84       17.86         3.80  OK
+QQQUSDT           15.69        3.63         4.33  OK
+TQQQUSDT          48.69        7.12         6.84  OK
+SQQQUSDT          46.63        5.48         8.51  OK
+
+  all 12 shipped instruments still attenuate past 2.5x when the anchor market shuts
+
+written to argus\data\universe_validation.json
+universe_exit=0
+  NVDAUSDT: no basis history (HistoryError)
+  TSLAUSDT: no basis history (HistoryError)
+  AAPLUSDT: no basis history (HistoryError)
+  MSFTUSDT: no basis history (HistoryError)
+  METAUSDT: no basis history (HistoryError)
+  GOOGLUSDT: no basis history (HistoryError)
+  AMZNUSDT: no basis history (HistoryError)
+  COINUSDT: no basis history (HistoryError)
+  MSTRUSDT: no basis history (HistoryError)
+  QQQUSDT: no basis history (HistoryError)
+  TQQQUSDT: no basis history (HistoryError)
+  SQQQUSDT: no basis history (HistoryError)
+nothing measurable; no file written
+effectiveness_exit=1
+{
+  "ran_at": "2026-09-14T13:45:12.903124+00:00",
+  "decisions_written": [
+    {
+      "seq": 184,
+      "symbol": "NVDAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.58,
+      "attests_llm_decided": true,
+      "notes_written": 17,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 0.00 \u2014 earnings dominates: 8 distinct sources against 5"
+      ]
+    },
+    {
+      "seq": 185,
+      "symbol": "TSLAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.62,
+      "attests_llm_decided": true,
+      "notes_written": 17,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": []
+    },
+    {
+      "seq": 186,
+      "symbol": "AAPLUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 17,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": []
+    },
+    {
+      "seq": 187,
+      "symbol": "MSFTUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.82,
+      "attests_llm_decided": true,
+      "notes_written": 17,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": []
+    },
+    {
+      "seq": 188,
+      "symbol": "METAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 18,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 20.00 \u2014 earnings dominates: confidence 0.72 against 0.55",
+        "[grounding] 2 of 8 figure(s) do not resolve to anything the desk was given: -103bps, -95",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 189,
+      "symbol": "GOOGLUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 18,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 27.00 \u2014 earnings dominates: confidence 0.72 against 0.45",
+        "[grounding] 1 of 9 figure(s) do not resolve to anything the desk was given: -0.03",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 190,
+      "symbol": "AMZNUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.85,
+      "attests_llm_decided": true,
+      "notes_written": 17,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 10.00 \u2014 earnings dominates: confidence 0.72 against 0.55",
+        "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 16.27bps",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 191,
+      "symbol": "COINUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.78,
+      "attests_llm_decided": true,
+      "notes_written": 19,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] event (bullish) vs sentiment (bearish), gap 58.00 \u2014 event dominates: confidence 0.72 against 0.55",
+        "[conflict:direction] event (bullish) vs earnings (bearish), gap 28.00 \u2014 event dominates: 8 distinct sources against 6",
+        "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 30.00 \u2014 earnings dominates: confidence 0.72 against 0.55",
+        "[grounding] 2 of 8 figure(s) do not resolve to anything the desk was given: -192 bps, 8",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 192,
+      "symbol": "MSTRUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.78,
+      "attests_llm_decided": true,
+      "notes_written": 16,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+      ]
+    },
+    {
+      "seq": 193,
+      "symbol": "QQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 19,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 46bps",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 194,
+      "symbol": "TQQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 20,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 3",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 195,
+      "symbol": "SQQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.88,
+      "attests_llm_decided": true,
+      "notes_written": 19,
+      "protocol": {
+        "digest": "sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1",
+        "version": 2,
+        "reduced_this_decision": false
+      },
+      "flags": []
+    }
+  ],
+  "settled_this_cycle": [
+    {
+      "seq": 70,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-351.1506"
+    },
+    {
+      "seq": 71,
+      "symbol": "TSLAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-188.8536"
+    },
+    {
+      "seq": 72,
+      "symbol": "AAPLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-29.3703"
+    },
+    {
+      "seq": 73,
+      "symbol": "MSFTUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "26.2128"
+    },
+    {
+      "seq": 74,
+      "symbol": "METAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "202.1974"
+    },
+    {
+      "seq": 75,
+      "symbol": "GOOGLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "153.9546"
+    },
+    {
+      "seq": 76,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-352.4774"
+    },
+    {
+      "seq": 77,
+      "symbol": "AMZNUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-90.2864"
+    },
+    {
+      "seq": 78,
+      "symbol": "COINUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "578.6958"
+    },
+    {
+      "seq": 79,
+      "symbol": "MSTRUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "208.7811"
+    },
+    {
+      "seq": 80,
+      "symbol": "QQQUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-129.3013"
+    },
+    {
+      "seq": 81,
+      "symbol": "TQQQUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-392.5999"
+    },
+    {
+      "seq": 82,
+      "symbol": "SQQQUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "415.8111"
+    },
+    {
+      "seq": 83,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-351.1506"
+    },
+    {
+      "seq": 84,
+      "symbol": "TSLAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-193.6500"
+    },
+    {
+      "seq": 85,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-351.5929"
+    },
+    {
+      "seq": 86,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-344.0683"
+    },
+    {
+      "seq": 87,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-340.9665"
+    },
+    {
+      "seq": 88,
+      "symbol": "TSLAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-175.2381"
+    },
+    {
+      "seq": 89,
+      "symbol": "AAPLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-28.1749"
+    },
+    {
+      "seq": 90,
+      "symbol": "MSFTUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "26.8194"
+    },
+    {
+      "seq": 91,
+      "symbol": "METAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "216.0313"
+    },
+    {
+      "seq": 92,
+      "symbol": "GOOGLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "120.3549"
+    },
+    {
+      "seq": 93,
+      "symbol": "AMZNUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-91.8288"
+    },
+    {
+      "seq": 94,
+      "symbol": "COINUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "597.9934"
+    },
+    {
+      "seq": 95,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-324.5380"
+    },
+    {
+      "seq": 96,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-323.6484"
+    },
+    {
+      "seq": 97,
+      "symbol": "TSLAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-157.8302"
+    },
+    {
+      "seq": 98,
+      "symbol": "AAPLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-26.3813"
+    },
+    {
+      "seq": 99,
+      "symbol": "MSFTUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "36.3313"
+    },
+    {
+      "seq": 100,
+      "symbol": "METAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "222.9623"
+    },
+    {
+      "seq": 101,
+      "symbol": "GOOGLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "127.1758"
+    },
+    {
+      "seq": 102,
+      "symbol": "AMZNUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-87.2002"
+    },
+    {
+      "seq": 103,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-324.0932"
+    },
+    {
+      "seq": 104,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-321.8687"
+    },
+    {
+      "seq": 105,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-320.0883"
+    },
+    {
+      "seq": 106,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-310.7306"
+    },
+    {
+      "seq": 107,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-297.3309"
+    },
+    {
+      "seq": 108,
+      "symbol": "TSLAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-144.6664"
+    },
+    {
+      "seq": 109,
+      "symbol": "AAPLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-16.2050"
+    },
+    {
+      "seq": 110,
+      "symbol": "MSFTUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "49.7191"
+    },
+    {
+      "seq": 111,
+      "symbol": "METAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "233.6925"
+    },
+    {
+      "seq": 112,
+      "symbol": "GOOGLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "175.4799"
+    },
+    {
+      "seq": 113,
+      "symbol": "AMZNUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-68.2554"
+    },
+    {
+      "seq": 114,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-237.4768"
+    },
+    {
+      "seq": 115,
+      "symbol": "TSLAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-105.2343"
+    },
+    {
+      "seq": 116,
+      "symbol": "AAPLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "2.7060"
+    },
+    {
+      "seq": 117,
+      "symbol": "MSFTUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "77.8273"
+    },
+    {
+      "seq": 118,
+      "symbol": "METAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "271.4259"
+    },
+    {
+      "seq": 119,
+      "symbol": "GOOGLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "213.6714"
+    },
+    {
+      "seq": 120,
+      "symbol": "AMZNUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-15.2923"
+    },
+    {
+      "seq": 121,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-224.7817"
+    },
+    {
+      "seq": 122,
+      "symbol": "TSLAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-107.6742"
+    },
+    {
+      "seq": 123,
+      "symbol": "AAPLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "44.0781"
+    },
+    {
+      "seq": 124,
+      "symbol": "MSFTUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "105.8879"
+    },
+    {
+      "seq": 125,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-210.2326"
+    },
+    {
+      "seq": 126,
+      "symbol": "TSLAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-83.2212"
+    },
+    {
+      "seq": 127,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-175.5041"
+    },
+    {
+      "seq": 128,
+      "symbol": "TSLAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-58.0995"
+    },
+    {
+      "seq": 129,
+      "symbol": "AAPLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "46.5046"
+    },
+    {
+      "seq": 130,
+      "symbol": "MSFTUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "99.7299"
+    },
+    {
+      "seq": 131,
+      "symbol": "METAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "321.4758"
+    },
+    {
+      "seq": 132,
+      "symbol": "GOOGLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "212.4642"
+    },
+    {
+      "seq": 133,
+      "symbol": "AMZNUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "15.3392"
+    },
+    {
+      "seq": 134,
+      "symbol": "COINUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "768.0278"
+    },
+    {
+      "seq": 135,
+      "symbol": "MSTRUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "412.5891"
+    },
+    {
+      "seq": 136,
+      "symbol": "QQQUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-42.0696"
+    },
+    {
+      "seq": 137,
+      "symbol": "TQQQUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-186.0935"
+    },
+    {
+      "seq": 138,
+      "symbol": "SQQQUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "180.6322"
+    }
+  ],
+  "tokens_spent": 230674,
+  "token_budget": 330000,
+  "stopped_early": "",
+  "chain": {
+    "entries": 195,
+    "chain_intact": true,
+    "links_intact": true,
+    "first_break_at": null,
+    "truncated": false,
+    "anchor": "anchor agrees with the log",
+    "head_hash": "956c09d2ac6d2f29"
+  },
+  "protocol": "argus-paper-v1 v2 (sha256:0b10323271f4d51a221b14a596a37d367f1c135b54e1aeb41bd9188b03b2cef1)"
+}
+exit=0
+
+cycle 8: 5 claim(s) on MSTRUSDT, head daac1862a354a628
+    resolves 2026-09-15T14:21
+    resolves 2026-09-17T14:21
+    resolves 2026-09-21T14:21
+    resolves 2026-09-28T14:21
+    resolves 2026-10-14T14:21
+  anchored to 4 calendar(s)
+
+  2 claim(s) resolve inside the window and 4 are still open when it starts
+cadence_exit=0
+0 claim(s) resolved this run
+
+REGISTER ΓÇö 46 claim(s), 0 resolved, 46 pending, 0 unresolvable
+
+written to argus\data\register_scoreboard.json
+register_exit=0
+CYCLE CHECK ΓÇö cycle_2026-09-14_1900.log
+
+  PASS     exit_code
+           process exited 0
+  PASS     symbols_decided
+           12 of 12 symbols produced a decision
+  PASS     ran_to_completion
+           the cycle reached every symbol it was given
+  PASS     token_budget
+           230,674 of 330,000 spent (70%)
+  PASS     budget_not_exhausted
+           the guard did not fire
+  PASS     chain_intact
+           the hash chain verified after the write
+  PASS     leans_recorded
+           12 of 12 decision(s) carry a directional lean
+  PASS     verdicts_parsed
+           every verdict parsed
+  PASS     session
+           session phase(s) seen: rth  <-- price discovery
+
+  9/9 checks passed. **FALSIFIER FIRED**: this cycle had price discovery and the desk still proposed no exposure on any symbol. eval/autopsy.py named exactly this as the observation that moves the cause of the abstentions from the sampling to the desk. Its conclusion is now refuted and must be rewritten, not defended
+
+written to argus\data\cycle_check.json
+check_exit=0

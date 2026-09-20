@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-09-14T20:07:16.232478+00:00",
+  "positions": 3,
+  "weights": {
+    "NVDAUSDT": 0.4,
+    "TSLAUSDT": 0.3,
+    "METAUSDT": 0.3
+  },
+  "effective_bets": 1.1185,
+  "torsion_bets": 2.9404,
+  "variance_shares": [
+    0.97974,
+    0.006791,
+    0.013469
+  ],
+  "eigenvalues": [
+    2.23593e-05,
+    1.74896e-05,
+    1.07698e-05
+  ],
+  "hedges": [
+    {
+      "instrument": "TQQQUSDT",
+      "ratio": -0.372,
+      "variance_reduction": 0.4515,
+      "correlation": 0.6719
+    },
+    {
+      "instrument": "QQQUSDT",
+      "ratio": -1.0984,
+      "variance_reduction": 0.4476,
+      "correlation": 0.669
+    },
+    {
+      "instrument": "SQQQUSDT",
+      "ratio": 0.3667,
+      "variance_reduction": 0.4428,
+      "correlation": -0.6655
+    }
+  ]
+}

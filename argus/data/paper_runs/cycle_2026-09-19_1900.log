@@ -1,0 +1,601 @@
+﻿=== ARGUS paper cycle 2026-09-19_1900 ===
+sampling MSTRUSDT for 90s (weekend)...
+
+MARKOUT ΓÇö MSTRUSDT, 90s of weekend, 69 book sample(s), 100 print(s), 0% flagged RPI
+
+   horizon  prints    median      mean     worst
+        5s       4    -0.321    -1.925    -7.699
+       15s       0    +0.000    +0.000    +0.000
+       30s       0    +0.000    +0.000    +0.000
+       60s       0    +0.000    +0.000    +0.000
+
+  4 joined print(s) at the 5s horizon over 90s of MSTRUSDT (weekend) ΓÇö below the 20 this module will draw a conclusion from. The sample says the book was quiet, not that resting here is safe
+
+written to argus\data\markout.json
+markout_exit=0
+EXECUTABLE COST ΓÇö slippage in bps against mid, taking the ask
+
+symbol         quoted      $1000      $5000     $25000    $100000
+-----------------------------------------------------------------
+NVDAUSDT         0.45       0.22       1.07       1.81       3.62
+TSLAUSDT         2.47       2.18       2.97       4.50       6.58
+AAPLUSDT         0.30       1.65       3.52       5.80       7.57
+MSFTUSDT         4.85       3.37       3.89       5.26       8.04
+METAUSDT         0.30       1.72       3.71       6.29          ΓÇö
+GOOGLUSDT        1.71       1.37       2.18       3.90       6.56
+AMZNUSDT         1.97       2.13       4.02       6.04       9.18
+COINUSDT         3.59       2.84       4.71       5.88      13.77
+MSTRUSDT         0.64       1.80       2.48       5.17       7.82
+QQQUSDT          0.14       0.35       0.74       1.95       3.04
+TQQQUSDT         1.38       1.90       2.88      11.62      19.50
+SQQQUSDT         5.26       5.70       7.83      14.91      29.22
+
+12 book(s) written to argus\data\depth.json
+depth_exit=0
+recorded 12 snapshot(s) to argus\data\book_tape.jsonl
+
+  360 snapshots over 122.614h: a near-touch level holds a median 3.09 contracts. **Change is reported per horizon, not pooled** ΓÇö a level moves a very different share of itself over 30 seconds than over an hour, and one median over both is a number about the sampling schedule rather than about the book. The shortest horizon with at least 100 observations is `under_30s`, where a level moves a median 24.0% of itself ΓÇö that is the figure the simulator should take, being nearest the per-event timescale it models. The attribution rule ΓÇö which side of a resting order a decrease came from ΓÇö is not in this data and cannot be, so it stays a swept assumption rather than a measurement.
+
+written to argus\data\book_calibration.json
+bookcalib_exit=0
+  NVDAUSDT: extended=14.0 overnight=12.7 rth=31.3 weekend=5.0 | reopen=51.6 (1.6x rth, n=65)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 5.0bps per bar against a 31.3bps regular-hours bar; no reduction, and this layer may not size up
+  TSLAUSDT: extended=14.6 overnight=12.7 rth=37.5 weekend=6.1 | reopen=76.1 (2.0x rth, n=65)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 6.1bps per bar against a 37.5bps regular-hours bar; no reduction, and this layer may not size up
+  AAPLUSDT: extended=10.5 overnight=7.6 rth=23.7 weekend=5.5 | reopen=43.8 (1.8x rth, n=65)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 5.5bps per bar against a 23.7bps regular-hours bar; no reduction, and this layer may not size up
+  MSFTUSDT: extended=13.4 overnight=9.0 rth=25.9 weekend=5.6 | reopen=40.6 (1.6x rth, n=65)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 5.6bps per bar against a 25.9bps regular-hours bar; no reduction, and this layer may not size up
+  METAUSDT: extended=14.8 overnight=10.1 rth=34.6 weekend=6.4 | reopen=67.5 (1.9x rth, n=65)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 6.4bps per bar against a 34.6bps regular-hours bar; no reduction, and this layer may not size up
+  GOOGLUSDT: extended=13.6 overnight=9.2 rth=23.2 weekend=5.6 | reopen=49.3 (2.1x rth, n=65)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 5.6bps per bar against a 23.2bps regular-hours bar; no reduction, and this layer may not size up
+  AMZNUSDT: extended=12.6 overnight=7.8 rth=23.6 weekend=4.8 | reopen=41.2 (1.7x rth, n=65)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 4.8bps per bar against a 23.6bps regular-hours bar; no reduction, and this layer may not size up
+  COINUSDT: extended=28.8 overnight=19.4 rth=65.5 weekend=13.7 | reopen=95.7 (1.5x rth, n=65)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 13.7bps per bar against a 65.5bps regular-hours bar; no reduction, and this layer may not size up
+  MSTRUSDT: extended=38.4 overnight=30.7 rth=68.8 weekend=18.6 | reopen=103.0 (1.5x rth, n=65)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 18.6bps per bar against a 68.8bps regular-hours bar; no reduction, and this layer may not size up
+  QQQUSDT: extended=9.1 overnight=10.2 rth=15.2 weekend=3.9 | reopen=28.3 (1.9x rth, n=65)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 3.9bps per bar against a 15.2bps regular-hours bar; no reduction, and this layer may not size up
+  TQQQUSDT: extended=26.2 overnight=30.7 rth=45.9 weekend=8.5 | reopen=87.2 (1.9x rth, n=65)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 8.5bps per bar against a 45.9bps regular-hours bar; no reduction, and this layer may not size up
+  SQQQUSDT: extended=26.2 overnight=31.5 rth=47.5 weekend=8.0 | reopen=84.3 (1.8x rth, n=65)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 8.0bps per bar against a 47.5bps regular-hours bar; no reduction, and this layer may not size up
+
+12 profile(s) written to argus\data\session_risk.json
+session_risk_exit=0
+symbol        RTH bps/h  wknd bps/h  attenuation  anchor
+NVDAUSDT          30.41        4.36         6.98  OK
+TSLAUSDT          37.48        5.94         6.31  OK
+AAPLUSDT          25.81        4.42         5.83  OK
+MSFTUSDT          25.19        4.58         5.50  OK
+METAUSDT          35.03        5.56         6.30  OK
+GOOGLUSDT         24.23        5.28         4.59  OK
+AMZNUSDT          24.53        3.76         6.52  OK
+COINUSDT          65.82       12.13         5.43  OK
+MSTRUSDT          68.48       16.92         4.05  OK
+QQQUSDT           15.56        3.53         4.41  OK
+TQQQUSDT          48.06        7.34         6.55  OK
+SQQQUSDT          46.55        5.77         8.07  OK
+
+  all 12 shipped instruments still attenuate past 2.5x when the anchor market shuts
+
+written to argus\data\universe_validation.json
+universe_exit=0
+  NVDAUSDT hedged with NVDA index (all): r=+0.989 [95% low +0.988], optimal ratio 0.983 removes 97.9% of variance, one-for-one removes 97.9%, n=1438
+  NVDAUSDT hedged with NVDA index (extended): r=+0.998 [95% low +0.998], optimal ratio 0.990 removes 99.6% of variance, one-for-one removes 99.6%, n=433
+  NVDAUSDT hedged with NVDA index (overnight): r=+0.995 [95% low +0.994], optimal ratio 0.992 removes 99.0% of variance, one-for-one removes 99.0%, n=347
+  NVDAUSDT hedged with NVDA index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.988 removes 99.8% of variance, one-for-one removes 99.8%, n=263
+  NVDAUSDT hedged with NVDA index (weekend): r=+0.997 [95% low +0.997], optimal ratio 0.997 removes 99.4% of variance, one-for-one removes 99.4%, n=392
+  TSLAUSDT hedged with TSLA index (all): r=+0.991 [95% low +0.990], optimal ratio 0.993 removes 98.2% of variance, one-for-one removes 98.2%, n=1438
+  TSLAUSDT hedged with TSLA index (extended): r=+0.999 [95% low +0.998], optimal ratio 0.997 removes 99.7% of variance, one-for-one removes 99.7%, n=433
+  TSLAUSDT hedged with TSLA index (overnight): r=+0.997 [95% low +0.997], optimal ratio 1.002 removes 99.5% of variance, one-for-one removes 99.5%, n=347
+  TSLAUSDT hedged with TSLA index (rth): r=+1.000 [95% low +1.000], optimal ratio 0.999 removes 99.9% of variance, one-for-one removes 99.9%, n=263
+  TSLAUSDT hedged with TSLA index (weekend): r=+0.989 [95% low +0.987], optimal ratio 0.995 removes 97.8% of variance, one-for-one removes 97.8%, n=392
+  AAPLUSDT hedged with AAPL index (all): r=+0.989 [95% low +0.987], optimal ratio 0.980 removes 97.8% of variance, one-for-one removes 97.7%, n=1438
+  AAPLUSDT hedged with AAPL index (extended): r=+0.996 [95% low +0.995], optimal ratio 0.980 removes 99.3% of variance, one-for-one removes 99.2%, n=433
+  AAPLUSDT hedged with AAPL index (overnight): r=+0.996 [95% low +0.996], optimal ratio 1.001 removes 99.3% of variance, one-for-one removes 99.3%, n=347
+  AAPLUSDT hedged with AAPL index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.987 removes 99.8% of variance, one-for-one removes 99.8%, n=263
+  AAPLUSDT hedged with AAPL index (weekend): r=+0.997 [95% low +0.996], optimal ratio 1.000 removes 99.4% of variance, one-for-one removes 99.4%, n=392
+  MSFTUSDT hedged with MSFT index (all): r=+0.991 [95% low +0.990], optimal ratio 0.989 removes 98.3% of variance, one-for-one removes 98.2%, n=1438
+  MSFTUSDT hedged with MSFT index (extended): r=+0.998 [95% low +0.997], optimal ratio 0.994 removes 99.5% of variance, one-for-one removes 99.5%, n=433
+  MSFTUSDT hedged with MSFT index (overnight): r=+0.996 [95% low +0.996], optimal ratio 0.996 removes 99.3% of variance, one-for-one removes 99.3%, n=347
+  MSFTUSDT hedged with MSFT index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.983 removes 99.8% of variance, one-for-one removes 99.8%, n=263
+  MSFTUSDT hedged with MSFT index (weekend): r=+0.999 [95% low +0.999], optimal ratio 1.011 removes 99.8% of variance, one-for-one removes 99.8%, n=392
+  METAUSDT hedged with META index (all): r=+0.994 [95% low +0.993], optimal ratio 0.990 removes 98.8% of variance, one-for-one removes 98.7%, n=1438
+  METAUSDT hedged with META index (extended): r=+0.998 [95% low +0.998], optimal ratio 0.988 removes 99.7% of variance, one-for-one removes 99.6%, n=433
+  METAUSDT hedged with META index (overnight): r=+0.998 [95% low +0.997], optimal ratio 1.004 removes 99.5% of variance, one-for-one removes 99.5%, n=347
+  METAUSDT hedged with META index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.999 removes 99.8% of variance, one-for-one removes 99.8%, n=263
+  METAUSDT hedged with META index (weekend): r=+0.998 [95% low +0.998], optimal ratio 1.000 removes 99.6% of variance, one-for-one removes 99.6%, n=392
+  GOOGLUSDT hedged with GOOGL index (all): r=+0.984 [95% low +0.983], optimal ratio 0.997 removes 96.9% of variance, one-for-one removes 96.9%, n=1438
+  GOOGLUSDT hedged with GOOGL index (extended): r=+0.997 [95% low +0.996], optimal ratio 1.008 removes 99.3% of variance, one-for-one removes 99.3%, n=433
+  GOOGLUSDT hedged with GOOGL index (overnight): r=+0.995 [95% low +0.994], optimal ratio 1.007 removes 99.1% of variance, one-for-one removes 99.1%, n=347
+  GOOGLUSDT hedged with GOOGL index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.987 removes 99.8% of variance, one-for-one removes 99.8%, n=263
+  GOOGLUSDT hedged with GOOGL index (weekend): r=+0.996 [95% low +0.995], optimal ratio 1.005 removes 99.2% of variance, one-for-one removes 99.2%, n=392
+  AMZNUSDT hedged with AMZN index (all): r=+0.989 [95% low +0.988], optimal ratio 0.996 removes 97.9% of variance, one-for-one removes 97.9%, n=1438
+  AMZNUSDT hedged with AMZN index (extended): r=+0.997 [95% low +0.996], optimal ratio 1.002 removes 99.4% of variance, one-for-one removes 99.4%, n=433
+  AMZNUSDT hedged with AMZN index (overnight): r=+0.998 [95% low +0.997], optimal ratio 1.004 removes 99.6% of variance, one-for-one removes 99.6%, n=347
+  AMZNUSDT hedged with AMZN index (rth): r=+0.999 [95% low +0.998], optimal ratio 0.989 removes 99.7% of variance, one-for-one removes 99.7%, n=263
+  AMZNUSDT hedged with AMZN index (weekend): r=+0.998 [95% low +0.998], optimal ratio 0.999 removes 99.7% of variance, one-for-one removes 99.7%, n=392
+  COINUSDT hedged with COIN index (all): r=+0.991 [95% low +0.990], optimal ratio 0.995 removes 98.3% of variance, one-for-one removes 98.3%, n=1438
+  COINUSDT hedged with COIN index (extended): r=+0.998 [95% low +0.998], optimal ratio 0.995 removes 99.6% of variance, one-for-one removes 99.6%, n=433
+  COINUSDT hedged with COIN index (overnight): r=+0.997 [95% low +0.996], optimal ratio 0.998 removes 99.4% of variance, one-for-one removes 99.4%, n=347
+  COINUSDT hedged with COIN index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.995 removes 99.9% of variance, one-for-one removes 99.9%, n=263
+  COINUSDT hedged with COIN index (weekend): r=+0.998 [95% low +0.998], optimal ratio 0.998 removes 99.7% of variance, one-for-one removes 99.7%, n=392
+  MSTRUSDT hedged with MSTR index (all): r=+0.989 [95% low +0.988], optimal ratio 0.993 removes 97.9% of variance, one-for-one removes 97.9%, n=1438
+  MSTRUSDT hedged with MSTR index (extended): r=+0.999 [95% low +0.999], optimal ratio 0.993 removes 99.8% of variance, one-for-one removes 99.8%, n=433
+  MSTRUSDT hedged with MSTR index (overnight): r=+0.995 [95% low +0.994], optimal ratio 0.999 removes 99.0% of variance, one-for-one removes 99.0%, n=347
+  MSTRUSDT hedged with MSTR index (rth): r=+1.000 [95% low +1.000], optimal ratio 0.997 removes 99.9% of variance, one-for-one removes 99.9%, n=263
+  MSTRUSDT hedged with MSTR index (weekend): r=+0.998 [95% low +0.998], optimal ratio 1.000 removes 99.6% of variance, one-for-one removes 99.6%, n=392
+  QQQUSDT hedged with QQQ index (all): r=+0.979 [95% low +0.977], optimal ratio 0.983 removes 95.9% of variance, one-for-one removes 95.9%, n=1438
+  QQQUSDT hedged with QQQ index (extended): r=+0.996 [95% low +0.995], optimal ratio 0.983 removes 99.2% of variance, one-for-one removes 99.2%, n=433
+  QQQUSDT hedged with QQQ index (overnight): r=+0.994 [95% low +0.992], optimal ratio 1.007 removes 98.7% of variance, one-for-one removes 98.7%, n=347
+  QQQUSDT hedged with QQQ index (rth): r=+0.998 [95% low +0.997], optimal ratio 0.991 removes 99.6% of variance, one-for-one removes 99.6%, n=263
+  QQQUSDT hedged with QQQ index (weekend): r=+0.989 [95% low +0.987], optimal ratio 0.999 removes 97.8% of variance, one-for-one removes 97.8%, n=392
+  TQQQUSDT hedged with TQQQ index (all): r=+0.984 [95% low +0.982], optimal ratio 0.992 removes 96.8% of variance, one-for-one removes 96.8%, n=1438
+  TQQQUSDT hedged with TQQQ index (extended): r=+0.998 [95% low +0.997], optimal ratio 0.988 removes 99.6% of variance, one-for-one removes 99.6%, n=433
+  TQQQUSDT hedged with TQQQ index (overnight): r=+0.992 [95% low +0.990], optimal ratio 1.006 removes 98.3% of variance, one-for-one removes 98.3%, n=347
+  TQQQUSDT hedged with TQQQ index (rth): r=+0.999 [95% low +0.998], optimal ratio 0.993 removes 99.7% of variance, one-for-one removes 99.7%, n=263
+  TQQQUSDT hedged with TQQQ index (weekend): r=+0.991 [95% low +0.990], optimal ratio 1.004 removes 98.3% of variance, one-for-one removes 98.3%, n=392
+  SQQQUSDT hedged with SQQQ index (all): r=+0.974 [95% low +0.971], optimal ratio 0.988 removes 94.9% of variance, one-for-one removes 94.9%, n=1438
+  SQQQUSDT hedged with SQQQ index (extended): r=+0.996 [95% low +0.995], optimal ratio 0.986 removes 99.2% of variance, one-for-one removes 99.2%, n=433
+  SQQQUSDT hedged with SQQQ index (overnight): r=+0.988 [95% low +0.985], optimal ratio 1.011 removes 97.5% of variance, one-for-one removes 97.5%, n=347
+  SQQQUSDT hedged with SQQQ index (rth): r=+0.996 [95% low +0.995], optimal ratio 0.997 removes 99.2% of variance, one-for-one removes 99.2%, n=263
+  SQQQUSDT hedged with SQQQ index (weekend): r=+0.990 [95% low +0.988], optimal ratio 0.999 removes 98.1% of variance, one-for-one removes 98.1%, n=392
+
+60 measurement(s) written to argus\data\hedge_effectiveness.json
+effectiveness_exit=0
+{
+  "ran_at": "2026-09-19T13:41:11.076209+00:00",
+  "decisions_written": [
+    {
+      "seq": 401,
+      "symbol": "NVDAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 18,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 41.00 \u2014 earnings dominates: confidence 0.62 against 0.35",
+        "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 20.80bps",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 402,
+      "symbol": "TSLAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 18,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 14.00 \u2014 earnings dominates: confidence 0.62 against 0.35",
+        "[grounding] 1 of 10 figure(s) do not resolve to anything the desk was given: 20.8bps",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 403,
+      "symbol": "AAPLUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 17,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+      ]
+    },
+    {
+      "seq": 404,
+      "symbol": "MSFTUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.82,
+      "attests_llm_decided": true,
+      "notes_written": 17,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.20 \u2014 earnings dominates: confidence 0.55 against 0.35"
+      ]
+    },
+    {
+      "seq": 405,
+      "symbol": "METAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.78,
+      "attests_llm_decided": true,
+      "notes_written": 18,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.50 \u2014 cross_asset dominates: confidence 0.95 against 0.45",
+        "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 250",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 406,
+      "symbol": "GOOGLUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 18,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.30 \u2014 earnings dominates: confidence 0.72 against 0.42",
+        "[grounding] 2 of 10 figure(s) do not resolve to anything the desk was given: -0.02%, 8",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 407,
+      "symbol": "AMZNUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.82,
+      "attests_llm_decided": true,
+      "notes_written": 16,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+      ]
+    },
+    {
+      "seq": 408,
+      "symbol": "COINUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.82,
+      "attests_llm_decided": true,
+      "notes_written": 17,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.27 \u2014 earnings dominates: confidence 0.72 against 0.45"
+      ]
+    },
+    {
+      "seq": 409,
+      "symbol": "MSTRUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.62,
+      "attests_llm_decided": true,
+      "notes_written": 19,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 1070.00 \u2014 event dominates: confidence 0.72 against 0.45",
+        "[conflict:direction] event (bullish) vs earnings (bearish), gap 1039.00 \u2014 event dominates: confidence 0.72 against 0.55",
+        "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 31.00 \u2014 earnings dominates: confidence 0.55 against 0.45",
+        "[grounding] 2 of 7 figure(s) do not resolve to anything the desk was given: 20.80bps, 310.7bps",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ]
+    },
+    {
+      "seq": 410,
+      "symbol": "QQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.62,
+      "attests_llm_decided": true,
+      "notes_written": 18,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": []
+    },
+    {
+      "seq": 411,
+      "symbol": "TQQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.92,
+      "attests_llm_decided": true,
+      "notes_written": 18,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": []
+    },
+    {
+      "seq": 412,
+      "symbol": "SQQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.88,
+      "attests_llm_decided": true,
+      "notes_written": 18,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": []
+    }
+  ],
+  "settled_this_cycle": [
+    {
+      "seq": 353,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "120.6300"
+    },
+    {
+      "seq": 354,
+      "symbol": "TSLAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-117.8383"
+    },
+    {
+      "seq": 355,
+      "symbol": "AAPLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-50.4661"
+    },
+    {
+      "seq": 356,
+      "symbol": "MSFTUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-13.7321"
+    },
+    {
+      "seq": 357,
+      "symbol": "METAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-106.9763"
+    },
+    {
+      "seq": 358,
+      "symbol": "GOOGLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-228.5205"
+    },
+    {
+      "seq": 359,
+      "symbol": "AMZNUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "20.8768"
+    },
+    {
+      "seq": 360,
+      "symbol": "COINUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "692.0757"
+    },
+    {
+      "seq": 361,
+      "symbol": "MSTRUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "1040.5319"
+    },
+    {
+      "seq": 362,
+      "symbol": "QQQUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "20.2719"
+    },
+    {
+      "seq": 363,
+      "symbol": "TQQQUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "30.4878"
+    },
+    {
+      "seq": 364,
+      "symbol": "SQQQUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "-52.3560"
+    },
+    {
+      "causal_chains_graded": 3
+    }
+  ],
+  "marked_this_cycle": [
+    {
+      "seq": 389,
+      "symbol": "NVDAUSDT",
+      "horizon_hours": 18.0071,
+      "move_bps": "106.3685",
+      "lean": "up"
+    },
+    {
+      "seq": 390,
+      "symbol": "TSLAUSDT",
+      "horizon_hours": 18.0071,
+      "move_bps": "65.6697",
+      "lean": "down"
+    },
+    {
+      "seq": 391,
+      "symbol": "AAPLUSDT",
+      "horizon_hours": 18.0071,
+      "move_bps": "-32.7128",
+      "lean": "up"
+    },
+    {
+      "seq": 392,
+      "symbol": "MSFTUSDT",
+      "horizon_hours": 18.0071,
+      "move_bps": "-14.1354",
+      "lean": "none"
+    },
+    {
+      "seq": 393,
+      "symbol": "METAUSDT",
+      "horizon_hours": 18.0071,
+      "move_bps": "13.8901",
+      "lean": "down"
+    },
+    {
+      "seq": 394,
+      "symbol": "GOOGLUSDT",
+      "horizon_hours": 18.0071,
+      "move_bps": "-27.5882",
+      "lean": "up"
+    },
+    {
+      "seq": 395,
+      "symbol": "AMZNUSDT",
+      "horizon_hours": 18.0071,
+      "move_bps": "4.7192",
+      "lean": "up"
+    },
+    {
+      "seq": 396,
+      "symbol": "COINUSDT",
+      "horizon_hours": 18.0071,
+      "move_bps": "2.0520",
+      "lean": "down"
+    },
+    {
+      "seq": 397,
+      "symbol": "MSTRUSDT",
+      "horizon_hours": 18.0071,
+      "move_bps": "161.4583",
+      "lean": "up"
+    },
+    {
+      "seq": 398,
+      "symbol": "QQQUSDT",
+      "horizon_hours": 18.0071,
+      "move_bps": "21.5242",
+      "lean": "up"
+    },
+    {
+      "seq": 399,
+      "symbol": "TQQQUSDT",
+      "horizon_hours": 18.0071,
+      "move_bps": "44.4074",
+      "lean": "up"
+    },
+    {
+      "seq": 400,
+      "symbol": "SQQQUSDT",
+      "horizon_hours": 18.0071,
+      "move_bps": "-49.7512",
+      "lean": "down"
+    }
+  ],
+  "tokens_spent": 293868,
+  "unreported_calls": 0,
+  "token_budget": 330000,
+  "stopped_early": "",
+  "chain": {
+    "entries": 412,
+    "chain_intact": true,
+    "links_intact": true,
+    "first_break_at": null,
+    "truncated": false,
+    "anchor": "anchor agrees with the log",
+    "head_hash": "229f30a9c561e343"
+  },
+  "protocol": "argus-paper-v1 v3 (sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8)"
+}
+exit=0
+
+cycle 27: 5 claim(s) on MSFTUSDT, head 49bdca9e73ec7cd9
+    resolves 2026-09-20T14:15
+    resolves 2026-09-22T14:15
+    resolves 2026-09-26T14:15
+    resolves 2026-10-03T14:15
+    resolves 2026-10-19T14:15
+
+  38 claim(s) resolve inside the window and 59 are still open when it starts
+cadence_exit=0
+2 claim(s) resolved this run
+  Γ£ù MSFTUSDT abs_move_above_bps 66.8 by 2026-09-19T14:11 (p=0.60) [56fdd97d5ff2]  observed 8.305311347891261191913462707
+  Γ£ô SQQQUSDT abs_move_above_bps 98.08 by 2026-09-19T14:11 (p=0.60) [37ad3200c600]  observed -129.8026998961578400830737279
+
+REGISTER ΓÇö 141 claim(s), 60 resolved, 79 pending, 2 unresolvable
+  argus                  60 resolved  Brier 0.2297  hit rate 65%
+
+  THE WALL ΓÇö 21 claim(s) we got wrong, most confident first:
+    Γ£ù NVDAUSDT abs_move_above_bps 45.46 by 2026-09-15T09:21 (p=0.60) [381cbc033f4b]  observed 12.25316932937461708845845704
+    Γ£ù TSLAUSDT abs_move_above_bps 50.23 by 2026-09-15T09:21 (p=0.60) [c387181dd2e6]  observed -5.577867023650156180276662204
+    Γ£ù AAPLUSDT abs_move_above_bps 37.55 by 2026-09-15T09:21 (p=0.60) [2588c7bcd941]  observed -12.37324963785610816030902945
+    Γ£ù AMZNUSDT abs_move_above_bps 40.7 by 2026-09-15T09:21 (p=0.60) [d71b10a405eb]  observed -32.76229572905976158522144154
+    Γ£ù MSTRUSDT abs_move_above_bps 138.15 by 2026-09-15T09:21 (p=0.60) [919de6cb9750]  observed -22.67402312750359005366185474
+    Γ£ù TSLAUSDT abs_move_above_bps 50.28 by 2026-09-16T18:14 (p=0.60) [5eec2201b2a4]  observed -13.14317673378076062639821029
+    Γ£ù AAPLUSDT abs_move_above_bps 37.55 by 2026-09-16T20:11 (p=0.60) [4ae4dfa61cdf]  observed 33.15449996985954548194586774
+    Γ£ù METAUSDT abs_move_above_bps 66.48 by 2026-09-17T16:11 (p=0.60) [fe99a2216199]  observed 41.36443544932118006825131849
+    Γ£ù TQQQUSDT abs_move_above_bps 182.37 by 2026-09-17T18:17 (p=0.60) [394c43522a43]  observed 168.2829435253850541928123217
+    Γ£ù QQQUSDT abs_move_above_bps 31.84 by 2026-09-18T18:10 (p=0.60) [933c2db4e3a6]  observed 14.49881500069705841349505089
+
+written to argus\data\register_scoreboard.json
+register_exit=0
+CYCLE CHECK ΓÇö cycle_2026-09-19_1900.log
+
+  PASS     exit_code
+           process exited 0
+  PASS     symbols_decided
+           12 of 12 symbols produced a decision
+  PASS     ran_to_completion
+           the cycle reached every symbol it was given
+  PASS     token_budget
+           293,868 of 330,000 spent (89%)
+  PASS     cumulative_tokens
+           6,953,872 token(s) across 25 recorded cycle(s), 278,155 per cycle ΓÇö roughly 1,112,620/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway
+  PASS     budget_not_exhausted
+           the guard did not fire
+  PASS     chain_intact
+           the hash chain verified after the write
+  PASS     leans_recorded
+           12 of 12 row(s) carry a lean and a lean_confidence
+  PASS     leans_gradeable
+           12 of 12 decision(s) state a direction (11 up, 1 down, 0 none)
+  PASS     verdicts_parsed
+           every verdict parsed
+  PASS     session
+           session phase(s) seen: weekend  (anchor market shut)
+
+  11/11 checks passed. The cycle ran with the anchor market shut, so it says nothing about whether this desk trades
+
+written to argus\data\cycle_check.json
+check_exit=0

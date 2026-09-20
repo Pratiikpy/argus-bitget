@@ -1,0 +1,37 @@
+{
+  "boundary_cases": [
+    {
+      "case": "well_after_resolution",
+      "argus_visible": true,
+      "tradingagents_visible": true,
+      "note": "both should show the graded outcome"
+    },
+    {
+      "case": "well_before_resolution",
+      "argus_visible": false,
+      "tradingagents_visible": false,
+      "note": "both should hide the outcome"
+    },
+    {
+      "case": "exact_resolution_instant",
+      "argus_visible": false,
+      "tradingagents_visible": true,
+      "note": "granularity divergence: ARGUS's strict < excludes an episode settled at exactly `now`; TradingAgents' <= on date strings includes an entry resolved exactly on `as_of` \u2014 both real, both intentional, different time granularities"
+    }
+  ],
+  "boundary_agreement_on_clear_cases": true,
+  "pending_inclusion": {
+    "argus_shows_pending": true,
+    "tradingagents_shows_pending": false
+  },
+  "no_floor": {
+    "argus_states_a_pattern_from_one": false,
+    "tradingagents_shows_content_from_one": true
+  },
+  "ablation": {
+    "with_floor_states_pattern": false,
+    "without_floor_would_state_pattern": true,
+    "floor_is_load_bearing": true
+  },
+  "scope_statement": "Claimed: both systems' point-in-time guard against future information leaking into a recall was run, not assumed \u2014 both correctly hide an unresolved outcome and correctly reveal it once resolved, verified across the exact boundary on real code. ARGUS additionally shows ungraded episodes as context (TradingAgents' real code explicitly filters every pending entry out before building context \u2014 read directly, not inferred) and additionally refuses to state a pattern below a stated floor (MIN_EPISODES_FOR_A_LESSON=5, shown load-bearing by ablation) \u2014 TradingAgents' real get_past_context has no equivalent floor of any kind, verified by running it on a single episode and confirming it returns content. ARGUS's lessons() is pure arithmetic, zero tokens, zero model calls; TradingAgents' equivalent prose is produced by one LLM call per graded episode (reflection.py's quick_thinking_llm.invoke, read directly, not run \u2014 no LLM call was made anywhere in this comparison, matching this project's own hackathon-key budget discipline).\n\nNOT claimed: that TradingAgents' design is a mistake. Excluding pending entries from context and having no minimum-sample floor are real, working design choices for a system whose memory is advisory prose re-read by a model that can itself discount thin evidence \u2014 a different premise from ARGUS's own, where the calibration scorecard (a separate ARGUS capability) already applies the same floor discipline and `lessons()` exists specifically so no model has to do that discounting itself. Also NOT claimed: that ARGUS's structured, falsifiable design produces BETTER trading decisions than prose reflection \u2014 that would need graded real-world outcomes from both systems on the same decisions, which this comparison does not have and does not claim to.\n"
+}

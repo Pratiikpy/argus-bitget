@@ -35,6 +35,7 @@ import os
 import time
 import urllib.error
 import urllib.request
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
@@ -93,6 +94,32 @@ class Usage:
     total_tokens: int
     cached_tokens: int = 0
 
+    reported: bool = True
+    """Whether the venue actually sent a ``usage`` block.
+
+    **Absence is not zero, and here it is the one number that measures our own runway.** Every field
+    above was built with ``usage_block.get(name, 0)``, so a response that omitted ``usage``
+    entirely — a stream that ends early, a proxy that strips it, an error shape — produced a
+    Completion reporting **zero tokens spent**. Nothing distinguished that from a genuinely free
+    call.
+
+    That silently undercounts a finite hackathon key in the safest-looking direction: the burn looks
+    smaller than it is, and `eval/cyclecheck.cumulative_tokens` inherits the understatement. A
+    measurement that fails toward "cheaper than reality" on a budget is the worst way for it to
+    fail.
+
+    ``False`` means *unmeasured*, not free.
+    """
+
+    @property
+    def is_measured(self) -> bool:
+        """A usage block arrived **and** carried a nonzero total.
+
+        Both conditions: a venue that sends ``usage: {}`` has technically reported, and counting
+        that as a measured zero is the same error one level down.
+        """
+        return self.reported and self.total_tokens > 0
+
     @property
     def reasoning_share(self) -> float:
         """Fraction of completion tokens spent thinking rather than answering.
@@ -117,7 +144,28 @@ class TokenBudget:
                 f"Raise the limit deliberately rather than by accident."
             )
 
+    unreported_calls: int = 0
+    """Calls the venue never billed us for in writing.
+
+    **Counted, because the budget cannot see them.** `record` adds `usage.total_tokens`, so a
+    response with no ``usage`` block adds nothing and the budget believes the call was free. The
+    spend then drifts below reality in the one direction a budget must never drift, and
+    `eval/cyclecheck.cumulative_tokens` inherits the understatement.
+
+    This cannot be repaired by guessing a number — the tokens really are unknown. It can only be
+    made visible, so a reader sees `spent` beside the count of calls that `spent` does not include.
+    """
+
     def record(self, usage: Usage) -> None:
+        """Add what the venue reported, and remember what it did not.
+
+        A call with no usage block is **not** free; it is unmeasured. Inventing an estimate here
+        would put a fabricated number into the one figure that guards a finite key, so the honest
+        move is to add nothing and increment the count of what is missing.
+        """
+        if not usage.reported:
+            self.unreported_calls += 1
+            return
         self.spent += usage.total_tokens
 
     @property
@@ -144,6 +192,20 @@ class Completion:
     @property
     def wants_tool_call(self) -> bool:
         return self.finish_reason == "tool_calls" and bool(self.tool_calls)
+
+
+_NOTHING = object()
+"""Sentinel for "no value was parsed".
+
+``None`` cannot serve: ``null`` is valid JSON, and a model that answers ``null`` must be told it
+returned the wrong shape rather than have it read as a parse failure."""
+
+MAX_COMPLETION_TOKENS = 8192
+"""Ceiling for the automatic growth after a truncated answer.
+
+Growth stops here rather than climbing forever: past this point a schema that still does not fit
+is a prompt problem, and the honest report is that the decision could not be obtained — not a
+larger bill and a quieter failure."""
 
 
 class QwenClient:
@@ -259,6 +321,7 @@ class QwenClient:
         messages: list[dict[str, Any]],
         *,
         required_keys: tuple[str, ...] = (),
+        validate: Callable[[dict[str, Any]], str] | None = None,
         max_tokens: int = 2048,
         attempts: int = 3,
         thinking: Thinking = Thinking.LOW,
@@ -281,28 +344,96 @@ class QwenClient:
                 # cache and every retry would reproduce the same failure.
                 seed=attempt if attempt else None,
             )
-            # Empty content with reasoning present means the token budget was spent thinking
-            # before any answer was emitted. Measured on DeepSeek-via-NIM: 1,668 characters of
-            # reasoning against a 900-token cap produced an empty string, which reads as a parse
-            # failure and is really a truncation. Retrying at the same size would fail identically.
-            if not got.content.strip() and got.reasoning.strip():
-                max_tokens = min(max_tokens * 3, 8192)
-                convo = list(messages)
-                last = (
-                    f"reasoning consumed the budget before any answer "
-                    f"({got.usage.completion_tokens} tokens); retrying at max_tokens={max_tokens}"
+            # --- 1. Truncation, established from the wire and not inferred from a parse error.
+            #
+            # `finish_reason == "length"` is the provider saying it stopped because the cap was
+            # reached. Verified live on 2026-09-13: a 600-word thesis capped at 300 tokens returns
+            # exactly `finish_reason: "length"` and `Unterminated string starting at: line 1
+            # column 11`. That is the same error class a genuinely malformed response raises, and
+            # the two need opposite treatment — the model did nothing wrong when it was cut off.
+            #
+            # Reading it here is, as far as the survey in
+            # `research/architecture/llm-structured-output.md` could establish, absent from all 114
+            # agent repositories on this machine: every one of them infers truncation from the
+            # parse failure, retries at the same cap, and appends the truncated text to the
+            # conversation — which enlarges the prompt and makes the next truncation more likely.
+            # That was this client's bug too, and it cost a live cycle.
+            #
+            # The response is NOT repaired. A repair library completes a truncated string by
+            # guessing, and the truncated field here is a trading thesis: a plausible invented
+            # ending to a rationale is worse than no decision, because it reads as reasoning the
+            # model never did.
+            truncated = got.finish_reason == "length" or (
+                not got.content.strip() and bool(got.reasoning.strip())
+            )
+            if truncated:
+                if max_tokens >= MAX_COMPLETION_TOKENS:
+                    last = (
+                        f"the answer was still cut off at the {MAX_COMPLETION_TOKENS}-token "
+                        f"ceiling (finish_reason={got.finish_reason!r}); the schema cannot be "
+                        f"answered within the budget, and a truncated decision is not repaired"
+                    )
+                    break
+                grown = min(max_tokens * 3, MAX_COMPLETION_TOKENS)
+                why = (
+                    "reasoning consumed the budget before any answer"
+                    if got.finish_reason != "length" else "the answer was cut off at the cap"
                 )
+                last = (
+                    f"{why} ({got.usage.completion_tokens} tokens, "
+                    f"finish_reason={got.finish_reason!r}); retrying at max_tokens={grown}"
+                )
+                max_tokens = grown
+                # Back to the original prompt. Feeding a truncated answer back as context is what
+                # makes the retry larger than the attempt that already did not fit.
+                convo = list(messages)
                 continue
 
+            # --- 2. A complete response that is not clean JSON: extract, then validate.
+            # Valid JSON is tried first, and brace extraction is only a fallback for text that
+            # does not parse at all. The order matters: extraction is for a schema wrapped in
+            # prose, not for reaching inside a well-formed structure. A response of
+            # `[{...}, {...}]` parses cleanly as a list of two decisions, and digging the first
+            # object out of it would silently pick one of them.
+            text = _strip_fences(got.content)
+            # Untyped on purpose: `json.loads` returns Any, and annotating it `dict` would tell
+            # the type checker the shape was confirmed before anything confirmed it.
             try:
-                parsed: dict[str, Any] = json.loads(_strip_fences(got.content))
+                parsed = json.loads(text)
             except json.JSONDecodeError as exc:
-                last = f"invalid JSON ({exc})"
-            else:
-                missing = [k for k in required_keys if k not in parsed]
-                if not missing:
-                    return parsed
-                last = f"missing required keys: {missing}"
+                extracted = extract_json_object(text)
+                if extracted == text:
+                    parsed = _NOTHING
+                    last = f"invalid JSON ({exc})"
+                else:
+                    try:
+                        parsed = json.loads(extracted)
+                    except json.JSONDecodeError as inner:
+                        parsed = _NOTHING
+                        last = f"invalid JSON even after extracting the object ({inner})"
+
+            if parsed is not _NOTHING:
+                if not isinstance(parsed, dict):
+                    last = f"expected a JSON object, got {type(parsed).__name__}"
+                else:
+                    obj: dict[str, Any] = parsed
+                    missing = [k for k in required_keys if k not in obj]
+                    if missing:
+                        # Never filled in here. A defaulted verdict or quantity is a decision nobody
+                        # made, wearing the model's authority.
+                        last = f"missing required keys: {missing}"
+                    else:
+                        # Presence is not validity. `required_keys` passed a response carrying
+                        # ``"verdict": "sell"`` — a *side* in the verdict field — because the key
+                        # was there; measured at roughly one call in five on the decision prompt
+                        # (`data/consistency.json`). A caller that knows the value space says so
+                        # here and gets the retry this loop already performs, with the specific
+                        # complaint fed back. Silently routing it to HUMAN_REVIEW downstream is the
+                        # last resort, not the first response.
+                        complaint = validate(obj) if validate is not None else ""
+                        if not complaint:
+                            return obj
+                        last = complaint
 
             convo = [
                 *messages,
@@ -365,6 +496,47 @@ def _strip_fences(text: str) -> str:
     return t.strip()
 
 
+def extract_json_object(text: str) -> str:
+    """The outermost balanced ``{...}`` in a response, after any fences are removed.
+
+    For the case where the model obeyed the schema but wrapped it in prose — "Here is my
+    analysis: {...} Let me know if you need more." Brace counting rather than a regex, because a
+    regex either stops at the first ``}`` (truncating a nested object) or runs to the last one in
+    the whole string (swallowing trailing prose); and it is string-aware, because a ``}`` inside a
+    thesis would otherwise end the object early. Escapes are honoured so a quoted ``\\"`` does not
+    flip the parser out of string state.
+
+    Returns the original text unchanged when no balanced object is found, so the caller still sees
+    the real parse error rather than one produced here.
+    """
+    t = _strip_fences(text)
+    start = t.find("{")
+    if start == -1:
+        return t
+    depth = 0
+    in_string = False
+    escaped = False
+    for i in range(start, len(t)):
+        ch = t[i]
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return t[start:i + 1]
+    return t
+
+
 def _parse_stream(resp: Any) -> Completion:
     """Assemble a Completion from a Server-Sent Events stream.
 
@@ -413,6 +585,8 @@ def _parse_stream(resp: Any) -> Completion:
 
     details = usage_block.get("completion_tokens_details", {}) or {}
     prompt_details = usage_block.get("prompt_tokens_details", {}) or {}
+    # An absent usage block is recorded as unmeasured rather than as a free call. See `Usage`.
+    reported = bool(usage_block)
     return Completion(
         content="".join(content),
         reasoning="".join(reasoning),
@@ -422,6 +596,7 @@ def _parse_stream(resp: Any) -> Completion:
             reasoning_tokens=details.get("reasoning_tokens", 0),
             total_tokens=usage_block.get("total_tokens", 0),
             cached_tokens=prompt_details.get("cached_tokens", 0),
+            reported=reported,
         ),
         finish_reason=finish_reason or "stop",
         tool_calls=tool_calls,

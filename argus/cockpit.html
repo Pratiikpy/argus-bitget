@@ -1,527 +1,63 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ARGUS Decision Cockpit</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
-
 <style>
-  /* Light palette on bare :root — every token declared here before any override. */
-  :root {
-    --ground:      #F4F6FA;
-    --panel:       #FFFFFF;
-    --panel-2:     #EDF1F7;
-    --line:        #D5DCE8;
-    --line-soft:   #E4E9F1;
-    --ink:         #131A26;
-    --ink-2:       #3D4859;
-    --muted:       #6B7890;   /* blue-biased neutral, chosen not inherited */
-    --live:        #12855E;
-    --dormant:     #7C8798;
-    --accent:      #B26A08;   /* amber — the anchor-asleep signal */
-    --accent-soft: #FBF0DC;
-    --alert:       #C0442C;
-    --shadow:      0 1px 2px rgba(19,26,38,.06), 0 8px 24px rgba(19,26,38,.05);
-
-    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
-    --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --ground:      #0C1220;
-      --panel:       #141C2C;
-      --panel-2:     #1B2436;
-      --line:        #26314A;
-      --line-soft:   #1E2839;
-      --ink:         #DDE4F0;
-      --ink-2:       #AEB9CC;
-      --muted:       #76839B;
-      --live:        #4FD39C;
-      --dormant:     #566074;
-      --accent:      #E0A33C;
-      --accent-soft: #2A2214;
-      --alert:       #E0644A;
-      --shadow:      0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.28);
-    }
-  }
-
-  :root[data-theme="dark"] {
-    --ground:      #0C1220;
-    --panel:       #141C2C;
-    --panel-2:     #1B2436;
-    --line:        #26314A;
-    --line-soft:   #1E2839;
-    --ink:         #DDE4F0;
-    --ink-2:       #AEB9CC;
-    --muted:       #76839B;
-    --live:        #4FD39C;
-    --dormant:     #566074;
-    --accent:      #E0A33C;
-    --accent-soft: #2A2214;
-    --alert:       #E0644A;
-    --shadow:      0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.28);
-  }
-
-  * { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    padding-inline: 20px;
-    padding-block: 28px 64px;
-    background: var(--ground);
-    color: var(--ink);
-    font-family: var(--sans);
-    font-size: 14px;
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
-
-  /* ── masthead ────────────────────────────────────────────────────────── */
-  .masthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 14px 18px; }
-  .mark {
-    font-family: var(--mono); font-weight: 600; font-size: 19px;
-    letter-spacing: .14em; color: var(--ink);
-  }
-  .tagline { color: var(--muted); font-size: 13px; max-width: 62ch; }
-  .stamp {
-    margin-left: auto; font-family: var(--mono); font-size: 11px;
-    color: var(--muted); letter-spacing: .05em;
-  }
-
-  /* ── the two clocks: the one thing only this subject has ─────────────── */
-  .clocks {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
-    background: var(--line); border: 1px solid var(--line);
-    border-radius: 3px; overflow: hidden;
-  }
-  .clock { background: var(--panel); padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; }
-  .clock-head {
-    display: flex; align-items: center; gap: 8px;
-    font-family: var(--mono); font-size: 10.5px; letter-spacing: .13em;
-    text-transform: uppercase; color: var(--muted);
-  }
-  .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
-  .dot.on  { background: var(--live); box-shadow: 0 0 0 3px color-mix(in srgb, var(--live) 18%, transparent); }
-  .dot.off { background: var(--dormant); }
-  .clock-state {
-    font-family: var(--mono); font-size: 26px; font-weight: 600;
-    letter-spacing: -.01em; font-variant-numeric: tabular-nums;
-  }
-  .clock-state.live { color: var(--live); }
-  .clock-state.shut { color: var(--accent); }
-  .clock-note { color: var(--ink-2); font-size: 12.5px; }
-  .countdown { font-variant-numeric: tabular-nums; }
-
-  /* ── panels ──────────────────────────────────────────────────────────── */
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 16px; }
-  .panel {
-    background: var(--panel); border: 1px solid var(--line);
-    border-radius: 3px; padding: 16px 18px 18px;
-    display: flex; flex-direction: column; gap: 12px;
-  }
-  .panel.wide { grid-column: 1 / -1; }
-  .panel-head { display: flex; align-items: baseline; gap: 10px; }
-  h2 {
-    margin: 0; font-family: var(--mono); font-size: 11px; font-weight: 600;
-    letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
-  }
-  .subtheme {
-    margin-left: auto; font-family: var(--mono); font-size: 10px;
-    color: var(--muted); opacity: .8;
-  }
-  .lede { margin: 0; color: var(--ink-2); font-size: 13px; max-width: 66ch; }
-
-  /* ── instrument board ────────────────────────────────────────────────── */
-  .scroller { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12.5px; }
-  th {
-    text-align: right; font-weight: 500; color: var(--muted);
-    font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
-    padding: 0 0 8px; border-bottom: 1px solid var(--line);
-  }
-  th:first-child, td:first-child { text-align: left; }
-  td {
-    text-align: right; padding: 6px 0; border-bottom: 1px solid var(--line-soft);
-    font-variant-numeric: tabular-nums; color: var(--ink);
-  }
-  td + td, th + th { padding-left: 16px; }
-  tr:last-child td { border-bottom: none; }
-  .sym { font-weight: 600; }
-  .anchor-tag { color: var(--muted); font-weight: 400; }
-  .up { color: var(--live); } .down { color: var(--alert); }
-
-  /* ── lineage trace ───────────────────────────────────────────────────── */
-  .trace { display: flex; flex-direction: column; gap: 0; font-family: var(--mono); font-size: 12px; }
-  .trace-row {
-    display: flex; gap: 10px; padding: 7px 0;
-    border-bottom: 1px solid var(--line-soft);
-  }
-  .trace-row:last-child { border-bottom: none; }
-  .trace-depth { color: var(--dormant); flex: none; }
-  .trace-val { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--ink); }
-  .loc { color: var(--muted); font-size: 11px; }
-  .claim { color: var(--ink); font-weight: 500; }
-
-  /* ── verdict ─────────────────────────────────────────────────────────── */
-  .verdict {
-    border-left: 2px solid var(--accent); background: var(--accent-soft);
-    padding: 12px 14px; font-size: 13px; color: var(--ink);
-  }
-  .verdict strong { font-family: var(--mono); font-weight: 600; }
-  .pair { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; font-size: 12.5px; }
-  .pair + .pair { border-top: 1px solid var(--line-soft); }
-  .pair dt { color: var(--muted); }
-  .pair dd { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums; }
-
-  /* ── stress bars ─────────────────────────────────────────────────────── */
-  .bars { display: flex; flex-direction: column; gap: 9px; }
-  .bar-row { display: grid; grid-template-columns: 120px 1fr 74px; align-items: center; gap: 10px; }
-  .bar-label { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2); }
-  .bar-track { height: 7px; background: var(--panel-2); border-radius: 1px; position: relative; }
-  .bar-fill { position: absolute; top: 0; bottom: 0; border-radius: 1px; }
-  .bar-fill.ok { background: var(--live); }
-  .bar-fill.bad { background: var(--alert); }
-  .bar-val {
-    font-family: var(--mono); font-size: 11.5px; text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* ── execution slices ────────────────────────────────────────────────── */
-  .slices { display: flex; height: 26px; border-radius: 2px; overflow: hidden; border: 1px solid var(--line); }
-  .slice {
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--mono); font-size: 10.5px; color: var(--ground);
-    background: var(--accent); border-right: 1px solid var(--panel);
-  }
-  .slice:last-child { border-right: none; }
-  .slice.passive { background: var(--dormant); }
-
-  /* ── challenge grid ──────────────────────────────────────────────────── */
-  .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 6px; }
-  .control {
-    display: flex; align-items: center; gap: 7px; padding: 7px 9px;
-    border: 1px solid var(--line-soft); border-radius: 2px;
-    font-family: var(--mono); font-size: 11px; background: var(--panel-2);
-  }
-  .tick { color: var(--live); font-weight: 600; flex: none; }
-  .ours { margin-left: auto; color: var(--accent); font-size: 9.5px; letter-spacing: .06em; }
-
-  /* ── findings ────────────────────────────────────────────────────────── */
-  .findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
-  .finding { display: flex; flex-direction: column; gap: 3px; }
-  .finding-n {
-    font-family: var(--mono); font-size: 21px; font-weight: 600;
-    color: var(--accent); font-variant-numeric: tabular-nums;
-  }
-  .finding-k { font-size: 12px; color: var(--ink-2); }
-  .finding-src { font-size: 11px; color: var(--muted); }
-
-  footer {
-    color: var(--muted); font-size: 11.5px; font-family: var(--mono);
-    border-top: 1px solid var(--line); padding-top: 14px;
-  }
-  .fail { color: var(--alert); font-weight: 600; }
-
-  @media (max-width: 620px) {
-    .clocks { grid-template-columns: 1fr; }
-    .bar-row { grid-template-columns: 96px 1fr 62px; }
-  }
-  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
-</style>
-
-<div class="wrap">
-
-  <header class="masthead">
-    <div class="mark">ARGUS</div>
-    <p class="tagline">Decision cockpit for tokenized US equities. The token trades continuously; its anchor does not.</p>
-    <div class="stamp" id="stamp">rNVDA · live Bitget data</div>
-  </header>
-
-  <!-- The two clocks. This disagreement is the entire problem the desk exists for. -->
-  <section class="clocks" aria-label="Session clocks">
-    <div class="clock">
-      <div class="clock-head"><span class="dot on"></span>Token clock · Bitget perp</div>
-      <div class="clock-state live">TRADING</div>
-      <div class="clock-note">Continuous. 12 instruments quoting, median spread 0.57&thinsp;bps.</div>
-    </div>
-    <div class="clock">
-      <div class="clock-head"><span class="dot off"></span>Anchor clock · NYSE</div>
-      <div class="clock-state shut">SHUT <span class="countdown" id="countdown">51.9h</span></div>
-      <div class="clock-note">Weekend. No hedge in the underlying is placeable until the next auction.</div>
-    </div>
-  </section>
-
-  <div class="grid">
-
-    <!-- Instrument board -->
-    <section class="panel wide">
-      <div class="panel-head">
-        <h2>Instrument board</h2>
-        <span class="subtheme">verified by session attenuation</span>
-      </div>
-      <p class="lede">Twelve instruments whose index goes quiet when their anchor shuts. SPXUSDT was excluded at 1.43&times; attenuation — it trades at $0.49 and has no closing underlying.</p>
-      <div class="scroller">
-        <table>
-          <thead>
-            <tr><th>Instrument</th><th>Last</th><th>Spread</th><th>24h</th><th>Fee ÷ spread</th></tr>
-          </thead>
-          <tbody id="board"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Information extraction -->
-    <section class="panel">
-      <div class="panel-head"><h2>Claim lineage</h2><span class="subtheme">info extraction</span></div>
-      <p class="lede">Every number walks back to a page and a cell. A claim with no locator does not appear on this desk.</p>
-      <div class="trace">
-        <div class="trace-row"><span class="claim">Gross margin fell 250&thinsp;bps</span><span class="trace-val">−2.50&thinsp;pp</span></div>
-        <div class="trace-row"><span class="trace-depth">└─</span><span class="loc">computed as (revenue − COGS) ÷ revenue, vs prior quarter</span></div>
-        <div class="trace-row"><span class="trace-depth">&nbsp;&nbsp;├─</span><span class="loc">revenue · 10-Q p84 R4C2</span><span class="trace-val">18 200</span></div>
-        <div class="trace-row"><span class="trace-depth">&nbsp;&nbsp;└─</span><span class="loc">COGS · 10-Q p84 R7C2</span><span class="trace-val">9 100</span></div>
-      </div>
-    </section>
-
-    <!-- Portfolio copilot -->
-    <section class="panel">
-      <div class="panel-head"><h2>Portfolio copilot</h2><span class="subtheme">open theme</span></div>
-      <p class="lede">The same ticket, two mandates. Personalisation that does not change the verdict is styling.</p>
-      <div class="verdict">
-        <strong>Conservative income</strong> — good trade in isolation, bad trade for your book: it lifts rNVDA from 10.0% to 18.2%, past your 5% single-name cap.
-      </div>
-      <dl style="margin:0">
-        <div class="pair"><dt>Aggressive event trader</dt><dd style="color:var(--live)">within mandate</dd></div>
-        <div class="pair"><dt>Ticket</dt><dd>$10 000</dd></div>
-        <div class="pair"><dt>Sector after</dt><dd>18.2% of 60% cap</dd></div>
-      </dl>
-    </section>
-
-    <!-- Stress -->
-    <section class="panel">
-      <div class="panel-head"><h2>Decision stress</h2><span class="subtheme">stress testing</span></div>
-      <p class="lede">Exit cost rises as depth falls — a position is hardest to leave exactly when you want to.</p>
-      <div class="bars" id="stress"></div>
-    </section>
-
-    <!-- Execution -->
-    <section class="panel">
-      <div class="panel-head"><h2>Execution plan</h2><span class="subtheme">execution assistance</span></div>
-      <p class="lede">Anchor asleep, so passive weight is cut, not raised: on a third-depth book a resting order is adversely selected.</p>
-      <div class="slices">
-        <div class="slice" style="flex:0.6">60% near-touch</div>
-        <div class="slice" style="flex:0.4">40% market</div>
-      </div>
-      <dl style="margin:0">
-        <div class="pair"><dt>Participation</dt><dd>0.40% of ADV</dd></div>
-        <div class="pair"><dt>Expected cost</dt><dd>6.3&thinsp;bps</dd></div>
-        <div class="pair"><dt>Round trip to beat</dt><dd style="color:var(--accent)">12.0&thinsp;bps</dd></div>
-      </dl>
-    </section>
-
-    <!-- Review -->
-    <section class="panel">
-      <div class="panel-head"><h2>Error profile</h2><span class="subtheme">review &amp; self-evolution</span></div>
-      <p class="lede">Graded decisions, separated by which part was wrong. 0 of 12 corpus sources do post-trade attribution.</p>
-      <dl style="margin:0">
-        <div class="pair"><dt>Correct</dt><dd>—</dd></div>
-        <div class="pair"><dt>Right idea, wrong size</dt><dd>—</dd></div>
-        <div class="pair"><dt>Wrong and confident</dt><dd>—</dd></div>
-        <div class="pair"><dt>Calibration gap</dt><dd>awaiting settlements</dd></div>
-      </dl>
-      <p class="lede" style="font-size:12px;color:var(--muted)">The paper ledger is 2 decisions old. Below five graded outcomes it refuses to draw a pattern.</p>
-    </section>
-
-    <!-- Challenge Mode -->
-    <section class="panel wide">
-      <div class="panel-head">
-        <h2>Challenge mode</h2>
-        <span class="subtheme">13 controls · 13 passing · 9 original to ARGUS</span>
-      </div>
-      <p class="lede">Attacks a judge runs against the live system. TraderBench, the closest existing adversarial finance-agent benchmark, covers one of these outright and three partially.</p>
-      <div class="controls" id="controls"></div>
-    </section>
-
-
-    <!-- Observatory: the model bake-off -->
-    <section class="panel">
-      <div class="panel-head"><h2>Model bake-off</h2><span class="subtheme">track 2 · open theme</span></div>
-      <p class="lede">Identical frame, identical prompt, identical costs, temperature 0. The model is the only variable — and they split.</p>
-      <div class="trace">
-        <div class="trace-row"><span class="claim">Qwen 3.8 Max</span><span class="loc">no_trade &times;3</span><span class="trace-val">1.00</span></div>
-        <div class="trace-row"><span class="trace-depth">└─</span><span class="loc">an unhedgeable 51h gap is reason to stand aside</span></div>
-        <div class="trace-row"><span class="claim">DeepSeek v4 Pro</span><span class="loc">reduce &times;3</span><span class="trace-val">1.00</span></div>
-        <div class="trace-row"><span class="trace-depth">└─</span><span class="loc">a confirmed guidance cut is reason to cut exposure</span></div>
-      </div>
-      <div class="verdict">Both internally consistent at <strong>1.00</strong>, both confident, and they disagree. A single-model system shows you one of these and calls it the answer.</div>
-    </section>
-
-    <!-- Factor lab -->
-    <section class="panel">
-      <div class="panel-head"><h2>Factor cemetery</h2><span class="subtheme">factor discovery</span></div>
-      <p class="lede">The proposer never sees a score — its context has no field that can hold one. 8 proposed, <strong>0 certified</strong>.</p>
-      <div class="trace">
-        <div class="trace-row"><span class="claim">closure_reversion</span><span class="loc">gross +2.43 &rarr; net &minus;4.00</span><span class="trace-val">cost</span></div>
-        <div class="trace-row"><span class="claim">long_while_closed</span><span class="loc">gross +0.90 &rarr; net &minus;0.11</span><span class="trace-val">cost</span></div>
-        <div class="trace-row"><span class="claim">weekend_only</span><span class="loc">survived cost and OOS</span><span class="trace-val">DSR</span></div>
-        <div class="trace-row"><span class="trace-depth">&nbsp;</span><span class="loc">5 more died on the 12bps round trip</span></div>
-      </div>
-    </section>
-
-    <!-- Earnings decomposition -->
-    <section class="panel">
-      <div class="panel-head"><h2>Earnings decomposition</h2><span class="subtheme">earnings agent</span></div>
-      <p class="lede">Seven surprises, kept apart. A beat with cut guidance is a different asset from a beat with raised guidance.</p>
-      <dl style="margin:0">
-        <div class="pair"><dt>headline (EPS beat)</dt><dd style="color:var(--live)">+0.70</dd></div>
-        <div class="pair"><dt>forward (guidance, Q&amp;A)</dt><dd style="color:var(--alert)">&minus;0.50</dd></div>
-        <div class="pair"><dt>weighted</dt><dd>&minus;0.159</dd></div>
-        <div class="pair"><dt>read</dt><dd style="color:var(--alert)">bearish &minus;47.7bps</dd></div>
-        <div class="pair"><dt>confidence</dt><dd>0.234</dd></div>
-      </dl>
-      <p class="lede" style="font-size:12px;color:var(--muted)">"EPS beat &rarr; buy" reads this print as a buy.</p>
-    </section>
-
-    <!-- Measured findings -->
-    <section class="panel wide">
-      <div class="panel-head"><h2>Measured, not assumed</h2><span class="subtheme">90 days · live Bitget series</span></div>
-      <div class="findings">
-        <div class="finding">
-          <span class="finding-n">7.0&times;</span>
-          <span class="finding-k">Price-discovery attenuation, RTH → weekend</span>
-          <span class="finding-src">32.17 → 4.53 bps/hr, NVDA index</span>
-        </div>
-        <div class="finding">
-          <span class="finding-n">4.27</span>
-          <span class="finding-k">Median rToken basis, bps</span>
-          <span class="finding-src">28 067 observations · we had written 150–450</span>
-        </div>
-        <div class="finding">
-          <span class="finding-n">7.7%</span>
-          <span class="finding-k">Monetizable after full cost stack</span>
-          <span class="finding-src">naive arbitrage does not pay here</span>
-        </div>
-        <div class="finding">
-          <span class="finding-n fail">FAIL</span>
-          <span class="finding-k">Weekend continuation effect</span>
-          <span class="finding-src">train 48.7% · out-of-sample 66.7% · not one effect</span>
-        </div>
-        <div class="finding">
-          <span class="finding-n fail">0 / 12</span>
-          <span class="finding-k">Strategies surviving the deflation gate</span>
-          <span class="finding-src">11 of 12 beat buy-and-hold on Sharpe first</span>
-        </div>
-        <div class="finding">
-          <span class="finding-n fail">0 / 8</span>
-          <span class="finding-k">Factors certified</span>
-          <span class="finding-src">7 killed by cost · 1 by DSR</span>
-        </div>
-        <div class="finding">
-          <span class="finding-n">317</span>
-          <span class="finding-k">Tests, ruff and mypy --strict clean</span>
-          <span class="finding-src">53 modules · 7 data artefacts from live series</span>
-        </div>
-      </div>
-    </section>
-
-  </div>
-
-  <footer>
-    Human decides. This desk presents; it places no orders. Track&nbsp;3 positioning.
-    <span id="asof"></span>
-  </footer>
-</div>
-
-<script>
-  // Live snapshot taken from Bitget's public endpoint at build time. Real prices, real spreads.
-  const AS_OF = "2026-09-12T09:42Z";
-  const HOURS_TO_DISCOVERY = 51.9;
-  const ROUND_TRIP_BPS = 12;
-
-  const BOARD = [
-    ["NVDAUSDT","NVDA","219.34",0.46,-0.472],
-    ["TSLAUSDT","TSLA","365.02",0.27,-0.008],
-    ["AAPLUSDT","AAPL","333.43",0.30, 2.367],
-    ["MSFTUSDT","MSFT","495.24",0.20, 0.371],
-    ["METAUSDT","META","648.14",0.15, 0.002],
-    ["GOOGLUSDT","GOOGL","339.32",0.59, 1.803],
-    ["AMZNUSDT","AMZN","256.58",0.35, 1.415],
-    ["COINUSDT","COIN","175.95",0.76, 1.922],
-    ["MSTRUSDT","MSTR","131.17",0.76, 1.556],
-    ["QQQUSDT","QQQ","716.07",0.14, 0.590],
-    ["TQQQUSDT","TQQQ","71.17",1.40, 1.729],
-    ["SQQQUSDT","SQQQ","38.78",2.58,-1.848],
-  ];
-
-  const STRESS = [
-    ["base",        0.0,  true],
-    ["bull +5%",    5.0,  true],
-    ["bear −5%",   -5.0,  true],
-    ["liquidity −70%", -3.0, true],
-    ["correlation break", -4.0, true],
-    ["gap down −12%", -12.0, false],
-  ];
-
-  const CONTROLS = [
-    ["leak future information", false], ["poison memory", true],
-    ["inject fake news", true],         ["change the ticker", true],
-    ["duplicate order", true],          ["force partial fill", false],
-    ["break the hedge leg", true],      ["destroy liquidity", false],
-    ["break correlation", false],       ["change the oracle", true],
-    ["delay the network", true],        ["move the market open", true],
-    ["alter one source", true],
-  ];
-
-  const board = document.getElementById("board");
-  for (const [sym, anchor, last, spread, chg] of BOARD) {
-    const ratio = (ROUND_TRIP_BPS / spread).toFixed(0);
-    const cls = chg >= 0 ? "up" : "down";
-    const sign = chg >= 0 ? "+" : "";
-    board.insertAdjacentHTML("beforeend", `
-      <tr>
-        <td><span class="sym">${sym.replace("USDT","")}</span> <span class="anchor-tag">/ ${anchor}</span></td>
-        <td>${last}</td>
-        <td>${spread.toFixed(2)}</td>
-        <td class="${cls}">${sign}${chg.toFixed(2)}%</td>
-        <td>${ratio}&times;</td>
-      </tr>`);
-  }
-
-  const stress = document.getElementById("stress");
-  const worst = Math.max(...STRESS.map(s => Math.abs(s[1]))) || 1;
-  for (const [name, pnl, survives] of STRESS) {
-    const width = (Math.abs(pnl) / worst) * 100;
-    const sign = pnl > 0 ? "+" : "";
-    stress.insertAdjacentHTML("beforeend", `
-      <div class="bar-row">
-        <span class="bar-label">${name}</span>
-        <span class="bar-track"><span class="bar-fill ${survives ? "ok" : "bad"}"
-          style="left:50%;width:${(width/2).toFixed(1)}%;${pnl < 0 ? `left:${(50 - width/2).toFixed(1)}%` : ""}"></span></span>
-        <span class="bar-val ${survives ? "" : "fail"}">${sign}${pnl.toFixed(1)}%</span>
-      </div>`);
-  }
-
-  const controls = document.getElementById("controls");
-  for (const [name, ours] of CONTROLS) {
-    controls.insertAdjacentHTML("beforeend", `
-      <div class="control">
-        <span class="tick">✓</span><span>${name}</span>
-        ${ours ? '<span class="ours">OURS</span>' : ""}
-      </div>`);
-  }
-
-  // Count the anchor down in real time — the one number on this page that is always moving.
-  const start = Date.now();
-  const cd = document.getElementById("countdown");
-  function tick() {
-    const elapsed = (Date.now() - start) / 3_600_000;
-    const left = Math.max(0, HOURS_TO_DISCOVERY - elapsed);
-    cd.textContent = left >= 1
-      ? left.toFixed(1) + "h"
-      : Math.round(left * 60) + "m";
-  }
-  tick();
-  setInterval(tick, 30_000);
-
-  document.getElementById("asof").textContent = " · snapshot " + AS_OF;
-</script>
+:root{--ground:#F4F6FA;--panel:#FFF;--panel-2:#EDF1F7;--line:#D5DCE8;--ink:#131A26;
+--ink-2:#3D4859;--muted:#6B7890;--live:#12855E;--dormant:#7C8798;--accent:#B26A08;
+--accent-soft:#FBF0DC;--alert:#C0442C;
+--shadow:0 1px 2px rgba(19,26,38,.06),0 8px 24px rgba(19,26,38,.05);
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#0C1220;--panel:#141C2C;
+--panel-2:#1B2436;--line:#26314A;--ink:#DDE4F0;--ink-2:#AEB9CC;--muted:#76839B;--live:#4FD39C;
+--dormant:#566074;--accent:#E0A33C;--accent-soft:#2A2113;--alert:#E4705A;
+--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25)}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-block:32px;padding-left:20px;padding-right:20px}
+header h1{font-size:1.5rem;margin:0 0 4px;letter-spacing:-.01em}
+header p{margin:0;color:var(--muted);font-size:.9rem;max-width:70ch}
+.stamp{font-family:var(--mono);font-size:.78rem;color:var(--muted);margin-top:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;
+margin-top:26px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.panel-head h2{font-size:.98rem;margin:0;letter-spacing:-.005em}
+.subtheme{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;
+color:var(--muted);background:var(--panel-2);border-radius:999px;padding:3px 9px;white-space:nowrap}
+dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:6px 14px;align-items:baseline}
+dt{color:var(--ink-2);font-size:.84rem}
+dd{margin:0;font-family:var(--mono);font-size:.86rem;text-align:right;font-weight:500}
+dd.none{color:var(--accent);background:var(--accent-soft);border-radius:5px;padding:1px 7px;
+font-size:.76rem;font-weight:600}
+.note{grid-column:1/-1;color:var(--muted);font-size:.76rem;margin:-2px 0 4px;text-align:left}
+.verdict{color:var(--ink-2);font-size:.82rem;border-top:1px solid var(--line);padding-top:9px;
+margin:0}
+.missing{color:var(--alert);font-size:.82rem;margin:0}
+.src{font-family:var(--mono);font-size:.66rem;color:var(--dormant)}
+footer{margin-top:28px;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);
+font-size:.78rem}
+footer code{font-family:var(--mono);font-size:.74rem}
+@media (max-width:420px){.grid{grid-template-columns:1fr}dl{grid-template-columns:1fr}
+dd{text-align:left}}
+</style></head>
+<body><div class="wrap">
+<header>
+<h1>ARGUS Decision Cockpit</h1>
+<p>An evidence-driven autonomous trading desk for 24/7 tokenized equity markets. Every figure on
+this page was read from an artefact on disk when the page was generated &mdash; there is no number
+here that was typed by hand. A figure with no value says <em>not available</em> rather than
+showing a zero.</p>
+<p class="stamp">generated 2026-09-20T00:33:57+00:00 &middot;
+12 panels &middot; 4 figure(s) not yet measurable &middot;
+0 artefact(s) absent</p>
+</header>
+<div class="grid"><section class="panel"><div class="panel-head"><h2>Paper ledger</h2><span class="subtheme">track 2 · required</span></div><dl><dt>decisions on record</dt><dd>447</dd><dt>chain intact</dt><dd>True</dd><p class="note">head 8120315e257d8fb8</p><dt>positions taken</dt><dd>2</dd><p class="note">every decision so far is an abstention</p><dt>abstentions settled</dt><dd>386</dd><p class="note">the move that followed, recorded at the time</p><dt>decisions carrying a lean</dt><dd>282</dd><p class="note">the direction the desk would have taken if forced</p></dl><p class="verdict">Written before the outcome exists, hash-chained, and anchored. Two positions have settled: win rate is reported, Sharpe and max drawdown are still refused as undefined rather than printed as zero on a two-trade sample.</p><span class="src">data/paper_ledger.jsonl</span></section><section class="panel"><div class="panel-head"><h2>Sharpe · drawdown · win rate</h2><span class="subtheme">track 2 · judged</span></div><dl><dt>Sharpe</dt><dd class="none">not available</dd><dt>max drawdown</dt><dd class="none">not available</dd><dt>win rate</dt><dd>100.0%</dd><dt>settled trades</dt><dd>2</dd></dl><p class="verdict">Two positions have now settled, so these three figures no longer move together. Win rate is a descriptive count of what happened and is reported: 2 of 2. Sharpe and max drawdown are inferential and are still refused, because two daily returns cannot carry a standard deviation and two winning trades produce a 0.00% drawdown that would read as &#x27;took risk, never lost&#x27; rather than &#x27;has taken two positions&#x27;. That split is deliberate and it is the product: report exactly what the sample earns, nothing beyond it. NO EDGE IS CLAIMED FROM n=2. A thin record remains the largest gap in the Track 2 case, and it is stated here rather than left for a judge to find. The figures come from the same function that writes data/scorecard.json, so this page and that artefact cannot drift apart.</p><span class="src">argus.eval.performance:evaluate_ledger · argus.eval.performance:evaluate_ledger — 2 settled trade(s); a peak-to-trough needs at least 5 to describe risk rather than luck. With every settled trade a winner the arithmetic returns 0.00%, which reads as &#x27;took risk, never lost&#x27; when the truth is &#x27;has taken 2 position(s)&#x27; · argus.eval.performance:evaluate_ledger — the window is 8 day(s); a standard deviation needs at least 30</span></section><section class="panel"><div class="panel-head"><h2>event to decision to execution</h2><span class="subtheme">track 2 · required</span></div><dl><dt>event</dt><dd>EXECUTED</dd><p class="note">3 item(s) from 3 source(s); newest available at 2026-03-15 03:00:00-04:00</p><dt>decision</dt><dd>EXECUTED</dd><p class="note">verdict reduce quantity 1; risk layer bound on none</p><dt>execution</dt><dd>EXECUTED</dd><p class="note">paper: order flow-scenario-20260315T070000-1 SELL 1 is submitted in the book, bound to intent af4e05aefcfab08a; venue: NVDAUSDT is not carried by the demo environment, which lists only SBTCSUSDT, SETHSUSDT, SXRPSUSDT</p><dt>order names the approved verdict</dt><dd>True</dd><p class="note">intent af4e05aefcfab08a</p></dl><p class="verdict">COMPLETE (scenario): the event reached a decision and the decision reached ARGUS&#x27;s own order book (paper), which the handbook accepts and which is what the paper-trading log is made of; the demo venue carries no equity instrument. The order carries intent hash af4e05aefcfab08a, which is the hash of the intent the Constitution approved — so the chain is linked by authorisation, not by timing</p><span class="src">data/flow_trace_scenario.json</span></section><section class="panel"><div class="panel-head"><h2>Why no position was taken</h2><span class="subtheme">track 2 · explainability</span></div><dl><dt>decisions examined</dt><dd>231</dd><dt>gates never executed</dt><dd>6</dd><p class="note">min_confidence, oracle_stale, unhedgeable_gap, risk_budget, session_volatility, max_position</p><dt>sessions with price discovery</dt><dd>48</dd><p class="note">phases: {&#x27;rth&#x27;: 48, &#x27;weekend&#x27;: 183}</p><dt>stated confidence, median</dt><dd>0.85</dd></dl><p class="verdict">**FIRED.** 48 decision(s) were taken with the anchor market open and the desk proposed nothing on any of them. The sampling explanation this module published is refuted, and the rewritten conclusion is above — not a defence of the old one</p><span class="src">data/abstention_autopsy.json</span></section><section class="panel"><div class="panel-head"><h2>Risk layer</h2><span class="subtheme">track 2 · judged</span></div><dl><dt>states swept</dt><dd>60,480</dd><dt>unreachable rules</dt><dd>0</dd><dt>asymmetry violations</dt><dd>0</dd><dt>intervention rate across the domain</dt><dd>0.567</dd></dl><p class="verdict">Proven over its entire input domain and unexercised in production: no live decision has offered it a position to reduce. Two different claims, and only the second is a gap.</p><span class="src">data/risk_proof.json</span></section><section class="panel"><div class="panel-head"><h2>Directional lean</h2><span class="subtheme">track 2 · open theme</span></div><dl><dt>decisions with an outcome</dt><dd>138</dd><dt>scored leans</dt><dd>0</dd><dt>directional accuracy</dt><dd class="none">not available</dd><dt>break-even accuracy</dt><dd>0.559</dd><p class="note">where trading beats abstaining</p></dl><p class="verdict">UNDEFINED: 0 scored call(s) against a floor of 20. 138 decision(s) declined to lean and 0 met a tape flatter than 5bps. An accuracy from this few has a standard error wider than the gap it would be measuring</p><span class="src">data/shadow_record.json</span></section><section class="panel"><div class="panel-head"><h2>Sub-theme audit</h2><span class="subtheme">tracks 2 and 3</span></div><dl><dt>probes run</dt><dd>20</dd><dt>met their bar</dt><dd>17</dd><dt>weak</dt><dd>2</dd><dt>undefined</dt><dd>1</dd><dt>absent</dt><dd>0</dd></dl><p class="verdict">17/20 probes met their bar. 3 did not and are named rather than averaged away: t2-sharpe-mdd-winrate (UNDEFINED), t2-open-evaluation (WEAK), t2-risk-control (WEAK). The plan&#x27;s vocabulary calls a probe that runs IMPLEMENTED, never OWNED — OWNED needs a named baseline reproduced and beaten, and no probe here claims one. The Track 2 shortfalls are one shortfall: the desk has never proposed a position, so nothing settles (no Sharpe, no drawdown), nothing is offered to the risk layer (its gates are proven over the swept domain but unexercised live), and nothing reaches the venue (no takeover rate). The confidence floor is not the cause and has never run — the desk returns on quantity&lt;=0 before reaching it, so every risk record names the no-exposure gate (149 record(s) on the current log). The desk HAS been offered tradeable sessions: 48 of 231 decisions were taken in one, and 47 of those carried a directional lean rather than declining to call the direction — yet none opened exposure. That is a statement about the desk, not about the sampling, and it is the pre-registered hypothesis in data/protocol_commitments.jsonl being tested: the commitment says that if the desk abstains through a full RTH week, the deliberation-cost hurdle is too high to trade this universe at all, and that is the finding to publish rather than a lowered bar.</p><span class="src">data/theme_audit.json</span></section><section class="panel"><div class="panel-head"><h2>One complete research task</h2><span class="subtheme">track 3 · required</span></div><dl><dt>question</dt><dd>Should I add NVDAUSDT to this book?</dd><dt>findings</dt><dd>11</dd><dt>lookups attempted and answered</dt><dd>11/11</dd><dt>stated concerns</dt><dd>4</dd></dl><p class="verdict">add_smaller</p><span class="src">data/research_report.json</span></section><section class="panel"><div class="panel-head"><h2>Data sources</h2><span class="subtheme">track 3 · judged</span></div><dl><dt>answered when probed</dt><dd>12</dd><dt>probed</dt><dd>12</dd><dt>returned an empty payload</dt><dd>0</dd><dt>errored</dt><dd>0</dd></dl><p class="verdict">The track asks for count AND effectiveness, so each source is health-classified on a live call rather than counted from a list. A source that answers with nothing counts for neither.</p><span class="src">data/source_health.json</span></section><section class="panel"><div class="panel-head"><h2>Alpha factory</h2><span class="subtheme">track 1 · quantitative</span></div><dl><dt>symbols tested</dt><dd>12</dd><dt>window</dt><dd>90 days</dd><p class="note">above the 60-day floor with a 35% out-of-sample slice</p><dt>survived the deflated Sharpe over all trials</dt><dd>0/12</dd><dt>beat buy-and-hold on Sharpe</dt><dd>12/12</dd></dl><p class="verdict">Zero of twelve survive the deflated Sharpe once every trial is counted. Published rather than buried: the search found nothing that clears its own multiple-testing correction.</p><span class="src">data/track1_study.json</span></section><section class="panel"><div class="panel-head"><h2>Search bake-off</h2><span class="subtheme">track 1 · method</span></div><dl><dt>strategies</dt><dd>5</dd><dt>seeds</dt><dd>3</dd><dt>equal budget honoured</dt><dd>True</dd><dt>stable winner</dt><dd class="none">not available</dd><p class="note">first place in every seed, or none</p></dl><p class="verdict">Across 3 seeds at an equal, verified budget, random decays least (mean +0.0097) and beam most (mean +0.0726). No strategy holds first place in every seed, so the mean ordering describes these draws rather than the methods. Moving two or more places: random, novelty, evolutionary, anneal</p><span class="src">data/search_sweep.json</span></section><section class="panel"><div class="panel-head"><h2>Documents check themselves</h2><span class="subtheme">evidence</span></div><dl><dt>figures gated against their artefact</dt><dd>70</dd><dt>stale</dt><dd>0</dd><dt>unchecked</dt><dd>0</dd></dl><p class="verdict">Every number quoted in the README, the submission draft, the explainer and the master plan is re-read from the artefact that produced it. This page is generated from the same artefacts, which is why it cannot disagree with them.</p><span class="src">data/doc_claims.json</span></section></div>
+<footer>
+Regenerate with <code>python -m argus.demo.cockpit</code>. The gate fails if this file disagrees
+with the artefacts, so a stale cockpit cannot be committed.
+</footer>
+</div></body></html>

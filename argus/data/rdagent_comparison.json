@@ -1,0 +1,79 @@
+{
+  "argus_execution_surface_scan": {
+    "path": "C:\\Users\\prate\\bitget\\argus\\src\\argus\\research\\searchoff.py",
+    "forbidden_calls_found": [],
+    "has_execution_surface": false
+  },
+  "rdagent_execution_surface_scan": {
+    "path": "C:\\Users\\prate\\bitget\\argus\\src\\argus\\eval\\baselines\\rdagent_factor.py",
+    "forbidden_calls_found": [
+      "subprocess.check_output"
+    ],
+    "has_execution_surface": true
+  },
+  "injection_proof": {
+    "marker_written": true,
+    "marker_contents": "ARGUS proof-of-execution - real subprocess ran real payload",
+    "workspace_path": "C:\\Users\\prate\\bitget\\argus\\data\\_rdagent_workspace_tmp\\ce6231c05f2a4a6e989b09d1bc0ceb3b",
+    "execution_error": "NoOutputError: Execution succeeded without error.\nExpected output file not found.",
+    "executed_attacker_code": true
+  },
+  "failure_cases": [
+    {
+      "system": "rdagent",
+      "input": "factor.py raises RuntimeError",
+      "outcome": "CustomRuntimeError caught cleanly by execute()'s own handler: True"
+    },
+    {
+      "system": "argus",
+      "input": "Window('not_a_real_op', ...)",
+      "outcome": "GrammarError at construction \u2014 never reaches a search loop at all"
+    }
+  ],
+  "trial_pool": {
+    "bars": 1487,
+    "budget": 400,
+    "trials_spent": 400,
+    "distinct_candidates": 326,
+    "best_in_sample": 0.017811,
+    "in_sample_observations": 965,
+    "variance_of_trials": 0.00214234,
+    "raw_claim": 0.017811,
+    "deflated_probability": 9.343739192668732e-05,
+    "deflated_error": null,
+    "deflation_is_severe": true
+  },
+  "ablation": [
+    {
+      "trials": 1,
+      "probability": 0.7098517163710125
+    },
+    {
+      "trials": 5,
+      "probability": 0.12286683113241015
+    },
+    {
+      "trials": 25,
+      "probability": 0.01025459354538133
+    },
+    {
+      "trials": 100,
+      "probability": 0.0010230510022581352
+    },
+    {
+      "trials": 400,
+      "probability": 9.343739192668732e-05
+    }
+  ],
+  "costs": {
+    "rdagent_subprocess_spawn_seconds": 0.10177287999977125,
+    "argus_grammar_evaluate_seconds": 0.1813041384999815,
+    "bars_scored": 1487,
+    "argus_cost_exceeds_rdagent_spawn_floor": true
+  },
+  "reproducibility": {
+    "argus_reproducible": true
+  },
+  "used_live_market_data": true,
+  "scope_statement": "Claimed: RD-Agent's real, unmodified FactorFBWorkspace.execute() executes attacker-controlled Python via an unsandboxed subprocess (LocalEnv, hard-coded for factor execution, confirmed by reading factor_coder/config.py's get_factor_env()) \u2014 demonstrated by running it, not by reading the source alone; ARGUS's typed grammar contains zero eval/exec/subprocess calls anywhere in its source (AST-verified, the same technique grammar_comparison.py already runs, reused here rather than re-derived). Separately and independently: RD-Agent's real factor-search accept/reject mechanism has no trial-count correction anywhere in its source (confirmed by an exhaustive grep for deflation/multiple-testing/PBO/FDR terms across the whole real repository, zero matches); ARGUS's real deflated_sharpe(), run on a real 400-trial search_random pass over real NVDAUSDT hourly bars, reports a 9.3e-05 probability for the best in-sample candidate that same real trial pool produced \u2014 a discovery a system with RD-Agent's real accept/reject mechanism has no way to refuse.\n\nNOT claimed: that RD-Agent's factor-implementation CODER (the LLM call that writes factor.py in the first place, upstream of the execute() step this comparison starts at) is unsound \u2014 this comparison exercises the EXECUTION step only, not the code-generation step, which this module does not vendor or run. NOT claimed: that every RD-Agent-proposed factor is spurious \u2014 the real qlib backtest template DOES separate train/valid/test date ranges (confirmed by reading factor_template/conf_combined_factors.yaml), so the metrics themselves are computed out-of- sample; the gap found here is narrower and specific: the SAME held-out test window is reused as the acceptance criterion across an unbounded number of loop iterations, with nothing correcting for how many hypotheses were tried against it. NOT claimed: that ARGUS's search methodology (random/beam/evolutionary/novelty/anneal) finds BETTER factors than RD-Agent's LLM-driven proposals \u2014 the published Track 1 result is that 0 of 12 symbols survive the deflated Sharpe over all trials on ARGUS's own side too (research/searchoff.py's own module docstring); the claim here is narrower still: ARGUS's search has a real gate that would catch the exact failure mode RD-Agent's real accept/reject mechanism has no defense against. NOT claimed: that ARGUS's grammar evaluation is cheaper than RD-Agent's subprocess execution \u2014 measure_costs()'s own docstring is explicit that the two numbers measure different things (a fixed per-call subprocess-spawn floor vs. real O(bars) computation with no subprocess tax at all), and on this project's real ~1487-bar NVDAUSDT window the computation-bound ARGUS number is the LARGER of the two, found by running both, not assumed from a smaller synthetic fixture.\n"
+}

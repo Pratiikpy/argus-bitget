@@ -1,0 +1,97 @@
+{
+  "generated_at": "2026-09-19T19:31:42.977670+00:00",
+  "source": "https://api.bitget.com/api/v3/market/orderbook",
+  "snapshots": 396,
+  "symbols": [
+    "AAPLUSDT",
+    "AMZNUSDT",
+    "COINUSDT",
+    "GOOGLUSDT",
+    "METAUSDT",
+    "MSFTUSDT",
+    "MSTRUSDT",
+    "NVDAUSDT",
+    "QQQUSDT",
+    "SQQQUSDT",
+    "TQQQUSDT",
+    "TSLAUSDT"
+  ],
+  "spans_hours": 128.614,
+  "level_size": {
+    "count": 7920,
+    "median": 3.015,
+    "p10": 0.11,
+    "p90": 40.37
+  },
+  "paired_snapshots": 384,
+  "change_by_horizon": {
+    "under_30s": {
+      "gap_seconds": [
+        0.0,
+        30.0
+      ],
+      "observations": 169,
+      "median_share_of_level": 0.23977,
+      "p90_share_of_level": 2.29209,
+      "grew": 52,
+      "shrank": 70,
+      "share_growing": 0.4262
+    },
+    "30s_to_2min": {
+      "gap_seconds": [
+        30.0,
+        120.0
+      ],
+      "observations": 749,
+      "median_share_of_level": 0.77327,
+      "p90_share_of_level": 8.60668,
+      "grew": 353,
+      "shrank": 355,
+      "share_growing": 0.4986
+    },
+    "2min_to_10min": {
+      "gap_seconds": [
+        120.0,
+        600.0
+      ],
+      "observations": 0,
+      "median_share_of_level": null,
+      "p90_share_of_level": null,
+      "grew": 0,
+      "shrank": 0,
+      "share_growing": null
+    },
+    "10min_to_1h": {
+      "gap_seconds": [
+        600.0,
+        3600.0
+      ],
+      "observations": 0,
+      "median_share_of_level": null,
+      "p90_share_of_level": null,
+      "grew": 0,
+      "shrank": 0,
+      "share_growing": null
+    },
+    "over_1h": {
+      "gap_seconds": [
+        3600.0,
+        null
+      ],
+      "observations": 473,
+      "median_share_of_level": 0.93197,
+      "p90_share_of_level": 22.26712,
+      "grew": 259,
+      "shrank": 206,
+      "share_growing": 0.557
+    }
+  },
+  "change_pooled": {
+    "observations": 1391,
+    "median_share_of_level": 0.80072,
+    "grew": 664,
+    "shrank": 631,
+    "warning": "Pooled across every snapshot gap in the tape, which span 14s to 64803s. Read `change_by_horizon` instead: this figure averages observations taken over incommensurable elapsed times and is kept only so the earlier artefacts remain comparable."
+  },
+  "verdict": "396 snapshots over 128.614h: a near-touch level holds a median 3.015 contracts. **Change is reported per horizon, not pooled** \u2014 a level moves a very different share of itself over 30 seconds than over an hour, and one median over both is a number about the sampling schedule rather than about the book. The shortest horizon with at least 100 observations is `under_30s`, where a level moves a median 24.0% of itself \u2014 that is the figure the simulator should take, being nearest the per-event timescale it models. The attribution rule \u2014 which side of a resting order a decrease came from \u2014 is not in this data and cannot be, so it stays a swept assumption rather than a measurement."
+}

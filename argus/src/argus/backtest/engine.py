@@ -34,6 +34,7 @@ from argus.backtest.metrics import (
     out_of_sample_decay,
     sharpe,
 )
+from argus.backtest.metrics import stability as rolling_stability
 from argus.cost.model import CostModel
 from argus.execution.passive import PassiveExecution, PassiveExecutionError, book_from_bar
 
@@ -110,6 +111,44 @@ class BacktestResult:
     trades: int
     passive: PassiveReport | None = None
 
+    net_returns: tuple[float, ...] = ()
+    """The per-period net return series, kept so rolling statistics can be formed downstream.
+
+    Track 1 is scored on rolling 30-day Sharpe stability as its own criterion, and a stability
+    statistic cannot be recovered from a summary — the summary is what it is a statistic *of*.
+    Carrying the series is the only way the study can report it without re-running the backtest."""
+
+    weights: tuple[float, ...] = ()
+    """The per-bar target weight the signal actually achieved, ``weights[i]`` held from bar ``i``
+    to ``i+1`` — computed every call (``run``'s own loop, ``achieved`` appended each bar) but
+    dropped before this session, so nothing downstream could ever answer "when did a position
+    open and close" from a completed backtest, only the aggregate cost/return summary.
+
+    This is a **continuous-weight rebalancing engine, not a discrete-trade one** — ``trades``
+    above is a bare count of bars where the weight changed materially, never an entry/exit pair
+    with its own realised P&L. Exposing the weight series is what lets a caller reconstruct
+    discrete trade boundaries after the fact (a weight crossing zero, or reversing sign, is an
+    open/close event) without re-running the backtest — needed to compare against any
+    discrete-trade risk system (a circuit breaker, `freqtrade`'s Protections) on the same
+    underlying data, which nothing in this module could do before this field existed.
+    """
+
+    @property
+    def stability(self) -> dict[str, float | int] | None:
+        """Rolling-window Sharpe stability, or ``None`` when the series is too short.
+
+        ``None`` rather than a fabricated figure: a rolling statistic over fewer periods than one
+        window is not a rolling statistic, and the study prints the absence.
+        """
+        window = min(30, max(2, len(self.net_returns) // 4))
+        try:
+            return rolling_stability(
+                list(self.net_returns), window=window,
+                periods_per_year=self.periods_per_year,
+            ).as_dict()
+        except MetricError:
+            return None
+
     @property
     def cost_destroyed_the_edge(self) -> bool:
         """Did the fee flip a winning gross result into a losing net one?
@@ -131,6 +170,7 @@ class BacktestResult:
             "in_sample": self.in_sample.as_dict() if self.in_sample else None,
             "out_of_sample": self.out_of_sample.as_dict() if self.out_of_sample else None,
             "decay": self.decay,
+            "stability": self.stability,
             "passive": self.passive.as_dict() if self.passive else None,
         }
 
@@ -268,6 +308,8 @@ def run(
         decay=decay,
         total_cost_bps=total_cost * 10_000,
         trades=trades,
+        net_returns=tuple(net_returns),
+        weights=tuple(weights),
         passive=(
             PassiveReport(
                 attempts=p_attempts,
@@ -284,6 +326,122 @@ def run(
             else None
         ),
     )
+
+
+@dataclass(frozen=True, slots=True)
+class SyntheticTrade:
+    """One discrete position, reconstructed from a continuous-weight backtest's weight series —
+    the unit a discrete-trade risk system (a circuit breaker, `freqtrade`'s Protections) reasons
+    about, which :func:`run`'s native output never produces (see :attr:`BacktestResult.weights`'s
+    docstring). "Synthetic" because it is reconstructed after the fact from a weight trajectory,
+    not observed as a real fill — a fact this name states rather than lets a reader assume away.
+    """
+
+    symbol: str
+    entry_bar: int
+    exit_bar: int
+    entry_ts: datetime
+    exit_ts: datetime
+    direction: str
+    """``"long"`` or ``"short"`` — the sign of the weight held for this trade's whole span."""
+
+    weight: float
+    """The weight held. Simplification, stated plainly: a strategy that varies its weight while
+    staying the same sign (0.5 -> 0.8, say) is reconstructed as ONE trade at its *entry* weight,
+    not as a sequence of size adjustments — the entry/exit price pair is what a discrete-trade
+    protection system needs, and modelling every intermediate resize would answer a question
+    (position-sizing behaviour) this extractor does not claim to."""
+
+    entry_price: Decimal
+    exit_price: Decimal
+
+    @property
+    def return_pct(self) -> float:
+        """Direction-adjusted price return over the holding period, entry to exit price only —
+        **not** cost-adjusted and **not** weighted by the intermediate weight path within the
+        trade (see :attr:`weight`'s docstring). A caller wanting a fee-aware figure should apply
+        `cost.model.CostModel` to this trade's own entry/exit rather than trust this field alone
+        for anything but direction and rough magnitude.
+        """
+        raw = float((self.exit_price - self.entry_price) / self.entry_price)
+        return raw if self.direction == "long" else -raw
+
+
+def extract_trades(
+    bars: Sequence[Bar], weights: Sequence[float], *, symbol: str = "",
+) -> list[SyntheticTrade]:
+    """Reconstruct discrete trades from a completed backtest's ``(bars, weights)`` pair.
+
+    ``symbol`` is stamped onto every trade verbatim (default ``""`` for a caller that does not
+    need it) — one `run()` call is always over one instrument, so it is a single value here, not
+    per-trade data reconstructed from anything; carried so multi-symbol callers (a per-pair
+    protection like freqtrade's ``LowProfitPairs``) can combine trades from several `run()` calls
+    and still tell which came from where.
+
+    ``weights[i]`` is the weight held from bar ``i`` to ``i+1`` (:attr:`BacktestResult.weights`'s
+    own docstring) — a trade **opens** at the first bar where the weight becomes nonzero after
+    being flat or opposite-signed, and **closes** at the first bar it returns to flat or reverses
+    sign. A reversal is simultaneously a close and a re-open at the same bar, mirroring
+    `desk.book.Position.apply_fill`'s own reversal handling (verified against
+    ``nautilus_trader``'s ``position.rs:545-551`` when that module was built) rather than
+    inventing a second convention for the same event.
+
+    Read ``bars[:-1]`` against ``weights`` (index ``i`` prices a trade opened at bar ``i``) and
+    ``bars[1:]`` for the bar the position was actually marked to close *at* — the same one-bar
+    lag :func:`run`'s own loop uses (a weight set at bar ``i`` earns the return from ``i`` to
+    ``i+1``), so a reconstructed trade's exit price is the price the weight change actually paid
+    or received against, not the price at the bar the *signal* changed.
+    """
+    if len(weights) != len(bars) - 1:
+        raise MetricError(
+            f"{len(weights)} weight(s) do not match {len(bars)} bar(s) — extract_trades needs "
+            f"the exact (bars, weights) pair a single `run()` call produced, not a mismatched one"
+        )
+
+    def _direction(w: float) -> str | None:
+        if w > 0:
+            return "long"
+        if w < 0:
+            return "short"
+        return None
+
+    trades: list[SyntheticTrade] = []
+    open_bar: int | None = None
+    open_direction: str | None = None
+    open_weight = 0.0
+
+    def _close(exit_bar: int) -> None:
+        nonlocal open_bar, open_direction
+        if open_bar is None or open_direction is None:
+            return
+        trades.append(SyntheticTrade(
+            symbol=symbol, entry_bar=open_bar, exit_bar=exit_bar,
+            entry_ts=bars[open_bar].ts, exit_ts=bars[exit_bar].ts,
+            direction=open_direction, weight=open_weight,
+            entry_price=bars[open_bar].close, exit_price=bars[exit_bar].close,
+        ))
+        open_bar = None
+        open_direction = None
+
+    for i, w in enumerate(weights):
+        direction = _direction(w)
+        if open_direction is None:
+            if direction is not None:
+                open_bar, open_direction, open_weight = i, direction, w
+            continue
+        if direction == open_direction:
+            continue
+        # Flat or reversed: close what was open, then re-open if the new weight is nonzero.
+        _close(i)
+        if direction is not None:
+            open_bar, open_direction, open_weight = i, direction, w
+
+    if open_bar is not None:
+        # Still open when the series ends: close it at the last available bar rather than
+        # dropping it — an unrealised position is a real position, not an absent one.
+        _close(len(bars) - 1)
+
+    return trades
 
 
 def sweep(

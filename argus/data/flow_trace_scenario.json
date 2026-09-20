@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-09-14T07:45:14.277298+00:00",
+  "trace_id": "flow-scenario-20260315T070000",
+  "symbol": "NVDAUSDT",
+  "mode": "scenario",
+  "complete": true,
+  "reached_venue": false,
+  "links_hold": true,
+  "decision_intent_hash": "af4e05aefcfab08a",
+  "venue_intent_hash": "af4e05aefcfab08a",
+  "legs": [
+    {
+      "leg": "event",
+      "status": "EXECUTED",
+      "summary": "3 item(s) from 3 source(s); newest available at 2026-03-15 03:00:00-04:00",
+      "at": "2026-03-15T07:00:00+00:00",
+      "detail": {
+        "items": 3,
+        "sources": [
+          "news",
+          "sec-edgar",
+          "social"
+        ],
+        "newest_claim": "rNVDA last 118.40, down 1.2% since the filing on roughly a third of regular-hours depth; quoted spread 9.4bps.",
+        "newest_available_at": "2026-03-15 03:00:00-04:00"
+      }
+    },
+    {
+      "leg": "decision",
+      "status": "EXECUTED",
+      "summary": "verdict reduce quantity 1; risk layer bound on none",
+      "at": "2026-03-15T07:00:00+00:00",
+      "detail": {
+        "verdict": "reduce",
+        "quantity": "1",
+        "side": "sell",
+        "lean": "down",
+        "binding_constraint": "none",
+        "ruling_reason": "within every configured limit",
+        "notes": [
+          "[quarantine] 3 evidence item(s) screened, none withheld",
+          "[panel] 1 of 3 analysts run: event",
+          "[panel] sentiment not run \u2014 relevance 0.18 below 0.35 \u2014 its evidence is stale, low-credibility, or carries nothing this analyst reads. 1 piece(s) of evidence it would have read went unexamined; that is a judgement about cost, not about their worth",
+          "[panel] earnings not run \u2014 no evidence on its channels (filing, transcript)",
+          "[panel] 4.534bps of deliberation not spent, against a 12bps round trip",
+          "causal chain: 7 links stated, gradable at the next price discovery",
+          "[panel] 1 analyst(s) ran concurrently in 33.0s; none could read another's answer, so agreement is consensus rather than contagion",
+          "[panel] cross_asset also ran, outside the evidence-cost selection above: it reads the hedge menu (0 instrument(s)) and the position rather than the evidence list, so no fact about the evidence could make it irrelevant",
+          "hedge menu empty: nothing placeable for 30.5h; 100% of risk carried as priced residual",
+          "panel: 2 analysts, 2 distinct sources, independence 1.00 -> bearish at 0.82 after provenance discount",
+          "[conflict] none: 2 analysts agreed on direction and size",
+          "[debate] not held \u2014 the panel agreed on direction across 2 analyst(s), and a debate between two seats that already agree is paid restatement. It runs when they split."
+        ]
+      }
+    },
+    {
+      "leg": "execution",
+      "status": "EXECUTED",
+      "summary": "paper: order flow-scenario-20260315T070000-1 SELL 1 is submitted in the book, bound to intent af4e05aefcfab08a; venue: NVDAUSDT is not carried by the demo environment, which lists only SBTCSUSDT, SETHSUSDT, SXRPSUSDT",
+      "at": "2026-03-15T07:00:00+00:00",
+      "detail": {
+        "client_order_id": "flow-scenario-20260315T070000-1",
+        "state": "submitted",
+        "quantity": "1",
+        "side": "SELL",
+        "approved_intent_hash": "af4e05aefcfab08a",
+        "transitions": [
+          "submitted"
+        ],
+        "venue": "unavailable for NVDAUSDT",
+        "demo_symbols": [
+          "SBTCSUSDT",
+          "SETHSUSDT",
+          "SXRPSUSDT"
+        ]
+      }
+    }
+  ],
+  "verdict": "COMPLETE (scenario): the event reached a decision and the decision reached ARGUS's own order book (paper), which the handbook accepts and which is what the paper-trading log is made of; the demo venue carries no equity instrument. The order carries intent hash af4e05aefcfab08a, which is the hash of the intent the Constitution approved \u2014 so the chain is linked by authorisation, not by timing"
+}

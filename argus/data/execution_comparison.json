@@ -1,0 +1,174 @@
+{
+  "base_case": {
+    "rtoken": "NVDAUSDT",
+    "crypto": "BTCUSDT",
+    "rtoken_slippage_bps": "0.9842284392337896788902555422",
+    "crypto_slippage_bps": "0.006579817462703949667028337300",
+    "rtoken_funding_bps": "0",
+    "crypto_funding_bps": "0.810000",
+    "real_crypto_sor_pick_at_entry": "BTCUSDT",
+    "argus_pick_at_entry": "BTCUSDT",
+    "agree_at_entry": true,
+    "break_even_holding_days": "1",
+    "argus_pick_past_break_even": "NVDAUSDT",
+    "diverges_past_break_even": true
+  },
+  "divergence_sweep": {
+    "rtoken": "NVDAUSDT",
+    "crypto": "BTCUSDT",
+    "points": [
+      {
+        "holding_days": "0",
+        "argus_pick": "BTCUSDT",
+        "real_crypto_sor_pick": "BTCUSDT",
+        "agree": true
+      },
+      {
+        "holding_days": "0.25",
+        "argus_pick": "BTCUSDT",
+        "real_crypto_sor_pick": "BTCUSDT",
+        "agree": true
+      },
+      {
+        "holding_days": "0.5",
+        "argus_pick": "NVDAUSDT",
+        "real_crypto_sor_pick": "BTCUSDT",
+        "agree": false
+      },
+      {
+        "holding_days": "1",
+        "argus_pick": "NVDAUSDT",
+        "real_crypto_sor_pick": "BTCUSDT",
+        "agree": false
+      },
+      {
+        "holding_days": "2",
+        "argus_pick": "NVDAUSDT",
+        "real_crypto_sor_pick": "BTCUSDT",
+        "agree": false
+      },
+      {
+        "holding_days": "5",
+        "argus_pick": "NVDAUSDT",
+        "real_crypto_sor_pick": "BTCUSDT",
+        "agree": false
+      }
+    ],
+    "n_points": 6,
+    "n_disagreements": 4,
+    "disagreement_rate": 0.6666666666666666
+  },
+  "leg_pair_sweep": {
+    "n_pairs": 5,
+    "n_ok": 5,
+    "n_agree_at_entry": 5,
+    "n_diverge_past_break_even": 5,
+    "results": [
+      {
+        "rtoken": "NVDAUSDT",
+        "crypto": "BTCUSDT",
+        "rtoken_slippage_bps": "0.7639605638921435962091351466",
+        "crypto_slippage_bps": "0.006580640151512658848427457326",
+        "rtoken_funding_bps": "0",
+        "crypto_funding_bps": "0.810000",
+        "real_crypto_sor_pick_at_entry": "BTCUSDT",
+        "argus_pick_at_entry": "BTCUSDT",
+        "agree_at_entry": true,
+        "break_even_holding_days": "1",
+        "argus_pick_past_break_even": "NVDAUSDT",
+        "diverges_past_break_even": true
+      },
+      {
+        "rtoken": "NVDAUSDT",
+        "crypto": "ETHUSDT",
+        "rtoken_slippage_bps": "0.8753104746600438309457135469",
+        "crypto_slippage_bps": "0.02079430069806467443403112075",
+        "rtoken_funding_bps": "0",
+        "crypto_funding_bps": "0.570000",
+        "real_crypto_sor_pick_at_entry": "ETHUSDT",
+        "argus_pick_at_entry": "ETHUSDT",
+        "agree_at_entry": true,
+        "break_even_holding_days": "1",
+        "argus_pick_past_break_even": "NVDAUSDT",
+        "diverges_past_break_even": true
+      },
+      {
+        "rtoken": "AAPLUSDT",
+        "crypto": "BTCUSDT",
+        "rtoken_slippage_bps": "2.088938133943227234537163435",
+        "crypto_slippage_bps": "0.006582026197780672406630996473",
+        "rtoken_funding_bps": "0",
+        "crypto_funding_bps": "0.810000",
+        "real_crypto_sor_pick_at_entry": "BTCUSDT",
+        "argus_pick_at_entry": "BTCUSDT",
+        "agree_at_entry": true,
+        "break_even_holding_days": "1",
+        "argus_pick_past_break_even": "AAPLUSDT",
+        "diverges_past_break_even": true
+      },
+      {
+        "rtoken": "AAPLUSDT",
+        "crypto": "ETHUSDT",
+        "rtoken_slippage_bps": "2.033729515811420502046036553",
+        "crypto_slippage_bps": "0.02079862562681857982824494957",
+        "rtoken_funding_bps": "0",
+        "crypto_funding_bps": "0.570000",
+        "real_crypto_sor_pick_at_entry": "ETHUSDT",
+        "argus_pick_at_entry": "ETHUSDT",
+        "agree_at_entry": true,
+        "break_even_holding_days": "2",
+        "argus_pick_past_break_even": "AAPLUSDT",
+        "diverges_past_break_even": true
+      },
+      {
+        "rtoken": "MSFTUSDT",
+        "crypto": "BTCUSDT",
+        "rtoken_slippage_bps": "2.734732037878452303650279330",
+        "crypto_slippage_bps": "0.006582407462870285103814439301",
+        "rtoken_funding_bps": "0",
+        "crypto_funding_bps": "0.810000",
+        "real_crypto_sor_pick_at_entry": "BTCUSDT",
+        "argus_pick_at_entry": "BTCUSDT",
+        "agree_at_entry": true,
+        "break_even_holding_days": "2",
+        "argus_pick_past_break_even": "MSFTUSDT",
+        "diverges_past_break_even": true
+      }
+    ]
+  },
+  "failure_cases": {
+    "single_leg": {
+      "executions": [
+        {
+          "exchange": "ONLY",
+          "symbol": "T",
+          "side": 0,
+          "lastPrice": 1,
+          "lastQty": 5
+        }
+      ],
+      "real_raised": false
+    },
+    "exchange_filter_matches_nothing": {
+      "executions": [],
+      "real_returns_empty_list_not_an_error": true,
+      "real_raised": false
+    },
+    "order_larger_than_book": {
+      "requested_qty": 1000.0,
+      "real_total_filled": 5,
+      "real_silently_underfills_with_no_flag": true,
+      "real_raised": false
+    }
+  },
+  "costs": {
+    "repeats": 3,
+    "crypto_sor_subprocess_seconds_per_call": 2.0491136999989976,
+    "argus_pure_python_seconds_per_call": 3.0233333139525104e-05,
+    "argus_faster_by_factor": 67776.63880269023
+  },
+  "reproducibility": {
+    "identical": true
+  },
+  "scope_statement": "crypto_sor's real, vendored CompositeOrderBook.newOrder(), run through a real Node/ts-node subprocess and fed each leg's real measured slippage as its synthetic price, always picks the crypto leg on this venue's real, live data \u2014 crypto majors quote an order of magnitude or more tighter than the rToken legs tested. argus.desk.execution.choose_hedge_leg prices the real funding channel crypto_sor has no representation of at all, and past a real, computed break-even holding horizon the two real systems diverge: crypto_sor's real output never changes with holding time, ARGUS's does. This is a same-venue, cross-asset-class comparison, not a cross-exchange one \u2014 crypto_sor was built to route across venues; feeding it two legs of one venue's own universe as competing quotes is a faithful use of its real, general 'lowest quoted price wins' logic, not a different algorithm. NOT claimed that routing through either leg is a validated hedge of anything \u2014 only the execution cost of each leg is priced here, never whether it actually offsets the exposure being hedged. NOT claimed the measured break-even horizons are permanent constants \u2014 rToken funding on this venue is usually zero and crypto funding is usually small and can change sign; both are measured live, not assumed."
+}

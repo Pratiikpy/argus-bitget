@@ -1,0 +1,106 @@
+{
+  "symbol": "NVDAUSDT",
+  "bars": 1487,
+  "budget": 400,
+  "seeds": [
+    20260913,
+    20260914,
+    20260915
+  ],
+  "budget_was_equal": true,
+  "stable_winner": null,
+  "moved_two_or_more": [
+    "random",
+    "novelty",
+    "evolutionary",
+    "anneal"
+  ],
+  "strategies": [
+    {
+      "name": "random",
+      "mean_in_sample": 0.031574,
+      "mean_out_of_sample": 0.021923,
+      "mean_decay": 0.009651,
+      "per_seed_decay": [
+        0.026141,
+        0.022296,
+        -0.019484
+      ],
+      "per_seed_rank": [
+        3,
+        2,
+        1
+      ],
+      "rank_spread": 2
+    },
+    {
+      "name": "novelty",
+      "mean_in_sample": 0.027039,
+      "mean_out_of_sample": 0.007251,
+      "mean_decay": 0.019788,
+      "per_seed_decay": [
+        0.014728,
+        0.018679,
+        0.025959
+      ],
+      "per_seed_rank": [
+        2,
+        1,
+        3
+      ],
+      "rank_spread": 2
+    },
+    {
+      "name": "evolutionary",
+      "mean_in_sample": 0.040112,
+      "mean_out_of_sample": 0.017114,
+      "mean_decay": 0.022998,
+      "per_seed_decay": [
+        0.029736,
+        0.025873,
+        0.013384
+      ],
+      "per_seed_rank": [
+        4,
+        3,
+        2
+      ],
+      "rank_spread": 2
+    },
+    {
+      "name": "anneal",
+      "mean_in_sample": 0.054692,
+      "mean_out_of_sample": 0.024657,
+      "mean_decay": 0.030035,
+      "per_seed_decay": [
+        0.012338,
+        0.025959,
+        0.051808
+      ],
+      "per_seed_rank": [
+        1,
+        4,
+        4
+      ],
+      "rank_spread": 3
+    },
+    {
+      "name": "beam",
+      "mean_in_sample": 0.036727,
+      "mean_out_of_sample": -0.03587,
+      "mean_decay": 0.072597,
+      "per_seed_decay": [
+        0.061874,
+        0.060719,
+        0.095197
+      ],
+      "per_seed_rank": [
+        5,
+        5,
+        5
+      ],
+      "rank_spread": 0
+    }
+  ],
+  "verdict": "Across 3 seeds at an equal, verified budget, random decays least (mean +0.0097) and beam most (mean +0.0726). No strategy holds first place in every seed, so the mean ordering describes these draws rather than the methods. Moving two or more places: random, novelty, evolutionary, anneal"
+}

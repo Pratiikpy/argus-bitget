@@ -1,0 +1,213 @@
+{
+  "symbol": "NVDAUSDT",
+  "checked_at": "2026-09-13T04:45:01.309006+00:00",
+  "skills_available": [
+    "macro-analyst",
+    "market-intel",
+    "news-briefing",
+    "sentiment-analyst",
+    "technical-analysis"
+  ],
+  "skills_reached": [
+    "technical-analysis"
+  ],
+  "tools_probed": 19,
+  "tools_answered": 6,
+  "by_health": {
+    "ok": 6,
+    "empty": 10,
+    "tool_error": 3
+  },
+  "results": [
+    {
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "action": "rsi",
+      "yields": "momentum: RSI(14) with an overbought/oversold reading",
+      "health": "ok",
+      "detail": "bitget:technical_analysis: ok",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"rsi\": 26.69, \"period\": 14, \"signal\": \"oversold\"}"
+    },
+    {
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "action": "macd",
+      "yields": "trend: MACD line, signal line and the cross",
+      "health": "ok",
+      "detail": "bitget:technical_analysis: ok",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"macd\": -1.958663, \"signal\": 0.152911, \"histogram\": -2.111574, \"cross\": \"death_cross\"}"
+    },
+    {
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "action": "atr",
+      "yields": "volatility: ATR and a suggested stop distance",
+      "health": "ok",
+      "detail": "bitget:technical_analysis: ok",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"atr\": 1.2124, \"atr_pct\": 0.56, \"suggested_stop\": 215.7314, \"period\": 14}"
+    },
+    {
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "action": "bollinger",
+      "yields": "volatility envelope: Bollinger bands",
+      "health": "ok",
+      "detail": "bitget:technical_analysis: ok",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"upper\": 217.3562, \"middle\": 218.9457, \"lower\": 220.5352, \"bandwidth\": -0.0145, \"pct_b\": 0.939, \"position\": \"above_upper\"}"
+    },
+    {
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "action": "support_resistance",
+      "yields": "structure: nearby support and resistance levels",
+      "health": "ok",
+      "detail": "bitget:technical_analysis: ok",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"supports\": [], \"resistances\": [], \"current_price\": 217.55}"
+    },
+    {
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "action": "ma",
+      "yields": "trend: moving averages",
+      "health": "ok",
+      "detail": "bitget:technical_analysis: ok",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"price\": 217.55, \"ma7\": 218.7343, \"ma25\": 220.5492, \"ma99\": 223.9925, \"trend\": \"bear\"}"
+    },
+    {
+      "skill": "sentiment-analyst",
+      "tool": "sentiment_index",
+      "action": "current",
+      "yields": "crowd mood: the Fear & Greed index",
+      "health": "empty",
+      "detail": "bitget:sentiment_index: reachable, returned no data; upstream returned only an error envelope",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    },
+    {
+      "skill": "sentiment-analyst",
+      "tool": "derivatives_sentiment",
+      "action": "long_short",
+      "yields": "positioning: the long/short account ratio",
+      "health": "empty",
+      "detail": "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    },
+    {
+      "skill": "sentiment-analyst",
+      "tool": "derivatives_sentiment",
+      "action": "open_interest",
+      "yields": "positioning: open interest",
+      "health": "empty",
+      "detail": "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    },
+    {
+      "skill": "sentiment-analyst",
+      "tool": "derivatives_sentiment",
+      "action": "taker_ratio",
+      "yields": "pressure: the taker buy/sell ratio",
+      "health": "empty",
+      "detail": "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    },
+    {
+      "skill": "macro-analyst",
+      "tool": "macro_indicators",
+      "action": "latest_release",
+      "yields": "macro: the most recent scheduled economic release",
+      "health": "empty",
+      "detail": "bitget:macro_indicators: reachable, returned no data; upstream returned only an error envelope",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    },
+    {
+      "skill": "macro-analyst",
+      "tool": "rates_yields",
+      "action": "yield_curve",
+      "yields": "macro: the US Treasury yield curve",
+      "health": "empty",
+      "detail": "bitget:rates_yields: ok; answered with a hollow payload (every leg error or zero)",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    },
+    {
+      "skill": "macro-analyst",
+      "tool": "cross_asset",
+      "action": "correlation",
+      "yields": "macro: rolling correlation of BTC against equities, gold and the dollar",
+      "health": "tool_error",
+      "detail": "bitget:cross_asset: tool reported an error (Error executing tool cross_asset: )",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    },
+    {
+      "skill": "macro-analyst",
+      "tool": "global_assets",
+      "action": "price",
+      "yields": "the anchor equity's own price, which is what an rToken tracks",
+      "health": "tool_error",
+      "detail": "bitget:global_assets: tool reported an error (Error executing tool global_assets: )",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    },
+    {
+      "skill": "news-briefing",
+      "tool": "news_feed",
+      "action": "latest",
+      "yields": "narrative: aggregated headlines across 44 feeds",
+      "health": "empty",
+      "detail": "bitget:news_feed: reachable, returned no data",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    },
+    {
+      "skill": "news-briefing",
+      "tool": "tradfi_news",
+      "action": "earnings",
+      "yields": "the earnings calendar, which dates the next scheduled catalyst",
+      "health": "empty",
+      "detail": "bitget:tradfi_news: reachable, returned no data; upstream returned only an error envelope",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    },
+    {
+      "skill": "market-intel",
+      "tool": "defi_analytics",
+      "action": "tvl_rank",
+      "yields": "capital: DeFi TVL rankings",
+      "health": "empty",
+      "detail": "bitget:defi_analytics: ok; upstream returned only an error envelope",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    },
+    {
+      "skill": "market-intel",
+      "tool": "network_status",
+      "action": "eth_gas",
+      "yields": "chain load: Ethereum gas",
+      "health": "empty",
+      "detail": "bitget:network_status: ok; upstream returned only an error envelope",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    },
+    {
+      "skill": "market-intel",
+      "tool": "crypto_market",
+      "action": "trending",
+      "yields": "attention: trending coins",
+      "health": "tool_error",
+      "detail": "bitget:crypto_market: tool reported an error (Error executing tool crypto_market: ConnectTimeout(''))",
+      "checked_at": "2026-09-13T04:45:01.309006+00:00",
+      "sample": null
+    }
+  ]
+}

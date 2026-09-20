@@ -1,0 +1,80 @@
+{
+  "designed_cases": [
+    {
+      "name": "median_real_basis",
+      "spread_bps": 1.12,
+      "maxme_profit": 0.01120000000000232,
+      "maxme_reports_opportunity": true,
+      "argus_expected_executable_bps": "-13.4800",
+      "argus_is_monetizable": false,
+      "disagreement": true
+    },
+    {
+      "name": "p95_real_basis",
+      "spread_bps": 11.06,
+      "maxme_profit": 0.13179999999999836,
+      "maxme_reports_opportunity": true,
+      "argus_expected_executable_bps": "-3.5400",
+      "argus_is_monetizable": false,
+      "disagreement": true
+    },
+    {
+      "name": "max_observed_real_basis",
+      "spread_bps": 27.01,
+      "maxme_profit": 0.610300000000052,
+      "maxme_reports_opportunity": true,
+      "argus_expected_executable_bps": "10.8463",
+      "argus_is_monetizable": true,
+      "disagreement": false
+    }
+  ],
+  "any_designed_disagreement": true,
+  "swept": {
+    "n": 60,
+    "n_maxme_reports_opportunity": 60,
+    "n_argus_monetizable": 0,
+    "n_disagreements": 60,
+    "disagreement_rate": 1.0
+  },
+  "cost_stack_ablation": [
+    {
+      "stage": "all_real_costs",
+      "argus_monetizable": false
+    },
+    {
+      "stage": "fee_zeroed_only",
+      "argus_monetizable": false
+    },
+    {
+      "stage": "fee_and_spread_zeroed",
+      "argus_monetizable": false
+    },
+    {
+      "stage": "all_costs_zeroed",
+      "argus_monetizable": true
+    }
+  ],
+  "cost_stack_ablation_confirms_the_full_stack_is_the_mechanism": true,
+  "fee_alone_does_not_explain_the_disagreement": true,
+  "failure_cases": [
+    {
+      "system": "maxme",
+      "input": "empty order book",
+      "outcome": "IndexError: list index out of range"
+    },
+    {
+      "system": "argus",
+      "input": "zero index (undefined basis)",
+      "outcome": "basis_bps=0, monetizable=False"
+    }
+  ],
+  "costs": {
+    "maxme_arbitrage_depth_opportunity_seconds_per_call": 6.5330500001437034e-06,
+    "argus_decompose_seconds_per_call": 2.3789000006217974e-06
+  },
+  "reproducibility": {
+    "maxme_reproducible": true,
+    "argus_reproducible": true
+  },
+  "scope_statement": "Claimed: maxme/bitcoin-arbitrage's real, unmodified get_profit_for()/arbitrage_depth_opportunity() report a positive \"profit\" on order-book spreads shaped to match ARGUS's own measured real basis distribution (median 1.12bps, p95 11.06bps, max 27.01bps on 2,159 real NVDAUSDT hourly observations), with no fee term anywhere in the function \u2014 confirmed by running it, not by reading the return statement alone. ARGUS's real decompose()/Decomposition.expected_executable_bps, run on the identical resulting spread, correctly refuses the median and p95 cases as not monetizable once the real round-trip taker fee, spread-crossing cost, slippage, execution probability, and failed-leg survival are applied (the max-observed case, 27.01bps, clears the real cost stack on BOTH sides \u2014 a real, honestly-reported agreement, not a third disagreement). A cost-stack ablation (the same median spread, ARGUS's own real cost terms progressively zeroed) found the fee term ALONE does not flip the verdict \u2014 spread-crossing (0.6bps) plus slippage (2.0bps) already exceed the 1.12bps median spread even at zero fee \u2014 so the honest claim is broader than \"the fee term drives it\": maxme's real code omits ALL of fee, spread-crossing, and slippage, and only zeroing the full stack reproduces its naive verdict. This was the actual result of running the ablation, not the one originally planned when it was designed.\n\nNOT claimed: that maxme/bitcoin-arbitrage is a currently-profitable, actively-traded system in production \u2014 it is an older, small (Apache/MIT-licensed) open-source project, studied here as a real, verifiable example of the fee-blind detection pattern ARGUS's own module docstring already names as the common failure mode (\"almost every entry will answer it by finding a spread and declaring an opportunity\"), not as a claim about its current market use. NOT claimed that a positive maxme \"profit\" is always wrong \u2014 for a large enough spread (this comparison's own max_observed_real_basis case, 27.01bps) ARGUS's own decomposition also finds it monetizable; the finding is specifically about the SMALL, common spreads (median and p95) that make up the bulk of the real distribution. NOT claimed that the swept disagreement rate generalises beyond the Gaussian-shaped construction used here \u2014 it is matched to ARGUS's own measured real distribution's first two moments, not identical to the real historical series bar-for-bar.\n"
+}

@@ -1,0 +1,49 @@
+{
+  "generated_at": "2026-09-13T16:14:15.261032+00:00",
+  "criteria": [
+    {
+      "name": "decision consistency",
+      "grade": "weak",
+      "value": 1.0,
+      "unit": "",
+      "detail": "2 of 2 model(s) returned an identical verdict across 3 replays of one frame at fixed temperature. Unanimity over three replays is weak evidence of determinism and is reported as such rather than as a passing grade",
+      "source": "data/bakeoff.json"
+    },
+    {
+      "name": "risk-violation rate",
+      "grade": "pass",
+      "value": 0.0,
+      "unit": "",
+      "detail": "0 violation(s) across 6,720 swept states (2,928 of which the layer reduced). The sweep is exhaustive, so this is a property of the layer rather than of the traffic it happened to see",
+      "source": "data/risk_proof.json"
+    },
+    {
+      "name": "stress behaviour",
+      "grade": "pass",
+      "value": 1.0,
+      "unit": "",
+      "detail": "9 of 9 scenario(s) survived at the stated loss tolerance. This tests a held position against a scenario library; it does not test the desk deciding under stress, which needs decisions taken in a stressed regime and there are none. Out-of-sample degradation over the same record reads CLEAN, with no signal flagged",
+      "source": "data/stress_report.json"
+    },
+    {
+      "name": "human-takeover rate",
+      "grade": "undefined",
+      "value": null,
+      "unit": "",
+      "detail": "UNDEFINED over 57 decision(s): none would have reached the venue, so there was nothing a human could have been asked about. This is the state of a desk that has not yet traded, and it is not a takeover rate of zero. The policy is not dead code: across 88 recorded cycle(s), 2 of 5 escalation conditions have actually occurred \u2014 ungrounded_figure (21), unresolved_conflict (12) \u2014 each of which would have handed the decision to a human had it opened exposure.",
+      "source": "data/takeover.json"
+    },
+    {
+      "name": "incremental value",
+      "grade": "weak",
+      "value": -200.86,
+      "unit": "bps",
+      "detail": "Over 42 instant(s) (25 effective), the desk opened 0 position(s) for +0bps. The best fixed rule was reversion at +201bps over 42 trade(s), and it is the best of 5 rules tried, which is itself a selection. NO INCREMENTAL VALUE DEMONSTRATED, and none disproved either: no baseline is separated from the desk at 5% on this sample. With 25 effective instant(s) this record can notice a large difference and cannot settle a small one.",
+      "source": "data/incremental_value.json"
+    }
+  ],
+  "passing": 2,
+  "undefined": 1,
+  "total": 5,
+  "verdict": "2 of 5 criteria pass, 1 are undefined on this record. Weak: decision consistency, incremental value. Undefined: human-takeover rate \u2014 the record does not support these yet, which is a different statement from scoring zero on them. This benchmark is published having been run against its own author first, and four of the five criteria currently return something unflattering, undefined, or both."
+}

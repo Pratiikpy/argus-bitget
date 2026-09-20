@@ -1,0 +1,52 @@
+def compute_base_rate(
+    price_df: pd.DataFrame,
+    direction: str,
+    horizon: int,
+    condition_mask: Optional[pd.Series] = None,
+) -> float:
+    """
+    Compute the base rate: what fraction of ALL hours saw price go in the
+    expected direction? This is the benchmark a whale must beat to show edge.
+
+    Parameters
+    ----------
+    price_df : pd.DataFrame
+        Hourly prices with timestamp_utc and close columns.
+    direction : str
+        'up' or 'down'.
+    horizon : int
+        Hours forward to measure.
+    condition_mask : pd.Series, optional
+        Boolean mask (positionally aligned with price_df) to restrict
+        to a sentiment regime.
+
+    Returns
+    -------
+    float
+        Fraction of hours where price moved in the expected direction.
+    """
+    price = price_df.copy()
+    price["timestamp_utc"] = pd.to_datetime(price["timestamp_utc"], utc=True)
+    price = price.sort_values("timestamp_utc").reset_index(drop=True)
+
+    price_series = price.set_index("timestamp_utc")["close"]
+    future = price["timestamp_utc"] + pd.Timedelta(hours=horizon)
+    future_price = future.map(price_series)
+    fwd_return = (future_price - price["close"]) / price["close"]
+
+    # Apply condition mask by position (numpy array) to avoid index mismatch
+    if condition_mask is not None:
+        mask_arr = condition_mask.values if hasattr(condition_mask, "values") else condition_mask
+        fwd_return = fwd_return[mask_arr]
+
+    valid = fwd_return.dropna()
+
+    if len(valid) == 0:
+        return 0.5
+
+    if direction == "up":
+        return float((valid > 0).sum() / len(valid))
+    else:
+        return float((valid < 0).sum() / len(valid))
+
+

@@ -1,0 +1,609 @@
+{
+  "generated_at": "2026-09-14T10:52:46.836029+00:00",
+  "reference": "nkaz001/hftbacktest queue.rs:183-330",
+  "metric": "mean |estimated qty ahead - true qty ahead| as a share of the entry level",
+  "episodes_per_regime": 4000,
+  "reproduction": [
+    {
+      "model": "PowerProbQueueFunc n=1",
+      "cases": 9,
+      "max_deviation": 0.0,
+      "reproduced": true
+    },
+    {
+      "model": "PowerProbQueueFunc n=2",
+      "cases": 9,
+      "max_deviation": 0.0,
+      "reproduced": true
+    },
+    {
+      "model": "PowerProbQueueFunc n=3",
+      "cases": 9,
+      "max_deviation": 0.0,
+      "reproduced": true
+    },
+    {
+      "model": "PowerProbQueueFunc2 n=1",
+      "cases": 9,
+      "max_deviation": 0.0,
+      "reproduced": true
+    },
+    {
+      "model": "PowerProbQueueFunc2 n=2",
+      "cases": 9,
+      "max_deviation": 0.0,
+      "reproduced": true
+    },
+    {
+      "model": "PowerProbQueueFunc3 n=2",
+      "cases": 9,
+      "max_deviation": 5.551115123125783e-17,
+      "reproduced": true
+    },
+    {
+      "model": "LogProbQueueFunc",
+      "cases": 9,
+      "max_deviation": 1.1102230246251565e-16,
+      "reproduced": true
+    },
+    {
+      "model": "LogProbQueueFunc2",
+      "cases": 9,
+      "max_deviation": 1.1102230246251565e-16,
+      "reproduced": true
+    }
+  ],
+  "all_reproduced": true,
+  "in_sample": [
+    {
+      "regime": "\u03b3=1 \u00b7 cancels proportional to quantity",
+      "note": "the assumption PowerProbability(n=1) encodes, as the generative rule",
+      "best_model": "PowerProbability n=2",
+      "best_model_error": 0.0197,
+      "best_naive": "ABLATION: every cancel is ahead of you",
+      "best_naive_error": 0.02494,
+      "margin": 0.00524,
+      "margin_ci95": [
+        0.00452,
+        0.00596
+      ],
+      "cost_bps_saved": 0.0605,
+      "model_wins": true
+    },
+    {
+      "regime": "\u03b3=2 \u00b7 cancels concentrated at the front",
+      "note": "P(from back) falls below the quantity share, so the correct prob is lower than n=1",
+      "best_model": "PowerProbability n=2",
+      "best_model_error": 0.01433,
+      "best_naive": "ABLATION: every cancel is ahead of you",
+      "best_naive_error": 0.01855,
+      "margin": 0.00422,
+      "margin_ci95": [
+        0.00356,
+        0.00488
+      ],
+      "cost_bps_saved": 0.0635,
+      "model_wins": true
+    },
+    {
+      "regime": "\u03b3=0.5 \u00b7 cancels spread toward the back",
+      "note": "P(from back) rises above the quantity share, so the correct prob is higher than n=1",
+      "best_model": "PowerProbability n=1",
+      "best_model_error": 0.02326,
+      "best_naive": "ABLATION: coin",
+      "best_naive_error": 0.02499,
+      "margin": 0.00173,
+      "margin_ci95": [
+        0.00105,
+        0.00242
+      ],
+      "cost_bps_saved": -0.0196,
+      "model_wins": true
+    },
+    {
+      "regime": "front-sticky \u00b7 the front never cancels",
+      "note": "outside the family: 'every cancellation is behind you' is the exact truth",
+      "best_model": "LogProbability2",
+      "best_model_error": 0.03645,
+      "best_naive": "ABLATION: every cancel is behind you",
+      "best_naive_error": 0.0,
+      "margin": -0.03645,
+      "margin_ci95": [
+        -0.03747,
+        -0.03543
+      ],
+      "cost_bps_saved": -0.1401,
+      "model_wins": false
+    },
+    {
+      "regime": "adversarial \u00b7 front-sticky and replenishing",
+      "note": "the front never cancels and the queue keeps growing behind \u2014 the hostile case",
+      "best_model": "LogProbability2",
+      "best_model_error": 0.01765,
+      "best_naive": "ABLATION: every cancel is behind you",
+      "best_naive_error": 0.0,
+      "margin": -0.01765,
+      "margin_ci95": [
+        -0.01838,
+        -0.01692
+      ],
+      "cost_bps_saved": -0.0748,
+      "model_wins": false
+    }
+  ],
+  "out_of_sample": [
+    {
+      "regime": "\u03b3=1 \u00b7 cancels proportional to quantity",
+      "note": "the assumption PowerProbability(n=1) encodes, as the generative rule",
+      "best_model": "PowerProbability n=2",
+      "best_model_error": 0.01901,
+      "best_naive": "ABLATION: every cancel is ahead of you",
+      "best_naive_error": 0.02423,
+      "margin": 0.00522,
+      "margin_ci95": [
+        0.00453,
+        0.00591
+      ],
+      "cost_bps_saved": 0.0598,
+      "model_wins": true
+    },
+    {
+      "regime": "\u03b3=2 \u00b7 cancels concentrated at the front",
+      "note": "P(from back) falls below the quantity share, so the correct prob is lower than n=1",
+      "best_model": "PowerProbability n=2",
+      "best_model_error": 0.01491,
+      "best_naive": "ABLATION: every cancel is ahead of you",
+      "best_naive_error": 0.01954,
+      "margin": 0.00463,
+      "margin_ci95": [
+        0.00389,
+        0.00537
+      ],
+      "cost_bps_saved": 0.0502,
+      "model_wins": true
+    },
+    {
+      "regime": "\u03b3=0.5 \u00b7 cancels spread toward the back",
+      "note": "P(from back) rises above the quantity share, so the correct prob is higher than n=1",
+      "best_model": "PowerProbability n=1",
+      "best_model_error": 0.02358,
+      "best_naive": "ABLATION: coin",
+      "best_naive_error": 0.02512,
+      "margin": 0.00155,
+      "margin_ci95": [
+        0.00085,
+        0.00224
+      ],
+      "cost_bps_saved": -0.0263,
+      "model_wins": true
+    },
+    {
+      "regime": "front-sticky \u00b7 the front never cancels",
+      "note": "outside the family: 'every cancellation is behind you' is the exact truth",
+      "best_model": "LogProbability2",
+      "best_model_error": 0.0356,
+      "best_naive": "ABLATION: every cancel is behind you",
+      "best_naive_error": 0.0,
+      "margin": -0.0356,
+      "margin_ci95": [
+        -0.0366,
+        -0.0346
+      ],
+      "cost_bps_saved": -0.1433,
+      "model_wins": false
+    },
+    {
+      "regime": "adversarial \u00b7 front-sticky and replenishing",
+      "note": "the front never cancels and the queue keeps growing behind \u2014 the hostile case",
+      "best_model": "LogProbability2",
+      "best_model_error": 0.01696,
+      "best_naive": "ABLATION: every cancel is behind you",
+      "best_naive_error": 0.0,
+      "margin": -0.01696,
+      "margin_ci95": [
+        -0.01767,
+        -0.01625
+      ],
+      "cost_bps_saved": -0.0563,
+      "model_wins": false
+    }
+  ],
+  "detail": {
+    "\u03b3=1 \u00b7 cancels proportional to quantity": [
+      {
+        "model": "PowerProbability n=2",
+        "episodes": 4000,
+        "queue_error": 0.0197,
+        "fill_error": 0.05657,
+        "cost_bps": 0.035
+      },
+      {
+        "model": "PowerProbability n=1",
+        "episodes": 4000,
+        "queue_error": 0.02083,
+        "fill_error": 0.06974,
+        "cost_bps": 0.0285
+      },
+      {
+        "model": "PowerProbability2 n=2",
+        "episodes": 4000,
+        "queue_error": 0.02252,
+        "fill_error": 0.036,
+        "cost_bps": 0.0641
+      },
+      {
+        "model": "PowerProbability3 n=2",
+        "episodes": 4000,
+        "queue_error": 0.02289,
+        "fill_error": 0.1258,
+        "cost_bps": 0.0108
+      },
+      {
+        "model": "ABLATION: every cancel is ahead of you",
+        "episodes": 4000,
+        "queue_error": 0.02494,
+        "fill_error": 0.02388,
+        "cost_bps": 0.0955
+      },
+      {
+        "model": "LogProbability",
+        "episodes": 4000,
+        "queue_error": 0.02515,
+        "fill_error": 0.10478,
+        "cost_bps": 0.0235
+      },
+      {
+        "model": "ABLATION: coin",
+        "episodes": 4000,
+        "queue_error": 0.02683,
+        "fill_error": 0.11263,
+        "cost_bps": 0.0204
+      },
+      {
+        "model": "LogProbability2",
+        "episodes": 4000,
+        "queue_error": 0.03081,
+        "fill_error": 0.15704,
+        "cost_bps": 0.002
+      },
+      {
+        "model": "ABLATION: every cancel is behind you",
+        "episodes": 4000,
+        "queue_error": 0.03472,
+        "fill_error": 0.17613,
+        "cost_bps": 0.0
+      },
+      {
+        "model": "ABLATION: RiskAdverse (trades only)",
+        "episodes": 4000,
+        "queue_error": 0.03472,
+        "fill_error": 0.17613,
+        "cost_bps": 0.0
+      }
+    ],
+    "\u03b3=2 \u00b7 cancels concentrated at the front": [
+      {
+        "model": "PowerProbability n=2",
+        "episodes": 4000,
+        "queue_error": 0.01433,
+        "fill_error": 0.058,
+        "cost_bps": 0.0295
+      },
+      {
+        "model": "PowerProbability2 n=2",
+        "episodes": 4000,
+        "queue_error": 0.01693,
+        "fill_error": 0.03607,
+        "cost_bps": 0.0582
+      },
+      {
+        "model": "ABLATION: every cancel is ahead of you",
+        "episodes": 4000,
+        "queue_error": 0.01855,
+        "fill_error": 0.02323,
+        "cost_bps": 0.0929
+      },
+      {
+        "model": "PowerProbability n=1",
+        "episodes": 4000,
+        "queue_error": 0.01865,
+        "fill_error": 0.08404,
+        "cost_bps": 0.0232
+      },
+      {
+        "model": "PowerProbability3 n=2",
+        "episodes": 4000,
+        "queue_error": 0.02392,
+        "fill_error": 0.14221,
+        "cost_bps": 0.0084
+      },
+      {
+        "model": "LogProbability",
+        "episodes": 4000,
+        "queue_error": 0.02747,
+        "fill_error": 0.12625,
+        "cost_bps": 0.0155
+      },
+      {
+        "model": "ABLATION: coin",
+        "episodes": 4000,
+        "queue_error": 0.03018,
+        "fill_error": 0.13473,
+        "cost_bps": 0.0122
+      },
+      {
+        "model": "LogProbability2",
+        "episodes": 4000,
+        "queue_error": 0.03578,
+        "fill_error": 0.17951,
+        "cost_bps": 0.0036
+      },
+      {
+        "model": "ABLATION: every cancel is behind you",
+        "episodes": 4000,
+        "queue_error": 0.04094,
+        "fill_error": 0.19276,
+        "cost_bps": 0.0
+      },
+      {
+        "model": "ABLATION: RiskAdverse (trades only)",
+        "episodes": 4000,
+        "queue_error": 0.04094,
+        "fill_error": 0.19276,
+        "cost_bps": 0.0
+      }
+    ],
+    "\u03b3=0.5 \u00b7 cancels spread toward the back": [
+      {
+        "model": "PowerProbability n=1",
+        "episodes": 4000,
+        "queue_error": 0.02326,
+        "fill_error": 0.0659,
+        "cost_bps": 0.0381
+      },
+      {
+        "model": "PowerProbability3 n=2",
+        "episodes": 4000,
+        "queue_error": 0.02335,
+        "fill_error": 0.10788,
+        "cost_bps": 0.0088
+      },
+      {
+        "model": "PowerProbability n=2",
+        "episodes": 4000,
+        "queue_error": 0.02403,
+        "fill_error": 0.05794,
+        "cost_bps": 0.0482
+      },
+      {
+        "model": "LogProbability",
+        "episodes": 4000,
+        "queue_error": 0.02413,
+        "fill_error": 0.08832,
+        "cost_bps": 0.0218
+      },
+      {
+        "model": "ABLATION: coin",
+        "episodes": 4000,
+        "queue_error": 0.02499,
+        "fill_error": 0.09535,
+        "cost_bps": 0.0185
+      },
+      {
+        "model": "PowerProbability2 n=2",
+        "episodes": 4000,
+        "queue_error": 0.02689,
+        "fill_error": 0.03731,
+        "cost_bps": 0.0711
+      },
+      {
+        "model": "LogProbability2",
+        "episodes": 4000,
+        "queue_error": 0.02824,
+        "fill_error": 0.13951,
+        "cost_bps": 0.0058
+      },
+      {
+        "model": "ABLATION: every cancel is ahead of you",
+        "episodes": 4000,
+        "queue_error": 0.02991,
+        "fill_error": 0.02559,
+        "cost_bps": 0.1024
+      },
+      {
+        "model": "ABLATION: every cancel is behind you",
+        "episodes": 4000,
+        "queue_error": 0.03117,
+        "fill_error": 0.15439,
+        "cost_bps": 0.0
+      },
+      {
+        "model": "ABLATION: RiskAdverse (trades only)",
+        "episodes": 4000,
+        "queue_error": 0.03117,
+        "fill_error": 0.15439,
+        "cost_bps": 0.0
+      }
+    ],
+    "front-sticky \u00b7 the front never cancels": [
+      {
+        "model": "ABLATION: every cancel is behind you",
+        "episodes": 4000,
+        "queue_error": 0.0,
+        "fill_error": 0.0,
+        "cost_bps": 0.0
+      },
+      {
+        "model": "ABLATION: RiskAdverse (trades only)",
+        "episodes": 4000,
+        "queue_error": 0.0,
+        "fill_error": 0.0,
+        "cost_bps": 0.0
+      },
+      {
+        "model": "LogProbability2",
+        "episodes": 4000,
+        "queue_error": 0.03645,
+        "fill_error": 0.03503,
+        "cost_bps": 0.1401
+      },
+      {
+        "model": "PowerProbability3 n=2",
+        "episodes": 4000,
+        "queue_error": 0.06462,
+        "fill_error": 0.06525,
+        "cost_bps": 0.261
+      },
+      {
+        "model": "ABLATION: coin",
+        "episodes": 4000,
+        "queue_error": 0.06617,
+        "fill_error": 0.08019,
+        "cost_bps": 0.3208
+      },
+      {
+        "model": "LogProbability",
+        "episodes": 4000,
+        "queue_error": 0.07205,
+        "fill_error": 0.0842,
+        "cost_bps": 0.3368
+      },
+      {
+        "model": "PowerProbability n=1",
+        "episodes": 4000,
+        "queue_error": 0.08472,
+        "fill_error": 0.09421,
+        "cost_bps": 0.3768
+      },
+      {
+        "model": "PowerProbability n=2",
+        "episodes": 4000,
+        "queue_error": 0.09089,
+        "fill_error": 0.09581,
+        "cost_bps": 0.3832
+      },
+      {
+        "model": "PowerProbability2 n=2",
+        "episodes": 4000,
+        "queue_error": 0.10206,
+        "fill_error": 0.11749,
+        "cost_bps": 0.47
+      },
+      {
+        "model": "ABLATION: every cancel is ahead of you",
+        "episodes": 4000,
+        "queue_error": 0.11173,
+        "fill_error": 0.13445,
+        "cost_bps": 0.5378
+      }
+    ],
+    "adversarial \u00b7 front-sticky and replenishing": [
+      {
+        "model": "ABLATION: every cancel is behind you",
+        "episodes": 4000,
+        "queue_error": 0.0,
+        "fill_error": 0.0,
+        "cost_bps": 0.0
+      },
+      {
+        "model": "ABLATION: RiskAdverse (trades only)",
+        "episodes": 4000,
+        "queue_error": 0.0,
+        "fill_error": 0.0,
+        "cost_bps": 0.0
+      },
+      {
+        "model": "LogProbability2",
+        "episodes": 4000,
+        "queue_error": 0.01765,
+        "fill_error": 0.0187,
+        "cost_bps": 0.0748
+      },
+      {
+        "model": "PowerProbability3 n=2",
+        "episodes": 4000,
+        "queue_error": 0.03332,
+        "fill_error": 0.02797,
+        "cost_bps": 0.1119
+      },
+      {
+        "model": "ABLATION: coin",
+        "episodes": 4000,
+        "queue_error": 0.04407,
+        "fill_error": 0.05469,
+        "cost_bps": 0.2188
+      },
+      {
+        "model": "LogProbability",
+        "episodes": 4000,
+        "queue_error": 0.04582,
+        "fill_error": 0.05425,
+        "cost_bps": 0.217
+      },
+      {
+        "model": "PowerProbability n=1",
+        "episodes": 4000,
+        "queue_error": 0.04923,
+        "fill_error": 0.05019,
+        "cost_bps": 0.2008
+      },
+      {
+        "model": "PowerProbability n=2",
+        "episodes": 4000,
+        "queue_error": 0.05077,
+        "fill_error": 0.04705,
+        "cost_bps": 0.1882
+      },
+      {
+        "model": "PowerProbability2 n=2",
+        "episodes": 4000,
+        "queue_error": 0.06346,
+        "fill_error": 0.06689,
+        "cost_bps": 0.2675
+      },
+      {
+        "model": "ABLATION: every cancel is ahead of you",
+        "episodes": 4000,
+        "queue_error": 0.07672,
+        "fill_error": 0.09681,
+        "cost_bps": 0.3873
+      }
+    ]
+  },
+  "regimes": 5,
+  "regimes_won_in_sample": 3,
+  "regimes_won_out_of_sample": 3,
+  "failure_cases": [
+    {
+      "regime": "front-sticky \u00b7 the front never cancels",
+      "note": "outside the family: 'every cancellation is behind you' is the exact truth",
+      "best_model": "LogProbability2",
+      "best_model_error": 0.03645,
+      "best_naive": "ABLATION: every cancel is behind you",
+      "best_naive_error": 0.0,
+      "margin": -0.03645,
+      "margin_ci95": [
+        -0.03747,
+        -0.03543
+      ],
+      "cost_bps_saved": -0.1401,
+      "model_wins": false
+    },
+    {
+      "regime": "adversarial \u00b7 front-sticky and replenishing",
+      "note": "the front never cancels and the queue keeps growing behind \u2014 the hostile case",
+      "best_model": "LogProbability2",
+      "best_model_error": 0.01765,
+      "best_naive": "ABLATION: every cancel is behind you",
+      "best_naive_error": 0.0,
+      "margin": -0.01765,
+      "margin_ci95": [
+        -0.01838,
+        -0.01692
+      ],
+      "cost_bps_saved": -0.0748,
+      "model_wins": false
+    }
+  ],
+  "verdict": "All 8 probability functions reproduce hftbacktest to 1.1e-16 on identical inputs \u2014 the port is exact. Across 5 generative regimes swept rather than chosen, a probability function estimates the queue better than the best constant in 3 of 5 in sample and 3 of 5 held out, every margin with its whole 95% interval above zero. It loses in 2: front-sticky \u00b7 the front never cancels; adversarial \u00b7 front-sticky and replenishing \u2014 where the front of the queue never cancels, 'every cancellation is behind you' is not a naive assumption but the exact truth, and no member of the family can express it. That regime is the model's documented failure case, and reporting it is the difference between a sweep and a demonstration. One result cuts against the model and is reported rather than dropped: in \u03b3=0.5 \u00b7 cancels spread toward the back it estimates the queue better and still costs more (-0.020bps), because a better *average* position estimate can sit on the optimistic side at exactly the moments that decide a fill. Queue accuracy and execution cost are not the same objective, and a capability that only ever reported the metric it wins on would never have found that."
+}

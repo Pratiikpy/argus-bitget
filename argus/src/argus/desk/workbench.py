@@ -37,6 +37,7 @@ from decimal import Decimal
 
 from argus.cost.model import CostModel
 from argus.execution.passive import BookObservation, PassiveExecution
+from argus.sim.market import MarketError, exit_cost_bps
 
 _ZERO = Decimal("0")
 
@@ -277,6 +278,17 @@ class StressResult:
     pnl_pct: Decimal
     exit_cost_bps: Decimal
     survives: bool
+    exit_measured: bool = False
+    """Whether ``exit_cost_bps`` was measured against a simulated book or assumed from the fee."""
+
+    exitable: bool = True
+    """Whether the position could be fully liquidated at all.
+
+    The finding arithmetic cannot produce. On a thin book a position can be **unexitable at any
+    price**, and no multiplier applied to a fee will ever say so.
+    """
+
+    unfilled_quantity: Decimal = _ZERO
 
 
 def stress_position(
@@ -286,11 +298,21 @@ def stress_position(
     loss_tolerance_pct: Decimal,
     scenarios: tuple[Scenario, ...] = STANDARD_SCENARIOS,
     cost: CostModel | None = None,
+    simulate: bool = True,
 ) -> list[StressResult]:
     """Recompute a position under each scenario, exit cost included.
 
     A static stress table is the field norm. The property that matters here is that exit cost
     rises as liquidity falls — a position is hardest to leave exactly when you most want to.
+
+    **``simulate=True`` measures that instead of assuming it.** The position is liquidated into a
+    book populated by the ABIDES agent zoo at the scenario's liquidity, and the cost is the
+    realised slippage from the mid to the achieved VWAP, plus the fee. Setting ``simulate=False``
+    falls back to ``round_trip / liquidity_multiplier`` — a number that moves in the right
+    direction and is otherwise invented, kept only so the two can be compared.
+
+    The simulation earns its cost by answering one question arithmetic cannot: whether the position
+    can be exited **at all**. A fee divided by a multiplier always says yes.
     """
     model = cost or CostModel.bitget_perp()
     notional = quantity * entry_price
@@ -301,15 +323,35 @@ def stress_position(
         value = quantity * shocked
         pnl = value - notional
         pnl_pct = (pnl / notional * Decimal("100")) if notional > 0 else _ZERO
-        # Exit cost scales inversely with liquidity: thin books cost more to leave.
-        exit_cost = model.round_trip_bps() / max(s.liquidity_multiplier, Decimal("0.01"))
+
+        measured, exitable, unfilled = False, True, _ZERO
+        if simulate:
+            try:
+                m = exit_cost_bps(
+                    quantity=quantity,
+                    depth_multiplier=max(s.liquidity_multiplier, Decimal("0.01")),
+                    reference_price=shocked,
+                )
+                exit_cost = model.round_trip_bps() + m.slippage_bps
+                measured, exitable, unfilled = True, m.fully_exited, m.unfilled
+            except MarketError:
+                # A simulated book that cannot produce a mid cannot price an exit. Fall back and
+                # say so, rather than reporting an assumed number as a measured one.
+                exit_cost = model.round_trip_bps() / max(s.liquidity_multiplier, Decimal("0.01"))
+        else:
+            exit_cost = model.round_trip_bps() / max(s.liquidity_multiplier, Decimal("0.01"))
+
         out.append(StressResult(
             scenario=s.name,
             position_value=value,
             pnl=pnl,
             pnl_pct=pnl_pct,
             exit_cost_bps=exit_cost,
-            survives=pnl_pct > -loss_tolerance_pct,
+            # A position that cannot be liquidated does not survive, whatever its mark says.
+            survives=pnl_pct > -loss_tolerance_pct and exitable,
+            exit_measured=measured,
+            exitable=exitable,
+            unfilled_quantity=unfilled,
         ))
     return out
 
@@ -334,6 +376,33 @@ class TraderProfile:
     loss_tolerance_pct: Decimal
     preferred_evidence: tuple[str, ...] = ()
 
+    # --- the dimensions an Investor Policy Statement carries that the first six did not ---
+    #
+    # Chosen because each one can change a decision *on this venue*, not because an IPS lists them.
+    # A field that cannot flip a verdict is styling, and the audit against Vibe-Trading
+    # (`research/architecture/personalisation-audit.md`) found our divergence rate was low precisely
+    # because six fields left too little for a profile to disagree about.
+
+    requires_hedge: bool = False
+    """Refuse to open exposure that cannot be hedged right now.
+
+    The strongest personalisation dimension available here, because the hedge menu is genuinely
+    empty for 65 hours a week while the anchor market sleeps. A profile with this set declines every
+    weekend position; one without it accepts them. Two traders, the same evidence, opposite answers
+    — which is what personalisation has to mean."""
+
+    excluded_symbols: tuple[str, ...] = ()
+    """Instruments this trader will not hold, whatever the evidence says.
+
+    A hard refusal rather than a penalty: an exclusion that can be outvoted by a good thesis is a
+    preference, and a mandate is not a preference."""
+
+    max_concurrent_positions: int = 0
+    """Zero means unlimited. A cap the book must respect regardless of individual position size."""
+
+    min_confidence: float = 0.0
+    """Conviction floor. A cautious trader may want more than the desk's own 0.55."""
+
     @classmethod
     def conservative(cls) -> TraderProfile:
         return cls(
@@ -341,6 +410,12 @@ class TraderProfile:
             max_position_pct=Decimal("5"), max_sector_pct=Decimal("15"),
             holding_horizon_hours=720, loss_tolerance_pct=Decimal("3"),
             preferred_evidence=("filing", "sec-edgar"),
+            # Will not carry unhedgeable exposure, and wants more conviction than the desk floor.
+            # Both of these make this profile decline positions the aggressive one accepts.
+            requires_hedge=True,
+            excluded_symbols=("TQQQUSDT", "SQQQUSDT"),
+            max_concurrent_positions=3,
+            min_confidence=0.7,
         )
 
     @classmethod
@@ -350,6 +425,9 @@ class TraderProfile:
             max_position_pct=Decimal("25"), max_sector_pct=Decimal("60"),
             holding_horizon_hours=48, loss_tolerance_pct=Decimal("15"),
             preferred_evidence=("news", "social", "transcript"),
+            requires_hedge=False,
+            max_concurrent_positions=0,
+            min_confidence=0.55,
         )
 
 

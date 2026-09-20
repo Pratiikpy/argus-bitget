@@ -22,6 +22,43 @@ dev = [
     "hypothesis>=6.100",
     "ruff>=0.5",
     "mypy>=1.10",
+    # Needed only to import the vendored `eval/baselines/vibe_trading_enforcement.py` (its own
+    # unmodified `import pandas as pd` line) and `eval/crosssection_comparison.py` (which builds
+    # small pandas DataFrames to run qlib's real, vendored `CSRankNorm`) — never imported by
+    # argus's own shipped src/ code, which stays pydantic + python-dateutil only per this
+    # project's standing rule.
+    "pandas>=2.0",
+    "pandas-stubs>=2.0",
+    # Needed only for the vendored, verbatim `eval/baselines/vectorbt_dsr_metrics.py` (its own
+    # unmodified `from scipy.stats import norm` line) — same "eval-only, never imported by
+    # argus's own src/ code" reasoning as pandas above.
+    "scipy>=1.10",
+    "scipy-stubs>=1.0",
+    # Needed only for `eval/sentiment_comparison.py`, which runs the REAL published
+    # `ProsusAI/finbert` model (no source to vendor — it is a HuggingFace Hub inference model,
+    # loaded at runtime via the standard `transformers.pipeline()` API exactly as its own README
+    # documents, never copied into this repository) as the named baseline for "Market sentiment".
+    # Same "eval-only, never imported by argus's own src/ code" reasoning as pandas/scipy above.
+    "transformers>=5.0",
+    "torch>=2.14",
+    # Needed only for `eval/rdagent_comparison.py`'s vendored `rdagent_factor.py`, whose own
+    # unmodified `from filelock import FileLock` line (RD-Agent's real code, not ours) is
+    # imported at module level. Already present transitively via transformers/huggingface_hub;
+    # declared explicitly here because this package now imports it directly, not just
+    # transitively. Same "eval-only, never imported by argus's own src/ code" reasoning as
+    # pandas/scipy/transformers above. Unlicense (public domain).
+    "filelock>=3.20",
+    # Needed for `eval/shapematch_comparison.py`: the real, published `stumpy` PyPI package
+    # (its own real `stumpy.stump()` public API, not vendored — same "real, published library,
+    # no code to vendor" reasoning as transformers/finbert above), used alongside the vendored
+    # `eval/baselines/stumpy_squared_distance.py` excerpt of its `_calculate_squared_distance`.
+    # Same "eval-only, never imported by argus's own src/ code" reasoning as pandas/scipy above.
+    "stumpy>=1.14",
+    # Needed for `eval/cointegration_comparison.py`: the real, published `statsmodels` PyPI
+    # package (its own real `adfuller`, not vendored — same "real, published library, no code to
+    # vendor" reasoning as stumpy/finBERT above), the reference ARGUS's own real `adf()` already
+    # reproduces to 1e-9 per `tests/test_cointegration.py`.
+    "statsmodels>=0.15",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -41,7 +78,110 @@ target-version = "py311"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 
+[tool.ruff.lint.per-file-ignores]
+# RUF001 flags full-width punctuation (：，。（）) as "ambiguous" with its ASCII lookalikes. In a
+# file that is one half Chinese by design that is a false positive on every line: full-width marks
+# are correct Chinese typography and substituting ASCII ones would produce text that reads as
+# broken to a Chinese speaker. Scoped to this one file so the check keeps working everywhere else,
+# where a full-width character really would be a mistake.
+"src/argus/lui/phrasebook.py" = ["RUF001"]
+
+# Vendored, verbatim third-party files (see `eval/baselines/__init__.py`) are exempt from our own
+# lint conventions for the same reason they are exempt from mypy --strict in [[tool.mypy.overrides]]
+# below: fixing an em-dash, an import order, a `datetime.UTC` modernization or an `str, Enum`
+# inheritance style in someone else's file to satisfy OUR ruleset would mean the file no longer
+# matches its cited upstream commit byte-for-byte, which is the entire point of vendoring it this
+# way. Every code below was produced by running ruff against these two files and copying its own
+# list, not chosen in advance — if a future re-vendor from a newer upstream commit trips a
+# DIFFERENT rule, add it here rather than editing the vendored source to dodge it.
+"src/argus/eval/baselines/vibe_trading_enforcement.py" = ["RUF002", "RUF003", "I001", "UP017"]
+"src/argus/eval/baselines/vibe_trading_mandate_model.py" = ["UP042"]
+"src/argus/eval/baselines/qlib_cs_processor.py" = [
+    "B006", "E501", "F541", "I001", "RUF021", "UP007", "UP019", "UP045",
+]
+"src/argus/eval/baselines/vectorbt_dsr_metrics.py" = ["I001", "E501"]
+"src/argus/eval/baselines/tradingagents_memory.py" = ["RUF013"]
+"src/argus/eval/baselines/tradingagents_rating.py" = ["RUF002"]
+"src/argus/eval/baselines/serenity_guards.py" = ["I001", "RUF023", "UP017"]
+"src/argus/eval/baselines/serenity_journal.py" = ["I001"]
+"src/argus/eval/baselines/tradingagents_feedlist_interface.py" = ["I001", "RUF013"]
+"src/argus/eval/baselines/tradingagents_feedlist_default_config.py" = ["E501"]
+"src/argus/eval/baselines/qlib_expression_base.py" = ["E501", "I001", "RUF010", "UP010", "UP032"]
+"src/argus/eval/baselines/qlib_expression_ops.py" = [
+    "E501", "I001", "RUF005", "RUF010", "SIM108", "UP006", "UP007", "UP008", "UP010", "UP030",
+    "UP032", "UP035",
+]
+"src/argus/eval/baselines/qlib_eval_surface.py" = ["E501", "F821", "RUF003", "UP031"]
+"src/argus/eval/baselines/rdagent_experiment.py" = ["E501", "F401"]
+"src/argus/eval/baselines/rdagent_factor.py" = [
+    "B006", "B026", "B904", "E501", "F541", "F841", "I001", "RUF010", "RUF013", "UP006", "UP007",
+    "UP035",
+]
+"src/argus/eval/baselines/rdagent_costeer_task.py" = ["E501", "RUF013"]
+"src/argus/eval/baselines/rdagent_cache_utils.py" = ["E501", "F821"]
+"src/argus/eval/baselines/stumpy_squared_distance.py" = ["F821", "RUF002"]
+"src/argus/eval/baselines/pytaa_vigilant_allocation.py" = ["UP006", "UP035"]
+"src/argus/eval/baselines/whale_signals_event_study.py" = ["SIM108", "UP045"]
+"src/argus/eval/baselines/quantconnect_sue.py" = ["B905"]
+"src/argus/eval/baselines/quantconnect_preholiday_decision.py" = ["F821"]
+"src/argus/eval/baselines/alphalens_ic.py" = ["F821", "RUF005", "B028"]
+
 [tool.mypy]
 python_version = "3.11"
 strict = true
 warn_unreachable = true
+
+# Vendored, verbatim third-party files (see `eval/baselines/__init__.py`) are exempt from our own
+# strict-typing standard by design: editing them to satisfy mypy would mean they are no longer the
+# unmodified copy the whole point of vendoring them requires. Correctness for these two is instead
+# verified by the byte-for-byte diff against the cited upstream commit (run at vendoring time) and
+# by `tests/test_baselines.py` actually exercising `check_mandate()` end to end. Their own
+# `from src.live.mandate.model import (...)` line is real code that only resolves at runtime via
+# `eval/baselines/loader.py`'s `sys.modules` shim, which mypy's static import resolution cannot see
+# — expected, not a defect.
+[[tool.mypy.overrides]]
+module = [
+    "argus.eval.baselines.vibe_trading_enforcement",
+    "argus.eval.baselines.vibe_trading_mandate_model",
+    "argus.eval.baselines.qlib_cs_processor",
+    "argus.eval.baselines.vectorbt_dsr_metrics",
+    "argus.eval.baselines.tradingagents_memory",
+    "argus.eval.baselines.serenity_journal",
+    "argus.eval.baselines.serenity_guards",
+    "argus.eval.baselines.tradingagents_feedlist_interface",
+    "argus.eval.baselines.tradingagents_feedlist_errors",
+    "argus.eval.baselines.tradingagents_feedlist_config",
+    "argus.eval.baselines.tradingagents_feedlist_default_config",
+    "argus.eval.baselines.qlib_expression_base",
+    "argus.eval.baselines.qlib_expression_ops",
+    "argus.eval.baselines.qlib_eval_surface",
+    "argus.eval.baselines.rdagent_experiment",
+    "argus.eval.baselines.rdagent_factor",
+    "argus.eval.baselines.rdagent_costeer_task",
+    "argus.eval.baselines.rdagent_exception",
+    "argus.eval.baselines.rdagent_cache_utils",
+    "argus.eval.baselines.stumpy_squared_distance",
+    "argus.eval.baselines.lean_pairs_ranking",
+    "argus.eval.baselines.maxme_arbitrer",
+    "argus.eval.baselines.pytaa_vigilant_allocation",
+    "argus.eval.baselines.pytaa_signal",
+    "argus.eval.baselines.whale_signals_event_study",
+    "argus.eval.baselines.quantconnect_sue",
+    "argus.eval.baselines.quantconnect_preholiday_decision",
+    "argus.eval.baselines.alphalens_ic",
+]
+ignore_errors = true
+ignore_missing_imports = true
+
+# `stumpy` (the real, published PyPI package, not vendored — see eval/shapematch_comparison.py's
+# own docstring) ships no type stubs and no py.typed marker. This does NOT relax strict checking
+# on our own code that imports it — only mypy's inability to see INTO stumpy's own types.
+[[tool.mypy.overrides]]
+module = ["stumpy", "stumpy.*"]
+ignore_missing_imports = true
+
+# `statsmodels` (the real, published PyPI package, not vendored — see
+# eval/cointegration_comparison.py's own docstring) ships no type stubs either.
+[[tool.mypy.overrides]]
+module = ["statsmodels", "statsmodels.*"]
+ignore_missing_imports = true

@@ -36,7 +36,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from pathlib import Path
 
@@ -157,15 +157,33 @@ def _closed_sessions(
 
 
 def _median(values: list[Decimal]) -> Decimal:
+    """The middle value, averaging the two middles on an even-length list.
+
+    **This returned the upper of the two middles and was wrong on every even-length input** —
+    ``[1, 2, 3, 4]`` gave 3 rather than 2.5. Every figure this function produced was biased upward
+    by half an inter-quantile step, including the published `median_closed_move_bps` and
+    `median_reopen_move_bps` in `data/gap_study.json`. Six other medians in this codebase were
+    correct; this one was hand-rolled because the values are `Decimal` and `statistics.median`
+    returns a float. Averaging in `Decimal` keeps both the type and the answer.
+    """
     if not values:
         return Decimal("0")
-    s = sorted(values)
-    return s[len(s) // 2]
+    ordered = sorted(values)
+    middle = len(ordered) // 2
+    if len(ordered) % 2:
+        return ordered[middle]
+    return (ordered[middle - 1] + ordered[middle]) / 2
 
 
-def study(symbols: tuple[str, ...] = RTOKEN_SYMBOLS, *, days: int = 90) -> dict[str, object]:
-    """Measure closed-session behaviour and reopening moves across every rToken."""
-    clock = DualClock()
+def raw_sessions(
+    symbols: tuple[str, ...] = RTOKEN_SYMBOLS, *, days: int = 90,
+    holidays: frozenset[date] | None = None,
+) -> tuple[list[ClosedSession], dict[str, str]]:
+    """Every real closed session across `symbols`, unaggregated — the fetch-and-classify step
+    `study()` itself uses, exposed separately so a caller can inspect individual real sessions
+    (e.g. `eval/afterhours_comparison.py`'s per-session real P&L check) rather than only the
+    aggregated `by_phase` statistics `study()` returns."""
+    clock = DualClock(holidays)
     all_sessions: list[ClosedSession] = []
     failures: dict[str, str] = {}
 
@@ -179,6 +197,24 @@ def study(symbols: tuple[str, ...] = RTOKEN_SYMBOLS, *, days: int = 90) -> dict[
             failures[symbol] = "insufficient history"
             continue
         all_sessions.extend(_closed_sessions(points, symbol, clock))
+
+    return all_sessions, failures
+
+
+def study(
+    symbols: tuple[str, ...] = RTOKEN_SYMBOLS, *, days: int = 90,
+    holidays: frozenset[date] | None = None,
+) -> dict[str, object]:
+    """Measure closed-session behaviour and reopening moves across every rToken.
+
+    ``holidays`` did not exist as a parameter here until 2026-09-16: `study()` always
+    constructed `DualClock()` bare, so the `SessionPhase.HOLIDAY` branch `_closed_sessions()`
+    already classifies for had never once fired in a real run — real market holidays were
+    silently absorbed into whichever other phase the day's hours happened to match (see
+    `eval/afterhours_comparison.py` for the real, measured consequence and a real holiday
+    calendar to pass here). Omitting it keeps this function's exact prior behaviour.
+    """
+    all_sessions, failures = raw_sessions(symbols, days=days, holidays=holidays)
 
     if not all_sessions:
         return {"error": "no closed sessions measured", "failures": failures}

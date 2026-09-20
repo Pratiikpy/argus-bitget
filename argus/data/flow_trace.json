@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-09-13T20:17:54.617728+00:00",
+  "trace_id": "flow-ledger-178",
+  "symbol": "SQQQUSDT",
+  "mode": "live",
+  "complete": false,
+  "links_hold": null,
+  "decision_intent_hash": "b00fadb748886526",
+  "venue_intent_hash": null,
+  "legs": [
+    {
+      "leg": "event",
+      "status": "EXECUTED",
+      "summary": "recorded decision 178 on SQQQUSDT: [panel] 1 of 3 analysts run: event",
+      "at": "2026-09-13T19:30:02.618017+00:00",
+      "detail": {
+        "seq": 178,
+        "session_phase": "weekend",
+        "hours_to_discovery": 18.0
+      }
+    },
+    {
+      "leg": "decision",
+      "status": "EXECUTED",
+      "summary": "verdict no_trade quantity 0, lean up, stated confidence 0.95",
+      "at": "2026-09-13T19:30:02.618017+00:00",
+      "detail": {
+        "thesis": "Weekend session with 18 hours to genuine price discovery, anchor market asleep, no news catalysts, and no actionable edge. The 24h change of +2.4% on SQQQ is already reflected in the token price. Under a general mandate with no specific client constraint, the correct action is to preserve capital an",
+        "binding_constraint": "none",
+        "approved_intent_hash": "b00fadb748886526"
+      }
+    },
+    {
+      "leg": "execution",
+      "status": "NOT_REACHED",
+      "summary": "the desk proposed no exposure (no_trade, quantity 0), so no order was created to send",
+      "at": "2026-09-13T19:30:02.618017+00:00",
+      "detail": {
+        "seq": 178
+      }
+    }
+  ],
+  "verdict": "INCOMPLETE (live): event and decision ran; the execution leg was not reached because the desk proposed no exposure (no_trade, quantity 0), so no order was created to send. Track 2's required event->decision->execution material is NOT demonstrated by this run"
+}

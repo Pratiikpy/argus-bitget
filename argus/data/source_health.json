@@ -1,0 +1,96 @@
+{
+  "probed_at": "2026-09-13T16:35:08.075053+00:00",
+  "total": 12,
+  "live": 12,
+  "empty": 0,
+  "errored": 0,
+  "skipped": 0,
+  "note": "each probe runs the module's own fetch, so a parse failure counts as a failure",
+  "results": [
+    {
+      "name": "Bitget rToken tickers",
+      "module": "market/bitget.py",
+      "health": "ok",
+      "detail": "12 item(s)",
+      "items": 12
+    },
+    {
+      "name": "Bitget market candles",
+      "module": "market/history.py",
+      "health": "ok",
+      "detail": "47 item(s)",
+      "items": 47
+    },
+    {
+      "name": "Bitget index candles",
+      "module": "market/history.py",
+      "health": "ok",
+      "detail": "47 item(s)",
+      "items": 47
+    },
+    {
+      "name": "SEC EDGAR filings",
+      "module": "market/evidence.py",
+      "health": "ok",
+      "detail": "6 item(s)",
+      "items": 6
+    },
+    {
+      "name": "US Treasury curve",
+      "module": "market/macro.py",
+      "health": "ok",
+      "detail": "175 item(s)",
+      "items": 175
+    },
+    {
+      "name": "Crypto Fear & Greed",
+      "module": "market/macro.py",
+      "health": "ok",
+      "detail": "1 item(s)",
+      "items": 1
+    },
+    {
+      "name": "CBOE VIX",
+      "module": "market/volatility.py",
+      "health": "ok",
+      "detail": "1 item(s)",
+      "items": 1
+    },
+    {
+      "name": "FINRA short volume",
+      "module": "market/microstructure.py",
+      "health": "ok",
+      "detail": "12325 item(s)",
+      "items": 12325
+    },
+    {
+      "name": "Nasdaq halts",
+      "module": "market/microstructure.py",
+      "health": "ok",
+      "detail": "23 item(s)",
+      "items": 23
+    },
+    {
+      "name": "Yahoo consensus estimates",
+      "module": "market/estimates.py",
+      "health": "ok",
+      "detail": "4 item(s)",
+      "items": 4
+    },
+    {
+      "name": "SEC XBRL fundamentals",
+      "module": "market/fundamentals.py",
+      "health": "ok",
+      "detail": "67 item(s)",
+      "items": 67
+    },
+    {
+      "name": "Bitget Skill server (last probe)",
+      "module": "market/skills.py",
+      "health": "ok",
+      "detail": "6 item(s)",
+      "items": 6
+    }
+  ],
+  "verdict": "12 of 12 source(s) answered with usable content at 2026-09-13T16:35:08+00:00. Every configured source is live in this run."
+}

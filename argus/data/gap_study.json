@@ -1,33 +1,35 @@
 {
-  "generated_at": "2026-09-12T08:25:49.834193+00:00",
+  "generated_at": "2026-09-14T08:01:54.189577+00:00",
   "days": 90,
   "round_trip_fee_bps": "12",
-  "total_closed_sessions": 832,
-  "symbols_failed": {},
+  "total_closed_sessions": 693,
+  "symbols_failed": {
+    "NVDAUSDT": "HTTP 429 for history-candles: {\"code\":\"429\",\"msg\":\"Too Many Requests\",\"requestTime\":1789372498240,\"data\":null}"
+  },
   "headline": {
-    "continuation_rate_pct": 51.9,
+    "continuation_rate_pct": 51.4,
     "coin_flip_is": 50.0,
-    "median_reopen_move_bps": "58.26",
-    "reopen_clears_fee_pct": 89.3
+    "median_reopen_move_bps": "57.25",
+    "reopen_clears_fee_pct": 89.5
   },
   "by_phase": {
     "weekend": {
-      "sessions": 156,
+      "sessions": 132,
       "median_hours_closed": 66.0,
-      "median_closed_move_bps": "119.44",
-      "median_reopen_move_bps": "55.40",
-      "continuation_rate_pct": 57.7,
-      "reopen_clears_fee_pct": 84.6,
-      "median_net_of_fee_bps": "43.40"
+      "median_closed_move_bps": "103.30",
+      "median_reopen_move_bps": "55.01",
+      "continuation_rate_pct": 56.1,
+      "reopen_clears_fee_pct": 85.6,
+      "median_net_of_fee_bps": "43.01"
     },
     "overnight": {
-      "sessions": 676,
+      "sessions": 561,
       "median_hours_closed": 18.0,
-      "median_closed_move_bps": "122.61",
-      "median_reopen_move_bps": "58.44",
-      "continuation_rate_pct": 50.6,
+      "median_closed_move_bps": "113.35",
+      "median_reopen_move_bps": "58.42",
+      "continuation_rate_pct": 50.3,
       "reopen_clears_fee_pct": 90.4,
-      "median_net_of_fee_bps": "46.44"
+      "median_net_of_fee_bps": "46.42"
     }
   }
 }

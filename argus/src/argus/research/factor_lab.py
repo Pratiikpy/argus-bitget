@@ -14,8 +14,20 @@ that makes their results meaningless:
 * **FactorForge** feeds the generator the IC of the top three factors every round and asks for
   variations (``evolution_engine.py:95-99``).
 
-**FactorMiner is the counter-example and gets the credit**: its generator sees only syntax errors,
-never scores (``factor_generator.py:91-112``).
+**FactorMiner is the closest thing to a counter-example, and it does not hold either.** This
+docstring previously credited its generator with seeing "only syntax errors, never scores", and the
+source does not support that. ``factorminer/agent/factor_generator.py:113-118`` declares
+``generate_batch(memory_signal=..., library_state=...)`` — "guided by memory priors" — and the
+signal is rendered straight into the user prompt at ``:165-171``. What it carries is not neutral:
+``factorminer/memory/retrieval.py:742-750`` writes ``=== RECOMMENDED DIRECTIONS (P_succ) ===``
+followed by each pattern's ``success_rate`` grade, and ``library_state`` carries
+``recent_admissions``, the names of the factors that scored well enough to be admitted. Coarse
+grades are still outcomes. Its *evaluator* is genuinely independent of its generator, which is more
+than RD-Agent manages; its *memory* is the side door.
+
+That finding is what `argus.research.memory` is built around: the lab's own memory records
+everything and publishes only identity and structural facts, with an import-time guard that fails
+if an outcome-bearing field is ever added to the signal.
 
 This lab enforces the separation structurally rather than by convention:
 
@@ -45,6 +57,7 @@ from argus.backtest.metrics import (
     deflated_sharpe,
 )
 from argus.cost.model import CostModel
+from argus.research.overfit import Observation, OverfitReport, run_all
 from argus.truth.clocks import DualClock, SessionPhase
 
 
@@ -90,6 +103,14 @@ class ProposerContext:
     """The proposer may know *how many* times it has been asked, which is not a signal about
     quality — and it prevents the pathological loop of re-proposing the same thing forever."""
 
+    memory: tuple[str, ...] = ()
+    """Lines from :meth:`argus.research.memory.MemorySignal.render`, when a memory is attached.
+
+    Every one of them is identity or structure — what has already been evaluated, and what could not
+    be measured at all. They are built from a whitelist in `research/memory.py` and a guard there
+    fails at import if an outcome-bearing field is ever added, because a memory is the one way to
+    contaminate this class without editing it."""
+
 
 @dataclass(frozen=True, slots=True)
 class Factor:
@@ -120,6 +141,10 @@ class FactorRecord:
     net_sharpe: float | None = None
     oos_sharpe: float | None = None
     dsr: float | None = None
+    overfit: dict[str, Any] | None = None
+    """The anti-overfit report, when one could be computed. ``None`` means the factor never
+    reached the gate, which is different from reaching it and being found wanting."""
+
     rejection_reason: str = ""
 
     def advance(self, to: Lifecycle, *, note: str = "") -> None:
@@ -153,6 +178,7 @@ class FactorRecord:
             "net_sharpe": self.net_sharpe,
             "oos_sharpe": self.oos_sharpe,
             "dsr": self.dsr,
+            "overfit": self.overfit,
             "rejection_reason": self.rejection_reason,
             "path": [f"{a}->{b}" for a, b in self.history],
         }
@@ -174,6 +200,10 @@ def _ret(bars: Sequence[Bar], i: int, n: int) -> float:
     return (b - a) / a if a > 0 else 0.0
 
 
+def _sign(x: float) -> float:
+    return 1.0 if x > 0 else (-1.0 if x < 0 else 0.0)
+
+
 def _closed(bars: Sequence[Bar], i: int) -> bool:
     return not _CLOCK.phase(bars[i].ts).has_price_discovery
 
@@ -182,9 +212,15 @@ PRIMITIVES: dict[str, Any] = {
     "long_while_closed": lambda b, i: 1.0 if _closed(b, i) else 0.0,
     "long_while_open": lambda b, i: 1.0 if not _closed(b, i) else 0.0,
     "weekend_only": lambda b, i: 1.0 if _CLOCK.phase(b[i].ts) is SessionPhase.WEEKEND else 0.0,
-    "closure_momentum": lambda b, i: (1.0 if _ret(b, i, 6) > 0 else -1.0) if _closed(b, i) else 0.0,
+    # Flat when the lookback has no history. These two previously fell through to a full -1.0
+    # (and +1.0) position on six bars of missing data, because `_ret` returns 0.0 and `0.0 > 0` is
+    # False. A momentum factor taking a maximum short on data it does not have is a bug; it was
+    # found by reconstructing these primitives in `argus.research.grammar` and diffing the two.
+    "closure_momentum": lambda b, i: (
+        _sign(_ret(b, i, 6)) if _closed(b, i) else 0.0
+    ),
     "closure_reversion": lambda b, i: (
-        (-1.0 if _ret(b, i, 6) > 0 else 1.0) if _closed(b, i) else 0.0
+        -_sign(_ret(b, i, 6)) if _closed(b, i) else 0.0
     ),
     "near_reopen": lambda b, i: (
         1.0 if _closed(b, i) and _CLOCK.state(b[i].ts).hours_to_next_discovery <= 4 else 0.0
@@ -205,6 +241,39 @@ class Evaluator:
         self._bars = bars
         self._cost = cost or CostModel.bitget_perp()
         self._cost.assert_gateable()
+
+    def observations(self, record: FactorRecord) -> list[Observation]:
+        """Turn one factor into the (factor value, next-bar return) pairs the gates score.
+
+        ARGUS's lab evaluates a factor on a **single** instrument's bar series, so the natural
+        "cross-section at a period" does not exist. Rather than fabricate one, each bar becomes its
+        own period with one observation, and the rank correlation is taken across a rolling window
+        of bars instead of across names at an instant. That is a real difference from the
+        cross-sectional IC in the literature and it is stated rather than glossed: the gates are
+        measuring time-series predictive power here, not cross-sectional ranking power.
+        """
+        bars = self._bars
+        signal = PRIMITIVES[record.factor.expression]
+        out: list[Observation] = []
+        window = max(2, record.factor.horizon_bars)
+        for i in range(len(bars) - 1):
+            try:
+                value = float(signal(bars, i))
+            except (ValueError, ZeroDivisionError, OverflowError, IndexError):
+                continue
+            nxt = _ret(bars, i + 1, 1)
+            # One period per window keeps enough readings inside a period for a rank correlation
+            # to be defined at all; a period holding a single pair has no ranks to correlate.
+            out.append(Observation(period=i // window, name=f"bar{i % window}",
+                                   factor=value, forward_return=nxt))
+        return out
+
+    def overfit_report(self, record: FactorRecord) -> OverfitReport | None:
+        """Run the four anti-overfit gates over this factor's own readings."""
+        rows = self.observations(record)
+        if not rows:
+            return None
+        return run_all(rows)
 
     def score(self, record: FactorRecord) -> FactorRecord:
         """Walk one factor through every gate, in order, stopping at the first failure."""
@@ -254,6 +323,10 @@ class FactorLab:
 
     evaluator: Evaluator
     records: list[FactorRecord] = field(default_factory=list)
+    memory: Any | None = None
+    """An optional :class:`argus.research.memory.FactorMemory`. Attached, the lab stops re-scoring
+    hypotheses it has a record of, and the proposer is told what has been tried — never how any of
+    it did. Typed loosely to keep the memory module's dependency one-directional."""
 
     @property
     def trials(self) -> int:
@@ -274,12 +347,27 @@ class FactorLab:
             ),
             already_proposed=tuple(r.factor.name for r in self.records),
             trials_so_far=self.trials,
+            memory=() if self.memory is None else tuple(self.memory.signal().render()),
         )
 
-    def submit(self, factor: Factor) -> FactorRecord:
+    def submit(self, factor: Factor) -> FactorRecord | None:
+        """Score one proposal. Returns ``None`` when memory has seen this hypothesis before.
+
+        A repeat is suppressed rather than re-scored, and deliberately does **not** increment
+        :attr:`trials`. The Deflated Sharpe gate consumes that count as the number of distinct looks
+        taken; re-testing one hypothesis produces no new maximum, so counting it again would deflate
+        against a search that never happened. The suppression is counted in the memory and surfaced
+        by :meth:`funnel`, so a proposer going in circles is visible rather than merely cheap.
+        """
+        if self.memory is not None and self.memory.seen(factor):
+            self.memory.note_duplicate()
+            return None
         record = FactorRecord(factor=factor, trial_number=self.trials + 1)
         self.records.append(record)
-        return self.evaluator.score(record)
+        scored = self.evaluator.score(record)
+        if self.memory is not None:
+            self.memory.remember(scored)
+        return scored
 
     def gate(self) -> dict[str, Any]:
         """Apply the Deflated Sharpe gate to survivors, using the real trial count."""
@@ -305,14 +393,33 @@ class FactorLab:
                 record.reject(f"DSR uncomputable: {exc}")
                 continue
 
-            if record.dsr > 0.95:
-                record.advance(Lifecycle.CERTIFIED)
-                certified.append(record)
-            else:
+            if record.dsr <= 0.95:
                 record.reject(
                     f"DSR {record.dsr} over {self.trials} trials — not distinguishable from "
                     f"the best of a random search"
                 )
+                continue
+
+            # The Deflated Sharpe asks whether this result beats the best of a random *search*.
+            # The anti-overfit gates ask a different question — whether the factor beats its own
+            # shuffled self, holds its sign across sub-periods and regimes, and decays like a real
+            # signal. A factor can clear the first and fail the second, so both are required before
+            # anything is called certified. An INCONCLUSIVE verdict does not certify either:
+            # "we could not tell" is not "it passed".
+            overfit = self.evaluator.overfit_report(record)
+            if overfit is not None:
+                record.overfit = overfit.as_dict()
+                if overfit.failed or overfit.inconclusive:
+                    record.reject(f"anti-overfit: {overfit.verdict}")
+                    continue
+
+            record.advance(Lifecycle.CERTIFIED)
+            certified.append(record)
+        if self.memory is not None:
+            # The gate is where a factor reaches its terminal state. Memory written at score time
+            # records every survivor as oos_tested, so it is refreshed here or it is wrong.
+            for record in self.records:
+                self.memory.update(record)
         return {
             "trials": self.trials,
             "variance_of_trial_sharpes": round(variance, 4),
@@ -339,10 +446,25 @@ class FactorLab:
             "by_final_state": counts,
             "certified": counts.get(str(Lifecycle.CERTIFIED), 0),
             "rejected": counts.get(str(Lifecycle.REJECTED), 0),
+            # Repeats are suppressed rather than scored, so they do not appear above. Reporting the
+            # number keeps a proposer that is going in circles visible instead of merely cheap.
+            "duplicates_suppressed": (
+                0 if self.memory is None else self.memory.duplicates_suppressed
+            ),
         }
 
 
 def report(lab: FactorLab) -> dict[str, Any]:
+    """Run the gate, then describe the lab.
+
+    **The gate is called first, deliberately.** It was second here, and since a dict literal is
+    evaluated top to bottom the funnel was computed before any factor reached its terminal state —
+    the published `data/factor_lab.json` recorded ``by_final_state: {oos_tested: 1}`` and
+    ``certified: 0`` for a factor the gate had not yet judged. Nothing certified at the time, so the
+    two numbers happened to agree and the defect stayed invisible; the first certification would
+    have produced a report whose funnel contradicted its own gate.
+    """
+    gate = lab.gate()
     return {
         "generated_at": datetime.now(UTC).isoformat(),
         "separation": (
@@ -350,7 +472,7 @@ def report(lab: FactorLab) -> dict[str, Any]:
             "evaluation is deterministic Python and no model grades a factor"
         ),
         "funnel": lab.funnel(),
-        "gate": lab.gate(),
+        "gate": gate,
         "factors": [r.as_dict() for r in lab.records],
         "cemetery": lab.cemetery(),
     }
@@ -358,24 +480,51 @@ def report(lab: FactorLab) -> dict[str, Any]:
 
 def main() -> int:
     from argus.market.history import CandleType, fetch_range
+    from argus.research.memory import FactorMemory
 
     candles = fetch_range("NVDAUSDT", days=90, interval="1H", candle_type=CandleType.MARKET)
-    bars = [Bar(ts=c.ts, close=c.close) for c in candles]
-    lab = FactorLab(evaluator=Evaluator(bars))
+    bars = [
+        Bar(
+            ts=c.ts,
+            close=c.close,
+            # Same reason as `track1_study`: a grammar field with no data behind it reads 0.0 for
+            # every bar, and the search cannot tell that apart from a real constant.
+            extra={"volume": float(c.volume), "high": float(c.high), "low": float(c.low)},
+        )
+        for c in candles
+    ]
+
+    root = Path(__file__).resolve().parents[3] / "data"
+    memory_path = root / "factor_memory.json"
+    memory = FactorMemory.load(memory_path)
+    lab = FactorLab(evaluator=Evaluator(bars), memory=memory)
 
     # Stand-ins for model proposals: every vetted primitive, submitted blind. The lab behaves
     # identically whether these come from a model or a list — which is the point of the boundary.
+    # On the second run every one of these is already in memory, so the lab suppresses them all
+    # rather than re-scoring them; that is the loop working, not a failure.
     for name in PRIMITIVES:
         lab.submit(Factor(name=name, expression=name, rationale="session-structure hypothesis"))
 
-    out = Path(__file__).resolve().parents[3] / "data" / "factor_lab.json"
+    out = root / "factor_lab.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     payload = report(lab)
-    out.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
+    memory.save(memory_path)
 
     f = payload["funnel"]
     print(f"proposed {f['proposed']} · certified {f['certified']} · rejected {f['rejected']}")
+    print(f"suppressed as already evaluated: {f['duplicates_suppressed']}")
     print(f"trials fed to the DSR gate: {payload['gate'].get('trials')}")
+
+    # A run in which every proposal was already known has produced no new evidence, and writing its
+    # empty funnel over the previous report would destroy a real result to record that nothing
+    # happened. Found by running this twice: the second pass overwrote eight scored factors with
+    # zeroes. The memory is still saved — it is the thing that legitimately changed.
+    if not lab.records:
+        print(f"\nevery proposal was already evaluated; {out.name} left as it was")
+        return 0
+
+    out.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
     print("\ncemetery:")
     for row in payload["cemetery"]:
         print(f"  {row['name']:<22} died at {row['died_at']:<14} {row['reason'][:70]}")

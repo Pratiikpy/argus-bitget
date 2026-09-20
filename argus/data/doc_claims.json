@@ -1,0 +1,1153 @@
+{
+  "total": 70,
+  "checked": 70,
+  "ok": 70,
+  "stale": 0,
+  "absent": 18,
+  "unchecked": 0,
+  "findings": [
+    {
+      "claim": "tests_passing",
+      "doc": "readme",
+      "line": 39,
+      "quoted": [
+        "4,276"
+      ],
+      "live": [
+        5095
+      ],
+      "status": "OK",
+      "excerpt": "4,276 tests collected"
+    },
+    {
+      "claim": "tests_passing",
+      "doc": "submission",
+      "line": 157,
+      "quoted": [
+        "4,276"
+      ],
+      "live": [
+        5095
+      ],
+      "status": "OK",
+      "excerpt": "4,276 tests"
+    },
+    {
+      "claim": "tests_passing",
+      "doc": "submission",
+      "line": 301,
+      "quoted": [
+        "4,276"
+      ],
+      "live": [
+        5095
+      ],
+      "status": "OK",
+      "excerpt": "4,276 tests collected"
+    },
+    {
+      "claim": "tests_passing",
+      "doc": "explained",
+      "line": 654,
+      "quoted": [
+        "4,276"
+      ],
+      "live": [
+        5095
+      ],
+      "status": "OK",
+      "excerpt": "4,276 tests"
+    },
+    {
+      "claim": "tests_passing",
+      "doc": "explained",
+      "line": 1696,
+      "quoted": [
+        "4,276"
+      ],
+      "live": [
+        5095
+      ],
+      "status": "OK",
+      "excerpt": "4,276 tests collected"
+    },
+    {
+      "claim": "tests_passing",
+      "doc": "explained",
+      "line": 1945,
+      "quoted": [
+        "4,276"
+      ],
+      "live": [
+        5095
+      ],
+      "status": "OK",
+      "excerpt": "4,276 tests collected"
+    },
+    {
+      "claim": "source_files",
+      "doc": "readme",
+      "line": 39,
+      "quoted": [
+        "265"
+      ],
+      "live": [
+        265
+      ],
+      "status": "OK",
+      "excerpt": "strict clean on 265 source files"
+    },
+    {
+      "claim": "source_files",
+      "doc": "submission",
+      "line": 157,
+      "quoted": [
+        "265"
+      ],
+      "live": [
+        265
+      ],
+      "status": "OK",
+      "excerpt": "strict` clean on 265 files"
+    },
+    {
+      "claim": "source_files",
+      "doc": "submission",
+      "line": 301,
+      "quoted": [
+        "265"
+      ],
+      "live": [
+        265
+      ],
+      "status": "OK",
+      "excerpt": "strict` clean across 265 source files"
+    },
+    {
+      "claim": "source_files",
+      "doc": "explained",
+      "line": 1942,
+      "quoted": [
+        "265"
+      ],
+      "live": [
+        265
+      ],
+      "status": "OK",
+      "excerpt": "strict` clean on 265 source files"
+    },
+    {
+      "claim": "register_claims",
+      "doc": "readme",
+      "line": 12,
+      "quoted": [
+        "156"
+      ],
+      "live": [
+        156
+      ],
+      "status": "OK",
+      "excerpt": "156 claims across"
+    },
+    {
+      "claim": "register_claims",
+      "doc": "submission",
+      "line": 73,
+      "quoted": [
+        "156"
+      ],
+      "live": [
+        156
+      ],
+      "status": "OK",
+      "excerpt": "156 claims across"
+    },
+    {
+      "claim": "register_claims",
+      "doc": "explained",
+      "line": 1806,
+      "quoted": [
+        "156"
+      ],
+      "live": [
+        156
+      ],
+      "status": "OK",
+      "excerpt": "156 claims across"
+    },
+    {
+      "claim": "register_claims",
+      "doc": "master-plan",
+      "line": 410,
+      "quoted": [
+        "156"
+      ],
+      "live": [
+        156
+      ],
+      "status": "OK",
+      "excerpt": "156 claims across"
+    },
+    {
+      "claim": "ledger_decisions",
+      "doc": "readme",
+      "line": 41,
+      "quoted": [
+        "447"
+      ],
+      "live": [
+        447
+      ],
+      "status": "OK",
+      "excerpt": "447 decisions in the paper ledger"
+    },
+    {
+      "claim": "ledger_decisions",
+      "doc": "submission",
+      "line": null,
+      "quoted": [],
+      "live": [
+        447
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "ledger_decisions",
+      "doc": "explained",
+      "line": null,
+      "quoted": [],
+      "live": [
+        447
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "modules_importable",
+      "doc": "readme",
+      "line": 40,
+      "quoted": [
+        "131",
+        "131"
+      ],
+      "live": [
+        131,
+        131
+      ],
+      "status": "OK",
+      "excerpt": "131/131 modules importable"
+    },
+    {
+      "claim": "modules_importable",
+      "doc": "submission",
+      "line": 302,
+      "quoted": [
+        "131",
+        "131"
+      ],
+      "live": [
+        131,
+        131
+      ],
+      "status": "OK",
+      "excerpt": "131/131 modules importable"
+    },
+    {
+      "claim": "subthemes",
+      "doc": "readme",
+      "line": 40,
+      "quoted": [
+        "18",
+        "18"
+      ],
+      "live": [
+        18,
+        18
+      ],
+      "status": "OK",
+      "excerpt": "18/18 sub-themes"
+    },
+    {
+      "claim": "subthemes",
+      "doc": "submission",
+      "line": 157,
+      "quoted": [
+        "18",
+        "18"
+      ],
+      "live": [
+        18,
+        18
+      ],
+      "status": "OK",
+      "excerpt": "18/18 sub-themes"
+    },
+    {
+      "claim": "ledger_entries",
+      "doc": "readme",
+      "line": 41,
+      "quoted": [
+        "447"
+      ],
+      "live": [
+        447
+      ],
+      "status": "OK",
+      "excerpt": "447 decisions"
+    },
+    {
+      "claim": "ledger_entries",
+      "doc": "readme",
+      "line": 204,
+      "quoted": [
+        "231"
+      ],
+      "live": [
+        447
+      ],
+      "status": "OK",
+      "excerpt": "231 ledger entries"
+    },
+    {
+      "claim": "ledger_entries",
+      "doc": "submission",
+      "line": 278,
+      "quoted": [
+        "447"
+      ],
+      "live": [
+        447
+      ],
+      "status": "OK",
+      "excerpt": "447 decisions"
+    },
+    {
+      "claim": "ledger_entries",
+      "doc": "explained",
+      "line": 1123,
+      "quoted": [
+        "231"
+      ],
+      "live": [
+        447
+      ],
+      "status": "OK",
+      "excerpt": "paper-trading log has 231 decisions"
+    },
+    {
+      "claim": "settled_abstentions",
+      "doc": "readme",
+      "line": 204,
+      "quoted": [
+        "386"
+      ],
+      "live": [
+        386
+      ],
+      "status": "OK",
+      "excerpt": "386 have settled as abstentions"
+    },
+    {
+      "claim": "settled_abstentions",
+      "doc": "submission",
+      "line": null,
+      "quoted": [],
+      "live": [
+        386
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "settled_abstentions",
+      "doc": "explained",
+      "line": 1123,
+      "quoted": [
+        "386"
+      ],
+      "live": [
+        386
+      ],
+      "status": "OK",
+      "excerpt": "386 have settled as abstentions"
+    },
+    {
+      "claim": "leans_recorded",
+      "doc": "readme",
+      "line": 213,
+      "quoted": [
+        "282"
+      ],
+      "live": [
+        282
+      ],
+      "status": "OK",
+      "excerpt": "282 decisions carry a lean"
+    },
+    {
+      "claim": "leans_recorded",
+      "doc": "explained",
+      "line": null,
+      "quoted": [],
+      "live": [
+        282
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "t1_beat_buy_and_hold",
+      "doc": "submission",
+      "line": null,
+      "quoted": [],
+      "live": [
+        12
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "t1_beat_buy_and_hold",
+      "doc": "explained",
+      "line": 1544,
+      "quoted": [
+        "12"
+      ],
+      "live": [
+        12
+      ],
+      "status": "OK",
+      "excerpt": "12 of 12 symbols have a strategy that beats buy"
+    },
+    {
+      "claim": "t1_beat_buy_and_hold",
+      "doc": "master-plan",
+      "line": null,
+      "quoted": [],
+      "live": [
+        12
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "t1_dsr_candidates",
+      "doc": "explained",
+      "line": 1554,
+      "quoted": [
+        "2"
+      ],
+      "live": [
+        2
+      ],
+      "status": "OK",
+      "excerpt": "2 of 12 survive that softer gate"
+    },
+    {
+      "claim": "t1_rolling_scorable",
+      "doc": "explained",
+      "line": 1568,
+      "quoted": [
+        "1,107",
+        "2,129"
+      ],
+      "live": [
+        1107,
+        2129
+      ],
+      "status": "OK",
+      "excerpt": "1,107 of 2,129 windows"
+    },
+    {
+      "claim": "t1_rolling_scorable_worst",
+      "doc": "explained",
+      "line": 1570,
+      "quoted": [
+        "308"
+      ],
+      "live": [
+        308
+      ],
+      "status": "OK",
+      "excerpt": "scorable in only 308 windows"
+    },
+    {
+      "claim": "t1_dsr_survivors",
+      "doc": "explained",
+      "line": 2829,
+      "quoted": [
+        "Zero"
+      ],
+      "live": [
+        0
+      ],
+      "status": "OK",
+      "excerpt": "Zero of twelve Track 1 winners survive the search"
+    },
+    {
+      "claim": "t1_dsr_survivors",
+      "doc": "master-plan",
+      "line": null,
+      "quoted": [],
+      "live": [
+        0
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "t1_oos_breaches",
+      "doc": "explained",
+      "line": 1590,
+      "quoted": [
+        "8"
+      ],
+      "live": [
+        8
+      ],
+      "status": "OK",
+      "excerpt": "8 of twelve breach"
+    },
+    {
+      "claim": "t1_oos_breaches",
+      "doc": "master-plan",
+      "line": null,
+      "quoted": [],
+      "live": [
+        8
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "arbitrage_monetisable",
+      "doc": "submission",
+      "line": null,
+      "quoted": [],
+      "live": [
+        4.58
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "arbitrage_monetisable",
+      "doc": "explained",
+      "line": 1434,
+      "quoted": [
+        "4.58"
+      ],
+      "live": [
+        4.58
+      ],
+      "status": "OK",
+      "excerpt": "monetisable **4.58%"
+    },
+    {
+      "claim": "arbitrage_monetisable",
+      "doc": "master-plan",
+      "line": null,
+      "quoted": [],
+      "live": [
+        4.58
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "weekend_continuation",
+      "doc": "explained",
+      "line": 1461,
+      "quoted": [
+        "57.7"
+      ],
+      "live": [
+        57.7
+      ],
+      "status": "OK",
+      "excerpt": "57.7% continuation"
+    },
+    {
+      "claim": "weekend_continuation",
+      "doc": "master-plan",
+      "line": null,
+      "quoted": [],
+      "live": [
+        57.7
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "session_beta_higher_open",
+      "doc": "readme",
+      "line": 193,
+      "quoted": [
+        "10",
+        "11"
+      ],
+      "live": [
+        10,
+        11
+      ],
+      "status": "OK",
+      "excerpt": "on 10 of 11 rTokens"
+    },
+    {
+      "claim": "session_beta_higher_open",
+      "doc": "submission",
+      "line": 102,
+      "quoted": [
+        "10",
+        "11"
+      ],
+      "live": [
+        10,
+        11
+      ],
+      "status": "OK",
+      "excerpt": "on 10 of 11 rTokens"
+    },
+    {
+      "claim": "session_beta_higher_open",
+      "doc": "explained",
+      "line": 471,
+      "quoted": [
+        "10",
+        "11"
+      ],
+      "live": [
+        10,
+        11
+      ],
+      "status": "OK",
+      "excerpt": "on 10 of 11 rTokens"
+    },
+    {
+      "claim": "session_beta_higher_open",
+      "doc": "explained",
+      "line": 1491,
+      "quoted": [
+        "10",
+        "11"
+      ],
+      "live": [
+        10,
+        11
+      ],
+      "status": "OK",
+      "excerpt": "on 10 of 11 rTokens"
+    },
+    {
+      "claim": "session_beta_higher_open",
+      "doc": "master-plan",
+      "line": 233,
+      "quoted": [
+        "10",
+        "11"
+      ],
+      "live": [
+        10,
+        11
+      ],
+      "status": "OK",
+      "excerpt": "on 10 of 11 rTokens"
+    },
+    {
+      "claim": "aapl_beta_open",
+      "doc": "readme",
+      "line": 193,
+      "quoted": [
+        "0.68"
+      ],
+      "live": [
+        0.6755
+      ],
+      "status": "OK",
+      "excerpt": "AAPL reads 0.68"
+    },
+    {
+      "claim": "aapl_beta_open",
+      "doc": "submission",
+      "line": 102,
+      "quoted": [
+        "0.675"
+      ],
+      "live": [
+        0.6755
+      ],
+      "status": "OK",
+      "excerpt": "AAPL reads **0.675"
+    },
+    {
+      "claim": "aapl_beta_open",
+      "doc": "explained",
+      "line": null,
+      "quoted": [],
+      "live": [
+        0.6755
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "aapl_beta_open",
+      "doc": "master-plan",
+      "line": 234,
+      "quoted": [
+        "0.675"
+      ],
+      "live": [
+        0.6755
+      ],
+      "status": "OK",
+      "excerpt": "AAPL is 0.675"
+    },
+    {
+      "claim": "aapl_beta_shut",
+      "doc": "readme",
+      "line": 193,
+      "quoted": [
+        "0.105"
+      ],
+      "live": [
+        0.1052
+      ],
+      "status": "OK",
+      "excerpt": "against 0.105 shut"
+    },
+    {
+      "claim": "aapl_beta_shut",
+      "doc": "submission",
+      "line": 103,
+      "quoted": [
+        "0.105"
+      ],
+      "live": [
+        0.1052
+      ],
+      "status": "OK",
+      "excerpt": "against 0.105 shut"
+    },
+    {
+      "claim": "aapl_beta_shut",
+      "doc": "explained",
+      "line": null,
+      "quoted": [],
+      "live": [
+        0.1052
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "aapl_beta_shut",
+      "doc": "master-plan",
+      "line": 234,
+      "quoted": [
+        "0.105"
+      ],
+      "live": [
+        0.1052
+      ],
+      "status": "OK",
+      "excerpt": "against 0.105 shut"
+    },
+    {
+      "claim": "hurdle_symbols_clearing_rth",
+      "doc": "readme",
+      "line": null,
+      "quoted": [],
+      "live": [
+        11
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "hurdle_symbols_clearing_rth",
+      "doc": "submission",
+      "line": null,
+      "quoted": [],
+      "live": [
+        11
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "hurdle_symbols_clearing_rth",
+      "doc": "explained",
+      "line": 1138,
+      "quoted": [
+        "eleven"
+      ],
+      "live": [
+        11
+      ],
+      "status": "OK",
+      "excerpt": "regular hours on eleven of twelve symbols"
+    },
+    {
+      "claim": "hurdle_symbols_clearing_rth",
+      "doc": "master-plan",
+      "line": 77,
+      "quoted": [
+        "eleven"
+      ],
+      "live": [
+        11
+      ],
+      "status": "OK",
+      "excerpt": "regular hours on eleven of twelve symbols"
+    },
+    {
+      "claim": "hurdle_symbols_clearing_rth",
+      "doc": "master-plan",
+      "line": 488,
+      "quoted": [
+        "eleven"
+      ],
+      "live": [
+        11
+      ],
+      "status": "OK",
+      "excerpt": "regular hours on eleven of twelve symbols"
+    },
+    {
+      "claim": "hurdle_clearing_range",
+      "doc": "readme",
+      "line": 218,
+      "quoted": [
+        "61",
+        "89"
+      ],
+      "live": [
+        61,
+        89
+      ],
+      "status": "OK",
+      "excerpt": "61\u201389% of the time during US regular"
+    },
+    {
+      "claim": "hurdle_clearing_range",
+      "doc": "submission",
+      "line": null,
+      "quoted": [],
+      "live": [
+        61,
+        89
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "hurdle_clearing_range",
+      "doc": "explained",
+      "line": 1137,
+      "quoted": [
+        "61",
+        "89"
+      ],
+      "live": [
+        61,
+        89
+      ],
+      "status": "OK",
+      "excerpt": "61\u201389% of the time during US regular"
+    },
+    {
+      "claim": "hurdle_clearing_range",
+      "doc": "master-plan",
+      "line": 77,
+      "quoted": [
+        "61",
+        "89"
+      ],
+      "live": [
+        61,
+        89
+      ],
+      "status": "OK",
+      "excerpt": "61\u201389% of the time during US regular"
+    },
+    {
+      "claim": "hurdle_clearing_range",
+      "doc": "master-plan",
+      "line": 488,
+      "quoted": [
+        "61",
+        "89"
+      ],
+      "live": [
+        61,
+        89
+      ],
+      "status": "OK",
+      "excerpt": "61\u201389% of the time in US regular"
+    },
+    {
+      "claim": "hurdle_qqq_rth",
+      "doc": "submission",
+      "line": 293,
+      "quoted": [
+        "48.3"
+      ],
+      "live": [
+        48.3
+      ],
+      "status": "OK",
+      "excerpt": "QQQ alone falling short at 48.3%"
+    },
+    {
+      "claim": "hurdle_qqq_rth",
+      "doc": "master-plan",
+      "line": null,
+      "quoted": [],
+      "live": [
+        48.3
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "teardowns",
+      "doc": "readme",
+      "line": 333,
+      "quoted": [
+        "61"
+      ],
+      "live": [
+        61
+      ],
+      "status": "OK",
+      "excerpt": "61 code-level teardowns"
+    },
+    {
+      "claim": "teardowns",
+      "doc": "explained",
+      "line": 569,
+      "quoted": [
+        "61"
+      ],
+      "live": [
+        61
+      ],
+      "status": "OK",
+      "excerpt": "61 code-level teardowns"
+    },
+    {
+      "claim": "pbo_range",
+      "doc": "explained",
+      "line": 1957,
+      "quoted": [
+        "0.11",
+        "0.77"
+      ],
+      "live": [
+        0.11429,
+        0.77143
+      ],
+      "status": "OK",
+      "excerpt": "0.11 to **0.77** across twelve symbols"
+    },
+    {
+      "claim": "pbo_worst",
+      "doc": "explained",
+      "line": 2175,
+      "quoted": [
+        "0.77"
+      ],
+      "live": [
+        0.77143
+      ],
+      "status": "OK",
+      "excerpt": "overfitting is **0.77** \u2014 the worst of the twelve"
+    },
+    {
+      "claim": "fdr_trials",
+      "doc": "explained",
+      "line": 2143,
+      "quoted": [
+        "0",
+        "300"
+      ],
+      "live": [
+        0,
+        300
+      ],
+      "status": "OK",
+      "excerpt": "0 of 300 (symbol, variant) trials"
+    },
+    {
+      "claim": "mintrl_range",
+      "doc": "explained",
+      "line": 1959,
+      "quoted": [
+        "0.47",
+        "3.52"
+      ],
+      "live": [
+        0.468,
+        3.522
+      ],
+      "status": "OK",
+      "excerpt": "0.47 to **3.52 years** of live hourly"
+    },
+    {
+      "claim": "brier_index",
+      "doc": "explained",
+      "line": 1954,
+      "quoted": [
+        "51.8"
+      ],
+      "live": [
+        51.764
+      ],
+      "status": "OK",
+      "excerpt": "Brier Index 51.8**"
+    },
+    {
+      "claim": "brier_index",
+      "doc": "explained",
+      "line": 2031,
+      "quoted": [
+        "51.8"
+      ],
+      "live": [
+        51.764
+      ],
+      "status": "OK",
+      "excerpt": "Brier Index of 51.8**"
+    },
+    {
+      "claim": "skill_vs_climatology",
+      "doc": "explained",
+      "line": 2033,
+      "quoted": [
+        "6.4"
+      ],
+      "live": [
+        6.43
+      ],
+      "status": "OK",
+      "excerpt": "**+6.4% against climatology**"
+    },
+    {
+      "claim": "hurdle_break_even",
+      "doc": "explained",
+      "line": 2218,
+      "quoted": [
+        "56.0"
+      ],
+      "live": [
+        55.96
+      ],
+      "status": "OK",
+      "excerpt": "directional accuracy of 56.0%"
+    },
+    {
+      "claim": "hurdle_median_move",
+      "doc": "explained",
+      "line": 2216,
+      "quoted": [
+        "137"
+      ],
+      "live": [
+        136.79
+      ],
+      "status": "OK",
+      "excerpt": "median absolute 24-hour move is 137bps"
+    },
+    {
+      "claim": "xs_trials",
+      "doc": "explained",
+      "line": 1664,
+      "quoted": [
+        "80"
+      ],
+      "live": [
+        80
+      ],
+      "status": "OK",
+      "excerpt": "Trials (factors \u00d7 trading rules) | 80"
+    },
+    {
+      "claim": "xs_backtests",
+      "doc": "explained",
+      "line": 1665,
+      "quoted": [
+        "1,336"
+      ],
+      "live": [
+        1336
+      ],
+      "status": "OK",
+      "excerpt": "Backtests actually run (every phase) | 1,336"
+    },
+    {
+      "claim": "xs_positive_gross",
+      "doc": "explained",
+      "line": 1666,
+      "quoted": [
+        "31"
+      ],
+      "live": [
+        31
+      ],
+      "status": "OK",
+      "excerpt": "positive **before** cost | 31"
+    },
+    {
+      "claim": "xs_positive_net",
+      "doc": "explained",
+      "line": 1667,
+      "quoted": [
+        "4"
+      ],
+      "live": [
+        4
+      ],
+      "status": "OK",
+      "excerpt": "positive **after** cost | 4"
+    },
+    {
+      "claim": "xs_phase_agreement",
+      "doc": "explained",
+      "line": 1669,
+      "quoted": [
+        "0"
+      ],
+      "live": [
+        0
+      ],
+      "status": "OK",
+      "excerpt": "phases agree on sign | **0**"
+    },
+    {
+      "claim": "overfit_noise_primitives",
+      "doc": "readme",
+      "line": null,
+      "quoted": [],
+      "live": [
+        6
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "overfit_noise_primitives",
+      "doc": "explained",
+      "line": 559,
+      "quoted": [
+        "Six"
+      ],
+      "live": [
+        6
+      ],
+      "status": "OK",
+      "excerpt": "Six are indistinguishable from"
+    }
+  ]
+}

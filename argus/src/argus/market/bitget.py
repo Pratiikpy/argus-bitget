@@ -21,6 +21,7 @@ premise of this system — and it is now checkable rather than asserted.
 from __future__ import annotations
 
 import json
+import sys
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -125,13 +126,51 @@ def _dec(value: Any, default: str = "0") -> Decimal:
 
     An empty field becomes the default rather than raising: a missing funding rate should not
     prevent a price from being usable, but it must never silently become something plausible.
+
+    **Use this only for quantities whose zero is a real reading** — a funding rate of zero is what
+    the venue pays 81% of the time, and a volume of zero is a quiet hour. For anything that is a
+    *price*, use :func:`_price`: see the note there for why the two cannot share a parser.
     """
     if value in (None, "", "null"):
         return Decimal(default)
     try:
         return Decimal(str(value))
-    except Exception:
+    except (ArithmeticError, ValueError, TypeError):
+        # Narrowed from `except Exception`. A bare catch would turn a bug in our own call into a
+        # default, which is the failure this whole function is supposed to make visible.
         return Decimal(default)
+
+
+def _price(value: Any, *, field: str, symbol: str) -> Decimal:
+    """A price, or an exception. Never zero.
+
+    **The defect this closes.** Every price on a `Ticker` — last, bid, ask, the 24h high and low —
+    was parsed by :func:`_dec`, so a field the venue omitted or returned unparseable became
+    ``Decimal("0")`` and travelled on as a real quote. Zero is not a price. It is the absence of
+    one, and the two must never be the same value, because downstream every one of them reads as a
+    number rather than as a gap:
+
+    * ``notional = quantity * entry_price`` silently becomes 0, so a position has no size and no
+      cost, and `cost/model.py` charges nothing on it.
+    * a 0 entry price makes any subsequent return infinite or undefined, which is why several
+      callers already carry ``if prev <= 0: continue`` — those guards are this defect being worked
+      around at the far end instead of refused at the near one.
+    * `Ticker.spread_bps` returns 0 for a non-positive bid or ask, which reads as *the tightest
+      possible book* at exactly the moment we know least about it.
+
+    The last is the one that would have cost money: a missing quote would have made every hurdle
+    look clearable. So a missing price raises here, at the boundary, where it can still be
+    attributed to the venue rather than to arithmetic forty lines later.
+    """
+    if value in (None, "", "null"):
+        raise BitgetError(f"{symbol}: the venue returned no {field}; a missing price is not zero")
+    try:
+        got = Decimal(str(value))
+    except (ArithmeticError, ValueError, TypeError) as exc:
+        raise BitgetError(f"{symbol}: {field}={value!r} is not a number") from exc
+    if got <= 0:
+        raise BitgetError(f"{symbol}: {field}={got} is not a positive price")
+    return got
 
 
 def fetch_tickers(product_type: str = "usdt-futures") -> dict[str, Ticker]:
@@ -143,18 +182,27 @@ def fetch_tickers(product_type: str = "usdt-futures") -> dict[str, Ticker]:
         symbol = row.get("symbol", "")
         if not symbol:
             continue
-        out[symbol] = Ticker(
-            symbol=symbol,
-            last=_dec(row.get("lastPr")),
-            bid=_dec(row.get("bidPr")),
-            ask=_dec(row.get("askPr")),
-            high_24h=_dec(row.get("high24h")),
-            low_24h=_dec(row.get("low24h")),
-            change_24h=_dec(row.get("change24h")),
-            base_volume=_dec(row.get("baseVolume")),
-            funding_rate=_dec(row.get("fundingRate")),
-            fetched_at=now,
-        )
+        try:
+            out[symbol] = Ticker(
+                symbol=symbol,
+                # Prices raise rather than defaulting to zero. See `_price`.
+                last=_price(row.get("lastPr"), field="lastPr", symbol=symbol),
+                bid=_price(row.get("bidPr"), field="bidPr", symbol=symbol),
+                ask=_price(row.get("askPr"), field="askPr", symbol=symbol),
+                high_24h=_price(row.get("high24h"), field="high24h", symbol=symbol),
+                low_24h=_price(row.get("low24h"), field="low24h", symbol=symbol),
+                # These three may legitimately be zero: no change, no volume, no funding due.
+                change_24h=_dec(row.get("change24h")),
+                base_volume=_dec(row.get("baseVolume")),
+                funding_rate=_dec(row.get("fundingRate")),
+                fetched_at=now,
+            )
+        except BitgetError as exc:
+            # One unpriceable instrument must not cost the other eleven their cycle, and it must
+            # not be silently absent either. It is omitted from the result — callers already treat
+            # a missing symbol as "no data for this name", which is exactly what happened — and the
+            # reason is printed so a venue that stops quoting something is visible in the log.
+            print(f"ticker omitted: {exc}", file=sys.stderr)
     return out
 
 
@@ -189,10 +237,12 @@ def fetch_candles(
             continue
         out.append({
             "ts": datetime.fromtimestamp(int(row[0]) / 1000, tz=UTC),
-            "open": _dec(row[1]),
-            "high": _dec(row[2]),
-            "low": _dec(row[3]),
-            "close": _dec(row[4]),
+            # OHLC are prices and raise on absence. A candle with a zero close poisons every
+            # return computed from it, and does so silently: the bar looks present.
+            "open": _price(row[1], field="open", symbol=symbol),
+            "high": _price(row[2], field="high", symbol=symbol),
+            "low": _price(row[3], field="low", symbol=symbol),
+            "close": _price(row[4], field="close", symbol=symbol),
             "volume": _dec(row[5]),
         })
     return out

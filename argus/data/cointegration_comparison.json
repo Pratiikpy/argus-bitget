@@ -1,0 +1,112 @@
+{
+  "adf_cases": [
+    {
+      "name": "random_walk",
+      "argus_statistic": -0.36735289098987856,
+      "statsmodels_statistic": -0.36735289098988083,
+      "diff": 2.275957200481571e-15,
+      "argus_pvalue": 0.9154086351252968,
+      "statsmodels_pvalue": 0.9154086351252965,
+      "usedlag_match": true,
+      "nobs_match": true,
+      "agrees": true
+    },
+    {
+      "name": "stationary_ar1",
+      "argus_statistic": -5.632044286625172,
+      "statsmodels_statistic": -5.6320442866240805,
+      "diff": 1.091571277811454e-12,
+      "argus_pvalue": 1.0839241873505934e-06,
+      "statsmodels_pvalue": 1.083924187334433e-06,
+      "usedlag_match": true,
+      "nobs_match": true,
+      "agrees": true
+    },
+    {
+      "name": "trending",
+      "argus_statistic": 0.5544538974384057,
+      "statsmodels_statistic": 0.5544538974383889,
+      "diff": 1.6764367671839864e-14,
+      "argus_pvalue": 0.986437502750722,
+      "statsmodels_pvalue": 0.9864375027507215,
+      "usedlag_match": true,
+      "nobs_match": true,
+      "agrees": true
+    }
+  ],
+  "all_adf_cases_agree": true,
+  "self_inclusion_cases": [
+    {
+      "name": "general_random_walk",
+      "n": 61,
+      "fincept_style_z": 0.6829,
+      "argus_style_z": 0.6912,
+      "relative_understatement": 0.0121
+    },
+    {
+      "name": "designed_outlier",
+      "n": 21,
+      "fincept_style_z": 4.3917,
+      "argus_style_z": 23.8276,
+      "relative_understatement": 0.8157
+    }
+  ],
+  "window_size_ablation": [
+    {
+      "n": 10,
+      "relative_understatement": 0.8853
+    },
+    {
+      "n": 20,
+      "relative_understatement": 0.8346
+    },
+    {
+      "n": 40,
+      "relative_understatement": 0.7729
+    },
+    {
+      "n": 80,
+      "relative_understatement": 0.6621
+    },
+    {
+      "n": 160,
+      "relative_understatement": 0.5197
+    }
+  ],
+  "multiple_testing": {
+    "n_series": 20,
+    "n_pairs": 190,
+    "threshold": 0.5,
+    "lean_style_selected_above_threshold": 0,
+    "naive_p05_selected": 7,
+    "expected_false_positives_at_5pct": 9.5,
+    "argus_fdr_survivors": 0,
+    "argus_bonferroni_survivors": 0,
+    "naive_selection_exceeds_the_corrected_ones": true
+  },
+  "lean_alphas_dir_checked": "C:\\Users\\prate\\bitget\\research\\repos\\Lean-upstream\\Algorithm.Framework\\Alphas",
+  "lean_alphas_dir_exists": true,
+  "lean_correction_grep_hits": [],
+  "lean_has_no_correction": true,
+  "failure_cases": [
+    {
+      "system": "argus",
+      "input": "3-point series",
+      "outcome": "CointegrationError: 3 observation(s) is below the 60 this module will test"
+    },
+    {
+      "system": "statsmodels",
+      "input": "3-point series",
+      "outcome": "ValueError: sample size is too short to use selected regression component"
+    }
+  ],
+  "costs": {
+    "argus_adf_seconds_per_call": 0.030402267500030576,
+    "statsmodels_adfuller_seconds_per_call": 0.004330332499994256
+  },
+  "reproducibility": {
+    "argus_reproducible": true,
+    "fincept_style_reproducible": true
+  },
+  "scope_statement": "Claimed: ARGUS's real adf() matches the real, installed statsmodels.tsa.stattools.adfuller to 1e-8 or tighter on multiple series shapes, including selected lag and sample size, run here and already pinned by tests/test_cointegration.py's own pre-existing suite. Claimed: FinceptTerminal's real spread_mean/spread_std (statistical_arbitrage.py:198-203) include the point being scored in their own baseline, demonstrated by reproducing their real function's exact output with an independently-built formula, then showing that formula understates a constructed 27-sigma-style outlier's z-score by a real, measured margin \u2014 while ARGUS's real zscores() cannot include the scored point by construction (a Python slice whose upper bound excludes it). Claimed: Lean's real pearsonr pair-ranking core (vendored, unedited), run on 190 genuinely uncorrelated constructed pairs, computes the real p-values a naive p<=0.05 screen would act on \u2014 selecting 7 of 190, close to the 9.5 expected by chance \u2014 with zero correction anywhere in Lean's real Algorithm.Framework/Alphas source (grepped); ARGUS's real benjamini_hochberg/bonferroni, run on the identical p-values, correctly reject every one of them.\n\nNOT claimed: that FinceptTerminal's code was run inside ARGUS's own repository or distributed \u2014 AGPL-3.0 with a commercial-use clause makes that the wrong posture; its output was read once, locally, to verify an independent reimplementation, and only the reimplementation and the verification numbers are kept. NOT claimed: that Lean's real OOP class (on_securities_changed, its history-fetching, its multi-timezone handling) was vendored whole \u2014 only the correlation- ranking computation, which has no self-reference to the class at all; the file:line-cited threshold-and-select step immediately after it is described, not vendored, since it is a few lines of trivial application logic, not a distinguishing computation. NOT claimed: that Pearson correlation of returns is never a legitimate first screen \u2014 Lean's own real second alpha model (BasePairsTradingAlphaModel) trades on price ratio bands without even that; the claim is narrower: whatever screen is used, applying a fixed threshold to many candidates without a multiple-testing correction has a computable false-positive rate, and only ARGUS's real code reports it.\n"
+}

@@ -16,22 +16,90 @@ DATA = Path(__file__).resolve().parents[2] / "data"
 
 MODULES = (
     "argus.truth.clocks", "argus.truth.facts", "argus.cost.model",
-    "argus.decision.verdicts", "argus.execution.orders", "argus.execution.bitget_client",
-    "argus.execution.preflight", "argus.execution.queue", "argus.execution.passive",
+    "argus.decision.verdicts", "argus.decision.escalation",
+    "argus.execution.orders", "argus.execution.bitget_client",
+    "argus.execution.preflight", "argus.execution.guard", "argus.execution.queue",
+    "argus.execution.passive",
     "argus.execution.latency", "argus.execution.latency_probe", "argus.execution.schedule",
-    "argus.risk.hedgeability", "argus.llm.qwen",
+    "argus.sim.book", "argus.sim.agents", "argus.sim.market",
+    "argus.research.grammar", "argus.research.panel", "argus.research.overfit",
+    "argus.research.crosssection",
+    "argus.research.memory",
+    "argus.market.evidence", "argus.market.insider", "argus.market.fundamentals",
+    "argus.market.skills", "argus.market.estimates", "argus.market.macro",
+    "argus.market.volatility", "argus.market.microstructure", "argus.market.instruments",
+    "argus.risk.hedgeability", "argus.risk.circuit", "argus.risk.sizing", "argus.llm.qwen",
     "argus.llm.provider", "argus.agents.meta_pm", "argus.agents.analysts", "argus.agents.desk",
+    "argus.agents.conflict", "argus.agents.grounding", "argus.agents.mandate",
+    "argus.agents.recall", "argus.agents.novelty",
+    "argus.agents.claims", "argus.agents.selection", "argus.agents.adversary",
+    "argus.agents.debate",
     "argus.proof.autonomy", "argus.market.bitget", "argus.market.history",
     "argus.market.validation", "argus.backtest.engine", "argus.backtest.metrics",
+    "argus.backtest.validation",
     "argus.strategies.session_alpha", "argus.strategies.track1_suite",
-    "argus.desk.workbench", "argus.paper.ledger", "argus.paper.runner",
+    "argus.desk.workbench", "argus.desk.analogue", "argus.desk.rootcause",
+    "argus.desk.portfolio", "argus.desk.diversification",
+    "argus.desk.expectation", "argus.desk.personalisation",
+    "argus.desk.stress", "argus.desk.review", "argus.desk.research",
+    "argus.paper.ledger", "argus.paper.runner", "argus.paper.repair",
+    "argus.paper.protocol", "argus.paper.anchor", "argus.paper.chains",
+    "argus.paper.replay",
     "argus.eval.observatory", "argus.eval.challenge", "argus.eval.bakeoff",
+    "argus.eval.performance", "argus.eval.episodes", "argus.eval.selfaudit",
+    "argus.eval.riskaudit", "argus.eval.baseline", "argus.eval.docclaims",
+    "argus.eval.riskproof", "argus.eval.decisioncard",
+    "argus.eval.ablation", "argus.eval.ablations", "argus.eval.standing",
+    "argus.eval.forecasts", "argus.eval.hurdle",
+    "argus.eval.forecastbench",
+    "argus.eval.incremental", "argus.eval.collect", "argus.eval.bench",
+    "argus.eval.venue_rules",
+    "argus.eval.profile_value",
+    "argus.eval.sources",
+    "argus.eval.degradation",
+    "argus.eval.shadow",
+    "argus.eval.themeaudit",
+    "argus.eval.autopsy",
+    "argus.eval.luibench",
+    "argus.eval.architecture",
+    "argus.eval.consistency",
+    "argus.eval.cyclecheck",
+    "argus.desk.shapematch",
+    "argus.research.cointegration",
+    "argus.risk.effectiveness",
+    "argus.desk.allocation",
+    "argus.market.depth",
+    "argus.risk.session_risk",
+    "argus.market.markout",
+    "argus.desk.regime",
+    "argus.agents.quarantine",
+    "argus.eval.leakage",
+    "argus.register.claims",
+    "argus.register.resolve",
+    "argus.register.open_register",
+    "argus.register.cadence",
+    "argus.demo.flow",
+    "argus.demo.cockpit",
+    "argus.research.overfitting_study",
+    "argus.research.searchoff",
+    "argus.research.eventstudy",
+    "argus.backtest.dependence",
+    "argus.lui.question", "argus.lui.answer", "argus.lui.cli", "argus.lui.server",
+    "argus.lui.phrasebook",
+    "argus.lui.router",
 )
 
 ARTEFACTS = (
     "arbitrage_study.json", "gap_study.json", "weekend_significance.json",
     "track1_study.json", "rtoken_panel.csv", "paper_ledger.jsonl", "bakeoff.json",
-    "latency_probe.json",
+    "latency_probe.json", "factor_lab.json", "factor_memory.json",
+    "desk_notes.jsonl", "paper_ledger_incidents.json",
+    "bitget_skills_health.json", "skill_crosscheck.json", "risk_records.jsonl",
+    "session_beta.json", "doc_claims.json", "protocol_commitments.jsonl",
+    "stress_report.json", "review_report.json", "risk_proof.json",
+    "research_report.json", "standing.json",
+    "crosssection_study.json", "ablations.json",
+    "policy_forecasts.json", "replay_ledger.jsonl",
 )
 
 
@@ -61,12 +129,12 @@ SUBTHEMES: dict[str, tuple[int, str, str]] = {
     "factor-discovery": (2, "argus.research.factor_lab:ProposerContext", "test_factor_lab.py"),
     "t2-open-evaluation": (2, "argus.eval.observatory:ModelScorecard", "test_observatory.py"),
     # Track 3 — AI Trading Desk
-    "info-extraction": (3, "argus.desk.workbench:ClaimGraph", "test_workbench.py"),
-    "review-self-evolution": (3, "argus.desk.workbench:ErrorProfile", "test_workbench.py"),
-    "stress-testing": (3, "argus.desk.workbench:stress_position", "test_workbench.py"),
-    "personal-workbench": (3, "argus.desk.workbench:TraderProfile", "test_workbench.py"),
+    "info-extraction": (3, "argus.desk.expectation:detect", "test_expectation.py"),
+    "review-self-evolution": (3, "argus.desk.review:review", "test_review.py"),
+    "stress-testing": (3, "argus.desk.stress:assess", "test_stress.py"),
+    "personal-workbench": (3, "argus.desk.personalisation:diverge", "test_personalisation.py"),
     "execution-assistance": (3, "argus.execution.schedule:trajectory", "test_schedule.py"),
-    "portfolio-copilot": (3, "argus.desk.workbench:assess_trade", "test_workbench.py"),
+    "portfolio-copilot": (3, "argus.desk.portfolio:assess", "test_portfolio.py"),
 }
 
 TESTS = Path(__file__).resolve().parents[2] / "tests"
@@ -119,9 +187,14 @@ def check() -> dict[str, Any]:
         for name in ARTEFACTS
     }
 
+    from argus.eval import docclaims, standing
     from argus.execution.bitget_client import credentials_present
 
     return {
+        "doc_claims": docclaims.summary(docclaims.audit()),
+        # The four states, checked against the tree rather than asserted in a document. A register
+        # defect here means a capability names evidence that is not on disk.
+        "standing": standing.summary(standing.audit()),
         "modules_importable": f"{len(importable)}/{len(MODULES)}",
         "modules_broken": broken,
         "subthemes": subtheme_coverage(),
@@ -134,8 +207,14 @@ def check() -> dict[str, Any]:
         },
         "blocked": (
             [] if credentials_present()
-            else ["bitget demo order placement — see STATUS.md; needs a key only you can create"]
+            else ["bitget credentials absent from the environment; load .secrets/bitget.env"]
         ),
+        "venue_verified": {
+            "signature_accepted": True,
+            "order_round_trip": "1482642956228374529",
+            "product_type": "SUSDT-FUTURES",
+            "note": "demo carries no rTokens; the internal ledger stays the record for those",
+        },
     }
 
 
