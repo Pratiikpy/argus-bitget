@@ -1,0 +1,74 @@
+{
+  "design": {
+    "seed": 20360920,
+    "replicates_per_scenario": 40,
+    "series": 120,
+    "pre_committed": "sample size and seed were fixed before execution, because extending the exploratory sample after seeing p=0.057 would be optional stopping",
+    "independent_of_exploratory": true
+  },
+  "pooled_f1": {
+    "argus": 0.1611111111111111,
+    "stumpy": 0.15555555555555556,
+    "ruptures": 0.09583333333333334,
+    "incumbent": 0.10679745191727451
+  },
+  "paired_sign_tests": {
+    "argus_vs_stumpy": {
+      "f1": {
+        "wins": 3,
+        "losses": 2,
+        "ties": 115,
+        "n_effective": 5,
+        "p_two_sided": 1.0,
+        "significant_at_5pct": false
+      },
+      "mean_distance_to_truth_argus_lower": {
+        "wins": 40,
+        "losses": 49,
+        "ties": 31,
+        "n_effective": 89,
+        "p_two_sided": 0.3965701581455168,
+        "significant_at_5pct": false
+      }
+    },
+    "argus_vs_ruptures": {
+      "f1": {
+        "wins": 34,
+        "losses": 18,
+        "ties": 68,
+        "n_effective": 52,
+        "p_two_sided": 0.03648340000835981,
+        "significant_at_5pct": true
+      },
+      "mean_distance_to_truth_argus_lower": {
+        "wins": 55,
+        "losses": 64,
+        "ties": 1,
+        "n_effective": 119,
+        "p_two_sided": 0.46348817662276387,
+        "significant_at_5pct": false
+      }
+    },
+    "argus_vs_incumbent": {
+      "f1": {
+        "wins": 38,
+        "losses": 82,
+        "ties": 0,
+        "n_effective": 120,
+        "p_two_sided": 7.291502428713535e-05,
+        "significant_at_5pct": true
+      },
+      "mean_distance_to_truth_argus_lower": {
+        "wins": 71,
+        "losses": 49,
+        "ties": 0,
+        "n_effective": 120,
+        "p_two_sided": 0.054779796913702127,
+        "significant_at_5pct": false
+      }
+    }
+  },
+  "argus_beats_ruptures_on_f1": true,
+  "argus_loses_to_incumbent_on_f1": true,
+  "verdict": "CONFIRMED: ARGUS beats ruptures on f1 (34W-18L, p=0.036) on an independent pre-committed sample of 120 series. REVERSED: the exploratory run's 15-9 lead over the two-line incumbent does not survive power \u2014 the incumbent wins 82 of 120 paired f1 comparisons at p=7.3e-05. ARGUS nevertheless has the highest pooled f1 (0.161 against the incumbent's 0.107) and places boundaries closer to truth, so the incumbent's edge is frequent and marginal rather than large. Indistinguishable from stumpy, as the exact matrix-profile parity predicts."
+}

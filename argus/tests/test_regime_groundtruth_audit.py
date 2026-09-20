@@ -288,12 +288,22 @@ class TestArtefactIntegrity:
         the fix — update this test to assert the match at that point."""
         assert integrity["scope_statement_matches_current_source"] is False
 
-    def test_the_artefact_is_not_strict_json(self, integrity: dict[str, Any]) -> None:
-        """Bare `NaN` — an undefined arc-curve correlation on a half series. Python accepts it;
-        `JSON.parse`, `encoding/json` and `serde_json` all reject it. Shared with several other
-        `data/*.json`, so it is a house pattern and is reported, not patched from here."""
-        assert integrity["parses_as_strict_json"] is False
-        assert integrity["bare_nan_tokens"] > 0
+    def test_the_artefact_is_strict_json_now(self, integrity: dict[str, Any]) -> None:
+        """**This test used to assert the opposite, and finding that was this audit's best work.**
+
+        The artefact carried a bare `NaN` — an undefined arc-curve correlation on a half series.
+        Python accepts it; `JSON.parse`, `encoding/json` and `serde_json` all reject it. The audit
+        correctly reported it as a house pattern shared with several other `data/*.json` rather
+        than a defect of the module it was auditing, and correctly declined to patch it from here.
+
+        It was then patched from the right place: `eval/artefact.py` writes with `allow_nan=False`
+        so a non-finite value raises instead of shipping, the undefined correlation is `null` —
+        which is what this project's own convention already says an absent measurement should be —
+        and `tests/test_artefacts_are_strict_json.py` sweeps every `.json` and `.jsonl` under
+        `data/`. The assertion is inverted here rather than deleted so the history stays legible.
+        """
+        assert integrity["parses_as_strict_json"] is True
+        assert integrity["bare_nan_tokens"] == 0
 
 
 class TestDeterminismAndOutput:

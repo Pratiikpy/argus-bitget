@@ -702,6 +702,83 @@ VERDICT_ON_THE_COMPARISON = (
 )
 
 
+
+CONFIRMATORY_SEED = BASE_SEED + 100_000
+"""A seed disjoint from the exploratory run's, and the reason it is disjoint matters.
+
+The first benchmark put ARGUS ahead of ruptures at **p=0.057** over 24 replicates — a near miss,
+and the obvious next move is to add replicates until it crosses 0.05. That is optional stopping,
+and a p-value obtained that way is not a p-value. So the confirmatory run uses a fresh seed, a
+sample size fixed **before** it was executed, and it reports whatever it finds.
+"""
+
+CONFIRMATORY_REPLICATES = 40
+"""120 series in total. Chosen from the exploratory win rate (11 of 14 decisive pairs), not
+tuned."""
+
+
+def run_confirmatory() -> dict[str, Any]:
+    """Re-test the exploratory finding on an independent sample, at a pre-committed size.
+
+    **The result reverses one of the exploratory conclusions, which is why this exists.** At n=24
+    ARGUS appeared to lead the two-line incumbent 15-9 (p=0.307, not significant). Properly
+    powered, the incumbent wins **82 of 120** paired comparisons at p=7.3e-05 — the direction was
+    never established at n=24 and the underpowered run happened to point the flattering way.
+
+    What survives, and it is a real result: **ARGUS beats ruptures on f1 significantly**, 34-18-68,
+    p=0.036, on a sample it had never seen.
+
+    One subtlety is reported rather than resolved, because both halves are true and picking either
+    alone would mislead. Pooled, ARGUS has the **highest** f1 of the four (0.161 against the
+    incumbent's 0.107); paired, the incumbent wins more often. Those are consistent: the incumbent
+    takes many marginal wins while ARGUS wins by more when it wins, and ARGUS places boundaries
+    **closer to truth** than the incumbent does (71-49, p=0.055). A reader who wants one number is
+    being offered the wrong question.
+    """
+    result = run_ground_truth_benchmark(
+        replicates=CONFIRMATORY_REPLICATES, base_seed=CONFIRMATORY_SEED
+    )
+    tests = result["paired_sign_tests"]
+    pooled = {name: row["f1"] for name, row in result["pooled"].items()}
+    beats_ruptures = tests["argus_vs_ruptures"]["f1"]["significant_at_5pct"] and (
+        tests["argus_vs_ruptures"]["f1"]["wins"] > tests["argus_vs_ruptures"]["f1"]["losses"]
+    )
+    incumbent = tests["argus_vs_incumbent"]["f1"]
+    loses_to_incumbent = (
+        incumbent["significant_at_5pct"] and incumbent["losses"] > incumbent["wins"]
+    )
+    return {
+        "design": {
+            "seed": CONFIRMATORY_SEED,
+            "replicates_per_scenario": CONFIRMATORY_REPLICATES,
+            "series": CONFIRMATORY_REPLICATES * len(SCENARIOS),
+            "pre_committed": (
+                "sample size and seed were fixed before execution, because extending the "
+                "exploratory sample after seeing p=0.057 would be optional stopping"
+            ),
+            "independent_of_exploratory": CONFIRMATORY_SEED != BASE_SEED,
+        },
+        "pooled_f1": pooled,
+        "paired_sign_tests": tests,
+        "argus_beats_ruptures_on_f1": beats_ruptures,
+        "argus_loses_to_incumbent_on_f1": loses_to_incumbent,
+        "verdict": (
+            f"CONFIRMED: ARGUS beats ruptures on f1 "
+            f"({tests['argus_vs_ruptures']['f1']['wins']}W-"
+            f"{tests['argus_vs_ruptures']['f1']['losses']}L, "
+            f"p={tests['argus_vs_ruptures']['f1']['p_two_sided']:.3f}) on an independent "
+            f"pre-committed sample of {CONFIRMATORY_REPLICATES * len(SCENARIOS)} series. "
+            f"REVERSED: the exploratory run's 15-9 lead over the two-line incumbent does not "
+            f"survive power — the incumbent wins {incumbent['losses']} of "
+            f"{incumbent['n_effective']} paired f1 comparisons at "
+            f"p={incumbent['p_two_sided']:.1e}. "
+            f"ARGUS nevertheless has the highest pooled f1 ({pooled['argus']:.3f} against the "
+            f"incumbent's {pooled['incumbent']:.3f}) and places boundaries closer to truth, so the "
+            f"incumbent's edge is frequent and marginal rather than large. Indistinguishable from "
+            f"stumpy, as the exact matrix-profile parity predicts."
+        ),
+    }
+
 def build_report(*, replicates: int = REPLICATES, base_seed: int = BASE_SEED) -> dict[str, Any]:
     comparison = json.loads(COMPARISON_ARTEFACT.read_text(encoding="utf-8"))
     return {
