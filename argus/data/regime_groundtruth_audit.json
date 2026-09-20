@@ -1,0 +1,2628 @@
+{
+  "baselines_are_real": {
+    "stumpy_version": "1.14.1",
+    "stumpy_path": "C:\\Users\\prate\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\stumpy\\__init__.py",
+    "ruptures_version": "1.1.10",
+    "ruptures_path": "C:\\Users\\prate\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\ruptures\\__init__.py",
+    "stumpy_executed": true,
+    "ruptures_executed": true,
+    "windows_compared": 937,
+    "argus_vs_stumpy_index_agreement": 1.0,
+    "parity_reproduces_on_unseen_input": true,
+    "exclusion_factor": 5
+  },
+  "ground_truth": {
+    "paired_sign_tests": {
+      "argus_vs_stumpy": {
+        "f1": {
+          "wins": 1,
+          "losses": 0,
+          "ties": 23,
+          "n_effective": 1,
+          "p_two_sided": 1.0,
+          "significant_at_5pct": false
+        },
+        "mean_distance_to_truth_argus_lower": {
+          "wins": 6,
+          "losses": 8,
+          "ties": 10,
+          "n_effective": 14,
+          "p_two_sided": 0.79052734375,
+          "significant_at_5pct": false
+        }
+      },
+      "argus_vs_ruptures": {
+        "f1": {
+          "wins": 11,
+          "losses": 3,
+          "ties": 10,
+          "n_effective": 14,
+          "p_two_sided": 0.057373046875,
+          "significant_at_5pct": false
+        },
+        "mean_distance_to_truth_argus_lower": {
+          "wins": 16,
+          "losses": 8,
+          "ties": 0,
+          "n_effective": 24,
+          "p_two_sided": 0.15158963203430176,
+          "significant_at_5pct": false
+        }
+      },
+      "argus_vs_incumbent": {
+        "f1": {
+          "wins": 15,
+          "losses": 9,
+          "ties": 0,
+          "n_effective": 24,
+          "p_two_sided": 0.30745625495910645,
+          "significant_at_5pct": false
+        },
+        "mean_distance_to_truth_argus_lower": {
+          "wins": 20,
+          "losses": 4,
+          "ties": 0,
+          "n_effective": 24,
+          "p_two_sided": 0.001543879508972168,
+          "significant_at_5pct": true
+        }
+      }
+    },
+    "margin_sweep": {
+      "margins": [
+        12,
+        24,
+        48,
+        96,
+        192
+      ],
+      "pooled_f1_by_margin": {
+        "12": {
+          "argus": 0.25,
+          "stumpy": 0.22916666666666666,
+          "ruptures": 0.041666666666666664,
+          "incumbent": 0.07905771858211086
+        },
+        "24": {
+          "argus": 0.3333333333333333,
+          "stumpy": 0.3125,
+          "ruptures": 0.16666666666666666,
+          "incumbent": 0.09256977715230896
+        },
+        "48": {
+          "argus": 0.4375,
+          "stumpy": 0.4166666666666667,
+          "ruptures": 0.22916666666666666,
+          "incumbent": 0.09403176545640253
+        },
+        "96": {
+          "argus": 0.5208333333333334,
+          "stumpy": 0.4791666666666667,
+          "ruptures": 0.4583333333333333,
+          "incumbent": 0.1080170809996891
+        },
+        "192": {
+          "argus": 0.75,
+          "stumpy": 0.7291666666666666,
+          "ruptures": 0.7916666666666666,
+          "incumbent": 0.1080170809996891
+        }
+      },
+      "budgeted_ordering_by_margin": [
+        [
+          "argus",
+          "stumpy",
+          "ruptures"
+        ],
+        [
+          "argus",
+          "stumpy",
+          "ruptures"
+        ],
+        [
+          "argus",
+          "stumpy",
+          "ruptures"
+        ],
+        [
+          "argus",
+          "stumpy",
+          "ruptures"
+        ],
+        [
+          "ruptures",
+          "argus",
+          "stumpy"
+        ]
+      ],
+      "ordering_stable": false,
+      "argus_at_least_ruptures_at_every_margin": false,
+      "largest_margin_where_argus_leads_ruptures": 96,
+      "smallest_margin_where_ruptures_leads_argus": 192
+    },
+    "series_length": 960,
+    "true_breaks": [
+      320,
+      640
+    ],
+    "margin_bars": 24,
+    "replicates_per_scenario": 8,
+    "base_seed": 20260920,
+    "metric_source": "ruptures.metrics (hausdorff, precision_recall) \u2014 the baseline's own",
+    "per_scenario": {
+      "variance_switch": {
+        "argus": {
+          "n_found": 2.0,
+          "precision": 0.375,
+          "recall": 0.375,
+          "f1": 0.375,
+          "hausdorff": 180.125,
+          "mean_distance_to_truth": 82.8125
+        },
+        "stumpy": {
+          "n_found": 2.0,
+          "precision": 0.375,
+          "recall": 0.375,
+          "f1": 0.375,
+          "hausdorff": 166.25,
+          "mean_distance_to_truth": 74.375
+        },
+        "ruptures": {
+          "n_found": 2.0,
+          "precision": 0.3125,
+          "recall": 0.3125,
+          "f1": 0.3125,
+          "hausdorff": 174.25,
+          "mean_distance_to_truth": 85.625
+        },
+        "incumbent": {
+          "n_found": 30.625,
+          "precision": 0.06040882552530348,
+          "recall": 0.875,
+          "f1": 0.11237466022349743,
+          "hausdorff": 305.0,
+          "mean_distance_to_truth": 113.67259809174652
+        }
+      },
+      "drift_switch": {
+        "argus": {
+          "n_found": 2.0,
+          "precision": 0.3125,
+          "recall": 0.3125,
+          "f1": 0.3125,
+          "hausdorff": 235.875,
+          "mean_distance_to_truth": 75.875
+        },
+        "stumpy": {
+          "n_found": 2.0,
+          "precision": 0.3125,
+          "recall": 0.3125,
+          "f1": 0.3125,
+          "hausdorff": 235.5,
+          "mean_distance_to_truth": 76.0625
+        },
+        "ruptures": {
+          "n_found": 2.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "hausdorff": 148.625,
+          "mean_distance_to_truth": 124.8125
+        },
+        "incumbent": {
+          "n_found": 57.125,
+          "precision": 0.03103062977550683,
+          "recall": 0.875,
+          "f1": 0.05985878138253963,
+          "hausdorff": 305.0,
+          "mean_distance_to_truth": 110.13556209415584
+        }
+      },
+      "both_switch": {
+        "argus": {
+          "n_found": 2.0,
+          "precision": 0.3125,
+          "recall": 0.3125,
+          "f1": 0.3125,
+          "hausdorff": 147.25,
+          "mean_distance_to_truth": 66.75
+        },
+        "stumpy": {
+          "n_found": 2.0,
+          "precision": 0.25,
+          "recall": 0.25,
+          "f1": 0.25,
+          "hausdorff": 195.75,
+          "mean_distance_to_truth": 74.625
+        },
+        "ruptures": {
+          "n_found": 2.0,
+          "precision": 0.1875,
+          "recall": 0.1875,
+          "f1": 0.1875,
+          "hausdorff": 128.75,
+          "mean_distance_to_truth": 90.75
+        },
+        "incumbent": {
+          "n_found": 32.375,
+          "precision": 0.05637846961740435,
+          "recall": 0.875,
+          "f1": 0.10547588985088985,
+          "hausdorff": 305.0,
+          "mean_distance_to_truth": 118.25929067088201
+        }
+      }
+    },
+    "pooled": {
+      "argus": {
+        "n_found": 2.0,
+        "precision": 0.3333333333333333,
+        "recall": 0.3333333333333333,
+        "f1": 0.3333333333333333,
+        "hausdorff": 187.75,
+        "mean_distance_to_truth": 75.14583333333333
+      },
+      "stumpy": {
+        "n_found": 2.0,
+        "precision": 0.3125,
+        "recall": 0.3125,
+        "f1": 0.3125,
+        "hausdorff": 199.16666666666666,
+        "mean_distance_to_truth": 75.02083333333333
+      },
+      "ruptures": {
+        "n_found": 2.0,
+        "precision": 0.16666666666666666,
+        "recall": 0.16666666666666666,
+        "f1": 0.16666666666666666,
+        "hausdorff": 150.54166666666666,
+        "mean_distance_to_truth": 100.39583333333333
+      },
+      "incumbent": {
+        "n_found": 40.041666666666664,
+        "precision": 0.04927264163940489,
+        "recall": 0.875,
+        "f1": 0.09256977715230896,
+        "hausdorff": 305.0,
+        "mean_distance_to_truth": 114.02248361892815
+      }
+    },
+    "ranking_by_f1": [
+      "argus",
+      "stumpy",
+      "ruptures",
+      "incumbent"
+    ],
+    "budgeted_ranking_by_f1": [
+      "argus",
+      "stumpy",
+      "ruptures"
+    ],
+    "argus_beats_incumbent_f1": true,
+    "argus_beats_incumbent_mean_distance": true,
+    "argus_beats_ruptures_f1": true,
+    "best_budgeted_arm": "argus",
+    "replicates": [
+      {
+        "scenario": "variance_switch",
+        "seed": 20260920,
+        "boundaries": {
+          "argus": [
+            184,
+            428
+          ],
+          "stumpy": [
+            427,
+            765
+          ],
+          "ruptures": [
+            533,
+            585
+          ],
+          "incumbent": [
+            241,
+            247,
+            277,
+            278,
+            280,
+            281,
+            283,
+            290,
+            309,
+            320,
+            476,
+            477,
+            487,
+            489,
+            516,
+            518,
+            520,
+            521,
+            523,
+            529,
+            534,
+            535,
+            542,
+            547,
+            552,
+            553,
+            559,
+            560,
+            562,
+            571,
+            595,
+            611,
+            617,
+            869,
+            872,
+            873,
+            880,
+            882,
+            883,
+            907,
+            930
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 212.0,
+            "mean_distance_to_truth": 122.0
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 125.0,
+            "mean_distance_to_truth": 116.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 213.0,
+            "mean_distance_to_truth": 81.0
+          },
+          "incumbent": {
+            "n_found": 41.0,
+            "precision": 0.04878048780487805,
+            "recall": 1.0,
+            "f1": 0.09302325581395349,
+            "hausdorff": 290.0,
+            "mean_distance_to_truth": 114.1951219512195
+          }
+        }
+      },
+      {
+        "scenario": "variance_switch",
+        "seed": 20260921,
+        "boundaries": {
+          "argus": [
+            352,
+            796
+          ],
+          "stumpy": [
+            349,
+            796
+          ],
+          "ruptures": [
+            574,
+            749
+          ],
+          "incumbent": [
+            241,
+            321,
+            457,
+            461,
+            462,
+            465,
+            499,
+            515,
+            581,
+            601,
+            604,
+            607,
+            629,
+            910,
+            917,
+            921,
+            945,
+            959
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 156.0,
+            "mean_distance_to_truth": 94.0
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 156.0,
+            "mean_distance_to_truth": 92.5
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 254.0,
+            "mean_distance_to_truth": 87.5
+          },
+          "incumbent": {
+            "n_found": 18.0,
+            "precision": 0.1111111111111111,
+            "recall": 1.0,
+            "f1": 0.19999999999999998,
+            "hausdorff": 319.0,
+            "mean_distance_to_truth": 141.16666666666666
+          }
+        }
+      },
+      {
+        "scenario": "variance_switch",
+        "seed": 20260922,
+        "boundaries": {
+          "argus": [
+            643,
+            779
+          ],
+          "stumpy": [
+            643,
+            779
+          ],
+          "ruptures": [
+            304,
+            485
+          ],
+          "incumbent": [
+            241,
+            246,
+            252,
+            260,
+            269,
+            272,
+            510,
+            515,
+            552,
+            553,
+            557,
+            558,
+            559,
+            619,
+            643,
+            888,
+            926,
+            927,
+            929,
+            932,
+            934,
+            940,
+            951
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 323.0,
+            "mean_distance_to_truth": 71.0
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 323.0,
+            "mean_distance_to_truth": 71.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 155.0,
+            "mean_distance_to_truth": 85.5
+          },
+          "incumbent": {
+            "n_found": 23.0,
+            "precision": 0.043478260869565216,
+            "recall": 0.5,
+            "f1": 0.08,
+            "hausdorff": 311.0,
+            "mean_distance_to_truth": 147.2608695652174
+          }
+        }
+      },
+      {
+        "scenario": "variance_switch",
+        "seed": 20260923,
+        "boundaries": {
+          "argus": [
+            126,
+            773
+          ],
+          "stumpy": [
+            213,
+            772
+          ],
+          "ruptures": [
+            434,
+            632
+          ],
+          "incumbent": [
+            241,
+            250,
+            251,
+            252,
+            260,
+            262,
+            274,
+            278,
+            279,
+            280,
+            281,
+            294,
+            300,
+            311,
+            316,
+            317,
+            318,
+            321,
+            464,
+            477,
+            479,
+            484,
+            514,
+            515,
+            549,
+            553,
+            587,
+            600,
+            632,
+            636,
+            637,
+            885,
+            893,
+            896,
+            909,
+            917,
+            920,
+            946,
+            954,
+            957
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 194.0,
+            "mean_distance_to_truth": 163.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 132.0,
+            "mean_distance_to_truth": 119.5
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 114.0,
+            "mean_distance_to_truth": 61.0
+          },
+          "incumbent": {
+            "n_found": 40.0,
+            "precision": 0.05,
+            "recall": 1.0,
+            "f1": 0.09523809523809523,
+            "hausdorff": 317.0,
+            "mean_distance_to_truth": 108.675
+          }
+        }
+      },
+      {
+        "scenario": "variance_switch",
+        "seed": 20260924,
+        "boundaries": {
+          "argus": [
+            326,
+            593
+          ],
+          "stumpy": [
+            325,
+            593
+          ],
+          "ruptures": [
+            502,
+            622
+          ],
+          "incumbent": [
+            241,
+            282,
+            292,
+            293,
+            295,
+            302,
+            311,
+            313,
+            317,
+            320,
+            523,
+            524,
+            526,
+            569,
+            574,
+            576,
+            582,
+            630,
+            632,
+            633,
+            646,
+            870,
+            873,
+            876,
+            900,
+            952
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 47.0,
+            "mean_distance_to_truth": 26.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 47.0,
+            "mean_distance_to_truth": 26.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 182.0,
+            "mean_distance_to_truth": 78.0
+          },
+          "incumbent": {
+            "n_found": 26.0,
+            "precision": 0.07692307692307693,
+            "recall": 1.0,
+            "f1": 0.14285714285714288,
+            "hausdorff": 312.0,
+            "mean_distance_to_truth": 82.38461538461539
+          }
+        }
+      },
+      {
+        "scenario": "variance_switch",
+        "seed": 20260925,
+        "boundaries": {
+          "argus": [
+            297,
+            629
+          ],
+          "stumpy": [
+            297,
+            629
+          ],
+          "ruptures": [
+            448,
+            627
+          ],
+          "incumbent": [
+            241,
+            262,
+            268,
+            269,
+            297,
+            301,
+            308,
+            310,
+            494,
+            499,
+            502,
+            503,
+            509,
+            510,
+            523,
+            525,
+            534,
+            544,
+            549,
+            557,
+            558,
+            571,
+            573,
+            574,
+            575,
+            576,
+            601,
+            603,
+            629,
+            860,
+            912
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hausdorff": 23.0,
+            "mean_distance_to_truth": 17.0
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "hausdorff": 23.0,
+            "mean_distance_to_truth": 17.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 128.0,
+            "mean_distance_to_truth": 70.5
+          },
+          "incumbent": {
+            "n_found": 31.0,
+            "precision": 0.06451612903225806,
+            "recall": 1.0,
+            "f1": 0.12121212121212122,
+            "hausdorff": 272.0,
+            "mean_distance_to_truth": 87.96774193548387
+          }
+        }
+      },
+      {
+        "scenario": "variance_switch",
+        "seed": 20260926,
+        "boundaries": {
+          "argus": [
+            651,
+            807
+          ],
+          "stumpy": [
+            650,
+            806
+          ],
+          "ruptures": [
+            193,
+            639
+          ],
+          "incumbent": [
+            241,
+            250,
+            251,
+            252,
+            285,
+            286,
+            295,
+            306,
+            311,
+            315,
+            427,
+            430,
+            507,
+            508,
+            509,
+            522,
+            546,
+            560,
+            571,
+            582,
+            586,
+            590,
+            591,
+            599,
+            600,
+            625,
+            626,
+            634,
+            636,
+            881,
+            882,
+            897,
+            908,
+            909,
+            937,
+            941,
+            945,
+            948,
+            949,
+            950
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 331.0,
+            "mean_distance_to_truth": 89.0
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 330.0,
+            "mean_distance_to_truth": 88.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 127.0,
+            "mean_distance_to_truth": 64.0
+          },
+          "incumbent": {
+            "n_found": 40.0,
+            "precision": 0.05,
+            "recall": 1.0,
+            "f1": 0.09523809523809523,
+            "hausdorff": 310.0,
+            "mean_distance_to_truth": 120.5
+          }
+        }
+      },
+      {
+        "scenario": "variance_switch",
+        "seed": 20260927,
+        "boundaries": {
+          "argus": [
+            165,
+            644
+          ],
+          "stumpy": [
+            514,
+            644
+          ],
+          "ruptures": [
+            414,
+            861
+          ],
+          "incumbent": [
+            241,
+            243,
+            464,
+            485,
+            495,
+            497,
+            498,
+            500,
+            551,
+            552,
+            553,
+            554,
+            555,
+            557,
+            580,
+            582,
+            583,
+            584,
+            585,
+            593,
+            622,
+            628,
+            654,
+            911,
+            928,
+            949
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 155.0,
+            "mean_distance_to_truth": 79.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 194.0,
+            "mean_distance_to_truth": 65.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 221.0,
+            "mean_distance_to_truth": 157.5
+          },
+          "incumbent": {
+            "n_found": 26.0,
+            "precision": 0.038461538461538464,
+            "recall": 0.5,
+            "f1": 0.07142857142857144,
+            "hausdorff": 309.0,
+            "mean_distance_to_truth": 107.23076923076923
+          }
+        }
+      },
+      {
+        "scenario": "drift_switch",
+        "seed": 20260920,
+        "boundaries": {
+          "argus": [
+            627,
+            747
+          ],
+          "stumpy": [
+            626,
+            747
+          ],
+          "ruptures": [
+            355,
+            781
+          ],
+          "incumbent": [
+            241,
+            247,
+            277,
+            278,
+            280,
+            281,
+            283,
+            290,
+            309,
+            335,
+            382,
+            383,
+            385,
+            392,
+            394,
+            396,
+            416,
+            429,
+            430,
+            435,
+            469,
+            470,
+            471,
+            474,
+            476,
+            484,
+            485,
+            492,
+            503,
+            510,
+            514,
+            530,
+            534,
+            535,
+            542,
+            547,
+            552,
+            553,
+            562,
+            571,
+            595,
+            608,
+            609,
+            611,
+            617,
+            649,
+            650,
+            686,
+            688,
+            811,
+            813,
+            815,
+            817,
+            821,
+            827,
+            847,
+            848,
+            854,
+            880,
+            882,
+            883,
+            907,
+            930
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 307.0,
+            "mean_distance_to_truth": 60.0
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 306.0,
+            "mean_distance_to_truth": 60.5
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 141.0,
+            "mean_distance_to_truth": 88.0
+          },
+          "incumbent": {
+            "n_found": 63.0,
+            "precision": 0.031746031746031744,
+            "recall": 1.0,
+            "f1": 0.06153846153846154,
+            "hausdorff": 290.0,
+            "mean_distance_to_truth": 110.23809523809524
+          }
+        }
+      },
+      {
+        "scenario": "drift_switch",
+        "seed": 20260921,
+        "boundaries": {
+          "argus": [
+            637,
+            783
+          ],
+          "stumpy": [
+            636,
+            783
+          ],
+          "ruptures": [
+            399,
+            560
+          ],
+          "incumbent": [
+            241,
+            412,
+            424,
+            425,
+            447,
+            469,
+            494,
+            522,
+            525,
+            527,
+            530,
+            531,
+            532,
+            537,
+            581,
+            601,
+            604,
+            607,
+            629,
+            657,
+            683,
+            691,
+            698,
+            700,
+            723,
+            726,
+            735,
+            736,
+            737,
+            739,
+            743,
+            781,
+            782,
+            783,
+            793,
+            851,
+            852,
+            854,
+            873,
+            910,
+            917,
+            921,
+            945,
+            959
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 317.0,
+            "mean_distance_to_truth": 73.0
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 316.0,
+            "mean_distance_to_truth": 73.5
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 80.0,
+            "mean_distance_to_truth": 79.5
+          },
+          "incumbent": {
+            "n_found": 44.0,
+            "precision": 0.022727272727272728,
+            "recall": 0.5,
+            "f1": 0.04347826086956522,
+            "hausdorff": 319.0,
+            "mean_distance_to_truth": 126.02272727272727
+          }
+        }
+      },
+      {
+        "scenario": "drift_switch",
+        "seed": 20260922,
+        "boundaries": {
+          "argus": [
+            519,
+            640
+          ],
+          "stumpy": [
+            519,
+            640
+          ],
+          "ruptures": [
+            477,
+            763
+          ],
+          "incumbent": [
+            241,
+            246,
+            252,
+            260,
+            269,
+            272,
+            348,
+            366,
+            368,
+            372,
+            394,
+            395,
+            396,
+            399,
+            401,
+            437,
+            440,
+            441,
+            446,
+            455,
+            456,
+            477,
+            479,
+            494,
+            496,
+            526,
+            550,
+            553,
+            554,
+            558,
+            559,
+            619,
+            643,
+            649,
+            685,
+            686,
+            693,
+            725,
+            782,
+            792,
+            795,
+            796,
+            812,
+            872,
+            877,
+            878,
+            879,
+            888,
+            926,
+            927,
+            929,
+            932,
+            934,
+            940,
+            951
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 199.0,
+            "mean_distance_to_truth": 60.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 199.0,
+            "mean_distance_to_truth": 60.5
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 157.0,
+            "mean_distance_to_truth": 140.0
+          },
+          "incumbent": {
+            "n_found": 55.0,
+            "precision": 0.01818181818181818,
+            "recall": 0.5,
+            "f1": 0.03508771929824561,
+            "hausdorff": 311.0,
+            "mean_distance_to_truth": 129.6727272727273
+          }
+        }
+      },
+      {
+        "scenario": "drift_switch",
+        "seed": 20260923,
+        "boundaries": {
+          "argus": [
+            209,
+            774
+          ],
+          "stumpy": [
+            208,
+            774
+          ],
+          "ruptures": [
+            192,
+            518
+          ],
+          "incumbent": [
+            241,
+            250,
+            251,
+            252,
+            260,
+            262,
+            274,
+            278,
+            279,
+            280,
+            281,
+            294,
+            300,
+            311,
+            316,
+            317,
+            318,
+            325,
+            351,
+            385,
+            386,
+            397,
+            404,
+            408,
+            421,
+            436,
+            438,
+            489,
+            514,
+            517,
+            543,
+            544,
+            549,
+            553,
+            587,
+            600,
+            632,
+            636,
+            637,
+            663,
+            668,
+            677,
+            701,
+            704,
+            707,
+            710,
+            711,
+            715,
+            747,
+            754,
+            780,
+            781,
+            788,
+            843,
+            844,
+            861,
+            872,
+            885,
+            893,
+            896,
+            909,
+            917,
+            920,
+            946,
+            954,
+            957
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 134.0,
+            "mean_distance_to_truth": 122.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 134.0,
+            "mean_distance_to_truth": 123.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 128.0,
+            "mean_distance_to_truth": 125.0
+          },
+          "incumbent": {
+            "n_found": 66.0,
+            "precision": 0.030303030303030304,
+            "recall": 1.0,
+            "f1": 0.05882352941176471,
+            "hausdorff": 317.0,
+            "mean_distance_to_truth": 103.46969696969697
+          }
+        }
+      },
+      {
+        "scenario": "drift_switch",
+        "seed": 20260924,
+        "boundaries": {
+          "argus": [
+            478,
+            606
+          ],
+          "stumpy": [
+            478,
+            606
+          ],
+          "ruptures": [
+            471,
+            860
+          ],
+          "incumbent": [
+            241,
+            282,
+            292,
+            293,
+            295,
+            302,
+            311,
+            313,
+            317,
+            321,
+            325,
+            354,
+            359,
+            360,
+            367,
+            375,
+            401,
+            411,
+            436,
+            437,
+            449,
+            450,
+            453,
+            457,
+            472,
+            487,
+            489,
+            497,
+            522,
+            569,
+            574,
+            576,
+            582,
+            630,
+            632,
+            633,
+            665,
+            667,
+            670,
+            673,
+            683,
+            687,
+            688,
+            689,
+            713,
+            717,
+            721,
+            722,
+            723,
+            725,
+            727,
+            728,
+            732,
+            764,
+            826,
+            827,
+            828,
+            834,
+            836,
+            846,
+            873,
+            876,
+            900,
+            952
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 158.0,
+            "mean_distance_to_truth": 96.0
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 158.0,
+            "mean_distance_to_truth": 96.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 220.0,
+            "mean_distance_to_truth": 185.5
+          },
+          "incumbent": {
+            "n_found": 64.0,
+            "precision": 0.03125,
+            "recall": 1.0,
+            "f1": 0.06060606060606061,
+            "hausdorff": 312.0,
+            "mean_distance_to_truth": 90.03125
+          }
+        }
+      },
+      {
+        "scenario": "drift_switch",
+        "seed": 20260925,
+        "boundaries": {
+          "argus": [
+            637,
+            761
+          ],
+          "stumpy": [
+            636,
+            760
+          ],
+          "ruptures": [
+            269,
+            574
+          ],
+          "incumbent": [
+            241,
+            262,
+            268,
+            269,
+            297,
+            301,
+            308,
+            310,
+            327,
+            363,
+            388,
+            389,
+            406,
+            408,
+            410,
+            422,
+            425,
+            434,
+            445,
+            449,
+            454,
+            455,
+            458,
+            469,
+            474,
+            478,
+            479,
+            481,
+            483,
+            484,
+            486,
+            489,
+            493,
+            526,
+            534,
+            547,
+            548,
+            557,
+            558,
+            571,
+            573,
+            574,
+            575,
+            576,
+            601,
+            603,
+            616,
+            617,
+            629,
+            654,
+            655,
+            656,
+            674,
+            710,
+            711,
+            753,
+            762,
+            803,
+            842,
+            844,
+            912
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 317.0,
+            "mean_distance_to_truth": 62.0
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 316.0,
+            "mean_distance_to_truth": 62.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 66.0,
+            "mean_distance_to_truth": 58.5
+          },
+          "incumbent": {
+            "n_found": 61.0,
+            "precision": 0.03278688524590164,
+            "recall": 1.0,
+            "f1": 0.06349206349206349,
+            "hausdorff": 272.0,
+            "mean_distance_to_truth": 92.0
+          }
+        }
+      },
+      {
+        "scenario": "drift_switch",
+        "seed": 20260926,
+        "boundaries": {
+          "argus": [
+            588,
+            709
+          ],
+          "stumpy": [
+            588,
+            709
+          ],
+          "ruptures": [
+            473,
+            838
+          ],
+          "incumbent": [
+            241,
+            250,
+            251,
+            252,
+            285,
+            286,
+            295,
+            306,
+            311,
+            315,
+            341,
+            362,
+            391,
+            405,
+            406,
+            443,
+            444,
+            446,
+            448,
+            449,
+            467,
+            474,
+            498,
+            526,
+            532,
+            533,
+            545,
+            560,
+            571,
+            582,
+            586,
+            590,
+            591,
+            599,
+            600,
+            625,
+            626,
+            634,
+            636,
+            644,
+            648,
+            655,
+            657,
+            672,
+            715,
+            768,
+            792,
+            804,
+            826,
+            859,
+            860,
+            866,
+            869,
+            881,
+            882,
+            897,
+            908,
+            909,
+            937,
+            941,
+            945,
+            948,
+            949,
+            950
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 268.0,
+            "mean_distance_to_truth": 60.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 268.0,
+            "mean_distance_to_truth": 60.5
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 198.0,
+            "mean_distance_to_truth": 175.5
+          },
+          "incumbent": {
+            "n_found": 64.0,
+            "precision": 0.03125,
+            "recall": 1.0,
+            "f1": 0.06060606060606061,
+            "hausdorff": 310.0,
+            "mean_distance_to_truth": 116.75
+          }
+        }
+      },
+      {
+        "scenario": "drift_switch",
+        "seed": 20260927,
+        "boundaries": {
+          "argus": [
+            507,
+            628
+          ],
+          "stumpy": [
+            507,
+            628
+          ],
+          "ruptures": [
+            414,
+            839
+          ],
+          "incumbent": [
+            241,
+            243,
+            341,
+            361,
+            366,
+            522,
+            523,
+            526,
+            528,
+            531,
+            536,
+            540,
+            549,
+            557,
+            580,
+            582,
+            583,
+            584,
+            586,
+            593,
+            622,
+            628,
+            696,
+            745,
+            752,
+            753,
+            756,
+            757,
+            758,
+            784,
+            785,
+            786,
+            787,
+            807,
+            808,
+            845,
+            855,
+            911,
+            928,
+            949
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 187.0,
+            "mean_distance_to_truth": 72.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 187.0,
+            "mean_distance_to_truth": 72.5
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 199.0,
+            "mean_distance_to_truth": 146.5
+          },
+          "incumbent": {
+            "n_found": 40.0,
+            "precision": 0.05,
+            "recall": 1.0,
+            "f1": 0.09523809523809523,
+            "hausdorff": 309.0,
+            "mean_distance_to_truth": 112.9
+          }
+        }
+      },
+      {
+        "scenario": "both_switch",
+        "seed": 20260920,
+        "boundaries": {
+          "argus": [
+            512,
+            660
+          ],
+          "stumpy": [
+            512,
+            660
+          ],
+          "ruptures": [
+            360,
+            585
+          ],
+          "incumbent": [
+            241,
+            247,
+            277,
+            278,
+            280,
+            281,
+            283,
+            290,
+            309,
+            320,
+            476,
+            477,
+            487,
+            489,
+            516,
+            518,
+            520,
+            521,
+            523,
+            530,
+            534,
+            535,
+            542,
+            547,
+            552,
+            553,
+            559,
+            560,
+            562,
+            571,
+            595,
+            611,
+            617,
+            856,
+            857,
+            859,
+            860,
+            864,
+            880,
+            882,
+            883,
+            907,
+            930
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 192.0,
+            "mean_distance_to_truth": 74.0
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 192.0,
+            "mean_distance_to_truth": 74.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 55.0,
+            "mean_distance_to_truth": 47.5
+          },
+          "incumbent": {
+            "n_found": 43.0,
+            "precision": 0.046511627906976744,
+            "recall": 1.0,
+            "f1": 0.08888888888888888,
+            "hausdorff": 290.0,
+            "mean_distance_to_truth": 118.20930232558139
+          }
+        }
+      },
+      {
+        "scenario": "both_switch",
+        "seed": 20260921,
+        "boundaries": {
+          "argus": [
+            353,
+            784
+          ],
+          "stumpy": [
+            352,
+            784
+          ],
+          "ruptures": [
+            398,
+            577
+          ],
+          "incumbent": [
+            241,
+            321,
+            457,
+            461,
+            462,
+            465,
+            499,
+            515,
+            581,
+            601,
+            604,
+            607,
+            629,
+            860,
+            872,
+            910,
+            917,
+            921,
+            945,
+            959
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 144.0,
+            "mean_distance_to_truth": 88.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 144.0,
+            "mean_distance_to_truth": 88.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 78.0,
+            "mean_distance_to_truth": 70.5
+          },
+          "incumbent": {
+            "n_found": 20.0,
+            "precision": 0.1,
+            "recall": 1.0,
+            "f1": 0.18181818181818182,
+            "hausdorff": 319.0,
+            "mean_distance_to_truth": 149.65
+          }
+        }
+      },
+      {
+        "scenario": "both_switch",
+        "seed": 20260922,
+        "boundaries": {
+          "argus": [
+            248,
+            638
+          ],
+          "stumpy": [
+            637,
+            780
+          ],
+          "ruptures": [
+            465,
+            513
+          ],
+          "incumbent": [
+            241,
+            246,
+            252,
+            260,
+            269,
+            272,
+            510,
+            515,
+            552,
+            553,
+            557,
+            558,
+            559,
+            619,
+            643,
+            874,
+            876,
+            888,
+            926,
+            927,
+            929,
+            932,
+            934,
+            940,
+            951
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 72.0,
+            "mean_distance_to_truth": 37.0
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 317.0,
+            "mean_distance_to_truth": 71.5
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 145.0,
+            "mean_distance_to_truth": 136.0
+          },
+          "incumbent": {
+            "n_found": 25.0,
+            "precision": 0.04,
+            "recall": 0.5,
+            "f1": 0.07407407407407407,
+            "hausdorff": 311.0,
+            "mean_distance_to_truth": 154.28
+          }
+        }
+      },
+      {
+        "scenario": "both_switch",
+        "seed": 20260923,
+        "boundaries": {
+          "argus": [
+            211,
+            758
+          ],
+          "stumpy": [
+            210,
+            758
+          ],
+          "ruptures": [
+            192,
+            627
+          ],
+          "incumbent": [
+            241,
+            250,
+            251,
+            252,
+            260,
+            262,
+            274,
+            278,
+            279,
+            280,
+            281,
+            294,
+            300,
+            311,
+            316,
+            317,
+            318,
+            321,
+            464,
+            477,
+            479,
+            484,
+            514,
+            515,
+            549,
+            553,
+            587,
+            600,
+            632,
+            636,
+            637,
+            870,
+            871,
+            885,
+            893,
+            896,
+            909,
+            917,
+            920,
+            946,
+            954,
+            957
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 118.0,
+            "mean_distance_to_truth": 113.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 118.0,
+            "mean_distance_to_truth": 114.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 128.0,
+            "mean_distance_to_truth": 70.5
+          },
+          "incumbent": {
+            "n_found": 42.0,
+            "precision": 0.047619047619047616,
+            "recall": 1.0,
+            "f1": 0.0909090909090909,
+            "hausdorff": 317.0,
+            "mean_distance_to_truth": 114.47619047619048
+          }
+        }
+      },
+      {
+        "scenario": "both_switch",
+        "seed": 20260924,
+        "boundaries": {
+          "argus": [
+            327,
+            552
+          ],
+          "stumpy": [
+            552,
+            705
+          ],
+          "ruptures": [
+            363,
+            502
+          ],
+          "incumbent": [
+            241,
+            282,
+            292,
+            293,
+            295,
+            302,
+            311,
+            313,
+            317,
+            320,
+            523,
+            524,
+            526,
+            569,
+            574,
+            576,
+            582,
+            630,
+            632,
+            633,
+            648,
+            849,
+            851,
+            860,
+            868,
+            869,
+            873,
+            876,
+            900,
+            952
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 88.0,
+            "mean_distance_to_truth": 47.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 232.0,
+            "mean_distance_to_truth": 76.5
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 138.0,
+            "mean_distance_to_truth": 90.5
+          },
+          "incumbent": {
+            "n_found": 30.0,
+            "precision": 0.06666666666666667,
+            "recall": 1.0,
+            "f1": 0.125,
+            "hausdorff": 312.0,
+            "mean_distance_to_truth": 100.36666666666666
+          }
+        }
+      },
+      {
+        "scenario": "both_switch",
+        "seed": 20260925,
+        "boundaries": {
+          "argus": [
+            407,
+            630
+          ],
+          "stumpy": [
+            406,
+            630
+          ],
+          "ruptures": [
+            194,
+            621
+          ],
+          "incumbent": [
+            241,
+            262,
+            268,
+            269,
+            297,
+            301,
+            308,
+            310,
+            495,
+            499,
+            502,
+            503,
+            509,
+            510,
+            523,
+            525,
+            534,
+            544,
+            549,
+            557,
+            558,
+            571,
+            573,
+            574,
+            575,
+            576,
+            601,
+            603,
+            629,
+            856,
+            912
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 87.0,
+            "mean_distance_to_truth": 48.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 86.0,
+            "mean_distance_to_truth": 48.0
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 126.0,
+            "mean_distance_to_truth": 72.5
+          },
+          "incumbent": {
+            "n_found": 31.0,
+            "precision": 0.06451612903225806,
+            "recall": 1.0,
+            "f1": 0.12121212121212122,
+            "hausdorff": 272.0,
+            "mean_distance_to_truth": 87.80645161290323
+          }
+        }
+      },
+      {
+        "scenario": "both_switch",
+        "seed": 20260926,
+        "boundaries": {
+          "argus": [
+            602,
+            723
+          ],
+          "stumpy": [
+            602,
+            723
+          ],
+          "ruptures": [
+            338,
+            483
+          ],
+          "incumbent": [
+            241,
+            250,
+            251,
+            252,
+            285,
+            286,
+            295,
+            306,
+            311,
+            315,
+            427,
+            430,
+            507,
+            508,
+            509,
+            522,
+            546,
+            560,
+            571,
+            582,
+            586,
+            590,
+            591,
+            599,
+            600,
+            625,
+            626,
+            634,
+            636,
+            881,
+            882,
+            897,
+            908,
+            909,
+            937,
+            941,
+            945,
+            948,
+            949,
+            950
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 282.0,
+            "mean_distance_to_truth": 60.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 282.0,
+            "mean_distance_to_truth": 60.5
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 157.0,
+            "mean_distance_to_truth": 87.5
+          },
+          "incumbent": {
+            "n_found": 40.0,
+            "precision": 0.05,
+            "recall": 1.0,
+            "f1": 0.09523809523809523,
+            "hausdorff": 310.0,
+            "mean_distance_to_truth": 120.5
+          }
+        }
+      },
+      {
+        "scenario": "both_switch",
+        "seed": 20260927,
+        "boundaries": {
+          "argus": [
+            515,
+            636
+          ],
+          "stumpy": [
+            515,
+            636
+          ],
+          "ruptures": [
+            419,
+            843
+          ],
+          "incumbent": [
+            241,
+            243,
+            464,
+            485,
+            495,
+            497,
+            498,
+            500,
+            551,
+            552,
+            553,
+            554,
+            555,
+            557,
+            580,
+            582,
+            583,
+            584,
+            585,
+            593,
+            622,
+            628,
+            655,
+            656,
+            657,
+            911,
+            928,
+            949
+          ]
+        },
+        "scores": {
+          "argus": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 195.0,
+            "mean_distance_to_truth": 64.5
+          },
+          "stumpy": {
+            "n_found": 2.0,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "hausdorff": 195.0,
+            "mean_distance_to_truth": 64.5
+          },
+          "ruptures": {
+            "n_found": 2.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "hausdorff": 203.0,
+            "mean_distance_to_truth": 151.0
+          },
+          "incumbent": {
+            "n_found": 28.0,
+            "precision": 0.03571428571428571,
+            "recall": 0.5,
+            "f1": 0.06666666666666667,
+            "hausdorff": 309.0,
+            "mean_distance_to_truth": 100.78571428571429
+          }
+        }
+      }
+    ]
+  },
+  "family_placebo": {
+    "available": true,
+    "n_symbols": 12,
+    "argus": {
+      "family_spread": [
+        50,
+        122
+      ],
+      "family_spread_total": 172,
+      "non_family_triples": 219,
+      "non_family_median_total": 1077.0,
+      "non_family_min_total": 23,
+      "n_non_family_at_or_below_family": 15,
+      "family_percentile": 0.0684931506849315,
+      "non_family_triples_with_first_spread_zero": 0
+    },
+    "stumpy": {
+      "family_spread": [
+        50,
+        122
+      ],
+      "family_spread_total": 172,
+      "non_family_triples": 219,
+      "non_family_median_total": 1119.0,
+      "non_family_min_total": 170,
+      "n_non_family_at_or_below_family": 1,
+      "family_percentile": 0.0045662100456621,
+      "non_family_triples_with_first_spread_zero": 0
+    },
+    "ruptures": {
+      "family_spread": [
+        0,
+        1
+      ],
+      "family_spread_total": 1,
+      "non_family_triples": 219,
+      "non_family_median_total": 676.0,
+      "non_family_min_total": 96,
+      "n_non_family_at_or_below_family": 0,
+      "family_percentile": 0.0,
+      "non_family_triples_with_first_spread_zero": 1
+    },
+    "family_is_outlier_for_every_method": true
+  },
+  "artefact_integrity": {
+    "artefact": "data\\regime_comparison.json",
+    "parses_as_strict_json": false,
+    "bare_nan_tokens": 2,
+    "speedup_field": 310.3619817636603,
+    "speedup_recomputed": 310.36198176366025,
+    "speedup_self_consistent": true,
+    "novelty_rate_field": 0.17647058823529413,
+    "novelty_rate_recomputed": 0.17647058823529413,
+    "novelty_rate_self_consistent": true,
+    "scope_statement_matches_current_source": false,
+    "measured_fields_reproduce": true
+  },
+  "determinism": {
+    "identical": true,
+    "replicates_per_scenario": 2,
+    "base_seed": 20260920
+  },
+  "verdict_on_the_comparison": "THE COMPARISON IS REAL; ONE OF ITS SEVEN FINDINGS DOES NOT SURVIVE GROUND TRUTH. eval/regime_comparison.py genuinely ran the specialists -- stumpy 1.14.1 and ruptures 1.1.10 are imported and called through their own public APIs, no hand-rolled substitute appears anywhere in the module, and ARGUS's matrix_profile_index reproduces stumpy.stump's nearest-neighbour index exactly (agreement 1.0) on a seeded series generated here that the module never saw. Its headline figures re-derive from its own artefact and its p-values reproduce exactly under scipy. Its LOST verdict against the two-line incumbent stands and is if anything understated. WHAT DOES NOT SURVIVE IS FINDING 7, the QQQ-family coherence test, and it fails in the direction that favours ARGUS -- which is why it is worth saying loudly. That finding awards the win to ruptures because its boundaries spread 0 and 1 bars across three instruments over one underlying, against ARGUS's 50 and 122, and it treats spread as 'pure error measurement'. The placebo control run here says the referee does discriminate: the family sits at percentile 0.000 (ruptures), 0.005 (stumpy) and 0.068 (ARGUS) against all 219 non-family three-symbol combinations, so the agreement is not a shared-calendar artefact. But coherence is not accuracy, and on seeded synthetic price paths with KNOWN change points, scored with ruptures' own metrics, the ordering INVERTS: pooled f1 over 24 replicates is ARGUS 0.333, stumpy 0.312, ruptures 0.167, and on a pure drift switch ruptures scores 0.000 -- it places its boundaries consistently, and consistently in the wrong place (its Hausdorff on that scenario is the best of the three while its f1 is zero). A detector can have zero spread and the worst accuracy, so 'spread is pure error' is false as stated. THAT INVERSION IS ITSELF TOLERANCE-DEPENDENT AND THE SWEEP IS PUBLISHED RATHER THAN THE MARGIN THAT SUITS: ARGUS leads ruptures at 12, 24, 48 and 96 bars (0.250/0.042, 0.333/0.167, 0.438/0.229, 0.521/0.458) and LOSES at 192 bars (0.750/0.792), so ordering_stable is False. 192 bars is a fifth of the series and 60% of the distance between the two true breaks, which is why the lead is read as real rather than as an artefact -- but the flip is a fact and is reported as one. The gap is also not significant: a paired sign test over the 24 replicates gives ARGUS 11 wins, 3 losses, 10 ties against ruptures, p=0.057 two-sided; against stumpy 1W-0L-23T, p=1.0, which is the parity finding showing up again; against the incumbent 15W-9L, p=0.307. So the correct statement is that ARGUS is not beaten by ruptures on accuracy, NOT that it beats it. THE VERDICT ITSELF IS UNCHANGED, on its own terms and then some: every arm is bad in absolute terms (best pooled f1 0.333 at a 24-bar margin, mean distance to truth 66-125 bars) and the real incumbent, run budget-free as it actually ships, scores f1 0.093 by firing 40 times a series -- so regime detection here is weak across the board rather than ARGUS being beaten by a better specialist. The correct reading is that ruptures wins the coherence test and loses the accuracy test, ARGUS and stumpy are near-identical as the parity finding predicts, and the capability stays LOST because nothing in it clears a meaningful bar -- not because ruptures does it better. TWO DEFECTS FOUND IN THE ARTEFACT, neither affecting a measured number: the shipped data/regime_comparison.json carries a narrated scope_statement that has drifted from the measured fields beside it (it says 337x where costs.stumpy_speedup reads 310.36, and a calendar bucket of 27 where the field reads 38), so it predates the current source and needs regenerating; and it contains bare NaN, making it invalid strict JSON -- a house-wide pattern across several data/*.json rather than this module's invention. NOT VERIFIED: (1) that these synthetic processes resemble real rToken regime structure -- they are Gaussian returns with step changes in drift and variance, chosen because the incumbent rule keys on exactly that, and a real regime may be none of these shapes; (2) that the ARGUS-over-ruptures f1 gap is statistically significant -- it is not, p=0.057 two-sided on a paired sign test, and it reverses at a 192-bar tolerance; (3) anything about economic value -- no strategy was backtested on any segmentation here, exactly as in the module being audited; (4) ruptures at any penalty or kernel other than the two configurations regime_comparison.py chose, which are the ones re-used here -- a different kernel might not fail the drift switch; (5) stumpy's streaming FLOSS path, which neither module exercises; (6) the 60-day live figures in data/regime_comparison.json were re-derived from that artefact and its p-values reproduce, but the live fetch behind them was not repeated here, so a fresh market run would move the counts as that module itself warns."
+}

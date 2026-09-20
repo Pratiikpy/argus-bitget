@@ -72,7 +72,7 @@
   },
   "silent_failure_cases": {
     "linear_growth_zero_variance": {
-      "real_sue": Infinity,
+      "real_sue": null,
       "real_is_infinite": true,
       "real_warnings": [
         "divide by zero encountered in scalar divide"
@@ -81,7 +81,7 @@
       "argus_refused": true
     },
     "all_flat_eps": {
-      "real_sue": NaN,
+      "real_sue": null,
       "real_is_nan": true,
       "real_warnings": [
         "invalid value encountered in scalar divide"
@@ -97,7 +97,7 @@
     "real_ranking": [
       {
         "symbol": "CONSTRUCTED_LINEAR",
-        "sue": Infinity
+        "sue": null
       },
       {
         "symbol": "AMZN",

@@ -19,8 +19,9 @@ every real injection task in all four of its v1 suites. It is here because the a
 installing a package that pulls openai, anthropic, cohere, langchain and google-genai into this
 project's interpreter so the corpus can be regenerated on every test run — is a worse trade than
 vendoring the output with its generator script inside it. Generated output can go stale against its
-source in a way a copied ``.py`` cannot, so ``eval/quarantine_comparison.verify_corpus_against_clone``
-re-derives every template from the clone's own ``ast`` on each run and a test asserts the result.
+source in a way a copied ``.py`` cannot, so
+``eval/quarantine_comparison.verify_corpus_against_clone`` re-derives every template from the
+clone's own ``ast`` on each run and a test asserts the result.
 
 Only vendor a file here when: (1) its licence permits redistribution, (2) the comparison is
 worth the reproduction cost, and (3) the file is small and self-contained enough that vendoring

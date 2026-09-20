@@ -1,0 +1,820 @@
+{
+  "days": 60,
+  "fetch_failures": {},
+  "parity": {
+    "n_instruments": 12,
+    "n_observations": 1438,
+    "covariance_max_abs_diff": 8.131516293641283e-20,
+    "argus_weights": {
+      "AAPLUSDT": 0.238058,
+      "AMZNUSDT": 0.072618,
+      "COINUSDT": 0.021318,
+      "GOOGLUSDT": 0.095614,
+      "METAUSDT": 0.098273,
+      "MSFTUSDT": 0.094824,
+      "MSTRUSDT": 0.013403,
+      "NVDAUSDT": 0.073544,
+      "QQQUSDT": 0.169299,
+      "SQQQUSDT": 0.061083,
+      "TQQQUSDT": 0.019039,
+      "TSLAUSDT": 0.042926
+    },
+    "variants": {
+      "riskfolio_hrp_single_no_leaf_order": {
+        "weights": {
+          "AAPLUSDT": 0.238058,
+          "AMZNUSDT": 0.072618,
+          "COINUSDT": 0.021318,
+          "GOOGLUSDT": 0.095614,
+          "METAUSDT": 0.098273,
+          "MSFTUSDT": 0.094824,
+          "MSTRUSDT": 0.013403,
+          "NVDAUSDT": 0.073544,
+          "QQQUSDT": 0.169299,
+          "SQQQUSDT": 0.061083,
+          "TQQQUSDT": 0.019039,
+          "TSLAUSDT": 0.042926
+        },
+        "max_abs_weight_diff_vs_argus": 1.942890293094024e-16,
+        "one_way_turnover_vs_argus": 4.0419056990259605e-16,
+        "library_stdout": null
+      },
+      "riskfolio_hrp_default": {
+        "weights": {
+          "AAPLUSDT": 0.22736,
+          "AMZNUSDT": 0.047334,
+          "COINUSDT": 0.038638,
+          "GOOGLUSDT": 0.087064,
+          "METAUSDT": 0.033126,
+          "MSFTUSDT": 0.043836,
+          "MSTRUSDT": 0.025913,
+          "NVDAUSDT": 0.048315,
+          "QQQUSDT": 0.302308,
+          "SQQQUSDT": 0.061416,
+          "TQQQUSDT": 0.02414,
+          "TSLAUSDT": 0.06055
+        },
+        "max_abs_weight_diff_vs_argus": 0.13300894509033528,
+        "one_way_turnover_vs_argus": 0.18589639801086028,
+        "library_stdout": null
+      },
+      "riskfolio_hrp_ward": {
+        "weights": {
+          "AAPLUSDT": 0.22736,
+          "AMZNUSDT": 0.047334,
+          "COINUSDT": 0.038638,
+          "GOOGLUSDT": 0.087064,
+          "METAUSDT": 0.033126,
+          "MSFTUSDT": 0.043836,
+          "MSTRUSDT": 0.025913,
+          "NVDAUSDT": 0.048315,
+          "QQQUSDT": 0.302308,
+          "SQQQUSDT": 0.061416,
+          "TQQQUSDT": 0.02414,
+          "TSLAUSDT": 0.06055
+        },
+        "max_abs_weight_diff_vs_argus": 0.13300894509033528,
+        "one_way_turnover_vs_argus": 0.18589639801086028,
+        "library_stdout": null
+      },
+      "riskfolio_herc_ward": {
+        "weights": {
+          "AAPLUSDT": 0.122835,
+          "AMZNUSDT": 0.080195,
+          "COINUSDT": 0.020875,
+          "GOOGLUSDT": 0.105591,
+          "METAUSDT": 0.050708,
+          "MSFTUSDT": 0.074269,
+          "MSTRUSDT": 0.016959,
+          "NVDAUSDT": 0.073958,
+          "QQQUSDT": 0.271173,
+          "SQQQUSDT": 0.098627,
+          "TQQQUSDT": 0.030496,
+          "TSLAUSDT": 0.054314
+        },
+        "max_abs_weight_diff_vs_argus": 0.11522333808337033,
+        "one_way_turnover_vs_argus": 0.18378736413483074,
+        "library_stdout": null
+      },
+      "riskfolio_herc2_ward": {
+        "weights": {
+          "AAPLUSDT": 0.081943,
+          "AMZNUSDT": 0.081943,
+          "COINUSDT": 0.081943,
+          "GOOGLUSDT": 0.081943,
+          "METAUSDT": 0.081943,
+          "MSFTUSDT": 0.081943,
+          "MSTRUSDT": 0.081943,
+          "NVDAUSDT": 0.081943,
+          "QQQUSDT": 0.081943,
+          "SQQQUSDT": 0.098627,
+          "TQQQUSDT": 0.081943,
+          "TSLAUSDT": 0.081943
+        },
+        "max_abs_weight_diff_vs_argus": 0.15611500856344251,
+        "one_way_turnover_vs_argus": 0.28635294202689066,
+        "library_stdout": null
+      },
+      "riskfolio_nco_ward": {
+        "weights": {
+          "AAPLUSDT": 0.226471,
+          "AMZNUSDT": 0.07052,
+          "COINUSDT": 0.0,
+          "GOOGLUSDT": 0.043032,
+          "METAUSDT": 0.001529,
+          "MSFTUSDT": 0.032362,
+          "MSTRUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "QQQUSDT": 0.431189,
+          "SQQQUSDT": 0.194896,
+          "TQQQUSDT": 0.0,
+          "TSLAUSDT": 0.0
+        },
+        "max_abs_weight_diff_vs_argus": 0.2618906462066005,
+        "one_way_turnover_vs_argus": 0.3957044339298216,
+        "library_stdout": "You must convert self.cov to a positive definite matrix\nYou must convert self.cov to a positive definite matrix"
+      },
+      "riskfolio_hrp_dbht": {
+        "error": "ValueError: setting an array element with a sequence."
+      },
+      "riskfolio_hrp_cvar": {
+        "weights": {
+          "AAPLUSDT": 0.139904,
+          "AMZNUSDT": 0.068156,
+          "COINUSDT": 0.059935,
+          "GOOGLUSDT": 0.118278,
+          "METAUSDT": 0.053085,
+          "MSFTUSDT": 0.07045,
+          "MSTRUSDT": 0.063885,
+          "NVDAUSDT": 0.06307,
+          "QQQUSDT": 0.131196,
+          "SQQQUSDT": 0.110432,
+          "TQQQUSDT": 0.062293,
+          "TSLAUSDT": 0.059317
+        },
+        "max_abs_weight_diff_vs_argus": 0.09815351297215563,
+        "one_way_turnover_vs_argus": 0.22075435824026204,
+        "library_stdout": null
+      },
+      "riskfolio_hrp_kendall": {
+        "weights": {
+          "AAPLUSDT": 0.229561,
+          "AMZNUSDT": 0.072417,
+          "COINUSDT": 0.01189,
+          "GOOGLUSDT": 0.09535,
+          "METAUSDT": 0.064563,
+          "MSFTUSDT": 0.138798,
+          "MSTRUSDT": 0.00966,
+          "NVDAUSDT": 0.073798,
+          "QQQUSDT": 0.170581,
+          "SQQQUSDT": 0.059781,
+          "TQQQUSDT": 0.019184,
+          "TSLAUSDT": 0.054419
+        },
+        "max_abs_weight_diff_vs_argus": 0.04397418771027663,
+        "one_way_turnover_vs_argus": 0.05714610292377872,
+        "library_stdout": null
+      }
+    },
+    "argus_reproduces_riskfolio_exactly": true
+  },
+  "oos_variance": {
+    "train_bars": 480,
+    "test_bars": 96,
+    "n_instruments": 12,
+    "n_origins": 9,
+    "results": {
+      "argus_hrp": {
+        "n_windows": 9,
+        "mean_oos_vol_bps": 14.11715233373134,
+        "median_oos_vol_bps": 14.048158598006818,
+        "mean_in_sample_vol_bps": 14.919859242571304,
+        "oos_vol_ratio_vs_argus": 1.0,
+        "mean_effective_positions": 7.375161263674853,
+        "mean_largest_weight": 0.22546211998053167,
+        "mean_inverse_pair_overlap": 0.062372710005964685,
+        "windows_beating_argus": 0,
+        "windows_losing_to_argus": 0,
+        "windows_tied_with_argus": 9,
+        "windows_compared": 9,
+        "sign_test_p": null
+      },
+      "equal_weight": {
+        "n_windows": 9,
+        "mean_oos_vol_bps": 19.52140562468926,
+        "median_oos_vol_bps": 19.470505419569346,
+        "mean_in_sample_vol_bps": 20.992785488594606,
+        "oos_vol_ratio_vs_argus": 1.3828146897618345,
+        "mean_effective_positions": 11.999999999999998,
+        "mean_largest_weight": 0.08333333333333333,
+        "mean_inverse_pair_overlap": 0.08333333333333333,
+        "windows_beating_argus": 0,
+        "windows_losing_to_argus": 9,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 9,
+        "sign_test_p": 0.00390625,
+        "holm_threshold": 0.005555555555555556,
+        "significant_after_holm": true
+      },
+      "inverse_variance": {
+        "n_windows": 9,
+        "mean_oos_vol_bps": 15.146110369851007,
+        "median_oos_vol_bps": 15.613562768812617,
+        "mean_in_sample_vol_bps": 16.81480596125385,
+        "oos_vol_ratio_vs_argus": 1.0728870817424763,
+        "mean_effective_positions": 6.742706051429803,
+        "mean_largest_weight": 0.2881787619746643,
+        "mean_inverse_pair_overlap": 0.03166539369209219,
+        "windows_beating_argus": 1,
+        "windows_losing_to_argus": 8,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 9,
+        "sign_test_p": 0.0390625,
+        "holm_threshold": 0.0071428571428571435,
+        "significant_after_holm": false
+      },
+      "riskfolio_hrp_single_no_leaf_order": {
+        "n_windows": 9,
+        "mean_oos_vol_bps": 14.117152333731335,
+        "median_oos_vol_bps": 14.048158598006816,
+        "mean_in_sample_vol_bps": 14.919859242571304,
+        "oos_vol_ratio_vs_argus": 0.9999999999999997,
+        "mean_effective_positions": 7.375161263674853,
+        "mean_largest_weight": 0.22546211998053167,
+        "mean_inverse_pair_overlap": 0.0623727100059647,
+        "windows_beating_argus": 0,
+        "windows_losing_to_argus": 0,
+        "windows_tied_with_argus": 9,
+        "windows_compared": 9,
+        "sign_test_p": null
+      },
+      "riskfolio_hrp_default": {
+        "n_windows": 9,
+        "mean_oos_vol_bps": 13.60057332535475,
+        "median_oos_vol_bps": 13.676751710692917,
+        "mean_in_sample_vol_bps": 14.751413240168603,
+        "oos_vol_ratio_vs_argus": 0.9634077046018493,
+        "mean_effective_positions": 6.854472219657824,
+        "mean_largest_weight": 0.2638273030474859,
+        "mean_inverse_pair_overlap": 0.06613335728893278,
+        "windows_beating_argus": 8,
+        "windows_losing_to_argus": 1,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 9,
+        "sign_test_p": 0.0390625,
+        "holm_threshold": 0.008333333333333333,
+        "significant_after_holm": false
+      },
+      "riskfolio_hrp_ward": {
+        "n_windows": 9,
+        "mean_oos_vol_bps": 14.020462973925074,
+        "median_oos_vol_bps": 14.711393058801304,
+        "mean_in_sample_vol_bps": 15.241434031965438,
+        "oos_vol_ratio_vs_argus": 0.9931509303349205,
+        "mean_effective_positions": 7.260023435090037,
+        "mean_largest_weight": 0.23377944040197912,
+        "mean_inverse_pair_overlap": 0.05317763698900101,
+        "windows_beating_argus": 3,
+        "windows_losing_to_argus": 6,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 9,
+        "sign_test_p": 0.5078125,
+        "holm_threshold": 0.016666666666666666,
+        "significant_after_holm": false
+      },
+      "riskfolio_herc_ward": {
+        "n_windows": 9,
+        "mean_oos_vol_bps": 13.292143721012714,
+        "median_oos_vol_bps": 13.304127259681712,
+        "mean_in_sample_vol_bps": 14.562312108067326,
+        "oos_vol_ratio_vs_argus": 0.9415598420123752,
+        "mean_effective_positions": 7.2317052200869085,
+        "mean_largest_weight": 0.2614867150440293,
+        "mean_inverse_pair_overlap": 0.06466086757025441,
+        "windows_beating_argus": 5,
+        "windows_losing_to_argus": 4,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 9,
+        "sign_test_p": 1.0,
+        "holm_threshold": 0.025,
+        "significant_after_holm": false
+      },
+      "riskfolio_herc2_ward": {
+        "n_windows": 9,
+        "mean_oos_vol_bps": 18.342882644880852,
+        "median_oos_vol_bps": 18.319267784949467,
+        "mean_in_sample_vol_bps": 19.4961749871812,
+        "oos_vol_ratio_vs_argus": 1.2993330532427994,
+        "mean_effective_positions": 11.666115141073012,
+        "mean_largest_weight": 0.10109317623758024,
+        "mean_inverse_pair_overlap": 0.0747768660908917,
+        "windows_beating_argus": 1,
+        "windows_losing_to_argus": 8,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 9,
+        "sign_test_p": 0.0390625,
+        "holm_threshold": 0.01,
+        "significant_after_holm": false
+      },
+      "riskfolio_nco_ward": {
+        "n_windows": 9,
+        "mean_oos_vol_bps": 8.229346721080525,
+        "median_oos_vol_bps": 8.713445594577184,
+        "mean_in_sample_vol_bps": 9.346523918224412,
+        "oos_vol_ratio_vs_argus": 0.582932487128968,
+        "mean_effective_positions": 3.734333284903813,
+        "mean_largest_weight": 0.43424169861788536,
+        "mean_inverse_pair_overlap": 0.14286093783955695,
+        "windows_beating_argus": 9,
+        "windows_losing_to_argus": 0,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 9,
+        "sign_test_p": 0.00390625,
+        "holm_threshold": 0.00625,
+        "significant_after_holm": true
+      },
+      "riskfolio_hrp_cvar": {
+        "n_windows": 9,
+        "mean_oos_vol_bps": 14.331568909307974,
+        "median_oos_vol_bps": 13.960645900961316,
+        "mean_in_sample_vol_bps": 15.575328613795211,
+        "oos_vol_ratio_vs_argus": 1.0151883730165827,
+        "mean_effective_positions": 10.039048854160676,
+        "mean_largest_weight": 0.15786476940563152,
+        "mean_inverse_pair_overlap": 0.1012390435751607,
+        "windows_beating_argus": 4,
+        "windows_losing_to_argus": 5,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 9,
+        "sign_test_p": 1.0,
+        "holm_threshold": 0.05,
+        "significant_after_holm": false
+      },
+      "riskfolio_hrp_kendall": {
+        "n_windows": 9,
+        "mean_oos_vol_bps": 13.308698717011929,
+        "median_oos_vol_bps": 13.522465706738817,
+        "mean_in_sample_vol_bps": 14.60834120475165,
+        "oos_vol_ratio_vs_argus": 0.9427325286568098,
+        "mean_effective_positions": 7.275920720673208,
+        "mean_largest_weight": 0.23845986823569415,
+        "mean_inverse_pair_overlap": 0.05832098198802807,
+        "windows_beating_argus": 7,
+        "windows_losing_to_argus": 2,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 9,
+        "sign_test_p": 0.1796875,
+        "holm_threshold": 0.0125,
+        "significant_after_holm": false
+      }
+    },
+    "ranking_by_mean_oos_vol": [
+      "riskfolio_nco_ward",
+      "riskfolio_herc_ward",
+      "riskfolio_hrp_kendall",
+      "riskfolio_hrp_default",
+      "riskfolio_hrp_ward",
+      "riskfolio_hrp_single_no_leaf_order",
+      "argus_hrp",
+      "riskfolio_hrp_cvar",
+      "inverse_variance",
+      "riskfolio_herc2_ward",
+      "equal_weight"
+    ],
+    "winner": "riskfolio_nco_ward",
+    "argus_rank": 7,
+    "argus_wins": false,
+    "baselines_with_lower_mean_oos_vol": [
+      "riskfolio_hrp_default",
+      "riskfolio_hrp_ward",
+      "riskfolio_herc_ward",
+      "riskfolio_nco_ward",
+      "riskfolio_hrp_kendall"
+    ],
+    "baselines_significant_after_holm": [
+      "equal_weight",
+      "riskfolio_nco_ward"
+    ],
+    "parity_twin_null_control": {
+      "windows_tied_with_argus": 9,
+      "windows_compared": 9,
+      "sign_test_p": null,
+      "oos_vol_ratio_vs_argus": 0.9999999999999997,
+      "behaves_as_a_null": true
+    },
+    "errors": {
+      "riskfolio_hrp_dbht": "ValueError: setting an array element with a sequence."
+    },
+    "library_stdout": {
+      "riskfolio_nco_ward": "You must convert self.cov to a positive definite matrix"
+    }
+  },
+  "oos_variance_dense": {
+    "train_bars": 240,
+    "test_bars": 48,
+    "n_instruments": 12,
+    "n_origins": 24,
+    "results": {
+      "argus_hrp": {
+        "n_windows": 24,
+        "mean_oos_vol_bps": 13.960819907940598,
+        "median_oos_vol_bps": 13.619450394486892,
+        "mean_in_sample_vol_bps": 14.680377665133669,
+        "oos_vol_ratio_vs_argus": 1.0,
+        "mean_effective_positions": 7.460783633148711,
+        "mean_largest_weight": 0.23076157792151467,
+        "mean_inverse_pair_overlap": 0.06800772504744673,
+        "windows_beating_argus": 0,
+        "windows_losing_to_argus": 0,
+        "windows_tied_with_argus": 24,
+        "windows_compared": 24,
+        "sign_test_p": null
+      },
+      "equal_weight": {
+        "n_windows": 24,
+        "mean_oos_vol_bps": 18.600563185305294,
+        "median_oos_vol_bps": 18.94382263120178,
+        "mean_in_sample_vol_bps": 21.175752120917473,
+        "oos_vol_ratio_vs_argus": 1.3323403143912569,
+        "mean_effective_positions": 11.999999999999998,
+        "mean_largest_weight": 0.0833333333333333,
+        "mean_inverse_pair_overlap": 0.0833333333333333,
+        "windows_beating_argus": 0,
+        "windows_losing_to_argus": 24,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 24,
+        "sign_test_p": 1.1920928955078125e-07,
+        "holm_threshold": 0.005555555555555556,
+        "significant_after_holm": true
+      },
+      "inverse_variance": {
+        "n_windows": 24,
+        "mean_oos_vol_bps": 15.150064897480759,
+        "median_oos_vol_bps": 15.21871748067814,
+        "mean_in_sample_vol_bps": 17.25073996386679,
+        "oos_vol_ratio_vs_argus": 1.0851844660544432,
+        "mean_effective_positions": 6.8628411601391255,
+        "mean_largest_weight": 0.2753132950604308,
+        "mean_inverse_pair_overlap": 0.030497523964853387,
+        "windows_beating_argus": 3,
+        "windows_losing_to_argus": 21,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 24,
+        "sign_test_p": 0.0002771615982055664,
+        "holm_threshold": 0.0071428571428571435,
+        "significant_after_holm": true
+      },
+      "riskfolio_hrp_single_no_leaf_order": {
+        "n_windows": 24,
+        "mean_oos_vol_bps": 13.960819907940598,
+        "median_oos_vol_bps": 13.619450394486892,
+        "mean_in_sample_vol_bps": 14.68037766513367,
+        "oos_vol_ratio_vs_argus": 1.0,
+        "mean_effective_positions": 7.460783633148712,
+        "mean_largest_weight": 0.2307615779215146,
+        "mean_inverse_pair_overlap": 0.06800772504744675,
+        "windows_beating_argus": 0,
+        "windows_losing_to_argus": 0,
+        "windows_tied_with_argus": 24,
+        "windows_compared": 24,
+        "sign_test_p": null
+      },
+      "riskfolio_hrp_default": {
+        "n_windows": 24,
+        "mean_oos_vol_bps": 13.694130721455254,
+        "median_oos_vol_bps": 13.83357284079125,
+        "mean_in_sample_vol_bps": 14.999047751493267,
+        "oos_vol_ratio_vs_argus": 0.9808973120315334,
+        "mean_effective_positions": 7.240581505793474,
+        "mean_largest_weight": 0.2405868654581346,
+        "mean_inverse_pair_overlap": 0.06569319941007708,
+        "windows_beating_argus": 15,
+        "windows_losing_to_argus": 9,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 24,
+        "sign_test_p": 0.30745625495910645,
+        "holm_threshold": 0.01,
+        "significant_after_holm": false
+      },
+      "riskfolio_hrp_ward": {
+        "n_windows": 24,
+        "mean_oos_vol_bps": 13.912946007213323,
+        "median_oos_vol_bps": 13.926803642431997,
+        "mean_in_sample_vol_bps": 15.386244856593096,
+        "oos_vol_ratio_vs_argus": 0.9965708388874749,
+        "mean_effective_positions": 7.379227436689287,
+        "mean_largest_weight": 0.22312538320278144,
+        "mean_inverse_pair_overlap": 0.057345111897226325,
+        "windows_beating_argus": 11,
+        "windows_losing_to_argus": 13,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 24,
+        "sign_test_p": 0.8388197422027588,
+        "holm_threshold": 0.025,
+        "significant_after_holm": false
+      },
+      "riskfolio_herc_ward": {
+        "n_windows": 24,
+        "mean_oos_vol_bps": 14.137575037884554,
+        "median_oos_vol_bps": 13.903462664498575,
+        "mean_in_sample_vol_bps": 15.007068754388394,
+        "oos_vol_ratio_vs_argus": 1.0126607986572065,
+        "mean_effective_positions": 6.376179912638836,
+        "mean_largest_weight": 0.29242458510457053,
+        "mean_inverse_pair_overlap": 0.08927373013308475,
+        "windows_beating_argus": 13,
+        "windows_losing_to_argus": 11,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 24,
+        "sign_test_p": 0.8388197422027588,
+        "holm_threshold": 0.05,
+        "significant_after_holm": false
+      },
+      "riskfolio_herc2_ward": {
+        "n_windows": 24,
+        "mean_oos_vol_bps": 16.43421755031125,
+        "median_oos_vol_bps": 15.11114528307499,
+        "mean_in_sample_vol_bps": 17.174422462638677,
+        "oos_vol_ratio_vs_argus": 1.1771670760514459,
+        "mean_effective_positions": 9.450816787754158,
+        "mean_largest_weight": 0.17871776237321615,
+        "mean_inverse_pair_overlap": 0.0668873866538321,
+        "windows_beating_argus": 8,
+        "windows_losing_to_argus": 16,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 24,
+        "sign_test_p": 0.15158963203430176,
+        "holm_threshold": 0.008333333333333333,
+        "significant_after_holm": false
+      },
+      "riskfolio_nco_ward": {
+        "n_windows": 24,
+        "mean_oos_vol_bps": 8.531765271206815,
+        "median_oos_vol_bps": 8.329343030042885,
+        "mean_in_sample_vol_bps": 9.309412277494957,
+        "oos_vol_ratio_vs_argus": 0.6111220778912949,
+        "mean_effective_positions": 3.351158694137728,
+        "mean_largest_weight": 0.4860075706832332,
+        "mean_inverse_pair_overlap": 0.14643893913599237,
+        "windows_beating_argus": 22,
+        "windows_losing_to_argus": 2,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 24,
+        "sign_test_p": 3.5881996154785156e-05,
+        "holm_threshold": 0.00625,
+        "significant_after_holm": true
+      },
+      "riskfolio_hrp_cvar": {
+        "n_windows": 24,
+        "mean_oos_vol_bps": 13.425562251605136,
+        "median_oos_vol_bps": 13.235558358457096,
+        "mean_in_sample_vol_bps": 15.021396260036077,
+        "oos_vol_ratio_vs_argus": 0.9616600128169392,
+        "mean_effective_positions": 9.742216134885663,
+        "mean_largest_weight": 0.16454775820674591,
+        "mean_inverse_pair_overlap": 0.10715727462689555,
+        "windows_beating_argus": 15,
+        "windows_losing_to_argus": 9,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 24,
+        "sign_test_p": 0.30745625495910645,
+        "holm_threshold": 0.0125,
+        "significant_after_holm": false
+      },
+      "riskfolio_hrp_kendall": {
+        "n_windows": 24,
+        "mean_oos_vol_bps": 13.513347517832834,
+        "median_oos_vol_bps": 13.142568088442331,
+        "mean_in_sample_vol_bps": 14.648039334621114,
+        "oos_vol_ratio_vs_argus": 0.9679479863605108,
+        "mean_effective_positions": 7.189332976715856,
+        "mean_largest_weight": 0.2365783892948179,
+        "mean_inverse_pair_overlap": 0.06108662062972483,
+        "windows_beating_argus": 15,
+        "windows_losing_to_argus": 9,
+        "windows_tied_with_argus": 0,
+        "windows_compared": 24,
+        "sign_test_p": 0.30745625495910645,
+        "holm_threshold": 0.016666666666666666,
+        "significant_after_holm": false
+      }
+    },
+    "ranking_by_mean_oos_vol": [
+      "riskfolio_nco_ward",
+      "riskfolio_hrp_cvar",
+      "riskfolio_hrp_kendall",
+      "riskfolio_hrp_default",
+      "riskfolio_hrp_ward",
+      "argus_hrp",
+      "riskfolio_hrp_single_no_leaf_order",
+      "riskfolio_herc_ward",
+      "inverse_variance",
+      "riskfolio_herc2_ward",
+      "equal_weight"
+    ],
+    "winner": "riskfolio_nco_ward",
+    "argus_rank": 6,
+    "argus_wins": false,
+    "baselines_with_lower_mean_oos_vol": [
+      "riskfolio_hrp_default",
+      "riskfolio_hrp_ward",
+      "riskfolio_nco_ward",
+      "riskfolio_hrp_cvar",
+      "riskfolio_hrp_kendall"
+    ],
+    "baselines_significant_after_holm": [
+      "equal_weight",
+      "inverse_variance",
+      "riskfolio_nco_ward"
+    ],
+    "parity_twin_null_control": {
+      "windows_tied_with_argus": 24,
+      "windows_compared": 24,
+      "sign_test_p": null,
+      "oos_vol_ratio_vs_argus": 1.0,
+      "behaves_as_a_null": true
+    },
+    "errors": {
+      "riskfolio_hrp_dbht": "ValueError: setting an array element with a sequence."
+    },
+    "library_stdout": {
+      "riskfolio_nco_ward": "You must convert self.cov to a positive definite matrix"
+    }
+  },
+  "convex_rebalance": {
+    "horizon_bars": 168,
+    "argus_vol_before_bps": 21.712393901524408,
+    "argus_vol_after_bps": 16.16320973387351,
+    "rows": [
+      {
+        "assumed_sharpe": 0.25,
+        "argus_break_even_bars": 165.43851141952612,
+        "argus_worth_doing": true,
+        "argus_one_way_turnover": 0.27450645587404343,
+        "implied_gamma": 0.9473457114013987,
+        "convex_one_way_turnover": 0.14721334225954089,
+        "convex_max_weight_after": 0.23054667559286462,
+        "convex_trades": true,
+        "agree_on_go_no_go": true
+      },
+      {
+        "assumed_sharpe": 0.5,
+        "argus_break_even_bars": 82.71925570976306,
+        "argus_worth_doing": true,
+        "argus_one_way_turnover": 0.27450645587404343,
+        "implied_gamma": 1.8946914228027973,
+        "convex_one_way_turnover": 0.17952969771064944,
+        "convex_max_weight_after": 0.25262369147052455,
+        "convex_trades": true,
+        "agree_on_go_no_go": true
+      },
+      {
+        "assumed_sharpe": 1.0,
+        "argus_break_even_bars": 41.35962785488153,
+        "argus_worth_doing": true,
+        "argus_one_way_turnover": 0.27450645587404343,
+        "implied_gamma": 3.7893828456055947,
+        "convex_one_way_turnover": 0.34557585815471836,
+        "convex_max_weight_after": 0.26127790120897476,
+        "convex_trades": true,
+        "agree_on_go_no_go": true
+      },
+      {
+        "assumed_sharpe": 2.0,
+        "argus_break_even_bars": 20.679813927440765,
+        "argus_worth_doing": true,
+        "argus_one_way_turnover": 0.27450645587404343,
+        "implied_gamma": 7.578765691211189,
+        "convex_one_way_turnover": 0.4727249292494836,
+        "convex_max_weight_after": 0.3691728506280775,
+        "convex_trades": true,
+        "agree_on_go_no_go": true
+      }
+    ],
+    "agreement_rate": 1.0,
+    "heuristic_always_trades_more": false
+  },
+  "sharpe_sensitivity": {
+    "horizon_bars": 168,
+    "rows": [
+      {
+        "assumed_sharpe_annual": 0.25,
+        "break_even_bars": 165.43851141952612,
+        "worth_doing": true,
+        "verdict": "11 leg(s) (AAPLUSDT 8.3%->23.8%, AMZNUSDT 8.3%->7.3%, COINUSDT 8.3%->2.1%, GOOGLUSDT 8.3%->9.6%...), turnover 54.9% costing 3.3bps. Portfolio volatility 22 -> 16bps per bar, variance down 44.6%. It repays in 165 bars, inside the 168-bar horizon, at an assumed annualised Sharpe of 0.2. Worth doing"
+      },
+      {
+        "assumed_sharpe_annual": 0.5,
+        "break_even_bars": 82.71925570976306,
+        "worth_doing": true,
+        "verdict": "11 leg(s) (AAPLUSDT 8.3%->23.8%, AMZNUSDT 8.3%->7.3%, COINUSDT 8.3%->2.1%, GOOGLUSDT 8.3%->9.6%...), turnover 54.9% costing 3.3bps. Portfolio volatility 22 -> 16bps per bar, variance down 44.6%. It repays in 83 bars, inside the 168-bar horizon, at an assumed annualised Sharpe of 0.5. Worth doing"
+      },
+      {
+        "assumed_sharpe_annual": 1.0,
+        "break_even_bars": 41.35962785488153,
+        "worth_doing": true,
+        "verdict": "11 leg(s) (AAPLUSDT 8.3%->23.8%, AMZNUSDT 8.3%->7.3%, COINUSDT 8.3%->2.1%, GOOGLUSDT 8.3%->9.6%...), turnover 54.9% costing 3.3bps. Portfolio volatility 22 -> 16bps per bar, variance down 44.6%. It repays in 41 bars, inside the 168-bar horizon, at an assumed annualised Sharpe of 1.0. Worth doing"
+      },
+      {
+        "assumed_sharpe_annual": 2.0,
+        "break_even_bars": 20.679813927440765,
+        "worth_doing": true,
+        "verdict": "11 leg(s) (AAPLUSDT 8.3%->23.8%, AMZNUSDT 8.3%->7.3%, COINUSDT 8.3%->2.1%, GOOGLUSDT 8.3%->9.6%...), turnover 54.9% costing 3.3bps. Portfolio volatility 22 -> 16bps per bar, variance down 44.6%. It repays in 21 bars, inside the 168-bar horizon, at an assumed annualised Sharpe of 2.0. Worth doing"
+      }
+    ],
+    "flip_sharpe_annual": 0.2461882610409615,
+    "flip_check": {
+      "worth_doing_just_below_flip": false,
+      "worth_doing_just_above_flip": true,
+      "closed_form_verified": true
+    },
+    "verdict_is_stable_across_the_band": true
+  },
+  "rebalance_sweep": {
+    "n_origins": 8,
+    "n_cells": 256,
+    "do_not_rebalance": 89,
+    "do_not_rebalance_share": 0.34765625,
+    "non_trivial_cells": 224,
+    "non_trivial_do_not_rebalance_share": 0.2544642857142857,
+    "by_assumed_sharpe": {
+      "0.25": {
+        "cells": 64,
+        "do_not_rebalance": 42
+      },
+      "0.5": {
+        "cells": 64,
+        "do_not_rebalance": 22
+      },
+      "1.0": {
+        "cells": 64,
+        "do_not_rebalance": 14
+      },
+      "2.0": {
+        "cells": 64,
+        "do_not_rebalance": 11
+      }
+    },
+    "by_book": {
+      "equal_weight": {
+        "cells": 32,
+        "do_not_rebalance": 1
+      },
+      "half_in_one_name": {
+        "cells": 32,
+        "do_not_rebalance": 8
+      },
+      "hrp_target_itself": {
+        "cells": 32,
+        "do_not_rebalance": 32
+      },
+      "inverse_variance": {
+        "cells": 32,
+        "do_not_rebalance": 13
+      },
+      "random_0": {
+        "cells": 32,
+        "do_not_rebalance": 10
+      },
+      "random_1": {
+        "cells": 32,
+        "do_not_rebalance": 5
+      },
+      "random_2": {
+        "cells": 32,
+        "do_not_rebalance": 20
+      },
+      "single_name": {
+        "cells": 32,
+        "do_not_rebalance": 0
+      }
+    },
+    "docstring_claim_holds": false
+  },
+  "failure_cases": {
+    "two_assets_below_min": {
+      "argus_raises": true,
+      "message": "2 instrument(s) is below the 3 that make a hierarchy; use inverse-variance weights and call them that"
+    },
+    "duplicated_column": {
+      "argus_weight_sum": 1.0,
+      "max_abs_weight_diff_vs_argus": 6.938893903907228e-17
+    },
+    "zero_variance_column": {
+      "covariance_matrix_returned": true,
+      "argus_raises": true,
+      "message": "an instrument with zero variance cannot be clustered; it has no risk to allocate and no correlation to measure"
+    }
+  },
+  "costs": {
+    "repeats": 3,
+    "argus_hrp_seconds": 0.00044596666703000665,
+    "riskfolio_hrp_seconds": 0.04146026666664208,
+    "cvxportfolio_mpo_seconds_one_solve": 2.654930000018794,
+    "argus_is_faster": true
+  },
+  "reproducibility": {
+    "identical": true
+  },
+  "scope_statement": "ARGUS's own hierarchical risk parity (desk/allocation.py) is run against the real, pip-installed Riskfolio-Lib 7.3.0 (BSD-3-Clause, byte-identical to the corpus clone at 632a9e48) and the real, pip-installed cvxportfolio 1.5.1 (GPL-3.0, identical to the corpus clone at 351c782b modulo line endings), on the SAME real 60-day hourly Bitget candle history for the real 12-symbol rToken universe and the SAME sample covariance. CLAIMED, and each is a number from a command that was run: (a) under Riskfolio's own configuration with leaf_order disabled, ARGUS's HRP reproduces Riskfolio's HRP to floating-point identity, so the two are the same algorithm and not merely similar ones; (b) under Riskfolio's SHIPPED DEFAULT (leaf_order=True, scipy's optimal_ordering) the weights diverge materially, and that single keyword is the whole of the divergence -- ARGUS's quasi_diagonal is a plain pre-order traversal and implements no optimal leaf ordering; (c) on walk-forward realised out-of-sample volatility over non-overlapping held-out windows, ARGUS does NOT win -- it ranks in the middle of eleven allocators on both the 9-window and the 24-window walk-forward, and Riskfolio's NCO (Nested Clustered Optimization) beats it in 22 of 24 windows at roughly 0.61x its realised volatility, a paired sign test of p=3.6e-05 that survives Holm correction across all ten comparisons. NCO won every walk-forward this module has been run on, at both window lengths, so this capability is LOST to the specialist on its own criterion and the full ranking is published rather than the headline alone; (d) Riskfolio-Lib 7.3.0's HERC and HERC2 models raise TypeError on every call because optimization() passes three keywords _hierarchical_recursive_bisection does not accept, so their numbers here come from a documented shim, not from the library as shipped; (e) cvxportfolio's MultiPeriodOptimization, given ARGUS's own covariance, ARGUS's own taker fee as its linear cost coefficient and ARGUS's own horizon, agrees with the break-even heuristic's go/no-go at every Sharpe in the band while trading materially less than the heuristic's full move to target; (f) the recommendation's flip point in assumed annual Sharpe is computed in closed form and verified by evaluating the function either side of it. NOT CLAIMED that the whole ranking is statistically established: only NCO's win and the two losses to naive baselines survive Holm correction, every other ordering here is inside the noise of 24 windows, and each per-comparison p-value and its own Holm threshold is published so no row can be read as more than it is. NOT CLAIMED that the lowest-variance allocator is the one a desk should hold: NCO reaches its variance by holding roughly 3.4 effective positions out of 12 against ARGUS's 7.5, and by leaning far harder than any other allocator on QQQUSDT paired against its own inverse SQQQUSDT -- an internal hedge, not diversification -- while Riskfolio printed a not-positive-definite warning on every window that produced it. All three facts are reported beside the score rather than under it. NOT CLAIMED that ARGUS's turnover pricing is equivalent to the convex program -- the two value a variance reduction under different economics (volatility targeting versus mean-variance) and the translation between them is stated explicitly rather than assumed away. NOT CLAIMED that any of these numbers are fixed properties: they are computed from live candle data and will move the next time this module runs."
+}
