@@ -63,7 +63,12 @@ Number = int | float
 
 def parse_number(text: str) -> Number:
     """'eleven' -> 11, '1,470' -> 1470, '7.72' -> 7.72. Raises on anything else."""
-    cleaned = text.strip().lower().replace(",", "")
+    # U+2212 MINUS SIGN is what prose is typeset with; U+002D HYPHEN-MINUS is what float() accepts.
+    # Spelled by code point rather than pasted, so the glyph never appears in this source and the
+    # two cannot be confused by a reader — which is the confusion that made the first version of
+    # the refusal claim match nothing at all.
+    TYPOGRAPHIC_MINUS = chr(0x2212)
+    cleaned = text.strip().lower().replace(",", "").replace(TYPOGRAPHIC_MINUS, "-")
     if cleaned in _WORDS:
         return _WORDS[cleaned]
     if re.fullmatch(r"-?\d+", cleaned):
@@ -301,6 +306,29 @@ def settled_trades() -> int:
     return int(PaperLedger(path=DATA / "paper_ledger.jsonl").performance()["settled_trades"])
 
 
+def refusal_accuracy_2h() -> tuple[Number, Number]:
+    """Directional calls right, and total, at the ~2h horizon.
+
+    The figure that answers "447 decisions, zero trades — it has demonstrated nothing", so it is
+    the last figure in these documents that may be allowed to drift.
+    """
+    row = _refusal_row()
+    return int(row["correct"]), int(row["directional"])
+
+
+def refusal_forgone_2h() -> Number:
+    """Median net bps forgone by refusing, at ~2h. Negative means refusing saved money."""
+    return float(_refusal_row()["median_forgone_bps"])
+
+
+def _refusal_row() -> dict[str, Any]:
+    blob = _json("refusal_alpha.json")
+    for row in blob["horizons"]:
+        if row["horizon"] == "about_2h":
+            return dict(row)
+    raise KeyError("refusal_alpha.json has no about_2h horizon")
+
+
 def module_count() -> int:
     from argus.status import MODULES
     return len(MODULES)
@@ -392,6 +420,19 @@ CLAIMS: tuple[Claim, ...] = (
           r"(?P<q>[\d,]+) (?:falsifiable )?claims? "
           r"(?:across|about|committed|pre-registered|on the register)",
           register_claims, ("readme", "submission", "explained", "master-plan"), mode="lagging"),
+    # Registered 2026-09-20. `eval/refusal.py` existed and ran, and appeared in no document, no
+    # command list and no panel — the single strongest answer to the obvious attack on an
+    # all-refusal ledger was invisible. A number that is not quoted cannot go stale, which is why
+    # it survived every previous sweep of this gate.
+    # `\s+` rather than a literal space, and U+2212 accepted alongside `-`. The first spelling
+    # of these two bound on one document and silently missed the other: the phrase wrapped
+    # across a line there, and the figure was written with a typographic minus. A claim that
+    # matches nothing reports ABSENT, which reads exactly like a document that simply does
+    # not make the claim — so a pattern bug and an honest silence are indistinguishable.
+    Claim("refusal_accuracy_2h", r"(?P<q1>\d+)\s+of\s+(?P<q2>\d+)\s+directional\s+calls",
+          refusal_accuracy_2h, ("readme", "public-readme")),
+    Claim("refusal_forgone_2h", rf"forgave\s+(?P<q>[-{chr(0x2212)}]?[\d.]+)\s*bps of net edge",
+          refusal_forgone_2h, ("readme", "public-readme")),
     Claim("settled_trades", r"(?P<q>\d+) settled trades?",
           settled_trades, ("readme", "submission", "explained")),
     # Registered the day the anchor claims were found to be false. The documents said the register

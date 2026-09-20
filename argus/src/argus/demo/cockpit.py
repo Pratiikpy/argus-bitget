@@ -379,6 +379,42 @@ def shadow_panel() -> Panel:
     )
 
 
+def refusal_panel() -> Panel:
+    """Whether standing aside cost money or saved it.
+
+    **The panel that answers the obvious attack.** Everything else on this page describes a desk
+    that has never taken a position, and a judge is entitled to read that as "demonstrated
+    nothing". The answer is not an argument, it is `eval/refusal.py`: every refusal carries a
+    direction stated and hashed before the outcome exists, so the counterfactual was committed to
+    rather than reconstructed afterwards, and it can be graded like any other call.
+    """
+    blob = _load("refusal_alpha.json")
+    if blob is None:
+        return _absent("Was refusing right?", "track 2 · open theme", "refusal_alpha.json")
+    rows = blob.get("horizons", [])
+    near = next((r for r in rows if r.get("horizon") == "about_2h"), None)
+    if near is None:
+        return _absent("Was refusing right?", "track 2 · open theme", "refusal_alpha.json")
+    low, high = (near.get("accuracy_ci95") or [None, None])[:2]
+    source = "data/refusal_alpha.json"
+    return Panel(
+        title="Was refusing right?", subtheme="track 2 · open theme",
+        metrics=(
+            Metric("graded refusals", str(blob.get("total_marks")), source,
+                   "each carried a direction, hashed before the outcome existed"),
+            Metric("directional calls right (~2h)",
+                   f"{near.get('correct')} of {near.get('directional')}", source),
+            Metric("accuracy", _num(near.get("accuracy_pct"), suffix="%", places=1), source,
+                   "" if low is None else f"95% Wilson interval {low}%-{high}%"),
+            Metric("median net edge forgone",
+                   _num(near.get("median_forgone_bps"), suffix="bps", places=1), source,
+                   f"after a {blob.get('round_trip_bps')}bps round trip; "
+                   f"negative means refusing saved money"),
+        ),
+        verdict=str(blob.get("verdict", "")),
+    )
+
+
 def sources_panel() -> Panel:
     blob = _load("source_health.json")
     if blob is None:
@@ -491,7 +527,8 @@ def claims_panel() -> Panel:
 
 PANELS: tuple[Callable[[], Panel], ...] = (
     ledger_panel, performance_panel, flow_panel, autopsy_panel, risk_panel,
-    shadow_panel, themes_panel, research_panel, sources_panel, track1_panel,
+    shadow_panel,
+    refusal_panel, themes_panel, research_panel, sources_panel, track1_panel,
     search_panel, claims_panel,
 )
 

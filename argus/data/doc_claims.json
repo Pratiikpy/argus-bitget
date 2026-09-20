@@ -1,7 +1,7 @@
 {
-  "total": 78,
-  "checked": 78,
-  "ok": 78,
+  "total": 82,
+  "checked": 82,
+  "ok": 82,
   "stale": 0,
   "absent": 21,
   "unchecked": 0,
@@ -191,7 +191,7 @@
     {
       "claim": "register_claims",
       "doc": "readme",
-      "line": 169,
+      "line": 171,
       "quoted": [
         "156"
       ],
@@ -241,6 +241,62 @@
       "excerpt": "156 claims across"
     },
     {
+      "claim": "refusal_accuracy_2h",
+      "doc": "readme",
+      "line": 169,
+      "quoted": [
+        "92",
+        "158"
+      ],
+      "live": [
+        92,
+        158
+      ],
+      "status": "OK",
+      "excerpt": "92 of 158 directional calls"
+    },
+    {
+      "claim": "refusal_accuracy_2h",
+      "doc": "public-readme",
+      "line": 96,
+      "quoted": [
+        "92",
+        "158"
+      ],
+      "live": [
+        92,
+        158
+      ],
+      "status": "OK",
+      "excerpt": "92 of 158 directional calls"
+    },
+    {
+      "claim": "refusal_forgone_2h",
+      "doc": "readme",
+      "line": 169,
+      "quoted": [
+        "\u22127.9"
+      ],
+      "live": [
+        -7.93
+      ],
+      "status": "OK",
+      "excerpt": "forgave \u22127.9bps of net edge"
+    },
+    {
+      "claim": "refusal_forgone_2h",
+      "doc": "public-readme",
+      "line": 99,
+      "quoted": [
+        "\u22127.9"
+      ],
+      "live": [
+        -7.93
+      ],
+      "status": "OK",
+      "excerpt": "forgave \u22127.9bps of net edge"
+    },
+    {
       "claim": "settled_trades",
       "doc": "readme",
       "line": 64,
@@ -278,7 +334,7 @@
     {
       "claim": "anchors_confirmed",
       "doc": "readme",
-      "line": 169,
+      "line": 171,
       "quoted": [
         "38"
       ],
@@ -442,7 +498,7 @@
     {
       "claim": "ledger_entries",
       "doc": "readme",
-      "line": 226,
+      "line": 228,
       "quoted": [
         "447"
       ],
@@ -516,7 +572,7 @@
     {
       "claim": "leans_recorded",
       "doc": "readme",
-      "line": 237,
+      "line": 239,
       "quoted": [
         "282"
       ],
@@ -723,7 +779,7 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "readme",
-      "line": 215,
+      "line": 217,
       "quoted": [
         "10",
         "11"
@@ -798,7 +854,7 @@
     {
       "claim": "aapl_beta_open",
       "doc": "readme",
-      "line": 215,
+      "line": 217,
       "quoted": [
         "0.68"
       ],
@@ -848,7 +904,7 @@
     {
       "claim": "aapl_beta_shut",
       "doc": "readme",
-      "line": 215,
+      "line": 217,
       "quoted": [
         "0.105"
       ],
@@ -959,7 +1015,7 @@
     {
       "claim": "hurdle_clearing_range",
       "doc": "readme",
-      "line": 242,
+      "line": 244,
       "quoted": [
         "61",
         "89"
@@ -1055,7 +1111,7 @@
     {
       "claim": "teardowns",
       "doc": "readme",
-      "line": 357,
+      "line": 359,
       "quoted": [
         "61"
       ],
