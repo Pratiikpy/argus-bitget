@@ -35,11 +35,13 @@ Nothing above needs a credential.
 
 | | |
 |---|---|
-| Tests | **490 passing**, 11 skipped |
-| Type checking | `mypy --strict` clean on **32 modules** |
+| Tests | **5,100 tests collected**, 33 skipped — run `pytest -q` |
+| Type checking | **`mypy --strict` clean on 266 source files** |
 | Lint | `ruff` clean |
-| Sub-theme coverage | **18/18**, resolved by import at runtime — not claimed in prose |
-| Data artefacts | 13 on disk, each reproducible from a single command |
+| Module health | **131/131 modules importable**, checked by `python -m argus.status` |
+| Sub-theme coverage | **18/18 sub-themes**, resolved by import at runtime — not claimed in prose |
+| Data artefacts | **46 cited across these documents**, every one reproducible from a single named command, with a test that fails if a document cites an artefact nothing writes |
+| Quoted figures | **71 numbers in these documents are re-checked against their artefacts** by `python -m argus.eval.docclaims --tests`, which exits non-zero if any has drifted |
 
 The measurements behind the design are in the PRD, including the ones that went against us:
 
@@ -78,9 +80,13 @@ test asserting the defect cannot be reintroduced.
 **Implemented, not owned.** The PRD's acceptance matrix (§7.2a) records which of ten proof gates
 each sub-theme has passed, and several remain open. Two things are unproven rather than built:
 
-1. **No venue has accepted an order.** The signed path is verified three ways against Bitget's own
-   SDK source and probed live to credential lookup, but signature *acceptance* is untested because
-   no Demo API key exists yet.
+1. **No position has settled.** The venue path itself is proven — the Bitget signature is accepted
+   and a real demo order round-tripped, id `1482642956228374529`, productType `SUSDT-FUTURES`. What
+   does not exist is a *settled* trade: all 447 decisions on the paper ledger are refusals, so
+   Sharpe, max drawdown and win rate are undefined and the code prints the reason for each rather
+   than a zero. Two earlier ledger rows appeared to be filled trades; they recorded positions the
+   risk layer had refused, and they are void — kept in the chain, excluded from every figure, and
+   documented in `argus/src/argus/paper/corrections.py`.
 2. **No certified alpha exists.** 0 of 8 factors and 0 of 12 strategies cleared the deflation gate.
    That is the finding, and it is reported as one.
 

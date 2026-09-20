@@ -39,6 +39,13 @@ REPORT_PATH = DATA / "doc_claims.json"
 
 DOCS = {
     "readme": PACKAGE / "README.md",
+    # The repository's front page — the first document a reader opens, and until 2026-09-20 the
+    # only one this gate could not see, because it had no counterpart in this tree and was edited
+    # directly in the publication repo. It had drifted furthest of any document here: "490 passing"
+    # against a live 5,113, and "clean on 32 modules" against 266 source files — while its own
+    # `pytest -q` code block, eight lines above, said 5,100. Now kept here and synced outward, so
+    # the most-read file is the most-checked one.
+    "public-readme": ROOT / "README.md",
     "submission": ROOT / "SUBMISSION-DRAFT.md",
     "explained": ROOT / "ARGUS-EXPLAINED.md",
     "master-plan": ROOT / "ARGUS-MASTER-PLAN.md",
@@ -279,6 +286,21 @@ def ledger_decisions() -> int:
     return sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
 
 
+def settled_trades() -> int:
+    """Positions that actually settled, voided rows excluded.
+
+    Registered because this is the number that went wrong worst. The README's status block carried
+    "2 settled trades, both directionally correct, +14.99 net after costs" while the same file, two
+    screens up, withdrew that claim — the two rows were booked against positions the Constitution
+    had refused (`paper/corrections.py`). Nothing in the gate covered the sentence, so the
+    self-checking documents reported a clean bill over a figure that contradicted the correction
+    printed above it. A claim the checker cannot see is a claim nobody is checking.
+    """
+    from argus.paper.ledger import PaperLedger
+
+    return int(PaperLedger(path=DATA / "paper_ledger.jsonl").performance()["settled_trades"])
+
+
 def module_count() -> int:
     from argus.status import MODULES
     return len(MODULES)
@@ -361,19 +383,24 @@ CLAIMS: tuple[Claim, ...] = (
     # claim, and matching both made the checker report a disagreement between a document and
     # itself.
     Claim("tests_passing", r"(?P<q>\d{1,3},\d{3}|\d{4,}) tests(?: passing| collected)?",
-          tests_collected, ("readme", "submission", "explained"), mode="at_least"),
+          tests_collected, ("readme", "public-readme", "submission", "explained"), mode="at_least"),
     Claim("source_files", r"strict\W{0,3}clean (?:on|across) (?P<q>\d+) (?:source )?files",
-          source_files, ("readme", "submission", "explained")),
+          source_files, ("readme", "public-readme", "submission", "explained")),
+    # `falsifiable claims about` was added after README:163 was found quoting 36 against a live 156
+    # — the sentence had drifted by 120 claims and matched no pattern, so the gate never saw it.
     Claim("register_claims",
-          r"(?P<q>[\d,]+) claims (?:across|committed|pre-registered|on the register)",
+          r"(?P<q>[\d,]+) (?:falsifiable )?claims? "
+          r"(?:across|about|committed|pre-registered|on the register)",
           register_claims, ("readme", "submission", "explained", "master-plan"), mode="lagging"),
+    Claim("settled_trades", r"(?P<q>\d+) settled trades?",
+          settled_trades, ("readme", "submission", "explained")),
     Claim("ledger_decisions",
           r"(?P<q>[\d,]+) decisions? in the paper ledger",
           ledger_decisions, ("readme", "submission", "explained"), mode="lagging"),
     Claim("modules_importable", r"(?P<q>\d+)/(?P<q2>\d+) modules importable",
-          lambda: (module_count(), module_count()), ("readme", "submission")),
+          lambda: (module_count(), module_count()), ("readme", "public-readme", "submission")),
     Claim("subthemes", r"(?P<q>\d+)/(?P<q2>\d+) sub-themes",
-          lambda: (subtheme_count(), subtheme_count()), ("readme", "submission")),
+          lambda: (subtheme_count(), subtheme_count()), ("readme", "public-readme", "submission")),
     Claim("ledger_entries",
           r"(?P<q>\d+) (?:decisions(?= in the paper ledger|, 20\d\d|\. Every one|, 0 settled)"
           r"|ledger entries)|paper-trading log has (?P<q1>\d+) decisions", ledger_entries,

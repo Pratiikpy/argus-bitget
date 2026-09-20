@@ -83,6 +83,21 @@ class DeskRun:
     panel: SourceIndependenceGraph
     proof: AutonomyProof
     ruling: ConstitutionRuling | None = None
+    ruled_intent: Intent | None = None
+    """The intent the Constitution was actually handed — `attacked`, after escalation.
+
+    **Recorded because its absence made the risk record contradict itself.** `paper/runner.py`
+    wrote `quantity_before` from `proof.llm_original_intent`, the model's first draft, while
+    `binding_constraint` and `reason` came from the ruling on this intent — a later stage. On live
+    seq 264 and 265 that produced a single row reading `quantity_before: "1"` beside
+    `intervened: false` and `reason: "no exposure proposed; nothing to narrow"`, which cannot all
+    be true at once. Downstream, `eval/riskaudit.py` counted those rows as positions offered to the
+    risk layer and reported *"2 of which offered a position to reduce"* while `eval/autopsy.py`
+    reported *"0 of 447 decision(s) proposed exposure"* — two of our own modules disagreeing about
+    the same live record.
+
+    The model's first draft is still worth keeping and is still on the proof; it is simply not what
+    the Constitution ruled on, and the risk record is a record of the Constitution."""
     ablated_rulings: dict[str, ConstitutionRuling] = field(default_factory=dict)
     """Population RCT: the same `attacked` intent this cycle actually decided on, re-ruled against
     every caller-supplied gate-ablated `ConstitutionPolicy`, keyed by label.
@@ -741,7 +756,8 @@ class TradingDesk:
 
         return DeskRun(
             symbol=symbol, as_of=session.as_of, panel=panel,
-            proof=proof, ruling=ruling, ablated_rulings=ablated_rulings, order=order, notes=notes,
+            proof=proof, ruling=ruling, ruled_intent=attacked,
+            ablated_rulings=ablated_rulings, order=order, notes=notes,
             # Sorted so the record is stable between runs on identical evidence; a set's iteration
             # order would make two identical decisions serialise differently.
             evidence_sources=tuple(sorted({e.source for e in evidence})),

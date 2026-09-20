@@ -272,6 +272,31 @@ class TestContentIsEscaped:
         page = _page(Panel("<b>P</b>", "t", ()))
         assert "<b>P</b>" not in page
 
+    def test_terminal_emphasis_renders_as_bold_not_as_asterisks(self) -> None:
+        """Several verdicts come from modules whose primary surface is a terminal, where `**x**` is
+        this codebase's emphasis convention. `eval/autopsy.py`'s falsifier says `**FIRED.**`, and it
+        reached the public page as four literal asterisks."""
+        page = _page(Panel("P", "t", (), verdict="the falsifier **FIRED.** on 216 decisions"))
+        assert "<strong>FIRED.</strong>" in page
+        assert "**" not in page
+
+    def test_emphasis_never_becomes_an_injection_vector(self) -> None:
+        """Escaping happens before the asterisks are paired, so markup inside an emphasised span is
+        still inert — otherwise this would be a way to smuggle tags in through an artefact."""
+        page = _page(Panel("P", "t", (), verdict="**<script>alert(1)</script>**"))
+        assert "<script>" not in page
+        assert "&lt;script&gt;" in page
+
+    def test_an_unbalanced_asterisk_run_is_left_exactly_as_written(self) -> None:
+        """Guessing where the author meant to close emphasis would silently rewrite a verdict."""
+        page = _page(Panel("P", "t", (), verdict="a **dangling run of emphasis"))
+        assert "a **dangling run of emphasis" in page
+        assert "<strong>" not in page
+
+    def test_the_published_page_carries_no_literal_asterisk_pairs(self) -> None:
+        """The real page, not a fixture — this is the surface a judge opens."""
+        assert "**" not in render(build())
+
 
 class TestTheEvidenceIsTraceable:
     def test_every_metric_names_the_file_it_came_from(self) -> None:

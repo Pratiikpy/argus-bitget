@@ -275,3 +275,51 @@ class TestTheLiveRegister:
             )
             ok, note = verify(commitment)
             assert ok, f"attaching the anchor must not change the digest: {note}"
+
+
+class TestTheWallIsReadableByAStranger:
+    """The Wall publishes what we got wrong. A row nobody can check is not publication.
+
+    Both defects here were live on 2026-09-20: every one of the 24 rows printed an unrounded
+    ``str(Decimal)`` up to 28 places, and 7 of the 14 ``abs_move_above_bps`` rows showed a
+    **negative** observed against an ``|x|`` predicate, so the FALSE could not be reproduced from
+    the published row without knowing to take the absolute value first.
+    """
+
+    def test_a_long_decimal_is_rounded_for_display(self) -> None:
+        from argus.register.resolve import shown
+
+        claim = replace(_claim(), observed="12.25316932937461708845845704")
+        assert shown(claim) == "12.25"
+
+    def test_an_absolute_predicate_shows_the_value_it_was_graded_on(self) -> None:
+        """A signed observed under an |x| test is the row a reader cannot verify."""
+        from argus.register.resolve import shown
+
+        claim = replace(
+            _claim(predicate=Predicate.ABS_MOVE_ABOVE_BPS, threshold="50"),
+            observed="-5.577867023650156180276662204",
+        )
+        assert shown(claim) == "|-5.58| = 5.58"
+
+    def test_the_stored_value_is_never_altered(self) -> None:
+        """Display-time only. The exact string is what the verdict was computed from, and it is
+        the audit trail — rounding it at the source would rewrite resolved, anchored claims."""
+        from argus.register.resolve import shown
+
+        exact = "12.25316932937461708845845704"
+        claim = replace(_claim(), observed=exact)
+        shown(claim)
+        assert claim.observed == exact
+
+    def test_a_pending_claim_has_nothing_to_show(self) -> None:
+        from argus.register.resolve import shown
+
+        assert shown(_claim()) == "—"
+
+    def test_an_unresolvable_reason_is_passed_through_unchanged(self) -> None:
+        """UNRESOLVABLE stores a sentence, not a number. Formatting it would destroy it."""
+        from argus.register.resolve import shown
+
+        reason = "no bar at or before registration to measure the move from"
+        assert shown(replace(_claim(), observed=reason)) == reason

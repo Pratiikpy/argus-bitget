@@ -1,8 +1,8 @@
 {
   "decisions": 365,
-  "positions_offered": 2,
+  "positions_offered": 0,
   "interventions": 0,
-  "intervention_rate": 0.0,
+  "intervention_rate": null,
   "exercise": "untested",
   "healthy": false,
   "by_constraint": {},

@@ -188,9 +188,14 @@ def ledger_panel() -> Panel:
                    "the direction the desk would have taken if forced"),
         ),
         verdict=(
-            "Written before the outcome exists, hash-chained, and anchored. Two positions have "
-            "settled: win rate is reported, Sharpe and max drawdown are still refused as "
-            "undefined rather than printed as zero on a two-trade sample."
+            # This said "Two positions have settled: win rate is reported" until 2026-09-20. They
+            # had not: both rows were booked against positions the Constitution refused, and are
+            # now VOID (`paper/corrections.py`). Nothing has settled, so no win rate exists — and
+            # a public evidence page is the last place a withdrawn number should survive.
+            "Written before the outcome exists, hash-chained, and anchored. No position has "
+            "settled, so win rate, Sharpe and max drawdown are all refused as undefined rather "
+            "than printed as zero — a zero here would describe an account that never traded, not "
+            "a desk that traded badly."
         ),
     )
 
@@ -247,16 +252,24 @@ def performance_panel() -> Panel:
             Metric("settled trades", str(perf.trades), source),
         ),
         verdict=(
-            "Two positions have now settled, so these three figures no longer move together. "
-            "Win rate is a descriptive count of what happened and is reported: 2 of 2. Sharpe and "
-            "max drawdown are inferential and are still refused, because two daily returns cannot "
-            "carry a standard deviation and two winning trades produce a 0.00% drawdown that would "
-            "read as 'took risk, never lost' rather than 'has taken two positions'. That split is "
-            "deliberate and it is the product: report exactly what the sample earns, nothing "
-            "beyond it. NO EDGE IS CLAIMED FROM n=2. A thin record remains the largest gap in the "
-            "Track 2 case, and it is stated here rather than left for a judge to find. The figures "
-            "come from the same function that writes data/scorecard.json, so this page and that "
-            "artefact cannot drift apart."
+            # Rewritten 2026-09-20. This panel claimed "Two positions have now settled ... Win rate
+            # is reported: 2 of 2". Both rows were booked against positions the Constitution had
+            # refused, by a `paper/runner.py` defect, and are now VOID. The claim is withdrawn here
+            # rather than quietly deleted, because a page whose whole argument is "we publish what
+            # we got wrong" does not get to make its own error disappear.
+            # No markdown here — this string is written straight into <p class="verdict">, so "**"
+            # would render as literal asterisks on the public page.
+            "ZERO POSITIONS HAVE SETTLED. All three figures are refused as undefined, and each "
+            "says why rather than printing a zero: a 0.00% drawdown over an account that never "
+            "took a position reads as 'took risk, never lost' and is not comparable to a traded "
+            "strategy's. A win rate over zero trades is undefined, not zero per cent. NO EDGE IS "
+            "CLAIMED, AND NONE CAN BE. This page previously reported two settled trades and a 100% "
+            "win rate; those rows were recorded against positions the risk layer had refused, and "
+            "they are void — kept in the chain, excluded from every figure, and named in the "
+            "correction the ledger prints. A thin record is the largest gap in the Track 2 case, "
+            "and it is stated here rather than left for a judge to find. The figures come from the "
+            "same function that writes data/scorecard.json, so this page and that artefact cannot "
+            "drift apart."
         ),
     )
 
@@ -394,9 +407,15 @@ def research_panel() -> Panel:
     return Panel(
         title="One complete research task", subtheme="track 3 · required",
         metrics=(
-            Metric("question", str(blob.get("question", ""))[:120], "data/research_report.json"),
+            # Short labels here on purpose. The panel's `dl` is a two-column grid with the value
+            # right-aligned, so a long label wraps and drags its value down with it: "lookups
+            # attempted and answered" rendered over four lines beside a value of "11/11", and the
+            # full question ran to three. Both are put in the note, which is full-width.
+            Metric("question", _first_line(str(blob.get("question", ""))),
+                   "data/research_report.json", str(blob.get("question", ""))[:160]),
             Metric("findings", str(len(blob.get("findings", []))), "data/research_report.json"),
-            Metric("lookups attempted and answered", str(coverage), "data/research_report.json"),
+            Metric("lookups answered", str(coverage), "data/research_report.json",
+                   "every lookup the task attempted, and how many returned an answer"),
             Metric("stated concerns", str(len(blob.get("concerns", []))),
                    "data/research_report.json"),
         ),
@@ -543,6 +562,35 @@ dd{text-align:left}}
 """
 
 
+def _first_line(text: str, *, limit: int = 34) -> str:
+    """A value short enough for the right-hand column, cut on a word boundary.
+
+    The grid gives a value about a third of the panel, so anything longer wraps and pushes the
+    whole row apart. The untruncated text goes in the note beneath, which spans the full width."""
+    text = " ".join(text.split())
+    if len(text) <= limit:
+        return text
+    return text[:limit].rsplit(" ", 1)[0] + "…"
+
+
+def _emphasis(text: str) -> str:
+    """Escape for HTML, then turn `**bold**` into `<strong>`.
+
+    Several verdicts are produced by modules whose primary surface is a terminal, where `**x**` is
+    this codebase's emphasis convention — `eval/autopsy.py`'s falsifier says `**FIRED.**`. Escaping
+    those strings and writing them straight into the page printed literal asterisks on a public,
+    judge-visible surface. Order matters: escape first, so the pairing below can only ever see the
+    asterisks and never markup a panel's text smuggled in from an artefact.
+    """
+    escaped = html.escape(text)
+    parts = escaped.split("**")
+    if len(parts) % 2 == 0:  # unbalanced — leave it exactly as written rather than guess
+        return escaped
+    return "".join(
+        part if i % 2 == 0 else f"<strong>{part}</strong>" for i, part in enumerate(parts)
+    )
+
+
 def _panel_html(panel: Panel) -> str:
     head = (
         f'<div class="panel-head"><h2>{html.escape(panel.title)}</h2>'
@@ -565,7 +613,7 @@ def _panel_html(panel: Panel) -> str:
         if metric.note:
             rows.append(f'<p class="note">{html.escape(metric.note)}</p>')
     body = f"<dl>{''.join(rows)}</dl>" if rows else ""
-    verdict = f'<p class="verdict">{html.escape(panel.verdict)}</p>' if panel.verdict else ""
+    verdict = f'<p class="verdict">{_emphasis(panel.verdict)}</p>' if panel.verdict else ""
     sources = sorted({m.source for m in panel.metrics})
     src = f'<span class="src">{html.escape(" · ".join(sources))}</span>' if sources else ""
     return f'<section class="panel">{head}{body}{verdict}{src}</section>'

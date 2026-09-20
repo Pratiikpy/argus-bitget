@@ -568,7 +568,21 @@ class PaperLedger:
         fixed 2026-09-20). They stay in the chain unedited; every figure here excludes them, and
         the correction is reported alongside rather than silently applied.
         """
+        from argus.eval.performance import evaluate_ledger
         from argus.paper.corrections import VOIDED, is_voided, render
+
+        # Sharpe, max drawdown and win rate — with the REASON each is undefined rather than a
+        # zero — live in `eval/performance.py`, and this method never surfaced them, so the README
+        # pointed a reader at a command that could not answer what it promised. One definition,
+        # reported here. The import is local because `eval/performance.py` imports `PaperLedger` at
+        # module scope; a top-level import is circular (same reason `corrections` is imported here).
+        graded = evaluate_ledger(self).as_dict()
+        metrics = {
+            "sharpe": graded["sharpe"],
+            "max_drawdown_pct": graded["max_drawdown_pct"],
+            "win_rate_pct": graded["win_rate_pct"],
+            "undefined": graded["undefined"],
+        }
 
         settled = [
             e for e in self.entries
@@ -583,12 +597,12 @@ class PaperLedger:
                 "abstentions": len(abstentions),
                 "settled_trades": 0,
                 "note": "no settled trades yet — nothing to report",
+                **metrics,
                 **correction,
             }
 
         nets = [Decimal(e.net_pnl or "0") for e in settled]
         grosses = [Decimal(e.gross_pnl or "0") for e in settled]
-        wins = sum(1 for n in nets if n > 0)
 
         return {
             "decisions": len(self.entries),
@@ -599,7 +613,10 @@ class PaperLedger:
             "net_pnl": str(sum(nets)),
             "cost_drag": str(sum(grosses) - sum(nets)),
             "cost_flipped_the_sign": sum(grosses) > 0 >= sum(nets),
-            "win_rate_pct": round(100 * wins / len(settled), 1),
+            # `win_rate_pct` deliberately comes from `metrics`, not from `wins / len(settled)`
+            # recomputed here — one definition, and `eval/performance.py`'s is the one that knows
+            # when the count is too small to mean anything.
             "chain": self.verify(),
+            **metrics,
             **correction,
         }

@@ -373,8 +373,31 @@ def check(
             "no cycle log records a token figure, so the drain on the key cannot be measured",
         ))
 
-    if "token budget exhausted" in text:
-        checks.append(Check("budget_not_exhausted", FAIL, "the guard fired during the cycle"))
+    # **The budget ends a cycle two ways and only one of them says "token budget exhausted".**
+    # `llm/qwen.py:143` raises with that phrase, but `paper/runner.py` stops *pre-emptively* when
+    # `budget.remaining < PER_SYMBOL_TOKENS` and breaks — so the guard never fires and the phrase
+    # never reaches the log. That is how cycle_2026-09-20_0100 reported `budget_not_exhausted PASS`
+    # in the same report as `ran_to_completion FAIL — stopped after 11 of 12 symbol(s): 13314
+    # token(s) left of 330000, below the 25000 a symbol costs`. A substring search for one module's
+    # wording is structurally incapable of catching the only way the budget now actually truncates
+    # a cycle. Test the condition instead: a cycle that stopped early with less than one symbol's
+    # worth of budget left was stopped BY the budget, whoever wrote the sentence.
+    from argus.paper.runner import PER_SYMBOL_TOKENS
+
+    guard_fired = "token budget exhausted" in text
+    stop_reason = stopped.group(1) if stopped else ""
+    headroom = (
+        int(budget.group(1)) - int(spent.group(1))
+        if spent is not None and budget is not None
+        else None
+    )
+    starved = bool(stop_reason) and headroom is not None and headroom < PER_SYMBOL_TOKENS
+    if guard_fired or starved:
+        checks.append(Check(
+            "budget_not_exhausted", FAIL,
+            "the guard fired during the cycle" if guard_fired
+            else f"the budget ended the cycle before the guard had to — {stop_reason}",
+        ))
     else:
         checks.append(Check("budget_not_exhausted", PASS, "the guard did not fire"))
 

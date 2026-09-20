@@ -356,7 +356,15 @@ def main() -> int:  # pragma: no cover - CLI
     )
     sizes = [Decimal(s.strip()) for s in args.sizes.split(",") if s.strip()]
     header = f"{'symbol':12} {'quoted':>8} " + " ".join(f"{'$' + str(int(s)):>10}" for s in sizes)
-    print("EXECUTABLE COST — slippage in bps against mid, taking the ask\n")
+    # The two kinds of number in this table are not the same measurement, and the header used to
+    # claim they were ("slippage in bps against mid, taking the ask"). `quoted` is the FULL
+    # touch-to-touch spread (`Book.spread_bps`, line 134); the size columns are mid-relative
+    # (`Sweep.slippage_bps`, line 185). A size that fits inside the top level pays the HALF spread,
+    # so it reads exactly half `quoted` — QQQUSDT prints quoted 0.14 beside $1000 0.07. Anyone
+    # taking a quoted-vs-executable ratio off the old header divided by a denominator twice too
+    # large and understated the gap the table exists to show.
+    print("EXECUTABLE COST — bps. 'quoted' is the full bid-ask spread; the size columns are")
+    print("slippage against mid, taking the ask (a size inside the touch reads half 'quoted').\n")
     print(header)
     print("-" * len(header))
     rows: list[dict[str, Any]] = []

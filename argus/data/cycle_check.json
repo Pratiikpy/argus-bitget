@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T06:47:46.594696+00:00",
+  "generated_at": "2026-09-20T07:02:29.129851+00:00",
   "log": "cycle_2026-09-20_0100.log",
   "sound": false,
   "saw_price_discovery": false,
@@ -33,8 +33,8 @@
     },
     {
       "check": "budget_not_exhausted",
-      "status": "PASS",
-      "detail": "the guard did not fire"
+      "status": "FAIL",
+      "detail": "the budget ended the cycle before the guard had to \u2014 stopped after 11 of 12 symbol(s): 13314 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
     },
     {
       "check": "chain_intact",
@@ -62,5 +62,5 @@
       "detail": "session phase(s) seen: weekend  (anchor market shut)"
     }
   ],
-  "verdict": "9/11 checks passed. FAILED \u2014 symbols_decided: 11 of 12 symbols produced a decision; ran_to_completion: stopped after 11 of 12 symbol(s): 13314 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.. The cycle ran with the anchor market shut, so it says nothing about whether this desk trades"
+  "verdict": "8/11 checks passed. FAILED \u2014 symbols_decided: 11 of 12 symbols produced a decision; ran_to_completion: stopped after 11 of 12 symbol(s): 13314 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.; budget_not_exhausted: the budget ended the cycle before the guard had to \u2014 stopped after 11 of 12 symbol(s): 13314 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.. The cycle ran with the anchor market shut, so it says nothing about whether this desk trades"
 }

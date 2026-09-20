@@ -310,6 +310,11 @@ def _write_risk_record(seq: int, symbol: str, at: datetime, run: DeskRun) -> Non
     """
     ruling = run.ruling
     original = run.proof.llm_original_intent
+    # `quantity_before` must be what the **Constitution** was handed, not the model's first draft.
+    # See `DeskRun.ruled_intent` for the live rows where those two differed and made the record
+    # self-contradictory. Falls back to the draft only when the desk recorded no ruled intent at
+    # all, which is the pre-2026-09-20 record shape.
+    ruled = run.ruled_intent or original
     final = run.proof.llm_revised_intent or (
         ruling.resulting_intent if ruling is not None else original
     )
@@ -327,7 +332,10 @@ def _write_risk_record(seq: int, symbol: str, at: datetime, run: DeskRun) -> Non
                 "chain_schema": RECORD_SCHEMA,
                 "binding_constraint": None if ruling is None else ruling.binding_constraint,
                 "reason": None if ruling is None else ruling.reason,
-                "quantity_before": str(original.quantity),
+                "quantity_before": str(ruled.quantity),
+                # Kept alongside, not instead: the model's first draft is real and worth auditing,
+                # it is simply not the number the risk layer acted on.
+                "model_draft_quantity": str(original.quantity),
                 "quantity_after": str(final.quantity),
                 "model_changed_its_mind": run.proof.llm_changed_its_mind,
                 "constitution_only_reduced": run.proof.constitution_only_reduced(),

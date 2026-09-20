@@ -150,6 +150,33 @@ class TestTheDenominatorIsTheDecisionsThatOfferedAPosition:
         rows = [_abstention(i) for i in range(1, 40)]
         assert from_records(rows).decisions == 39
 
+    def test_a_voided_row_is_not_counted_as_a_position_offered(self) -> None:
+        """**The live seq-264 shape.** Until 2026-09-20 `paper/runner.py` wrote `quantity_before`
+        from the model's first draft rather than from the intent the Constitution actually ruled
+        on, so the two voided rows store `quantity_before: "1"` beside `intervened: false` and
+        `reason: "no exposure proposed"`. Counting them made this module report 2 positions offered
+        while `eval/autopsy.py` reported 0 proposed exposure off the same record.
+
+        The stored rows are deliberately not edited — see `paper/corrections.py` — so every reader
+        carries the correction instead.
+        """
+        from argus.paper.corrections import VOIDED
+
+        assert VOIDED, "this test is meaningless if the void register is empty"
+        voided = [_row(v.seq, intervened=False, before="1", after="0") for v in VOIDED]
+        report = from_records(voided + [_abstention(i) for i in range(900, 940)])
+        assert report.positions_offered == 0
+        assert report.rate is None
+        assert report.exercise is Exercise.UNTESTED
+
+    def test_a_voided_row_is_still_counted_as_a_decision(self) -> None:
+        """Excluded from the numerator, never from the record. A void row happened; hiding it from
+        the decision count would be the deletion this whole correction exists to refuse."""
+        from argus.paper.corrections import VOIDED
+
+        voided = [_row(v.seq, intervened=False, before="1", after="0") for v in VOIDED]
+        assert from_records(voided).decisions == len(VOIDED)
+
 
 class TestTheAsymmetryIsChecked:
     def test_increasing_exposure_is_caught(self) -> None:

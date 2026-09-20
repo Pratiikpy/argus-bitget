@@ -92,6 +92,18 @@ IDENTITY_TOLERANCE = 1e-9
 
 Floating point only; anything larger is a bug in the decomposition, not rounding."""
 
+SAME_TRADE_RHO = 0.70
+"""|rho| at or above which a candidate is substantially the position already held.
+
+Above this the second name adds notional without adding a bet, which is the case the diversification
+warning exists for. These twelve instruments routinely correlate above 0.9, so the bar is set where
+the relationship stops being incidental rather than at a textbook 0.5."""
+
+DISTINCT_TRADE_RHO = 0.30
+"""|rho| at or below which the candidate is a materially different bet.
+
+Between the two constants the honest answer is "partly" — and saying so beats picking a side."""
+
 
 class Session(StrEnum):
     """Which bars an estimate was computed over."""
@@ -475,10 +487,22 @@ class TradeImpact:
             )
         if self.max_correlation is not None:
             other, rho = self.max_correlation
-            lines.append(
-                f"[portfolio] most correlated with {other} at {rho:+.2f}; adding it buys less "
-                f"diversification than the position count suggests"
-            )
+            # The verdict must follow the number it quotes. This clause used to be appended
+            # unconditionally, and `max_correlation` is non-None for any non-empty prior book, so
+            # it fired on every run regardless: a four-name book whose effective positions ROSE
+            # 2.4 -> 3.2 at a max |rho| of 0.26 was told, two lines below that, that the trade
+            # "buys less diversification than the position count suggests". The two sentences
+            # contradicted each other and the correlation one was wrong.
+            if abs(rho) >= SAME_TRADE_RHO:
+                verdict = "adding it buys less diversification than the position count suggests"
+            elif abs(rho) <= DISTINCT_TRADE_RHO:
+                verdict = "largely a different bet from what you already own"
+            else:
+                verdict = (
+                    "partly the same trade; the diversification is real but smaller than the "
+                    "position count suggests"
+                )
+            lines.append(f"[portfolio] most correlated with {other} at {rho:+.2f}; {verdict}")
         lines.extend(f"[portfolio] {note}" for note in self.notes)
         return lines
 

@@ -26,7 +26,7 @@ import json
 from collections.abc import Sequence
 from dataclasses import asdict, replace
 from datetime import UTC, datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
@@ -259,7 +259,9 @@ def scoreboard(
         "wall": [
             {
                 "claim": c.render(), "claimant": c.claimant, "confidence": c.confidence,
-                "observed": c.observed, "resolved_at": c.resolved_at,
+                # Both: `observed` is the exact graded value (the audit trail), `observed_shown`
+                # is what a reader can check against the threshold. See `shown()`.
+                "observed": c.observed, "observed_shown": shown(c), "resolved_at": c.resolved_at,
                 "hash": c.entry_hash,
             }
             for c in sorted(
@@ -268,6 +270,32 @@ def scoreboard(
             )
         ],
     }
+
+
+def shown(claim: Claim) -> str:
+    """How an observed value is *printed*. `claim.observed` keeps the exact graded value.
+
+    The Wall is read by strangers, and it was publishing two things a stranger cannot check.
+    Every row printed an unrounded ``str(Decimal)`` — up to 28 decimal places of a basis-point
+    figure sitting beside a threshold quoted to two. And under ``ABS_MOVE_ABOVE_BPS`` the stored
+    value is *signed* (line 130) while the verdict is graded on ``abs(move_bps)`` (line 136), so
+    seven of fourteen such rows published a negative observed against an ``|x|`` test: a reader
+    comparing ``-5.58`` to a threshold of ``50.23`` cannot reproduce the FALSE without knowing to
+    take the absolute value first.
+
+    Fixed at display time, not at write time, deliberately: the stored string is the audit trail —
+    it is the number the verdict was actually computed from — and rounding it at the source would
+    silently rewrite claims already resolved and anchored.
+    """
+    if claim.observed is None:
+        return "—"  # PENDING: the horizon has not passed, so nothing has been observed
+    try:
+        value = Decimal(claim.observed)
+    except (InvalidOperation, ValueError):
+        return claim.observed  # an UNRESOLVABLE reason, not a number
+    if claim.predicate is Predicate.ABS_MOVE_ABOVE_BPS:
+        return f"|{value:.2f}| = {abs(value):.2f}"
+    return f"{value:.2f}"
 
 
 def main() -> int:  # pragma: no cover - CLI
@@ -285,7 +313,7 @@ def main() -> int:  # pragma: no cover - CLI
         fresh = resolve_all()
         print(f"{len(fresh)} claim(s) resolved this run")
         for claim in fresh:
-            print("  " + claim.render() + f"  observed {claim.observed}")
+            print("  " + claim.render() + f"  observed {shown(claim)}")
 
     board = scoreboard()
     print()
@@ -301,7 +329,7 @@ def main() -> int:  # pragma: no cover - CLI
     if board["wall"]:
         print(f"\n  THE WALL — {len(board['wall'])} claim(s) we got wrong, most confident first:")
         for miss in board["wall"][:10]:
-            print(f"    {miss['claim']}  observed {miss['observed']}")
+            print(f"    {miss['claim']}  observed {miss['observed_shown']}")
 
     out = REGISTER_PATH.parent / "register_scoreboard.json"
     out.write_text(json.dumps(board, indent=2), encoding="utf-8")

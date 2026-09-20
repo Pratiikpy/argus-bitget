@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-20T02:25:52.317400+00:00",
-  "modules": 265,
-  "internal_imports": 698,
+  "generated_at": "2026-09-20T07:34:20.477071+00:00",
+  "modules": 266,
+  "internal_imports": 705,
   "sound": true,
   "violations": [],
   "cycles": [
@@ -18,6 +18,13 @@
       "members": [
         "argus.eval.collect",
         "argus.eval.incremental"
+      ],
+      "import_time": false
+    },
+    {
+      "members": [
+        "argus.eval.performance",
+        "argus.paper.ledger"
       ],
       "import_time": false
     },
@@ -83,9 +90,9 @@
     {
       "package": "eval",
       "modules": 122,
-      "afferent": 8,
+      "afferent": 9,
       "efferent": 16,
-      "instability": 0.667
+      "instability": 0.64
     },
     {
       "package": "execution",
@@ -117,10 +124,10 @@
     },
     {
       "package": "paper",
-      "modules": 9,
-      "afferent": 24,
+      "modules": 10,
+      "afferent": 25,
       "efferent": 10,
-      "instability": 0.294
+      "instability": 0.286
     },
     {
       "package": "proof",
@@ -179,5 +186,5 @@
       "instability": 0.0
     }
   ],
-  "verdict": "265 modules, 698 internal imports. every declared contract holds: the deterministic core reaches no model-facing module at any depth, and no producer imports its consumer. 4 dependency cycle(s), each broken at load by a deferred import in one direction \u2014 real coupling, safe ordering, and reported rather than scored as clean."
+  "verdict": "266 modules, 705 internal imports. every declared contract holds: the deterministic core reaches no model-facing module at any depth, and no producer imports its consumer. 5 dependency cycle(s), each broken at load by a deferred import in one direction \u2014 real coupling, safe ordering, and reported rather than scored as clean."
 }

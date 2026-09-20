@@ -1,20 +1,46 @@
 {
-  "total": 69,
-  "checked": 69,
-  "ok": 69,
+  "total": 76,
+  "checked": 76,
+  "ok": 76,
   "stale": 0,
-  "absent": 19,
+  "absent": 21,
   "unchecked": 0,
   "findings": [
     {
       "claim": "tests_passing",
       "doc": "readme",
-      "line": 55,
+      "line": 61,
       "quoted": [
         "5,100"
       ],
       "live": [
-        5100
+        5113
+      ],
+      "status": "OK",
+      "excerpt": "5,100 tests collected"
+    },
+    {
+      "claim": "tests_passing",
+      "doc": "public-readme",
+      "line": 27,
+      "quoted": [
+        "5,100"
+      ],
+      "live": [
+        5113
+      ],
+      "status": "OK",
+      "excerpt": "5,100 tests collected"
+    },
+    {
+      "claim": "tests_passing",
+      "doc": "public-readme",
+      "line": 38,
+      "quoted": [
+        "5,100"
+      ],
+      "live": [
+        5113
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -27,7 +53,7 @@
         "5,100"
       ],
       "live": [
-        5100
+        5113
       ],
       "status": "OK",
       "excerpt": "5,100 tests"
@@ -40,7 +66,7 @@
         "5,100"
       ],
       "live": [
-        5100
+        5113
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -53,7 +79,7 @@
         "5,100"
       ],
       "live": [
-        5100
+        5113
       ],
       "status": "OK",
       "excerpt": "5,100 tests"
@@ -66,7 +92,7 @@
         "5,100"
       ],
       "live": [
-        5100
+        5113
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -79,7 +105,7 @@
         "5,100"
       ],
       "live": [
-        5100
+        5113
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -87,7 +113,7 @@
     {
       "claim": "source_files",
       "doc": "readme",
-      "line": 55,
+      "line": 61,
       "quoted": [
         "266"
       ],
@@ -96,6 +122,19 @@
       ],
       "status": "OK",
       "excerpt": "strict clean on 266 source files"
+    },
+    {
+      "claim": "source_files",
+      "doc": "public-readme",
+      "line": 39,
+      "quoted": [
+        "266"
+      ],
+      "live": [
+        266
+      ],
+      "status": "OK",
+      "excerpt": "strict` clean on 266 source files"
     },
     {
       "claim": "source_files",
@@ -151,6 +190,19 @@
     },
     {
       "claim": "register_claims",
+      "doc": "readme",
+      "line": 169,
+      "quoted": [
+        "156"
+      ],
+      "live": [
+        156
+      ],
+      "status": "OK",
+      "excerpt": "156 falsifiable claims about"
+    },
+    {
+      "claim": "register_claims",
       "doc": "submission",
       "line": 81,
       "quoted": [
@@ -189,9 +241,44 @@
       "excerpt": "156 claims across"
     },
     {
+      "claim": "settled_trades",
+      "doc": "readme",
+      "line": 64,
+      "quoted": [
+        "0"
+      ],
+      "live": [
+        0
+      ],
+      "status": "OK",
+      "excerpt": "0 settled trades"
+    },
+    {
+      "claim": "settled_trades",
+      "doc": "submission",
+      "line": null,
+      "quoted": [],
+      "live": [
+        0
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "settled_trades",
+      "doc": "explained",
+      "line": null,
+      "quoted": [],
+      "live": [
+        0
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
       "claim": "ledger_decisions",
       "doc": "readme",
-      "line": 57,
+      "line": 63,
       "quoted": [
         "447"
       ],
@@ -226,7 +313,22 @@
     {
       "claim": "modules_importable",
       "doc": "readme",
-      "line": 56,
+      "line": 62,
+      "quoted": [
+        "131",
+        "131"
+      ],
+      "live": [
+        131,
+        131
+      ],
+      "status": "OK",
+      "excerpt": "131/131 modules importable"
+    },
+    {
+      "claim": "modules_importable",
+      "doc": "public-readme",
+      "line": 41,
       "quoted": [
         "131",
         "131"
@@ -256,7 +358,22 @@
     {
       "claim": "subthemes",
       "doc": "readme",
-      "line": 56,
+      "line": 62,
+      "quoted": [
+        "18",
+        "18"
+      ],
+      "live": [
+        18,
+        18
+      ],
+      "status": "OK",
+      "excerpt": "18/18 sub-themes"
+    },
+    {
+      "claim": "subthemes",
+      "doc": "public-readme",
+      "line": 42,
       "quoted": [
         "18",
         "18"
@@ -286,7 +403,7 @@
     {
       "claim": "ledger_entries",
       "doc": "readme",
-      "line": 57,
+      "line": 63,
       "quoted": [
         "447"
       ],
@@ -299,7 +416,7 @@
     {
       "claim": "ledger_entries",
       "doc": "readme",
-      "line": 220,
+      "line": 226,
       "quoted": [
         "447"
       ],
@@ -373,7 +490,7 @@
     {
       "claim": "leans_recorded",
       "doc": "readme",
-      "line": 231,
+      "line": 237,
       "quoted": [
         "282"
       ],
@@ -473,7 +590,7 @@
     {
       "claim": "t1_dsr_survivors",
       "doc": "explained",
-      "line": 2829,
+      "line": 2844,
       "quoted": [
         "Zero"
       ],
@@ -580,7 +697,7 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "readme",
-      "line": 209,
+      "line": 215,
       "quoted": [
         "10",
         "11"
@@ -655,7 +772,7 @@
     {
       "claim": "aapl_beta_open",
       "doc": "readme",
-      "line": 209,
+      "line": 215,
       "quoted": [
         "0.68"
       ],
@@ -705,7 +822,7 @@
     {
       "claim": "aapl_beta_shut",
       "doc": "readme",
-      "line": 209,
+      "line": 215,
       "quoted": [
         "0.105"
       ],
@@ -816,7 +933,7 @@
     {
       "claim": "hurdle_clearing_range",
       "doc": "readme",
-      "line": 236,
+      "line": 242,
       "quoted": [
         "61",
         "89"
@@ -912,7 +1029,7 @@
     {
       "claim": "teardowns",
       "doc": "readme",
-      "line": 351,
+      "line": 357,
       "quoted": [
         "61"
       ],

@@ -390,7 +390,11 @@ class Autopsy:
     def verdict(self) -> str:
         if not self.decisions:
             return "UNDEFINED: no decisions on record; nothing to explain"
-        if self.proposed_exposure:
+        # `and not self.unreached` is load-bearing. Some decisions proposing exposure does not make
+        # the whole chain exercised: the ones that stopped at gate 1 still never reached the gates
+        # below, and the listing under this verdict would show them UNREACHED while the sentence
+        # claimed the opposite. Only claim "exercised" when nothing is actually unreached.
+        if self.proposed_exposure and not self.unreached:
             return (
                 f"{self.proposed_exposure} of {self.decisions} decision(s) proposed exposure, so "
                 f"the risk chain has live inputs and its outcomes below are exercised rather than "

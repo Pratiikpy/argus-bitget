@@ -219,8 +219,18 @@ def check() -> dict[str, Any]:
 
 
 def main() -> int:
-    print(json.dumps(check(), indent=2, default=str))
-    return 0
+    """Exit non-zero when a document quotes a number the artefacts contradict.
+
+    This used to `return 0` unconditionally, so a stale figure appeared as one line of JSON inside
+    a report that a reader — or a CI step — would call green. The count is already computed and
+    already printed; making it an exit code costs nothing and is the difference between reporting
+    the defect and catching it. Note this is the cheap audit: `tests_passing` is in `EXPENSIVE` and
+    is skipped here, which is why the block names its `unchecked` count. `eval/docclaims.py
+    --tests` is the exhaustive gate.
+    """
+    report = check()
+    print(json.dumps(report, indent=2, default=str))
+    return 1 if report["doc_claims"]["stale"] else 0
 
 
 if __name__ == "__main__":

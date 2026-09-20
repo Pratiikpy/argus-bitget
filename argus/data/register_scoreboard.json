@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T06:45:53.176014+00:00",
+  "generated_at": "2026-09-20T07:02:00.639921+00:00",
   "registered": 156,
   "resolved": 66,
   "pending": 88,
@@ -20,6 +20,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "12.25316932937461708845845704",
+      "observed_shown": "|12.25| = 12.25",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "381cbc033f4b39d1b104cc166fa5dce9eb4fbd907a6a8031efdec64919188919"
     },
@@ -28,6 +29,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "-5.577867023650156180276662204",
+      "observed_shown": "|-5.58| = 5.58",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "c387181dd2e6a8abc2d2c93bb7577f6b366b8f16cbccc646f24ef19fd0d3df79"
     },
@@ -36,6 +38,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "-12.37324963785610816030902945",
+      "observed_shown": "|-12.37| = 12.37",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "2588c7bcd941f4ef6fd18d48f2a204e763d9ca723ee1b486d367ae17ea420ed5"
     },
@@ -44,6 +47,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "-32.76229572905976158522144154",
+      "observed_shown": "|-32.76| = 32.76",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "d71b10a405eb8c6de91b61edd1e9c9dd090ef8fb7e49fc64386390da684b3191"
     },
@@ -52,6 +56,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "-22.67402312750359005366185474",
+      "observed_shown": "|-22.67| = 22.67",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "919de6cb9750a98cc9877f92ff6ae6faaa3b28a573ddb77ddc022f0c436a33c4"
     },
@@ -60,6 +65,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "-13.14317673378076062639821029",
+      "observed_shown": "|-13.14| = 13.14",
       "resolved_at": "2026-09-16T20:12:44.239960+00:00",
       "hash": "5eec2201b2a47a5e460f743188dafd88c199a875053a7d9a677a18c6f04861c6"
     },
@@ -68,6 +74,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "33.15449996985954548194586774",
+      "observed_shown": "|33.15| = 33.15",
       "resolved_at": "2026-09-16T20:12:44.239960+00:00",
       "hash": "4ae4dfa61cdfbba4b8b45fe88fe5e18115a917b2d3ba1fb98e23d7c8b7bd8cea"
     },
@@ -76,6 +83,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "41.36443544932118006825131849",
+      "observed_shown": "|41.36| = 41.36",
       "resolved_at": "2026-09-17T16:14:31.791501+00:00",
       "hash": "fe99a221619988fdcd2f05a8017619539a9ed00971ba6be5a9e5368ef47e6093"
     },
@@ -84,6 +92,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "168.2829435253850541928123217",
+      "observed_shown": "|168.28| = 168.28",
       "resolved_at": "2026-09-17T20:11:04.282834+00:00",
       "hash": "394c43522a43b9f2faf0befce457c4a180eddea738fc91a36c68cb11b4396de6"
     },
@@ -92,6 +101,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "14.49881500069705841349505089",
+      "observed_shown": "|14.50| = 14.50",
       "resolved_at": "2026-09-18T18:15:19.349621+00:00",
       "hash": "933c2db4e3a664dd1dd59ad87ee3c3bc5f8a403aedc01852cf2756a97d938d06"
     },
@@ -100,6 +110,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "8.305311347891261191913462707",
+      "observed_shown": "|8.31| = 8.31",
       "resolved_at": "2026-09-19T14:15:06.858649+00:00",
       "hash": "56fdd97d5ff2532ee260fc3399a6f1a3c1a7b495067748b7fdeba8a7e344136f"
     },
@@ -108,6 +119,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "-90.70629773529715914966539126",
+      "observed_shown": "|-90.71| = 90.71",
       "resolved_at": "2026-09-19T16:12:56.588355+00:00",
       "hash": "dac6696fe45912ecbdb345fe94d7549c0742bc4439a9b7d4f1cc8db388400f02"
     },
@@ -116,6 +128,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "26.34467618002195389681668496",
+      "observed_shown": "|26.34| = 26.34",
       "resolved_at": "2026-09-19T20:13:19.513614+00:00",
       "hash": "310124ee63028402b32d47e2fe0f8fbdef029ecdd70b1a70b6d48e5949f21d1c"
     },
@@ -124,6 +137,7 @@
       "claimant": "argus",
       "confidence": 0.6,
       "observed": "-0.8941877794336810730253353204",
+      "observed_shown": "|-0.89| = 0.89",
       "resolved_at": "2026-09-19T20:13:19.513614+00:00",
       "hash": "21a3d4d2e628d87e0a0f62b16d6812c41dfb652977f73ca33333567d322088ef"
     },
@@ -132,6 +146,7 @@
       "claimant": "argus",
       "confidence": 0.5,
       "observed": "12.25316932937461708845845704",
+      "observed_shown": "12.25",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "7ffe510f62d05ed3f7fcbd7ce9d129969a20e3a7e7bc3045cf049d1cbc23e2b7"
     },
@@ -140,6 +155,7 @@
       "claimant": "argus",
       "confidence": 0.5,
       "observed": "-5.577867023650156180276662204",
+      "observed_shown": "-5.58",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "f4a11ebb729055392070d1567d7a5f20f1c419d2accdff375089807e13050a45"
     },
@@ -148,6 +164,7 @@
       "claimant": "argus",
       "confidence": 0.5,
       "observed": "161.4637213736586949025335199",
+      "observed_shown": "161.46",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "db69b6c5a007768046dcfd99155fa6fe634f9d1d27dc01b2740cb211be1595bb"
     },
@@ -156,6 +173,7 @@
       "claimant": "argus",
       "confidence": 0.5,
       "observed": "319.9837745916345538792767212",
+      "observed_shown": "319.98",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "e66352461a3aaaf57d658571b3868cfe91da623042ce6bfa5be2e659dce2fa9a"
     },
@@ -164,6 +182,7 @@
       "claimant": "argus",
       "confidence": 0.5,
       "observed": "294.2226453263521151900993634",
+      "observed_shown": "294.22",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "76f18288ce505d5f47bdf55892270d734ec161bd5ad99a78b76571a0a725ad82"
     },
@@ -172,6 +191,7 @@
       "claimant": "argus",
       "confidence": 0.5,
       "observed": "-32.76229572905976158522144154",
+      "observed_shown": "-32.76",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "a90aba9cfbe9b2125c9ce0b3eba401f3501dea6fb3e5e5a015437e769cd15670"
     },
@@ -180,6 +200,7 @@
       "claimant": "argus",
       "confidence": 0.5,
       "observed": "356.4801799269046949676693843",
+      "observed_shown": "356.48",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "f7183c1163cac927387eec437df6efca329a7d5823640f74b410bea5cac1b384"
     },
@@ -188,6 +209,7 @@
       "claimant": "argus",
       "confidence": 0.5,
       "observed": "-22.67402312750359005366185474",
+      "observed_shown": "-22.67",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "d1434ab620100bf8fed9bd10d00c7b4a37024727a483c2f086a5f78fbc760d34"
     },
@@ -196,6 +218,7 @@
       "claimant": "argus",
       "confidence": 0.5,
       "observed": "62.59513749590997681134679129",
+      "observed_shown": "62.60",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "c62195b277a0cf5effa8f1cff08db978ae13f65510bd8d89aecba9053ba6cc32"
     },
@@ -204,6 +227,7 @@
       "claimant": "argus",
       "confidence": 0.5,
       "observed": "-175.6954612005856515373352855",
+      "observed_shown": "-175.70",
       "resolved_at": "2026-09-15T16:15:46.987306+00:00",
       "hash": "03eabe9487d7c874236d077f5261e3700ab75f52a7402a1d5f700ab5d3cec71c"
     }

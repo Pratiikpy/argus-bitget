@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T05:35:38.672445+00:00",
+  "generated_at": "2026-09-20T07:34:19.424075+00:00",
   "probes": 20,
   "runs": 17,
   "weak": 2,
@@ -105,7 +105,7 @@
       "question": "Agent architecture quality",
       "bar": "the structural claims are facts about the import graph, and are checked",
       "status": "RUNS",
-      "evidence": "266 modules, 701 internal imports. 0 contract violation(s); 0 cycle(s) able to break at import out of 4 total \u2014 the rest are broken at load by a deferred import and are reported as coupling rather than scored as clean. The deterministic core (truth, cost, risk, decision, backtest) reaches no model-facing module at any depth. 4 foundation package(s) carry high fan-in at zero instability. 2 authorisation chokepoint(s) that raise rather than warn: orders.py:317, bitget_client.py:340",
+      "evidence": "266 modules, 705 internal imports. 0 contract violation(s); 0 cycle(s) able to break at import out of 5 total \u2014 the rest are broken at load by a deferred import and are reported as coupling rather than scored as clean. The deterministic core (truth, cost, risk, decision, backtest) reaches no model-facing module at any depth. 4 foundation package(s) carry high fan-in at zero instability. 2 authorisation chokepoint(s) that raise rather than warn: orders.py:317, bitget_client.py:340",
       "artefact": "data/architecture.json"
     },
     {
@@ -165,7 +165,7 @@
       "question": "A portfolio-aware AI PM evaluating how a trade changes beta, sector and factor exposures, correlation, and concentration, with stress tests or hedge suggestions",
       "bar": "every named dimension appears in ONE answer about ONE proposed trade",
       "status": "RUNS",
-      "evidence": "one proposed trade assessed against a live book over 126 open-session bar(s) in a single answer \u2014 [portfolio] open-session beta 0.99 -> 1.11; [portfolio] NVDAUSDT would carry 16% of total portfolio risk (was new position); [portfolio] risk spread across 1.7 -> 2.2 effective position(s); [portfolio] most correlated with TSLAUSDT at +0.26; adding it buys less diversification th",
+      "evidence": "one proposed trade assessed against a live book over 126 open-session bar(s) in a single answer \u2014 [portfolio] open-session beta 0.99 -> 1.11; [portfolio] NVDAUSDT would carry 16% of total portfolio risk (was new position); [portfolio] risk spread across 1.7 -> 2.2 effective position(s); [portfolio] most correlated with TSLAUSDT at +0.26; largely a different bet from what you ",
       "artefact": "argus.desk.portfolio:assess"
     },
     {

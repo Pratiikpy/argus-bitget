@@ -166,6 +166,33 @@ class TestEveryCheckCanFail:
         got = check(_log(tmp_path, extra="LLM unavailable: token budget exhausted: 33600/25000"))
         assert next(c for c in got.checks if c.name == "budget_not_exhausted").status == FAIL
 
+    def test_a_budget_truncated_cycle_cannot_report_budget_not_exhausted(
+        self, tmp_path: Path
+    ) -> None:
+        """**The live shape from cycle_2026-09-20_0100, which this check passed.** `runner.py`
+        stops pre-emptively when the remaining budget is under one symbol's cost, so the guard in
+        `qwen.py` never fires and its wording never reaches the log — and the old substring search
+        therefore reported PASS beside `ran_to_completion FAIL` in the same report. A cycle stopped
+        early with less than a symbol's budget left was stopped by the budget."""
+        got = check(_log(
+            tmp_path, spent=316_686, budget=330_000,
+            stopped=(
+                "stopped after 11 of 12 symbol(s): 13314 token(s) left of 330000, "
+                "below the 25000 a symbol costs."
+            ),
+        ))
+        found = next(c for c in got.checks if c.name == "budget_not_exhausted")
+        assert found.status == FAIL
+        assert "before the guard had to" in found.detail
+
+    def test_stopping_early_with_budget_to_spare_is_not_blamed_on_the_budget(
+        self, tmp_path: Path
+    ) -> None:
+        """The converse, so the new check cannot become a blanket FAIL on every early stop: a
+        cycle that stopped for some other reason with 130,000 tokens left is not budget-starved."""
+        got = check(_log(tmp_path, stopped="stopped after 7 of 12 symbol(s): venue unreachable"))
+        assert next(c for c in got.checks if c.name == "budget_not_exhausted").status == PASS
+
     def test_a_broken_chain_fails_loudly(self, tmp_path: Path) -> None:
         got = check(_log(tmp_path, intact=False))
         found = next(c for c in got.checks if c.name == "chain_intact")

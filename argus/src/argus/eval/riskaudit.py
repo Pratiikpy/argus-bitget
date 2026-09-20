@@ -224,10 +224,25 @@ def from_records(
     records: Iterable[dict[str, Any]], *, settled_trades: int = 0
 ) -> RiskAudit:
     """Build the audit from the per-decision risk records written beside the ledger."""
+    from argus.paper.corrections import is_voided
+
     rows = list(records)
     interventions: list[Intervention] = []
     offered = 0
     for row in rows:
+        # **Voided rows carry a `quantity_before` that was never offered to the Constitution.**
+        # Until 2026-09-20 `paper/runner.py` wrote that field from the model's first draft rather
+        # than from the intent the Constitution actually ruled on, so seq 264 and 265 store
+        # `quantity_before: "1"` beside `intervened: false` and `reason: "no exposure proposed;
+        # nothing to narrow"` — three claims that cannot all be true. Counting them made this
+        # module report *"2 of which offered a position to reduce"* while `eval/autopsy.py`
+        # reported *"0 of 447 decision(s) proposed exposure"* off the same record.
+        #
+        # The rows are not edited — they are an audited artefact, and `paper/corrections.py`
+        # already names them — so the correction lives in every reader, exactly as it does for the
+        # ledger's own `is_abstention`.
+        if is_voided(int(row.get("seq", 0))):
+            continue
         if str(row.get("quantity_before", "0")) not in ("0", "0.0", ""):
             offered += 1
         if not row.get("intervened"):
