@@ -23,7 +23,7 @@ from pathlib import Path
 
 from argus.agents.desk import ConstitutionPolicy, DeskRun, TradingDesk
 from argus.cost.model import CostModel
-from argus.decision.verdicts import Verdict
+from argus.decision.verdicts import Intent, Verdict
 from argus.eval.autopsy import RECORD_SCHEMA
 from argus.eval.gate_ablation import ablated_variants
 from argus.execution.guard import Guard, GuardError
@@ -468,6 +468,42 @@ run a one-symbol and a four-symbol cycle and solve the pair.
 """
 
 
+def governed_intent(run: DeskRun, *, symbol: str = "") -> Intent:
+    """The intent the ledger may record: what the **Constitution** decided, never the model's raw
+    proposal.
+
+    **Extracted from `run_once` on 2026-09-20 because being inline is why a critical bug survived.**
+    The line read `proof.llm_revised_intent or proof.llm_original_intent`, whose fallback silently
+    discarded the risk layer on every decision the model was not re-asked about — the common case,
+    since the desk deliberately does not buy a second opinion when nothing bound
+    (*"[constitution] nothing bound, so the decision was not re-put to the model"*).
+    `agents/desk.py:657` computes the same value correctly as
+    `proof.llm_revised_intent or ruling.resulting_intent`. The two disagreed; the ledger believed
+    the wrong one.
+
+    **It fabricated two trades on the live record, seq 264 and 265.** For both, `agents/desk.py`
+    emitted *"no order: final verdict human_review with quantity 0"* and the risk record wrote
+    `quantity_after: 0, binding_constraint: no_exposure`, while the ledger stored
+    `verdict: trade, quantity: 1` and the settlement pass later booked **+9.6521** and **+5.3339**
+    of P&L against positions the desk had refused to take. Those two rows were, until this fix,
+    the entire basis of the project's win rate and net-P&L figures.
+
+    No test caught it: every test fed this path an intent the Constitution had already allowed, so
+    the divergent branch was never exercised. It was found by an adversarial audit reading
+    `eval/decisioncard.py --seq 264`, which printed all four contradictory facts on one page.
+
+    `DeskRun.ruling` is optional only because of a dataclass default; `desk.run()` always sets it.
+    A genuinely absent ruling means the Constitution never ruled, and the fail-safe direction is to
+    refuse — falling back to the unconstrained intent is exactly the bug.
+    """
+    if run.ruling is None:
+        raise RuntimeError(
+            f"{symbol or run.symbol}: the desk returned no Constitution ruling, so nothing may be "
+            f"recorded; refusing rather than booking the model's unconstrained intent"
+        )
+    return run.proof.llm_revised_intent or run.ruling.resulting_intent
+
+
 def run_once(
     *,
     symbols: tuple[str, ...] = ("NVDAUSDT",),
@@ -734,7 +770,7 @@ def run_once(
             history=ledger.entries,
         )
 
-        final = run.proof.llm_revised_intent or run.proof.llm_original_intent
+        final = governed_intent(run, symbol=symbol)
 
         # The pre-registered protocol, applied last and able only to reduce. It is deliberately the
         # final gate: the Constitution reasons about this position's risk, and the protocol asks a

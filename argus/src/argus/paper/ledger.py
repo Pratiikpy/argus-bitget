@@ -537,9 +537,21 @@ class PaperLedger:
         }
 
     def performance(self) -> dict[str, Any]:
-        """What the log actually says. Net of costs, abstentions counted separately."""
-        settled = [e for e in self.entries if e.is_settled and not e.is_abstention]
+        """What the log actually says. Net of costs, abstentions counted separately.
+
+        **Voided rows are excluded** — see `paper/corrections.py`. Two rows on the live record
+        booked P&L against positions the Constitution had refused (a `paper/runner.py` defect
+        fixed 2026-09-20). They stay in the chain unedited; every figure here excludes them, and
+        the correction is reported alongside rather than silently applied.
+        """
+        from argus.paper.corrections import VOIDED, is_voided, render
+
+        settled = [
+            e for e in self.entries
+            if e.is_settled and not e.is_abstention and not is_voided(e.seq)
+        ]
         abstentions = [e for e in self.entries if e.is_abstention]
+        correction = {"correction": render(), "voided_rows": len(VOIDED)} if VOIDED else {}
 
         if not settled:
             return {
@@ -547,6 +559,7 @@ class PaperLedger:
                 "abstentions": len(abstentions),
                 "settled_trades": 0,
                 "note": "no settled trades yet — nothing to report",
+                **correction,
             }
 
         nets = [Decimal(e.net_pnl or "0") for e in settled]
@@ -564,4 +577,5 @@ class PaperLedger:
             "cost_flipped_the_sign": sum(grosses) > 0 >= sum(nets),
             "win_rate_pct": round(100 * wins / len(settled), 1),
             "chain": self.verify(),
+            **correction,
         }

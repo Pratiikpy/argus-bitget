@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T02:20:18.322712+00:00",
+  "generated_at": "2026-09-20T03:48:20.846604+00:00",
   "model": "argus/qwen3.8-max",
   "ledger": {
     "entries": 447,
@@ -15,38 +15,22 @@
     "last_day": "2026-09-19",
     "capital": "10000",
     "periods_per_year": 365,
-    "trades": 2,
+    "trades": 0,
     "open_positions": 0,
     "abstentions": 445,
-    "flat_days": 7,
-    "net_pnl": "14.9860",
-    "total_return_pct": 0.1499,
+    "flat_days": 8,
+    "net_pnl": "0",
+    "total_return_pct": 0.0,
     "max_drawdown_pct": null,
     "sharpe": null,
     "sortino": null,
-    "win_rate_pct": 100.0,
+    "win_rate_pct": null,
     "undefined": {
       "sharpe": "the window is 8 day(s); a standard deviation needs at least 30",
       "sortino": "the window is 8 day(s); a standard deviation needs at least 30",
-      "max_drawdown": "2 settled trade(s); a peak-to-trough needs at least 5 to describe risk rather than luck. With every settled trade a winner the arithmetic returns 0.00%, which reads as 'took risk, never lost' when the truth is 'has taken 2 position(s)'"
-    },
-    "by_symbol": [
-      {
-        "symbol": "COINUSDT",
-        "trades": 1,
-        "wins": 1,
-        "net_pnl": "9.6521",
-        "win_rate_pct": 100.0
-      },
-      {
-        "symbol": "MSTRUSDT",
-        "trades": 1,
-        "wins": 1,
-        "net_pnl": "5.3339",
-        "win_rate_pct": 100.0
-      }
-    ],
-    "largest_symbol_share_pct": 64.4
+      "win_rate": "no settled trades; a win rate over zero trades is undefined, not zero per cent",
+      "max_drawdown": "no settled trades; equity never moved, so the 0.0% this would otherwise report measures an account that never took a position rather than the desk's risk control, and is not comparable to a traded strategy's drawdown"
+    }
   },
   "episodes": {
     "decisions": 447,

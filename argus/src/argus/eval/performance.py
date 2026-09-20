@@ -42,6 +42,7 @@ from decimal import Decimal
 from typing import Any
 
 from argus.backtest.metrics import MetricError, max_drawdown, sharpe, sortino
+from argus.paper.corrections import is_voided
 from argus.paper.ledger import Entry, PaperLedger
 
 PERIODS_PER_YEAR = 365
@@ -212,7 +213,19 @@ class PaperPerformance:
 
 
 def _settled_trades(ledger: PaperLedger) -> list[Entry]:
-    return [e for e in ledger.entries if e.is_settled and not e.is_abstention]
+    """Settled positions the desk actually took.
+
+    **Voided rows are excluded, and that exclusion is the whole reason this function has a
+    docstring.** `paper/corrections.py` lists ledger rows that record a fill the Constitution had
+    refused — a `paper/runner.py` defect fixed on 2026-09-20. They are left in the chain unedited
+    (deleting them would make the record look better than the system behaved), so every consumer
+    must filter them instead. Without this filter, Sharpe, win rate, max drawdown and net P&L are
+    all computed over positions that were never opened.
+    """
+    return [
+        e for e in ledger.entries
+        if e.is_settled and not e.is_abstention and not is_voided(e.seq)
+    ]
 
 
 def daily_series(

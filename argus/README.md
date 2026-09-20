@@ -16,17 +16,33 @@ outcome exists.**
 
 Most trading agents ask *what should I trade?* ARGUS asks a harder question:
 **should this decision-maker be trusted with capital right now?** On the live record the answer has
-been *no* **445 times out of 447** — and the interesting output is not the trade, it is the
+been *no* **447 times out of 447** — and the interesting output is not the trade, it is the
 record that says why.
 
-**The two exceptions are the point, not an asterisk.** On 2026-09-15 the desk broke a 263-decision
-refusal streak to sell COINUSDT and MSTRUSDT into the CLARITY Act cloture failure, stating its
-thesis and its 16.27bps cost hurdle *before* the outcome existed. Both settled 24h later, both
-directionally correct, both net-positive after real costs (**+9.65** and **+5.33**, `--report`).
-**Two trades is not a track record and no Sharpe is claimed from it** — `--report` declines to
-print one, which is the same discipline as the refusals. What two-for-two does show is that the
-gate is a gate and not a wall: it opens on a dated, sourced catalyst, and it charges itself the
-cost of acting first.
+> ### ⚠️ Correction, 2026-09-20 — two "trades" in this ledger were never taken
+>
+> Earlier today this README claimed the desk had broken its refusal streak with two profitable
+> trades (COINUSDT and MSTRUSDT, +14.99 net). **That claim was false and is withdrawn.**
+>
+> `paper/runner.py` selected the intent to record as
+> `llm_revised_intent or llm_original_intent`. That fallback bypasses the risk layer, and it is
+> reached precisely when the desk chooses *not* to re-put a decision to the model — which is most
+> decisions. For ledger seq 264 and 265 the Constitution refused the position
+> (`quantity_after: 0`, `binding_constraint: no_exposure`) and `agents/desk.py` wrote
+> *"no order: final verdict human_review with quantity 0"* — while the ledger stored
+> `verdict: trade, quantity: 1` and the settlement pass later booked P&L against positions that
+> were never opened.
+>
+> **The rows are still in the ledger and have not been edited.** The chain guarantees a record was
+> not altered; it does not guarantee the record was right, and quietly deleting the two rows that
+> made the numbers look good is exactly the behaviour this project exists to refuse. They are
+> marked as void in `paper/corrections.py`, with the evidence, and every figure derived from the
+> ledger now excludes them.
+>
+> Found by an adversarial pre-submission audit reading `eval/decisioncard.py --seq 264`, which
+> printed all four contradictory facts on one page — the artefact did its job. No test caught it:
+> every test fed that path an intent the Constitution had already allowed, so the divergent branch
+> was never exercised. `tests/test_governed_intent.py` now exercises it directly.
 
 Design: [`../ARGUS-ARCHITECTURE.md`](../ARGUS-ARCHITECTURE.md) ·
 Plan and evidence: [`../ARGUS-MASTER-PLAN.md`](../ARGUS-MASTER-PLAN.md)
@@ -36,7 +52,7 @@ Plan and evidence: [`../ARGUS-MASTER-PLAN.md`](../ARGUS-MASTER-PLAN.md)
 ## Status, measured on 2026-09-20
 
 ```
-4,276 tests collected (33 skipped)   ruff clean   mypy --strict clean on 265 source files
+4,276 tests collected (33 skipped)   ruff clean   mypy --strict clean on 266 source files
 131/131 modules importable           18/18 sub-themes resolve to a symbol and a test file
 447 decisions in the paper ledger (as of 2026-09-20)  chain verifies, head anchor agrees, no truncation
 2 settled trades, both directionally correct, +14.99 net after costs   99.6% abstention rate
@@ -201,10 +217,12 @@ that was read. None of them is claimed as *proven better* — see "The honest pa
 
 ## The honest part
 
-- **Zero positions have settled.** Every one of the 231 ledger entries is `no_trade`, and 386 have settled as abstentions. Track 2's
-  quantitative half — Sharpe, max drawdown, win rate — is computed from settled trades, so those
-  three numbers do not exist yet. `eval/performance.py` returns `null` and the reason, rather than
-  printing `0.0` and letting it read as a flat result.
+- **Zero positions have settled.** All 447 ledger entries are refusals, and 386 have settled as
+  abstentions. Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they record fills
+  the risk layer had refused, and are excluded everywhere (see the correction at the top of this
+  file and `paper/corrections.py`). Track 2's quantitative half — Sharpe, max drawdown, win rate —
+  is computed from settled trades, so those three numbers do not exist. `eval/performance.py`
+  returns `null` and the reason, rather than printing `0.0` and letting it read as a flat result.
 - **The `side` field carries no information, and that was measured rather than assumed.** Over the
   53 abstentions settled at the time of the measurement it was `BUY` in **all 53**, directionally
   right 3.8% of the time against a base rate of up-moves of exactly 3.8% — a schema being filled in,

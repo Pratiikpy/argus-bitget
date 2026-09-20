@@ -1,18 +1,19 @@
 {
-  "generated_at": "2026-09-15T03:18:38.507638+00:00",
-  "decisions": 231,
-  "gate_population": 149,
-  "proposed_exposure": 0,
+  "generated_at": "2026-09-20T02:25:14.860177+00:00",
+  "decisions": 447,
+  "gate_population": 365,
+  "proposed_exposure": 2,
   "session_coverage": {
     "by_phase": {
-      "rth": 48,
-      "weekend": 183
+      "extended": 1,
+      "rth": 216,
+      "weekend": 230
     },
-    "with_price_discovery": 48,
-    "median_hours_to_discovery": 28.13,
+    "with_price_discovery": 216,
+    "median_hours_to_discovery": 18.0,
     "min_hours_to_discovery": 0.0,
     "single_phase_only": false,
-    "note": "231 decision(s) across 2 session phase(s): rth=48, weekend=183. 48 were taken while the anchor market had price discovery"
+    "note": "447 decision(s) across 3 session phase(s): extended=1, rth=216, weekend=230. 216 were taken while the anchor market had price discovery"
   },
   "gates": [
     {
@@ -20,9 +21,9 @@
       "name": "no_exposure",
       "checks": "verdict carries no quantity, or quantity <= 0",
       "status": "FIRED",
-      "reached": 149,
-      "fired": 149,
-      "note": "bound on 149 of 149 decision(s) that reached it"
+      "reached": 365,
+      "fired": 365,
+      "note": "bound on 365 of 365 decision(s) that reached it"
     },
     {
       "order": 2,
@@ -31,7 +32,7 @@
       "status": "UNREACHED",
       "reached": 0,
       "fired": 0,
-      "note": "never executed: an earlier gate returned first on all 149 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
     },
     {
       "order": 3,
@@ -40,7 +41,7 @@
       "status": "UNREACHED",
       "reached": 0,
       "fired": 0,
-      "note": "never executed: an earlier gate returned first on all 149 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
     },
     {
       "order": 4,
@@ -49,48 +50,128 @@
       "status": "UNREACHED",
       "reached": 0,
       "fired": 0,
-      "note": "never executed: an earlier gate returned first on all 149 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
     },
     {
       "order": 5,
+      "name": "gross_exposure",
+      "checks": "whole-book gross notional above the configured cap",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 6,
+      "name": "signed_exposure",
+      "checks": "whole-book net directional notional above the configured cap",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 7,
+      "name": "hedge_integrity",
+      "checks": "REDUCE would leave a linked hedge position's partner exposed",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 8,
+      "name": "margin_usage",
+      "checks": "venue-reported margin ratio at or above the policy cap",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 9,
+      "name": "factor_exposure",
+      "checks": "measured book exposure to a named factor above its configured cap",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 10,
+      "name": "scenario_loss",
+      "checks": "worst modelled benchmark shock already past the loss floor",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 11,
+      "name": "liquidation_cost",
+      "checks": "worst position's forced-exit slippage proxy at or above the policy cap",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 12,
+      "name": "per_symbol_underperformance",
+      "checks": "one symbol's windowed realized PnL below its configured floor \u2014 narrows that symbol only, not the whole order",
+      "status": "UNREACHED",
+      "reached": 0,
+      "fired": 0,
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+    },
+    {
+      "order": 13,
       "name": "risk_budget",
       "checks": "circuit breaker's drawdown ladder sizes the book below the request",
       "status": "UNREACHED",
       "reached": 0,
       "fired": 0,
-      "note": "never executed: an earlier gate returned first on all 149 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
     },
     {
-      "order": 6,
+      "order": 14,
       "name": "session_volatility",
       "checks": "measured path volatility above the regular-hours baseline",
       "status": "UNREACHED",
       "reached": 0,
       "fired": 0,
-      "note": "never executed: an earlier gate returned first on all 149 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
     },
     {
-      "order": 7,
+      "order": 15,
       "name": "max_position",
       "checks": "size above the position cap",
       "status": "UNREACHED",
       "reached": 0,
       "fired": 0,
-      "note": "never executed: an earlier gate returned first on all 149 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
+      "note": "never executed: an earlier gate returned first on all 365 decision(s), so this rule has not been exercised and its permissiveness is unmeasured"
     }
   ],
   "unreached_gates": [
     "min_confidence",
     "oracle_stale",
     "unhedgeable_gap",
+    "gross_exposure",
+    "signed_exposure",
+    "hedge_integrity",
+    "margin_usage",
+    "factor_exposure",
+    "scenario_loss",
+    "liquidation_cost",
+    "per_symbol_underperformance",
     "risk_budget",
     "session_volatility",
     "max_position"
   ],
-  "confidence_median": 0.85,
-  "confidence_mean": 0.8377,
-  "confidence_min": 0.58,
-  "confidence_would_have_bound": false,
-  "verdict": "0 of 231 decision(s) proposed exposure. The first gate (no_exposure) returned on every one, so 6 downstream gate(s) never executed at all: min_confidence, oracle_stale, unhedgeable_gap, risk_budget, session_volatility, max_position. Their permissiveness is unmeasured, not demonstrated. The funnel is computed over the 149 decision(s) carrying a risk record, which is fewer than the 231 on the ledger because the risk log began later; the session finding below covers all 231. Stated confidence runs a median 0.85 and never below 0.58, so the 0.55 floor would not have bound either \u2014 but that is a second fact, not the reason: the reason is that it was never evaluated. 231 decision(s) across 2 session phase(s): rth=48, weekend=183. 48 were taken while the anchor market had price discovery **The sampling explanation this module published is REFUTED.** 48 decision(s) were taken with the anchor market open \u2014 the session it claimed the desk had never been offered \u2014 and the desk proposed nothing on any of them. The cause is the desk's own conviction about direction, not when it was asked. Whether that refusal is *correct* is still UNDEFINED: eval/shadow.py has 0 scored calls against a floor of 20, and the first decisions carrying a directional lean have not settled yet.",
-  "falsifier": "**FIRED.** 48 decision(s) were taken with the anchor market open and the desk proposed nothing on any of them. The sampling explanation this module published is refuted, and the rewritten conclusion is above \u2014 not a defence of the old one"
+  "confidence_median": 0.72,
+  "confidence_mean": 0.7454,
+  "confidence_min": 0.42,
+  "confidence_would_have_bound": true,
+  "verdict": "2 of 447 decision(s) proposed exposure, so the risk chain has live inputs and its outcomes below are exercised rather than unreached",
+  "falsifier": "the next session with price discovery is 35.1h away, and the committed cycle schedule (13:30/15:30/17:30/19:30 UTC) sits inside US regular hours. If the desk abstains through a full session of those, the cause is the desk and this conclusion is refuted"
 }

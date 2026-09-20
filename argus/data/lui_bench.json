@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-13T21:19:12.096527+00:00",
+  "generated_at": "2026-09-20T02:25:30.560076+00:00",
   "cases": 40,
   "understanding": 1.0,
   "intent_accuracy": 1.0,
@@ -31,7 +31,7 @@
       "correct": true,
       "refusal_correct": true,
       "grounded": true,
-      "sources": 1,
+      "sources": 3,
       "reason": ""
     },
     {
@@ -46,7 +46,7 @@
       "correct": true,
       "refusal_correct": true,
       "grounded": true,
-      "sources": 1,
+      "sources": 3,
       "reason": ""
     },
     {
@@ -61,7 +61,7 @@
       "correct": true,
       "refusal_correct": true,
       "grounded": true,
-      "sources": 1,
+      "sources": 3,
       "reason": ""
     },
     {
@@ -76,7 +76,7 @@
       "correct": true,
       "refusal_correct": true,
       "grounded": true,
-      "sources": 1,
+      "sources": 3,
       "reason": ""
     },
     {
@@ -91,7 +91,7 @@
       "correct": true,
       "refusal_correct": true,
       "grounded": true,
-      "sources": 1,
+      "sources": 3,
       "reason": ""
     },
     {
@@ -106,7 +106,7 @@
       "correct": true,
       "refusal_correct": true,
       "grounded": true,
-      "sources": 1,
+      "sources": 3,
       "reason": ""
     },
     {
@@ -121,7 +121,7 @@
       "correct": true,
       "refusal_correct": true,
       "grounded": true,
-      "sources": 1,
+      "sources": 3,
       "reason": ""
     },
     {
