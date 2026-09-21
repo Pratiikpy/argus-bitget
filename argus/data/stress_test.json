@@ -1,0 +1,159 @@
+{
+  "symbol": "NVDAUSDT",
+  "horizon_bars": 48,
+  "failure_threshold_drawdown": 0.3,
+  "seed": 20260921,
+  "searches": {
+    "ungoverned_likelihood_weighted": {
+      "likelihood_weighted": true,
+      "episodes_evaluated": 600,
+      "failures_found": 599,
+      "failure_rate": 0.9983333333333333,
+      "first_failure_at_episode": 1,
+      "best_episode": {
+        "total_logprob": 219.59822310455903,
+        "log_likelihood_ratio_vs_modal_path": -1.403859452069554,
+        "sigma_from_mode": 1.6756249294335257,
+        "failed": true,
+        "miss_distance": -0.9686248370283475,
+        "final_equity": 11818.102468025378,
+        "max_drawdown": 1.2686248370283475,
+        "reward": 319.598223104559
+      },
+      "highest_loglikelihood_failure": {
+        "total_logprob": 219.59822310455903,
+        "log_likelihood_ratio_vs_modal_path": -1.403859452069554,
+        "sigma_from_mode": 1.6756249294335257,
+        "failed": true,
+        "miss_distance": -0.9686248370283475,
+        "final_equity": 11818.102468025378,
+        "max_drawdown": 1.2686248370283475,
+        "reward": 319.598223104559
+      },
+      "nominal_distribution": {
+        "mu": 3.6857709816942294e-05,
+        "sigma": 0.0039932550188253365,
+        "fitted_from_returns": 2158
+      }
+    },
+    "ungoverned_unweighted": {
+      "likelihood_weighted": false,
+      "episodes_evaluated": 600,
+      "failures_found": 595,
+      "failure_rate": 0.9916666666666667,
+      "first_failure_at_episode": 1,
+      "best_episode": {
+        "total_logprob": 198.7859288390401,
+        "log_likelihood_ratio_vs_modal_path": -22.21615371758847,
+        "sigma_from_mode": 6.665756328817979,
+        "failed": true,
+        "miss_distance": -1.316459254157503,
+        "final_equity": -21778.150743515558,
+        "max_drawdown": 1.6164592541575031,
+        "reward": 100.0
+      },
+      "highest_loglikelihood_failure": {
+        "total_logprob": 198.7859288390401,
+        "log_likelihood_ratio_vs_modal_path": -22.21615371758847,
+        "sigma_from_mode": 6.665756328817979,
+        "failed": true,
+        "miss_distance": -1.316459254157503,
+        "final_equity": -21778.150743515558,
+        "max_drawdown": 1.6164592541575031,
+        "reward": 100.0
+      },
+      "nominal_distribution": {
+        "mu": 3.6857709816942294e-05,
+        "sigma": 0.0039932550188253365,
+        "fitted_from_returns": 2158
+      }
+    },
+    "governed_likelihood_weighted": {
+      "likelihood_weighted": true,
+      "episodes_evaluated": 600,
+      "failures_found": 389,
+      "failure_rate": 0.6483333333333333,
+      "first_failure_at_episode": 71,
+      "best_episode": {
+        "total_logprob": 216.13421980372777,
+        "log_likelihood_ratio_vs_modal_path": -4.867862752900805,
+        "sigma_from_mode": 3.120212413570847,
+        "failed": true,
+        "miss_distance": -0.005223376139645686,
+        "final_equity": 6950.29155382802,
+        "max_drawdown": 0.3052233761396457,
+        "reward": 316.1342198037278
+      },
+      "highest_loglikelihood_failure": {
+        "total_logprob": 216.13421980372777,
+        "log_likelihood_ratio_vs_modal_path": -4.867862752900805,
+        "sigma_from_mode": 3.120212413570847,
+        "failed": true,
+        "miss_distance": -0.005223376139645686,
+        "final_equity": 6950.29155382802,
+        "max_drawdown": 0.3052233761396457,
+        "reward": 316.1342198037278
+      },
+      "nominal_distribution": {
+        "mu": 3.6857709816942294e-05,
+        "sigma": 0.0039932550188253365,
+        "fitted_from_returns": 2158
+      }
+    },
+    "governed_unweighted": {
+      "likelihood_weighted": false,
+      "episodes_evaluated": 600,
+      "failures_found": 454,
+      "failure_rate": 0.7566666666666667,
+      "first_failure_at_episode": 65,
+      "best_episode": {
+        "total_logprob": 193.59223876143773,
+        "log_likelihood_ratio_vs_modal_path": -27.409843795190852,
+        "sigma_from_mode": 7.404031846931893,
+        "failed": true,
+        "miss_distance": -0.00977077405345328,
+        "final_equity": 7279.226606226643,
+        "max_drawdown": 0.30977077405345327,
+        "reward": 100.0
+      },
+      "highest_loglikelihood_failure": {
+        "total_logprob": 193.59223876143773,
+        "log_likelihood_ratio_vs_modal_path": -27.409843795190852,
+        "sigma_from_mode": 7.404031846931893,
+        "failed": true,
+        "miss_distance": -0.00977077405345328,
+        "final_equity": 7279.226606226643,
+        "max_drawdown": 0.30977077405345327,
+        "reward": 100.0
+      },
+      "nominal_distribution": {
+        "mu": 3.6857709816942294e-05,
+        "sigma": 0.0039932550188253365,
+        "fitted_from_returns": 2158
+      }
+    }
+  },
+  "paired": {
+    "paths": 200,
+    "equity_difference": {
+      "mean": -3788.4752691318963,
+      "ci95": [
+        -10349.861650728422,
+        3307.829656727492
+      ],
+      "n": 200,
+      "excludes_zero": false
+    },
+    "governed_failure_rate": 0.025,
+    "ungoverned_failure_rate": 0.995
+  },
+  "headline": {
+    "most_probable_failure_log_ratio": -1.403859452069554,
+    "most_probable_failure_sigma_from_mode": 1.6756249294335257,
+    "ungoverned_failures_found": 599,
+    "governed_failures_found": 389,
+    "fat_tail_failures_found_unweighted": 595,
+    "guard_survived_the_search": false
+  },
+  "scope_statement": "An adversary searches for the market path most likely to drive a constant-long account into a 30% drawdown, charged the log-likelihood of every move under a Gaussian fitted to this symbol's real hourly returns. Both arms run the identical code path and differ only in their thresholds; the paired block runs the SAME sampled paths through both. NOT CLAIMED: that the fitted Gaussian is the market \u2014 a probability here is a statement about that model, and real returns are fat-tailed, which is why the unweighted search is published beside it. NOT CLAIMED: anything about paths the search never visited, or about ARGUS's own model, which has proposed exposure twice in 447 decisions."
+}

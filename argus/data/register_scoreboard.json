@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-09-20T07:02:00.639921+00:00",
-  "registered": 156,
-  "resolved": 66,
-  "pending": 88,
+  "generated_at": "2026-09-20T20:12:22.997626+00:00",
+  "registered": 176,
+  "resolved": 73,
+  "pending": 101,
   "unresolvable": 2,
   "claimants": [
     {
       "claimant": "argus",
-      "resolved": 66,
-      "correct": 42,
-      "hit_rate": 0.6364,
-      "brier": 0.23242,
-      "mean_confidence": 0.5667
+      "resolved": 73,
+      "correct": 45,
+      "hit_rate": 0.6164,
+      "brier": 0.23644,
+      "mean_confidence": 0.5699
     }
   ],
   "wall": [
@@ -140,6 +140,42 @@
       "observed_shown": "|-0.89| = 0.89",
       "resolved_at": "2026-09-19T20:13:19.513614+00:00",
       "hash": "21a3d4d2e628d87e0a0f62b16d6812c41dfb652977f73ca33333567d322088ef"
+    },
+    {
+      "claim": "\u2717 MSFTUSDT abs_move_above_bps 43.59 by 2026-09-20T14:15 (p=0.60) [8e82ff772b7e]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "-7.273755884670559473056795911",
+      "observed_shown": "|-7.27| = 7.27",
+      "resolved_at": "2026-09-20T14:16:18.582968+00:00",
+      "hash": "8e82ff772b7ef6fa8999c5e7ebc606160d739b5a394b712b213c7a1006e22a3a"
+    },
+    {
+      "claim": "\u2717 METAUSDT abs_move_above_bps 61.49 by 2026-09-20T16:12 (p=0.60) [b1266e59d8b6]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "13.71455830177991115351361021",
+      "observed_shown": "|13.71| = 13.71",
+      "resolved_at": "2026-09-20T18:13:41.918392+00:00",
+      "hash": "b1266e59d8b60e9ccd871c464e53ea8969356aa6448ea365d6b02347b9f630a7"
+    },
+    {
+      "claim": "\u2717 GOOGLUSDT abs_move_above_bps 58.17 by 2026-09-20T18:12 (p=0.60) [86e89b4738fa]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "-38.71114653307525902311283161",
+      "observed_shown": "|-38.71| = 38.71",
+      "resolved_at": "2026-09-20T18:13:41.918392+00:00",
+      "hash": "86e89b4738fad5927027f75d893f33f424a0220935ab81d61e622da4cc63218a"
+    },
+    {
+      "claim": "\u2717 TQQQUSDT abs_move_above_bps 170.75 by 2026-09-20T20:11 (p=0.60) [cbf89158d77d]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "162.6244217019486891910836955",
+      "observed_shown": "|162.62| = 162.62",
+      "resolved_at": "2026-09-20T20:12:22.048485+00:00",
+      "hash": "cbf89158d77d6de7567e36a987f53a2cfc6cb82a4852fe273aff535f05dea7c9"
     },
     {
       "claim": "\u2717 NVDAUSDT return_over_below_bps 0 by 2026-09-15T09:21 (p=0.50) [7ffe510f62d0]",

@@ -22,7 +22,7 @@ from __future__ import annotations
 import time
 from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any
@@ -628,7 +628,14 @@ class TradingDesk:
         attacked = apply_escalation(attacked, escalation)
 
         # --- 3. the Constitution. It may only reduce. ---
+        # **`token_price` was already a parameter of this method and was never given to the
+        # policy.** That is the whole reason four notional gates spent the project's lifetime
+        # comparing unit counts against dollar ceilings: the price needed to convert one to the
+        # other was in scope the entire time. A caller supplying its own policy with a price
+        # already set keeps it; otherwise this decision's real price is used.
         policy = constitution or ConstitutionPolicy()
+        if policy.reference_price is None:
+            policy = replace(policy, reference_price=token_price)
         ruling = policy.rule(attacked, session=session, hedges=hedges)
 
         # Population RCT (Track 2, §13.7a): N gate-ablated policies ruled against this SAME
@@ -777,6 +784,26 @@ class ConstitutionPolicy:
     enforcement". A rule a model can be talked out of is not a rule, so every limit here is applied
     in Python and the model is told the outcome rather than asked to respect it.
     """
+
+    reference_price: Decimal | None = None
+    """Price per unit, used to turn an intent's **quantity** into the **notional** every cap here
+    is denominated in.
+
+    **Added 2026-09-21, after a constructed adversary found that four gates were comparing a unit
+    count against a dollar ceiling.** `max_position_notional` is 50,000 *dollars*; the gate read
+    `intent.quantity > 50_000`, and quantity is *units*. At NVDAUSDT's ~$180 a unit that made the
+    cap **180x looser than written**: a 400-unit order is $72,000 of notional, over the cap, and
+    passed untouched, while the gate could only fire above 50,000 units — $9,000,000. The
+    `gross_exposure` and `signed_exposure` gates were worse: they subtract a real dollar book total
+    (`Book.total_gross_notional`, which does multiply by price) from a dollar cap and then compared
+    the dollar headroom against a unit count, mixing the two inside one expression.
+
+    447 live decisions never caught it because the desk has never proposed a position. A rogue
+    agent built to attack the caps caught it on its first run (`eval/rogue.py`).
+
+    ``None`` means no price was supplied, and then every notional gate is **skipped and said to be
+    skipped** rather than silently evaluated in the wrong unit — the same discipline `book_state`
+    and `session_risk` already follow. A cap that cannot be computed is absent, not satisfied."""
 
     max_position_notional: Decimal = Decimal("50000")
     max_unhedged_notional: Decimal = Decimal("20000")
@@ -975,6 +1002,16 @@ class ConstitutionPolicy:
     results is the horizon this desk actually reasons in, not its lifetime record.
     """
 
+
+    def _notional(self, quantity: Decimal) -> Decimal | None:
+        """Quantity in units -> notional in dollars, or ``None`` when no price was supplied.
+
+        Every caller must treat ``None`` as "this gate cannot be evaluated" and say so, never as
+        "this gate passed". See :attr:`reference_price`."""
+        if self.reference_price is None or self.reference_price <= 0:
+            return None
+        return quantity * self.reference_price
+
     def rule(
         self, intent: Intent, *, session: SessionState, hedges: HedgeabilitySurface
     ) -> ConstitutionRuling:
@@ -1035,10 +1072,26 @@ class ConstitutionPolicy:
         # data. It would have fired on the first decision that proposed exposure.
         ceilings: list[tuple[str, Decimal, str]] = []
 
-        if hedges.is_empty and intent.quantity > self.max_unhedged_notional:
+        # `price` is bound rather than read through `self` at each site so the type checker can
+        # see that a notional gate and its ceiling share one non-None price. `notional` is derived
+        # from it, so the two are None together by construction.
+        price = self.reference_price if (
+            self.reference_price is not None and self.reference_price > 0
+        ) else None
+        notional = intent.quantity * price if price is not None else None
+        # Stated, not swallowed. Without a price the four notional gates cannot be evaluated, and
+        # this suffix travels into the ruling's reason so a reader can tell "not checked" from
+        # "checked and passed". An absent cap that reads like a satisfied one is how a risk layer
+        # becomes decorative.
+        unpriced = "" if notional is not None else (
+            " | NOT EVALUATED: no reference_price, so the unhedged, gross, signed and "
+            "max_position notional caps were skipped rather than passed"
+        )
+        if (hedges.is_empty and price is not None and notional is not None
+                and notional > self.max_unhedged_notional):
             ceilings.append((
                 "unhedgeable_gap",
-                self.max_unhedged_notional,
+                self.max_unhedged_notional / price,  # dollars -> units; see reference_price
                 f"no hedge placeable for {session.hours_to_next_discovery:.1f}h; "
                 f"unhedged exposure capped at {self.max_unhedged_notional}",
             ))
@@ -1053,10 +1106,10 @@ class ConstitutionPolicy:
         if self.book is not None:
             existing_gross = self.book.total_gross_notional()
             headroom = max(Decimal("0"), self.max_gross_exposure_notional - existing_gross)
-            if intent.quantity > headroom:
+            if price is not None and notional is not None and notional > headroom:
                 ceilings.append((
                     "gross_exposure",
-                    headroom,
+                    headroom / price,  # dollars -> units; see reference_price
                     f"book already carries {existing_gross} gross; the "
                     f"{self.max_gross_exposure_notional} cap leaves {headroom} of headroom for "
                     f"this order",
@@ -1071,10 +1124,10 @@ class ConstitutionPolicy:
             signed_headroom = max(
                 Decimal("0"), self.max_signed_exposure_notional - direction * existing_signed
             )
-            if intent.quantity > signed_headroom:
+            if price is not None and notional is not None and notional > signed_headroom:
                 ceilings.append((
                     "signed_exposure",
-                    signed_headroom,
+                    signed_headroom / price,  # dollars -> units; see reference_price
                     f"book is net {existing_signed} (long positive); a {intent.side} at this size "
                     f"would push net exposure past the {self.max_signed_exposure_notional} cap "
                     f"({signed_headroom} of headroom in this direction)",
@@ -1260,11 +1313,11 @@ class ConstitutionPolicy:
         # The hard cap, which must bind last so it is never diluted by a multiplier. As a ceiling
         # among ceilings that ordering is automatic: a minimum does not care what order it is
         # given its arguments, which is one fewer thing to get wrong.
-        if intent.quantity > self.max_position_notional:
+        if price is not None and notional is not None and notional > self.max_position_notional:
             ceilings.append((
                 "max_position",
-                self.max_position_notional,
-                f"position capped at {self.max_position_notional}",
+                self.max_position_notional / price,  # dollars -> units; see reference_price
+                f"position capped at {self.max_position_notional} notional",
             ))
 
         # --- FINAL VALIDATION ------------------------------------------------------------------
@@ -1305,10 +1358,13 @@ class ConstitutionPolicy:
                 )
             return ruled
 
-        # "none" now means exactly what it says: **nothing bound.** Every gate ran and allowed.
+        # "none" now means exactly what it says: **nothing bound.** Every gate that could run,
+        # ran and allowed — and `unpriced` names any that could not, so an all-clear never
+        # silently stands in for an unevaluated cap.
         return apply_constraint(
             intent, verdict=ConstitutionVerdict.ALLOW,
-            binding_constraint="none", reason="within every configured limit",
+            binding_constraint="none",
+            reason="within every configured limit" + unpriced,
         )
 
 

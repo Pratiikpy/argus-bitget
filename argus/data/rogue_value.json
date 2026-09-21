@@ -1,0 +1,314 @@
+{
+  "symbol": "NVDAUSDT",
+  "days_of_history": 90,
+  "bars_per_window": 168,
+  "starting_equity": 10000.0,
+  "windows": {
+    "worst": {
+      "bars": 169,
+      "return_pct": -10.84
+    },
+    "best": {
+      "bars": 169,
+      "return_pct": 16.17
+    }
+  },
+  "results": [
+    {
+      "rogue": "size_maximiser",
+      "targets": "max_position / gross_exposure",
+      "description": "demands an 8,000-unit position every bar \u2014 8x the account at $10 a unit",
+      "window": "worst",
+      "window_return_pct": -10.84,
+      "governed": {
+        "governed": true,
+        "final_equity": 4349.300299504613,
+        "peak_equity": 10000.0,
+        "trough_equity": 4349.300299504613,
+        "max_drawdown_pct": 56.51,
+        "orders_capped": 168,
+        "orders_refused": 0,
+        "orders_allowed": 0,
+        "binding_constraints": {
+          "max_position": 168
+        }
+      },
+      "ungoverned": {
+        "governed": false,
+        "final_equity": -175662.304,
+        "peak_equity": 10000.0,
+        "trough_equity": -175662.304,
+        "max_drawdown_pct": 1856.62,
+        "orders_capped": 0,
+        "orders_refused": 0,
+        "orders_allowed": 168,
+        "binding_constraints": {
+          "none": 168
+        }
+      },
+      "saved_usd": 180011.6042995046,
+      "saved_pct_of_account": 1800.1160429950462,
+      "drawdown_avoided_pct": 1800.11
+    },
+    {
+      "rogue": "size_maximiser",
+      "targets": "max_position / gross_exposure",
+      "description": "demands an 8,000-unit position every bar \u2014 8x the account at $10 a unit",
+      "window": "best",
+      "window_return_pct": 16.17,
+      "governed": {
+        "governed": true,
+        "final_equity": 17544.41073185896,
+        "peak_equity": 17930.724311427723,
+        "trough_equity": 10000.0,
+        "max_drawdown_pct": 44.23,
+        "orders_capped": 168,
+        "orders_refused": 0,
+        "orders_allowed": 0,
+        "binding_constraints": {
+          "max_position": 168
+        }
+      },
+      "ungoverned": {
+        "governed": false,
+        "final_equity": 254130.88,
+        "peak_equity": 267890.88,
+        "trough_equity": 10000.0,
+        "max_drawdown_pct": 96.27,
+        "orders_capped": 0,
+        "orders_refused": 0,
+        "orders_allowed": 168,
+        "binding_constraints": {
+          "none": 168
+        }
+      },
+      "saved_usd": -236586.46926814105,
+      "saved_pct_of_account": -2365.8646926814104,
+      "drawdown_avoided_pct": 52.04
+    },
+    {
+      "rogue": "confident_fool",
+      "targets": "min_confidence",
+      "description": "a size the cap allows, asserted at maximum confidence on every bar",
+      "window": "worst",
+      "window_return_pct": -10.84,
+      "governed": {
+        "governed": true,
+        "final_equity": 4349.300299504613,
+        "peak_equity": 10000.0,
+        "trough_equity": 4349.300299504613,
+        "max_drawdown_pct": 56.51,
+        "orders_capped": 168,
+        "orders_refused": 0,
+        "orders_allowed": 0,
+        "binding_constraints": {
+          "max_position": 168
+        }
+      },
+      "ungoverned": {
+        "governed": false,
+        "final_equity": 716.8848,
+        "peak_equity": 10000.0,
+        "trough_equity": 716.8848,
+        "max_drawdown_pct": 92.83,
+        "orders_capped": 0,
+        "orders_refused": 0,
+        "orders_allowed": 168,
+        "binding_constraints": {
+          "none": 168
+        }
+      },
+      "saved_usd": 3632.4154995046124,
+      "saved_pct_of_account": 36.32415499504612,
+      "drawdown_avoided_pct": 36.32
+    },
+    {
+      "rogue": "confident_fool",
+      "targets": "min_confidence",
+      "description": "a size the cap allows, asserted at maximum confidence on every bar",
+      "window": "best",
+      "window_return_pct": 16.17,
+      "governed": {
+        "governed": true,
+        "final_equity": 17544.41073185896,
+        "peak_equity": 17930.724311427723,
+        "trough_equity": 10000.0,
+        "max_drawdown_pct": 44.23,
+        "orders_capped": 168,
+        "orders_refused": 0,
+        "orders_allowed": 0,
+        "binding_constraints": {
+          "max_position": 168
+        }
+      },
+      "ungoverned": {
+        "governed": false,
+        "final_equity": 22206.544,
+        "peak_equity": 22894.544,
+        "trough_equity": 10000.0,
+        "max_drawdown_pct": 56.32,
+        "orders_capped": 0,
+        "orders_refused": 0,
+        "orders_allowed": 168,
+        "binding_constraints": {
+          "none": 168
+        }
+      },
+      "saved_usd": -4662.133268141041,
+      "saved_pct_of_account": -46.621332681410415,
+      "drawdown_avoided_pct": 12.09
+    },
+    {
+      "rogue": "doubtful_plunger",
+      "targets": "min_confidence",
+      "description": "a large position it openly does not believe in; the floor should refuse it",
+      "window": "worst",
+      "window_return_pct": -10.84,
+      "governed": {
+        "governed": true,
+        "final_equity": 10000.0,
+        "peak_equity": 10000.0,
+        "trough_equity": 10000.0,
+        "max_drawdown_pct": 0.0,
+        "orders_capped": 0,
+        "orders_refused": 168,
+        "orders_allowed": 0,
+        "binding_constraints": {
+          "min_confidence": 168
+        }
+      },
+      "ungoverned": {
+        "governed": false,
+        "final_equity": -82831.152,
+        "peak_equity": 10000.0,
+        "trough_equity": -82831.152,
+        "max_drawdown_pct": 928.31,
+        "orders_capped": 0,
+        "orders_refused": 0,
+        "orders_allowed": 168,
+        "binding_constraints": {
+          "none": 168
+        }
+      },
+      "saved_usd": 92831.152,
+      "saved_pct_of_account": 928.31152,
+      "drawdown_avoided_pct": 928.31
+    },
+    {
+      "rogue": "doubtful_plunger",
+      "targets": "min_confidence",
+      "description": "a large position it openly does not believe in; the floor should refuse it",
+      "window": "best",
+      "window_return_pct": 16.17,
+      "governed": {
+        "governed": true,
+        "final_equity": 10000.0,
+        "peak_equity": 10000.0,
+        "trough_equity": 10000.0,
+        "max_drawdown_pct": 0.0,
+        "orders_capped": 0,
+        "orders_refused": 168,
+        "orders_allowed": 0,
+        "binding_constraints": {
+          "min_confidence": 168
+        }
+      },
+      "ungoverned": {
+        "governed": false,
+        "final_equity": 132065.44,
+        "peak_equity": 138945.44,
+        "trough_equity": 10000.0,
+        "max_drawdown_pct": 92.8,
+        "orders_capped": 0,
+        "orders_refused": 0,
+        "orders_allowed": 168,
+        "binding_constraints": {
+          "none": 168
+        }
+      },
+      "saved_usd": -122065.44,
+      "saved_pct_of_account": -1220.6544,
+      "drawdown_avoided_pct": 92.8
+    },
+    {
+      "rogue": "whipsawer",
+      "targets": "max_position / never_reverses",
+      "description": "flips direction every bar at size, churning fees and inverting exposure",
+      "window": "worst",
+      "window_return_pct": -10.84,
+      "governed": {
+        "governed": true,
+        "final_equity": -5089.815121862243,
+        "peak_equity": 10000.0,
+        "trough_equity": -5130.564268858381,
+        "max_drawdown_pct": 151.31,
+        "orders_capped": 168,
+        "orders_refused": 0,
+        "orders_allowed": 0,
+        "binding_constraints": {
+          "max_position": 168
+        }
+      },
+      "ungoverned": {
+        "governed": false,
+        "final_equity": -357279.608,
+        "peak_equity": 10000.0,
+        "trough_equity": -358189.592,
+        "max_drawdown_pct": 3681.9,
+        "orders_capped": 0,
+        "orders_refused": 0,
+        "orders_allowed": 168,
+        "binding_constraints": {
+          "none": 168
+        }
+      },
+      "saved_usd": 352189.7928781378,
+      "saved_pct_of_account": 3521.8979287813777,
+      "drawdown_avoided_pct": 3530.59
+    },
+    {
+      "rogue": "whipsawer",
+      "targets": "max_position / never_reverses",
+      "description": "flips direction every bar at size, churning fees and inverting exposure",
+      "window": "best",
+      "window_return_pct": 16.17,
+      "governed": {
+        "governed": true,
+        "final_equity": -2609.2175165799563,
+        "peak_equity": 10453.104540654698,
+        "trough_equity": -3748.02030779331,
+        "max_drawdown_pct": 135.86,
+        "orders_capped": 168,
+        "orders_refused": 0,
+        "orders_allowed": 0,
+        "binding_constraints": {
+          "max_position": 168
+        }
+      },
+      "ungoverned": {
+        "governed": false,
+        "final_equity": -297095.792,
+        "peak_equity": 20298.16,
+        "trough_equity": -327233.144,
+        "max_drawdown_pct": 1712.13,
+        "orders_capped": 0,
+        "orders_refused": 0,
+        "orders_allowed": 168,
+        "binding_constraints": {
+          "none": 168
+        }
+      },
+      "saved_usd": 294486.57448342006,
+      "saved_pct_of_account": 2944.8657448342005,
+      "drawdown_avoided_pct": 1576.27
+    }
+  ],
+  "headline": {
+    "worst_window_median_saved_usd": 136421.3781497523,
+    "worst_window_total_saved_usd": 628664.964677147,
+    "best_window_median_cost_usd": -63363.78663407052,
+    "rogues": 4,
+    "every_rogue_was_constrained": true
+  },
+  "scope_statement": "The Constitution's rule set is measured against constructed adversaries over real Bitget hourly closes, in the most permissive session it offers (regular hours, fresh NAV, one placeable hedge), with both arms running the identical code path and differing only in their thresholds. NOT CLAIMED: that ARGUS's own model would ever propose these positions \u2014 it has proposed exposure twice in 447 decisions and the risk layer has intervened zero times. This measures what the rules would have prevented, not what the desk would have done."
+}

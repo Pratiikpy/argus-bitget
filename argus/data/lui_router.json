@@ -1,0 +1,76 @@
+{
+  "model": "minishlab/potion-base-8M (MIT, static embeddings, no network at query time)",
+  "abstain_threshold": 0.32,
+  "in_scope": {
+    "heldout": {
+      "total": 21,
+      "answered": 16,
+      "correct": 11,
+      "wrong": 5,
+      "accuracy": 0.5238,
+      "coverage": 0.7619
+    },
+    "tuned": {
+      "total": 17,
+      "answered": 16,
+      "correct": 16,
+      "wrong": 0,
+      "accuracy": 0.9412,
+      "coverage": 0.9412
+    },
+    "baseline_heldout": {
+      "total": 21,
+      "answered": 4,
+      "correct": 2,
+      "wrong": 2,
+      "accuracy": 0.0952,
+      "coverage": 0.1905
+    },
+    "baseline_tuned": {
+      "total": 17,
+      "answered": 1,
+      "correct": 0,
+      "wrong": 1,
+      "accuracy": 0.0,
+      "coverage": 0.0588
+    }
+  },
+  "out_of_scope": {
+    "probes": 14,
+    "wrongly_answered": 1,
+    "recall": 0.9286,
+    "examples_wrongly_answered": [
+      "what is 17 times 23"
+    ]
+  },
+  "paraphrase_invariance": {
+    "pairs": 8,
+    "invariant": 6,
+    "invariant_by_declining_both": 2,
+    "failure_rate": 0.25,
+    "failures": [
+      {
+        "bucket": "performance",
+        "a": "are we up or down",
+        "b": "are we in profit or loss",
+        "routed_a": "abstention_why",
+        "routed_b": "None"
+      },
+      {
+        "bucket": "evidence",
+        "a": "what did you read",
+        "b": "what did you look at",
+        "routed_a": "evidence",
+        "routed_b": "None"
+      }
+    ]
+  },
+  "headline": {
+    "heldout_accuracy": 0.5238,
+    "baseline_heldout_accuracy": 0.0952,
+    "improvement_x": 5.5,
+    "out_of_scope_recall": 0.9286,
+    "runs_without_a_model_key": true
+  },
+  "scope_statement": "A nearest-centroid router over static embeddings is built from the 17-case TUNED corpus and scored on the 21-case HELDOUT corpus it has never seen, beside the deterministic pattern layer on the same corpora. Out-of-scope recall is measured against 14 ordinary questions from other domains; paraphrase invariance follows CheckList's INV design. NOT CLAIMED: that 21 held-out cases and 14 probes are a benchmark \u2014 they are small, they are ours, and a wider corpus would move these numbers. NOT CLAIMED: that this matches a hosted model; it matches a regex layer, which is what the deployed demo actually ships."
+}
