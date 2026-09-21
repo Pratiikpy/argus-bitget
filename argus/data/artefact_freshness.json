@@ -1,0 +1,129 @@
+{
+  "last_decision": "2026-09-20T19:41:14.160382+00:00",
+  "ledger_derived_artefacts": 11,
+  "stale": 3,
+  "undated": 3,
+  "stale_detail": [
+    {
+      "artefact": "flow_trace.json",
+      "owner": "argus.demo.flow",
+      "stamped_at": "2026-09-13T20:17:54.617728+00:00",
+      "behind_hours": 167.4,
+      "stale": true,
+      "rerun": "python -m argus.demo.flow"
+    },
+    {
+      "artefact": "profile_divergence.json",
+      "owner": "argus.eval.profilestudy",
+      "stamped_at": "2026-09-15T01:52:09.466914+00:00",
+      "behind_hours": 137.8,
+      "stale": true,
+      "rerun": "python -m argus.eval.profilestudy"
+    },
+    {
+      "artefact": "lui_bench.json",
+      "owner": "argus.eval.luibench",
+      "stamped_at": "2026-09-20T02:25:30.560076+00:00",
+      "behind_hours": 17.3,
+      "stale": true,
+      "rerun": "python -m argus.eval.luibench"
+    }
+  ],
+  "undated_names": [
+    "artefact_freshness.json",
+    "doc_claims.json",
+    "risk_audit.json"
+  ],
+  "detail": [
+    {
+      "artefact": "abstention_autopsy.json",
+      "owner": "argus.eval.autopsy",
+      "stamped_at": "2026-09-21T13:05:39.818749+00:00",
+      "behind_hours": -17.4,
+      "stale": false,
+      "rerun": "python -m argus.eval.autopsy"
+    },
+    {
+      "artefact": "artefact_freshness.json",
+      "owner": "argus.eval.freshness",
+      "stamped_at": null,
+      "behind_hours": null,
+      "stale": false,
+      "rerun": "python -m argus.eval.freshness"
+    },
+    {
+      "artefact": "cycle_check.json",
+      "owner": "argus.eval.cyclecheck",
+      "stamped_at": "2026-09-20T20:12:23.518829+00:00",
+      "behind_hours": -0.5,
+      "stale": false,
+      "rerun": "python -m argus.eval.cyclecheck"
+    },
+    {
+      "artefact": "doc_claims.json",
+      "owner": "argus.eval.docclaims",
+      "stamped_at": null,
+      "behind_hours": null,
+      "stale": false,
+      "rerun": "python -m argus.eval.docclaims"
+    },
+    {
+      "artefact": "flow_trace.json",
+      "owner": "argus.demo.flow",
+      "stamped_at": "2026-09-13T20:17:54.617728+00:00",
+      "behind_hours": 167.4,
+      "stale": true,
+      "rerun": "python -m argus.demo.flow"
+    },
+    {
+      "artefact": "lui_bench.json",
+      "owner": "argus.eval.luibench",
+      "stamped_at": "2026-09-20T02:25:30.560076+00:00",
+      "behind_hours": 17.3,
+      "stale": true,
+      "rerun": "python -m argus.eval.luibench"
+    },
+    {
+      "artefact": "profile_divergence.json",
+      "owner": "argus.eval.profilestudy",
+      "stamped_at": "2026-09-15T01:52:09.466914+00:00",
+      "behind_hours": 137.8,
+      "stale": true,
+      "rerun": "python -m argus.eval.profilestudy"
+    },
+    {
+      "artefact": "risk_audit.json",
+      "owner": "argus.eval.riskaudit",
+      "stamped_at": null,
+      "behind_hours": null,
+      "stale": false,
+      "rerun": "python -m argus.eval.riskaudit"
+    },
+    {
+      "artefact": "shadow_record.json",
+      "owner": "argus.eval.shadow",
+      "stamped_at": "2026-09-21T13:05:40.298375+00:00",
+      "behind_hours": -17.4,
+      "stale": false,
+      "rerun": "python -m argus.eval.shadow"
+    },
+    {
+      "artefact": "surface_agreement.json",
+      "owner": "argus.eval.surfaces",
+      "stamped_at": "2026-09-21T11:47:47.696817+00:00",
+      "behind_hours": -16.1,
+      "stale": false,
+      "rerun": "python -m argus.eval.surfaces"
+    },
+    {
+      "artefact": "theme_audit.json",
+      "owner": "argus.eval.themeaudit",
+      "stamped_at": "2026-09-21T13:05:56.832457+00:00",
+      "behind_hours": -17.4,
+      "stale": false,
+      "rerun": "python -m argus.eval.themeaudit"
+    }
+  ],
+  "why_this_matters": "eval/docclaims.py compares a quoted figure against its artefact, and a stale artefact agrees with a stale document perfectly \u2014 the pair is consistent and both describe a record that has moved on. Re-running eval/refusal.py after the ledger grew from 447 to 495 moved its 2h accuracy from 58.2% to 59.6% and dropped its overnight horizon from 51.2% to 40.4%, below a coin flip. Neither figure was wrong when written.",
+  "scope_statement": "An artefact is attributed to the module that declares it as its own REPORT_PATH, not to every module that mentions the filename. NOT CLAIMED: that a stale artefact is wrong \u2014 it measures an earlier record, and a dated finding is a legitimate thing to publish. What it must not be is unnoticed. NOT CLAIMED: that re-running is always right; some studies are deliberately pinned to a window, and this reports the lag so that keeping it becomes a decision."
+}

@@ -58,7 +58,7 @@ Product requirements: [`../ARGUS-MASTER-PRD.md`](../ARGUS-MASTER-PRD.md)
 ## Status, measured on 2026-09-21
 
 ```
-5,946 tests collected   ruff clean   mypy --strict clean on 292 source files
+5,946 tests collected   ruff clean   mypy --strict clean on 293 source files
 131/131 modules importable           18/18 sub-themes resolve to a symbol and a test file
 495 decisions in the paper ledger (as of 2026-09-21)  chain verifies, head anchor agrees, no truncation
 0 settled trades (2 rows VOID — see the correction above)      100.0% abstention rate
