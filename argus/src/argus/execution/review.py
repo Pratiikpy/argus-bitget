@@ -196,6 +196,7 @@ def review(
     session: Any | None = None,
     hedges: Any | None = None,
     confidence: float = 1.0,
+    reference_price: Decimal | None = None,
 ) -> ReviewVerdict:
     """Rule on one order and report the whole chain behind the answer.
 
@@ -221,7 +222,29 @@ def review(
             caveats=(UNEXERCISED_NOTE,),
         )
 
-    rules = policy if policy is not None else ConstitutionPolicy()
+    # **Every notional gate in this service was dead, and this is the third place that defect
+    # appeared.** `ConstitutionPolicy` denominates `max_position_notional`, `max_gross_exposure`
+    # and the rest in *money*, and computes them from `reference_price`; left at ``None`` it skips
+    # them and says so. So a default-constructed policy ran the structural gates and silently
+    # ignored every size limit — on the one service that exists to point the Constitution outward
+    # at somebody else's order.
+    #
+    # A limit order carries its own price and that is the right one to use: it is the price the
+    # caller has committed to, so it bounds the notional exactly. A market order carries none, and
+    # rather than invent a quote the gates stay skipped and `reference_price` stays ``None`` — the
+    # Constitution already reports that honestly, and a made-up price would produce a limit that
+    # looks enforced and is not. `caveats` says which of the two happened.
+    #
+    # Precedence: an explicit `reference_price` from the caller, else the order's own limit price,
+    # else nothing. The caller's wins because they may be reviewing a market order against a quote
+    # only they have — this service takes no market-data dependency by design, and inventing a
+    # price here would produce a limit that looks enforced and is not.
+    if policy is not None:
+        rules = policy
+    else:
+        priced = reference_price if reference_price is not None else read.price
+        rules = ConstitutionPolicy(reference_price=priced) if priced is not None \
+            else ConstitutionPolicy()
     now = datetime.now(UTC)
     clock = DualClock()
     state = session if session is not None else SessionState(
@@ -275,6 +298,15 @@ def review(
     else:
         verdict, reason = ALLOW, ruling.reason
 
+    # A caller is entitled to know that the size limits did not run, rather than reading an ALLOW
+    # and assuming they did.
+    caveats = [UNEXERCISED_NOTE]
+    if getattr(rules, "reference_price", None) is None:
+        caveats.append(
+            "no reference price was available for this order, so the notional limits "
+            "(position size, gross exposure) were SKIPPED rather than passed. Send a limit "
+            "order, whose price bounds the notional exactly, to have them evaluated."
+        )
     return ReviewVerdict(
         verdict=verdict,
         binding_constraint=bound,
@@ -282,7 +314,7 @@ def review(
         submitted_qty=read.qty,
         permitted_qty=permitted,
         chain=tuple(chain),
-        caveats=(UNEXERCISED_NOTE,),
+        caveats=tuple(caveats),
     )
 
 

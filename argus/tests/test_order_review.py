@@ -88,6 +88,12 @@ class TestTheContractIsTheOneBitgetPublishes:
         assert got.verdict != REFUSE
 
 
+# The notional gates are denominated in money, so a review that is given no price cannot run
+# them — see `review()`'s `reference_price`. These tests supply one, because the claim being
+# tested is about the *size* limits. `TestWithoutAPriceTheSizeGatesSaySo` covers the other case.
+PRICE = Decimal("180")
+
+
 class TestItBeatsTheBaselineItNames:
     def test_an_order_bitgets_own_layer_would_pass_is_narrowed_here(self) -> None:
         """**The claim in miniature.**
@@ -95,7 +101,7 @@ class TestItBeatsTheBaselineItNames:
         `executeWithSafety` sees: not a dryRun, readOnly off, riskLevel not high. It sends this
         order untouched. It never looks at the size, because size is not what that layer is for.
         """
-        got = review(_order(qty="1000000"))
+        got = review(_order(qty="1000000"), reference_price=PRICE)
         assert got.verdict in (NARROW, REFUSE)
         assert got.permitted_qty is not None
         assert got.permitted_qty < Decimal("1000000")
@@ -104,12 +110,12 @@ class TestItBeatsTheBaselineItNames:
     def test_the_binding_constraint_is_named_not_scored(self) -> None:
         """`research/overfit.py` refuses a 0-100 score for a stated reason, and a 73/100 here would
         invite a caller to ship an order that failed a hard limit because it passed soft ones."""
-        got = review(_order(qty="1000000"))
+        got = review(_order(qty="1000000"), reference_price=PRICE)
         assert isinstance(got.binding_constraint, str) and got.binding_constraint
         assert not hasattr(got, "score")
 
     def test_the_whole_chain_is_reported_not_only_the_gate_that_fired(self) -> None:
-        got = review(_order(qty="1000000"))
+        got = review(_order(qty="1000000"), reference_price=PRICE)
         statuses = [row["status"] for row in got.chain]
         from argus.eval.autopsy import CHAIN
 
@@ -120,7 +126,7 @@ class TestItBeatsTheBaselineItNames:
     def test_gates_after_a_terminal_binder_read_unreached_not_passed(self) -> None:
         """The distinction the whole project exists for: a gate that never ran has not allowed
         anything. A TERMINAL binder (here, `min_confidence`) still ends evaluation outright."""
-        got = review(_order(qty="1000000"), confidence=0.1)
+        got = review(_order(qty="1000000"), confidence=0.1, reference_price=PRICE)
         assert got.binding_constraint == "min_confidence"
         fired = next(i for i, row in enumerate(got.chain) if row["status"] == "FIRED")
         assert all(row["status"] == "UNREACHED" for row in got.chain[fired + 1:])
@@ -131,7 +137,7 @@ class TestItBeatsTheBaselineItNames:
         (here, `unhedgeable_gap`) does not short-circuit the ones after it in source order, and
         this chain report must not claim it does. Same defect this module's own tests once carried
         as `desk.carrydesk.walk_chain`, independently, before the Constitution's restructure."""
-        got = review(_order(qty="1000000"))
+        got = review(_order(qty="1000000"), reference_price=PRICE)
         assert got.binding_constraint == "unhedgeable_gap"
         fired = next(i for i, row in enumerate(got.chain) if row["status"] == "FIRED")
         assert all(row["status"] == "PASSED" for row in got.chain[fired + 1:])
@@ -221,3 +227,49 @@ class TestTheBaselineIsQuotedNotRemembered:
         assert "if (dryRun)" in body
         assert "readOnly && op.isWrite" in body
         assert 'riskLevel === "high" && !confirm' in body
+
+
+class TestWithoutAPriceTheSizeGatesSaySo:
+    """**The limitation, asserted rather than left for a caller to discover.**
+
+    `ConstitutionPolicy` denominates its size limits in money and derives them from
+    `reference_price`. A market order carries no price and this service takes no market-data
+    dependency, so there is nothing to convert quantity into notional with — and the honest
+    behaviour is to skip those gates and say so, not to invent a quote and produce a limit that
+    looks enforced and is not.
+
+    This was not honest for a while. A default-constructed policy skipped every notional gate in
+    silence, so a million-unit market order came back ALLOW with `binding_constraint: none` and
+    the reason *"within every configured limit"* — a sentence that was false about limits that had
+    never run. The same defect appeared in three places on the same day: here, in the desk's
+    ablated policies, and in the swept risk proof.
+    """
+
+    def test_a_huge_market_order_is_allowed_but_the_caveat_names_what_was_skipped(self) -> None:
+        got = review(_order(qty="1000000"))
+        assert got.verdict == ALLOW
+        assert any("SKIPPED" in c for c in got.caveats), got.caveats
+        assert any("notional" in c for c in got.caveats)
+
+    def test_the_same_order_with_a_price_is_narrowed(self) -> None:
+        """The pair that makes the caveat meaningful: same payload, price supplied, gate fires."""
+        without = review(_order(qty="1000000"))
+        with_price = review(_order(qty="1000000"), reference_price=PRICE)
+        assert without.verdict == ALLOW
+        assert with_price.verdict in (NARROW, REFUSE)
+        assert with_price.permitted_qty is not None
+        assert with_price.permitted_qty < Decimal("1000000")
+
+    def test_a_limit_order_uses_its_own_price_without_being_told(self) -> None:
+        """A limit price is a committed price, so it bounds the notional exactly."""
+        got = review(_order(qty="1000000", orderType="limit", price="180"))
+        assert got.verdict in (NARROW, REFUSE)
+        assert not any("SKIPPED" in c for c in got.caveats)
+
+    def test_an_explicit_reference_price_beats_the_orders_own(self) -> None:
+        """A caller reviewing against their own quote must not be overruled by the payload."""
+        cheap = review(_order(qty="1000", orderType="limit", price="1"))
+        dear = review(_order(qty="1000", orderType="limit", price="1"),
+                      reference_price=Decimal("100000"))
+        assert dear.permitted_qty is not None and cheap.permitted_qty is not None
+        assert dear.permitted_qty < cheap.permitted_qty
