@@ -67,6 +67,15 @@ Grown from evidence, never from imagination. **When a rival is read, record what
 do not do at all.** A feature we never thought of does not appear above as LOST; it does not
 appear at all, and that is the single most likely way this ledger is wrong.
 
+**Tested and rejected, 2026-09-21 — expanding the OOS negative set to fix `t3-lui`'s Chinese
+over-firing.** 24 new structurally-casual/rhetorical Chinese negatives added to
+`oblique_out_of_scope.json`, retrained, single honest held-out check. Made both axes worse
+(accuracy 74.06%→68.9%, OOS recall 85.71%→79%), not better. Reverted; `t3-lui` stays LOST as
+measured. `TUNED`/`CASES` deliberately not touched — both are independence-valued benchmarks with
+cited historical figures, and engineering cases into them with knowledge of the gap would have
+compromised the one property that makes them worth anything. The design lever named in the RIVAL
+finding is not solved; it is now a *tested* open problem rather than an untested one.
+
 **9 comparisons on disk map to no Bitget-taxonomy row** (all Track-1 or cross-cutting; found by the
 CONNECT lens, 2026-09-21): `arbitrage_comparison.json` (maxme/bitcoin-arbitrage), `rotation_comparison.json`
 (pytaa), `cointegration_comparison.json` (statsmodels/Lean/FinceptTerminal), `afterhours_comparison.json`
