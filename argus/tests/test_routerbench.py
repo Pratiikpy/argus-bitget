@@ -185,7 +185,37 @@ class TestTheRecordIsQueryable:
             assert {"ask", "must_refuse", "reached_router", "confidence", "routed_to"} <= set(entry)
 
     def test_a_stubbed_run_scores_a_correct_routing_as_correct(self) -> None:
-        stub = _Stub({"anything still open": ("position", 0.9)})
-        result = run(client=stub, now=AT)
-        hit = next(o for o in result.outcomes if o.case.ask == "anything still open")
+        """Scoring is exercised with a **synthetic** case, not one borrowed from `CASES`.
+
+        This test used to pick ``"anything still open"`` out of the live corpus because the
+        pattern layer could not classify it, so it was guaranteed to fall through to the router.
+        On 2026-09-21 the patterns were widened and caught it — and every other answerable case
+        in `CASES` — so the test failed on an *improvement*. A test whose setup depends on the
+        system under test still being weak will always eventually break for the wrong reason.
+        """
+        from argus.eval.routerbench import Case
+        from argus.lui.question import Intent
+
+        ask = "zzz qqq vvv"          # deliberately unclassifiable by any pattern, now or later
+        case = Case(ask=ask, expect=Intent.POSITION, family="synthetic", lang="en")
+        stub = _Stub({ask: ("position", 0.9)})
+        result = run((case,), client=stub, now=AT)
+        hit = next(o for o in result.outcomes if o.case.ask == ask)
         assert hit.reached_router and hit.correct_target
+
+    def test_the_pattern_layer_now_catches_every_answerable_case_in_the_corpus(self) -> None:
+        """A finding, pinned: this corpus no longer reaches the router at all.
+
+        `eval/routerbench.py`'s forty cases were written as phrasings the deterministic layer
+        could not handle — it caught 16 of 40. After the widening on 2026-09-21 it catches every
+        answerable one, which is why the test above had to stop borrowing from the corpus. If this
+        ever fails, the patterns regressed.
+        """
+        from argus.lui.question import Intent, classify
+
+        fell_through = [
+            c for c in CASES
+            if not c.must_refuse
+            and classify(c.ask, now=AT).intent in (Intent.UNKNOWN, Intent.AMBIGUOUS)
+        ]
+        assert not fell_through, [c.ask for c in fell_through]
