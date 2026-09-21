@@ -2622,18 +2622,8 @@
     },
     {
       "capability": "Session-aware execution that refuses to solve through a boundary",
-      "problem": "same_input_comparison is claimed but not evidenced",
-      "detail": "data/schedule_comparison.json records nothing about same_input_comparison: no key among argus, ours, comparison, both, arms, side_by_side..."
-    },
-    {
-      "capability": "Session-aware execution that refuses to solve through a boundary",
       "problem": "ablation is claimed but not evidenced",
       "detail": "data/schedule_comparison.json records nothing about ablation: no key among ablation, ablations, ablated, arms, variant, without..."
-    },
-    {
-      "capability": "Queue-position modelling ported from hftbacktest and measured against it",
-      "problem": "same_input_comparison is claimed but not evidenced",
-      "detail": "data/queue_proof.json records nothing about same_input_comparison: no key among argus, ours, comparison, both, arms, side_by_side..."
     },
     {
       "capability": "Queue-position modelling ported from hftbacktest and measured against it",

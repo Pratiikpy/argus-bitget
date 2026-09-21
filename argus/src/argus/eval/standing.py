@@ -4298,6 +4298,19 @@ SIGNATURES: dict[str, tuple[str, ...]] = {
     ),
     "same_input_comparison": (
         "argus", "ours", "comparison", "both", "arms", "side_by_side", "versus", "vs",
+        # Added 2026-09-21. A comparison is often recorded by its *outcome* rather than by the
+        # word "comparison": `schedule_comparison.json` carries `ac_wins_in_sample` against a
+        # TWAP arm, `queue_proof.json` carries `best_naive` and `regimes_won_in_sample`,
+        # `track1_study.json` carries `beats_baseline`. Each is two arms on one input, recorded
+        # under a name the original vocabulary could not see.
+        #
+        # Each token was tested against every artefact before being added, and two candidates
+        # were REJECTED for matching things that are not comparisons: "baseline" matches
+        # `standing.json` itself, because every register entry names the baseline it is measured
+        # against, and "counterfactual" matches `scorecard.json`'s `mean_counterfactual_bps`,
+        # which is a P&L figure. A vocabulary wide enough to match anything is the filename check
+        # this module was built to replace.
+        "wins", "beats", "won", "head_to_head", "naive",
     ),
     "statistically_valid_evaluation": (
         "p_value", "pvalue", "ci", "ci95", "interval", "wilson", "stderr", "std_error",

@@ -174,3 +174,60 @@ class TestTheLiveRegister:
         report = audit()
         implemented = {c.name for c in report.capabilities if c.state is State.IMPLEMENTED}
         assert len(implemented) >= 7
+
+
+class TestTheVocabularyIsWideEnoughButNotWider:
+    """**A signature that matches anything is the filename check this module replaced.**
+
+    The vocabulary was widened on 2026-09-21 because a comparison is often recorded by its
+    *outcome* rather than by the word "comparison" — `schedule_comparison.json` carries
+    `ac_wins_in_sample` against a TWAP arm, `track1_study.json` carries `beats_baseline`. Two
+    candidate tokens were rejected during that widening, and these tests pin the rejections so a
+    future edit cannot quietly reintroduce them.
+    """
+
+    def test_baseline_is_not_a_comparison_token(self) -> None:
+        """It matches `standing.json` itself: every register entry names the baseline it is
+        measured against, so accepting it would let the register verify its own claims."""
+        from argus.eval.standing import SIGNATURES
+
+        assert "baseline" not in SIGNATURES["same_input_comparison"]
+
+    def test_counterfactual_is_not_an_ablation_token(self) -> None:
+        """It matches `scorecard.json`'s `mean_counterfactual_bps`, which is a P&L figure. A
+        forgone-return number is not an experiment with arms."""
+        from argus.eval.standing import SIGNATURES
+
+        assert "counterfactual" not in SIGNATURES["ablation"]
+
+    def test_an_outcome_shaped_comparison_is_recognised(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The case the widening was for."""
+        import argus.eval.standing as standing
+
+        blob = tmp_path / "data" / "sched.json"
+        blob.parent.mkdir(parents=True, exist_ok=True)
+        blob.write_text(json.dumps({"per_symbol": {"NVDAUSDT": {"ac_wins_in_sample": True}}}))
+        monkeypatch.setattr(standing, "PACKAGE", tmp_path)
+        status, _ = verify(
+            Proof("same_input_comparison", "two arms", artefact="data/sched.json"),
+            module_present=True,
+        )
+        assert status == "VERIFIED"
+
+    def test_an_artefact_with_only_a_baseline_field_is_still_unproven(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Naming what you were measured against is not the same as having measured it."""
+        import argus.eval.standing as standing
+
+        blob = tmp_path / "data" / "named.json"
+        blob.parent.mkdir(parents=True, exist_ok=True)
+        blob.write_text(json.dumps({"baseline": "qlib", "note": "we should compare one day"}))
+        monkeypatch.setattr(standing, "PACKAGE", tmp_path)
+        status, _ = verify(
+            Proof("same_input_comparison", "claimed", artefact="data/named.json"),
+            module_present=True,
+        )
+        assert status == "UNPROVEN"
