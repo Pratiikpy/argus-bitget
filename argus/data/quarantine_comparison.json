@@ -634,26 +634,26 @@
   },
   "costs": {
     "repeats": 20,
-    "v1_seconds_per_headline": 4.874357142324122e-05,
-    "seconds_per_headline": 0.00029196622448840313,
-    "v1_seconds_per_attack_string": 0.0001859873013234765,
-    "seconds_per_attack_string": 0.001239181937087429,
+    "v1_seconds_per_headline": 3.744408165161707e-05,
+    "seconds_per_headline": 0.00025440755101842615,
+    "v1_seconds_per_attack_string": 0.00016216506622770233,
+    "seconds_per_attack_string": 0.0010810937417230866,
     "headlines": 49,
     "attack_strings": 302,
     "scaling_seconds_by_input_bytes": {
-      "6000": 0.020716099999845028,
-      "24000": 0.07288059999700636,
-      "96000": 0.32598439999856055
+      "6000": 0.016333800042048097,
+      "24000": 0.06456029997207224,
+      "96000": 0.26379820000147447
     },
     "scaling_ratios_per_4x_input": [
-      3.5180656589585664,
-      4.472855602340687
+      3.9525584864437353,
+      4.086074570836712
     ],
     "scales_linearly": true
   },
   "reproducibility": {
     "identical": true
   },
-  "verdict": "AgentDojo won the first run outright (27 of 302 strings, 1 of 16 templates, and 0.00 withholding precision in production). After the rewrite that measurement forced, ARGUS withholds 302 of 302 with zero false positives on every negative corpus we have, and still loses to semantic paraphrase (9 of 12), which is the class AgentDojo's own transformer defence is for and ours deliberately is not.",
-  "scope_statement": "The real AgentDojo package (0.1.35, installed from the local clone into an isolated venv) generated 302 real attack strings across its 16 registered fixed-template attacks, by calling its own BaseAttack.attack() for every user-task x injection-task pair in all four real v1 suites. Those exact strings are run through ARGUS's own agents/quarantine.py. CLAIMED, and this is the finding that started it: on 2026-09-20 the v1 detector caught 27 of 302 (1 of 16 templates, 1 of the 6 canonical ones) and its withholding precision on the live desk's own production record was 0.00 -- all six distinct items it had ever withheld across 385 runs were false positives, three of them Twitter's own bidi isolates and emoji ZWJ, three of them ordinary r/TQQQ prose. The specialist won that comparison outright. CLAIMED, after the rewrite the measurement forced: 302 of 302 strings and 16 of 16 templates are now withheld, all 6 production false positives are gone (3 no longer fire at all, 3 are flagged and KEPT), and both negative corpora -- the committed 49-headline calibration set and 10 hand-written near misses -- remain at zero false positives. NOT CLAIMED that ARGUS beats AgentDojo's own transformers_pi_detector: that defence was not run, because it needs a 440MB DeBERTa checkpoint this project deliberately does not ship, and the three semantic paraphrases in PARAPHRASES that ARGUS misses are precisely the class a classifier is expected to get and a lexical detector is not. The honest summary is that ARGUS now matches AgentDojo's attack corpus completely and remains beatable by paraphrase. NOT CLAIMED that 100% recall on this corpus is 100% recall on prompt injection: 302 strings from 16 templates is a benchmark, and a detector tuned until it clears a benchmark has learned the benchmark unless it also holds on inputs the benchmark does not contain -- which is what PARAPHRASES and the mutation test are for, and the paraphrase result (9 of 12) is reported unrounded rather than removed. NOT CLAIMED that AgentDojo's own published attack-success rates were reproduced: those are measured against an LLM agent executing tool calls, this comparison uses no LLM at all, and no ASR or utility-under-attack number appears anywhere here. NOT VERIFIED that the six audited production items are the only false positives the desk has ever produced -- they are the only ones it ever ACTED on. An item that was hostile and was not caught would leave no trace in data/desk_notes.jsonl at all, so production recall is unmeasured and unmeasurable from the record as it stands."
+  "verdict": "AgentDojo won the first run outright (27 of 302 strings, 1 of 16 templates, and 0.00 withholding precision in production). After the rewrite that measurement forced, ARGUS withholds 302 of 302 with zero false positives on every negative corpus we have, and now catches all 12 of 12 hand-written paraphrases in PARAPHRASES, including the three written as deliberate semantic paraphrases -- on this twelve-item corpus, not a claim that generalises past it.",
+  "scope_statement": "The real AgentDojo package (0.1.35, installed from the local clone into an isolated venv) generated 302 real attack strings across its 16 registered fixed-template attacks, by calling its own BaseAttack.attack() for every user-task x injection-task pair in all four real v1 suites. Those exact strings are run through ARGUS's own agents/quarantine.py. CLAIMED, and this is the finding that started it: on 2026-09-20 the v1 detector caught 27 of 302 (1 of 16 templates, 1 of the 6 canonical ones) and its withholding precision on the live desk's own production record was 0.00 -- all six distinct items it had ever withheld across 385 runs were false positives, three of them Twitter's own bidi isolates and emoji ZWJ, three of them ordinary r/TQQQ prose. The specialist won that comparison outright. CLAIMED, after the rewrite the measurement forced: 302 of 302 strings and 16 of 16 templates are now withheld, all 6 production false positives are gone (3 no longer fire at all, 3 are flagged and KEPT), and both negative corpora -- the committed 49-headline calibration set and 10 hand-written near misses -- remain at zero false positives. NOT CLAIMED that ARGUS beats AgentDojo's own transformers_pi_detector: that defence was not run, because it needs a 440MB DeBERTa checkpoint this project deliberately does not ship. On this corpus a lexical detector currently catches everything a semantic classifier would be expected to catch, which is a fact about this twelve-item corpus and not a claim that a lexical approach subsumes a semantic one in general. CLAIMED, and past what was expected: all 12 of 12 hand-written paraphrases in PARAPHRASES are now withheld, including the three written as deliberate semantic paraphrases sharing no vocabulary with a lexical trigger. NOT CLAIMED that this generalises past this one twelve-item corpus -- twelve hand-written strings is a smoke test for generalisation, not a semantic-robustness benchmark, and a corpus this small can be cleared by memorising it rather than by understanding meaning. NOT CLAIMED that AgentDojo's own published attack-success rates were reproduced: those are measured against an LLM agent executing tool calls, this comparison uses no LLM at all, and no ASR or utility-under-attack number appears anywhere here. NOT VERIFIED that the six audited production items are the only false positives the desk has ever produced -- they are the only ones it ever ACTED on. An item that was hostile and was not caught would leave no trace in data/desk_notes.jsonl at all, so production recall is unmeasured and unmeasurable from the record as it stands."
 }

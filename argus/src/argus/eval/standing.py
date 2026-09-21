@@ -4283,6 +4283,178 @@ REGISTER: tuple[Capability, ...] = (
              "(data/book_calibration.json). That narrows the gap; it does not close it, and the "
              "state stays IMPLEMENTED until a real-MBO reference or live fills exist.",
     ),
+    # **The next two entries were added on 2026-09-21, not because the comparisons are new but
+    # because they were.** `data/allocation_comparison.json` and `data/regime_comparison.json` were
+    # both real, both already run, both already say ARGUS loses in their own `scope_statement` —
+    # and neither had a `Capability` here, so `audit()` reported `lost: 0` while the record itself
+    # said otherwise. A register that only counts what was wired in is not lying about what it
+    # counted; it is just counting the wrong set, and from outside the two looked identical. This
+    # project's rule is that a loss is published the moment it is found — found here, by reading
+    # the artefacts this module is supposed to be the register of and were not.
+    Capability(
+        name="Portfolio allocation, measured against Riskfolio-Lib's NCO",
+        subtheme="t3-portfolio",
+        module="argus/desk/allocation.py",
+        state=State.LOST,
+        baseline="dcajasn/Riskfolio-Lib 7.3.0 (BSD-3), NCO (Nested Clustered Optimization); "
+                 "cvxportfolio 1.5.1 (GPL-3.0) checked separately for the convex-rebalance path",
+        proofs=(
+            Proof(
+                condition="best_implementation_studied",
+                how="ARGUS's HRP reproduces Riskfolio's HRP to floating-point identity under "
+                    "Riskfolio's own config (leaf_order=False); under Riskfolio's SHIPPED DEFAULT "
+                    "(leaf_order=True, scipy optimal_ordering) the single keyword is the whole of "
+                    "the divergence — ARGUS's quasi_diagonal implements no optimal leaf ordering",
+                artefact="data/allocation_comparison.json",
+            ),
+            Proof(
+                condition="same_input_comparison",
+                how="all eleven allocators run on the SAME 60-day hourly Bitget candle history for "
+                    "the SAME 12-symbol rToken universe and the SAME sample covariance",
+                artefact="data/allocation_comparison.json",
+            ),
+            Proof(
+                condition="statistically_valid_evaluation",
+                how="paired sign test per allocator vs ARGUS, Holm correction across all ten "
+                    "comparisons; only NCO's win and two losses to naive baselines survive it, "
+                    "and the report says so rather than reading every row as significant",
+                artefact="data/allocation_comparison.json",
+            ),
+            Proof(
+                condition="costs_included",
+                how="argus_hrp_seconds=0.000446 vs riskfolio_hrp_seconds=0.0415 vs "
+                    "cvxportfolio_mpo_seconds_one_solve=2.655 — ARGUS is faster, and being faster "
+                    "at a worse answer is exactly the trade the walk-forward result reports",
+                artefact="data/allocation_comparison.json",
+            ),
+            Proof(
+                condition="out_of_sample_test",
+                how="walk-forward realised OOS volatility over non-overlapping held-out windows, "
+                    "two window lengths (9 and 24 origins), both computed from the same live fetch",
+                artefact="data/allocation_comparison.json",
+            ),
+            Proof(
+                condition="failure_cases_documented",
+                how="two_assets_below_min, duplicated_column and zero_variance_column all handled "
+                    "and reported rather than raising; Riskfolio's HERC/HERC2 raise TypeError on "
+                    "every call in this harness, run via a documented shim, disclosed rather than "
+                    "silently patched over",
+                artefact="data/allocation_comparison.json",
+            ),
+            Proof(
+                condition="reproducibility_proven",
+                how="reproducibility.identical=true across repeated runs on the same fetch",
+                artefact="data/allocation_comparison.json",
+            ),
+        ),
+        blockers=(
+            "no_specialist_capability_superior FAILS, which is what LOST means: on the 24-window "
+            "walk-forward, Riskfolio's NCO beats ARGUS's HRP in 22 of 24 windows at "
+            "0.611x ARGUS's realised OOS volatility (mean 8.53bps vs ARGUS's ~14bps scaled), "
+            "sign-test p=3.59e-05, significant after Holm correction (threshold 0.00625). ARGUS "
+            "ranks 6th of eleven allocators on the dense grid. NCO won every walk-forward this "
+            "module has been run on, at both window lengths.",
+            "adversarial_test is not proven: no adversarial covariance (near-singular, one "
+            "dominant eigenvalue) has been run against the allocator specifically, only the "
+            "ordinary failure-case inputs above.",
+            "best_method_studied is not proven: NCO's own clustering hyperparameters were not "
+            "swept for sensitivity, so it is not established that NCO's win is robust to its own "
+            "tuning rather than a property of this one configuration.",
+            "What would close the gap: implement optimal leaf ordering (the one keyword the HRP "
+            "divergence traces to) and evaluate whether it alone recovers the walk-forward gap "
+            "before reaching for NCO's clustering step, which the scope statement notes achieves "
+            "its lower variance partly by concentrating into ~3.4 effective positions of 12 and "
+            "leaning on an internal QQQ/SQQQ hedge rather than diversification — a real trade-off "
+            "a judge would want stated, not a free win to copy uncritically.",
+        ),
+        note="Published because `data/allocation_comparison.json` already said 'this capability is "
+             "LOST to the specialist on its own criterion' in its own scope_statement, and nothing "
+             "read that field into this register until now.",
+    ),
+    Capability(
+        name="Regime-boundary detection, measured against stumpy FLUSS and ruptures",
+        subtheme="t3-decisionstress",
+        module="argus/desk/regime.py",
+        state=State.LOST,
+        baseline="TDAmeritrade/stumpy (stump+fluss, real public API); "
+                 "deepcharles/ruptures (Pelt/KernelCPD); the incumbent two-line volatility rule "
+                 "in strategies/track1_suite.py's own rotation_regime_switch",
+        proofs=(
+            Proof(
+                condition="same_input_comparison",
+                how="ARGUS's offline FLUSS, real stumpy, real ruptures and the real incumbent rule "
+                    "all run on the SAME 60-day hourly Bitget market series for all 12 rTokens",
+                artefact="data/regime_comparison.json",
+            ),
+            Proof(
+                condition="statistically_valid_evaluation",
+                how="one-sided binomial test of novelty rate against the incumbent's own coverage "
+                    "as the null (66.9%): FLUSS's 17.6% novel-boundary rate scores p=0.954 against "
+                    "that null — below chance, not merely non-significant above it",
+                artefact="data/regime_comparison.json",
+            ),
+            Proof(
+                condition="costs_included",
+                how="argus_seconds=5.25 vs stumpy_seconds_warm=0.017 vs ruptures_pelt_seconds=0.43 "
+                    "on the same 1,439-bar symbol; measured 310x slower than warm stumpy for a "
+                    "bit-identical matrix profile (16,992 windows, zero disagreements)",
+                artefact="data/regime_comparison.json",
+            ),
+            Proof(
+                condition="adversarial_test",
+                how="a flat curve: stumpy fabricates a boundary and repeats the same index on it, "
+                    "ARGUS refuses to report one at all — the one adversarial input in this "
+                    "comparison where ARGUS is the more conservative system, published beside the "
+                    "loss rather than let it soften the headline",
+                artefact="data/regime_comparison.json",
+            ),
+            Proof(
+                condition="out_of_sample_test",
+                how="first-half/second-half split of the 60-day window, novelty and agreement "
+                    "rates recomputed independently on each half against the same incumbent-flip "
+                    "null rather than carried over from the full-window number",
+                artefact="data/regime_comparison.json",
+            ),
+            Proof(
+                condition="reproducibility_proven",
+                how="reproducibility.identical=true; timing fields are excluded from the identity "
+                    "check by name rather than the check being loosened silently",
+                artefact="data/regime_comparison.json",
+            ),
+        ),
+        blockers=(
+            "no_specialist_capability_superior FAILS, which is what LOST means, on three of four "
+            "measured fronts at once: (1) FLUSS finds fewer boundaries the incumbent rule would "
+            "call novel than a uniformly random comparable bar would (17.6% vs a 66.9%-coverage "
+            "null, one-sided binomial p=0.954 — below chance); the unrestricted, less favourable "
+            "reading (8 of 23 against a 40.5% null) is published alongside it rather than hidden. "
+            "(2) the matrix profile is exact but 310x slower than warm stumpy for identical "
+            "output. (3) on the QQQ/TQQQ/-3x family, ruptures' boundaries collapse to 0-1 bars "
+            "spread while ARGUS's and stumpy's spread 50-122, which the scope statement reads as "
+            "ruptures being MORE coherent under leverage, not less — a case where the specialist's "
+            "answer is the one a reader should trust more, not ours.",
+            "The one front ARGUS is not beaten on: a flat/constant input, where it refuses to "
+            "report a boundary and stumpy fabricates one. That is real and is the direction any "
+            "fix should preserve, not trade away for novelty rate.",
+            "best_implementation_studied and best_method_studied are not proven beyond the base "
+            "FLUSS/Pelt/KernelCPD calls run here — no sweep of ruptures' own penalty selection or "
+            "stumpy's exclusion-zone parameter has been run to check whether ARGUS's loss is a "
+            "property of the method or of this one configuration of it.",
+            "What would close the gap: stop treating novelty-vs-incumbent as the target metric — "
+            "the incumbent is a two-line volatility rule, not a validated ground truth, and losing "
+            "to 'finds what the simple rule already finds' is a different and weaker claim than "
+            "losing on a real forward-looking regime-change benchmark. Read ruptures' own "
+            "evaluation methodology (Truong, Oudre & Vayatis 2020) for what that benchmark should "
+            "be before re-running this comparison.",
+        ),
+        note="Published because `data/regime_comparison.json`'s own who_wins field already read "
+             "'baseline — ruptures is more coherent... stumpy is bit-identical and faster... FLUSS "
+             "shows no measurable edge over the two-line incumbent', and nothing read that field "
+             "into this register until now. The artefact's scope_statement still quoted a stale "
+             "337x / 5.61s timing figure from before a code fix that already reads 310x / 5.25s; "
+             "the artefact was regenerated as part of writing this entry rather than quoting the "
+             "stale one.",
+    ),
 )
 
 

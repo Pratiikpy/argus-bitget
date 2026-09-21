@@ -1,8 +1,8 @@
 {
   "total": 96,
   "checked": 87,
-  "ok": 73,
-  "lagging": 14,
+  "ok": 72,
+  "lagging": 15,
   "stale": 0,
   "absent": 24,
   "deleted": 0,
@@ -351,14 +351,14 @@
       "line": 445,
       "quoted": [
         "17",
-        "24"
+        "26"
       ],
       "live": [
         17,
-        24
+        26
       ],
       "status": "OK",
-      "excerpt": "17 of 24 capabilities are OWNED"
+      "excerpt": "17 of 26 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -366,14 +366,14 @@
       "line": 110,
       "quoted": [
         "17",
-        "24"
+        "26"
       ],
       "live": [
         17,
-        24
+        26
       ],
       "status": "OK",
-      "excerpt": "17 of 24 capabilities are OWNED"
+      "excerpt": "17 of 26 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -382,7 +382,7 @@
       "quoted": [],
       "live": [
         17,
-        24
+        26
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -394,7 +394,7 @@
       "quoted": [],
       "live": [
         17,
-        24
+        26
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -746,7 +746,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        457
+        469
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -757,7 +757,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        457
+        469
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -770,9 +770,9 @@
         "457"
       ],
       "live": [
-        457
+        469
       ],
-      "status": "OK",
+      "status": "LAGGING",
       "excerpt": "457 have settled as abstentions"
     },
     {

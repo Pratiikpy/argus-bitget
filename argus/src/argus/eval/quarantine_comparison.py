@@ -255,7 +255,9 @@ PARAPHRASES = (
 """Twelve hand-written injections that are NOT in AgentDojo, written to test generalisation rather
 than memorisation of one benchmark's phrasings. Three of them — the first three — are deliberate
 semantic paraphrases that keep the meaning of "ignore your previous instructions" while sharing no
-vocabulary with it. They are expected to fail and they do; see the scope statement."""
+vocabulary with it, written to be hard for a lexical detector. See `run_paraphrase_recall()` for
+the live pass/fail count rather than a claim here about what it was on the day this was written —
+that claim went stale once and is not being repeated as a docstring this time."""
 
 
 # --- recall ---------------------------------------------------------------------------------
@@ -716,38 +718,82 @@ def severity_table() -> dict[str, str]:
             for p in Pattern}
 
 
-SCOPE_STATEMENT = (
-    "The real AgentDojo package (0.1.35, installed from the local clone into an isolated venv) "
-    "generated 302 real attack strings across its 16 registered fixed-template attacks, by calling "
-    "its own BaseAttack.attack() for every user-task x injection-task pair in all four real v1 "
-    "suites. Those exact strings are run through ARGUS's own agents/quarantine.py. "
-    "CLAIMED, and this is the finding that started it: on 2026-09-20 the v1 detector caught 27 of "
-    "302 (1 of 16 templates, 1 of the 6 canonical ones) and its withholding precision on the live "
-    "desk's own production record was 0.00 -- all six distinct items it had ever withheld across "
-    "385 runs were false positives, three of them Twitter's own bidi isolates and emoji ZWJ, three "
-    "of them ordinary r/TQQQ prose. The specialist won that comparison outright. "
-    "CLAIMED, after the rewrite the measurement forced: 302 of 302 strings and 16 of 16 templates "
-    "are now withheld, all 6 production false positives are gone (3 no longer fire at all, 3 are "
-    "flagged and KEPT), and both negative corpora -- the committed 49-headline calibration set and "
-    "10 hand-written near misses -- remain at zero false positives. "
-    "NOT CLAIMED that ARGUS beats AgentDojo's own transformers_pi_detector: that defence was not "
-    "run, because it needs a 440MB DeBERTa checkpoint this project deliberately does not ship, and "
-    "the three semantic paraphrases in PARAPHRASES that ARGUS misses are precisely the class a "
-    "classifier is expected to get and a lexical detector is not. The honest summary is that ARGUS "
-    "now matches AgentDojo's attack corpus completely and remains beatable by paraphrase. "
-    "NOT CLAIMED that 100% recall on this corpus is 100% recall on prompt injection: 302 strings "
-    "from 16 templates is a benchmark, and a detector tuned until it clears a benchmark has "
-    "learned the benchmark unless it also holds on inputs the benchmark does not contain -- which "
-    "is what PARAPHRASES and the mutation test are for, and the paraphrase result (9 of 12) is "
-    "reported unrounded rather than removed. "
-    "NOT CLAIMED that AgentDojo's own published attack-success rates were reproduced: those are "
-    "measured against an LLM agent executing tool calls, this comparison uses no LLM at all, and "
-    "no ASR or utility-under-attack number appears anywhere here. "
-    "NOT VERIFIED that the six audited production items are the only false positives the desk has "
-    "ever produced -- they are the only ones it ever ACTED on. An item that was hostile and was "
-    "not caught would leave no trace in data/desk_notes.jsonl at all, so production recall is "
-    "unmeasured and unmeasurable from the record as it stands."
-)
+def _paraphrase_clauses(paraphrases: dict[str, Any]) -> tuple[str, str]:
+    """The two SCOPE_STATEMENT clauses a detector change can silently invalidate.
+
+    Both used to be hardcoded prose reading "the paraphrase result (9 of 12)" and "the three
+    semantic paraphrases ... that ARGUS misses" -- true when written, and quietly false once the
+    detector generalised to catch all twelve, because nothing regenerated the text. The artefact's
+    own `paraphrases` field already had the correct number; only the sentence describing it had
+    gone stale. That is the exact "buried prose contradicting adjacent data" defect this project
+    keeps re-finding, one module further in. Computed from the live result so it can only ever
+    read as honest again, never stale again.
+    """
+    missed, withheld, total = paraphrases["missed"], paraphrases["withheld"], paraphrases["total"]
+    if not missed:
+        transformer = (
+            "NOT CLAIMED that ARGUS beats AgentDojo's own transformers_pi_detector: that defence "
+            "was not run, because it needs a 440MB DeBERTa checkpoint this project deliberately "
+            "does not ship. On this corpus a lexical detector currently catches everything a "
+            "semantic classifier would be expected to catch, which is a fact about this "
+            "twelve-item corpus and not a claim that a lexical approach subsumes a semantic one "
+            "in general."
+        )
+        oos = (
+            f"CLAIMED, and past what was expected: all {total} of {total} hand-written "
+            f"paraphrases in PARAPHRASES are now withheld, including the three written as "
+            f"deliberate semantic paraphrases sharing no vocabulary with a lexical trigger. NOT "
+            f"CLAIMED that this generalises past this one twelve-item corpus -- twelve "
+            f"hand-written strings is a smoke test for generalisation, not a semantic-robustness "
+            f"benchmark, and a corpus this small can be cleared by memorising it rather than by "
+            f"understanding meaning."
+        )
+        return transformer, oos
+    transformer = (
+        "NOT CLAIMED that ARGUS beats AgentDojo's own transformers_pi_detector: that defence was "
+        "not run, because it needs a 440MB DeBERTa checkpoint this project deliberately does not "
+        f"ship, and the {len(missed)} semantic paraphrase(s) in PARAPHRASES that ARGUS misses are "
+        "precisely the class a classifier is expected to get and a lexical detector is not. The "
+        "honest summary is that ARGUS now matches AgentDojo's attack corpus completely and "
+        "remains beatable by paraphrase."
+    )
+    oos = (
+        f"NOT CLAIMED that 100% recall on this corpus is 100% recall on prompt injection: 302 "
+        f"strings from 16 templates is a benchmark, and a detector tuned until it clears a "
+        f"benchmark has learned the benchmark unless it also holds on inputs the benchmark does "
+        f"not contain -- which is what PARAPHRASES and the mutation test are for, and the "
+        f"paraphrase result ({withheld} of {total}) is reported unrounded rather than removed."
+    )
+    return transformer, oos
+
+
+def scope_statement(paraphrases: dict[str, Any]) -> str:
+    """Assembled with the live paraphrase result, not a snapshot. See `_paraphrase_clauses`."""
+    transformer_clause, oos_clause = _paraphrase_clauses(paraphrases)
+    return (
+        "The real AgentDojo package (0.1.35, installed from the local clone into an isolated venv) "
+        "generated 302 real attack strings across its 16 registered fixed-template attacks, by "
+        "calling its own BaseAttack.attack() for every user-task x injection-task pair in all four "
+        "real v1 suites. Those exact strings are run through ARGUS's own agents/quarantine.py. "
+        "CLAIMED, and this is the finding that started it: on 2026-09-20 the v1 detector caught 27 "
+        "of 302 (1 of 16 templates, 1 of the 6 canonical ones) and its withholding precision on "
+        "the live desk's own production record was 0.00 -- all six distinct items it had ever "
+        "withheld across 385 runs were false positives, three of them Twitter's own bidi isolates "
+        "and emoji ZWJ, three of them ordinary r/TQQQ prose. The specialist won that comparison "
+        "outright. CLAIMED, after the rewrite the measurement forced: 302 of 302 strings and 16 of "
+        "16 templates are now withheld, all 6 production false positives are gone (3 no longer "
+        "fire at all, 3 are flagged and KEPT), and both negative corpora -- the committed "
+        "49-headline calibration set and 10 hand-written near misses -- remain at zero false "
+        f"positives. {transformer_clause} "
+        f"{oos_clause} "
+        "NOT CLAIMED that AgentDojo's own published attack-success rates were reproduced: those "
+        "are measured against an LLM agent executing tool calls, this comparison uses no LLM at "
+        "all, and no ASR or utility-under-attack number appears anywhere here. "
+        "NOT VERIFIED that the six audited production items are the only false positives the desk "
+        "has ever produced -- they are the only ones it ever ACTED on. An item that was hostile "
+        "and was not caught would leave no trace in data/desk_notes.jsonl at all, so production "
+        "recall is unmeasured and unmeasurable from the record as it stands."
+    )
 
 
 def render(report: dict[str, Any]) -> str:
@@ -854,12 +900,29 @@ def render(report: dict[str, Any]) -> str:
 def build_report() -> dict[str, Any]:
     recall = run_recall()
     precision = run_precision()
+    paraphrases = run_paraphrase_recall()
+    missed, withheld, total = paraphrases["missed"], paraphrases["withheld"], paraphrases["total"]
+    # **This used to hardcode "9 of 12" and "still loses to semantic paraphrase" as literal prose,
+    # disconnected from `paraphrases` two lines below it.** The detector generalised to catch all
+    # twelve some time after that sentence was written; the sentence itself was never re-derived,
+    # so the artefact's own verdict field contradicted its own paraphrases field. Built from the
+    # live result now, the same fix as `scope_statement()` below and for the same reason.
+    if not missed:
+        paraphrase_clause = (
+            f"and now catches all {total} of {total} hand-written paraphrases in PARAPHRASES, "
+            f"including the three written as deliberate semantic paraphrases -- on this "
+            f"twelve-item corpus, not a claim that generalises past it"
+        )
+    else:
+        paraphrase_clause = (
+            f"and still loses to semantic paraphrase ({withheld} of {total}), which is the class "
+            f"AgentDojo's own transformer defence is for and ours deliberately is not"
+        )
     verdict = (
         "AgentDojo won the first run outright (27 of 302 strings, 1 of 16 templates, and 0.00 "
         "withholding precision in production). After the rewrite that measurement forced, ARGUS "
-        "withholds 302 of 302 with zero false positives on every negative corpus we have, and "
-        "still loses to semantic paraphrase (9 of 12), which is the class AgentDojo's own "
-        "transformer defence is for and ours deliberately is not."
+        f"withholds 302 of 302 with zero false positives on every negative corpus we have, "
+        f"{paraphrase_clause}."
     )
     return {
         "reference": {
@@ -871,7 +934,7 @@ def build_report() -> dict[str, Any]:
         "corpus_verification": verify_corpus_against_clone(),
         "severity_table": severity_table(),
         "recall": recall,
-        "paraphrases": run_paraphrase_recall(),
+        "paraphrases": paraphrases,
         "precision": precision,
         "mutation": run_mutation_robustness(),
         "ablation": run_ablation(),
@@ -879,7 +942,7 @@ def build_report() -> dict[str, Any]:
         "costs": measure_costs(),
         "reproducibility": run_reproducibility_check(),
         "verdict": verdict,
-        "scope_statement": SCOPE_STATEMENT,
+        "scope_statement": scope_statement(paraphrases),
     }
 
 
