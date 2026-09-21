@@ -43,6 +43,7 @@ from argus.agents.conflict import report as conflict_report
 from argus.agents.debate import Debate, DebateBudget, Ending
 from argus.agents.debate import hold as hold_debate
 from argus.agents.earnings import EarningsRead
+from argus.agents.entitygate import check as check_entities
 from argus.agents.grounding import check as check_grounding
 from argus.agents.grounding import extract as extract_figures
 from argus.agents.mandate import Mandate, order_evidence
@@ -576,6 +577,18 @@ class TradingDesk:
             records=[(e.id, e.attributes) for e in evidence if e.attributes],
         )
         notes.extend(claims.render())
+
+        # The same thesis, checked a third way — and this one asks about *instruments* rather than
+        # figures or properties. Numeric grounding catches a wrong number; the claim checker
+        # catches a wrong property; neither notices a thesis that reasons about NVDA and then
+        # names TSLA, because "TSLA" is not a figure and carries no attribute to contradict.
+        #
+        # The mechanism is `HKUSTDial/DeepEar`'s (MIT), read at source: an instrument the model
+        # proposes is kept only if it also appears in the text the model was given. Reported, never
+        # repaired — silently swapping an unsupported instrument for a supported one would invent a
+        # different claim and hide that it had.
+        entities = check_entities(proof.llm_original_intent.thesis, evidence=evidence)
+        notes.extend(entities.render())
 
         # --- 2b. the standing adversary. It may only reduce. ---
         #
