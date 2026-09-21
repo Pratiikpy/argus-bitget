@@ -4396,7 +4396,7 @@ REGISTER: tuple[Capability, ...] = (
             Proof(
                 condition="costs_included",
                 how="argus_seconds=5.25 vs stumpy_seconds_warm=0.017 vs ruptures_pelt_seconds=0.43 "
-                    "on the same 1,439-bar symbol; measured 310x slower than warm stumpy for a "
+                    "on the same 1,439-bar symbol; measured ~306x slower than warm stumpy for a "
                     "bit-identical matrix profile (16,992 windows, zero disagreements)",
                 artefact="data/regime_comparison.json",
             ),
@@ -4428,7 +4428,7 @@ REGISTER: tuple[Capability, ...] = (
             "call novel than a uniformly random comparable bar would (17.6% vs a 66.9%-coverage "
             "null, one-sided binomial p=0.954 — below chance); the unrestricted, less favourable "
             "reading (8 of 23 against a 40.5% null) is published alongside it rather than hidden. "
-            "(2) the matrix profile is exact but 310x slower than warm stumpy for identical "
+            "(2) the matrix profile is exact but ~306x slower than warm stumpy for identical "
             "output. (3) on the QQQ/TQQQ/-3x family, ruptures' boundaries collapse to 0-1 bars "
             "spread while ARGUS's and stumpy's spread 50-122, which the scope statement reads as "
             "ruptures being MORE coherent under leverage, not less — a case where the specialist's "
@@ -4450,10 +4450,11 @@ REGISTER: tuple[Capability, ...] = (
         note="Published because `data/regime_comparison.json`'s own who_wins field already read "
              "'baseline — ruptures is more coherent... stumpy is bit-identical and faster... FLUSS "
              "shows no measurable edge over the two-line incumbent', and nothing read that field "
-             "into this register until now. The artefact's scope_statement still quoted a stale "
-             "337x / 5.61s timing figure from before a code fix that already reads 310x / 5.25s; "
-             "the artefact was regenerated as part of writing this entry rather than quoting the "
-             "stale one.",
+             "into this register until now. The artefact carried a stale 337x / 5.61s timing "
+             "figure from before a code fix that already read 310x / 5.25s; regenerated on "
+             "2026-09-21, it now reads ~306x / 4.72s. The small further drift between 310x and "
+             "306x across the two regenerations is ordinary wall-clock variance in a timing "
+             "measurement, not a second stale figure — the loss verdict is unaffected either way.",
     ),
 )
 

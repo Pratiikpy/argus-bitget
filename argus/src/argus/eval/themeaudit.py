@@ -183,7 +183,30 @@ def _analyst_ran(analyst: str) -> Finding:
 
 
 def t2_event() -> Finding:
-    return _analyst_ran("event")
+    got = _analyst_ran("event")
+    if got.status == ABSENT:
+        return got
+    comp = _load_json("eventdriven_comparison.json")
+    if comp is None:
+        return got
+    brc = comp["base_rate_case"]
+    # Measured against whale-signals' own real, vendored compute_hit_rates() and
+    # compute_base_rate() (research/repos*/whale-signals): both test hit rates against a FIXED
+    # 50% null on a real 200-event sample; the real base rate is 56.7%, so a rule this thin can
+    # look skilled purely from picking the more common outcome. Cited here rather than only in
+    # `data/eventdriven_comparison.json` because it is the rival evidence this probe's own status
+    # word has never carried.
+    return Finding(
+        got.status,
+        f"{got.evidence} — measured against whale-signals' own vendored null-testing code on "
+        f"{brc['n_events']} real events: the true base rate is {brc['real_base_rate_24h']:.1%}, "
+        f"whale-signals' own hit rate scores {brc['whale_signals']['hit_rate']:.1%} "
+        f"(p={brc['whale_signals']['p_value_vs_fixed_null']:.3f} against a fixed 50% null it "
+        f"never checks against the true rate), and a null swept against the real rate "
+        f"minimises near it rather than at 50%: "
+        f"{comp['null_ablation'].get('minimized_near_the_true_rate')}",
+        got.artefact,
+    )
 
 
 def t2_sentiment() -> Finding:
@@ -214,12 +237,29 @@ def t2_earnings() -> Finding:
     separates = clean.expected_move_bps != cut.expected_move_bps or clean.dominant != cut.dominant
     if ran.status == ABSENT:
         return ran
+    comp = _load_json("earnings_comparison.json")
+    rival = ""
+    if comp is not None:
+        rc = comp["ranking_case"]
+        # QuantConnect's own vendored, ungarded Standardized Unexpected Earnings formula ranks a
+        # constructed zero-variance artefact top of a 10-symbol universe because it divides by a
+        # near-zero standard deviation without a guard. ARGUS reproduces the same formula to
+        # float identity on every real case and refuses the artefact rather than ranking it.
+        rival = (
+            f" · measured against QuantConnect's own vendored SUE on real SEC EDGAR data: it "
+            f"ranks the constructed zero-variance artefact top ({rc['real_top_symbol']!r}, "
+            f"is_the_constructed_artifact={rc['real_top_is_the_constructed_artifact']}) while "
+            f"ARGUS tops out at {rc.get('argus_top_symbol')!r} and excludes the artefact "
+            f"(excludes={rc.get('argus_excludes_the_constructed_artifact')}); reproduces the "
+            f"real formula to identity on every real case (all_agree="
+            f"{comp['baseline_reproduced'].get('all_agree')})"
+        )
     return Finding(
         ran.status if separates else WEAK,
         f"{ran.evidence} · a clean beat reads {clean.expected_move_bps}bps "
         f"(dominant {clean.dominant!r}) while the same beat with a guidance cut reads "
         f"{cut.expected_move_bps}bps (dominant {cut.dominant!r}) — the decomposition separates "
-        f"them: {separates}",
+        f"them: {separates}{rival}",
         ran.artefact,
     )
 
@@ -265,13 +305,34 @@ def t2_factor_discovery() -> Finding:
     # The trial count is not bookkeeping: it is the denominator of the Deflated Sharpe gate, so a
     # memory that forgets a hypothesis makes every survivor look more significant than it is.
     status = RUNS if count else WEAK
+    rival = ""
+    comp = _load_json("rdagent_comparison.json")
+    if comp is not None:
+        pool = comp.get("trial_pool", {})
+        # Microsoft's real RD-Agent (FactorFBWorkspace.execute) runs attacker-supplied Python
+        # unsandboxed via LocalEnv — we ran a real injection against it and it executed. ARGUS's
+        # factor proposer has no execution surface at all: nothing it produces is ever `exec`'d.
+        # The trial pool is the second half of the comparison: 400 hypotheses tried, 326 distinct
+        # after suppression, and the best in-sample Sharpe survives multiple-testing deflation
+        # from 0.0178 to a probability of 9.3e-05 — a number this memory's own denominator feeds.
+        rival = (
+            f" · measured against Microsoft's real RD-Agent: its FactorFBWorkspace.execute runs "
+            f"attacker Python unsandboxed and a real injection against it executed "
+            f"(injection_proof.executed_attacker_code="
+            f"{comp.get('injection_proof', {}).get('executed_attacker_code')}); ARGUS's proposer "
+            f"has no execution surface to attack. Deflated Sharpe on this memory's own "
+            f"{pool.get('budget')}-trial pool ({pool.get('distinct_candidates')} distinct): "
+            f"raw {pool.get('raw_claim')} -> "
+            f"deflated probability {pool.get('deflated_probability'):.2e} "
+            f"(severe={pool.get('deflation_is_severe')})"
+        )
     return Finding(
         status,
         f"{count} hypothesis(es) evaluated and remembered across {runs} run(s), with {suppressed} "
         f"duplicate proposal(s) suppressed rather than re-paid for. The count feeds the Deflated "
         f"Sharpe denominator, so forgetting one would inflate every survivor. The memory publishes "
         f"identity and structural facts only — an import-time guard raises if an outcome-bearing "
-        f"field is ever added to what the proposer can see.",
+        f"field is ever added to what the proposer can see.{rival}",
         "data/factor_memory.json",
     )
 

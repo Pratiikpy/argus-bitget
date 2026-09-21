@@ -15,11 +15,11 @@ carries a result.**
 
 | # | part | tr | kind | our status | named rival | rival run | who won | last checked |
 |---|---|----|------|-----------|-------------|-----------|---------|--------------|
-| 1 | `event-driven` | T2 | subtheme | IMPLEMENTED | — | no | — | — |
+| 1 | `event-driven` | T2 | subtheme | IMPLEMENTED | whale-signals | **yes** | methodological — see note | 2026-09-21 |
 | 2 | `sentiment` | T2 | subtheme | IMPLEMENTED | — | no | — | — |
-| 3 | `earnings` | T2 | subtheme | IMPLEMENTED | — | no | — | — |
+| 3 | `earnings` | T2 | subtheme | IMPLEMENTED | QuantConnect (vendored SUE) | **yes** | ARGUS (refuses the artefact QC ranks top) | 2026-09-21 |
 | 4 | `cross-asset-execution` | T2 | subtheme | IMPLEMENTED | — | no | — | — |
-| 5 | `factor-discovery` | T2 | subtheme | IMPLEMENTED | — | no | — | — |
+| 5 | `factor-discovery` | T2 | subtheme | IMPLEMENTED | Microsoft RD-Agent | **yes** | ARGUS (no execution surface; RD-Agent ran attacker code) | 2026-09-21 |
 | 6 | `t2-open-evaluation` | T2 | subtheme | IMPLEMENTED (weak) | — | no | — | — |
 | 7 | `t2-sharpe-mdd-winrate` | T2 | judging | NOT DEMONSTRATED | — | no | — | — |
 | 8 | `t2-explainability` | T2 | judging | IMPLEMENTED | — | no | — | — |
@@ -38,14 +38,17 @@ carries a result.**
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 2 of 20, both LOST, as of 2026-09-21.** That is this ledger's honest
-scoreboard — it names whether *this specific Bitget-taxonomy row* has a rival comparison wired in,
-which is a narrower and different question from `eval/standing.py`'s own register (26 capabilities
-across the whole codebase, 17 OWNED, 2 LOST, independently verified — do not read "0" here as "0
-OWNED anywhere," an earlier session conflated the two and said so wrongly to the owner). What this
-ledger's `rival run` column still says: of 20 judged rows, 16 already have a real comparison sitting
-in `data/` unwired (found by the CONNECT lens, 2026-09-21 — see `Activity/10_LOOP_DESIGN.md`), and
-only the 2 losses have been wired through to a state change so far. Every other number in this
+**`rival run` is `yes` on 5 of 20 as of 2026-09-21: 2 LOST, 2 real wins (earnings vs QuantConnect,
+factor-discovery vs Microsoft RD-Agent), 1 methodological (event-driven vs whale-signals — neither
+system establishes a real effect on this data; the finding is that whale-signals tests against the
+wrong null, not that ARGUS's own number beats theirs, and no fabricated score is recorded for it).**
+That is this ledger's honest scoreboard — it names whether *this specific Bitget-taxonomy row* has
+a rival comparison wired in, which is a narrower and different question from `eval/standing.py`'s
+own register (26 capabilities across the whole codebase, 17 OWNED, 2 LOST, independently verified —
+do not read "0" here as "0 OWNED anywhere," an earlier session conflated the two and said so wrongly
+to the owner). What this ledger's `rival run` column still says: of 20 judged rows, 13 more already
+have a real comparison sitting in `data/` unwired (found by the CONNECT lens, 2026-09-21 — see
+`Activity/10_LOOP_DESIGN.md`). Every other number in this
 project — 60 commits, 5,000+ tests, 96 pinned doc claims — measures how carefully we checked
 *ourselves*; wiring the remaining 16 rows is the highest-value CONNECT work still queued.
 
