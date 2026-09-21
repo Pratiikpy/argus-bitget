@@ -41,6 +41,24 @@ DEPLOY_PACKAGE = DEPLOY / "api" / "argus"
 DEPLOY_DATA = DEPLOY / "data"
 MANIFEST_PATH = DEPLOY / "sync_manifest.json"
 
+CONSOLE_ARTEFACTS: tuple[str, ...] = (
+    "paper_ledger.jsonl",
+    "research_report.json",
+    "lui_router.json",
+    "regime_comparison.json",
+    "oblique_bench.json",
+    "surface_agreement.json",
+    "standing.json",
+    "lui_ngram_model.json",
+)
+"""Artefacts the hosted console's own pages read at request time.
+
+Listed by hand rather than discovered, because discovery would mean importing the page modules and
+tracing their reads — and a sync tool that executes the thing it is packaging is a worse idea than
+a list somebody has to maintain. A name here that the bundle lacks is reported, never auto-copied:
+the rule that a new artefact reaches the public surface only on purpose is the point, and this
+check exists so that a *deliberate* omission is distinguishable from a forgotten one."""
+
 SKIP_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules"}
 """``node_modules`` added 2026-09-16: the crypto_sor comparison harness installs real npm
 packages under `eval/baselines/crypto_sor_shim/` to run a real Node subprocess, and the first
@@ -66,6 +84,11 @@ class SyncResult:
     data_files: int = 0
     data_updated: int = 0
     missing_upstream: list[str] = field(default_factory=list)
+    needed_by_console: list[str] = field(default_factory=list)
+    """Artefacts a console page reads that the bundle does not carry.
+
+    Distinct from `missing_upstream`, which is the opposite direction: a file in the bundle whose
+    source is gone. This one is a file the source has and the bundle needs."""
     ledger_before: int = 0
     ledger_after: int = 0
     dry_run: bool = False
@@ -83,6 +106,7 @@ class SyncResult:
             "data_files": self.data_files,
             "data_updated": self.data_updated,
             "missing_upstream": self.missing_upstream,
+            "needed_by_console": self.needed_by_console,
             "ledger_before": self.ledger_before,
             "ledger_after": self.ledger_after,
             "ledger_gap_closed": self.ledger_gap,
@@ -100,6 +124,16 @@ class SyncResult:
             lines.append(
                 f"            the bundle was missing {self.ledger_gap} decision(s) "
                 f"({self.ledger_gap / self.ledger_after:.0%} of the record)"
+            )
+        if self.needed_by_console:
+            lines.append(
+                f"  ** {len(self.needed_by_console)} artefact(s) a console page READS are not in "
+                f"the bundle — those pages will render 'artefact unreadable' **"
+            )
+            lines += [f"      {name}" for name in self.needed_by_console]
+            lines.append(
+                "      Copy them into deploy/data deliberately; this tool will not widen the "
+                "public surface on its own."
             )
         if self.missing_upstream:
             lines += ["", "  ⚠ present in the bundle but ABSENT upstream — not carried forward:"]
@@ -167,6 +201,22 @@ def sync(*, dry_run: bool = False) -> SyncResult:
             if not dry_run:
                 item.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(upstream, item)
+
+    # **What the console's own pages read, that the bundle does not carry.**
+    #
+    # The deliberate rule above — a new artefact reaches the bundle only by being added on purpose
+    # — is the right posture and it has a blind spot this closes. It protects against *widening*
+    # the public surface by accident; it says nothing about a page that ships and then degrades.
+    #
+    # `/wrong` is built to survive a missing artefact by printing "artefact unreadable" instead of
+    # silently shortening. That is correct behaviour and it looked exactly like a broken page:
+    # four of its six findings rendered as unreadable from the bundle, because the artefacts had
+    # never been seeded. The page did its job and nobody was told. Same trap as the n-gram model
+    # a few days earlier, which is twice.
+    result.needed_by_console = sorted(
+        name for name in CONSOLE_ARTEFACTS
+        if not (DEPLOY_DATA / name).is_file() and (SOURCE_DATA / name).is_file()
+    )
 
     if not dry_run:
         MANIFEST_PATH.write_text(json.dumps(result.as_dict(), indent=2), encoding="utf-8")

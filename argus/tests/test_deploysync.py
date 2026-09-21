@@ -157,3 +157,70 @@ class TestTheManifestRecordsWhatWasCopied:
         blob = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
         when = datetime.fromisoformat(blob["synced_at"])
         assert when <= datetime.now(UTC) + timedelta(minutes=5)
+
+
+class TestTheConsoleArtefactCheck:
+    """**A page that degrades gracefully looks exactly like a broken page.**
+
+    `/wrong` is built to survive a missing artefact by printing "artefact unreadable" rather than
+    silently shortening — correct behaviour, and four of its six findings rendered that way from
+    the bundle because the artefacts had never been seeded. The page did its job and nobody was
+    told. This check is what tells them.
+    """
+
+    def test_it_reports_an_artefact_the_console_reads_but_the_bundle_lacks(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        import argus.demo.deploysync as mod
+
+        source, bundle = tmp_path / "data", tmp_path / "deploy" / "data"
+        (bundle / "sub").mkdir(parents=True)
+        source.mkdir(parents=True)
+        (source / "standing.json").write_text("{}", encoding="utf-8")
+        (tmp_path / "deploy" / "api").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "src" / "argus").mkdir(parents=True, exist_ok=True)
+
+        monkeypatch.setattr(mod, "SOURCE_DATA", source)
+        monkeypatch.setattr(mod, "DEPLOY_DATA", bundle)
+        monkeypatch.setattr(mod, "DEPLOY", tmp_path / "deploy")
+        monkeypatch.setattr(mod, "SOURCE_PACKAGE", tmp_path / "src" / "argus")
+        monkeypatch.setattr(mod, "DEPLOY_PACKAGE", tmp_path / "deploy" / "api" / "argus")
+        monkeypatch.setattr(mod, "MANIFEST_PATH", tmp_path / "deploy" / "m.json")
+
+        result = mod.sync(dry_run=True)
+        assert "standing.json" in result.needed_by_console
+
+    def test_an_artefact_absent_upstream_is_not_reported_as_needed(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        """It cannot be copied and is not the console's problem — that is `missing_upstream`."""
+        import argus.demo.deploysync as mod
+
+        source, bundle = tmp_path / "data", tmp_path / "deploy" / "data"
+        source.mkdir(parents=True)
+        bundle.mkdir(parents=True)
+        (tmp_path / "deploy" / "api").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "src" / "argus").mkdir(parents=True, exist_ok=True)
+
+        monkeypatch.setattr(mod, "SOURCE_DATA", source)
+        monkeypatch.setattr(mod, "DEPLOY_DATA", bundle)
+        monkeypatch.setattr(mod, "DEPLOY", tmp_path / "deploy")
+        monkeypatch.setattr(mod, "SOURCE_PACKAGE", tmp_path / "src" / "argus")
+        monkeypatch.setattr(mod, "DEPLOY_PACKAGE", tmp_path / "deploy" / "api" / "argus")
+        monkeypatch.setattr(mod, "MANIFEST_PATH", tmp_path / "deploy" / "m.json")
+
+        assert mod.sync(dry_run=True).needed_by_console == []
+
+    def test_the_live_bundle_carries_every_artefact_its_pages_read(self) -> None:
+        """The regression itself: no console page may render 'artefact unreadable' in production."""
+        from argus.demo.deploysync import CONSOLE_ARTEFACTS, DEPLOY_DATA, SOURCE_DATA
+
+        if not DEPLOY_DATA.exists():
+            import pytest
+
+            pytest.skip("no deploy bundle in this checkout")
+        absent = [
+            name for name in CONSOLE_ARTEFACTS
+            if (SOURCE_DATA / name).is_file() and not (DEPLOY_DATA / name).is_file()
+        ]
+        assert not absent, f"the hosted console would show these as unreadable: {absent}"
