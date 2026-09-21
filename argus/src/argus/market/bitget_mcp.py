@@ -1,0 +1,247 @@
+"""Bitget's own US-equity data service, read through its MCP endpoint — and no key is needed.
+
+**This exists because Track 3 scores "data sources / Skill integration count *and effectiveness*"
+by name, and ARGUS was not using this service at all.** The handbook lists `bitget-mcp-server`
+alongside `bitget-signal` and says plainly that neither requires a Bitget account or an API key.
+`market/skills.py` already probes the five `bitget-signal` research Skills; nothing touched this
+one, which is the larger of the two and the one carrying the *anchor* data for tokenized US
+equities — quotes, fundamentals, earnings calendar, institutional holdings and analyst estimates
+for the underlying stocks our rTokens track.
+
+**What is actually there, enumerated by calling it rather than by reading the docs.** The server
+(`bitget-mcp-server` v4.0.3 at ``https://agent.bitget.com/mcp``) exposes **two** tools, not the
+long list the handbook's category table implies: ``guide`` walks a catalog, and ``do_query``
+executes one catalog entry. Behind them sit **67 entries in five categories** — crypto 40, equity
+21, ETF 3, news 1, sentiment 2.
+
+The 21 equity entries matter most here, because ARGUS's universe is twelve tokenized US equities
+and the *anchor* is exactly what a tokenized-equity desk cannot see from the venue's own book:
+``equity_calendar_earnings``, ``equity_estimates_consensus``, ``equity_ownership_form_13f``,
+``equity_fundamental_*`` and the rest.
+
+**Two things were found by probing that no document states, and both would cost an afternoon:**
+
+* **The endpoint returns 403 to Python's default User-Agent** and 200 to curl's. Identical request
+  otherwise. So :data:`_HEADERS` sets one explicitly — a client that omits it fails in a way that
+  looks exactly like a credential problem and is not.
+* **``do_query`` takes ``entry_id``, not ``id``.** The catalog lists entries under a key called
+  ``id``, so the obvious call is wrong, and the server answers with a pydantic validation error
+  rather than a hint. Named here so the next reader does not rediscover it.
+
+Transport is JSON-RPC over HTTP with Server-Sent Events framing: a reply arrives as ``data: {...}``
+lines rather than a bare body, which is why :func:`_post` parses for the prefix instead of calling
+``json.loads`` on the response.
+
+**This module fetches; it does not decide.** Everything returned is evidence for the desk to weigh,
+and it is deliberately *not* wired into the Constitution — the risk layer computes, and a rule that
+reaches for the network is a rule that can fail open.
+
+    python -m argus.market.bitget_mcp
+"""
+
+from __future__ import annotations
+
+import contextlib
+import json
+import urllib.error
+import urllib.request
+import uuid
+from collections.abc import Mapping
+from dataclasses import dataclass
+from typing import Any
+
+ENDPOINT = "https://agent.bitget.com/mcp"
+"""The HTTP transport the handbook publishes. Keyless, and confirmed keyless by calling it."""
+
+_HEADERS = {
+    "Content-Type": "application/json",
+    "Accept": "application/json, text/event-stream",
+    # **Load-bearing.** The endpoint 403s Python's default User-Agent and answers curl's. This is
+    # not documented anywhere and presents as an auth failure on a service that needs no auth.
+    "User-Agent": "curl/8.0",
+}
+
+PROTOCOL_VERSION = "2024-11-05"
+TIMEOUT = 45.0
+
+
+class BitgetMcpError(RuntimeError):
+    """The service could not be reached or refused a call. Raised rather than returning empty.
+
+    An empty result and an unreachable service are different facts, and `market/skills.py` already
+    learned that lesson: a probe that reports a transport failure as "no data" measures the probe.
+    """
+
+
+@dataclass(frozen=True, slots=True)
+class Entry:
+    """One catalog entry: a named dataset `do_query` can execute."""
+
+    entry_id: str
+    category: str
+    name: str = ""
+    description: str = ""
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "entry_id": self.entry_id, "category": self.category,
+            "name": self.name, "description": self.description,
+        }
+
+
+def _post(payload: dict[str, Any], session: str | None = None) -> tuple[dict[str, Any], str | None]:
+    """One JSON-RPC call, unwrapping the SSE framing the server replies with."""
+    headers = dict(_HEADERS)
+    if session:
+        headers["Mcp-Session-Id"] = session
+    request = urllib.request.Request(
+        ENDPOINT, data=json.dumps(payload).encode(), headers=headers,
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
+            raw = response.read().decode("utf-8", "replace")
+            returned = response.headers.get("Mcp-Session-Id")
+    except urllib.error.HTTPError as exc:
+        raise BitgetMcpError(f"{exc.code} from {ENDPOINT}: {exc.reason}") from exc
+    except OSError as exc:
+        raise BitgetMcpError(f"transport failure reaching {ENDPOINT}: {exc}") from exc
+
+    for line in raw.splitlines():
+        if line.startswith("data: "):
+            return json.loads(line[6:]), returned
+    try:
+        return json.loads(raw), returned
+    except json.JSONDecodeError as exc:
+        raise BitgetMcpError(f"unparseable reply from {ENDPOINT}: {raw[:200]}") from exc
+
+
+class BitgetDataService:
+    """A session against the MCP server. One handshake, then any number of queries."""
+
+    def __init__(self) -> None:
+        handshake, session = _post({
+            "jsonrpc": "2.0", "id": str(uuid.uuid4()), "method": "initialize",
+            "params": {
+                "protocolVersion": PROTOCOL_VERSION, "capabilities": {},
+                "clientInfo": {"name": "argus", "version": "1.0"},
+            },
+        })
+        info = handshake.get("result", {}).get("serverInfo", {})
+        self.server = f"{info.get('name', '?')} {info.get('version', '?')}"
+        self._session = session
+        # Required by the protocol before the server will serve tool calls. A failure here is not
+        # fatal on this implementation, so it is attempted and not asserted.
+        with contextlib.suppress(BitgetMcpError):
+            _post({"jsonrpc": "2.0", "id": str(uuid.uuid4()),
+                   "method": "notifications/initialized", "params": {}}, self._session)
+
+    def _call(self, tool: str, arguments: Mapping[str, Any]) -> dict[str, Any]:
+        reply, _ = _post({
+            "jsonrpc": "2.0", "id": str(uuid.uuid4()), "method": "tools/call",
+            "params": {"name": tool, "arguments": dict(arguments)},
+        }, self._session)
+        if "error" in reply:
+            raise BitgetMcpError(f"{tool}: {reply['error']}")
+        return dict(reply.get("result", {}))
+
+    def categories(self) -> list[dict[str, Any]]:
+        """The five top-level groups and how many entries each holds."""
+        result = self._call("guide", {})
+        found = result.get("structuredContent", {}).get("categories", [])
+        return [dict(c) for c in found]
+
+    def entries(self, category: str) -> list[Entry]:
+        """Every dataset in one category, by id."""
+        result = self._call("guide", {"category": category})
+        content = result.get("structuredContent", {})
+        rows = content.get("entries") or content.get("items") or []
+        return [
+            Entry(
+                entry_id=str(row.get("id", "")), category=category,
+                name=str(row.get("name", "") or ""),
+                description=str(row.get("description", "") or ""),
+            )
+            for row in rows if row.get("id")
+        ]
+
+    def query(self, entry_id: str, **params: Any) -> dict[str, Any]:
+        """Execute one catalog entry.
+
+        The keyword is ``entry_id``. The catalog calls the same field ``id``, so the natural call
+        is rejected with a pydantic error — see the module docstring.
+        """
+        result = self._call("do_query", {"entry_id": entry_id, "params": dict(params)})
+        if result.get("isError"):
+            text = json.dumps(result.get("content", ""))[:300]
+            raise BitgetMcpError(f"{entry_id}: {text}")
+        payload = result.get("structuredContent", {})
+        if not payload.get("success", True):
+            raise BitgetMcpError(f"{entry_id}: service reported failure: {payload}")
+        return dict(payload.get("data", {}))
+
+    def results(self, entry_id: str, **params: Any) -> list[dict[str, Any]]:
+        """The rows of a query, unwrapped from the service's envelope."""
+        rows = self.query(entry_id, **params).get("results", [])
+        return [dict(r) for r in rows] if isinstance(rows, list) else []
+
+    # --- the anchor facts a tokenized-equity desk cannot see from the venue's book -------------
+
+    def quote(self, symbol: str) -> dict[str, Any]:
+        """Live bid/ask/last on the **underlying** stock, not the rToken.
+
+        The gap between the two is the basis every arbitrage and hedge claim in this project rests
+        on, and until now it was read from the venue's own index rather than from an equity feed.
+        """
+        rows = self.results("equity_price_quote", symbol=symbol)
+        return rows[0] if rows else {}
+
+    def next_earnings(self, symbol: str) -> dict[str, Any]:
+        """The next scheduled report. A date, from the source, rather than an inference.
+
+        Directly relevant to the risk layer's event-window reasoning: a position held across an
+        earnings print is a different risk from the same position held the week before."""
+        rows = self.results("equity_calendar_earnings", symbol=symbol)
+        return rows[0] if rows else {}
+
+    def consensus(self, symbol: str) -> dict[str, Any]:
+        """Analyst consensus and price targets."""
+        rows = self.results("equity_estimates_consensus", symbol=symbol)
+        return rows[0] if rows else {}
+
+    def institutional_holdings(self, symbol: str) -> list[dict[str, Any]]:
+        """13F filings. Who owns it, at the last reporting period."""
+        return self.results("equity_ownership_form_13f", symbol=symbol)
+
+
+def underlying_of(rtoken: str) -> str:
+    """``NVDAUSDT`` -> ``NVDA``. The rToken symbol carries its anchor's ticker as a prefix.
+
+    Deliberately a plain suffix strip rather than a lookup table: the venue's own naming is the
+    mapping, and a table would be a second source of truth to keep in sync."""
+    return rtoken.upper().removesuffix("USDT")
+
+
+def main() -> int:  # pragma: no cover - CLI
+    import sys
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    service = BitgetDataService()
+    print(f"connected to {service.server} at {ENDPOINT} — no API key")
+    total = 0
+    for category in service.categories():
+        count = int(category.get("entry_count", 0))
+        total += count
+        note = str(category.get("description", ""))[:44]
+        print(f"  {category.get('key', '?'):10} {count:3} entr(ies)  {note}")
+    print(f"  {'TOTAL':10} {total:3}")
+    return 0
+
+
+if __name__ == "__main__":  # pragma: no cover
+    raise SystemExit(main())
+
+
+__all__ = [
+    "ENDPOINT", "BitgetDataService", "BitgetMcpError", "Entry", "main", "underlying_of",
+]

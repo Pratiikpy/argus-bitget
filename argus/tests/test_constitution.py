@@ -282,6 +282,11 @@ class TestAResizedOrderIsStillCheckedByEveryOtherGate:
         from argus.risk.circuit import BookState
 
         return ConstitutionPolicy(
+            # A unit price, so quantity and notional coincide and the dollar-denominated gates
+            # this class tests can actually fire. Added 2026-09-21 with `reference_price`: an
+            # unpriced policy now skips the four notional gates and says so, which is right in
+            # production and would silently remove the gate under test here.
+            reference_price=Decimal("1"),
             book_state=BookState(
                 equity=Decimal("30000"),
                 peak_equity=Decimal("100000"),

@@ -625,6 +625,19 @@ def _policy_for(base: ConstitutionPolicy, state: State) -> ConstitutionPolicy:
     from argus.risk.circuit import BookState
     from argus.risk.session_risk import SessionRisk
 
+    # **A price of 1, stated rather than defaulted.** `ConstitutionPolicy` gained
+    # `reference_price` on 2026-09-21, when a rogue harness found four gates comparing a unit
+    # count against a dollar ceiling. An unpriced policy now skips those four gates and says so —
+    # which is correct in production and would silently disable a quarter of the Constitution
+    # here, across all 2,177,280 states. The sweep's own `unreachable` check caught exactly that:
+    # `unhedgeable_gap`, `gross_exposure`, `signed_exposure` and `max_position` all became
+    # unreachable, which is the rule-shadowing defect this module exists to detect, turned on
+    # itself.
+    #
+    # One is the right value, not a placeholder: QUANTITIES straddles the dollar limits directly
+    # (19999/20000/20001 against a 20,000 cap) and the synthetic book below is already priced at
+    # unity for the same reason, so quantity and notional coincide and the swept thresholds mean
+    # what they say.
     equity = Decimal("100000")
     book_state = BookState(
         equity=equity,
@@ -753,7 +766,8 @@ def _policy_for(base: ConstitutionPolicy, state: State) -> ConstitutionPolicy:
         )  # realized_pnl_since = 10 * (50 - 100) = -500, past the -100 floor below
 
     return replace(
-        base, book_state=book_state, session_risk=risk, book=real_book,
+        base,
+        reference_price=Decimal("1"), book_state=book_state, session_risk=risk, book=real_book,
         factor_exposures=factor_exposures,
         factor_exposure_limits={"test-factor": 0.5} if state.extra_risk == "factor" else {},
         stress_outcomes=stress_outcomes,

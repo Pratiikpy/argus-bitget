@@ -133,7 +133,9 @@ class TestAblatedVariantsAreIsolated:
 class TestPopulationRct:
     def test_order_size_shows_up_as_a_violation_when_it_is_the_only_binder(self) -> None:
         session, hedges = _session(), _hedges_available()
-        baseline = ConstitutionPolicy(max_position_notional=Decimal("100"))
+        baseline = ConstitutionPolicy(
+            reference_price=Decimal("1"), max_position_notional=Decimal("100"),
+        )
         frames = [("f1", _trade("101"))]
         results = population_rct(
             frames, session=session, hedges=hedges, baseline=baseline,
@@ -146,7 +148,9 @@ class TestPopulationRct:
 
     def test_a_dimension_no_frame_ever_reaches_is_reported_inert_not_hidden(self) -> None:
         session, hedges = _session(), _hedges_available()
-        baseline = ConstitutionPolicy(max_position_notional=Decimal("999999"))
+        baseline = ConstitutionPolicy(
+            reference_price=Decimal("1"), max_position_notional=Decimal("999999"),
+        )
         frames = [("f1", _trade("1"))]
         results = population_rct(
             frames, session=session, hedges=hedges, baseline=baseline,
@@ -168,7 +172,9 @@ class TestPopulationRct:
         """`max_position` is a strict `>`, so the boundary value itself must not read as a
         violation on either the full policy or the ablated one."""
         session, hedges = _session(), _hedges_available()
-        baseline = ConstitutionPolicy(max_position_notional=Decimal("50"))
+        baseline = ConstitutionPolicy(
+            reference_price=Decimal("1"), max_position_notional=Decimal("50"),
+        )
         frames = [("f1", _trade("50"))]
         results = population_rct(
             frames, session=session, hedges=hedges, baseline=baseline,
@@ -178,7 +184,9 @@ class TestPopulationRct:
 
     def test_as_dict_carries_the_violation_rate(self) -> None:
         session, hedges = _session(), _hedges_available()
-        baseline = ConstitutionPolicy(max_position_notional=Decimal("1"))
+        baseline = ConstitutionPolicy(
+            reference_price=Decimal("1"), max_position_notional=Decimal("1"),
+        )
         frames = [("f1", _trade("2")), ("f2", _trade("1"))]
         results = population_rct(
             frames, session=session, hedges=hedges, baseline=baseline,
