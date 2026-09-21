@@ -59,10 +59,17 @@ class _TradeProposingModel:
         raise NotImplementedError
 
 
+TOKEN_PRICE = Decimal("200")
+"""The fixture's token price, named so the notional caps below can be expressed as arithmetic.
+
+A cap is a **notional**, so the quantity it permits depends on this number. Tests that hard-code
+the resulting quantity instead stop testing the conversion the moment this changes."""
+
+
 def _run(model: _TradeProposingModel, **kw: Any) -> Any:
     desk = TradingDesk(model)
     return desk.run(
-        symbol="NVDAUSDT", session=_session(), token_price=Decimal("200"),
+        symbol="NVDAUSDT", session=_session(), token_price=TOKEN_PRICE,
         position=Decimal("0"), evidence=_evidence(),
         hedges=HedgeabilitySurface(candidates=()), decision_id="test-ablated",
         constitution=ConstitutionPolicy(), **kw,
@@ -75,6 +82,15 @@ class TestAblatedRulings:
         assert run.ablated_rulings == {}
 
     def test_a_tighter_variant_produces_a_different_ruling_than_the_real_one(self) -> None:
+        """**The cap is a notional, and the expected quantity below is derived from that.**
+
+        These three assertions used to expect a quantity of ``1`` from
+        ``max_position_notional=Decimal("1")``, which was only ever true while the Constitution
+        compared a dollar cap against a quantity in *units* — the 180x defect. The cap is $1 and
+        `_run` prices the token at $200, so the largest position it permits is 0.005 units. The
+        number is written as the division rather than as ``0.005`` so that changing the fixture's
+        price cannot leave a literal behind that silently stops testing anything.
+        """
         model = _TradeProposingModel()
         run = _run(
             model,
@@ -84,7 +100,9 @@ class TestAblatedRulings:
         )
         assert run.ruling is not None
         assert run.ablated_rulings["no_position_cap"].binding_constraint == "max_position"
-        assert run.ablated_rulings["no_position_cap"].resulting_intent.quantity == Decimal("1")
+        assert run.ablated_rulings["no_position_cap"].resulting_intent.quantity == (
+            Decimal("1") / TOKEN_PRICE
+        )
         # The real ruling is untouched by the variant existing at all.
         assert run.ruling.binding_constraint != "max_position"
 
@@ -96,8 +114,27 @@ class TestAblatedRulings:
                 "loose": ConstitutionPolicy(max_position_notional=Decimal("999999")),
             },
         )
-        assert run.ablated_rulings["tight"].resulting_intent.quantity == Decimal("1")
+        assert run.ablated_rulings["tight"].resulting_intent.quantity == (
+            Decimal("1") / TOKEN_PRICE
+        )
         assert run.ablated_rulings["loose"].binding_constraint != "max_position"
+
+    def test_a_variant_carrying_its_own_price_is_not_overwritten(self) -> None:
+        """The back-fill in `desk.py` must fill a gap, never overrule a caller.
+
+        A variant that states its own `reference_price` is asking a specific counterfactual — "what
+        would this look like if the token were worth $10" — and silently replacing it with the live
+        price would answer a different question while looking like it answered that one.
+        """
+        run = _run(
+            _TradeProposingModel(),
+            ablated_constitutions={
+                "priced": ConstitutionPolicy(
+                    max_position_notional=Decimal("1"), reference_price=Decimal("10"),
+                ),
+            },
+        )
+        assert run.ablated_rulings["priced"].resulting_intent.quantity == Decimal("0.1")
 
     def test_ablated_variants_cost_no_extra_llm_calls(self) -> None:
         """The whole point: N deterministic re-rulings, never N more model calls."""
@@ -124,4 +161,6 @@ class TestAblatedRulings:
         )
         record = run.as_dict()
         assert record["ablated_rulings"]["tight"]["binding_constraint"] == "max_position"
-        assert record["ablated_rulings"]["tight"]["resulting_quantity"] == "1"
+        assert record["ablated_rulings"]["tight"]["resulting_quantity"] == str(
+            Decimal("1") / TOKEN_PRICE
+        )

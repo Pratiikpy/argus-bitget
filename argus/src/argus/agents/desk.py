@@ -644,8 +644,22 @@ class TradingDesk:
         # `self.pm.revise` below: an ablated variant's ruling is a counterfactual measurement, not
         # a real decision the model should react to, and letting it trigger a real revision would
         # spend budget on N synthetic conversations nobody asked the model to have.
+        #
+        # **Each variant gets the same `reference_price` back-fill the real policy gets above, and
+        # omitting it silently disabled every notional gate in every ablation.** A variant is
+        # constructed by a caller to answer "what would this decision look like under a tighter
+        # cap", so it arrives carrying only the field being varied — a bare
+        # `ConstitutionPolicy(max_position_notional=Decimal("1"))` has `reference_price=None`,
+        # which means "skip the notional gates and say so". The ablation then reported
+        # `binding_constraint="none"` for a policy whose whole purpose was to bind, and the RCT
+        # measured the difference between two policies that both had a quarter of the Constitution
+        # switched off. Same defect as the one `eval/riskproof.py` carried over 2,177,280 states,
+        # in a second place, found by a test rather than by reading.
         ablated_rulings = {
-            label: variant.rule(attacked, session=session, hedges=hedges)
+            label: (
+                variant if variant.reference_price is not None
+                else replace(variant, reference_price=token_price)
+            ).rule(attacked, session=session, hedges=hedges)
             for label, variant in (ablated_constitutions or {}).items()
         }
         # The round trip happens only when something actually bound.
