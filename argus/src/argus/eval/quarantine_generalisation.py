@@ -64,6 +64,7 @@ choice, only that its cost is larger than the comparison's framing suggests.
 from __future__ import annotations
 
 import ast
+import importlib.machinery
 import importlib.util
 import json
 import random
@@ -157,16 +158,58 @@ def verify_heldout_against_clone() -> dict[str, Any]:
     }
 
 
-def _load_deployed_snapshot() -> _Detector | None:
-    """Import `deploy/api/argus/agents/quarantine.py` as an independent pre-rewrite detector.
+SNAPSHOT_PATH = Path(__file__).resolve().parents[3] / "data" / "quarantine_pre_rewrite.py.txt"
+"""The pre-rewrite detector, archived here rather than read out of `deploy/`.
 
-    Loaded by file path under a private module name rather than by adding `deploy/api` to
-    `sys.path`, because that directory shadows the whole `argus` package and importing it that way
-    would silently replace the live modules for the rest of the process.
+**`deploy/api/argus/agents/quarantine.py` was the witness and `argus.demo.deploysync` overwrote
+it.** That copy was six days older than the rewrite and its agreement with the frozen `v1_inspect`
+was the evidence that the "before" column is a real detector rather than a weakened stand-in. Then
+the bundle was refreshed for an unrelated reason and the deployed file became the *new* detector,
+so the comparison started reporting that the pre-rewrite snapshot detects 302 of 302 — which is
+the rewrite's own score, measured against itself.
+
+A baseline that any routine sync can silently replace with the thing it is the baseline *for* is
+not a baseline. This copy is taken from `Pratiikpy/argus-bitget` at ``dd29896`` and stored under
+`data/`, where nothing writes. The provenance is a commit hash, so the claim can be checked against
+the published history rather than against a file somebody hopes is old.
+
+The commit was **chosen by scoring, not by position in the log.** The obvious pick was ``835c610``,
+the parent of the commit titled *"Teach the injection detector meaning"* — and that version already
+scores 302 of 302, because the rewrite landed earlier and that commit refined it. Taking the
+parent of the suggestively-titled commit would have installed the rewritten detector as its own
+baseline and reported a perfect "before" column. Each historical version was run over the corpus
+instead; ``dd29896`` is the one that reproduces 27, which is what makes it the pre-rewrite
+detector."""
+
+_SNAPSHOT_COMMIT = "dd29896"
+"""The commit this file was taken from. Named so a reader can run
+``git show dd29896:argus/src/argus/agents/quarantine.py`` and diff it against the archive."""
+
+
+def _load_deployed_snapshot() -> _Detector | None:
+    """Import the archived pre-rewrite detector.
+
+    Loaded by file path under a private module name rather than by adding its directory to
+    `sys.path`: the original lived under `deploy/api`, which shadows the whole `argus` package,
+    and importing it that way would silently replace the live modules for the rest of the process.
+    The private name is kept for the same reason even though the path has moved.
     """
-    if not _DEPLOYED.is_file():
+    source = SNAPSHOT_PATH if SNAPSHOT_PATH.is_file() else _DEPLOYED
+    if not source.is_file():
         return None
-    spec = importlib.util.spec_from_file_location("_argus_deployed_quarantine_20260914", _DEPLOYED)
+    # The loader is passed explicitly because the archive is stored as `.py.txt`. Without it
+    # `spec_from_file_location` cannot infer one from the suffix and returns a spec with
+    # `loader=None`, which this function then reports as "no snapshot present" — a missing
+    # baseline indistinguishable from a deliberately absent one. The double suffix is itself
+    # deliberate: a `.py` under `data/` would be collected by the linter and the type checker as
+    # live source, and this is a frozen historical artefact that must not be modernised.
+    spec = importlib.util.spec_from_file_location(
+        "_argus_deployed_quarantine_20260914",
+        source,
+        loader=importlib.machinery.SourceFileLoader(
+            "_argus_deployed_quarantine_20260914", str(source)
+        ),
+    )
     if spec is None or spec.loader is None:
         return None
     module = importlib.util.module_from_spec(spec)

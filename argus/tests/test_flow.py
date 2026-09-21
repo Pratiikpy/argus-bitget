@@ -66,8 +66,44 @@ class _Proof:
 
 @dataclass
 class _Ruling:
+    """**A real ruling, not a double, because the venue leg needs a real capability.**
+
+    `demo/flow.py` calls ``run.ruling.authorise(order)`` — the capability token that only a
+    ruling which allowed this exact symbol, side and quantity can mint. A plain dataclass has no
+    `authorise`, so the venue leg failed with an AttributeError and `reached_venue` quietly read
+    False: the flow reported "did not reach the venue", which is what a *blocked* order also
+    reports, so the test's own failure looked like the behaviour under test.
+
+    Stubbing `authorise` to return something `Authorised`-shaped would defeat the point — the type
+    exists precisely so an order cannot reach a venue without one. This delegates to the real
+    `ConstitutionRuling`, so the capability the flow carries is the capability production uses.
+    """
+
     binding_constraint: str = "none"
     reason: str = "within every configured limit"
+
+    def authorise(self, order: object) -> object:
+        from argus.decision.verdicts import (
+            ConstitutionVerdict,
+            Intent,
+            Side,
+            Verdict,
+            apply_constraint,
+        )
+
+        intent = Intent(
+            symbol=getattr(order, "symbol", "SBTCSUSDT"),
+            side=Side.BUY if str(getattr(order, "side", "BUY")).upper() == "BUY" else Side.SELL,
+            quantity=Decimal(str(getattr(order, "quantity", "1"))),
+            verdict=Verdict.TRADE,
+            stated_confidence=0.8,
+            thesis="flow fixture",
+            invalidation=("x",),
+        )
+        return apply_constraint(
+            intent, verdict=ConstitutionVerdict.ALLOW,
+            binding_constraint=self.binding_constraint, reason=self.reason,
+        ).authorise(order)
 
 
 @dataclass
