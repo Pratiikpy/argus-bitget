@@ -1,8 +1,8 @@
 {
   "total": 96,
   "checked": 87,
-  "ok": 72,
-  "lagging": 15,
+  "ok": 70,
+  "lagging": 17,
   "stale": 0,
   "absent": 24,
   "deleted": 0,
@@ -180,7 +180,7 @@
         "176"
       ],
       "live": [
-        181
+        186
       ],
       "status": "LAGGING",
       "excerpt": "176 claims across"
@@ -193,7 +193,7 @@
         "176"
       ],
       "live": [
-        181
+        186
       ],
       "status": "LAGGING",
       "excerpt": "176 falsifiable claims about"
@@ -204,7 +204,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        181
+        186
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -217,7 +217,7 @@
         "176"
       ],
       "live": [
-        181
+        186
       ],
       "status": "LAGGING",
       "excerpt": "176 claims across"
@@ -230,7 +230,7 @@
         "176"
       ],
       "live": [
-        181
+        186
       ],
       "status": "LAGGING",
       "excerpt": "176 claims across"
@@ -243,7 +243,7 @@
         "176"
       ],
       "live": [
-        181
+        186
       ],
       "status": "LAGGING",
       "excerpt": "176 claims across"
@@ -256,7 +256,7 @@
         "176"
       ],
       "live": [
-        181
+        186
       ],
       "status": "LAGGING",
       "excerpt": "176 claims across"
@@ -269,7 +269,7 @@
         "176"
       ],
       "live": [
-        181
+        186
       ],
       "status": "LAGGING",
       "excerpt": "176 claims across"
@@ -543,9 +543,9 @@
       ],
       "live": [
         38,
-        52
+        56
       ],
-      "status": "OK",
+      "status": "LAGGING",
       "excerpt": "38 of the 52 proofs carry a Bitcoin"
     },
     {
@@ -558,9 +558,9 @@
       ],
       "live": [
         38,
-        52
+        56
       ],
-      "status": "OK",
+      "status": "LAGGING",
       "excerpt": "38 of the 52 carry a Bitcoin"
     },
     {
@@ -571,7 +571,7 @@
         "500"
       ],
       "live": [
-        516
+        519
       ],
       "status": "LAGGING",
       "excerpt": "500 decisions in the paper ledger"
@@ -582,7 +582,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        516
+        519
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -593,7 +593,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        516
+        519
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -696,7 +696,7 @@
         "500"
       ],
       "live": [
-        516
+        519
       ],
       "status": "LAGGING",
       "excerpt": "500 decisions"
@@ -709,7 +709,7 @@
         "500"
       ],
       "live": [
-        516
+        519
       ],
       "status": "LAGGING",
       "excerpt": "500 ledger entries"
@@ -722,7 +722,7 @@
         "500"
       ],
       "live": [
-        516
+        519
       ],
       "status": "LAGGING",
       "excerpt": "500 decisions"
@@ -735,7 +735,7 @@
         "500"
       ],
       "live": [
-        516
+        519
       ],
       "status": "LAGGING",
       "excerpt": "paper-trading log has 500 decisions"
@@ -783,7 +783,7 @@
         "334"
       ],
       "live": [
-        350
+        353
       ],
       "status": "LAGGING",
       "excerpt": "334 decisions carry a lean"
@@ -794,7 +794,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        350
+        353
       ],
       "status": "ABSENT",
       "excerpt": ""

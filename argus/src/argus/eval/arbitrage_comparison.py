@@ -15,8 +15,9 @@ selection loop (`if profit >= 0 and profit >= best_profit`). The only fee-aware 
 real repository is one OPTIONAL simulator observer
 (`observers/traderbotsim.py::TraderBotSim.__init__(..., fee=0, ...)`), itself defaulting to zero —
 never in the detection layer this module runs. Run on order-book depth shaped to match ARGUS's
-own measured real basis distribution (`data/arbitrage_study.json`: median 1.12bps, p95 11.06bps
-on 2,159 real NVDAUSDT hourly observations), the real, unmodified maxme detector reports a
+own measured real basis distribution (`data/arbitrage_study.json`'s live NVDAUSDT figures, read
+by :func:`real_basis` rather than typed in here — see that function's docstring for why), the
+real, unmodified maxme detector reports a
 positive "profit" on spreads ARGUS's real cost decomposition — round-trip taker fee (measured
 12bps), quoted-spread crossing, slippage, execution probability, failed-leg survival — correctly
 refuses as not monetizable.
@@ -32,6 +33,7 @@ already called for, not sought out separately.
 
 from __future__ import annotations
 
+import json
 import random
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -46,6 +48,48 @@ from argus.eval.baselines.maxme_arbitrer_loader import (
 from argus.market.history import BasisPoint
 from argus.research.arbitrage_study import ROUND_TRIP_BPS, Decomposition, decompose
 from argus.truth.clocks import DualClock
+
+_STUDY_PATH = Path(__file__).resolve().parents[3] / "data" / "arbitrage_study.json"
+
+
+class RealBasisUnavailableError(RuntimeError):
+    """`data/arbitrage_study.json` is missing or does not carry NVDAUSDT's own figures.
+
+    Raised rather than falling back to a typed-in default — a fallback here is exactly how the
+    designed cases ended up testing 1.12/11.06/27.01bps (the old signed-basis quantiles) years
+    after the study switched to an absolute basis and the real numbers became 3.16/11.30/33.19bps.
+    A missing artefact should stop this comparison, not quietly run on stale numbers.
+    """
+
+
+def real_basis(symbol: str = "NVDAUSDT") -> tuple[float, float, float]:
+    """The live median/p95/max apparent-basis figures this comparison's designed cases are built
+    from, read from the study artefact rather than typed in.
+
+    **This is the fix for a real defect, not a style preference.** The three spread values below
+    used to be literal floats (1.12, 11.06, 27.01) matching the study's OLD signed-basis
+    quantiles. The study (`research/arbitrage_study.py:157`) switched to an absolute basis
+    (`apparent = [abs(r.apparent_bps) for r in ...]`) at some point after that; `data/`
+    `arbitrage_study.json`'s current NVDAUSDT figures are 3.16/11.30/33.19bps, and the three
+    designed cases, the fee-ablation default, and four places in SCOPE_STATEMENT all kept quoting
+    the old numbers. Reading them live here means all of those now describe the same run.
+    """
+    if not _STUDY_PATH.is_file():
+        raise RealBasisUnavailableError(f"no study artefact at {_STUDY_PATH}")
+    blob = json.loads(_STUDY_PATH.read_text(encoding="utf-8"))
+    row = blob.get("per_symbol", {}).get(symbol)
+    if row is None:
+        raise RealBasisUnavailableError(f"{symbol!r} not in {_STUDY_PATH}'s per_symbol")
+    try:
+        return (
+            float(row["apparent_bps_median"]),
+            float(row["apparent_bps_p95"]),
+            float(row["apparent_bps_max"]),
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise RealBasisUnavailableError(
+            f"{symbol!r}'s row in {_STUDY_PATH} is missing an apparent_bps_* figure"
+        ) from exc
 
 
 class ArbitrageComparisonError(RuntimeError):
@@ -140,14 +184,16 @@ def run_spread_case(spread_bps: float, *, name: str, clock: DualClock, ts: datet
 
 def run_designed_cases() -> list[SpreadCase]:
     """Spreads matched to ARGUS's own measured real distribution
-    (data/arbitrage_study.json: median 1.12bps, p5/p95 -6.46/+11.06bps, max 27.01bps) — not
-    convenient numbers chosen to make the point, the point's own real shape."""
+    (data/arbitrage_study.json's live NVDAUSDT apparent-basis median/p95/max) — not convenient
+    numbers chosen to make the point, the point's own real shape, read live rather than typed in
+    (see :func:`real_basis` for why that distinction is load-bearing here)."""
+    median, p95, max_observed = real_basis()
     clock = DualClock()
     ts = datetime(2026, 6, 15, 14, 0, tzinfo=UTC)  # a regular-hours timestamp, both markets open
     cases = [
-        ("median_real_basis", 1.12),
-        ("p95_real_basis", 11.06),
-        ("max_observed_real_basis", 27.01),
+        ("median_real_basis", median),
+        ("p95_real_basis", p95),
+        ("max_observed_real_basis", max_observed),
     ]
     return [run_spread_case(bps, name=name, clock=clock, ts=ts) for name, bps in cases]
 
@@ -209,18 +255,20 @@ class FeeAblationPoint:
         return {"stage": self.stage, "argus_monetizable": self.argus_monetizable}
 
 
-def run_fee_ablation(*, spread_bps: float = 1.12) -> list[FeeAblationPoint]:
-    """The SAME spread as the real median case, progressively zeroing ARGUS's own real cost
-    terms — fee alone first, since that is the term maxme's docs-level omission would suggest is
-    the whole story, THEN spread-crossing and slippage too.
+def run_fee_ablation(*, spread_bps: float | None = None) -> list[FeeAblationPoint]:
+    """The SAME spread as the real median case (read live from :func:`real_basis` when not
+    overridden), progressively zeroing ARGUS's own real cost terms — fee alone first, since that
+    is the term maxme's docs-level omission would suggest is the whole story, THEN spread-crossing
+    and slippage too.
 
-    **A real finding from actually running this, not the ablation originally planned**: zeroing
-    the fee ALONE does not flip the verdict at the median real spread (1.12bps) — spread-crossing
-    (0.6bps) + slippage (2.0bps) alone already exceed it, so gross_after_costs stays negative even
-    at zero fee. The honest claim is broader than "the fee term drives it": maxme's real code
-    omits ALL of fee, spread-crossing, and slippage, and only zeroing the FULL stack — not fee in
-    isolation — reproduces maxme's naive verdict. Caught by running the ablation before writing
-    the finding, not by assuming the mechanism from the module's own headline number."""
+    **What this finds now depends on the live median, and that is the point.** This ablation used
+    to run at a hardcoded 1.12bps (the study's old, stale median). Whether spread-crossing
+    (0.6bps) + slippage (2.0bps) = 2.6bps alone exceeds the median spread is an empirical
+    question, not a fixed fact about this module — at 1.12bps it did (2.6 > 1.12); read
+    `data/arbitrage_comparison.json`'s own `cost_stack_ablation` for what it finds at the current
+    live median, and do not assume the old conclusion survived the correction unchanged."""
+    if spread_bps is None:
+        spread_bps, _, _ = real_basis()
     clock = DualClock()
     ts = datetime(2026, 6, 15, 14, 0, tzinfo=UTC)
     point = _basis_point_for_spread_bps(spread_bps, ts=ts)
@@ -346,35 +394,90 @@ def run_reproducibility_check() -> dict[str, bool]:
 # Scope statement.
 # =================================================================================================
 
-SCOPE_STATEMENT = """\
+def scope_statement(
+    designed: list[SpreadCase], fee_ablation: list[FeeAblationPoint],
+    median: float, p95: float, max_observed: float,
+) -> str:
+    """Assembled from the live designed-case and fee-ablation results, not a snapshot of them.
+
+    **Every specific claim below used to be typed in against the study's old, stale basis
+    figures (1.12/11.06/27.01bps).** The study since switched to an absolute basis and the real
+    NVDAUSDT figures are 3.16/11.30/33.19bps — different enough that the OLD narrative structure
+    ("median and p95 refused, only max clears", "fee alone does not flip it") was not safe to
+    assume still holds; each clause below is built from what the live cases and ablation actually
+    say, not carried forward from the previous, now-wrong numbers.
+    """
+
+    def _joined(names: list[str]) -> str:
+        if len(names) <= 1:
+            return "".join(names)
+        return f"{', '.join(names[:-1])} and {names[-1]}"
+
+    by_name = {c.name: c for c in designed}
+    med_case, p95_case, max_case = (
+        by_name["median_real_basis"], by_name["p95_real_basis"], by_name["max_observed_real_basis"]
+    )
+    refused = [c.name.replace("_real_basis", "") for c in (med_case, p95_case, max_case)
+               if c.disagreement]
+    cleared = [c.name.replace("_real_basis", "") for c in (med_case, p95_case, max_case)
+               if not c.disagreement]
+    fee_alone_flips = fee_ablation[1].argus_monetizable
+    # Precomputed rather than inlined in the f-string below: a conditional expression containing
+    # an escaped quote is a backslash inside an f-string brace, which Python 3.11 rejects.
+    verb = "correctly refuses" if refused else "agrees on"
+    refused_names = _joined(refused) if refused else "no"
+    refused_noun = f"case{'s' if len(refused) != 1 else ''}"
+    cleared_clause = (
+        f" ({_joined(cleared)} case{'s' if len(cleared) > 1 else ''} clear the real cost stack "
+        f"on both sides — a real, honestly-reported agreement, not a further disagreement)"
+        if cleared else ""
+    )
+    fee_flip_clause = (
+        "still does not flip the verdict" if not fee_alone_flips
+        else "DOES flip the verdict on its own — a different mechanism than the previous run found"
+    )
+    honest_claim = (
+        'broader than "the fee term drives it": maxme\'s real code omits ALL of fee, '
+        "spread-crossing, and slippage, and only zeroing the full stack reproduces its naive "
+        "verdict"
+        if not fee_alone_flips else
+        "narrower than the previous run's: at the current live median the non-fee costs alone "
+        "no longer exceed the spread, so the fee term itself is doing real work here now"
+    )
+    agreement_clause = (
+        f"for the case{'s' if len(cleared) > 1 else ''} that clear the real cost stack "
+        f"({_joined(cleared)}), ARGUS's own decomposition also finds it monetizable"
+        if cleared else
+        "on this run every one of the three designed cases still disagrees, so no case currently "
+        "demonstrates ARGUS and maxme agreeing"
+    )
+    return f"""\
 Claimed: maxme/bitcoin-arbitrage's real, unmodified get_profit_for()/arbitrage_depth_opportunity() \
 report a positive "profit" on order-book spreads shaped to match ARGUS's own measured real basis \
-distribution (median 1.12bps, p95 11.06bps, max 27.01bps on 2,159 real NVDAUSDT hourly \
-observations), with no fee term anywhere in the function — confirmed by running it, not by \
-reading the return statement alone. ARGUS's real decompose()/\
-Decomposition.expected_executable_bps, run on the identical resulting spread, correctly \
-refuses the median and p95 cases as not \
-monetizable once the real round-trip taker fee, spread-crossing cost, slippage, execution \
-probability, and failed-leg survival are applied (the max-observed case, 27.01bps, clears the \
-real cost stack on BOTH sides — a real, honestly-reported agreement, not a third disagreement). A \
-cost-stack ablation (the same median spread, ARGUS's own real cost terms progressively zeroed) \
-found the fee term ALONE does not flip the verdict — spread-crossing (0.6bps) plus slippage \
-(2.0bps) already exceed the 1.12bps median spread even at zero fee — so the honest claim is \
-broader than "the fee term drives it": maxme's real code omits ALL of fee, spread-crossing, and \
-slippage, and only zeroing the full stack reproduces its naive verdict. This was the actual \
-result of running the ablation, not the one originally planned when it was designed.
+distribution (median {median:.2f}bps, p95 {p95:.2f}bps, max {max_observed:.2f}bps on 2,159 real \
+NVDAUSDT hourly observations), with no fee term anywhere in the function — confirmed by running \
+it, not by reading the return statement alone. ARGUS's real decompose()/\
+Decomposition.expected_executable_bps, run on the identical resulting spread, {verb} \
+the {refused_names} {refused_noun} as not monetizable once the real round-trip \
+taker fee, spread-crossing cost, slippage, execution probability, and failed-leg survival are \
+applied{cleared_clause}. \
+A cost-stack ablation (the median spread, ARGUS's own real cost terms progressively zeroed) \
+found the fee term ALONE {fee_flip_clause} \
+— spread-crossing (0.6bps) plus slippage (2.0bps) total 2.6bps against a {median:.2f}bps median, \
+so the honest claim is {honest_claim}. \
+This is the actual result of running the ablation against the live median, not a number carried \
+forward from a previous run.
 
 NOT claimed: that maxme/bitcoin-arbitrage is a currently-profitable, actively-traded system in \
 production — it is an older, small (Apache/MIT-licensed) open-source project, studied here as a \
 real, verifiable example of the fee-blind detection pattern ARGUS's own module docstring already \
 names as the common failure mode ("almost every entry will answer it by finding a spread and \
 declaring an opportunity"), not as a claim about its current market use. NOT claimed that a \
-positive maxme "profit" is always wrong — for a large enough spread (this comparison's own \
-max_observed_real_basis case, 27.01bps) ARGUS's own decomposition also finds it monetizable; the \
-finding is specifically about the SMALL, common spreads (median and p95) that make up the bulk of \
-the real distribution. NOT claimed that the swept disagreement rate generalises beyond the \
-Gaussian-shaped construction used here — it is matched to ARGUS's own measured real distribution's \
-first two moments, not identical to the real historical series bar-for-bar.
+positive maxme "profit" is always wrong — {agreement_clause}; \
+the finding is specifically about spreads maxme calls a profit that ARGUS's real cost stack \
+refuses. NOT claimed that the swept disagreement rate generalises beyond the Gaussian-shaped \
+construction used here — it is matched to ARGUS's own measured real distribution's first two \
+moments, not identical to the real historical series bar-for-bar.
 """
 
 
@@ -418,7 +521,7 @@ def main() -> dict[str, Any]:
         "failure_cases": [f.as_dict() for f in failure_cases],
         "costs": costs,
         "reproducibility": reproducibility,
-        "scope_statement": SCOPE_STATEMENT,
+        "scope_statement": scope_statement(designed, fee_ablation, *real_basis()),
     }
 
 
@@ -477,14 +580,15 @@ if __name__ == "__main__":
 
 
 __all__ = [
-    "SCOPE_STATEMENT",
     "ArbitrageComparisonError",
     "FailureCase",
     "FeeAblationPoint",
+    "RealBasisUnavailableError",
     "SpreadCase",
     "SweepSummary",
     "main",
     "measure_costs",
+    "real_basis",
     "render",
     "run_designed_cases",
     "run_failure_cases",
@@ -492,4 +596,5 @@ __all__ = [
     "run_reproducibility_check",
     "run_spread_case",
     "run_swept_cases",
+    "scope_statement",
 ]

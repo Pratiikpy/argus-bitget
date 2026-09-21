@@ -8,10 +8,11 @@ cases use constructed order-book depth and `BasisPoint`s. See
 
 from __future__ import annotations
 
+from types import ModuleType
+
 import pytest
 
 from argus.eval.arbitrage_comparison import (
-    SCOPE_STATEMENT,
     main,
     measure_costs,
     render,
@@ -20,12 +21,13 @@ from argus.eval.arbitrage_comparison import (
     run_fee_ablation,
     run_reproducibility_check,
     run_swept_cases,
+    scope_statement,
 )
 from argus.eval.baselines.maxme_arbitrer_loader import load_arbitrer_module
 
 
 @pytest.fixture(scope="module")
-def arbitrer_module():
+def arbitrer_module() -> ModuleType:
     return load_arbitrer_module()
 
 
@@ -63,20 +65,34 @@ class TestSweptCases:
 
 
 class TestCostStackAblation:
-    def test_fee_alone_does_not_explain_the_disagreement(self) -> None:
-        """The real result of running this ablation, not the one originally planned — spread-
-        crossing and slippage alone already exceed the median real spread even at zero fee."""
+    def test_full_costs_refuse_and_zeroing_everything_reproduces_maxmes_verdict(self) -> None:
+        """The two ends of the ablation are stable regardless of which basis figures feed it:
+        with every real cost applied ARGUS refuses, and with the whole stack zeroed it agrees
+        with maxme's fee-blind verdict — this is what the ablation exists to bracket."""
         points = {p.stage: p for p in run_fee_ablation()}
         assert points["all_real_costs"].argus_monetizable is False
-        assert points["fee_zeroed_only"].argus_monetizable is False
-
-    def test_the_full_cost_stack_zeroed_reproduces_maxmes_naive_verdict(self) -> None:
-        points = {p.stage: p for p in run_fee_ablation()}
         assert points["all_costs_zeroed"].argus_monetizable is True
+
+    def test_whether_the_fee_alone_flips_it_is_read_from_the_live_median_not_assumed(self) -> None:
+        """This assertion used to read `is False` unconditionally: at the study's old, stale
+        median (1.12bps) spread-crossing + slippage (2.6bps) alone exceeded the spread, so
+        zeroing the fee term in isolation never flipped the verdict. The study since moved to an
+        absolute basis and the real median is 3.16bps — above that same 2.6bps — so on the live
+        data fee_zeroed_only genuinely IS monetizable now. Asserted against `real_basis()`'s own
+        current number rather than re-pinned to a literal, so this test cannot go stale the same
+        way the code it tests just did."""
+        from argus.eval.arbitrage_comparison import real_basis
+
+        median, _, _ = real_basis()
+        points = {p.stage: p for p in run_fee_ablation()}
+        non_fee_costs_bps = 0.6 + 2.0  # spread-crossing + slippage, both fixed policy constants
+        assert points["fee_zeroed_only"].argus_monetizable is (median > non_fee_costs_bps)
 
 
 class TestFailureCases:
-    def test_maxmes_real_code_crashes_on_an_empty_order_book(self, arbitrer_module) -> None:
+    def test_maxmes_real_code_crashes_on_an_empty_order_book(
+        self, arbitrer_module: ModuleType
+    ) -> None:
         """The real, verified behaviour — get_profit_for()'s own first line indexes
         `self.depths[kask]["asks"][mi]` with no length guard, and `get_max_depth()`'s own guards
         still leave `mi=mj=0` when both sides are empty, so index 0 is read from an empty list.
@@ -111,11 +127,24 @@ class TestMainAndRender:
         report = main()
         assert report["any_designed_disagreement"]
         assert report["cost_stack_ablation_confirms_the_full_stack_is_the_mechanism"]
-        assert report["fee_alone_does_not_explain_the_disagreement"]
-        assert report["scope_statement"] == SCOPE_STATEMENT
+        # NOT asserted here whether fee-alone flips the verdict: that is read from the live
+        # median in TestCostStackAblation and is not stable across a study re-run, unlike the
+        # two ends of the ablation this method already checks.
         import json
 
         json.dumps(report)
+
+    def test_the_reports_scope_statement_matches_what_scope_statement_would_build_now(self) -> None:
+        """`scope_statement` takes the live designed cases and ablation as arguments, so the only
+        way this could drift from `main()`'s own report is `main()` passing something other than
+        its own live results into it — this is the guard against that."""
+        from argus.eval.arbitrage_comparison import real_basis
+
+        report = main()
+        rebuilt = scope_statement(
+            run_designed_cases(), run_fee_ablation(), *real_basis(),
+        )
+        assert report["scope_statement"] == rebuilt
 
     def test_render_produces_readable_text(self) -> None:
         report = main()
