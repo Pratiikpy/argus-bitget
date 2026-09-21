@@ -1,0 +1,2313 @@
+{
+  "model": "openai/gpt-oss-20b",
+  "seed": 20260921,
+  "total": 384,
+  "dev": [
+    {
+      "ask": "What holdings do I have at the moment?",
+      "expect": "position",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "针对该股票，您参考了哪些市场数据？",
+      "expect": "evidence",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "今儿交易会在几时开始",
+      "expect": "session",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "那笔止损下单到底是怎么决定的",
+      "expect": "decision_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "能解释一下你们决定卖掉B股票的思路吗？",
+      "expect": "decision_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "对今天的那笔卖出的思路能说说",
+      "expect": "decision_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "昨天为什么不买卖啊？",
+      "expect": "abstention_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "能把这段周期内的每笔操作列成表吗？",
+      "expect": "decision_list",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "What archives and charts did the crew consult for the TSLA push?",
+      "expect": "evidence",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "What influenced the choice to execute that move?",
+      "expect": "decision_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "I see we stayed put on the USD/JPY pair last minute — what's the rationale there?",
+      "expect": "abstention_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "盘中全不下单原因为啥",
+      "expect": "abstention_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the market currently in session, or has it called it quits for the day?",
+      "expect": "session",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "今日咱们账户没有任何买卖动作，背后有什么考虑吗？",
+      "expect": "abstention_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "看起来今天什么也没做，是不是有啥问题？",
+      "expect": "abstention_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "给我把所有决策的清单贴出来吧",
+      "expect": "decision_list",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "What was the logic behind the flip on Gold last Friday's close?",
+      "expect": "decision_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "Did something make you skip the trade on that rally?",
+      "expect": "abstention_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "Which data points did you rely on when you were eyeing the EUR/JPY spread?",
+      "expect": "evidence",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "请问这笔交易的依据是什么样的数据来源？",
+      "expect": "evidence",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "把最近所有单都按时间顺序写出来？",
+      "expect": "decision_list",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which positions are live at the moment?",
+      "expect": "position",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "这种“自信”说法究竟可信不可信？",
+      "expect": "calibration",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Explain the logic that drove the overnight shift on the USD/EUR bond.",
+      "expect": "decision_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "选这个股票前你查了哪些资料？",
+      "expect": "evidence",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "持续的置信值是否稳健？",
+      "expect": "calibration",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "想看一下你们最近五笔交易的详情。",
+      "expect": "decision_list",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "您认为这场行情为何不值得入场？",
+      "expect": "abstention_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What charts or data did you consult before scooping up the TLT note?",
+      "expect": "evidence",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "过去一段时间你们的判断准确率怎样？",
+      "expect": "calibration",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can we rely on the confidence bar you posted last week to still hold today?",
+      "expect": "calibration",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "现在手上还有哪些仓位？",
+      "expect": "position",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "你手里现在有多少单",
+      "expect": "position",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s the whole line of picks you’ve made in the last 24 hours?",
+      "expect": "decision_list",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Do the confidence figures still hold after the last quarter’s moves?",
+      "expect": "calibration",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "多长时间能确认这信心还是靠谱？",
+      "expect": "calibration",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What held us back from flipping on the trade line?",
+      "expect": "abstention_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "What stage of the day are we at and are trades running?",
+      "expect": "session",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "这段时间我的收益到底跟了多少？",
+      "expect": "performance",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "目前是哪个交易阶段？",
+      "expect": "session",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "Do the confidence numbers we hand out hold up under the test?",
+      "expect": "calibration",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "How's my account doing overall right now?",
+      "expect": "performance",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "现在是市区行情还是收盘前？",
+      "expect": "session",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "您对持续时间内的自信度评估有何见解？",
+      "expect": "calibration",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "整个交易周期收益率是正还是负",
+      "expect": "performance",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "你为什么当时决定不再持有？",
+      "expect": "decision_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "到底用了哪些指标来评估D基金？",
+      "expect": "evidence",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们为此订单查了哪些新闻？",
+      "expect": "evidence",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "What's the entire record of trades we have performed?",
+      "expect": "decision_list",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "Which research pieces were you reading before making that call?",
+      "expect": "evidence",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "Where did the desk source the intel for the call on the energy futures?",
+      "expect": "evidence",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "为何今天放弃B的持仓？",
+      "expect": "decision_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the confidence level you gave me trustworthy over time?",
+      "expect": "calibration",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "Give me the rundown of all the open spots I’ve got?",
+      "expect": "position",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What tipped you off to go long on TSLA last Friday?",
+      "expect": "decision_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "对于XX股你查了哪些新闻",
+      "expect": "evidence",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在该开市还是收盘？",
+      "expect": "session",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "归纳这段时间的所有动作，能一览吗？",
+      "expect": "decision_list",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "请问当时为何选择加仓此个股？",
+      "expect": "decision_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "本盘到哪一刻了？",
+      "expect": "session",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "那一笔AAPL卖单背后藏着哪条策略？",
+      "expect": "decision_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们决定持有C期权是出于什么判断？",
+      "expect": "decision_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What's sitting in the book right now?",
+      "expect": "position",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "市场今天现在开着吗？",
+      "expect": "session",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "你用的技术指标里哪几条是支撑做多的依据",
+      "expect": "evidence",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "Had a change of heart on that trade? Why it didn't happen?",
+      "expect": "abstention_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Give me a snapshot of what we’re positionally locked in now.",
+      "expect": "position",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Give me the snapshot of the open positions at this tick.",
+      "expect": "position",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "Explain the reasoning for the swap you executed on Monday.",
+      "expect": "decision_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "给我一份过去三天的所有交易记录",
+      "expect": "decision_list",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "What part of the session are we at?",
+      "expect": "session",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "目前账户里有什么开仓？",
+      "expect": "position",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在是白天还是下午？",
+      "expect": "session",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "What statistics and feeds powered the logic behind the PFE bet?",
+      "expect": "evidence",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "Why did the desk keep its cool and go quiet with the market?",
+      "expect": "abstention_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "你说的概率评估能保持不变吗",
+      "expect": "calibration",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can we lean on your confidence rating for the long run?",
+      "expect": "calibration",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What positions are still active now?",
+      "expect": "position",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "这笔操作参考了哪些行情指标？",
+      "expect": "evidence",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天到底为什么没交易",
+      "expect": "abstention_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did you bail on that BTC stop on the 12th?",
+      "expect": "decision_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "How did the balance tick over the session? better or worse?",
+      "expect": "performance",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "上周盈亏表看上去咋样？",
+      "expect": "performance",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did you keep the position flat this morning?",
+      "expect": "abstention_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "Can you list the current positions the desk is holding?",
+      "expect": "position",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "What was the logic behind taking the long on that futures contract?",
+      "expect": "decision_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "这天到底干嘛没干？",
+      "expect": "abstention_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is trading still happening right now?",
+      "expect": "session",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "Is the market still firing up, or is it on a coffee break?",
+      "expect": "session",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Can I pull the full set of orders the desk placed last month?",
+      "expect": "decision_list",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "请问现在是哪个时段的交易？",
+      "expect": "session",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "当前持仓里多头与空头的比例如何？",
+      "expect": "position",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "你为什么那天卖出那个股票？",
+      "expect": "decision_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "Do I have faith in the confidence you expressed?",
+      "expect": "calibration",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "请问对比历史，您对自信度的判断准确率如何？",
+      "expect": "calibration",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which sources fed the desk's vision on the GME spike?",
+      "expect": "evidence",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "现在市场是不是还在开？",
+      "expect": "session",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "我想看最近一周的操作日志",
+      "expect": "decision_list",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "What bets are we holding on the books right at this moment?",
+      "expect": "position",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the open positions currently.",
+      "expect": "position",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "Give me a recap of every move we executed.",
+      "expect": "decision_list",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "在当时该交易的逻辑依据是什么？",
+      "expect": "decision_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Give me the full playbook of trades we made today.",
+      "expect": "decision_list",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "想看一遍今天所有的操作清单",
+      "expect": "decision_list",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can we trust the risk gauge the desk keeps declaring?",
+      "expect": "calibration",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "What charts or data sources did the desk consult for that trade?",
+      "expect": "evidence",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the haul for the account as a whole.",
+      "expect": "performance",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "What made you decide to skip that one?",
+      "expect": "abstention_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Which assets are currently open in the account?",
+      "expect": "position",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "What holdings do we have open right now?",
+      "expect": "position",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "How do you know the confidence levels don't wobble?",
+      "expect": "calibration",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "Is my portfolio up or down overall?",
+      "expect": "performance",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "在做决策时引用了哪些公开资料？",
+      "expect": "evidence",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "那笔买入为何被视为最佳时机？",
+      "expect": "decision_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which factors tipped the scales toward that decision?",
+      "expect": "decision_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "What sources were on deck when the desk chose to short the tech index?",
+      "expect": "evidence",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me what pieces we hold at the moment.",
+      "expect": "position",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "我注意到今天没有任何交易，哪儿决定停手？",
+      "expect": "abstention_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is your confidence level reliable across different days?",
+      "expect": "calibration",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Is the market still open at this time?",
+      "expect": "session",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "Is the confidence bar the one we can lean on over the long haul?",
+      "expect": "calibration",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "现在的仓位到底是怎么安排的？",
+      "expect": "position",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did the desk gamble on the heatwave in NVDA last Tuesday?",
+      "expect": "decision_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "Do those confidence levels stay solid even when the pulse of the market tightens?",
+      "expect": "calibration",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "打印一下今天的持仓状况",
+      "expect": "position",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在手上还有哪些持仓？",
+      "expect": "position",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did you go long on ABC last week?",
+      "expect": "decision_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "你们的概率评估值到底保持稳定吗？",
+      "expect": "calibration",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在的敞口结构是怎样的？",
+      "expect": "position",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "当前持仓有哪些股票",
+      "expect": "position",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "How reliable is your certainty when it comes to these decisions?",
+      "expect": "calibration",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "你们说的自信度真的可靠吗？",
+      "expect": "calibration",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "你把宏观数据放进去了吗",
+      "expect": "evidence",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在的账户余额跟开始的时候差多少？",
+      "expect": "performance",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "Show me the real‑time open positions.",
+      "expect": "position",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "最近口袋里的钱是涨还是掉？",
+      "expect": "performance",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can you walk me through the thinking that guided our jump into XYZ this morning?",
+      "expect": "decision_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "我想了解近期的决策轨迹，能给我一份完整清单吗？",
+      "expect": "decision_list",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "您可否把所有近期决策一并列出来？",
+      "expect": "decision_list",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们现在持有的股票有哪些？",
+      "expect": "position",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the confidence level you quoted still accurate after the recent dip?",
+      "expect": "calibration",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "请给我上个月的交易清单。",
+      "expect": "decision_list",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "能否列出当下所有未结清的持仓？",
+      "expect": "position",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "长期来看你们的自信度有没有波动？",
+      "expect": "calibration",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "What market feeds did you check for that trade?",
+      "expect": "evidence",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "总体收益率在这段周期里是升还是降？",
+      "expect": "performance",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "可否分享一下，此次交易为何停在原位？",
+      "expect": "abstention_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "说说那天买入A股的理由，为什么要抬头？",
+      "expect": "decision_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Where can I see the backlog of all choices the team made on paper?",
+      "expect": "decision_list",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "Did the desk lock us out or just chill?",
+      "expect": "abstention_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "What part of the trading day are we in?",
+      "expect": "session",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "What's the logic behind buying XYZ yesterday?",
+      "expect": "decision_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "Is the market burning hot today?",
+      "expect": "session",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Did the market close earlier today?",
+      "expect": "session",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "What prompted the hedge you rolled over?",
+      "expect": "decision_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "我上一笔买入的原因是什么",
+      "expect": "decision_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "Where do we stand in the day’s session timeline?",
+      "expect": "session",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "你这周所有的下单策略都有点列出来",
+      "expect": "decision_list",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "Show me the current open positions in my book.",
+      "expect": "position",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "What kept us from making a trade today?",
+      "expect": "abstention_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "这段时间已到收盘前吗？",
+      "expect": "session",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "Where did the intel on that NVDA trade come from?",
+      "expect": "evidence",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Pull up the entire playbook of moves the desk logged this week.",
+      "expect": "decision_list",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "你们评估E期货时看了哪些图表？",
+      "expect": "evidence",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "目前我们正处在交易时间吗？",
+      "expect": "session",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What made us keep the windows shut instead of trading?",
+      "expect": "abstention_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "Is the market still open or has it closed for the day?",
+      "expect": "session",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "What did you see that made you flip that position on LMN?",
+      "expect": "decision_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "What made you decide not to trade today?",
+      "expect": "abstention_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "做这笔的参考信息到底是从哪儿来？",
+      "expect": "evidence",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "Show me the ledger of every trade we’ve logged since Q1 kicked off.",
+      "expect": "decision_list",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What stopped you from taking any action this session?",
+      "expect": "abstention_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "现在属于盘前还是盘后？",
+      "expect": "session",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "最近你们的决策一览表是什么？",
+      "expect": "decision_list",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which reports fed the decision on that particular security?",
+      "expect": "evidence",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "Will your certainty stay solid as the markets move?",
+      "expect": "calibration",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Has the desk’s predictive certainty been stable over time?",
+      "expect": "calibration",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the live position list for this account?",
+      "expect": "position",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What flipped the switch on that surprise sell of 500 shares of ABC?",
+      "expect": "decision_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "这套策略的置信度跟过去保持一致吗？",
+      "expect": "calibration",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "这段时间的资产表现大致如何？",
+      "expect": "performance",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "说说那一次放手的原因吧。",
+      "expect": "decision_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天让AAPL出手的思路是怎样的？",
+      "expect": "decision_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the bell out or still about to hit?",
+      "expect": "session",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "你说的自信率一直可信吗？",
+      "expect": "calibration",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "What was the gut on the big swing we made in TSLA at 3 pm?",
+      "expect": "decision_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "How confident am I to rely on your predictions?",
+      "expect": "calibration",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "What spots are live in the portfolio as we speak?",
+      "expect": "position",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "今天交易时段是不是还没到？",
+      "expect": "session",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did we sit idle instead of moving the market?",
+      "expect": "abstention_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "Give me the verdict on our performance—win, loss, or break‑even?",
+      "expect": "performance",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "整盘的资金流向该怎么说？",
+      "expect": "performance",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    }
+  ],
+  "test": [
+    {
+      "ask": "你为什么把仓位卖光了",
+      "expect": "decision_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在是交易时间吗？",
+      "expect": "session",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Do you keep track if your certainty sticks or slips?",
+      "expect": "calibration",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "请问当前市场处于开盘状态吗？",
+      "expect": "session",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can you pull up the diary of moves the desk executed over the last fiscal period?",
+      "expect": "decision_list",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "对C的买入是因为什么？",
+      "expect": "decision_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "请把这段时间的交易记录一次性罗列？",
+      "expect": "decision_list",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "Did something throw you off on that EUR/USD swing last night?",
+      "expect": "decision_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What’s the bottom line on our gains or losses lately?",
+      "expect": "performance",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "整体表现咋样，赚多没亏多？",
+      "expect": "performance",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们的自信度是真的吗？",
+      "expect": "calibration",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在市况已经打开吗？",
+      "expect": "session",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "How has the money's been moving in and out of this portfolio?",
+      "expect": "performance",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "请问近段时间的收益率大概是多少？",
+      "expect": "performance",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "打个表格列出上个月的每笔交易",
+      "expect": "decision_list",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "How's the pot doing at the end of this week?",
+      "expect": "performance",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "你们今天怎么都不动手了？",
+      "expect": "abstention_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "整体来看，我们的账户处于盈亏状态吗？",
+      "expect": "performance",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "这单的依据是哪些来源？",
+      "expect": "evidence",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can you give me the playbook of moves you’ve pulled since the start of the week?",
+      "expect": "decision_list",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Can you point to the market feeds you checked on that symbol?",
+      "expect": "evidence",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "How consistent is that confidence score across the longer swings of the market?",
+      "expect": "calibration",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "你参考了哪家券商的数据源",
+      "expect": "evidence",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "What slice of the trading day are we in right now?",
+      "expect": "session",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the rundown of all the positions you’ve taken today?",
+      "expect": "decision_list",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "你们拿什么信息来判断？",
+      "expect": "evidence",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "What data fed into the call on ABC?",
+      "expect": "evidence",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "Where are the decisions that the desk logged all day?",
+      "expect": "decision_list",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "Is it still live trading or paused?",
+      "expect": "session",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "How's the bottom line looking after the month‑end crunch?",
+      "expect": "performance",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Give me the big picture, what was the total win or loss?",
+      "expect": "performance",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "What held you back from hitting that move yesterday?",
+      "expect": "abstention_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "现在是交易的哪个时间段？",
+      "expect": "session",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why were we sitting on cash all day?",
+      "expect": "abstention_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "整个交易日里都有哪些动作？",
+      "expect": "decision_list",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "这份自信报告在长期来看有多可信？",
+      "expect": "calibration",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "该笔单背后靠的具体数据点是哪一类？",
+      "expect": "evidence",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which assets are currently open in my account?",
+      "expect": "position",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "我现在手上还有哪些持仓？",
+      "expect": "position",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s the clock saying for market hours?",
+      "expect": "session",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What thought process led to the short on BTC last night?",
+      "expect": "decision_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "现在是上午还是下午？",
+      "expect": "session",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "此刻账户里正持有的仓位是哪些？",
+      "expect": "position",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did the desk sit on that upside-side opportunity today?",
+      "expect": "abstention_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "Is the confidence level you set a trustworthy compass over a full trading cycle?",
+      "expect": "calibration",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "你们现在手里是打着哪些？",
+      "expect": "position",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "此刻未平仓的多空各占几块？",
+      "expect": "position",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "我现在持有什么？",
+      "expect": "position",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "你那预测结果可靠性怎么检测",
+      "expect": "calibration",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在是开盘状态还是已收盘",
+      "expect": "session",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did we pick that particular trade?",
+      "expect": "decision_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "请把最近所有开仓/平仓的记录发我看看？",
+      "expect": "decision_list",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can you list every trade you've made?",
+      "expect": "decision_list",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "持仓里有什么大单？",
+      "expect": "position",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "把我这周的所有决定都列出来",
+      "expect": "decision_list",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "What kept the desk from striking the anchor on that stock yesterday?",
+      "expect": "abstention_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What are we holding at the moment?",
+      "expect": "position",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Which instruments are still in play according to the live feed?",
+      "expect": "position",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "List every move the desk did this session.",
+      "expect": "decision_list",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "你们估计的可信度能否持续保持？",
+      "expect": "calibration",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "At what stage of the trading day are we?",
+      "expect": "session",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "你们这段时间到底干了哪些操作？",
+      "expect": "decision_list",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "能给我列出所有的买卖记录吗？",
+      "expect": "decision_list",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "Tell me the net win or loss we’re sitting on right now.",
+      "expect": "performance",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "你说的信心度能坚持几天",
+      "expect": "calibration",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "这段时间我赚了还是赔了？",
+      "expect": "performance",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "您认为之前给出的自信度评估是否持续可靠？",
+      "expect": "calibration",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "别打？到底有什么原因今天没动啊？",
+      "expect": "abstention_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "What was the hesitation that kept you from acting on that?",
+      "expect": "abstention_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "你们决定卖出A的理由到底是啥？",
+      "expect": "decision_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "本盘为何没有任何开仓？可否简单说明？",
+      "expect": "abstention_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which stocks are we still holding today?",
+      "expect": "position",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "Did my account come out ahead or behind this period?",
+      "expect": "performance",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "盘前为什么啥也没动",
+      "expect": "abstention_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s the ledger showing after the last swing?",
+      "expect": "performance",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "What data did you consult for that particular symbol?",
+      "expect": "evidence",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "Where did you get your information on that ticker?",
+      "expect": "evidence",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "What stopped us from moving the needle this session?",
+      "expect": "abstention_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "请问目前持仓有哪些？",
+      "expect": "position",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Lay out the lineup of decisions the desk took from January to now.",
+      "expect": "decision_list",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "能否概括一下最近的盈亏情况？",
+      "expect": "performance",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "这个模型的稳定性有多高",
+      "expect": "calibration",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "这笔AAPL止盈的逻辑是基于什么？",
+      "expect": "decision_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "上周累计净值变化多少",
+      "expect": "performance",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "能给我看看最近的盈亏表吗？",
+      "expect": "performance",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Do you think your confidence holds up the same every day?",
+      "expect": "calibration",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "今天上午还没开盘，等会儿会吗？",
+      "expect": "session",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "能给我看看分析这个符号时参考了什么资料？",
+      "expect": "evidence",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Show me the rundown of all decisions taken.",
+      "expect": "decision_list",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "最近的收益咋样，跟以前比怎么样？",
+      "expect": "performance",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "What charts or news did you skim when you were looking at AMZN?",
+      "expect": "evidence",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "现在仓位里还有哪些股未平仓",
+      "expect": "position",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "这种自评标准能一直用吗？",
+      "expect": "calibration",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "Give me the full trail of directives the desk has issued so far.",
+      "expect": "decision_list",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "Did we end up in the red or the green?",
+      "expect": "performance",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "做此交易时主要查阅了哪些数据？",
+      "expect": "evidence",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "Give me the rundown of every move the desk took in March.",
+      "expect": "decision_list",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "Explain the call to sell PQR two days back.",
+      "expect": "decision_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the round‑up of all decision punches we threw since morning.",
+      "expect": "decision_list",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "What holdings does the desk have in the portfolio right now?",
+      "expect": "position",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "整个账户表现怎样，亏了还是赚了？",
+      "expect": "performance",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What's the net result of all my trades so far?",
+      "expect": "performance",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "Overall, are we sailing ahead or drifting off course with the portfolio?",
+      "expect": "performance",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What was the spark that pushed you into that nickel‑fatty trade on the 7th?",
+      "expect": "decision_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "能把我账户的全部决策记录发给我吗？",
+      "expect": "decision_list",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们怎么看到的这家公司的数据？",
+      "expect": "evidence",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "市场现在是凌晨还是收盘前",
+      "expect": "session",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the market up and humming or still on the bench?",
+      "expect": "session",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "What's the P&L looking like across the board?",
+      "expect": "performance",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "Did our trades stack up to a net win or a loss on the board?",
+      "expect": "performance",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "我现在持仓到底是什么？",
+      "expect": "position",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们测量的可靠性是如何维持的？",
+      "expect": "calibration",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "为什么连一句操作都没给？",
+      "expect": "abstention_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "针对那笔平仓，您决定的动机是什么？",
+      "expect": "decision_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Where are we in the trading day at the moment?",
+      "expect": "session",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "What stopped us from getting in on the move?",
+      "expect": "abstention_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me how the account fared today, net? positive or negative?",
+      "expect": "performance",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "Did we walk off the floor with a win or a loss this cycle?",
+      "expect": "performance",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "你们最近有没有停板？",
+      "expect": "abstention_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the floor open, or do we have a break coming?",
+      "expect": "session",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "What figures or signals were used to pick PQR?",
+      "expect": "evidence",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "How's the book been performing—blue chips or red dirt?",
+      "expect": "performance",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "Which reports fed into the decision on the new biotech share?",
+      "expect": "evidence",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Is the stated risk assessment still trustworthy given recent volatility?",
+      "expect": "calibration",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "为什么一直保持观望？",
+      "expect": "abstention_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "可否说说您在分析时关注了哪些指标？",
+      "expect": "evidence",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "给我看看当前的资产配置。",
+      "expect": "position",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the account up or down after the market's been moving?",
+      "expect": "performance",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "现阶段我们手上还有哪些头寸？",
+      "expect": "position",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "你这边市场现在处于哪个时段",
+      "expect": "session",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "您此刻保持观望的原因何在？",
+      "expect": "abstention_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the confidence rating you give us always reliable?",
+      "expect": "calibration",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "今天干脆不出手，这背后存在哪个阻碍？",
+      "expect": "abstention_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "今晨为何全不挂单？",
+      "expect": "abstention_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "当前持仓是哪些品种？",
+      "expect": "position",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "There's been a quiet stance on the soybean futures; what moved that decision?",
+      "expect": "abstention_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Why did the desk cut the position in DEF at 4:10 pm?",
+      "expect": "decision_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "到底检查了哪些数据支持这个决定？",
+      "expect": "evidence",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s the list of all the calls you’ve made so far this session?",
+      "expect": "decision_list",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Did we come out on top this quarter or dive in the red?",
+      "expect": "performance",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "Is it morning or afternoon session now?",
+      "expect": "session",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "How solid is the certainty meter the team is bragging about?",
+      "expect": "calibration",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "现在是白天还是深夜，市场处于哪段？",
+      "expect": "session",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Where are we in the trading day—up early, break, or winding down?",
+      "expect": "session",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "为何今天卖出AAPL 100股？",
+      "expect": "decision_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在是交易日的哪一段？",
+      "expect": "session",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "能列出上周我所有的交易指令吗？",
+      "expect": "decision_list",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天全部停牌？能说说为何不走动？",
+      "expect": "abstention_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the bell still open for trading?",
+      "expect": "session",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "这段时间我的盈亏到底怎么算？",
+      "expect": "performance",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "为什么那一笔交易会被认为是一次失误？",
+      "expect": "decision_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "信心指数稳定吗？",
+      "expect": "calibration",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "What pushed you to go long on that specific symbol?",
+      "expect": "decision_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "Is the market open yet?",
+      "expect": "session",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "Tell me if the exchange doors are still open and ready to trade.",
+      "expect": "session",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "这支股票的买卖依据都是哪块数据？",
+      "expect": "evidence",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which news or chart patterns did you check for XYZ?",
+      "expect": "evidence",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "What made us hit the pause button on any orders today?",
+      "expect": "abstention_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "Where can I find the historical trade log from the desk?",
+      "expect": "decision_list",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "Give me a quick rundown on how this account's been faring.",
+      "expect": "performance",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "你们最近的回报率大概是个啥？",
+      "expect": "performance",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Did you pull in any macro numbers when you were watching GOOG?",
+      "expect": "evidence",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "能否提供最新一周的交易决策清单？",
+      "expect": "decision_list",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "过去几天的预测有多靠谱？",
+      "expect": "calibration",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "Show me the current spread of positions the desk carries.",
+      "expect": "position",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Why did the desk decide to short that bond last Tuesday?",
+      "expect": "decision_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "这笔期权交易是怎么定的？",
+      "expect": "decision_why",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "So, why did you leave that opportunity on the shelf?",
+      "expect": "abstention_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the ledger of every call the desk made in June.",
+      "expect": "decision_list",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "en"
+    },
+    {
+      "ask": "What’s the inventory sitting in my account right now?",
+      "expect": "position",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the entire trade history, action list.",
+      "expect": "decision_list",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "账面上这周的累计盈亏没变化吗？",
+      "expect": "performance",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "昨天市场波动，为什么没给仓位加一点？",
+      "expect": "abstention_why",
+      "persona": "a quant who is sceptical of the desk and asks pointed questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Give me the inventory of all the choices made by the trading team so far this year.",
+      "expect": "decision_list",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "交易台为何保持低姿态",
+      "expect": "abstention_why",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "我账户的净值到底是正是负？",
+      "expect": "performance",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which sources informed your view on that stock?",
+      "expect": "evidence",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "en"
+    },
+    {
+      "ask": "之前的信心值有没有偏差？",
+      "expect": "calibration",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "这期账户总盈亏怎么",
+      "expect": "performance",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "整体表现是不是还算不错？",
+      "expect": "performance",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "那次买卖的背后为什么要这么做？",
+      "expect": "decision_why",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们在做X时看了哪些图？",
+      "expect": "evidence",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "这日盘整为何全盘收敛？",
+      "expect": "abstention_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "这个决定的依据是什么文件？",
+      "expect": "evidence",
+      "persona": "a cautious first-time investor who avoids jargon entirely",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did we let the trade on BTC drift rather than snap it?",
+      "expect": "abstention_why",
+      "persona": "a compliance officer who asks indirect, formal questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What nuggets of intel did we sift through for the RHT trade?",
+      "expect": "evidence",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "en"
+    },
+    {
+      "ask": "帮我列一列从昨夜到今天的操作",
+      "expect": "decision_list",
+      "persona": "an impatient trader typing one-liners between calls",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can we trust your confidence metrics across days?",
+      "expect": "calibration",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "账户最近一次结算结果算多少",
+      "expect": "performance",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "zh"
+    },
+    {
+      "ask": "最近把盘面保持清空，背后有何逻辑？",
+      "expect": "abstention_why",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    },
+    {
+      "ask": "Tell me the sources that spun the trade on LMN.",
+      "expect": "evidence",
+      "persona": "a blunt retail day-trader who types fast and drops punctuation",
+      "lang": "en"
+    },
+    {
+      "ask": "当下的净头寸具体是哪些头寸？",
+      "expect": "position",
+      "persona": "a hedge-fund portfolio manager who speaks in industry shorthand",
+      "lang": "zh"
+    }
+  ]
+}
