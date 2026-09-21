@@ -1,0 +1,131 @@
+{
+  "tradingagents_core_case": {
+    "system": "tradingagents",
+    "category": "core_stock_apis",
+    "outcome": "raised",
+    "detail": "vendor connection refused"
+  },
+  "tradingagents_optional_case": {
+    "system": "tradingagents",
+    "category": "macro_data",
+    "outcome": "degraded_to_sentinel",
+    "detail": "DATA_UNAVAILABLE: optional macro_data could not be retrieved (vendor connection refused). Proceed without it; do not fabricate values."
+  },
+  "argus_core_equivalent_case": {
+    "system": "argus",
+    "category": "edgar_(core-equivalent)",
+    "outcome": "returned_cleanly",
+    "detail": "edgar: unavailable (OSError)"
+  },
+  "argus_optional_equivalent_case": {
+    "system": "argus",
+    "category": "insider_(optional-equivalent)",
+    "outcome": "returned_cleanly",
+    "detail": "insider: unavailable (OSError)"
+  },
+  "swept_tradingagents_cases": [
+    {
+      "system": "tradingagents",
+      "category": "core_stock_apis",
+      "outcome": "raised",
+      "detail": "vendor connection refused"
+    },
+    {
+      "system": "tradingagents",
+      "category": "technical_indicators",
+      "outcome": "raised",
+      "detail": "vendor connection refused"
+    },
+    {
+      "system": "tradingagents",
+      "category": "fundamental_data",
+      "outcome": "raised",
+      "detail": "vendor connection refused"
+    },
+    {
+      "system": "tradingagents",
+      "category": "fundamental_data",
+      "outcome": "raised",
+      "detail": "vendor connection refused"
+    },
+    {
+      "system": "tradingagents",
+      "category": "fundamental_data",
+      "outcome": "raised",
+      "detail": "vendor connection refused"
+    },
+    {
+      "system": "tradingagents",
+      "category": "fundamental_data",
+      "outcome": "raised",
+      "detail": "vendor connection refused"
+    },
+    {
+      "system": "tradingagents",
+      "category": "news_data",
+      "outcome": "raised",
+      "detail": "vendor connection refused"
+    },
+    {
+      "system": "tradingagents",
+      "category": "news_data",
+      "outcome": "raised",
+      "detail": "vendor connection refused"
+    },
+    {
+      "system": "tradingagents",
+      "category": "news_data",
+      "outcome": "raised",
+      "detail": "vendor connection refused"
+    },
+    {
+      "system": "tradingagents",
+      "category": "macro_data",
+      "outcome": "degraded_to_sentinel",
+      "detail": "DATA_UNAVAILABLE: optional macro_data could not be retrieved (vendor connection refused). Proceed without it; do not fabricate values."
+    },
+    {
+      "system": "tradingagents",
+      "category": "prediction_markets",
+      "outcome": "degraded_to_sentinel",
+      "detail": "DATA_UNAVAILABLE: optional prediction_markets could not be retrieved (vendor connection refused). Proceed without it; do not fabricate values."
+    }
+  ],
+  "swept_argus_cases": [
+    {
+      "system": "argus",
+      "category": "edgar_(OSError)",
+      "outcome": "returned_cleanly",
+      "detail": "edgar: unavailable (OSError)"
+    },
+    {
+      "system": "argus",
+      "category": "edgar_(TimeoutError)",
+      "outcome": "returned_cleanly",
+      "detail": "edgar: unavailable (TimeoutError)"
+    }
+  ],
+  "swept_ta_core_always_raises": true,
+  "swept_ta_optional_never_raises": true,
+  "swept_argus_never_raises": true,
+  "ablation": {
+    "caught_types_are_swallowed": true,
+    "uncaught_type_propagates": true,
+    "the_scoping_is_load_bearing": true
+  },
+  "reproducibility": {
+    "tradingagents_reproducible": true,
+    "argus_reproducible": true
+  },
+  "out_of_sample": {
+    "path": "C:\\Users\\prate\\bitget\\argus\\data\\desk_notes.jsonl",
+    "cycles": 457,
+    "distinct_sources_seen": 5,
+    "checked": true
+  },
+  "costs": {
+    "tradingagents_dispatch_us_per_call": 22.90710003580898,
+    "argus_gather_us_per_call": 2.922099898569286
+  },
+  "scope_statement": "Claimed: run on identical failure scenarios, TradingAgents' real route_to_vendor() raises when every configured vendor for a \"core\" category fails with a genuine error, while ARGUS's real gather() never raises for any single source's failure \u2014 core or opt-in \u2014 instead recording the failure as a status line the decision-maker sees. Both behaviours are the real code's own, confirmed by running each, not by reading either alone. The exception-type scoping in gather()'s try/except is shown load-bearing: the exact types it names are swallowed into a status line; a type it does not name (ValueError, standing in for a genuine programming-logic bug) propagates \u2014 gather() is not a blanket except.\n\nNOT claimed: that TradingAgents' design is a defect. Its own comment states the intent plainly \u2014 \"a broken primary must be visible in the logs\" \u2014 and it IS visible, via the raised exception itself, to whatever code called route_to_vendor(). The difference under test is narrower and verifiable: whether a single live source's failure can abort a full perception cycle. In TradingAgents' real code, for a core category with zero working vendors, it can; in ARGUS's real code, for any source, it cannot. Also NOT claimed: that ARGUS's four named vendors (EDGAR, RSS, Bitget Skills, insider/fundamentals-when-supplied) outnumber or outperform TradingAgents' \u2014 the source-count comparison is separately covered by best_implementation_studied's own artefact (../research/architecture/datasource-audit.md), not repeated here.\n"
+}

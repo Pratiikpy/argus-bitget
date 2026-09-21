@@ -3250,10 +3250,13 @@ REGISTER: tuple[Capability, ...] = (
             Proof(
                 condition="costs_included",
                 how=(
-                    "ARGUS's own chain overhead measured, not estimated: ~9.9ms/entry to write, "
-                    "~0.014s to verify a 250-entry ledger"
+                    "ARGUS's own chain overhead measured, not estimated: 9.75ms/entry to write, "
+                    "0.021s to verify a 250-entry ledger — this artefact had never been "
+                    "generated before 2026-09-21 (cited the module's own source only, ATTESTED); "
+                    "the previous text here read '~0.014s to verify', unchecked against a real "
+                    "run and wrong by roughly 50% once one existed"
                 ),
-                artefact="src/argus/eval/journal_comparison.py",
+                artefact="data/journal_comparison.json",
             ),
             Proof(
                 condition="out_of_sample_test",
@@ -3396,11 +3399,12 @@ REGISTER: tuple[Capability, ...] = (
             Proof(
                 condition="costs_included",
                 how=(
-                    "dispatch overhead measured, not estimated, on 1,000 real calls each: "
-                    "TradingAgents' route_to_vendor() ~21us/call, ARGUS's gather() ~2-3us/call — "
-                    "both exclude the network leg itself by design, so this is pure dispatch cost"
+                    "dispatch overhead measured, not estimated: TradingAgents' route_to_vendor() "
+                    "22.9us/call, ARGUS's gather() 2.9us/call — both exclude the network leg "
+                    "itself by design, so this is pure dispatch cost. First persisted to an "
+                    "artefact 2026-09-21; previously cited the module's own source only"
                 ),
-                artefact="src/argus/eval/feedlist_comparison.py",
+                artefact="data/feedlist_comparison.json",
             ),
             Proof(
                 condition="out_of_sample_test",

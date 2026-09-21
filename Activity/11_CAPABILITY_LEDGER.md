@@ -73,10 +73,17 @@ reasoning-trail quality), `t2-sharpe-mdd-winrate` (structurally blocked — the 
 trades, not a missing comparison). `t3-lui` closed 2026-09-21 — see row 19 and
 `Activity/10_LOOP_DESIGN.md` iteration 6.
 
-**Three artefacts named as rivals in `eval/standing.py` prose have no persisted output on disk:**
-`feedlist_comparison.py`, `grammar_comparison.py`, `journal_comparison.py` — the modules exist, the
-comparisons apparently ran once (cited by name in standing.py), but `data/*.json` for none of them
-exists now. Next AUDIT iteration: re-run all three and confirm they still work, or mark honestly.
+**Closed 2026-09-21 — the three never-run modules.** `feedlist_comparison.py`,
+`grammar_comparison.py`, `journal_comparison.py` all ran clean and produced real, substantive
+first-ever artefacts (Windows CRLF caused the rival journal library to false-positive a tamper
+alert on untampered data; the rival factor-eval library executes real injected code via `eval()`
+where ARGUS's grammar parser has no execution surface at all). Two `costs_included` citations
+upgraded from ATTESTED (cited the module's own source) to VERIFIED (cited the new artefact) — and
+in doing so caught a real, previously-unchecked wrong number: `journal_comparison`'s citation
+claimed "~0.014s to verify 250 entries," never checked against a real run; the real figure is
+0.021s, about 50% off. Fixed. `failure_cases_documented` on the journal capability stays ATTESTED
+on purpose — the new artefact's keys genuinely don't carry that condition's vocabulary, and
+forcing the citation would have turned ATTESTED into UNPROVEN, a regression, not an improvement.
 
 ## AUDIT sweep, 2026-09-21 — internal contradictions found and fixed
 

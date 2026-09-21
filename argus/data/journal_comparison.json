@@ -1,0 +1,79 @@
+{
+  "serenity_crlf_case": {
+    "system": "serenity_guardrails_chained_journal",
+    "disk_bytes_contain_crlf": true,
+    "verify_reports_clean": false,
+    "detail": "GuardError: journal head anchor mismatch: anchored 2 entries, found 2 \u2014 possible tail truncation"
+  },
+  "argus_crlf_case": {
+    "system": "argus_paper_ledger",
+    "disk_bytes_contain_crlf": true,
+    "verify_reports_clean": true,
+    "detail": "{'entries': 2, 'chain_intact': True, 'links_intact': True, 'first_break_at': None, 'truncated': False, 'anchor': 'anchor agrees with the log', 'head_hash': 'f8f43ca93b1184ee'}"
+  },
+  "tamper_comparison": {
+    "serenity_detects_it": true,
+    "argus_detects_it": true,
+    "both_detect_genuine_tampering": true
+  },
+  "ablation": {
+    "hashing_raw_disk_bytes_is_fragile": true,
+    "hashing_parsed_content_is_robust": true,
+    "the_design_choice_is_load_bearing": true
+  },
+  "swept_entry_counts": [
+    {
+      "entry_count": 1,
+      "serenity_clean": false,
+      "argus_clean": true
+    },
+    {
+      "entry_count": 2,
+      "serenity_clean": false,
+      "argus_clean": true
+    },
+    {
+      "entry_count": 3,
+      "serenity_clean": false,
+      "argus_clean": true
+    },
+    {
+      "entry_count": 5,
+      "serenity_clean": false,
+      "argus_clean": true
+    },
+    {
+      "entry_count": 10,
+      "serenity_clean": false,
+      "argus_clean": true
+    },
+    {
+      "entry_count": 25,
+      "serenity_clean": false,
+      "argus_clean": true
+    },
+    {
+      "entry_count": 50,
+      "serenity_clean": false,
+      "argus_clean": true
+    }
+  ],
+  "swept_serenity_always_fails": true,
+  "swept_argus_always_clean": true,
+  "out_of_sample": {
+    "ledger_path": "C:\\Users\\prate\\bitget\\argus\\data\\paper_ledger.jsonl",
+    "entries": 519,
+    "chain_intact": true,
+    "checked": true
+  },
+  "truncation_comparison": {
+    "serenity_detects_truncation": true,
+    "argus_detects_truncation": true
+  },
+  "costs": {
+    "write_seconds_per_250_entries": 2.436566899996251,
+    "write_ms_per_entry": 9.746267599985003,
+    "verify_seconds_for_250_entries": 0.020879499963484704
+  },
+  "scope_statement": "Claimed: on genuine tampering (a real content edit to a stored entry), both systems' real code correctly detects it \u2014 verified by running both, not assumed from either design. On a completely UNTAMPERED write/verify cycle on this real platform (Windows), serenity-guardrails' real ChainedJournal reports its own head anchor as mismatched due to a genuine, platform-specific bug (hashing raw disk bytes that Python's own default text-mode I/O silently altered via universal-newline translation); ARGUS's real PaperLedger, writing the identical CRLF-containing bytes to disk under the same conditions, verifies clean \u2014 because it hashes canonically re-serialized PARSED content, never raw disk bytes, a design property confirmed both by reading the source and by running it.\n\nNOT claimed: that serenity-guardrails' journal is broken on every platform \u2014 this is a Windows- specific defect (POSIX text-mode I/O does not perform CRLF translation, so the same code likely verifies cleanly there); not re-tested on a non-Windows platform here, stated as NOT VERIFIED rather than assumed either way. Also NOT claimed: that ARGUS's hash-chain is otherwise richer than serenity's \u2014 both implement the same core idea (per-entry link + head-anchor sidecar for truncation detection) equally completely for what each is scoped to do.\n"
+}
