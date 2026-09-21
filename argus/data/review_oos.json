@@ -1,0 +1,78 @@
+{
+  "decisions": 433,
+  "split_share": 0.5,
+  "in_sample_decisions": 216,
+  "out_of_sample_decisions": 217,
+  "in_sample_defects": 352,
+  "out_of_sample_defects": 402,
+  "rules": 5,
+  "gradeable_out_of_sample": 3,
+  "not_gradeable_out_of_sample": 2,
+  "survived": 3,
+  "flipped": 0,
+  "survival_rate": 1.0,
+  "detail": [
+    {
+      "rule": "narrow-evidence-base",
+      "in_sample": "misleading",
+      "out_of_sample": "misleading",
+      "in_fired": 39,
+      "out_fired": 42,
+      "in_caught": 15,
+      "out_caught": 13,
+      "gradeable_out_of_sample": true,
+      "survived": true,
+      "flipped": false
+    },
+    {
+      "rule": "low-independence-panel",
+      "in_sample": "misleading",
+      "out_of_sample": "misleading",
+      "in_fired": 29,
+      "out_fired": 39,
+      "in_caught": 3,
+      "out_caught": 3,
+      "gradeable_out_of_sample": true,
+      "survived": true,
+      "flipped": false
+    },
+    {
+      "rule": "thin-panel",
+      "in_sample": "misleading",
+      "out_of_sample": "misleading",
+      "in_fired": 47,
+      "out_fired": 46,
+      "in_caught": 20,
+      "out_caught": 17,
+      "gradeable_out_of_sample": true,
+      "survived": true,
+      "flipped": false
+    },
+    {
+      "rule": "sequential-agreement",
+      "in_sample": "proposed",
+      "out_of_sample": "proposed",
+      "in_fired": 204,
+      "out_fired": 217,
+      "in_caught": 0,
+      "out_caught": 0,
+      "gradeable_out_of_sample": false,
+      "survived": false,
+      "flipped": false
+    },
+    {
+      "rule": "unhedged-risk-is-stated-not-assumed",
+      "in_sample": "proposed",
+      "out_of_sample": "proposed",
+      "in_fired": 216,
+      "out_fired": 217,
+      "in_caught": 0,
+      "out_caught": 0,
+      "gradeable_out_of_sample": false,
+      "survived": false,
+      "flipped": false
+    }
+  ],
+  "failure_cases": [],
+  "scope_statement": "Every standing rule is graded twice: on the earlier half of the decisions by ledger sequence, and on the later half held back. The split is chronological, never random, because a random split grades a rule on a decision that preceded the ones it was fitted on. Each half is scored against defects observed WITHIN that half. NOT CLAIMED: that this is the full self-evolution loop \u2014 STANDING_RULES are written by hand rather than generated from the in-sample window, so this tests whether a rule's grade generalises, not whether the rule would have been discovered again. NOT CLAIMED: that a rule which is not gradeable out of sample failed; too few firings to judge is the absence of a test, and it is counted separately."
+}

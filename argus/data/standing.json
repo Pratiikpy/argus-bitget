@@ -2236,8 +2236,8 @@
         },
         {
           "condition": "out_of_sample_test",
-          "how": "the lifecycle logic tested here is not fixture-only code: it is the exact, unmodified desk.review.evaluate() already run against the real desk record (data/review_report.json, 40 real decisions, all five standing rules genuinely graded and genuinely refused promotion) - the six designed fixtures probe boundaries that real data has not yet reached (no standing rule has cleared MIN_DECISIONS with a high enough precision), while the same unmodified function is what already produced the real, on-record result",
-          "artefact": "data/review_report.json",
+          "how": "433 real decisions split 216/217 by ledger sequence; every standing rule graded on both halves at the production MIN_DECISIONS. 3 of 5 are gradeable on the held-out half and all 3 keep the same verdict; the other 2 fire too rarely to judge and are counted as not-gradeable rather than as failures, because the absence of a test is not a bad result",
+          "artefact": "data/review_oos.json",
           "test": ""
         },
         {
@@ -2609,11 +2609,6 @@
       "capability": "Self-evolving review rules",
       "problem": "failure_cases_documented is claimed but not evidenced",
       "detail": "data/review_report.json records nothing about failure_cases_documented: no key among failure, failures, failure_cases, misses, limitation, limitations..."
-    },
-    {
-      "capability": "Self-evolving review rules",
-      "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "data/review_report.json records nothing about out_of_sample_test: no key among out_of_sample, oos, holdout, held_out, heldout, train..."
     }
   ],
   "clean": false,

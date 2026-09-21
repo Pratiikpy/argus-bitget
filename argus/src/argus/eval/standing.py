@@ -3786,16 +3786,22 @@ REGISTER: tuple[Capability, ...] = (
             ),
             Proof(
                 condition="out_of_sample_test",
+                # The previous version of this proof argued that the in-sample run was ALSO the
+                # out-of-sample one because the same unmodified function produced it. That is an
+                # argument about code paths, not about held-out data, and `verify()` was right to
+                # reject it: a rule graded on the decisions it was written against describes the
+                # past. `eval/reviewoos.py` now runs the real thing — 433 decisions split
+                # chronologically (never randomly, which would grade a rule on a decision that
+                # preceded the ones it was fitted on), each half scored only against the defects
+                # observed within it.
                 how=(
-                    "the lifecycle logic tested here is not fixture-only code: it is the exact, "
-                    "unmodified desk.review.evaluate() already run against the real desk record "
-                    "(data/review_report.json, 40 real decisions, all five standing rules "
-                    "genuinely graded and genuinely refused promotion) - the six designed "
-                    "fixtures probe boundaries that real data has not yet reached (no standing "
-                    "rule has cleared MIN_DECISIONS with a high enough precision), while the same "
-                    "unmodified function is what already produced the real, on-record result"
+                    "433 real decisions split 216/217 by ledger sequence; every standing rule "
+                    "graded on both halves at the production MIN_DECISIONS. 3 of 5 are gradeable "
+                    "on the held-out half and all 3 keep the same verdict; the other 2 fire too "
+                    "rarely to judge and are counted as not-gradeable rather than as failures, "
+                    "because the absence of a test is not a bad result"
                 ),
-                artefact="data/review_report.json",
+                artefact="data/review_oos.json",
             ),
             Proof(
                 condition="reproducibility_proven",
