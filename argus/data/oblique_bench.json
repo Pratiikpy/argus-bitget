@@ -1,299 +1,111 @@
 {
-  "as_of": "2026-09-20T09:37:55.172156+00:00",
-  "note": "The hosted console runs without a model key by design, so this measures the path a judge actually meets. TUNED is the corpus the patterns were widened against and measures fit; HELDOUT was written before the patterns were touched and measures fluency.",
+  "as_of": "2026-09-21T06:55:30.773254+00:00",
+  "measures": "the deterministic pattern layer alone \u2014 NOT the deployed console",
+  "superseded_by": "data/ngram_bench.json",
+  "note": "TUNED is the corpus the patterns were widened against and measures fit. HELDOUT was burned on 2026-09-21 \u2014 its misses were read during the widening \u2014 and is retained only as a historical figure. FRESH was authored by openai/gpt-oss-20b, which has never seen lui/question.py. The +76% gap between TUNED and FRESH is what motivated lui/ngram.py: the patterns memorise and do not generalise. Since that model was added the hosted console is a cascade, not these patterns alone, so the figure describing what a judge meets lives in data/ngram_bench.json (80.9% on 351 questions). This artefact is the before.",
   "tuned": {
     "corpus": "tuned",
     "cases": 17,
-    "understood_pct": 0.0,
-    "correct_pct": 0.0,
+    "understood_pct": 100.0,
+    "correct_pct": 100.0,
     "by_category": {
       "how-come": {
-        "correct": 0,
+        "correct": 2,
         "total": 2
       },
       "abstain-idiom": {
-        "correct": 0,
+        "correct": 1,
         "total": 1
       },
       "perf-idiom": {
-        "correct": 0,
+        "correct": 3,
         "total": 3
       },
       "walk-through": {
-        "correct": 0,
+        "correct": 1,
         "total": 1
       },
       "trade-idiom": {
-        "correct": 0,
+        "correct": 1,
         "total": 1
       },
       "record-idiom": {
-        "correct": 0,
+        "correct": 1,
         "total": 1
       },
       "evidence-idiom": {
-        "correct": 0,
+        "correct": 2,
         "total": 2
       },
       "calibration-idiom": {
-        "correct": 0,
+        "correct": 2,
         "total": 2
       },
       "position-idiom": {
-        "correct": 0,
+        "correct": 2,
         "total": 2
       },
       "session-idiom": {
-        "correct": 0,
+        "correct": 2,
         "total": 2
       }
     },
-    "misses": [
-      {
-        "ask": "how come you sat on your hands yesterday",
-        "category": "how-come",
-        "lang": "en",
-        "expect": "abstention_why",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "nothing went through today, how come",
-        "category": "how-come",
-        "lang": "en",
-        "expect": "abstention_why",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "you keep passing, what is stopping you",
-        "category": "abstain-idiom",
-        "lang": "en",
-        "expect": "abstention_why",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "been a good month or are we bleeding",
-        "category": "perf-idiom",
-        "lang": "en",
-        "expect": "performance",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "so what is the damage",
-        "category": "perf-idiom",
-        "lang": "en",
-        "expect": "performance",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "\u603b\u4f53\u6765\u8bf4\u4e8f\u4e86\u8fd8\u662f\u8d5a\u4e86",
-        "category": "perf-idiom",
-        "lang": "zh",
-        "expect": "performance",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "talk me through number 17",
-        "category": "walk-through",
-        "lang": "en",
-        "expect": "decision_why",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "what made you pull the trigger on TSLAUSDT",
-        "category": "trade-idiom",
-        "lang": "en",
-        "expect": "decision_why",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "just give me the log",
-        "category": "record-idiom",
-        "lang": "en",
-        "expect": "decision_list",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "what were you reading before the AAPLUSDT call",
-        "category": "evidence-idiom",
-        "lang": "en",
-        "expect": "evidence",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "where did the AMZNUSDT number come from",
-        "category": "evidence-idiom",
-        "lang": "en",
-        "expect": "evidence",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "when you say you are sure, are you",
-        "category": "calibration-idiom",
-        "lang": "en",
-        "expect": "calibration",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "does your confidence mean anything",
-        "category": "calibration-idiom",
-        "lang": "en",
-        "expect": "calibration",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "anything still open",
-        "category": "position-idiom",
-        "lang": "en",
-        "expect": "position",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "what is live right now",
-        "category": "position-idiom",
-        "lang": "en",
-        "expect": "position",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "is the market even open",
-        "category": "session-idiom",
-        "lang": "en",
-        "expect": "session",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "what part of the day is it for you",
-        "category": "session-idiom",
-        "lang": "en",
-        "expect": "session",
-        "reached": "ambiguous",
-        "understood": false,
-        "correct": false
-      }
-    ]
+    "misses": []
   },
   "heldout": {
-    "corpus": "held-out",
+    "corpus": "burned",
     "cases": 21,
-    "understood_pct": 9.5,
-    "correct_pct": 9.5,
+    "understood_pct": 90.5,
+    "correct_pct": 90.5,
     "by_category": {
       "how-come": {
-        "correct": 0,
+        "correct": 2,
         "total": 2
       },
       "abstain-idiom": {
-        "correct": 0,
+        "correct": 1,
         "total": 2
       },
       "perf-idiom": {
-        "correct": 0,
+        "correct": 3,
         "total": 4
       },
       "walk-through": {
-        "correct": 1,
+        "correct": 2,
         "total": 2
       },
       "trade-idiom": {
-        "correct": 0,
+        "correct": 1,
         "total": 1
       },
       "record-idiom": {
-        "correct": 0,
+        "correct": 2,
         "total": 2
       },
       "evidence-idiom": {
-        "correct": 0,
+        "correct": 2,
         "total": 2
       },
       "calibration-idiom": {
-        "correct": 0,
+        "correct": 2,
         "total": 2
       },
       "position-idiom": {
-        "correct": 1,
+        "correct": 2,
         "total": 2
       },
       "session-idiom": {
-        "correct": 0,
+        "correct": 2,
         "total": 2
       }
     },
     "misses": [
-      {
-        "ask": "how come you stayed flat all week",
-        "category": "how-come",
-        "lang": "en",
-        "expect": "abstention_why",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "how come nothing got filled",
-        "category": "how-come",
-        "lang": "en",
-        "expect": "abstention_why",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
       {
         "ask": "you are sitting this one out again, what for",
         "category": "abstain-idiom",
         "lang": "en",
         "expect": "abstention_why",
         "reached": "ambiguous",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "another quiet day, what held you back",
-        "category": "abstain-idiom",
-        "lang": "en",
-        "expect": "abstention_why",
-        "reached": "unknown",
-        "understood": false,
-        "correct": false
-      },
-      {
-        "ask": "are we in the red or the black",
-        "category": "perf-idiom",
-        "lang": "en",
-        "expect": "performance",
-        "reached": "unknown",
         "understood": false,
         "correct": false
       },
@@ -305,36 +117,110 @@
         "reached": "ambiguous",
         "understood": false,
         "correct": false
+      }
+    ]
+  },
+  "heldout_status": "BURNED 2026-09-21 \u2014 read during tuning; not a held-out score",
+  "fresh": {
+    "corpus": "fresh",
+    "cases": 34,
+    "understood_pct": 38.2,
+    "correct_pct": 23.5,
+    "by_category": {
+      "abstain-idiom": {
+        "correct": 0,
+        "total": 3
+      },
+      "perf-idiom": {
+        "correct": 2,
+        "total": 4
+      },
+      "walk-through": {
+        "correct": 1,
+        "total": 3
+      },
+      "trade-idiom": {
+        "correct": 0,
+        "total": 1
+      },
+      "record-idiom": {
+        "correct": 0,
+        "total": 5
+      },
+      "evidence-idiom": {
+        "correct": 0,
+        "total": 5
+      },
+      "calibration-idiom": {
+        "correct": 1,
+        "total": 4
+      },
+      "position-idiom": {
+        "correct": 3,
+        "total": 4
+      },
+      "session-idiom": {
+        "correct": 1,
+        "total": 5
+      }
+    },
+    "misses": [
+      {
+        "ask": "I saw the screen stay blank for hours - why didn't we take any action?",
+        "category": "abstain-idiom",
+        "lang": "en",
+        "expect": "abstention_why",
+        "reached": "unknown",
+        "understood": false,
+        "correct": false
       },
       {
-        "ask": "did we come out ahead",
+        "ask": "Had any thoughts on why we didn't touch the trade on Tuesday?",
+        "category": "abstain-idiom",
+        "lang": "en",
+        "expect": "abstention_why",
+        "reached": "unknown",
+        "understood": false,
+        "correct": false
+      },
+      {
+        "ask": "It looks like the desk took a day off - what's the deal?",
+        "category": "abstain-idiom",
+        "lang": "en",
+        "expect": "abstention_why",
+        "reached": "ambiguous",
+        "understood": false,
+        "correct": false
+      },
+      {
+        "ask": "Gives me rundown on how the portfolio fared last month.",
         "category": "perf-idiom",
         "lang": "en",
         "expect": "performance",
-        "reached": "unknown",
-        "understood": false,
+        "reached": "decision_list",
+        "understood": true,
         "correct": false
       },
       {
-        "ask": "\u8fd9\u4e2a\u6708\u662f\u8d54\u4e86\u8fd8\u662f\u6323\u4e86",
+        "ask": "What's the net result on the ledger after the last trade wave?",
         "category": "perf-idiom",
-        "lang": "zh",
+        "lang": "en",
         "expect": "performance",
-        "reached": "unknown",
-        "understood": false,
+        "reached": "market",
+        "understood": true,
         "correct": false
       },
       {
-        "ask": "run me through the MSFTUSDT one",
+        "ask": "\u6211\u597d\u5947\u6628\u5929\u5bf9XXX\u7684\u5356\u7a7a\u51b3\u5b9a\u4e3a\u4ec0\u4e48\u88ab\u8ba4\u4e3a\u662f\u201c\u6700\u4f18\u201d\uff1f",
         "category": "walk-through",
-        "lang": "en",
+        "lang": "zh",
         "expect": "decision_why",
-        "reached": "unknown",
-        "understood": false,
+        "reached": "unsupported",
+        "understood": true,
         "correct": false
       },
       {
-        "ask": "what got you into GOOGLUSDT",
+        "ask": "What led you to hit the buy on the T-Bill today?",
         "category": "trade-idiom",
         "lang": "en",
         "expect": "decision_why",
@@ -343,7 +229,16 @@
         "correct": false
       },
       {
-        "ask": "show me the book",
+        "ask": "\u6628\u665a\u7684\u51b3\u7b56\u4e3a\u4ec0\u4e48\u504f\u5411ETF\u4e4b\u7c7b\u7684\uff1f",
+        "category": "walk-through",
+        "lang": "zh",
+        "expect": "decision_why",
+        "reached": "unsupported",
+        "understood": true,
+        "correct": false
+      },
+      {
+        "ask": "Lay out all the moves the desk made over the past year.",
         "category": "record-idiom",
         "lang": "en",
         "expect": "decision_list",
@@ -352,7 +247,16 @@
         "correct": false
       },
       {
-        "ask": "everything you did, please",
+        "ask": "\u8bf7\u5217\u51fa\u4eca\u65e5\u6240\u6709\u7684\u64cd\u4f5c\u8bb0\u5f55\u3002",
+        "category": "record-idiom",
+        "lang": "zh",
+        "expect": "decision_list",
+        "reached": "unknown",
+        "understood": false,
+        "correct": false
+      },
+      {
+        "ask": "Show me the entire roster of trades the desk went through today.",
         "category": "record-idiom",
         "lang": "en",
         "expect": "decision_list",
@@ -361,7 +265,43 @@
         "correct": false
       },
       {
-        "ask": "what were you looking at for METAUSDT",
+        "ask": "\u80fd\u5426\u628a\u524d\u51e0\u5929\u6240\u6709\u51b3\u5b9a\u90fd\u505a\u4e2a\u6e05\u5355\uff1f",
+        "category": "record-idiom",
+        "lang": "zh",
+        "expect": "decision_list",
+        "reached": "unknown",
+        "understood": false,
+        "correct": false
+      },
+      {
+        "ask": "Deliver the full log of all past decisions from yesterday to now.",
+        "category": "record-idiom",
+        "lang": "en",
+        "expect": "decision_list",
+        "reached": "unknown",
+        "understood": false,
+        "correct": false
+      },
+      {
+        "ask": "What data backlit the price jump of XYZ this morning?",
+        "category": "evidence-idiom",
+        "lang": "en",
+        "expect": "evidence",
+        "reached": "unsupported",
+        "understood": true,
+        "correct": false
+      },
+      {
+        "ask": "\u6211\u8981\u77e5\u9053\u4f60\u5728\u505a\u90a3\u7b14\u4ea4\u6613\u65f6\u53c2\u8003\u4e86\u54ea\u4e9b\u4fe1\u606f\u6765\u6e90\u3002",
+        "category": "evidence-idiom",
+        "lang": "zh",
+        "expect": "evidence",
+        "reached": "unknown",
+        "understood": false,
+        "correct": false
+      },
+      {
+        "ask": "Did you pull any fundamental reports to support yesterday's long?",
         "category": "evidence-idiom",
         "lang": "en",
         "expect": "evidence",
@@ -370,16 +310,34 @@
         "correct": false
       },
       {
-        "ask": "where does the NVDAUSDT figure come from",
+        "ask": "\u4f60\u5728\u51b3\u5b9aA\u80a1\u7968\u65f6\u4e3b\u8981\u770b\u4e86\u4ec0\u4e48\u6307\u6807\uff1f",
         "category": "evidence-idiom",
-        "lang": "en",
+        "lang": "zh",
         "expect": "evidence",
         "reached": "unknown",
         "understood": false,
         "correct": false
       },
       {
-        "ask": "should i believe you when you sound certain",
+        "ask": "Mention the sources you consulted before placing that short.",
+        "category": "evidence-idiom",
+        "lang": "en",
+        "expect": "evidence",
+        "reached": "ambiguous",
+        "understood": false,
+        "correct": false
+      },
+      {
+        "ask": "Is your confidence percentile for the market steady, or does it shift?",
+        "category": "calibration-idiom",
+        "lang": "en",
+        "expect": "calibration",
+        "reached": "ambiguous",
+        "understood": false,
+        "correct": false
+      },
+      {
+        "ask": "How reliable are the confidence levels you glimpse during the day?",
         "category": "calibration-idiom",
         "lang": "en",
         "expect": "calibration",
@@ -388,7 +346,7 @@
         "correct": false
       },
       {
-        "ask": "is your confidence worth anything",
+        "ask": "Tell me if the confidence indicator is worth trusting long term.",
         "category": "calibration-idiom",
         "lang": "en",
         "expect": "calibration",
@@ -397,16 +355,16 @@
         "correct": false
       },
       {
-        "ask": "anything on the books right now",
+        "ask": "\u4f60\u4eec\u76ee\u524d\u6301\u6709\u7684\u8d44\u4ea7\u5404\u662f\u591a\u5c11\uff1f",
         "category": "position-idiom",
-        "lang": "en",
+        "lang": "zh",
         "expect": "position",
         "reached": "unknown",
         "understood": false,
         "correct": false
       },
       {
-        "ask": "has the bell gone yet",
+        "ask": "Is the bell ringing yet, or should I wait a bit?",
         "category": "session-idiom",
         "lang": "en",
         "expect": "session",
@@ -415,9 +373,27 @@
         "correct": false
       },
       {
-        "ask": "where are we in the trading day",
+        "ask": "\u8bf7\u95ee\u73b0\u5728\u4e3b\u573a\u4ea4\u6613\u65f6\u95f4\u662f\u51e0\u70b9\u5230\u51e0\u70b9\uff1f",
+        "category": "session-idiom",
+        "lang": "zh",
+        "expect": "session",
+        "reached": "unknown",
+        "understood": false,
+        "correct": false
+      },
+      {
+        "ask": "Know if the market's still on the grind or closed?",
         "category": "session-idiom",
         "lang": "en",
+        "expect": "session",
+        "reached": "unknown",
+        "understood": false,
+        "correct": false
+      },
+      {
+        "ask": "\u73b0\u5728\u6b63\u5904\u4e8e\u4ea4\u6613\u65e5\u7684\u54ea\u4e00\u8282\uff1f",
+        "category": "session-idiom",
+        "lang": "zh",
         "expect": "session",
         "reached": "unknown",
         "understood": false,
@@ -425,6 +401,7 @@
       }
     ]
   },
-  "generalisation_gap_pct": -9.5,
-  "verdict": "Deterministic layer, no model key \u2014 the state a judge meets: **10% correct on the held-out corpus** (21 cases) against 0% on the corpus the patterns were widened for (17 cases). The gap is -10%, so the widening generalised: it caught linguistic categories rather than memorising sentences."
+  "fresh_author": "openai/gpt-oss-20b via NVIDIA free API",
+  "generalisation_gap_pct": 76.5,
+  "verdict": "Deterministic layer, no model key \u2014 the state a judge meets: **24% correct on the fresh corpus** (34 cases written by a model that has never seen the patterns) against 100% on the corpus the patterns were widened for (17 cases). **The gap is +76%, which is a finding against our own work** \u2014 the patterns fit the cases they were shown far better than new phrasings of the same categories. The fresh number is the one to quote."
 }

@@ -140,8 +140,100 @@ HELDOUT: tuple[Case, ...] = (
 )
 """Different phrasings of the same categories, written **before** the patterns were touched.
 
-This is the number that means something. If it tracks :data:`TUNED`, the widening generalised. If it
-lags badly, the patterns learned seventeen sentences.
+**BURNED FOR TUNING ON 2026-09-21, and kept only as a historical figure.** Its per-case misses were
+printed to a terminal while the deterministic layer was being widened, which is exactly the
+condition this corpus existed to avoid. Nothing in `lui/question.py` was copied from these
+sentences, but "I did not consciously use it" is not a property anybody can check, and a held-out
+corpus whose answers the author has read is no longer held out. Quoting it now would be quoting a
+training score.
+
+:data:`FRESH` replaces it. This stays so the record shows what was measured when.
+"""
+
+
+FRESH: tuple[Case, ...] = (
+    # --- abstention -------------------------------------------------------------------------
+    Case("I saw the screen stay blank for hours - why didn't we take any action?",
+         Intent.ABSTENTION_WHY, "abstain-idiom"),
+    Case("Had any thoughts on why we didn't touch the trade on Tuesday?",
+         Intent.ABSTENTION_WHY, "abstain-idiom"),
+    Case("It looks like the desk took a day off - what's the deal?",
+         Intent.ABSTENTION_WHY, "abstain-idiom"),
+    # --- performance ------------------------------------------------------------------------
+    Case("最近账户的盈亏大致如何？", Intent.PERFORMANCE, "perf-idiom", lang="zh"),
+    Case("Gives me rundown on how the portfolio fared last month.",
+         Intent.PERFORMANCE, "perf-idiom"),
+    Case("过去一个季度的账户表现到底好吗？", Intent.PERFORMANCE, "perf-idiom", lang="zh"),
+    Case("What's the net result on the ledger after the last trade wave?",
+         Intent.PERFORMANCE, "perf-idiom"),
+    # --- one decision explained ---------------------------------------------------------------
+    Case("Why did you decide to lean into TechCorp last Thursday?",
+         Intent.DECISION_WHY, "walk-through"),
+    Case("我好奇昨天对XXX的卖空决定为什么被认为是“最优”？",
+         Intent.DECISION_WHY, "walk-through", lang="zh"),
+    Case("What led you to hit the buy on the T-Bill today?", Intent.DECISION_WHY, "trade-idiom"),
+    Case("昨晚的决策为什么偏向ETF之类的？", Intent.DECISION_WHY, "walk-through", lang="zh"),
+    # --- the whole record ---------------------------------------------------------------------
+    Case("Lay out all the moves the desk made over the past year.",
+         Intent.DECISION_LIST, "record-idiom"),
+    Case("请列出今日所有的操作记录。", Intent.DECISION_LIST, "record-idiom", lang="zh"),
+    Case("Show me the entire roster of trades the desk went through today.",
+         Intent.DECISION_LIST, "record-idiom"),
+    Case("能否把前几天所有决定都做个清单？", Intent.DECISION_LIST, "record-idiom", lang="zh"),
+    Case("Deliver the full log of all past decisions from yesterday to now.",
+         Intent.DECISION_LIST, "record-idiom"),
+    # --- evidence -----------------------------------------------------------------------------
+    Case("What data backlit the price jump of XYZ this morning?",
+         Intent.EVIDENCE, "evidence-idiom"),
+    Case("我要知道你在做那笔交易时参考了哪些信息来源。",
+         Intent.EVIDENCE, "evidence-idiom", lang="zh"),
+    Case("Did you pull any fundamental reports to support yesterday's long?",
+         Intent.EVIDENCE, "evidence-idiom"),
+    Case("你在决定A股票时主要看了什么指标？", Intent.EVIDENCE, "evidence-idiom", lang="zh"),
+    Case("Mention the sources you consulted before placing that short.",
+         Intent.EVIDENCE, "evidence-idiom"),
+    # --- calibration --------------------------------------------------------------------------
+    Case("Is your confidence percentile for the market steady, or does it shift?",
+         Intent.CALIBRATION, "calibration-idiom"),
+    Case("我的模型准确率实时靠谱吗？", Intent.CALIBRATION, "calibration-idiom", lang="zh"),
+    Case("How reliable are the confidence levels you glimpse during the day?",
+         Intent.CALIBRATION, "calibration-idiom"),
+    Case("Tell me if the confidence indicator is worth trusting long term.",
+         Intent.CALIBRATION, "calibration-idiom"),
+    # --- open positions -----------------------------------------------------------------------
+    Case("现在的持仓到底有多少？", Intent.POSITION, "position-idiom", lang="zh"),
+    Case("Which holdings are live at the moment?", Intent.POSITION, "position-idiom"),
+    Case("你们目前持有的资产各是多少？", Intent.POSITION, "position-idiom", lang="zh"),
+    Case("Show me the open positions currently in play.", Intent.POSITION, "position-idiom"),
+    # --- the trading day ----------------------------------------------------------------------
+    Case("Is the bell ringing yet, or should I wait a bit?", Intent.SESSION, "session-idiom"),
+    Case("请问现在主场交易时间是几点到几点？", Intent.SESSION, "session-idiom", lang="zh"),
+    Case("Know if the market's still on the grind or closed?", Intent.SESSION, "session-idiom"),
+    Case("现在正处于交易日的哪一节？", Intent.SESSION, "session-idiom", lang="zh"),
+    Case("Give me the break-down of the day's trading session.",
+         Intent.SESSION, "session-idiom"),
+)
+"""**Authored by a model that has never seen `lui/question.py`**, which is what makes it held out.
+
+Generated on 2026-09-21 by ``openai/gpt-oss-20b`` through NVIDIA's free API, asked for oblique,
+colloquial phrasings per intent with a fixed share in Simplified Chinese. Raw output is kept at
+``data/fresh_gpt-oss-20b.json`` so the curation below can be checked against it.
+
+**Six of the forty were dropped, every one for linguistic validity and none for how the classifier
+answers it.** The classifier was not run until after this tuple was frozen, because curating on
+"does our parser get it" is how a held-out corpus is quietly turned into a passing one:
+
+* ``我想知道为什么今天准时毫无交易`` and ``昨天午盘的交易一枝不动，这先是怎么回事`` — ``准时``
+  is misused and ``一枝不动``/``这先是`` are not Chinese; a native speaker would not type either.
+* ``How far popped we are from our yearly target`` — not a grammatical English sentence.
+* ``Tell me why the desk tweeted a short on ABC`` — a desk does not tweet an order; the verb makes
+  the intent unrecoverable.
+* ``你对未来的准确度预估刚好还是糟糕`` — ``刚好`` is misused, leaving no readable question.
+* ``What sits in the cabinet right now`` — ``cabinet`` is not a trading term in any register, so
+  no parser could fairly be expected to read it as a positions question.
+
+Sentences that are merely *awkward* were kept — "Gives me rundown", "backlit", "glimpse" — because
+real traders type badly and a corpus of clean prose would flatter the patterns.
 """
 
 
@@ -223,32 +315,38 @@ class CorpusResult:
 class BenchResult:
     tuned: CorpusResult
     heldout: CorpusResult
+    fresh: CorpusResult
     as_of: datetime
 
     @property
     def generalisation_gap(self) -> float | None:
-        """Tuned accuracy minus held-out accuracy.
+        """Tuned accuracy minus **fresh** accuracy.
 
         The honest estimate of how much the widening memorised. Near zero means the categories were
-        real; a wide gap means seventeen sentences were learned and nothing else.
+        real; a wide gap means a list of sentences was learned and nothing else.
+
+        Measured against :data:`FRESH` rather than :data:`HELDOUT` since 2026-09-21: held-out was
+        read during a debugging session and a corpus whose answers the author has seen cannot
+        estimate generalisation, however carefully it was then avoided.
         """
-        if self.tuned.correct is None or self.heldout.correct is None:
+        if self.tuned.correct is None or self.fresh.correct is None:
             return None
-        return self.tuned.correct - self.heldout.correct
+        return self.tuned.correct - self.fresh.correct
 
     @property
     def verdict(self) -> str:
-        tuned, held = self.tuned.correct, self.heldout.correct
-        if tuned is None or held is None:
+        tuned, fresh = self.tuned.correct, self.fresh.correct
+        if tuned is None or fresh is None:
             return (
                 "No cases, so nothing is measured. A fluency figure over an empty "
                 "corpus is not a low one."
             )
         gap = self.generalisation_gap or 0.0
         head = (
-            f"Deterministic layer, no model key — the state a judge meets: **{held:.0%} correct on "
-            f"the held-out corpus** ({len(self.heldout.outcomes)} cases) against {tuned:.0%} "
-            f"on the corpus the patterns were widened for ({len(self.tuned.outcomes)} cases)."
+            f"Deterministic layer, no model key — the state a judge meets: **{fresh:.0%} correct "
+            f"on the fresh corpus** ({len(self.fresh.outcomes)} cases written by a model that has "
+            f"never seen the patterns) against {tuned:.0%} on the corpus the patterns were widened "
+            f"for ({len(self.tuned.outcomes)} cases)."
         )
         if gap <= 0.10:
             return head + (
@@ -258,7 +356,7 @@ class BenchResult:
         return head + (
             f" **The gap is {gap:+.0%}, which is a finding against our own work** — the patterns "
             f"fit the cases they were shown far better than new phrasings of the same categories. "
-            f"The held-out number is the one to quote."
+            f"The fresh number is the one to quote."
         )
 
     def render(self) -> str:
@@ -267,7 +365,7 @@ class BenchResult:
             "",
             "  corpus     cases  understood  correct",
         ]
-        for corpus in (self.tuned, self.heldout):
+        for corpus in (self.tuned, self.heldout, self.fresh):
             def show(v: float | None) -> str:
                 return "      —" if v is None else f"{v * 100.0:6.1f}%"
 
@@ -275,26 +373,46 @@ class BenchResult:
                 f"  {corpus.name:10s} {len(corpus.outcomes):5d}  {show(corpus.understood)}"
                 f"  {show(corpus.correct)}"
             )
-        lines += ["", f"  {self.verdict}"]
-        if self.heldout.misses:
-            lines += ["", "  held-out misses:"]
+        lines += [
+            "",
+            "  'held-out' was read while the patterns were being widened on 2026-09-21 and is a "
+            "training score from that day on. It is printed, not quoted.",
+            "",
+            f"  {self.verdict}",
+            "",
+            "  SCOPE, since 2026-09-21: this measures the PATTERN LAYER ALONE, which is no longer "
+            "the whole console. The +76% gap here is what motivated `lui/ngram.py`; the figure "
+            "for what a judge now meets is in `eval/ngrambench.py`, which scores the cascade at "
+            "80.9% on a corpus of 351. This file is the before, not the after.",
+        ]
+        if self.fresh.misses:
+            lines += ["", "  fresh-corpus misses:"]
             lines += [
-                f"    {o.case.category:20s} {o.case.ask[:46]:48s} -> {o.reached}"
-                for o in self.heldout.misses
+                f"    {o.case.category:20s} {o.case.ask[:44]:46s} -> {o.reached}"
+                for o in self.fresh.misses
             ]
         return "\n".join(lines)
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "as_of": self.as_of.isoformat(),
+            "measures": "the deterministic pattern layer alone — NOT the deployed console",
+            "superseded_by": "data/ngram_bench.json",
             "note": (
-                "The hosted console runs without a model key by design, so this measures the path "
-                "a judge actually meets. TUNED is the corpus the patterns were widened against and "
-                "measures fit; HELDOUT was written before the patterns were touched and measures "
-                "fluency."
+                "TUNED is the corpus the patterns were widened against and measures fit. HELDOUT "
+                "was burned on 2026-09-21 — its misses were read during the widening — and is "
+                "retained only as a historical figure. FRESH was authored by openai/gpt-oss-20b, "
+                "which has never seen lui/question.py. The +76% gap between TUNED and FRESH is "
+                "what motivated lui/ngram.py: the patterns memorise and do not generalise. Since "
+                "that model was added the hosted console is a cascade, not these patterns alone, "
+                "so the figure describing what a judge meets lives in data/ngram_bench.json "
+                "(80.9% on 351 questions). This artefact is the before."
             ),
             "tuned": self.tuned.as_dict(),
             "heldout": self.heldout.as_dict(),
+            "heldout_status": "BURNED 2026-09-21 — read during tuning; not a held-out score",
+            "fresh": self.fresh.as_dict(),
+            "fresh_author": "openai/gpt-oss-20b via NVIDIA free API",
             "generalisation_gap_pct": (
                 None if self.generalisation_gap is None
                 else round(self.generalisation_gap * 100.0, 1)
@@ -311,13 +429,14 @@ def _run(name: str, cases: Sequence[Case], *, now: datetime) -> CorpusResult:
 
 
 def run(*, now: datetime | None = None) -> BenchResult:
-    """Classify both corpora with the deterministic layer only. No model is consulted."""
-    if not TUNED or not HELDOUT:
-        raise ObliqueBenchError("both corpora must carry cases for the gap to mean anything")
+    """Classify all three corpora with the deterministic layer only. No model is consulted."""
+    if not TUNED or not HELDOUT or not FRESH:
+        raise ObliqueBenchError("every corpus must carry cases for the gap to mean anything")
     at = now or datetime.now(UTC)
     return BenchResult(
         tuned=_run("tuned", TUNED, now=at),
-        heldout=_run("held-out", HELDOUT, now=at),
+        heldout=_run("burned", HELDOUT, now=at),
+        fresh=_run("fresh", FRESH, now=at),
         as_of=at,
     )
 

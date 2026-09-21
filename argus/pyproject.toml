@@ -13,14 +13,19 @@ license = { text = "MIT" }
 dependencies = [
     "pydantic>=2.7",
     "python-dateutil>=2.9",
-    # The console's semantic intent router (`lui/semantic.py`). Static embeddings — a
-    # token-to-vector table and a mean, no forward pass — so it pulls numpy, tokenizers and
-    # safetensors but NOT torch or onnxruntime. Declared as a hard dependency rather than an
-    # extra because the deployed demo ships no model key, which makes this layer the one a judge
-    # actually meets: it lifts held-out intent accuracy from 9.5% to 52.4% while refusing 93% of
-    # out-of-scope questions (`eval/luirouter.py`). `lui/semantic.available()` still degrades to
-    # the pattern layer if it is genuinely absent, because a missing dependency must read as
-    # absent rather than as a zero score.
+    # The semantic intent router (`lui/semantic.py`). Static embeddings — a token-to-vector table
+    # and a mean, no forward pass — so it pulls numpy, tokenizers and safetensors but NOT torch.
+    #
+    # **This comment used to justify the dependency with "9.5% to 52.4%", and that figure is
+    # withdrawn.** It was measured on a corpus written by the same author, in the same sitting, as
+    # the router's own training examples. Re-measured on one authored by a model that has never
+    # seen this repository, the router scores level with the regular expressions it was built to
+    # beat, and leave-one-out CV shows its similarity distributions for right and wrong answers
+    # overlapping completely — so no abstention threshold separates them (`eval/luirouter.py`).
+    #
+    # It is **not deployed**: the console uses `lui/ngram.py`, which needs no dependency at all.
+    # This stays so the comparison in `eval/luirouter.py` can still be run and the loss stays
+    # reproducible rather than becoming a claim in a document nobody can check.
     "model2vec>=0.9",
 ]
 
@@ -123,6 +128,23 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 # broken to a Chinese speaker. Scoped to this one file so the check keeps working everywhere else,
 # where a full-width character really would be a mistake.
 "src/argus/lui/phrasebook.py" = ["RUF001"]
+# Same false positive, same reason: `obliquebench.FRESH` carries Chinese cases written by a model
+# asked for natural Chinese, and `？`/`，` are the correct marks. Rewriting them ASCII would change
+# the corpus after it was frozen — and a test corpus edited to satisfy a linter is no longer the
+# corpus that was measured.
+"src/argus/eval/obliquebench.py" = ["RUF001"]
+# `eval/ngrambench.py` matches the full-width `？` for the same reason `lui/question.py` does: half
+# its corpora are Chinese, and a trailing full-width question mark is how a Chinese question ends.
+"src/argus/eval/ngrambench.py" = ["RUF001"]
+# Same again for the test that asserts the Chinese behaviour: the assertion is *about* a Chinese
+# sentence, so it has to contain one.
+"tests/test_ngram_router.py" = ["RUF001"]
+# `lui/question.py` joined this list on 2026-09-21, when its Chinese order patterns gained an
+# interrogative guard. Chinese has no auxiliary inversion, so the question is marked by a word or
+# by `？` itself — the full-width mark is *the signal being matched*, not decoration. Substituting
+# the ASCII `?` would stop the guard firing on real Chinese input and let "why did you sell 100
+# AAPL today?" be read as an instruction to sell, which is the exact bug the guard was added to fix.
+"src/argus/lui/question.py" = ["RUF001", "RUF003"]
 
 # Vendored, verbatim third-party files (see `eval/baselines/__init__.py`) are exempt from our own
 # lint conventions for the same reason they are exempt from mypy --strict in [[tool.mypy.overrides]]

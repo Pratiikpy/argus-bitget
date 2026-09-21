@@ -28,6 +28,27 @@ from `TUNED` only and its threshold is fitted against `TUNED` plus out-of-scope 
 is never consulted during construction — once a corpus is used to tune, it stops measuring
 generalisation and starts measuring memorisation.
 
+**CORRECTION, 2026-09-21 — the held-out in-scope figure below is not a fluency measure, and the
+number it produced was too kind to us.** Two things went wrong with it and both are recorded here
+rather than quietly fixed:
+
+1. `HELDOUT` was **burned** that day: its per-case misses were printed while `lui/question.py` was
+   being widened. It is a training score from then on.
+2. More seriously, `HELDOUT` was written by the same author as `TUNED`, in one sitting. Style is
+   inherited even when phrasings are not, so it was never as independent as the docstring above
+   claims.
+
+Re-measured against `obliquebench.FRESH` — 34 cases authored by `openai/gpt-oss-20b`, which has
+never seen this repository — **the router scores 23.5%, exactly level with the deterministic
+patterns it was built to beat**, not the 52.4% this module reported. Leave-one-out cross-validation
+over 52 labelled examples puts it at 30.8%, with cosine similarity for correct answers spanning
+0.20-0.75 and for wrong answers 0.00-0.80: **the distributions overlap completely, so no abstention
+threshold separates them.** `ABSTAIN_THRESHOLD` is fitted to noise.
+
+The router is therefore **not deployed**, and the honest headline for Track 3 is the deterministic
+layer's **23.5% on novel phrasings**. See `eval/obliquebench.py` for the corpora and
+`Activity/PROGRESS.md` for the full working.
+
     python -m argus.eval.luirouter
 """
 
@@ -40,7 +61,7 @@ from pathlib import Path
 from typing import Any
 
 from argus.eval.artefact import write
-from argus.eval.obliquebench import HELDOUT, TUNED, Case
+from argus.eval.obliquebench import FRESH, HELDOUT, TUNED, Case
 from argus.lui.semantic import ABSTAIN_THRESHOLD, SemanticRouter, available
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "lui_router.json"
@@ -169,8 +190,14 @@ def run() -> dict[str, Any]:
 
     heldout = _score(router, HELDOUT)
     tuned = _score(router, TUNED)
+    # The corpus that actually estimates generalisation — see the correction in the module
+    # docstring. Both layers are scored on it so the comparison is same-input, and the router's
+    # advantage over the patterns it was built to beat can be read off directly rather than
+    # inferred from two numbers measured on different corpora.
+    fresh = _score(router, FRESH)
     baseline_heldout = _deterministic_baseline(HELDOUT)
     baseline_tuned = _deterministic_baseline(TUNED)
+    baseline_fresh = _deterministic_baseline(FRESH)
 
     # Out-of-scope: every one the router answers is a confident wrong answer.
     oos_answered = [q for q in OUT_OF_SCOPE if router.route(q).confident]
@@ -198,9 +225,21 @@ def run() -> dict[str, Any]:
         "abstain_threshold": ABSTAIN_THRESHOLD,
         "in_scope": {
             "heldout": heldout.as_dict(),
+            "heldout_status": (
+                "BURNED 2026-09-21 — read during pattern tuning, and written by the same author as "
+                "TUNED. Not a generalisation estimate; retained as a historical figure only."
+            ),
             "tuned": tuned.as_dict(),
+            "fresh": fresh.as_dict(),
+            "fresh_author": "openai/gpt-oss-20b — has never seen this repository",
             "baseline_heldout": baseline_heldout.as_dict(),
             "baseline_tuned": baseline_tuned.as_dict(),
+            "baseline_fresh": baseline_fresh.as_dict(),
+            "headline": (
+                "On the only corpus that estimates generalisation, the router and the "
+                "deterministic patterns it was built to beat score the same. The router is not "
+                "deployed."
+            ),
         },
         "out_of_scope": {
             "probes": len(OUT_OF_SCOPE),
@@ -215,25 +254,37 @@ def run() -> dict[str, Any]:
             "failure_rate": round(1 - inv_pass / len(PARAPHRASES), 4),
             "failures": inv_failures,
         },
+        # **The headline is the FRESH comparison, not the held-out one.** Leading with held-out
+        # would advertise a 5.5x improvement that a fresh corpus says is 1.0x, which is precisely
+        # the flattering-comparison failure this file's own docstring warns about.
         "headline": {
-            "heldout_accuracy": round(heldout.accuracy, 4),
-            "baseline_heldout_accuracy": round(baseline_heldout.accuracy, 4),
+            "fresh_accuracy": round(fresh.accuracy, 4),
+            "baseline_fresh_accuracy": round(baseline_fresh.accuracy, 4),
             "improvement_x": (
-                round(heldout.accuracy / baseline_heldout.accuracy, 1)
-                if baseline_heldout.accuracy > 0 else None
+                round(fresh.accuracy / baseline_fresh.accuracy, 1)
+                if baseline_fresh.accuracy > 0 else None
             ),
+            "heldout_accuracy_BURNED": round(heldout.accuracy, 4),
+            "baseline_heldout_accuracy_BURNED": round(baseline_heldout.accuracy, 4),
             "out_of_scope_recall": round(oos_recall, 4),
             "runs_without_a_model_key": True,
+            "deployed": False,
+            "why_not_deployed": (
+                "No measured advantage over the pattern layer on an independently authored "
+                "corpus, against a 13.4 MB cost in the serverless bundle."
+            ),
         },
         "scope_statement": (
             "A nearest-centroid router over static embeddings is built from the 17-case TUNED "
-            "corpus and scored on the 21-case HELDOUT corpus it has never seen, beside the "
-            "deterministic pattern layer on the same corpora. Out-of-scope recall is measured "
+            "corpus and scored beside the deterministic pattern layer on the same corpora. The "
+            "figure that estimates generalisation is FRESH: 34 cases authored by "
+            "openai/gpt-oss-20b, which has never seen this repository. HELDOUT is reported too "
+            "but is BURNED — its misses were read while the patterns were being widened on "
+            "2026-09-21, and it shared an author with TUNED. Out-of-scope recall is measured "
             "against 14 ordinary questions from other domains; paraphrase invariance follows "
-            "CheckList's INV design. NOT CLAIMED: that 21 held-out cases and 14 probes are a "
-            "benchmark — they are small, they are ours, and a wider corpus would move these "
-            "numbers. NOT CLAIMED: that this matches a hosted model; it matches a regex layer, "
-            "which is what the deployed demo actually ships."
+            "CheckList's INV design. NOT CLAIMED: that 34 cases and 14 probes are a benchmark — "
+            "they are small and a wider corpus would move these numbers. NOT CLAIMED: that the "
+            "router helps; on FRESH it does not beat the regex layer, and it is not deployed."
         ),
     }
 
@@ -243,14 +294,18 @@ def render(report: dict[str, Any]) -> list[str]:
     times = f"{head['improvement_x']}x" if head["improvement_x"] else "n/a"
     return [
         "LUI ROUTER — meaning-based intent routing, no model key",
-        f"  in-scope (held-out, never seen): {head['heldout_accuracy']:.1%} "
-        f"against the pattern layer's {head['baseline_heldout_accuracy']:.1%} — {times}",
+        f"  in-scope (FRESH, independently authored): {head['fresh_accuracy']:.1%} "
+        f"against the pattern layer's {head['baseline_fresh_accuracy']:.1%} — {times}",
+        f"  in-scope (held-out): {head['heldout_accuracy_BURNED']:.1%} vs "
+        f"{head['baseline_heldout_accuracy_BURNED']:.1%} — **BURNED 2026-09-21**, printed for the "
+        f"record and not quoted",
         f"  out-of-scope recall: {head['out_of_scope_recall']:.0%} "
         f"({scope['wrongly_answered']} of {scope['probes']} wrongly answered)",
         f"  paraphrase invariance: {inv['invariant']}/{inv['pairs']} pairs route identically "
         f"(failure rate {inv['failure_rate']:.0%})",
         "  Reported as three named figures rather than one word, because no published benchmark "
         "defines 'fluency' and a blended score hides which half is weak.",
+        f"  NOT DEPLOYED: {head['why_not_deployed']}",
     ]
 
 

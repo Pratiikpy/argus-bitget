@@ -10,6 +10,7 @@
       "accuracy": 0.5238,
       "coverage": 0.7619
     },
+    "heldout_status": "BURNED 2026-09-21 \u2014 read during pattern tuning, and written by the same author as TUNED. Not a generalisation estimate; retained as a historical figure only.",
     "tuned": {
       "total": 17,
       "answered": 16,
@@ -18,22 +19,40 @@
       "accuracy": 0.9412,
       "coverage": 0.9412
     },
+    "fresh": {
+      "total": 34,
+      "answered": 16,
+      "correct": 8,
+      "wrong": 8,
+      "accuracy": 0.2353,
+      "coverage": 0.4706
+    },
+    "fresh_author": "openai/gpt-oss-20b \u2014 has never seen this repository",
     "baseline_heldout": {
       "total": 21,
-      "answered": 4,
-      "correct": 2,
+      "answered": 21,
+      "correct": 19,
       "wrong": 2,
-      "accuracy": 0.0952,
-      "coverage": 0.1905
+      "accuracy": 0.9048,
+      "coverage": 1.0
     },
     "baseline_tuned": {
       "total": 17,
-      "answered": 1,
-      "correct": 0,
-      "wrong": 1,
-      "accuracy": 0.0,
-      "coverage": 0.0588
-    }
+      "answered": 17,
+      "correct": 17,
+      "wrong": 0,
+      "accuracy": 1.0,
+      "coverage": 1.0
+    },
+    "baseline_fresh": {
+      "total": 34,
+      "answered": 16,
+      "correct": 8,
+      "wrong": 8,
+      "accuracy": 0.2353,
+      "coverage": 0.4706
+    },
+    "headline": "On the only corpus that estimates generalisation, the router and the deterministic patterns it was built to beat score the same. The router is not deployed."
   },
   "out_of_scope": {
     "probes": 14,
@@ -66,11 +85,15 @@
     ]
   },
   "headline": {
-    "heldout_accuracy": 0.5238,
-    "baseline_heldout_accuracy": 0.0952,
-    "improvement_x": 5.5,
+    "fresh_accuracy": 0.2353,
+    "baseline_fresh_accuracy": 0.2353,
+    "improvement_x": 1.0,
+    "heldout_accuracy_BURNED": 0.5238,
+    "baseline_heldout_accuracy_BURNED": 0.9048,
     "out_of_scope_recall": 0.9286,
-    "runs_without_a_model_key": true
+    "runs_without_a_model_key": true,
+    "deployed": false,
+    "why_not_deployed": "No measured advantage over the pattern layer on an independently authored corpus, against a 13.4 MB cost in the serverless bundle."
   },
-  "scope_statement": "A nearest-centroid router over static embeddings is built from the 17-case TUNED corpus and scored on the 21-case HELDOUT corpus it has never seen, beside the deterministic pattern layer on the same corpora. Out-of-scope recall is measured against 14 ordinary questions from other domains; paraphrase invariance follows CheckList's INV design. NOT CLAIMED: that 21 held-out cases and 14 probes are a benchmark \u2014 they are small, they are ours, and a wider corpus would move these numbers. NOT CLAIMED: that this matches a hosted model; it matches a regex layer, which is what the deployed demo actually ships."
+  "scope_statement": "A nearest-centroid router over static embeddings is built from the 17-case TUNED corpus and scored beside the deterministic pattern layer on the same corpora. The figure that estimates generalisation is FRESH: 34 cases authored by openai/gpt-oss-20b, which has never seen this repository. HELDOUT is reported too but is BURNED \u2014 its misses were read while the patterns were being widened on 2026-09-21, and it shared an author with TUNED. Out-of-scope recall is measured against 14 ordinary questions from other domains; paraphrase invariance follows CheckList's INV design. NOT CLAIMED: that 34 cases and 14 probes are a benchmark \u2014 they are small and a wider corpus would move these numbers. NOT CLAIMED: that the router helps; on FRESH it does not beat the regex layer, and it is not deployed."
 }

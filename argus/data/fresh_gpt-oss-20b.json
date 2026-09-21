@@ -1,0 +1,63 @@
+{
+  "model": "openai/gpt-oss-20b",
+  "per_intent": 5,
+  "chinese_per_intent": 2,
+  "questions": {
+    "abstention_why": [
+      "I saw the screen stay blank for hours – why didn't we take any action?",
+      "我想知道为什么今天准时毫无交易。",
+      "Had any thoughts on why we didn't touch the trade on Tuesday?",
+      "昨天午盘的交易一枝不动，这先是怎么回事？",
+      "It looks like the desk took a day off – what's the deal?"
+    ],
+    "performance": [
+      "How far popped we are from our yearly target – do we win or tie?",
+      "最近账户的盈亏大致如何？",
+      "Gives me rundown on how the portfolio fared last month.",
+      "过去一个季度的账户表现到底好吗？",
+      "What’s the net result on the ledger after the last trade wave?"
+    ],
+    "decision_why": [
+      "Why did you decide to lean into TechCorp last Thursday?",
+      "我好奇昨天对XXX的卖空决定为什么被认为是“最优”？",
+      "What led you to hit the buy on the T-Bill today?",
+      "昨晚的决策为什么偏向ETF之类的？",
+      "Tell me why the desk tweeted a short on ABC?"
+    ],
+    "decision_list": [
+      "Lay out all the moves the desk made over the past year.",
+      "请列出今日所有的操作记录。",
+      "Show me the entire roster of trades the desk went through today.",
+      "能否把前几天所有决定都做个清单？",
+      "Deliver the full log of all past decisions from yesterday to now."
+    ],
+    "evidence": [
+      "What data backlit the price jump of XYZ this morning?",
+      "我要知道你在做那笔交易时参考了哪些信息来源。",
+      "Did you pull any fundamental reports to support yesterday’s long?",
+      "你在决定A股票时主要看了什么指标？",
+      "Mention the sources you consulted before placing that short."
+    ],
+    "calibration": [
+      "Is your confidence percentile for the market steady, or does it shift?",
+      "我的模型准确率实时靠谱吗？",
+      "How reliable are the confidence levels you glimpse during the day?",
+      "你对未来的准确度预估刚好还是糟糕？",
+      "Tell me if the confidence indicator is worth trusting long term."
+    ],
+    "position": [
+      "What sits in the cabinet right now?",
+      "现在的持仓到底有多少？",
+      "Which holdings are live at the moment?",
+      "你们目前持有的资产各是多少？",
+      "Show me the open positions currently in play."
+    ],
+    "session": [
+      "Is the bell ringing yet, or should I wait a bit?",
+      "请问现在主场交易时间是几点到几点？",
+      "Know if the market's still on the grind or closed?",
+      "现在正处于交易日的哪一节？",
+      "Give me the break-down of the day’s trading session."
+    ]
+  }
+}
