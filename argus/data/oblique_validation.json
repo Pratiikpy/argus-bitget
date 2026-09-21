@@ -1,0 +1,1737 @@
+{
+  "model": "openai/gpt-oss-20b",
+  "seed": 20260922,
+  "total": 288,
+  "dev": [
+    {
+      "ask": "Might you let me know if we ended the month in the black or the red?",
+      "expect": "performance",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "你们的判断准确率最近怎样？",
+      "expect": "calibration",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What kept the trading crew from setting sail this morning?",
+      "expect": "abstention_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "我想知道现在桌面上有哪些尚未下手的球？",
+      "expect": "position",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "Was the account’s season a winning streak or a rainy spell?",
+      "expect": "performance",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "能否说明自信指数在过去的准确率？",
+      "expect": "calibration",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "上一次手中的买卖到底考虑了哪些因素？",
+      "expect": "decision_why",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "请问关于BOND的看法，您查阅了哪些资料？",
+      "expect": "evidence",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "能把最近一整天的每次动刀印出来吗？",
+      "expect": "decision_list",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did we decide to hop on that particular trade with ABC when the market was so choppy?",
+      "expect": "decision_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Would you be able to provide the full log of actions the desk has executed lately?",
+      "expect": "decision_list",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Can you lay out the entire dance of orders the desk put in yesterday?",
+      "expect": "decision_list",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What sources were on the desk’s radar for the XYZ trade?",
+      "expect": "evidence",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "What stopped the desk from making a move today?",
+      "expect": "abstention_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "过去三个月你们的自信度变化如何？",
+      "expect": "calibration",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "要是说说这条信息的来源，我到底查过哪些地方？",
+      "expect": "evidence",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "市场今天是开门还是还没敲钟？",
+      "expect": "session",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "整体来看，钱包里的钱升了还是降了？",
+      "expect": "performance",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "您认为过去的信心评级一直可靠吗？",
+      "expect": "calibration",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s the full transcript of the desk’s order saga from market open to close?",
+      "expect": "decision_list",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "能否说说今天的交易阶段在哪个区间？",
+      "expect": "session",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "能否拿一份完整的交易决策日志出来？",
+      "expect": "decision_list",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "针对AAPL的分析，您参考了哪些数据？",
+      "expect": "evidence",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "请问整盘运作是进盈还是出亏？",
+      "expect": "performance",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "别着急，能说说为什么没把手推上去吗？",
+      "expect": "abstention_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "Are we still in the market’s prime time or winding down?",
+      "expect": "session",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "我们的航行，看起来像风暴后漂泊，最终靠岸是收获还是损失？",
+      "expect": "performance",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "请说明此前止盈的决策依据？",
+      "expect": "decision_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "那一次的闪电时刻，为什么球被风吹得不进？",
+      "expect": "decision_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "What sources did the team scan to gauge sentiment on the emerging tech stocks?",
+      "expect": "evidence",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "现在是午间的风暴，还是早晨的微风？",
+      "expect": "session",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "How did the trade engine score in the final match?",
+      "expect": "performance",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "能否给我一份最近所有决策的清单？",
+      "expect": "decision_list",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "此刻的手中，有没有还在飞行的球？",
+      "expect": "position",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "关于上一笔风向的拐角，你为何把球挡在篮框外？",
+      "expect": "decision_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "最近盈亏情况如何？",
+      "expect": "performance",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "请问上周二的仓位调整，为什么做出那样的抉择？",
+      "expect": "decision_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which assets have we still baked into the account?",
+      "expect": "position",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "What decisions did we punch in during the last trading day?",
+      "expect": "decision_list",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "那次加仓的思路是什么？",
+      "expect": "decision_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did we keep the books still while the market roared?",
+      "expect": "abstention_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the playbook of moves the desk drafted all day.",
+      "expect": "decision_list",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "整体盈利或亏损多少？",
+      "expect": "performance",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did the desk keep the ship anchored in calm waters today?",
+      "expect": "abstention_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "What factor pulled you into buying Apple at that lunch hour spike?",
+      "expect": "decision_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "此刻市场是开着还是休市？",
+      "expect": "session",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What data did the desk scour for the trade on PQR?",
+      "expect": "evidence",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "我看到盘口全空，你们是不是打算跑路？",
+      "expect": "abstention_why",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "能列出从上周开始的操作记录吗？",
+      "expect": "decision_list",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "How did the radar detect the wave that made us buy DEF last week?",
+      "expect": "decision_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "能否告诉我现在有哪些开放的仓位？",
+      "expect": "position",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s sitting in our portfolio at this instant?",
+      "expect": "position",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "Did we squeak past the profit target yesterday?",
+      "expect": "performance",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "What made you decide to load up on Oracle back on the 7th, a day it was biting?",
+      "expect": "decision_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "你们是从哪里抽取那股能量，像风筝需要的线索？",
+      "expect": "evidence",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "眼下手里还是打着哪些头寸？",
+      "expect": "position",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "能告诉我今天的交易时段吗？",
+      "expect": "session",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the market on the dance floor yet, or are we still on the prelude?",
+      "expect": "session",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "能把最近一周内所有买卖全列出来吗？",
+      "expect": "decision_list",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在是交易时间吗？",
+      "expect": "session",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What time of day is the session right now?",
+      "expect": "session",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "What are we holding on the sidelines at the moment?",
+      "expect": "position",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "现在的赛季阶段，像阳光还是阴影？",
+      "expect": "session",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "把我整个赛季的决策全部拆开来，像拼图一样展示？",
+      "expect": "decision_list",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "Does the exchange sound the bell yet, or is it still just a whisper?",
+      "expect": "session",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Where did the desk pull the intel from before locking in that position?",
+      "expect": "evidence",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "总的风暴里，咱们的收益跟亏本谁占主导？",
+      "expect": "performance",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们为什么选择在那一时点做多那个代币？",
+      "expect": "decision_why",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "Show me the playbook of every move the desk made since open.",
+      "expect": "decision_list",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What’s the bottom line on our account for the last session?",
+      "expect": "performance",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "给我一份今天的买卖记录，没漏吗？",
+      "expect": "decision_list",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "雨季已过，为什么篮子里还没抓起一颗球？",
+      "expect": "abstention_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "这张图表背后，主要靠哪些数据驱动？",
+      "expect": "evidence",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "这单交易是依据哪套指标做出的？",
+      "expect": "evidence",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the market playing or still on mute at the moment?",
+      "expect": "session",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "你说对未来几天的把握，跟历史的似是而非吗？",
+      "expect": "calibration",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "帮我把这一季的每一次投篮都记下来，好让我看清全局？",
+      "expect": "decision_list",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "What part of the trading day are we in – morning, noon or after‑the-afternoon?",
+      "expect": "session",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "How reliable has the confidence metric been historically?",
+      "expect": "calibration",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "Are the desk’s certainty levels as reliable as a seasoned umpire’s call?",
+      "expect": "calibration",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "What drove the decision to long XYZ at 9:05?",
+      "expect": "decision_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "现在在哪个交易阶段？",
+      "expect": "session",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which market signals did the desk chew over for the telecom shares before the midday break?",
+      "expect": "evidence",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Give me the live snapshot of the desk’s open positions.",
+      "expect": "position",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "帮我拉出今天所有的操作清单。",
+      "expect": "decision_list",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "在这波行情里，你们到底为什么不出手？",
+      "expect": "abstention_why",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the stated level of certainty reliable, or should we take it with a pinch of salt?",
+      "expect": "calibration",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "今儿咱们到底咋没动刀？",
+      "expect": "abstention_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天的观望理由是什么？",
+      "expect": "abstention_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did you stay put on the airline stock that hit a new high?",
+      "expect": "abstention_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "现在手里有没有多头/空头？",
+      "expect": "position",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "这时候我应该知道啥币正在持有？",
+      "expect": "position",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "决策依据的外部消息来自哪儿？",
+      "expect": "evidence",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "这段时间你们的预测靠谱吗？",
+      "expect": "calibration",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "目前市场已经开市了吗？",
+      "expect": "session",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can you confirm if the bell has rung for today's session?",
+      "expect": "session",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Is the ledger in the green or still bleeding?",
+      "expect": "performance",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "现在的篮筐里，哪些球还没入网？",
+      "expect": "position",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们手上的多空仓到底多少？",
+      "expect": "position",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which stats the desk checked before hitting the ball on GHI?",
+      "expect": "evidence",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "Did the crew scan the radar before swinging at MNO?",
+      "expect": "evidence",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "这个月的盈利曲线大概如何？",
+      "expect": "performance",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "How much did we cark up or down by at the end of day?",
+      "expect": "performance",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "对上次以150成交的抛售，能说说背后的思路？",
+      "expect": "decision_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "关于昨天收盘价120的买入，您能透露动机吗？",
+      "expect": "decision_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "整体表现呈现好还是差？",
+      "expect": "performance",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "那笔买入的时机究竟是凭啥决定的？",
+      "expect": "decision_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can you back up the confidence score with past track record?",
+      "expect": "calibration",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "我想知道手头上的所有持仓。",
+      "expect": "position",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "针对那支代码，我查看了哪些行情图表？",
+      "expect": "evidence",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did we short ABC after the earnings release?",
+      "expect": "decision_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "给我说说现在是盘前、盘中还是盘后？",
+      "expect": "session",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "这段期间的所有操作记录能刷出来吗？",
+      "expect": "decision_list",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "为什么今天没有把机会抢下来？",
+      "expect": "abstention_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What kept you on the sidelines when the coffee futures were rallying yesterday?",
+      "expect": "abstention_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What swung the desk to go long on S&P 500 futures on Monday, despite the earlier sell-off?",
+      "expect": "decision_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "想查看从开始到现在的所有动作概要，方便吗？",
+      "expect": "decision_list",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天你们为何没动手？",
+      "expect": "abstention_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "在看那支股的风向时，你们到底盯了哪些天气预报？",
+      "expect": "evidence",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "What hour of the game are we in, and does the crowd still cheer?",
+      "expect": "session",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "How far into the trading day are we?",
+      "expect": "session",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "请说说依据了哪些技术指标？",
+      "expect": "evidence",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "昨天的那场强风，你们是怎么在雨后跳投的？",
+      "expect": "decision_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "How did the portfolio fare over the last quarter—green or grey?",
+      "expect": "performance",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the bottom line on the portfolio’s profitability so far.",
+      "expect": "performance",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "那个股票的研究是依据哪些信息源？",
+      "expect": "evidence",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the market live or are we still in the pre‑open lull?",
+      "expect": "session",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "今天那颗小提灯没亮，您能说说原因吗？",
+      "expect": "abstention_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "这份账本最近的盈亏走向怎么样？",
+      "expect": "performance",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "Give me the chronology of all our bets from the start of the session.",
+      "expect": "decision_list",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "看盘时总是安静，难道有隐忧？",
+      "expect": "abstention_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "把整套交易决策打印出来，哪条被取消？",
+      "expect": "decision_list",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "Could you point me to the market clues the desk used when evaluating STU?",
+      "expect": "evidence",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "What is on the table for the desk at this very instant?",
+      "expect": "position",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Do we have a sweet streak or a rainy spell in our trades up to now?",
+      "expect": "performance",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Why did you take the short on SPY when the news was buzzing that Thursday?",
+      "expect": "decision_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "最近的盈亏可否给个整体概览？",
+      "expect": "performance",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在是啥时间段，盘子算不算热闹？",
+      "expect": "session",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "在做那一笔之前，我参考了哪些官方数据？",
+      "expect": "evidence",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "I need the rundown of every decision taken by the team during the last trading week.",
+      "expect": "decision_list",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Any word on why we stayed quiet when the action was brewing?",
+      "expect": "abstention_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "能列举你们依据的几条数据吗？",
+      "expect": "evidence",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们参考了哪些行情图？",
+      "expect": "evidence",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can you show me the complete set of choices we've made in trades this quarter?",
+      "expect": "decision_list",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    }
+  ],
+  "test": [
+    {
+      "ask": "账户的收益率大概是多少？",
+      "expect": "performance",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What wind patterns led to the choice of shorting ABC at noon?",
+      "expect": "decision_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "What’s on the table right now, any open bets?",
+      "expect": "position",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "能否说说账户的整体表现，盈亏方向如何？",
+      "expect": "performance",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the arena on for play or still in the warm‑up?",
+      "expect": "session",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "请展示当前未平仓的头寸。",
+      "expect": "position",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "眼下有哪些资产在持仓？",
+      "expect": "position",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "能说说你们的置信水平稳定吗？",
+      "expect": "calibration",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "请给我展示过去一周的所有交易决策。",
+      "expect": "decision_list",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天现在此时是行情高峰期吗？",
+      "expect": "session",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "Do the confidence levels actually line up with outcomes?",
+      "expect": "calibration",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "Does the confidence gauge still hold steady like a seasoned goalie’s glove?",
+      "expect": "calibration",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "支持该笔操作的数据来源是什么？",
+      "expect": "evidence",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在持仓里，有哪些资产在等着。",
+      "expect": "position",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "此刻属于早盘还是晚盘？",
+      "expect": "session",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "What were the lineup changes the desk plotted during the session?",
+      "expect": "decision_list",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "那笔三月中旬的卖空，背后用到了哪些触发点？",
+      "expect": "decision_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "Did something cause the desk to hold back from the trade that afternoon?",
+      "expect": "abstention_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Why did we let the opportunity slip by on the trading floor?",
+      "expect": "abstention_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "今天市场是不是已经开盘？",
+      "expect": "session",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "I'm curious about the rationale behind the move on 7th June's position in DEF.",
+      "expect": "decision_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "能看从上月起的交易日志吗？",
+      "expect": "decision_list",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "信心度随时间波动，您会怎么评估？",
+      "expect": "calibration",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which analyst reports and price charts did the desk peruse when the Nasdaq was rattling off yesterday?",
+      "expect": "evidence",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "现在账面上还有哪些开仓？",
+      "expect": "position",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "那个confidence值长期有效吗？",
+      "expect": "calibration",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s the big picture on the account’s gains or losses this month?",
+      "expect": "performance",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "你这说的有多靠谱，能跟真实结果比一比吗？",
+      "expect": "calibration",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can you walk me through the thought process that led to the sell of GHI?",
+      "expect": "decision_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "At what point in the match is the desk making its first move?",
+      "expect": "session",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "Where are the active positions hanging in the market air today?",
+      "expect": "position",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "Which sources lit the fireball that guided our stance on OPQ?",
+      "expect": "evidence",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the current lineup of positions the desk is holding.",
+      "expect": "position",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "我想听听你对自己预测可信度的评估。",
+      "expect": "calibration",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "为啥我们把仓位抛到这儿？能说说其中的思路？",
+      "expect": "decision_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "I wonder if the confidence metrics have stuck around or drifted lately.",
+      "expect": "calibration",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "现在手上有哪些持仓？",
+      "expect": "position",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "盘中这么安静，咱们是咋拣了不交易？",
+      "expect": "abstention_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did the desk aim a missile at the tech rally yesterday?",
+      "expect": "decision_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "Which ships are still docked in the account right now?",
+      "expect": "position",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "把咱们今天的所有决策都列一遍，方便查。",
+      "expect": "decision_list",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "What did the captain see that steered us into the XYZ drop zone?",
+      "expect": "decision_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "能说说今天为何没有抓住机会吗？",
+      "expect": "abstention_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "这段时间咋就不出单，现场竟然空档。",
+      "expect": "abstention_why",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们在做这笔之前查了哪些数据源？",
+      "expect": "evidence",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "Could you give me the lay of the land in terms of profits and losses so far?",
+      "expect": "performance",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "我记得上次的骤雨，你怎么把球挑出来，却没扔进篮筐？",
+      "expect": "decision_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s the current jam in the market clock—open, close, or somewhere in between?",
+      "expect": "session",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "How firm is the desk’s confidence rope in a season of surprises?",
+      "expect": "calibration",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "我想知道你们的信心，像海浪一样持久吗？",
+      "expect": "calibration",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "Let me know the current array of positions we have open.",
+      "expect": "position",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "I wonder what kept the trading team from moving the needle yesterday?",
+      "expect": "abstention_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "How sound do you find the desk's self-assessed confidence over time?",
+      "expect": "calibration",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "What was the rationale behind the exit point we set on JKL?",
+      "expect": "decision_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "What holdings are on the books right now?",
+      "expect": "position",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "请问我们现在处于哪个时间段的交易？",
+      "expect": "session",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "Did a sudden frost stop the lineup from hitting the field?",
+      "expect": "abstention_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "Is the desk’s confidence bar sticking or just a flashy flicker over time?",
+      "expect": "calibration",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "请帮忙拉下整合版的交易记录表。",
+      "expect": "decision_list",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "What nuggets of data did the desk consult before putting a price on LMN?",
+      "expect": "evidence",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Which holdings are we sitting on at the moment?",
+      "expect": "position",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "此行买卖的背后逻辑是怎样的？",
+      "expect": "decision_why",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "这份自信，是像日出一样可靠，还是像薄雾一样易散？",
+      "expect": "calibration",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "为那股没能翻盘，能列出支撑你判断的指标吗？",
+      "expect": "evidence",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "这几天你说的自信度，跟实际走势有多匹配？",
+      "expect": "calibration",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "What made you decide to remain idle while the tech giants moved faster?",
+      "expect": "abstention_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Does the desk’s stated faith in the market stay solid through volatility?",
+      "expect": "calibration",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Any sense of how the capital's ride went since the start of the year?",
+      "expect": "performance",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the full playbook of moves the desk has made this week.",
+      "expect": "decision_list",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "Can we rely on the desk’s certainty when it gives us a thumbs-up on a trade?",
+      "expect": "calibration",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Can you lay out every trade move the crew made from kickoff to closing?",
+      "expect": "decision_list",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "Will the confidence meter keep its aim after stormy markets?",
+      "expect": "calibration",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "Which charts or feeds were consulted before we hit the numbers on MNO?",
+      "expect": "evidence",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "Which holdings are still dancing on the board?",
+      "expect": "position",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "请列出当前的仓位配置。",
+      "expect": "position",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Could you pull up the diary of all the moves the desk made over the past month?",
+      "expect": "decision_list",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the current lineup of positions the desk has on the field.",
+      "expect": "position",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "Why didn’t you jump in on the options that just broke out?",
+      "expect": "abstention_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "Which positions do we have still open at the moment?",
+      "expect": "position",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "请问之前的把握度，现在还有保持吗？",
+      "expect": "calibration",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "List every trade action the desk has taken since market opened.",
+      "expect": "decision_list",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "能说说今天交易时段还没开始吗？",
+      "expect": "session",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "对未来行情的预测真的稳健吗？",
+      "expect": "calibration",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "请问现在手里的仓位到底如何？",
+      "expect": "position",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "What research or indicators shaped the desk's view on VWX?",
+      "expect": "evidence",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "我想知道你们参考了哪些报纸的风口，才能做出那次投篮？",
+      "expect": "evidence",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "这把整个赛季的利滚利，像晴天的露水，是升是降？",
+      "expect": "performance",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "Does the certainty gauge hold up over longer time frames?",
+      "expect": "calibration",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "我想看你们每笔决策的时间戳，整整表一遍。",
+      "expect": "decision_list",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "这段时间，咱们没有动笔，究竟是怎么回事？",
+      "expect": "abstention_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "Give me the full roster of decisions the desk logged for the day.",
+      "expect": "decision_list",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "今早的风云未变，但篮框为何一直空置？",
+      "expect": "abstention_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在是交易日的哪一段时间？",
+      "expect": "session",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "What held us back from executing that trade we were eyeing?",
+      "expect": "abstention_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "给我列出所有你们在场上走过的路线，一一打好记录？",
+      "expect": "decision_list",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "Did we sail into a profit lagoon or walk away empty?",
+      "expect": "performance",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "现盘里持仓的币种有哪些？",
+      "expect": "position",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "What tipped the scales in favor of that call on XYZ last week?",
+      "expect": "decision_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "这期总收入是正是负？我咋查。",
+      "expect": "performance",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "Could you tell me what positions are in the books right now?",
+      "expect": "position",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "这段时间的预测准确率，您怎么看？",
+      "expect": "calibration",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "本场比赛的得失，好像冷风吹进篮筐，究竟是加分还是扣分？",
+      "expect": "performance",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "能否把所有的抓球动作，像季风记录那样呈现给我？",
+      "expect": "decision_list",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "How did the portfolio weather the last round of gusts?",
+      "expect": "performance",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "咱们这波操作，累计收益到底是赚还是赔？",
+      "expect": "performance",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "我注意到最近几笔均被搁置，能否透露一点背后的考量？",
+      "expect": "abstention_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "Give me a quick rundown of whether the account’s been swimming in cash or drowning in debt.",
+      "expect": "performance",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "What’s the backstory of the data you reviewed before voting on the steel index?",
+      "expect": "evidence",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "最近你们一直安静，真是啥也没动？",
+      "expect": "abstention_why",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "What charts or weather reports did the desk consult for JKL?",
+      "expect": "evidence",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "今天的场面，是热血上场还是赛前热身？",
+      "expect": "session",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "为何上一次卖出中信银行时采用的逻辑？",
+      "expect": "decision_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the bell ringing yet?",
+      "expect": "session",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "说说现在仓位都在怎么分配？",
+      "expect": "position",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "这币的行情图纸上有哪些图表被参考？",
+      "expect": "evidence",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天的市场，像比赛开始前的哨声还是刚刚点球？",
+      "expect": "session",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "盘面现在的空档里，谁在持球？",
+      "expect": "position",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "天色很晴好，却没人举起球拍，究竟是干嘛不行动？",
+      "expect": "abstention_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在是盘中吗？",
+      "expect": "session",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    },
+    {
+      "ask": "那次买入BTC的理由到底是啥？",
+      "expect": "decision_why",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "请告诉我你们在分析那支股票时，先看了哪些数据旗帜？",
+      "expect": "evidence",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "Tell me whether the market's gates are open and what hour it is.",
+      "expect": "session",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Could you shed light on why the market sits idle at that time?",
+      "expect": "abstention_why",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "Do you trust that '95% confidence' label stays solid over the seasons?",
+      "expect": "calibration",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "en"
+    },
+    {
+      "ask": "How dependable is the desk’s self-assuredness when it calls the shots on trades?",
+      "expect": "calibration",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "账面上目前利润是不是在账面上变成负值？",
+      "expect": "performance",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "能解释一下昨天下午买入万科的理由吗？",
+      "expect": "decision_why",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们的信心曲线，像风速计一样准确吗？",
+      "expect": "calibration",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "那个进场点到底基于什么假设？",
+      "expect": "decision_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "Give me the rundown of every hand the desk dealt in the last session.",
+      "expect": "decision_list",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "en"
+    },
+    {
+      "ask": "展示过去三天的决策全都？",
+      "expect": "decision_list",
+      "persona": "an operations analyst who asks precise, procedural questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "数算一番，利滚利还是负债压顶？",
+      "expect": "performance",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the market drumming a bell or holding a silence?",
+      "expect": "session",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "你们说的置信度到底能坚持多久？",
+      "expect": "calibration",
+      "persona": "a crypto-native trader who uses internet slang and abbreviations",
+      "lang": "zh"
+    },
+    {
+      "ask": "What made us shift from base to leverage on that trade?",
+      "expect": "decision_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "en"
+    },
+    {
+      "ask": "我们在风平浪静的盘面上，为什么手无寸铁？",
+      "expect": "abstention_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "What weather forecasts did the desk rely on for PQR?",
+      "expect": "evidence",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "听说那次卖出是因某因素，我能弄清楚背后的逻辑吗？",
+      "expect": "decision_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "一轮赛季的投篮，球路到底是射进篮筐还是擦碰篮筐？",
+      "expect": "performance",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "整体看，我这套资金收获还是输在上面？",
+      "expect": "performance",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why was the market still a quiet drizzle instead of a full‑on thunderstorm?",
+      "expect": "abstention_why",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "en"
+    },
+    {
+      "ask": "上手差不多停下来，咱们原因是什么？",
+      "expect": "abstention_why",
+      "persona": "a risk manager who always frames questions around what went wrong",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们的自信，像季风一样变化吗？",
+      "expect": "calibration",
+      "persona": "a swing trader who speaks in metaphors about weather and sport",
+      "lang": "zh"
+    },
+    {
+      "ask": "当前持仓情况可否一览？",
+      "expect": "position",
+      "persona": "a family-office principal who is polite and slightly formal",
+      "lang": "zh"
+    }
+  ]
+}

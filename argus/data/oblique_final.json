@@ -1,0 +1,2115 @@
+{
+  "model": "openai/gpt-oss-20b",
+  "seed": 20260923,
+  "total": 351,
+  "dev": [
+    {
+      "ask": "Can you lay out every move the desk’s made so far?",
+      "expect": "decision_list",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "现在仓位一览表给我。",
+      "expect": "position",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "What prompted the sudden sell on the Euro at 02:45?",
+      "expect": "decision_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "Where did the desk pull the info from for that rally?",
+      "expect": "evidence",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "关于G基金的决策依据是什么？",
+      "expect": "evidence",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "能把最近一周所有你们做出的交易决策发给我吗？",
+      "expect": "decision_list",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the trading floor awake, or have we hit the post‑market grind?",
+      "expect": "session",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "想知道从今天开始到现在的全部操作记录。",
+      "expect": "decision_list",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天为什么没动手？",
+      "expect": "abstention_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "What guided the desk in hitting that 14:00 exit on 1234?",
+      "expect": "decision_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "Why keep the cabin quiet on that trade?",
+      "expect": "abstention_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "有哪些数据支撑你决定进这只？",
+      "expect": "evidence",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did the desk back off on that 150 share move on the X ticker?",
+      "expect": "decision_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "Did we see a win or just a loss over the last period?",
+      "expect": "performance",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the live positions on the account.",
+      "expect": "position",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "能不能给我说说现在整个账户的盈亏总额是多少？",
+      "expect": "performance",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们自称的信心度持续可靠吗？",
+      "expect": "calibration",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which charts did the desk look at before the 11‑00 move?",
+      "expect": "evidence",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "Is the beast still up, or has the exchange gone to sleep?",
+      "expect": "session",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "现在是第几个小时的市场？",
+      "expect": "session",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "What evidence did the desk review to confirm the trade?",
+      "expect": "evidence",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "一到市场开门，我的桌面却是空的，能说说这到底是怎么回事吗？",
+      "expect": "abstention_why",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "账面上这几天的收益敲给我算算。",
+      "expect": "performance",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did the desk stay flat when the bell rang?",
+      "expect": "abstention_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "Can we see the record of every action that went into the system this quarter?",
+      "expect": "decision_list",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "What did the signal look like that led to that move?",
+      "expect": "decision_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "Has the trustworthiness of your predictions changed over time?",
+      "expect": "calibration",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "Got any clues as to why nothing shifted on the board?",
+      "expect": "abstention_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "能告诉我他们查看了哪些资料来判断这个标的？",
+      "expect": "evidence",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "你查了哪些来源才对这只有信心？",
+      "expect": "evidence",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们判断F期货时参考了哪些报表？",
+      "expect": "evidence",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们为什么那天买入AAPL，却不再做多？",
+      "expect": "decision_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did you pick that moment to flip that position?",
+      "expect": "decision_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "What made the desk flip on that silver tick yesterday?",
+      "expect": "decision_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "你们的信心水平在不同时间段里是否一致？",
+      "expect": "calibration",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s sitting in the portfolio at present?",
+      "expect": "position",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "这次操作的依据是哪些数据？",
+      "expect": "evidence",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why are we skating on that one?",
+      "expect": "abstention_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "Did anything block the desk from making a play in the ticker tape today?",
+      "expect": "abstention_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "你们说的自信度，随时间变化靠谱吗？",
+      "expect": "calibration",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "By the book, how far did the equity move this period—gain or loss?",
+      "expect": "performance",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "What’s the story behind the flat action this morning?",
+      "expect": "abstention_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "Has the trading day kicked off yet?",
+      "expect": "session",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "What stage of the trading day are we in?",
+      "expect": "session",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "Did we net a gain or head into the red?",
+      "expect": "performance",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "Why the desk kept its cool and didn't make a move today?",
+      "expect": "abstention_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "What held the floor from moving in today's trade book?",
+      "expect": "abstention_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "此刻持仓情况是怎样的？",
+      "expect": "position",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "这套模型说的稳住，长期下会一直准吗？",
+      "expect": "calibration",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在你手上有什么头寸？",
+      "expect": "position",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s the overall outcome of our trades lately?",
+      "expect": "performance",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "手里还持有什么？",
+      "expect": "position",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天大家干啥都没出手？",
+      "expect": "abstention_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "能否给我算一算这笔交易的整体收益？",
+      "expect": "performance",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "能否确认你们的概率模型在过去几个月里保持稳定？",
+      "expect": "calibration",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What charts or feeds fed the decision on that symbol?",
+      "expect": "evidence",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "Where are we in the trading day cycle?",
+      "expect": "session",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "能把最近这段时间里桌子做过的所有决策一次性给我展示吗？",
+      "expect": "decision_list",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天啥子没动，咱怎么不打一下？",
+      "expect": "abstention_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "整体账面是涨还是跌？",
+      "expect": "performance",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "到底为何咱手上没点银子？",
+      "expect": "abstention_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "昨天整笔操作的盈亏到底咋样？",
+      "expect": "performance",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "Right now, what are we sitting on in the portfolio?",
+      "expect": "position",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "请把今天的交易台面记下。",
+      "expect": "decision_list",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which holdings are live at the tick?",
+      "expect": "position",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "昨晚你买的那手，怎么决定？",
+      "expect": "decision_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "能把昨天所有的买卖记录给我一览吗？",
+      "expect": "decision_list",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Show all decisions the desk recorded in the past month.",
+      "expect": "decision_list",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "Which bets are still hanging in the box as we speak?",
+      "expect": "position",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "这段时间的成绩是涨是跌？",
+      "expect": "performance",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "为什么会在那个时间点卖掉黄金？你们当时想了什么？",
+      "expect": "decision_why",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s on the books at the moment?",
+      "expect": "position",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "How did the account sail after the trade session?",
+      "expect": "performance",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "这大盘行情好像有点动荡，还是你们决定先放空？为什么不跟进？",
+      "expect": "abstention_why",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Give me the playbook of all desk moves today.",
+      "expect": "decision_list",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "这份自信指引会一直稳定吗？",
+      "expect": "calibration",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "那手为何这么冲？",
+      "expect": "decision_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在是盘中还是午休？",
+      "expect": "session",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is your confidence still solid after a week of volatility?",
+      "expect": "calibration",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "对账单显示红字多少？",
+      "expect": "performance",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在是哪段交易时间？",
+      "expect": "session",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "What back‑end data did you consult before the move?",
+      "expect": "evidence",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "现在你们手里还有哪些仓位？",
+      "expect": "position",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "What time of day are we at in the trading cycle?",
+      "expect": "session",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "今天交易窗口已经开了吗？",
+      "expect": "session",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "盘面现在留着什么？",
+      "expect": "position",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "你说的自信度能持久吗？",
+      "expect": "calibration",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天外盘活动还是与平日一样寂寞，原因是？",
+      "expect": "abstention_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "Where are the current holdings of the desk at the moment?",
+      "expect": "position",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "Which news or charts fired up the desk for the AMD trade?",
+      "expect": "evidence",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "What indicators or feeds did you check for the EUR/USD spike?",
+      "expect": "evidence",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "把今天的每个进出记录给我一条条列出来。",
+      "expect": "decision_list",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "这信心值还可靠，咱信不信？",
+      "expect": "calibration",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Does the confidence score keep up when the market shifts or just sticks?",
+      "expect": "calibration",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "这笔对标的的决策，动机具体是什么？",
+      "expect": "decision_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "Show me the current heap of holdings—any long or short positions?",
+      "expect": "position",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "在分析E股票时你们主要看了哪些指标？",
+      "expect": "evidence",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们为什么在上一个交易日把CETF加仓？",
+      "expect": "decision_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "能给我一份最近半个月的交易清单吗？",
+      "expect": "decision_list",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "你对这只检查过哪些资料？",
+      "expect": "evidence",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "What research material did you pull for the BTC swing?",
+      "expect": "evidence",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "How reliable is the desk’s certainty as the market drags?",
+      "expect": "calibration",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "What’s the overall win/loss on the line?",
+      "expect": "performance",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "对你们自信值的持久性，你们怎么看？",
+      "expect": "calibration",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "请把从上周开始到现在的所有决策发给我。",
+      "expect": "decision_list",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the session open or on pause?",
+      "expect": "session",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "为什么在行情飙升时不跟单？",
+      "expect": "abstention_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们的自信程度是不是会波动？",
+      "expect": "calibration",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "Show me the playbook—every call the desk has made so far this month.",
+      "expect": "decision_list",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "你们用了哪些信息来决定这笔交易？",
+      "expect": "evidence",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "What's the haul in the account this cycle—up or down, give me the ballpark?",
+      "expect": "performance",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "What research sources did you pull for the recent trade?",
+      "expect": "evidence",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "今天整盘都没见任何下单，究竟咋想的？",
+      "expect": "abstention_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "我想确认你们的预判一贯靠谱吗？",
+      "expect": "calibration",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们是依据哪些来源决定进入这个市场的？",
+      "expect": "evidence",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "给我列一遍今晚的所有手。",
+      "expect": "decision_list",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is that confidence score still solid or has it dipped lately?",
+      "expect": "calibration",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "那根手为什么全停？",
+      "expect": "abstention_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "List the positions we currently hold.",
+      "expect": "position",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "Did the portfolio do the trick or is it still chugging in the red?",
+      "expect": "performance",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "市场现在处在啥时间段？",
+      "expect": "session",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did the desk fire that 3:45 stop on XYZ?",
+      "expect": "decision_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "咱这一周盈亏到底？",
+      "expect": "performance",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们刚才那次买入XYZ的决定，原因是什么？",
+      "expect": "decision_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "那信心指数的可靠性，你们怎么评估？",
+      "expect": "calibration",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在盘里我到底还有哪些仓位？",
+      "expect": "position",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What kept the desk from moving at all this shift?",
+      "expect": "abstention_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "从凌晨到现在，你们干了什么，列清单。",
+      "expect": "decision_list",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "目前是黄灯还是红灯？",
+      "expect": "session",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在是啥时间？市场是已经开门了吗？",
+      "expect": "session",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "List every trade order we placed in the trade history.",
+      "expect": "decision_list",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "说说昨晚进这单的原因吧。",
+      "expect": "decision_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which reports or signals were the desk's eyes on before the JKL move?",
+      "expect": "evidence",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "你们今天留着盘不动是有什么原因吗？",
+      "expect": "abstention_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "整体收益表现是正增长还是负增长？",
+      "expect": "performance",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can I trust the desk’s confidence ratings over the next two days?",
+      "expect": "calibration",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "今天整个行情阴雨绵绵，咱们到底为什么还是没主动买卖？",
+      "expect": "abstention_why",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the confidence rating you quoted still solid, or is it a soft one?",
+      "expect": "calibration",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "What sticks are we holding at the moment—give me the list?",
+      "expect": "position",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "此刻的开仓位置清单能给我吗？",
+      "expect": "position",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "目前账面上有什么持仓？",
+      "expect": "position",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can we trust the confidence score you gave us last Friday?",
+      "expect": "calibration",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "What’s the current line‑up of positions?",
+      "expect": "position",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "解释下决定卖出USDC的原因吧。",
+      "expect": "decision_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在是开市还是停市？",
+      "expect": "session",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is it the prime session or still pre‑market?",
+      "expect": "session",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "Why did the team stay still while the market was rolling?",
+      "expect": "abstention_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "本来想让盘子热络，怎么没听到交易声？",
+      "expect": "abstention_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s keeping the desk from taking a swing today?",
+      "expect": "abstention_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "What was the bottom line on the account after the day's rush?",
+      "expect": "performance",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "目前还是未开盘还是正在交易？",
+      "expect": "session",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "这个月的盈利到底是甜还是苦？",
+      "expect": "performance",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "此刻你们有什么未平仓的交易吗？",
+      "expect": "position",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "能把从上月起的每一次操作都呈现吗？",
+      "expect": "decision_list",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "List every trade the desk logged this week.",
+      "expect": "decision_list",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "How did the account fare—profit or loss this week?",
+      "expect": "performance",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "平时给出的概率估计，过去一周表现还好吗？",
+      "expect": "calibration",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What are all the moves we executed over the day?",
+      "expect": "decision_list",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "现在是交易时间吗？",
+      "expect": "session",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Should I believe the desk’s trust score for the upcoming session?",
+      "expect": "calibration",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "这站不出手，原因说说。",
+      "expect": "abstention_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "请列出现有的所有仓位。",
+      "expect": "position",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "关于那只债的资料来源能说吗？",
+      "expect": "evidence",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did we let the hands be idle while the market was hot?",
+      "expect": "abstention_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "Is your certainty level reliable across the longer term?",
+      "expect": "calibration",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "Are you still confident in the probabilities you shared?",
+      "expect": "calibration",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "What made the team decide to nudge the order for Y on Tuesday?",
+      "expect": "decision_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "想看下过去三天你们的操作清单。",
+      "expect": "decision_list",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "What was the spark behind buying ABC on Friday night?",
+      "expect": "decision_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "What moves were taken last 48 hours?",
+      "expect": "decision_list",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "Can you walk me through the logic that stopped us from hammering the Z stock?",
+      "expect": "decision_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "目前的持仓到底是怎样的？",
+      "expect": "position",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们的置信水平，在连续交易中表现如何？",
+      "expect": "calibration",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "之前说的信心水平，别改了吧，可信吗？",
+      "expect": "calibration",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "Can you point to the data that guided that decision?",
+      "expect": "evidence",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    }
+  ],
+  "test": [
+    {
+      "ask": "上个季度的盈利情况能说说吗？跟平时比是涨了还是跌了？",
+      "expect": "performance",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the market still on? Need to know the hour.",
+      "expect": "session",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "能说说为什么上周日你们卖掉B债？",
+      "expect": "decision_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "这笔交易的背后有没有特别的数据信号来支持？",
+      "expect": "evidence",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "咱手里现在还有哪只？",
+      "expect": "position",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "Give me the full log of all decisions from the last session.",
+      "expect": "decision_list",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "今晚为何咱无动作？",
+      "expect": "abstention_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "货真价实地盘子保持观望，背后理由是什么？",
+      "expect": "abstention_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "给我发张今天的全局交易日志。",
+      "expect": "decision_list",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Did we hit our target yesterday? Give a quick summary.",
+      "expect": "performance",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "Give me the whole playbook of trades we’ve executed.",
+      "expect": "decision_list",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "Why did we shove in that EUR/USD drift on Tuesday?",
+      "expect": "decision_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "你们查这只股票的数据哪儿拿的？",
+      "expect": "evidence",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "你说的自信度稳定性如何？",
+      "expect": "calibration",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "对这笔交易的依据是哪些数据来源？",
+      "expect": "evidence",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "能否给我看看信心指数的历史验证结果？",
+      "expect": "calibration",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们在上周五中午的那笔买入到底是怎么想的？",
+      "expect": "decision_why",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s currently sitting on the desk?",
+      "expect": "position",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "当前你们手里还有没平的头寸吗？能列一下吗？",
+      "expect": "position",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Show the full order history the desk’s followed.",
+      "expect": "decision_list",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "我想听听你当时为什么要卖这只？",
+      "expect": "decision_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天交易日到了哪一段？",
+      "expect": "session",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "帮我看看现在还有什么未平仓的？",
+      "expect": "position",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天的交易季节还是在走？",
+      "expect": "session",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "I want a rundown of every trade the desk executed or dropped lately.",
+      "expect": "decision_list",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "给我列出最近所有的交易决策。",
+      "expect": "decision_list",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "What tipped us into that XYZ trade last Wednesday?",
+      "expect": "decision_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "这份概率声明，过去一年的准确率如何？",
+      "expect": "calibration",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "关于这支股票，你们查了哪些信息？",
+      "expect": "evidence",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did we pull the long on AAPL that I recall?",
+      "expect": "decision_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "目前台上有什么正在跑的单？",
+      "expect": "position",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "我想知道你们看的信息是哪些。",
+      "expect": "evidence",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why did we stay flat when the feed was all over the place?",
+      "expect": "abstention_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "Is the trust in your ratings staying sharp over the run?",
+      "expect": "calibration",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "对于你的判断，后期依旧能信赖吗？",
+      "expect": "calibration",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "我想知道最近的每一次买卖都是什么时点发出的，能整理一下吗？",
+      "expect": "decision_list",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "把所有的决策记录都贴出来，别漏。",
+      "expect": "decision_list",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "How steady are the desk’s confidence levels since the last review?",
+      "expect": "calibration",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "What phase of the day are we in—morning rush or close hustle?",
+      "expect": "session",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "I noticed the servers were dead quiet; what kept the team from moving any positions?",
+      "expect": "abstention_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "那笔做空黄金的理由到底是什么？",
+      "expect": "decision_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "What made you hold off instead of jumping in?",
+      "expect": "abstention_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "Does the market still have its fingers on the pulse, or is it closing?",
+      "expect": "session",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "在做那笔交易之前你们查了哪些数据？",
+      "expect": "evidence",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What stopped us from pushing any orders today?",
+      "expect": "abstention_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "Pull up the log of all the moves the team executed last week.",
+      "expect": "decision_list",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "What tipped us off to go long on the XYZ trade?",
+      "expect": "decision_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "账户利润有上涨吗，还是在下滑？",
+      "expect": "performance",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "How solid is the confidence band you’re selling on these picks?",
+      "expect": "calibration",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "Why didn’t the desk act on the signal that came through?",
+      "expect": "abstention_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "Did we make a dent in the profits this round?",
+      "expect": "performance",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "说说你们在评估VWAP时用的是什么数据？",
+      "expect": "evidence",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "这几天的交易时段是不是已经开始？",
+      "expect": "session",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which charts or feeds did we consult before dropping the ABC order?",
+      "expect": "evidence",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "What made us take the 10‑minute break on the 7‑AM/6‑PM trade?",
+      "expect": "decision_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "整场交易看来没有任何操作，为什么不动手？",
+      "expect": "abstention_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "最近的收益曲线到底呈现什么样的趋势？是呈现正增长还是负增长？",
+      "expect": "performance",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Where are the open bets as of this moment?",
+      "expect": "position",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "What’s the money status after the last run?",
+      "expect": "performance",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "现在手头亏了多少，咱到底是赢还是赔？",
+      "expect": "performance",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在打开的仓位都在哪？",
+      "expect": "position",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "最近收益怎么了，还是赚不赚？",
+      "expect": "performance",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "你说这手子的盈亏是多少？",
+      "expect": "performance",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Show me the open positions the desk has on the table.",
+      "expect": "position",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "你们为何在波动加剧时保持沉默？",
+      "expect": "abstention_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "想知道此刻的空多头部位是哪些？",
+      "expect": "position",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "最近的表现能说说谁是赚了谁是赔的？",
+      "expect": "performance",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "能告诉我现在处在交易日的哪一节吗？",
+      "expect": "session",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们说的自信度，过去多久有保证？",
+      "expect": "calibration",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "这两个月我的账户表现如何？是赚了还是亏了？",
+      "expect": "performance",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What sources fed the desk’s intel on the 9‑PAM trades?",
+      "expect": "evidence",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "那个概率值过去可别骗人？",
+      "expect": "calibration",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "How’s the book looking at the end of the day?",
+      "expect": "performance",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "Which holdings are still open at the moment?",
+      "expect": "position",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "What’s the clock on market status right now?",
+      "expect": "session",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "What tipped the desk into opening that 8‑hour swing on ABC?",
+      "expect": "decision_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "把今晚的全部手段一条条给我。",
+      "expect": "decision_list",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "今晚的盘子现在几小时了？",
+      "expect": "session",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "整个账户的盈亏趋势现在看起来怎样？",
+      "expect": "performance",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "能说说今天盘中你们持仓的情况吗？",
+      "expect": "position",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "请把这个月里你们所有的交易决定都列出来。",
+      "expect": "decision_list",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在持仓到底是哪儿？",
+      "expect": "position",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "为何上周转手卖掉BTC？能说说动机吗？",
+      "expect": "decision_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the market still ringing or is it silent now?",
+      "expect": "session",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "When the markets were ripe, why did we sit on the fence this morning?",
+      "expect": "abstention_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "想看下过去一个月里你们都开了哪些单，能列出来吗？",
+      "expect": "decision_list",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "总体来看，咱资产是蓝还是红？",
+      "expect": "performance",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在手里的仓位到底怎么分布？",
+      "expect": "position",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "当时你们参考了哪些行情图表或新闻？",
+      "expect": "evidence",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "把你们的全部买卖决策一一打出来。",
+      "expect": "decision_list",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "From where did the desk get the data on that flag today?",
+      "expect": "evidence",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "Did you cross the news wires or the tick data for GHI before placing that?",
+      "expect": "evidence",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "你说的自信度，前后是否一致？",
+      "expect": "calibration",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "盘子现在是开着还是关着？",
+      "expect": "session",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "What positions are we holding right now?",
+      "expect": "position",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "这批决策都在哪儿，全部发给我。",
+      "expect": "decision_list",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which instruments are still open today?",
+      "expect": "position",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "Does the desk still back its 0.8 confidence in the 6‑O clock bet?",
+      "expect": "calibration",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "这股你看了哪些报表？",
+      "expect": "evidence",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the market buzzing or still half‑asleep?",
+      "expect": "session",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "Which positions are we sitting on today?",
+      "expect": "position",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "这张表里的持仓，能直接说出来吗？",
+      "expect": "position",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s the current hour on the market clock?",
+      "expect": "session",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "举例说说你们分析某个指数时参考了什么资料。",
+      "expect": "evidence",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "How much did the desk climb or slump by the close?",
+      "expect": "performance",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "能把最近一周的买卖记录发给我吗？",
+      "expect": "decision_list",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "What data fed into the call for the DEF trade—any stats or models?",
+      "expect": "evidence",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "你们说的自信度是跟以前一样靠谱吗？",
+      "expect": "calibration",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "I need to know if the trust score you've been pushing is really holding weight.",
+      "expect": "calibration",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me the full roll of all positions we slid or slid out.",
+      "expect": "decision_list",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "最近的盈亏点算是上扬还是下跌？",
+      "expect": "performance",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "那一次进仓，背后想啥？",
+      "expect": "decision_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "那天仓位保持平盘，背后有什么考虑？",
+      "expect": "abstention_why",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which data sources did you consult for that GOOG position?",
+      "expect": "evidence",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "Do your predictions hold when you run them daily?",
+      "expect": "calibration",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "真是坐着没操作，咱本该出一手，咋不行？",
+      "expect": "abstention_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "市场现在算是早盘还是午盘？",
+      "expect": "session",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "为何你昨个星期二买这只？",
+      "expect": "decision_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which charts or data did you consult before betting on that stock?",
+      "expect": "evidence",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "What’s the entire run‑through of our trade actions?",
+      "expect": "decision_list",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "现在手里的头寸大概怎么分布？",
+      "expect": "position",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "So why did the desk go quiet today—no trades at all?",
+      "expect": "abstention_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "现在是交易时间还是休市？",
+      "expect": "session",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天为什么你们柜台没动手？",
+      "expect": "abstention_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "Which reports or ticks shaped that trade pick?",
+      "expect": "evidence",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "综合来看利润是多少？",
+      "expect": "performance",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "能说说那次卖出决定的背后逻辑吗？",
+      "expect": "decision_why",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "整个账户的盈亏状态，现在是盈是亏？",
+      "expect": "performance",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "Show me the P/L trend for this week.",
+      "expect": "performance",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "过去一个月的表现，总体是红还是黑？",
+      "expect": "performance",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s hanging in our book right now?",
+      "expect": "position",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "Can you walk me through the rationale behind that specific trade?",
+      "expect": "decision_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "How come we dumped that position in the afternoon, what went down there?",
+      "expect": "decision_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "Which slice of the day are we in right now?",
+      "expect": "session",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "请给我把桌子近期所有买卖的列表说给我听。",
+      "expect": "decision_list",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "What was the profit or loss on last month’s trading?",
+      "expect": "performance",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "How did the account finish this quarter? Up or down?",
+      "expect": "performance",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "Give me the snapshot of all open legs at the desk's end.",
+      "expect": "position",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "这份自信度保持得怎么样？",
+      "expect": "calibration",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "Give me the grand total on the books—did we net positive or are we bleeding?",
+      "expect": "performance",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "Show me every call the desk made today.",
+      "expect": "decision_list",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "en"
+    },
+    {
+      "ask": "这支行情分析背后，数据都来自哪？",
+      "expect": "evidence",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "Do the confidence levels keep their bite as markets twist?",
+      "expect": "calibration",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "我看空盘，咋留着不动？",
+      "expect": "abstention_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "当时把ABC卖掉，关键理由能跟我说说吗？",
+      "expect": "decision_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "Give me the action log from yesterday’s session.",
+      "expect": "decision_list",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "How’s the account faring overall?",
+      "expect": "performance",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "刚才我的报表显示今天没有任何成交，能解释一下你们为什么没动吗？",
+      "expect": "abstention_why",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "Did the session close yet? I need to confirm.",
+      "expect": "session",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "不说说今天你们为什么不下单吗？",
+      "expect": "abstention_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "What prevented the desk from putting a foot on that trade?",
+      "expect": "abstention_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "把近期所有买卖的决策历史一次性拿出来。",
+      "expect": "decision_list",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "今天是交易日吗？",
+      "expect": "session",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "What's the market status now – open, paused, or closed?",
+      "expect": "session",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "List every action the desk took during the session.",
+      "expect": "decision_list",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "要是说说你们收集H合约的哪些信息？",
+      "expect": "evidence",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "那笔9点卖出A股，背后到底是怎么想的？",
+      "expect": "decision_why",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "Does the floor still have the bell ringing?",
+      "expect": "session",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "这交易决定背后的逻辑是啥？",
+      "expect": "decision_why",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在手里还有哪些仓位？",
+      "expect": "position",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "Is the joint still hot or is it winding down?",
+      "expect": "session",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "为什么上个交易日这样买？",
+      "expect": "decision_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "zh"
+    },
+    {
+      "ask": "What pushed you to exit the BTC hedge at 11:00?",
+      "expect": "decision_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "能讲一下为什么前几天把D货物平掉？",
+      "expect": "decision_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "Why short TSLA after the earnings?",
+      "expect": "decision_why",
+      "persona": "a night-shift trader who is tired and terse",
+      "lang": "en"
+    },
+    {
+      "ask": "Where did the desk pull the numbers from on 4567?",
+      "expect": "evidence",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "那天你们选择买入SPX期权的理由是什么？",
+      "expect": "decision_why",
+      "persona": "a student learning to trade who asks naive, wordy questions",
+      "lang": "zh"
+    },
+    {
+      "ask": "What’s the run‑log of every call the floor made since the bell?",
+      "expect": "decision_list",
+      "persona": "a former floor trader who uses old pit jargon",
+      "lang": "en"
+    },
+    {
+      "ask": "你们为什么在昨天收盘时买进A股？",
+      "expect": "decision_why",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "你们现在正处于午盘吗？",
+      "expect": "session",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "zh"
+    },
+    {
+      "ask": "How do you gauge that confidence staying real after the fact?",
+      "expect": "calibration",
+      "persona": "a sceptical journalist probing the desk for weaknesses",
+      "lang": "en"
+    },
+    {
+      "ask": "今天的交易区间是怎么划分的？",
+      "expect": "session",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "现在行情处于什么阶段？",
+      "expect": "session",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    },
+    {
+      "ask": "How reliable are those certainty percentages you've been pinging us?",
+      "expect": "calibration",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "en"
+    },
+    {
+      "ask": "现在处于谁的交易时段？",
+      "expect": "session",
+      "persona": "a data scientist who phrases everything as a hypothesis",
+      "lang": "zh"
+    },
+    {
+      "ask": "这笔交易参考了哪些行情或新闻？",
+      "expect": "evidence",
+      "persona": "a busy founder who dictates questions by voice and rambles",
+      "lang": "zh"
+    }
+  ]
+}
