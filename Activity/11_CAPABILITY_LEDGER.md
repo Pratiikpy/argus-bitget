@@ -74,6 +74,28 @@ reasoning-trail quality), `t3-lui` (no rival for conversational/LUI fluency), `t
 comparisons apparently ran once (cited by name in standing.py), but `data/*.json` for none of them
 exists now. Next AUDIT iteration: re-run all three and confirm they still work, or mark honestly.
 
+## AUDIT sweep, 2026-09-21 — internal contradictions found and fixed
+
+A full sweep of the 26 `SCOPE_STATEMENT`-bearing comparison modules (dispatched from the CONNECT
+lens; processed in the next AUDIT iteration — full detail in `Activity/10_LOOP_DESIGN.md`, iterations
+2–3) found and fixed **five modules carrying a stale or self-contradictory claim in their own
+shipped artefact**: `sentiment_comparison.py` (repeated a finding `standing.py` had already
+reversed), `mandate_comparison.py` (three different counts for one quantity, plus two wrong
+`desk.py` line citations — backs an already-OWNED capability), `dsr_comparison.py` and
+`crosssection_comparison.py` (hardcoded sweep sizes that drifted after a grid dimension was
+added — both converted to functions fed by the live count, matching last iteration's
+`quarantine_comparison.py` fix), and `review_comparison.py` (a real coverage gap — "four
+thresholds ablated" claimed, only two actually are; the missing two are queued as BUILD work, not
+rushed). `sentiment_comparison.json` could not be regenerated — its module needs
+`BITGET_QWEN_API_KEY`, genuinely tested and genuinely blocked by the standing rule against
+spending that metered key from a loop.
+
+**Still queued from the same sweep:** `arbitrage_comparison.py` (flagged as the highest-risk
+latent case — six live-data literals in one prose block, methodology switched from signed to
+absolute basis), `factor_divergence_comparison.py`, `eventdriven_comparison.py`,
+`cointegration_comparison.py`, `rotation_comparison.py` (all need a re-run to confirm no further
+drift, none confirmed broken yet).
+
 ## Live-surface defects found by the JUDGE lens
 
 | surface | defect | found |
