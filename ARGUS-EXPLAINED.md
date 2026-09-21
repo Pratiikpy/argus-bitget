@@ -558,7 +558,7 @@ cries wolf on correct writing is worse than no checker, because the next real fi
 
 **3. We published our own negative result — and then published a harsher correction to it.**
 We ran four anti-overfit gates over our eight vetted factor primitives on 2,159 real NVDA bars.
-**Six are indistinguishable from randomly shuffled data. Two return no verdict at all for want of
+**All eight are indistinguishable from randomly shuffled data. None returns a verdict for want of
 data — which is not a pass. None clears every gate, and all eight are net-negative after the 12bps
 round trip.** Statistical structure and tradeable edge are different things.
 

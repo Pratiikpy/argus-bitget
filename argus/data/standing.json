@@ -275,8 +275,8 @@
         },
         {
           "condition": "failure_cases_documented",
-          "how": "0 of 12 symbols survive DSR on either gate, and that is what is reported",
-          "artefact": "data/track1_study.json",
+          "how": "2 of 8 primitives return no verdict: the deflated-Sharpe gate needs a variance across trials and raises rather than returning NaN when the observations cannot supply one. The refusal is designed \u2014 vectorbt's own deflated_sharpe_ratio silently NaNs on a single trial \u2014 and a gate that cannot decide has still protected nothing on that input, which is why it is counted as a failure case rather than folded into the rejections",
+          "artefact": "data/overfit_gates.json",
           "test": ""
         },
         {
@@ -2589,11 +2589,6 @@
       "capability": "Deliberation priced as a trading cost",
       "problem": "reproducibility_proven is claimed but not evidenced",
       "detail": "data/deliberation_comparison.json records nothing about reproducibility_proven: no key among reproducibility, reproducible, deterministic, identical, seed, seeds..."
-    },
-    {
-      "capability": "Overfitting gates that raise instead of returning NaN",
-      "problem": "failure_cases_documented is claimed but not evidenced",
-      "detail": "data/track1_study.json records nothing about failure_cases_documented: no key among failure, failures, failure_cases, misses, limitation, limitations..."
     },
     {
       "capability": "Market sentiment",

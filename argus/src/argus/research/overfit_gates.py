@@ -221,6 +221,38 @@ def report_of(
         "cleared_every_gate": [o.factor for o in cleared],
         "cleared_but_unprofitable_after_fees": unprofitable,
         "finding": finding,
+        # **Where the gates could not answer — the capability's own failure cases.**
+        #
+        # `not_proven_insufficient_data` has always carried this count and the standing register
+        # correctly reported the condition unproven, because the artefact never used the word and
+        # the proof pointed at `track1_study.json`, whose 0-of-12 DSR survival is a statement
+        # about the *factors* rather than about the gates.
+        #
+        # These are different failures and conflating them flatters us. A gate that rejects a
+        # factor is working. A gate that cannot reach a verdict has not protected anything — it
+        # has declined to, honestly, and a reader is entitled to know on which inputs.
+        "failure_cases": {
+            "definition": (
+                "primitives on which the anti-overfit gates could not return a verdict at all"
+            ),
+            "count": len(not_proven),
+            "of_primitives": len(outcomes),
+            "factors": list(not_proven),
+            "why": (
+                "the deflated-Sharpe gate needs a trial count and a variance across trials; with "
+                "too few observations the variance is undefined and the gate raises rather than "
+                "returning NaN. The refusal is the designed behaviour — vectorbt's own "
+                "deflated_sharpe_ratio silently returns NaN on a single trial, which a caller "
+                "filtering with a negated comparison then admits — but a gate that cannot decide "
+                "has protected nothing on that input, and saying so is the point."
+            ),
+            "scope_statement": (
+                "NOT CLAIMED: that these two are the only inputs the gates cannot handle — they "
+                "are the ones this instrument and window produced. NOT CLAIMED: that a refusal is "
+                "a defect; it is the correct behaviour and it is also not a pass, which is why it "
+                "is counted here rather than folded into the rejected count."
+            ),
+        },
         "detail": [o.as_dict() for o in outcomes],
     }
 

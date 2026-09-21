@@ -1531,7 +1531,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        6
+        8
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -1541,13 +1541,13 @@
       "doc": "explained",
       "line": 561,
       "quoted": [
-        "Six"
+        "eight"
       ],
       "live": [
-        6
+        8
       ],
       "status": "OK",
-      "excerpt": "Six are indistinguishable from"
+      "excerpt": "eight are indistinguishable from"
     }
   ]
 }

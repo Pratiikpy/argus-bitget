@@ -688,8 +688,20 @@ REGISTER: tuple[Capability, ...] = (
             ),
             Proof(
                 condition="failure_cases_documented",
-                how="0 of 12 symbols survive DSR on either gate, and that is what is reported",
-                artefact="data/track1_study.json",
+                # This cited `track1_study.json`'s 0-of-12 DSR survival, which is a statement
+                # about the *factors* — every one rejected — and not about the gates. A gate that
+                # rejects a factor is working. The gates' own failures are the inputs on which
+                # they cannot reach a verdict at all, and those live in `overfit_gates.json`,
+                # where the count had been recorded since the module was written and never named.
+                how=(
+                    "2 of 8 primitives return no verdict: the deflated-Sharpe gate needs a "
+                    "variance across trials and raises rather than returning NaN when the "
+                    "observations cannot supply one. The refusal is designed — vectorbt's own "
+                    "deflated_sharpe_ratio silently NaNs on a single trial — and a gate that "
+                    "cannot decide has still protected nothing on that input, which is why it is "
+                    "counted as a failure case rather than folded into the rejections"
+                ),
+                artefact="data/overfit_gates.json",
             ),
             Proof(
                 condition="baseline_reproduced",

@@ -5,9 +5,9 @@
 **ARGUS refuses trades that cannot pay for themselves, and writes down why before the
 outcome exists.**
 
-- Of eight vetted factor primitives over **2,159 real NVDA bars**, **6 are indistinguishable
-  from randomly shuffled data** and **2 return no verdict at all** for want of data — which
-  is not a pass. **None clears every gate, and all eight lose money after the 12bps round trip.**
+- Of eight vetted factor primitives over **2,159 real NVDA bars**, **all 8 are indistinguishable
+  from randomly shuffled data** — none clears a single gate, and all eight lose money after the
+  12bps round trip.
   Published, not buried (`data/overfit_gates.json`).
 - Every decision is hash-chained **before** its outcome exists, and **176 claims across the
   twelve Bitget rTokens** are pre-registered and anchored to Bitcoin before they can be checked
