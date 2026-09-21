@@ -356,6 +356,48 @@ def settled_trades() -> int:
     return int(PaperLedger(path=DATA / "paper_ledger.jsonl").performance()["settled_trades"])
 
 
+def _ngram_report() -> dict[str, Any]:
+    return dict(json.loads((DATA / "ngram_bench.json").read_text(encoding="utf-8")))
+
+
+def _ngram_layer(layer: str, field: str) -> Number:
+    """One layer's figure out of the bench artefact.
+
+    Every LUI number in the documents is read from the *same* run, so an accuracy and the error
+    count printed beside it can never come from two different measurements. Quoting a good
+    accuracy from one run next to a low error count from another would be true twice and
+    misleading once.
+    """
+    for row in _ngram_report()["layers"]:
+        if row["layer"] == layer:
+            value = row[field]
+            return round(float(value) * 100.0, 1) if field == "accuracy" else int(value)
+    raise KeyError(f"no layer {layer!r} in ngram_bench.json")
+
+
+def lui_fresh_accuracy() -> Number:
+    """In-scope accuracy on the independently authored corpus, as a percentage.
+
+    Guarded because it is the figure most likely to drift back upward by accident: every future
+    widening of `lui/question.py` raises the TUNED score, and a reader copying "the LUI number"
+    from a terminal could easily copy that one. This reads the fresh corpus's result out of the
+    artefact, so the document can only ever quote the number that was actually measured on a
+    corpus nobody here wrote.
+    """
+    blob = json.loads((DATA / "oblique_bench.json").read_text(encoding="utf-8"))
+    return float(blob["fresh"]["correct_pct"])
+
+
+def lui_router_fresh_accuracy() -> Number:
+    """The router's accuracy on the same corpus — the loss, kept checkable.
+
+    A withdrawn claim is only withdrawn while somebody keeps checking that the replacement is
+    still true. `luirouter.py` recomputes this on every run.
+    """
+    blob = json.loads((DATA / "lui_router.json").read_text(encoding="utf-8"))
+    return round(float(blob["headline"]["fresh_accuracy"]) * 100.0, 1)
+
+
 def refusal_accuracy_2h() -> tuple[Number, Number]:
     """Directional calls right, and total, at the ~2h horizon.
 
@@ -531,6 +573,26 @@ CLAIMS: tuple[Claim, ...] = (
           refusal_forgone_2h, ("readme", "public-readme")),
     Claim("standing_owned", r"(?P<q1>\d+) of (?P<q2>\d+) capabilities are OWNED",
           standing_counts, ("readme", "public-readme", "submission", "explained")),
+    # Both LUI figures are guarded because both are *losses*, and a losing number left ungated is
+    # the one that quietly improves between drafts. The phrasings are anchored to the sentences
+    # actually written in SUBMISSION-DRAFT.md.
+    Claim("lui_router_fresh_accuracy",
+          r"model2vec` scores the same (?P<q>[\d.]+)%",
+          lui_router_fresh_accuracy, ("submission",)),
+    # The three figures that describe the console a judge actually meets. All read out of
+    # `ngram_bench.json`, so the document cannot quote a layer's score from a different run than
+    # the one that produced its error count.
+    Claim("lui_patterns_accuracy",
+          r"regex layer that was deployed scores (?P<q>[\d.]+)%",
+          lambda: _ngram_layer("patterns", "accuracy"), ("submission",)),
+    Claim("lui_cascade",
+          r"now ships: (?P<q1>[\d.]+)% correct with (?P<q2>\d+) confident errors",
+          lambda: (_ngram_layer("cascade", "accuracy"),
+                   _ngram_layer("cascade", "confidently_wrong")),
+          ("submission",)),
+    Claim("lui_out_of_scope_recall",
+          r"Out-of-scope recall (?P<q>\d+)%",
+          lambda: round(_ngram_report()["out_of_scope"]["recall"] * 100.0), ("submission",)),
     Claim("reliable_skill_tools",
           r"(?P<q1>\d+) of (?P<q2>\d+) answer three times out of three",
           reliable_skill_tools, ("submission",)),
