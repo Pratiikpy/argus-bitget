@@ -217,16 +217,48 @@ def anchor(
     return result
 
 
+def _detached_file_bytes(digest: bytes, receipt_proof: bytes) -> bytes:
+    """Wrap a raw calendar receipt as a standard ``DetachedTimestampFile``.
+
+    **The docstring this replaced said the raw bytes were written "unchanged so the reference
+    client can read them", and that was exactly backwards.** A calendar returns the *timestamp*
+    portion of a proof; an ``.ots`` file is that portion preceded by the header magic, a version
+    varint, the file-hash operation and the digest. Written raw, the reference client rejects the
+    file on the magic before reading any proof — which is what it did to all 48 proofs on
+    2026-09-20.
+
+    That was repaired by rewriting the files on disk, and the writer was left alone, so the next
+    four anchors were born broken and `tests/test_anchorcheck.py` failed on them. Fixing the
+    artefact and not the thing that produces it buys exactly one cycle.
+
+    The layout is built by hand rather than by importing ``opentimestamps``: this module is on the
+    write path for the paper ledger, and the library is an eval-time dependency that the deployed
+    bundle does not carry. `register/anchorcheck.py` reads every file back with the real library,
+    so the format is verified against the reference implementation rather than against this
+    comment.
+    """
+    from io import BytesIO
+
+    out = BytesIO()
+    out.write(b"\x00OpenTimestamps\x00\x00Proof\x00\xbf\x89\xe2\xe8\x84\xe8\x92\x94")
+    out.write(b"\x01")          # major version, as a varint
+    out.write(b"\x08")          # OpSHA256's tag — the digests here are SHA-256
+    out.write(digest)
+    out.write(receipt_proof)
+    return out.getvalue()
+
+
 def _store(result: Anchor, *, directory: Path) -> None:
     """Write the proofs beside the ledger, one file per calendar plus a manifest.
 
-    The raw ``.ots`` bytes are written unchanged so the reference client can read them. A proof
-    reformatted for our own convenience would be a proof only we can verify.
+    Each is written as a standard ``DetachedTimestampFile`` so the reference client can read it.
+    A proof only we can parse is not a proof.
     """
     directory.mkdir(parents=True, exist_ok=True)
+    digest = binascii.unhexlify(result.digest_hex)
     for index, receipt in enumerate(result.receipts):
         name = f"{result.digest_hex[:16]}-{index}.ots"
-        (directory / name).write_bytes(receipt.proof_bytes)
+        (directory / name).write_bytes(_detached_file_bytes(digest, receipt.proof_bytes))
     (directory / f"{result.digest_hex[:16]}.json").write_text(
         json.dumps(result.as_dict(), indent=2) + "\n", encoding="utf-8"
     )

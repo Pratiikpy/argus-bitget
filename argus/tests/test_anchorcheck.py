@@ -108,3 +108,66 @@ class TestTheCheckerCanActuallyFail:
         """Guards against the check quietly pointing at a fixture directory."""
         assert ANCHOR_DIR.name == "anchors"
         assert ANCHOR_DIR.exists()
+
+
+class TestTheWriterProducesReadableProofs:
+    """**The repair that had to happen twice.**
+
+    On 2026-09-20 all 48 proofs were unreadable by the reference client — they held the raw
+    calendar receipt with no ``DetachedTimestampFile`` header — and were rewritten on disk. The
+    *writer* in `paper/anchor.py` was left alone, its docstring still claiming the raw bytes were
+    written "unchanged so the reference client can read them". The next cadence cycle produced four
+    more broken proofs and this file failed on them.
+
+    Fixing an artefact without fixing what produces it buys exactly one cycle. These tests are on
+    the writer.
+    """
+
+    def test_a_written_proof_parses_with_the_reference_library(self) -> None:
+        # A **real** calendar receipt out of a stored manifest, not a hand-built one. The first
+        # attempt wrote a plausible-looking body by hand and the reference library raised
+        # TruncationError on it — proving only that the test author cannot hand-write the wire
+        # format, which was never the question. The question is whether the wrapper is right.
+        import binascii
+        import json
+
+        from opentimestamps.core.serialize import (  # type: ignore[import-untyped]
+            BytesDeserializationContext,
+        )
+        from opentimestamps.core.timestamp import (  # type: ignore[import-untyped]
+            DetachedTimestampFile,
+        )
+
+        from argus.paper.anchor import _detached_file_bytes
+
+        manifest = next(
+            path for path in sorted(ANCHOR_DIR.glob("*.json")) if "-" not in path.stem
+        )
+        stored = json.loads(manifest.read_text(encoding="utf-8"))
+        digest = binascii.unhexlify(stored["digest"])
+        body = binascii.unhexlify(stored["receipts"][0]["proof_hex"])
+
+        parsed = DetachedTimestampFile.deserialize(
+            BytesDeserializationContext(_detached_file_bytes(digest, body))
+        )
+        # `file_digest` is an attribute on the library's own class, not a method. Read from
+        # `DetachedTimestampFile`, not guessed.
+        assert parsed.file_digest == digest
+
+    def test_the_header_is_the_one_the_reference_client_looks_for(self) -> None:
+        """Asserted against the library's own constant, never against a copied literal."""
+        from opentimestamps.core.timestamp import (  # type: ignore[import-untyped]
+            DetachedTimestampFile,
+        )
+
+        from argus.paper.anchor import _detached_file_bytes
+
+        written = _detached_file_bytes(bytes(32), b"")
+        assert written.startswith(DetachedTimestampFile.HEADER_MAGIC)
+
+    def test_the_digest_survives_the_wrapping(self) -> None:
+        """A proof that attests a different digest than the one anchored proves nothing."""
+        from argus.paper.anchor import _detached_file_bytes
+
+        digest = bytes(range(100, 132))
+        assert digest in _detached_file_bytes(digest, b"\x00")

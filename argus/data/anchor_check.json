@@ -1,9 +1,9 @@
 {
-  "total": 48,
-  "readable": 48,
+  "total": 52,
+  "readable": 52,
   "unreadable": 0,
   "confirmed_on_bitcoin": 38,
-  "calendar_pending": 10,
+  "calendar_pending": 14,
   "bitcoin_block_range": [
     966822,
     967736
@@ -513,6 +513,42 @@
       "bitcoin_blocks": [
         967122
       ],
+      "pending_calendars": [
+        "https://finney.calendar.eternitywall.com"
+      ],
+      "error": ""
+    },
+    {
+      "path": "f9c6f4cae94c2b7d-0.ots",
+      "readable": true,
+      "bitcoin_blocks": [],
+      "pending_calendars": [
+        "https://alice.btc.calendar.opentimestamps.org"
+      ],
+      "error": ""
+    },
+    {
+      "path": "f9c6f4cae94c2b7d-1.ots",
+      "readable": true,
+      "bitcoin_blocks": [],
+      "pending_calendars": [
+        "https://bob.btc.calendar.opentimestamps.org"
+      ],
+      "error": ""
+    },
+    {
+      "path": "f9c6f4cae94c2b7d-2.ots",
+      "readable": true,
+      "bitcoin_blocks": [],
+      "pending_calendars": [
+        "https://alice.btc.calendar.opentimestamps.org"
+      ],
+      "error": ""
+    },
+    {
+      "path": "f9c6f4cae94c2b7d-3.ots",
+      "readable": true,
+      "bitcoin_blocks": [],
       "pending_calendars": [
         "https://finney.calendar.eternitywall.com"
       ],
