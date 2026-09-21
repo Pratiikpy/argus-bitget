@@ -394,6 +394,35 @@ def standing_counts() -> tuple[Number, Number]:
     return len(report.earned), len(report.capabilities)
 
 
+def reliable_skill_tools() -> tuple[Number, Number]:
+    """Bitget Skill tools that answer every attempt, and the total probed.
+
+    Pinned because this figure was quoted from a single sweep and was **understating** us: the
+    snapshot said 6 of 19 and repeated measurement found 9. A claim that moves depending on which
+    day it was taken needs the gate more than a stable one does."""
+    blob = _json("skill_reliability.json")
+    return int(blob["by_verdict"].get("reliable", 0)), int(blob["tools"])
+
+
+def answering_data_entries() -> tuple[Number, Number]:
+    """Bitget data-catalog entries that return rows, and the total called."""
+    blob = _json("data_coverage.json")
+    return int(blob["answering"]), int(blob["entries_probed"])
+
+
+def governed_failure_rates() -> tuple[Number, Number]:
+    """Ungoverned and governed failure rates from the adaptive stress search, as percentages.
+
+    The Track 2 headline for *risk control layer effectiveness*, and the one number in this
+    project that is not a chosen parameter — the adversary searched for the path rather than
+    being handed one."""
+    paired = _json("stress_test.json")["paired"]
+    return (
+        round(100 * float(paired["ungoverned_failure_rate"]), 1),
+        round(100 * float(paired["governed_failure_rate"]), 1),
+    )
+
+
 def module_count() -> int:
     from argus.status import MODULES
     return len(MODULES)
@@ -502,6 +531,14 @@ CLAIMS: tuple[Claim, ...] = (
           refusal_forgone_2h, ("readme", "public-readme")),
     Claim("standing_owned", r"(?P<q1>\d+) of (?P<q2>\d+) capabilities are OWNED",
           standing_counts, ("readme", "public-readme", "submission", "explained")),
+    Claim("reliable_skill_tools",
+          r"(?P<q1>\d+) of (?P<q2>\d+) answer three times out of three",
+          reliable_skill_tools, ("submission",)),
+    Claim("answering_data_entries", r"(?P<q1>\d+) of (?P<q2>\d+) answer, and",
+          answering_data_entries, ("submission",)),
+    Claim("governed_failure_rates",
+          r"failure rate is (?P<q1>[\d.]+)% ungoverned against (?P<q2>[\d.]+)% governed",
+          governed_failure_rates, ("submission",)),
     Claim("settled_trades", r"(?P<q>\d+) settled trades?",
           settled_trades, ("readme", "submission", "explained")),
     # Registered the day the anchor claims were found to be false. The documents said the register
