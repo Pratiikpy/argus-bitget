@@ -24,7 +24,7 @@ carries a result.**
 | 7 | `t2-sharpe-mdd-winrate` | T2 | judging | NOT DEMONSTRATED | — | no | — | — |
 | 8 | `t2-explainability` | T2 | judging | IMPLEMENTED | — | no | — | — |
 | 9 | `t2-risk-control` | T2 | judging | IMPLEMENTED (weak) | freqtrade PrecisionRecallProtection | **yes** | ARGUS (precision 59.2% vs 19.3% at full recall, dominates every threshold) | 2026-09-21 |
-| 10 | `t2-architecture` | T2 | judging | IMPLEMENTED | — | no | — | — |
+| 10 | `t2-architecture` | T2 | judging | IMPLEMENTED | RD-Agent + AgentDojo (two rivals) | **yes** | ARGUS (no execution surface vs RD-Agent's real `eval()`; 0 production FPs after fix vs 6 before) | 2026-09-21 |
 | 11 | `info-extraction` | T3 | subtheme | IMPLEMENTED | — | no | — | — |
 | 12 | `review-self-evolution` | T3 | subtheme | IMPLEMENTED | — | no | — | — |
 | 13 | `stress-testing` | T3 | subtheme | **LOST** | stumpy FLUSS + ruptures + incumbent rule | **yes** | specialist | 2026-09-21 |
@@ -38,16 +38,19 @@ carries a result.**
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 7 of 20 as of 2026-09-21: 3 LOST (one of them split — LUI intent
+**`rival run` is `yes` on 8 of 20 as of 2026-09-21: 3 LOST (one of them split — LUI intent
 accuracy loses to Rasa's DIET classifier, p=0.0014, while ARGUS wins out-of-scope refusal
-separately and significantly, p=0.031, neither laundering the other), 3 real wins (earnings vs
+separately and significantly, p=0.031, neither laundering the other), 4 real wins (earnings vs
 QuantConnect, factor-discovery vs Microsoft RD-Agent, risk-control vs freqtrade's real
 PrecisionRecallProtection — ARGUS's precision at full recall is 59.2% against freqtrade's best
 swept 19.3%, dominating every threshold, and freqtrade's own proxy correlates only weakly
-(r=0.26) with the real drawdown ground truth it approximates), 1 methodological (event-driven vs
-whale-signals — neither system establishes a real effect on this data; the finding is that
-whale-signals tests against the wrong null, not that ARGUS's own number beats theirs, and no
-fabricated score is recorded for it).** That is this ledger's honest scoreboard — it names whether
+(r=0.26) with the real drawdown ground truth it approximates — and architecture vs two rivals at
+once, RD-Agent's real `eval()`-executed injection against ARGUS's zero execution surface, plus
+AgentDojo's real attack corpus behind the production false-positive count that went from 6 to 0),
+1 methodological (event-driven vs whale-signals — neither system establishes a real effect on
+this data; the finding is that whale-signals tests against the wrong null, not that ARGUS's own
+number beats theirs, and no fabricated score is recorded for it).** That is this ledger's honest
+scoreboard — it names whether
 *this specific Bitget-taxonomy row* has a rival comparison wired in, which is a narrower and
 different question from `eval/standing.py`'s own register (27 capabilities across the whole
 codebase, 17 OWNED, 3 LOST, independently verified — do not read "0" here as "0 OWNED anywhere,"

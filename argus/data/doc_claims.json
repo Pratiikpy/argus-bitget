@@ -283,8 +283,8 @@
         "218"
       ],
       "live": [
-        233,
-        229
+        244,
+        240
       ],
       "status": "LAGGING",
       "excerpt": "222 of those 500 decisions were taken in a tradeable session with the anchor market open, and **218 of them"
@@ -571,7 +571,7 @@
         "500"
       ],
       "live": [
-        519
+        522
       ],
       "status": "LAGGING",
       "excerpt": "500 decisions in the paper ledger"
@@ -582,7 +582,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        519
+        522
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -593,7 +593,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        519
+        522
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -696,7 +696,7 @@
         "500"
       ],
       "live": [
-        519
+        522
       ],
       "status": "LAGGING",
       "excerpt": "500 decisions"
@@ -709,7 +709,7 @@
         "500"
       ],
       "live": [
-        519
+        522
       ],
       "status": "LAGGING",
       "excerpt": "500 ledger entries"
@@ -722,7 +722,7 @@
         "500"
       ],
       "live": [
-        519
+        522
       ],
       "status": "LAGGING",
       "excerpt": "500 decisions"
@@ -735,7 +735,7 @@
         "500"
       ],
       "live": [
-        519
+        522
       ],
       "status": "LAGGING",
       "excerpt": "paper-trading log has 500 decisions"
@@ -746,7 +746,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        469
+        481
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -757,7 +757,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        469
+        481
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -770,7 +770,7 @@
         "457"
       ],
       "live": [
-        469
+        481
       ],
       "status": "LAGGING",
       "excerpt": "457 have settled as abstentions"
@@ -783,7 +783,7 @@
         "334"
       ],
       "live": [
-        353
+        356
       ],
       "status": "LAGGING",
       "excerpt": "334 decisions carry a lean"
@@ -794,7 +794,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        353
+        356
       ],
       "status": "ABSENT",
       "excerpt": ""

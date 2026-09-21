@@ -670,6 +670,31 @@ def j_t2_architecture() -> Finding:
     report = architecture_audit()
     gates = authorisation_chokepoints()
     stable = [p for p in report.packages if p.instability == 0.0 and p.afferent > 5]
+    rival = ""
+    rd = _load_json("rdagent_comparison.json")
+    q = _load_json("quarantine_comparison.json")
+    if rd is not None and q is not None:
+        argus_scan = rd["argus_execution_surface_scan"]
+        rd_scan = rd["rdagent_execution_surface_scan"]
+        precision = q["precision"]
+        # Two independent rivals, two different attack surfaces, same architectural property:
+        # ARGUS's deterministic layers have no path to code execution at all, so there is nothing
+        # for an injection to run on. Microsoft's real RD-Agent does have that path and a real
+        # injection used it; AgentDojo's real attack corpus measures what reaches a human/desk
+        # decision through it, before and after the fix that measurement forced.
+        rival = (
+            f" · measured against two real rivals on the same property: Microsoft's real "
+            f"RD-Agent (`{rd_scan['path'].rsplit(chr(92), 1)[-1]}`) has an execution surface "
+            f"({rd_scan['forbidden_calls_found']}) and a real injected payload executed through "
+            f"it ({rd['injection_proof']['executed_attacker_code']}); ARGUS's own factor "
+            f"proposer (`{argus_scan['path'].rsplit(chr(92), 1)[-1]}`) has none "
+            f"({argus_scan['has_execution_surface']}). Separately, AgentDojo's real 302-string "
+            f"attack corpus (recall {q['recall']['totals']['withheld']}/"
+            f"{q['recall']['totals']['strings']}) measures what reaches a production decision: "
+            f"{precision['production_false_positives_before']} production false positives before "
+            f"the rewrite the comparison forced, {precision['production_false_positives_after']} "
+            f"after"
+        )
     return Finding(
         RUNS if report.sound else WEAK,
         f"{len(report.graph.modules)} modules, {len(report.graph.edges)} internal imports. "
@@ -679,7 +704,8 @@ def j_t2_architecture() -> Finding:
         f"reported as coupling rather than scored as clean. The deterministic core "
         f"({', '.join(DETERMINISTIC_NAMES)}) reaches no model-facing module at any depth. "
         f"{len(stable)} foundation package(s) carry high fan-in at zero instability. "
-        f"{len(gates)} authorisation chokepoint(s) that raise rather than warn: {', '.join(gates)}",
+        f"{len(gates)} authorisation chokepoint(s) that raise rather than warn: "
+        f"{', '.join(gates)}{rival}",
         "data/architecture.json",
     )
 
