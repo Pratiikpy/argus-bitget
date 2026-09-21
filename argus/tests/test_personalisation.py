@@ -288,3 +288,58 @@ class TestTheMandateRespectsTheBook:
         conservative, _aggressive = standard_profiles()
         report = audit([_p(notional="4000", loss="2")], (conservative,), book=book)
         assert report.cases[0].verdicts[0].outcome is Outcome.REFUSED
+
+
+class TestTheDemonstrationLeavesEvidence:
+    """**It printed its result and wrote nothing, and "personalized thesis" is a judged criterion.**
+
+    Every other capability in this project lands an artefact that `eval/docclaims.py` can read and
+    a document can cite. This one produced a divergence rate that existed only in whichever
+    terminal last ran it — which is an assertion, the exact thing the module's own docstring says
+    it was built to replace.
+    """
+
+    def test_running_it_writes_an_artefact(self, tmp_path, monkeypatch) -> None:
+        import json
+
+        import argus.desk.personalisation as mod
+
+        target = tmp_path / "personalisation.json"
+        monkeypatch.setattr(mod, "REPORT_PATH", target)
+        assert mod.main() == 0
+        written = json.loads(target.read_text(encoding="utf-8"))
+        assert "divergence_rate" in written
+        assert written.get("cases")
+
+    def test_the_artefact_names_what_it_does_not_claim(self, tmp_path, monkeypatch) -> None:
+        """A divergence rate with no scope statement invites the reading that higher is better.
+
+        It is not: a profile set that disagrees about everything is as useless as one that agrees
+        about everything.
+        """
+        import json
+
+        import argus.desk.personalisation as mod
+
+        target = tmp_path / "personalisation.json"
+        monkeypatch.setattr(mod, "REPORT_PATH", target)
+        mod.main()
+        scope = json.loads(target.read_text(encoding="utf-8"))["scope_statement"]
+        assert "NOT CLAIMED" in scope
+
+    def test_cases_where_personalisation_did_not_bind_are_kept(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        """Dropping the non-diverging cases would turn a measurement into a highlight reel."""
+        import json
+
+        import argus.desk.personalisation as mod
+
+        target = tmp_path / "personalisation.json"
+        monkeypatch.setattr(mod, "REPORT_PATH", target)
+        mod.main()
+        cases = json.loads(target.read_text(encoding="utf-8"))["cases"]
+        assert any(not c["diverged"] for c in cases), (
+            "every case diverged, so either the fixtures changed or the non-diverging ones "
+            "are being filtered out of the artefact"
+        )

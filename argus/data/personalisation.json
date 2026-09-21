@@ -1,0 +1,138 @@
+{
+  "proposals": 4,
+  "diverged": 1,
+  "divergence_rate": 0.25,
+  "is_evidence": true,
+  "cases": [
+    {
+      "proposal": {
+        "symbol": "NVDAUSDT",
+        "sector": "technology",
+        "notional": "20000",
+        "horizon_hours": 24.0,
+        "expected_loss_pct": "8"
+      },
+      "diverged": true,
+      "sizes_diverged": true,
+      "outcomes": [
+        "refused",
+        "taken"
+      ],
+      "verdicts": [
+        {
+          "profile": "conservative income",
+          "outcome": "refused",
+          "permitted_notional": "0",
+          "reasons": [
+            "the thesis concedes 8% in its bad case against a 3% tolerance; resizing does not change a percentage"
+          ]
+        },
+        {
+          "profile": "aggressive event trader",
+          "outcome": "taken",
+          "permitted_notional": "20000",
+          "reasons": [
+            "within a 25% position limit and the 72h ceiling this mandate actually applies (48h x 1.5 slack)"
+          ]
+        }
+      ]
+    },
+    {
+      "proposal": {
+        "symbol": "NVDAUSDT",
+        "sector": "technology",
+        "notional": "4000",
+        "horizon_hours": 24.0,
+        "expected_loss_pct": "2"
+      },
+      "diverged": false,
+      "sizes_diverged": false,
+      "outcomes": [
+        "taken"
+      ],
+      "verdicts": [
+        {
+          "profile": "conservative income",
+          "outcome": "taken",
+          "permitted_notional": "4000",
+          "reasons": [
+            "within a 5% position limit and the 1080h ceiling this mandate actually applies (720h x 1.5 slack)"
+          ]
+        },
+        {
+          "profile": "aggressive event trader",
+          "outcome": "taken",
+          "permitted_notional": "4000",
+          "reasons": [
+            "within a 25% position limit and the 72h ceiling this mandate actually applies (48h x 1.5 slack)"
+          ]
+        }
+      ]
+    },
+    {
+      "proposal": {
+        "symbol": "MSTRUSDT",
+        "sector": "technology",
+        "notional": "15000",
+        "horizon_hours": 2000.0,
+        "expected_loss_pct": "12"
+      },
+      "diverged": false,
+      "sizes_diverged": false,
+      "outcomes": [
+        "refused"
+      ],
+      "verdicts": [
+        {
+          "profile": "conservative income",
+          "outcome": "refused",
+          "permitted_notional": "0",
+          "reasons": [
+            "the thesis needs 2000h against a 720h mandate; that is a different trader's trade"
+          ]
+        },
+        {
+          "profile": "aggressive event trader",
+          "outcome": "refused",
+          "permitted_notional": "0",
+          "reasons": [
+            "the thesis needs 2000h against a 48h mandate; that is a different trader's trade"
+          ]
+        }
+      ]
+    },
+    {
+      "proposal": {
+        "symbol": "COINUSDT",
+        "sector": "technology",
+        "notional": "3000",
+        "horizon_hours": 12.0,
+        "expected_loss_pct": "20"
+      },
+      "diverged": false,
+      "sizes_diverged": false,
+      "outcomes": [
+        "refused"
+      ],
+      "verdicts": [
+        {
+          "profile": "conservative income",
+          "outcome": "refused",
+          "permitted_notional": "0",
+          "reasons": [
+            "the thesis concedes 20% in its bad case against a 3% tolerance; resizing does not change a percentage"
+          ]
+        },
+        {
+          "profile": "aggressive event trader",
+          "outcome": "refused",
+          "permitted_notional": "0",
+          "reasons": [
+            "the thesis concedes 20% in its bad case against a 15% tolerance; resizing does not change a percentage"
+          ]
+        }
+      ]
+    }
+  ],
+  "scope_statement": "Every profile in `standard_profiles()` is run against the same proposals and its verdict recorded, so 'personalised' means the profiles reached DIFFERENT answers on IDENTICAL market state rather than that a profile object exists. NOT CLAIMED: that a high divergence rate is good \u2014 a profile set that disagrees about everything is as useless as one that agrees about everything. NOT CLAIMED: that these four proposals characterise the space; they are four, and the cases where personalisation did NOT bind are printed by name rather than dropped."
+}
