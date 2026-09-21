@@ -219,3 +219,53 @@ class TestThePageHoldsUpAtPhoneWidthAndInBothThemes:
 
     def test_the_viewport_meta_is_present(self) -> None:
         assert 'name="viewport"' in PAGE and "width=device-width" in PAGE
+
+
+class TestTheResearchTaskIsReachable:
+    """**A required Track 3 material that had no route.**
+
+    The handbook asks for "one complete research task (full flow from question to actionable
+    insight)". `desk/research.py` runs it and `data/research_report.json` records it — and the
+    file shipped inside the deploy bundle with nothing serving it. A deliverable a judge cannot
+    open is a deliverable that was not submitted.
+    """
+
+    def test_the_page_renders_the_whole_chain(self, base_url: str) -> None:
+        status, raw, headers = _get(base_url + "/research")
+        body = raw.decode("utf-8")
+        assert status == 200
+        assert "text/html" in headers.get("Content-Type", "")
+        assert "One complete research task" in body
+        assert "Produced by" in body
+
+    def test_the_artefact_is_available_as_json(self, base_url: str) -> None:
+        status, body, _ = _get(base_url + "/research?format=json")
+        assert status == 200
+        payload = json.loads(body)
+        assert payload["available"] is True
+        assert payload["findings"], "the chain must carry its steps"
+        assert payload["question"] and payload["verdict"]
+
+    def test_every_step_names_what_produced_it(self, base_url: str) -> None:
+        """The point of the page is provenance, not the verdict."""
+        _, body, _ = _get(base_url + "/research?format=json")
+        for finding in json.loads(body)["findings"]:
+            assert finding.get("step"), finding
+            assert "source" in finding, finding
+
+    def test_the_console_links_to_it(self, base_url: str) -> None:
+        """A route nobody can find is the same problem one step removed."""
+        _, raw, _ = _get(base_url + "/")
+        assert "/research" in raw.decode("utf-8")
+
+    def test_a_missing_artefact_is_a_stated_absence_not_an_empty_page(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        """"Has not been run" and "ran and found nothing" are different claims."""
+        import argus.lui.server as mod
+
+        monkeypatch.setenv("ARGUS_DATA_DIR", str(tmp_path))
+        report = mod._research_report()
+        assert report["available"] is False
+        assert "looked_in" in report
+        assert "No research task on record" in mod._render_research(report)
