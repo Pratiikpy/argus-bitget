@@ -278,56 +278,56 @@
       "doc": "readme",
       "line": 169,
       "quoted": [
-        "92",
-        "158"
+        "115",
+        "193"
       ],
       "live": [
-        92,
-        158
+        115,
+        193
       ],
       "status": "OK",
-      "excerpt": "92 of 158 directional calls"
+      "excerpt": "115 of 193 directional calls"
     },
     {
       "claim": "refusal_accuracy_2h",
       "doc": "public-readme",
       "line": 101,
       "quoted": [
-        "92",
-        "158"
+        "115",
+        "193"
       ],
       "live": [
-        92,
-        158
+        115,
+        193
       ],
       "status": "OK",
-      "excerpt": "92 of 158 directional calls"
+      "excerpt": "115 of 193 directional calls"
     },
     {
       "claim": "refusal_forgone_2h",
       "doc": "readme",
       "line": 169,
       "quoted": [
-        "\u22127.9"
+        "\u22126.9"
       ],
       "live": [
-        -7.93
+        -6.93
       ],
       "status": "OK",
-      "excerpt": "forgave \u22127.9bps of net edge"
+      "excerpt": "forgave \u22126.9bps of net edge"
     },
     {
       "claim": "refusal_forgone_2h",
       "doc": "public-readme",
-      "line": 104,
+      "line": 105,
       "quoted": [
-        "\u22127.9"
+        "\u22126.9"
       ],
       "live": [
-        -7.93
+        -6.93
       ],
       "status": "OK",
-      "excerpt": "forgave \u22127.9bps of net edge"
+      "excerpt": "forgave \u22126.9bps of net edge"
     },
     {
       "claim": "standing_owned",
@@ -347,7 +347,7 @@
     {
       "claim": "standing_owned",
       "doc": "public-readme",
-      "line": 109,
+      "line": 110,
       "quoted": [
         "17",
         "24"

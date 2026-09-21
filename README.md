@@ -98,10 +98,11 @@ each sub-theme has passed, and several remain open. Two things are unproven rath
 **The obvious attack, and the measurement that answers it.** *"447 decisions, zero trades — it has
 demonstrated nothing."* Every refusal carries a stated direction, hashed with the decision before
 the outcome exists, so the counterfactual was committed to rather than reconstructed. Graded against
-what actually happened (`python -m argus.eval.refusal`): at the ~2h horizon **92 of 158 directional
-calls were right — 58.2%, 95% Wilson interval 50.4–65.6%**, which excludes a coin flip but only
-barely, and the overnight horizon at 51.2% does not exclude one at all. The decisive figure is the
-other one: **the median decision forgave −7.9bps of net edge after the 12bps round trip.** The
+what actually happened (`python -m argus.eval.refusal`): at the ~2h horizon **115 of 193 directional
+calls were right — 59.6%, 95% Wilson interval 52.5–66.3%**, which excludes a coin flip but only
+barely, and the overnight horizon has *fallen to 40.4%* — below a coin flip, and still not
+distinguishable from one. The decisive figure is the
+other one: **the median decision forgave −6.9bps of net edge after the 12bps round trip.** The
 typical refusal was not caution costing money — it was the trade being unprofitable. An empty ledger
 is the result here, not the gap.
 
