@@ -10,7 +10,7 @@ from argus.eval.baselines.vectorbt_loader import (
     vectorbt_var_sharpe,
 )
 from argus.eval.dsr_comparison import (
-    SCOPE_STATEMENT,
+    scope_statement,
     DsrCase,
     ablation_cases,
     compare,
@@ -148,8 +148,13 @@ class TestSilentNanCost:
 
 class TestScopeStatement:
     def test_names_the_self_found_fix(self) -> None:
-        assert "NOT claimed" in SCOPE_STATEMENT
-        assert "fixed the same session" in SCOPE_STATEMENT
+        text = scope_statement(1215)
+        assert "NOT claimed" in text
+        assert "fixed the same session" in text
+
+    def test_carries_the_live_sweep_count(self) -> None:
+        assert "42" in scope_statement(42)
+        assert "42" not in scope_statement(43)
 
 
 class TestMain:

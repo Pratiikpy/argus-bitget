@@ -410,13 +410,18 @@ not of any single sentence within it.
 NOT claimed: that ARGUS's SentimentAnalyst classifies sentiment more accurately than finBERT — \
 its own docstring explicitly disclaims that race ("FinBERT is the baseline and beating it on \
 classification is not where the edge is"), and this comparison does not attempt it. NOT claimed \
-that this defense is deployed with effect in production: the capability's own DEMOTED blocker \
-(the live sentiment feed is empty in ~93% of cycles) is untouched by this finding and stays \
-exactly as open — this comparison proves the MECHANISM works when evidence reaches it, not that \
-evidence currently reaches it. NOT claimed that finBERT itself is a bad model — it is doing \
-exactly what it was built to do (per-sentence classification); the gap is a naive CONSUMER of it \
-having no source-independence layer, which is an architectural property of the classification-\
-only paradigm, not a defect in finBERT's training.
+that this defense was ever deployed with effect while the feed was down: the capability's \
+DEMOTED blocker read, until 2026-09-16, "the live sentiment feed is empty in ~93% of cycles" — \
+that finding has since REVERSED (`eval/standing.py`'s own register, corrected the same day): a \
+live network-access change fixed the feed, and a sweep against the real twelve-symbol universe \
+found 0 of 12 cycles empty. This comparison's mechanism claim never depended on that number \
+either way — it proves the defense works when evidence reaches the analyst, which is now the \
+ordinary case rather than the rare one, and the correction is recorded here rather than left as \
+a stale parenthetical repeating a finding this project has already reversed elsewhere. NOT \
+claimed that finBERT itself is a bad model — it is doing exactly what it was built to do \
+(per-sentence classification); the gap is a naive CONSUMER of it having no source-independence \
+layer, which is an architectural property of the classification-only paradigm, not a defect in \
+finBERT's training.
 """
 
 

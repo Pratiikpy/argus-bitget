@@ -16,13 +16,14 @@ defense-in-depth check, and (skipped here — see :mod:`argus.eval.baselines`) m
 floors. ARGUS's ``Mandate.out_of_mandate`` checks holding horizon, position-size percentage of
 capital, an excluded-symbol list, hedge availability, a confidence floor, and a concurrent-position
 cap, and — unlike Vibe-Trading — collects every applicable reason rather than stopping at the
-first. Four dimensions overlap (notional/position-size, excluded symbols) or nearly so; the rest are
-each system's own. ``no_specialist_capability_superior`` at the bottom of this module states the
-scope this is honestly claimed over, not "ARGUS wins everything a pre-trade gate could check" —
-portfolio-wide leverage and gross exposure are a *different* ARGUS capability's job
-(``agents.desk.ConstitutionPolicy.max_gross_exposure_notional`` /
-``max_signed_exposure_notional`` — the class at ``agents/desk.py:753``, its ``rule()`` method
-that enforces the exposure ceiling at ``agents/desk.py:958`` — checked directly before this claim
+first. Two of ARGUS's six dimensions overlap Vibe-Trading's, or nearly so (notional/position-size, the
+excluded-symbol list); the other four — horizon, hedge availability, the confidence floor, the
+concurrent-position cap — have no Vibe-Trading equivalent at all. ``no_specialist_capability_superior``
+at the bottom of this module states the scope this is honestly claimed over, not "ARGUS wins
+everything a pre-trade gate could check" — portfolio-wide leverage and gross exposure are a
+*different* ARGUS capability's job (``agents.desk.ConstitutionPolicy.max_gross_exposure_notional``
+/ ``max_signed_exposure_notional`` — the class at ``agents/desk.py:865``, its ``rule()`` method
+that enforces the exposure ceiling at ``agents/desk.py:1042`` — checked directly before this claim
 was written), not this one's.
 
 Also see ``research/architecture/personalisation-audit.md`` for the corrected record of two
@@ -723,7 +724,7 @@ a hard per-symbol exclusion list, hedge-availability refusal, a confidence floor
 position cap) AND reaches the reasoning layer before a thesis is written (`agents/desk.py`'s \
 `mandate_block` + `ordered_evidence`, read inside `MarketFrame.to_prompt_block()`) — no studied \
 specialist capability is superior. Vibe-Trading's `check_mandate()` has no representation for \
-five of ARGUS's six dimensions (only the exclude-list and a notional cap overlap) and, verified \
+four of ARGUS's six dimensions (only the exclude-list and a notional cap overlap) and, verified \
 directly across every file in its repository that could plausibly carry it, no mechanism \
 anywhere that reaches an LLM's reasoning at all — see `eval/baselines/` and `research/\
 architecture/personalisation-audit.md`'s correction notice for what was checked.
@@ -732,8 +733,8 @@ NOT claimed: that ARGUS's Mandate is a complete pre-trade risk gate. Vibe-Tradin
 total-exposure, daily-trade-count, instrument/asset-class allowlist and funding-ceiling checks \
 have no ARGUS equivalent INSIDE `agents.mandate.Mandate` — by design, not oversight: \
 portfolio-wide leverage and gross/signed exposure are `agents.desk.ConstitutionPolicy`'s job \
-(`max_gross_exposure_notional` / `max_signed_exposure_notional`, `agents/desk.py:753`, gate \
-logic in `rule()` at `agents/desk.py:958`), a separate, already-built ARGUS capability this \
+(`max_gross_exposure_notional` / `max_signed_exposure_notional`, `agents/desk.py:865`, gate \
+logic in `rule()` at `agents/desk.py:1042`), a separate, already-built ARGUS capability this \
 module does not re-litigate. Whether splitting \
 "whose trade is this" from "how much risk can the book carry" across two modules is better \
 architecture than Vibe-Trading's one bundled gate is a real, currently open question — not decided \

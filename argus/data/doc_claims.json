@@ -283,8 +283,8 @@
         "218"
       ],
       "live": [
-        229,
-        225
+        233,
+        229
       ],
       "status": "LAGGING",
       "excerpt": "222 of those 500 decisions were taken in a tradeable session with the anchor market open, and **218 of them"
@@ -571,7 +571,7 @@
         "500"
       ],
       "live": [
-        507
+        516
       ],
       "status": "LAGGING",
       "excerpt": "500 decisions in the paper ledger"
@@ -582,7 +582,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        507
+        516
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -593,7 +593,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        507
+        516
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -696,7 +696,7 @@
         "500"
       ],
       "live": [
-        507
+        516
       ],
       "status": "LAGGING",
       "excerpt": "500 decisions"
@@ -709,7 +709,7 @@
         "500"
       ],
       "live": [
-        507
+        516
       ],
       "status": "LAGGING",
       "excerpt": "500 ledger entries"
@@ -722,7 +722,7 @@
         "500"
       ],
       "live": [
-        507
+        516
       ],
       "status": "LAGGING",
       "excerpt": "500 decisions"
@@ -735,7 +735,7 @@
         "500"
       ],
       "live": [
-        507
+        516
       ],
       "status": "LAGGING",
       "excerpt": "paper-trading log has 500 decisions"
@@ -783,7 +783,7 @@
         "334"
       ],
       "live": [
-        341
+        350
       ],
       "status": "LAGGING",
       "excerpt": "334 decisions carry a lean"
@@ -794,7 +794,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        341
+        350
       ],
       "status": "ABSENT",
       "excerpt": ""

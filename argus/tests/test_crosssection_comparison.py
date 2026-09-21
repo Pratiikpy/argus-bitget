@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from argus.eval.baselines.qlib_loader import QlibCrossSectionSymbols, load_qlib_baseline
 from argus.eval.crosssection_comparison import (
-    SCOPE_STATEMENT,
+    scope_statement,
     ablation_cases,
     compare_ordering,
     designed_panels,
@@ -107,9 +107,14 @@ class TestSingleNameDistortionCost:
 
 class TestScopeStatement:
     def test_names_the_real_divergence_and_the_real_design_boundary(self) -> None:
-        assert "CrossScale" in SCOPE_STATEMENT
-        assert "NOT claimed" in SCOPE_STATEMENT
-        assert "1.73" in SCOPE_STATEMENT
+        text = scope_statement(54)
+        assert "CrossScale" in text
+        assert "NOT claimed" in text
+        assert "1.73" in text
+
+    def test_carries_the_live_sweep_count(self) -> None:
+        assert "77" in scope_statement(77)
+        assert "78" not in scope_statement(77)
 
 
 class TestMain:

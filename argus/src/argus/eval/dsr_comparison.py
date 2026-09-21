@@ -341,10 +341,20 @@ def silent_nan_cost(symbols: Any) -> SilentNanCost:
 # Scope statement.
 # =============================================================================================
 
-SCOPE_STATEMENT = """\
+def scope_statement(sweep_total: int) -> str:
+    """Assembled with the live sweep size, not a typed-in snapshot of it.
+
+    The case count used to be a literal "405-case" in this prose. A grid dimension was added later
+    (`swept_cases()` now produces 1,215), and the prose was never re-typed to match — the same
+    stale-number-in-scope_statement defect found and fixed elsewhere this session
+    (`quarantine_comparison.py`, `regime_comparison.py`). Taking the count as a parameter here means
+    it can only ever read as current.
+    """
+    return f"""\
 Claimed: ARGUS's `deflated_sharpe` and vectorbt's real `deflated_sharpe_ratio` implement the \
 same published formula (Bailey & Lopez de Prado) and agree EXACTLY (max abs diff over a \
-405-case deterministic sweep: see SweepSummary) everywhere both are valid. Where vectorbt's real \
+{sweep_total:,}-case deterministic sweep: see SweepSummary) everywhere both are valid. Where \
+vectorbt's real \
 accessor computes a NaN `var_sharpe` (a single trial, `np.var(x, ddof=1)`, its own documented \
 zero-degrees-of-freedom behaviour) and silently returns NaN, ARGUS's `deflated_sharpe` raises \
 `MetricError` before the comparison could ever run — verified against vectorbt's own real, \
@@ -383,7 +393,7 @@ def main() -> dict[str, Any]:
         "ablations": [a.as_dict() for a in ablations],
         "ablation_all_load_bearing": all(a.tripped_raises for a in ablations),
         "silent_nan_cost": cost.as_dict(),
-        "scope_statement": SCOPE_STATEMENT,
+        "scope_statement": scope_statement(sweep_summary.total),
     }
 
 
@@ -421,7 +431,6 @@ if __name__ == "__main__":
 
 
 __all__ = [
-    "SCOPE_STATEMENT",
     "AblationCase",
     "DesignedRun",
     "DsrCase",
@@ -438,6 +447,7 @@ __all__ = [
     "run_designed",
     "run_sweep",
     "run_vectorbt_dsr",
+    "scope_statement",
     "silent_nan_cost",
     "swept_cases",
 ]

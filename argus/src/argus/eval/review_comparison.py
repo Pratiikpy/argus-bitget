@@ -245,9 +245,20 @@ class ThresholdAblation:
 
 
 def run_threshold_ablations() -> tuple[ThresholdAblation, ...]:
-    """Each of the four module-level thresholds (ALWAYS_FIRES, NEVER_FIRES implicitly via the
-    fire-rate check, MIN_PRECISION, MIN_FIRINGS), patched to a value that flips the verdict on an
-    otherwise-identical fixture — real code, not a hand-derived counterfactual."""
+    """Two of ``review.py``'s four status-gating thresholds, each patched to a value that flips
+    the verdict on an otherwise-identical fixture — real code, not a hand-derived counterfactual.
+
+    **This docstring used to claim all four** (ALWAYS_FIRES, NEVER_FIRES, MIN_PRECISION,
+    MIN_FIRINGS) were ablated here; only MIN_PRECISION and ALWAYS_FIRES actually are, below.
+    NEVER_FIRES and MIN_FIRINGS have no fixture in this function — a real coverage gap, not a
+    stale number, found the same way the stale-number defects elsewhere in this session's
+    `SCOPE_STATEMENT` sweep were: by comparing what the prose claimed against what the code
+    actually returns (``len(run_threshold_ablations())`` is 2, not 4). Adding the missing two
+    needs fixtures built against ``review.py``'s ``_status_for``-style gating cascade in
+    ``desk/review.py:340-369`` (``fire_rate`` for NEVER_FIRES, ``p.fired`` for MIN_FIRINGS), and
+    is queued as a BUILD task rather than rushed here under this iteration's time pressure — an
+    incorrect fixture written quickly would be a worse defect than an honest gap.
+    """
     import argus.desk.review as review_module
 
     rule = _rule()
@@ -303,9 +314,10 @@ landing on the intended status. TradingAgents' real, vendored TradingMemoryLog h
 anywhere: storing a reflection about a decision that was independently, demonstrably WRONG (a \
 real -15% realised return) and reading it back later shows it re-injected identically to a \
 reflection about a right call — grepped directly across the whole repository for any \
-precision/track-record concept tied to memory: zero matches. Four of ARGUS's own thresholds \
-(MIN_PRECISION, ALWAYS_FIRES among them) shown independently load-bearing by patching each to a \
-value that flips an otherwise-identical fixture's verdict.
+precision/track-record concept tied to memory: zero matches. Two of ARGUS's four status-gating \
+thresholds (MIN_PRECISION, ALWAYS_FIRES) shown independently load-bearing by patching each to a \
+value that flips an otherwise-identical fixture's verdict; NEVER_FIRES and MIN_FIRINGS are not \
+yet ablated here — see `run_threshold_ablations`'s own docstring for the honest gap.
 
 NOT claimed: that TradingAgents' unconditional reuse is a design mistake in the way it presents \
 itself — a system whose memory feeds a model that reasons over the prose (and can itself discount \

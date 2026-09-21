@@ -269,11 +269,21 @@ def single_name_distortion_cost(cs_rank_norm: Any) -> SingleNameDistortionCost:
 # Scope statement.
 # =============================================================================================
 
-SCOPE_STATEMENT = """\
+def scope_statement(swept_count: int) -> str:
+    """Assembled with the live sweep size, not a typed-in snapshot of it.
+
+    The panel count used to be a literal "324-panel" in this prose while `main()` computed and
+    published a separate, correct `swept_count` two lines below it — the same
+    stale-number-in-scope_statement defect found and fixed elsewhere this session
+    (`quarantine_comparison.py`, `dsr_comparison.py`). Taking the count as a parameter means the
+    two can no longer read differently.
+    """
+    return f"""\
 Claimed: within cross-sectional RANKING (grouping a panel by date and ordering instruments \
 within each date), ARGUS's `crossrank` and qlib's real `CSRankNorm` agree exactly on relative \
-order on every panel tested — hand-designed and a 324-panel deterministic sweep — verified by \
-running both real functions, not derived. Where they diverge is a real, run-verified edge case: \
+order on every panel tested — hand-designed and a {swept_count}-panel deterministic sweep — \
+verified by running both real functions, not derived. Where they diverge is a real, run-verified \
+edge case: \
 a single-instrument date qlib's real code turns into an extreme value (1.73 on its own scale, \
 the maximum the transform can produce) while ARGUS's own explicit guard returns a neutral 0.5, \
 matching `CrossRank`'s own documented design rationale.
@@ -317,7 +327,7 @@ def main() -> dict[str, Any]:
         "ablations": [a.as_dict() for a in ablations],
         "ablation_all_load_bearing": all(a.differs for a in ablations),
         "single_name_distortion": cost.as_dict(),
-        "scope_statement": SCOPE_STATEMENT,
+        "scope_statement": scope_statement(len(swept)),
     }
 
 
@@ -356,7 +366,6 @@ if __name__ == "__main__":
 
 
 __all__ = [
-    "SCOPE_STATEMENT",
     "AblationCase",
     "CrossSectionComparisonError",
     "RankOrderComparison",
@@ -368,6 +377,7 @@ __all__ = [
     "render",
     "run_argus",
     "run_qlib",
+    "scope_statement",
     "single_name_distortion_cost",
     "swept_panels",
 ]
