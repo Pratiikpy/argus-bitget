@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-14T10:52:46.836029+00:00",
+  "generated_at": "2026-09-21T11:07:37.667418+00:00",
   "reference": "nkaz001/hftbacktest queue.rs:183-330",
   "metric": "mean |estimated qty ahead - true qty ahead| as a share of the entry level",
   "episodes_per_regime": 4000,
@@ -56,7 +56,7 @@
   "all_reproduced": true,
   "in_sample": [
     {
-      "regime": "\u03b3=1 \u00b7 cancels proportional to quantity",
+      "regime": "gamma=1 - cancels proportional to quantity",
       "note": "the assumption PowerProbability(n=1) encodes, as the generative rule",
       "best_model": "PowerProbability n=2",
       "best_model_error": 0.0197,
@@ -71,7 +71,7 @@
       "model_wins": true
     },
     {
-      "regime": "\u03b3=2 \u00b7 cancels concentrated at the front",
+      "regime": "gamma=2 - cancels concentrated at the front",
       "note": "P(from back) falls below the quantity share, so the correct prob is lower than n=1",
       "best_model": "PowerProbability n=2",
       "best_model_error": 0.01433,
@@ -86,7 +86,7 @@
       "model_wins": true
     },
     {
-      "regime": "\u03b3=0.5 \u00b7 cancels spread toward the back",
+      "regime": "gamma=0.5 - cancels spread toward the back",
       "note": "P(from back) rises above the quantity share, so the correct prob is higher than n=1",
       "best_model": "PowerProbability n=1",
       "best_model_error": 0.02326,
@@ -101,7 +101,7 @@
       "model_wins": true
     },
     {
-      "regime": "front-sticky \u00b7 the front never cancels",
+      "regime": "front-sticky - the front never cancels",
       "note": "outside the family: 'every cancellation is behind you' is the exact truth",
       "best_model": "LogProbability2",
       "best_model_error": 0.03645,
@@ -116,7 +116,7 @@
       "model_wins": false
     },
     {
-      "regime": "adversarial \u00b7 front-sticky and replenishing",
+      "regime": "adversarial - front-sticky and replenishing",
       "note": "the front never cancels and the queue keeps growing behind \u2014 the hostile case",
       "best_model": "LogProbability2",
       "best_model_error": 0.01765,
@@ -133,7 +133,7 @@
   ],
   "out_of_sample": [
     {
-      "regime": "\u03b3=1 \u00b7 cancels proportional to quantity",
+      "regime": "gamma=1 - cancels proportional to quantity",
       "note": "the assumption PowerProbability(n=1) encodes, as the generative rule",
       "best_model": "PowerProbability n=2",
       "best_model_error": 0.01901,
@@ -148,7 +148,7 @@
       "model_wins": true
     },
     {
-      "regime": "\u03b3=2 \u00b7 cancels concentrated at the front",
+      "regime": "gamma=2 - cancels concentrated at the front",
       "note": "P(from back) falls below the quantity share, so the correct prob is lower than n=1",
       "best_model": "PowerProbability n=2",
       "best_model_error": 0.01491,
@@ -163,7 +163,7 @@
       "model_wins": true
     },
     {
-      "regime": "\u03b3=0.5 \u00b7 cancels spread toward the back",
+      "regime": "gamma=0.5 - cancels spread toward the back",
       "note": "P(from back) rises above the quantity share, so the correct prob is higher than n=1",
       "best_model": "PowerProbability n=1",
       "best_model_error": 0.02358,
@@ -178,7 +178,7 @@
       "model_wins": true
     },
     {
-      "regime": "front-sticky \u00b7 the front never cancels",
+      "regime": "front-sticky - the front never cancels",
       "note": "outside the family: 'every cancellation is behind you' is the exact truth",
       "best_model": "LogProbability2",
       "best_model_error": 0.0356,
@@ -193,7 +193,7 @@
       "model_wins": false
     },
     {
-      "regime": "adversarial \u00b7 front-sticky and replenishing",
+      "regime": "adversarial - front-sticky and replenishing",
       "note": "the front never cancels and the queue keeps growing behind \u2014 the hostile case",
       "best_model": "LogProbability2",
       "best_model_error": 0.01696,
@@ -209,7 +209,7 @@
     }
   ],
   "detail": {
-    "\u03b3=1 \u00b7 cancels proportional to quantity": [
+    "gamma=1 - cancels proportional to quantity": [
       {
         "model": "PowerProbability n=2",
         "episodes": 4000,
@@ -281,7 +281,7 @@
         "cost_bps": 0.0
       }
     ],
-    "\u03b3=2 \u00b7 cancels concentrated at the front": [
+    "gamma=2 - cancels concentrated at the front": [
       {
         "model": "PowerProbability n=2",
         "episodes": 4000,
@@ -353,7 +353,7 @@
         "cost_bps": 0.0
       }
     ],
-    "\u03b3=0.5 \u00b7 cancels spread toward the back": [
+    "gamma=0.5 - cancels spread toward the back": [
       {
         "model": "PowerProbability n=1",
         "episodes": 4000,
@@ -425,7 +425,7 @@
         "cost_bps": 0.0
       }
     ],
-    "front-sticky \u00b7 the front never cancels": [
+    "front-sticky - the front never cancels": [
       {
         "model": "ABLATION: every cancel is behind you",
         "episodes": 4000,
@@ -497,7 +497,7 @@
         "cost_bps": 0.5378
       }
     ],
-    "adversarial \u00b7 front-sticky and replenishing": [
+    "adversarial - front-sticky and replenishing": [
       {
         "model": "ABLATION: every cancel is behind you",
         "episodes": 4000,
@@ -575,7 +575,7 @@
   "regimes_won_out_of_sample": 3,
   "failure_cases": [
     {
-      "regime": "front-sticky \u00b7 the front never cancels",
+      "regime": "front-sticky - the front never cancels",
       "note": "outside the family: 'every cancellation is behind you' is the exact truth",
       "best_model": "LogProbability2",
       "best_model_error": 0.03645,
@@ -590,7 +590,7 @@
       "model_wins": false
     },
     {
-      "regime": "adversarial \u00b7 front-sticky and replenishing",
+      "regime": "adversarial - front-sticky and replenishing",
       "note": "the front never cancels and the queue keeps growing behind \u2014 the hostile case",
       "best_model": "LogProbability2",
       "best_model_error": 0.01765,
@@ -605,5 +605,32 @@
       "model_wins": false
     }
   ],
-  "verdict": "All 8 probability functions reproduce hftbacktest to 1.1e-16 on identical inputs \u2014 the port is exact. Across 5 generative regimes swept rather than chosen, a probability function estimates the queue better than the best constant in 3 of 5 in sample and 3 of 5 held out, every margin with its whole 95% interval above zero. It loses in 2: front-sticky \u00b7 the front never cancels; adversarial \u00b7 front-sticky and replenishing \u2014 where the front of the queue never cancels, 'every cancellation is behind you' is not a naive assumption but the exact truth, and no member of the family can express it. That regime is the model's documented failure case, and reporting it is the difference between a sweep and a demonstration. One result cuts against the model and is reported rather than dropped: in \u03b3=0.5 \u00b7 cancels spread toward the back it estimates the queue better and still costs more (-0.020bps), because a better *average* position estimate can sit on the optimistic side at exactly the moments that decide a fill. Queue accuracy and execution cost are not the same objective, and a capability that only ever reported the metric it wins on would never have found that."
+  "ablation": {
+    "arms": {
+      "RiskAdverse (trades only)": {
+        "regimes": 5,
+        "mean_queue_error": 0.02137,
+        "worse_than_best_model_by": 0.00704
+      },
+      "coin": {
+        "regimes": 5,
+        "mean_queue_error": 0.03845,
+        "worse_than_best_model_by": 0.02412
+      },
+      "every cancel is ahead of you": {
+        "regimes": 5,
+        "mean_queue_error": 0.05237,
+        "worse_than_best_model_by": 0.03804
+      },
+      "every cancel is behind you": {
+        "regimes": 5,
+        "mean_queue_error": 0.02137,
+        "worse_than_best_model_by": 0.00704
+      }
+    },
+    "best_modelled_queue_error": 0.01433,
+    "what_each_arm_removes": "the queue model, replaced by a fixed assumption about where cancellations happen. 'every cancel is ahead of you' is the no-queue-model case a backtest falls into when it fills a resting order the moment price touches it.",
+    "scope_statement": "These arms are scored on the SAME episodes as the real models, by the same `score()` call, so the comparison is same-input by construction rather than by arrangement. NOT CLAIMED: that beating a fixed-constant assumption is a strong result \u2014 it is the floor, and the models are also measured against each other and against hftbacktest's own reproduction. NOT CLAIMED: that the -0.45%/+90% figure quoted in `execution/queue.py` was produced here; it comes from a Nautilus replay and is cited as the reason this model exists, not as an output of this file."
+  },
+  "verdict": "All 8 probability functions reproduce hftbacktest to 1.1e-16 on identical inputs \u2014 the port is exact. Across 5 generative regimes swept rather than chosen, a probability function estimates the queue better than the best constant in 3 of 5 in sample and 3 of 5 held out, each margin with its whole 95% interval above zero. It loses in 2: front-sticky - the front never cancels; adversarial - front-sticky and replenishing \u2014 where the front of the queue never cancels, 'every cancellation is behind you' is not a naive assumption but the exact truth and no member of the family can express it. That is the model's documented failure case, and reporting it is the difference between a sweep and a demonstration. One result cuts against the model and is reported rather than dropped: in gamma=0.5 - cancels spread toward the back it estimates the queue better and still costs more (-0.020bps), because a better *average* position estimate can sit on the optimistic side at exactly the moments that decide a fill. Queue accuracy and execution cost are not the same objective, and a capability that only ever reported the metric it wins on would never have found that."
 }

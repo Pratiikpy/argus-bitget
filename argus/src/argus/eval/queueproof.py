@@ -66,7 +66,7 @@ from __future__ import annotations
 import json
 import math
 import random
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -602,7 +602,71 @@ def run(*, episodes: int = 4000, seed: int = 20260914) -> dict[str, Any]:
         "regimes_won_in_sample": sum(1 for r in in_sample if r.model_wins),
         "regimes_won_out_of_sample": sum(1 for r in out_of_sample if r.model_wins),
         "failure_cases": [r.as_dict() for r in in_sample if not r.model_wins],
+        "ablation": _ablation(detail),
         "verdict": _verdict(reproductions, in_sample, out_of_sample),
+    }
+
+
+def _ablation(detail: Mapping[str, Sequence[Mapping[str, Any]]]) -> dict[str, Any]:
+    """The four ablation arms `score()` already runs, finally recorded as one.
+
+    **Nothing new is computed here.** `_models()` has always included four arms that replace the
+    queue model with an assumption — every cancel is behind you, every cancel is ahead of you, a
+    coin, and trades-only — and `score()` has always run them on the identical episodes. They were
+    scored, used to pick `best_naive`, and then left scattered through `detail` under their own
+    names, so the artefact never said the word *ablation* and the standing register correctly
+    reported the condition as unproven.
+
+    That is the honest reading of that failure: the experiment was run and not reported. The wrong
+    fix would have been to add the key and point it at nothing. This points it at the arms that
+    ran.
+
+    The arm that matters most is **every cancel is ahead of you** — the assumption a backtest makes
+    when it ignores queue position entirely and lets a resting order fill the moment price touches
+    it. This module's own docstring records what that assumption is worth: a local sim showed
+    **+90% where the real replay gave -0.45%.**
+    """
+    arms: dict[str, list[float]] = {}
+    for scored in detail.values():
+        for row in scored:
+            name = str(row.get("model", ""))
+            if name.startswith("ABLATION:"):
+                arms.setdefault(name.removeprefix("ABLATION: ").strip(), []).append(
+                    float(row.get("queue_error", 0.0))
+                )
+    best_real = min(
+        (float(row.get("queue_error", 0.0))
+         for scored in detail.values() for row in scored
+         if not str(row.get("model", "")).startswith("ABLATION:")),
+        default=0.0,
+    )
+    summary = {
+        name: {
+            "regimes": len(errors),
+            "mean_queue_error": round(sum(errors) / len(errors), 5) if errors else None,
+            "worse_than_best_model_by": (
+                round(sum(errors) / len(errors) - best_real, 5) if errors else None
+            ),
+        }
+        for name, errors in sorted(arms.items())
+    }
+    return {
+        "arms": summary,
+        "best_modelled_queue_error": round(best_real, 5),
+        "what_each_arm_removes": (
+            "the queue model, replaced by a fixed assumption about where cancellations happen. "
+            "'every cancel is ahead of you' is the no-queue-model case a backtest falls into when "
+            "it fills a resting order the moment price touches it."
+        ),
+        "scope_statement": (
+            "These arms are scored on the SAME episodes as the real models, by the same "
+            "`score()` call, so the comparison is same-input by construction rather than by "
+            "arrangement. NOT CLAIMED: that beating a fixed-constant assumption is a strong "
+            "result — it is the floor, and the models are also measured against each other and "
+            "against hftbacktest's own reproduction. NOT CLAIMED: that the -0.45%/+90% figure "
+            "quoted in `execution/queue.py` was produced here; it comes from a Nautilus replay "
+            "and is cited as the reason this model exists, not as an output of this file."
+        ),
     }
 
 
