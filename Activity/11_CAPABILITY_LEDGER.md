@@ -32,21 +32,25 @@ carries a result.**
 | 15 | `execution-assistance` | T3 | subtheme | IMPLEMENTED | — | no | — | — |
 | 16 | `portfolio-copilot` | T3 | subtheme | **LOST** | Riskfolio-Lib NCO | **yes** | specialist (p=3.6e-05) | 2026-09-21 |
 | 17 | `t3-source-depth` | T3 | judging | IMPLEMENTED | — | no | — | — |
-| 18 | `t3-research-quality` | T3 | judging | IMPLEMENTED | — | no | — | — |
+| 18 | `t3-research-quality` | T3 | judging | IMPLEMENTED | QuantConnect Lean + statsmodels (two rivals) | **yes** | ARGUS (0 FDR/Bonferroni survivors vs Lean's uncorrected 7-of-190, ~9.5 expected FPs) | 2026-09-21 |
 | 19 | `t3-lui` | T3 | judging | **LOST** on accuracy, **WON** on safety | RasaHQ/rasa DIET (Apache-2.0) | **yes** | split — Rasa (accuracy, p=0.0014); ARGUS (OOS refusal, p=0.031) | 2026-09-21 |
 | 20 | `t3-personal-thesis` | T3 | judging | IMPLEMENTED | — | no | — | — |
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 8 of 20 as of 2026-09-21: 3 LOST (one of them split — LUI intent
+**`rival run` is `yes` on 9 of 20 as of 2026-09-21: 3 LOST (one of them split — LUI intent
 accuracy loses to Rasa's DIET classifier, p=0.0014, while ARGUS wins out-of-scope refusal
-separately and significantly, p=0.031, neither laundering the other), 4 real wins (earnings vs
+separately and significantly, p=0.031, neither laundering the other), 5 real wins (earnings vs
 QuantConnect, factor-discovery vs Microsoft RD-Agent, risk-control vs freqtrade's real
 PrecisionRecallProtection — ARGUS's precision at full recall is 59.2% against freqtrade's best
 swept 19.3%, dominating every threshold, and freqtrade's own proxy correlates only weakly
-(r=0.26) with the real drawdown ground truth it approximates — and architecture vs two rivals at
+(r=0.26) with the real drawdown ground truth it approximates — architecture vs two rivals at
 once, RD-Agent's real `eval()`-executed injection against ARGUS's zero execution surface, plus
-AgentDojo's real attack corpus behind the production false-positive count that went from 6 to 0),
+AgentDojo's real attack corpus behind the production false-positive count that went from 6 to 0 —
+and research-quality vs QuantConnect's real Lean engine and statsmodels: Lean has no multiple-
+testing correction anywhere in its cointegration code, a naive p<0.05 selection over 190 real
+pairs picks 7 "cointegrated" pairs against the 9.5 false positives theory predicts at that rate,
+while ARGUS's own FDR- and Bonferroni-corrected survivors on the identical pairs are both zero),
 1 methodological (event-driven vs whale-signals — neither system establishes a real effect on
 this data; the finding is that whale-signals tests against the wrong null, not that ARGUS's own
 number beats theirs, and no fabricated score is recorded for it).** That is this ledger's honest
