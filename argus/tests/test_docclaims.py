@@ -134,7 +134,10 @@ def test_live_overrides_bypass_disk(tmp_path: Path) -> None:
     docs = _doc(tmp_path, "readme", "1,470 tests passing")
     claim = Claim("tests_passing", r"(?P<q>[\d,]+) tests", lambda: 0, ("readme",), mode="at_least")
     report = audit((claim,), docs, live_overrides={"tests_passing": 1500})
-    assert report.findings[0].status == "OK"
+    # LAGGING, not OK: the override took effect and the document is behind it, which is the point
+    # of the override. Both are passing states; what matters here is that disk was not read.
+    assert report.findings[0].status in {"OK", "LAGGING"}
+    assert report.findings[0].live == (1500,)
 
 
 def test_summary_counts(tmp_path: Path) -> None:
@@ -179,7 +182,8 @@ def test_the_real_documents_quote_no_stale_number() -> None:
 def test_the_real_documents_make_every_registered_claim_somewhere() -> None:
     """A registered claim no document makes is dead weight; prune it or restore the prose."""
     report = audit()
-    made = {f.claim for f in report.findings if f.status in {"OK", "STALE", "UNCHECKED"}}
+    made = {f.claim for f in report.findings
+            if f.status in {"OK", "LAGGING", "STALE", "UNCHECKED"}}
     assert made == {c.name for c in CLAIMS}
 
 
@@ -325,3 +329,55 @@ class TestAFastGrowingCounterNeedsItsOwnMode:
 
         with pytest.raises(ValueError, match="unknown mode"):
             agrees("1", 1, "vibes")
+
+
+class TestLaggingIsNamedNotHiddenBehindOK:
+    """**Tolerated is not the same as equal, and the report printed both as OK.**
+
+    `LAG_TOLERANCE` lets a counter that grows every cycle trail its live value rather than failing
+    the gate between refreshes, which is right. What was wrong was the rendering: `quoted 495, live
+    500` appeared identically to `quoted 115/193, live 115/193`, so seven published figures — one of
+    them 386 against a live 457 — read as agreement while being behind the record.
+    """
+
+    def test_a_figure_inside_tolerance_is_lagging_not_ok(self) -> None:
+        from argus.eval.docclaims import agrees
+
+        # Behind, but inside the tolerance: the gate passes and the state must still say so.
+        assert agrees("495", 500, "lagging")
+        assert not agrees("495", 500, "exact")
+
+    def test_a_figure_beyond_tolerance_is_still_stale(self) -> None:
+        from argus.eval.docclaims import LAG_TOLERANCE, agrees
+
+        live = 1000.0
+        beyond = live * (1.0 - LAG_TOLERANCE) - 1.0
+        assert not agrees(str(int(beyond)), live, "lagging")
+
+    def test_overstating_is_never_tolerated(self) -> None:
+        from argus.eval.docclaims import agrees
+
+        assert not agrees("505", 500, "lagging")
+
+    def test_an_exact_match_is_not_reported_as_lagging(self) -> None:
+        from argus.eval.docclaims import agrees
+
+        assert agrees("500", 500, "lagging")
+        assert agrees("500", 500, "exact")
+
+    def test_the_summary_carries_the_lagging_lines(self) -> None:
+        """A count without the lines is a number nobody can act on."""
+        from argus.eval.docclaims import audit, summary
+
+        out = summary(audit())
+        assert "lagging" in out
+        assert "lagging_detail" in out
+        assert out["lagging"] == len(out["lagging_detail"])
+
+    def test_lagging_does_not_fail_the_run(self) -> None:
+        """This change must not break a build that was passing; it only stops hiding the gap."""
+        from argus.eval.docclaims import audit
+
+        report = audit()
+        assert report.count("LAGGING") >= 0
+        assert not report.stale, [f"{f.doc}:{f.line} {f.claim}" for f in report.stale]

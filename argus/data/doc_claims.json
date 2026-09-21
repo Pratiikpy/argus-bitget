@@ -1,7 +1,8 @@
 {
   "total": 96,
   "checked": 87,
-  "ok": 87,
+  "ok": 81,
+  "lagging": 6,
   "stale": 0,
   "absent": 24,
   "deleted": 0,
@@ -278,15 +279,15 @@
       "doc": "readme",
       "line": 22,
       "quoted": [
-        "217",
-        "213"
+        "222",
+        "218"
       ],
       "live": [
-        217,
-        213
+        222,
+        218
       ],
       "status": "OK",
-      "excerpt": "217 of those 495 decisions were taken in a tradeable session with the anchor market open, and **213 of them"
+      "excerpt": "222 of those 500 decisions were taken in a tradeable session with the anchor market open, and **218 of them"
     },
     {
       "claim": "refusal_accuracy_2h",
@@ -550,7 +551,7 @@
     {
       "claim": "anchors_confirmed",
       "doc": "explained",
-      "line": 2539,
+      "line": 2541,
       "quoted": [
         "38",
         "52"
@@ -567,13 +568,13 @@
       "doc": "readme",
       "line": 71,
       "quoted": [
-        "495"
+        "500"
       ],
       "live": [
-        495
+        502
       ],
-      "status": "OK",
-      "excerpt": "495 decisions in the paper ledger"
+      "status": "LAGGING",
+      "excerpt": "500 decisions in the paper ledger"
     },
     {
       "claim": "ledger_decisions",
@@ -581,7 +582,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        495
+        502
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -592,7 +593,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        495
+        502
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -692,52 +693,52 @@
       "doc": "readme",
       "line": 71,
       "quoted": [
-        "495"
+        "500"
       ],
       "live": [
-        495
+        502
       ],
-      "status": "OK",
-      "excerpt": "495 decisions"
+      "status": "LAGGING",
+      "excerpt": "500 decisions"
     },
     {
       "claim": "ledger_entries",
       "doc": "readme",
       "line": 236,
       "quoted": [
-        "495"
+        "500"
       ],
       "live": [
-        495
+        502
       ],
-      "status": "OK",
-      "excerpt": "495 ledger entries"
+      "status": "LAGGING",
+      "excerpt": "500 ledger entries"
     },
     {
       "claim": "ledger_entries",
       "doc": "submission",
       "line": 395,
       "quoted": [
-        "495"
+        "500"
       ],
       "live": [
-        495
+        502
       ],
-      "status": "OK",
-      "excerpt": "495 decisions"
+      "status": "LAGGING",
+      "excerpt": "500 decisions"
     },
     {
       "claim": "ledger_entries",
       "doc": "explained",
       "line": 1125,
       "quoted": [
-        "495"
+        "500"
       ],
       "live": [
-        495
+        502
       ],
-      "status": "OK",
-      "excerpt": "paper-trading log has 495 decisions"
+      "status": "LAGGING",
+      "excerpt": "paper-trading log has 500 decisions"
     },
     {
       "claim": "settled_abstentions",
@@ -745,7 +746,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        445
+        457
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -756,7 +757,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        445
+        457
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -766,26 +767,26 @@
       "doc": "explained",
       "line": 1125,
       "quoted": [
-        "386"
+        "457"
       ],
       "live": [
-        445
+        457
       ],
       "status": "OK",
-      "excerpt": "386 have settled as abstentions"
+      "excerpt": "457 have settled as abstentions"
     },
     {
       "claim": "leans_recorded",
       "doc": "readme",
       "line": 247,
       "quoted": [
-        "282"
+        "334"
       ],
       "live": [
-        329
+        336
       ],
-      "status": "OK",
-      "excerpt": "282 decisions carry a lean"
+      "status": "LAGGING",
+      "excerpt": "334 decisions carry a lean"
     },
     {
       "claim": "leans_recorded",
@@ -793,7 +794,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        329
+        336
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -877,7 +878,7 @@
     {
       "claim": "t1_dsr_survivors",
       "doc": "explained",
-      "line": 2855,
+      "line": 2857,
       "quoted": [
         "Zero"
       ],
@@ -1370,7 +1371,7 @@
     {
       "claim": "pbo_worst",
       "doc": "explained",
-      "line": 2177,
+      "line": 2179,
       "quoted": [
         "0.77"
       ],
@@ -1383,7 +1384,7 @@
     {
       "claim": "fdr_trials",
       "doc": "explained",
-      "line": 2145,
+      "line": 2147,
       "quoted": [
         "0",
         "300"
@@ -1418,7 +1419,7 @@
         "51.8"
       ],
       "live": [
-        51.764
+        51.842
       ],
       "status": "OK",
       "excerpt": "Brier Index 51.8**"
@@ -1431,7 +1432,7 @@
         "51.8"
       ],
       "live": [
-        51.764
+        51.842
       ],
       "status": "OK",
       "excerpt": "Brier Index of 51.8**"
@@ -1441,18 +1442,18 @@
       "doc": "explained",
       "line": 2035,
       "quoted": [
-        "6.4"
+        "6.8"
       ],
       "live": [
-        6.43
+        6.8180000000000005
       ],
       "status": "OK",
-      "excerpt": "**+6.4% against climatology**"
+      "excerpt": "**+6.8% against climatology**"
     },
     {
       "claim": "hurdle_break_even",
       "doc": "explained",
-      "line": 2220,
+      "line": 2222,
       "quoted": [
         "56.0"
       ],
@@ -1465,7 +1466,7 @@
     {
       "claim": "hurdle_median_move",
       "doc": "explained",
-      "line": 2218,
+      "line": 2220,
       "quoted": [
         "137"
       ],

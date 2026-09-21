@@ -104,7 +104,7 @@ def _remember(report: Report) -> None:
     """
     seen = _seen()
     for finding in report.findings:
-        if finding.status in {"OK", "STALE"} and finding.line is not None:
+        if finding.status in {"OK", "LAGGING", "STALE"} and finding.line is not None:
             seen[f"{finding.claim}|{finding.doc}"] = finding.line
     payload = json.dumps(dict(sorted(seen.items())), indent=2) + chr(10)
     SEEN_PATH.write_text(payload, encoding="utf-8")
@@ -189,7 +189,7 @@ class Finding:
     line: int | None
     quoted: tuple[str, ...]
     live: tuple[Number, ...] | None
-    status: str          # OK | STALE | ABSENT | DELETED | UNCHECKED
+    status: str          # OK | LAGGING | STALE | ABSENT | DELETED | UNCHECKED
     excerpt: str = ""
 
     def as_dict(self) -> dict[str, Any]:
@@ -224,13 +224,15 @@ class Report:
         said 61. A self-verification gate that fails depending on which flag last ran is worse than
         no gate, because it teaches a reader to re-run until green.
         """
-        return self.count("OK") + self.count("STALE") + self.count("UNCHECKED")
+        return (self.count("OK") + self.count("LAGGING") + self.count("STALE")
+                + self.count("UNCHECKED"))
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "total": self.total,
-            "checked": self.count("OK") + self.count("STALE"),
+            "checked": self.count("OK") + self.count("LAGGING") + self.count("STALE"),
             "ok": self.count("OK"),
+            "lagging": self.count("LAGGING"),
             "stale": self.count("STALE"),
             "absent": self.count("ABSENT"),
             "deleted": self.count("DELETED"),
@@ -862,12 +864,23 @@ def audit(
                 line = _line_of(text, match.start())
                 if live_tuple is None:
                     status = "UNCHECKED"
-                elif len(quoted) != len(live_tuple):
+                elif len(quoted) != len(live_tuple) or not all(
+                    agrees(q, v, claim.mode) for q, v in zip(quoted, live_tuple, strict=True)
+                ):
                     status = "STALE"
+                elif any(
+                    not agrees(q, v, "exact") for q, v in zip(quoted, live_tuple, strict=True)
+                ):
+                    # **Tolerated is not the same as equal, and printing both as OK hid the
+                    # difference.** `LAG_TOLERANCE` exists so a counter that grows every cycle does
+                    # not fail the gate between refreshes, which is right. But the report rendered
+                    # `quoted 495, live 500` identically to `quoted 115/193, live 115/193`, so a
+                    # reader scanning for OK could not see that five published figures were behind
+                    # the record. This fails nothing that passed before; it stops the pass from
+                    # looking like agreement when it is forbearance.
+                    status = "LAGGING"
                 else:
-                    status = "OK" if all(
-                        agrees(q, v, claim.mode) for q, v in zip(quoted, live_tuple, strict=True)
-                    ) else "STALE"
+                    status = "OK"
                 report.findings.append(Finding(claim.name, doc, line, quoted, live_tuple,
                                                status, excerpt))
     return report
@@ -877,7 +890,13 @@ def summary(report: Report) -> dict[str, Any]:
     """The compact form ``argus.status`` embeds: counts plus the stale lines by name."""
     return {
         "total": report.total,
-        "checked": report.count("OK") + report.count("STALE"),
+        "checked": report.count("OK") + report.count("LAGGING") + report.count("STALE"),
+        "lagging": report.count("LAGGING"),
+        "lagging_detail": [
+            f"{f.doc}:{f.line} {f.claim} quotes {'/'.join(f.quoted)}, live "
+            f"{'/'.join(str(v) for v in (f.live or ()))}"
+            for f in report.findings if f.status == "LAGGING"
+        ],
         "stale": report.count("STALE"),
         "unchecked": report.count("UNCHECKED"),
         "stale_detail": [

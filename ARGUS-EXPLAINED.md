@@ -1122,7 +1122,7 @@ why.
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 495 decisions on record. Every one of them is a refusal, and 386 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 500 decisions on record. Every one of them is a refusal, and 457 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
 zero trades, those three numbers **do not exist**. Not "are zero" — do not exist. Half of the track
@@ -1952,7 +1952,7 @@ source is a build failure, not a typo.
 | Live data sources reaching a decision | 15 |
 | Paper ledger | 166 decisions on record, chain intact, head anchored |
 | Scored policy forecasts | 49,142 raw / **32,196 effective** over 4,150 distinct instants |
-| Forecast calibration | Brier 0.2327, ECE 0.0128, improving to 0.0135 out of sample |
+| Forecast calibration | Brier 0.2319, ECE 0.0109, reliability 0.0002 against resolution 0.0166 |
 | Forecast record on ForecastBench's scale | **Brier Index 51.8**, where 50 is a coin |
 | Forecast skill against climatology | **+6.4%** — real, and small |
 | Murphy identity residual | 1.5e-14, so the decomposition reconstructs its own input |
@@ -2029,11 +2029,13 @@ could attack today.
 4. **Effective sample size on every scored record.** Intra-cluster correlation, design effect,
    distinct instants, effective count. The competing entry with the largest advertised record does
    not do this, and its intervals are about 1.9 times too narrow as a result. `eval/forecasts.py`.
-5. **49,142 point-in-time scored forecasts, restated in the metrics the public benchmarks use.**
-   Brier 0.2327 against a 0.25 coin, which is a **Brier Index of 51.8** on ForecastBench's scale
+5. **49,526 point-in-time scored forecasts, restated in the metrics the public benchmarks use.**
+   Brier 0.2319 against a 0.25 coin, which is a **Brier Index of 51.8** on ForecastBench's scale
    where 50 is a coin. Skill is reported against three references and not the flattering one:
-   +6.9% against a coin, **+6.4% against climatology**, +33.0% against persistence. Expected
-   calibration error 0.0128, improving to 0.0135 on a chronological split.
+   +7.2% against a coin, **+6.8% against climatology**, +33.3% against persistence. Expected
+   calibration error 0.0109, with reliability 0.0002 against resolution 0.0166 — the forecasts
+   discriminate by more than they are miscalibrated, which is the decomposition that matters and
+   the one a single Brier number hides.
 
    **What the decomposition says, and it is not a boast.** Reliability 0.00029 against resolution
    0.01562 on an uncertainty of 0.24866. In plain terms: these forecasts are *extremely well

@@ -16,11 +16,11 @@ outcome exists.**
 
 Most trading agents ask *what should I trade?* ARGUS asks a harder question:
 **should this decision-maker be trusted with capital right now?** On the live record the answer has
-been *no* **495 times out of 495** — and the interesting output is not the trade, it is the
+been *no* **500 times out of 500** — and the interesting output is not the trade, it is the
 record that says why.
 
-**The obvious rebuttal is that it never got the chance, and the record refutes it.** 217 of those
-495 decisions were taken in a tradeable session with the anchor market open, and **213 of them
+**The obvious rebuttal is that it never got the chance, and the record refutes it.** 222 of those
+500 decisions were taken in a tradeable session with the anchor market open, and **218 of them
 carried a directional lean** — the desk said which way it thought the instrument would go, hashed
 that call before the outcome existed, and still opened nothing. An earlier version of
 `eval/autopsy.py` explained the abstention as a sampling artefact, that the desk kept being asked
@@ -68,7 +68,7 @@ Product requirements: [`../ARGUS-MASTER-PRD.md`](../ARGUS-MASTER-PRD.md)
 ```
 5,946 tests collected   ruff clean   mypy --strict clean on 293 source files
 131/131 modules importable           18/18 sub-themes resolve to a symbol and a test file
-495 decisions in the paper ledger (as of 2026-09-21)  chain verifies, head anchor agrees, no truncation
+500 decisions in the paper ledger (as of 2026-09-21)  chain verifies, head anchor agrees, no truncation
 0 settled trades (2 rows VOID — see the correction above)      100.0% abstention rate
 ```
 
@@ -233,7 +233,7 @@ that was read. None of them is claimed as *proven better* — see "The honest pa
 
 ## The honest part
 
-- **Zero positions have settled.** All 495 ledger entries are refusals, and 386 have settled as
+- **Zero positions have settled.** All 500 ledger entries are refusals, and 457 have settled as
   abstentions. Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they record fills
   the risk layer had refused, and are excluded everywhere (see the correction at the top of this
   file and `paper/corrections.py`). Track 2's quantitative half — Sharpe, max drawdown, win rate —
@@ -244,7 +244,7 @@ that was read. None of them is claimed as *proven better* — see "The honest pa
   right 3.8% of the time against a base rate of up-moves of exactly 3.8% — a schema being filled in,
   not a view. So the desk now states a **lean** on every decision including the ones it refuses,
   covered by the chain through the intent hash and graded against the move that followed
-  (`eval/shadow.py`). **282 decisions carry a lean** so far — already UP and DOWN at differing
+  (`eval/shadow.py`). **334 decisions carry a lean** so far — already UP and DOWN at differing
   confidences, where `side` never varied — and none has settled, so the record says UNDEFINED rather
   than falling back to `side` to produce a number today.
 - The abstentions are correct rather than broken: the log begins on a weekend with the anchor market

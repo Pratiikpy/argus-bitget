@@ -1,14 +1,14 @@
 {
-  "last_decision": "2026-09-20T19:41:14.160382+00:00",
+  "last_decision": "2026-09-21T13:41:06.120148+00:00",
   "ledger_derived_artefacts": 11,
-  "stale": 3,
+  "stale": 7,
   "undated": 3,
   "stale_detail": [
     {
       "artefact": "flow_trace.json",
       "owner": "argus.demo.flow",
       "stamped_at": "2026-09-13T20:17:54.617728+00:00",
-      "behind_hours": 167.4,
+      "behind_hours": 185.4,
       "stale": true,
       "rerun": "python -m argus.demo.flow"
     },
@@ -16,7 +16,7 @@
       "artefact": "profile_divergence.json",
       "owner": "argus.eval.profilestudy",
       "stamped_at": "2026-09-15T01:52:09.466914+00:00",
-      "behind_hours": 137.8,
+      "behind_hours": 155.8,
       "stale": true,
       "rerun": "python -m argus.eval.profilestudy"
     },
@@ -24,9 +24,41 @@
       "artefact": "lui_bench.json",
       "owner": "argus.eval.luibench",
       "stamped_at": "2026-09-20T02:25:30.560076+00:00",
-      "behind_hours": 17.3,
+      "behind_hours": 35.3,
       "stale": true,
       "rerun": "python -m argus.eval.luibench"
+    },
+    {
+      "artefact": "cycle_check.json",
+      "owner": "argus.eval.cyclecheck",
+      "stamped_at": "2026-09-20T20:12:23.518829+00:00",
+      "behind_hours": 17.5,
+      "stale": true,
+      "rerun": "python -m argus.eval.cyclecheck"
+    },
+    {
+      "artefact": "surface_agreement.json",
+      "owner": "argus.eval.surfaces",
+      "stamped_at": "2026-09-21T11:47:47.696817+00:00",
+      "behind_hours": 1.9,
+      "stale": true,
+      "rerun": "python -m argus.eval.surfaces"
+    },
+    {
+      "artefact": "abstention_autopsy.json",
+      "owner": "argus.eval.autopsy",
+      "stamped_at": "2026-09-21T13:05:39.818749+00:00",
+      "behind_hours": 0.6,
+      "stale": true,
+      "rerun": "python -m argus.eval.autopsy"
+    },
+    {
+      "artefact": "shadow_record.json",
+      "owner": "argus.eval.shadow",
+      "stamped_at": "2026-09-21T13:05:40.298375+00:00",
+      "behind_hours": 0.6,
+      "stale": true,
+      "rerun": "python -m argus.eval.shadow"
     }
   ],
   "undated_names": [
@@ -39,8 +71,8 @@
       "artefact": "abstention_autopsy.json",
       "owner": "argus.eval.autopsy",
       "stamped_at": "2026-09-21T13:05:39.818749+00:00",
-      "behind_hours": -17.4,
-      "stale": false,
+      "behind_hours": 0.6,
+      "stale": true,
       "rerun": "python -m argus.eval.autopsy"
     },
     {
@@ -55,8 +87,8 @@
       "artefact": "cycle_check.json",
       "owner": "argus.eval.cyclecheck",
       "stamped_at": "2026-09-20T20:12:23.518829+00:00",
-      "behind_hours": -0.5,
-      "stale": false,
+      "behind_hours": 17.5,
+      "stale": true,
       "rerun": "python -m argus.eval.cyclecheck"
     },
     {
@@ -71,7 +103,7 @@
       "artefact": "flow_trace.json",
       "owner": "argus.demo.flow",
       "stamped_at": "2026-09-13T20:17:54.617728+00:00",
-      "behind_hours": 167.4,
+      "behind_hours": 185.4,
       "stale": true,
       "rerun": "python -m argus.demo.flow"
     },
@@ -79,7 +111,7 @@
       "artefact": "lui_bench.json",
       "owner": "argus.eval.luibench",
       "stamped_at": "2026-09-20T02:25:30.560076+00:00",
-      "behind_hours": 17.3,
+      "behind_hours": 35.3,
       "stale": true,
       "rerun": "python -m argus.eval.luibench"
     },
@@ -87,7 +119,7 @@
       "artefact": "profile_divergence.json",
       "owner": "argus.eval.profilestudy",
       "stamped_at": "2026-09-15T01:52:09.466914+00:00",
-      "behind_hours": 137.8,
+      "behind_hours": 155.8,
       "stale": true,
       "rerun": "python -m argus.eval.profilestudy"
     },
@@ -103,23 +135,23 @@
       "artefact": "shadow_record.json",
       "owner": "argus.eval.shadow",
       "stamped_at": "2026-09-21T13:05:40.298375+00:00",
-      "behind_hours": -17.4,
-      "stale": false,
+      "behind_hours": 0.6,
+      "stale": true,
       "rerun": "python -m argus.eval.shadow"
     },
     {
       "artefact": "surface_agreement.json",
       "owner": "argus.eval.surfaces",
       "stamped_at": "2026-09-21T11:47:47.696817+00:00",
-      "behind_hours": -16.1,
-      "stale": false,
+      "behind_hours": 1.9,
+      "stale": true,
       "rerun": "python -m argus.eval.surfaces"
     },
     {
       "artefact": "theme_audit.json",
       "owner": "argus.eval.themeaudit",
-      "stamped_at": "2026-09-21T13:05:56.832457+00:00",
-      "behind_hours": -17.4,
+      "stamped_at": "2026-09-21T13:43:54.246953+00:00",
+      "behind_hours": -0.0,
       "stale": false,
       "rerun": "python -m argus.eval.themeaudit"
     }
