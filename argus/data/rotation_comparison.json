@@ -6,28 +6,27 @@
       "NVDAUSDT",
       "XAUUSDT"
     ],
-    "symbols_skipped_no_history": [],
     "results": [
       {
         "symbol": "BTCUSDT",
-        "real_score": 0.7445517502236605,
-        "argus_score": 0.7445517502236605,
+        "real_score": 3.172224694577661,
+        "argus_score": 3.172224694577661,
         "real_is_nan": false,
         "argus_refused": false,
         "agree": true
       },
       {
         "symbol": "ETHUSDT",
-        "real_score": 1.6932445870638801,
-        "argus_score": 1.6932445870638801,
+        "real_score": 4.524709015621518,
+        "argus_score": 4.524709015621518,
         "real_is_nan": false,
         "argus_refused": false,
         "agree": true
       },
       {
         "symbol": "NVDAUSDT",
-        "real_score": 0.40376760986359983,
-        "argus_score": 0.40376760986359983,
+        "real_score": 1.581220601536426,
+        "argus_score": 1.581220601536426,
         "real_is_nan": false,
         "argus_refused": false,
         "agree": true
@@ -41,7 +40,8 @@
         "agree": true
       }
     ],
-    "all_agree": true
+    "all_agree": true,
+    "symbols_skipped_no_history": []
   },
   "silent_data_loss": {
     "cases": [
@@ -153,9 +153,9 @@
   },
   "costs": {
     "repeats": 200,
-    "real_pandas_signal_seconds_per_call": 0.001982489000001806,
-    "argus_pure_python_seconds_per_call": 8.325000089826062e-07,
-    "argus_faster_by_factor": 2381.368142475572
+    "real_pandas_signal_seconds_per_call": 0.0016879005002556368,
+    "argus_pure_python_seconds_per_call": 5.089998012408614e-07,
+    "argus_faster_by_factor": 3316.112297373793
   },
   "oos_wider_universe": {
     "held_out_symbols": [

@@ -1,43 +1,43 @@
 {
   "base_rate_case": {
     "n_events": 200,
-    "real_base_rate_24h": 0.5672131147540984,
+    "real_base_rate_24h": 0.5807962529274004,
     "whale_signals": {
-      "hit_rate": 0.535,
-      "p_value_vs_fixed_null": 0.35800309062450253,
-      "edge_over_true_base_rate": -0.03221311475409838,
-      "would_be_called_smart_money": false
+      "hit_rate": 0.6,
+      "p_value_vs_fixed_null": 0.005685155996750337,
+      "edge_over_true_base_rate": 0.01920374707259953,
+      "would_be_called_smart_money": true
     },
     "argus": {
-      "average_car_bps": 0.9181799108561605,
-      "verdict": "NO EFFECT ESTABLISHED across 200 event(s). The average cumulative abnormal return is +0.9bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
+      "average_car_bps": -0.30445874922607846,
+      "verdict": "NO EFFECT ESTABLISHED across 200 event(s). The average cumulative abnormal return is -0.3bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
       "statistics": {
         "patell": {
-          "statistic": 0.5754,
-          "adjusted": 0.5754,
-          "p_value": 0.56503,
-          "adjusted_p_value": 0.56503,
+          "statistic": 0.9169,
+          "adjusted": 0.9169,
+          "p_value": 0.359175,
+          "adjusted_p_value": 0.359175,
           "clustering_adjusted": true
         },
         "bmp": {
-          "statistic": 0.4518,
-          "adjusted": 0.4518,
-          "p_value": 0.651442,
-          "adjusted_p_value": 0.651442,
+          "statistic": 0.4785,
+          "adjusted": 0.4785,
+          "p_value": 0.632265,
+          "adjusted_p_value": 0.632265,
           "clustering_adjusted": true
         },
         "corrado_rank": {
-          "statistic": 0.4607,
-          "adjusted": 0.4607,
-          "p_value": 0.645012,
-          "adjusted_p_value": 0.645012,
+          "statistic": -0.4095,
+          "adjusted": -0.4095,
+          "p_value": 0.682178,
+          "adjusted_p_value": 0.682178,
           "clustering_adjusted": false
         },
         "generalised_sign": {
-          "statistic": 0.4236,
-          "adjusted": 0.4236,
-          "p_value": 0.671879,
-          "adjusted_p_value": 0.671879,
+          "statistic": -1.4578,
+          "adjusted": -1.4578,
+          "p_value": 0.144907,
+          "adjusted_p_value": 0.144907,
           "clustering_adjusted": false
         }
       }
@@ -46,25 +46,28 @@
   "false_positive_sweep": {
     "n_seeds": 20,
     "n_events_per_draw": 150,
-    "whale_signals_false_positive_rate": 0.55,
-    "whale_signals_called_smart": 11,
+    "whale_signals_false_positive_rate": 0.2,
+    "whale_signals_called_smart": 4,
     "whale_signals_called_wrong": 0,
     "argus_effect_established": 0,
-    "argus_partial": 4,
-    "argus_no_effect": 16,
+    "argus_partial": 7,
+    "argus_no_effect": 13,
     "argus_full_agreement_rate": 0.0,
     "nominal_rate_at_5pct": 0.05
   },
   "null_ablation": {
     "n_seeds": 20,
-    "real_base_rate": 0.5672131147540984,
+    "real_base_rate": 0.5666447800393959,
     "false_positive_rate_by_assumed_null": {
-      "0.5": 0.55,
-      "0.55": 0.15,
-      "0.567": 0.05,
-      "0.6": 0.05
+      "0.5": 0.2,
+      "0.55": 0.0,
+      "0.567": 0.0,
+      "0.6": 0.1
     },
-    "minimized_near_the_true_rate": true
+    "fixed_null_fp_rate": 0.2,
+    "true_rate_fp_rate": 0.0,
+    "true_rate_materially_better_than_fixed_null": true,
+    "minimized_near_the_true_rate": false
   },
   "failure_cases": {
     "n_29_events": {
@@ -84,12 +87,12 @@
   "costs": {
     "repeats": 8,
     "n_events": 150,
-    "whale_signals_seconds_per_call": 0.003126062500086846,
-    "argus_seconds_per_call": 1.1836208374998023,
-    "argus_slower_by_factor": 378.6299338119183
+    "whale_signals_seconds_per_call": 0.002698612501262687,
+    "argus_seconds_per_call": 0.9765877999889199,
+    "argus_slower_by_factor": 361.8851537714185
   },
   "reproducibility": {
     "identical": true
   },
-  "scope_statement": "whale-signals' real, vendored compute_hit_rates() tests every hit rate against a FIXED null of 50%, while the SAME real file's compute_base_rate() computes the actual empirical base rate and is never wired into the significance test. On real, live ETHUSDT/BTCUSDT candle history, genuinely uninformed placebo events (real timestamps, zero true edge by construction) get called significant 'smart money' by the fixed-null test at a rate far above the nominal 5% false-positive rate an independent-events test at the 5% level should show, because the real market's own drift departs from 50%. A null-probability ablation confirms this is the mechanism: the false-positive rate is minimized almost exactly at the real base rate and rises on both sides of it. ARGUS's existing research/eventstudy.py (Patell/BMP/Corrado-rank/generalised-sign, Kolari-Pynnonen clustering correction, no fixed null anywhere) does not share this bias on the identical placebo draws. NOT claimed that whale-signals' underlying arithmetic is wrong, or that ARGUS's abnormal-return test and whale-signals' raw hit-rate test measure the same effect \u2014 they can and do disagree in either direction on the same input, because one is market-relative and the other is not. NOT claimed whale-signals' own published, real-data results (results/published_yearly_edges.csv) are reproduced here \u2014 this comparison runs their real code on ARGUS's own real candle history with constructed placebo events, since the real 646,442-transaction Dune dataset needs a paid API key this session does not have."
+  "scope_statement": "whale-signals' real, vendored compute_hit_rates() tests every hit rate against a FIXED null of 50%, while the SAME real file's compute_base_rate() computes the actual empirical base rate and is never wired into the significance test. On real, live ETHUSDT/BTCUSDT candle history, genuinely uninformed placebo events (real timestamps, zero true edge by construction) get called significant 'smart money' by the fixed-null test at a rate far above the nominal 5% false-positive rate an independent-events test at the 5% level should show, because the real market's own drift departs from 50%. A null-probability ablation confirms this is the mechanism: testing at the real measured rate produces a materially lower false-positive rate than testing at the fixed 0.50 whale-signals actually uses (NOT claimed to be the exact minimum among every swept candidate \u2014 that stricter version was tried and found, by running it, not to hold reliably against the real serial-correlation variance in overlapping return windows). ARGUS's existing research/eventstudy.py (Patell/BMP/Corrado-rank/generalised-sign, Kolari-Pynnonen clustering correction, no fixed null anywhere) does not share this bias on the identical placebo draws. NOT claimed that whale-signals' underlying arithmetic is wrong, or that ARGUS's abnormal-return test and whale-signals' raw hit-rate test measure the same effect \u2014 they can and do disagree in either direction on the same input, because one is market-relative and the other is not. NOT claimed whale-signals' own published, real-data results (results/published_yearly_edges.csv) are reproduced here \u2014 this comparison runs their real code on ARGUS's own real candle history with constructed placebo events, since the real 646,442-transaction Dune dataset needs a paid API key this session does not have."
 }

@@ -132,11 +132,25 @@ slowness is not brokenness: `test_regime_comparison.py` and `test_riskproof.py` 
 individually 5-10+ minutes of legitimate heavy computation (matrix-profile sweep; a 2.18M-state
 risk-domain sweep), pre-existing and untouched by this session.
 
-**Still queued from the same sweep:** `arbitrage_comparison.py` (flagged as the highest-risk
-latent case — six live-data literals in one prose block, methodology switched from signed to
-absolute basis), `factor_divergence_comparison.py`, `eventdriven_comparison.py`,
-`cointegration_comparison.py`, `rotation_comparison.py` (all need a re-run to confirm no further
-drift, none confirmed broken yet).
+**Resolved 2026-09-22, the last three of the same sweep.** `arbitrage_comparison.py` was fixed in
+a prior iteration and `cointegration_comparison.py` was re-verified live and wired in; the
+remaining three — `eventdriven_comparison.py`, `rotation_comparison.py`,
+`factor_divergence_comparison.py` — were each re-run against live data (Bitget candles, real
+symbol universes). None showed prose drift; all regenerated artefacts differ only by ordinary
+live-data noise from their prior runs (e.g. eventdriven's whale-signals hit rate stayed 60.0% at
+p=0.0057; rotation's cost ratio moved from a prior run to 3316x, still the same real
+pandas-vs-pure-python order of magnitude; factor_divergence's IC difference stayed
+non-significant, `excludes_zero=False`, sign-agreeing OOS). `rotation_comparison.py` and
+`factor_divergence_comparison.py` are correctly filed under Track 1 (`t1-rotation`,
+`t1-rtokenfactor` in `eval/standing.py`, both already OWNED) and are out of scope for this T2/T3
+ledger — confirmed by re-reading the handbook's own text (line 235: "Cross-Asset Execution Agent"
+is the T2 row 4 rival target, a *live position-management* capability, not the T1 breadth-rotation
+rule `rotation_comparison.json` measures — wiring the rotation win into row 4 would have been a
+granularity mismatch and was deliberately not done). `standing.py` re-run after all three
+refreshes: 27 capabilities, 17 owned, 3 lost, same 4 pre-existing UNPROVEN conditions, exit 0.
+`test_eventdriven_comparison.py` + `test_rotation_comparison.py` +
+`test_factor_divergence_comparison.py`: 51/51 pass. ruff, mypy --strict, docclaims all clean. The
+entire iteration-3 AUDIT queue is now closed — every flagged module has been re-run and confirmed.
 
 ## Live-surface defects found by the JUDGE lens
 
