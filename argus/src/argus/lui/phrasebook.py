@@ -172,6 +172,19 @@ PHRASES: dict[str, dict[Language, str]] = {
         Language.EN: "  seq {seq} {symbol} {verdict} (confidence {confidence:.2f}) {at}",
         Language.ZH: "  序号 {seq} {symbol} {verdict}（置信度 {confidence:.2f}）{at}",
     },
+    # Voided rows are excluded from the count and said to be, never silently dropped. A total
+    # that quietly shrinks is the same defect as one that quietly includes a refused position.
+    "list.voided": {
+        Language.EN: (
+            "  {voided} row(s) excluded from these counts: they record positions the risk layer "
+            "refused and the ledger booked anyway (see paper/corrections.py). They remain in the "
+            "chain, listed but not counted."
+        ),
+        Language.ZH: (
+            "  {voided} 条记录未计入统计：风险层已拒绝的仓位被错误写入账本"
+            "（见 paper/corrections.py）。记录仍保留在链上，仅列出、不计数。"
+        ),
+    },
     # --- integrity ---------------------------------------------------------------------------
     "integ.header": {
         Language.EN: "Hash chain {state} across {count} entry(ies).",

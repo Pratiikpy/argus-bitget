@@ -593,3 +593,76 @@ class TestQueryStringRepair:
         broken = "为什么你没有交易".encode().decode("latin-1")
         assert classify(broken, now=NOW).intent is Intent.UNKNOWN
         assert classify(repair_mojibake(broken), now=NOW).intent is Intent.ABSTENTION_WHY
+
+
+class TestVoidedRowsAreNotCountedAsTrades:
+    """**The console contradicted every other surface, and both numbers came from one chain.**
+
+    Two live rows booked positions the Constitution had explicitly refused
+    (`paper/corrections.py`). `ledger.performance`, `eval/performance`, the cockpit and the
+    scorecard all exclude them. `answer_decision_list` counted `entry.verdict` raw, so the console
+    answered *"493 no_trade, 2 trade"* while the submission and README said zero trades.
+
+    That is precisely how a tamper-evident log launders a mistake: the chain verifies, so the
+    wrong number looks authenticated.
+    """
+
+    def test_the_breakdown_excludes_voided_rows(self) -> None:
+        from datetime import UTC, datetime
+
+        from argus.lui.answer import answer
+        from argus.lui.question import classify
+        from argus.paper.ledger import PaperLedger
+        from argus.paper.runner import LEDGER_PATH
+
+        ledger = PaperLedger(path=LEDGER_PATH)
+        if not ledger.entries:
+            import pytest
+
+            pytest.skip("no live ledger on this machine")
+        result = answer(ledger, classify("show me every decision", now=datetime.now(UTC)))
+        assert "trade" not in result.data.get("verdicts", {}), (
+            "a position the risk layer refused must not be counted as a trade"
+        )
+
+    def test_the_excluded_rows_are_named_not_silently_dropped(self) -> None:
+        """A total that quietly shrinks is the same defect as one that quietly includes."""
+        from datetime import UTC, datetime
+
+        from argus.lui.answer import answer
+        from argus.lui.question import classify
+        from argus.paper.ledger import PaperLedger
+        from argus.paper.runner import LEDGER_PATH
+
+        ledger = PaperLedger(path=LEDGER_PATH)
+        if not ledger.entries:
+            import pytest
+
+            pytest.skip("no live ledger on this machine")
+        result = answer(ledger, classify("show me every decision", now=datetime.now(UTC)))
+        voided = result.data.get("voided", 0)
+        if voided:
+            assert any("corrections.py" in line for line in result.lines), (
+                "excluded rows must be explained where they are excluded"
+            )
+
+    def test_the_voided_rows_remain_in_the_chain(self) -> None:
+        """`corrections.py` refuses deletion; the rows stay and are listed, just not counted."""
+        from argus.paper.corrections import VOIDED
+        from argus.paper.ledger import PaperLedger
+        from argus.paper.runner import LEDGER_PATH
+
+        ledger = PaperLedger(path=LEDGER_PATH)
+        if not ledger.entries:
+            import pytest
+
+            pytest.skip("no live ledger on this machine")
+        # VOIDED holds VoidedEntry records, not bare sequence numbers — read from the module
+        # rather than assumed. The first version of this test iterated it as ints and compared
+        # objects against a set of numbers, which fails loudly; the dangerous version of that
+        # mistake is the one that fails silently.
+        present = {e.seq for e in ledger.entries}
+        for voided in VOIDED:
+            assert voided.seq in present, (
+                f"seq {voided.seq} was deleted; corrections.py forbids that"
+            )

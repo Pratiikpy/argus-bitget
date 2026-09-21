@@ -225,8 +225,23 @@ def answer_decision_list(ledger: PaperLedger, question: Question) -> Answer:
     rows = _matching(ledger, question)
     if not rows:
         return _refuse(question, "No decisions match that window or symbol.")
+    # **A voided row records something the desk did not do, and counting it as a trade made the
+    # console contradict every other surface.** Two rows on the live record booked positions the
+    # Constitution had explicitly refused (`paper/corrections.py`), and every consumer of the
+    # ledger excludes them — `ledger.performance`, `eval/performance`, the cockpit, the scorecard.
+    # This one did not: it counted `entry.verdict` raw, so the console answered *"493 no_trade,
+    # 2 trade"* while the submission, the README and the cockpit all said zero trades.
+    #
+    # Both statements were built from the same chain, which is exactly how a tamper-evident log
+    # launders a mistake: the chain verifies, so the wrong number looks authenticated. The rows
+    # still appear in the listing below — deleting them is what `corrections.py` refuses — but
+    # they are counted as what they were, not as what they claimed.
     verdicts: dict[str, int] = {}
+    voided = 0
     for entry in rows:
+        if entry.is_void:
+            voided += 1
+            continue
         verdicts[entry.verdict] = verdicts.get(entry.verdict, 0) + 1
     lang = question.language
     lines = [
@@ -234,13 +249,15 @@ def answer_decision_list(ledger: PaperLedger, question: Question) -> Answer:
           window=(f" in {question.window.label}" if question.window else ""),
           breakdown=", ".join(f"{n} {v}" for v, n in sorted(verdicts.items()))),
     ]
+    if voided:
+        lines.append(t("list.voided", lang, voided=voided))
     for entry in rows[-5:]:
         lines.append(
             t("list.row", lang, seq=entry.seq, symbol=entry.symbol, verdict=entry.verdict,
               confidence=entry.stated_confidence, at=entry.decided_at)
         )
     return Answer(question=question, lines=lines, sources=[_src(e) for e in rows[-5:]],
-                  data={"count": len(rows), "verdicts": verdicts})
+                  data={"count": len(rows), "verdicts": verdicts, "voided": voided})
 
 
 def answer_integrity(ledger: PaperLedger, question: Question) -> Answer:
