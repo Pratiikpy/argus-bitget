@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T18:43:14.941692+00:00",
+  "generated_at": "2026-09-21T19:43:03.298575+00:00",
   "probes": 20,
   "runs": 17,
   "weak": 2,
@@ -15,7 +15,7 @@
       "question": "How do news / announcements / macro events drive autonomous Agent trading?",
       "bar": "the event analyst took part in real recorded decisions, not just in a test",
       "status": "RUNS",
-      "evidence": "event took part in 212 of 469 recorded decision(s). Last: [panel] 3 of 3 analysts run: event, sentiment, earnings \u2014 measured against whale-signals' own vendored null-testing code on 200 real events: the true base rate is 56.7%, whale-signals' own hit rate scores 53.5% (p=0.358 against a fixed 50% null it never checks against the true rate), and a null swept against the real rate minimises near it rather than at 50%: True",
+      "evidence": "event took part in 212 of 469 recorded decision(s). Last: [panel] 3 of 3 analysts run: event, sentiment, earnings \u2014 measured against whale-signals' own vendored null-testing code on 200 real events: the true base rate is 58.1%, whale-signals' own hit rate scores 60.0% (p=0.006 against a fixed 50% null it never checks against the true rate), and a null swept against the real rate minimises near it rather than at 50%: False",
       "artefact": "data/desk_notes.jsonl"
     },
     {
@@ -45,7 +45,7 @@
       "question": "How does the Agent manage rToken and Crypto positions simultaneously?",
       "bar": "the cross-asset analyst took part in real recorded decisions",
       "status": "RUNS",
-      "evidence": "cross_asset took part in 353 of 469 recorded decision(s). Last: [panel] cross_asset also ran, outside the evidence-cost selection above: it reads the hedge menu (0 instrument(s)) and the position rather than the evidence lis",
+      "evidence": "cross_asset took part in 353 of 469 recorded decision(s). Last: [panel] cross_asset also ran, outside the evidence-cost selection above: it reads the hedge menu (0 instrument(s)) and the position rather than the evidence lis \u00b7 measured against crypto_sor's real composite order-book router on real NVDAUSDT/BTCUSDT quotes: both agree at zero holding time (argus='BTCUSDT', crypto_sor='BTCUSDT') but diverge past the real break-even of 1 day(s) because crypto_sor never prices funding; the holding-time sweep shows 4/6 points disagree once funding is counted, and 5/5 real rToken/crypto leg pairs diverge past their own break-even \u2014 never a hand-picked single case",
       "artefact": "data/desk_notes.jsonl"
     },
     {
@@ -165,7 +165,7 @@
       "question": "A portfolio-aware AI PM evaluating how a trade changes beta, sector and factor exposures, correlation, and concentration, with stress tests or hedge suggestions",
       "bar": "every named dimension appears in ONE answer about ONE proposed trade",
       "status": "RUNS",
-      "evidence": "one proposed trade assessed against a live book over 124 open-session bar(s) in a single answer \u2014 [portfolio] open-session beta 0.93 -> 1.06; [portfolio] NVDAUSDT would carry 18% of total portfolio risk (was new position); [portfolio] risk spread across 1.7 -> 2.3 effective position(s); [portfolio] most correlated with TSLAUSDT at +0.30; partly the same trade; the diversifica",
+      "evidence": "one proposed trade assessed against a live book over 125 open-session bar(s) in a single answer \u2014 [portfolio] open-session beta 0.93 -> 1.06; [portfolio] NVDAUSDT would carry 18% of total portfolio risk (was new position); [portfolio] risk spread across 1.7 -> 2.3 effective position(s); [portfolio] most correlated with TSLAUSDT at +0.31; partly the same trade; the diversifica",
       "artefact": "argus.desk.portfolio:assess"
     },
     {

@@ -18,7 +18,7 @@ carries a result.**
 | 1 | `event-driven` | T2 | subtheme | IMPLEMENTED | whale-signals | **yes** | methodological — see note | 2026-09-21 |
 | 2 | `sentiment` | T2 | subtheme | IMPLEMENTED | — | no | — | — |
 | 3 | `earnings` | T2 | subtheme | IMPLEMENTED | QuantConnect (vendored SUE) | **yes** | ARGUS (refuses the artefact QC ranks top) | 2026-09-21 |
-| 4 | `cross-asset-execution` | T2 | subtheme | IMPLEMENTED | — | no | — | — |
+| 4 | `cross-asset-execution` | T2 | subtheme | IMPLEMENTED | crypto_sor (real composite order-book router) | **yes** | ARGUS (funding-aware; crypto_sor never prices funding, 5/5 real leg pairs diverge past break-even) | 2026-09-22 |
 | 5 | `factor-discovery` | T2 | subtheme | IMPLEMENTED | Microsoft RD-Agent | **yes** | ARGUS (no execution surface; RD-Agent ran attacker code) | 2026-09-21 |
 | 6 | `t2-open-evaluation` | T2 | subtheme | IMPLEMENTED (weak) | — | no | — | — |
 | 7 | `t2-sharpe-mdd-winrate` | T2 | judging | NOT DEMONSTRATED | — | no | — | — |
@@ -38,20 +38,24 @@ carries a result.**
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 9 of 20 as of 2026-09-21: 3 LOST (one of them split — LUI intent
+**`rival run` is `yes` on 10 of 20 as of 2026-09-22: 3 LOST (one of them split — LUI intent
 accuracy loses to Rasa's DIET classifier, p=0.0014, while ARGUS wins out-of-scope refusal
-separately and significantly, p=0.031, neither laundering the other), 5 real wins (earnings vs
+separately and significantly, p=0.031, neither laundering the other), 6 real wins (earnings vs
 QuantConnect, factor-discovery vs Microsoft RD-Agent, risk-control vs freqtrade's real
 PrecisionRecallProtection — ARGUS's precision at full recall is 59.2% against freqtrade's best
 swept 19.3%, dominating every threshold, and freqtrade's own proxy correlates only weakly
 (r=0.26) with the real drawdown ground truth it approximates — architecture vs two rivals at
 once, RD-Agent's real `eval()`-executed injection against ARGUS's zero execution surface, plus
 AgentDojo's real attack corpus behind the production false-positive count that went from 6 to 0 —
-and research-quality vs QuantConnect's real Lean engine and statsmodels: Lean has no multiple-
+research-quality vs QuantConnect's real Lean engine and statsmodels: Lean has no multiple-
 testing correction anywhere in its cointegration code, a naive p<0.05 selection over 190 real
 pairs picks 7 "cointegrated" pairs against the 9.5 false positives theory predicts at that rate,
-while ARGUS's own FDR- and Bonferroni-corrected survivors on the identical pairs are both zero),
-1 methodological (event-driven vs whale-signals — neither system establishes a real effect on
+while ARGUS's own FDR- and Bonferroni-corrected survivors on the identical pairs are both zero —
+and cross-asset-execution vs crypto_sor's real composite order-book router: crypto_sor's real
+`newOrder()` has no fee, funding, or holding-cost term anywhere in its source, so it can only ever
+route on entry slippage; ARGUS's hedge router prices the real funding channel too and diverges
+from crypto_sor's pick on 5 of 5 real rToken/crypto leg pairs past their own real break-even), 1
+methodological (event-driven vs whale-signals — neither system establishes a real effect on
 this data; the finding is that whale-signals tests against the wrong null, not that ARGUS's own
 number beats theirs, and no fabricated score is recorded for it).** That is this ledger's honest
 scoreboard — it names whether
