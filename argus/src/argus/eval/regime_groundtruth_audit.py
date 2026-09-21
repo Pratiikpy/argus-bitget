@@ -28,13 +28,16 @@ What this audit does NOT do: it does not re-fetch or re-derive `regime_compariso
 figures. Those were re-run and they reproduce; this module adds the two measurements that were
 missing, and one integrity check on the shipped artefact (below).
 
-**Integrity check on the artefact.** `data/regime_comparison.json` carries a hand-written
-`scope_statement` beside its measured fields, and the two disagree: the prose says stumpy is "337x"
-faster and that a calendar bucket "holds 27 of 552", while the same file's `costs.stumpy_speedup`
-reads 310.36 and `calendar_control.ruptures_bic.fullest_bucket` reads 38. The module's current
-`SCOPE_STATEMENT` constant says 310x and 38 — so the constant was corrected after the run and the
-artefact was never regenerated. Every *measured* number checked here reproduces; it is the narrated
-copy of them that drifted. `check_artefact_consistency` pins this so it cannot drift again silently.
+**Integrity check on the artefact — found drifted, since fixed.** `data/regime_comparison.json`
+carries a hand-written `scope_statement` beside its measured fields; this check found them
+disagree — the prose said stumpy was "337x" faster and that a calendar bucket "holds 27 of 552",
+while the same file's `costs.stumpy_speedup` read 310.36 and
+`calendar_control.ruptures_bic.fullest_bucket` read 38. The module's `SCOPE_STATEMENT` constant
+already said 310x and 38 at the time, so the constant had been corrected and the artefact simply
+never regenerated. Every *measured* number checked here reproduced; it was only the narrated copy
+of them that had drifted. Regenerated 2026-09-21 (re-running `regime_comparison.py` refreshes the
+whole artefact, prose included); the two now agree, and `check_artefact_consistency` still pins
+this so it cannot drift again silently without being caught the same way.
 
 **Taken and rejected.** Taken: `ruptures.metrics.hausdorff` and `precision_recall`
 (`ruptures/metrics/precisionrecall.py:9-46` — note its convention that both partitions end with

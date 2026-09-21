@@ -279,14 +279,16 @@ class TestArtefactIntegrity:
         assert integrity["speedup_self_consistent"] is True
         assert integrity["novelty_rate_self_consistent"] is True
 
-    def test_the_narrated_scope_statement_has_drifted_from_the_measurements(
+    def test_the_narrated_scope_statement_now_matches_the_measurements(
         self, integrity: dict[str, Any]
     ) -> None:
-        """A real defect, found and reported rather than fixed here: the artefact's prose says 337x
-        and a calendar bucket of 27 while the fields beside it read 310.36 and 38, so the file
-        predates the current source. A failure here means the artefact was regenerated, which is
-        the fix — update this test to assert the match at that point."""
-        assert integrity["scope_statement_matches_current_source"] is False
+        """`data/regime_comparison.json` was regenerated during the AUDIT sweep that reused this
+        module's finding (the artefact's prose said 337x and a calendar bucket of 27 while the
+        fields beside it already read 310x and 38 — the file predated the current source). This
+        test used to assert the drift itself as a documented, live defect; it failed the moment
+        the artefact was regenerated, exactly as its own docstring said it would, and that failure
+        is the fix landing rather than a regression. Asserting the match now, not the drift."""
+        assert integrity["scope_statement_matches_current_source"] is True
 
     def test_the_artefact_is_strict_json_now(self, integrity: dict[str, Any]) -> None:
         """**This test used to assert the opposite, and finding that was this audit's best work.**

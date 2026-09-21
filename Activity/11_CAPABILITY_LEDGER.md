@@ -106,6 +106,16 @@ could not be regenerated — its module needs
 `BITGET_QWEN_API_KEY`, genuinely tested and genuinely blocked by the standing rule against
 spending that metered key from a loop.
 
+**Resolved 2026-09-21, the "hung" background suite.** Two F's had sat unidentified for four
+iterations. Batched, individually-timed diagnosis (queued three iterations ago, run this
+iteration) found: one genuine bug — `test_regime_groundtruth_audit.py` was a deliberate tripwire
+asserting `regime_comparison.json`'s scope_statement was stale, and this loop's own earlier fix
+(regenerating that artefact) correctly flipped the tripwire without anyone completing its own
+documented follow-up. Fixed exactly as the test's own docstring instructed. The rest of the
+slowness is not brokenness: `test_regime_comparison.py` and `test_riskproof.py` are each
+individually 5-10+ minutes of legitimate heavy computation (matrix-profile sweep; a 2.18M-state
+risk-domain sweep), pre-existing and untouched by this session.
+
 **Still queued from the same sweep:** `arbitrage_comparison.py` (flagged as the highest-risk
 latent case — six live-data literals in one prose block, methodology switched from signed to
 absolute basis), `factor_divergence_comparison.py`, `eventdriven_comparison.py`,
