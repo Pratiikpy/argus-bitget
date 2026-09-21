@@ -89,7 +89,9 @@ rows it was built from. When the record cannot support an answer you get a refus
 never a guess. <span id="stat"></span></p>
 <p class="sub" style="margin-top:-14px">Track 3 asks for one complete research task, question to
 actionable insight: <a href="/research" style="color:var(--accent)">see the full chain</a> &mdash;
-eleven steps, each naming the module that produced it.</p>
+eleven steps, each naming the module that produced it. And the other half of the story:
+<a href="/wrong" style="color:var(--accent)">what we got wrong</a> &mdash; every bug, withdrawn
+claim and lost comparison, read live from its own artefact.</p>
 
 <form class="bar" id="f">
   <input type="text" id="q" placeholder="why did you do nothing all weekend" autocomplete="off">
@@ -514,6 +516,24 @@ class Handler(BaseHTTPRequestHandler):
                 return
             if path == "/status":
                 self._send(json.dumps(_status()).encode(), "application/json")
+                return
+            if path == "/wrong":
+                # **The losses, reachable.** Bitget's own S1 showcase led with a negative result;
+                # ours were scattered across six artefacts a reader had to know to look for.
+                # Assembled at request time from those artefacts rather than written down once,
+                # because a hand-written description of a measurement drifts the first time the
+                # measurement changes.
+                from argus.lui.corrections_page import collect
+                from argus.lui.corrections_page import render as render_wrong
+
+                found = collect(_ledger_path().parent)
+                if (parse_qs(route.query).get("format") or [""])[0] == "json":
+                    self._send(
+                        json.dumps([c.as_dict() for c in found], ensure_ascii=False).encode(),
+                        "application/json",
+                    )
+                    return
+                self._send(render_wrong(found).encode(), "text/html; charset=utf-8")
                 return
             if path == "/research":
                 # **A required Track 3 material that had no route.** The handbook asks for "one

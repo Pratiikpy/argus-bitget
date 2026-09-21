@@ -269,3 +269,48 @@ class TestTheResearchTaskIsReachable:
         assert report["available"] is False
         assert "looked_in" in report
         assert "No research task on record" in mod._render_research(report)
+
+
+class TestTheLossesPage:
+    """**A losses page that silently shortens is the most flattering possible lie.**
+
+    Every entry is read from an artefact at request time rather than written down once, so the
+    failure mode that matters is not a wrong entry — it is a *missing* one disappearing quietly.
+    """
+
+    def test_it_is_reachable_and_linked(self, base_url: str) -> None:
+        status, raw, _ = _get(base_url + "/wrong")
+        assert status == 200
+        assert "What we got wrong" in raw.decode("utf-8")
+        _, home, _ = _get(base_url + "/")
+        assert "/wrong" in home.decode("utf-8"), "a route nobody can find is not submitted"
+
+    def test_it_records_real_findings(self, base_url: str) -> None:
+        _, raw, _ = _get(base_url + "/wrong?format=json")
+        rows = json.loads(raw)
+        assert len(rows) >= 5
+        kinds = {r["kind"] for r in rows}
+        assert {"bug", "loss", "withdrawn"} <= kinds, (
+            "the page must carry bugs we shipped, comparisons we lost, and claims we withdrew"
+        )
+
+    def test_every_entry_names_its_artefact(self, base_url: str) -> None:
+        """An unsourced confession is just as unverifiable as an unsourced boast."""
+        _, raw, _ = _get(base_url + "/wrong?format=json")
+        for row in json.loads(raw):
+            assert row["artefact"], row
+            assert row["headline"] and row["detail"], row
+
+    def test_a_missing_artefact_is_listed_not_dropped(self, tmp_path) -> None:
+        """The one failure mode this page must not have."""
+        from argus.lui.corrections_page import collect
+
+        found = collect(tmp_path)
+        assert found, "an empty data directory must still produce entries"
+        assert any("unreadable" in c.headline for c in found), (
+            "a finding whose artefact is gone must say so, not vanish"
+        )
+
+    def test_it_does_not_claim_completeness(self, base_url: str) -> None:
+        _, raw, _ = _get(base_url + "/wrong")
+        assert "not everything wrong" in raw.decode("utf-8").lower()
