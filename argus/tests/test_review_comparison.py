@@ -44,25 +44,42 @@ class TestLifecycleCases:
 
 
 class TestThresholdAblations:
-    def test_both_thresholds_are_independently_load_bearing(self) -> None:
+    def test_all_four_thresholds_are_independently_load_bearing(self) -> None:
+        """NEVER_FIRES and MIN_FIRINGS were added 2026-09-21 — the function used to return 2,
+        docstring claiming 4, an overclaim caught by an AUDIT sweep and closed as a queued BUILD
+        task rather than rushed. This asserts the real count, not a re-typed literal, would be
+        the more thorough guard — but the specific dimension names matter more here, since a
+        length-4 result with a wrong or duplicated dimension would pass a bare count check."""
         results = run_threshold_ablations()
-        assert len(results) == 2
+        by_dim = {r.dimension: r for r in results}
+        assert set(by_dim) == {
+            "min_precision", "always_fires_ceiling", "never_fires_floor", "min_firings_floor",
+        }
         for r in results:
             assert r.differs, r.dimension
+            assert r.real_status == Status.ACTIVE, r.dimension
 
     def test_the_real_thresholds_are_restored_after_ablation(self) -> None:
         """The monkeypatches must not leak into any other test in the same process."""
-        from argus.desk.review import ALWAYS_FIRES, MIN_PRECISION
+        from argus.desk.review import ALWAYS_FIRES, MIN_FIRINGS, MIN_PRECISION, NEVER_FIRES
 
         run_threshold_ablations()
         assert MIN_PRECISION == 0.5
         assert ALWAYS_FIRES == 0.9
+        assert NEVER_FIRES == 0.0
+        assert MIN_FIRINGS == 5
 
 
 class TestScopeStatement:
     def test_names_what_is_and_is_not_claimed(self) -> None:
         assert "NOT claimed" in SCOPE_STATEMENT
         assert "zero matches" in SCOPE_STATEMENT
+
+    def test_claims_all_four_thresholds_not_two(self) -> None:
+        """This used to say 'Two of ARGUS's four' — accurate then, wrong now that all four are
+        genuinely ablated. Regression guard for the overclaim this replaced."""
+        assert "All four of ARGUS's" in SCOPE_STATEMENT
+        assert "Two of ARGUS's four" not in SCOPE_STATEMENT
 
 
 class TestMain:

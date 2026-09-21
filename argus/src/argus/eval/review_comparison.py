@@ -245,19 +245,18 @@ class ThresholdAblation:
 
 
 def run_threshold_ablations() -> tuple[ThresholdAblation, ...]:
-    """Two of ``review.py``'s four status-gating thresholds, each patched to a value that flips
+    """All four of ``review.py``'s status-gating thresholds, each patched to a value that flips
     the verdict on an otherwise-identical fixture — real code, not a hand-derived counterfactual.
 
-    **This docstring used to claim all four** (ALWAYS_FIRES, NEVER_FIRES, MIN_PRECISION,
-    MIN_FIRINGS) were ablated here; only MIN_PRECISION and ALWAYS_FIRES actually are, below.
-    NEVER_FIRES and MIN_FIRINGS have no fixture in this function — a real coverage gap, not a
-    stale number, found the same way the stale-number defects elsewhere in this session's
-    `SCOPE_STATEMENT` sweep were: by comparing what the prose claimed against what the code
-    actually returns (``len(run_threshold_ablations())`` is 2, not 4). Adding the missing two
-    needs fixtures built against ``review.py``'s ``_status_for``-style gating cascade in
-    ``desk/review.py:340-369`` (``fire_rate`` for NEVER_FIRES, ``p.fired`` for MIN_FIRINGS), and
-    is queued as a BUILD task rather than rushed here under this iteration's time pressure — an
-    incorrect fixture written quickly would be a worse defect than an honest gap.
+    **This function used to ablate only two** (MIN_PRECISION, ALWAYS_FIRES); the docstring
+    claimed all four and NEVER_FIRES/MIN_FIRINGS had no fixture at all — a real coverage gap,
+    found the same way the stale-number defects elsewhere in this session's `SCOPE_STATEMENT`
+    sweep were: by comparing what the prose claimed against what the code actually returned
+    (``len(run_threshold_ablations())`` was 2, not 4). The two added below share one fixture
+    (fires 5 of 20 decisions, every firing on a real GROUNDING defect: fire_rate 0.25, precision
+    1.0, fired == MIN_FIRINGS exactly) rather than inventing a fresh one each, since both
+    NEVER_FIRES and MIN_FIRINGS gate on properties that same fixture already sits exactly at the
+    boundary of — ``review.py``'s cascade in ``desk/review.py:340-369``.
     """
     import argus.desk.review as review_module
 
@@ -298,6 +297,47 @@ def run_threshold_ablations() -> tuple[ThresholdAblation, ...]:
         ThresholdAblation("always_fires_ceiling", real_perf2.status, ablated_perf2.status)
     )
 
+    # NEVER_FIRES and MIN_FIRINGS: one shared fixture sitting exactly at both gates' boundary —
+    # fires 5 of 20 decisions (fire_rate 0.25: real, comfortably above the real 0.0 NEVER_FIRES
+    # floor and below the real 0.9 ALWAYS_FIRES ceiling), every firing catching a real defect
+    # (precision 1.0, comfortably above MIN_PRECISION), fired == 5 == MIN_FIRINGS exactly (passes
+    # `fired < MIN_FIRINGS` since 5 is not less than 5). Real status is ACTIVE; verified by an
+    # assertion below rather than assumed, since a fixture that silently lands somewhere else
+    # would make both flips below meaningless.
+    n3 = 20
+    fires3 = set(range(5))
+    records3 = _records(n3, fires_on=fires3)
+    defects3 = [Defect(i, "X", DefectKind.GROUNDING, "x") for i in range(5)]  # 5/5 caught = 1.0
+    real_perf3 = evaluate(rule, records3, defects3, min_decisions=20)
+    assert real_perf3.status == Status.ACTIVE, (
+        f"the shared NEVER_FIRES/MIN_FIRINGS fixture must be real-ACTIVE for either ablation "
+        f"below to demonstrate anything; got {real_perf3.status}"
+    )
+
+    # NEVER_FIRES: fire_rate 0.25 is real-ACTIVE under the real 0.0 floor; patching the floor to
+    # 0.3 (above the fixture's own 0.25) should flip it to DEAD_WEIGHT.
+    original_nf = review_module.NEVER_FIRES
+    try:
+        review_module.NEVER_FIRES = 0.3
+        ablated_perf3 = evaluate(rule, records3, defects3, min_decisions=20)
+    finally:
+        review_module.NEVER_FIRES = original_nf
+    results.append(
+        ThresholdAblation("never_fires_floor", real_perf3.status, ablated_perf3.status)
+    )
+
+    # MIN_FIRINGS: fired == 5 clears the real floor of 5 exactly; patching the floor to 10 (above
+    # the fixture's 5 firings) should flip it to EARNING.
+    original_mf = review_module.MIN_FIRINGS
+    try:
+        review_module.MIN_FIRINGS = 10
+        ablated_perf4 = evaluate(rule, records3, defects3, min_decisions=20)
+    finally:
+        review_module.MIN_FIRINGS = original_mf
+    results.append(
+        ThresholdAblation("min_firings_floor", real_perf3.status, ablated_perf4.status)
+    )
+
     return tuple(results)
 
 
@@ -314,10 +354,9 @@ landing on the intended status. TradingAgents' real, vendored TradingMemoryLog h
 anywhere: storing a reflection about a decision that was independently, demonstrably WRONG (a \
 real -15% realised return) and reading it back later shows it re-injected identically to a \
 reflection about a right call — grepped directly across the whole repository for any \
-precision/track-record concept tied to memory: zero matches. Two of ARGUS's four status-gating \
-thresholds (MIN_PRECISION, ALWAYS_FIRES) shown independently load-bearing by patching each to a \
-value that flips an otherwise-identical fixture's verdict; NEVER_FIRES and MIN_FIRINGS are not \
-yet ablated here — see `run_threshold_ablations`'s own docstring for the honest gap.
+precision/track-record concept tied to memory: zero matches. All four of ARGUS's status-gating \
+thresholds (MIN_PRECISION, ALWAYS_FIRES, NEVER_FIRES, MIN_FIRINGS) shown independently \
+load-bearing by patching each to a value that flips an otherwise-identical fixture's verdict.
 
 NOT claimed: that TradingAgents' unconditional reuse is a design mistake in the way it presents \
 itself — a system whose memory feeds a model that reasons over the prose (and can itself discount \

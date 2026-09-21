@@ -3766,10 +3766,13 @@ REGISTER: tuple[Capability, ...] = (
             Proof(
                 condition="ablation",
                 how=(
-                    "two of ARGUS's four lifecycle thresholds (MIN_PRECISION, ALWAYS_FIRES) "
-                    "shown independently load-bearing by patching each to a value that flips an "
-                    "otherwise-identical fixture's verdict (ACTIVE->MISLEADING, "
-                    "not-flagged->NO_DISCRIMINATION), verified programmatically, not derived"
+                    "all four of ARGUS's lifecycle thresholds (MIN_PRECISION, ALWAYS_FIRES, "
+                    "NEVER_FIRES, MIN_FIRINGS) shown independently load-bearing by patching each "
+                    "to a value that flips an otherwise-identical fixture's verdict "
+                    "(ACTIVE->MISLEADING, ACTIVE->NO_DISCRIMINATION, ACTIVE->DEAD_WEIGHT, "
+                    "ACTIVE->EARNING), verified programmatically, not derived — the last two "
+                    "were added 2026-09-21; this line correctly said two before that, and is "
+                    "updated now that the code genuinely tests all four"
                 ),
                 test="test_review_comparison.py::TestThresholdAblations",
             ),

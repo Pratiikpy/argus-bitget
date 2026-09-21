@@ -85,8 +85,10 @@ reversed), `mandate_comparison.py` (three different counts for one quantity, plu
 `crosssection_comparison.py` (hardcoded sweep sizes that drifted after a grid dimension was
 added — both converted to functions fed by the live count, matching last iteration's
 `quarantine_comparison.py` fix), and `review_comparison.py` (a real coverage gap — "four
-thresholds ablated" claimed, only two actually are; the missing two are queued as BUILD work, not
-rushed). `sentiment_comparison.json` could not be regenerated — its module needs
+thresholds ablated" claimed, only two actually were). **The queued BUILD work is done**: the
+missing two (`NEVER_FIRES`, `MIN_FIRINGS`) were implemented in iteration 5, both verified to flip
+against the live artefact, "four thresholds" is now genuinely true. `sentiment_comparison.json`
+could not be regenerated — its module needs
 `BITGET_QWEN_API_KEY`, genuinely tested and genuinely blocked by the standing rule against
 spending that metered key from a loop.
 
