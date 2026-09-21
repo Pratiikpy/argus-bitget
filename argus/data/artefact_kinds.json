@@ -1,0 +1,1560 @@
+{
+  "artefacts": 133,
+  "deterministic": 67,
+  "re_measured": 66,
+  "re_measured_names": [
+    "ablations.json",
+    "afterhours_comparison.json",
+    "allocation.json",
+    "allocation_comparison.json",
+    "arbitrage_comparison.json",
+    "arbitrage_study.json",
+    "bakeoff.json",
+    "bitget_skills_health.json",
+    "book_calibration.json",
+    "book_tape.jsonl",
+    "carry_study.json",
+    "cointegration.json",
+    "consistency.json",
+    "crosssection_study.json",
+    "data_coverage.json",
+    "degradation.json",
+    "depth.json",
+    "desk_notes.jsonl",
+    "diversification.json",
+    "eventdriven_comparison.json",
+    "execution_comparison.json",
+    "factor_divergence_comparison.json",
+    "factor_lab.json",
+    "factor_memory.json",
+    "gap_study.json",
+    "hedge_effectiveness.json",
+    "hedge_tradeable.json",
+    "hurdle_clearance.json",
+    "incremental_value.json",
+    "latency_probe.json",
+    "lui_bench.json",
+    "markout.json",
+    "overfit_gates.json",
+    "overfitting_study.json",
+    "paper_ledger.jsonl",
+    "policy_forecasts.json",
+    "profile_value.json",
+    "protocol_commitments.jsonl",
+    "rdagent_comparison.json",
+    "regime_comparison.json",
+    "regimes.json",
+    "register_opened.json",
+    "register_resolutions.jsonl",
+    "register_scoreboard.json",
+    "research_report.json",
+    "risk_layer_comparison.json",
+    "risk_proof.json",
+    "risk_records.jsonl",
+    "rogue_value.json",
+    "rotation.json",
+    "rotation_comparison.json",
+    "schedule_comparison.json",
+    "search_bakeoff.json",
+    "search_sweep.json",
+    "session_beta.json",
+    "session_risk.json",
+    "shape_matches.json",
+    "skill_reliability.json",
+    "source_health.json",
+    "stress_report.json",
+    "stress_test.json",
+    "theme_audit.json",
+    "track1_study.json",
+    "universe_validation.json",
+    "venue_rules.json",
+    "weekend_significance.json"
+  ],
+  "detail": [
+    {
+      "artefact": "ablations.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/ablations.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "abstention_autopsy.json",
+      "kind": "deterministic",
+      "writers": [
+        "demo/cockpit.py",
+        "eval/autopsy.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "abstention_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/abstention_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "afterhours_comparison.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/afterhours_comparison.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "agentdojo_attack_corpus.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/quarantine_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "agentdojo_heldout_v122_corpus.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/quarantine_generalisation.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "allocation.json",
+      "kind": "re-measured",
+      "writers": [
+        "desk/allocation.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "allocation_agreement.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/allocation_agreement.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "allocation_comparison.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/allocation_comparison.py",
+        "eval/allocation_cost_ablation.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "allocation_cost_ablation.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/allocation_cost_ablation.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "anchor_check.json",
+      "kind": "deterministic",
+      "writers": [
+        "register/anchorcheck.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "arbitrage_comparison.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/arbitrage_comparison.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "arbitrage_study.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/docclaims.py",
+        "research/arbitrage_study.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "architecture.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/architecture.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "argus_bench.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/bench.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "artefact_kinds.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/artefactkind.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "bakeoff.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/bakeoff.py",
+        "eval/bench.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "bitget_skills_health.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/sourceaudit.py",
+        "eval/sources.py",
+        "market/skills.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "argus.market.skills",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "book_calibration.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/bookcalib.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "urllib.request"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "book_tape.jsonl",
+      "kind": "re-measured",
+      "writers": [
+        "eval/bookcalib.py",
+        "eval/grammar_comparison.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "urllib.request"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "carry_desk.json",
+      "kind": "deterministic",
+      "writers": [
+        "desk/carrydesk.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "carry_study.json",
+      "kind": "re-measured",
+      "writers": [
+        "research/carry.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range",
+        "urllib.request"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "causal_chains.jsonl",
+      "kind": "deterministic",
+      "writers": [
+        "paper/chains.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "cointegration.json",
+      "kind": "re-measured",
+      "writers": [
+        "research/cointegration.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "cointegration_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/cointegration_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "consistency.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/consistency.py",
+        "eval/themeaudit.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "corpus_claims.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/corpusclaim.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "crosssection_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/crosssection_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "crosssection_study.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/docclaims.py",
+        "research/crosssection.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "cycle_check.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/cyclecheck.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "data_coverage.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/datacoverage.py",
+        "eval/docclaims.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.bitget_mcp"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "degradation.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/bench.py",
+        "eval/degradation.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "deliberation_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/deliberation_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "depth.json",
+      "kind": "re-measured",
+      "writers": [
+        "market/depth.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "desk_notes.jsonl",
+      "kind": "re-measured",
+      "writers": [
+        "eval/bench.py",
+        "eval/feedlist_comparison.py",
+        "eval/sourceaudit.py",
+        "eval/themeaudit.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "diversification.json",
+      "kind": "re-measured",
+      "writers": [
+        "desk/diversification.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "doc_claims.json",
+      "kind": "deterministic",
+      "writers": [
+        "demo/cockpit.py",
+        "eval/docclaims.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "doc_claims_seen.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/docclaims.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "dsr_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/dsr_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "earnings_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/earnings_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "eventdriven_comparison.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/eventdriven_comparison.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "execution_comparison.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/execution_comparison.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "factor_divergence_comparison.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/factor_divergence_comparison.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "factor_lab.json",
+      "kind": "re-measured",
+      "writers": [
+        "research/factor_lab.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "factor_memory.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/themeaudit.py",
+        "research/factor_lab.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "feedlist_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/feedlist_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "flow_trace.json",
+      "kind": "deterministic",
+      "writers": [
+        "demo/cockpit.py",
+        "demo/flow.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "flow_trace_scenario.json",
+      "kind": "deterministic",
+      "writers": [
+        "demo/cockpit.py",
+        "demo/flow.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "forecastbench_restatement.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/docclaims.py",
+        "eval/forecastbench.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "gap_study.json",
+      "kind": "re-measured",
+      "writers": [
+        "research/gap_study.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "grammar_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/grammar_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "hedge_effectiveness.json",
+      "kind": "re-measured",
+      "writers": [
+        "risk/effectiveness.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "hedge_tradeable.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/hedge_tradeable.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "hurdle_clearance.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/clearance.py",
+        "eval/docclaims.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "hurdle_frontier.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/docclaims.py",
+        "eval/hurdle.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "incremental_value.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/bench.py",
+        "eval/incremental.py",
+        "eval/themeaudit.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "journal.jsonl",
+      "kind": "deterministic",
+      "writers": [
+        "eval/journal_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "journal_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/journal_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "latency_probe.json",
+      "kind": "re-measured",
+      "writers": [
+        "execution/latency_probe.py"
+      ],
+      "reaches_live_data_via": [
+        "urllib.request"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "leakage.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/leakage.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "ledger.jsonl",
+      "kind": "deterministic",
+      "writers": [
+        "eval/journal_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "live_headlines.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/quarantine_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "lui_bench.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/luibench.py",
+        "eval/themeaudit.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "lui_ngram_model.json",
+      "kind": "deterministic",
+      "writers": [
+        "demo/deploysync.py",
+        "eval/ngramtrain.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "lui_router.json",
+      "kind": "deterministic",
+      "writers": [
+        "demo/deploysync.py",
+        "eval/docclaims.py",
+        "eval/luirouter.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "mandate_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/mandate_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "markout.json",
+      "kind": "re-measured",
+      "writers": [
+        "market/markout.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "ngram_bench.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/docclaims.py",
+        "eval/ngrambench.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "oblique_bench.json",
+      "kind": "deterministic",
+      "writers": [
+        "demo/deploysync.py",
+        "eval/docclaims.py",
+        "eval/obliquebench.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "oblique_final.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/ngrambench.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "oblique_out_of_scope.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/ngramtrain.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "oblique_pool.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/ngrambench.py",
+        "eval/ngramtrain.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "oblique_sealed.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/ngrambench.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "oblique_validation.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/ngrambench.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "overfit_gates.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/docclaims.py",
+        "research/overfit_gates.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "overfitting_study.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/docclaims.py",
+        "research/overfitting_study.py",
+        "research/track1_study.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "paper_ledger.jsonl",
+      "kind": "re-measured",
+      "writers": [
+        "demo/cockpit.py",
+        "demo/deploysync.py",
+        "eval/docclaims.py",
+        "eval/hurdle.py",
+        "eval/journal_comparison.py",
+        "eval/profilestudy.py",
+        "eval/quarantine_generalisation.py",
+        "eval/refusal.py",
+        "eval/riskaudit.py",
+        "eval/themeaudit.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "paper_ledger_incidents.json",
+      "kind": "deterministic",
+      "writers": [
+        "paper/repair.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "personalisation.json",
+      "kind": "deterministic",
+      "writers": [
+        "desk/personalisation.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "policy_forecasts.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/degradation.py",
+        "eval/forecasts.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "population_rct.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/gate_ablation.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "profile_divergence.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/profilestudy.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "profile_value.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/profile_value.py",
+        "eval/themeaudit.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "protocol_commitments.jsonl",
+      "kind": "re-measured",
+      "writers": [
+        "paper/protocol.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "quarantine_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/quarantine_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "quarantine_generalisation.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/quarantine_generalisation.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "quarantine_production_withholdings.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/quarantine_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "queue_proof.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/queueproof.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "rdagent_comparison.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/rdagent_comparison.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "recall_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/recall_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "refusal_alpha.json",
+      "kind": "deterministic",
+      "writers": [
+        "demo/cockpit.py",
+        "eval/docclaims.py",
+        "eval/refusal.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "regime_comparison.json",
+      "kind": "re-measured",
+      "writers": [
+        "demo/deploysync.py",
+        "eval/regime_comparison.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "regimes.json",
+      "kind": "re-measured",
+      "writers": [
+        "desk/regime.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "register.jsonl",
+      "kind": "deterministic",
+      "writers": [
+        "eval/docclaims.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "register_opened.json",
+      "kind": "re-measured",
+      "writers": [
+        "register/open_register.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "register_resolutions.jsonl",
+      "kind": "re-measured",
+      "writers": [
+        "register/resolve.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "register_scoreboard.json",
+      "kind": "re-measured",
+      "writers": [
+        "register/resolve.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "replay_ledger.jsonl",
+      "kind": "deterministic",
+      "writers": [
+        "eval/hurdle.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "research_report.json",
+      "kind": "re-measured",
+      "writers": [
+        "demo/cockpit.py",
+        "demo/deploysync.py",
+        "eval/themeaudit.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "review_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/review_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "review_oos.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/reviewoos.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "risk_audit.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/riskaudit.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "risk_layer_comparison.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/risk_layer_comparison.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "risk_proof.json",
+      "kind": "re-measured",
+      "writers": [
+        "demo/cockpit.py",
+        "eval/bench.py",
+        "eval/riskproof.py",
+        "eval/themeaudit.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "risk_records.jsonl",
+      "kind": "re-measured",
+      "writers": [
+        "eval/migrate_risk_records.py",
+        "eval/riskaudit.py",
+        "eval/themeaudit.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "rogue_value.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/rogue.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "rotation.json",
+      "kind": "re-measured",
+      "writers": [
+        "desk/rotation.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "rotation_comparison.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/rotation_comparison.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "router_bench.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/routerbench.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "schedule_comparison.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/schedule_comparison.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "scorecard.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/scorecard.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "search_bakeoff.json",
+      "kind": "re-measured",
+      "writers": [
+        "research/searchoff.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "search_sweep.json",
+      "kind": "re-measured",
+      "writers": [
+        "demo/cockpit.py",
+        "research/searchoff.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "sentiment_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/sentiment_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "session_beta.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/docclaims.py",
+        "research/session_beta_study.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "session_risk.json",
+      "kind": "re-measured",
+      "writers": [
+        "risk/session_risk.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "shadow_record.json",
+      "kind": "deterministic",
+      "writers": [
+        "demo/cockpit.py",
+        "eval/shadow.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "shape_matches.json",
+      "kind": "re-measured",
+      "writers": [
+        "desk/shapematch.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "shapematch_comparison.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/shapematch_comparison.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "skill_reliability.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/docclaims.py",
+        "eval/skillreliability.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.skills"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "source_audit.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/sourceaudit.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "source_health.json",
+      "kind": "re-measured",
+      "writers": [
+        "demo/cockpit.py",
+        "eval/sourceaudit.py",
+        "eval/sources.py",
+        "eval/themeaudit.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "argus.market.skills",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "standing.json",
+      "kind": "deterministic",
+      "writers": [
+        "demo/deploysync.py",
+        "eval/standing.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "stress_report.json",
+      "kind": "re-measured",
+      "writers": [
+        "desk/stress.py",
+        "eval/bench.py",
+        "eval/themeaudit.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "stress_test.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/docclaims.py",
+        "eval/stresstest.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "surface_agreement.json",
+      "kind": "deterministic",
+      "writers": [
+        "demo/deploysync.py",
+        "eval/surfaces.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "sync_manifest.json",
+      "kind": "deterministic",
+      "writers": [
+        "demo/deploysync.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "takeover.json",
+      "kind": "deterministic",
+      "writers": [
+        "eval/bench.py"
+      ],
+      "reaches_live_data_via": [],
+      "rerunning_it": "must produce the same numbers; a difference is a defect"
+    },
+    {
+      "artefact": "theme_audit.json",
+      "kind": "re-measured",
+      "writers": [
+        "demo/cockpit.py",
+        "eval/themeaudit.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "track1_study.json",
+      "kind": "re-measured",
+      "writers": [
+        "demo/cockpit.py",
+        "eval/degradation.py",
+        "eval/docclaims.py",
+        "eval/risk_layer_comparison.py",
+        "research/track1_study.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "universe_validation.json",
+      "kind": "re-measured",
+      "writers": [
+        "market/validation.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "venue_rules.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/venue_rules.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history",
+        "fetch_range"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    },
+    {
+      "artefact": "weekend_significance.json",
+      "kind": "re-measured",
+      "writers": [
+        "eval/docclaims.py",
+        "research/significance.py"
+      ],
+      "reaches_live_data_via": [
+        "argus.market.bitget",
+        "argus.market.history"
+      ],
+      "rerunning_it": "produces a fresh measurement; a difference is the market moving, not a bug"
+    }
+  ],
+  "why_this_matters": "overfit_gates.json has produced three different results on three runs \u2014 4/4, then 6/2, then 8/0 \u2014 because it fetches a rolling 90-day window. Nothing was broken on any occasion. A judge who re-runs a re-measured artefact and gets a fourth number should read that as the instrument moving; a judge who re-runs a deterministic one and gets a different number has found a defect. The two must not look alike.",
+  "scope_statement": "Classification is derived from what each writer imports \u2014 a module that names `argus.market.history`, `fetch_range`, `urllib` or similar is treated as reaching live data. NOT CLAIMED: that every deterministic artefact has been re-run and compared byte for byte; that is a separate and expensive job, and this only establishes which ones such a comparison would be MEANINGFUL for. NOT CLAIMED: that a re-measured artefact is worse \u2014 it is the only honest kind for a claim about a live market, and it simply has to be quoted with its date."
+}
