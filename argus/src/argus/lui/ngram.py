@@ -202,6 +202,35 @@ class NgramClassifier:
             for gram in char_wb_ngrams(text.lower(), self.min_n, self.max_n)
         )
 
+    def probabilities(self, text: str) -> list[tuple[float, str]]:
+        """Every class and its probability, highest first — **before** any threshold or
+        out-of-scope suppression is applied.
+
+        Exposed because `eval/ngrambench.operating_point` needs to sweep the threshold, and
+        sweeping it through :meth:`predict` cannot work: `predict` applies the shipped threshold
+        first, so every candidate below it has already become ``None`` by the time a sweep sees
+        it. The first version of that sweep did exactly this and produced a dead flat line across
+        four thresholds — a knob that moved nothing, reported as evidence the knob was well set.
+
+        Returns an empty list when the question contains no known non-whitespace n-gram, which is
+        the same condition :meth:`predict` declines on.
+        """
+        if not self._has_content(text):
+            return []
+        vector = self._vector(text)
+        if not vector:
+            return []
+        scores = [
+            self._intercept[c] + sum(w * self._coef[c][i] for i, w in vector.items())
+            for c in range(len(self.classes))
+        ]
+        top = max(scores)
+        exps = [math.exp(s - top) for s in scores]
+        total = sum(exps)
+        return sorted(
+            ((e / total, self.classes[i]) for i, e in enumerate(exps)), reverse=True
+        )
+
     def predict(self, text: str) -> Prediction:
         """Classify one question, declining below the fitted threshold."""
         if not self._has_content(text):

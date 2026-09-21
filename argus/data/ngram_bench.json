@@ -23,6 +23,53 @@
       }
     ]
   },
+  "operating_point": {
+    "shipped_threshold": 0.2,
+    "rows": 433,
+    "out_of_scope_probes": 14,
+    "sweep": [
+      {
+        "threshold": 0.14,
+        "correct": 322,
+        "accuracy": 0.7436,
+        "confidently_wrong": 59,
+        "out_of_scope_recall": 0.7857
+      },
+      {
+        "threshold": 0.16,
+        "correct": 322,
+        "accuracy": 0.7436,
+        "confidently_wrong": 58,
+        "out_of_scope_recall": 0.7857
+      },
+      {
+        "threshold": 0.18,
+        "correct": 320,
+        "accuracy": 0.739,
+        "confidently_wrong": 54,
+        "out_of_scope_recall": 0.7857
+      },
+      {
+        "threshold": 0.2,
+        "correct": 315,
+        "accuracy": 0.7275,
+        "confidently_wrong": 47,
+        "out_of_scope_recall": 0.8571
+      },
+      {
+        "threshold": 0.25,
+        "correct": 285,
+        "accuracy": 0.6582,
+        "confidently_wrong": 22,
+        "out_of_scope_recall": 1.0
+      }
+    ],
+    "rejected_changes": {
+      "out_of_scope_margin": "requiring the out_of_scope class to beat the runner-up by a margin buys about +1.4% in-scope and costs 15 points of out-of-scope recall \u2014 rejected",
+      "lower_threshold": "0.16 buys about +1.7% correct for roughly 11 more confident errors and 7 points of recall \u2014 rejected"
+    },
+    "scope_statement": "Swept on the BURNED splits (pool-test and validation), never on the sealed corpus, because choosing an operating point on the set you then report is how a measurement becomes a fit. NOT CLAIMED: that 0.20 is optimal \u2014 only that the two obvious moves away from it lose more than they gain on these rows. NOT CLAIMED: that the remaining declines are a defect; they sit at 0.156-0.199 against a nine-class chance floor of 0.111, which is a model correctly reporting that it does not know."
+  },
   "layers": [
     {
       "layer": "patterns",

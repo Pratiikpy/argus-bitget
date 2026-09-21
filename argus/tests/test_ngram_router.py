@@ -330,3 +330,52 @@ class TestTheModelOnDisk:
         """Abstention is a threshold, never a predicted label."""
         blob = json.loads(MODEL_PATH.read_text(encoding="utf-8"))
         assert not {"unknown", "ambiguous", "unsupported"} & set(blob["classes"])
+
+
+class TestTheOperatingPointSweepCanActuallyMove:
+    """**A knob that moves nothing, reported as evidence the knob is well set.**
+
+    The first version of `operating_point` swept the threshold through `predict()` — which applies
+    the shipped threshold before returning, so every candidate below it was already `None`. The
+    result was a dead flat line across four values, which reads exactly like a well-chosen
+    parameter. Same failure class as the tautological surface check killed the day before.
+    """
+
+    def test_probabilities_are_returned_before_any_suppression(
+        self, model: NgramClassifier
+    ) -> None:
+        """`probabilities()` must expose candidates `predict()` would have declined."""
+        from argus.eval.ngrambench import _rows
+
+        declined_but_ranked = 0
+        for row in _rows("pool-test")[:120]:
+            if model.predict(row["ask"]).intent is None and model.probabilities(row["ask"]):
+                declined_but_ranked += 1
+        assert declined_but_ranked > 0, (
+            "probabilities() returns nothing predict() declined, so a sweep over it is inert"
+        )
+
+    def test_the_sweep_is_not_flat(self) -> None:
+        from argus.eval.ngrambench import operating_point
+
+        rows = operating_point()["sweep"]
+        accuracies = {r["accuracy"] for r in rows}
+        recalls = {r["out_of_scope_recall"] for r in rows}
+        assert len(accuracies) > 1, f"the threshold changed nothing: {accuracies}"
+        assert len(recalls) > 1, f"out-of-scope recall changed nothing: {recalls}"
+
+    def test_the_two_costs_move_in_opposite_directions(self) -> None:
+        """The trade is the whole point: looser thresholds buy accuracy and sell recall."""
+        from argus.eval.ngrambench import operating_point
+
+        rows = sorted(operating_point()["sweep"], key=lambda r: r["threshold"])
+        assert rows[0]["accuracy"] > rows[-1]["accuracy"]
+        assert rows[0]["out_of_scope_recall"] < rows[-1]["out_of_scope_recall"]
+
+    def test_the_rejected_changes_are_recorded(self) -> None:
+        """Two proposed improvements were measured and killed; the reasons stay checkable."""
+        from argus.eval.ngrambench import operating_point
+
+        rejected = operating_point()["rejected_changes"]
+        assert "out_of_scope_margin" in rejected
+        assert "lower_threshold" in rejected

@@ -314,6 +314,94 @@ def out_of_scope_recall(model: NgramClassifier) -> dict[str, Any]:
     }
 
 
+def operating_point(
+    rows: Sequence[dict[str, str]] | None = None, *, thresholds: Sequence[float] = (),
+) -> dict[str, Any]:
+    """The abstention threshold swept against both costs, so the choice is checkable.
+
+    **This exists because two obvious improvements were proposed and both lost.** The model's
+    dominant failure is not confusion — it is abstention: on the sealed corpus 52 of ~81 errors
+    are declines, and 32 of those are the out-of-scope class winning on a genuinely in-scope
+    question. Fixing out-of-scope recall (29% -> 86%) cost in-scope accuracy, and that trade was
+    invisible until it was measured.
+
+    Two levers were swept on the burned splits — never on the sealed corpus, which is the
+    measurement — and neither pays:
+
+    * **Require the out-of-scope class to win by a margin.** Buys +1.4% in-scope for **-15 points
+      of out-of-scope recall**. Out-of-scope recall is CLINC150's named hard half and the thing a
+      console in front of an account is judged on; trading it for a point of accuracy is the wrong
+      direction.
+    * **Lower the threshold.** 0.16 buys +1.7% correct for **+11 confident errors** and -7 points
+      of recall.
+
+    So the shipped 0.20 stays, and the sweep is recorded rather than the conclusion. A future
+    reader can disagree with the choice by looking at the same numbers instead of taking this
+    docstring's word for it.
+
+    The remaining declines sit at confidences of 0.156-0.199 against a nine-class chance floor of
+    0.111. **That is a model saying it does not know, and it is right** — the honest remaining
+    lever is more training data, which is untested rather than dismissed.
+    """
+    from argus.eval.luirouter import OUT_OF_SCOPE as PROBES
+    from argus.lui.ngram import OUT_OF_SCOPE, NgramClassifier
+
+    model = NgramClassifier.load()
+    scored = list(rows) if rows is not None else _rows("pool-test") + _rows("validation")
+    grid = tuple(thresholds) or (0.14, 0.16, 0.18, 0.20, 0.25)
+
+    swept: list[dict[str, Any]] = []
+    for threshold in grid:
+        # **Raw probabilities, not `predict()`.** `predict` applies the shipped threshold before
+        # returning, so a sweep built on it cannot see anything below that threshold and reports
+        # a dead flat line — which the first version of this function did, across four values.
+        correct = wrong = 0
+        for row in scored:
+            ranked = model.probabilities(row["ask"])
+            if not ranked or ranked[0][1] == OUT_OF_SCOPE or ranked[0][0] < threshold:
+                continue
+            if ranked[0][1] == row["expect"]:
+                correct += 1
+            else:
+                wrong += 1
+        answered = 0
+        for probe in PROBES:
+            ranked = model.probabilities(probe)
+            if ranked and ranked[0][1] != OUT_OF_SCOPE and ranked[0][0] >= threshold:
+                answered += 1
+        swept.append({
+            "threshold": threshold,
+            "correct": correct,
+            "accuracy": round(correct / len(scored), 4) if scored else 0.0,
+            "confidently_wrong": wrong,
+            "out_of_scope_recall": round(1 - answered / len(PROBES), 4),
+        })
+    return {
+        "shipped_threshold": model.threshold,
+        "rows": len(scored),
+        "out_of_scope_probes": len(PROBES),
+        "sweep": swept,
+        "rejected_changes": {
+            "out_of_scope_margin": (
+                "requiring the out_of_scope class to beat the runner-up by a margin buys about "
+                "+1.4% in-scope and costs 15 points of out-of-scope recall — rejected"
+            ),
+            "lower_threshold": (
+                "0.16 buys about +1.7% correct for roughly 11 more confident errors and 7 points "
+                "of recall — rejected"
+            ),
+        },
+        "scope_statement": (
+            "Swept on the BURNED splits (pool-test and validation), never on the sealed corpus, "
+            "because choosing an operating point on the set you then report is how a measurement "
+            "becomes a fit. NOT CLAIMED: that 0.20 is optimal — only that the two obvious moves "
+            "away from it lose more than they gain on these rows. NOT CLAIMED: that the remaining "
+            "declines are a defect; they sit at 0.156-0.199 against a nine-class chance floor of "
+            "0.111, which is a model correctly reporting that it does not know."
+        ),
+    }
+
+
 def run(split: str = "sealed") -> dict[str, Any]:
     if not available():
         raise NgramBenchError(
@@ -350,6 +438,7 @@ def run(split: str = "sealed") -> dict[str, Any]:
             "here and was produced after the model was frozen."
         ),
         "out_of_scope": out_of_scope_recall(model),
+        "operating_point": operating_point(),
         "layers": [layer.as_dict() for layer in layers],
         "by_language": by_language,
         "cascade_dominates_incumbent": dominates,
@@ -454,4 +543,6 @@ if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(main())
 
 
-__all__ = ["REPORT_PATH", "Layer", "NgramBenchError", "main", "render", "run"]
+__all__ = [
+    "REPORT_PATH", "Layer", "NgramBenchError", "main", "operating_point", "render", "run",
+]
