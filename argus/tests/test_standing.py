@@ -327,6 +327,26 @@ class TestTheLiveRegisterIsHonest:
         checking against that same real constant). A capability appearing here that is NOT in
         this exact set is the real regression this test exists to catch — add it to the set only
         after checking its thirteen the same way these twenty-three were checked, never to make a
+        test pass. Closed the same day a twenty-fourth time: "Numeric decision grounding vs.
+        TradingAgents' real, unchecked TraderProposal" (`t2-explainability`) — TradingAgents' real
+        trader.py, schemas.py, portfolio_manager.py, all three risk_mgmt/*.py debators,
+        reporting.py, and trading_graph.py read in full first: the Trader's own prompt asks the
+        model to ground prices in the market report, but nothing downstream — not the schema's
+        own real `field_validator`, not any real consumer of `trader_investment_plan` — ever
+        checks that it did. Vendored the real `TraderProposal` (byte-verified against the same
+        commit already pinned for `tradingagents_memory.py`/`tradingagents_rating.py`) and ran it
+        for real: its own unmodified validator accepts an `entry_price` of 999,999.0, a negative
+        price, with zero relationship to any real fact, because `_coerce_optional_float` only
+        normalises string FORMAT (a placeholder, a trailing "%", a currency symbol), never the
+        VALUE. Same-input comparison against ARGUS's own, already-existing `agents.grounding.
+        check` on real, live Bitget prices across 3 real symbols and 4 fabrication magnitudes: 0
+        of 12 caught by the real rival, 12 of 12 caught by ARGUS, with a positive control
+        confirming the real current price still resolves cleanly on the same live data — not a
+        blanket flag. The ablation isolated the exact mechanism rather than assuming it: a figure
+        just inside `grounding.py`'s own `TOLERANCE` constant resolves, the identical figure moved
+        just past it on the same real fact does not. A capability appearing here that is NOT in
+        this exact set is the real regression this test exists to catch — add it to the set only
+        after checking its thirteen the same way these twenty-four were checked, never to make a
         test pass."""
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
@@ -340,6 +360,7 @@ class TestTheLiveRegisterIsHonest:
             "Funding-aware cross-asset hedge routing vs. a fee-blind composite router",
             "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
             "Net executable arbitrage vs. a fee-blind detector",
+            "Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal",
             "Path-shape matching with a calibrated null",
             "Per-profile mandate that changes the verdict",
             "Perception layer: what the desk can see",
@@ -447,6 +468,10 @@ class TestTheLiveRegisterIsHonest:
             in rendered
         )
         assert "rToken factor divergence vs. Alphalens' real Information Coefficient" in rendered
+        assert (
+            "Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal"
+            in rendered
+        )
 
     def test_the_summary_is_one_line(self) -> None:
         assert "\n" not in summary(audit())

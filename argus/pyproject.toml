@@ -162,6 +162,7 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 "src/argus/eval/baselines/vectorbt_dsr_metrics.py" = ["I001", "E501"]
 "src/argus/eval/baselines/tradingagents_memory.py" = ["RUF013"]
 "src/argus/eval/baselines/tradingagents_rating.py" = ["RUF002"]
+"src/argus/eval/baselines/tradingagents_trader.py" = ["UP042"]
 "src/argus/eval/baselines/serenity_guards.py" = ["I001", "RUF023", "UP017"]
 "src/argus/eval/baselines/serenity_journal.py" = ["I001"]
 "src/argus/eval/baselines/tradingagents_feedlist_interface.py" = ["I001", "RUF013"]
@@ -206,6 +207,7 @@ module = [
     "argus.eval.baselines.qlib_cs_processor",
     "argus.eval.baselines.vectorbt_dsr_metrics",
     "argus.eval.baselines.tradingagents_memory",
+    "argus.eval.baselines.tradingagents_trader",
     "argus.eval.baselines.serenity_journal",
     "argus.eval.baselines.serenity_guards",
     "argus.eval.baselines.tradingagents_feedlist_interface",

@@ -22,7 +22,7 @@ carries a result.**
 | 5 | `factor-discovery` | T2 | subtheme | IMPLEMENTED | Microsoft RD-Agent | **yes** | ARGUS (no execution surface; RD-Agent ran attacker code) | 2026-09-21 |
 | 6 | `t2-open-evaluation` | T2 | subtheme | IMPLEMENTED (weak) | — | no | — | — |
 | 7 | `t2-sharpe-mdd-winrate` | T2 | judging | NOT DEMONSTRATED | — | no | — | — |
-| 8 | `t2-explainability` | T2 | judging | IMPLEMENTED | — | no | — | — |
+| 8 | `t2-explainability` | T2 | judging | IMPLEMENTED | TradingAgents (real TraderProposal) | **yes** | ARGUS (grounding.check catches 12/12 fabricated prices; TradingAgents' validator catches 0/12) | 2026-09-22 |
 | 9 | `t2-risk-control` | T2 | judging | IMPLEMENTED (weak) | freqtrade PrecisionRecallProtection | **yes** | ARGUS (precision 59.2% vs 19.3% at full recall, dominates every threshold) | 2026-09-21 |
 | 10 | `t2-architecture` | T2 | judging | IMPLEMENTED | RD-Agent + AgentDojo (two rivals) | **yes** | ARGUS (no execution surface vs RD-Agent's real `eval()`; 0 production FPs after fix vs 6 before) | 2026-09-21 |
 | 11 | `info-extraction` | T3 | subtheme | IMPLEMENTED | — | no | — | — |
@@ -38,9 +38,9 @@ carries a result.**
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 10 of 20 as of 2026-09-22: 3 LOST (one of them split — LUI intent
+**`rival run` is `yes` on 11 of 20 as of 2026-09-22: 3 LOST (one of them split — LUI intent
 accuracy loses to Rasa's DIET classifier, p=0.0014, while ARGUS wins out-of-scope refusal
-separately and significantly, p=0.031, neither laundering the other), 6 real wins (earnings vs
+separately and significantly, p=0.031, neither laundering the other), 7 real wins (earnings vs
 QuantConnect, factor-discovery vs Microsoft RD-Agent, risk-control vs freqtrade's real
 PrecisionRecallProtection — ARGUS's precision at full recall is 59.2% against freqtrade's best
 swept 19.3%, dominating every threshold, and freqtrade's own proxy correlates only weakly
@@ -51,11 +51,15 @@ research-quality vs QuantConnect's real Lean engine and statsmodels: Lean has no
 testing correction anywhere in its cointegration code, a naive p<0.05 selection over 190 real
 pairs picks 7 "cointegrated" pairs against the 9.5 false positives theory predicts at that rate,
 while ARGUS's own FDR- and Bonferroni-corrected survivors on the identical pairs are both zero —
-and cross-asset-execution vs crypto_sor's real composite order-book router: crypto_sor's real
+cross-asset-execution vs crypto_sor's real composite order-book router: crypto_sor's real
 `newOrder()` has no fee, funding, or holding-cost term anywhere in its source, so it can only ever
 route on entry slippage; ARGUS's hedge router prices the real funding channel too and diverges
-from crypto_sor's pick on 5 of 5 real rToken/crypto leg pairs past their own real break-even), 1
-methodological (event-driven vs whale-signals — neither system establishes a real effect on
+from crypto_sor's pick on 5 of 5 real rToken/crypto leg pairs past their own real break-even — and
+explainability vs TradingAgents' real TraderProposal: its own field_validator only normalises
+string format, never a figure's value, so a fabricated price with no relationship to any real
+fact validates unflagged in 12/12 constructed cases (0 caught); ARGUS's grounding.check flags
+12/12 of the same fabricated figures, with a positive control confirming it is not a blanket
+flag), 1 methodological (event-driven vs whale-signals — neither system establishes a real effect on
 this data; the finding is that whale-signals tests against the wrong null, not that ARGUS's own
 number beats theirs, and no fabricated score is recorded for it).** That is this ledger's honest
 scoreboard — it names whether

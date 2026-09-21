@@ -1,0 +1,163 @@
+{
+  "baseline_reproduced": {
+    "real_entry_price_validated": 999999.0,
+    "real_stop_loss_validated": 1.0,
+    "real_validator_raised": false,
+    "real_rendered": "**Action**: Buy\n\n**Reasoning**: ATR breakout confirms bullish continuation near the stated level.\n\n**Entry Price**: 999999.0\n\n**Stop Loss**: 1.0\n\nFINAL TRANSACTION PROPOSAL: **BUY**"
+  },
+  "same_input_comparison": {
+    "cases": [
+      {
+        "symbol": "NVDAUSDT",
+        "factor": 7.3,
+        "fabricated_entry_price": 1660.677,
+        "real_current_price": 227.49,
+        "tradingagents_real_validator_raised": false,
+        "argus_grounding_flags_it": true
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "factor": 0.03,
+        "fabricated_entry_price": 6.8247,
+        "real_current_price": 227.49,
+        "tradingagents_real_validator_raised": false,
+        "argus_grounding_flags_it": true
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "factor": -1.0,
+        "fabricated_entry_price": -227.49,
+        "real_current_price": 227.49,
+        "tradingagents_real_validator_raised": false,
+        "argus_grounding_flags_it": true
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "factor": 1000.0,
+        "fabricated_entry_price": 227490.0,
+        "real_current_price": 227.49,
+        "tradingagents_real_validator_raised": false,
+        "argus_grounding_flags_it": true
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "factor": 7.3,
+        "fabricated_entry_price": 2478.131,
+        "real_current_price": 339.47,
+        "tradingagents_real_validator_raised": false,
+        "argus_grounding_flags_it": true
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "factor": 0.03,
+        "fabricated_entry_price": 10.1841,
+        "real_current_price": 339.47,
+        "tradingagents_real_validator_raised": false,
+        "argus_grounding_flags_it": true
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "factor": -1.0,
+        "fabricated_entry_price": -339.47,
+        "real_current_price": 339.47,
+        "tradingagents_real_validator_raised": false,
+        "argus_grounding_flags_it": true
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "factor": 1000.0,
+        "fabricated_entry_price": 339470.0,
+        "real_current_price": 339.47,
+        "tradingagents_real_validator_raised": false,
+        "argus_grounding_flags_it": true
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "factor": 7.3,
+        "fabricated_entry_price": 3664.454,
+        "real_current_price": 501.98,
+        "tradingagents_real_validator_raised": false,
+        "argus_grounding_flags_it": true
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "factor": 0.03,
+        "fabricated_entry_price": 15.0594,
+        "real_current_price": 501.98,
+        "tradingagents_real_validator_raised": false,
+        "argus_grounding_flags_it": true
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "factor": -1.0,
+        "fabricated_entry_price": -501.98,
+        "real_current_price": 501.98,
+        "tradingagents_real_validator_raised": false,
+        "argus_grounding_flags_it": true
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "factor": 1000.0,
+        "fabricated_entry_price": 501980.0,
+        "real_current_price": 501.98,
+        "tradingagents_real_validator_raised": false,
+        "argus_grounding_flags_it": true
+      }
+    ],
+    "n_cases": 12,
+    "n_tradingagents_catches": 0,
+    "n_argus_catches": 12
+  },
+  "positive_control": {
+    "results": [
+      {
+        "symbol": "NVDAUSDT",
+        "real_price": 227.48,
+        "argus_resolves_the_real_figure": true
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "real_price": 339.51,
+        "argus_resolves_the_real_figure": true
+      },
+      {
+        "symbol": "MSFTUSDT",
+        "real_price": 501.98,
+        "argus_resolves_the_real_figure": true
+      }
+    ],
+    "all_real_figures_resolve": true
+  },
+  "ablation": {
+    "real_value": 189.4991,
+    "just_inside_tolerance": 191.3941,
+    "just_inside_resolves": true,
+    "just_outside_tolerance": 200.869,
+    "just_outside_resolves": false,
+    "tolerance_is_the_load_bearing_boundary": true
+  },
+  "failure_cases": {
+    "negative_price": {
+      "real_value_accepted": -50.0,
+      "real_validator_raised": false
+    },
+    "percent_string_dropped_to_none": {
+      "real_input": "15%",
+      "real_result": null,
+      "real_dropped_to_none_not_converted": true
+    },
+    "placeholder_string_dropped_to_none": {
+      "real_input": "N/A",
+      "real_result": null
+    }
+  },
+  "costs": {
+    "repeats": 200,
+    "tradingagents_validator_seconds_per_call": 2.348999842070043e-06,
+    "argus_grounding_seconds_per_call": 2.025499998126179e-05
+  },
+  "reproducibility": {
+    "identical": true
+  },
+  "scope_statement": "TradingAgents' real, unmodified TraderProposal (agents/schemas.py) validates a fabricated entry_price with no relationship to any real fact the desk was given, in every case tested across three real symbols and four magnitudes/directions -- its field_validator only normalises string FORMAT (placeholder text, a trailing '%', a currency symbol), never the VALUE, and no downstream consumer (portfolio_manager.py, the three risk_mgmt debators, reporting.py, trading_graph.py -- all read directly) compares entry_price/stop_loss against market_report's real figures. ARGUS's real grounding.check, run on the same real facts and the same fabricated figures, flags every one, and a positive control on the same real symbols confirms it is not a blanket flag -- the real current price resolves cleanly. NOT claimed TradingAgents' full pipeline never catches bad output by any means -- only that the one real, checkable code path (the schema's own validator plus every real consumer of its output) performs no value-level check. NOT claimed about TraderProposal.reasoning (free text) -- only the two numeric fields the schema itself defines. NOT claimed ARGUS's mechanism proves a figure is CORRECT, only that it is traceable to a known value -- stated in grounding.py's own module docstring, not stronger here."
+}

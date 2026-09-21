@@ -621,12 +621,36 @@ def j_t2_explainability() -> Finding:
     flagged = sum(1 for r in _rows("desk_notes.jsonl") if r.get("flags"))
     grounding, _ = _notes_mentioning("[grounding]")
     claim, _ = _notes_mentioning("[claim]")
+    rival = ""
+    comp = _load_json("explainability_comparison.json")
+    if comp is not None:
+        same = comp["same_input_comparison"]
+        control = comp["positive_control"]
+        # TradingAgents' real TraderProposal (agents/schemas.py) is a structured-output type
+        # whose own field_validator only normalises string FORMAT, never the VALUE — no real
+        # downstream consumer (portfolio_manager.py, the risk debators, reporting.py) checks
+        # entry_price/stop_loss against the market report either. ARGUS's grounding.check
+        # resolves every figure against the facts the desk actually had; cited here because
+        # this is the live, judged surface, not only in standing.py's t2-explainability entry.
+        n_cases = same["n_cases"]
+        n_ta = same["n_tradingagents_catches"]
+        n_argus = same["n_argus_catches"]
+        control_ok = control["all_real_figures_resolve"]
+        rival = (
+            f" · measured against TradingAgents' real TraderProposal on real, live Bitget "
+            f"prices across 3 symbols: its own field_validator only normalises string format, "
+            f"never a figure's value, so a fabricated price with no relationship to any real "
+            f"fact validates and flows downstream unflagged in {n_cases}/{n_cases} constructed "
+            f"cases ({n_ta} caught); ARGUS's grounding.check flags {n_argus}/{n_cases} of the "
+            f"same fabricated figures, and a positive control confirms it is not a blanket "
+            f"flag — the real current price resolves cleanly: {control_ok}"
+        )
     return Finding(
         RUNS if grounding and claim else WEAK,
         f"every decision carries its reasoning trail: {grounding} with numeric grounding checked, "
         f"{claim} with claims checked against the evidence's own fields, {flagged} of {total} "
         f"raising a flag that reached the cycle summary. eval/decisioncard.py renders one "
-        f"decision's whole trail on a page, including the lean it held while refusing",
+        f"decision's whole trail on a page, including the lean it held while refusing{rival}",
         "data/desk_notes.jsonl",
     )
 

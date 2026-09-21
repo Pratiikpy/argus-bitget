@@ -49,6 +49,10 @@ from argus.eval.baselines.tradingagents_loader import (
     TradingAgentsBaselineLoadError,
     load_trading_memory_log_class,
 )
+from argus.eval.baselines.tradingagents_trader_loader import (
+    TradingAgentsTraderLoadError,
+    load_trader_module,
+)
 from argus.eval.baselines.vectorbt_loader import (
     VectorbtBaselineLoadError,
     load_vectorbt_baseline,
@@ -88,6 +92,8 @@ _TA_MEMORY_BODY_SHA256 = "66644c9a6960ad1b6f81d49f30bac4003aadf68913ffff1fac5580
 _TA_MEMORY_ORIGINAL_LINE_COUNT = 334
 _TA_RATING_BODY_SHA256 = "09fd9c75b0260cb56ecc0dadbb3003895974d7baa4ecb042e0f6c53af03f0457"
 _TA_RATING_ORIGINAL_LINE_COUNT = 83
+_TA_TRADER_BODY_SHA256 = "d4bf0faec7acffeafb69cbc52baa37a2d1632fc8e26a1df8888cb5ff326cd089"
+_TA_TRADER_ORIGINAL_LINE_COUNT = 133
 
 # Same reasoning, for `serenity_journal.py` and `serenity_guards.py` — cross-checked against
 # github.com/SerenityTn/serenity-guardrails at commit 13d46dc1c6204f27fe321bd66023691918017cce.
@@ -319,6 +325,12 @@ class TestVendoredFilesHaveNotDrifted:
             _BASELINES_DIR / "tradingagents_rating.py", _TA_RATING_ORIGINAL_LINE_COUNT
         )
         assert got == _TA_RATING_BODY_SHA256
+
+    def test_tradingagents_trader_body_matches_the_pinned_hash(self) -> None:
+        got = _body_sha256(
+            _BASELINES_DIR / "tradingagents_trader.py", _TA_TRADER_ORIGINAL_LINE_COUNT
+        )
+        assert got == _TA_TRADER_BODY_SHA256
 
     def test_serenity_journal_body_matches_the_pinned_hash(self) -> None:
         got = _body_sha256(
@@ -933,6 +945,38 @@ class TestTradingAgentsLoaderMakesTheRealCodeRunnable:
                 load_trading_memory_log_class()
         finally:
             del sys.modules["tradingagents"]
+
+
+class TestTradingAgentsTraderLoaderMakesTheRealCodeRunnable:
+    def test_load_trader_module_succeeds_and_exposes_the_real_symbols(self) -> None:
+        module = load_trader_module()
+        assert module.TraderProposal.__name__ == "TraderProposal"
+        assert module.TraderAction.BUY.value == "Buy"
+        assert callable(module.render_trader_proposal)
+
+    def test_the_real_validator_accepts_a_fabricated_entry_price(self) -> None:
+        module = load_trader_module()
+        proposal = module.TraderProposal(
+            action=module.TraderAction.BUY, reasoning="x", entry_price=999_999.0,
+        )
+        assert proposal.entry_price == 999_999.0
+
+    def test_loading_twice_in_one_process_is_idempotent(self) -> None:
+        first = load_trader_module()
+        second = load_trader_module()
+        assert first is second
+
+    def test_a_pre_existing_unrelated_module_under_the_dotted_name_is_refused(self) -> None:
+        import types
+
+        dotted = "argus_baseline_tradingagents_trader"
+        sentinel = types.ModuleType(dotted)
+        sys.modules[dotted] = sentinel
+        try:
+            with pytest.raises(TradingAgentsTraderLoadError, match="did not create"):
+                load_trader_module()
+        finally:
+            del sys.modules[dotted]
 
 
 class TestTradingAgentsFeedlistLoaderMakesTheRealCodeRunnable:

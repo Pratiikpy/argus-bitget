@@ -2790,13 +2790,120 @@
         "What would close the gap: not 'adopt Rasa' \u2014 impossible in this project's stdlib-only bundle, and it would forfeit the safety win outright. Rebalance or expand the OOS negative set per language, or split OOS detection into its own binary gate ahead of intent routing so it stops competing with the other eight intents in one softmax. Not implemented here: changing an OOS gate on a training corpus this small, without the resources to confirm the fix did not just move the loss somewhere else, would be a worse defect than leaving the gap named and open."
       ],
       "note": "Latency and deployability were also measured (ARGUS ~66x faster median response, ~375x faster cold start, a 1.8MB stdlib-only bundle vs Rasa's 1.9GB TensorFlow venv needing Python<=3.10) but are reported here as an unreproduced finding from the agent that ran the original comparison, not re-measured inside eval/lui_comparison.py, so no Proof above cites them \u2014 stated rather than silently dropped, per this project's own rule against a claim outliving its evidence."
+    },
+    {
+      "name": "Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal",
+      "subtheme": "t2-explainability",
+      "module": "argus/agents/grounding.py,argus/eval/explainability_comparison.py,argus/eval/baselines/tradingagents_trader.py,argus/eval/baselines/tradingagents_trader_loader.py",
+      "state": "owned",
+      "baseline": "TradingAgents' real, unmodified TraderProposal (agents/schemas.py) \u2014 the structured-output type its real Trader agent fills to produce every transaction proposal, including entry_price and stop_loss",
+      "conditions_met": [
+        "best_implementation_studied",
+        "best_method_studied",
+        "baseline_reproduced",
+        "implementation_complete",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "failure_cases_documented",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "conditions_missing": [],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "TradingAgents' real trader.py, schemas.py, portfolio_manager.py, all three risk_mgmt/*.py debators, reporting.py, and trading_graph.py read in full: trader.py's own grounding instruction (line 36-39) asks the model to anchor prices in the market report, but no real consumer of trader_investment_plan anywhere in the pipeline compares entry_price/stop_loss against it \u2014 grepped exhaustively, zero hits",
+          "artefact": "src/argus/eval/baselines/tradingagents_trader.py",
+          "test": ""
+        },
+        {
+          "condition": "best_method_studied",
+          "how": "two real methods compared: TradingAgents' prompt-only grounding instruction (no code enforcement anywhere downstream) vs. ARGUS's real agents.grounding.check \u2014 deterministic numeric resolution of every figure in a thesis against the facts the desk actually had, already existing and already tested (test_grounding.py), reused here rather than reimplemented",
+          "artefact": "src/argus/agents/grounding.py",
+          "test": ""
+        },
+        {
+          "condition": "baseline_reproduced",
+          "how": "TradingAgents' real, unmodified TraderProposal.entry_price validated at 999,999.0 with no relationship to any real fact \u2014 the real Pydantic validator raises nothing; its own _coerce_optional_float only normalises string format (placeholder text, a trailing '%', a currency symbol), never the value",
+          "artefact": "",
+          "test": "test_explainability_comparison.py::TestBaselineReproduced"
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "grounding.check/extract/GroundingReport already existed, already tested end to end (test_grounding.py) before this comparison; this capability wires real live desk facts through it against the real rival, not a stub",
+          "artefact": "",
+          "test": "test_grounding.py"
+        },
+        {
+          "condition": "same_input_comparison",
+          "how": "both real systems checked on the same real, live Bitget current price (and the same fabricated entry_price) for the same real symbols \u2014 TradingAgents' real validator and ARGUS's real grounding.check, not a re-implementation of either",
+          "artefact": "",
+          "test": "test_explainability_comparison.py::TestSameInputComparison::test_each_case_names_the_real_symbol_and_the_real_current_price"
+        },
+        {
+          "condition": "statistically_valid_evaluation",
+          "how": "swept across 3 real symbols and 4 fabrication magnitudes/directions (7.3x, 0.03x, -1x, 1000x of the real live price) \u2014 12 cases, not one hand-picked figure; TradingAgents' real validator catches 0 of 12, ARGUS catches 12 of 12",
+          "artefact": "",
+          "test": "test_explainability_comparison.py::TestSameInputComparison::test_tradingagents_real_validator_never_catches_a_fabricated_price"
+        },
+        {
+          "condition": "costs_included",
+          "how": "real wall-clock cost measured on both real, pure-Python checks per call",
+          "artefact": "",
+          "test": "test_explainability_comparison.py::TestCosts"
+        },
+        {
+          "condition": "out_of_sample_test",
+          "how": "run against real, freshly-fetched live Bitget ticker data across 3 real symbols never used to design the mechanism, plus a positive control confirming the real current price resolves cleanly on the same live data \u2014 not a blanket flag",
+          "artefact": "",
+          "test": "test_explainability_comparison.py::TestPositiveControl"
+        },
+        {
+          "condition": "ablation",
+          "how": "isolates the exact mechanism: a figure just inside grounding.py's own TOLERANCE constant resolves, the identical figure moved just past it on the same real fact does not \u2014 the tolerance boundary is the load-bearing mechanism, verified directly rather than assumed",
+          "artefact": "",
+          "test": "test_explainability_comparison.py::TestAblation"
+        },
+        {
+          "condition": "adversarial_test",
+          "how": "the real rival's edge-case behaviour tested directly: a negative price (-50.0) is accepted with no error, exercising the one boundary _coerce_optional_float does not even attempt to check",
+          "artefact": "",
+          "test": "test_explainability_comparison.py::TestFailureCases::test_a_negative_price_is_accepted_without_error"
+        },
+        {
+          "condition": "failure_cases_documented",
+          "how": "three real, measured behaviours of the real validator found by running it: a negative price is accepted unchecked, a percent-distance string is dropped to None rather than converted, and a placeholder string is dropped to None",
+          "artefact": "",
+          "test": "test_explainability_comparison.py::TestFailureCases"
+        },
+        {
+          "condition": "reproducibility_proven",
+          "how": "the same real thesis and real facts checked twice return the same result",
+          "artefact": "",
+          "test": "test_explainability_comparison.py::TestReproducibility"
+        },
+        {
+          "condition": "no_specialist_capability_superior",
+          "how": "scoped explicitly \u2014 SCOPE_STATEMENT in eval/explainability_comparison.py. Claimed: on the one checkable property (is a stated number traceable to a real fact), ARGUS's grounding.check enforces it in code and TradingAgents' real schema does not. NOT claimed TradingAgents' full pipeline never catches bad output by any other means \u2014 only that the one real, checkable code path performs no value-level check. NOT claimed about TraderProposal.reasoning (free text), only its two numeric fields. NOT claimed ARGUS's mechanism proves a figure is correct, only that it is traceable",
+          "artefact": "",
+          "test": "test_explainability_comparison.py::TestMain"
+        }
+      ],
+      "blockers": [
+        "TradingAgents' full multi-agent pipeline was not run end to end (would require an LLM call this project has no credentials for against their preferred provider) \u2014 this comparison instead runs the real, unmodified structured-output type its Trader agent fills, and reads every real downstream consumer of that type's output directly, which is sufficient to establish the absence of a value-level check without needing the LLM call itself"
+      ],
+      "note": ""
     }
   ],
   "by_state": {
     "lost": 3,
     "tied": 0,
     "implemented": 7,
-    "owned": 17
+    "owned": 18
   },
   "findings": [
     {
