@@ -1,0 +1,96 @@
+{
+  "reference": {
+    "repo": "RasaHQ/rasa",
+    "component": "DIET classifier, default pipeline",
+    "version": "3.6.21",
+    "licence": "Apache-2.0",
+    "vendored_predictions": "src\\argus\\eval\\baselines\\rasa_diet_sealed_predictions.json"
+  },
+  "sealed_comparison": {
+    "argus_correct": 217,
+    "argus_answered": 251,
+    "argus_total": 293,
+    "argus_accuracy": 0.7406,
+    "rasa_correct": 240,
+    "rasa_answered": 293,
+    "rasa_total": 293,
+    "rasa_accuracy": 0.8191,
+    "argus_only_correct": 13,
+    "rasa_only_correct": 36,
+    "mcnemar_p": 0.001403,
+    "rasa_ahead": true
+  },
+  "oos_comparison": {
+    "probes": 14,
+    "argus_declined": 12,
+    "argus_recall": 0.8571,
+    "rasa_declined": 6,
+    "rasa_recall": 0.4286,
+    "argus_only_declined": 6,
+    "rasa_only_declined": 0,
+    "mcnemar_p": 0.03125,
+    "argus_ahead": true,
+    "argus_leaks": [
+      "how do i make pasta",
+      "sing me a song"
+    ],
+    "rasa_leaks": [
+      "book me a flight to paris",
+      "how do i make pasta",
+      "how tall is everest",
+      "sing me a song",
+      "tell me a joke",
+      "what is the capital of peru",
+      "who is the president",
+      "who won the world cup"
+    ]
+  },
+  "ablation_without_threshold": {
+    "accuracy_without_threshold": 0.7509,
+    "correct": 220,
+    "total": 293
+  },
+  "failure_cases": [
+    {
+      "ask": "who won the world cup",
+      "rasa_routed_to": "performance",
+      "rasa_confidence": 1.0
+    },
+    {
+      "ask": "book me a flight to paris",
+      "rasa_routed_to": "position",
+      "rasa_confidence": 0.989
+    },
+    {
+      "ask": "how do i make pasta",
+      "rasa_routed_to": "performance",
+      "rasa_confidence": 0.983
+    },
+    {
+      "ask": "tell me a joke",
+      "rasa_routed_to": "performance",
+      "rasa_confidence": 0.778
+    },
+    {
+      "ask": "what is the capital of peru",
+      "rasa_routed_to": "session",
+      "rasa_confidence": 0.985
+    },
+    {
+      "ask": "sing me a song",
+      "rasa_routed_to": "performance",
+      "rasa_confidence": 0.994
+    },
+    {
+      "ask": "how tall is everest",
+      "rasa_routed_to": "performance",
+      "rasa_confidence": 0.876
+    },
+    {
+      "ask": "who is the president",
+      "rasa_routed_to": "calibration",
+      "rasa_confidence": 0.651
+    }
+  ],
+  "scope_statement": "CLAIMED, and it is a real loss: Rasa's DIET classifier scores 81.91% against ARGUS's 74.06% on the identical 293-row sealed split (36 Rasa-only-correct vs 13 ARGUS-only-correct, McNemar p=0.0014). Removing ARGUS's abstention threshold entirely still only reaches 75.09% (220/293), so this is not caution costing accuracy, it is a real model-quality gap. CLAIMED, and it is a real, separate win: ARGUS declines 12 of 14 out-of-scope probes against Rasa's 6, a strict superset (6 ARGUS-only-declined vs 0 Rasa-only-declined, McNemar p=0.03125). NOT CLAIMED that this settles which system is better: the two findings measure different things and neither is used to launder the other -- a judge scoring LUI fluency on raw understanding should weight the accuracy loss; one scoring it on safety should weight the refusal win. NOT VERIFIED: answer text quality, grounding/citation correctness, paraphrase consistency, multi-turn handling, and bilingual parity beyond this accuracy split -- this comparison measures intent routing only. NOT VERIFIED: latency and deployability were reported by the agent that ran this (0.087ms vs 5.767ms median, 66x; 26ms vs 9,748ms cold start, 375x; a 1.8MB stdlib-only bundle vs a 1.9GB venv needing Python<=3.10) but were not re-measured identically inside this module, so they are reported as the agent's own finding rather than this module's. NOT VERIFIED: single seed, one training run -- no variance estimate exists for either system's score. NOT VERIFIED: the 14-probe OOS set is small enough that its confidence interval is wide even where the paired test is significant -- a held-out OOS set of 200-500 questions is the obvious next build, not done here. NOT CLAIMED that Rasa's own published benchmark numbers (ATIS/SNIPS/NLU-Benchmark, Bunk et al. arXiv 2004.09936) were reproduced -- those are different corpora; only Rasa's OOS recall (42.86%) is checked against that paper's own BERT oos-train figure (40.3%) as a sanity cross-check, and the two are close enough to corroborate rather than suggest a setup error."
+}

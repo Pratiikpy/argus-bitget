@@ -112,65 +112,65 @@
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "293"
+        "294"
       ],
       "live": [
-        293
+        294
       ],
       "status": "OK",
-      "excerpt": "strict clean on 293 source files"
+      "excerpt": "strict clean on 294 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 44,
       "quoted": [
-        "293"
+        "294"
       ],
       "live": [
-        293
+        294
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 293 source files"
+      "excerpt": "strict` clean on 294 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 229,
       "quoted": [
-        "293"
+        "294"
       ],
       "live": [
-        293
+        294
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 293 files"
+      "excerpt": "strict` clean on 294 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 418,
       "quoted": [
-        "293"
+        "294"
       ],
       "live": [
-        293
+        294
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 293 source files"
+      "excerpt": "strict` clean across 294 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 1944,
       "quoted": [
-        "293"
+        "294"
       ],
       "live": [
-        293
+        294
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 293 source files"
+      "excerpt": "strict` clean on 294 source files"
     },
     {
       "claim": "register_claims",
@@ -351,14 +351,14 @@
       "line": 445,
       "quoted": [
         "17",
-        "26"
+        "27"
       ],
       "live": [
         17,
-        26
+        27
       ],
       "status": "OK",
-      "excerpt": "17 of 26 capabilities are OWNED"
+      "excerpt": "17 of 27 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -366,14 +366,14 @@
       "line": 110,
       "quoted": [
         "17",
-        "26"
+        "27"
       ],
       "live": [
         17,
-        26
+        27
       ],
       "status": "OK",
-      "excerpt": "17 of 26 capabilities are OWNED"
+      "excerpt": "17 of 27 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -382,7 +382,7 @@
       "quoted": [],
       "live": [
         17,
-        26
+        27
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -394,7 +394,7 @@
       "quoted": [],
       "live": [
         17,
-        26
+        27
       ],
       "status": "ABSENT",
       "excerpt": ""

@@ -1,0 +1,2103 @@
+{
+  "source": "RasaHQ/rasa 3.6.21, DIET classifier, default pipeline config, Apache-2.0",
+  "trained_on": "argus.eval.ngramtrain.training_rows() -- ARGUS's own 334 training rows, 9 labels incl. out_of_scope",
+  "scored_on": "the sealed split (293 rows) and the 14 OOS probes, both from argus.eval.ngrambench",
+  "trained_and_scored": "2026-09-21, single seed, single training run",
+  "sealed_predictions": [
+    {
+      "ask": "到现在为止的交易列表全给我看？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "session",
+      "conf": 0.97
+    },
+    {
+      "ask": "Why did we decide to short that tech stock back on Tuesday?",
+      "expect": "decision_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.991
+    },
+    {
+      "ask": "What tipped us into buying that commodity on Monday?",
+      "expect": "decision_why",
+      "lang": "en",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "你说的自信是否一直靠谱？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "过去几日的预测信心水平如何？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 0.9925
+    },
+    {
+      "ask": "Is the market humming or still a quiet lull?",
+      "expect": "session",
+      "lang": "en",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "那次决定用到哪些新闻来源？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 1.0
+    },
+    {
+      "ask": "这段时间没交易，背后为什么？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.9947
+    },
+    {
+      "ask": "最终收盘时的盈利点数是多少？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9972
+    },
+    {
+      "ask": "What held back our portfolio from moving this afternoon?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.9994
+    },
+    {
+      "ask": "这回没进场，原因到底是哪条？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.9504
+    },
+    {
+      "ask": "What's the bottom line on our pot?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "position",
+      "conf": 0.8738
+    },
+    {
+      "ask": "Is there a rundown of every decision taken so far?",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "performance",
+      "conf": 0.6521
+    },
+    {
+      "ask": "Does the confidence value match what actually happened?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "我想知道你们的信心到底有没有站得住脚？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 0.8081
+    },
+    {
+      "ask": "请把桌面做出的每笔决策罗列出来。",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "这时处于盘中哪个段落？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "No moves today, what’s the story behind the pause?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.7397
+    },
+    {
+      "ask": "现在持有什么股票？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "账户整体咋摊？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9985
+    },
+    {
+      "ask": "此刻有哪些持仓在跑？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "Can you vouch for the trustworthiness of those confidence metrics?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "能说说整体盈亏现在是红还是黑？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.5231
+    },
+    {
+      "ask": "做那笔交易时查了什么资料？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.9999
+    },
+    {
+      "ask": "保持空盘，背后到底是怎么想的？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "position",
+      "conf": 0.9957
+    },
+    {
+      "ask": "这几天的自信水平能信吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "What made us exit the crypto trade at the half‑hour mark yesterday?",
+      "expect": "decision_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "市场现在是开盘还是收盘？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "What sent the signal for that move into that commodity?",
+      "expect": "decision_why",
+      "lang": "en",
+      "got": "decision_why",
+      "conf": 0.7167
+    },
+    {
+      "ask": "我想知道当前持仓的情况。",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "想让你把所有决策清单打个包？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "整体收益率现在是多少？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 1.0
+    },
+    {
+      "ask": "当时看多V的选择背后动机为何？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "Which time slot are we at in the trading day?",
+      "expect": "session",
+      "lang": "en",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "Can you walk me through the logic behind that quick entry?",
+      "expect": "decision_why",
+      "lang": "en",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "我看到账面没有交易，能告诉我当时是怎么考虑的吗？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.9808
+    },
+    {
+      "ask": "现在是午盘还是晚盘？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "过去的判断力还能保住吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "现在手里有哪些仓位在运行？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "放弃了B时的动机是什么？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "Is the market still buzzing or already wrapped up?",
+      "expect": "session",
+      "lang": "en",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "What’s keeping the desk on its hands today?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "Why are we staying flat on the 9‑month spread?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.9833
+    },
+    {
+      "ask": "Where are the holdings standing as we close?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 0.9
+    },
+    {
+      "ask": "你们的判断力这段时间可靠吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "Where are we in the trading marathon today?",
+      "expect": "session",
+      "lang": "en",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "What's the current set of open stances in the book?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "Is the book up or down at close?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "session",
+      "conf": 0.8528
+    },
+    {
+      "ask": "Why stayed flat when the market was humming?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.9997
+    },
+    {
+      "ask": "Show the lineup of open positions today.",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "你参考了哪些数据来评B？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 1.0
+    },
+    {
+      "ask": "现在是买卖时段还是休市？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "What phase of the day are we in the market?",
+      "expect": "session",
+      "lang": "en",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "Is the confidence rating a steady hand or just a feel‑er?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 0.9997
+    },
+    {
+      "ask": "把最近的每一次决策都发给我看看。",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "请问此刻市场在哪个区间？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "能讲讲那笔买入的逻辑吗？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "你们的判断信心，是一直没变，还是会调？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "Was there any heady action on the desk this morning?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "Show me the playbook of every move you’ve made this run.",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "这季度盈利如何？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9977
+    },
+    {
+      "ask": "哪条新闻让你们决定买入？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "能把最近的所有动作给我一览吗？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "Put together every decision you’ve taken in the book today.",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "decision_list",
+      "conf": 0.9859
+    },
+    {
+      "ask": "能把所有的交易指令按时间顺序发给我吗？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "Give me the net outcome of our trades so far—up or down?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "performance",
+      "conf": 0.8199
+    },
+    {
+      "ask": "What positions are still in the balance?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "Got any intel on why we didn’t swing into action?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.9752
+    },
+    {
+      "ask": "Why did the desk sit on the sidelines today?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "Do the confidence numbers stay tight or wobble over time?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "你查阅B时用到啥来源？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.9999
+    },
+    {
+      "ask": "Give me the play-by-play of every move on the desk.",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "你能把每次操作都列出来吗？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "那个交易背后的考虑点是什么？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 0.9984
+    },
+    {
+      "ask": "How solid is the confidence rating you posted this morning?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "List all the trade calls we made from the opening bell onward.",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "session",
+      "conf": 0.5406
+    },
+    {
+      "ask": "有无做过哪些数据比对？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.9985
+    },
+    {
+      "ask": "现在有哪些持仓？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "这份指标的准确率能算作可靠吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "啥原因让你们没干？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "这期的盈亏幅度咋个样？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 1.0
+    },
+    {
+      "ask": "I need a rundown of all the desk actions during the session.",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "position",
+      "conf": 0.993
+    },
+    {
+      "ask": "Has the exchange folded its doors yet?",
+      "expect": "session",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.9997
+    },
+    {
+      "ask": "调查该股票的依据是什么文件？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.9493
+    },
+    {
+      "ask": "Which holdings are we standing on at present?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "How’s the account looking – upside or downside?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "performance",
+      "conf": 0.9997
+    },
+    {
+      "ask": "请列出实时持仓的整体情况。",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 0.9958
+    },
+    {
+      "ask": "What commitments have skin in the game currently?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "你们在决定时看了哪些报表，能说说吗？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.9988
+    },
+    {
+      "ask": "目前账户的盈亏情况咋样？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.7784
+    },
+    {
+      "ask": "请把最近的所有下单记录给我梳理一遍。",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "How did we do in the grand tally?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "performance",
+      "conf": 0.9822
+    },
+    {
+      "ask": "What phase of the day are we at now, cheers?",
+      "expect": "session",
+      "lang": "en",
+      "got": "session",
+      "conf": 0.9993
+    },
+    {
+      "ask": "市场现在还在营业吗？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "What research files did the desk reference for the industrial pick?",
+      "expect": "evidence",
+      "lang": "en",
+      "got": "evidence",
+      "conf": 0.9999
+    },
+    {
+      "ask": "今天股市还开着吗？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "What's hanging on the table right now?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 0.9959
+    },
+    {
+      "ask": "现在是开市吧？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "这周你们都下了哪些单？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.9875
+    },
+    {
+      "ask": "Can I count on your certainty over the long haul?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "现在是交易时间吗？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "你们本月做了哪些事？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.9999
+    },
+    {
+      "ask": "账面盈亏曲线现在的走势是？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.5413
+    },
+    {
+      "ask": "到目前为止，我的资产增减了几多？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9995
+    },
+    {
+      "ask": "你们声称的自信指数现在还靠谱吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 0.9998
+    },
+    {
+      "ask": "Can you explain the pause behind the lack of action during the session?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "decision_why",
+      "conf": 0.9997
+    },
+    {
+      "ask": "上次卖X的理由你怎么解释？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "What kept the seat empty instead of taking the plunge?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "今日是休市还是开？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "Is the book up or down after today?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "performance",
+      "conf": 0.9483
+    },
+    {
+      "ask": "Do you think the “hot” signal will stay hot?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "position",
+      "conf": 0.5908
+    },
+    {
+      "ask": "账户最近表现咋样？是赚还是亏？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9999
+    },
+    {
+      "ask": "请说说我目前有哪些未平仓的头寸。",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "Did the team keep their horses still today?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.9961
+    },
+    {
+      "ask": "上个月的盈亏情况能给我说说吗？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 0.9774
+    },
+    {
+      "ask": "你们分析该期权时，参考了哪些统计数据？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 1.0
+    },
+    {
+      "ask": "没下单是有啥隐忧？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.9998
+    },
+    {
+      "ask": "评B时你查了哪些资料？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 1.0
+    },
+    {
+      "ask": "我想知道你们在考虑C时，看了哪些数据。",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 0.3582
+    },
+    {
+      "ask": "为何按此价位买入C？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "能说明一下用什么数据验证那张图的准确性？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.9439
+    },
+    {
+      "ask": "为何你们选了那只看跌期权而不是别的？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "今天是午市？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "Show me the ledger of every call made.",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "为什么这件事没出手？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.9948
+    },
+    {
+      "ask": "过去三天的交易记录可以列出来吗？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "这支股票背后参考了哪些图表？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 1.0
+    },
+    {
+      "ask": "Dump the playbook of every trade you took this week.",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "那种“我很确定”究竟在时间上能坚持吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 0.9314
+    },
+    {
+      "ask": "现在行情开盘了吗？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "Do we have faith in the desk’s confidence over the long haul?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "最近市场波动大，你们居然没开仓，究竟是什么原因？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 0.7061
+    },
+    {
+      "ask": "Why was there zero action on the desk?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "decision_why",
+      "conf": 0.519
+    },
+    {
+      "ask": "为什么今天不扣点，停住了？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.998
+    },
+    {
+      "ask": "这段时间为何一直没下一笔？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.4881
+    },
+    {
+      "ask": "最近几天的盈亏情况怎么样？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 1.0
+    },
+    {
+      "ask": "Why’s the room still empty – no moves in the account?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "performance",
+      "conf": 0.557
+    },
+    {
+      "ask": "请把所有决策记录一次性发给我。",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "What’s the bottom line on our profit or loss after the session?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "session",
+      "conf": 0.9991
+    },
+    {
+      "ask": "你们是基于哪些数据做出那一买卖决定的？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 0.9924
+    },
+    {
+      "ask": "今天为何点盘保持沉默？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.6731
+    },
+    {
+      "ask": "这笔交易背后有没有相关的研究报告或新闻？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.998
+    },
+    {
+      "ask": "把之前所有决策都拉出来？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "当下的持仓情况能告诉我吗？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "What’s the list of all the picks from kickoff to now?",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "decision_list",
+      "conf": 0.7636
+    },
+    {
+      "ask": "今天的交易时段是否已结束？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "Walk me through every move the desk pulled this day.",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "decision_why",
+      "conf": 0.9617
+    },
+    {
+      "ask": "What’s the story behind taking that long on the short for 123?",
+      "expect": "decision_why",
+      "lang": "en",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "Is your confidence still rock solid after the churn?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "你们的预测准确率一如既往吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "你们说今天保持观望，可我想知道背后的想法。",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 0.7784
+    },
+    {
+      "ask": "我看到全盘没动，究竟是哪些考量？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "session",
+      "conf": 0.5159
+    },
+    {
+      "ask": "你对自己的判断会不会有起伏？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 0.7563
+    },
+    {
+      "ask": "What’s hanging in the bag right now?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "How solid is your confidence gauge when the market gets noisy?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "What positions are still open in the account?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "最近的收益把我说说？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9984
+    },
+    {
+      "ask": "总盈亏到底来多少？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 1.0
+    },
+    {
+      "ask": "当时怎么估那笔交易的风险？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 0.9984
+    },
+    {
+      "ask": "当时决定买入A时，你们在想什么？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "今天市场还在做活吗？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "之前只观察没出手，原因何在？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.4895
+    },
+    {
+      "ask": "Why’s the desk playing it safe instead of making moves?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.9998
+    },
+    {
+      "ask": "手里现在有几手？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "Is the market been quiet from the desk's side?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "session",
+      "conf": 0.7731
+    },
+    {
+      "ask": "你们在过去的某个时点为何选择以此价位做多？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "此刻是哪个时段？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "对于B股票，你们参考了哪些资料？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 0.9737
+    },
+    {
+      "ask": "为啥你们会相信这只股的走势？看了什么资料？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.9999
+    },
+    {
+      "ask": "你们的自信度在市场变化时还能维持吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "How did the books look after closing?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "position",
+      "conf": 0.9938
+    },
+    {
+      "ask": "当前持仓的状况能一览吗？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 0.998
+    },
+    {
+      "ask": "收盘时手里的钱涨了几块？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9943
+    },
+    {
+      "ask": "List every transaction that landed in the books.",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "position",
+      "conf": 0.974
+    },
+    {
+      "ask": "现在有什么开放的持仓吗？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "请问在做决定时参考了哪些来源？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 1.0
+    },
+    {
+      "ask": "现手上有哪些持仓？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "这段时间的净值变化我看不太懂，能解释一下吗？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 0.595
+    },
+    {
+      "ask": "你们为什么选择此时卖出A？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "那一次卖出的原因怎么想的？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "Show the sources we checked for the options play.",
+      "expect": "evidence",
+      "lang": "en",
+      "got": "evidence",
+      "conf": 0.9968
+    },
+    {
+      "ask": "总盈利得几把？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9795
+    },
+    {
+      "ask": "Did the portfolio hit a sweet spot or a sour patch today?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "performance",
+      "conf": 0.5164
+    },
+    {
+      "ask": "What kept us from hitting the trade button this morning?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "Which sticks are we holding at the moment?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "咱们现在处在盘中吗？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 0.9999
+    },
+    {
+      "ask": "How dependable are your confidence numbers after the noise?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "现在账户里还有哪些持仓？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "我想确认一下是上午还是下午的盘？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "这套模型的可靠性你怎么看？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 0.9931
+    },
+    {
+      "ask": "当前还有什么可持？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "现在手上还有哪些持仓？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "今天为什么一直不挂单？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.9998
+    },
+    {
+      "ask": "今天的账户表现是涨是跌？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9982
+    },
+    {
+      "ask": "那段时间的全部交易行程能发给我吗？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "session",
+      "conf": 0.9484
+    },
+    {
+      "ask": "上周你们买进了X股，能透露一下当时的想法吗？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9992
+    },
+    {
+      "ask": "今天是打个折的下午？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "在那个点位止损的原因是？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "你们说自己信心很高，过去真的是一直这么稳吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "那天为什么要做Z的交易，能解释一下吗？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.9877
+    },
+    {
+      "ask": "What’s the reason you decided to skip the trades on this day?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.9998
+    },
+    {
+      "ask": "账户的净值涨跌情况能说一下吗？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.3657
+    },
+    {
+      "ask": "What’s the scoop on the desk staying chill today?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.9996
+    },
+    {
+      "ask": "现在手里别有何仓位？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "Is the trading floor up and running now?",
+      "expect": "session",
+      "lang": "en",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "有关该标的的研究材料是什么？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "position",
+      "conf": 0.939
+    },
+    {
+      "ask": "这么信心满满，未来还能一直吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "out_of_scope",
+      "conf": 1.0
+    },
+    {
+      "ask": "把最近的出入场一次性说说。",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 0.9996
+    },
+    {
+      "ask": "现在是早盘还是午休？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "你自信值跟不上去怎么办？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "out_of_scope",
+      "conf": 0.5768
+    },
+    {
+      "ask": "我能把这个信心度当成真值吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 0.9971
+    },
+    {
+      "ask": "你们用哪些指标来决定不跟？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.9999
+    },
+    {
+      "ask": "Which charts or feeds tipped the scale for that move?",
+      "expect": "evidence",
+      "lang": "en",
+      "got": "evidence",
+      "conf": 0.9988
+    },
+    {
+      "ask": "What made us take that shot on the bond last week?",
+      "expect": "decision_why",
+      "lang": "en",
+      "got": "decision_why",
+      "conf": 0.9999
+    },
+    {
+      "ask": "过去一年你们的判定准确率如何？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "为什么今天我在行情里看不到任何买卖指令？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "What’s sitting in the books right now?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "What’s the headline after today’s session?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "session",
+      "conf": 0.926
+    },
+    {
+      "ask": "What part of the trading day are we in at the moment?",
+      "expect": "session",
+      "lang": "en",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "所有的交易决定都展示一下？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 0.9983
+    },
+    {
+      "ask": "此时此刻的仓位分布怎样？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 0.9996
+    },
+    {
+      "ask": "今天怎么全停？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.7133
+    },
+    {
+      "ask": "我想知道你们到底做了哪些决策，全部说一下。",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.9911
+    },
+    {
+      "ask": "对于昨日的那笔大单，操作理由是什么？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "How much can we trust the confidence bar over the long haul?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "在评估该标的时用了哪些数据来源？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 1.0
+    },
+    {
+      "ask": "你们参考了哪些数据源？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 1.0
+    },
+    {
+      "ask": "Did we end up ahead or behind today?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.5759
+    },
+    {
+      "ask": "我想看完整的买卖历史，别漏。",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 0.9996
+    },
+    {
+      "ask": "你们说的自信度多久能被验证？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "把所有的指令展开给我。",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "市场开盘了吗？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "Which legs are still on the table at the moment?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 0.9997
+    },
+    {
+      "ask": "Could you lay out the playbook of all the moves?",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "Is the certainty you spin still as solid as a rock?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "当天的走势似乎很活跃，怎么可能你们一动不动？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "position",
+      "conf": 0.9091
+    },
+    {
+      "ask": "我记得你们在10点时买进那支股，能说说背后的想法吗？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 0.9814
+    },
+    {
+      "ask": "我们仍处在交易时间段吗？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "信息来源都在哪儿？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.8529
+    },
+    {
+      "ask": "现在的多空头全景是怎样？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "能给我列举完整的操作清单吗？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "Show me the rundown of each call the desk made.",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "position",
+      "conf": 0.6257
+    },
+    {
+      "ask": "你为何对那仓位有兴趣？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 0.9888
+    },
+    {
+      "ask": "这份自信声明，能说明它的可靠性吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "最近一周的整体跑赢/跑输情况是怎样的？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 0.9996
+    },
+    {
+      "ask": "What holdings are hanging on the table right now?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "支撑这判断的依据是？",
+      "expect": "evidence",
+      "lang": "zh",
+      "got": "evidence",
+      "conf": 0.9981
+    },
+    {
+      "ask": "现在还是买卖时间吗？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "Which dashboards are you checking when you look at those numbers?",
+      "expect": "evidence",
+      "lang": "en",
+      "got": "evidence",
+      "conf": 0.833
+    },
+    {
+      "ask": "How's the book looking after today's swings?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "position",
+      "conf": 0.9012
+    },
+    {
+      "ask": "总共赚了多少，还是亏了点？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 1.0
+    },
+    {
+      "ask": "How did the account play out this cycle?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "performance",
+      "conf": 0.9999
+    },
+    {
+      "ask": "今天你们为什么保持观望？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 0.6874
+    },
+    {
+      "ask": "你们说的自信度能维持多稳定？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "Can you hand me the itinerary of trades?",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "decision_list",
+      "conf": 0.8478
+    },
+    {
+      "ask": "How are we faring at the end of the day, net?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "Are the certainty scores you gave us dependable over time?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "Give me the record of all the calls you’ve put in since the break.",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "Which positions still carry over as we speak?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "你们最近下的所有单我想一览。",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "Got any numbers on the day's take?",
+      "expect": "performance",
+      "lang": "en",
+      "got": "decision_why",
+      "conf": 0.827
+    },
+    {
+      "ask": "那天怎么什么都没下单，能说说原因吗？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "Do we have any lumber left in the basket?",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 0.7442
+    },
+    {
+      "ask": "为什么今天整天都在观望，没做点什么？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.9895
+    },
+    {
+      "ask": "我看现在账户值是多少，上涨还是下跌？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9824
+    },
+    {
+      "ask": "现在手里还有哪些仓位？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "现在是交易时间段吗？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "那次买A的主因到底是啥？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 0.8314
+    },
+    {
+      "ask": "我记得那天卖出了Y，能说说背后原因吗？",
+      "expect": "decision_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 1.0
+    },
+    {
+      "ask": "眼下的头寸咋样？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 1.0
+    },
+    {
+      "ask": "What held us back from nudging the 3‑month strangle?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "abstention_why",
+      "conf": 0.9999
+    },
+    {
+      "ask": "那块为何没加仓？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "decision_why",
+      "conf": 0.9988
+    },
+    {
+      "ask": "能把所有交易决策都给我列一遍吗？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "现在手上还有哪些品种？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "最近几笔后，账户净值表现怎样？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9998
+    },
+    {
+      "ask": "这段时间的全部买卖记录能提供一份吗？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 0.9271
+    },
+    {
+      "ask": "你今天是不是只顾着观望？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "你觉得此刻是早盘还是午盘？",
+      "expect": "session",
+      "lang": "zh",
+      "got": "session",
+      "conf": 0.9999
+    },
+    {
+      "ask": "目前的仓位是怎么分布？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "过去几次的自信值稳吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "Which data feeds did we consult before grabbing the biotech?",
+      "expect": "evidence",
+      "lang": "en",
+      "got": "evidence",
+      "conf": 1.0
+    },
+    {
+      "ask": "之前的预测一直准确吗？",
+      "expect": "calibration",
+      "lang": "zh",
+      "got": "calibration",
+      "conf": 0.6252
+    },
+    {
+      "ask": "能把所有的交易决策都罗列一下吗？",
+      "expect": "decision_list",
+      "lang": "zh",
+      "got": "decision_list",
+      "conf": 1.0
+    },
+    {
+      "ask": "账面盈亏如今是啥状态？",
+      "expect": "performance",
+      "lang": "zh",
+      "got": "performance",
+      "conf": 0.9964
+    },
+    {
+      "ask": "Chronicle the sequence of trades executed after market opened.",
+      "expect": "decision_list",
+      "lang": "en",
+      "got": "session",
+      "conf": 0.9917
+    },
+    {
+      "ask": "Has the market spilled into session yet?",
+      "expect": "session",
+      "lang": "en",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "手里现在持仓多少？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "Do your confidence bells ring true over time?",
+      "expect": "calibration",
+      "lang": "en",
+      "got": "calibration",
+      "conf": 1.0
+    },
+    {
+      "ask": "这一刻我该看到的仓位情况是怎样的？",
+      "expect": "position",
+      "lang": "zh",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "When does the day’s trading close for today?",
+      "expect": "session",
+      "lang": "en",
+      "got": "session",
+      "conf": 1.0
+    },
+    {
+      "ask": "Give me a snapshot of all open legs at present.",
+      "expect": "position",
+      "lang": "en",
+      "got": "position",
+      "conf": 1.0
+    },
+    {
+      "ask": "What’s the hold‑up that left us stuck in neutral?",
+      "expect": "abstention_why",
+      "lang": "en",
+      "got": "position",
+      "conf": 0.9589
+    },
+    {
+      "ask": "今天好像全程空盘，究竟是为什么？",
+      "expect": "abstention_why",
+      "lang": "zh",
+      "got": "abstention_why",
+      "conf": 0.9925
+    }
+  ],
+  "oos_probe_predictions": [
+    {
+      "ask": "who won the world cup",
+      "routed_to": "performance",
+      "conf": 1.0
+    },
+    {
+      "ask": "book me a flight to paris",
+      "routed_to": "position",
+      "conf": 0.989
+    },
+    {
+      "ask": "how do i make pasta",
+      "routed_to": "performance",
+      "conf": 0.983
+    },
+    {
+      "ask": "tell me a joke",
+      "routed_to": "performance",
+      "conf": 0.778
+    },
+    {
+      "ask": "what is the capital of peru",
+      "routed_to": "session",
+      "conf": 0.985
+    },
+    {
+      "ask": "sing me a song",
+      "routed_to": "performance",
+      "conf": 0.994
+    },
+    {
+      "ask": "how tall is everest",
+      "routed_to": "performance",
+      "conf": 0.876
+    },
+    {
+      "ask": "who is the president",
+      "routed_to": "calibration",
+      "conf": 0.651
+    }
+  ],
+  "oos_declined": 6,
+  "oos_probes": 14
+}

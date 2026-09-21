@@ -51,6 +51,20 @@ LOCK_STALE_SECONDS = 900.0
 took 29 minutes for twelve symbols, but it holds the lock only across a single append), so a lock
 older than this belonged to a process that died."""
 
+MAX_THESIS_LENGTH = 4000
+"""How much of a decision's reasoning the ledger keeps. Found stuck at 500 on 2026-09-21 — no
+comment, no ellipsis on cut, and it was silently cutting real reasoning mid-word: **350 of the
+519 rows on record hit exactly 500 characters**, which is 67% of every decision this desk has
+ever made. This is an append-only, hash-chained log, so the truncated historical rows cannot be
+repaired without breaking the chain — read `research/architecture/` for how this project treats
+that class of defect (acknowledge and route around, never rewrite history) — but every future
+decision keeps up to 4,000 characters, chosen generously rather than by measuring what 500 let
+through: the naturally-short entries (never hit the old cap) still ran up to 498 characters with
+a 90th percentile of 474, meaning even the "normal" case was pressed right up against the old
+limit and tells us nothing reliable about how long a real thesis wants to be. Found by driving
+the deployed console as a real user and reading what it actually said, not by scanning the code
+for suspicious literals."""
+
 
 class LedgerError(RuntimeError):
     """The ledger was asked to do something that would make it untrustworthy."""
@@ -359,7 +373,7 @@ class PaperLedger:
                 quantity=str(quantity),
                 entry_price=str(entry_price),
                 stated_confidence=stated_confidence,
-                thesis=thesis[:500],
+                thesis=thesis[:MAX_THESIS_LENGTH],
                 invalidation=tuple(invalidation),
                 market_state_hash=market_state_hash,
                 approved_intent_hash=approved_intent_hash,

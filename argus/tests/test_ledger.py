@@ -485,3 +485,53 @@ class TestTheLeanIsOnTheRecord:
         assert settled.lean == "down"
         assert settled.lean_confidence == 0.55
         assert led.verify()["chain_intact"] is True
+
+
+class TestThesisLength:
+    """Found by driving the deployed console as a real user, not by scanning the code: two of
+    three reasoning blocks in one live answer cut off mid-word, and the raw ledger showed why —
+    `thesis[:500]` with no ellipsis, no comment, silently discarding whatever came after. 350 of
+    519 rows on the live record hit exactly 500 characters. The historical rows cannot be
+    repaired (append-only, hash-chained), but nothing protected this field from happening again,
+    which is the gap these tests close."""
+
+    def test_a_long_thesis_is_kept_up_to_the_new_limit(self, tmp_path: Path) -> None:
+        from argus.paper.ledger import MAX_THESIS_LENGTH
+
+        led = _ledger(tmp_path)
+        long_thesis = "reasoning " * 200  # 2,000 chars, comfortably past the old 500-char cap
+        assert len(long_thesis) > 500
+        entry = led.record(
+            symbol="NVDAUSDT", verdict="trade", side="BUY",
+            quantity=Decimal("10"), entry_price=Decimal("220"),
+            stated_confidence=0.7, thesis=long_thesis,
+            invalidation=("guidance reaffirmed",),
+            market_state_hash="abc123", approved_intent_hash="def456",
+            session_phase="weekend", hours_to_discovery=30.5, decided_at=T0,
+        )
+        assert entry.thesis == long_thesis[:MAX_THESIS_LENGTH]
+        assert len(entry.thesis) > 500, "the exact regression this test exists to catch"
+
+    def test_a_thesis_past_the_new_limit_is_still_bounded_not_unbounded(
+        self, tmp_path: Path
+    ) -> None:
+        """No cap at all would let one pathological generation bloat every row after it in an
+        append-only log forever. A generous, documented ceiling is the right trade — not none."""
+        from argus.paper.ledger import MAX_THESIS_LENGTH
+
+        led = _ledger(tmp_path)
+        pathological = "x" * 50_000
+        entry = led.record(
+            symbol="NVDAUSDT", verdict="trade", side="BUY",
+            quantity=Decimal("10"), entry_price=Decimal("220"),
+            stated_confidence=0.7, thesis=pathological,
+            invalidation=("guidance reaffirmed",),
+            market_state_hash="abc123", approved_intent_hash="def456",
+            session_phase="weekend", hours_to_discovery=30.5, decided_at=T0,
+        )
+        assert len(entry.thesis) == MAX_THESIS_LENGTH
+
+    def test_a_short_thesis_is_never_padded_or_altered(self, tmp_path: Path) -> None:
+        led = _ledger(tmp_path)
+        entry = _record(led)
+        assert entry.thesis == "guidance cut not priced"

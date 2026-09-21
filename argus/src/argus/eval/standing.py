@@ -4459,6 +4459,111 @@ REGISTER: tuple[Capability, ...] = (
              "306x across the two regenerations is ordinary wall-clock variance in a timing "
              "measurement, not a second stale figure — the loss verdict is unaffected either way.",
     ),
+    # **Found by a JUDGE-lens pass, not by searching for a rival first.** Driving the deployed
+    # console as a real user surfaced two things on the same day: a live truncation bug
+    # (paper/ledger.py, fixed separately, see MAX_THESIS_LENGTH) and the fact that "LUI fluency" —
+    # a named Track 3 judging criterion, on the track this project actually files — had never been
+    # measured against anything outside this repository. This entry is that measurement.
+    Capability(
+        name="LUI intent routing, measured against Rasa's real DIET classifier",
+        subtheme="t3-lui",
+        module="argus/lui/ngram.py",
+        state=State.LOST,
+        baseline="RasaHQ/rasa 3.6.21 (Apache-2.0), DIET classifier, default pipeline config",
+        proofs=(
+            Proof(
+                condition="best_implementation_studied",
+                how="RasaHQ/rasa chosen because bounded-domain conversational intent "
+                    "understanding is its primary purpose, not a framework with chat bolted on; "
+                    "it is the OSS NLU engine the benchmarking literature treats as a baseline, "
+                    "and DIET has a published paper (Bunk et al., arXiv 2004.09936). "
+                    "ConvLab-3 rejected for granularity (a full TOD pipeline, NLU is one "
+                    "swappable module); snips-nlu rejected as unmaintained since Jan 2020 despite "
+                    "correct granularity, per the standing rule to take the harder candidate. No "
+                    "finance-specific permissively-licensed conversational NLU system was found "
+                    "to exist — only datasets (BANKING77, CLINC150).",
+                artefact="data/lui_comparison.json",
+            ),
+            Proof(
+                condition="baseline_reproduced",
+                how="Rasa trained on ARGUS's own 334 training rows (all 9 labels incl. "
+                    "out_of_scope) and scored on the identical sealed split; reproduced "
+                    "independently from the vendored predictions before this module existed "
+                    "(217/251/293 argus, 240/291/293 rasa, matching to 4 decimal places)",
+                artefact="data/lui_comparison.json",
+                test="test_lui_comparison.py::TestVendoredReference",
+            ),
+            Proof(
+                condition="same_input_comparison",
+                how="both systems scored on the identical 293-row sealed split and the identical "
+                    "14 out-of-scope probes; ARGUS's side runs live through the exact console "
+                    "function (classify_with_fallback), never vendored",
+                artefact="data/lui_comparison.json",
+                test="test_lui_comparison.py::TestSealedComparison",
+            ),
+            Proof(
+                condition="statistically_valid_evaluation",
+                how="McNemar's exact test (Dietterich 1998) on paired predictions: sealed "
+                    "accuracy p=0.0014 (13 argus-only vs 36 rasa-only correct), out-of-scope "
+                    "p=0.03125 (6 argus-only vs 0 rasa-only declined)",
+                artefact="data/lui_comparison.json",
+                test="test_lui_comparison.py::TestMcnemarExact",
+            ),
+            Proof(
+                condition="ablation",
+                how="ARGUS's abstention threshold removed entirely (raw top-1 from "
+                    "probabilities(), no suppression): accuracy rises only to 75.09% "
+                    "(220/293), still below Rasa's 81.91% — rules out 'ARGUS is just being "
+                    "careful' as the explanation for the gap",
+                artefact="data/lui_comparison.json",
+                test="test_lui_comparison.py::TestAblationWithoutThreshold",
+            ),
+            Proof(
+                condition="failure_cases_documented",
+                how="Rasa's 8 out-of-scope leaks named with routed intent and confidence (e.g. "
+                    "'who won the world cup' -> performance at confidence 1.0, saturated — no "
+                    "threshold would rescue it); ARGUS's 2 leaks ('how do i make pasta', 'sing "
+                    "me a song') are a strict subset of Rasa's 8",
+                artefact="data/lui_comparison.json",
+                test="test_lui_comparison.py::TestOosComparison",
+            ),
+        ),
+        blockers=(
+            "no_specialist_capability_superior FAILS on the headline metric, which is what LOST "
+            "means: Rasa's DIET classifier scores 81.91% intent accuracy against ARGUS's 74.06% "
+            "on the identical sealed split, p=0.0014, not softenable by the ablation above.",
+            "The one front ARGUS is not beaten on, and it is real and separately significant: "
+            "out-of-scope refusal. ARGUS declines 12 of 14 probes against Rasa's 6, a strict "
+            "superset, p=0.03125. This does not reverse the LOST verdict on accuracy — the two "
+            "findings measure different things and this register does not average them into a "
+            "tie — but it is the honest reading of what ARGUS gets right that a headline loss "
+            "must not bury.",
+            "adversarial_test and out_of_sample_test are not proven: single seed, one training "
+            "run per Rasa config, no variance estimate for either system. The 14-probe "
+            "out-of-scope set is too small to carry the safety claim alone — Wilson CIs are wide "
+            "([0.60, 0.96] vs [0.21, 0.67]) even where the paired test is significant; a held-out "
+            "set of 200-500 probes is the obvious next build and was not done here.",
+            "Root cause, read from the confusion rather than assumed: ARGUS's out_of_scope class "
+            "absorbs 39 genuinely in-scope sealed questions — 35 of them Chinese — and Rasa "
+            "answers 25 of those 39 correctly. That single mechanism is close to the entire "
+            "accuracy deficit and close to the entire safety advantage at once: the char n-gram "
+            "OOS gate appears to key on Chinese surface features that over-generalise into "
+            "genuine in-scope Chinese questions.",
+            "What would close the gap: not 'adopt Rasa' — impossible in this project's "
+            "stdlib-only bundle, and it would forfeit the safety win outright. Rebalance or "
+            "expand the OOS negative set per language, or split OOS detection into its own "
+            "binary gate ahead of intent routing so it stops competing with the other eight "
+            "intents in one softmax. Not implemented here: changing an OOS gate on a training "
+            "corpus this small, without the resources to confirm the fix did not just move the "
+            "loss somewhere else, would be a worse defect than leaving the gap named and open.",
+        ),
+        note="Latency and deployability were also measured (ARGUS ~66x faster median response, "
+             "~375x faster cold start, a 1.8MB stdlib-only bundle vs Rasa's 1.9GB TensorFlow "
+             "venv needing Python<=3.10) but are reported here as an unreproduced finding from "
+             "the agent that ran the original comparison, not re-measured inside "
+             "eval/lui_comparison.py, so no Proof above cites them — stated rather than silently "
+             "dropped, per this project's own rule against a claim outliving its evidence.",
+    ),
 )
 
 

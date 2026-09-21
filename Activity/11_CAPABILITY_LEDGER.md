@@ -33,20 +33,23 @@ carries a result.**
 | 16 | `portfolio-copilot` | T3 | subtheme | **LOST** | Riskfolio-Lib NCO | **yes** | specialist (p=3.6e-05) | 2026-09-21 |
 | 17 | `t3-source-depth` | T3 | judging | IMPLEMENTED | — | no | — | — |
 | 18 | `t3-research-quality` | T3 | judging | IMPLEMENTED | — | no | — | — |
-| 19 | `t3-lui` | T3 | judging | IMPLEMENTED | — | no | — | — |
+| 19 | `t3-lui` | T3 | judging | **LOST** on accuracy, **WON** on safety | RasaHQ/rasa DIET (Apache-2.0) | **yes** | split — Rasa (accuracy, p=0.0014); ARGUS (OOS refusal, p=0.031) | 2026-09-21 |
 | 20 | `t3-personal-thesis` | T3 | judging | IMPLEMENTED | — | no | — | — |
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 5 of 20 as of 2026-09-21: 2 LOST, 2 real wins (earnings vs QuantConnect,
-factor-discovery vs Microsoft RD-Agent), 1 methodological (event-driven vs whale-signals — neither
-system establishes a real effect on this data; the finding is that whale-signals tests against the
-wrong null, not that ARGUS's own number beats theirs, and no fabricated score is recorded for it).**
-That is this ledger's honest scoreboard — it names whether *this specific Bitget-taxonomy row* has
-a rival comparison wired in, which is a narrower and different question from `eval/standing.py`'s
-own register (26 capabilities across the whole codebase, 17 OWNED, 2 LOST, independently verified —
-do not read "0" here as "0 OWNED anywhere," an earlier session conflated the two and said so wrongly
-to the owner). What this ledger's `rival run` column still says: of 20 judged rows, 13 more already
+**`rival run` is `yes` on 6 of 20 as of 2026-09-21: 3 LOST (one of them split — LUI intent
+accuracy loses to Rasa's DIET classifier, p=0.0014, while ARGUS wins out-of-scope refusal
+separately and significantly, p=0.031, neither laundering the other), 2 real wins (earnings vs
+QuantConnect, factor-discovery vs Microsoft RD-Agent), 1 methodological (event-driven vs
+whale-signals — neither system establishes a real effect on this data; the finding is that
+whale-signals tests against the wrong null, not that ARGUS's own number beats theirs, and no
+fabricated score is recorded for it).** That is this ledger's honest scoreboard — it names whether
+*this specific Bitget-taxonomy row* has a rival comparison wired in, which is a narrower and
+different question from `eval/standing.py`'s own register (27 capabilities across the whole
+codebase, 17 OWNED, 3 LOST, independently verified — do not read "0" here as "0 OWNED anywhere,"
+an earlier session conflated the two and said so wrongly to the owner). What this ledger's
+`rival run` column still says: of 20 judged rows, 13 more already
 have a real comparison sitting in `data/` unwired (found by the CONNECT lens, 2026-09-21 — see
 `Activity/10_LOOP_DESIGN.md`). Every other number in this
 project — 60 commits, 5,000+ tests, 96 pinned doc claims — measures how carefully we checked
@@ -66,8 +69,9 @@ deflated Sharpe), `factor_divergence_comparison.json` (Alphalens/WorldQuant Alph
 (LatencySensitiveBench, arXiv 2505.19481), `search_bakeoff.json` (internal, no external specialist).
 
 **Genuine capability gaps — no comparison exists at all:** `t2-explainability` (no rival for
-reasoning-trail quality), `t3-lui` (no rival for conversational/LUI fluency), `t2-sharpe-mdd-winrate`
-(structurally blocked — the desk has no settled trades, not a missing comparison).
+reasoning-trail quality), `t2-sharpe-mdd-winrate` (structurally blocked — the desk has no settled
+trades, not a missing comparison). `t3-lui` closed 2026-09-21 — see row 19 and
+`Activity/10_LOOP_DESIGN.md` iteration 6.
 
 **Three artefacts named as rivals in `eval/standing.py` prose have no persisted output on disk:**
 `feedlist_comparison.py`, `grammar_comparison.py`, `journal_comparison.py` — the modules exist, the
@@ -107,5 +111,6 @@ drift, none confirmed broken yet).
 | `/status` | serves 447 entries against a local 507; reports `stale: true` about itself | 2026-09-21 |
 | `/wrong` | **404** — the corrections page is absent from the deployed build | 2026-09-21 |
 | `/research` | **404** — the research surface is absent from the deployed build | 2026-09-21 |
+| `abstention_why` answer | Two of three reasoning blocks in one real answer cut off mid-word ("...unlikely to m"). Traced to `paper/ledger.py`'s `thesis[:500]` — silent, no ellipsis. **350 of 519 ledger rows (67%) affected.** Fixed forward-only (historical rows are hash-chained, cannot be repaired) — `MAX_THESIS_LENGTH` raised to 4000, documented, tested. | 2026-09-21 |
 
 `argus/README.md:211` claims the console is live and working. Two of its five routes are not.
