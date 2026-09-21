@@ -1,99 +1,110 @@
 {
-  "total": 93,
-  "checked": 85,
-  "ok": 85,
+  "total": 95,
+  "checked": 86,
+  "ok": 86,
   "stale": 0,
   "absent": 24,
   "deleted": 0,
-  "unchecked": 8,
+  "unchecked": 9,
   "findings": [
     {
       "claim": "tests_passing",
       "doc": "readme",
       "line": 61,
       "quoted": [
-        "5,100"
+        "5,946"
       ],
       "live": null,
       "status": "UNCHECKED",
-      "excerpt": "5,100 tests collected"
+      "excerpt": "5,946 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 27,
       "quoted": [
-        "5,100"
+        "5,946"
       ],
       "live": null,
       "status": "UNCHECKED",
-      "excerpt": "5,100 tests collected"
+      "excerpt": "5,946 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 38,
       "quoted": [
-        "5,100"
+        "5,946"
       ],
       "live": null,
       "status": "UNCHECKED",
-      "excerpt": "5,100 tests collected"
+      "excerpt": "5,946 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "submission",
       "line": 229,
       "quoted": [
-        "5,100"
+        "5,946"
       ],
       "live": null,
       "status": "UNCHECKED",
-      "excerpt": "5,100 tests"
+      "excerpt": "5,946 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "submission",
-      "line": 373,
+      "line": 325,
       "quoted": [
-        "5,100"
+        "5,946"
       ],
       "live": null,
       "status": "UNCHECKED",
-      "excerpt": "5,100 tests collected"
+      "excerpt": "5,946 tests"
+    },
+    {
+      "claim": "tests_passing",
+      "doc": "submission",
+      "line": 418,
+      "quoted": [
+        "5,946"
+      ],
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "5,946 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 656,
       "quoted": [
-        "5,100"
+        "5,946"
       ],
       "live": null,
       "status": "UNCHECKED",
-      "excerpt": "5,100 tests"
+      "excerpt": "5,946 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1698,
       "quoted": [
-        "5,100"
+        "5,946"
       ],
       "live": null,
       "status": "UNCHECKED",
-      "excerpt": "5,100 tests collected"
+      "excerpt": "5,946 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1947,
       "quoted": [
-        "5,100"
+        "5,946"
       ],
       "live": null,
       "status": "UNCHECKED",
-      "excerpt": "5,100 tests collected"
+      "excerpt": "5,946 tests collected"
     },
     {
       "claim": "source_files",
@@ -137,7 +148,7 @@
     {
       "claim": "source_files",
       "doc": "submission",
-      "line": 373,
+      "line": 418,
       "quoted": [
         "287"
       ],
@@ -165,26 +176,26 @@
       "doc": "readme",
       "line": 12,
       "quoted": [
-        "156"
+        "176"
       ],
       "live": [
         176
       ],
       "status": "OK",
-      "excerpt": "156 claims across"
+      "excerpt": "176 claims across"
     },
     {
       "claim": "register_claims",
       "doc": "readme",
       "line": 171,
       "quoted": [
-        "156"
+        "176"
       ],
       "live": [
         176
       ],
       "status": "OK",
-      "excerpt": "156 falsifiable claims about"
+      "excerpt": "176 falsifiable claims about"
     },
     {
       "claim": "register_claims",
@@ -202,52 +213,65 @@
       "doc": "submission",
       "line": 83,
       "quoted": [
-        "156"
+        "176"
       ],
       "live": [
         176
       ],
       "status": "OK",
-      "excerpt": "156 claims across"
+      "excerpt": "176 claims across"
+    },
+    {
+      "claim": "register_claims",
+      "doc": "submission",
+      "line": 303,
+      "quoted": [
+        "176"
+      ],
+      "live": [
+        176
+      ],
+      "status": "OK",
+      "excerpt": "176 claims across"
     },
     {
       "claim": "register_claims",
       "doc": "explained",
       "line": 1808,
       "quoted": [
-        "156"
+        "176"
       ],
       "live": [
         176
       ],
       "status": "OK",
-      "excerpt": "156 claims across"
+      "excerpt": "176 claims across"
     },
     {
       "claim": "register_claims",
       "doc": "master-plan",
       "line": 410,
       "quoted": [
-        "156"
+        "176"
       ],
       "live": [
         176
       ],
       "status": "OK",
-      "excerpt": "156 claims across"
+      "excerpt": "176 claims across"
     },
     {
       "claim": "register_claims",
       "doc": "architecture",
       "line": 171,
       "quoted": [
-        "156"
+        "176"
       ],
       "live": [
         176
       ],
       "status": "OK",
-      "excerpt": "156 claims across"
+      "excerpt": "176 claims across"
     },
     {
       "claim": "refusal_accuracy_2h",
@@ -446,7 +470,7 @@
     {
       "claim": "governed_failure_rates",
       "doc": "submission",
-      "line": 392,
+      "line": 437,
       "quoted": [
         "99.5",
         "2.5"
@@ -498,26 +522,30 @@
       "doc": "readme",
       "line": 171,
       "quoted": [
-        "38"
+        "38",
+        "52"
       ],
       "live": [
-        38
+        38,
+        52
       ],
       "status": "OK",
-      "excerpt": "38 of the 48 proofs carry a Bitcoin"
+      "excerpt": "38 of the 52 proofs carry a Bitcoin"
     },
     {
       "claim": "anchors_confirmed",
       "doc": "explained",
       "line": 2539,
       "quoted": [
-        "38"
+        "38",
+        "52"
       ],
       "live": [
-        38
+        38,
+        52
       ],
       "status": "OK",
-      "excerpt": "38 of the 48 carry a Bitcoin"
+      "excerpt": "38 of the 52 carry a Bitcoin"
     },
     {
       "claim": "ledger_decisions",
@@ -587,7 +615,7 @@
     {
       "claim": "modules_importable",
       "doc": "submission",
-      "line": 374,
+      "line": 419,
       "quoted": [
         "131",
         "131"
@@ -673,7 +701,7 @@
     {
       "claim": "ledger_entries",
       "doc": "submission",
-      "line": 350,
+      "line": 395,
       "quoted": [
         "447"
       ],
@@ -1249,7 +1277,7 @@
     {
       "claim": "hurdle_qqq_rth",
       "doc": "submission",
-      "line": 365,
+      "line": 410,
       "quoted": [
         "48.3"
       ],

@@ -607,8 +607,18 @@ CLAIMS: tuple[Claim, ...] = (
     # was "anchored to Bitcoin" and verifiable "with the reference OpenTimestamps client" while all
     # 48 proofs were raw calendar receipts carrying only a pending attestation — unreadable by that
     # client, and not anchored to anything yet. Both are now true, and both are now checked.
-    Claim("anchors_confirmed", r"(?P<q>\d+) of the 48(?:\*\*)? (?:proofs )?carry a Bitcoin",
-          lambda: __import__("argus.register.anchorcheck", fromlist=["x"]).confirmed_anchors(),
+    # **The total was hard-coded into this guard's own pattern as `48`, so it stopped guarding the
+    # moment a proof was added.** The register grew to 52 and the sentence stopped matching, which
+    # the DELETED status reported — but had the sentence been left alone it would have read "38 of
+    # the 48" beside 52 proofs on disk, and this guard would have gone on passing it, because the
+    # literal it was checking against was in the regex rather than in the artefact. Both numbers
+    # are captured and both are checked now.
+    Claim("anchors_confirmed",
+          r"(?P<q1>\d+) of the (?P<q2>\d+)(?:\*\*)? (?:proofs )?carry a Bitcoin",
+          lambda: (
+              __import__("argus.register.anchorcheck", fromlist=["x"]).confirmed_anchors(),
+              __import__("argus.register.anchorcheck", fromlist=["x"]).check().total,
+          ),
           ("readme", "explained"), mode="lagging"),
     Claim("ledger_decisions",
           r"(?P<q>[\d,]+) decisions? in the paper ledger",

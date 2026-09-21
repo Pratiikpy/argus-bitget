@@ -24,7 +24,7 @@ Built for the Bitget AI Base Camp / Genesis Hackathon Season 2, across all three
 cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module + sub-theme coverage, resolved by import
-pytest -q                       # 5,100 tests collected
+pytest -q                       # 5,946 tests collected
 ```
 
 Nothing above needs a credential.
@@ -35,8 +35,8 @@ Nothing above needs a credential.
 
 | | |
 |---|---|
-| Tests | **5,100 tests collected**, 33 skipped — run `pytest -q` |
-| Type checking | **`mypy --strict` clean on 284 source files** |
+| Tests | **5,946 tests collected**, 33 skipped — run `pytest -q` |
+| Type checking | **`mypy --strict` clean on 287 source files** |
 | Lint | `ruff` clean |
 | Module health | **131/131 modules importable**, checked by `python -m argus.status` |
 | Sub-theme coverage | **18/18 sub-themes**, resolved by import at runtime — not claimed in prose |
