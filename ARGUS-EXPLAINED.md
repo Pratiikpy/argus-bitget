@@ -1122,7 +1122,7 @@ why.
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 447 decisions on record. Every one of them is a refusal, and 386 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 495 decisions on record. Every one of them is a refusal, and 386 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
 zero trades, those three numbers **do not exist**. Not "are zero" — do not exist. Half of the track
@@ -1941,7 +1941,7 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 139 files, 17 packages, 55,306 lines; `mypy --strict` clean on 291 source files |
+| Source modules | 139 files, 17 packages, 55,306 lines; `mypy --strict` clean on 292 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 129/129 modules importable |
 | Tests | 5,946 tests collected, 33 skipped, `ruff` clean |

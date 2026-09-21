@@ -21,7 +21,7 @@
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 27,
+      "line": 32,
       "quoted": [
         "5,946"
       ],
@@ -32,7 +32,7 @@
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 38,
+      "line": 43,
       "quoted": [
         "5,946"
       ],
@@ -111,65 +111,65 @@
       "doc": "readme",
       "line": 61,
       "quoted": [
-        "291"
+        "292"
       ],
       "live": [
-        291
+        292
       ],
       "status": "OK",
-      "excerpt": "strict clean on 291 source files"
+      "excerpt": "strict clean on 292 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
-      "line": 39,
+      "line": 44,
       "quoted": [
-        "291"
+        "292"
       ],
       "live": [
-        291
+        292
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 291 source files"
+      "excerpt": "strict` clean on 292 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 229,
       "quoted": [
-        "291"
+        "292"
       ],
       "live": [
-        291
+        292
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 291 files"
+      "excerpt": "strict` clean on 292 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 418,
       "quoted": [
-        "291"
+        "292"
       ],
       "live": [
-        291
+        292
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 291 source files"
+      "excerpt": "strict` clean across 292 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 1944,
       "quoted": [
-        "291"
+        "292"
       ],
       "live": [
-        291
+        292
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 291 source files"
+      "excerpt": "strict` clean on 292 source files"
     },
     {
       "claim": "register_claims",
@@ -291,7 +291,7 @@
     {
       "claim": "refusal_accuracy_2h",
       "doc": "public-readme",
-      "line": 96,
+      "line": 101,
       "quoted": [
         "92",
         "158"
@@ -319,7 +319,7 @@
     {
       "claim": "refusal_forgone_2h",
       "doc": "public-readme",
-      "line": 99,
+      "line": 104,
       "quoted": [
         "\u22127.9"
       ],
@@ -347,7 +347,7 @@
     {
       "claim": "standing_owned",
       "doc": "public-readme",
-      "line": 104,
+      "line": 109,
       "quoted": [
         "17",
         "24"
@@ -552,13 +552,13 @@
       "doc": "readme",
       "line": 63,
       "quoted": [
-        "447"
+        "495"
       ],
       "live": [
         495
       ],
       "status": "OK",
-      "excerpt": "447 decisions in the paper ledger"
+      "excerpt": "495 decisions in the paper ledger"
     },
     {
       "claim": "ledger_decisions",
@@ -600,7 +600,7 @@
     {
       "claim": "modules_importable",
       "doc": "public-readme",
-      "line": 41,
+      "line": 46,
       "quoted": [
         "131",
         "131"
@@ -645,7 +645,7 @@
     {
       "claim": "subthemes",
       "doc": "public-readme",
-      "line": 42,
+      "line": 47,
       "quoted": [
         "18",
         "18"
@@ -677,52 +677,52 @@
       "doc": "readme",
       "line": 63,
       "quoted": [
-        "447"
+        "495"
       ],
       "live": [
         495
       ],
       "status": "OK",
-      "excerpt": "447 decisions"
+      "excerpt": "495 decisions"
     },
     {
       "claim": "ledger_entries",
       "doc": "readme",
       "line": 228,
       "quoted": [
-        "447"
+        "495"
       ],
       "live": [
         495
       ],
       "status": "OK",
-      "excerpt": "447 ledger entries"
+      "excerpt": "495 ledger entries"
     },
     {
       "claim": "ledger_entries",
       "doc": "submission",
       "line": 395,
       "quoted": [
-        "447"
+        "495"
       ],
       "live": [
         495
       ],
       "status": "OK",
-      "excerpt": "447 decisions"
+      "excerpt": "495 decisions"
     },
     {
       "claim": "ledger_entries",
       "doc": "explained",
       "line": 1125,
       "quoted": [
-        "447"
+        "495"
       ],
       "live": [
         495
       ],
       "status": "OK",
-      "excerpt": "paper-trading log has 447 decisions"
+      "excerpt": "paper-trading log has 495 decisions"
     },
     {
       "claim": "settled_abstentions",

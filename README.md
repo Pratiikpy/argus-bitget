@@ -7,7 +7,12 @@ week** the anchor market is shut and price discovery attenuates rather than stop
 agents ask *what should I trade?* ARGUS asks a harder question: **should this decision-maker be
 trusted with capital right now?**
 
-Built for the Bitget AI Base Camp / Genesis Hackathon Season 2, across all three tracks.
+Built for the Bitget AI Base Camp / Genesis Hackathon Season 2. **The engine covers all three
+tracks and all eighteen sub-themes; exactly one track is entered.** Track 3 (AI Trading Desk)
+is filed. Track 2 (Agentic Trading) is **not**, and the reason is the thesis rather than the
+deadline: it is 50% quantitative, scored on paper-trading Sharpe, drawdown and win rate, and
+this desk has refused every one of its 495 decisions. Filing it would mean loosening the risk
+layer to manufacture a track record — breaking the exact property the system exists to hold.
 
 ---
 
@@ -36,7 +41,7 @@ Nothing above needs a credential.
 | | |
 |---|---|
 | Tests | **5,946 tests collected**, 33 skipped — run `pytest -q` |
-| Type checking | **`mypy --strict` clean on 291 source files** |
+| Type checking | **`mypy --strict` clean on 292 source files** |
 | Lint | `ruff` clean |
 | Module health | **131/131 modules importable**, checked by `python -m argus.status` |
 | Sub-theme coverage | **18/18 sub-themes**, resolved by import at runtime — not claimed in prose |
