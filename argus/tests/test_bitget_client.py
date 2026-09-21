@@ -167,17 +167,56 @@ class TestSafetyDefaults:
 
 
 class TestOrderGuards:
+    @staticmethod
+    def _authorised(order: Order):
+        """Wrap an order in the capability `place_order` now requires.
+
+        These two tests passed a bare `Order` and broke when `submit` began accepting only an
+        `Authorised` — the capability token that can be produced solely by a ruling that allowed
+        this exact symbol, side and quantity. They were asserting the *guards*, which still exist
+        and still fire; they were simply constructing the argument the old way.
+
+        Built through `ConstitutionRuling.authorise` rather than by hand, because constructing an
+        `Authorised` directly is refused by design and a test that found a way around that would
+        be testing a hole rather than the guard.
+        """
+        from argus.decision.verdicts import (
+            ConstitutionVerdict,
+            Intent,
+            Side,
+            Verdict,
+            apply_constraint,
+        )
+
+        intent = Intent(
+            symbol=order.symbol,
+            side=Side.SELL if order.side.upper() == "SELL" else Side.BUY,
+            quantity=Decimal(str(order.quantity)),
+            verdict=Verdict.TRADE,
+            stated_confidence=0.8,
+            thesis="fixture",
+            invalidation=("x",),
+        )
+        ruling = apply_constraint(
+            intent, verdict=ConstitutionVerdict.ALLOW,
+            binding_constraint="none", reason="nothing bound",
+        )
+        return ruling.authorise(order)
+
     def test_an_unauthorised_order_never_reaches_the_venue(self, client) -> None:
         """The last place this can be enforced."""
         order = Order("c-1", "NVDAUSDT", "SELL", Decimal("1"), "hash")
+        authorised = self._authorised(order)
+        # Blanked *after* authorisation, so the hash check is what has to catch it rather than
+        # the capability type — which is the guard this test is named for.
         object.__setattr__(order, "approved_intent_hash", "   ")
         with pytest.raises(BitgetOrderError, match="Constitution verdict"):
-            client.place_order(order)
+            client.place_order(authorised)
 
     def test_a_limit_order_without_a_price_is_refused(self, client) -> None:
         order = Order("c-2", "NVDAUSDT", "SELL", Decimal("1"), "hash-ok")
         with pytest.raises(BitgetOrderError, match="requires a price"):
-            client.place_order(order, order_type="limit")
+            client.place_order(self._authorised(order), order_type="limit")
 
 
 class TestCredentialDetection:

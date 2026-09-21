@@ -124,10 +124,22 @@ class TestTheSubmission:
 
 
 class TestTheProofsAreStoredVerbatim:
-    def test_the_raw_bytes_are_written_unchanged(
+    def test_the_receipt_is_preserved_inside_a_standard_wrapper(
         self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
     ) -> None:
-        """A proof reformatted for our convenience is a proof only we can verify."""
+        """**This test used to assert the defect, with a correct principle stated backwards.**
+
+        It read ``written[0].read_bytes() == payload`` under the docstring *"a proof reformatted
+        for our convenience is a proof only we can verify"*. The principle is right and the
+        conclusion was inverted: an ``.ots`` file is the calendar's timestamp **preceded by** the
+        header magic, a version, the file-hash op and the digest. Writing the bare receipt is not
+        fidelity to the format, it is omission of it, and the reference client rejected all 48
+        proofs on the magic because of it.
+
+        So the property asserted now is the one that was meant: the calendar's bytes reach disk
+        unaltered, *and* the file around them is the standard one. Both halves, or the claim that
+        anyone can verify the register without our cooperation is false again.
+        """
         import argus.paper.anchor as mod
 
         payload = b"\xf0\x08\x01\x02\x03"
@@ -135,7 +147,12 @@ class TestTheProofsAreStoredVerbatim:
         got = anchor(DIGEST, calendars=("https://x",), directory=tmp_path)
         written = list(tmp_path.glob("*.ots"))
         assert len(written) == 1
-        assert written[0].read_bytes() == payload
+        blob = written[0].read_bytes()
+        assert blob.endswith(payload), "the calendar's own bytes must reach disk unaltered"
+        assert blob.startswith(
+            b"\x00OpenTimestamps\x00\x00Proof\x00\xbf\x89\xe2\xe8\x84\xe8\x92\x94"
+        ), "and inside the file the reference client looks for"
+        assert DIGEST in blob, "attesting the digest that was actually anchored"
         assert got.anchored
 
     def test_a_manifest_is_written_beside_the_proofs(
