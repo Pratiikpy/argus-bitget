@@ -100,13 +100,17 @@ def training_rows() -> tuple[list[str], list[str]]:
     pool = json.loads(POOL_PATH.read_text(encoding="utf-8"))
     texts = [row["ask"] for row in pool["dev"]]
     labels = [row["expect"] for row in pool["dev"]]
-    for case in TUNED:
-        texts.append(case.ask)
-        labels.append(str(case.expect))
-    for case in CASES:
-        if str(case.expect) not in EXCLUDED_LABELS:
-            texts.append(case.ask)
-            labels.append(str(case.expect))
+    # `obliquebench.Case` and `luibench.Case` are two different classes that happen to share the
+    # two attributes used here. Chained into one loop variable they are a type error, and papering
+    # over it with a cast would hide the day one of them grows a third field this code needs.
+    # Flattened to the pair actually consumed instead.
+    for ask, expect in [
+        *((c.ask, str(c.expect)) for c in TUNED),
+        *((c.ask, str(c.expect)) for c in CASES),
+    ]:
+        if expect not in EXCLUDED_LABELS:
+            texts.append(ask)
+            labels.append(expect)
     keep = [i for i, label in enumerate(labels) if label not in EXCLUDED_LABELS]
     texts, labels = [texts[i] for i in keep], [labels[i] for i in keep]
 

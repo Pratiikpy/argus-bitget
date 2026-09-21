@@ -267,3 +267,12 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = ["riskfolio", "riskfolio.*", "cvxportfolio", "cvxportfolio.*"]
 ignore_missing_imports = true
+
+# `scikit-learn` ships no type stubs. It appears in exactly one module — `eval/ngramtrain.py`,
+# which FITS the console's n-gram classifier — and nothing on the shipped import path touches it:
+# `lui/ngram.py` scores in the standard library precisely because the deployed bundle carries no
+# dependencies at all. Same "eval-only, never imported by argus's own src/ code" boundary as
+# pandas/scipy/stumpy above.
+[[tool.mypy.overrides]]
+module = ["sklearn", "sklearn.*"]
+ignore_missing_imports = true
