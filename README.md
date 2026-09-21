@@ -36,7 +36,7 @@ Nothing above needs a credential.
 | | |
 |---|---|
 | Tests | **5,100 tests collected**, 33 skipped — run `pytest -q` |
-| Type checking | **`mypy --strict` clean on 283 source files** |
+| Type checking | **`mypy --strict` clean on 284 source files** |
 | Lint | `ruff` clean |
 | Module health | **131/131 modules importable**, checked by `python -m argus.status` |
 | Sub-theme coverage | **18/18 sub-themes**, resolved by import at runtime — not claimed in prose |

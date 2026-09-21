@@ -1,0 +1,268 @@
+{
+  "symbol": "NVDAUSDT",
+  "attempts_per_tool": 3,
+  "tools": 19,
+  "by_verdict": {
+    "reliable": 9,
+    "down": 10
+  },
+  "skills_total": 5,
+  "skills_with_a_reliable_tool": 3,
+  "reliable_skills": [
+    "macro-analyst",
+    "market-intel",
+    "technical-analysis"
+  ],
+  "results": [
+    {
+      "skill": "market-intel",
+      "tool": "defi_analytics",
+      "action": "tvl_rank",
+      "attempts": 3,
+      "answered": 3,
+      "rate": 1.0,
+      "verdict": "reliable",
+      "median_latency_s": 20.3,
+      "failures": []
+    },
+    {
+      "skill": "market-intel",
+      "tool": "network_status",
+      "action": "eth_gas",
+      "attempts": 3,
+      "answered": 3,
+      "rate": 1.0,
+      "verdict": "reliable",
+      "median_latency_s": 15.3,
+      "failures": []
+    },
+    {
+      "skill": "macro-analyst",
+      "tool": "rates_yields",
+      "action": "yield_curve",
+      "attempts": 3,
+      "answered": 3,
+      "rate": 1.0,
+      "verdict": "reliable",
+      "median_latency_s": 20.4,
+      "failures": []
+    },
+    {
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "action": "rsi",
+      "attempts": 3,
+      "answered": 3,
+      "rate": 1.0,
+      "verdict": "reliable",
+      "median_latency_s": 0.4,
+      "failures": []
+    },
+    {
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "action": "macd",
+      "attempts": 3,
+      "answered": 3,
+      "rate": 1.0,
+      "verdict": "reliable",
+      "median_latency_s": 0.4,
+      "failures": []
+    },
+    {
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "action": "atr",
+      "attempts": 3,
+      "answered": 3,
+      "rate": 1.0,
+      "verdict": "reliable",
+      "median_latency_s": 0.4,
+      "failures": []
+    },
+    {
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "action": "bollinger",
+      "attempts": 3,
+      "answered": 3,
+      "rate": 1.0,
+      "verdict": "reliable",
+      "median_latency_s": 0.4,
+      "failures": []
+    },
+    {
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "action": "support_resistance",
+      "attempts": 3,
+      "answered": 3,
+      "rate": 1.0,
+      "verdict": "reliable",
+      "median_latency_s": 0.4,
+      "failures": []
+    },
+    {
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "action": "ma",
+      "attempts": 3,
+      "answered": 3,
+      "rate": 1.0,
+      "verdict": "reliable",
+      "median_latency_s": 0.4,
+      "failures": []
+    },
+    {
+      "skill": "macro-analyst",
+      "tool": "cross_asset",
+      "action": "correlation",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 40.3,
+      "failures": [
+        "bitget:cross_asset: tool reported an error (Error executing tool cross_asset: )",
+        "bitget:cross_asset: tool reported an error (Error executing tool cross_asset: )",
+        "bitget:cross_asset: tool reported an error (Error executing tool cross_asset: )"
+      ]
+    },
+    {
+      "skill": "market-intel",
+      "tool": "crypto_market",
+      "action": "trending",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 30.3,
+      "failures": [
+        "bitget:crypto_market: tool reported an error (Error executing tool crypto_market: ConnectTimeout('')",
+        "bitget:crypto_market: tool reported an error (Error executing tool crypto_market: ConnectTimeout('')",
+        "bitget:crypto_market: tool reported an error (Error executing tool crypto_market: ConnectTimeout('')"
+      ]
+    },
+    {
+      "skill": "sentiment-analyst",
+      "tool": "derivatives_sentiment",
+      "action": "long_short",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 15.4,
+      "failures": [
+        "bitget:derivatives_sentiment: reachable, returned no data",
+        "bitget:derivatives_sentiment: reachable, returned no data",
+        "bitget:derivatives_sentiment: reachable, returned no data"
+      ]
+    },
+    {
+      "skill": "sentiment-analyst",
+      "tool": "derivatives_sentiment",
+      "action": "open_interest",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 15.3,
+      "failures": [
+        "bitget:derivatives_sentiment: reachable, returned no data",
+        "bitget:derivatives_sentiment: reachable, returned no data",
+        "bitget:derivatives_sentiment: reachable, returned no data"
+      ]
+    },
+    {
+      "skill": "sentiment-analyst",
+      "tool": "derivatives_sentiment",
+      "action": "taker_ratio",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 15.3,
+      "failures": [
+        "bitget:derivatives_sentiment: reachable, returned no data",
+        "bitget:derivatives_sentiment: reachable, returned no data",
+        "bitget:derivatives_sentiment: reachable, returned no data"
+      ]
+    },
+    {
+      "skill": "macro-analyst",
+      "tool": "global_assets",
+      "action": "price",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 15.3,
+      "failures": [
+        "bitget:global_assets: tool reported an error (Error executing tool global_assets: )",
+        "bitget:global_assets: tool reported an error (Error executing tool global_assets: )",
+        "bitget:global_assets: tool reported an error (Error executing tool global_assets: )"
+      ]
+    },
+    {
+      "skill": "macro-analyst",
+      "tool": "macro_indicators",
+      "action": "latest_release",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 20.3,
+      "failures": [
+        "bitget:macro_indicators: reachable, returned no data",
+        "bitget:macro_indicators: reachable, returned no data",
+        "bitget:macro_indicators: reachable, returned no data"
+      ]
+    },
+    {
+      "skill": "news-briefing",
+      "tool": "news_feed",
+      "action": "latest",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 20.7,
+      "failures": [
+        "bitget:news_feed: reachable, returned no data",
+        "bitget:news_feed: reachable, returned no data",
+        "bitget:news_feed: reachable, returned no data"
+      ]
+    },
+    {
+      "skill": "sentiment-analyst",
+      "tool": "sentiment_index",
+      "action": "current",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 30.3,
+      "failures": [
+        "bitget:sentiment_index: reachable, returned no data",
+        "bitget:sentiment_index: reachable, returned no data",
+        "bitget:sentiment_index: reachable, returned no data"
+      ]
+    },
+    {
+      "skill": "news-briefing",
+      "tool": "tradfi_news",
+      "action": "earnings",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 15.3,
+      "failures": [
+        "bitget:tradfi_news: reachable, returned no data",
+        "bitget:tradfi_news: reachable, returned no data",
+        "bitget:tradfi_news: reachable, returned no data"
+      ]
+    }
+  ],
+  "scope_statement": "Each of Bitget's 19 official research-Skill tools is called 3 times, 2.0s apart, through the same client the desk uses, and classified reliable / intermittent / down. NOT CLAIMED: that 3 attempts characterise a service \u2014 they distinguish always from sometimes from never and nothing finer. NOT CLAIMED: that a failure is Bitget's fault; the failures observed carry the service's own error envelopes, including an explicit ConnectTimeout from its upstream, so the most this says is that the door was shut when we knocked."
+}

@@ -15,7 +15,7 @@
         "5,100"
       ],
       "live": [
-        5895
+        5907
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -28,7 +28,7 @@
         "5,100"
       ],
       "live": [
-        5895
+        5907
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -41,7 +41,7 @@
         "5,100"
       ],
       "live": [
-        5895
+        5907
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -54,7 +54,7 @@
         "5,100"
       ],
       "live": [
-        5895
+        5907
       ],
       "status": "OK",
       "excerpt": "5,100 tests"
@@ -67,7 +67,7 @@
         "5,100"
       ],
       "live": [
-        5895
+        5907
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -75,12 +75,12 @@
     {
       "claim": "tests_passing",
       "doc": "explained",
-      "line": 654,
+      "line": 656,
       "quoted": [
         "5,100"
       ],
       "live": [
-        5895
+        5907
       ],
       "status": "OK",
       "excerpt": "5,100 tests"
@@ -88,12 +88,12 @@
     {
       "claim": "tests_passing",
       "doc": "explained",
-      "line": 1696,
+      "line": 1698,
       "quoted": [
         "5,100"
       ],
       "live": [
-        5895
+        5907
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -101,12 +101,12 @@
     {
       "claim": "tests_passing",
       "doc": "explained",
-      "line": 1945,
+      "line": 1947,
       "quoted": [
         "5,100"
       ],
       "live": [
-        5895
+        5907
       ],
       "status": "OK",
       "excerpt": "5,100 tests collected"
@@ -116,65 +116,65 @@
       "doc": "readme",
       "line": 61,
       "quoted": [
-        "283"
+        "284"
       ],
       "live": [
-        283
+        284
       ],
       "status": "OK",
-      "excerpt": "strict clean on 283 source files"
+      "excerpt": "strict clean on 284 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 39,
       "quoted": [
-        "283"
+        "284"
       ],
       "live": [
-        283
+        284
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 283 source files"
+      "excerpt": "strict` clean on 284 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 180,
       "quoted": [
-        "283"
+        "284"
       ],
       "live": [
-        283
+        284
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 283 files"
+      "excerpt": "strict` clean on 284 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 324,
       "quoted": [
-        "283"
+        "284"
       ],
       "live": [
-        283
+        284
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 283 source files"
+      "excerpt": "strict` clean across 284 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
-      "line": 1942,
+      "line": 1944,
       "quoted": [
-        "283"
+        "284"
       ],
       "live": [
-        283
+        284
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 283 source files"
+      "excerpt": "strict` clean on 284 source files"
     },
     {
       "claim": "register_claims",
@@ -229,7 +229,7 @@
     {
       "claim": "register_claims",
       "doc": "explained",
-      "line": 1806,
+      "line": 1808,
       "quoted": [
         "156"
       ],
@@ -426,7 +426,7 @@
     {
       "claim": "anchors_confirmed",
       "doc": "explained",
-      "line": 2537,
+      "line": 2539,
       "quoted": [
         "38"
       ],
@@ -603,7 +603,7 @@
     {
       "claim": "ledger_entries",
       "doc": "explained",
-      "line": 1123,
+      "line": 1125,
       "quoted": [
         "447"
       ],
@@ -638,7 +638,7 @@
     {
       "claim": "settled_abstentions",
       "doc": "explained",
-      "line": 1123,
+      "line": 1125,
       "quoted": [
         "386"
       ],
@@ -686,7 +686,7 @@
     {
       "claim": "t1_beat_buy_and_hold",
       "doc": "explained",
-      "line": 1544,
+      "line": 1546,
       "quoted": [
         "12"
       ],
@@ -710,7 +710,7 @@
     {
       "claim": "t1_dsr_candidates",
       "doc": "explained",
-      "line": 1554,
+      "line": 1556,
       "quoted": [
         "2"
       ],
@@ -723,7 +723,7 @@
     {
       "claim": "t1_rolling_scorable",
       "doc": "explained",
-      "line": 1568,
+      "line": 1570,
       "quoted": [
         "1,107",
         "2,129"
@@ -738,7 +738,7 @@
     {
       "claim": "t1_rolling_scorable_worst",
       "doc": "explained",
-      "line": 1570,
+      "line": 1572,
       "quoted": [
         "308"
       ],
@@ -751,7 +751,7 @@
     {
       "claim": "t1_dsr_survivors",
       "doc": "explained",
-      "line": 2853,
+      "line": 2855,
       "quoted": [
         "Zero"
       ],
@@ -775,7 +775,7 @@
     {
       "claim": "t1_oos_breaches",
       "doc": "explained",
-      "line": 1590,
+      "line": 1592,
       "quoted": [
         "8"
       ],
@@ -810,7 +810,7 @@
     {
       "claim": "arbitrage_monetisable",
       "doc": "explained",
-      "line": 1434,
+      "line": 1436,
       "quoted": [
         "4.58"
       ],
@@ -834,7 +834,7 @@
     {
       "claim": "weekend_continuation",
       "doc": "explained",
-      "line": 1461,
+      "line": 1463,
       "quoted": [
         "57.7"
       ],
@@ -888,7 +888,7 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "explained",
-      "line": 471,
+      "line": 473,
       "quoted": [
         "10",
         "11"
@@ -903,7 +903,7 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "explained",
-      "line": 1491,
+      "line": 1493,
       "quoted": [
         "10",
         "11"
@@ -1055,7 +1055,7 @@
     {
       "claim": "hurdle_symbols_clearing_rth",
       "doc": "explained",
-      "line": 1138,
+      "line": 1140,
       "quoted": [
         "eleven"
       ],
@@ -1121,7 +1121,7 @@
     {
       "claim": "hurdle_clearing_range",
       "doc": "explained",
-      "line": 1137,
+      "line": 1139,
       "quoted": [
         "61",
         "89"
@@ -1203,7 +1203,7 @@
     {
       "claim": "teardowns",
       "doc": "explained",
-      "line": 569,
+      "line": 571,
       "quoted": [
         "61"
       ],
@@ -1229,7 +1229,7 @@
     {
       "claim": "pbo_range",
       "doc": "explained",
-      "line": 1957,
+      "line": 1959,
       "quoted": [
         "0.11",
         "0.77"
@@ -1244,7 +1244,7 @@
     {
       "claim": "pbo_worst",
       "doc": "explained",
-      "line": 2175,
+      "line": 2177,
       "quoted": [
         "0.77"
       ],
@@ -1257,7 +1257,7 @@
     {
       "claim": "fdr_trials",
       "doc": "explained",
-      "line": 2143,
+      "line": 2145,
       "quoted": [
         "0",
         "300"
@@ -1272,7 +1272,7 @@
     {
       "claim": "mintrl_range",
       "doc": "explained",
-      "line": 1959,
+      "line": 1961,
       "quoted": [
         "0.47",
         "3.52"
@@ -1287,7 +1287,7 @@
     {
       "claim": "brier_index",
       "doc": "explained",
-      "line": 1954,
+      "line": 1956,
       "quoted": [
         "51.8"
       ],
@@ -1300,7 +1300,7 @@
     {
       "claim": "brier_index",
       "doc": "explained",
-      "line": 2031,
+      "line": 2033,
       "quoted": [
         "51.8"
       ],
@@ -1313,7 +1313,7 @@
     {
       "claim": "skill_vs_climatology",
       "doc": "explained",
-      "line": 2033,
+      "line": 2035,
       "quoted": [
         "6.4"
       ],
@@ -1326,7 +1326,7 @@
     {
       "claim": "hurdle_break_even",
       "doc": "explained",
-      "line": 2218,
+      "line": 2220,
       "quoted": [
         "56.0"
       ],
@@ -1339,7 +1339,7 @@
     {
       "claim": "hurdle_median_move",
       "doc": "explained",
-      "line": 2216,
+      "line": 2218,
       "quoted": [
         "137"
       ],
@@ -1352,7 +1352,7 @@
     {
       "claim": "xs_trials",
       "doc": "explained",
-      "line": 1664,
+      "line": 1666,
       "quoted": [
         "80"
       ],
@@ -1365,7 +1365,7 @@
     {
       "claim": "xs_backtests",
       "doc": "explained",
-      "line": 1665,
+      "line": 1667,
       "quoted": [
         "1,336"
       ],
@@ -1378,7 +1378,7 @@
     {
       "claim": "xs_positive_gross",
       "doc": "explained",
-      "line": 1666,
+      "line": 1668,
       "quoted": [
         "31"
       ],
@@ -1391,7 +1391,7 @@
     {
       "claim": "xs_positive_net",
       "doc": "explained",
-      "line": 1667,
+      "line": 1669,
       "quoted": [
         "4"
       ],
@@ -1404,7 +1404,7 @@
     {
       "claim": "xs_phase_agreement",
       "doc": "explained",
-      "line": 1669,
+      "line": 1671,
       "quoted": [
         "0"
       ],
@@ -1428,7 +1428,7 @@
     {
       "claim": "overfit_noise_primitives",
       "doc": "explained",
-      "line": 559,
+      "line": 561,
       "quoted": [
         "Six"
       ],
