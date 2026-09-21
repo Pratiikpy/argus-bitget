@@ -342,6 +342,7 @@ class TestTheLiveRegisterIsHonest:
             "Net executable arbitrage vs. a fee-blind detector",
             "Path-shape matching with a calibrated null",
             "Per-profile mandate that changes the verdict",
+            "Perception layer: what the desk can see",
             "Pre-registered trading protocol, hash-committed",
             "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
             "Typed factor grammar with no execution surface",

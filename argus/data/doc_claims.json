@@ -326,30 +326,30 @@
       "doc": "readme",
       "line": 437,
       "quoted": [
-        "16",
+        "17",
         "24"
       ],
       "live": [
-        16,
+        17,
         24
       ],
       "status": "OK",
-      "excerpt": "16 of 24 capabilities are OWNED"
+      "excerpt": "17 of 24 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
       "doc": "public-readme",
       "line": 104,
       "quoted": [
-        "16",
+        "17",
         "24"
       ],
       "live": [
-        16,
+        17,
         24
       ],
       "status": "OK",
-      "excerpt": "16 of 24 capabilities are OWNED"
+      "excerpt": "17 of 24 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -357,7 +357,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        16,
+        17,
         24
       ],
       "status": "ABSENT",
@@ -369,7 +369,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        16,
+        17,
         24
       ],
       "status": "ABSENT",

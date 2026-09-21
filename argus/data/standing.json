@@ -1937,7 +1937,7 @@
       "name": "Perception layer: what the desk can see",
       "subtheme": "t3-datasources",
       "module": "argus/market/evidence.py,argus/market/volatility.py,argus/market/macro.py,argus/eval/feedlist_comparison.py,argus/eval/baselines/tradingagents_feedlist_loader.py,argus/eval/baselines/tradingagents_feedlist_interface.py,argus/eval/baselines/tradingagents_feedlist_errors.py,argus/eval/baselines/tradingagents_feedlist_config.py,argus/eval/baselines/tradingagents_feedlist_default_config.py",
-      "state": "implemented",
+      "state": "owned",
       "baseline": "OpenBB-finance/OpenBB provider set; TauricResearch/TradingAgents feed list",
       "conditions_met": [
         "best_implementation_studied",
@@ -2018,8 +2018,8 @@
         },
         {
           "condition": "failure_cases_documented",
-          "how": "each feed's outage is a status line the decision carries, and four of five official Bitget Skills are recorded as dead upstream rather than omitted; the feed-list comparison's own SCOPE_STATEMENT states in writing what is NOT claimed \u2014 that TradingAgents' raise-on-core-failure design is a defect, only that ARGUS's own design cannot be aborted by one live source the same way",
-          "artefact": "data/bitget_skills_health.json",
+          "how": "every tool that does not answer is named, with the service's own error text attached: 10 of 19 are recorded down across three separated attempts, carrying envelopes like `Error executing tool cross_asset` and an explicit upstream ConnectTimeout. Repointed from the single-sweep artefact on 2026-09-21: that file recorded 6 ok / 10 empty / 3 tool_error one day and 6 ok / 13 timeout the next, from the same code against the same endpoint, so it could not distinguish a dead tool from an unlucky call. Repeating the measurement showed 9 of 19 answer three for three \u2014 the snapshot was understating the integration \u2014 and produced a failure set that is stable rather than whichever error happened to occur. The feed-list comparison's SCOPE_STATEMENT still states what is NOT claimed: not that TradingAgents' raise-on-core-failure design is a defect, only that ARGUS's own design cannot be aborted by one live source the same way",
+          "artefact": "data/skill_reliability.json",
           "test": ""
         },
         {
@@ -2581,8 +2581,8 @@
   "by_state": {
     "lost": 0,
     "tied": 0,
-    "implemented": 8,
-    "owned": 16
+    "implemented": 7,
+    "owned": 17
   },
   "findings": [
     {
@@ -2599,11 +2599,6 @@
       "capability": "Risk layer proved by domain sweep",
       "problem": "failure_cases_documented is claimed but not evidenced",
       "detail": "data/risk_layer_comparison.json records nothing about failure_cases_documented: no key among failure, failures, failure_cases, misses, limitation, limitations..."
-    },
-    {
-      "capability": "Perception layer: what the desk can see",
-      "problem": "failure_cases_documented is claimed but not evidenced",
-      "detail": "data/bitget_skills_health.json records nothing about failure_cases_documented: no key among failure, failures, failure_cases, misses, limitation, limitations..."
     },
     {
       "capability": "Market sentiment",

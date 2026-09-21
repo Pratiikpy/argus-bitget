@@ -3319,11 +3319,14 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/tradingagents_feedlist_config.py,"
             "argus/eval/baselines/tradingagents_feedlist_default_config.py"
         ),
-        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
-        # instead of checking that files existed: failure_cases_documented is claimed here and the
-        # artefact records nothing about it. Restore OWNED by making the artefact
-        # carry the evidence, not by editing this line.
-        state=State.IMPLEMENTED,
+        # Demoted from OWNED on 2026-09-20 when `verify()` began opening the artefacts: the
+        # failure_cases_documented proof pointed at data/bitget_skills_health.json, which records
+        # a health state per tool and no failure cases. Restored on 2026-09-21 the way that
+        # comment demanded — by making an artefact carry the evidence, not by editing the state.
+        # `eval/skillreliability.py` calls every tool three times and names all 10 that never
+        # answer, each with the service's own error text. `verify()` confirms it; nothing here
+        # was loosened.
+        state=State.OWNED,
         baseline="OpenBB-finance/OpenBB provider set; TauricResearch/TradingAgents feed list",
         proofs=(
             Proof(
@@ -3425,13 +3428,21 @@ REGISTER: tuple[Capability, ...] = (
             Proof(
                 condition="failure_cases_documented",
                 how=(
-                    "each feed's outage is a status line the decision carries, and four of five "
-                    "official Bitget Skills are recorded as dead upstream rather than omitted; "
-                    "the feed-list comparison's own SCOPE_STATEMENT states in writing what is NOT "
-                    "claimed — that TradingAgents' raise-on-core-failure design is a defect, only "
-                    "that ARGUS's own design cannot be aborted by one live source the same way"
+                    "every tool that does not answer is named, with the service's own error text "
+                    "attached: 10 of 19 are recorded down across three separated attempts, "
+                    "carrying envelopes like `Error executing tool cross_asset` and an explicit "
+                    "upstream ConnectTimeout. Repointed from the single-sweep artefact on "
+                    "2026-09-21: that file recorded 6 ok / 10 empty / 3 tool_error one day and 6 "
+                    "ok / 13 timeout the next, from the same code against the same endpoint, so "
+                    "it could not distinguish a dead tool from an unlucky call. Repeating the "
+                    "measurement showed 9 of 19 answer three for three — the snapshot was "
+                    "understating the integration — and produced a failure set that is stable "
+                    "rather than whichever error happened to occur. The feed-list comparison's "
+                    "SCOPE_STATEMENT still states what is NOT claimed: not that TradingAgents' "
+                    "raise-on-core-failure design is a defect, only that ARGUS's own design "
+                    "cannot be aborted by one live source the same way"
                 ),
-                artefact="data/bitget_skills_health.json",
+                artefact="data/skill_reliability.json",
             ),
             Proof(
                 condition="reproducibility_proven",
