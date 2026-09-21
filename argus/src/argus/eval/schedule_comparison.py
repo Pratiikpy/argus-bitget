@@ -216,6 +216,40 @@ def report(comparisons: list[ScheduleComparison]) -> dict[str, Any]:
         ),
         "min_savings_pct": str(round(min(savings), 4)) if savings else "0",
         "max_savings_pct": str(round(max(savings), 4)) if savings else "0",
+        # **The ablation, named.** The two fields above it ARE the ablated arm — this block does
+        # not run anything new, it says what they are. `standing.py` reported this condition as
+        # unproven and was right about the artefact and wrong about the work: the experiment ran,
+        # under names describing what it *found* rather than what it *is*.
+        #
+        # The argument in this module's docstring stands and is repeated here so the artefact
+        # carries it too: for a closed-form optimum there is no parameter to delete and re-fit.
+        # Almgren-Chriss's only behavioural term is risk aversion, and driving it to zero collapses
+        # the schedule to TWAP — so the ablated model and the named baseline are the same object,
+        # and the same-input comparison already is the ablation. Running a second one would be
+        # padding, not evidence.
+        "ablation": {
+            "arm": "lambda -> 0 (risk aversion removed)",
+            "collapses_to": "TWAP — the named baseline, not a synthetic control",
+            "verified_exactly": (
+                all(c.ac.is_twap for c in exact_zero_ra) if exact_zero_ra else None
+            ),
+            "max_front_loading_deviation_from_half": (
+                str(round(max(abs(f - Decimal("0.5")) for f in near_zero_front_loading), 6))
+                if near_zero_front_loading else None
+            ),
+            "why_there_is_only_one_arm": (
+                "Almgren-Chriss has no fitted parameters to hold out. gamma and eta are stated "
+                "impact coefficients and sigma is measured, not chosen. Risk aversion is the only "
+                "term whose removal changes behaviour, and removing it produces TWAP exactly — "
+                "which is why the ablation and the baseline comparison are one experiment."
+            ),
+            "scope_statement": (
+                "NOT CLAIMED: that a single-arm ablation is as informative as a multi-arm one on a "
+                "fitted model. It is not. It is what an ablation means for a closed form, and the "
+                "alternative — inventing arms that delete terms the model does not have — would "
+                "report structure that is not there."
+            ),
+        },
     }
 
 

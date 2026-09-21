@@ -543,8 +543,55 @@ def compare_real_symbols(
         "in_sample": _tally(is_checkpoints).as_dict(),
         "out_of_sample": _tally(oos_checkpoints).as_dict(),
         "protection_ablation": protection_ablation(all_checkpoints),
+        "failure_cases": _failure_cases(per_symbol, all_checkpoints),
         "cost_bps_applied_per_trade": str(_cost_bps()),
         "checkpoints_total": len(all_checkpoints),
+    }
+
+
+def _failure_cases(
+    per_symbol: Mapping[str, Any], checkpoints: Sequence[Checkpoint]
+) -> dict[str, Any]:
+    """Where freqtrade locked and ARGUS did not — this capability's documented misses.
+
+    **The number was always here and was never called what it is.** ``_tally`` has always reported
+    ``freqtrade_only``, and every one of those checkpoints is a moment the named baseline protected
+    the book and we did not. The artefact reported it beside ``argus_only`` as one half of an
+    agreement statistic, which is a true framing and a comfortable one; `standing.py` asked for
+    failure cases, found no key, and was right to.
+
+    Nothing new is computed. This selects the same checkpoints and names them.
+
+    **Why these are not simply bugs.** ARGUS and freqtrade measure different things — ARGUS reads
+    realised drawdown directly, freqtrade infers it from closed trades — so a freqtrade-only lock
+    can be a false positive on its side rather than a miss on ours, and the measurement-architecture
+    block quantifies exactly that. They are reported as misses anyway, because deciding which of
+    them were "really" our fault is the kind of judgement the author of the system should not be
+    making about their own misses.
+    """
+    # The predicate is `_tally`'s, not a re-derivation of it. The first version of this function
+    # invented the attribute name `freqtrade_locked` — the real one is `freqtrade_risk_locked` —
+    # and silently reported **zero** failure cases beside an `overall` block saying 32. A guessed
+    # field name that happens to be absent reads exactly like a clean result.
+    only = [c for c in checkpoints if c.freqtrade_risk_locked and not c.argus_locked]
+    by_symbol: dict[str, int] = {}
+    for check in only:
+        symbol = check.symbol
+        by_symbol[symbol] = by_symbol.get(symbol, 0) + 1
+    return {
+        "definition": "checkpoints where freqtrade locked the book and ARGUS did not",
+        "count": len(only),
+        "of_checkpoints": len(checkpoints),
+        "rate": round(len(only) / len(checkpoints), 4) if checkpoints else 0.0,
+        "by_symbol": dict(sorted(by_symbol.items(), key=lambda kv: -kv[1])),
+        "symbols_with_none": sorted(set(per_symbol) - set(by_symbol)),
+        "scope_statement": (
+            "NOT CLAIMED: that every one is an ARGUS defect. The two systems measure drawdown "
+            "differently — ARGUS from realised equity, freqtrade inferred from closed trades — so "
+            "some of these are the baseline locking on a signal that was not there. NOT CLAIMED: "
+            "that the converse column (argus_only) cancels them out; a miss and an extra catch are "
+            "different events and averaging them into an agreement rate hides both."
+        ),
     }
 
 

@@ -2596,11 +2596,6 @@
       "detail": "data/track1_study.json records nothing about failure_cases_documented: no key among failure, failures, failure_cases, misses, limitation, limitations..."
     },
     {
-      "capability": "Risk layer proved by domain sweep",
-      "problem": "failure_cases_documented is claimed but not evidenced",
-      "detail": "data/risk_layer_comparison.json records nothing about failure_cases_documented: no key among failure, failures, failure_cases, misses, limitation, limitations..."
-    },
-    {
       "capability": "Market sentiment",
       "problem": "out_of_sample_test is claimed but not evidenced",
       "detail": "data/sentiment_comparison.json records nothing about out_of_sample_test: no key among out_of_sample, oos, holdout, held_out, heldout, train..."
@@ -2619,11 +2614,6 @@
       "capability": "Self-evolving review rules",
       "problem": "out_of_sample_test is claimed but not evidenced",
       "detail": "data/review_report.json records nothing about out_of_sample_test: no key among out_of_sample, oos, holdout, held_out, heldout, train..."
-    },
-    {
-      "capability": "Session-aware execution that refuses to solve through a boundary",
-      "problem": "ablation is claimed but not evidenced",
-      "detail": "data/schedule_comparison.json records nothing about ablation: no key among ablation, ablations, ablated, arms, variant, without..."
     }
   ],
   "clean": false,
