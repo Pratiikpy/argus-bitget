@@ -629,9 +629,30 @@ def j_t2_risk_control() -> Finding:
             f"reachable and correct; what is missing is live exercise, and that is downstream of "
             f"the desk never proposing a position rather than of anything in the layer."
         )
+    rival = ""
+    comp = _load_json("risk_layer_comparison.json")
+    if comp is not None:
+        ma = comp["measurement_architecture"]
+        # freqtrade's own PrecisionRecallProtection is a PROXY (a simulated equity curve) for the
+        # thing that actually matters — the real drawdown ground truth. ARGUS measures the ground
+        # truth directly. The correlation between freqtrade's proxy and that ground truth is the
+        # whole question: a weak one means no amount of re-tuning freqtrade's threshold reads as a
+        # deliberate design choice, because the signal it is tuned against barely tracks reality.
+        rival = (
+            f" · measured against freqtrade's real PrecisionRecallProtection on "
+            f"{ma['n_checkpoints']} checkpoints: freqtrade's own proxy correlates with the real "
+            f"drawdown ground truth at r={ma['freqtrade_proxy_vs_truth_correlation']} (weak); at "
+            f"full recall ARGUS's real precision is {ma['argus_real_point']['precision']:.1%} "
+            f"against freqtrade's best swept precision of "
+            f"{ma['freqtrade_best_precision_at_full_recall']:.1%}, dominating every threshold "
+            f"swept ({ma['argus_dominates_every_swept_threshold']}). Out-of-sample agreement "
+            f"between the two systems' real lock decisions: "
+            f"{comp['real_symbols']['out_of_sample']['agreement_rate']:.1%} on "
+            f"{comp['real_symbols']['out_of_sample']['n']} held-out checkpoints"
+        )
     return Finding(
         RUNS if fired else WEAK,
-        f"the risk layer's effect is counted rather than claimed: {lines[:260]}{swept}",
+        f"the risk layer's effect is counted rather than claimed: {lines[:260]}{swept}{rival}",
         "data/risk_proof.json",
     )
 

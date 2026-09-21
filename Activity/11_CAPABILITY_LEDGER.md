@@ -23,7 +23,7 @@ carries a result.**
 | 6 | `t2-open-evaluation` | T2 | subtheme | IMPLEMENTED (weak) | — | no | — | — |
 | 7 | `t2-sharpe-mdd-winrate` | T2 | judging | NOT DEMONSTRATED | — | no | — | — |
 | 8 | `t2-explainability` | T2 | judging | IMPLEMENTED | — | no | — | — |
-| 9 | `t2-risk-control` | T2 | judging | IMPLEMENTED (weak) | — | no | — | — |
+| 9 | `t2-risk-control` | T2 | judging | IMPLEMENTED (weak) | freqtrade PrecisionRecallProtection | **yes** | ARGUS (precision 59.2% vs 19.3% at full recall, dominates every threshold) | 2026-09-21 |
 | 10 | `t2-architecture` | T2 | judging | IMPLEMENTED | — | no | — | — |
 | 11 | `info-extraction` | T3 | subtheme | IMPLEMENTED | — | no | — | — |
 | 12 | `review-self-evolution` | T3 | subtheme | IMPLEMENTED | — | no | — | — |
@@ -38,10 +38,13 @@ carries a result.**
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 6 of 20 as of 2026-09-21: 3 LOST (one of them split — LUI intent
+**`rival run` is `yes` on 7 of 20 as of 2026-09-21: 3 LOST (one of them split — LUI intent
 accuracy loses to Rasa's DIET classifier, p=0.0014, while ARGUS wins out-of-scope refusal
-separately and significantly, p=0.031, neither laundering the other), 2 real wins (earnings vs
-QuantConnect, factor-discovery vs Microsoft RD-Agent), 1 methodological (event-driven vs
+separately and significantly, p=0.031, neither laundering the other), 3 real wins (earnings vs
+QuantConnect, factor-discovery vs Microsoft RD-Agent, risk-control vs freqtrade's real
+PrecisionRecallProtection — ARGUS's precision at full recall is 59.2% against freqtrade's best
+swept 19.3%, dominating every threshold, and freqtrade's own proxy correlates only weakly
+(r=0.26) with the real drawdown ground truth it approximates), 1 methodological (event-driven vs
 whale-signals — neither system establishes a real effect on this data; the finding is that
 whale-signals tests against the wrong null, not that ARGUS's own number beats theirs, and no
 fabricated score is recorded for it).** That is this ledger's honest scoreboard — it names whether
