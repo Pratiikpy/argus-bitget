@@ -42,6 +42,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
+from random import Random
 from statistics import fmean, pstdev
 from typing import Any
 
@@ -52,6 +53,16 @@ DATA = Path(__file__).resolve().parents[3] / "data"
 REPORT_PATH = DATA / "profile_value.json"
 
 MIN_INSTANTS = 200
+SKILL_TRIALS = 20_000
+"""Permutation draws behind :attr:`ProfileResult.skill_p_value`. Fixed, so it reproduces."""
+
+SKILL_SEED = 20260921
+"""Seeded so two runs on the same outcomes agree. A significance test that moves between runs is
+one more number a reader has to take on trust."""
+
+SKILL_ALPHA = 0.05
+"""Stated here rather than inline so a reader can disagree with it in one place."""
+
 BAD_CASE_SIGMAS = 2.0
 """How many trailing standard deviations the thesis concedes in its bad case.
 
@@ -127,6 +138,48 @@ class ProfileResult:
         return self.taken_value * (1.0 - self.refusal_rate) - self.take_everything
 
     @property
+    def skill_p_value(self) -> float | None:
+        """How often refusing *at random*, at this mandate's own rate, does at least this well.
+
+        **Without this the verdict below was a check that could not fail.** Any gain above zero
+        read as "earned its keep", however small and however few refusals produced it. The first
+        run of this module reported +0.35bps off **72 refusals out of 4,528** and called it earned;
+        the test says random refusal matches or beats that in most draws, so the number was noise
+        wearing a conclusion.
+
+        The null is deliberately the narrow one: *this mandate's refusal rate, applied to these
+        same outcomes, with the choice of which to refuse made at random.* It therefore asks only
+        whether the mandate picked **which** trades to decline better than a coin — not whether
+        refusing at that rate was a good idea, which is a different question and is answered by the
+        sign of the gain.
+
+        ``None`` when the test is undefined: nothing refused, or nothing taken.
+        """
+        if not self.refused or not self.taken:
+            return None
+        pooled = [*self.taken, *self.refused]
+        total = len(pooled)
+        held = len(self.refused)
+        baseline = fmean(pooled)
+        observed = self.utility_gain_bps
+        keep_share = 1.0 - held / total
+        rng = Random(SKILL_SEED)
+        order = list(range(total))
+        atleast = 0
+        for _ in range(SKILL_TRIALS):
+            rng.shuffle(order)
+            kept = [pooled[i] for i in order[held:]]
+            if fmean(kept) * keep_share - baseline >= observed:
+                atleast += 1
+        return (atleast + 1) / (SKILL_TRIALS + 1)
+
+    @property
+    def beat_random_refusal(self) -> bool:
+        """Did the mandate choose *which* trades to decline better than chance would have?"""
+        p = self.skill_p_value
+        return p is not None and p < SKILL_ALPHA and self.utility_gain_bps > 0
+
+    @property
     def verdict(self) -> str:
         if not self.refused:
             return (
@@ -139,12 +192,26 @@ class ProfileResult:
                 f"lose money and it cannot make any; refusing all trades is not a strategy, and "
                 f"the utility number below is the cost of that"
             )
-        direction = "earned its keep" if self.utility_gain_bps > 0 else "cost its owner money"
+        p = self.skill_p_value
+        if self.utility_gain_bps <= 0:
+            direction = "cost its owner money"
+        elif self.beat_random_refusal:
+            direction = "earned its keep"
+        else:
+            direction = (
+                "gained, but not by more than refusing at random would have: the gain is not "
+                "evidence of selection"
+            )
         return (
             f"{self.name} refused {self.refusal_rate:.0%} of proposals and {direction}: the trades "
             f"it declined averaged {self.refused_value:+.1f}bps and the ones it allowed averaged "
             f"{self.taken_value:+.1f}bps, a gain of {self.utility_gain_bps:+.2f}bps per decision "
             f"over taking everything"
+            + (
+                f". Refusing {len(self.refused)} of {self.decisions} at random matches or beats "
+                f"that in p={p:.3f} of {SKILL_TRIALS:,} draws"
+                if p is not None else ""
+            )
         )
 
     def as_dict(self) -> dict[str, Any]:
@@ -158,6 +225,10 @@ class ProfileResult:
             "refused_value_bps": round(self.refused_value, 3),
             "take_everything_bps": round(self.take_everything, 3),
             "utility_gain_bps": round(self.utility_gain_bps, 4),
+            "skill_p_value": (
+                round(self.skill_p_value, 4) if self.skill_p_value is not None else None
+            ),
+            "beat_random_refusal": self.beat_random_refusal,
             "verdict": self.verdict,
         }
 
@@ -172,7 +243,7 @@ class ProfileValueReport:
 
     @property
     def any_helped(self) -> bool:
-        return any(r.utility_gain_bps > 0 and r.taken and r.refused for r in self.results)
+        return any(r.beat_random_refusal for r in self.results)
 
     @property
     def verdict(self) -> str:
@@ -186,7 +257,7 @@ class ProfileValueReport:
             "refusals by measuring each mandate against taking everything *at its own permitted "
             "size*, so the two effects are not added together."
         )
-        helped = [r.name for r in self.results if r.utility_gain_bps > 0 and r.taken and r.refused]
+        helped = [r.name for r in self.results if r.beat_random_refusal]
         if helped:
             return (
                 f"{head} {', '.join(helped)} improved its owner's outcome by refusing: the trades "
@@ -198,7 +269,10 @@ class ProfileValueReport:
             f"{head} NO MANDATE IMPROVED ITS OWNER'S OUTCOME on this sample. Divergence is real "
             f"and demonstrated; usefulness is not. A mandate that refuses trades no better or "
             f"worse than the ones it allows is enforcing a preference, not adding value, and "
-            f"saying so is the honest reading of this result." + sizing
+            f"saying so is the honest reading of this result. Usefulness here means beating "
+            f"refusal at random at the mandate's own rate, not merely showing a gain above "
+            f"zero — an earlier run of this module reported +0.35bps off 72 refusals and called "
+            f"it earned, and that gain does not survive the test." + sizing
         )
 
     def render(self) -> str:
@@ -206,12 +280,14 @@ class ProfileValueReport:
             f"PROFILE VALUE — {self.instants:,} instant(s), "
             f"mandates disagreed on {self.divergence_rate:.0%}",
             "",
-            f"{'profile':>24}{'refused':>9}{'declined':>11}{'allowed':>10}{'gain':>9}",
+            f"{'profile':>24}{'refused':>9}{'declined':>11}{'allowed':>10}{'gain':>9}{'p':>8}",
         ]
         for result in self.results:
             lines.append(
                 f"{result.name:>24}{result.refusal_rate:>9.0%}{result.refused_value:>10.1f}b"
                 f"{result.taken_value:>9.1f}b{result.utility_gain_bps:>8.2f}b"
+                + (f"{result.skill_p_value:>8.3f}" if result.skill_p_value is not None else
+                   f"{'n/a':>8}")
             )
         lines.append("")
         lines.extend(f"  {r.verdict}" for r in self.results)
@@ -304,6 +380,9 @@ if __name__ == "__main__":  # pragma: no cover - CLI
 __all__ = [
     "BAD_CASE_SIGMAS",
     "MIN_INSTANTS",
+    "SKILL_ALPHA",
+    "SKILL_SEED",
+    "SKILL_TRIALS",
     "ProfileResult",
     "ProfileValueError",
     "ProfileValueReport",

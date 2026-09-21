@@ -1,20 +1,22 @@
 {
-  "generated_at": "2026-09-13T16:50:23.119554+00:00",
+  "generated_at": "2026-09-21T13:34:59.646565+00:00",
   "instants": 4528,
   "divergence_rate": 1.0,
-  "any_helped": true,
+  "any_helped": false,
   "results": [
     {
       "name": "conservative income",
       "decisions": 4528,
-      "taken": 4456,
-      "refused": 72,
-      "refusal_rate": 0.0159,
-      "taken_value_bps": -7.625,
-      "refused_value_bps": -22.153,
-      "take_everything_bps": -7.856,
-      "utility_gain_bps": 0.3523,
-      "verdict": "conservative income refused 2% of proposals and earned its keep: the trades it declined averaged -22.2bps and the ones it allowed averaged -7.6bps, a gain of +0.35bps per decision over taking everything"
+      "taken": 3740,
+      "refused": 788,
+      "refusal_rate": 0.174,
+      "taken_value_bps": -8.897,
+      "refused_value_bps": 12.033,
+      "take_everything_bps": -5.255,
+      "utility_gain_bps": -2.0942,
+      "skill_p_value": 0.9964,
+      "beat_random_refusal": false,
+      "verdict": "conservative income refused 17% of proposals and cost its owner money: the trades it declined averaged +12.0bps and the ones it allowed averaged -8.9bps, a gain of -2.09bps per decision over taking everything. Refusing 788 of 4528 at random matches or beats that in p=0.996 of 20,000 draws"
     },
     {
       "name": "aggressive event trader",
@@ -22,12 +24,14 @@
       "taken": 4528,
       "refused": 0,
       "refusal_rate": 0.0,
-      "taken_value_bps": -15.359,
+      "taken_value_bps": -12.604,
       "refused_value_bps": 0.0,
-      "take_everything_bps": -15.359,
+      "take_everything_bps": -12.604,
       "utility_gain_bps": 0.0,
+      "skill_p_value": null,
+      "beat_random_refusal": false,
       "verdict": "aggressive event trader refused nothing across 4528 proposal(s), so it cannot have helped or hurt: on this sample it is not a mandate, it is a pass-through"
     }
   ],
-  "verdict": "2 shipped mandate(s) over 4,528 real instant(s); the mandates disagreed with each other on 100% of them. conservative income improved its owner's outcome by refusing: the trades declined were worse than the ones allowed. This is the measurement the divergence audit could not make, and it is the one a judge should ask for."
+  "verdict": "2 shipped mandate(s) over 4,528 real instant(s); the mandates disagreed with each other on 100% of them. NO MANDATE IMPROVED ITS OWNER'S OUTCOME on this sample. Divergence is real and demonstrated; usefulness is not. A mandate that refuses trades no better or worse than the ones it allows is enforcing a preference, not adding value, and saying so is the honest reading of this result. Usefulness here means beating refusal at random at the mandate's own rate, not merely showing a gain above zero \u2014 an earlier run of this module reported +0.35bps off 72 refusals and called it earned, and that gain does not survive the test. Note that a mandate which narrows every position loses less than one which does not, and that is sizing rather than selection: the utility figure above isolates the refusals by measuring each mandate against taking everything *at its own permitted size*, so the two effects are not added together."
 }

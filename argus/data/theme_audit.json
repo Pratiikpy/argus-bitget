@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T13:05:56.832457+00:00",
+  "generated_at": "2026-09-21T13:43:54.246953+00:00",
   "probes": 20,
   "runs": 17,
   "weak": 2,
@@ -145,7 +145,7 @@
       "question": "How to build a customized workbench with a clear thesis?",
       "bar": "a profile provably changes the answer, measured rather than asserted",
       "status": "RUNS",
-      "evidence": "personalisation measured rather than asserted: 2 shipped mandate(s) over 4,528 real instant(s); the mandates disagreed with each other on 100% of them. conservative income improved its owner's outcome by refusing: the trades declined were worse th",
+      "evidence": "personalisation measured rather than asserted: 2 shipped mandate(s) over 4,528 real instant(s); the mandates disagreed with each other on 100% of them. NO MANDATE IMPROVED ITS OWNER'S OUTCOME on this sample. Divergence is real and demonstrated; us",
       "artefact": "data/profile_value.json"
     },
     {
@@ -205,7 +205,7 @@
       "question": "Personalized thesis",
       "bar": "personalisation changes the answer measurably",
       "status": "RUNS",
-      "evidence": "personalisation measured rather than asserted: 2 shipped mandate(s) over 4,528 real instant(s); the mandates disagreed with each other on 100% of them. conservative income improved its owner's outcome by refusing: the trades declined were worse th",
+      "evidence": "personalisation measured rather than asserted: 2 shipped mandate(s) over 4,528 real instant(s); the mandates disagreed with each other on 100% of them. NO MANDATE IMPROVED ITS OWNER'S OUTCOME on this sample. Divergence is real and demonstrated; us",
       "artefact": "data/profile_value.json"
     }
   ]
