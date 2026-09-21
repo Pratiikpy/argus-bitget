@@ -1,0 +1,56 @@
+{
+  "generated_at": "2026-09-21T11:47:47.696817+00:00",
+  "facts_checked": 5,
+  "agree": 5,
+  "disagree": 0,
+  "clean": true,
+  "checks": [
+    {
+      "fact": "settled trades",
+      "console": 0,
+      "artefact": 0,
+      "console_source": "lui.answer:answer_decision_list verdict breakdown",
+      "artefact_source": "eval.performance:evaluate_ledger.trades",
+      "agrees": true,
+      "why_it_matters": "the submission, the README and the cockpit all state zero trades; a console saying otherwise makes our own record contradict our own claim on the surface built to show the record can be trusted"
+    },
+    {
+      "fact": "decisions on record",
+      "console": 495,
+      "artefact": 495,
+      "console_source": "lui.answer:answer_decision_list count",
+      "artefact_source": "paper.ledger entries",
+      "agrees": true,
+      "why_it_matters": "a stale snapshot verifies its chain perfectly, so a wrong count here looks healthy"
+    },
+    {
+      "fact": "sharpe is computable",
+      "console": false,
+      "artefact": false,
+      "console_source": "lui.answer:answer_performance",
+      "artefact_source": "eval.performance:evaluate_ledger.sharpe",
+      "agrees": true,
+      "why_it_matters": "Track 2 is scored on Sharpe; a console that shows one where the maths refuses is the worst available failure and would be found by the first judge who asked twice"
+    },
+    {
+      "fact": "abstentions",
+      "console": 493,
+      "artefact": 493,
+      "console_source": "lui.answer:answer_decision_list verdict breakdown",
+      "artefact_source": "eval.performance abstentions, less the voided rows",
+      "agrees": true,
+      "why_it_matters": "'refused 495 times out of 495' is the headline claim; the console must be able to show the same arithmetic"
+    },
+    {
+      "fact": "count: page header vs list",
+      "console": 495,
+      "artefact": 495,
+      "console_source": "lui.server:_status (the page header)",
+      "artefact_source": "lui.answer:answer_decision_list (the list itself)",
+      "agrees": true,
+      "why_it_matters": "the header is the first number read and the list is the one checked; a stale snapshot verifies its chain perfectly, so disagreement here is the only signal"
+    }
+  ],
+  "disagreements": [],
+  "scope_statement": "Each fact is read off the CONSOLE's production answer path (classify -> reclassify -> answer) and off the artefact the documents quote, and the two are compared. NOT CLAIMED: that agreement means either is correct \u2014 two surfaces can agree and both be wrong, which is what `eval/docclaims.py` checks separately by comparing each against its source. NOT CLAIMED: that this covers every figure; it covers the ones that appear on more than one surface, which is where a contradiction can hide."
+}

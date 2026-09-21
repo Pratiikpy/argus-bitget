@@ -61,6 +61,13 @@ jobs:
       - name: Anchor proofs
         run: python -m argus.register.anchorcheck
 
+      # Do two readings of the same fact agree? `docclaims` checks every figure against its own
+      # source and cannot catch this: on 2026-09-21 the console reported 2 trades while the README
+      # reported 0, and BOTH were reading their own source correctly. A per-surface check never
+      # asks whether the surfaces agree with each other.
+      - name: Surface agreement
+        run: python -m argus.eval.surfaces
+
       # The offline suite. `-m "not live"` is not used because the markers do not partition that
       # way; instead the network-bound comparison files are ignored here and named explicitly in `live`.
       - name: Tests
