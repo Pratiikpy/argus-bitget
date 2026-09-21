@@ -600,7 +600,13 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("tradeable_sessions_with_lean",
           r"(?P<q1>\d+) of those\s+\d+ decisions were taken in a tradeable session"
           r"[\s\S]{0,120}?\*\*(?P<q2>\d+) of them",
-          tradeable_sessions_with_lean, ("readme",)),
+          tradeable_sessions_with_lean, ("readme",), mode="lagging"),
+    # `lagging`, not `exact`. Both halves are counters the paper runner appends to, and the mode
+    # was wrong from the day the claim was registered: it went stale twice in one session as the
+    # ledger moved 217/213 to 222/218 to 229/225. LAG_TOLERANCE's own docstring names this failure
+    # — an exact gate on a growing counter fails constantly and trains a reader to ignore it —
+    # and the fix is the state built for exactly this, which keeps the gap visible without
+    # breaking the run.
     Claim("refusal_accuracy_2h", r"(?P<q1>\d+)\s+of\s+(?P<q2>\d+)\s+directional\s+calls",
           refusal_accuracy_2h, ("readme", "public-readme")),
     Claim("refusal_forgone_2h", rf"forgave\s+(?P<q>[-{chr(0x2212)}]?[\d.]+)\s*bps of net edge",

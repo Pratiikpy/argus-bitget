@@ -77,6 +77,30 @@ DEFAULT_NOTIONAL = Decimal("10000")
 DEFAULT_HORIZON_HOURS = 24.0
 
 
+def _downside(stream: Sequence[float]) -> float:
+    """Root-mean-square of the negative outcomes, in bps. Zero when nothing lost.
+
+    Semi-deviation rather than standard deviation, because a mandate exists to limit **losses** and
+    a measure that penalises upside dispersion would credit a mandate for refusing winners — which
+    is precisely the behaviour this module caught the conservative profile doing.
+    """
+    losses = [x for x in stream if x < 0.0]
+    if not losses:
+        return 0.0
+    return float((sum(x * x for x in losses) / len(stream)) ** 0.5)
+
+
+def _p(value: float) -> str:
+    """Render a permutation p-value without ever printing an impossible one.
+
+    The ``(hits + 1) / (trials + 1)`` correction makes zero unreachable by construction, so a
+    literal ``p=0.000`` is a rendering artefact rather than a result, and a reader who knows that
+    reads it as a bug. Below the resolution of the test, say so.
+    """
+    floor = 1.0 / (SKILL_TRIALS + 1)
+    return f"<{floor:.1e}" if value <= floor else f"{value:.3f}"
+
+
 class ProfileValueError(ValueError):
     """Raised rather than reporting a utility claim from too little."""
 
@@ -138,6 +162,79 @@ class ProfileResult:
         return self.taken_value * (1.0 - self.refusal_rate) - self.take_everything
 
     @property
+    def mandate_stream(self) -> list[float]:
+        """What the owner actually lived through, decision by decision.
+
+        A refused proposal is not a missing observation — it is a realised outcome of exactly zero,
+        because no position was opened. Pairing it against :attr:`everything_stream` decision for
+        decision is what makes the two comparable.
+        """
+        return [*self.taken, *([0.0] * len(self.refused))]
+
+    @property
+    def everything_stream(self) -> list[float]:
+        """The same decisions with every proposal taken at the size this mandate permitted."""
+        return [*self.taken, *self.refused]
+
+    @property
+    def downside_deviation(self) -> float:
+        """Root-mean-square of the losses only, under the mandate. Gains are not risk."""
+        return _downside(self.mandate_stream)
+
+    @property
+    def downside_taking_everything(self) -> float:
+        return _downside(self.everything_stream)
+
+    @property
+    def tail_reduction(self) -> float:
+        """Fraction of the downside deviation the mandate removed. Negative means it added risk."""
+        base = self.downside_taking_everything
+        if base <= 0.0:
+            return 0.0
+        return (base - self.downside_deviation) / base
+
+    @property
+    def tail_p_value(self) -> float | None:
+        """How often refusing *at random*, at this rate, cuts the downside tail at least this much.
+
+        **Risk reduction is the one claim a mandate can always win by cheating.** Refusing anything
+        replaces a realised outcome with a zero, and zeros have no dispersion, so a mandate that
+        refuses indiscriminately shows a smaller downside deviation while demonstrating nothing —
+        refuse everything and the measured risk is perfect. Reporting the reduction on its own
+        would be the same defect as reporting a utility gain on its own, which is the one this
+        module was just corrected for.
+
+        So the null is the same null: **this refusal rate, these outcomes, chosen at random.** A
+        mandate delivers risk *as a skill* only when it beats that.
+        """
+        if not self.refused or not self.taken:
+            return None
+        pooled = self.everything_stream
+        total, held = len(pooled), len(self.refused)
+        observed = self.tail_reduction
+        base = _downside(pooled)
+        if base <= 0.0:
+            return None
+        # Zeroing a value removes exactly its own squared term from the sum, and only negatives
+        # carry one. So a draw costs `held` lookups instead of a full copy and re-scan.
+        squares = [x * x if x < 0.0 else 0.0 for x in pooled]
+        grand = sum(squares)
+        rng = Random(SKILL_SEED)
+        atleast = 0
+        for _ in range(SKILL_TRIALS):
+            removed = sum(squares[i] for i in rng.sample(range(total), held))
+            drawn = ((grand - removed) / total) ** 0.5
+            if (base - drawn) / base >= observed:
+                atleast += 1
+        return (atleast + 1) / (SKILL_TRIALS + 1)
+
+    @property
+    def delivered_its_risk_promise(self) -> bool:
+        """Cut the downside tail by more than refusing the same number at random would have."""
+        p = self.tail_p_value
+        return p is not None and p < SKILL_ALPHA and self.tail_reduction > 0.0
+
+    @property
     def skill_p_value(self) -> float | None:
         """How often refusing *at random*, at this mandate's own rate, does at least this well.
 
@@ -160,16 +257,19 @@ class ProfileResult:
         pooled = [*self.taken, *self.refused]
         total = len(pooled)
         held = len(self.refused)
-        baseline = fmean(pooled)
+        grand = sum(pooled)
+        baseline = grand / total
         observed = self.utility_gain_bps
         keep_share = 1.0 - held / total
+        kept_count = total - held
+        # Only the refused values differ between draws, so each trial sums `held` terms rather
+        # than rebuilding and re-averaging the whole stream. Identical arithmetic, and it is the
+        # difference between this test running and this test being skipped.
         rng = Random(SKILL_SEED)
-        order = list(range(total))
         atleast = 0
         for _ in range(SKILL_TRIALS):
-            rng.shuffle(order)
-            kept = [pooled[i] for i in order[held:]]
-            if fmean(kept) * keep_share - baseline >= observed:
+            dropped = sum(pooled[i] for i in rng.sample(range(total), held))
+            if (grand - dropped) / kept_count * keep_share - baseline >= observed:
                 atleast += 1
         return (atleast + 1) / (SKILL_TRIALS + 1)
 
@@ -209,9 +309,38 @@ class ProfileResult:
             f"over taking everything"
             + (
                 f". Refusing {len(self.refused)} of {self.decisions} at random matches or beats "
-                f"that in p={p:.3f} of {SKILL_TRIALS:,} draws"
+                f"that in p={_p(p)} of {SKILL_TRIALS:,} draws"
                 if p is not None else ""
             )
+            + self._risk_clause
+        )
+
+    @property
+    def _risk_clause(self) -> str:
+        """What the mandate bought, which the return figure alone cannot say.
+
+        **A conservative mandate is not supposed to be alpha.** It sells expected return for a
+        smaller loss tail, and judging it only on bps asks it to be something it never claimed to
+        be. Reporting the cost without the purchase is as partial as reporting the purchase
+        without the cost, so the verdict now carries both and lets them disagree.
+        """
+        tp = self.tail_p_value
+        if tp is None:
+            return ""
+        direction = "cut" if self.tail_reduction > 0 else "widened"
+        clause = (
+            f". On risk rather than return it {direction} the downside tail by "
+            f"{abs(self.tail_reduction) * 100:.1f}% "
+            f"({self.downside_taking_everything:.1f}bps to {self.downside_deviation:.1f}bps)"
+        )
+        if self.delivered_its_risk_promise:
+            return clause + (
+                f", and random refusal achieves that in only p={_p(tp)} of draws — so the mandate "
+                f"is buying safety with the return it gives up, which is what it exists to do"
+            )
+        return clause + (
+            f", but random refusal at the same rate does at least as well in p={_p(tp)} of draws, "
+            f"so this is what refusing {self.refusal_rate:.0%} of anything would have bought"
         )
 
     def as_dict(self) -> dict[str, Any]:
@@ -229,6 +358,13 @@ class ProfileResult:
                 round(self.skill_p_value, 4) if self.skill_p_value is not None else None
             ),
             "beat_random_refusal": self.beat_random_refusal,
+            "downside_deviation_bps": round(self.downside_deviation, 3),
+            "downside_taking_everything_bps": round(self.downside_taking_everything, 3),
+            "tail_reduction_pct": round(self.tail_reduction * 100.0, 2),
+            "tail_p_value": (
+                round(self.tail_p_value, 4) if self.tail_p_value is not None else None
+            ),
+            "delivered_its_risk_promise": self.delivered_its_risk_promise,
             "verdict": self.verdict,
         }
 

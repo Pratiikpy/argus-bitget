@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T13:34:59.646565+00:00",
+  "generated_at": "2026-09-21T14:34:26.709896+00:00",
   "instants": 4528,
   "divergence_rate": 1.0,
   "any_helped": false,
@@ -14,9 +14,14 @@
       "refused_value_bps": 12.033,
       "take_everything_bps": -5.255,
       "utility_gain_bps": -2.0942,
-      "skill_p_value": 0.9964,
+      "skill_p_value": 0.9965,
       "beat_random_refusal": false,
-      "verdict": "conservative income refused 17% of proposals and cost its owner money: the trades it declined averaged +12.0bps and the ones it allowed averaged -8.9bps, a gain of -2.09bps per decision over taking everything. Refusing 788 of 4528 at random matches or beats that in p=0.996 of 20,000 draws"
+      "downside_deviation_bps": 93.031,
+      "downside_taking_everything_bps": 144.025,
+      "tail_reduction_pct": 35.41,
+      "tail_p_value": 0.0,
+      "delivered_its_risk_promise": true,
+      "verdict": "conservative income refused 17% of proposals and cost its owner money: the trades it declined averaged +12.0bps and the ones it allowed averaged -8.9bps, a gain of -2.09bps per decision over taking everything. Refusing 788 of 4528 at random matches or beats that in p=0.997 of 20,000 draws. On risk rather than return it cut the downside tail by 35.4% (144.0bps to 93.0bps), and random refusal achieves that in only p=<5.0e-05 of draws \u2014 so the mandate is buying safety with the return it gives up, which is what it exists to do"
     },
     {
       "name": "aggressive event trader",
@@ -30,6 +35,11 @@
       "utility_gain_bps": 0.0,
       "skill_p_value": null,
       "beat_random_refusal": false,
+      "downside_deviation_bps": 216.12,
+      "downside_taking_everything_bps": 216.12,
+      "tail_reduction_pct": 0.0,
+      "tail_p_value": null,
+      "delivered_its_risk_promise": false,
       "verdict": "aggressive event trader refused nothing across 4528 proposal(s), so it cannot have helped or hurt: on this sample it is not a mandate, it is a pass-through"
     }
   ],
