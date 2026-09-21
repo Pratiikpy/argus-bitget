@@ -1,7 +1,7 @@
 {
-  "total": 95,
-  "checked": 86,
-  "ok": 86,
+  "total": 96,
+  "checked": 87,
+  "ok": 87,
   "stale": 0,
   "absent": 24,
   "deleted": 0,
@@ -10,7 +10,7 @@
     {
       "claim": "tests_passing",
       "doc": "readme",
-      "line": 61,
+      "line": 69,
       "quoted": [
         "5,946"
       ],
@@ -109,7 +109,7 @@
     {
       "claim": "source_files",
       "doc": "readme",
-      "line": 61,
+      "line": 69,
       "quoted": [
         "293"
       ],
@@ -187,7 +187,7 @@
     {
       "claim": "register_claims",
       "doc": "readme",
-      "line": 171,
+      "line": 179,
       "quoted": [
         "176"
       ],
@@ -274,9 +274,24 @@
       "excerpt": "176 claims across"
     },
     {
+      "claim": "tradeable_sessions_with_lean",
+      "doc": "readme",
+      "line": 22,
+      "quoted": [
+        "217",
+        "213"
+      ],
+      "live": [
+        217,
+        213
+      ],
+      "status": "OK",
+      "excerpt": "217 of those 495 decisions were taken in a tradeable session with the anchor market open, and **213 of them"
+    },
+    {
       "claim": "refusal_accuracy_2h",
       "doc": "readme",
-      "line": 169,
+      "line": 177,
       "quoted": [
         "115",
         "193"
@@ -306,7 +321,7 @@
     {
       "claim": "refusal_forgone_2h",
       "doc": "readme",
-      "line": 169,
+      "line": 177,
       "quoted": [
         "\u22126.9"
       ],
@@ -332,7 +347,7 @@
     {
       "claim": "standing_owned",
       "doc": "readme",
-      "line": 437,
+      "line": 445,
       "quoted": [
         "17",
         "24"
@@ -485,7 +500,7 @@
     {
       "claim": "settled_trades",
       "doc": "readme",
-      "line": 64,
+      "line": 72,
       "quoted": [
         "0"
       ],
@@ -520,7 +535,7 @@
     {
       "claim": "anchors_confirmed",
       "doc": "readme",
-      "line": 171,
+      "line": 179,
       "quoted": [
         "38",
         "52"
@@ -550,7 +565,7 @@
     {
       "claim": "ledger_decisions",
       "doc": "readme",
-      "line": 63,
+      "line": 71,
       "quoted": [
         "495"
       ],
@@ -585,7 +600,7 @@
     {
       "claim": "modules_importable",
       "doc": "readme",
-      "line": 62,
+      "line": 70,
       "quoted": [
         "131",
         "131"
@@ -630,7 +645,7 @@
     {
       "claim": "subthemes",
       "doc": "readme",
-      "line": 62,
+      "line": 70,
       "quoted": [
         "18",
         "18"
@@ -675,7 +690,7 @@
     {
       "claim": "ledger_entries",
       "doc": "readme",
-      "line": 63,
+      "line": 71,
       "quoted": [
         "495"
       ],
@@ -688,7 +703,7 @@
     {
       "claim": "ledger_entries",
       "doc": "readme",
-      "line": 228,
+      "line": 236,
       "quoted": [
         "495"
       ],
@@ -762,7 +777,7 @@
     {
       "claim": "leans_recorded",
       "doc": "readme",
-      "line": 239,
+      "line": 247,
       "quoted": [
         "282"
       ],
@@ -969,7 +984,7 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "readme",
-      "line": 217,
+      "line": 225,
       "quoted": [
         "10",
         "11"
@@ -1044,7 +1059,7 @@
     {
       "claim": "aapl_beta_open",
       "doc": "readme",
-      "line": 217,
+      "line": 225,
       "quoted": [
         "0.68"
       ],
@@ -1094,7 +1109,7 @@
     {
       "claim": "aapl_beta_shut",
       "doc": "readme",
-      "line": 217,
+      "line": 225,
       "quoted": [
         "0.105"
       ],
@@ -1205,7 +1220,7 @@
     {
       "claim": "hurdle_clearing_range",
       "doc": "readme",
-      "line": 244,
+      "line": 252,
       "quoted": [
         "61",
         "89"
@@ -1301,7 +1316,7 @@
     {
       "claim": "teardowns",
       "doc": "readme",
-      "line": 359,
+      "line": 367,
       "quoted": [
         "61"
       ],

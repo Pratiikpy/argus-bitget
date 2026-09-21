@@ -19,6 +19,14 @@ Most trading agents ask *what should I trade?* ARGUS asks a harder question:
 been *no* **495 times out of 495** — and the interesting output is not the trade, it is the
 record that says why.
 
+**The obvious rebuttal is that it never got the chance, and the record refutes it.** 217 of those
+495 decisions were taken in a tradeable session with the anchor market open, and **213 of them
+carried a directional lean** — the desk said which way it thought the instrument would go, hashed
+that call before the outcome existed, and still opened nothing. An earlier version of
+`eval/autopsy.py` explained the abstention as a sampling artefact, that the desk kept being asked
+while the market was shut. That explanation shipped with a falsifier, and on the grown ledger the
+falsifier **fired and killed it** (`data/abstention_autopsy.json`).
+
 > ### ⚠️ Correction, 2026-09-20 — two "trades" in this ledger were never taken
 >
 > Earlier today this README claimed the desk had broken its refusal streak with two profitable

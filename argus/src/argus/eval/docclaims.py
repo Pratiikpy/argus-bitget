@@ -398,6 +398,32 @@ def lui_router_fresh_accuracy() -> Number:
     return round(float(blob["headline"]["fresh_accuracy"]) * 100.0, 1)
 
 
+def tradeable_sessions_with_lean() -> tuple[Number, Number]:
+    """Decisions taken with the anchor market OPEN, and how many called a direction.
+
+    **The pair that answers "it never got the chance."** A desk abstaining only while the market
+    is shut has demonstrated nothing. One abstaining 217 times with the market open, having
+    committed to a direction on 213 of them, has demonstrated a judgement.
+
+    `eval/autopsy.py` once published the first explanation — that the desk kept being sampled
+    during closed sessions — and shipped a falsifier alongside it. On the grown ledger the
+    falsifier fired and killed the explanation. Both numbers move with the record, so both are
+    read from the artefact rather than written beside a claim that would quietly age into being
+    wrong the same way.
+    """
+    blob = json.loads((DATA / "theme_audit.json").read_text(encoding="utf-8"))
+    found = re.search(
+        r"(\d+) of \d+ decisions were taken in one, and (\d+) of those", json.dumps(blob)
+    )
+    if not found:
+        raise ClaimError(
+            "theme_audit.json no longer states the tradeable-session counts in the shape this "
+            "claim reads. The sentence moved; the guard must follow it rather than be deleted, "
+            "because a guard that quietly stops matching is the defect SEEN_PATH exists to catch."
+        )
+    return int(found.group(1)), int(found.group(2))
+
+
 def refusal_accuracy_2h() -> tuple[Number, Number]:
     """Directional calls right, and total, at the ~2h horizon.
 
@@ -567,6 +593,12 @@ CLAIMS: tuple[Claim, ...] = (
     # across a line there, and the figure was written with a typographic minus. A claim that
     # matches nothing reports ABSENT, which reads exactly like a document that simply does
     # not make the claim — so a pattern bug and an honest silence are indistinguishable.
+    # The rebuttal-killer. Both halves guarded, because quoting the open-session count without
+    # the lean count would let the stronger claim decay into the weaker one unnoticed.
+    Claim("tradeable_sessions_with_lean",
+          r"(?P<q1>\d+) of those\s+\d+ decisions were taken in a tradeable session"
+          r"[\s\S]{0,120}?\*\*(?P<q2>\d+) of them",
+          tradeable_sessions_with_lean, ("readme",)),
     Claim("refusal_accuracy_2h", r"(?P<q1>\d+)\s+of\s+(?P<q2>\d+)\s+directional\s+calls",
           refusal_accuracy_2h, ("readme", "public-readme")),
     Claim("refusal_forgone_2h", rf"forgave\s+(?P<q>[-{chr(0x2212)}]?[\d.]+)\s*bps of net edge",
