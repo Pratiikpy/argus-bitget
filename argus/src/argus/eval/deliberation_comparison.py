@@ -38,7 +38,9 @@ costs (verified by calling the real `deliberation_cost_bps`, not paraphrased).
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -277,15 +279,35 @@ tiers at all, while ARGUS's own formula can — which is the property this capab
 """
 
 
-def main() -> int:  # pragma: no cover - CLI
-    import json
+def check_reproducibility() -> dict[str, Any]:
+    """Both compared functions are pure and deterministic — no LLM call, no randomness, no clock
+    in the modelled output. Reproducibility here is not a plausible assumption from that fact; it
+    is run and confirmed, the same discipline every other comparison in this project applies
+    (`regime_comparison.py`, `allocation_comparison.py`, ...), because a claim resting on 'this
+    should be deterministic' rather than 'this was run twice and matched' is exactly the gap
+    `verify()` exists to catch."""
+    first = {
+        "thinking_budget_cases": [c.as_dict() for c in run_thinking_budget_cases()],
+        "swept_comparison": [p.as_dict() for p in swept_comparison()],
+        "ablation": run_ablation().as_dict(),
+    }
+    second = {
+        "thinking_budget_cases": [c.as_dict() for c in run_thinking_budget_cases()],
+        "swept_comparison": [p.as_dict() for p in swept_comparison()],
+        "ablation": run_ablation().as_dict(),
+    }
+    identical = json.dumps(first, sort_keys=True) == json.dumps(second, sort_keys=True)
+    return {"identical": identical, "deterministic": identical}
 
+
+def main() -> int:  # pragma: no cover - CLI
     thinking_cases = run_thinking_budget_cases()
     swept = swept_comparison()
     ablation = run_ablation()
     costs = measure_costs()
 
     report = {
+        "generated_at": datetime.now(UTC).isoformat(),
         "thinking_budget_cases": [c.as_dict() for c in thinking_cases],
         "swept_comparison": [p.as_dict() for p in swept],
         "linear_decay_collapses_argus_real_tiers": linear_decay_collapses_argus_real_tiers(
@@ -295,6 +317,7 @@ def main() -> int:  # pragma: no cover - CLI
         "argus_cost_is_unbounded": argus_cost_is_unbounded(swept),
         "ablation": ablation.as_dict(),
         "costs": costs,
+        "reproducibility": check_reproducibility(),
         "scope_statement": SCOPE_STATEMENT,
     }
     for c in thinking_cases:

@@ -451,10 +451,17 @@ class TestTheLiveRegisterIsHonest:
         hand-editing the artefact — this project never hand-edits an artefact to match a claim.
         The fresh run reconfirms the original finding on both real narratives: finBERT's naive
         aggregate scales with repetition every time, ARGUS's real analyst never does,
-        reproducibility holds (signal_stable=True on a genuine re-sample). A capability appearing
+        reproducibility holds (signal_stable=True on a genuine re-sample). Restored to OWNED a
+        thirty-third time, same day, at zero cost: "Deliberation priced as a trading cost"
+        (`t2-agentic`) had the identical conditions_missing-vs-verify() gap — reproducibility_proven
+        claimed, artefact silent on it — but unlike the others, this module makes no LLM call at
+        all (an earlier note in project memory had wrongly filed it as Qwen-key-blocked). Both
+        compared cost functions are pure and deterministic, so `check_reproducibility()` runs each
+        comparison twice and JSON-compares them for byte identity — reproducibility was not a
+        plausible assumption to leave unproven, it was simply never run. A capability appearing
         here that is NOT in
         this exact set is the real regression this test exists to catch — add it to the set only
-        after checking its thirteen the same way these thirty-two were checked, never to make a
+        after checking its thirteen the same way these thirty-three were checked, never to make a
         test pass."""
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
@@ -464,6 +471,7 @@ class TestTheLiveRegisterIsHonest:
             "Cross-sectional factor evaluation",
             "Data-honest cross-asset breadth rotation vs. a silently-dropping reference",
             "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel",
+            "Deliberation priced as a trading cost",
             "Episodic memory across decisions",
             "Factor discovery with no execution surface and trial-corrected selection",
             "Funding-aware cross-asset hedge routing vs. a fee-blind composite router",

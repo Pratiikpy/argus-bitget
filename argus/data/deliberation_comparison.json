@@ -1,4 +1,5 @@
 {
+  "generated_at": "2026-09-22T07:02:28.918240+00:00",
   "thinking_budget_cases": [
     {
       "label": "off",
@@ -115,8 +116,12 @@
     "the_specific_window_value_is_load_bearing": true
   },
   "costs": {
-    "linear_decay_us_per_call": 0.7509800001571421,
-    "argus_us_per_call": 2.807290000055218
+    "linear_decay_us_per_call": 0.43309000320732594,
+    "argus_us_per_call": 2.873379993252456
+  },
+  "reproducibility": {
+    "identical": true,
+    "deterministic": true
   },
   "scope_statement": "Claimed: ARGUS's real deliberation-cost model (`execution.latency.latency_slippage_bps`) and an independently reimplemented version of LatencySensitiveBench's real linear price-decay model (verified against reference vectors computed from their own unmodified code) answer the same question \u2014 \"what does N seconds of LLM inference delay cost, in execution quality\" \u2014 with genuinely different, both-real shapes. ARGUS's charge scales as sqrt(delay), matching the textbook expected-displacement result for a random walk, and is unbounded. The baseline's charge scales linearly up to a fixed cap (`decay_window`, their own stated default 1.5s) and is flat beyond it \u2014 confirmed by running it, not assumed from reading. On ARGUS's own real, bake-off-measured thinking-budget delays (3s / 8s / 40s), the baseline's real formula reports the IDENTICAL cost for all three, because all three exceed its cap; ARGUS's own real formula reports three distinct, correctly ordered costs on the identical delays. An ablation confirms the collapse is caused by the SPECIFIC 1.5s cap value, not the existence of a cap in general \u2014 widening it to 60s (still finite) restores the ability to distinguish ARGUS's own three delays.\n\nNOT claimed: that LatencySensitiveBench's model is \"wrong\" for the purpose ITS OWN paper built it for \u2014 a bounded, simple decay may be a deliberate, defensible modelling choice for the delay ranges their own benchmark actually exercises (likely sub-2-second, matching classical HFT latency budgets, not the 3-40 second range a reasoning LLM like Qwen actually runs at). The finding is narrower and precise: applied to the delay range ARGUS's real system actually operates in, the baseline's real formula cannot distinguish ARGUS's own three real thinking tiers at all, while ARGUS's own formula can \u2014 which is the property this capability is about.\n"
 }

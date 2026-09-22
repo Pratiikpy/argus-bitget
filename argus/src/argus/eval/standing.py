@@ -355,11 +355,15 @@ REGISTER: tuple[Capability, ...] = (
             "argus/agents/meta_pm.py,argus/execution/latency.py,"
             "argus/eval/deliberation_comparison.py,argus/eval/baselines/latencybench_reimpl.py"
         ),
-        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
-        # instead of checking that files existed: reproducibility_proven is claimed here and the
-        # artefact records nothing about it. Restore OWNED by making the artefact
-        # carry the evidence, not by editing this line.
-        state=State.IMPLEMENTED,
+        # Restored to OWNED 2026-09-22. Was demoted on 2026-09-20 when `verify()` began opening
+        # artefacts instead of checking that files existed: reproducibility_proven was claimed and
+        # the artefact recorded nothing about it. Both compared functions are pure and
+        # deterministic (no LLM call anywhere in this module — an earlier note in this project's
+        # own memory wrongly filed this capability as Qwen-key-blocked; it never needed one),
+        # so reproducibility was not a plausible assumption to leave unproven — it was run.
+        # `check_reproducibility()` added to `deliberation_comparison.py`: both comparisons run
+        # twice, JSON-compared for byte identity. All 13 conditions now verify.
+        state=State.OWNED,
         baseline=(
             "HaoKang-Timmy/LatencySensitiveBench (arxiv 2505.19481, NeurIPS 2025) — found "
             "2026-09-16 by a fresh, targeted search after the original 88-repo corpus survey "

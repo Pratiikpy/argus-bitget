@@ -4,7 +4,7 @@
       "name": "Deliberation priced as a trading cost",
       "subtheme": "t2-agentic",
       "module": "argus/agents/meta_pm.py,argus/execution/latency.py,argus/eval/deliberation_comparison.py,argus/eval/baselines/latencybench_reimpl.py",
-      "state": "implemented",
+      "state": "owned",
       "baseline": "HaoKang-Timmy/LatencySensitiveBench (arxiv 2505.19481, NeurIPS 2025) \u2014 found 2026-09-16 by a fresh, targeted search after the original 88-repo corpus survey found nothing; the ONE real exception to 'every harness treats latency as free'",
       "conditions_met": [
         "best_implementation_studied",
@@ -3223,17 +3223,11 @@
   "by_state": {
     "lost": 3,
     "tied": 0,
-    "implemented": 2,
-    "owned": 26
+    "implemented": 1,
+    "owned": 27
   },
-  "findings": [
-    {
-      "capability": "Deliberation priced as a trading cost",
-      "problem": "reproducibility_proven is claimed but not evidenced",
-      "detail": "data/deliberation_comparison.json records nothing about reproducibility_proven: no key among reproducibility, reproducible, deterministic, identical, seed, seeds..."
-    }
-  ],
-  "clean": false,
+  "findings": [],
+  "clean": true,
   "owned_conditions": [
     "best_implementation_studied",
     "best_method_studied",
