@@ -142,9 +142,19 @@ class SyncResult:
 
 
 def _count_lines(path: Path) -> int:
+    """Despite the generic name, both call sites are `paper_ledger.jsonl` — the "decisions"
+    figure this module prints. A raw line count was exactly that count until settlement seals
+    (2026-09-22) added a second row kind; filtering `kind == "decision"` keeps it that way, the
+    same fix `eval/docclaims.py::ledger_decisions` needed for the identical reason. A row missing
+    the key entirely (every line written before that field existed) defaults to `"decision"`,
+    matching `Entry`'s own dataclass default.
+    """
     if not path.exists():
         return 0
-    return sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
+    return sum(
+        1 for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and json.loads(line).get("kind", "decision") == "decision"
+    )
 
 
 def _copy_tree(source: Path, target: Path, *, dry_run: bool) -> tuple[int, int]:

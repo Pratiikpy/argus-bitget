@@ -27,9 +27,40 @@ from argus.demo.deploysync import (
     NEVER_COPY,
     SKIP_SUFFIXES,
     SyncResult,
+    _count_lines,
     sync,
 )
 from argus.lui.server import STALE_AFTER_HOURS
+
+
+class TestCountLinesCountsDecisionsOnly:
+    """Added 2026-09-22 alongside settlement seals: a raw line count of paper_ledger.jsonl was
+    exactly the decision count until seals added a second row kind, at which point the printed
+    'N decisions' figure roughly doubled. `_count_lines` is only ever called on this one file
+    (both call sites in sync() are paper_ledger.jsonl), despite the generic name."""
+
+    def test_seal_rows_are_not_counted_as_decisions(self, tmp_path: Path) -> None:
+        path = tmp_path / "p.jsonl"
+        path.write_text(
+            "\n".join([
+                json.dumps({"seq": 1, "kind": "decision"}),
+                json.dumps({"seq": -1, "kind": "settlement_seal", "target_seq": 1}),
+                json.dumps({"seq": 2, "kind": "decision"}),
+            ]) + "\n",
+            encoding="utf-8",
+        )
+        assert _count_lines(path) == 2
+
+    def test_a_row_with_no_kind_key_at_all_defaults_to_decision(self, tmp_path: Path) -> None:
+        """Every line written before the kind field existed has no such key in its raw JSON --
+        matching Entry's own dataclass default is what keeps old rows counted as they always
+        were."""
+        path = tmp_path / "p.jsonl"
+        path.write_text(json.dumps({"seq": 1}) + "\n", encoding="utf-8")
+        assert _count_lines(path) == 1
+
+    def test_a_missing_file_counts_as_zero(self, tmp_path: Path) -> None:
+        assert _count_lines(tmp_path / "nope.jsonl") == 0
 
 
 class TestTheSyncReportsTheGapRatherThanHidingIt:
