@@ -8,29 +8,29 @@
         "symbol": "AAPLUSDT",
         "bars": 1439,
         "argus_cuts": [
-          130,
-          564
+          125,
+          559
         ],
         "stumpy_cuts": [
-          129,
-          564
+          124,
+          559
         ],
-        "ruptures_bic_n_cuts": 47,
+        "ruptures_bic_n_cuts": 46,
         "ruptures_fixed_cuts": [
-          154,
-          844
+          149,
+          839
         ],
         "n_real_incumbent_flips": 23,
-        "n_regime_py_proxy_flips": 51,
+        "n_regime_py_proxy_flips": 50,
         "real_flips_matched_by_proxy_within_2_bars": 5,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.938292,
-        "incumbent_covered_fraction": 0.577251,
+        "cac_correlation_with_stumpy": 0.950498,
+        "incumbent_covered_fraction": 0.572512,
         "argus_comparable_boundaries": [
-          564
+          559
         ],
         "argus_boundaries_outside_comparable_region": [
-          130
+          125
         ],
         "argus_novel_boundaries": [],
         "argus_vs_stumpy_offsets": [
@@ -41,117 +41,119 @@
           24,
           280
         ],
-        "argus_seconds": 4.7729,
-        "stumpy_seconds": 32.7847,
-        "ruptures_seconds": 0.4562
+        "argus_seconds": 4.6886,
+        "stumpy_seconds": 31.5048,
+        "ruptures_seconds": 0.4598
       },
       {
         "symbol": "AMZNUSDT",
         "bars": 1439,
         "argus_cuts": [
-          890,
-          1294
+          480,
+          885
         ],
         "stumpy_cuts": [
-          889,
-          1294
+          479,
+          884
         ],
         "ruptures_bic_n_cuts": 47,
         "ruptures_fixed_cuts": [
-          154,
-          485
+          149,
+          480
         ],
-        "n_real_incumbent_flips": 33,
-        "n_regime_py_proxy_flips": 67,
-        "real_flips_matched_by_proxy_within_2_bars": 7,
+        "n_real_incumbent_flips": 34,
+        "n_regime_py_proxy_flips": 66,
+        "real_flips_matched_by_proxy_within_2_bars": 6,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.953003,
-        "incumbent_covered_fraction": 0.642654,
+        "cac_correlation_with_stumpy": 0.864337,
+        "incumbent_covered_fraction": 0.647393,
         "argus_comparable_boundaries": [
-          890,
-          1294
+          480,
+          885
         ],
         "argus_boundaries_outside_comparable_region": [],
-        "argus_novel_boundaries": [],
+        "argus_novel_boundaries": [
+          480
+        ],
         "argus_vs_stumpy_offsets": [
           1,
-          0
+          1
         ],
         "argus_vs_ruptures_fixed_offsets": [
-          405,
-          809
+          0,
+          405
         ],
-        "argus_seconds": 5.3873,
-        "stumpy_seconds": 0.0173,
-        "ruptures_seconds": 0.3954
+        "argus_seconds": 5.2299,
+        "stumpy_seconds": 0.0178,
+        "ruptures_seconds": 0.3522
       },
       {
         "symbol": "COINUSDT",
         "bars": 1439,
         "argus_cuts": [
           120,
-          1058
+          1053
         ],
         "stumpy_cuts": [
-          795,
-          1058
+          790,
+          1053
         ],
         "ruptures_bic_n_cuts": 46,
         "ruptures_fixed_cuts": [
-          154,
-          635
+          149,
+          630
         ],
         "n_real_incumbent_flips": 33,
-        "n_regime_py_proxy_flips": 53,
-        "real_flips_matched_by_proxy_within_2_bars": 6,
+        "n_regime_py_proxy_flips": 51,
+        "real_flips_matched_by_proxy_within_2_bars": 5,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.783741,
-        "incumbent_covered_fraction": 0.726066,
+        "cac_correlation_with_stumpy": 0.793603,
+        "incumbent_covered_fraction": 0.721327,
         "argus_comparable_boundaries": [
-          1058
+          1053
         ],
         "argus_boundaries_outside_comparable_region": [
           120
         ],
         "argus_novel_boundaries": [
-          1058
+          1053
         ],
         "argus_vs_stumpy_offsets": [
-          675,
+          670,
           0
         ],
         "argus_vs_ruptures_fixed_offsets": [
-          34,
+          29,
           423
         ],
-        "argus_seconds": 5.6923,
-        "stumpy_seconds": 0.0345,
-        "ruptures_seconds": 0.4519
+        "argus_seconds": 5.2128,
+        "stumpy_seconds": 0.019,
+        "ruptures_seconds": 0.4267
       },
       {
         "symbol": "GOOGLUSDT",
         "bars": 1439,
         "argus_cuts": [
-          145
+          140
         ],
         "stumpy_cuts": [
-          144,
-          986
+          139,
+          981
         ],
         "ruptures_bic_n_cuts": 46,
         "ruptures_fixed_cuts": [
-          172,
-          437
+          167,
+          432
         ],
-        "n_real_incumbent_flips": 40,
+        "n_real_incumbent_flips": 38,
         "n_regime_py_proxy_flips": 47,
         "real_flips_matched_by_proxy_within_2_bars": 6,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.982912,
-        "incumbent_covered_fraction": 0.76019,
+        "cac_correlation_with_stumpy": 0.978472,
+        "incumbent_covered_fraction": 0.740284,
         "argus_comparable_boundaries": [],
         "argus_boundaries_outside_comparable_region": [
-          145
+          140
         ],
         "argus_novel_boundaries": [],
         "argus_vs_stumpy_offsets": [
@@ -160,78 +162,78 @@
         "argus_vs_ruptures_fixed_offsets": [
           27
         ],
-        "argus_seconds": 5.251,
-        "stumpy_seconds": 0.0323,
-        "ruptures_seconds": 0.3785
+        "argus_seconds": 5.4517,
+        "stumpy_seconds": 0.0173,
+        "ruptures_seconds": 0.4221
       },
       {
         "symbol": "METAUSDT",
         "bars": 1439,
         "argus_cuts": [
           120,
-          249
+          244
         ],
         "stumpy_cuts": [
-          120,
-          411
+          207,
+          1064
         ],
-        "ruptures_bic_n_cuts": 43,
+        "ruptures_bic_n_cuts": 44,
         "ruptures_fixed_cuts": [
-          976,
-          1129
+          971,
+          1124
         ],
-        "n_real_incumbent_flips": 36,
-        "n_regime_py_proxy_flips": 35,
-        "real_flips_matched_by_proxy_within_2_bars": 8,
+        "n_real_incumbent_flips": 34,
+        "n_regime_py_proxy_flips": 34,
+        "real_flips_matched_by_proxy_within_2_bars": 6,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.967689,
+        "cac_correlation_with_stumpy": 0.961972,
         "incumbent_covered_fraction": 0.695735,
         "argus_comparable_boundaries": [
-          249
+          244
         ],
         "argus_boundaries_outside_comparable_region": [
           120
         ],
         "argus_novel_boundaries": [],
         "argus_vs_stumpy_offsets": [
-          0,
-          129
+          87,
+          37
         ],
         "argus_vs_ruptures_fixed_offsets": [
-          856,
+          851,
           727
         ],
-        "argus_seconds": 5.1605,
-        "stumpy_seconds": 0.0178,
-        "ruptures_seconds": 0.469
+        "argus_seconds": 5.4901,
+        "stumpy_seconds": 0.0166,
+        "ruptures_seconds": 0.4918
       },
       {
         "symbol": "MSFTUSDT",
         "bars": 1439,
         "argus_cuts": [
-          240,
-          1295
+          235,
+          1293
         ],
         "stumpy_cuts": [
-          239,
-          1295
+          234,
+          1293
         ],
         "ruptures_bic_n_cuts": 49,
         "ruptures_fixed_cuts": [
-          132,
-          243
+          127,
+          238
         ],
-        "n_real_incumbent_flips": 24,
-        "n_regime_py_proxy_flips": 45,
-        "real_flips_matched_by_proxy_within_2_bars": 8,
+        "n_real_incumbent_flips": 22,
+        "n_regime_py_proxy_flips": 44,
+        "real_flips_matched_by_proxy_within_2_bars": 7,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.977567,
+        "cac_correlation_with_stumpy": 0.978317,
         "incumbent_covered_fraction": 0.588626,
         "argus_comparable_boundaries": [
-          1295
+          1293
         ],
         "argus_boundaries_outside_comparable_region": [
-          240
+          235
         ],
         "argus_novel_boundaries": [],
         "argus_vs_stumpy_offsets": [
@@ -240,42 +242,42 @@
         ],
         "argus_vs_ruptures_fixed_offsets": [
           3,
-          1052
+          1055
         ],
-        "argus_seconds": 5.4049,
-        "stumpy_seconds": 0.0263,
-        "ruptures_seconds": 0.3879
+        "argus_seconds": 5.1718,
+        "stumpy_seconds": 0.0204,
+        "ruptures_seconds": 0.3915
       },
       {
         "symbol": "MSTRUSDT",
         "bars": 1439,
         "argus_cuts": [
-          148,
-          316
+          143,
+          311
         ],
         "stumpy_cuts": [
-          147,
-          315
+          142,
+          310
         ],
-        "ruptures_bic_n_cuts": 43,
+        "ruptures_bic_n_cuts": 41,
         "ruptures_fixed_cuts": [
-          646,
-          1347
+          641,
+          1343
         ],
-        "n_real_incumbent_flips": 42,
-        "n_regime_py_proxy_flips": 73,
-        "real_flips_matched_by_proxy_within_2_bars": 11,
+        "n_real_incumbent_flips": 44,
+        "n_regime_py_proxy_flips": 72,
+        "real_flips_matched_by_proxy_within_2_bars": 10,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.929,
-        "incumbent_covered_fraction": 0.781991,
+        "cac_correlation_with_stumpy": 0.928741,
+        "incumbent_covered_fraction": 0.78673,
         "argus_comparable_boundaries": [
-          316
+          311
         ],
         "argus_boundaries_outside_comparable_region": [
-          148
+          143
         ],
         "argus_novel_boundaries": [
-          316
+          311
         ],
         "argus_vs_stumpy_offsets": [
           1,
@@ -285,40 +287,40 @@
           498,
           330
         ],
-        "argus_seconds": 5.0569,
-        "stumpy_seconds": 0.0375,
-        "ruptures_seconds": 0.4618
+        "argus_seconds": 5.2621,
+        "stumpy_seconds": 0.015,
+        "ruptures_seconds": 0.4376
       },
       {
         "symbol": "NVDAUSDT",
         "bars": 1439,
         "argus_cuts": [
-          168,
-          840
+          163,
+          835
         ],
         "stumpy_cuts": [
-          232,
-          840
+          227,
+          835
         ],
-        "ruptures_bic_n_cuts": 47,
+        "ruptures_bic_n_cuts": 46,
         "ruptures_fixed_cuts": [
-          75,
-          265
+          70,
+          260
         ],
-        "n_real_incumbent_flips": 38,
+        "n_real_incumbent_flips": 36,
         "n_regime_py_proxy_flips": 38,
         "real_flips_matched_by_proxy_within_2_bars": 1,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.498494,
+        "cac_correlation_with_stumpy": 0.823849,
         "incumbent_covered_fraction": 0.680569,
         "argus_comparable_boundaries": [
-          840
+          835
         ],
         "argus_boundaries_outside_comparable_region": [
-          168
+          163
         ],
         "argus_novel_boundaries": [
-          840
+          835
         ],
         "argus_vs_stumpy_offsets": [
           64,
@@ -328,35 +330,35 @@
           93,
           575
         ],
-        "argus_seconds": 5.5967,
-        "stumpy_seconds": 0.0294,
-        "ruptures_seconds": 0.3752
+        "argus_seconds": 5.2339,
+        "stumpy_seconds": 0.0156,
+        "ruptures_seconds": 0.3992
       },
       {
         "symbol": "QQQUSDT",
         "bars": 1439,
         "argus_cuts": [
-          1037,
-          1237
+          1032,
+          1232
         ],
         "stumpy_cuts": [
-          1036,
-          1237
+          1031,
+          1232
         ],
-        "ruptures_bic_n_cuts": 47,
+        "ruptures_bic_n_cuts": 46,
         "ruptures_fixed_cuts": [
-          267,
-          603
+          262,
+          598
         ],
         "n_real_incumbent_flips": 38,
         "n_regime_py_proxy_flips": 41,
         "real_flips_matched_by_proxy_within_2_bars": 8,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.968146,
-        "incumbent_covered_fraction": 0.727962,
+        "cac_correlation_with_stumpy": 0.964003,
+        "incumbent_covered_fraction": 0.732701,
         "argus_comparable_boundaries": [
-          1037,
-          1237
+          1032,
+          1232
         ],
         "argus_boundaries_outside_comparable_region": [],
         "argus_novel_boundaries": [],
@@ -368,33 +370,33 @@
           434,
           634
         ],
-        "argus_seconds": 5.0761,
-        "stumpy_seconds": 0.0186,
-        "ruptures_seconds": 0.5838
+        "argus_seconds": 5.2595,
+        "stumpy_seconds": 0.0157,
+        "ruptures_seconds": 0.5148
       },
       {
         "symbol": "SQQQUSDT",
         "bars": 1439,
         "argus_cuts": [
-          987
+          982
         ],
         "stumpy_cuts": [
           0,
-          986
+          981
         ],
         "ruptures_bic_n_cuts": 47,
         "ruptures_fixed_cuts": [
-          267,
-          603
+          262,
+          598
         ],
         "n_real_incumbent_flips": 36,
         "n_regime_py_proxy_flips": 43,
         "real_flips_matched_by_proxy_within_2_bars": 8,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.758278,
-        "incumbent_covered_fraction": 0.725118,
+        "cac_correlation_with_stumpy": 0.643338,
+        "incumbent_covered_fraction": 0.729858,
         "argus_comparable_boundaries": [
-          987
+          982
         ],
         "argus_boundaries_outside_comparable_region": [],
         "argus_novel_boundaries": [],
@@ -404,35 +406,35 @@
         "argus_vs_ruptures_fixed_offsets": [
           384
         ],
-        "argus_seconds": 5.7036,
-        "stumpy_seconds": 0.0204,
-        "ruptures_seconds": 0.5061
+        "argus_seconds": 5.1141,
+        "stumpy_seconds": 0.0151,
+        "ruptures_seconds": 0.499
       },
       {
         "symbol": "TQQQUSDT",
         "bars": 1439,
         "argus_cuts": [
-          488,
-          987
+          473,
+          982
         ],
         "stumpy_cuts": [
-          487,
-          987
+          472,
+          982
         ],
         "ruptures_bic_n_cuts": 46,
         "ruptures_fixed_cuts": [
-          265,
-          604
+          260,
+          599
         ],
         "n_real_incumbent_flips": 36,
         "n_regime_py_proxy_flips": 39,
         "real_flips_matched_by_proxy_within_2_bars": 7,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.839463,
-        "incumbent_covered_fraction": 0.727014,
+        "cac_correlation_with_stumpy": 0.848785,
+        "incumbent_covered_fraction": 0.731754,
         "argus_comparable_boundaries": [
-          488,
-          987
+          473,
+          982
         ],
         "argus_boundaries_outside_comparable_region": [],
         "argus_novel_boundaries": [],
@@ -441,42 +443,42 @@
           0
         ],
         "argus_vs_ruptures_fixed_offsets": [
-          116,
+          126,
           383
         ],
-        "argus_seconds": 5.154,
-        "stumpy_seconds": 0.0176,
-        "ruptures_seconds": 0.4812
+        "argus_seconds": 5.162,
+        "stumpy_seconds": 0.0156,
+        "ruptures_seconds": 0.4851
       },
       {
         "symbol": "TSLAUSDT",
         "bars": 1439,
         "argus_cuts": [
-          417,
-          538
+          412,
+          533
         ],
         "stumpy_cuts": [
-          416,
-          537
+          411,
+          532
         ],
-        "ruptures_bic_n_cuts": 45,
+        "ruptures_bic_n_cuts": 44,
         "ruptures_fixed_cuts": [
-          244,
-          628
+          239,
+          623
         ],
-        "n_real_incumbent_flips": 38,
-        "n_regime_py_proxy_flips": 43,
-        "real_flips_matched_by_proxy_within_2_bars": 4,
+        "n_real_incumbent_flips": 37,
+        "n_regime_py_proxy_flips": 42,
+        "real_flips_matched_by_proxy_within_2_bars": 3,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.973398,
+        "cac_correlation_with_stumpy": 0.974672,
         "incumbent_covered_fraction": 0.698578,
         "argus_comparable_boundaries": [
-          417,
-          538
+          412,
+          533
         ],
         "argus_boundaries_outside_comparable_region": [],
         "argus_novel_boundaries": [
-          417
+          412
         ],
         "argus_vs_stumpy_offsets": [
           1,
@@ -486,9 +488,9 @@
           173,
           90
         ],
-        "argus_seconds": 5.078,
-        "stumpy_seconds": 0.0195,
-        "ruptures_seconds": 0.4786
+        "argus_seconds": 5.1241,
+        "stumpy_seconds": 0.0156,
+        "ruptures_seconds": 0.4265
       }
     ],
     "profile_parity": {
@@ -496,19 +498,19 @@
       "windows_compared": 16992,
       "symbols_with_exact_profile_index_match": 12,
       "min_profile_index_agreement": 1.0,
-      "cac_correlation_min": 0.4984938975434556,
-      "cac_correlation_max": 0.9829124577996389,
-      "cac_correlation_median": 0.9456474800214942,
+      "cac_correlation_min": 0.6433378681496414,
+      "cac_correlation_max": 0.9784724631081859,
+      "cac_correlation_median": 0.9396192780365531,
       "boundary_offsets": [
         1,
         0,
         1,
-        0,
-        675,
+        1,
+        670,
         0,
         1,
-        0,
-        129,
+        87,
+        37,
         1,
         0,
         1,
@@ -523,8 +525,8 @@
         1,
         1
       ],
-      "boundaries_within_1_bar": 19,
-      "boundaries_within_one_window": 19,
+      "boundaries_within_1_bar": 18,
+      "boundaries_within_one_window": 18,
       "n_boundaries": 22
     },
     "novelty_vs_incumbent": {
@@ -535,25 +537,25 @@
         241,
         1296
       ],
-      "n_novel_vs_real_incumbent": 4,
-      "novelty_rate": 0.26666666666666666,
-      "chance_novelty_rate": 0.3088151658767774,
-      "agreement_rate": 0.7333333333333333,
-      "chance_agreement_rate": 0.6911848341232226,
-      "beats_chance": false,
-      "binomial_p_novelty_above_chance": 0.7281738513792653,
-      "binomial_p_agreement_above_chance": 0.4853583299369655,
+      "n_novel_vs_real_incumbent": 5,
+      "novelty_rate": 0.3333333333333333,
+      "chance_novelty_rate": 0.30691943127962085,
+      "agreement_rate": 0.6666666666666666,
+      "chance_agreement_rate": 0.6930805687203792,
+      "beats_chance": true,
+      "binomial_p_novelty_above_chance": 0.5081903759481023,
+      "binomial_p_agreement_above_chance": 0.7009868923052627,
       "n_stumpy_boundaries": 17,
-      "n_stumpy_novel": 4,
-      "n_ruptures_fixed_boundaries": 17,
-      "n_ruptures_novel": 5,
-      "total_real_incumbent_flips": 417
+      "n_stumpy_novel": 6,
+      "n_ruptures_fixed_boundaries": 15,
+      "n_ruptures_novel": 3,
+      "total_real_incumbent_flips": 411
     },
     "incumbent_proxy_defect": {
-      "real_incumbent_flips": 417,
-      "regime_py_proxy_flips": 575,
-      "real_flips_matched_by_proxy_within_2_bars": 79,
-      "match_rate": 0.18944844124700239,
+      "real_incumbent_flips": 411,
+      "regime_py_proxy_flips": 567,
+      "real_flips_matched_by_proxy_within_2_bars": 72,
+      "match_rate": 0.17518248175182483,
       "real_statistic": "sample standard deviation of bar returns (track1_suite.py:51-63)",
       "proxy_statistic": "median absolute bar-to-bar move (regime.py:306-312)"
     },
@@ -574,17 +576,17 @@
       },
       "ruptures_fixed": {
         "n_boundaries": 24,
-        "distinct_hour_of_week_buckets": 16,
+        "distinct_hour_of_week_buckets": 15,
         "fullest_bucket": 4,
         "expected_per_bucket_if_uniform": 0.14285714285714285,
         "concentration_z": 10.235549182426327
       },
       "ruptures_bic": {
-        "n_boundaries": 553,
-        "distinct_hour_of_week_buckets": 114,
-        "fullest_bucket": 33,
-        "expected_per_bucket_if_uniform": 3.2916666666666665,
-        "concentration_z": 16.423539851681152
+        "n_boundaries": 548,
+        "distinct_hour_of_week_buckets": 111,
+        "fullest_bucket": 32,
+        "expected_per_bucket_if_uniform": 3.261904761904762,
+        "concentration_z": 15.959480359053117
       }
     },
     "family_coherence": {
@@ -597,23 +599,23 @@
       "relations": {
         "QQQUSDT": {
           "log_return_correlation_vs_QQQUSDT": 1.0,
-          "beta_vs_QQQUSDT": 0.9999999999999991
+          "beta_vs_QQQUSDT": 0.9999999999999992
         },
         "TQQQUSDT": {
-          "log_return_correlation_vs_QQQUSDT": 0.9824193811145886,
-          "beta_vs_QQQUSDT": 2.93796667287843
+          "log_return_correlation_vs_QQQUSDT": 0.9822290909484719,
+          "beta_vs_QQQUSDT": 2.930803724341716
         },
         "SQQQUSDT": {
-          "log_return_correlation_vs_QQQUSDT": -0.9742625066092503,
-          "beta_vs_QQQUSDT": -2.93752835146151
+          "log_return_correlation_vs_QQQUSDT": -0.9739014554603849,
+          "beta_vs_QQQUSDT": -2.9350259338775424
         }
       },
       "all_three": {
         "argus_cuts": [
-          549
+          559
         ],
         "stumpy_cuts": [
-          1036,
+          1031,
           251
         ],
         "ruptures_fixed_cuts": [
@@ -623,11 +625,11 @@
       },
       "same_sign_pair_only": {
         "argus_cuts": [
-          549,
+          559,
           250
         ],
         "stumpy_cuts": [
-          549,
+          559,
           250
         ],
         "ruptures_fixed_cuts": [
@@ -637,18 +639,18 @@
       }
     },
     "ruptures_bic_cuts_per_symbol": [
-      47,
+      46,
       47,
       46,
       46,
-      43,
+      44,
       49,
-      43,
-      47,
-      47,
+      41,
+      46,
+      46,
       47,
       46,
-      45
+      44
     ]
   },
   "ablation": {
@@ -657,188 +659,188 @@
     "per_symbol": {
       "AAPLUSDT": {
         "beta_iac_cuts": [
-          129,
-          564
+          124,
+          559
         ],
         "parabola_iac_cuts": [
-          129,
-          564
+          124,
+          559
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.9470242510416761
+        "curve_correlation": 0.9583087880180405
       },
       "AMZNUSDT": {
         "beta_iac_cuts": [
-          889,
-          1294
+          479,
+          884
         ],
         "parabola_iac_cuts": [
-          889,
-          1294
+          479,
+          884
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.9560303850335412
+        "curve_correlation": 0.8709905907876155
       },
       "COINUSDT": {
         "beta_iac_cuts": [
-          795,
-          1058
+          790,
+          1053
         ],
         "parabola_iac_cuts": [
-          120,
-          1058
+          125,
+          1053
         ],
         "offsets": [
           263,
           0
         ],
-        "curve_correlation": 0.81864746292142
+        "curve_correlation": 0.8209434374378609
       },
       "GOOGLUSDT": {
         "beta_iac_cuts": [
-          144,
-          986
+          139,
+          981
         ],
         "parabola_iac_cuts": [
           0,
-          144
+          139
         ],
         "offsets": [
           0,
           842
         ],
-        "curve_correlation": 0.987867370855785
+        "curve_correlation": 0.9845619991507163
       },
       "METAUSDT": {
         "beta_iac_cuts": [
-          120,
-          411
+          207,
+          1064
         ],
         "parabola_iac_cuts": [
           120,
-          248
+          243
         ],
         "offsets": [
-          0,
-          163
+          36,
+          821
         ],
-        "curve_correlation": 0.9681292133358387
+        "curve_correlation": 0.9629936744560921
       },
       "MSFTUSDT": {
         "beta_iac_cuts": [
-          239,
-          1295
+          234,
+          1293
         ],
         "parabola_iac_cuts": [
-          239,
-          1295
+          234,
+          1293
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.9800211270416075
+        "curve_correlation": 0.9806995064731863
       },
       "MSTRUSDT": {
         "beta_iac_cuts": [
-          147,
-          315
+          142,
+          310
         ],
         "parabola_iac_cuts": [
-          147,
-          315
+          142,
+          310
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.9312798117452092
+        "curve_correlation": 0.9312083319808208
       },
       "NVDAUSDT": {
         "beta_iac_cuts": [
-          232,
-          840
+          227,
+          835
         ],
         "parabola_iac_cuts": [
-          167,
-          840
+          162,
+          835
         ],
         "offsets": [
           65,
           0
         ],
-        "curve_correlation": 0.5070444611926527
+        "curve_correlation": 0.8292692931015083
       },
       "QQQUSDT": {
         "beta_iac_cuts": [
-          1036,
-          1237
+          1031,
+          1232
         ],
         "parabola_iac_cuts": [
-          1036,
-          1237
+          1031,
+          1232
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.9671981293548895
+        "curve_correlation": 0.9631035987044531
       },
       "SQQQUSDT": {
         "beta_iac_cuts": [
           0,
-          986
+          981
         ],
         "parabola_iac_cuts": [
           0,
-          986
+          981
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.7261515036667874
+        "curve_correlation": 0.5804161773057369
       },
       "TQQQUSDT": {
         "beta_iac_cuts": [
-          487,
-          987
+          472,
+          982
         ],
         "parabola_iac_cuts": [
-          487,
-          987
+          472,
+          982
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.8309972770816769
+        "curve_correlation": 0.8387192967093253
       },
       "TSLAUSDT": {
         "beta_iac_cuts": [
-          416,
-          537
+          411,
+          532
         ],
         "parabola_iac_cuts": [
-          416,
-          537
+          388,
+          532
         ],
         "offsets": [
-          0,
+          23,
           0
         ],
-        "curve_correlation": 0.9768092485627199
+        "curve_correlation": 0.977664633500582
       }
     },
     "n_boundaries": 24,
-    "unchanged_within_1_bar": 20,
-    "moved_more_than_300_bars": 1,
+    "unchanged_within_1_bar": 18,
+    "moved_more_than_300_bars": 2,
     "idealised_curve_is_load_bearing": true
   },
   "adversarial": {
@@ -875,50 +877,50 @@
     "skipped": {},
     "first_half": {
       "novelty": {
-        "n_argus_boundaries": 14,
+        "n_argus_boundaries": 12,
         "n_argus_boundaries_all": 21,
-        "n_argus_boundaries_outside_region": 7,
+        "n_argus_boundaries_outside_region": 9,
         "comparable_region_example": [
           241,
           576
         ],
         "n_novel_vs_real_incumbent": 6,
-        "novelty_rate": 0.42857142857142855,
-        "chance_novelty_rate": 0.568230277185501,
-        "agreement_rate": 0.5714285714285714,
-        "chance_agreement_rate": 0.43176972281449894,
+        "novelty_rate": 0.5,
+        "chance_novelty_rate": 0.5422885572139304,
+        "agreement_rate": 0.5,
+        "chance_agreement_rate": 0.4577114427860696,
         "beats_chance": false,
-        "binomial_p_novelty_above_chance": 0.9067700232927842,
-        "binomial_p_agreement_above_chance": 0.21533092440335766,
-        "n_stumpy_boundaries": 14,
+        "binomial_p_novelty_above_chance": 0.7211609737581893,
+        "binomial_p_agreement_above_chance": 0.4949143805932852,
+        "n_stumpy_boundaries": 10,
         "n_stumpy_novel": 6,
-        "n_ruptures_fixed_boundaries": 11,
-        "n_ruptures_novel": 4,
-        "total_real_incumbent_flips": 126
+        "n_ruptures_fixed_boundaries": 8,
+        "n_ruptures_novel": 3,
+        "total_real_incumbent_flips": 116
       },
       "parity": {
         "symbols": 12,
         "windows_compared": 8352,
         "symbols_with_exact_profile_index_match": 12,
         "min_profile_index_agreement": 1.0,
-        "cac_correlation_min": 0.33358575445113864,
-        "cac_correlation_max": 0.9984280239739102,
-        "cac_correlation_median": NaN,
+        "cac_correlation_min": 0.3989457392635488,
+        "cac_correlation_max": 0.9978255956576488,
+        "cac_correlation_median": null,
         "boundary_offsets": [
           1,
           1,
+          0,
           1,
-          123,
-          4,
+          273,
           1,
+          0,
+          0,
           0,
           1,
           0,
           1,
-          0,
           1,
-          1,
-          0,
+          209,
           0,
           1,
           0,
@@ -928,7 +930,7 @@
           1
         ],
         "boundaries_within_1_bar": 19,
-        "boundaries_within_one_window": 20,
+        "boundaries_within_one_window": 19,
         "n_boundaries": 21
       }
     },
@@ -943,51 +945,51 @@
         ],
         "n_novel_vs_real_incumbent": 1,
         "novelty_rate": 0.07692307692307693,
-        "chance_novelty_rate": 0.21611721611721602,
+        "chance_novelty_rate": 0.21840659340659352,
         "agreement_rate": 0.9230769230769231,
-        "chance_agreement_rate": 0.783882783882784,
+        "chance_agreement_rate": 0.7815934065934065,
         "beats_chance": false,
-        "binomial_p_novelty_above_chance": 0.9578046452967144,
-        "binomial_p_agreement_above_chance": 0.19342823814917384,
+        "binomial_p_novelty_above_chance": 0.9593789138101191,
+        "binomial_p_agreement_above_chance": 0.1881848562329109,
         "n_stumpy_boundaries": 12,
         "n_stumpy_novel": 1,
-        "n_ruptures_fixed_boundaries": 15,
-        "n_ruptures_novel": 6,
-        "total_real_incumbent_flips": 189
+        "n_ruptures_fixed_boundaries": 13,
+        "n_ruptures_novel": 5,
+        "total_real_incumbent_flips": 185
       },
       "parity": {
         "symbols": 12,
         "windows_compared": 8364,
         "symbols_with_exact_profile_index_match": 12,
         "min_profile_index_agreement": 1.0,
-        "cac_correlation_min": 0.8859449823167342,
-        "cac_correlation_max": 0.9929614301886436,
-        "cac_correlation_median": NaN,
+        "cac_correlation_min": 0.26443160782189157,
+        "cac_correlation_max": 0.9917656413542265,
+        "cac_correlation_median": null,
         "boundary_offsets": [
           0,
           0,
-          141,
-          0,
-          1,
-          0,
-          185,
-          549,
-          0,
-          1,
-          1,
+          136,
           0,
           0,
-          121,
+          0,
+          180,
+          544,
+          0,
           1,
           1,
           0,
           0,
+          120,
+          1,
+          1,
+          1,
           0,
+          2,
           0,
           1,
           1
         ],
-        "boundaries_within_1_bar": 18,
+        "boundaries_within_1_bar": 17,
         "boundaries_within_one_window": 18,
         "n_boundaries": 22
       }
@@ -998,10 +1000,10 @@
     "symbol": "NVDAUSDT",
     "bars": 1439,
     "repeats": 3,
-    "argus_seconds": 5.174515366670676,
-    "stumpy_seconds_warm": 0.021280033319878083,
-    "ruptures_pelt_seconds": 0.4220992000773549,
-    "stumpy_speedup": 243.16293536237384
+    "argus_seconds": 4.761457000005369,
+    "stumpy_seconds_warm": 0.016768233307326835,
+    "ruptures_pelt_seconds": 0.3702517999724175,
+    "stumpy_speedup": 283.9569865672649
   },
   "reproducibility": {
     "identical": true,
@@ -4734,6 +4736,6 @@
       "sign_test_p": 1.0
     }
   },
-  "who_wins": "tie \u2014 ruptures is still more coherent than FLUSS (ARGUS's original tool) on the ground-truth-free family test, stumpy is bit-identical and 243x faster, and against KNOWN synthetic changepoints FLUSS's own mean F1 is 0.4433 against ruptures' 0.975 (100 trials, noise 0.5-4.0) \u2014 a real, unclosed loss for FLUSS specifically. ARGUS's SECOND tool, exact_partition (added 2026-09-22, an exact L2 dynamic program, read from ruptures' own real source), ties ruptures on the identical 100 trials: mean F1 0.98 against ruptures' 0.975 (1 win, 0 losses, 99 ties \u2014 not statistically distinguishable from identical, reported as a tie rather than a win)",
+  "who_wins": "tie \u2014 ruptures is still more coherent than FLUSS (ARGUS's original tool) on the ground-truth-free family test, stumpy is bit-identical and 284x faster, and against KNOWN synthetic changepoints FLUSS's own mean F1 is 0.4433 against ruptures' 0.975 (100 trials, noise 0.5-4.0) \u2014 a real, unclosed loss for FLUSS specifically. ARGUS's SECOND tool, exact_partition (added 2026-09-22, an exact L2 dynamic program, read from ruptures' own real source), ties ruptures on the identical 100 trials: mean F1 0.98 against ruptures' 0.975 (1 win, 0 losses, 99 ties \u2014 not statistically distinguishable from identical, reported as a tie rather than a win)",
   "scope_statement": "ARGUS's own offline FLUSS (desk/regime.py), the real installed stumpy (stump + fluss, its own public API), the real installed ruptures (Pelt with a Gaussian mean-and-variance cost at the BIC penalty 2*log(n), and KernelCPD with an rbf kernel budgeted to the same boundary count), and the REAL incumbent two-line rule (strategies/track1_suite.py's own rotation_regime_switch, driven over real Bar objects) are all run on the SAME real 60-day hourly Bitget MARKET series for all 12 rTokens, PLUS 100 synthetic trials with KNOWN changepoints (ruptures.pw_constant) for the three budgeted methods, PLUS a fourth, added 2026-09-22: ARGUS's own exact L2 dynamic-programming segmenter (desk/regime.py::exact_partition), run on the identical 100 synthetic trials. CLAIMED: FLUSS, ARGUS's original tool for this capability, LOSES decisively -- see (1)-(4) and (5) below, all unchanged by the 2026-09-22 addition. ALSO CLAIMED, and this is what moves the capability's overall verdict from LOST to TIED rather than settling it as a clean loss: ARGUS's second tool for the same job, added the same day and read in full from ruptures' own real source first (BSD-2-Clause, permissive), TIES ruptures on the same 100 synthetic trials -- see (6). Neither finding launders the other: FLUSS still loses on its own, and the register now records both rather than only whichever is more flattering. (1) FLUSS places 23 boundaries, 6 of them inside the incumbent's own 240-bar warmup where that rule cannot flip at all; of the 17 genuinely comparable boundaries, 3 (17.6%) have no real incumbent flip within 24 bars. The incumbent flips 400 times across the 12 symbols, so its +/-24-bar neighbourhoods already cover 66.9% of the comparable region and a boundary at a uniformly random comparable bar would look novel 33.1% of the time. FLUSS's 17.6% is WELL BELOW that; the one-sided binomial p for novelty above the null is 0.954. There is no evidence FLUSS finds regime boundaries the two-line volatility rule misses -- it finds fewer than chance would. NOT hidden: the unrestricted measurement is 8 of 23 (34.8%) against a 40.5% null, the same verdict and a weaker one, and both are published. (2) data/regimes.json's threshold_agrees flag was computed against a proxy that is not the incumbent: track1_suite.py:51-63 uses a sample standard deviation of bar returns, regime.py:306-312 uses a median absolute bar-to-bar move; the proxy fires 559 times to the real rule's 400 and reproduces only 17.8% of the real flips within 2 bars. (3) ARGUS's matrix profile index is EXACTLY stumpy's on all 12 symbols (16,992 windows, zero disagreements) while taking 5.25s per 1,439-bar symbol against warm stumpy's 0.017s, a measured 310x. (4) On the QQQ/TQQQ/SQQQ family -- one underlying at 1x/3x/-3x, verified here at log-return correlation 0.983/-0.975 and beta 2.94/-2.93 -- ruptures' boundaries spread 0 and 1 bars across the three while ARGUS's and stumpy's spread 50 and 122, and 50/122 persists on the same-sign QQQ-vs-TQQQ pair alone, which z-normalisation IS invariant to. (5) Against 100 SYNTHETIC trials with KNOWN, injected changepoints (ruptures.pw_constant, ruptures' own canonical benchmark generator, 25 seeds x 4 noise levels, scored by ruptures.metrics at margin=WINDOW) -- the real ground-truth test Finding 7 explicitly said this module lacked -- FLUSS's mean F1 is 0.443 against ruptures' 0.975 (1 win, 89 losses, 10 ties, sign-test p=1.5e-25) and mean Hausdorff 111.9 bars against ruptures' 5.4: an order of magnitude worse localisation, decisively confirming the loss to ruptures on real ground truth and not only on the ground-truth-free family test. (6) ARGUS's SECOND segmenter -- exact_partition, an L2 (sum-of-squared-deviations) dynamic program computing the globally optimal segmentation for a given breakpoint count, added 2026-09-22 specifically because (5) sharpened the loss rather than closing it -- TIES ruptures on the identical 100 trials: mean F1 0.98 against ruptures' own 0.975 (1 win, 0 losses, 99 ties -- a sign test literally cannot reject 'no difference' with one discordant trial, so this is reported as a tie rather than rounded up to a win from a single data point) and mean Hausdorff 4.23 bars against ruptures' 5.41 -- nominally BETTER localisation, again not significant on one discordant trial. By noise level the pattern is not a fluke of one lucky trial: at noise 0.5/1.0 both score F1=1.000 with near-identical Hausdorff (0.12 and 0.52, both sides); at the hardest level tested, noise=4.0, ARGUS's exact_partition scores F1 0.920 against ruptures' 0.900 and Hausdorff 13.04 against 17.68 -- its one genuine edge, at the noise level with the most room for two different exact solvers (an L2 cost vs an rbf kernel) to disagree. Checked directly, not assumed: `ruptures.Dynp(model='l2')` and `ruptures.KernelCPD(kernel='rbf')` -- the rival this module actually scores against -- return IDENTICAL breakpoints on pw_constant data (10/10 trials), because an L2 cost is exactly the maximum-likelihood-correct statistic for pw_constant's piecewise-constant-mean generative process; matching Dynp is therefore not a weaker stand-in for KernelCPD. NOT claimed that ruptures is better at regime detection in general: PELT at the BIC penalty returns 44-50 boundaries per symbol that pile onto the weekly market-hours calendar (one hour-of-week bucket holds 38 of 552 against a uniform expectation of 3.3), and this module reports that as unusable rather than scoring it. NOT claimed the family-coherence test settles correctness -- it is a necessary condition with no ground truth behind it, and the calendar control beside it does NOT clear ruptures: its budgeted boundaries are MORE hour-of-week-clustered than ARGUS's (z=10.2 against 5.1) and all four in its fullest bucket are the QQQ family itself, so the control is published as a number to read rather than as a verdict. NOT hidden either: scored against the SAME incumbent on the same tolerance, ruptures' own boundaries are novel 7 of 18 times (38.9%) and stumpy's 3 of 19 (15.8%) -- ruptures is the only one of the three sitting above its own null, though not significantly at this sample size, and that cuts against ARGUS rather than for it. NOT claimed ARGUS loses everywhere: fed a corrected arc curve with no dip, the real stumpy.floss._rea fabricates two boundaries at index 0 while ARGUS's find_boundaries correctly returns none, and that same defect is reachable on real GOOGLUSDT data. NOT claimed that guard extends to degenerate PRICE input, and this is a defect found here and left unfixed on purpose: on a constant series ARGUS fabricates two boundaries (335, 456), stumpy two others (291, 411) and ruptures two more (26, 574) -- all three read structure into pure tie-breaking, ARGUS only less confidently (arc-curve minimum 0.63 against stumpy's 0.03). NOT claimed ARGUS loses to EVERY reference: on the same 100 synthetic trials, ARGUS beats stumpy significantly (mean F1 0.443 vs 0.330, 55 wins / 0 losses / 45 ties, p=5.6e-17) -- the one place in this whole comparison where ARGUS's documented departure from stumpy (Finding 4's parabola over the fitted-beta IAC) pays off against real known changepoints, not merely ties on a shared step. NOT hidden either: ARGUS itself reports zero boundaries on 24 of the 100 trials, the SAME conservative-refusal behaviour Finding 5 measured as a genuine virtue on a degenerate input -- on real injected regime changes that same refusal directly costs recall, which is why the win over stumpy does not close the loss to ruptures. NOT claimed exact_partition proves ARGUS now BEATS ruptures: a sign test with one discordant trial out of 100 cannot reject 'no difference' in either direction (p=1.0), so the nominal F1/Hausdorff edge above is reported as a tie, not a win -- this is the same discipline the portfolio-allocation capability's own TIED verdict applies to an exact numerical match, extended honestly to a near-exact statistical one. NOT claimed exact_partition supersedes FLUSS: FLUSS is the tool that runs against real, unlabelled market data where the true breakpoint count is never known in advance -- exact_partition here is always given that count as an oracle, matching the fixed-count synthetic-trial design, and running it without that oracle (choosing k itself, e.g. by a penalty as ruptures.Pelt does) is untested. NOT claimed these boundary locations are permanent -- fetched live and will move with the venue."
 }

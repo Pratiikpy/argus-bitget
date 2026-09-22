@@ -9,6 +9,17 @@ NVDAUSDT, 1,439 bars) reported `threshold_agrees: true` — the module's own out
 nothing the incumbent had not. One symbol, no numerical parity, no chance baseline. This module
 closes all three, across the full 12-symbol rToken universe.
 
+**A live-data note before Findings 1, 2 and 7.** All three run `run_base_case()`, which fetches
+real Bitget hourly candles fresh on every call — there is no frozen snapshot. The specific counts
+below (flip counts, novelty rates, family spreads) will drift as more candles accumulate; they were
+last refreshed 2026-09-22 (411 real incumbent flips, up from 400 on 2026-09-20/21) and are reported
+as a dated measurement, not a fixed fact. Re-run `python -m argus.eval.regime_comparison` for
+today's numbers rather than trusting these. What does NOT drift with the market — the qualitative
+conclusions ("neither shows significant skill above chance", "ruptures' family coherence holds") —
+is stated separately from the specific numbers that support it on any given day, and Finding 8's
+100-trial synthetic benchmark is seeded and unaffected by any of this, which is why the headline
+OWNED/TIED verdict for this capability rests on Finding 8, not on these live-data findings.
+
 **Finding 1 — the incumbent it compared itself against was not the incumbent.** `desk/regime.py`'s
 `_threshold_flips` says in its own docstring that it reimplements
 `strategies/track1_suite.py:206-215` and that "the arithmetic is the same and the comparison would
@@ -16,29 +27,37 @@ be meaningless if it were not". Read side by side, the arithmetic is **not** the
 `track1_suite.py:51-63`'s `_vol` is a sample **standard deviation of bar returns**, while
 `regime.py:306-312`'s `_volatility_bps` — the function `_threshold_flips` calls — is the **median
 absolute bar-to-bar move**. Different statistics, different flip sets, confirmed by running both:
-across the 12 rTokens the real `rotation_regime_switch` changes state 400 times and the proxy 559,
-and only 71 of the 400 real flips (17.8%) fall within 2 bars of a proxy flip. `data/regimes.json`'s
-`threshold_agrees` field was therefore computed against something that is not the rule it names.
-This module drives the **real** `rotation_regime_switch` over real `Bar` objects instead, and keeps
-the proxy alongside it only to measure the gap.
+across the 12 rTokens the real `rotation_regime_switch` changes state 411 times and the proxy 567,
+and only 17.5% of the real flips fall within 2 bars of a proxy flip (was 17.8%, 71 of 400, on
+2026-09-20/21 — the proportion is stable even as the raw counts move with the market).
+`data/regimes.json`'s `threshold_agrees` field was therefore computed against something that is not
+the rule it names. This module drives the **real** `rotation_regime_switch` over real `Bar` objects
+instead, and keeps the proxy alongside it only to measure the gap.
 
 **Finding 2 — the number this capability owed and never produced.** Across the 12 rTokens FLUSS
-places 23 boundaries, 6 of them inside the incumbent's own 240-bar warmup where the volatility rule
-cannot flip at all and a "discovery" would only be the rule's silence. Of the 17 boundaries in the
-region where both methods are free to answer (`comparable_region`), **3 (17.6%) have no real
-incumbent flip within 24 bars**. That looks like an argument for FLUSS until the null is computed:
-the real rule flips 400 times across the 12 symbols (23 to 39 each), so its +/-24-bar
-neighbourhoods already cover 66.9% of that region, and a boundary dropped at a uniformly random
-comparable bar would look "novel" 33.1% of the time. FLUSS's 17.6% is **well below** that —
-one-sided binomial p for novelty above the null is 0.954. **There is no evidence, on 12 symbols,
-that FLUSS finds regime boundaries the two-line volatility rule misses; it finds fewer than
-throwing a dart would.** Scored on the same incumbent at the same tolerance, ruptures' budgeted
-boundaries are novel 7 of 18 times (38.9%) and stumpy's 3 of 19 (15.8%) — ruptures is the only one
-of the three above its own null, which cuts against ARGUS rather than for it. That is the honest
-answer to the question `desk/regime.py` exists to answer, and it is a demotion.
-(Scored over the whole series instead, the same run reads 8 of 23,
-34.8%, against a 40.5% null — the same verdict, weaker, and 5 of those 8 "novel" boundaries were
-only novel because the incumbent had not warmed up yet. `comparable_region` explains the fix.)
+places boundaries in the region where both methods are free to answer (`comparable_region`), and a
+minority of them have no real incumbent flip within 24 bars — measured 2026-09-22 at 5 of 15
+(33.3%), against a chance null of 30.7% (the real rule now flips 411 times, so its +/-24-bar
+neighbourhoods cover 69.3% of the comparable region). FLUSS nominally clears that null, but not
+significantly: one-sided binomial p for novelty above the null is 0.51 — **indistinguishable from
+chance, which is itself the finding.** On 2026-09-20/21, with fewer real candles on record, the
+same measurement read 3 of 17 (17.6%) against a 33.1% null — FLUSS *below* chance that day, p=0.95
+— and ruptures read 7 of 18 (38.9%) against stumpy's 3 of 19 (15.8%), making ruptures look like the
+only one of the three with any edge. **That specific ranking has not survived one live-data
+refresh**: measured fresh, ruptures is now the one at chance-or-below and ARGUS's FLUSS and stumpy
+are the two nominally above it — the opposite ordering, on the identical live-data methodology, one
+day (of accumulated candles) later. Neither ordering is statistically significant in either
+direction (every one of these binomial p-values sits well clear of 0.05 both times), so the honest,
+drift-resistant reading is not "ruptures wins" or "ARGUS wins" but **there is no evidence, in
+either live snapshot, that any of the three finds regime boundaries the two-line volatility rule
+misses at a rate distinguishable from a dart throw.** That is the answer `desk/regime.py` exists to
+give, on live market data that will keep moving, and it is a demotion regardless of which day's
+snapshot is read.
+(Scored over the whole series instead of `comparable_region`, the same 2026-09-20/21 run read 8 of
+23, 34.8%, against a 40.5% null — the same verdict, weaker, and 5 of those 8 "novel" boundaries were
+only novel because the incumbent had not warmed up yet. `comparable_region` explains the fix; the
+whole-series framing was not re-measured on 2026-09-22 since `comparable_region` is the one that
+avoids the warmup artefact.)
 
 **Finding 3 — exact numerical parity with stumpy on the part that is shared.** ARGUS's own
 `matrix_profile_index` (pure-Python brute force, correlation identity) and the real, installed
@@ -89,12 +108,20 @@ real regime boundary is, so "who is right" is normally unanswerable. QQQUSDT, TQ
 escape that: they are the same NASDAQ-100 exposure at 1x, 3x and -3x. Measured on this data, hourly
 log-return correlation QQQ-TQQQ is 0.983 at beta 2.94 and QQQ-SQQQ is -0.975 at beta -2.93. A
 regime change in the underlying must therefore appear at the same hour in all three, so the spread
-of a method's k-th boundary across the family is a pure error measurement. ARGUS and stumpy both
-spread by 50 and 122 bars; ruptures' rbf kernel spreads by 0 and 1 bars on price and 0 and 0 on log
-returns. **Stated against it honestly: FLUSS's z-normalised distance matches shape and is not
-sign-invariant, so SQQQ's inverted path is a genuinely different shape to it — but QQQ vs TQQQ
-alone, same sign and pure scale, which z-normalisation IS invariant to, still spreads 50 and 122
-bars.** And a shared calendar can manufacture coherence, so that control is measured too rather
+of a method's k-th boundary across the family is a pure error measurement — reported here as a live
+number (see the live-data note above Finding 1), last measured 2026-09-22: ARGUS spreads by 559
+bars (one shared k-th boundary this time, down from two on 2026-09-20/21's 50-and-122 reading —
+FLUSS's own boundary count on the family symbols moves with the market, same as everything else in
+Findings 1 and 2), stumpy by 1,031 and 251, ruptures' rbf kernel by 2 and 1. `family_placebo`
+(`eval/regime_groundtruth_audit.py`) puts these against the distribution of the other 219
+non-family triples in the same universe: ruptures' spread sits at the 0th percentile (tighter than
+every one of the 219), unchanged in direction from the earlier reading and reconfirmed by its own
+dedicated regression test; ARGUS is at the 20.1th percentile and stumpy at the 79.9th — **neither
+clears the tightest-decile bar this control originally used, where both did on 2026-09-20/21.**
+That is read here as the SAME lesson Finding 2 teaches on a different axis: a live-data control
+that happened to look clean on one day's fetch is not the same claim as a control that holds
+structurally, and only ruptures' family-coherence result has actually reproduced across a live-data
+refresh. And a shared calendar can manufacture coherence, so that control is measured too rather
 than waved away. It does not clear ruptures outright and is not reported as if it did: on the
 hour-of-week histogram PELT-at-BIC is extreme (fullest bucket 38 against a uniform expectation of
 3.3, z=19.2), and the budgeted methods sit lower but not equal (ruptures' fullest bucket 4 against
@@ -194,6 +221,7 @@ from argus.desk.regime import (
     idealised_arc,
     matrix_profile_index,
 )
+from argus.eval.artefact import sanitise
 
 # `_threshold_flips` is private to `desk/regime.py` and is imported here on purpose: auditing it
 # against the rule it claims to reimplement IS this module's Finding 1, and a fourth copy of the
@@ -1623,7 +1651,17 @@ def main() -> int:  # pragma: no cover - CLI
     print(render(report))
     out = Path(__file__).resolve().parents[3] / "data" / "regime_comparison.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    # Two passes, deliberately: `default=str` first, exactly as before, catches whatever numpy
+    # scalar (an int64 from ruptures/stumpy, most likely) would otherwise raise inside plain
+    # json.dumps; sanitise()+allow_nan=False second turns the one genuinely undefined value in
+    # this report (an arc-curve correlation on a half series) into null instead of a bare NaN --
+    # the exact defect `eval/artefact.py` exists to prevent, that this module's own artefact kept
+    # regenerating with because it was never actually wired to use that module, only named in its
+    # docstring as one of the three originally fixed. Found by test_regime_groundtruth_audit.py's
+    # own regression pin going red again after this file's CLI was re-run for unrelated text
+    # fixes earlier in the session.
+    flattened = json.loads(json.dumps(report, default=str))
+    out.write_text(json.dumps(sanitise(flattened), indent=2, allow_nan=False), encoding="utf-8")
     print(f"\nwritten to {out}")
     return 0
 
