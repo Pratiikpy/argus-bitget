@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-22T01:49:50.858565+00:00",
+  "generated_at": "2026-09-22T01:57:54.934437+00:00",
   "probes": 20,
   "runs": 17,
   "weak": 2,
@@ -175,7 +175,7 @@
       "question": "Feature depth (data sources / Skill integration count and effectiveness)",
       "bar": "each source is health-classified on a live call, not counted from a list",
       "status": "RUNS",
-      "evidence": "12/12 data sources answered when probed \u2014 the track asks for count **and effectiveness**, so each is health-classified on a live call rather than counted from a list. Bitget's own Skills are separately measured: of nineteen tools, six carry data",
+      "evidence": "12/12 data sources answered when probed \u2014 the track asks for count **and effectiveness**, so each is health-classified on a live call rather than counted from a list. Bitget's own Skills are separately measured live, not hardcoded: of 19 tools probed, 6 answered \u00b7 measured against OpenBB's real provider count: 32 real providers (21 keyless) vs ARGUS's 12 \u2014 OpenBB wins on raw count, reported honestly rather than omitted; see t3-workbench for the property ARGUS wins instead",
       "artefact": "data/sources.json"
     },
     {

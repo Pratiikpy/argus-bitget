@@ -31,16 +31,18 @@ carries a result.**
 | 14 | `personal-workbench` | T3 | subtheme | IMPLEMENTED | OpenBB (real agent + data platform) | **yes** | split — OpenBB (32 real sources vs ARGUS's 12); ARGUS (point-in-time gating OpenBB's real source has zero representation of, verified sharp to the exact day) | 2026-09-22 |
 | 15 | `execution-assistance` | T3 | subtheme | IMPLEMENTED | hftbacktest (real LatencyModel) | **yes** | ARGUS (prices real deliberation delay hftbacktest's real trait has zero representation of; sqrt(t) scaling confirmed numerically) | 2026-09-22 |
 | 16 | `portfolio-copilot` | T3 | subtheme | **LOST** | Riskfolio-Lib NCO | **yes** | specialist (p=3.6e-05) | 2026-09-21 |
-| 17 | `t3-source-depth` | T3 | judging | IMPLEMENTED | — | no | — | — |
+| 17 | `t3-source-depth` | T3 | judging | IMPLEMENTED | OpenBB (real provider count) | **yes** | **specialist** — OpenBB (32 real providers vs ARGUS's 12) on raw count, honestly; ARGUS's sources are each live health-classified rather than counted from a list (effectiveness half of the criterion) — same evidence as row 14, synced here since this is the row the handbook actually names "count" | 2026-09-22 |
 | 18 | `t3-research-quality` | T3 | judging | IMPLEMENTED | QuantConnect Lean + statsmodels (two rivals) | **yes** | ARGUS (0 FDR/Bonferroni survivors vs Lean's uncorrected 7-of-190, ~9.5 expected FPs) | 2026-09-21 |
 | 19 | `t3-lui` | T3 | judging | **LOST** on accuracy, **WON** on safety | RasaHQ/rasa DIET (Apache-2.0) | **yes** | split — Rasa (accuracy, p=0.0014); ARGUS (OOS refusal, p=0.031) | 2026-09-21 |
 | 20 | `t3-personal-thesis` | T3 | judging | IMPLEMENTED | — | no | — | — |
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 15 of 20 as of 2026-09-22: 3 LOST (one of them split — LUI intent
+**`rival run` is `yes` on 16 of 20 as of 2026-09-22: 4 LOST (one of them split — LUI intent
 accuracy loses to Rasa's DIET classifier, p=0.0014, while ARGUS wins out-of-scope refusal
-separately and significantly, p=0.031, neither laundering the other), 1 more split
+separately and significantly, p=0.031, neither laundering the other; the 4th is
+t3-source-depth — OpenBB's real 32-provider count genuinely beats ARGUS's 12, no split
+framing applies to a row whose entire ask is count), 1 more split
 (personal-workbench: OpenBB genuinely wins on raw source breadth, 32 real providers vs ARGUS's
 12, reported honestly rather than omitted; ARGUS wins on point-in-time correctness, a property
 OpenBB's real agent source has zero representation of anywhere, verified sharp to the exact
@@ -90,10 +92,10 @@ codebase, 22 OWNED, 3 LOST, independently verified as of 2026-09-22 — do not r
 "0 OWNED anywhere," an earlier session conflated the two and said so wrongly to the owner; this
 count moves almost every iteration and this line is a snapshot, not a live figure — read
 `eval/standing.py`'s own output for the current number). What this ledger's `rival run` column
-tracks is narrower still: of 20 judged rows, 5 remain unwired (2 structurally blocked —
+tracks is narrower still: of 20 judged rows, 4 remain unwired (2 structurally blocked —
 `t2-sharpe-mdd-winrate` has nothing to settle yet, `sentiment` needs the metered Qwen key the
-loop cannot spend; 3 genuinely open — `t2-open-evaluation`, `t3-source-depth`,
-`t3-personal-thesis`). Every other number in this project — 6,160 tests, 96
+loop cannot spend; 2 genuinely open — `t2-open-evaluation`, `t3-personal-thesis`). Every
+other number in this project — 6,160 tests, 96
 pinned doc claims — measures how carefully we checked *ourselves*; wiring the remaining open
 rows is the highest-value RIVAL/CONNECT work still queued.
 
