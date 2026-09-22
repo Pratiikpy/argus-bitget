@@ -1052,6 +1052,8 @@ def _format_like(quoted: str, live: Number) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     args = sys.argv[1:] if argv is None else argv
     include_expensive = "--tests" in args
     report = audit(include_expensive=include_expensive)
