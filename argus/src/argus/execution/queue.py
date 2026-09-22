@@ -368,6 +368,36 @@ class L3FIFOQueue:
             ahead += existing.quantity
         return None
 
+    def reduce(self, price: Decimal, order_id: str, new_quantity: Decimal) -> bool:
+        """Shrink a resting order in place, keeping its queue position.
+
+        Added for real market-by-order feeds' Modify/Change message, which `queue.rs` itself
+        never has to handle — the reference port only ever sees Add/Cancel/Trade, because
+        hftbacktest's own examples build L2 from L3 rather than replaying a raw feed
+        (`docs/order_fill.rst`). A real MBO feed does carry Modify, and CME's MDP3 — like every
+        FIFO order-by-order venue this project has read about — treats a pure size *decrease* as
+        priority-preserving: the order keeps its place and simply gets smaller, no requeue. This
+        is standard across L3 feed protocols generally (ITCH, MDP3) but is NOT independently
+        confirmed against CME's own primary spec, which sits behind a login this project could
+        not reach — stated as unverified rather than silently assumed settled.
+
+        A size *increase* or a price change is NOT this method's job: both lose priority on a
+        real venue, and the caller must model that as `cancel` followed by `add` at the back, the
+        same as a brand new order. Passing a `new_quantity` at or above the current one is a
+        caller error, not something this method can safely interpret as "increase, keep
+        priority" — so it does nothing and returns ``False`` rather than guess.
+        """
+        queue = self._levels.get(price)
+        if queue is None:
+            return False
+        for existing in queue:
+            if existing.order_id == order_id:
+                if new_quantity <= _ZERO or new_quantity >= existing.quantity:
+                    return False
+                existing.quantity = new_quantity
+                return True
+        return False
+
     def on_trade(self, price: Decimal, traded_qty: Decimal) -> list[tuple[str, Decimal]]:
         """Consume the front of the queue and report what filled, in queue order."""
         queue = self._levels.get(price)

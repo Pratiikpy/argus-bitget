@@ -4306,13 +4306,32 @@ REGISTER: tuple[Capability, ...] = (
             "vendor, which would let our port run hftbacktest's own protocol on their own class "
             "of reference data; or our own orders resting in a real book, which is elapsed time "
             "and the owner's decision, not more building.",
+            "2026-09-22: the code side of the first route is now built and waiting, not "
+            "theorised. eval/mbo_queueproof.py replays a real DataBento GLBX.MDP3 MBO file "
+            "through the SAME L3FIFOQueue class the synthetic ground truth is built on (add "
+            "execution/queue.py:reduce, a priority-preserving size decrease the synthetic "
+            "simulator never needed since it never modelled a real feed's Modify message), "
+            "producing Episode objects the existing score() scores unchanged — 11 tests, checked "
+            "against the REAL installed databento_dbn.MBOMsg schema, not a mock. What is still "
+            "missing is the data itself: DataBento offers $125 in free historical-data credit to "
+            "a new signup, plausibly enough for one contract-day of MBO by the vendor's own "
+            "per-GB pricing, but this project does not create accounts on the owner's behalf — that "
+            "is his standing exception, not a code gap. The moment a .dbn/.dbn.zst file and an "
+            "API key exist, `python -m argus.eval.mbo_queueproof <file>` produces a real "
+            "queue_error comparable to the synthetic one, and this condition is settled by "
+            "running it rather than by more building.",
         ),
         note="Twelve of thirteen. The book recorder is running so the simulator's parameters stop "
              "being ours — and as of 2026-09-15 that calibration is read per elapsed-time horizon "
              "rather than pooled, which moved the near-touch turnover figure the book actually "
              "supports from 71.3% to 24.0% at the horizon nearest the per-event timescale "
-             "(data/book_calibration.json). That narrows the gap; it does not close it, and the "
-             "state stays IMPLEMENTED until a real-MBO reference or live fills exist.",
+             "(data/book_calibration.json). That narrows the gap; it does not close it. Updated "
+             "2026-09-22: the real-MBO replay path (eval/mbo_queueproof.py) is now built, tested "
+             "against the real databento_dbn schema, and ready to run the moment a real CME MBO "
+             "file exists — but none has been read, so no new proof condition is claimed here and "
+             "the state stays IMPLEMENTED. Building the path ahead of the data is deliberate, "
+             "matching this project's own standing rule for a genuine external blocker: build the "
+             "entire code path so it works the moment the missing piece is supplied.",
     ),
     # **The next two entries were added on 2026-09-21, not because the comparisons are new but
     # because they were.** `data/allocation_comparison.json` and `data/regime_comparison.json` were

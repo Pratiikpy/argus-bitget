@@ -359,6 +359,38 @@ class TestL3FIFO:
         assert book.on_trade(D("100"), D("999")) == [("ours", D("10"))]
         assert book.depth_at(D("100")) == 0
 
+    def test_a_size_decrease_preserves_priority_rather_than_requeuing(self) -> None:
+        """A real MBO Modify with a smaller size keeps the order's place -- the whole point of
+        adding `reduce` rather than modelling every modify as cancel-then-add, which would send
+        the shrunk order to the back and let our own order jump ahead of it for free."""
+        book = L3FIFOQueue()
+        book.add(D("100"), L3Order("a", D("30")))
+        book.add(D("100"), L3Order("ours", D("10"), is_ours=True))
+        assert book.reduce(D("100"), "a", D("12")) is True
+        assert book.ahead_of(D("100"), "ours") == D("12")
+        assert book.depth_at(D("100")) == D("22")
+
+    def test_a_size_increase_is_refused_not_silently_reinterpreted(self) -> None:
+        """Growing an order loses priority on a real venue -- the caller must model that as
+        cancel+add, and `reduce` refusing rather than guessing is what forces that rather than
+        letting a size increase quietly keep a priority it should have lost."""
+        book = L3FIFOQueue()
+        book.add(D("100"), L3Order("a", D("30")))
+        assert book.reduce(D("100"), "a", D("40")) is False
+        assert book.ahead_of(D("100"), "a") == D("0")  # unchanged: still 30, just unobserved here
+        assert book.depth_at(D("100")) == D("30")
+
+    def test_reducing_an_absent_order_is_refused(self) -> None:
+        book = L3FIFOQueue()
+        assert book.reduce(D("100"), "ghost", D("5")) is False
+
+    def test_reducing_to_zero_or_negative_is_refused_a_cancel_does_that_job(self) -> None:
+        book = L3FIFOQueue()
+        book.add(D("100"), L3Order("a", D("30")))
+        assert book.reduce(D("100"), "a", D("0")) is False
+        assert book.reduce(D("100"), "a", D("-5")) is False
+        assert book.depth_at(D("100")) == D("30")
+
     def test_l3_is_the_yardstick_for_the_estimators(self) -> None:
         """Same tape through L3 truth and through the estimate; both must be reachable.
 
