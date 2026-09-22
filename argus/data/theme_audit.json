@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-09-21T20:02:24.400105+00:00",
+  "generated_at": "2026-09-22T01:03:33.766800+00:00",
   "probes": 20,
   "runs": 17,
   "weak": 2,
   "undefined": 1,
   "absent": 0,
-  "verdict": "17/20 probes met their bar. 3 did not and are named rather than averaged away: t2-sharpe-mdd-winrate (UNDEFINED), t2-open-evaluation (WEAK), t2-risk-control (WEAK). The plan's vocabulary calls a probe that runs IMPLEMENTED, never OWNED \u2014 OWNED needs a named baseline reproduced and beaten, and no probe here claims one. The Track 2 shortfalls are one shortfall: the desk has never proposed a position, so nothing settles (no Sharpe, no drawdown), nothing is offered to the risk layer (its gates are proven over the swept domain but unexercised live), and nothing reaches the venue (no takeover rate). The confidence floor is not the cause and has never run \u2014 the desk returns on quantity<=0 before reaching it, so every risk record names the no-exposure gate (456 record(s) on the current log). The desk HAS been offered tradeable sessions: 260 of 538 decisions were taken in one, and 256 of those carried a directional lean rather than declining to call the direction \u2014 yet none opened exposure. That is a statement about the desk, not about the sampling, and it is the pre-registered hypothesis in data/protocol_commitments.jsonl being tested: the commitment says that if the desk abstains through a full RTH week, the deliberation-cost hurdle is too high to trade this universe at all, and that is the finding to publish rather than a lowered bar.",
-  "common_cause": "The Track 2 shortfalls are one shortfall: the desk has never proposed a position, so nothing settles (no Sharpe, no drawdown), nothing is offered to the risk layer (its gates are proven over the swept domain but unexercised live), and nothing reaches the venue (no takeover rate). The confidence floor is not the cause and has never run \u2014 the desk returns on quantity<=0 before reaching it, so every risk record names the no-exposure gate (456 record(s) on the current log). The desk HAS been offered tradeable sessions: 260 of 538 decisions were taken in one, and 256 of those carried a directional lean rather than declining to call the direction \u2014 yet none opened exposure. That is a statement about the desk, not about the sampling, and it is the pre-registered hypothesis in data/protocol_commitments.jsonl being tested: the commitment says that if the desk abstains through a full RTH week, the deliberation-cost hurdle is too high to trade this universe at all, and that is the finding to publish rather than a lowered bar.",
+  "verdict": "17/20 probes met their bar. 3 did not and are named rather than averaged away: t2-sharpe-mdd-winrate (UNDEFINED), t2-open-evaluation (WEAK), t2-risk-control (WEAK). The plan's vocabulary calls a probe that runs IMPLEMENTED, never OWNED \u2014 OWNED needs a named baseline reproduced and beaten, and no probe here claims one. The Track 2 shortfalls are one shortfall: the desk has never proposed a position, so nothing settles (no Sharpe, no drawdown), nothing is offered to the risk layer (its gates are proven over the swept domain but unexercised live), and nothing reaches the venue (no takeover rate). The confidence floor is not the cause and has never run \u2014 the desk returns on quantity<=0 before reaching it, so every risk record names the no-exposure gate (461 record(s) on the current log). The desk HAS been offered tradeable sessions: 265 of 543 decisions were taken in one, and 260 of those carried a directional lean rather than declining to call the direction \u2014 yet none opened exposure. That is a statement about the desk, not about the sampling, and it is the pre-registered hypothesis in data/protocol_commitments.jsonl being tested: the commitment says that if the desk abstains through a full RTH week, the deliberation-cost hurdle is too high to trade this universe at all, and that is the finding to publish rather than a lowered bar.",
+  "common_cause": "The Track 2 shortfalls are one shortfall: the desk has never proposed a position, so nothing settles (no Sharpe, no drawdown), nothing is offered to the risk layer (its gates are proven over the swept domain but unexercised live), and nothing reaches the venue (no takeover rate). The confidence floor is not the cause and has never run \u2014 the desk returns on quantity<=0 before reaching it, so every risk record names the no-exposure gate (461 record(s) on the current log). The desk HAS been offered tradeable sessions: 265 of 543 decisions were taken in one, and 260 of those carried a directional lean rather than declining to call the direction \u2014 yet none opened exposure. That is a statement about the desk, not about the sampling, and it is the pre-registered hypothesis in data/protocol_commitments.jsonl being tested: the commitment says that if the desk abstains through a full RTH week, the deliberation-cost hurdle is too high to trade this universe at all, and that is the finding to publish rather than a lowered bar.",
   "results": [
     {
       "key": "event-driven",
@@ -15,7 +15,7 @@
       "question": "How do news / announcements / macro events drive autonomous Agent trading?",
       "bar": "the event analyst took part in real recorded decisions, not just in a test",
       "status": "RUNS",
-      "evidence": "event took part in 213 of 476 recorded decision(s). Last: [panel] 3 of 3 analysts run: event, sentiment, earnings \u2014 measured against whale-signals' own vendored null-testing code on 200 real events: the true base rate is 58.1%, whale-signals' own hit rate scores 60.0% (p=0.006 against a fixed 50% null it never checks against the true rate), and a null swept against the real rate minimises near it rather than at 50%: False",
+      "evidence": "event took part in 214 of 481 recorded decision(s). Last: [panel] 3 of 3 analysts run: event, sentiment, earnings \u2014 measured against whale-signals' own vendored null-testing code on 200 real events: the true base rate is 58.1%, whale-signals' own hit rate scores 60.0% (p=0.006 against a fixed 50% null it never checks against the true rate), and a null swept against the real rate minimises near it rather than at 50%: False",
       "artefact": "data/desk_notes.jsonl"
     },
     {
@@ -25,7 +25,7 @@
       "question": "How does real-time social / forum / X sentiment translate into position signals?",
       "bar": "the sentiment analyst ran, and the depth of the feed behind it is stated honestly",
       "status": "RUNS",
-      "evidence": "sentiment took part in 436 of 476 recorded decision(s). Last: [panel] 3 of 3 analysts run: event, sentiment, earnings \u2014 but DEMOTED in our own register: on the live feed the near-duplicate clustering finds 6 items carrying 6 distinct stories, so there is no corroboration depth to read a sentiment from. Counted as running, not as competitive.",
+      "evidence": "sentiment took part in 441 of 481 recorded decision(s). Last: [panel] 1 of 3 analysts run: sentiment \u2014 but DEMOTED in our own register: on the live feed the near-duplicate clustering finds 6 items carrying 6 distinct stories, so there is no corroboration depth to read a sentiment from. Counted as running, not as competitive.",
       "artefact": "data/desk_notes.jsonl"
     },
     {
@@ -35,7 +35,7 @@
       "question": "How does the Agent autonomously interpret earnings / conference calls and execute?",
       "bar": "it ran live, and a beat with a guidance cut is separated from a clean beat",
       "status": "RUNS",
-      "evidence": "earnings took part in 375 of 476 recorded decision(s). Last: [panel] 3 of 3 analysts run: event, sentiment, earnings \u00b7 a clean beat reads 135.000bps (dominant 'guidance') while the same beat with a guidance cut reads 18.000bps (dominant 'consensus') \u2014 the decomposition separates them: True \u00b7 measured against QuantConnect's own vendored SUE on real SEC EDGAR data: it ranks the constructed zero-variance artefact top ('CONSTRUCTED_LINEAR', is_the_constructed_artifact=True) while ARGUS tops out at 'AMZN' and excludes the artefact (excludes=True); reproduces the real formula to identity on every real case (all_agree=True)",
+      "evidence": "earnings took part in 377 of 481 recorded decision(s). Last: [panel] 3 of 3 analysts run: event, sentiment, earnings \u00b7 a clean beat reads 135.000bps (dominant 'guidance') while the same beat with a guidance cut reads 18.000bps (dominant 'consensus') \u2014 the decomposition separates them: True \u00b7 measured against QuantConnect's own vendored SUE on real SEC EDGAR data: it ranks the constructed zero-variance artefact top ('CONSTRUCTED_LINEAR', is_the_constructed_artifact=True) while ARGUS tops out at 'AMZN' and excludes the artefact (excludes=True); reproduces the real formula to identity on every real case (all_agree=True)",
       "artefact": "data/desk_notes.jsonl"
     },
     {
@@ -45,7 +45,7 @@
       "question": "How does the Agent manage rToken and Crypto positions simultaneously?",
       "bar": "the cross-asset analyst took part in real recorded decisions",
       "status": "RUNS",
-      "evidence": "cross_asset took part in 360 of 476 recorded decision(s). Last: [panel] cross_asset also ran, outside the evidence-cost selection above: it reads the hedge menu (0 instrument(s)) and the position rather than the evidence lis \u00b7 measured against crypto_sor's real composite order-book router on real NVDAUSDT/BTCUSDT quotes: both agree at zero holding time (argus='BTCUSDT', crypto_sor='BTCUSDT') but diverge past the real break-even of 1 day(s) because crypto_sor never prices funding; the holding-time sweep shows 4/6 points disagree once funding is counted, and 5/5 real rToken/crypto leg pairs diverge past their own break-even \u2014 never a hand-picked single case",
+      "evidence": "cross_asset took part in 365 of 481 recorded decision(s). Last: [panel] cross_asset also ran, outside the evidence-cost selection above: it reads the hedge menu (0 instrument(s)) and the position rather than the evidence lis \u00b7 measured against crypto_sor's real composite order-book router on real NVDAUSDT/BTCUSDT quotes: both agree at zero holding time (argus='BTCUSDT', crypto_sor='BTCUSDT') but diverge past the real break-even of 1 day(s) because crypto_sor never prices funding; the holding-time sweep shows 4/6 points disagree once funding is counted, and 5/5 real rToken/crypto leg pairs diverge past their own break-even \u2014 never a hand-picked single case",
       "artefact": "data/desk_notes.jsonl"
     },
     {
@@ -65,7 +65,7 @@
       "question": "Agent evaluation / benchmarks: decision consistency, risk-violation rate, max drawdown, stress behavior, human-takeover rate, incremental value over baselines",
       "bar": "each of the six named measures is either computed or reported UNDEFINED with its reason",
       "status": "WEAK",
-      "evidence": "risk-violation rate: the Constitution intervened on 0 of 456 decision(s); it only ever reduced across all of them: True \u00b7 decision consistency: one state replayed 5 times with the response cache disabled \u2014 lean 100%, action 80%, verbatim 20%. Measured, not assumed from temperature=0 \u00b7 max drawdown: UNDEFINED \u2014 zero positions have settled, so there is no equity curve. eval/performance.py returns null and the reason rather than 0.0 \u00b7 stress behaviour: recorded in data/stress_report.json \u00b7 human-takeover rate: UNDEFINED \u2014 decision/escalation.py carries five deterministic triggers and takeover_rate() computes the figure, but no decision has reached the venue, so the denominator is zero \u00b7 incremental value over fixed rules: measured in data/incremental_value.json",
+      "evidence": "risk-violation rate: the Constitution intervened on 0 of 461 decision(s); it only ever reduced across all of them: True \u00b7 decision consistency: one state replayed 5 times with the response cache disabled \u2014 lean 100%, action 80%, verbatim 20%. Measured, not assumed from temperature=0 \u00b7 max drawdown: UNDEFINED \u2014 zero positions have settled, so there is no equity curve. eval/performance.py returns null and the reason rather than 0.0 \u00b7 stress behaviour: recorded in data/stress_report.json \u00b7 human-takeover rate: UNDEFINED \u2014 decision/escalation.py carries five deterministic triggers and takeover_rate() computes the figure, but no decision has reached the venue, so the denominator is zero \u00b7 incremental value over fixed rules: measured in data/incremental_value.json",
       "artefact": "data/risk_records.jsonl"
     },
     {
@@ -75,7 +75,7 @@
       "question": "Paper trading Sharpe, max drawdown, win rate",
       "bar": "all three computed from settled positions",
       "status": "UNDEFINED",
-      "evidence": "Sharpe, max drawdown and win rate are computed from settled trades and **zero positions have settled** across 538 decisions, every one an abstention. performance() returns null and the reason rather than 0.0, which would read as a flat result. This is the single largest gap against Track 2's 50% quantitative half, it is structural rather than a defect, and no amount of judged quality substitutes for it.",
+      "evidence": "Sharpe, max drawdown and win rate are computed from settled trades and **zero positions have settled** across 543 decisions, every one an abstention. performance() returns null and the reason rather than 0.0, which would read as a flat result. This is the single largest gap against Track 2's 50% quantitative half, it is structural rather than a defect, and no amount of judged quality substitutes for it.",
       "artefact": "data/paper_ledger.jsonl"
     },
     {
@@ -85,7 +85,7 @@
       "question": "Decision explainability",
       "bar": "every decision carries a checkable reasoning trail",
       "status": "RUNS",
-      "evidence": "every decision carries its reasoning trail: 476 with numeric grounding checked, 476 with claims checked against the evidence's own fields, 337 of 476 raising a flag that reached the cycle summary. eval/decisioncard.py renders one decision's whole trail on a page, including the lean it held while refusing \u00b7 measured against TradingAgents' real TraderProposal on real, live Bitget prices across 3 symbols: its own field_validator only normalises string format, never a figure's value, so a fabricated price with no relationship to any real fact validates and flows downstream unflagged in 12/12 constructed cases (0 caught); ARGUS's grounding.check flags 12/12 of the same fabricated figures, and a positive control confirms it is not a blanket flag \u2014 the real current price resolves cleanly: True",
+      "evidence": "every decision carries its reasoning trail: 481 with numeric grounding checked, 481 with claims checked against the evidence's own fields, 341 of 481 raising a flag that reached the cycle summary. eval/decisioncard.py renders one decision's whole trail on a page, including the lean it held while refusing \u00b7 measured against TradingAgents' real TraderProposal on real, live Bitget prices across 3 symbols: its own field_validator only normalises string format, never a figure's value, so a fabricated price with no relationship to any real fact validates and flows downstream unflagged in 12/12 constructed cases (0 caught); ARGUS's grounding.check flags 12/12 of the same fabricated figures, and a positive control confirms it is not a blanket flag \u2014 the real current price resolves cleanly: True",
       "artefact": "data/desk_notes.jsonl"
     },
     {
@@ -95,7 +95,7 @@
       "question": "Risk control layer effectiveness",
       "bar": "the layer's effect is counted, not claimed",
       "status": "WEAK",
-      "evidence": "the risk layer's effect is counted rather than claimed: [risk] the risk layer has not been exercised: 0 intervention(s) over 456 decision(s), 0 of which offered a position to reduce. This is untested, not safe Separately, the layer is swept over its entire input domain: 2177280 state(s), 4 unreachable rule(s), 0 violation(s), intervention rate 61.3% across that domain. So the rules are reachable and correct; what is missing is live exercise, and that is downstream of the desk never proposing a position rather than of anything in the layer. \u00b7 measured against freqtrade's real PrecisionRecallProtection on 325 checkpoints: freqtrade's own proxy correlates with the real drawdown ground truth at r=0.2641 (weak); at full recall ARGUS's real precision is 59.2% against freqtrade's best swept precision of 19.3%, dominating every threshold swept (True). Out-of-sample agreement between the two systems' real lock decisions: 72.2% on 126 held-out checkpoints",
+      "evidence": "the risk layer's effect is counted rather than claimed: [risk] the risk layer has not been exercised: 0 intervention(s) over 461 decision(s), 0 of which offered a position to reduce. This is untested, not safe Separately, the layer is swept over its entire input domain: 2177280 state(s), 4 unreachable rule(s), 0 violation(s), intervention rate 61.3% across that domain. So the rules are reachable and correct; what is missing is live exercise, and that is downstream of the desk never proposing a position rather than of anything in the layer. \u00b7 measured against freqtrade's real PrecisionRecallProtection on 325 checkpoints: freqtrade's own proxy correlates with the real drawdown ground truth at r=0.2641 (weak); at full recall ARGUS's real precision is 59.2% against freqtrade's best swept precision of 19.3%, dominating every threshold swept (True). Out-of-sample agreement between the two systems' real lock decisions: 72.2% on 126 held-out checkpoints",
       "artefact": "data/risk_proof.json"
     },
     {
@@ -105,7 +105,7 @@
       "question": "Agent architecture quality",
       "bar": "the structural claims are facts about the import graph, and are checked",
       "status": "RUNS",
-      "evidence": "297 modules, 812 internal imports. 0 contract violation(s); 0 cycle(s) able to break at import out of 5 total \u2014 the rest are broken at load by a deferred import and are reported as coupling rather than scored as clean. The deterministic core (truth, cost, risk, decision, backtest) reaches no model-facing module at any depth. 4 foundation package(s) carry high fan-in at zero instability. 2 authorisation chokepoint(s) that raise rather than warn: orders.py:319, bitget_client.py:355 \u00b7 measured against two real rivals on the same property: Microsoft's real RD-Agent (`rdagent_factor.py`) has an execution surface (['subprocess.check_output']) and a real injected payload executed through it (True); ARGUS's own factor proposer (`searchoff.py`) has none (False). Separately, AgentDojo's real 302-string attack corpus (recall 302/302) measures what reaches a production decision: 6 production false positives before the rewrite the comparison forced, 0 after",
+      "evidence": "298 modules, 813 internal imports. 0 contract violation(s); 0 cycle(s) able to break at import out of 5 total \u2014 the rest are broken at load by a deferred import and are reported as coupling rather than scored as clean. The deterministic core (truth, cost, risk, decision, backtest) reaches no model-facing module at any depth. 4 foundation package(s) carry high fan-in at zero instability. 2 authorisation chokepoint(s) that raise rather than warn: orders.py:319, bitget_client.py:355 \u00b7 measured against two real rivals on the same property: Microsoft's real RD-Agent (`rdagent_factor.py`) has an execution surface (['subprocess.check_output']) and a real injected payload executed through it (True); ARGUS's own factor proposer (`searchoff.py`) has none (False). Separately, AgentDojo's real 302-string attack corpus (recall 302/302) measures what reaches a production decision: 6 production false positives before the rewrite the comparison forced, 0 after",
       "artefact": "data/architecture.json"
     },
     {
@@ -115,7 +115,7 @@
       "question": "How does AI process unstructured info from earnings, macro, news?",
       "bar": "an expectation gap is computed from structured filings, not summarised from prose",
       "status": "RUNS",
-      "evidence": "expectation gap computed from a structured XBRL fact against a dated consensus rather than summarised from prose \u2014 direction of travel 'unknown', expectations rising into deceleration: False. [expectation] 42 analysts expect eps_diluted of 0.7400 for the quarter ending 2026-07-31; [expectation] that implies +8.8% against the 0.6800 actually delivered for the quarter ending 2025-07-31; [expectation] estimates ",
+      "evidence": "expectation gap computed from a structured XBRL fact against a dated consensus rather than summarised from prose \u2014 direction of travel 'unknown', expectations rising into deceleration: False. [expectation] 42 analysts expect eps_diluted of 0.7400 for the quarter ending 2026-07-31; [expectation] that implies +8.8% against the 0.6800 actually delivered for the quarter ending 2025-07-31; [expectation] estimates  \u00b7 measured against FinanceBench's real, published metrics-generated results: even GPT-4 under best-case oracle retrieval scores 92% on a pure numeric-filing-extraction task, and under a realistic in-context condition 40% of answers are confidently WRONG rather than refused; ARGUS's real SEC XBRL fetch resolved 5/6 freshly-designed real cases with no fabrication possible by construction, and a real ablation on NVDA's own live data shows why: a naive fetch is genuinely ambiguous between two real rows for one period (diverge=True), ARGUS's quarterly filter resolves to exactly one (True)",
       "artefact": "argus.desk.expectation:detect"
     },
     {
@@ -125,7 +125,7 @@
       "question": "After trading, how does AI help the trader review and iterate their research framework?",
       "bar": "it finds defects in our own record and scores each checklist rule on replay",
       "status": "RUNS",
-      "evidence": "graded the desk's own process against its own record: 827 observed process defect(s) from 476 decision(s), and each standing checklist rule scored on replay rather than asserted",
+      "evidence": "graded the desk's own process against its own record: 834 observed process defect(s) from 481 decision(s), and each standing checklist rule scored on replay rather than asserted",
       "artefact": "data/review_report.json"
     },
     {

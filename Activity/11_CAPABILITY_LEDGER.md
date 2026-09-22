@@ -25,7 +25,7 @@ carries a result.**
 | 8 | `t2-explainability` | T2 | judging | IMPLEMENTED | TradingAgents (real TraderProposal) | **yes** | ARGUS (grounding.check catches 12/12 fabricated prices; TradingAgents' validator catches 0/12) | 2026-09-22 |
 | 9 | `t2-risk-control` | T2 | judging | IMPLEMENTED (weak) | freqtrade PrecisionRecallProtection | **yes** | ARGUS (precision 59.2% vs 19.3% at full recall, dominates every threshold) | 2026-09-21 |
 | 10 | `t2-architecture` | T2 | judging | IMPLEMENTED | RD-Agent + AgentDojo (two rivals) | **yes** | ARGUS (no execution surface vs RD-Agent's real `eval()`; 0 production FPs after fix vs 6 before) | 2026-09-21 |
-| 11 | `info-extraction` | T3 | subtheme | IMPLEMENTED | — | no | — | — |
+| 11 | `info-extraction` | T3 | subtheme | IMPLEMENTED | FinanceBench (real, published LLM measurement) | **yes** | ARGUS (real SEC XBRL, no fabrication possible; FinanceBench's own GPT-4 oracle tops out at 92%, realistic retrieval gives 40% confidently-wrong answers) | 2026-09-22 |
 | 12 | `review-self-evolution` | T3 | subtheme | IMPLEMENTED | — | no | — | — |
 | 13 | `stress-testing` | T3 | subtheme | **LOST** | stumpy FLUSS + ruptures + incumbent rule | **yes** | specialist | 2026-09-21 |
 | 14 | `personal-workbench` | T3 | subtheme | IMPLEMENTED | — | no | — | — |
@@ -38,9 +38,9 @@ carries a result.**
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 11 of 20 as of 2026-09-22: 3 LOST (one of them split — LUI intent
+**`rival run` is `yes` on 12 of 20 as of 2026-09-22: 3 LOST (one of them split — LUI intent
 accuracy loses to Rasa's DIET classifier, p=0.0014, while ARGUS wins out-of-scope refusal
-separately and significantly, p=0.031, neither laundering the other), 7 real wins (earnings vs
+separately and significantly, p=0.031, neither laundering the other), 8 real wins (earnings vs
 QuantConnect, factor-discovery vs Microsoft RD-Agent, risk-control vs freqtrade's real
 PrecisionRecallProtection — ARGUS's precision at full recall is 59.2% against freqtrade's best
 swept 19.3%, dominating every threshold, and freqtrade's own proxy correlates only weakly
@@ -59,7 +59,11 @@ explainability vs TradingAgents' real TraderProposal: its own field_validator on
 string format, never a figure's value, so a fabricated price with no relationship to any real
 fact validates unflagged in 12/12 constructed cases (0 caught); ARGUS's grounding.check flags
 12/12 of the same fabricated figures, with a positive control confirming it is not a blanket
-flag), 1 methodological (event-driven vs whale-signals — neither system establishes a real effect on
+flag — and info-extraction vs FinanceBench's real, published measurement: even GPT-4 under
+best-case oracle retrieval scores only 92% on pure numeric-filing-extraction, and under a
+realistic in-context condition 40% of answers are confidently WRONG rather than refused;
+ARGUS's real SEC XBRL fetch resolved 5/6 freshly-designed real cases with no fabrication
+possible by construction), 1 methodological (event-driven vs whale-signals — neither system establishes a real effect on
 this data; the finding is that whale-signals tests against the wrong null, not that ARGUS's own
 number beats theirs, and no fabricated score is recorded for it).** That is this ledger's honest
 scoreboard — it names whether

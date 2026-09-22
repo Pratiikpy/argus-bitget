@@ -1,0 +1,184 @@
+{
+  "baseline_reproduced": {
+    "oracle": {
+      "n": 50,
+      "correct": 46,
+      "incorrect": 3,
+      "refusal": 1,
+      "accuracy": 0.92,
+      "confidently_wrong_rate": 0.06,
+      "source_file": "results/gpt-4_oracle.jsonl"
+    },
+    "singleStore": {
+      "n": 50,
+      "correct": 22,
+      "incorrect": 3,
+      "refusal": 25,
+      "accuracy": 0.44,
+      "confidently_wrong_rate": 0.06,
+      "source_file": "results/gpt-4_singleStore.jsonl"
+    },
+    "sharedStore": {
+      "n": 50,
+      "correct": 6,
+      "incorrect": 5,
+      "refusal": 39,
+      "accuracy": 0.12,
+      "confidently_wrong_rate": 0.1,
+      "source_file": "results/gpt-4-1106-preview_sharedStore.jsonl"
+    },
+    "inContext": {
+      "n": 50,
+      "correct": 6,
+      "incorrect": 20,
+      "refusal": 24,
+      "accuracy": 0.12,
+      "confidently_wrong_rate": 0.4,
+      "source_file": "results/gpt-4-1106-preview_inContext.jsonl"
+    },
+    "closedBook": {
+      "n": 50,
+      "correct": 0,
+      "incorrect": 0,
+      "refusal": 50,
+      "accuracy": 0.0,
+      "confidently_wrong_rate": 0.0,
+      "source_file": "results/gpt-4_closedBook.jsonl"
+    }
+  },
+  "designed_cases": {
+    "cases": [
+      {
+        "ticker": "NVDA",
+        "concept": "revenue",
+        "resolved": true,
+        "value": 96221000000.0,
+        "period_end": "2026-07-26",
+        "filed": "2026-08-26",
+        "form": "10-Q",
+        "n_periods": 65,
+        "status": [
+          "xbrl:NVDA:Revenues: 113 non-quarterly row(s) excluded (cumulative and annual durations sit beside the quarterly ones under the same fiscal period)",
+          "xbrl:NVDA:Revenues: 102 restated value(s) superseded by a later filing",
+          "xbrl:NVDA: revenue from Revenues, 65 period(s)"
+        ]
+      },
+      {
+        "ticker": "NVDA",
+        "concept": "eps_diluted",
+        "resolved": true,
+        "value": 2.46,
+        "period_end": "2026-07-26",
+        "filed": "2026-08-26",
+        "form": "10-Q",
+        "n_periods": 67,
+        "status": [
+          "xbrl:NVDA:EarningsPerShareDiluted: 124 non-quarterly row(s) excluded (cumulative and annual durations sit beside the quarterly ones under the same fiscal period)",
+          "xbrl:NVDA:EarningsPerShareDiluted: 118 restated value(s) superseded by a later filing",
+          "xbrl:NVDA: eps_diluted from EarningsPerShareDiluted, 67 period(s)"
+        ]
+      },
+      {
+        "ticker": "AAPL",
+        "concept": "net_income",
+        "resolved": true,
+        "value": 29789000000.0,
+        "period_end": "2026-06-27",
+        "filed": "2026-07-31",
+        "form": "10-Q",
+        "n_periods": 67,
+        "status": [
+          "xbrl:AAPL:NetIncomeLoss: 130 non-quarterly row(s) excluded (cumulative and annual durations sit beside the quarterly ones under the same fiscal period)",
+          "xbrl:AAPL:NetIncomeLoss: 141 restated value(s) superseded by a later filing",
+          "xbrl:AAPL: net_income from NetIncomeLoss, 67 period(s)"
+        ]
+      },
+      {
+        "ticker": "MSFT",
+        "concept": "operating_income",
+        "resolved": true,
+        "value": 38398000000.0,
+        "period_end": "2026-03-31",
+        "filed": "2026-04-29",
+        "form": "10-Q",
+        "n_periods": 61,
+        "status": [
+          "xbrl:MSFT:OperatingIncomeLoss: 128 non-quarterly row(s) excluded (cumulative and annual durations sit beside the quarterly ones under the same fiscal period)",
+          "xbrl:MSFT:OperatingIncomeLoss: 89 restated value(s) superseded by a later filing",
+          "xbrl:MSFT: operating_income from OperatingIncomeLoss, 61 period(s)"
+        ]
+      },
+      {
+        "ticker": "GOOGL",
+        "concept": "gross_profit",
+        "resolved": false,
+        "value": null,
+        "period_end": null,
+        "filed": null,
+        "form": null,
+        "n_periods": 0,
+        "status": [
+          "xbrl:GOOGL: no us-gaap tag for gross_profit among GrossProfit"
+        ]
+      },
+      {
+        "ticker": "AMZN",
+        "concept": "revenue",
+        "resolved": true,
+        "value": 200606000000.0,
+        "period_end": "2026-06-30",
+        "filed": "2026-07-31",
+        "form": "10-Q",
+        "n_periods": 33,
+        "status": [
+          "xbrl:AMZN:RevenueFromContractWithCustomerExcludingAssessedTax: 56 non-quarterly row(s) excluded (cumulative and annual durations sit beside the quarterly ones under the same fiscal period)",
+          "xbrl:AMZN:RevenueFromContractWithCustomerExcludingAssessedTax: 39 restated value(s) superseded by a later filing",
+          "xbrl:AMZN: revenue from RevenueFromContractWithCustomerExcludingAssessedTax, 33 period(s)"
+        ]
+      }
+    ],
+    "n_cases": 6,
+    "n_resolved": 5
+  },
+  "ablation": {
+    "target_period_end": "2008-07-27",
+    "naive_no_filter_n_matches": 2,
+    "naive_no_filter_values": [
+      55876000.0,
+      -120929000.0
+    ],
+    "naive_is_ambiguous": true,
+    "naive_values_diverge": true,
+    "argus_quarterly_only_value": -120929000.0,
+    "argus_quarterly_only_is_quarterly": true,
+    "argus_resolves_to_exactly_one": true
+  },
+  "failure_cases": {
+    "unknown_ticker": {
+      "n_facts": 0,
+      "status": [
+        "xbrl:ZZZZNOTREAL: no CIK on EDGAR"
+      ],
+      "raised": false,
+      "reports_why_rather_than_guessing": true
+    },
+    "point_in_time_withholds_future_filings": {
+      "n_facts_visible_at_2020": 45,
+      "status": [
+        "xbrl:NVDA:Revenues: 81 fact(s) filed after as_of withheld",
+        "xbrl:NVDA:Revenues: 72 non-quarterly row(s) excluded (cumulative and annual durations sit beside the quarterly ones under the same fiscal period)",
+        "xbrl:NVDA:Revenues: 82 restated value(s) superseded by a later filing",
+        "xbrl:NVDA: revenue from Revenues, 45 period(s)"
+      ],
+      "all_filed_before_cutoff": true
+    }
+  },
+  "costs": {
+    "repeats": 3,
+    "argus_live_xbrl_fetch_seconds_per_call": 0.3825156999907146
+  },
+  "reproducibility": {
+    "identical": true
+  },
+  "scope_statement": "FinanceBench's own real, published metrics-generated-subset results (50 real numeric line-item questions over real SEC filings, recomputed here from its own real result transcripts, not vendored): even GPT-4 under the best-case oracle condition scores 46/50 (92%), and every realistic retrieval condition collapses -- singleStore 44%, sharedStore 12% (78% refusal), inContext 12% correct but 40% CONFIDENTLY WRONG, closedBook 0%. ARGUS's real fetcher queries SEC's own structured XBRL endpoint directly rather than reading prose, so a fluent-but-wrong number is not a failure mode the mechanism has -- every real case tested here resolves to the government's own filed value or reports explicitly why not. NOT claimed ARGUS answered FinanceBench's own 50 questions -- it did not, and the unlicensed dataset is not reproduced here; the comparison is same-task-CLASS, not same-question-set. NOT claimed ARGUS can answer FinanceBench's harder DERIVED-ratio questions (fixed-asset turnover, opex ratio) -- it supports five raw line-item concepts, not multi-fact arithmetic over them. NOT claimed the underlying filed figures are restatement-proof -- restatements are detected and reported by this project's own existing `t3-infoextract` capability, not claimed newly here."
+}
