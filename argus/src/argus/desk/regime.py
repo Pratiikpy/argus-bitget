@@ -206,6 +206,114 @@ def find_boundaries(
     return sorted(found)
 
 
+# **A second, exact segmenter — not a replacement for FLUSS above, a different tool.** FLUSS asks
+# a shape question with no budget: "where does this series stop looking like itself", and its
+# only knob is a boundary *count*, never a data-driven choice of how many to report. Measured
+# against `ruptures.pw_constant`'s synthetic ground truth (`eval/regime_comparison.py`, Finding 8,
+# 2026-09-22) — 100 trials, known injected changepoints, ARGUS given the TRUE count as an oracle —
+# FLUSS still loses decisively to `ruptures.KernelCPD` at the same budget (mean F1 0.443 vs 0.975,
+# 1 win/89 losses/10 ties, p=1.5e-25). The reason is not a tuning knob: `pw_constant` generates
+# piecewise-CONSTANT-MEAN segments plus i.i.d. Gaussian noise, and FLUSS's nearest-neighbour arc
+# count is a shape proxy with no special affinity for exactly that generative process. An L2
+# (sum-of-squared-deviations) cost is the maximum-likelihood-correct statistic for a mean shift,
+# and finding the EXACT partition that minimises it, given the true number of segments, is a
+# textbook dynamic program — not a heuristic, so there is only one right answer to compare against.
+#
+# **Read before written: `ruptures/detection/dynp.py` and `ruptures/costs/costl2.py` in full**
+# (BSD-2-Clause, ENS Paris-Saclay/CNRS — permissive, built from the real source per this project's
+# own standing rule). `CostL2.error(start, end)` is `signal[start:end].var(axis=0).sum() * (end -
+# start)` — variance times length, i.e. the sum of squared deviations from the segment mean.
+# `Dynp.seg(start, end, n_bkps)` is a memoised recursion: zero breakpoints costs the whole segment;
+# otherwise try every admissible last breakpoint, recurse on the left piece with one fewer
+# breakpoint, and keep whichever split has the lowest total cost. `jump=1` matches this project's
+# own established choice for a fair ruptures comparison (`ruptures_bic` in
+# `eval/regime_comparison.py` sets it identically, "so the change-point grid is every bar, matching
+# FLUSS's per-window resolution").
+#
+# **Checked directly before trusting it, not assumed exact:** this reimplementation (bottom-up DP
+# with prefix-sum cost lookups rather than Dynp's top-down memoised recursion — algebraically the
+# same recurrence, computed the other way) returns byte-identical breakpoints to real
+# `ruptures.Dynp(model="l2", jump=1)` on 120/120 trials (30 seeds x 4 true breakpoint counts,
+# `pw_constant` data) — pinned in `tests/test_regime.py::TestExactPartitionMatchesRealRuptures`.
+# Separately checked that `Dynp(model="l2")` and `ruptures.KernelCPD(kernel="rbf")` — the rival
+# `eval/regime_comparison.py` actually scores against — return IDENTICAL breakpoints on
+# `pw_constant` data (10/10 trials checked): the two are different general-purpose methods that
+# converge on this specific data because an L2 cost is exactly what a piecewise-constant-mean
+# generative process calls for, so matching `Dynp` here is not a weaker stand-in for the real rival.
+def l2_cost_table(values: Sequence[float]) -> Any:
+    """Prefix sums of ``x`` and ``x**2`` so any segment's L2 cost is an O(1) lookup.
+
+    Returns a closure ``cost(start, end) -> float`` rather than the tables themselves: the DP
+    below never needs the raw sums, only the derived cost, and hiding the identity behind a
+    function keeps the sum-of-squares cancellation (``sum(x**2) - sum(x)**2 / n``) in one place.
+    """
+    prefix_x = [0.0]
+    prefix_x2 = [0.0]
+    for v in values:
+        prefix_x.append(prefix_x[-1] + v)
+        prefix_x2.append(prefix_x2[-1] + v * v)
+
+    def cost(start: int, end: int) -> float:
+        n = end - start
+        if n <= 0:
+            return 0.0
+        sx = prefix_x[end] - prefix_x[start]
+        sx2 = prefix_x2[end] - prefix_x2[start]
+        return sx2 - (sx * sx) / n
+
+    return cost
+
+
+def exact_partition(values: Sequence[float], n_bkps: int, *, min_size: int) -> list[int]:
+    """The globally optimal ``n_bkps``-breakpoint L2 partition — bottom-up DP with backpointers.
+
+    ``F[k][t]`` is the minimum total cost to split ``values[0:t]`` into exactly ``k`` segments,
+    each at least ``min_size`` long. ``F[0][0] = 0`` and every other ``F[0][t]`` stays unreachable
+    (``inf``), which is what makes the ``k=1`` row collapse to "the whole prefix costs
+    ``cost(0, t)``" without a separate base case: the only finite predecessor is ``s=0``.
+    Backpointers recover the actual breakpoints, not just the optimal cost, which is the entire
+    point of running this instead of just reading ``F[k_max][n]``.
+
+    O(n^2 * n_bkps) with an O(1) cost lookup per cell — for the sizes this project segments at
+    (hundreds of bars, a handful of breakpoints) that is tens of milliseconds in pure Python, not
+    the multi-second cost `matrix_profile_index` pays for its O(n^2 m) brute-force distance scan.
+    """
+    n = len(values)
+    if n_bkps < 0:
+        raise RegimeError("a negative breakpoint count has no partition")
+    if min_size < 1:
+        raise RegimeError("min_size must be at least 1")
+    k_max = n_bkps + 1
+    if n < k_max * min_size:
+        raise RegimeError(
+            f"{n} bar(s) cannot hold {k_max} segments of at least {min_size} bar(s) each"
+        )
+    cost = l2_cost_table(values)
+    NEG_INF = float("inf")
+    table = [[NEG_INF] * (n + 1) for _ in range(k_max + 1)]
+    back = [[-1] * (n + 1) for _ in range(k_max + 1)]
+    table[0][0] = 0.0
+    for k in range(1, k_max + 1):
+        for t in range(k * min_size, n + 1):
+            best, best_s = NEG_INF, -1
+            for s in range((k - 1) * min_size, t - min_size + 1):
+                if table[k - 1][s] == NEG_INF:
+                    continue
+                candidate = table[k - 1][s] + cost(s, t)
+                if candidate < best:
+                    best, best_s = candidate, s
+            table[k][t] = best
+            back[k][t] = best_s
+    bkps: list[int] = []
+    t, k = n, k_max
+    while k > 0:
+        s = back[k][t]
+        if k < k_max:
+            bkps.append(t)
+        t, k = s, k - 1
+    return sorted(bkps)
+
+
 @dataclass(frozen=True, slots=True)
 class Segment:
     """One stretch between boundaries, described by what it measurably did."""
@@ -432,8 +540,10 @@ __all__ = [
     "Segment",
     "arc_counts",
     "corrected_arc_curve",
+    "exact_partition",
     "find_boundaries",
     "idealised_arc",
+    "l2_cost_table",
     "matrix_profile_index",
     "segment",
 ]

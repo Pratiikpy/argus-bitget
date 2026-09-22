@@ -27,7 +27,7 @@ carries a result.**
 | 10 | `t2-architecture` | T2 | judging | IMPLEMENTED | RD-Agent + AgentDojo (two rivals) | **yes** | ARGUS (no execution surface vs RD-Agent's real `eval()`; 0 production FPs after fix vs 6 before) | 2026-09-21 |
 | 11 | `info-extraction` | T3 | subtheme | IMPLEMENTED | FinanceBench (real, published LLM measurement) | **yes** | ARGUS (real SEC XBRL, no fabrication possible; FinanceBench's own GPT-4 oracle tops out at 92%, realistic retrieval gives 40% confidently-wrong answers) | 2026-09-22 |
 | 12 | `review-self-evolution` | T3 | subtheme | **OWNED** | TauricResearch/TradingAgents reflection memory | **yes** | ARGUS (refusal machinery has no TradingAgents equivalent; checklist stays honestly empty) | 2026-09-22 |
-| 13 | `stress-testing` | T3 | subtheme | **LOST** | stumpy FLUSS + ruptures + incumbent rule | **yes** | specialist — decisively so on the real ground-truth test added 2026-09-22 (Finding 8: 100 synthetic trials, known changepoints, ARGUS vs ruptures mean F1 0.443 vs 0.975, p=1.5e-25); ARGUS does beat stumpy significantly on the same test (0.443 vs 0.330, p=5.6e-17), the one genuine win found here, not enough to flip the verdict | 2026-09-22 |
+| 13 | `stress-testing` | T3 | subtheme | **TIED** | stumpy FLUSS + ruptures + incumbent rule | **yes** | FLUSS (ARGUS's original tool) still LOSES decisively (Finding 8: 100 synthetic trials, known changepoints, F1 0.443 vs ruptures' 0.975, p=1.5e-25; beats stumpy 0.443 vs 0.330, p=5.6e-17 — real, not enough to flip FLUSS's own verdict). Read ruptures' real BSD-2-Clause source (`detection/dynp.py`, `costs/costl2.py`), built ARGUS's own exact L2 dynamic-program segmenter (`exact_partition`), verified it reproduces real `ruptures.Dynp` exactly (120/120 trials) and matches `KernelCPD(rbf)` — the actual rival — on 10/10 trials, wired into the SAME Finding-8 benchmark: ties ruptures, 1 win/0 losses/99 ties, mean F1 0.98 vs 0.975, sign-test p=1.0 (not significant — reported as a tie, not a win) | 2026-09-22 |
 | 14 | `personal-workbench` | T3 | subtheme | IMPLEMENTED | OpenBB (real agent + data platform) | **yes** | split — OpenBB (32 real sources vs ARGUS's 12); ARGUS (point-in-time gating OpenBB's real source has zero representation of, verified sharp to the exact day) | 2026-09-22 |
 | 15 | `execution-assistance` | T3 | subtheme | IMPLEMENTED | hftbacktest (real LatencyModel) | **yes** | ARGUS (prices real deliberation delay hftbacktest's real trait has zero representation of; sqrt(t) scaling confirmed numerically) | 2026-09-22 |
 | 16 | `portfolio-copilot` | T3 | subtheme | **TIED** | Riskfolio-Lib NCO | **yes** | tie (8.203bps both, ratio 1.0000) — optimal leaf ordering closed the separate ARGUS-vs-Riskfolio-HRP gap but left the NCO loss unchanged; built ARGUS's own `nco_weights` from Riskfolio's real NCO source (Ward linkage, active-set min-variance QP, two-diff gap statistic), verified to reproduce Riskfolio's real NCO to 1.3e-05 on the real book, wired into the same live walk-forward test that measured the loss and re-run fresh: a genuine tie, not a win | 2026-09-22 |
@@ -38,12 +38,17 @@ carries a result.**
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 18 of 20 as of 2026-09-22: 2 clean LOSSES to a named specialist
-(stress-testing vs ruptures, decisively, p=1.5e-25; t3-source-depth — OpenBB's real
-32-provider count genuinely beats ARGUS's 12, no split framing applies to a row whose entire
-ask is count), 1 standalone TIE (portfolio-copilot vs Riskfolio-Lib's real NCO: 8.203bps
-both, ratio 1.0000, an exact match on the live walk-forward test that used to be the loss),
-3 splits (personal-workbench and t3-personal-thesis, both wired against the same underlying
+**`rival run` is `yes` on 18 of 20 as of 2026-09-22: 1 clean LOSS to a named specialist
+(t3-source-depth — OpenBB's real 32-provider count genuinely beats ARGUS's 12, no split
+framing applies to a row whose entire ask is count), 2 standalone TIES (portfolio-copilot vs
+Riskfolio-Lib's real NCO: 8.203bps both, ratio 1.0000, an exact match on the live
+walk-forward test that used to be the loss; stress-testing vs ruptures — FLUSS, ARGUS's
+original segmenter, still LOSES decisively (F1 0.443 vs 0.975, p=1.5e-25), but a SECOND
+ARGUS segmenter built the same day from ruptures' own real BSD-2-Clause source — an exact L2
+dynamic program, `exact_partition` — ties ruptures on the identical 100-trial synthetic
+ground truth: 1 win/0 losses/99 ties, mean F1 0.98 vs 0.975, sign-test p=1.0, reported as a
+tie rather than a win since a single discordant trial proves nothing significant), 3 splits
+(personal-workbench and t3-personal-thesis, both wired against the same underlying
 evidence — `j_t3_personal_thesis` literally delegates to `t3_personal_workbench` in
 `themeaudit.py`, and the ledger counts each named row as its own unit per its own opening
 rule: OpenBB genuinely wins on raw source breadth, 32 real providers vs ARGUS's

@@ -31,6 +31,7 @@ from argus.eval.regime_comparison import (
     _sign_test_p,
     _synthetic_summary,
     argus_boundaries,
+    argus_dynp,
     argus_profile,
     comparable_region,
     incumbent_flips,
@@ -562,6 +563,14 @@ class TestReportingHonesty:
         assert "LOSES" in SCOPE_STATEMENT
         assert "NOT claimed" in SCOPE_STATEMENT
 
+    def test_the_scope_statement_states_the_tie_without_hiding_the_loss(self) -> None:
+        """FLUSS's own loss to ruptures must still read as a loss even after the 2026-09-22
+        exact_partition addition -- the two findings are published side by side, neither
+        laundering the other, matching the module docstring's own stated discipline."""
+        assert "TIES" in SCOPE_STATEMENT
+        assert "exact_partition" in SCOPE_STATEMENT
+        assert "TIED" in SCOPE_STATEMENT
+
     def test_the_scope_statement_names_every_system_that_was_run(self) -> None:
         for name in ("stumpy", "ruptures", "Pelt", "KernelCPD", "rotation_regime_switch"):
             assert name in SCOPE_STATEMENT
@@ -695,6 +704,53 @@ class TestFinding8SyntheticGroundtruth:
         assert full["overall"]["argus_mean_f1"] > full["overall"]["stumpy_mean_f1"]
         assert full["argus_vs_stumpy"]["sign_test_p"] is not None
         assert full["argus_vs_stumpy"]["sign_test_p"] < 0.01
+
+
+class TestArgusDynpTiesRuptures:
+    """ARGUS's second segmenter (`desk/regime.py::exact_partition`, added 2026-09-22) — pinned
+    separately from FLUSS's own, unchanged loss above. This capability moved LOST -> TIED because
+    of this class's findings, not because FLUSS improved."""
+
+    def test_dynp_never_loses_to_ruptures_on_the_published_record(self) -> None:
+        """Pinned in the direction that matters for TIED: zero losses is the claim, not a specific
+        win count. A future run reporting even one ruptures-only-win keeps the tie; any material
+        erosion (dynp losing MORE than it wins) would call the TIED verdict into question."""
+        full = run_synthetic_groundtruth()
+        vs_ruptures = full["argus_dynp_vs_ruptures"]
+        assert vs_ruptures["ruptures_wins"] == 0
+        assert vs_ruptures["argus_dynp_wins"] + vs_ruptures["ties"] == full["n_trials"]
+
+    def test_dynp_mean_f1_is_at_least_ruptures_own(self) -> None:
+        """Not claimed as a significant win (one discordant trial cannot support that) — only that
+        the nominal aggregate never falls BEHIND ruptures, which is the weaker, honest claim this
+        register's own TIED state makes."""
+        full = run_synthetic_groundtruth()
+        assert full["overall"]["argus_dynp_mean_f1"] >= full["overall"]["ruptures_mean_f1"]
+
+    def test_the_sign_test_cannot_reject_no_difference(self) -> None:
+        """The load-bearing reason this is reported as TIED and not OWNED: with at most a handful
+        of discordant trials, p is far from significant. If a future rebuild made this
+        significant, standing.py's proof text (which explicitly cites p=1.0 today) would need a
+        real rewrite, not a silent number bump -- this test exists so that rewrite is forced."""
+        full = run_synthetic_groundtruth()
+        p = full["argus_dynp_vs_ruptures"]["sign_test_p"]
+        assert p is None or p > 0.05
+
+    def test_argus_dynp_matches_real_ruptures_dynp_exactly(self) -> None:
+        """The claim `desk/regime.py`'s own module comment makes about `exact_partition` itself,
+        exercised through this module's own wrapper rather than re-imported directly -- confirms
+        `argus_dynp`'s `min_size=window` wiring doesn't drift from the underlying function's own
+        exact-match guarantee (already pinned in isolation by
+        `tests/test_regime.py::TestExactPartitionMatchesRealRuptures`)."""
+        ruptures = pytest.importorskip("ruptures", reason="the real rival, not vendored")
+        signal, _true = ruptures.pw_constant(
+            n_samples=300, n_features=1, n_bkps=2, noise_std=1.5, seed=11,
+        )
+        values = [float(v) for v in signal[:, 0]]
+        mine = argus_dynp(values, window=10, regimes=3)
+        ref_raw = ruptures.Dynp(model="l2", min_size=10, jump=1).fit(signal).predict(n_bkps=2)
+        ref = [b for b in ref_raw if b < len(values)]
+        assert mine == ref
 
     def test_synthetic_trial_is_a_frozen_dataclass_with_a_matching_dict(self) -> None:
         trial = run_synthetic_trial(n_samples=250, n_bkps=2, noise_std=1.0, seed=3)

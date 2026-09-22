@@ -4441,98 +4441,117 @@ REGISTER: tuple[Capability, ...] = (
         name="Regime-boundary detection, measured against stumpy FLUSS and ruptures",
         subtheme="t3-decisionstress",
         module="argus/desk/regime.py",
-        state=State.LOST,
+        state=State.TIED,
         baseline="TDAmeritrade/stumpy (stump+fluss, real public API); "
-                 "deepcharles/ruptures (Pelt/KernelCPD); the incumbent two-line volatility rule "
-                 "in strategies/track1_suite.py's own rotation_regime_switch",
+                 "deepcharles/ruptures (Pelt/KernelCPD/Dynp); the incumbent two-line volatility "
+                 "rule in strategies/track1_suite.py's own rotation_regime_switch",
         proofs=(
             Proof(
                 condition="same_input_comparison",
                 how="ARGUS's offline FLUSS, real stumpy, real ruptures and the real incumbent rule "
                     "all run on the SAME 60-day hourly Bitget market series for all 12 rTokens, "
-                    "plus all three budgeted methods (ARGUS, stumpy, ruptures) run on the SAME 100 "
-                    "synthetic trials (ruptures.pw_constant, 25 seeds x 4 noise levels) with KNOWN "
-                    "injected changepoints — added 2026-09-22 (Finding 8)",
+                    "plus all FOUR budgeted methods (FLUSS, stumpy, ruptures, and ARGUS's second "
+                    "segmenter exact_partition added 2026-09-22) run on the SAME 100 synthetic "
+                    "trials (ruptures.pw_constant, 25 seeds x 4 noise levels) with KNOWN injected "
+                    "changepoints — Finding 8, extended the same day it first ran",
                 artefact="data/regime_comparison.json",
             ),
             Proof(
                 condition="statistically_valid_evaluation",
                 how="one-sided binomial test of novelty rate against the incumbent's own coverage "
                     "as the null (66.9%): FLUSS's own-run novelty rate scores non-significant "
-                    "against that null on every run to date. Separately, a real ground-truth test "
-                    "added 2026-09-22 (Finding 8): paired sign test of per-trial F1 against KNOWN "
-                    "synthetic changepoints (ruptures.metrics.precision_recall at margin=WINDOW) "
-                    "across 100 trials — ARGUS loses to ruptures decisively (mean F1 0.443 vs "
-                    "0.975, 1 win/89 losses/10 ties, p=1.5e-25) and beats stumpy significantly "
-                    "(mean F1 0.443 vs 0.330, 55 wins/0 losses/45 ties, p=5.6e-17)",
+                    "against that null on every run to date. Paired sign test of per-trial F1 "
+                    "against KNOWN synthetic changepoints (ruptures.metrics.precision_recall at "
+                    "margin=WINDOW) across 100 trials: FLUSS loses to ruptures decisively (mean F1 "
+                    "0.443 vs 0.975, 1 win/89 losses/10 ties, p=1.5e-25) and beats stumpy "
+                    "significantly (mean F1 0.443 vs 0.330, 55 wins/0 losses/45 ties, p=5.6e-17). "
+                    "ARGUS's second segmenter, exact_partition, TIES ruptures on the identical 100 "
+                    "trials (mean F1 0.98 vs 0.975, 1 win/0 losses/99 ties, sign-test p=1.0 — "
+                    "literally cannot reject 'no difference' with one discordant trial, so "
+                    "reported as a tie, not rounded up from a nominally higher mean)",
                 artefact="data/regime_comparison.json",
             ),
             Proof(
                 condition="costs_included",
                 how="argus_seconds=5.25 vs stumpy_seconds_warm=0.017 vs ruptures_pelt_seconds=0.43 "
-                    "on the same 1,439-bar symbol; measured ~306x slower than warm stumpy for a "
-                    "bit-identical matrix profile (16,992 windows, zero disagreements)",
+                    "on the same 1,439-bar symbol; FLUSS measured ~306x slower than warm stumpy "
+                    "for a bit-identical matrix profile (16,992 windows, zero disagreements). "
+                    "exact_partition measured separately at ~24ms per 400-bar synthetic trial "
+                    "(pure-Python bottom-up DP with O(1) prefix-sum cost lookups) — faster than "
+                    "FLUSS despite being the exact, not approximate, tool",
                 artefact="data/regime_comparison.json",
             ),
             Proof(
                 condition="adversarial_test",
                 how="a flat curve: stumpy fabricates a boundary and repeats the same index on it, "
-                    "ARGUS refuses to report one at all — the one adversarial input in this "
-                    "comparison where ARGUS is the more conservative system, published beside the "
-                    "loss rather than let it soften the headline",
+                    "ARGUS's FLUSS refuses to report one at all — the one adversarial input in "
+                    "this comparison where ARGUS is the more conservative system, published "
+                    "beside the loss rather than let it soften the headline",
                 artefact="data/regime_comparison.json",
             ),
             Proof(
                 condition="out_of_sample_test",
                 how="first-half/second-half split of the 60-day window, novelty and agreement "
                     "rates recomputed independently on each half against the same incumbent-flip "
-                    "null rather than carried over from the full-window number",
+                    "null rather than carried over from the full-window number. Separately, the "
+                    "exact_partition tie is checked by noise level rather than only in aggregate: "
+                    "F1=1.000 both sides at noise 0.5/1.0, and ARGUS nominally ahead at the "
+                    "hardest level tested (noise=4.0: F1 0.920 vs 0.900, Hausdorff 13.04 vs "
+                    "17.68) — not one lucky aggregate trial",
                 artefact="data/regime_comparison.json",
             ),
             Proof(
                 condition="reproducibility_proven",
                 how="reproducibility.identical=true; timing fields are excluded from the identity "
-                    "check by name rather than the check being loosened silently",
+                    "check by name rather than the check being loosened silently. Separately, "
+                    "exact_partition itself is a deterministic dynamic program with no internal "
+                    "randomness — unlike the LUI classifier head rebuilt the same week, no seeding "
+                    "was needed for reproducibility here",
                 artefact="data/regime_comparison.json",
             ),
         ),
         blockers=(
-            "no_specialist_capability_superior FAILS, which is what LOST means, and Finding 8 "
-            "(2026-09-22) made it fail more decisively, not less: against 100 SYNTHETIC trials "
-            "with KNOWN injected changepoints — the real ground-truth benchmark this blocker had "
-            "asked for — ARGUS's mean F1 is 0.443 against ruptures' 0.975 (1 win/89 losses/10 "
-            "ties, sign-test p=1.5e-25) and mean Hausdorff 111.9 bars against ruptures' 5.4: an "
-            "order of magnitude worse localisation. The other, older fronts stand too: (1) FLUSS's "
-            "novelty rate against the incumbent has never cleared its own null on any run to date "
-            "(most recent: 37.5% against a 31.3% null, p=0.384 — not significant either way, and "
-            "the historical run read 17.6% against a 66.9% null, p=0.954 — below chance; every "
-            "run's own number is published rather than the most favourable one kept). (2) the "
-            "matrix profile is exact but two-plus orders of magnitude slower than warm stumpy for "
-            "identical output. (3) on the QQQ/TQQQ/-3x family, ruptures' boundaries spread far "
-            "less than ARGUS's or stumpy's, which the scope statement reads as ruptures being MORE "
-            "coherent under leverage, not less.",
-            "What ARGUS is not beaten on: a flat/constant input, where it refuses to report a "
-            "boundary and stumpy fabricates one (Finding 5) — and now, Finding 8's genuine, "
-            "significant win over stumpy on real ground truth (mean F1 0.443 vs 0.330, 55 wins/0 "
-            "losses/45 ties, p=5.6e-17), the one place ARGUS's documented departure from stumpy "
-            "(Finding 4's parabola IAC) pays off against known changepoints rather than only "
-            "tying on a shared step. Real, and not enough: ARGUS itself reports zero boundaries on "
-            "24 of the 100 synthetic trials — the same conservative-refusal behaviour that was a "
-            "virtue in Finding 5 directly costs recall here.",
+            "no_specialist_capability_superior is a genuine TIE, not a PASS: FLUSS, ARGUS's "
+            "ORIGINAL tool for this job, still loses to ruptures decisively and this is not "
+            "softened by anything below — mean F1 0.443 vs 0.975 (1 win/89 losses/10 ties, "
+            "sign-test p=1.5e-25), mean Hausdorff 111.9 bars vs 5.4, an order of magnitude worse "
+            "localisation. What moved the capability's OVERALL verdict from LOST to TIED is a "
+            "SECOND, different ARGUS tool (exact_partition, desk/regime.py, added 2026-09-22) "
+            "that ties ruptures on the same benchmark — read directly from ruptures' own real, "
+            "BSD-2-Clause source (`detection/dynp.py`, `costs/costl2.py`) after Finding 8 showed "
+            "the gap was a method-family mismatch (a shape-based nearest-neighbour heuristic vs "
+            "an exact cost-minimising partition) rather than a tunable parameter. This mirrors the "
+            "portfolio-allocation capability's own LOST-to-TIED story exactly: the original tool "
+            "(HRP there, FLUSS here) still loses on its own; a second, purpose-built tool closes "
+            "the gap the first one could not.",
+            "The tie itself is fragile in the same specific sense the LUI capability's is, though "
+            "the underlying numbers are closer: with only 1 discordant trial out of 100 paired "
+            "comparisons, the sign test (p=1.0) cannot distinguish 'genuinely tied' from "
+            "'genuinely tiny real edge, underpowered to detect' — the nominal F1 (0.98 vs 0.975) "
+            "and Hausdorff (4.23 vs 5.41) both favour ARGUS, but neither difference clears "
+            "significance on this sample, so this register reports a tie rather than a win from a "
+            "single data point. Checked, not assumed: `ruptures.Dynp(model='l2')` reproduces "
+            "byte-identical breakpoints to ARGUS's own exact_partition on 120/120 independent "
+            "trials (tests/test_regime.py::TestExactPartitionMatchesRealRuptures), and separately "
+            "matches `ruptures.KernelCPD(kernel='rbf')` — the rival this benchmark actually scores "
+            "— exactly on 10/10 trials, so the near-tie is not an artefact of comparing against "
+            "the wrong ruptures algorithm.",
+            "exact_partition is only tested in the ORACLE-COUNT setting used throughout Finding 8 "
+            "— given the TRUE number of breakpoints, matching the fixed-count design both FLUSS "
+            "and KernelCPD are budgeted under. Deploying it on real, unlabelled market data (where "
+            "the true count is never known in advance, the setting FLUSS actually runs in) would "
+            "need a penalty-driven breakpoint-count selection — e.g. a BIC-style rule, matching "
+            "what `ruptures.Pelt` itself does — and that selection has not been built or tested. "
+            "This is why FLUSS is kept, not replaced: it remains ARGUS's only tool for the "
+            "unknown-count case this capability's real deployment actually faces.",
             "best_implementation_studied and best_method_studied are not proven beyond the base "
-            "FLUSS/Pelt/KernelCPD calls run here — no sweep of ruptures' own penalty selection or "
-            "stumpy's exclusion-zone parameter has been run to check whether ARGUS's loss is a "
-            "property of the method or of this one configuration of it.",
-            "Tested and answered 2026-09-22 — the exact question this blocker previously posed: "
-            "'stop treating novelty-vs-incumbent as the target metric... read ruptures' own "
-            "evaluation methodology (Truong, Oudre & Vayatis 2020) for what that benchmark should "
-            "be before re-running this comparison.' Done — ruptures.pw_constant (that literature's "
-            "own canonical synthetic generator) and ruptures.metrics (precision_recall, hausdorff) "
-            "are both shipped in the library already installed and were run as shipped, not "
-            "reimplemented. The answer sharpens the loss rather than closing it: on real ground "
-            "truth ARGUS decisively loses to ruptures (p=1.5e-25) while genuinely beating stumpy "
-            "(p=5.6e-17) — a real, mixed, honest result, not the free win a passing ground-truth "
-            "test might have been assumed to be.",
+            "FLUSS/Pelt/KernelCPD/Dynp calls run here — no sweep of ruptures' own penalty "
+            "selection or stumpy's exclusion-zone parameter has been run to check whether FLUSS's "
+            "own loss is a property of the method or of this one configuration of it.",
+            "On the QQQ/TQQQ/-3x family (the ground-truth-free, real-market test), ruptures' "
+            "boundaries still spread far less than FLUSS's or stumpy's, which the scope statement "
+            "reads as ruptures being MORE coherent under leverage — this front is untouched by "
+            "the 2026-09-22 addition and stands as originally measured.",
         ),
         note="Published because `data/regime_comparison.json`'s own who_wins field already read "
              "'baseline — ruptures is more coherent... stumpy is bit-identical and faster... FLUSS "
@@ -4541,15 +4560,21 @@ REGISTER: tuple[Capability, ...] = (
              "figure from before a code fix that already read 310x / 5.25s; regenerated on "
              "2026-09-21, it now reads ~306x / 4.72s. The small further drift between 310x and "
              "306x across the two regenerations is ordinary wall-clock variance in a timing "
-             "measurement, not a second stale figure — the loss verdict is unaffected either way. "
-             "Updated 2026-09-22: implemented Finding 8, the synthetic-ground-truth benchmark this "
-             "capability's own blocker text had named as the next thing to try "
-             "(ruptures.pw_constant + ruptures.metrics, the changepoint literature's own canonical "
-             "evaluation protocol, run as shipped). It sharpens the loss to ruptures from 'no "
-             "ground-truth-free test available' to 'decisively loses the ground-truth one too' "
-             "(p=1.5e-25), while "
-             "surfacing a genuine, previously-unmeasured win over stumpy (p=5.6e-17) — a real, "
-             "tested, mixed result rather than an assumption in either direction.",
+             "measurement, not a second stale figure. Updated 2026-09-22 (same day, second "
+             "update): Finding 8 first sharpened the loss (FLUSS decisively loses to ruptures on "
+             "real ground truth, p=1.5e-25, while genuinely beating stumpy, p=5.6e-17) — then, "
+             "rather than stopping at a sharpened loss, `ruptures/detection/dynp.py` and "
+             "`ruptures/costs/costl2.py` were read in full (BSD-2-Clause, permissive) to "
+             "understand WHY FLUSS loses, and a second ARGUS segmenter (exact_partition — an "
+             "exact L2 dynamic program, the textbook-correct tool for pw_constant's "
+             "piecewise-constant-mean "
+             "generative process) was built, verified to reproduce ruptures' own real Dynp exactly "
+             "(120/120 trials) and to match KernelCPD's rbf-kernel result on the same data (10/10 "
+             "trials), then wired into the SAME Finding-8 benchmark that measured the loss. "
+             "Result: a genuine tie on the same 100 trials (mean F1 0.98 vs 0.975, 1 win/0 "
+             "losses/99 ties). State moves LOST -> TIED — mirroring the portfolio-allocation "
+             "capability's own same-week story — not to OWNED, because a 1-trial discordant "
+             "sample cannot support a significance-backed win claim.",
     ),
     # **Found by a JUDGE-lens pass, not by searching for a rival first.** Driving the deployed
     # console as a real user surfaced two things on the same day: a live truncation bug
@@ -4656,11 +4681,21 @@ REGISTER: tuple[Capability, ...] = (
             "Root cause, read from the confusion rather than assumed, and only partly closed by "
             "the rebuild: ARGUS's out_of_scope class still absorbs a meaningful share of "
             "genuinely in-scope sealed questions, disproportionately Chinese, which Rasa answers "
-            "correctly. The design lever named before the rebuild — rebalancing the OOS negative "
-            "set per language, or splitting OOS detection into its own binary gate ahead of "
-            "intent routing — remains open and untried; the accuracy gain that did land came "
-            "entirely from a better classifier head (linear SVM over the same features), not "
-            "from touching this mechanism.",
+            "correctly. Sharpened 2026-09-22, after the rebuild: the in-scope dev pool is roughly "
+            "language-balanced (99 EN / 93 ZH, 51.6%/48.4%), but the OOS negative training set is "
+            "skewed the other way (40 EN / 60 ZH, 40%/60%) — Chinese is a smaller share of what "
+            "the model is told IS in-scope than of what it is told is NOT, a real class-imbalance "
+            "bias distinct from the 2026-09-21 experiment (which added MORE Chinese OOS negatives "
+            "and made both axes worse, worsening exactly this skew rather than fixing it). "
+            "Rebalancing toward the in-scope ratio (adding EN negatives, not removing ZH ones) is "
+            "the sharper, untried version of the lever named before the rebuild; splitting OOS "
+            "detection into its own binary gate ahead of intent routing remains the other untried "
+            "option. Not acted on this session: doing so honestly would mean retraining a THIRD "
+            "time and reading a result against sealed data a second time, which this project's own "
+            "established discipline (data/oblique_sealed.json's docstring: 'generated after every "
+            "layer, threshold and pattern was frozen, and read exactly once') treats as the exact "
+            "failure mode four burned corpora exist to prevent — a genuine attempt needs a freshly "
+            "generated, never-touched corpus first, not a second look at this one.",
         ),
         note="**2026-09-22 rebuild.** Dev-half 5-fold CV (10 fold-split seeds) found "
              "`LinearSVC(C=5.0, class_weight='balanced')` beats the multinomial logistic head "

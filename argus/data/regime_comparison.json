@@ -8,29 +8,29 @@
         "symbol": "AAPLUSDT",
         "bars": 1439,
         "argus_cuts": [
-          135,
-          569
+          130,
+          564
         ],
         "stumpy_cuts": [
-          134,
-          569
+          129,
+          564
         ],
         "ruptures_bic_n_cuts": 47,
         "ruptures_fixed_cuts": [
-          159,
-          849
+          154,
+          844
         ],
         "n_real_incumbent_flips": 23,
-        "n_regime_py_proxy_flips": 52,
-        "real_flips_matched_by_proxy_within_2_bars": 6,
+        "n_regime_py_proxy_flips": 51,
+        "real_flips_matched_by_proxy_within_2_bars": 5,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.919503,
-        "incumbent_covered_fraction": 0.581991,
+        "cac_correlation_with_stumpy": 0.938292,
+        "incumbent_covered_fraction": 0.577251,
         "argus_comparable_boundaries": [
-          569
+          564
         ],
         "argus_boundaries_outside_comparable_region": [
-          135
+          130
         ],
         "argus_novel_boundaries": [],
         "argus_vs_stumpy_offsets": [
@@ -41,291 +41,284 @@
           24,
           280
         ],
-        "argus_seconds": 4.4684,
-        "stumpy_seconds": 29.6528,
-        "ruptures_seconds": 0.4498
+        "argus_seconds": 4.7729,
+        "stumpy_seconds": 32.7847,
+        "ruptures_seconds": 0.4562
       },
       {
         "symbol": "AMZNUSDT",
         "bars": 1439,
         "argus_cuts": [
-          490,
-          1295
+          890,
+          1294
         ],
         "stumpy_cuts": [
-          894,
-          1219
+          889,
+          1294
         ],
         "ruptures_bic_n_cuts": 47,
         "ruptures_fixed_cuts": [
-          159,
-          490
+          154,
+          485
         ],
         "n_real_incumbent_flips": 33,
-        "n_regime_py_proxy_flips": 65,
-        "real_flips_matched_by_proxy_within_2_bars": 6,
+        "n_regime_py_proxy_flips": 67,
+        "real_flips_matched_by_proxy_within_2_bars": 7,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.909014,
-        "incumbent_covered_fraction": 0.637915,
+        "cac_correlation_with_stumpy": 0.953003,
+        "incumbent_covered_fraction": 0.642654,
         "argus_comparable_boundaries": [
-          490,
-          1295
+          890,
+          1294
         ],
         "argus_boundaries_outside_comparable_region": [],
-        "argus_novel_boundaries": [
-          490
-        ],
+        "argus_novel_boundaries": [],
         "argus_vs_stumpy_offsets": [
-          404,
-          76
+          1,
+          0
         ],
         "argus_vs_ruptures_fixed_offsets": [
-          0,
-          805
+          405,
+          809
         ],
-        "argus_seconds": 4.7182,
-        "stumpy_seconds": 0.0159,
-        "ruptures_seconds": 0.3181
+        "argus_seconds": 5.3873,
+        "stumpy_seconds": 0.0173,
+        "ruptures_seconds": 0.3954
       },
       {
         "symbol": "COINUSDT",
         "bars": 1439,
         "argus_cuts": [
           120,
-          1063
+          1058
         ],
         "stumpy_cuts": [
-          800,
-          1063
+          795,
+          1058
         ],
-        "ruptures_bic_n_cuts": 47,
+        "ruptures_bic_n_cuts": 46,
         "ruptures_fixed_cuts": [
-          159,
-          640
+          154,
+          635
         ],
         "n_real_incumbent_flips": 33,
-        "n_regime_py_proxy_flips": 52,
-        "real_flips_matched_by_proxy_within_2_bars": 5,
+        "n_regime_py_proxy_flips": 53,
+        "real_flips_matched_by_proxy_within_2_bars": 6,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.75114,
-        "incumbent_covered_fraction": 0.730806,
+        "cac_correlation_with_stumpy": 0.783741,
+        "incumbent_covered_fraction": 0.726066,
         "argus_comparable_boundaries": [
-          1063
+          1058
         ],
         "argus_boundaries_outside_comparable_region": [
           120
         ],
         "argus_novel_boundaries": [
-          1063
+          1058
         ],
         "argus_vs_stumpy_offsets": [
-          680,
+          675,
           0
         ],
         "argus_vs_ruptures_fixed_offsets": [
-          39,
+          34,
           423
         ],
-        "argus_seconds": 4.7069,
-        "stumpy_seconds": 0.0146,
-        "ruptures_seconds": 0.3908
+        "argus_seconds": 5.6923,
+        "stumpy_seconds": 0.0345,
+        "ruptures_seconds": 0.4519
       },
       {
         "symbol": "GOOGLUSDT",
         "bars": 1439,
         "argus_cuts": [
-          150,
-          1273
+          145
         ],
         "stumpy_cuts": [
-          149,
-          1273
+          144,
+          986
         ],
         "ruptures_bic_n_cuts": 46,
         "ruptures_fixed_cuts": [
-          177,
-          442
+          172,
+          437
         ],
         "n_real_incumbent_flips": 40,
         "n_regime_py_proxy_flips": 47,
         "real_flips_matched_by_proxy_within_2_bars": 6,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.981902,
+        "cac_correlation_with_stumpy": 0.982912,
         "incumbent_covered_fraction": 0.76019,
-        "argus_comparable_boundaries": [
-          1273
-        ],
+        "argus_comparable_boundaries": [],
         "argus_boundaries_outside_comparable_region": [
-          150
+          145
         ],
         "argus_novel_boundaries": [],
         "argus_vs_stumpy_offsets": [
-          1,
-          0
+          1
         ],
         "argus_vs_ruptures_fixed_offsets": [
-          27,
-          831
+          27
         ],
-        "argus_seconds": 4.7219,
-        "stumpy_seconds": 0.0153,
-        "ruptures_seconds": 0.3725
+        "argus_seconds": 5.251,
+        "stumpy_seconds": 0.0323,
+        "ruptures_seconds": 0.3785
       },
       {
         "symbol": "METAUSDT",
         "bars": 1439,
         "argus_cuts": [
           120,
-          240
+          249
         ],
         "stumpy_cuts": [
-          124,
-          416
+          120,
+          411
         ],
         "ruptures_bic_n_cuts": 43,
         "ruptures_fixed_cuts": [
-          981,
-          1134
+          976,
+          1129
         ],
         "n_real_incumbent_flips": 36,
         "n_regime_py_proxy_flips": 35,
-        "real_flips_matched_by_proxy_within_2_bars": 7,
+        "real_flips_matched_by_proxy_within_2_bars": 8,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.986997,
+        "cac_correlation_with_stumpy": 0.967689,
         "incumbent_covered_fraction": 0.695735,
-        "argus_comparable_boundaries": [],
+        "argus_comparable_boundaries": [
+          249
+        ],
         "argus_boundaries_outside_comparable_region": [
-          120,
-          240
+          120
         ],
         "argus_novel_boundaries": [],
         "argus_vs_stumpy_offsets": [
-          4,
-          116
+          0,
+          129
         ],
         "argus_vs_ruptures_fixed_offsets": [
-          861,
-          741
+          856,
+          727
         ],
-        "argus_seconds": 4.8304,
-        "stumpy_seconds": 0.0171,
-        "ruptures_seconds": 0.4438
+        "argus_seconds": 5.1605,
+        "stumpy_seconds": 0.0178,
+        "ruptures_seconds": 0.469
       },
       {
         "symbol": "MSFTUSDT",
         "bars": 1439,
         "argus_cuts": [
-          245,
-          1062
+          240,
+          1295
         ],
         "stumpy_cuts": [
-          244,
-          1062
+          239,
+          1295
         ],
         "ruptures_bic_n_cuts": 49,
         "ruptures_fixed_cuts": [
-          137,
-          248
+          132,
+          243
         ],
         "n_real_incumbent_flips": 24,
         "n_regime_py_proxy_flips": 45,
         "real_flips_matched_by_proxy_within_2_bars": 8,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.975946,
+        "cac_correlation_with_stumpy": 0.977567,
         "incumbent_covered_fraction": 0.588626,
         "argus_comparable_boundaries": [
-          245,
-          1062
+          1295
         ],
-        "argus_boundaries_outside_comparable_region": [],
-        "argus_novel_boundaries": [
-          1062
+        "argus_boundaries_outside_comparable_region": [
+          240
         ],
+        "argus_novel_boundaries": [],
         "argus_vs_stumpy_offsets": [
           1,
           0
         ],
         "argus_vs_ruptures_fixed_offsets": [
           3,
-          814
+          1052
         ],
-        "argus_seconds": 4.6952,
-        "stumpy_seconds": 0.0161,
-        "ruptures_seconds": 0.354
+        "argus_seconds": 5.4049,
+        "stumpy_seconds": 0.0263,
+        "ruptures_seconds": 0.3879
       },
       {
         "symbol": "MSTRUSDT",
         "bars": 1439,
         "argus_cuts": [
-          153,
-          318
+          148,
+          316
         ],
         "stumpy_cuts": [
-          152,
-          320
+          147,
+          315
         ],
         "ruptures_bic_n_cuts": 43,
         "ruptures_fixed_cuts": [
-          651,
-          1352
+          646,
+          1347
         ],
         "n_real_incumbent_flips": 42,
         "n_regime_py_proxy_flips": 73,
-        "real_flips_matched_by_proxy_within_2_bars": 10,
+        "real_flips_matched_by_proxy_within_2_bars": 11,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.930527,
-        "incumbent_covered_fraction": 0.777251,
+        "cac_correlation_with_stumpy": 0.929,
+        "incumbent_covered_fraction": 0.781991,
         "argus_comparable_boundaries": [
-          318
+          316
         ],
         "argus_boundaries_outside_comparable_region": [
-          153
+          148
         ],
         "argus_novel_boundaries": [
-          318
+          316
         ],
         "argus_vs_stumpy_offsets": [
           1,
-          2
+          1
         ],
         "argus_vs_ruptures_fixed_offsets": [
           498,
-          333
+          330
         ],
-        "argus_seconds": 4.676,
-        "stumpy_seconds": 0.018,
-        "ruptures_seconds": 0.4496
+        "argus_seconds": 5.0569,
+        "stumpy_seconds": 0.0375,
+        "ruptures_seconds": 0.4618
       },
       {
         "symbol": "NVDAUSDT",
         "bars": 1439,
         "argus_cuts": [
-          173,
-          845
+          168,
+          840
         ],
         "stumpy_cuts": [
-          237,
-          845
+          232,
+          840
         ],
         "ruptures_bic_n_cuts": 47,
         "ruptures_fixed_cuts": [
-          80,
-          270
+          75,
+          265
         ],
-        "n_real_incumbent_flips": 37,
-        "n_regime_py_proxy_flips": 39,
+        "n_real_incumbent_flips": 38,
+        "n_regime_py_proxy_flips": 38,
         "real_flips_matched_by_proxy_within_2_bars": 1,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.097918,
+        "cac_correlation_with_stumpy": 0.498494,
         "incumbent_covered_fraction": 0.680569,
         "argus_comparable_boundaries": [
-          845
+          840
         ],
         "argus_boundaries_outside_comparable_region": [
-          173
+          168
         ],
         "argus_novel_boundaries": [
-          845
+          840
         ],
         "argus_vs_stumpy_offsets": [
           64,
@@ -335,35 +328,35 @@
           93,
           575
         ],
-        "argus_seconds": 4.8035,
-        "stumpy_seconds": 0.0155,
-        "ruptures_seconds": 0.3743
+        "argus_seconds": 5.5967,
+        "stumpy_seconds": 0.0294,
+        "ruptures_seconds": 0.3752
       },
       {
         "symbol": "QQQUSDT",
         "bars": 1439,
         "argus_cuts": [
-          1042,
-          1242
+          1037,
+          1237
         ],
         "stumpy_cuts": [
-          1041,
-          1242
+          1036,
+          1237
         ],
         "ruptures_bic_n_cuts": 47,
         "ruptures_fixed_cuts": [
-          272,
-          608
+          267,
+          603
         ],
         "n_real_incumbent_flips": 38,
         "n_regime_py_proxy_flips": 41,
         "real_flips_matched_by_proxy_within_2_bars": 8,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.977417,
-        "incumbent_covered_fraction": 0.723223,
+        "cac_correlation_with_stumpy": 0.968146,
+        "incumbent_covered_fraction": 0.727962,
         "argus_comparable_boundaries": [
-          1042,
-          1242
+          1037,
+          1237
         ],
         "argus_boundaries_outside_comparable_region": [],
         "argus_novel_boundaries": [],
@@ -375,33 +368,33 @@
           434,
           634
         ],
-        "argus_seconds": 4.7271,
-        "stumpy_seconds": 0.0152,
-        "ruptures_seconds": 0.5177
+        "argus_seconds": 5.0761,
+        "stumpy_seconds": 0.0186,
+        "ruptures_seconds": 0.5838
       },
       {
         "symbol": "SQQQUSDT",
         "bars": 1439,
         "argus_cuts": [
-          992
+          987
         ],
         "stumpy_cuts": [
           0,
-          991
+          986
         ],
         "ruptures_bic_n_cuts": 47,
         "ruptures_fixed_cuts": [
-          272,
-          608
+          267,
+          603
         ],
         "n_real_incumbent_flips": 36,
         "n_regime_py_proxy_flips": 43,
         "real_flips_matched_by_proxy_within_2_bars": 8,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.869291,
-        "incumbent_covered_fraction": 0.720379,
+        "cac_correlation_with_stumpy": 0.758278,
+        "incumbent_covered_fraction": 0.725118,
         "argus_comparable_boundaries": [
-          992
+          987
         ],
         "argus_boundaries_outside_comparable_region": [],
         "argus_novel_boundaries": [],
@@ -411,35 +404,35 @@
         "argus_vs_ruptures_fixed_offsets": [
           384
         ],
-        "argus_seconds": 4.7648,
-        "stumpy_seconds": 0.016,
-        "ruptures_seconds": 0.4505
+        "argus_seconds": 5.7036,
+        "stumpy_seconds": 0.0204,
+        "ruptures_seconds": 0.5061
       },
       {
         "symbol": "TQQQUSDT",
         "bars": 1439,
         "argus_cuts": [
-          493,
-          992
+          488,
+          987
         ],
         "stumpy_cuts": [
-          492,
-          992
+          487,
+          987
         ],
         "ruptures_bic_n_cuts": 46,
         "ruptures_fixed_cuts": [
-          270,
-          609
+          265,
+          604
         ],
         "n_real_incumbent_flips": 36,
         "n_regime_py_proxy_flips": 39,
         "real_flips_matched_by_proxy_within_2_bars": 7,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.877901,
-        "incumbent_covered_fraction": 0.722275,
+        "cac_correlation_with_stumpy": 0.839463,
+        "incumbent_covered_fraction": 0.727014,
         "argus_comparable_boundaries": [
-          493,
-          992
+          488,
+          987
         ],
         "argus_boundaries_outside_comparable_region": [],
         "argus_novel_boundaries": [],
@@ -451,39 +444,39 @@
           116,
           383
         ],
-        "argus_seconds": 4.7427,
-        "stumpy_seconds": 0.0157,
-        "ruptures_seconds": 0.4804
+        "argus_seconds": 5.154,
+        "stumpy_seconds": 0.0176,
+        "ruptures_seconds": 0.4812
       },
       {
         "symbol": "TSLAUSDT",
         "bars": 1439,
         "argus_cuts": [
-          422,
-          543
+          417,
+          538
         ],
         "stumpy_cuts": [
-          421,
-          542
+          416,
+          537
         ],
         "ruptures_bic_n_cuts": 45,
         "ruptures_fixed_cuts": [
-          249,
-          633
+          244,
+          628
         ],
         "n_real_incumbent_flips": 38,
         "n_regime_py_proxy_flips": 43,
         "real_flips_matched_by_proxy_within_2_bars": 4,
         "profile_index_agreement_with_stumpy": 1.0,
-        "cac_correlation_with_stumpy": 0.973155,
+        "cac_correlation_with_stumpy": 0.973398,
         "incumbent_covered_fraction": 0.698578,
         "argus_comparable_boundaries": [
-          422,
-          543
+          417,
+          538
         ],
         "argus_boundaries_outside_comparable_region": [],
         "argus_novel_boundaries": [
-          422
+          417
         ],
         "argus_vs_stumpy_offsets": [
           1,
@@ -493,9 +486,9 @@
           173,
           90
         ],
-        "argus_seconds": 4.6902,
-        "stumpy_seconds": 0.0148,
-        "ruptures_seconds": 0.4195
+        "argus_seconds": 5.078,
+        "stumpy_seconds": 0.0195,
+        "ruptures_seconds": 0.4786
       }
     ],
     "profile_parity": {
@@ -503,24 +496,23 @@
       "windows_compared": 16992,
       "symbols_with_exact_profile_index_match": 12,
       "min_profile_index_agreement": 1.0,
-      "cac_correlation_min": 0.09791824224154333,
-      "cac_correlation_max": 0.9869972072116984,
-      "cac_correlation_median": 0.9250148856966887,
+      "cac_correlation_min": 0.4984938975434556,
+      "cac_correlation_max": 0.9829124577996389,
+      "cac_correlation_median": 0.9456474800214942,
       "boundary_offsets": [
         1,
         0,
-        404,
-        76,
-        680,
+        1,
+        0,
+        675,
         0,
         1,
         0,
-        4,
-        116,
+        129,
         1,
         0,
         1,
-        2,
+        1,
         64,
         0,
         1,
@@ -531,51 +523,51 @@
         1,
         1
       ],
-      "boundaries_within_1_bar": 16,
-      "boundaries_within_one_window": 18,
-      "n_boundaries": 23
+      "boundaries_within_1_bar": 19,
+      "boundaries_within_one_window": 19,
+      "n_boundaries": 22
     },
     "novelty_vs_incumbent": {
-      "n_argus_boundaries": 16,
-      "n_argus_boundaries_all": 23,
+      "n_argus_boundaries": 15,
+      "n_argus_boundaries_all": 22,
       "n_argus_boundaries_outside_region": 7,
       "comparable_region_example": [
         241,
         1296
       ],
-      "n_novel_vs_real_incumbent": 6,
-      "novelty_rate": 0.375,
-      "chance_novelty_rate": 0.31297393364928927,
-      "agreement_rate": 0.625,
-      "chance_agreement_rate": 0.6870260663507107,
-      "beats_chance": true,
-      "binomial_p_novelty_above_chance": 0.3835826212122203,
-      "binomial_p_agreement_above_chance": 0.7927388592060546,
-      "n_stumpy_boundaries": 18,
-      "n_stumpy_novel": 5,
+      "n_novel_vs_real_incumbent": 4,
+      "novelty_rate": 0.26666666666666666,
+      "chance_novelty_rate": 0.3088151658767774,
+      "agreement_rate": 0.7333333333333333,
+      "chance_agreement_rate": 0.6911848341232226,
+      "beats_chance": false,
+      "binomial_p_novelty_above_chance": 0.7281738513792653,
+      "binomial_p_agreement_above_chance": 0.4853583299369655,
+      "n_stumpy_boundaries": 17,
+      "n_stumpy_novel": 4,
       "n_ruptures_fixed_boundaries": 17,
-      "n_ruptures_novel": 6,
-      "total_real_incumbent_flips": 416
+      "n_ruptures_novel": 5,
+      "total_real_incumbent_flips": 417
     },
     "incumbent_proxy_defect": {
-      "real_incumbent_flips": 416,
-      "regime_py_proxy_flips": 574,
-      "real_flips_matched_by_proxy_within_2_bars": 76,
-      "match_rate": 0.18269230769230768,
+      "real_incumbent_flips": 417,
+      "regime_py_proxy_flips": 575,
+      "real_flips_matched_by_proxy_within_2_bars": 79,
+      "match_rate": 0.18944844124700239,
       "real_statistic": "sample standard deviation of bar returns (track1_suite.py:51-63)",
       "proxy_statistic": "median absolute bar-to-bar move (regime.py:306-312)"
     },
     "calendar_control": {
       "argus": {
-        "n_boundaries": 23,
-        "distinct_hour_of_week_buckets": 19,
+        "n_boundaries": 22,
+        "distinct_hour_of_week_buckets": 16,
         "fullest_bucket": 2,
-        "expected_per_bucket_if_uniform": 0.13690476190476192,
-        "concentration_z": 5.050358224758501
+        "expected_per_bucket_if_uniform": 0.13095238095238096,
+        "concentration_z": 5.180361559779211
       },
       "stumpy": {
         "n_boundaries": 24,
-        "distinct_hour_of_week_buckets": 21,
+        "distinct_hour_of_week_buckets": 20,
         "fullest_bucket": 3,
         "expected_per_bucket_if_uniform": 0.14285714285714285,
         "concentration_z": 7.5818882832787615
@@ -588,11 +580,11 @@
         "concentration_z": 10.235549182426327
       },
       "ruptures_bic": {
-        "n_boundaries": 554,
-        "distinct_hour_of_week_buckets": 113,
+        "n_boundaries": 553,
+        "distinct_hour_of_week_buckets": 114,
         "fullest_bucket": 33,
-        "expected_per_bucket_if_uniform": 3.2976190476190474,
-        "concentration_z": 16.405422807420056
+        "expected_per_bucket_if_uniform": 3.2916666666666665,
+        "concentration_z": 16.423539851681152
       }
     },
     "family_coherence": {
@@ -605,15 +597,15 @@
       "relations": {
         "QQQUSDT": {
           "log_return_correlation_vs_QQQUSDT": 1.0,
-          "beta_vs_QQQUSDT": 1.000000000000001
+          "beta_vs_QQQUSDT": 0.9999999999999991
         },
         "TQQQUSDT": {
-          "log_return_correlation_vs_QQQUSDT": 0.982471613730417,
-          "beta_vs_QQQUSDT": 2.938082803042515
+          "log_return_correlation_vs_QQQUSDT": 0.9824193811145886,
+          "beta_vs_QQQUSDT": 2.93796667287843
         },
         "SQQQUSDT": {
-          "log_return_correlation_vs_QQQUSDT": -0.9742981403704104,
-          "beta_vs_QQQUSDT": -2.936671675413807
+          "log_return_correlation_vs_QQQUSDT": -0.9742625066092503,
+          "beta_vs_QQQUSDT": -2.93752835146151
         }
       },
       "all_three": {
@@ -621,7 +613,7 @@
           549
         ],
         "stumpy_cuts": [
-          1041,
+          1036,
           251
         ],
         "ruptures_fixed_cuts": [
@@ -647,7 +639,7 @@
     "ruptures_bic_cuts_per_symbol": [
       47,
       47,
-      47,
+      46,
       46,
       43,
       49,
@@ -665,187 +657,187 @@
     "per_symbol": {
       "AAPLUSDT": {
         "beta_iac_cuts": [
-          134,
-          569
+          129,
+          564
         ],
         "parabola_iac_cuts": [
-          134,
-          569
+          129,
+          564
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.9298895763949392
+        "curve_correlation": 0.9470242510416761
       },
       "AMZNUSDT": {
         "beta_iac_cuts": [
-          894,
-          1219
+          889,
+          1294
         ],
         "parabola_iac_cuts": [
-          489,
-          1295
+          889,
+          1294
         ],
         "offsets": [
-          401,
-          76
+          0,
+          0
         ],
-        "curve_correlation": 0.9258462654812859
+        "curve_correlation": 0.9560303850335412
       },
       "COINUSDT": {
         "beta_iac_cuts": [
-          800,
-          1063
+          795,
+          1058
         ],
         "parabola_iac_cuts": [
           120,
-          1063
+          1058
         ],
         "offsets": [
           263,
           0
         ],
-        "curve_correlation": 0.7902859717498874
+        "curve_correlation": 0.81864746292142
       },
       "GOOGLUSDT": {
         "beta_iac_cuts": [
-          149,
-          1273
+          144,
+          986
         ],
         "parabola_iac_cuts": [
-          149,
-          1273
+          0,
+          144
         ],
         "offsets": [
           0,
-          0
+          842
         ],
-        "curve_correlation": 0.98585229014595
+        "curve_correlation": 0.987867370855785
       },
       "METAUSDT": {
         "beta_iac_cuts": [
-          124,
-          416
+          120,
+          411
         ],
         "parabola_iac_cuts": [
-          124,
-          253
+          120,
+          248
         ],
         "offsets": [
           0,
           163
         ],
-        "curve_correlation": 0.9871785005709754
+        "curve_correlation": 0.9681292133358387
       },
       "MSFTUSDT": {
         "beta_iac_cuts": [
-          244,
-          1062
+          239,
+          1295
         ],
         "parabola_iac_cuts": [
-          244,
-          1062
+          239,
+          1295
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.9785754369356101
+        "curve_correlation": 0.9800211270416075
       },
       "MSTRUSDT": {
         "beta_iac_cuts": [
-          152,
-          320
+          147,
+          315
         ],
         "parabola_iac_cuts": [
-          152,
-          319
+          147,
+          315
         ],
         "offsets": [
           0,
-          1
+          0
         ],
-        "curve_correlation": 0.932407268816392
+        "curve_correlation": 0.9312798117452092
       },
       "NVDAUSDT": {
         "beta_iac_cuts": [
-          237,
-          845
+          232,
+          840
         ],
         "parabola_iac_cuts": [
-          172,
-          845
+          167,
+          840
         ],
         "offsets": [
           65,
           0
         ],
-        "curve_correlation": 0.0955484360203874
+        "curve_correlation": 0.5070444611926527
       },
       "QQQUSDT": {
         "beta_iac_cuts": [
-          1041,
-          1242
+          1036,
+          1237
         ],
         "parabola_iac_cuts": [
-          1041,
-          1242
+          1036,
+          1237
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.9766519051310222
+        "curve_correlation": 0.9671981293548895
       },
       "SQQQUSDT": {
         "beta_iac_cuts": [
           0,
-          991
+          986
         ],
         "parabola_iac_cuts": [
           0,
-          991
+          986
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.8539842439280317
+        "curve_correlation": 0.7261515036667874
       },
       "TQQQUSDT": {
         "beta_iac_cuts": [
-          492,
-          992
+          487,
+          987
         ],
         "parabola_iac_cuts": [
-          492,
-          992
+          487,
+          987
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.8756551814422622
+        "curve_correlation": 0.8309972770816769
       },
       "TSLAUSDT": {
         "beta_iac_cuts": [
-          421,
-          542
+          416,
+          537
         ],
         "parabola_iac_cuts": [
-          421,
-          542
+          416,
+          537
         ],
         "offsets": [
           0,
           0
         ],
-        "curve_correlation": 0.976454871223051
+        "curve_correlation": 0.9768092485627199
       }
     },
     "n_boundaries": 24,
-    "unchanged_within_1_bar": 19,
+    "unchanged_within_1_bar": 20,
     "moved_more_than_300_bars": 1,
     "idealised_curve_is_load_bearing": true
   },
@@ -884,24 +876,24 @@
     "first_half": {
       "novelty": {
         "n_argus_boundaries": 14,
-        "n_argus_boundaries_all": 23,
-        "n_argus_boundaries_outside_region": 9,
+        "n_argus_boundaries_all": 21,
+        "n_argus_boundaries_outside_region": 7,
         "comparable_region_example": [
           241,
           576
         ],
-        "n_novel_vs_real_incumbent": 7,
-        "novelty_rate": 0.5,
-        "chance_novelty_rate": 0.5571428571428572,
-        "agreement_rate": 0.5,
-        "chance_agreement_rate": 0.4428571428571429,
+        "n_novel_vs_real_incumbent": 6,
+        "novelty_rate": 0.42857142857142855,
+        "chance_novelty_rate": 0.568230277185501,
+        "agreement_rate": 0.5714285714285714,
+        "chance_agreement_rate": 0.43176972281449894,
         "beats_chance": false,
-        "binomial_p_novelty_above_chance": 0.7588128712475335,
-        "binomial_p_agreement_above_chance": 0.43224231225948373,
-        "n_stumpy_boundaries": 13,
-        "n_stumpy_novel": 5,
+        "binomial_p_novelty_above_chance": 0.9067700232927842,
+        "binomial_p_agreement_above_chance": 0.21533092440335766,
+        "n_stumpy_boundaries": 14,
+        "n_stumpy_novel": 6,
         "n_ruptures_fixed_boundaries": 11,
-        "n_ruptures_novel": 7,
+        "n_ruptures_novel": 4,
         "total_real_incumbent_flips": 126
       },
       "parity": {
@@ -909,86 +901,84 @@
         "windows_compared": 8352,
         "symbols_with_exact_profile_index_match": 12,
         "min_profile_index_agreement": 1.0,
-        "cac_correlation_min": 0.793114267511765,
-        "cac_correlation_max": 0.9985412907430639,
+        "cac_correlation_min": 0.33358575445113864,
+        "cac_correlation_max": 0.9984280239739102,
         "cac_correlation_median": NaN,
         "boundary_offsets": [
           1,
           1,
           1,
-          120,
-          1,
-          1,
-          0,
-          128,
-          0,
-          0,
-          1,
-          1,
+          123,
+          4,
           1,
           0,
+          1,
           0,
           1,
-          3,
-          0,
           0,
           1,
           1,
-          181,
-          310
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          1
         ],
-        "boundaries_within_1_bar": 18,
-        "boundaries_within_one_window": 19,
-        "n_boundaries": 23
+        "boundaries_within_1_bar": 19,
+        "boundaries_within_one_window": 20,
+        "n_boundaries": 21
       }
     },
     "second_half": {
       "novelty": {
-        "n_argus_boundaries": 15,
+        "n_argus_boundaries": 13,
         "n_argus_boundaries_all": 22,
-        "n_argus_boundaries_outside_region": 7,
+        "n_argus_boundaries_outside_region": 9,
         "comparable_region_example": [
           241,
           577
         ],
-        "n_novel_vs_real_incumbent": 2,
-        "novelty_rate": 0.13333333333333333,
-        "chance_novelty_rate": 0.20813492063492067,
-        "agreement_rate": 0.8666666666666667,
-        "chance_agreement_rate": 0.7918650793650793,
+        "n_novel_vs_real_incumbent": 1,
+        "novelty_rate": 0.07692307692307693,
+        "chance_novelty_rate": 0.21611721611721602,
+        "agreement_rate": 0.9230769230769231,
+        "chance_agreement_rate": 0.783882783882784,
         "beats_chance": false,
-        "binomial_p_novelty_above_chance": 0.8508149957221787,
-        "binomial_p_agreement_above_chance": 0.3681348734195846,
+        "binomial_p_novelty_above_chance": 0.9578046452967144,
+        "binomial_p_agreement_above_chance": 0.19342823814917384,
         "n_stumpy_boundaries": 12,
-        "n_stumpy_novel": 2,
+        "n_stumpy_novel": 1,
         "n_ruptures_fixed_boundaries": 15,
         "n_ruptures_novel": 6,
-        "total_real_incumbent_flips": 188
+        "total_real_incumbent_flips": 189
       },
       "parity": {
         "symbols": 12,
         "windows_compared": 8364,
         "symbols_with_exact_profile_index_match": 12,
         "min_profile_index_agreement": 1.0,
-        "cac_correlation_min": 0.8712856139860847,
-        "cac_correlation_max": 0.9935189639873514,
+        "cac_correlation_min": 0.8859449823167342,
+        "cac_correlation_max": 0.9929614301886436,
         "cac_correlation_median": NaN,
         "boundary_offsets": [
           0,
-          120,
-          200,
+          0,
+          141,
           0,
           1,
           0,
-          411,
-          554,
+          185,
+          549,
           0,
           1,
           1,
-          151,
           0,
-          126,
           0,
+          121,
+          1,
           1,
           0,
           0,
@@ -997,8 +987,8 @@
           1,
           1
         ],
-        "boundaries_within_1_bar": 16,
-        "boundaries_within_one_window": 16,
+        "boundaries_within_1_bar": 18,
+        "boundaries_within_one_window": 18,
         "n_boundaries": 22
       }
     },
@@ -1008,10 +998,10 @@
     "symbol": "NVDAUSDT",
     "bars": 1439,
     "repeats": 3,
-    "argus_seconds": 4.805952099966817,
-    "stumpy_seconds_warm": 0.01769360003527254,
-    "ruptures_pelt_seconds": 0.37601380003616214,
-    "stumpy_speedup": 271.620930188659
+    "argus_seconds": 5.174515366670676,
+    "stumpy_seconds_warm": 0.021280033319878083,
+    "ruptures_pelt_seconds": 0.4220992000773549,
+    "stumpy_speedup": 243.16293536237384
   },
   "reproducibility": {
     "identical": true,
@@ -1054,12 +1044,19 @@
           268,
           400
         ],
+        "argus_dynp_bkps": [
+          133,
+          268,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 269.0,
-        "ruptures_hausdorff": 1.0
+        "ruptures_hausdorff": 1.0,
+        "argus_dynp_hausdorff": 1.0
       },
       {
         "noise_std": 0.5,
@@ -1083,12 +1080,19 @@
           264,
           400
         ],
+        "argus_dynp_bkps": [
+          132,
+          264,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 133.0,
         "stumpy_hausdorff": 134.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1110,12 +1114,19 @@
           260,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          260,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 260.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1139,12 +1150,19 @@
           272,
           400
         ],
+        "argus_dynp_bkps": [
+          140,
+          272,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 152.0,
         "stumpy_hausdorff": 152.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1168,12 +1186,19 @@
           274,
           400
         ],
+        "argus_dynp_bkps": [
+          130,
+          274,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 145.0,
         "stumpy_hausdorff": 146.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1197,12 +1222,19 @@
           260,
           400
         ],
+        "argus_dynp_bkps": [
+          129,
+          260,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 127.0,
         "stumpy_hausdorff": 129.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1227,12 +1259,19 @@
           268,
           400
         ],
+        "argus_dynp_bkps": [
+          143,
+          268,
+          400
+        ],
         "argus_f1": 1.0,
         "stumpy_f1": 1.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 23.0,
         "stumpy_hausdorff": 23.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1256,12 +1295,19 @@
           267,
           400
         ],
+        "argus_dynp_bkps": [
+          134,
+          267,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 76.0,
         "stumpy_hausdorff": 134.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1283,12 +1329,19 @@
           269,
           400
         ],
+        "argus_dynp_bkps": [
+          133,
+          269,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 269.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1313,12 +1366,19 @@
           258,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          258,
+          400
+        ],
         "argus_f1": 1.0,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 17.0,
         "stumpy_hausdorff": 138.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1342,12 +1402,19 @@
           264,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          264,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 135.0,
         "stumpy_hausdorff": 136.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1371,12 +1438,19 @@
           267,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          267,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 149.0,
         "stumpy_hausdorff": 149.0,
-        "ruptures_hausdorff": 2.0
+        "ruptures_hausdorff": 2.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 0.5,
@@ -1398,12 +1472,19 @@
           262,
           400
         ],
+        "argus_dynp_bkps": [
+          129,
+          262,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 262.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1425,12 +1506,19 @@
           266,
           400
         ],
+        "argus_dynp_bkps": [
+          135,
+          266,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 266.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1454,12 +1542,19 @@
           266,
           400
         ],
+        "argus_dynp_bkps": [
+          139,
+          266,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 117.0,
         "stumpy_hausdorff": 139.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1481,12 +1576,19 @@
           263,
           400
         ],
+        "argus_dynp_bkps": [
+          126,
+          263,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 263.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1508,12 +1610,19 @@
           261,
           400
         ],
+        "argus_dynp_bkps": [
+          126,
+          261,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 261.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1537,12 +1646,19 @@
           274,
           400
         ],
+        "argus_dynp_bkps": [
+          141,
+          274,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 154.0,
         "stumpy_hausdorff": 154.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1566,12 +1682,19 @@
           260,
           400
         ],
+        "argus_dynp_bkps": [
+          127,
+          260,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 129.0,
         "stumpy_hausdorff": 127.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1595,12 +1718,19 @@
           264,
           400
         ],
+        "argus_dynp_bkps": [
+          130,
+          264,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 113.0,
         "stumpy_hausdorff": 130.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1622,12 +1752,19 @@
           267,
           400
         ],
+        "argus_dynp_bkps": [
+          129,
+          267,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 267.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1651,12 +1788,19 @@
           264,
           400
         ],
+        "argus_dynp_bkps": [
+          137,
+          264,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 118.0,
         "stumpy_hausdorff": 137.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1680,12 +1824,19 @@
           256,
           400
         ],
+        "argus_dynp_bkps": [
+          128,
+          256,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 136.0,
         "stumpy_hausdorff": 136.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1709,12 +1860,19 @@
           266,
           400
         ],
+        "argus_dynp_bkps": [
+          134,
+          266,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 128.0,
         "stumpy_hausdorff": 134.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 0.5,
@@ -1737,12 +1895,19 @@
           268,
           400
         ],
+        "argus_dynp_bkps": [
+          140,
+          268,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 85.0,
         "stumpy_hausdorff": 268.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -1764,12 +1929,19 @@
           267,
           400
         ],
+        "argus_dynp_bkps": [
+          133,
+          267,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 269.0,
-        "ruptures_hausdorff": 2.0
+        "ruptures_hausdorff": 2.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 1.0,
@@ -1793,12 +1965,19 @@
           264,
           400
         ],
+        "argus_dynp_bkps": [
+          132,
+          264,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 133.0,
         "stumpy_hausdorff": 134.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -1820,12 +1999,19 @@
           260,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          260,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 260.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -1849,12 +2035,19 @@
           272,
           400
         ],
+        "argus_dynp_bkps": [
+          140,
+          272,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 152.0,
         "stumpy_hausdorff": 152.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -1878,12 +2071,19 @@
           274,
           400
         ],
+        "argus_dynp_bkps": [
+          130,
+          274,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 145.0,
         "stumpy_hausdorff": 145.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -1907,12 +2107,19 @@
           260,
           400
         ],
+        "argus_dynp_bkps": [
+          129,
+          260,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 127.0,
         "stumpy_hausdorff": 129.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -1937,12 +2144,19 @@
           268,
           400
         ],
+        "argus_dynp_bkps": [
+          143,
+          268,
+          400
+        ],
         "argus_f1": 1.0,
         "stumpy_f1": 1.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 23.0,
         "stumpy_hausdorff": 23.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -1966,12 +2180,19 @@
           269,
           400
         ],
+        "argus_dynp_bkps": [
+          134,
+          269,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 83.0,
         "stumpy_hausdorff": 134.0,
-        "ruptures_hausdorff": 2.0
+        "ruptures_hausdorff": 2.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 1.0,
@@ -1993,12 +2214,19 @@
           269,
           400
         ],
+        "argus_dynp_bkps": [
+          133,
+          269,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 269.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -2022,12 +2250,19 @@
           258,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          258,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 138.0,
         "stumpy_hausdorff": 138.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -2051,12 +2286,19 @@
           264,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          264,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 135.0,
         "stumpy_hausdorff": 136.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -2080,12 +2322,19 @@
           267,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          267,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 149.0,
         "stumpy_hausdorff": 149.0,
-        "ruptures_hausdorff": 2.0
+        "ruptures_hausdorff": 2.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 1.0,
@@ -2108,12 +2357,19 @@
           262,
           400
         ],
+        "argus_dynp_bkps": [
+          129,
+          262,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 120.0,
         "stumpy_hausdorff": 262.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -2135,12 +2391,19 @@
           266,
           400
         ],
+        "argus_dynp_bkps": [
+          135,
+          266,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 266.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -2164,12 +2427,19 @@
           266,
           400
         ],
+        "argus_dynp_bkps": [
+          139,
+          266,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 117.0,
         "stumpy_hausdorff": 139.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -2191,12 +2461,19 @@
           263,
           400
         ],
+        "argus_dynp_bkps": [
+          126,
+          263,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 263.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -2218,12 +2495,19 @@
           261,
           400
         ],
+        "argus_dynp_bkps": [
+          128,
+          261,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 261.0,
-        "ruptures_hausdorff": 2.0
+        "ruptures_hausdorff": 2.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 1.0,
@@ -2247,12 +2531,19 @@
           274,
           400
         ],
+        "argus_dynp_bkps": [
+          141,
+          274,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 154.0,
         "stumpy_hausdorff": 154.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -2276,12 +2567,19 @@
           260,
           400
         ],
+        "argus_dynp_bkps": [
+          127,
+          260,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 129.0,
         "stumpy_hausdorff": 127.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -2305,12 +2603,19 @@
           260,
           400
         ],
+        "argus_dynp_bkps": [
+          130,
+          260,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 126.0,
         "stumpy_hausdorff": 130.0,
-        "ruptures_hausdorff": 4.0
+        "ruptures_hausdorff": 4.0,
+        "argus_dynp_hausdorff": 4.0
       },
       {
         "noise_std": 1.0,
@@ -2332,12 +2637,19 @@
           267,
           400
         ],
+        "argus_dynp_bkps": [
+          129,
+          267,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 267.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -2361,12 +2673,19 @@
           264,
           400
         ],
+        "argus_dynp_bkps": [
+          137,
+          264,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 118.0,
         "stumpy_hausdorff": 137.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -2390,12 +2709,19 @@
           256,
           400
         ],
+        "argus_dynp_bkps": [
+          128,
+          256,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 136.0,
         "stumpy_hausdorff": 136.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 1.0,
@@ -2419,12 +2745,19 @@
           267,
           400
         ],
+        "argus_dynp_bkps": [
+          134,
+          267,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 126.0,
         "stumpy_hausdorff": 134.0,
-        "ruptures_hausdorff": 1.0
+        "ruptures_hausdorff": 1.0,
+        "argus_dynp_hausdorff": 1.0
       },
       {
         "noise_std": 1.0,
@@ -2447,12 +2780,19 @@
           268,
           400
         ],
+        "argus_dynp_bkps": [
+          140,
+          268,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 85.0,
         "stumpy_hausdorff": 268.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 2.0,
@@ -2474,12 +2814,19 @@
           267,
           400
         ],
+        "argus_dynp_bkps": [
+          133,
+          267,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 269.0,
-        "ruptures_hausdorff": 7.0
+        "ruptures_hausdorff": 7.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 2.0,
@@ -2503,12 +2850,19 @@
           264,
           400
         ],
+        "argus_dynp_bkps": [
+          136,
+          264,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 134.0,
         "stumpy_hausdorff": 134.0,
-        "ruptures_hausdorff": 4.0
+        "ruptures_hausdorff": 4.0,
+        "argus_dynp_hausdorff": 4.0
       },
       {
         "noise_std": 2.0,
@@ -2530,12 +2884,19 @@
           253,
           400
         ],
+        "argus_dynp_bkps": [
+          132,
+          253,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 260.0,
-        "ruptures_hausdorff": 7.0
+        "ruptures_hausdorff": 7.0,
+        "argus_dynp_hausdorff": 7.0
       },
       {
         "noise_std": 2.0,
@@ -2559,12 +2920,19 @@
           273,
           400
         ],
+        "argus_dynp_bkps": [
+          140,
+          273,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 152.0,
         "stumpy_hausdorff": 152.0,
-        "ruptures_hausdorff": 1.0
+        "ruptures_hausdorff": 1.0,
+        "argus_dynp_hausdorff": 1.0
       },
       {
         "noise_std": 2.0,
@@ -2588,12 +2956,19 @@
           274,
           400
         ],
+        "argus_dynp_bkps": [
+          130,
+          290,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 145.0,
         "stumpy_hausdorff": 146.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 16.0
       },
       {
         "noise_std": 2.0,
@@ -2618,12 +2993,19 @@
           260,
           400
         ],
+        "argus_dynp_bkps": [
+          129,
+          260,
+          400
+        ],
         "argus_f1": 1.0,
         "stumpy_f1": 1.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 7.0,
         "stumpy_hausdorff": 7.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 2.0,
@@ -2648,12 +3030,19 @@
           268,
           400
         ],
+        "argus_dynp_bkps": [
+          143,
+          268,
+          400
+        ],
         "argus_f1": 1.0,
         "stumpy_f1": 1.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 23.0,
         "stumpy_hausdorff": 23.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 2.0,
@@ -2677,12 +3066,19 @@
           269,
           400
         ],
+        "argus_dynp_bkps": [
+          134,
+          269,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 83.0,
         "stumpy_hausdorff": 134.0,
-        "ruptures_hausdorff": 2.0
+        "ruptures_hausdorff": 2.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 2.0,
@@ -2704,12 +3100,19 @@
           269,
           400
         ],
+        "argus_dynp_bkps": [
+          133,
+          269,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 269.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 2.0,
@@ -2733,12 +3136,19 @@
           258,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          258,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 138.0,
         "stumpy_hausdorff": 138.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 2.0,
@@ -2762,12 +3172,19 @@
           273,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          264,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 135.0,
         "stumpy_hausdorff": 136.0,
-        "ruptures_hausdorff": 9.0
+        "ruptures_hausdorff": 9.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 2.0,
@@ -2791,12 +3208,19 @@
           264,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          264,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 146.0,
         "stumpy_hausdorff": 138.0,
-        "ruptures_hausdorff": 5.0
+        "ruptures_hausdorff": 5.0,
+        "argus_dynp_hausdorff": 5.0
       },
       {
         "noise_std": 2.0,
@@ -2820,12 +3244,19 @@
           262,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          261,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 120.0,
         "stumpy_hausdorff": 129.0,
-        "ruptures_hausdorff": 2.0
+        "ruptures_hausdorff": 2.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 2.0,
@@ -2848,12 +3279,19 @@
           266,
           400
         ],
+        "argus_dynp_bkps": [
+          135,
+          266,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 87.0,
         "stumpy_hausdorff": 266.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 2.0,
@@ -2877,12 +3315,19 @@
           266,
           400
         ],
+        "argus_dynp_bkps": [
+          139,
+          266,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 117.0,
         "stumpy_hausdorff": 139.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 2.0,
@@ -2904,12 +3349,19 @@
           263,
           400
         ],
+        "argus_dynp_bkps": [
+          126,
+          263,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 263.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 2.0,
@@ -2932,12 +3384,19 @@
           258,
           400
         ],
+        "argus_dynp_bkps": [
+          128,
+          258,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 108.0,
         "stumpy_hausdorff": 261.0,
-        "ruptures_hausdorff": 6.0
+        "ruptures_hausdorff": 6.0,
+        "argus_dynp_hausdorff": 3.0
       },
       {
         "noise_std": 2.0,
@@ -2961,12 +3420,19 @@
           274,
           400
         ],
+        "argus_dynp_bkps": [
+          141,
+          274,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 154.0,
         "stumpy_hausdorff": 154.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 2.0,
@@ -2990,12 +3456,19 @@
           263,
           400
         ],
+        "argus_dynp_bkps": [
+          126,
+          263,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 128.0,
         "stumpy_hausdorff": 127.0,
-        "ruptures_hausdorff": 3.0
+        "ruptures_hausdorff": 3.0,
+        "argus_dynp_hausdorff": 3.0
       },
       {
         "noise_std": 2.0,
@@ -3019,12 +3492,19 @@
           260,
           400
         ],
+        "argus_dynp_bkps": [
+          130,
+          260,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 126.0,
         "stumpy_hausdorff": 130.0,
-        "ruptures_hausdorff": 4.0
+        "ruptures_hausdorff": 4.0,
+        "argus_dynp_hausdorff": 4.0
       },
       {
         "noise_std": 2.0,
@@ -3048,12 +3528,19 @@
           267,
           400
         ],
+        "argus_dynp_bkps": [
+          129,
+          267,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 83.0,
         "stumpy_hausdorff": 129.0,
-        "ruptures_hausdorff": 1.0
+        "ruptures_hausdorff": 1.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 2.0,
@@ -3077,12 +3564,19 @@
           261,
           400
         ],
+        "argus_dynp_bkps": [
+          137,
+          261,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 118.0,
         "stumpy_hausdorff": 137.0,
-        "ruptures_hausdorff": 3.0
+        "ruptures_hausdorff": 3.0,
+        "argus_dynp_hausdorff": 3.0
       },
       {
         "noise_std": 2.0,
@@ -3106,12 +3600,19 @@
           256,
           400
         ],
+        "argus_dynp_bkps": [
+          111,
+          256,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 136.0,
         "stumpy_hausdorff": 136.0,
-        "ruptures_hausdorff": 17.0
+        "ruptures_hausdorff": 17.0,
+        "argus_dynp_hausdorff": 17.0
       },
       {
         "noise_std": 2.0,
@@ -3134,12 +3635,19 @@
           254,
           400
         ],
+        "argus_dynp_bkps": [
+          134,
+          254,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 146.0,
         "stumpy_hausdorff": 266.0,
-        "ruptures_hausdorff": 12.0
+        "ruptures_hausdorff": 12.0,
+        "argus_dynp_hausdorff": 12.0
       },
       {
         "noise_std": 2.0,
@@ -3162,12 +3670,19 @@
           268,
           400
         ],
+        "argus_dynp_bkps": [
+          140,
+          268,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 85.0,
         "stumpy_hausdorff": 268.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 4.0,
@@ -3189,12 +3704,19 @@
           140,
           400
         ],
+        "argus_dynp_bkps": [
+          133,
+          267,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 0.5,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 269.0,
-        "ruptures_hausdorff": 129.0
+        "ruptures_hausdorff": 129.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 4.0,
@@ -3218,12 +3740,19 @@
           264,
           400
         ],
+        "argus_dynp_bkps": [
+          136,
+          264,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 135.0,
         "stumpy_hausdorff": 136.0,
-        "ruptures_hausdorff": 4.0
+        "ruptures_hausdorff": 4.0,
+        "argus_dynp_hausdorff": 4.0
       },
       {
         "noise_std": 4.0,
@@ -3245,12 +3774,19 @@
           231,
           400
         ],
+        "argus_dynp_bkps": [
+          132,
+          231,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 0.5,
+        "argus_dynp_f1": 0.5,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 260.0,
-        "ruptures_hausdorff": 29.0
+        "ruptures_hausdorff": 29.0,
+        "argus_dynp_hausdorff": 29.0
       },
       {
         "noise_std": 4.0,
@@ -3274,12 +3810,19 @@
           273,
           400
         ],
+        "argus_dynp_bkps": [
+          140,
+          273,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 152.0,
         "stumpy_hausdorff": 152.0,
-        "ruptures_hausdorff": 1.0
+        "ruptures_hausdorff": 1.0,
+        "argus_dynp_hausdorff": 1.0
       },
       {
         "noise_std": 4.0,
@@ -3303,12 +3846,19 @@
           290,
           400
         ],
+        "argus_dynp_bkps": [
+          133,
+          290,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 145.0,
         "stumpy_hausdorff": 146.0,
-        "ruptures_hausdorff": 16.0
+        "ruptures_hausdorff": 16.0,
+        "argus_dynp_hausdorff": 16.0
       },
       {
         "noise_std": 4.0,
@@ -3333,12 +3883,19 @@
           252,
           400
         ],
+        "argus_dynp_bkps": [
+          127,
+          252,
+          400
+        ],
         "argus_f1": 1.0,
         "stumpy_f1": 1.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 14.0,
         "stumpy_hausdorff": 14.0,
-        "ruptures_hausdorff": 8.0
+        "ruptures_hausdorff": 8.0,
+        "argus_dynp_hausdorff": 8.0
       },
       {
         "noise_std": 4.0,
@@ -3363,12 +3920,19 @@
           269,
           400
         ],
+        "argus_dynp_bkps": [
+          141,
+          269,
+          400
+        ],
         "argus_f1": 1.0,
         "stumpy_f1": 1.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 23.0,
         "stumpy_hausdorff": 23.0,
-        "ruptures_hausdorff": 2.0
+        "ruptures_hausdorff": 2.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 4.0,
@@ -3392,12 +3956,19 @@
           269,
           400
         ],
+        "argus_dynp_bkps": [
+          134,
+          269,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 83.0,
         "stumpy_hausdorff": 134.0,
-        "ruptures_hausdorff": 2.0
+        "ruptures_hausdorff": 2.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 4.0,
@@ -3419,12 +3990,19 @@
           269,
           400
         ],
+        "argus_dynp_bkps": [
+          144,
+          269,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 269.0,
-        "ruptures_hausdorff": 11.0
+        "ruptures_hausdorff": 11.0,
+        "argus_dynp_hausdorff": 11.0
       },
       {
         "noise_std": 4.0,
@@ -3448,12 +4026,19 @@
           256,
           400
         ],
+        "argus_dynp_bkps": [
+          132,
+          256,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 138.0,
         "stumpy_hausdorff": 138.0,
-        "ruptures_hausdorff": 2.0
+        "ruptures_hausdorff": 2.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 4.0,
@@ -3478,12 +4063,19 @@
           276,
           400
         ],
+        "argus_dynp_bkps": [
+          123,
+          276,
+          400
+        ],
         "argus_f1": 1.0,
         "stumpy_f1": 1.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 10.0,
         "stumpy_hausdorff": 11.0,
-        "ruptures_hausdorff": 12.0
+        "ruptures_hausdorff": 12.0,
+        "argus_dynp_hausdorff": 12.0
       },
       {
         "noise_std": 4.0,
@@ -3507,12 +4099,19 @@
           266,
           400
         ],
+        "argus_dynp_bkps": [
+          134,
+          264,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 149.0,
         "stumpy_hausdorff": 149.0,
-        "ruptures_hausdorff": 3.0
+        "ruptures_hausdorff": 3.0,
+        "argus_dynp_hausdorff": 5.0
       },
       {
         "noise_std": 4.0,
@@ -3536,12 +4135,19 @@
           274,
           400
         ],
+        "argus_dynp_bkps": [
+          131,
+          247,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 120.0,
         "stumpy_hausdorff": 129.0,
-        "ruptures_hausdorff": 12.0
+        "ruptures_hausdorff": 12.0,
+        "argus_dynp_hausdorff": 15.0
       },
       {
         "noise_std": 4.0,
@@ -3565,12 +4171,19 @@
           261,
           400
         ],
+        "argus_dynp_bkps": [
+          135,
+          263,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 85.0,
         "stumpy_hausdorff": 135.0,
-        "ruptures_hausdorff": 5.0
+        "ruptures_hausdorff": 5.0,
+        "argus_dynp_hausdorff": 3.0
       },
       {
         "noise_std": 4.0,
@@ -3594,12 +4207,19 @@
           266,
           400
         ],
+        "argus_dynp_bkps": [
+          139,
+          266,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 117.0,
         "stumpy_hausdorff": 139.0,
-        "ruptures_hausdorff": 0.0
+        "ruptures_hausdorff": 0.0,
+        "argus_dynp_hausdorff": 0.0
       },
       {
         "noise_std": 4.0,
@@ -3621,12 +4241,19 @@
           263,
           400
         ],
+        "argus_dynp_bkps": [
+          128,
+          263,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 263.0,
-        "ruptures_hausdorff": 2.0
+        "ruptures_hausdorff": 2.0,
+        "argus_dynp_hausdorff": 2.0
       },
       {
         "noise_std": 4.0,
@@ -3650,12 +4277,19 @@
           258,
           400
         ],
+        "argus_dynp_bkps": [
+          120,
+          258,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 108.0,
         "stumpy_hausdorff": 126.0,
-        "ruptures_hausdorff": 6.0
+        "ruptures_hausdorff": 6.0,
+        "argus_dynp_hausdorff": 6.0
       },
       {
         "noise_std": 4.0,
@@ -3679,12 +4313,19 @@
           270,
           400
         ],
+        "argus_dynp_bkps": [
+          144,
+          274,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 139.0,
         "stumpy_hausdorff": 141.0,
-        "ruptures_hausdorff": 4.0
+        "ruptures_hausdorff": 4.0,
+        "argus_dynp_hausdorff": 3.0
       },
       {
         "noise_std": 4.0,
@@ -3708,12 +4349,19 @@
           263,
           400
         ],
+        "argus_dynp_bkps": [
+          124,
+          263,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 88.0,
         "stumpy_hausdorff": 127.0,
-        "ruptures_hausdorff": 3.0
+        "ruptures_hausdorff": 3.0,
+        "argus_dynp_hausdorff": 3.0
       },
       {
         "noise_std": 4.0,
@@ -3738,12 +4386,19 @@
           260,
           400
         ],
+        "argus_dynp_bkps": [
+          130,
+          260,
+          400
+        ],
         "argus_f1": 1.0,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 11.0,
         "stumpy_hausdorff": 130.0,
-        "ruptures_hausdorff": 4.0
+        "ruptures_hausdorff": 4.0,
+        "argus_dynp_hausdorff": 4.0
       },
       {
         "noise_std": 4.0,
@@ -3767,12 +4422,19 @@
           267,
           400
         ],
+        "argus_dynp_bkps": [
+          139,
+          267,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 83.0,
         "stumpy_hausdorff": 129.0,
-        "ruptures_hausdorff": 1.0
+        "ruptures_hausdorff": 1.0,
+        "argus_dynp_hausdorff": 10.0
       },
       {
         "noise_std": 4.0,
@@ -3796,12 +4458,19 @@
           136,
           400
         ],
+        "argus_dynp_bkps": [
+          112,
+          136,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 0.5,
+        "argus_dynp_f1": 0.5,
         "argus_hausdorff": 118.0,
         "stumpy_hausdorff": 137.0,
-        "ruptures_hausdorff": 128.0
+        "ruptures_hausdorff": 128.0,
+        "argus_dynp_hausdorff": 128.0
       },
       {
         "noise_std": 4.0,
@@ -3825,12 +4494,19 @@
           256,
           400
         ],
+        "argus_dynp_bkps": [
+          111,
+          256,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.5,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 136.0,
         "stumpy_hausdorff": 136.0,
-        "ruptures_hausdorff": 17.0
+        "ruptures_hausdorff": 17.0,
+        "argus_dynp_hausdorff": 17.0
       },
       {
         "noise_std": 4.0,
@@ -3852,12 +4528,19 @@
           306,
           400
         ],
+        "argus_dynp_bkps": [
+          108,
+          306,
+          400
+        ],
         "argus_f1": 0.0,
         "stumpy_f1": 0.0,
         "ruptures_f1": 0.0,
+        "argus_dynp_f1": 0.0,
         "argus_hausdorff": null,
         "stumpy_hausdorff": 266.0,
-        "ruptures_hausdorff": 40.0
+        "ruptures_hausdorff": 40.0,
+        "argus_dynp_hausdorff": 40.0
       },
       {
         "noise_std": 4.0,
@@ -3880,12 +4563,19 @@
           268,
           400
         ],
+        "argus_dynp_bkps": [
+          141,
+          268,
+          400
+        ],
         "argus_f1": 0.6667,
         "stumpy_f1": 0.0,
         "ruptures_f1": 1.0,
+        "argus_dynp_f1": 1.0,
         "argus_hausdorff": 146.0,
         "stumpy_hausdorff": 268.0,
-        "ruptures_hausdorff": 1.0
+        "ruptures_hausdorff": 1.0,
+        "argus_dynp_hausdorff": 1.0
       }
     ],
     "n_trials": 100,
@@ -3893,6 +4583,7 @@
       "argus_mean_f1": 0.4433,
       "stumpy_mean_f1": 0.33,
       "ruptures_mean_f1": 0.975,
+      "argus_dynp_mean_f1": 0.98,
       "argus_hausdorff": {
         "mean": 111.89,
         "found_none_count": 24,
@@ -3907,6 +4598,11 @@
         "mean": 5.41,
         "found_none_count": 0,
         "n_scored": 100
+      },
+      "argus_dynp_hausdorff": {
+        "mean": 4.23,
+        "found_none_count": 0,
+        "n_scored": 100
       }
     },
     "by_noise_level": {
@@ -3915,6 +4611,7 @@
         "argus_mean_f1": 0.4267,
         "stumpy_mean_f1": 0.32,
         "ruptures_mean_f1": 1.0,
+        "argus_dynp_mean_f1": 1.0,
         "argus_hausdorff": {
           "mean": 113.94,
           "found_none_count": 8,
@@ -3929,6 +4626,11 @@
           "mean": 0.12,
           "found_none_count": 0,
           "n_scored": 25
+        },
+        "argus_dynp_hausdorff": {
+          "mean": 0.12,
+          "found_none_count": 0,
+          "n_scored": 25
         }
       },
       "1.0": {
@@ -3936,6 +4638,7 @@
         "argus_mean_f1": 0.44,
         "stumpy_mean_f1": 0.32,
         "ruptures_mean_f1": 1.0,
+        "argus_dynp_mean_f1": 1.0,
         "argus_hausdorff": {
           "mean": 122.0,
           "found_none_count": 7,
@@ -3950,6 +4653,11 @@
           "mean": 0.52,
           "found_none_count": 0,
           "n_scored": 25
+        },
+        "argus_dynp_hausdorff": {
+          "mean": 0.52,
+          "found_none_count": 0,
+          "n_scored": 25
         }
       },
       "2.0": {
@@ -3957,6 +4665,7 @@
         "argus_mean_f1": 0.4533,
         "stumpy_mean_f1": 0.34,
         "ruptures_mean_f1": 1.0,
+        "argus_dynp_mean_f1": 1.0,
         "argus_hausdorff": {
           "mean": 112.9,
           "found_none_count": 4,
@@ -3971,6 +4680,11 @@
           "mean": 3.32,
           "found_none_count": 0,
           "n_scored": 25
+        },
+        "argus_dynp_hausdorff": {
+          "mean": 3.24,
+          "found_none_count": 0,
+          "n_scored": 25
         }
       },
       "4.0": {
@@ -3978,6 +4692,7 @@
         "argus_mean_f1": 0.4533,
         "stumpy_mean_f1": 0.34,
         "ruptures_mean_f1": 0.9,
+        "argus_dynp_mean_f1": 0.92,
         "argus_hausdorff": {
           "mean": 100.0,
           "found_none_count": 5,
@@ -3990,6 +4705,11 @@
         },
         "ruptures_hausdorff": {
           "mean": 17.68,
+          "found_none_count": 0,
+          "n_scored": 25
+        },
+        "argus_dynp_hausdorff": {
+          "mean": 13.04,
           "found_none_count": 0,
           "n_scored": 25
         }
@@ -4006,8 +4726,14 @@
       "ruptures_wins": 89,
       "ties": 10,
       "sign_test_p": 1.4701842918422953e-25
+    },
+    "argus_dynp_vs_ruptures": {
+      "argus_dynp_wins": 1,
+      "ruptures_wins": 0,
+      "ties": 99,
+      "sign_test_p": 1.0
     }
   },
-  "who_wins": "baseline \u2014 ruptures is more coherent on the ground-truth-free family test, stumpy is bit-identical and 272x faster, FLUSS shows no measurable edge over the two-line incumbent, and against KNOWN synthetic changepoints (100 trials, noise 0.5-4.0) ARGUS's mean F1 is 0.4433 against stumpy's 0.33 and ruptures' 0.975",
-  "scope_statement": "ARGUS's own offline FLUSS (desk/regime.py), the real installed stumpy (stump + fluss, its own public API), the real installed ruptures (Pelt with a Gaussian mean-and-variance cost at the BIC penalty 2*log(n), and KernelCPD with an rbf kernel budgeted to the same boundary count), and the REAL incumbent two-line rule (strategies/track1_suite.py's own rotation_regime_switch, driven over real Bar objects) are all run on the SAME real 60-day hourly Bitget MARKET series for all 12 rTokens, PLUS 100 synthetic trials with KNOWN changepoints (ruptures.pw_constant) for the three budgeted methods. CLAIMED, and this is the decisive finding: the capability LOSES. (1) FLUSS places 23 boundaries, 6 of them inside the incumbent's own 240-bar warmup where that rule cannot flip at all; of the 17 genuinely comparable boundaries, 3 (17.6%) have no real incumbent flip within 24 bars. The incumbent flips 400 times across the 12 symbols, so its +/-24-bar neighbourhoods already cover 66.9% of the comparable region and a boundary at a uniformly random comparable bar would look novel 33.1% of the time. FLUSS's 17.6% is WELL BELOW that; the one-sided binomial p for novelty above the null is 0.954. There is no evidence FLUSS finds regime boundaries the two-line volatility rule misses -- it finds fewer than chance would. NOT hidden: the unrestricted measurement is 8 of 23 (34.8%) against a 40.5% null, the same verdict and a weaker one, and both are published. (2) data/regimes.json's threshold_agrees flag was computed against a proxy that is not the incumbent: track1_suite.py:51-63 uses a sample standard deviation of bar returns, regime.py:306-312 uses a median absolute bar-to-bar move; the proxy fires 559 times to the real rule's 400 and reproduces only 17.8% of the real flips within 2 bars. (3) ARGUS's matrix profile index is EXACTLY stumpy's on all 12 symbols (16,992 windows, zero disagreements) while taking 5.25s per 1,439-bar symbol against warm stumpy's 0.017s, a measured 310x. (4) On the QQQ/TQQQ/SQQQ family -- one underlying at 1x/3x/-3x, verified here at log-return correlation 0.983/-0.975 and beta 2.94/-2.93 -- ruptures' boundaries spread 0 and 1 bars across the three while ARGUS's and stumpy's spread 50 and 122, and 50/122 persists on the same-sign QQQ-vs-TQQQ pair alone, which z-normalisation IS invariant to. (5) Against 100 SYNTHETIC trials with KNOWN, injected changepoints (ruptures.pw_constant, ruptures' own canonical benchmark generator, 25 seeds x 4 noise levels, scored by ruptures.metrics at margin=WINDOW) -- the real ground-truth test Finding 7 explicitly said this module lacked -- ARGUS's mean F1 is 0.443 against ruptures' 0.975 (1 win, 89 losses, 10 ties, sign-test p=1.5e-25) and mean Hausdorff 111.9 bars against ruptures' 5.4: an order of magnitude worse localisation, decisively confirming the loss to ruptures on real ground truth and not only on the ground-truth-free family test. NOT claimed that ruptures is better at regime detection in general: PELT at the BIC penalty returns 44-50 boundaries per symbol that pile onto the weekly market-hours calendar (one hour-of-week bucket holds 38 of 552 against a uniform expectation of 3.3), and this module reports that as unusable rather than scoring it. NOT claimed the family-coherence test settles correctness -- it is a necessary condition with no ground truth behind it, and the calendar control beside it does NOT clear ruptures: its budgeted boundaries are MORE hour-of-week-clustered than ARGUS's (z=10.2 against 5.1) and all four in its fullest bucket are the QQQ family itself, so the control is published as a number to read rather than as a verdict. NOT hidden either: scored against the SAME incumbent on the same tolerance, ruptures' own boundaries are novel 7 of 18 times (38.9%) and stumpy's 3 of 19 (15.8%) -- ruptures is the only one of the three sitting above its own null, though not significantly at this sample size, and that cuts against ARGUS rather than for it. NOT claimed ARGUS loses everywhere: fed a corrected arc curve with no dip, the real stumpy.floss._rea fabricates two boundaries at index 0 while ARGUS's find_boundaries correctly returns none, and that same defect is reachable on real GOOGLUSDT data. NOT claimed that guard extends to degenerate PRICE input, and this is a defect found here and left unfixed on purpose: on a constant series ARGUS fabricates two boundaries (335, 456), stumpy two others (291, 411) and ruptures two more (26, 574) -- all three read structure into pure tie-breaking, ARGUS only less confidently (arc-curve minimum 0.63 against stumpy's 0.03). NOT claimed ARGUS loses to EVERY reference: on the same 100 synthetic trials, ARGUS beats stumpy significantly (mean F1 0.443 vs 0.330, 55 wins / 0 losses / 45 ties, p=5.6e-17) -- the one place in this whole comparison where ARGUS's documented departure from stumpy (Finding 4's parabola over the fitted-beta IAC) pays off against real known changepoints, not merely ties on a shared step. NOT hidden either: ARGUS itself reports zero boundaries on 24 of the 100 trials, the SAME conservative-refusal behaviour Finding 5 measured as a genuine virtue on a degenerate input -- on real injected regime changes that same refusal directly costs recall, which is why the win over stumpy does not close the loss to ruptures. NOT claimed these boundary locations are permanent -- fetched live and will move with the venue."
+  "who_wins": "tie \u2014 ruptures is still more coherent than FLUSS (ARGUS's original tool) on the ground-truth-free family test, stumpy is bit-identical and 243x faster, and against KNOWN synthetic changepoints FLUSS's own mean F1 is 0.4433 against ruptures' 0.975 (100 trials, noise 0.5-4.0) \u2014 a real, unclosed loss for FLUSS specifically. ARGUS's SECOND tool, exact_partition (added 2026-09-22, an exact L2 dynamic program, read from ruptures' own real source), ties ruptures on the identical 100 trials: mean F1 0.98 against ruptures' 0.975 (1 win, 0 losses, 99 ties \u2014 not statistically distinguishable from identical, reported as a tie rather than a win)",
+  "scope_statement": "ARGUS's own offline FLUSS (desk/regime.py), the real installed stumpy (stump + fluss, its own public API), the real installed ruptures (Pelt with a Gaussian mean-and-variance cost at the BIC penalty 2*log(n), and KernelCPD with an rbf kernel budgeted to the same boundary count), and the REAL incumbent two-line rule (strategies/track1_suite.py's own rotation_regime_switch, driven over real Bar objects) are all run on the SAME real 60-day hourly Bitget MARKET series for all 12 rTokens, PLUS 100 synthetic trials with KNOWN changepoints (ruptures.pw_constant) for the three budgeted methods, PLUS a fourth, added 2026-09-22: ARGUS's own exact L2 dynamic-programming segmenter (desk/regime.py::exact_partition), run on the identical 100 synthetic trials. CLAIMED: FLUSS, ARGUS's original tool for this capability, LOSES decisively -- see (1)-(4) and (5) below, all unchanged by the 2026-09-22 addition. ALSO CLAIMED, and this is what moves the capability's overall verdict from LOST to TIED rather than settling it as a clean loss: ARGUS's second tool for the same job, added the same day and read in full from ruptures' own real source first (BSD-2-Clause, permissive), TIES ruptures on the same 100 synthetic trials -- see (6). Neither finding launders the other: FLUSS still loses on its own, and the register now records both rather than only whichever is more flattering. (1) FLUSS places 23 boundaries, 6 of them inside the incumbent's own 240-bar warmup where that rule cannot flip at all; of the 17 genuinely comparable boundaries, 3 (17.6%) have no real incumbent flip within 24 bars. The incumbent flips 400 times across the 12 symbols, so its +/-24-bar neighbourhoods already cover 66.9% of the comparable region and a boundary at a uniformly random comparable bar would look novel 33.1% of the time. FLUSS's 17.6% is WELL BELOW that; the one-sided binomial p for novelty above the null is 0.954. There is no evidence FLUSS finds regime boundaries the two-line volatility rule misses -- it finds fewer than chance would. NOT hidden: the unrestricted measurement is 8 of 23 (34.8%) against a 40.5% null, the same verdict and a weaker one, and both are published. (2) data/regimes.json's threshold_agrees flag was computed against a proxy that is not the incumbent: track1_suite.py:51-63 uses a sample standard deviation of bar returns, regime.py:306-312 uses a median absolute bar-to-bar move; the proxy fires 559 times to the real rule's 400 and reproduces only 17.8% of the real flips within 2 bars. (3) ARGUS's matrix profile index is EXACTLY stumpy's on all 12 symbols (16,992 windows, zero disagreements) while taking 5.25s per 1,439-bar symbol against warm stumpy's 0.017s, a measured 310x. (4) On the QQQ/TQQQ/SQQQ family -- one underlying at 1x/3x/-3x, verified here at log-return correlation 0.983/-0.975 and beta 2.94/-2.93 -- ruptures' boundaries spread 0 and 1 bars across the three while ARGUS's and stumpy's spread 50 and 122, and 50/122 persists on the same-sign QQQ-vs-TQQQ pair alone, which z-normalisation IS invariant to. (5) Against 100 SYNTHETIC trials with KNOWN, injected changepoints (ruptures.pw_constant, ruptures' own canonical benchmark generator, 25 seeds x 4 noise levels, scored by ruptures.metrics at margin=WINDOW) -- the real ground-truth test Finding 7 explicitly said this module lacked -- FLUSS's mean F1 is 0.443 against ruptures' 0.975 (1 win, 89 losses, 10 ties, sign-test p=1.5e-25) and mean Hausdorff 111.9 bars against ruptures' 5.4: an order of magnitude worse localisation, decisively confirming the loss to ruptures on real ground truth and not only on the ground-truth-free family test. (6) ARGUS's SECOND segmenter -- exact_partition, an L2 (sum-of-squared-deviations) dynamic program computing the globally optimal segmentation for a given breakpoint count, added 2026-09-22 specifically because (5) sharpened the loss rather than closing it -- TIES ruptures on the identical 100 trials: mean F1 0.98 against ruptures' own 0.975 (1 win, 0 losses, 99 ties -- a sign test literally cannot reject 'no difference' with one discordant trial, so this is reported as a tie rather than rounded up to a win from a single data point) and mean Hausdorff 4.23 bars against ruptures' 5.41 -- nominally BETTER localisation, again not significant on one discordant trial. By noise level the pattern is not a fluke of one lucky trial: at noise 0.5/1.0 both score F1=1.000 with near-identical Hausdorff (0.12 and 0.52, both sides); at the hardest level tested, noise=4.0, ARGUS's exact_partition scores F1 0.920 against ruptures' 0.900 and Hausdorff 13.04 against 17.68 -- its one genuine edge, at the noise level with the most room for two different exact solvers (an L2 cost vs an rbf kernel) to disagree. Checked directly, not assumed: `ruptures.Dynp(model='l2')` and `ruptures.KernelCPD(kernel='rbf')` -- the rival this module actually scores against -- return IDENTICAL breakpoints on pw_constant data (10/10 trials), because an L2 cost is exactly the maximum-likelihood-correct statistic for pw_constant's piecewise-constant-mean generative process; matching Dynp is therefore not a weaker stand-in for KernelCPD. NOT claimed that ruptures is better at regime detection in general: PELT at the BIC penalty returns 44-50 boundaries per symbol that pile onto the weekly market-hours calendar (one hour-of-week bucket holds 38 of 552 against a uniform expectation of 3.3), and this module reports that as unusable rather than scoring it. NOT claimed the family-coherence test settles correctness -- it is a necessary condition with no ground truth behind it, and the calendar control beside it does NOT clear ruptures: its budgeted boundaries are MORE hour-of-week-clustered than ARGUS's (z=10.2 against 5.1) and all four in its fullest bucket are the QQQ family itself, so the control is published as a number to read rather than as a verdict. NOT hidden either: scored against the SAME incumbent on the same tolerance, ruptures' own boundaries are novel 7 of 18 times (38.9%) and stumpy's 3 of 19 (15.8%) -- ruptures is the only one of the three sitting above its own null, though not significantly at this sample size, and that cuts against ARGUS rather than for it. NOT claimed ARGUS loses everywhere: fed a corrected arc curve with no dip, the real stumpy.floss._rea fabricates two boundaries at index 0 while ARGUS's find_boundaries correctly returns none, and that same defect is reachable on real GOOGLUSDT data. NOT claimed that guard extends to degenerate PRICE input, and this is a defect found here and left unfixed on purpose: on a constant series ARGUS fabricates two boundaries (335, 456), stumpy two others (291, 411) and ruptures two more (26, 574) -- all three read structure into pure tie-breaking, ARGUS only less confidently (arc-curve minimum 0.63 against stumpy's 0.03). NOT claimed ARGUS loses to EVERY reference: on the same 100 synthetic trials, ARGUS beats stumpy significantly (mean F1 0.443 vs 0.330, 55 wins / 0 losses / 45 ties, p=5.6e-17) -- the one place in this whole comparison where ARGUS's documented departure from stumpy (Finding 4's parabola over the fitted-beta IAC) pays off against real known changepoints, not merely ties on a shared step. NOT hidden either: ARGUS itself reports zero boundaries on 24 of the 100 trials, the SAME conservative-refusal behaviour Finding 5 measured as a genuine virtue on a degenerate input -- on real injected regime changes that same refusal directly costs recall, which is why the win over stumpy does not close the loss to ruptures. NOT claimed exact_partition proves ARGUS now BEATS ruptures: a sign test with one discordant trial out of 100 cannot reject 'no difference' in either direction (p=1.0), so the nominal F1/Hausdorff edge above is reported as a tie, not a win -- this is the same discipline the portfolio-allocation capability's own TIED verdict applies to an exact numerical match, extended honestly to a near-exact statistical one. NOT claimed exact_partition supersedes FLUSS: FLUSS is the tool that runs against real, unlabelled market data where the true breakpoint count is never known in advance -- exact_partition here is always given that count as an oracle, matching the fixed-count synthetic-trial design, and running it without that oracle (choosing k itself, e.g. by a penalty as ruptures.Pelt does) is untested. NOT claimed these boundary locations are permanent -- fetched live and will move with the venue."
 }

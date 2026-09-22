@@ -522,6 +522,21 @@ class TestTheLiveRegisterIsHonest:
         )
         assert cap.state is State.TIED
 
+    def test_regime_boundary_detection_moved_from_lost_to_tied(self) -> None:
+        """Pinned so a future edit cannot silently move this back to LOST or claim OWNED.
+
+        FLUSS, ARGUS's original segmenter, still loses decisively to ruptures (F1 0.443 vs
+        0.975, p=1.5e-25) — unchanged and not softened. What moved the CAPABILITY to TIED is a
+        second, different ARGUS tool (`desk/regime.py::exact_partition`, an exact L2 dynamic
+        program read from ruptures' own real source) that ties ruptures on the same 100-trial
+        synthetic ground truth (1 win/0 losses/99 ties, sign-test p=1.0 — far from significant,
+        so this is reported as a tie from one discordant trial, not a proven win)."""
+        cap = next(
+            c for c in REGISTER
+            if c.name == "Regime-boundary detection, measured against stumpy FLUSS and ruptures"
+        )
+        assert cap.state is State.TIED
+
     def test_every_capability_names_where_it_lives(self) -> None:
         for cap in REGISTER:
             assert cap.module, cap.name

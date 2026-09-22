@@ -25,8 +25,10 @@ from argus.desk.regime import (
     RegimeError,
     arc_counts,
     corrected_arc_curve,
+    exact_partition,
     find_boundaries,
     idealised_arc,
+    l2_cost_table,
     matrix_profile_index,
     segment,
 )
@@ -202,3 +204,94 @@ class TestTheLiveSeries:
         assert blob["segments"]
         starts = [s["start"] for s in blob["segments"]]
         assert starts == sorted(starts)
+
+
+class TestL2CostTable:
+    def test_a_constant_segment_costs_zero(self) -> None:
+        cost = l2_cost_table([5.0] * 10)
+        assert cost(0, 10) == pytest.approx(0.0, abs=1e-9)
+
+    def test_matches_the_textbook_sum_of_squared_deviations(self) -> None:
+        values = [1.0, 2.0, 4.0, 7.0, 3.0]
+        cost = l2_cost_table(values)
+        mean = sum(values) / len(values)
+        expected = sum((v - mean) ** 2 for v in values)
+        assert cost(0, len(values)) == pytest.approx(expected)
+
+    def test_an_empty_or_reversed_range_costs_nothing(self) -> None:
+        cost = l2_cost_table([1.0, 2.0, 3.0])
+        assert cost(1, 1) == 0.0
+        assert cost(2, 1) == 0.0
+
+
+class TestExactPartition:
+    def test_a_single_planted_step_is_found_exactly(self) -> None:
+        values = [1.0] * 20 + [10.0] * 20
+        assert exact_partition(values, 1, min_size=5) == [20]
+
+    def test_zero_breakpoints_returns_nothing(self) -> None:
+        assert exact_partition([1.0, 2.0, 3.0, 4.0, 5.0], 0, min_size=1) == []
+
+    def test_a_negative_breakpoint_count_is_rejected(self) -> None:
+        with pytest.raises(RegimeError, match="negative"):
+            exact_partition([1.0, 2.0, 3.0], -1, min_size=1)
+
+    def test_too_few_bars_for_the_requested_segments_is_rejected(self) -> None:
+        with pytest.raises(RegimeError, match="cannot hold"):
+            exact_partition([1.0, 2.0, 3.0], 2, min_size=2)
+
+    def test_every_segment_respects_the_minimum_size(self) -> None:
+        rng = random.Random(7)
+        values = [rng.gauss(0, 1) for _ in range(80)]
+        bkps = exact_partition(values, 3, min_size=10)
+        edges = [0, *bkps, len(values)]
+        for start, stop in pairwise(edges):
+            assert stop - start >= 10
+
+
+class TestExactPartitionMatchesRealRuptures:
+    """The load-bearing claim `desk/regime.py`'s own module comment makes: this bottom-up DP is
+    not merely inspired by `ruptures.Dynp(model="l2")`, it returns the identical answer — checked
+    directly, not assumed, because a combinatorial optimum has exactly one right answer to compare
+    against, unlike a continuous weight vector where "close" has to be defined."""
+
+    def test_120_synthetic_trials_exact_match(self) -> None:
+        ruptures = pytest.importorskip("ruptures", reason="the real rival, not vendored")
+        mismatches = []
+        for seed in range(30):
+            for n_bkps in (1, 2, 3, 4):
+                signal, _true_bkps = ruptures.pw_constant(
+                    n_samples=300, n_features=1, n_bkps=n_bkps, noise_std=1.5, seed=seed,
+                )
+                values = [float(v) for v in signal[:, 0]]
+                mine = exact_partition(values, n_bkps, min_size=10)
+                ref_raw = (
+                    ruptures.Dynp(model="l2", min_size=10, jump=1)
+                    .fit(signal)
+                    .predict(n_bkps=n_bkps)
+                )
+                ref = [b for b in ref_raw if b < len(values)]
+                if mine != ref:
+                    mismatches.append((seed, n_bkps, mine, ref))
+        assert not mismatches, f"{len(mismatches)} mismatch(es): {mismatches[:5]}"
+
+    def test_also_matches_kernelcpd_rbf_on_piecewise_constant_data(self) -> None:
+        """The rival `eval/regime_comparison.py` actually scores against is `KernelCPD(rbf)`, not
+        `Dynp`. Checked separately that the two converge on `pw_constant` data — an L2 cost is
+        exactly what a piecewise-constant-mean generative process calls for, so an rbf kernel's
+        extra flexibility buys nothing here and matching `Dynp` is not a weaker stand-in."""
+        ruptures = pytest.importorskip("ruptures", reason="the real rival, not vendored")
+        mismatches = []
+        for seed in range(10):
+            signal, _true_bkps = ruptures.pw_constant(
+                n_samples=200, n_features=1, n_bkps=3, noise_std=1.5, seed=seed,
+            )
+            values = [float(v) for v in signal[:, 0]]
+            mine = exact_partition(values, 3, min_size=5)
+            kernel_raw = (
+                ruptures.KernelCPD(kernel="rbf", min_size=5).fit(signal).predict(n_bkps=3)
+            )
+            kernel = [b for b in kernel_raw if b < len(values)]
+            if mine != kernel:
+                mismatches.append((seed, mine, kernel))
+        assert not mismatches, f"{len(mismatches)} mismatch(es): {mismatches}"
