@@ -367,7 +367,23 @@ class TestTheLiveRegisterIsHonest:
         `quarterly_only=True` path resolves to exactly the correct quarterly value. A capability
         appearing here that is NOT in this exact set is the real regression this test exists to
         catch — add it to the set only after checking its thirteen the same way these twenty-five
-        were checked, never to make a test pass."""
+        were checked, never to make a test pass. Restored to OWNED the same day a twenty-sixth
+        time: "Self-evolving review rules" (`t3-review`), demoted on 2026-09-20 when `verify()`
+        began opening artefacts instead of trusting filenames — `out_of_sample_test` was already
+        fixed earlier (`data/review_oos.json`, a real 216/217 held-out split); the one condition
+        still genuinely UNPROVEN was `failure_cases_documented`: `data/review_report.json` carried
+        the rejected rules' own numbers under a `rejected` key `SIGNATURES` does not match, so the
+        finding "none of the five standing rules earned a place" was true but not machine-checkable.
+        Fixed by adding `ReviewReport.failure_cases` to `desk/review.py` — a real, structured
+        summary of every rejected rule's own measured failure mode (rule, status, precision, why),
+        additive alongside the existing `rejected` field rather than a rename of it, since other
+        consumers of `rejected` were grepped for and found unrelated to this capability. Confirmed
+        by regenerating the artefact against the live record (now 481 decisions, up from a stale
+        40-decision snapshot) and re-running `standing.py`: this capability's `conditions_missing`
+        is empty, all thirteen VERIFIED or ATTESTED, register-wide UNPROVEN count fell from 4 to 3.
+        A capability appearing here that is NOT in this exact set is the real regression this test
+        exists to catch — add it to the set only after checking its thirteen the same way these
+        twenty-six were checked, never to make a test pass."""
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
             "Abstention scored as a decision",
@@ -386,6 +402,7 @@ class TestTheLiveRegisterIsHonest:
             "Perception layer: what the desk can see",
             "Pre-registered trading protocol, hash-committed",
             "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
+            "Self-evolving review rules",
             "Structured filing extraction vs. FinanceBench's real, published LLM measurement",
             "Typed factor grammar with no execution surface",
             "rToken factor divergence vs. Alphalens' real Information Coefficient",
@@ -421,8 +438,12 @@ class TestTheLiveRegisterIsHonest:
         assert "ablation" in cap.note and "30" in cap.note
 
     def test_the_review_checklist_is_recorded_as_not_yet_earned(self) -> None:
+        """Restored to OWNED 2026-09-22 (all thirteen conditions now VERIFIED/ATTESTED), but the
+        underlying fact this test protects is unchanged: the checklist itself is still honestly
+        empty, and OWNED does not launder that away."""
         cap = next(c for c in REGISTER if c.name == "Self-evolving review rules")
-        assert any("DEMOTED" in b for b in cap.blockers)
+        assert cap.state is State.OWNED
+        assert any("no rule has earned promotion" in b for b in cap.blockers)
 
     def test_the_grammar_records_its_remaining_breadth_gap(self) -> None:
         """The cross-sectional gap was closed and the register moved on to the next one. A

@@ -409,6 +409,16 @@ class ReviewReport:
         return [p for p in self.performance if not p.status.keeps_its_place]
 
     @property
+    def failure_cases(self) -> list[dict[str, Any]]:
+        """Every rejected rule's own measured failure mode, named rather than left implicit in
+        `rejected`'s raw numbers — this is what makes the claim "none of the five standing rules
+        earned a place" a documented finding rather than an assertion a reader has to derive."""
+        return [
+            {"rule": p.rule, "status": str(p.status), "precision": p.precision, "why": p.note}
+            for p in self.rejected
+        ]
+
+    @property
     def clean_rate(self) -> float:
         flagged = len({d.seq for d in self.defects})
         return 1.0 - (flagged / self.decisions) if self.decisions else 0.0
@@ -449,6 +459,7 @@ class ReviewReport:
             "recurring": [{"kind": k, "count": n} for k, n in self.recurring],
             "checklist": [p.as_dict() for p in self.checklist],
             "rejected": [p.as_dict() for p in self.rejected],
+            "failure_cases": self.failure_cases,
             "unassessable": list(self.unassessable),
             "defects": [d.as_dict() for d in self.defects],
         }

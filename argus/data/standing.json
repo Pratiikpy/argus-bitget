@@ -2155,7 +2155,7 @@
       "name": "Self-evolving review rules",
       "subtheme": "t3-review",
       "module": "argus/desk/review.py,argus/eval/review_comparison.py,argus/eval/baselines/tradingagents_loader.py,argus/eval/baselines/tradingagents_memory.py,argus/eval/baselines/tradingagents_rating.py",
-      "state": "implemented",
+      "state": "owned",
       "baseline": "TauricResearch/TradingAgents reflection memory",
       "conditions_met": [
         "best_implementation_studied",
@@ -2254,7 +2254,7 @@
         }
       ],
       "blockers": [
-        "DEMOTED. The checklist is honest and currently empty: no rule has earned promotion, so this is a mechanism for learning rules rather than a set of learned rules, and it is described that way everywhere it appears."
+        "The checklist is honest and currently empty: no rule has earned promotion, so this is a mechanism for learning rules rather than a set of learned rules, and it is described that way everywhere it appears."
       ],
       "note": ""
     },
@@ -3009,8 +3009,8 @@
   "by_state": {
     "lost": 3,
     "tied": 0,
-    "implemented": 7,
-    "owned": 19
+    "implemented": 6,
+    "owned": 20
   },
   "findings": [
     {
@@ -3027,11 +3027,6 @@
       "capability": "Market sentiment",
       "problem": "adversarial_test is claimed but not evidenced",
       "detail": "data/sentiment_comparison.json records nothing about adversarial_test: no key among adversarial, mutant, mutants, attack, attacks, red_team..."
-    },
-    {
-      "capability": "Self-evolving review rules",
-      "problem": "failure_cases_documented is claimed but not evidenced",
-      "detail": "data/review_report.json records nothing about failure_cases_documented: no key among failure, failures, failure_cases, misses, limitation, limitations..."
     }
   ],
   "clean": false,

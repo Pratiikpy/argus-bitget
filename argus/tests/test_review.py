@@ -131,6 +131,47 @@ class TestTheRefusalsAreNamedNotQuiet:
         assert Status.EARNING.keeps_its_place
 
 
+class TestFailureCasesAreDocumentedNotJustCounted:
+    """`failure_cases` exists because `standing.py::verify()` opens artefacts rather than trusting
+    filenames — a rejected rule's own measured failure mode must be a real JSON key a machine can
+    find, not only prose in `render()` or a bare number under an unrelated key name."""
+
+    def test_a_misleading_rule_appears_in_failure_cases_with_its_own_why(self) -> None:
+        rule = _rule(name="misleading-one")
+        performance = evaluate(rule, _records(60, flag_to=30), _defects([0, 1]))
+        report = review(notes=_records(60))
+        report.performance.append(performance)
+        cases = report.failure_cases
+        found = next(c for c in cases if c["rule"] == "misleading-one")
+        assert found["status"] == str(Status.MISLEADING)
+        assert found["why"]
+
+    def test_a_rule_that_keeps_its_place_is_not_in_failure_cases(self) -> None:
+        active = evaluate(_rule(name="active-one"), _records(60, flag_to=30), _defects(range(30)))
+        report = review(notes=_records(60))
+        report.performance.append(active)
+        names = {c["rule"] for c in report.failure_cases}
+        assert "active-one" not in names
+
+    def test_failure_cases_is_a_real_key_in_as_dict(self) -> None:
+        rule = _rule(name="dead-weight-one")
+        performance = evaluate(rule, _records(60), _defects(list(range(10))))
+        report = review(notes=_records(60))
+        report.performance.append(performance)
+        got = report.as_dict()
+        assert "failure_cases" in got
+        assert any(c["rule"] == "dead-weight-one" for c in got["failure_cases"])
+
+    def test_failure_cases_and_rejected_agree_on_which_rules_are_named(self) -> None:
+        report = review(notes=_records(60))
+        report.performance.append(
+            evaluate(_rule(name="x"), _records(60), _defects(list(range(10))))
+        )
+        rejected_names = {p.rule for p in report.rejected}
+        failure_case_names = {c["rule"] for c in report.failure_cases}
+        assert rejected_names == failure_case_names
+
+
 class TestARuleCanEarnItsPlace:
     def test_selective_and_right_is_active_or_earning(self) -> None:
         # fires on 10 of 60 (selective); 8 of those carry a targeted defect (precision 0.8)

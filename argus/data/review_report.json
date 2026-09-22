@@ -1,18 +1,23 @@
 {
-  "generated_at": "2026-09-13T05:48:08.757600+00:00",
-  "decisions": 40,
-  "clean_rate": 0.625,
+  "generated_at": "2026-09-22T01:06:56.963447+00:00",
+  "decisions": 481,
+  "clean_rate": 0.2910602910602911,
   "defects_by_kind": {
-    "grounding": 10,
-    "conflict": 18
+    "grounding": 404,
+    "conflict": 420,
+    "contradiction": 10
   },
   "recurring": [
     {
       "kind": "conflict",
-      "count": 18
+      "count": 420
     },
     {
       "kind": "grounding",
+      "count": 404
+    },
+    {
+      "kind": "contradiction",
       "count": 10
     }
   ],
@@ -22,54 +27,54 @@
       "rule": "narrow-evidence-base",
       "prompt": "If the panel read fewer than 6 distinct sources, ask where each number in the thesis came from before accepting it.",
       "status": "misleading",
-      "decisions": 40,
-      "fired": 12,
-      "caught": 4,
-      "false_alarms": 8,
-      "missed": 1,
-      "fire_rate": 0.3,
-      "precision": 0.3333333333333333,
-      "recall": 0.8,
-      "note": "right 33% of the times it fires; below 50% it sends the reader to the wrong place more often than the right one"
+      "decisions": 481,
+      "fired": 88,
+      "caught": 30,
+      "false_alarms": 58,
+      "missed": 172,
+      "fire_rate": 0.18295218295218296,
+      "precision": 0.3409090909090909,
+      "recall": 0.1485148514851485,
+      "note": "right 34% of the times it fires; below 50% it sends the reader to the wrong place more often than the right one"
     },
     {
       "rule": "low-independence-panel",
       "prompt": "If panel independence is under 2.5, treat agreement as one opinion, not several.",
       "status": "misleading",
-      "decisions": 40,
-      "fired": 10,
-      "caught": 1,
-      "false_alarms": 9,
-      "missed": 9,
-      "fire_rate": 0.25,
-      "precision": 0.1,
-      "recall": 0.1,
-      "note": "right 10% of the times it fires; below 50% it sends the reader to the wrong place more often than the right one"
+      "decisions": 481,
+      "fired": 76,
+      "caught": 6,
+      "false_alarms": 70,
+      "missed": 270,
+      "fire_rate": 0.158004158004158,
+      "precision": 0.07894736842105263,
+      "recall": 0.021739130434782608,
+      "note": "right 8% of the times it fires; below 50% it sends the reader to the wrong place more often than the right one"
     },
     {
       "rule": "thin-panel",
       "prompt": "If fewer than three analysts ran, ask what the silent ones would have read.",
       "status": "misleading",
-      "decisions": 40,
-      "fired": 14,
-      "caught": 6,
-      "false_alarms": 8,
-      "missed": 9,
-      "fire_rate": 0.35,
-      "precision": 0.42857142857142855,
-      "recall": 0.4,
-      "note": "right 43% of the times it fires; below 50% it sends the reader to the wrong place more often than the right one"
+      "decisions": 481,
+      "fired": 105,
+      "caught": 43,
+      "false_alarms": 62,
+      "missed": 298,
+      "fire_rate": 0.2182952182952183,
+      "precision": 0.4095238095238095,
+      "recall": 0.12609970674486803,
+      "note": "right 41% of the times it fires; below 50% it sends the reader to the wrong place more often than the right one"
     },
     {
       "rule": "sequential-agreement",
       "prompt": "When analysts agree, check whether they ran independently or one after another.",
       "status": "proposed",
-      "decisions": 40,
-      "fired": 30,
+      "decisions": 481,
+      "fired": 469,
       "caught": 0,
-      "false_alarms": 30,
+      "false_alarms": 469,
       "missed": 0,
-      "fire_rate": 0.75,
+      "fire_rate": 0.975051975051975,
       "precision": 0.0,
       "recall": null,
       "note": "no defect of the kind(s) this rule targets has been observed yet, so firing neither confirms nor refutes it; it cannot be graded on this record"
@@ -78,10 +83,10 @@
       "rule": "unhedged-risk-is-stated-not-assumed",
       "prompt": "If the hedge menu is empty, confirm the residual risk was priced, not ignored.",
       "status": "proposed",
-      "decisions": 40,
-      "fired": 40,
+      "decisions": 481,
+      "fired": 481,
       "caught": 0,
-      "false_alarms": 40,
+      "false_alarms": 481,
       "missed": 0,
       "fire_rate": 1.0,
       "precision": 0.0,
@@ -89,8 +94,39 @@
       "note": "no defect of the kind(s) this rule targets has been observed yet, so firing neither confirms nor refutes it; it cannot be graded on this record"
     }
   ],
+  "failure_cases": [
+    {
+      "rule": "narrow-evidence-base",
+      "status": "misleading",
+      "precision": 0.3409090909090909,
+      "why": "right 34% of the times it fires; below 50% it sends the reader to the wrong place more often than the right one"
+    },
+    {
+      "rule": "low-independence-panel",
+      "status": "misleading",
+      "precision": 0.07894736842105263,
+      "why": "right 8% of the times it fires; below 50% it sends the reader to the wrong place more often than the right one"
+    },
+    {
+      "rule": "thin-panel",
+      "status": "misleading",
+      "precision": 0.4095238095238095,
+      "why": "right 41% of the times it fires; below 50% it sends the reader to the wrong place more often than the right one"
+    },
+    {
+      "rule": "sequential-agreement",
+      "status": "proposed",
+      "precision": 0.0,
+      "why": "no defect of the kind(s) this rule targets has been observed yet, so firing neither confirms nor refutes it; it cannot be graded on this record"
+    },
+    {
+      "rule": "unhedged-risk-is-stated-not-assumed",
+      "status": "proposed",
+      "precision": 0.0,
+      "why": "no defect of the kind(s) this rule targets has been observed yet, so firing neither confirms nor refutes it; it cannot be graded on this record"
+    }
+  ],
   "unassessable": [
-    "any rule whose target is an OUTCOME defect: no decision has settled, so being right is not yet observable. These rules are reported on their process behaviour only.",
     "rules targeting risk interventions: the Constitution has never bound on this record, so nothing has tested them"
   ],
   "defects": [
@@ -261,6 +297,4842 @@
       "symbol": "NVDAUSDT",
       "kind": "conflict",
       "detail": "[conflict:conviction] earnings (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+    },
+    {
+      "seq": 103,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (insufficient_evidence) vs earnings (insufficient_evidence), gap 0.80 \u2014 earnings dominates: confidence 0.95 against 0.15"
+    },
+    {
+      "seq": 104,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs sentiment (neutral), gap 0.50 \u2014 event dominates: confidence 0.85 against 0.35"
+    },
+    {
+      "seq": 104,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+    },
+    {
+      "seq": 105,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs sentiment (neutral), gap 0.57 \u2014 event dominates: confidence 0.92 against 0.35"
+    },
+    {
+      "seq": 105,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.60 \u2014 cross_asset dominates: confidence 0.95 against 0.35"
+    },
+    {
+      "seq": 107,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 7.00 \u2014 earnings dominates: confidence 0.62 against 0.38"
+    },
+    {
+      "seq": 107,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 3.00 \u2014 earnings dominates: 8 distinct sources against 4"
+    },
+    {
+      "seq": 107,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 0.50"
+    },
+    {
+      "seq": 107,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 108,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 14.00 \u2014 earnings dominates: 8 distinct sources against 4"
+    },
+    {
+      "seq": 111,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 27.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 112,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.37 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 114,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 6.00 \u2014 earnings dominates: 8 distinct sources against 5"
+    },
+    {
+      "seq": 117,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 37.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 117,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 8 figure(s) do not resolve to anything the desk was given: -3.2bps, 0.64"
+    },
+    {
+      "seq": 117,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 118,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 12.00 \u2014 sentiment dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 118,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 42.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 118,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 30.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 118,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 0.64"
+    },
+    {
+      "seq": 118,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 119,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 42.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 119,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 10 figure(s) do not resolve to anything the desk was given: -3.56 bps"
+    },
+    {
+      "seq": 119,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 121,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 11.00 \u2014 sentiment dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 121,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: -1.8%"
+    },
+    {
+      "seq": 121,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 124,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 27.00 \u2014 earnings dominates: 7 distinct sources against 4"
+    },
+    {
+      "seq": 125,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 1.00 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 125,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 9.00 \u2014 earnings dominates: 8 distinct sources against 6"
+    },
+    {
+      "seq": 125,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: -184.6bps"
+    },
+    {
+      "seq": 125,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 126,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 127,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 3.00 \u2014 earnings dominates: 11 distinct sources against 6"
+    },
+    {
+      "seq": 127,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 20.80 bps"
+    },
+    {
+      "seq": 127,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 128,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 7.00 \u2014 earnings dominates: 11 distinct sources against 3"
+    },
+    {
+      "seq": 128,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 2 figure(s) do not resolve to anything the desk was given: 20.80 bps"
+    },
+    {
+      "seq": 128,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 130,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 81.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 131,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 0.48"
+    },
+    {
+      "seq": 131,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 132,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bullish) vs earnings (bullish), gap 0.37 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 133,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs sentiment (neutral), gap 0.32 \u2014 event dominates: confidence 0.72 against 0.40"
+    },
+    {
+      "seq": 134,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 27.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 134,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: -187 bps"
+    },
+    {
+      "seq": 134,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 135,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs sentiment (bearish), gap 251.00 \u2014 event dominates: 7 distinct sources against 3"
+    },
+    {
+      "seq": 135,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs earnings (bearish), gap 221.00 \u2014 neither dominates: equally confident on equally many sources; the disagreement stands unresolved"
+    },
+    {
+      "seq": 135,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 30.00 \u2014 earnings dominates: 7 distinct sources against 3"
+    },
+    {
+      "seq": 135,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict] 1 disagreement(s) unresolved on the evidence; the decision is taken in spite of them, not because they were settled"
+    },
+    {
+      "seq": 138,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 2 figure(s) do not resolve to anything the desk was given: 0.53"
+    },
+    {
+      "seq": 138,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 139,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 37.00 \u2014 sentiment dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 141,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 0.00 \u2014 earnings dominates: 6 distinct sources against 4"
+    },
+    {
+      "seq": 143,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 0.00 \u2014 sentiment dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 143,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 70.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 143,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 70.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 143,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 20.80bps"
+    },
+    {
+      "seq": 143,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 144,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 144,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 42.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 145,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 14.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 145,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 sentiment dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 145,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 20.80 bps"
+    },
+    {
+      "seq": 145,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 146,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 30.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 146,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 13.7%"
+    },
+    {
+      "seq": 146,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 149,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 4 figure(s) do not resolve to anything the desk was given: 226bps, 3"
+    },
+    {
+      "seq": 149,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 151,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 3.00 \u2014 earnings dominates: 8 distinct sources against 5"
+    },
+    {
+      "seq": 151,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 4 of 13 figure(s) do not resolve to anything the desk was given: 140 bps, 175, 20.80 bps"
+    },
+    {
+      "seq": 151,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 153,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 0.00 \u2014 sentiment dominates: confidence 0.45 against 0.35"
+    },
+    {
+      "seq": 153,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 80bps"
+    },
+    {
+      "seq": 153,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 154,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 27.00 \u2014 earnings dominates: 7 distinct sources against 3"
+    },
+    {
+      "seq": 155,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 14.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 155,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 8 figure(s) do not resolve to anything the desk was given: 20.80 bps, 8"
+    },
+    {
+      "seq": 155,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 156,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 156,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 42.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 157,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 14.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 157,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 9 figure(s) do not resolve to anything the desk was given: 20.80bps"
+    },
+    {
+      "seq": 157,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 158,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 7 figure(s) do not resolve to anything the desk was given: -187bps, -192bps"
+    },
+    {
+      "seq": 158,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 159,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 7 figure(s) do not resolve to anything the desk was given: -157, -257bps"
+    },
+    {
+      "seq": 159,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 162,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 9.00 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 162,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 4.00 \u2014 earnings dominates: 8 distinct sources against 5"
+    },
+    {
+      "seq": 162,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 7 figure(s) do not resolve to anything the desk was given: 0.48, 140bps, 20.80bps"
+    },
+    {
+      "seq": 162,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 163,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 4 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 163,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 164,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 0.48"
+    },
+    {
+      "seq": 164,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 166,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.40"
+    },
+    {
+      "seq": 166,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 8 figure(s) do not resolve to anything the desk was given: 20.80 bps, 8"
+    },
+    {
+      "seq": 166,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 167,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 3.00 \u2014 earnings dominates: 8 distinct sources against 4"
+    },
+    {
+      "seq": 167,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 20.8bps"
+    },
+    {
+      "seq": 167,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 171,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 8.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 171,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 4 figure(s) do not resolve to anything the desk was given: 20.80 bps, 35 bps, 8"
+    },
+    {
+      "seq": 171,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 173,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 14.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 173,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 20.80bps"
+    },
+    {
+      "seq": 173,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 174,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 70.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 175,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 175,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 175,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 7 figure(s) do not resolve to anything the desk was given: -3bps, 0.40, 120bps"
+    },
+    {
+      "seq": 175,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 175,
+      "symbol": "MSTRUSDT",
+      "kind": "contradiction",
+      "detail": "[claim] conviction: \"l hurdle of 20.80bps requires high conviction on both direction and magnitu\" is contradicted by form4-0001193125-26-385183-S (conviction=False) \u2014 the thesis treats the transaction"
+    },
+    {
+      "seq": 175,
+      "symbol": "MSTRUSDT",
+      "kind": "contradiction",
+      "detail": "[claim] a thesis that contradicts its own evidence is a defect in the reasoning, not a difference of opinion"
+    },
+    {
+      "seq": 176,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: -9.4bps"
+    },
+    {
+      "seq": 176,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 177,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 4 figure(s) do not resolve to anything the desk was given: 241bps, 3"
+    },
+    {
+      "seq": 177,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 179,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 10 figure(s) do not resolve to anything the desk was given: 1.56%, 173bps, 3"
+    },
+    {
+      "seq": 179,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 180,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 181,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 8 figure(s) do not resolve to anything the desk was given: -9bps, 59bps"
+    },
+    {
+      "seq": 181,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 182,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 183,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs cross_asset (neutral), gap 0.72 \u2014 event dominates: confidence 0.72 against 0.00"
+    },
+    {
+      "seq": 183,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 183,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 20.80 bps"
+    },
+    {
+      "seq": 183,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 184,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 0.00 \u2014 earnings dominates: 8 distinct sources against 5"
+    },
+    {
+      "seq": 188,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 20.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 188,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 8 figure(s) do not resolve to anything the desk was given: -103bps, -95"
+    },
+    {
+      "seq": 188,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 189,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 27.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 189,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 9 figure(s) do not resolve to anything the desk was given: -0.03"
+    },
+    {
+      "seq": 189,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 190,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 10.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 190,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 190,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 191,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 58.00 \u2014 event dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 191,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 28.00 \u2014 event dominates: 8 distinct sources against 6"
+    },
+    {
+      "seq": 191,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 30.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 191,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 8 figure(s) do not resolve to anything the desk was given: -192 bps, 8"
+    },
+    {
+      "seq": 191,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 192,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 193,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 46bps"
+    },
+    {
+      "seq": 193,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 194,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 3"
+    },
+    {
+      "seq": 194,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 196,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 0.00 \u2014 earnings dominates: 8 distinct sources against 4"
+    },
+    {
+      "seq": 196,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 6 figure(s) do not resolve to anything the desk was given: 16.27bps, 267bps"
+    },
+    {
+      "seq": 196,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 197,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 197,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 198,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 199,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 200,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 20.00 \u2014 earnings dominates: 8 distinct sources against 4"
+    },
+    {
+      "seq": 200,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 6 figure(s) do not resolve to anything the desk was given: 219.5bps, 8, 82%"
+    },
+    {
+      "seq": 200,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 201,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 201,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 202,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 77.00 \u2014 earnings dominates: confidence 0.82 against 0.45"
+    },
+    {
+      "seq": 202,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 77.00 \u2014 earnings dominates: confidence 0.82 against 0.45"
+    },
+    {
+      "seq": 203,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 435.00 \u2014 event dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 203,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 405.00 \u2014 neither dominates: equally confident on equally many sources; the disagreement stands unresolved"
+    },
+    {
+      "seq": 203,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 30.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 203,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict] 1 disagreement(s) unresolved on the evidence; the decision is taken in spite of them, not because they were settled"
+    },
+    {
+      "seq": 204,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 42.00 \u2014 event dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 204,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 35.00 \u2014 event dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 204,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 7.00 \u2014 earnings dominates: 8 distinct sources against 4"
+    },
+    {
+      "seq": 204,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 204,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 206,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 3"
+    },
+    {
+      "seq": 206,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 207,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 8 figure(s) do not resolve to anything the desk was given: 3, 37.7bps"
+    },
+    {
+      "seq": 207,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 208,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 14.00 \u2014 earnings dominates: 8 distinct sources against 6"
+    },
+    {
+      "seq": 208,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 208,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 209,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 31.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 210,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 0.47"
+    },
+    {
+      "seq": 210,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 212,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 6.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 212,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 12 figure(s) do not resolve to anything the desk was given: 16.27bps, 320bps, 8"
+    },
+    {
+      "seq": 212,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 213,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 31.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 214,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 214,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 214,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 214,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 215,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 985.00 \u2014 event dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 215,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 965.00 \u2014 earnings dominates: 8 distinct sources against 6"
+    },
+    {
+      "seq": 216,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 39.00 \u2014 event dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 216,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 216,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 216,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 219,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 3"
+    },
+    {
+      "seq": 219,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 220,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs sentiment (bearish), gap 135.00 \u2014 event dominates: 11 distinct sources against 5"
+    },
+    {
+      "seq": 220,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 132.00 \u2014 neither dominates: equally confident on equally many sources; the disagreement stands unresolved"
+    },
+    {
+      "seq": 220,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 3.00 \u2014 earnings dominates: 11 distinct sources against 5"
+    },
+    {
+      "seq": 220,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict] 1 disagreement(s) unresolved on the evidence; the decision is taken in spite of them, not because they were settled"
+    },
+    {
+      "seq": 220,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 6 figure(s) do not resolve to anything the desk was given: 16.27bps, 50bps"
+    },
+    {
+      "seq": 220,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 221,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 222,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 9 figure(s) do not resolve to anything the desk was given: 0.52, 26bps"
+    },
+    {
+      "seq": 222,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 224,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs sentiment (bullish), gap 0.00 \u2014 event dominates: 6 distinct sources against 4"
+    },
+    {
+      "seq": 224,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs earnings (bearish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.38"
+    },
+    {
+      "seq": 224,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 224,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 224,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 225,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 27.00 \u2014 earnings dominates: confidence 0.62 against 0.38"
+    },
+    {
+      "seq": 225,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 23.00 \u2014 earnings dominates: 7 distinct sources against 4"
+    },
+    {
+      "seq": 226,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 226,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 37.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 226,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 226,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 227,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 3.00 \u2014 event dominates: 8 distinct sources against 5"
+    },
+    {
+      "seq": 227,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 7.00 \u2014 neither dominates: equally confident on equally many sources; the disagreement stands unresolved"
+    },
+    {
+      "seq": 227,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict] 1 disagreement(s) unresolved on the evidence; the decision is taken in spite of them, not because they were settled"
+    },
+    {
+      "seq": 227,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 11 figure(s) do not resolve to anything the desk was given: 80bps"
+    },
+    {
+      "seq": 227,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 228,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 48.00 \u2014 event dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 228,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 10.00 \u2014 neither dominates: equally confident on equally many sources; the disagreement stands unresolved"
+    },
+    {
+      "seq": 228,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 38.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 228,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict] 1 disagreement(s) unresolved on the evidence; the decision is taken in spite of them, not because they were settled"
+    },
+    {
+      "seq": 230,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 3"
+    },
+    {
+      "seq": 230,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 231,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 3"
+    },
+    {
+      "seq": 231,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 232,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 6.00 \u2014 earnings dominates: 10 distinct sources against 4"
+    },
+    {
+      "seq": 232,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 9 figure(s) do not resolve to anything the desk was given: 18.53bps"
+    },
+    {
+      "seq": 232,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 233,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 3.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 233,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 4 of 11 figure(s) do not resolve to anything the desk was given: 137, 16.27bps, 27bps, 36"
+    },
+    {
+      "seq": 233,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 234,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 20.00 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 236,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 4.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 236,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 7 figure(s) do not resolve to anything the desk was given: 45bps, 7"
+    },
+    {
+      "seq": 236,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 237,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 10.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 237,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 3 figure(s) do not resolve to anything the desk was given: 16.27bps, 82%"
+    },
+    {
+      "seq": 237,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 237,
+      "symbol": "METAUSDT",
+      "kind": "contradiction",
+      "detail": "[claim] conviction: \"27bps total hurdle requires a high-conviction directional edge, and the con\" is contradicted by form4-0000950103-26-012607-S (conviction=False) \u2014 the thesis treats the transaction"
+    },
+    {
+      "seq": 237,
+      "symbol": "METAUSDT",
+      "kind": "contradiction",
+      "detail": "[claim] a thesis that contradicts its own evidence is a defect in the reasoning, not a difference of opinion"
+    },
+    {
+      "seq": 238,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.27 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 239,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 3.00 \u2014 earnings dominates: 11 distinct sources against 5"
+    },
+    {
+      "seq": 239,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 239,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 241,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs sentiment (bearish), gap 146.00 \u2014 event dominates: confidence 0.78 against 0.45"
+    },
+    {
+      "seq": 241,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs earnings (bearish), gap 132.00 \u2014 event dominates: confidence 0.78 against 0.55"
+    },
+    {
+      "seq": 241,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.10 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 245,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 17.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 245,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 3.00 \u2014 earnings dominates: 8 distinct sources against 5"
+    },
+    {
+      "seq": 245,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 11 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 245,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 247,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 8.00 \u2014 event dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 247,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 sentiment dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 247,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 247,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 249,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 168.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 249,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 4 of 6 figure(s) do not resolve to anything the desk was given: 16.27bps, 250, 8, 82%"
+    },
+    {
+      "seq": 249,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 251,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 19.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 251,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 33.00 \u2014 earnings dominates: 8 distinct sources against 6"
+    },
+    {
+      "seq": 251,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 8 figure(s) do not resolve to anything the desk was given: 0.64, 16.27bps, 80bps"
+    },
+    {
+      "seq": 251,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 252,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 252,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 13.7%"
+    },
+    {
+      "seq": 252,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 253,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs sentiment (bearish), gap 294.00 \u2014 event dominates: confidence 0.82 against 0.45"
+    },
+    {
+      "seq": 253,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 305.00 \u2014 event dominates: confidence 0.82 against 0.35"
+    },
+    {
+      "seq": 253,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 11.00 \u2014 sentiment dominates: confidence 0.45 against 0.35"
+    },
+    {
+      "seq": 253,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 9 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 253,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 256,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 3"
+    },
+    {
+      "seq": 256,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 258,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs sentiment (bearish), gap 145.00 \u2014 event dominates: 7 distinct sources against 4"
+    },
+    {
+      "seq": 258,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs earnings (bearish), gap 139.00 \u2014 event dominates: 7 distinct sources against 6"
+    },
+    {
+      "seq": 259,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs sentiment (bullish), gap 130.00 \u2014 event dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 259,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 130.00 \u2014 event dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 259,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 259,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 260,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 260,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 216bps"
+    },
+    {
+      "seq": 260,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 261,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 37.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 262,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 11 figure(s) do not resolve to anything the desk was given: 175, 189, 8"
+    },
+    {
+      "seq": 262,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 263,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 3.00 \u2014 sentiment dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 263,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 33.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 263,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 30.00 \u2014 earnings dominates: 8 distinct sources against 6"
+    },
+    {
+      "seq": 263,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 263,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 264,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 14.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 264,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 8 figure(s) do not resolve to anything the desk was given: 150bps, 8, 9.5%"
+    },
+    {
+      "seq": 264,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 265,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs sentiment (bearish), gap 450.00 \u2014 event dominates: confidence 0.82 against 0.45"
+    },
+    {
+      "seq": 265,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 453.00 \u2014 event dominates: confidence 0.82 against 0.55"
+    },
+    {
+      "seq": 265,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 3.00 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 265,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 265,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 267,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 6 figure(s) do not resolve to anything the desk was given: 294bps, 3, 8"
+    },
+    {
+      "seq": 267,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 268,
+      "symbol": "SQQQUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs cross_asset (neutral), gap 0.05 \u2014 event dominates: 6 distinct sources against 0"
+    },
+    {
+      "seq": 268,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 268,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 269,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 10.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 270,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 272,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 8.00 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 272,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 60bps"
+    },
+    {
+      "seq": 272,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 273,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 31.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 274,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 274,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 8 figure(s) do not resolve to anything the desk was given: 0.58, 8"
+    },
+    {
+      "seq": 274,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 275,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 6.00 \u2014 earnings dominates: confidence 0.72 against 0.52"
+    },
+    {
+      "seq": 276,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 37.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 277,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs sentiment (bearish), gap 148.00 \u2014 event dominates: 5 distinct sources against 3"
+    },
+    {
+      "seq": 277,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 138.00 \u2014 event dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 277,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 10.00 \u2014 sentiment dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 279,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 14.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 280,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs sentiment (bullish), gap 7.00 \u2014 event dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 280,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 10.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 282,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 10.00 \u2014 earnings dominates: 8 distinct sources against 4"
+    },
+    {
+      "seq": 282,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 10 figure(s) do not resolve to anything the desk was given: 17.4%, 40bps"
+    },
+    {
+      "seq": 282,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 283,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 29.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 284,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 9 figure(s) do not resolve to anything the desk was given: 177.5bps"
+    },
+    {
+      "seq": 284,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 285,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs cross_asset (neutral), gap 0.55 \u2014 event dominates: confidence 0.55 against 0.00"
+    },
+    {
+      "seq": 285,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 27.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 285,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 9 figure(s) do not resolve to anything the desk was given: 135bps, 80bps"
+    },
+    {
+      "seq": 285,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 286,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 70.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 287,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs sentiment (bearish), gap 521.00 \u2014 event dominates: confidence 0.82 against 0.55"
+    },
+    {
+      "seq": 287,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 525.00 \u2014 event dominates: confidence 0.82 against 0.35"
+    },
+    {
+      "seq": 287,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 4.00 \u2014 sentiment dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 288,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 4.00 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 288,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 8.00 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 288,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 36"
+    },
+    {
+      "seq": 288,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 289,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.13 \u2014 earnings dominates: confidence 0.55 against 0.42"
+    },
+    {
+      "seq": 289,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: +9.45bps"
+    },
+    {
+      "seq": 289,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 290,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: +8.4bps"
+    },
+    {
+      "seq": 290,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 291,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.27 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 292,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 0.00 \u2014 earnings dominates: confidence 0.72 against 0.52"
+    },
+    {
+      "seq": 292,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: +180bps"
+    },
+    {
+      "seq": 292,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 293,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs cross_asset (neutral), gap 0.22 \u2014 event dominates: confidence 0.72 against 0.50"
+    },
+    {
+      "seq": 293,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.27 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 293,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 293,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 294,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bearish) vs sentiment (bearish), gap 0.20 \u2014 sentiment dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 294,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 14.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 294,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 3.00 \u2014 earnings dominates: 7 distinct sources against 5"
+    },
+    {
+      "seq": 295,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 296,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 1.00 \u2014 sentiment dominates: confidence 0.45 against 0.35"
+    },
+    {
+      "seq": 296,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 12.00 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 296,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.10 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 296,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 77%"
+    },
+    {
+      "seq": 296,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 299,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 9 figure(s) do not resolve to anything the desk was given: 153.5bps, 8"
+    },
+    {
+      "seq": 299,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 300,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 31.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 300,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 10 figure(s) do not resolve to anything the desk was given: 36"
+    },
+    {
+      "seq": 300,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 301,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 4.00 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 302,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs cross_asset (neutral), gap 0.72 \u2014 event dominates: confidence 0.72 against 0.00"
+    },
+    {
+      "seq": 303,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 0.00 \u2014 event dominates: confidence 0.45 against 0.35"
+    },
+    {
+      "seq": 303,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 8.00 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 303,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.20 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 303,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 40bps"
+    },
+    {
+      "seq": 303,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 304,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 73.00 \u2014 earnings dominates: confidence 0.72 against 0.52"
+    },
+    {
+      "seq": 304,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 11 figure(s) do not resolve to anything the desk was given: 40, 80bps"
+    },
+    {
+      "seq": 304,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 305,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 305,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 305,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 306,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs sentiment (bearish), gap 81.00 \u2014 event dominates: 6 distinct sources against 4"
+    },
+    {
+      "seq": 306,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 11.00 \u2014 earnings dominates: 7 distinct sources against 6"
+    },
+    {
+      "seq": 306,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 70.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 307,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 10 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 307,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 308,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs sentiment (bearish), gap 364.00 \u2014 event dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 308,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs earnings (bearish), gap 364.00 \u2014 event dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 308,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.10 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 309,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bullish) vs earnings (bullish), gap 0.37 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 309,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.27 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 310,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 8.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 310,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 4 of 10 figure(s) do not resolve to anything the desk was given: 0.40, 0.80, 0.95, 80bps"
+    },
+    {
+      "seq": 310,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 313,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 313,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 9 figure(s) do not resolve to anything the desk was given: +258bps"
+    },
+    {
+      "seq": 313,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 314,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 315,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 107.00 \u2014 event dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 315,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 74.00 \u2014 earnings dominates: 7 distinct sources against 5"
+    },
+    {
+      "seq": 315,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 33.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 315,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 155bps"
+    },
+    {
+      "seq": 315,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 316,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.34 \u2014 earnings dominates: confidence 0.72 against 0.38"
+    },
+    {
+      "seq": 317,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 396.00 \u2014 event dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 317,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 382.00 \u2014 earnings dominates: 8 distinct sources against 5"
+    },
+    {
+      "seq": 317,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.20 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 318,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 318,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 319,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.17 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 320,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 3.00 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 320,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 80bps"
+    },
+    {
+      "seq": 320,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 322,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.55 \u2014 sentiment dominates: confidence 0.55 against 0.00"
+    },
+    {
+      "seq": 323,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 6.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 324,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 37.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 325,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 1.00 \u2014 event dominates: 6 distinct sources against 3"
+    },
+    {
+      "seq": 325,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bullish) vs earnings (bullish), gap 0.37 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 325,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 13.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 325,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 161.7bps"
+    },
+    {
+      "seq": 325,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 326,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 70.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 326,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 13.7%"
+    },
+    {
+      "seq": 326,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 327,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 326.00 \u2014 event dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 327,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 316.00 \u2014 event dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 327,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.20 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 331,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 10.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 332,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 4.00 \u2014 earnings dominates: confidence 0.62 against 0.38"
+    },
+    {
+      "seq": 334,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 335,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 14.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 335,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 40bps"
+    },
+    {
+      "seq": 335,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 336,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 10 figure(s) do not resolve to anything the desk was given: 68.5bps"
+    },
+    {
+      "seq": 336,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 337,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 11.00 \u2014 event dominates: 6 distinct sources against 4"
+    },
+    {
+      "seq": 337,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bullish) vs earnings (bullish), gap 0.27 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 337,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 14.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 337,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 80bps"
+    },
+    {
+      "seq": 337,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 338,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.27 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 339,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 8.00 \u2014 event dominates: 8 distinct sources against 3"
+    },
+    {
+      "seq": 339,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 14.00 \u2014 earnings dominates: 7 distinct sources against 3"
+    },
+    {
+      "seq": 341,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.27 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 341,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 0.48"
+    },
+    {
+      "seq": 341,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 342,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 261.00 \u2014 event dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 342,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 257.00 \u2014 earnings dominates: 8 distinct sources against 5"
+    },
+    {
+      "seq": 342,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 4.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 342,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 0.67"
+    },
+    {
+      "seq": 342,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 343,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.20 \u2014 sentiment dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 343,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 90"
+    },
+    {
+      "seq": 343,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 345,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 112.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 347,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 234.00 \u2014 event dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 347,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 153.00 \u2014 earnings dominates: 8 distinct sources against 4"
+    },
+    {
+      "seq": 347,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 81.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 347,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 134bps"
+    },
+    {
+      "seq": 347,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 348,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 31.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 348,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 13.7%"
+    },
+    {
+      "seq": 348,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 349,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 41.00 \u2014 earnings dominates: confidence 0.62 against 0.42"
+    },
+    {
+      "seq": 349,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 0.52"
+    },
+    {
+      "seq": 349,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 351,
+      "symbol": "TQQQUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.75 \u2014 sentiment dominates: confidence 0.75 against 0.00"
+    },
+    {
+      "seq": 352,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 352,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 353,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.37 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 353,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 9 figure(s) do not resolve to anything the desk was given: 150bps"
+    },
+    {
+      "seq": 353,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 354,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 31.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 355,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 356,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 109bps"
+    },
+    {
+      "seq": 356,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 358,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 60.6bps"
+    },
+    {
+      "seq": 358,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 359,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 10.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 359,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 132bps"
+    },
+    {
+      "seq": 359,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 360,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.30 \u2014 earnings dominates: confidence 0.72 against 0.42"
+    },
+    {
+      "seq": 361,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 952.00 \u2014 event dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 361,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 952.00 \u2014 event dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 361,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 0.00 \u2014 earnings dominates: 7 distinct sources against 6"
+    },
+    {
+      "seq": 361,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 361,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 364,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 5 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 364,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 365,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 6 figure(s) do not resolve to anything the desk was given: 258bps, 87"
+    },
+    {
+      "seq": 365,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 366,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 8.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 369,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs sentiment (bullish), gap 18.00 \u2014 event dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 369,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 6.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 369,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 6 figure(s) do not resolve to anything the desk was given: 0.64, 16.27bps"
+    },
+    {
+      "seq": 369,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 370,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 40.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 371,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs sentiment (bearish), gap 23.00 \u2014 event dominates: 5 distinct sources against 3"
+    },
+    {
+      "seq": 371,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bullish) vs earnings (bullish), gap 0.37 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 371,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 5.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 371,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 7 figure(s) do not resolve to anything the desk was given: 132bps, 40bps"
+    },
+    {
+      "seq": 371,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 372,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 27.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 372,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 80"
+    },
+    {
+      "seq": 372,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 373,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 119.00 \u2014 neither dominates: equally confident on equally many sources; the disagreement stands unresolved"
+    },
+    {
+      "seq": 373,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 127.00 \u2014 event dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 373,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.20 \u2014 sentiment dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 373,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict] 1 disagreement(s) unresolved on the evidence; the decision is taken in spite of them, not because they were settled"
+    },
+    {
+      "seq": 374,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 374,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 376,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 6 figure(s) do not resolve to anything the desk was given: -10bps, 192.5bps"
+    },
+    {
+      "seq": 376,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 377,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.27 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 379,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 4.00 \u2014 neither dominates: equally confident on equally many sources; the disagreement stands unresolved"
+    },
+    {
+      "seq": 379,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict] 1 disagreement(s) unresolved on the evidence; the decision is taken in spite of them, not because they were settled"
+    },
+    {
+      "seq": 379,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 379,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 380,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs cross_asset (neutral), gap 0.40 \u2014 cross_asset dominates: confidence 0.95 against 0.55"
+    },
+    {
+      "seq": 380,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.40 \u2014 cross_asset dominates: confidence 0.95 against 0.55"
+    },
+    {
+      "seq": 380,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 5 figure(s) do not resolve to anything the desk was given: -10bps, 0.68, 84bps"
+    },
+    {
+      "seq": 380,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 381,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 64bps"
+    },
+    {
+      "seq": 381,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 382,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 382,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 383,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs cross_asset (neutral), gap 0.22 \u2014 event dominates: confidence 0.72 against 0.50"
+    },
+    {
+      "seq": 383,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.05 \u2014 sentiment dominates: 4 distinct sources against 0"
+    },
+    {
+      "seq": 384,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 6 figure(s) do not resolve to anything the desk was given: -12bps, -15bps, 0.58"
+    },
+    {
+      "seq": 384,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 385,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 787.00 \u2014 event dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 385,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 337.00 \u2014 earnings dominates: 8 distinct sources against 5"
+    },
+    {
+      "seq": 385,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 450.00 \u2014 neither dominates: equally confident on equally many sources; the disagreement stands unresolved"
+    },
+    {
+      "seq": 385,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict] 1 disagreement(s) unresolved on the evidence; the decision is taken in spite of them, not because they were settled"
+    },
+    {
+      "seq": 385,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 385,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 386,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 386,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 388,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 0.41%"
+    },
+    {
+      "seq": 388,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 389,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.17 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 390,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bearish) vs earnings (bearish), gap 0.37 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 391,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: -4bps"
+    },
+    {
+      "seq": 391,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 392,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs sentiment (neutral), gap 0.27 \u2014 event dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 392,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs cross_asset (neutral), gap 0.72 \u2014 event dominates: confidence 0.72 against 0.00"
+    },
+    {
+      "seq": 392,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.45 \u2014 sentiment dominates: confidence 0.45 against 0.00"
+    },
+    {
+      "seq": 393,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.37 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 395,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 10.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 395,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 110bps"
+    },
+    {
+      "seq": 395,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 396,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.27 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 397,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 10.00 \u2014 sentiment dominates: 9 distinct sources against 8"
+    },
+    {
+      "seq": 398,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 6"
+    },
+    {
+      "seq": 398,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 399,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 5 figure(s) do not resolve to anything the desk was given: 0.85, 8"
+    },
+    {
+      "seq": 399,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 400,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 5 figure(s) do not resolve to anything the desk was given: 192.5bps, 8"
+    },
+    {
+      "seq": 400,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 401,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 41.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 401,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 20.80bps"
+    },
+    {
+      "seq": 401,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 402,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 14.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 402,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 10 figure(s) do not resolve to anything the desk was given: 20.8bps"
+    },
+    {
+      "seq": 402,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 403,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 404,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.20 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 405,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.50 \u2014 cross_asset dominates: confidence 0.95 against 0.45"
+    },
+    {
+      "seq": 405,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 250"
+    },
+    {
+      "seq": 405,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 406,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.30 \u2014 earnings dominates: confidence 0.72 against 0.42"
+    },
+    {
+      "seq": 406,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 10 figure(s) do not resolve to anything the desk was given: -0.02%, 8"
+    },
+    {
+      "seq": 406,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 407,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 408,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.27 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 409,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 1070.00 \u2014 event dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 409,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 1039.00 \u2014 event dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 409,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 31.00 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 409,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 7 figure(s) do not resolve to anything the desk was given: 20.80bps, 310.7bps"
+    },
+    {
+      "seq": 409,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 413,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.20 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 414,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 12.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 414,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 7 figure(s) do not resolve to anything the desk was given: 20.80 bps, 205 bps"
+    },
+    {
+      "seq": 414,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 416,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.27 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 416,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 359bps"
+    },
+    {
+      "seq": 416,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 417,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 14.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 417,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 5 of 14 figure(s) do not resolve to anything the desk was given: 0.40, 150bps, 20.8bps, 40"
+    },
+    {
+      "seq": 417,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 418,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 419,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs sentiment (neutral), gap 0.37 \u2014 event dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 420,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 37.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 420,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 9 figure(s) do not resolve to anything the desk was given: 20.80bps"
+    },
+    {
+      "seq": 420,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 421,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 1592.00 \u2014 event dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 421,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 1592.00 \u2014 event dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 423,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 0.07"
+    },
+    {
+      "seq": 423,
+      "symbol": "TQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 425,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.10 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 426,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs sentiment (bullish), gap 4.00 \u2014 event dominates: 5 distinct sources against 3"
+    },
+    {
+      "seq": 426,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 14.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 426,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.20 \u2014 earnings dominates: confidence 0.62 against 0.42"
+    },
+    {
+      "seq": 426,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 10 figure(s) do not resolve to anything the desk was given: 20.80bps"
+    },
+    {
+      "seq": 426,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 427,
+      "symbol": "AAPLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] earnings (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 earnings dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 428,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.20 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 428,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 0.45"
+    },
+    {
+      "seq": 428,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 429,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 31.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 429,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 20.8bps"
+    },
+    {
+      "seq": 429,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 430,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 33.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 430,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 430,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 431,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.27 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 432,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 10.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 432,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 20.80 bps"
+    },
+    {
+      "seq": 432,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 433,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bullish) vs sentiment (bullish), gap 0.20 \u2014 event dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 433,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.20 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 437,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.10 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 437,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 0.47"
+    },
+    {
+      "seq": 437,
+      "symbol": "NVDAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 438,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 10.00 \u2014 earnings dominates: confidence 0.62 against 0.42"
+    },
+    {
+      "seq": 438,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 10 figure(s) do not resolve to anything the desk was given: 20.80 bps"
+    },
+    {
+      "seq": 438,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 441,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 14.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 441,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 5 of 15 figure(s) do not resolve to anything the desk was given: 0.40, 0.80, 0.95, 150bps, 20.80 bps"
+    },
+    {
+      "seq": 441,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 442,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.37 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 443,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 444,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 0.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 444,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 20.8bps"
+    },
+    {
+      "seq": 444,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 445,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 3.00 \u2014 earnings dominates: 7 distinct sources against 6"
+    },
+    {
+      "seq": 447,
+      "symbol": "TQQQUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.80 \u2014 cross_asset dominates: confidence 0.95 against 0.15"
+    },
+    {
+      "seq": 451,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.10 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 453,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 3 figure(s) do not resolve to anything the desk was given: -2.45bps, 8"
+    },
+    {
+      "seq": 453,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 456,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs sentiment (bullish), gap 9.00 \u2014 sentiment dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 456,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bearish) vs earnings (bearish), gap 0.10 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 456,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 6.00 \u2014 earnings dominates: 8 distinct sources against 5"
+    },
+    {
+      "seq": 456,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 20.80bps"
+    },
+    {
+      "seq": 456,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 460,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.45 \u2014 sentiment dominates: confidence 0.45 against 0.00"
+    },
+    {
+      "seq": 461,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs sentiment (bullish), gap 14.00 \u2014 neither dominates: equally confident on equally many sources; the disagreement stands unresolved"
+    },
+    {
+      "seq": 461,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bearish) vs earnings (bearish), gap 0.34 \u2014 earnings dominates: confidence 0.72 against 0.38"
+    },
+    {
+      "seq": 461,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 14.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 461,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict] 1 disagreement(s) unresolved on the evidence; the decision is taken in spite of them, not because they were settled"
+    },
+    {
+      "seq": 461,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 4 of 13 figure(s) do not resolve to anything the desk was given: 0.55, 20.80 bps, 3.75, 80 bps"
+    },
+    {
+      "seq": 461,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 461,
+      "symbol": "TSLAUSDT",
+      "kind": "contradiction",
+      "detail": "[claim] conviction: \"urdle of 20.80 bps requires a high-conviction directional edge; the panel c\" is contradicted by form4-0001104659-26-106432-S (conviction=False) \u2014 the thesis treats the transaction"
+    },
+    {
+      "seq": 461,
+      "symbol": "TSLAUSDT",
+      "kind": "contradiction",
+      "detail": "[claim] a thesis that contradicts its own evidence is a defect in the reasoning, not a difference of opinion"
+    },
+    {
+      "seq": 463,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 31.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 463,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 9 figure(s) do not resolve to anything the desk was given: 359 bps"
+    },
+    {
+      "seq": 463,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 464,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 34.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 464,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 9 figure(s) do not resolve to anything the desk was given: 20.8bps"
+    },
+    {
+      "seq": 464,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 465,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.27 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 465,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 9 figure(s) do not resolve to anything the desk was given: -0.003%, 8"
+    },
+    {
+      "seq": 465,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 466,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.38"
+    },
+    {
+      "seq": 467,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 21.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 467,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 10 figure(s) do not resolve to anything the desk was given: 114 bps, 20.80 bps"
+    },
+    {
+      "seq": 467,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 468,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs sentiment (bullish), gap 287.00 \u2014 event dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 468,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bearish) vs earnings (bearish), gap 284.00 \u2014 event dominates: 9 distinct sources against 8"
+    },
+    {
+      "seq": 468,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 3.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 468,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 0.58"
+    },
+    {
+      "seq": 468,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 473,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (neutral) vs cross_asset (neutral), gap 0.55 \u2014 event dominates: confidence 0.55 against 0.00"
+    },
+    {
+      "seq": 473,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 31.00 \u2014 earnings dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 473,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 9 figure(s) do not resolve to anything the desk was given: 20.80 bps"
+    },
+    {
+      "seq": 473,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 475,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 42.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 475,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 6"
+    },
+    {
+      "seq": 475,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 476,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 346.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 476,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 11 figure(s) do not resolve to anything the desk was given: 20.80 bps, 20.80bps, 80bps"
+    },
+    {
+      "seq": 476,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 477,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 478,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.37 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 479,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 14.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 479,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 8 figure(s) do not resolve to anything the desk was given: 20.80bps, 85bps"
+    },
+    {
+      "seq": 479,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 480,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs sentiment (bullish), gap 78.00 \u2014 sentiment dominates: confidence 0.55 against 0.38"
+    },
+    {
+      "seq": 480,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs earnings (bullish), gap 82.00 \u2014 event dominates: 8 distinct sources against 6"
+    },
+    {
+      "seq": 480,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.20 \u2014 sentiment dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 480,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 4 figure(s) do not resolve to anything the desk was given: 20.8bps"
+    },
+    {
+      "seq": 480,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 481,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 8 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 481,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 484,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.27 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 485,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bearish) vs sentiment (bullish), gap 8.00 \u2014 event dominates: 5 distinct sources against 4"
+    },
+    {
+      "seq": 485,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bearish) vs earnings (bearish), gap 0.24 \u2014 earnings dominates: confidence 0.62 against 0.38"
+    },
+    {
+      "seq": 485,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 31.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 485,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 5 of 15 figure(s) do not resolve to anything the desk was given: -12bps, -35bps, 20.80bps, 3.75"
+    },
+    {
+      "seq": 485,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 485,
+      "symbol": "TSLAUSDT",
+      "kind": "contradiction",
+      "detail": "[claim] conviction: \"IX in calm regime) prevents a high-conviction short. The panels net to a mi\" is contradicted by form4-0001104659-26-106432-S (conviction=False) \u2014 the thesis treats the transaction"
+    },
+    {
+      "seq": 485,
+      "symbol": "TSLAUSDT",
+      "kind": "contradiction",
+      "detail": "[claim] a thesis that contradicts its own evidence is a defect in the reasoning, not a difference of opinion"
+    },
+    {
+      "seq": 487,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 4 figure(s) do not resolve to anything the desk was given: -2bps, 211bps"
+    },
+    {
+      "seq": 487,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 488,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 81.00 \u2014 earnings dominates: confidence 0.78 against 0.35"
+    },
+    {
+      "seq": 488,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 9 figure(s) do not resolve to anything the desk was given: 20.80 bps, 60 bps, 8"
+    },
+    {
+      "seq": 488,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 489,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 81.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 489,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 5 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 489,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 490,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 491,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 27.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 491,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 20.80bps"
+    },
+    {
+      "seq": 491,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 492,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bullish) vs sentiment (bullish), gap 0.10 \u2014 sentiment dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 492,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 3.00 \u2014 event dominates: confidence 0.45 against 0.35"
+    },
+    {
+      "seq": 492,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 4.00 \u2014 sentiment dominates: confidence 0.55 against 0.35"
+    },
+    {
+      "seq": 492,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 20.80 bps"
+    },
+    {
+      "seq": 492,
+      "symbol": "MSTRUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 493,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 6 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 493,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 494,
+      "symbol": "TQQQUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (neutral) vs cross_asset (neutral), gap 0.80 \u2014 cross_asset dominates: confidence 0.95 against 0.15"
+    },
+    {
+      "seq": 496,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.27 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 497,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 27.00 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 499,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 37.00 \u2014 earnings dominates: 7 distinct sources against 4"
+    },
+    {
+      "seq": 500,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 73.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 500,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 16.27bps"
+    },
+    {
+      "seq": 500,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 501,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 37.00 \u2014 earnings dominates: confidence 0.72 against 0.42"
+    },
+    {
+      "seq": 501,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 87bps"
+    },
+    {
+      "seq": 501,
+      "symbol": "GOOGLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 502,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 0.40"
+    },
+    {
+      "seq": 502,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 503,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 6.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 504,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 1005.00 \u2014 event dominates: confidence 0.82 against 0.55"
+    },
+    {
+      "seq": 504,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 932.00 \u2014 event dominates: confidence 0.82 against 0.62"
+    },
+    {
+      "seq": 504,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 73.00 \u2014 earnings dominates: 8 distinct sources against 7"
+    },
+    {
+      "seq": 505,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 23.3bps"
+    },
+    {
+      "seq": 505,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 510,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 47bps"
+    },
+    {
+      "seq": 510,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 511,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bearish) vs earnings (bearish), gap 37.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 512,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 33.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 512,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 3 of 7 figure(s) do not resolve to anything the desk was given: 16.27bps, 8"
+    },
+    {
+      "seq": 512,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 514,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 35.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 514,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 39.00 \u2014 earnings dominates: confidence 0.72 against 0.42"
+    },
+    {
+      "seq": 514,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 0.50"
+    },
+    {
+      "seq": 514,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 515,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 6.00 \u2014 earnings dominates: confidence 0.72 against 0.42"
+    },
+    {
+      "seq": 515,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 4 of 10 figure(s) do not resolve to anything the desk was given: 110bps, 45bps, 65bps, 8"
+    },
+    {
+      "seq": 515,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 516,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 783.00 \u2014 event dominates: 8 distinct sources against 7"
+    },
+    {
+      "seq": 517,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 12 figure(s) do not resolve to anything the desk was given: 23.3bps, 8"
+    },
+    {
+      "seq": 517,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 519,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 10 figure(s) do not resolve to anything the desk was given: -0.07%"
+    },
+    {
+      "seq": 519,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 520,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.17 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 520,
+      "symbol": "NVDAUSDT",
+      "kind": "contradiction",
+      "detail": "[claim] conviction: \"27bps total hurdle requires a high-conviction directional edge, and while t\" is contradicted by form4-0001199039-26-000014-S (conviction=False) \u2014 the thesis treats the transaction"
+    },
+    {
+      "seq": 520,
+      "symbol": "NVDAUSDT",
+      "kind": "contradiction",
+      "detail": "[claim] a thesis that contradicts its own evidence is a defect in the reasoning, not a difference of opinion"
+    },
+    {
+      "seq": 521,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 234.00 \u2014 event dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 521,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 228.00 \u2014 neither dominates: equally confident on equally many sources; the disagreement stands unresolved"
+    },
+    {
+      "seq": 521,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 6.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 521,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict] 1 disagreement(s) unresolved on the evidence; the decision is taken in spite of them, not because they were settled"
+    },
+    {
+      "seq": 523,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] event (bullish) vs earnings (bearish), gap 13.00 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 523,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 13.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 523,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 17.4%"
+    },
+    {
+      "seq": 523,
+      "symbol": "MSFTUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 524,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 10.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 525,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.10 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 526,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 168.00 \u2014 event dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 526,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 131.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 526,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 37.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+    },
+    {
+      "seq": 527,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 14.00 \u2014 earnings dominates: confidence 0.62 against 0.42"
+    },
+    {
+      "seq": 527,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 527,
+      "symbol": "COINUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 528,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 559.00 \u2014 event dominates: confidence 0.72 against 0.52"
+    },
+    {
+      "seq": 528,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 567.00 \u2014 event dominates: confidence 0.72 against 0.35"
+    },
+    {
+      "seq": 528,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.17 \u2014 sentiment dominates: confidence 0.52 against 0.35"
+    },
+    {
+      "seq": 531,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 8 figure(s) do not resolve to anything the desk was given: 8"
+    },
+    {
+      "seq": 531,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 532,
+      "symbol": "NVDAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.17 \u2014 earnings dominates: confidence 0.62 against 0.45"
+    },
+    {
+      "seq": 533,
+      "symbol": "TSLAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.13 \u2014 earnings dominates: confidence 0.55 against 0.42"
+    },
+    {
+      "seq": 533,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 7 figure(s) do not resolve to anything the desk was given: 90.3bps"
+    },
+    {
+      "seq": 533,
+      "symbol": "TSLAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 534,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 11 figure(s) do not resolve to anything the desk was given: 47bps"
+    },
+    {
+      "seq": 534,
+      "symbol": "AAPLUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 535,
+      "symbol": "MSFTUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] sentiment (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 sentiment dominates: confidence 0.30 against 0.00"
+    },
+    {
+      "seq": 536,
+      "symbol": "METAUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 6.00 \u2014 earnings dominates: confidence 0.72 against 0.55"
+    },
+    {
+      "seq": 536,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 10 figure(s) do not resolve to anything the desk was given: 48.5bps"
+    },
+    {
+      "seq": 536,
+      "symbol": "METAUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 537,
+      "symbol": "GOOGLUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 37.00 \u2014 earnings dominates: confidence 0.62 against 0.42"
+    },
+    {
+      "seq": 538,
+      "symbol": "AMZNUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 34.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+    },
+    {
+      "seq": 538,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 9 figure(s) do not resolve to anything the desk was given: 59.4bps"
+    },
+    {
+      "seq": 538,
+      "symbol": "AMZNUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 539,
+      "symbol": "COINUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 10.00 \u2014 earnings dominates: confidence 0.72 against 0.42"
+    },
+    {
+      "seq": 540,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bullish) vs sentiment (bullish), gap 0.10 \u2014 sentiment dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 540,
+      "symbol": "MSTRUSDT",
+      "kind": "conflict",
+      "detail": "[conflict:conviction] event (bullish) vs earnings (bullish), gap 0.10 \u2014 earnings dominates: confidence 0.55 against 0.45"
+    },
+    {
+      "seq": 541,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 1 of 5 figure(s) do not resolve to anything the desk was given: 6"
+    },
+    {
+      "seq": 541,
+      "symbol": "QQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+    },
+    {
+      "seq": 543,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] 2 of 7 figure(s) do not resolve to anything the desk was given: 3.2%, 8"
+    },
+    {
+      "seq": 543,
+      "symbol": "SQQQUSDT",
+      "kind": "grounding",
+      "detail": "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
     }
   ]
 }

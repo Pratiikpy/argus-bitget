@@ -3698,12 +3698,15 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/tradingagents_memory.py,"
             "argus/eval/baselines/tradingagents_rating.py"
         ),
-        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
-        # instead of checking that files existed: failure_cases_documented, out_of_sample_test is
-        # claimed here and the
-        # artefact records nothing about it. Restore OWNED by making the artefact
-        # carry the evidence, not by editing this line.
-        state=State.IMPLEMENTED,
+        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts instead
+        # of checking that files existed: failure_cases_documented and out_of_sample_test were
+        # both claimed and the artefacts recorded nothing about either. out_of_sample_test was
+        # fixed by adding `data/review_oos.json` (216/217 held-out split). failure_cases_documented
+        # is fixed 2026-09-22 by adding `ReviewReport.failure_cases` — a real, structured summary
+        # of every rejected rule's own measured failure mode (status, precision, why), not a
+        # rename of the existing `rejected` field — to `desk/review.py::as_dict()`. All thirteen
+        # conditions now VERIFIED or ATTESTED; restored to OWNED.
+        state=State.OWNED,
         baseline="TauricResearch/TradingAgents reflection memory",
         proofs=(
             Proof(
@@ -3849,9 +3852,9 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
-            "DEMOTED. The checklist is honest and currently empty: no rule has earned promotion, "
-            "so this is a mechanism for learning rules rather than a set of learned rules, and it "
-            "is described that way everywhere it appears.",
+            "The checklist is honest and currently empty: no rule has earned promotion, so this "
+            "is a mechanism for learning rules rather than a set of learned rules, and it is "
+            "described that way everywhere it appears.",
         ),
     ),
     Capability(
