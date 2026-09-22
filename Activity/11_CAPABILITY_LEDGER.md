@@ -164,11 +164,11 @@ entire iteration-3 AUDIT queue is now closed — every flagged module has been r
 
 | surface | defect | found |
 |---------|--------|-------|
-| repo visibility | `github.com/Pratiikpy/argus-bitget` is **PRIVATE** (`gh repo view` confirms `isPrivate: true`) — a judge cannot clone it at all, before anything else matters | 2026-09-21 |
+| repo visibility | `github.com/Pratiikpy/argus-bitget` is **PRIVATE** (`gh repo view` confirms `isPrivate: true`) — a judge cannot clone it at all, before anything else matters. **Still open 2026-09-22** — visibility is the owner's call, bundled with the still-unanswered question of removing `CLAUDE.md` first (flagged repeatedly, no response yet) | 2026-09-21 |
 | fresh install | `git clone` + fresh venv + `pip install -e ".[dev]"` from a genuinely empty machine state: **clean, exit 0** | 2026-09-21 |
-| `/status` | serves 447 entries against a local 507; reports `stale: true` about itself | 2026-09-21 |
-| `/wrong` | **404** — the corrections page is absent from the deployed build | 2026-09-21 |
-| `/research` | **404** — the research surface is absent from the deployed build | 2026-09-21 |
+| `/status` | ~~serves 447 entries against a local 507; reports `stale: true` about itself~~ **FIXED 2026-09-22** — root cause was the deploy bundle itself, 2 days stale (`argus.demo.deploysync --dry-run` found 22/312 package files and 9/30 artefacts behind, 48 decisions missing, 9% of the record); synced and redeployed to production (`vercel --prod`) with the owner's explicit go-ahead. Live now: `curl .../status` → `{"entries": 543, "chain_intact": true, "age_hours": 5.1, "stale": false}` | 2026-09-21, fixed 2026-09-22 |
+| `/wrong` | ~~**404** — the corrections page is absent from the deployed build~~ **FIXED 2026-09-22**, same redeploy — route existed in source since 2026-09-21 17:24 but the last production deploy predated it by ~2 days. Live now, renders real content ("WE SHIPPED IT BROKEN — 2 ledger rows booked P&L on positions the risk layer refused") | 2026-09-21, fixed 2026-09-22 |
+| `/research` | ~~**404** — the research surface is absent from the deployed build~~ **FIXED 2026-09-22**, same redeploy — route existed in source since 2026-09-21 17:10, same stale-deploy cause. Live now, renders the full 11-step research chain, "Every step ran", coverage 11/11 | 2026-09-21, fixed 2026-09-22 |
 | `abstention_why` answer | Two of three reasoning blocks in one real answer cut off mid-word ("...unlikely to m"). Traced to `paper/ledger.py`'s `thesis[:500]` — silent, no ellipsis. **350 of 519 ledger rows (67%) affected.** Fixed forward-only (historical rows are hash-chained, cannot be repaired) — `MAX_THESIS_LENGTH` raised to 4000, documented, tested. | 2026-09-21 |
 
-`argus/README.md:211` claims the console is live and working. Two of its five routes are not.
+`argus/README.md:211` claims the console is live and working. As of 2026-09-22 all five routes are — the one remaining item on this table (repo visibility) is a the owner decision, not a code defect.
