@@ -120,11 +120,38 @@ def _relinked(entries: list[Entry]) -> list[Entry]:
     collided — the earlier-written one keeps the lower sequence number because that is the order the
     file records, not because of its timestamp. Reordering by ``decided_at`` would be a judgement
     about which decision "really" came first, and the file is the record.
+
+    **Decisions and ``"settlement_seal"`` rows (added 2026-09-22) are renumbered in separate
+    spaces, not one shared count.** A decision keeps the dense ``1, 2, 3, ...`` scheme every
+    consumer already assumes ("decision N" means the Nth decision, not the Nth row of any kind);
+    a seal gets its own ``-1, -2, -3, ...`` count in its own relative order, matching how
+    `PaperLedger._seal_settlement` numbers them going forward — see its docstring for why the two
+    spaces must never share a counter. A seal's ``target_seq`` is rewritten to follow its target
+    decision's new number when repair actually renumbers that decision, so a seal never ends up
+    pointing at a seq nothing carries any more.
     """
+    old_to_new_decision_seq: dict[int, int] = {}
+    decision_i = 0
+    seal_i = 0
+    renumbered: list[Entry] = []
+    for entry in entries:
+        if entry.kind == "settlement_seal":
+            seal_i += 1
+            renumbered.append(replace(entry, seq=-seal_i))
+        else:
+            decision_i += 1
+            old_to_new_decision_seq[entry.seq] = decision_i
+            renumbered.append(replace(entry, seq=decision_i))
+
     out: list[Entry] = []
     prev = GENESIS
-    for i, entry in enumerate(entries, start=1):
-        fixed = replace(entry, seq=i, prev_hash=prev)
+    for entry in renumbered:
+        target = (
+            old_to_new_decision_seq.get(entry.target_seq)
+            if entry.kind == "settlement_seal" and entry.target_seq is not None
+            else entry.target_seq
+        )
+        fixed = replace(entry, prev_hash=prev, target_seq=target)
         out.append(fixed)
         prev = fixed.content_hash
     return out
@@ -133,7 +160,7 @@ def _relinked(entries: list[Entry]) -> list[Entry]:
 def plan(path: Path) -> RepairPlan:
     """Compute the repair without writing. Safe to run on a healthy log."""
     ledger = PaperLedger(path=path)
-    before = list(ledger.entries)
+    before = list(ledger._raw_entries)
     after = _relinked(before)
 
     seen: dict[int, int] = {}
@@ -152,12 +179,17 @@ def plan(path: Path) -> RepairPlan:
             # The content hash covers the decision and excludes settlement. `seq` and `prev_hash`
             # are part of it, so the comparison is made against a copy carrying the new identity:
             # what must be unchanged is the *decision*, not its position in the chain.
+            # `target_seq` joins that allowed-to-move set for a seal specifically: it is a chain
+            # link (which decision this points at), not decision content, and it is expected to
+            # move in lockstep whenever repair renumbers the decision it targets.
             content_preserved=(
-                replace(old, seq=new.seq, prev_hash=new.prev_hash).content_hash == new.content_hash
+                replace(
+                    old, seq=new.seq, prev_hash=new.prev_hash, target_seq=new.target_seq,
+                ).content_hash == new.content_hash
             ),
         )
         for old, new in zip(before, after, strict=True)
-        if (old.seq, old.prev_hash) != (new.seq, new.prev_hash)
+        if (old.seq, old.prev_hash, old.target_seq) != (new.seq, new.prev_hash, new.target_seq)
     )
     return RepairPlan(
         entries_before=len(before),
@@ -194,9 +226,12 @@ def repair(path: Path, *, reason: str, at: datetime | None = None) -> dict[str, 
     archive.write_bytes(path.read_bytes())
 
     ledger = PaperLedger(path=path)
-    ledger.entries = _relinked(ledger.entries)
+    # `_raw_entries`, not `entries`: the latter is a read-only, decisions-only *view* (see
+    # PaperLedger's own class docstring) — assigning to it doesn't exist any more, and rewriting
+    # the file from it alone would silently drop every settlement seal ever written.
+    ledger._raw_entries = _relinked(ledger._raw_entries)
     with path.open("w", encoding="utf-8") as fh:
-        for entry in ledger.entries:
+        for entry in ledger._raw_entries:
             fh.write(json.dumps(asdict(entry), default=str) + "\n")
     ledger._write_anchor()
 

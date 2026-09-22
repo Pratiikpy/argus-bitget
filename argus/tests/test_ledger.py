@@ -93,15 +93,35 @@ class TestOutcomesAreWrittenOnce:
         with pytest.raises(LedgerError, match="no entry"):
             _ledger(tmp_path).settle(99, exit_price=Decimal("1"))
 
-    def test_settlement_does_not_change_the_chain(self, tmp_path: Path) -> None:
-        """Outcomes sit outside the hash, so attaching one is distinguishable from tampering."""
+    def test_settlement_does_not_change_the_decision_s_own_hash(self, tmp_path: Path) -> None:
+        """Outcomes sit outside `content_hash`, so attaching one is distinguishable from tampering
+        with the decision itself — the settled row's own `content_hash` is unchanged."""
+        led = _ledger(tmp_path)
+        _record(led, n=0)
+        _record(led, n=1)
+        before_hash = led.entries[-1].content_hash
+        led.settle(1, exit_price=Decimal("230"))
+        assert led.entries[-1].content_hash == before_hash
+        assert led.verify()["chain_intact"] is True
+
+    def test_settlement_extends_the_chain_with_a_seal_rather_than_leaving_it_unchanged(
+        self, tmp_path: Path
+    ) -> None:
+        """**Updated 2026-09-22.** This used to assert `head_hash` was byte-identical before and
+        after settling — true before the settlement-seal fix, and it was true for the wrong
+        reason: nothing committed the outcome into the chain at all, which is the real gap
+        `_check_settlement_seals` exists to close. `head_hash` moving forward here is the fix
+        working, not a regression to guard against."""
         led = _ledger(tmp_path)
         _record(led, n=0)
         _record(led, n=1)
         before = led.verify()["head_hash"]
         led.settle(1, exit_price=Decimal("230"))
-        assert led.verify()["head_hash"] == before
-        assert led.verify()["chain_intact"] is True
+        after = led.verify()
+        assert after["head_hash"] != before
+        assert after["chain_intact"] is True
+        assert len(led.seals) == 1
+        assert led.seals[0].target_seq == 1
 
 
 class TestCosts:
@@ -535,3 +555,171 @@ class TestThesisLength:
         led = _ledger(tmp_path)
         entry = _record(led)
         assert entry.thesis == "guidance cut not priced"
+
+
+class TestSettlementSeals:
+    """The fix for a real, working exploit found by adversarial testing 2026-09-22: `content_hash`
+    deliberately excludes settlement fields (`net_pnl`, `direction_correct`, ...) so that attaching
+    an outcome is not indistinguishable from tampering — correct, and documented at
+    `Entry.content_hash`. But nothing else protected those fields either. A copy of the live ledger
+    was tampered with directly on disk — bypassing `settle()` entirely, exactly what a compromised
+    host or a malicious insider with file access would do — flipping a settled decision's `net_pnl`
+    sign, and `verify()` still reported `chain_intact: True`. These tests replay that attack and
+    confirm it is now caught, then check the fix does not introduce a new failure mode of its own.
+    """
+
+    def test_tampering_with_a_settled_outcome_is_now_detected(self, tmp_path: Path) -> None:
+        """The exact exploit: edit `net_pnl` directly in the file, bypassing `settle()`."""
+        led = _ledger(tmp_path)
+        _record(led, n=0)
+        led.settle(1, exit_price=Decimal("230"))
+        assert led.verify()["chain_intact"] is True  # sealed correctly first
+
+        lines = led.path.read_text(encoding="utf-8").splitlines()
+        row = json.loads(lines[0])
+        assert row["net_pnl"] is not None
+        row["net_pnl"] = str(-abs(float(row["net_pnl"])) - 1)  # a different, wrong value
+        row["direction_correct"] = not row["direction_correct"]
+        lines[0] = json.dumps(row, separators=(",", ":"))
+        led.path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+        tampered = PaperLedger(path=led.path)
+        report = tampered.verify()
+        assert report["chain_intact"] is False
+        assert report["tampered_settlements"] == [1]
+
+    def test_tampering_with_the_seal_itself_is_also_detected(self, tmp_path: Path) -> None:
+        """The other side of the same forgery: leave the decision alone, edit the seal's committed
+        hash instead so it matches whatever fake outcome an attacker wants believed."""
+        led = _ledger(tmp_path)
+        _record(led, n=0)
+        led.settle(1, exit_price=Decimal("230"))
+
+        lines = led.path.read_text(encoding="utf-8").splitlines()
+        seal_idx = next(i for i, ln in enumerate(lines) if json.loads(ln)["kind"] == "settlement_seal")
+        seal = json.loads(lines[seal_idx])
+        seal["settlement_seal_hash"] = "0" * 16  # a fabricated hash matching nothing real
+        lines[seal_idx] = json.dumps(seal, separators=(",", ":"))
+        led.path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+        tampered = PaperLedger(path=led.path)
+        report = tampered.verify()
+        assert report["chain_intact"] is False
+        assert report["tampered_settlements"] == [1]
+
+    def test_an_unsealed_settlement_is_flagged_not_silently_trusted(self, tmp_path: Path) -> None:
+        """A decision marked settled with no seal at all — the shape a settlement performed by
+        directly editing the file (never calling `settle()`) would take."""
+        led = _ledger(tmp_path)
+        _record(led, n=0)
+        lines = led.path.read_text(encoding="utf-8").splitlines()
+        row = json.loads(lines[0])
+        row["settled_at"] = T0.isoformat()
+        row["net_pnl"] = "500.00"
+        row["direction_correct"] = True
+        lines[0] = json.dumps(row, separators=(",", ":"))
+        led.path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+        bypassed = PaperLedger(path=led.path)
+        report = bypassed.verify()
+        assert report["chain_intact"] is False
+        assert report["unsealed_settlements"] == [1]
+
+    def test_a_correctly_settled_entry_passes_with_no_false_positive(self, tmp_path: Path) -> None:
+        led = _ledger(tmp_path)
+        _record(led, n=0)
+        led.record(
+            symbol="NVDAUSDT", verdict="no_trade", side="BUY",
+            quantity=Decimal("0"), entry_price=Decimal("220"),
+            stated_confidence=0.7, thesis="not enough edge",
+            invalidation=(), market_state_hash="abc", approved_intent_hash="def",
+            session_phase="weekend", hours_to_discovery=30.5, decided_at=T0 + timedelta(hours=1),
+        )
+        led.settle(1, exit_price=Decimal("230"))
+        led.settle_abstention(2, price_now=Decimal("225"))
+        report = led.verify()
+        assert report["chain_intact"] is True
+        assert report["tampered_settlements"] == []
+        assert report["unsealed_settlements"] == []
+
+    def test_seals_never_appear_in_entries(self, tmp_path: Path) -> None:
+        """The property nine other modules read, assuming every row is a real decision — must
+        never see a seal, or every one of them starts misreading the record."""
+        led = _ledger(tmp_path)
+        _record(led, n=0)
+        led.settle(1, exit_price=Decimal("230"))
+        assert len(led.entries) == 1
+        assert all(e.kind == "decision" for e in led.entries)
+        assert len(led.seals) == 1
+        assert led.seals[0].kind == "settlement_seal"
+
+    def test_settle_abstention_also_writes_a_seal(self, tmp_path: Path) -> None:
+        led = _ledger(tmp_path)
+        led.record(
+            symbol="NVDAUSDT", verdict="no_trade", side="BUY",
+            quantity=Decimal("0"), entry_price=Decimal("220"),
+            stated_confidence=0.7, thesis="not enough edge",
+            invalidation=(), market_state_hash="abc", approved_intent_hash="def",
+            session_phase="weekend", hours_to_discovery=30.5, decided_at=T0,
+        )
+        led.settle_abstention(1, price_now=Decimal("225"))
+        assert len(led.seals) == 1
+        assert led.seals[0].target_seq == 1
+
+    def test_the_chain_walk_does_not_false_positive_with_a_seal_between_two_decisions(
+        self, tmp_path: Path
+    ) -> None:
+        """The bug caught before it shipped: `verify()`'s core link-check used to walk `entries`
+        (decisions only), which skips seals entirely — comparing decision N+1's `prev_hash` against
+        decision N's `content_hash` while a seal actually sits between them on disk. That mismatch
+        would have made `verify()` cry tampering on a chain nothing had touched."""
+        led = _ledger(tmp_path)
+        _record(led, n=0)
+        led.settle(1, exit_price=Decimal("230"))  # writes a seal between decision 1 and decision 2
+        _record(led, n=1)
+        report = led.verify()
+        assert report["chain_intact"] is True
+        assert report["links_intact"] is True
+        assert report["first_break_at"] is None
+
+    def test_removing_a_trailing_seal_is_caught_as_truncation(self, tmp_path: Path) -> None:
+        """Deleting only the seal off the end (leaving the decision it sealed untouched) must not
+        look like a clean, unmodified log — the anchor's `raw_entries` count exists for this."""
+        led = _ledger(tmp_path)
+        _record(led, n=0)
+        led.settle(1, exit_price=Decimal("230"))
+        lines = led.path.read_text(encoding="utf-8").splitlines()
+        assert json.loads(lines[-1])["kind"] == "settlement_seal"
+        led.path.write_text("\n".join(lines[:-1]) + "\n", encoding="utf-8")
+
+        truncated = PaperLedger(path=led.path)
+        report = truncated.verify()
+        assert report["truncated"] is True
+        assert report["chain_intact"] is False
+
+    def test_a_seal_s_own_content_hash_is_not_affected_by_the_unhashed_seal_field(
+        self, tmp_path: Path
+    ) -> None:
+        """`Entry.content_hash`'s own docstring promises the ORIGINAL 12-key payload is untouched
+        by this feature — checked directly rather than trusted, since a silent change here would
+        rehash all 566 real decisions and break a chain already anchored to Bitcoin."""
+        plain = Entry(
+            seq=1, decided_at=T0.isoformat(), symbol="NVDAUSDT", verdict="trade", side="BUY",
+            quantity="10", entry_price="220", stated_confidence=0.7, thesis="t",
+            invalidation=(), market_state_hash="a", approved_intent_hash="b",
+            session_phase="weekend", hours_to_discovery=1.0, entry_cost_bps="1",
+            prev_hash=GENESIS,
+        )
+        payload = {
+            "seq": plain.seq, "decided_at": plain.decided_at, "symbol": plain.symbol,
+            "verdict": plain.verdict, "side": plain.side, "quantity": plain.quantity,
+            "entry_price": plain.entry_price, "stated_confidence": plain.stated_confidence,
+            "thesis": plain.thesis, "market_state_hash": plain.market_state_hash,
+            "approved_intent_hash": plain.approved_intent_hash, "prev_hash": plain.prev_hash,
+        }
+        import hashlib
+
+        expected = hashlib.sha256(
+            json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()[:16]
+        assert plain.content_hash == expected

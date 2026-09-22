@@ -228,3 +228,61 @@ class TestItReadsWhatTheLedgerWrites:
         ]
         for name in untouched:
             assert getattr(first, name) == getattr(original[1], name), name
+
+
+class TestSealsSurviveARepair:
+    """Added 2026-09-22 alongside settlement seals themselves. `_relinked` used to operate on
+    `ledger.entries` (decisions only) — fine before seals existed, and a real data-loss bug once
+    they do: rewriting the file from a decisions-only list silently drops every seal ever written.
+    """
+
+    def test_a_seal_is_not_dropped_by_repair(self, tmp_path: Path) -> None:
+        led = _clean(tmp_path / "p.jsonl")
+        led.settle_abstention(1, price_now=Decimal("101"))
+        assert len(led.seals) == 1
+        _collide(led.path)
+        repair(led.path, reason="concurrent writers", at=WHEN)
+        after = PaperLedger(path=led.path)
+        assert len(after.seals) == 1
+
+    def test_a_seal_s_target_seq_follows_its_decision_through_renumbering(
+        self, tmp_path: Path
+    ) -> None:
+        """The collision fixture inserts a duplicate ahead of decision 4's real position, so
+        repair renumbers everything from that point on — decision 4 (originally seq 4) settles
+        to a different seq after repair, and its seal must move with it, not point at whatever
+        row ends up with the old number."""
+        led = _clean(tmp_path / "p.jsonl")
+        led.settle_abstention(4, price_now=Decimal("101"))
+        original_target = led.seals[0].target_seq
+        _collide(led.path)
+        repair(led.path, reason="concurrent writers", at=WHEN)
+        after = PaperLedger(path=led.path)
+        reseated = next(e for e in after.entries if e.thesis == "thesis 3")
+        # The collision inserts a duplicate row ahead of decision 4's real position, so repair
+        # actually does shift its seq — this assertion is only meaningful if that precondition
+        # held; otherwise the test would pass trivially without exercising the retargeting at all.
+        assert reseated.seq != original_target
+        assert after.seals[0].target_seq == reseated.seq
+
+    def test_the_repaired_chain_with_a_seal_still_verifies_as_tamper_evident(
+        self, tmp_path: Path
+    ) -> None:
+        led = _clean(tmp_path / "p.jsonl")
+        led.settle_abstention(1, price_now=Decimal("101"))
+        _collide(led.path)
+        repair(led.path, reason="concurrent writers", at=WHEN)
+        report = PaperLedger(path=led.path).verify()
+        assert report["chain_intact"] is True
+        assert report["tampered_settlements"] == []
+        assert report["unsealed_settlements"] == []
+
+    def test_seals_keep_their_own_negative_seq_space_after_repair(self, tmp_path: Path) -> None:
+        led = _clean(tmp_path / "p.jsonl")
+        led.settle_abstention(1, price_now=Decimal("101"))
+        led.settle_abstention(2, price_now=Decimal("102"))
+        _collide(led.path)
+        repair(led.path, reason="concurrent writers", at=WHEN)
+        after = PaperLedger(path=led.path)
+        assert {s.seq for s in after.seals} == {-1, -2}
+        assert all(e.seq > 0 for e in after.entries)
