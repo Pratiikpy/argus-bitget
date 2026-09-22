@@ -1941,7 +1941,7 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 139 files, 17 packages, 55,306 lines; `mypy --strict` clean on 298 source files |
+| Source modules | 139 files, 17 packages, 55,306 lines; `mypy --strict` clean on 299 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 129/129 modules importable |
 | Tests | 5,946 tests collected, 33 skipped, `ruff` clean |

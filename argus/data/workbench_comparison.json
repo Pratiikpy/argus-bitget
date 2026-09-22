@@ -1,0 +1,88 @@
+{
+  "source_breadth": {
+    "openbb_total_providers": 32,
+    "openbb_keyless_providers": 21,
+    "openbb_provider_names": [
+      "alpha_vantage",
+      "benzinga",
+      "biztoc",
+      "bls",
+      "cboe",
+      "cftc",
+      "congress_gov",
+      "deribit",
+      "ecb",
+      "econdb",
+      "eia",
+      "famafrench",
+      "federal_reserve",
+      "finra",
+      "finviz",
+      "fmp",
+      "fred",
+      "government_us",
+      "imf",
+      "intrinio",
+      "multpl",
+      "nasdaq",
+      "oecd",
+      "sec",
+      "seeking_alpha",
+      "stockgrid",
+      "tiingo",
+      "tmx",
+      "tradier",
+      "tradingeconomics",
+      "wsj",
+      "yfinance"
+    ],
+    "argus_live_sources": 12,
+    "argus_sources_answering": 12,
+    "openbb_wins_breadth": true
+  },
+  "openbb_source_read": {
+    "terms_searched": [
+      "as_of",
+      "point.in.time",
+      "look.?ahead",
+      "historical_date",
+      "backtest",
+      "cutoff"
+    ],
+    "hits": {},
+    "total_hits": 0,
+    "zero_point_in_time_representation": true
+  },
+  "point_in_time_comparison": {
+    "far_past_cutoff": "2015-01-01",
+    "n_facts_visible_far_past": 26,
+    "far_past_status": [
+      "xbrl:NVDA:EarningsPerShareDiluted: 204 fact(s) filed after as_of withheld",
+      "xbrl:NVDA:EarningsPerShareDiluted: 39 non-quarterly row(s) excluded (cumulative and annual durations sit beside the quarterly ones under the same fiscal period)",
+      "xbrl:NVDA:EarningsPerShareDiluted: 40 restated value(s) superseded by a later filing",
+      "xbrl:NVDA: eps_diluted from EarningsPerShareDiluted, 26 period(s)"
+    ],
+    "n_facts_visible_now": 67,
+    "latest_filed_now": "2026-08-26",
+    "far_past_sees_materially_fewer_facts_than_now": true,
+    "all_far_past_facts_filed_before_cutoff": true
+  },
+  "failure_cases": {
+    "latest_real_filed_date": "2026-08-26",
+    "cutoff_on_filed_day": "2026-08-26T00:00:00+00:00",
+    "cutoff_day_before": "2026-08-25T00:00:00+00:00",
+    "visible_on_filed_day": true,
+    "withheld_the_day_before": true,
+    "boundary_is_sharp": true
+  },
+  "costs": {
+    "repeats": 3,
+    "argus_as_of_gated_fetch_seconds_per_call": 0.4107340999956553,
+    "openbb_agent_real_llm_calls_per_query": 3,
+    "openbb_agent_keyless": false
+  },
+  "reproducibility": {
+    "identical": true
+  },
+  "scope_statement": "OpenBB's real agent source (openbb-agents, no LICENSE file, read not vendored) has zero representation of point-in-time correctness anywhere -- grepped exhaustively for as_of, point-in-time, look-ahead, historical_date, backtest, and cutoff, zero matches across agent.py/tools.py/chains.py/prompts.py. ARGUS's real as_of gating, run on real live SEC XBRL data, correctly includes a real fact filed the same day as the cutoff and correctly withholds it when the cutoff is one day earlier -- a real, sharp boundary check, not assumed. OpenBB genuinely wins on raw source breadth: 32 real providers (21 keyless) vs ARGUS's 12 live-verified sources, reported honestly rather than omitted. NOT claimed OpenBB's agent is broken for its own stated purpose (live research assistance) -- point-in-time gating is not a feature it claims to have. NOT claimed ARGUS's data-source breadth is competitive with OpenBB's -- it is not, and closing that gap is a separate, named, unimplemented improvement (BLS/Fama-French/CFTC per this project's own prior OpenBB audit), not claimed here. NOT claimed every real OpenBB provider was individually exercised -- the provider count is read from the real directory listing, not from running each fetcher."
+}

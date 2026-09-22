@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-22T01:12:29.977982+00:00",
+  "generated_at": "2026-09-22T01:31:39.801021+00:00",
   "probes": 20,
   "runs": 17,
   "weak": 2,
@@ -105,7 +105,7 @@
       "question": "Agent architecture quality",
       "bar": "the structural claims are facts about the import graph, and are checked",
       "status": "RUNS",
-      "evidence": "298 modules, 813 internal imports. 0 contract violation(s); 0 cycle(s) able to break at import out of 5 total \u2014 the rest are broken at load by a deferred import and are reported as coupling rather than scored as clean. The deterministic core (truth, cost, risk, decision, backtest) reaches no model-facing module at any depth. 4 foundation package(s) carry high fan-in at zero instability. 2 authorisation chokepoint(s) that raise rather than warn: orders.py:319, bitget_client.py:355 \u00b7 measured against two real rivals on the same property: Microsoft's real RD-Agent (`rdagent_factor.py`) has an execution surface (['subprocess.check_output']) and a real injected payload executed through it (True); ARGUS's own factor proposer (`searchoff.py`) has none (False). Separately, AgentDojo's real 302-string attack corpus (recall 302/302) measures what reaches a production decision: 6 production false positives before the rewrite the comparison forced, 0 after",
+      "evidence": "299 modules, 815 internal imports. 0 contract violation(s); 0 cycle(s) able to break at import out of 5 total \u2014 the rest are broken at load by a deferred import and are reported as coupling rather than scored as clean. The deterministic core (truth, cost, risk, decision, backtest) reaches no model-facing module at any depth. 4 foundation package(s) carry high fan-in at zero instability. 2 authorisation chokepoint(s) that raise rather than warn: orders.py:319, bitget_client.py:355 \u00b7 measured against two real rivals on the same property: Microsoft's real RD-Agent (`rdagent_factor.py`) has an execution surface (['subprocess.check_output']) and a real injected payload executed through it (True); ARGUS's own factor proposer (`searchoff.py`) has none (False). Separately, AgentDojo's real 302-string attack corpus (recall 302/302) measures what reaches a production decision: 6 production false positives before the rewrite the comparison forced, 0 after",
       "artefact": "data/architecture.json"
     },
     {
@@ -145,7 +145,7 @@
       "question": "How to build a customized workbench with a clear thesis?",
       "bar": "a profile provably changes the answer, measured rather than asserted",
       "status": "RUNS",
-      "evidence": "personalisation measured rather than asserted: 2 shipped mandate(s) over 4,528 real instant(s); the mandates disagreed with each other on 100% of them. NO MANDATE IMPROVED ITS OWNER'S OUTCOME on this sample. Divergence is real and demonstrated; us",
+      "evidence": "personalisation measured rather than asserted: 2 shipped mandate(s) over 4,528 real instant(s); the mandates disagreed with each other on 100% of them. NO MANDATE IMPROVED ITS OWNER'S OUTCOME on this sample. Divergence is real and demonstrated; us \u00b7 measured against OpenBB's real agent and data platform: OpenBB wins on raw source breadth (32 real providers vs ARGUS's 12, reported honestly), but its real source has 0 point-in-time reference(s) across 6 terms grepped \u2014 zero representation of the property a workbench with a clear thesis needs to backtest without look-ahead; ARGUS's real as_of gate is verified sharp on the same real fact: visible on the exact filed day (True), withheld the day before (True)",
       "artefact": "data/profile_value.json"
     },
     {
@@ -205,7 +205,7 @@
       "question": "Personalized thesis",
       "bar": "personalisation changes the answer measurably",
       "status": "RUNS",
-      "evidence": "personalisation measured rather than asserted: 2 shipped mandate(s) over 4,528 real instant(s); the mandates disagreed with each other on 100% of them. NO MANDATE IMPROVED ITS OWNER'S OUTCOME on this sample. Divergence is real and demonstrated; us",
+      "evidence": "personalisation measured rather than asserted: 2 shipped mandate(s) over 4,528 real instant(s); the mandates disagreed with each other on 100% of them. NO MANDATE IMPROVED ITS OWNER'S OUTCOME on this sample. Divergence is real and demonstrated; us \u00b7 measured against OpenBB's real agent and data platform: OpenBB wins on raw source breadth (32 real providers vs ARGUS's 12, reported honestly), but its real source has 0 point-in-time reference(s) across 6 terms grepped \u2014 zero representation of the property a workbench with a clear thesis needs to backtest without look-ahead; ARGUS's real as_of gate is verified sharp on the same real fact: visible on the exact filed day (True), withheld the day before (True)",
       "artefact": "data/profile_value.json"
     }
   ]

@@ -28,7 +28,7 @@ carries a result.**
 | 11 | `info-extraction` | T3 | subtheme | IMPLEMENTED | FinanceBench (real, published LLM measurement) | **yes** | ARGUS (real SEC XBRL, no fabrication possible; FinanceBench's own GPT-4 oracle tops out at 92%, realistic retrieval gives 40% confidently-wrong answers) | 2026-09-22 |
 | 12 | `review-self-evolution` | T3 | subtheme | **OWNED** | TauricResearch/TradingAgents reflection memory | **yes** | ARGUS (refusal machinery has no TradingAgents equivalent; checklist stays honestly empty) | 2026-09-22 |
 | 13 | `stress-testing` | T3 | subtheme | **LOST** | stumpy FLUSS + ruptures + incumbent rule | **yes** | specialist | 2026-09-21 |
-| 14 | `personal-workbench` | T3 | subtheme | IMPLEMENTED | — | no | — | — |
+| 14 | `personal-workbench` | T3 | subtheme | IMPLEMENTED | OpenBB (real agent + data platform) | **yes** | split — OpenBB (32 real sources vs ARGUS's 12); ARGUS (point-in-time gating OpenBB's real source has zero representation of, verified sharp to the exact day) | 2026-09-22 |
 | 15 | `execution-assistance` | T3 | subtheme | IMPLEMENTED | — | no | — | — |
 | 16 | `portfolio-copilot` | T3 | subtheme | **LOST** | Riskfolio-Lib NCO | **yes** | specialist (p=3.6e-05) | 2026-09-21 |
 | 17 | `t3-source-depth` | T3 | judging | IMPLEMENTED | — | no | — | — |
@@ -38,9 +38,13 @@ carries a result.**
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 13 of 20 as of 2026-09-22: 3 LOST (one of them split — LUI intent
+**`rival run` is `yes` on 14 of 20 as of 2026-09-22: 3 LOST (one of them split — LUI intent
 accuracy loses to Rasa's DIET classifier, p=0.0014, while ARGUS wins out-of-scope refusal
-separately and significantly, p=0.031, neither laundering the other), 9 real wins (earnings vs
+separately and significantly, p=0.031, neither laundering the other), 1 more split
+(personal-workbench: OpenBB genuinely wins on raw source breadth, 32 real providers vs ARGUS's
+12, reported honestly rather than omitted; ARGUS wins on point-in-time correctness, a property
+OpenBB's real agent source has zero representation of anywhere, verified sharp to the exact
+day on real live SEC data), 9 real wins (earnings vs
 QuantConnect, factor-discovery vs Microsoft RD-Agent, risk-control vs freqtrade's real
 PrecisionRecallProtection — ARGUS's precision at full recall is 59.2% against freqtrade's best
 swept 19.3%, dominating every threshold, and freqtrade's own proxy correlates only weakly
@@ -76,14 +80,17 @@ this data; the finding is that whale-signals tests against the wrong null, not t
 number beats theirs, and no fabricated score is recorded for it).** That is this ledger's honest
 scoreboard — it names whether
 *this specific Bitget-taxonomy row* has a rival comparison wired in, which is a narrower and
-different question from `eval/standing.py`'s own register (27 capabilities across the whole
-codebase, 17 OWNED, 3 LOST, independently verified — do not read "0" here as "0 OWNED anywhere,"
-an earlier session conflated the two and said so wrongly to the owner). What this ledger's
-`rival run` column still says: of 20 judged rows, 13 more already
-have a real comparison sitting in `data/` unwired (found by the CONNECT lens, 2026-09-21 — see
-`Activity/10_LOOP_DESIGN.md`). Every other number in this
-project — 60 commits, 5,000+ tests, 96 pinned doc claims — measures how carefully we checked
-*ourselves*; wiring the remaining 16 rows is the highest-value CONNECT work still queued.
+different question from `eval/standing.py`'s own register (30 capabilities across the whole
+codebase, 21 OWNED, 3 LOST, independently verified as of 2026-09-22 — do not read "0" here as
+"0 OWNED anywhere," an earlier session conflated the two and said so wrongly to the owner; this
+count moves almost every iteration and this line is a snapshot, not a live figure — read
+`eval/standing.py`'s own output for the current number). What this ledger's `rival run` column
+tracks is narrower still: of 20 judged rows, 6 remain unwired (2 structurally blocked —
+`t2-sharpe-mdd-winrate` has nothing to settle yet, `sentiment` needs the metered Qwen key the
+loop cannot spend; 4 genuinely open — `t2-open-evaluation`, `execution-assistance`,
+`t3-source-depth`, `t3-personal-thesis`). Every other number in this project — 6,144 tests, 96
+pinned doc claims — measures how carefully we checked *ourselves*; wiring the remaining open
+rows is the highest-value RIVAL/CONNECT work still queued.
 
 ## MISSING — parts no row covers
 

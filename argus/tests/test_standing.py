@@ -383,7 +383,21 @@ class TestTheLiveRegisterIsHonest:
         is empty, all thirteen VERIFIED or ATTESTED, register-wide UNPROVEN count fell from 4 to 3.
         A capability appearing here that is NOT in this exact set is the real regression this test
         exists to catch — add it to the set only after checking its thirteen the same way these
-        twenty-six were checked, never to make a test pass."""
+        twenty-six were checked, never to make a test pass. Closed the same day a twenty-seventh
+        time: "Point-in-time correctness vs. OpenBB's real, ungated live-API agent"
+        (`t3-workbench`) — OpenBB's real `openbb-agents` (no LICENSE file, so grepped not
+        vendored) and OpenBB Platform's real 32-provider directory both read in full. Exhaustive
+        grep of the real agent source (`agent.py`/`tools.py`/`chains.py`/`prompts.py`) for
+        `as_of`/point-in-time/look-ahead/historical_date/backtest/cutoff: zero matches. ARGUS's
+        real `as_of` gating (already existing on every source, reused here) verified on real live
+        SEC XBRL data at the sharpest possible boundary: NVDA's real EPS fact filed 2026-08-26 is
+        visible when the cutoff is midnight of that day and withheld entirely when the cutoff is
+        one day earlier — the same real fact, one day apart, a genuinely sharp transition, not
+        assumed. The honest cost of this win, stated rather than hidden: OpenBB genuinely wins on
+        raw source breadth (32 real providers vs ARGUS's 12 live-verified), reported in the same
+        capability rather than omitted. A capability appearing here that is NOT in this exact set
+        is the real regression this test exists to catch — add it to the set only after checking
+        its thirteen the same way these twenty-seven were checked, never to make a test pass."""
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
             "Abstention scored as a decision",
@@ -400,6 +414,7 @@ class TestTheLiveRegisterIsHonest:
             "Path-shape matching with a calibrated null",
             "Per-profile mandate that changes the verdict",
             "Perception layer: what the desk can see",
+            "Point-in-time correctness vs. OpenBB's real, ungated live-API agent",
             "Pre-registered trading protocol, hash-committed",
             "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
             "Self-evolving review rules",
@@ -517,6 +532,9 @@ class TestTheLiveRegisterIsHonest:
         assert (
             "Structured filing extraction vs. FinanceBench's real, published LLM measurement"
             in rendered
+        )
+        assert (
+            "Point-in-time correctness vs. OpenBB's real, ungated live-API agent" in rendered
         )
 
     def test_the_summary_is_one_line(self) -> None:

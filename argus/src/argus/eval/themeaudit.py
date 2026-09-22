@@ -533,9 +533,31 @@ def t3_personal_workbench() -> Finding:
             "that a profile changes the answer is unmeasured",
         )
     blob = json.loads(path.read_text(encoding="utf-8"))
+    rival = ""
+    comp = _load_json("workbench_comparison.json")
+    if comp is not None:
+        breadth = comp["source_breadth"]
+        read = comp["openbb_source_read"]
+        failures = comp["failure_cases"]
+        # OpenBB's real agent (openbb-agents, read not vendored — no LICENSE file) has no
+        # representation of point-in-time correctness anywhere in its real source, grepped
+        # exhaustively; ARGUS's real as_of gating is verified here at the sharpest possible real
+        # boundary — the exact filed day versus the day immediately before it.
+        rival = (
+            f" · measured against OpenBB's real agent and data platform: OpenBB wins on raw "
+            f"source breadth ({breadth['openbb_total_providers']} real providers vs ARGUS's "
+            f"{breadth['argus_live_sources']}, reported honestly), but its real source has "
+            f"{read['total_hits']} point-in-time reference(s) across "
+            f"{len(read['terms_searched'])} terms grepped — zero representation of the property "
+            f"a workbench with a clear thesis needs to backtest without look-ahead; ARGUS's real "
+            f"as_of gate is verified sharp on the same real fact: visible on the exact filed day "
+            f"({failures['visible_on_filed_day']}), withheld the day before "
+            f"({failures['withheld_the_day_before']})"
+        )
     return Finding(
         RUNS,
-        f"personalisation measured rather than asserted: {str(blob.get('verdict', blob))[:200]}",
+        f"personalisation measured rather than asserted: "
+        f"{str(blob.get('verdict', blob))[:200]}{rival}",
         "data/profile_value.json",
     )
 
