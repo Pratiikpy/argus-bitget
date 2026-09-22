@@ -1,6 +1,6 @@
 {
   "symbol": "NVDAUSDT",
-  "checked_at": "2026-09-22T01:53:50.234197+00:00",
+  "checked_at": "2026-09-22T02:01:05.268353+00:00",
   "skills_available": [
     "macro-analyst",
     "market-intel",
@@ -12,13 +12,18 @@
     "technical-analysis"
   ],
   "skills_reachable": [
+    "macro-analyst",
+    "market-intel",
+    "news-briefing",
+    "sentiment-analyst",
     "technical-analysis"
   ],
   "tools_probed": 19,
   "tools_answered": 6,
   "by_health": {
     "ok": 6,
-    "timeout": 13
+    "empty": 10,
+    "tool_error": 3
   },
   "results": [
     {
@@ -28,8 +33,8 @@
       "yields": "momentum: RSI(14) with an overbought/oversold reading",
       "health": "ok",
       "detail": "bitget:technical_analysis: ok",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
-      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"rsi\": 79.38, \"period\": 14, \"signal\": \"overbought\"}"
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"rsi\": 79.49, \"period\": 14, \"signal\": \"overbought\"}"
     },
     {
       "skill": "technical-analysis",
@@ -38,8 +43,8 @@
       "yields": "trend: MACD line, signal line and the cross",
       "health": "ok",
       "detail": "bitget:technical_analysis: ok",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
-      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"macd\": 2.081691, \"signal\": 0.447041, \"histogram\": 1.63465, \"cross\": \"golden_cross\"}"
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"macd\": 2.08568, \"signal\": 0.450231, \"histogram\": 1.635448, \"cross\": \"golden_cross\"}"
     },
     {
       "skill": "technical-analysis",
@@ -48,8 +53,8 @@
       "yields": "volatility: ATR and a suggested stop distance",
       "health": "ok",
       "detail": "bitget:technical_analysis: ok",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
-      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"atr\": 1.4269, \"atr_pct\": 0.63, \"suggested_stop\": 225.5597, \"period\": 14}"
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"atr\": 1.4269, \"atr_pct\": 0.63, \"suggested_stop\": 225.6197, \"period\": 14}"
     },
     {
       "skill": "technical-analysis",
@@ -58,8 +63,8 @@
       "yields": "volatility envelope: Bollinger bands",
       "health": "ok",
       "detail": "bitget:technical_analysis: ok",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
-      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"upper\": 218.3038, \"middle\": 223.5314, \"lower\": 228.759, \"bandwidth\": -0.0468, \"pct_b\": 0.1013, \"position\": \"above_upper\"}"
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"upper\": 218.2951, \"middle\": 223.535, \"lower\": 228.7749, \"bandwidth\": -0.0469, \"pct_b\": 0.0978, \"position\": \"above_upper\"}"
     },
     {
       "skill": "technical-analysis",
@@ -68,8 +73,8 @@
       "yields": "structure: nearby support and resistance levels",
       "health": "ok",
       "detail": "bitget:technical_analysis: ok",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
-      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"supports\": [], \"resistances\": [], \"current_price\": 227.69}"
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"supports\": [], \"resistances\": [], \"current_price\": 227.76}"
     },
     {
       "skill": "technical-analysis",
@@ -78,17 +83,17 @@
       "yields": "trend: moving averages",
       "health": "ok",
       "detail": "bitget:technical_analysis: ok",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
-      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"price\": 227.69, \"ma7\": 225.7, \"ma25\": 222.7332, \"ma99\": 221.5698, \"trend\": \"bull\"}"
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"price\": 227.76, \"ma7\": 225.71, \"ma25\": 222.736, \"ma99\": 221.5705, \"trend\": \"bull\"}"
     },
     {
       "skill": "sentiment-analyst",
       "tool": "sentiment_index",
       "action": "current",
       "yields": "crowd mood: the Fear & Greed index",
-      "health": "timeout",
-      "detail": "bitget:sentiment_index: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "empty",
+      "detail": "bitget:sentiment_index: reachable, returned no data; upstream returned only an error envelope",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     },
     {
@@ -96,9 +101,9 @@
       "tool": "derivatives_sentiment",
       "action": "long_short",
       "yields": "positioning: the long/short account ratio",
-      "health": "timeout",
-      "detail": "bitget:derivatives_sentiment: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "empty",
+      "detail": "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     },
     {
@@ -106,9 +111,9 @@
       "tool": "derivatives_sentiment",
       "action": "open_interest",
       "yields": "positioning: open interest",
-      "health": "timeout",
-      "detail": "bitget:derivatives_sentiment: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "empty",
+      "detail": "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     },
     {
@@ -116,9 +121,9 @@
       "tool": "derivatives_sentiment",
       "action": "taker_ratio",
       "yields": "pressure: the taker buy/sell ratio",
-      "health": "timeout",
-      "detail": "bitget:derivatives_sentiment: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "empty",
+      "detail": "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     },
     {
@@ -126,9 +131,9 @@
       "tool": "macro_indicators",
       "action": "latest_release",
       "yields": "macro: the most recent scheduled economic release",
-      "health": "timeout",
-      "detail": "bitget:macro_indicators: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "empty",
+      "detail": "bitget:macro_indicators: reachable, returned no data; upstream returned only an error envelope",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     },
     {
@@ -136,9 +141,9 @@
       "tool": "rates_yields",
       "action": "yield_curve",
       "yields": "macro: the US Treasury yield curve",
-      "health": "timeout",
-      "detail": "bitget:rates_yields: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "empty",
+      "detail": "bitget:rates_yields: ok; answered with a hollow payload (every leg error or zero)",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     },
     {
@@ -146,9 +151,9 @@
       "tool": "cross_asset",
       "action": "correlation",
       "yields": "macro: rolling correlation of BTC against equities, gold and the dollar",
-      "health": "timeout",
-      "detail": "bitget:cross_asset: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "tool_error",
+      "detail": "bitget:cross_asset: tool reported an error (Error executing tool cross_asset: )",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     },
     {
@@ -156,9 +161,9 @@
       "tool": "global_assets",
       "action": "price",
       "yields": "the anchor equity's own price, which is what an rToken tracks",
-      "health": "timeout",
-      "detail": "bitget:global_assets: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "tool_error",
+      "detail": "bitget:global_assets: tool reported an error (Error executing tool global_assets: )",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     },
     {
@@ -166,9 +171,9 @@
       "tool": "news_feed",
       "action": "latest",
       "yields": "narrative: aggregated headlines across 44 feeds",
-      "health": "timeout",
-      "detail": "bitget:news_feed: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "empty",
+      "detail": "bitget:news_feed: reachable, returned no data",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     },
     {
@@ -176,9 +181,9 @@
       "tool": "tradfi_news",
       "action": "earnings",
       "yields": "the earnings calendar, which dates the next scheduled catalyst",
-      "health": "timeout",
-      "detail": "bitget:tradfi_news: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "empty",
+      "detail": "bitget:tradfi_news: reachable, returned no data; upstream returned only an error envelope",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     },
     {
@@ -186,9 +191,9 @@
       "tool": "defi_analytics",
       "action": "tvl_rank",
       "yields": "capital: DeFi TVL rankings",
-      "health": "timeout",
-      "detail": "bitget:defi_analytics: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "empty",
+      "detail": "bitget:defi_analytics: ok; upstream returned only an error envelope",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     },
     {
@@ -196,9 +201,9 @@
       "tool": "network_status",
       "action": "eth_gas",
       "yields": "chain load: Ethereum gas",
-      "health": "timeout",
-      "detail": "bitget:network_status: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "empty",
+      "detail": "bitget:network_status: ok; upstream returned only an error envelope",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     },
     {
@@ -206,9 +211,9 @@
       "tool": "crypto_market",
       "action": "trending",
       "yields": "attention: trending coins",
-      "health": "timeout",
-      "detail": "bitget:crypto_market: unavailable (TimeoutError)",
-      "checked_at": "2026-09-22T01:53:50.234197+00:00",
+      "health": "tool_error",
+      "detail": "bitget:crypto_market: tool reported an error (Error executing tool crypto_market: ConnectTimeout(''))",
+      "checked_at": "2026-09-22T02:01:05.268353+00:00",
       "sample": null
     }
   ]

@@ -22,6 +22,7 @@ from typing import Any, ClassVar
 import pytest
 
 from argus.market.skills import (
+    DEFAULT_TIMEOUT,
     PROBES,
     RSI_AGREEMENT_POINTS,
     SKILLS,
@@ -32,6 +33,7 @@ from argus.market.skills import (
     cross_check_rsi,
     evidence,
     hollow,
+    main,
     probe,
     rsi,
 )
@@ -45,11 +47,13 @@ class FakeClient:
     def __init__(self, table: dict[str, tuple[Any, str]]) -> None:
         self.table = table
         self.calls: list[tuple[str, dict[str, Any]]] = []
+        self.timeouts: list[int] = []
 
     def call(
         self, tool: str, args: dict[str, Any], *, timeout: int = 20
     ) -> tuple[Any, str]:
         self.calls.append((tool, args))
+        self.timeouts.append(timeout)
         return self.table.get(tool, (None, f"bitget:{tool}: unavailable (TimeoutError)"))
 
 
@@ -312,3 +316,49 @@ class TestTheReportIsAnArtefact:
         row = ToolHealth(probe=PROBES[0], health=Health.OK, detail="ok",
                          payload={"rsi": 1}, checked_at=AT.isoformat())
         assert row.as_dict()["yields"] == PROBES[0].yields
+
+
+class _FakeSkillSourceFactory:
+    """Constructed with no args, like the real `BitgetSkillSource` — every call is recorded and
+    times out harmlessly, so the test only inspects the timeout value threaded through."""
+
+    instances: ClassVar[list[_FakeSkillSourceFactory]] = []
+
+    def __init__(self) -> None:
+        self.timeouts: list[int] = []
+        _FakeSkillSourceFactory.instances.append(self)
+
+    def call(self, tool: str, args: dict[str, Any], *, timeout: int = 20) -> tuple[Any, str]:
+        self.timeouts.append(timeout)
+        return None, f"bitget:{tool}: unavailable (TimeoutError)"
+
+
+class TestMainThreadsTheCorrectTimeoutDefault:
+    """Regression test. `main()`'s own `--timeout` default once silently drifted to a stale 12,
+    disconnected from :data:`DEFAULT_TIMEOUT` (45) this module raised and documented why — the
+    drift misclassified every slow-but-alive upstream as TIMEOUT for a real sweep (2026-09-22)
+    before being caught and fixed. `main()` had no test at all before this, which is exactly how
+    that kind of drift hides."""
+
+    def test_the_cli_default_matches_the_modules_own_constant(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+    ) -> None:
+        _FakeSkillSourceFactory.instances.clear()
+        monkeypatch.setattr("argus.market.evidence.BitgetSkillSource", _FakeSkillSourceFactory)
+        out = tmp_path / "health.json"
+        main(["--out", str(out)])
+        assert _FakeSkillSourceFactory.instances
+        used = _FakeSkillSourceFactory.instances[0].timeouts
+        assert used
+        assert all(t == DEFAULT_TIMEOUT for t in used)
+
+    def test_an_explicit_timeout_flag_still_overrides_it(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+    ) -> None:
+        _FakeSkillSourceFactory.instances.clear()
+        monkeypatch.setattr("argus.market.evidence.BitgetSkillSource", _FakeSkillSourceFactory)
+        out = tmp_path / "health.json"
+        main(["--timeout", "7", "--out", str(out)])
+        used = _FakeSkillSourceFactory.instances[0].timeouts
+        assert used
+        assert all(t == 7 for t in used)

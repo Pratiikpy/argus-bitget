@@ -508,11 +508,18 @@ def cross_check_rsi(
     )
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     """Sweep the official Skill surface and write the health report beside the ledger.
 
     Separate from the decision cycle on purpose: a sweep pays a full timeout for every dead
     upstream, and the cycle reads the result rather than repeating the measurement.
+
+    ``argv`` defaults to ``None`` (real ``sys.argv``) so tests can pass ``[]`` and assert on the
+    parsed ``--timeout`` default without touching the network — the reason this parameter exists
+    at all is that the default silently drifted to a stale, too-short 12 once before (this
+    module's own :data:`DEFAULT_TIMEOUT` was raised to 45 and documented why, but nothing kept
+    this CLI's own default in sync with it), and an untestable ``main()`` is exactly how that kind
+    of drift hides.
     """
     import argparse
     from datetime import UTC
@@ -521,12 +528,12 @@ def main() -> int:
 
     parser = argparse.ArgumentParser(description="Probe Bitget's official research Skills.")
     parser.add_argument("--symbol", default="NVDAUSDT")
-    parser.add_argument("--timeout", type=int, default=12)
+    parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT)
     parser.add_argument(
         "--out", type=Path,
         default=Path(__file__).resolve().parents[3] / "data" / "bitget_skills_health.json",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     report = probe(
         BitgetSkillSource(), symbol=args.symbol, at=datetime.now(UTC), timeout=args.timeout
