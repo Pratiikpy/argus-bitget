@@ -1064,9 +1064,21 @@ This is where ARGUS is furthest ahead of the field, and it is where we recommend
 **The ledger is the foundation.** Every decision is written before its outcome exists, with the
 evidence, the hurdle, the session, the stated confidence, the thesis and the invalidation
 conditions. Each row carries the hash of the previous one, so editing any historical row breaks
-every hash after it. Settlement fields are deliberately excluded from the hash, which is why
+every hash after it. Settlement fields are deliberately excluded from that hash, which is why
 attaching an outcome later does not invalidate the chain — and also why a settled outcome can never
 rewrite the decision it settles.
+
+**That exclusion was tested adversarially, and it found a real gap.** Excluding settlement fields
+from the decision's own hash is correct — but on 2026-09-22 we copied the live ledger, edited a
+settled decision's P&L directly in the file (bypassing the code path entirely, exactly what a
+compromised host or a malicious insider with file access would do), and the chain still verified as
+intact. A settled outcome could be silently rewritten after the fact, undetected. Fixed with a
+second, independent mechanism: attaching an outcome now also commits a separately chain-linked
+"settlement seal," so editing a trade's recorded P&L after the fact breaks that seal's own link the
+same way editing a decision breaks the main chain. All 531 real decisions already settled at the
+time were backfilled — honestly caveated as proving unchanged since the backfill, not since the
+original settlement, since nothing committed to those specific outcomes at the time. Every decision
+settled from that date on carries the real, contemporaneous guarantee.
 
 **Truncation is detectable.** A hash chain proves what is present is unedited and says nothing about
 what was *removed*. We found that by deleting the last seven entries and watching the chain verify
@@ -1941,7 +1953,7 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 139 files, 17 packages, 55,306 lines; `mypy --strict` clean on 301 source files |
+| Source modules | 302 files, 21 packages, 116,426 lines; `mypy --strict` clean on 302 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 129/129 modules importable |
 | Tests | 5,946 tests collected, 33 skipped, `ruff` clean |
