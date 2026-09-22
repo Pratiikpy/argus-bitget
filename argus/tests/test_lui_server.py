@@ -314,3 +314,23 @@ class TestTheLossesPage:
     def test_it_does_not_claim_completeness(self, base_url: str) -> None:
         _, raw, _ = _get(base_url + "/wrong")
         assert "not everything wrong" in raw.decode("utf-8").lower()
+
+    def test_not_owned_counts_lost_and_tied_not_only_implemented(self, tmp_path) -> None:
+        """Regression: the prior version read only `by_state["implemented"]` for the numerator, so
+        a capability that had been measured and demonstrably LOST to a named specialist silently
+        vanished from "cannot claim OWNED" instead of being the clearest possible example of it —
+        on the one page whose entire purpose is not rounding up. Found 2026-09-22 driving the
+        deployed page as a real user: it read "7 of 28" while the live register was "6 of 31"."""
+        from argus.lui.corrections_page import collect
+
+        (tmp_path / "standing.json").write_text(
+            json.dumps({
+                "by_state": {"owned": 2, "implemented": 1, "lost": 1, "tied": 0},
+                "findings": [],
+            }),
+            encoding="utf-8",
+        )
+        found = collect(tmp_path)
+        matches = [c for c in found if "cannot claim OWNED" in c.headline]
+        assert len(matches) == 1
+        assert "2 of 4 capabilities cannot claim OWNED" in matches[0].headline

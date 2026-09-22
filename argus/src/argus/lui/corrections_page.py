@@ -163,10 +163,17 @@ def collect(data_dir: Path) -> list[Correction]:
         findings = standing.get("findings", [])
         unproven = [f for f in findings if "unproven" in str(f).lower()] or findings
         by_state = standing.get("by_state", {})
+        # Every state but OWNED cannot claim OWNED — LOST and TIED, not only IMPLEMENTED. The
+        # prior version read only by_state["implemented"], so a capability that had been measured
+        # and demonstrably LOST to a named specialist silently vanished from this count instead of
+        # being the clearest possible example of it — on the one page whose entire purpose is not
+        # rounding up. Found 2026-09-22 driving the deployed page as a real user.
+        total_capabilities = sum(int(v) for v in by_state.values()) if by_state else 0
+        not_owned = total_capabilities - int(by_state.get("owned", 0)) if by_state else "?"
         out.append(Correction(
             headline=(
-                f"{by_state.get('implemented', '?')} of "
-                f"{sum(int(v) for v in by_state.values()) if by_state else '?'} capabilities "
+                f"{not_owned} of "
+                f"{total_capabilities if by_state else '?'} capabilities "
                 f"cannot claim OWNED, and the register prints why"
             ),
             detail=(
