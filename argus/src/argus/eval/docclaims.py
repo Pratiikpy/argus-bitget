@@ -336,11 +336,22 @@ def break_even_at_the_actual_hurdle() -> float:
 
 
 def ledger_decisions() -> int:
-    """Decisions on the paper ledger. The number the status block quotes."""
+    """Decisions on the paper ledger. The number the status block quotes.
+
+    **Filters `kind == "decision"`, added 2026-09-22.** A raw line count used to be exactly the
+    decision count, and stopped being one the moment `paper/ledger.py` grew a second row kind,
+    `"settlement_seal"` — every settled trade now writes one extra line that is not a decision. A
+    row with no `"kind"` key at all (every line written before that field existed) defaults to
+    `"decision"`, matching `Entry`'s own dataclass default exactly, so old rows are counted
+    exactly as they always were.
+    """
     path = DATA / "paper_ledger.jsonl"
     if not path.exists():
         return 0
-    return sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
+    return sum(
+        1 for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and json.loads(line).get("kind", "decision") == "decision"
+    )
 
 
 def settled_trades() -> int:
@@ -504,8 +515,14 @@ def subtheme_count() -> int:
 
 
 def ledger_entries() -> int:
+    """Same `kind == "decision"` filter as `ledger_decisions` — see its docstring. Two functions
+    computing the identical count because two different claim regexes already existed for it
+    before this fix; not worth collapsing to one for this change alone."""
     path = DATA / "paper_ledger.jsonl"
-    return sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
+    return sum(
+        1 for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and json.loads(line).get("kind", "decision") == "decision"
+    )
 
 
 def settled_abstentions() -> int:

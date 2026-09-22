@@ -169,7 +169,7 @@ def training_rows() -> tuple[list[str], list[str]]:
     return texts, labels
 
 
-def balance_oos_by_language(rows: Sequence[dict]) -> list[dict]:
+def balance_oos_by_language(rows: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
     """Downsample every language group to the smallest group's size — see ``OOS_BALANCE_SEED``.
 
     Deterministic (seeded `random.Random`, sorted group order) so re-running training on the same
@@ -177,8 +177,8 @@ def balance_oos_by_language(rows: Sequence[dict]) -> list[dict]:
     subset each fit. A row with no ``lang`` field is kept untouched and unbalanced against, since
     there is nothing to balance it relative to.
     """
-    by_lang: dict[str, list[dict]] = {}
-    unlabelled: list[dict] = []
+    by_lang: dict[str, list[dict[str, Any]]] = {}
+    unlabelled: list[dict[str, Any]] = []
     for row in rows:
         lang = row.get("lang")
         if lang is None:
@@ -189,7 +189,7 @@ def balance_oos_by_language(rows: Sequence[dict]) -> list[dict]:
         return list(rows)
     target = min(len(group) for group in by_lang.values())
     rng = random.Random(OOS_BALANCE_SEED)
-    balanced: list[dict] = []
+    balanced: list[dict[str, Any]] = []
     for lang in sorted(by_lang):
         group = by_lang[lang]
         balanced.extend(group if len(group) <= target else rng.sample(group, target))
