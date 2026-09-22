@@ -26,37 +26,37 @@
     "sweep": [
       {
         "threshold": 0.14,
-        "correct": 343,
-        "accuracy": 0.7921,
-        "confidently_wrong": 56,
+        "correct": 352,
+        "accuracy": 0.8129,
+        "confidently_wrong": 61,
         "out_of_scope_recall": 0.9286
       },
       {
         "threshold": 0.16,
-        "correct": 329,
-        "accuracy": 0.7598,
-        "confidently_wrong": 47,
+        "correct": 339,
+        "accuracy": 0.7829,
+        "confidently_wrong": 48,
         "out_of_scope_recall": 1.0
       },
       {
         "threshold": 0.18,
-        "correct": 313,
-        "accuracy": 0.7229,
-        "confidently_wrong": 29,
+        "correct": 316,
+        "accuracy": 0.7298,
+        "confidently_wrong": 28,
         "out_of_scope_recall": 1.0
       },
       {
         "threshold": 0.2,
-        "correct": 270,
-        "accuracy": 0.6236,
-        "confidently_wrong": 14,
+        "correct": 273,
+        "accuracy": 0.6305,
+        "confidently_wrong": 16,
         "out_of_scope_recall": 1.0
       },
       {
         "threshold": 0.25,
-        "correct": 188,
-        "accuracy": 0.4342,
-        "confidently_wrong": 4,
+        "correct": 194,
+        "accuracy": 0.448,
+        "confidently_wrong": 3,
         "out_of_scope_recall": 1.0
       }
     ],
@@ -79,20 +79,20 @@
     {
       "layer": "ngram",
       "total": 293,
-      "answered": 269,
-      "correct": 231,
+      "answered": 276,
+      "correct": 238,
       "confidently_wrong": 38,
-      "accuracy": 0.7884,
-      "coverage": 0.9181
+      "accuracy": 0.8123,
+      "coverage": 0.942
     },
     {
       "layer": "cascade",
       "total": 293,
-      "answered": 270,
-      "correct": 228,
-      "confidently_wrong": 42,
-      "accuracy": 0.7782,
-      "coverage": 0.9215
+      "answered": 274,
+      "correct": 233,
+      "confidently_wrong": 41,
+      "accuracy": 0.7952,
+      "coverage": 0.9352
     }
   ],
   "by_language": {
@@ -138,24 +138,24 @@
       "ngram": {
         "layer": "ngram",
         "total": 188,
-        "answered": 171,
-        "correct": 151,
+        "answered": 178,
+        "correct": 158,
         "confidently_wrong": 20,
-        "accuracy": 0.8032,
-        "coverage": 0.9096
+        "accuracy": 0.8404,
+        "coverage": 0.9468
       },
       "cascade": {
         "layer": "cascade",
         "total": 188,
-        "answered": 175,
-        "correct": 152,
-        "confidently_wrong": 23,
-        "accuracy": 0.8085,
-        "coverage": 0.9309
+        "answered": 179,
+        "correct": 157,
+        "confidently_wrong": 22,
+        "accuracy": 0.8351,
+        "coverage": 0.9521
       }
     }
   },
   "cascade_dominates_incumbent": false,
-  "headline": "On 293 questions nothing here was tuned against, the deployed regex layer answers 77 correctly with 21 confident errors; the cascade answers 228 correctly with 42.",
+  "headline": "On 293 questions nothing here was tuned against, the deployed regex layer answers 77 correctly with 21 confident errors; the cascade answers 233 correctly with 41.",
   "scope_statement": "Every layer is scored on the same 192 questions, through the same entry points the console uses, with a fixed clock. Accuracy is over everything asked, not over everything answered, and the confident-error count is printed beside it because a layer that answers more is not thereby better. NOT CLAIMED: that 192 generated questions are a benchmark \u2014 they come from one model family, and real users will phrase things it never produced. NOT CLAIMED: that this measures the answer text; it measures which intent is reached, and reaching the right intent is necessary rather than sufficient. NOT CLAIMED: coverage of integrity, risk_control, order or market \u2014 the pool does not carry them, so the regex layer remains the only thing answering those four and is not measured here on them."
 }

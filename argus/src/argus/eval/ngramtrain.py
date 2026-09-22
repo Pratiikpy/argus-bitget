@@ -46,6 +46,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
@@ -87,6 +88,28 @@ with a new number to defend."""
 ABSTAIN_THRESHOLD = 0.15
 """See the module docstring. Fixed by a rule stated before the sweep, not picked from the table —
 re-derived, by the same rule, when the classifier head changed on 2026-09-22."""
+
+OOS_BALANCE_SEED = 20260922
+"""Downsampling the majority-language out-of-scope negatives is a training-time choice, not a
+dataset edit, so it needs its own seed rather than reusing the pool split's 20260921 — the two
+are picked independently and neither should silently move if the other changes.
+
+**Why this exists.** `data/oblique_out_of_scope.json` carries 40 English negatives and 60 Chinese
+ones — nobody chose that 40/60 split on purpose, it is just how many rows each language's authoring
+pass produced. Training on it unbalanced teaches the model "out-of-scope" partly as a proxy for
+"is this Chinese", which is exactly backwards: `data/oblique_pool.json`'s *in-scope* pool is close
+to 50/50 EN/ZH (192/192 before any split), so a Chinese question is not inherently more likely to
+be out-of-scope than an English one.
+
+**Measured, not assumed.** Out-of-fold 5-fold CV on the dev half, 5 fold-split seeds, holding
+everything else fixed (`LinearSVC(C=5.0, class_weight="balanced")`, same features): downsampling
+the 60 Chinese negatives to 40 (matching English) cut the rate at which genuine Chinese in-scope
+questions are wrongly refused as out-of-scope from 14.2% to 8.4% (66/465 to 39/465 held-out
+predictions), paired McNemar exact test b=28 (current wrong, balanced right) vs c=1 (the reverse),
+p<0.0001 — not a coincidence of one split. Overall CV accuracy was unaffected (78.5% vs 78.7%,
+within noise). This is the "genuinely different algorithmic idea" the 2026-09-22 rival-lens pass
+went looking for: not more evidence, a training-distribution fix for a mechanism the earlier
+`t3-lui` write-up had named as a hypothesis (`eval/standing.py`) but never actually tested."""
 
 EXCLUDED_LABELS = frozenset({
     "unknown", "ambiguous", "unsupported", "integrity", "risk_control", "order", "market",
@@ -140,10 +163,37 @@ def training_rows() -> tuple[list[str], list[str]]:
     # `eval/ngrambench.py` will simply report the recall that produces.
     if OOS_PATH.exists():
         negatives = json.loads(OOS_PATH.read_text(encoding="utf-8"))
-        for row in negatives["rows"]:
+        for row in balance_oos_by_language(negatives["rows"]):
             texts.append(row["ask"])
             labels.append(OUT_OF_SCOPE_LABEL)
     return texts, labels
+
+
+def balance_oos_by_language(rows: Sequence[dict]) -> list[dict]:
+    """Downsample every language group to the smallest group's size — see ``OOS_BALANCE_SEED``.
+
+    Deterministic (seeded `random.Random`, sorted group order) so re-running training on the same
+    `oblique_out_of_scope.json` always drops the identical rows rather than a different random
+    subset each fit. A row with no ``lang`` field is kept untouched and unbalanced against, since
+    there is nothing to balance it relative to.
+    """
+    by_lang: dict[str, list[dict]] = {}
+    unlabelled: list[dict] = []
+    for row in rows:
+        lang = row.get("lang")
+        if lang is None:
+            unlabelled.append(row)
+        else:
+            by_lang.setdefault(lang, []).append(row)
+    if not by_lang:
+        return list(rows)
+    target = min(len(group) for group in by_lang.values())
+    rng = random.Random(OOS_BALANCE_SEED)
+    balanced: list[dict] = []
+    for lang in sorted(by_lang):
+        group = by_lang[lang]
+        balanced.extend(group if len(group) <= target else rng.sample(group, target))
+    return balanced + unlabelled
 
 
 def fit(texts: Sequence[str], labels: Sequence[str]) -> Any:
