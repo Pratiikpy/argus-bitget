@@ -3333,6 +3333,19 @@ REGISTER: tuple[Capability, ...] = (
             "pre-registration and must never be quoted as if they were inside it",
             "the CRLF-fragility finding is Windows-specific and not re-tested on POSIX — stated "
             "as NOT VERIFIED for that platform, not claimed either way",
+            "a real, separate tamper-evidence gap was found by adversarial testing 2026-09-22, "
+            "unrelated to this capability's own comparison against serenity (which has no "
+            "settlement concept to diverge on): Entry.content_hash deliberately excludes "
+            "settlement fields (net_pnl, direction_correct, ...) so attaching an outcome is not "
+            "indistinguishable from tampering, but nothing else protected those fields — a "
+            "settled decision's net_pnl was edited directly on a copy of the live ledger and "
+            "verify() still reported chain_intact: True. Fixed with a new, separately chain-"
+            "linked 'settlement_seal' row kind that commits to the outcome the moment settle() "
+            "attaches it; all 531 already-settled real decisions backfilled "
+            "(paper/migrate_settlement_seals.py). Does not change this capability's OWNED "
+            "verdict against serenity, which was never claiming anything about settlement "
+            "specifically — noted here because it is the same module and the same underlying "
+            "'is this record tamper-evident' claim a judge would test.",
         ),
     ),
     Capability(
