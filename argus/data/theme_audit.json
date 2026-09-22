@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-22T01:31:39.801021+00:00",
+  "generated_at": "2026-09-22T01:49:50.858565+00:00",
   "probes": 20,
   "runs": 17,
   "weak": 2,
@@ -105,7 +105,7 @@
       "question": "Agent architecture quality",
       "bar": "the structural claims are facts about the import graph, and are checked",
       "status": "RUNS",
-      "evidence": "299 modules, 815 internal imports. 0 contract violation(s); 0 cycle(s) able to break at import out of 5 total \u2014 the rest are broken at load by a deferred import and are reported as coupling rather than scored as clean. The deterministic core (truth, cost, risk, decision, backtest) reaches no model-facing module at any depth. 4 foundation package(s) carry high fan-in at zero instability. 2 authorisation chokepoint(s) that raise rather than warn: orders.py:319, bitget_client.py:355 \u00b7 measured against two real rivals on the same property: Microsoft's real RD-Agent (`rdagent_factor.py`) has an execution surface (['subprocess.check_output']) and a real injected payload executed through it (True); ARGUS's own factor proposer (`searchoff.py`) has none (False). Separately, AgentDojo's real 302-string attack corpus (recall 302/302) measures what reaches a production decision: 6 production false positives before the rewrite the comparison forced, 0 after",
+      "evidence": "300 modules, 817 internal imports. 0 contract violation(s); 0 cycle(s) able to break at import out of 5 total \u2014 the rest are broken at load by a deferred import and are reported as coupling rather than scored as clean. The deterministic core (truth, cost, risk, decision, backtest) reaches no model-facing module at any depth. 4 foundation package(s) carry high fan-in at zero instability. 2 authorisation chokepoint(s) that raise rather than warn: orders.py:319, bitget_client.py:355 \u00b7 measured against two real rivals on the same property: Microsoft's real RD-Agent (`rdagent_factor.py`) has an execution surface (['subprocess.check_output']) and a real injected payload executed through it (True); ARGUS's own factor proposer (`searchoff.py`) has none (False). Separately, AgentDojo's real 302-string attack corpus (recall 302/302) measures what reaches a production decision: 6 production false positives before the rewrite the comparison forced, 0 after",
       "artefact": "data/architecture.json"
     },
     {
@@ -155,7 +155,7 @@
       "question": "After trader decision, how does AI handle order splitting and slippage management?",
       "bar": "the closed form behaves as the paper requires: risk aversion front-loads",
       "status": "RUNS",
-      "evidence": "Almgren-Chriss trajectory over 10 intervals: risk-neutral first slice 1000.0, urgent first slice 1000.0232008595890000 \u2014 a positive risk aversion front-loads the order as the closed form requires: True",
+      "evidence": "Almgren-Chriss trajectory over 10 intervals: risk-neutral first slice 1000.0, urgent first slice 1000.0232008595890000 \u2014 a positive risk aversion front-loads the order as the closed form requires: True \u00b7 measured against hftbacktest's real LatencyModel: its trait has exactly entry()/response(), grepped for any decision-latency concept across 5 terms with 0 hit(s); ARGUS's real thinking_budget_cost_bps prices the deliberation delay it cannot represent, on ARGUS's own three real bake-off-measured thinking budgets against today's live VIX: 3000ms=0.458479173279414870850000bps, 8000ms=0.74869335481842529670000bps, 40000ms=1.67412923567636884410000bps, sqrt(t)-scaling confirmed (True)",
       "artefact": "argus.execution.schedule:trajectory"
     },
     {

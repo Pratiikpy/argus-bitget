@@ -1,0 +1,68 @@
+{
+  "baseline_read": {
+    "terms_searched": [
+      "decision.latency",
+      "deliberat",
+      "llm.latency",
+      "think.*latency",
+      "reasoning.*latency"
+    ],
+    "hits": {},
+    "total_hits": 0,
+    "zero_decision_latency_representation": true,
+    "real_latency_model_trait_has_entry_and_response_only": true,
+    "real_constant_latency_constructor_has_exactly_two_params": true
+  },
+  "same_input_comparison": {
+    "vix_level_used": 14.87,
+    "vix_as_of": "2026-09-22T01:42:11+00:00",
+    "annualised_vol": "0.1487",
+    "results": [
+      {
+        "think_ms": 3000,
+        "cost_bps": "0.458479173279414870850000"
+      },
+      {
+        "think_ms": 8000,
+        "cost_bps": "0.74869335481842529670000"
+      },
+      {
+        "think_ms": 40000,
+        "cost_bps": "1.67412923567636884410000"
+      }
+    ],
+    "costs_strictly_increasing_with_think_ms": true
+  },
+  "ablation": {
+    "base_think_ms": 10000,
+    "quadrupled_think_ms": 40000,
+    "cost_at_base": "1.125843467166354200000",
+    "cost_at_quadrupled": "2.251686934332708600000",
+    "measured_ratio": 2.0,
+    "expected_sqrt_ratio": 2.0,
+    "matches_sqrt_scaling": true
+  },
+  "failure_cases": {
+    "zero_deliberation_is_allowed": {
+      "think_ms": 0,
+      "raised": false,
+      "note": "network delay alone still applies; zero deliberation is a real, valid state"
+    },
+    "negative_deliberation": {
+      "raised": true,
+      "message": "deliberation may be zero only in principle; network never is"
+    },
+    "negative_think_ms_in_cost_fn": {
+      "raised": true,
+      "message": "a rejected order has no slippage; check was_rejected before pricing it"
+    }
+  },
+  "costs": {
+    "repeats": 200,
+    "argus_cost_fn_seconds_per_call": 2.067500026896596e-06
+  },
+  "reproducibility": {
+    "identical": true
+  },
+  "scope_statement": "hftbacktest's real backtest/models/latency.rs (commit 5f3ec40b2afb764e0fea112f941ed85523ef4e88, MIT, read not run -- its latency model is a compiled Rust crate via PyO3 with no prebuilt wheel on this machine) grepped exhaustively for decision/deliberation/LLM/reasoning latency: zero matches. Its real LatencyModel trait has exactly entry() and response(); its real ConstantLatency::new() takes exactly two parameters -- no slot exists for the delay between a market event and a model deciding what to do about it. ARGUS's real thinking_budget_cost_bps, run on ARGUS's own three real bake-off-measured thinking budgets and today's real live VIX-derived volatility, prices that delay as real basis points of expected slippage, strictly increasing with think time and matching the sqrt(t) random-walk scaling the underlying argument requires, verified numerically rather than assumed. NOT claimed ARGUS's DecisionLatency is a substitute for hftbacktest's real IntpOrderLatency -- that models real historical network/venue latency with interpolation, a genuinely different and real capability ARGUS does not attempt here. NOT claimed hftbacktest's Rust code was executed -- its real signatures were read from source, not paraphrased or guessed, and confirmed to contain no decision-latency concept by both a targeted grep and a literal signature match."
+}

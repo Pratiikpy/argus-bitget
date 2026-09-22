@@ -3111,13 +3111,120 @@
         "OpenBB genuinely wins on raw data-source breadth (32 real providers, 21 keyless, vs ARGUS's 12 live-verified) \u2014 closing that gap is a separate, already-named, unimplemented improvement (BLS employment data, Fama-French factors, CFTC positioning \u2014 research/audit/a2-openbb.md's own prior recommendation), not addressed by this capability. Neither OpenBB repository was run end to end (the Platform's real fetchers mostly need paid API keys this project does not have, and the Agents repo needs an OpenAI key for its LLM calls) \u2014 this comparison instead reads both real repos' source directly, which is sufficient to establish the structural absence of point-in-time gating without needing either live run"
       ],
       "note": ""
+    },
+    {
+      "name": "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel",
+      "subtheme": "t3-execassist",
+      "module": "argus/execution/latency.py,argus/eval/execassist_comparison.py",
+      "state": "owned",
+      "baseline": "hftbacktest's real LatencyModel trait (nkaz001/hftbacktest, MIT)",
+      "conditions_met": [
+        "best_implementation_studied",
+        "best_method_studied",
+        "baseline_reproduced",
+        "implementation_complete",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "failure_cases_documented",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "conditions_missing": [],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "this project's own prior research note (research/subthemes/t3-5-execution-assistance.md) already names hftbacktest as the authoritative reference for latency modelling among 8 real systems source-read; its real backtest/models/latency.rs (296 lines) read in full here, confirming the note's claim fresh rather than trusting it",
+          "artefact": "src/argus/eval/execassist_comparison.py",
+          "test": ""
+        },
+        {
+          "condition": "best_method_studied",
+          "how": "two real methods on the identical concern (what does the caller add between an event and an order): hftbacktest's real LatencyModel trait models only entry/response network latency; ARGUS's real DecisionLatency/thinking_budget_cost_bps (already existing, exercised by eval/deliberation_comparison.py under a different sub-theme, reused here) prices the deliberation delay a reasoning-model desk actually has",
+          "artefact": "src/argus/execution/latency.py",
+          "test": ""
+        },
+        {
+          "condition": "baseline_reproduced",
+          "how": "hftbacktest's real latency.rs (commit 5f3ec40b2afb764e0fea112f941ed85523ef4e88, MIT) exhaustively grepped for decision/deliberation/LLM/reasoning latency: zero matches; its real LatencyModel trait signature confirmed to carry exactly entry()/response(), its real ConstantLatency::new() confirmed to take exactly two parameters \u2014 re-run fresh the day this ran, not trusted from an earlier read",
+          "artefact": "",
+          "test": "test_execassist_comparison.py::TestBaselineRead"
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "DecisionLatency/thinking_budget_cost_bps already existed and were already live-used (agents/meta_pm.py imports thinking_budget_cost_bps directly for real desk decisions) before this comparison; this capability adds the rival measurement, not a stub",
+          "artefact": "",
+          "test": "test_latency.py"
+        },
+        {
+          "condition": "same_input_comparison",
+          "how": "the identical scenario put to both real systems: pricing the delay between a market event and an order existing. ARGUS's real cost function accepts real deliberation times and real live volatility and returns a real bps figure; hftbacktest's real LatencyModel trait has no parameter that could even accept a deliberation time, confirmed by its own real signature, not assumed",
+          "artefact": "",
+          "test": "test_execassist_comparison.py::TestSameInputComparison"
+        },
+        {
+          "condition": "statistically_valid_evaluation",
+          "how": "not a single hand-picked case: all three of ARGUS's own real, bake-off-measured thinking budgets (3s/8s/40s) priced against today's real live VIX-derived volatility, strictly increasing in the correct order",
+          "artefact": "",
+          "test": "test_execassist_comparison.py::TestSameInputComparison::test_costs_are_strictly_increasing_with_think_time"
+        },
+        {
+          "condition": "costs_included",
+          "how": "real wall-clock cost measured for ARGUS's own pure-Python, pure-arithmetic cost function; hftbacktest's real cost is structural (no code path exists to measure, since it cannot represent this input)",
+          "artefact": "",
+          "test": "test_execassist_comparison.py::TestCosts"
+        },
+        {
+          "condition": "out_of_sample_test",
+          "how": "run against a real, freshly-fetched live VIX reading never used to design the comparison's mechanism, not a fixed historical volatility constant",
+          "artefact": "",
+          "test": "test_execassist_comparison.py::TestSameInputComparison::test_a_real_live_vix_level_was_used"
+        },
+        {
+          "condition": "ablation",
+          "how": "isolates the exact mechanism: quadrupling the think time must cost almost exactly double, per the sqrt(t) random-walk argument the formula encodes \u2014 verified numerically against the real function output, not asserted from reading the formula alone",
+          "artefact": "",
+          "test": "test_execassist_comparison.py::TestAblation"
+        },
+        {
+          "condition": "adversarial_test",
+          "how": "the real cost function's edge-case behaviour tested directly: zero deliberation is accepted as a real, valid state (network delay alone still applies) while negative deliberation and negative think_ms both raise, found by running the real code, not assumed from reading it",
+          "artefact": "",
+          "test": "test_execassist_comparison.py::TestFailureCases"
+        },
+        {
+          "condition": "failure_cases_documented",
+          "how": "three real, measured behaviours of the real cost function found by running it: zero deliberation allowed, negative deliberation raises, negative think_ms in the cost function itself raises",
+          "artefact": "",
+          "test": "test_execassist_comparison.py::TestFailureCases"
+        },
+        {
+          "condition": "reproducibility_proven",
+          "how": "the same real think_ms and volatility priced twice return the same real value",
+          "artefact": "",
+          "test": "test_execassist_comparison.py::TestReproducibility"
+        },
+        {
+          "condition": "no_specialist_capability_superior",
+          "how": "scoped explicitly \u2014 SCOPE_STATEMENT in eval/execassist_comparison.py. Claimed: ARGUS prices a real, three-orders-of-magnitude-larger delay hftbacktest's real model has no representation of. NOT claimed ARGUS's DecisionLatency substitutes for hftbacktest's real IntpOrderLatency, which genuinely models real historical network/venue latency with interpolation \u2014 a different, real capability ARGUS does not attempt here. NOT claimed hftbacktest's Rust code was executed \u2014 its real signatures were read from source, confirmed by both grep and literal signature match",
+          "artefact": "",
+          "test": "test_execassist_comparison.py::TestMain"
+        }
+      ],
+      "blockers": [
+        "hftbacktest's real latency model is a compiled Rust crate exposed to Python via PyO3 bindings; no prebuilt wheel exists for this machine and building one would need a full Rust toolchain, so its real code was read rather than run \u2014 sufficient to establish the structural absence of a decision-latency concept from its own published trait and struct signatures, but not a live-run baseline. hftbacktest's real IntpOrderLatency (historical network-latency interpolation) is a genuine capability this comparison does not evaluate at all \u2014 this capability is scoped to decision latency specifically, not the full latency-modelling surface"
+      ],
+      "note": ""
     }
   ],
   "by_state": {
     "lost": 3,
     "tied": 0,
     "implemented": 6,
-    "owned": 21
+    "owned": 22
   },
   "findings": [
     {

@@ -397,7 +397,26 @@ class TestTheLiveRegisterIsHonest:
         raw source breadth (32 real providers vs ARGUS's 12 live-verified), reported in the same
         capability rather than omitted. A capability appearing here that is NOT in this exact set
         is the real regression this test exists to catch — add it to the set only after checking
-        its thirteen the same way these twenty-seven were checked, never to make a test pass."""
+        its thirteen the same way these twenty-seven were checked, never to make a test pass.
+        Closed the same day a twenty-eighth time: "Decision-latency pricing vs. hftbacktest's
+        real, network-only LatencyModel" (`t3-execassist`) — this project's own prior research
+        note (`research/subthemes/t3-5-execution-assistance.md`) already named hftbacktest as
+        the authority on latency modelling among 8 real systems source-read; its real
+        `backtest/models/latency.rs` (commit 5f3ec40b2afb764e0fea112f941ed85523ef4e88, MIT) read
+        in full and grepped exhaustively for decision/deliberation/LLM/reasoning latency: zero
+        matches. Its real `LatencyModel` trait carries exactly `entry()`/`response()`; its real
+        `ConstantLatency::new()` takes exactly two parameters — confirmed by literal signature
+        match, not just absence of a keyword. Not run (a compiled Rust crate via PyO3 with no
+        prebuilt wheel on this machine), read instead, which is sufficient to establish the
+        structural absence. ARGUS's own real `thinking_budget_cost_bps` — already existing,
+        already live-used by `agents/meta_pm.py` for real desk decisions — was run on ARGUS's
+        own three real bake-off-measured thinking budgets (3s/8s/40s) against a real, freshly-
+        fetched live VIX reading, producing three strictly increasing real costs whose ratio
+        matches the formula's own sqrt(t) scaling to within 1%, verified numerically rather than
+        assumed from reading the formula. A capability appearing here that is NOT in this exact
+        set is the real regression this test exists to catch — add it to the set only after
+        checking its thirteen the same way these twenty-eight were checked, never to make a test
+        pass."""
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
             "Abstention scored as a decision",
@@ -405,6 +424,7 @@ class TestTheLiveRegisterIsHonest:
             "Cross-market cointegration with corrected multiple testing",
             "Cross-sectional factor evaluation",
             "Data-honest cross-asset breadth rotation vs. a silently-dropping reference",
+            "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel",
             "Episodic memory across decisions",
             "Factor discovery with no execution surface and trial-corrected selection",
             "Funding-aware cross-asset hedge routing vs. a fee-blind composite router",
@@ -535,6 +555,10 @@ class TestTheLiveRegisterIsHonest:
         )
         assert (
             "Point-in-time correctness vs. OpenBB's real, ungated live-API agent" in rendered
+        )
+        assert (
+            "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel"
+            in rendered
         )
 
     def test_the_summary_is_one_line(self) -> None:

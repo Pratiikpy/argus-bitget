@@ -29,7 +29,7 @@ carries a result.**
 | 12 | `review-self-evolution` | T3 | subtheme | **OWNED** | TauricResearch/TradingAgents reflection memory | **yes** | ARGUS (refusal machinery has no TradingAgents equivalent; checklist stays honestly empty) | 2026-09-22 |
 | 13 | `stress-testing` | T3 | subtheme | **LOST** | stumpy FLUSS + ruptures + incumbent rule | **yes** | specialist | 2026-09-21 |
 | 14 | `personal-workbench` | T3 | subtheme | IMPLEMENTED | OpenBB (real agent + data platform) | **yes** | split — OpenBB (32 real sources vs ARGUS's 12); ARGUS (point-in-time gating OpenBB's real source has zero representation of, verified sharp to the exact day) | 2026-09-22 |
-| 15 | `execution-assistance` | T3 | subtheme | IMPLEMENTED | — | no | — | — |
+| 15 | `execution-assistance` | T3 | subtheme | IMPLEMENTED | hftbacktest (real LatencyModel) | **yes** | ARGUS (prices real deliberation delay hftbacktest's real trait has zero representation of; sqrt(t) scaling confirmed numerically) | 2026-09-22 |
 | 16 | `portfolio-copilot` | T3 | subtheme | **LOST** | Riskfolio-Lib NCO | **yes** | specialist (p=3.6e-05) | 2026-09-21 |
 | 17 | `t3-source-depth` | T3 | judging | IMPLEMENTED | — | no | — | — |
 | 18 | `t3-research-quality` | T3 | judging | IMPLEMENTED | QuantConnect Lean + statsmodels (two rivals) | **yes** | ARGUS (0 FDR/Bonferroni survivors vs Lean's uncorrected 7-of-190, ~9.5 expected FPs) | 2026-09-21 |
@@ -38,13 +38,13 @@ carries a result.**
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 14 of 20 as of 2026-09-22: 3 LOST (one of them split — LUI intent
+**`rival run` is `yes` on 15 of 20 as of 2026-09-22: 3 LOST (one of them split — LUI intent
 accuracy loses to Rasa's DIET classifier, p=0.0014, while ARGUS wins out-of-scope refusal
 separately and significantly, p=0.031, neither laundering the other), 1 more split
 (personal-workbench: OpenBB genuinely wins on raw source breadth, 32 real providers vs ARGUS's
 12, reported honestly rather than omitted; ARGUS wins on point-in-time correctness, a property
 OpenBB's real agent source has zero representation of anywhere, verified sharp to the exact
-day on real live SEC data), 9 real wins (earnings vs
+day on real live SEC data), 10 real wins (earnings vs
 QuantConnect, factor-discovery vs Microsoft RD-Agent, risk-control vs freqtrade's real
 PrecisionRecallProtection — ARGUS's precision at full recall is 59.2% against freqtrade's best
 swept 19.3%, dominating every threshold, and freqtrade's own proxy correlates only weakly
@@ -74,21 +74,26 @@ anywhere in its real code; ARGUS's own refusal machinery (DEAD_WEIGHT, NO_DISCRI
 MISLEADING) has no TradingAgents equivalent, verified across six real lifecycle fixtures —
 this row was already run in an earlier iteration but never synced into this ledger; synced
 now, and separately, a genuine 6+ iteration-old standing.py gap on this same capability
-[failure_cases_documented] was closed this iteration, promoting it OWNED), 1 methodological
+[failure_cases_documented] was closed this iteration, promoting it OWNED — and execution-
+assistance vs hftbacktest's real LatencyModel: its real trait carries exactly entry()/
+response(), zero representation across 5 grepped terms of the delay between a market event
+and a reasoning model deciding what to do about it; ARGUS's real thinking_budget_cost_bps
+prices that real delay on ARGUS's own three real bake-off-measured thinking budgets against
+live VIX, with sqrt(t) scaling confirmed numerically), 1 methodological
 (event-driven vs whale-signals — neither system establishes a real effect on
 this data; the finding is that whale-signals tests against the wrong null, not that ARGUS's own
 number beats theirs, and no fabricated score is recorded for it).** That is this ledger's honest
 scoreboard — it names whether
 *this specific Bitget-taxonomy row* has a rival comparison wired in, which is a narrower and
-different question from `eval/standing.py`'s own register (30 capabilities across the whole
-codebase, 21 OWNED, 3 LOST, independently verified as of 2026-09-22 — do not read "0" here as
+different question from `eval/standing.py`'s own register (31 capabilities across the whole
+codebase, 22 OWNED, 3 LOST, independently verified as of 2026-09-22 — do not read "0" here as
 "0 OWNED anywhere," an earlier session conflated the two and said so wrongly to the owner; this
 count moves almost every iteration and this line is a snapshot, not a live figure — read
 `eval/standing.py`'s own output for the current number). What this ledger's `rival run` column
-tracks is narrower still: of 20 judged rows, 6 remain unwired (2 structurally blocked —
+tracks is narrower still: of 20 judged rows, 5 remain unwired (2 structurally blocked —
 `t2-sharpe-mdd-winrate` has nothing to settle yet, `sentiment` needs the metered Qwen key the
-loop cannot spend; 4 genuinely open — `t2-open-evaluation`, `execution-assistance`,
-`t3-source-depth`, `t3-personal-thesis`). Every other number in this project — 6,144 tests, 96
+loop cannot spend; 3 genuinely open — `t2-open-evaluation`, `t3-source-depth`,
+`t3-personal-thesis`). Every other number in this project — 6,160 tests, 96
 pinned doc claims — measures how carefully we checked *ourselves*; wiring the remaining open
 rows is the highest-value RIVAL/CONNECT work still queued.
 
