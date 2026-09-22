@@ -672,13 +672,23 @@ def j_t2_quant() -> Finding:
     settled = sum(1 for e in ledger.entries if e.is_settled and not e.is_abstention)
     if settled:
         return Finding(RUNS, f"{settled} settled position(s); performance() computes the three")
+    why = ""
+    frontier = _load_json("hurdle_frontier.json")
+    if frontier is not None and "binding_constraint" in frontier:
+        # Zero settled trades explains why Sharpe/MDD/win-rate are UNDEFINED, not WHY the desk
+        # abstains. eval/hurdle.py answers that second, harder question from data already on
+        # disk, with no additional model call: the size of the moves that actually happened
+        # against the size of the hurdle they had to clear, clustering-corrected. Cited rather
+        # than re-derived here so this probe and `python -m argus.eval.hurdle` never disagree.
+        why = f" Separately measured, not asserted: {frontier['binding_constraint']}"
     return Finding(
         UNDEFINED,
         f"Sharpe, max drawdown and win rate are computed from settled trades and **zero positions "
         f"have settled** across {len(ledger.entries)} decisions, every one an abstention. "
         f"performance() returns null and the reason rather than 0.0, which would read as a flat "
         f"result. This is the single largest gap against Track 2's 50% quantitative half, it is "
-        f"structural rather than a defect, and no amount of judged quality substitutes for it.",
+        f"structural rather than a defect, and no amount of judged quality substitutes for it."
+        f"{why}",
         "data/paper_ledger.jsonl",
     )
 

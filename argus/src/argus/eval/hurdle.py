@@ -1,10 +1,11 @@
 """Is abstaining right? The question a desk with no trades has to answer, answered with arithmetic.
 
-Every decision this desk has made is an abstention — 126 live, 30 replayed. The comfortable
-explanation is that the deliberation-cost hurdle is too high for this universe, and the replay
-harness was built to test exactly that by re-running the desk on regular-hours frames where the
-anchor market was open. It abstained on all twenty of those too. So the pre-registered hypothesis
-is refuted: the session phase was not the reason.
+Every decision this desk has made is an abstention — 481 live (2026-09-22, up from 126 when this
+module was first written) and 30 replayed. The comfortable explanation is that the
+deliberation-cost hurdle is too high for this universe, and the replay harness was built to test
+exactly that by re-running the desk on regular-hours frames where the anchor market was open. It
+abstained on all twenty of those too. So the pre-registered hypothesis is refuted: the session
+phase was not the reason.
 
 That leaves the real question, which no amount of further replaying answers: **was abstaining the
 correct policy?** This module answers it without a single additional model call, because the answer
@@ -23,17 +24,23 @@ accuracy the desk would need for trading to beat abstaining, given the moves tha
 and the hurdle it actually faced — and it can be compared against the desk's *measured* accuracy
 rather than an assumed one.
 
-**What this found, and it is not what was expected.** Realised 24-hour absolute moves in the replay
-average around 164bps against a total hurdle near 19bps. The hurdle is an order of magnitude
-smaller than the moves. So the binding constraint is **not** the cost of deliberation — it is the
-desk's own confidence gate. Abstention here is a statement about conviction, not about fees, and
-saying otherwise would have been the comfortable answer rather than the true one. The verdict this
-module emits names whichever constraint actually binds, and it is capable of naming ours.
+**What this found, and it is not what was expected.** Combined across both ledgers (511 instants,
+2026-09-22 run), the median realised absolute move is 103bps against a total hurdle of 18.8bps —
+5x, not the order-of-magnitude-smaller gap a fee explanation would need. 90% of instants clear the
+hurdle outright, and break-even directional accuracy is only 55.0%. The finding held at the first
+156-instant run in this module's original form and strengthens, not weakens, at 3x the sample:
+ICC is now 0.000 (no detectable within-timestamp clustering at this size), so all 511 instants
+count as independent rather than being discounted by a design effect. So the binding constraint is
+**not** the cost of deliberation — it is the desk's own confidence gate. Abstention here is a
+statement about conviction, not about fees, and saying otherwise would have been the comfortable
+answer rather than the true one. The verdict this module emits names whichever constraint actually
+binds, and it is capable of naming ours.
 
-**Sample size is handled, not assumed.** Thirty replayed instants across four symbols are not
-thirty independent facts: instants sharing a timestamp share a market. The intraclass correlation
-and Kish design effect from `eval.forecasts` are applied here rather than re-derived, so the
-reported precision is the effective one.
+**Sample size is handled, not assumed.** Instants sharing a timestamp share a market and are not
+independent facts. The intraclass correlation and Kish design effect from `eval.forecasts` are
+applied here rather than re-derived, so the reported precision is the effective one, not the raw
+count — re-run `python -m argus.eval.hurdle` to see the current figures; the live ledger grows
+every cycle and these numbers are a snapshot, not a constant.
 """
 
 from __future__ import annotations
