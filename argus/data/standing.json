@@ -2046,7 +2046,7 @@
       "name": "Market sentiment",
       "subtheme": "t2-sentiment",
       "module": "argus/agents/analysts.py,argus/market/macro.py,argus/eval/sentiment_comparison.py,argus/eval/baselines/finbert_loader.py",
-      "state": "implemented",
+      "state": "owned",
       "baseline": "ProsusAI/finBERT for classification; BloombergGPT and FinMA for the published bar",
       "conditions_met": [
         "best_implementation_studied",
@@ -3223,24 +3223,14 @@
   "by_state": {
     "lost": 3,
     "tied": 0,
-    "implemented": 3,
-    "owned": 25
+    "implemented": 2,
+    "owned": 26
   },
   "findings": [
     {
       "capability": "Deliberation priced as a trading cost",
       "problem": "reproducibility_proven is claimed but not evidenced",
       "detail": "data/deliberation_comparison.json records nothing about reproducibility_proven: no key among reproducibility, reproducible, deterministic, identical, seed, seeds..."
-    },
-    {
-      "capability": "Market sentiment",
-      "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "data/sentiment_comparison.json records nothing about out_of_sample_test: no key among out_of_sample, oos, holdout, held_out, heldout, train..."
-    },
-    {
-      "capability": "Market sentiment",
-      "problem": "adversarial_test is claimed but not evidenced",
-      "detail": "data/sentiment_comparison.json records nothing about adversarial_test: no key among adversarial, mutant, mutants, attack, attacks, red_team..."
     }
   ],
   "clean": false,

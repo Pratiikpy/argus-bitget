@@ -16,7 +16,7 @@ carries a result.**
 | # | part | tr | kind | our status | named rival | rival run | who won | last checked |
 |---|---|----|------|-----------|-------------|-----------|---------|--------------|
 | 1 | `event-driven` | T2 | subtheme | IMPLEMENTED | whale-signals | **yes** | methodological — see note | 2026-09-21 |
-| 2 | `sentiment` | T2 | subtheme | IMPLEMENTED | — | no | — | — |
+| 2 | `sentiment` | T2 | subtheme | **OWNED** | ProsusAI/finBERT (real, installed) | **yes** | ARGUS — on the real, named claim: coordination-attack resistance, not raw classification accuracy. FinBERT's naive per-post aggregate scales with N copies of one post; ARGUS's real analyst never does, on every narrative tested and reconfirmed on a fresh real run (2026-09-22, 8 Qwen calls, the owner's go-ahead) | 2026-09-22 |
 | 3 | `earnings` | T2 | subtheme | IMPLEMENTED | QuantConnect (vendored SUE) | **yes** | ARGUS (refuses the artefact QC ranks top) | 2026-09-21 |
 | 4 | `cross-asset-execution` | T2 | subtheme | IMPLEMENTED | crypto_sor (real composite order-book router) | **yes** | ARGUS (funding-aware; crypto_sor never prices funding, 5/5 real leg pairs diverge past break-even) | 2026-09-22 |
 | 5 | `factor-discovery` | T2 | subtheme | IMPLEMENTED | Microsoft RD-Agent | **yes** | ARGUS (no execution surface; RD-Agent ran attacker code) | 2026-09-21 |
@@ -38,7 +38,7 @@ carries a result.**
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 17 of 20 as of 2026-09-22: 4 LOST (one of them split — LUI intent
+**`rival run` is `yes` on 18 of 20 as of 2026-09-22: 4 LOST (one of them split — LUI intent
 accuracy loses to Rasa's DIET classifier, p=0.0014, while ARGUS wins out-of-scope refusal
 separately and significantly, p=0.031, neither laundering the other; the 4th is
 t3-source-depth — OpenBB's real 32-provider count genuinely beats ARGUS's 12, no split
@@ -49,7 +49,9 @@ evidence — `j_t3_personal_thesis` literally delegates to `t3_personal_workbenc
 rule: OpenBB genuinely wins on raw source breadth, 32 real providers vs ARGUS's
 12, reported honestly rather than omitted; ARGUS wins on point-in-time correctness, a property
 OpenBB's real agent source has zero representation of anywhere, verified sharp to the exact
-day on real live SEC data), 10 real wins (earnings vs
+day on real live SEC data), 11 real wins (sentiment vs the real, installed ProsusAI/finBERT —
+FinBERT's naive per-post aggregate scales with N copies of one coordinated post, ARGUS's real
+analyst never does, on every narrative and reconfirmed on a fresh real run, 2026-09-22 — earnings vs
 QuantConnect, factor-discovery vs Microsoft RD-Agent, risk-control vs freqtrade's real
 PrecisionRecallProtection — ARGUS's precision at full recall is 59.2% against freqtrade's best
 swept 19.3%, dominating every threshold, and freqtrade's own proxy correlates only weakly
@@ -91,15 +93,16 @@ number beats theirs, and no fabricated score is recorded for it).** That is this
 scoreboard — it names whether
 *this specific Bitget-taxonomy row* has a rival comparison wired in, which is a narrower and
 different question from `eval/standing.py`'s own register (31 capabilities across the whole
-codebase, 25 OWNED, 3 LOST, independently verified as of 2026-09-22 — do not read "0" here as
+codebase, 26 OWNED, 3 LOST, independently verified as of 2026-09-22 — do not read "0" here as
 "0 OWNED anywhere," an earlier session conflated the two and said so wrongly to the owner; this
 count moves almost every iteration and this line is a snapshot, not a live figure — read
 `eval/standing.py`'s own output for the current number). What this ledger's `rival run` column
-tracks is narrower still: of 20 judged rows, 3 remain unwired (2 structurally blocked —
-`t2-sharpe-mdd-winrate` has nothing to settle yet, `sentiment` needs the metered Qwen key the
-loop cannot spend; 1 genuinely open — `t2-open-evaluation`, itself a composite of six
-measures, two of which share the same zero-settled-trades blocker as
-`t2-sharpe-mdd-winrate`). Every
+tracks is narrower still: of 20 judged rows, 2 remain unwired (`t2-sharpe-mdd-winrate` is
+structurally blocked — nothing to settle yet; `t2-open-evaluation` is genuinely open, itself a
+composite of six measures, four already computed and two sharing the same zero-settled-trades
+blocker as `t2-sharpe-mdd-winrate`). `sentiment` closed 2026-09-22 — a real comparison against
+finBERT already existed, was 11/13 verified, and needed only two conditions' evidence relabeled
+plus one small real re-run (8 Qwen calls) to close, not a from-scratch build. Every
 other number in this project — 6,160 tests, 96
 pinned doc claims — measures how carefully we checked *ourselves*; wiring the remaining open
 rows is the highest-value RIVAL/CONNECT work still queued.

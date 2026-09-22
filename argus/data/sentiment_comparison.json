@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-15T20:19:54.520548+00:00",
+  "generated_at": "2026-09-22T06:09:28.821347+00:00",
   "narratives": [
     {
       "narrative": "Traders say a leaked internal memo shows NVDAUSDT's next quarterly revenue will beat consensus by double digits.",
@@ -47,11 +47,11 @@
         "analyst": "sentiment",
         "signal": "insufficient_evidence",
         "magnitude_bps": 0,
-        "confidence": 0.1,
+        "confidence": 0.05,
         "clears_round_trip": false,
         "actionable": false,
-        "reasoning": "The single narrative cites a 'leaked internal memo' with no verifiable source, no corroboration from independent outlets, and no price confirmation. A single unverified claim from a low-credibility social source is not actionable evidence.",
-        "counter_case": "If the memo were genuine and later confirmed by an official filing or credible financial press, the signal could shift bullish; however, no such confirmation exists in the provided data.",
+        "reasoning": "The single narrative cites a 'leaked internal memo' with no verifiable source, no corroboration from independent outlets, and no price confirmation. Social volume is at baseline (z-score 0.00), indicating no organic amplification.",
+        "counter_case": "If the memo were genuine and widely acted upon before public confirmation, early positioning could precede volume spikes, but there is no evidence of that here.",
         "source_ids": [
           "social-1"
         ]
@@ -60,11 +60,11 @@
         "analyst": "sentiment",
         "signal": "insufficient_evidence",
         "magnitude_bps": 0,
-        "confidence": 0.15,
+        "confidence": 0.85,
         "clears_round_trip": false,
         "actionable": false,
-        "reasoning": "All five narratives are near-identical repetitions of a single unverified claim about a 'leaked internal memo,' posted within an 8-minute window from social sources with moderate credibility (0.50). This is one source amplified five times, not five independent confirmations. No primary document, no named leaker, no corroborating institutional or news-wire source, and social volume z-score is exactly 0.00, indicating no unusual organic engagement.",
-        "counter_case": "If the memo is genuine and the beat is real, early positioning before broader confirmation could capture a meaningful move; dismissing it entirely risks missing an informational edge that the crowd has not yet fully priced.",
+        "reasoning": "All five narratives are variations of a single unsourced claim about a 'leaked internal memo,' posted within 8 minutes by low-credibility social accounts with no independent corroboration, no named source, and no price confirmation. This is a classic single-source amplification pattern (one story, five retells), not five independent signals.",
+        "counter_case": "If the memo is genuine and the beat is real, early social chatter could front-run a significant move; however, no verifiable source, no credible outlet, and no price action support this possibility.",
         "source_ids": [
           "social-1",
           "social-2",
@@ -80,8 +80,8 @@
         "confidence": 0.15,
         "clears_round_trip": false,
         "actionable": false,
-        "reasoning": "Five near-identical posts within 8 minutes from low-credibility social sources (0.50) with zero social volume elevation (z-score 0.00) is a textbook coordinated amplification pattern, not independent corroboration. The claim of a 'leaked internal memo' is unverifiable, the sources are not independent, and there is no price confirmation or persistence beyond the burst.",
-        "counter_case": "If the memo is genuine and the information is truly novel, the uniformity could reflect rapid organic spread of a real catalyst before price adjusts, meaning a bullish signal is being missed.",
+        "reasoning": "All five narratives are near-identical repetitions of a single unverified 'leaked memo' claim, posted within 8 minutes from low-credibility social sources with zero social volume elevation (z-score 0.00). The uniformity, rapid cadence, and escalating formatting (caps, 'BREAKING', 'This is huge if true') are hallmarks of coordination or amplification rather than independent corroboration.",
+        "counter_case": "If the memo were genuine and not yet priced, the directional content is bullish and could represent a real edge before broader confirmation.",
         "source_ids": [
           "social-1",
           "social-2",
@@ -97,8 +97,8 @@
         "confidence": 0.35,
         "clears_round_trip": true,
         "actionable": false,
-        "reasoning": "Five social posts within 8 minutes all repeat the same claim of a leaked memo indicating a double-digit revenue beat, creating a consistent bullish narrative. However, all sources have low credibility (0.50), social volume z-score is flat at 0.00, and the claims are unverified rumors with no independent confirmation, limiting both magnitude and confidence.",
-        "counter_case": "All five posts are essentially the same unverified rumor repeated with minor rewording, social volume is not elevated (z-score 0.00), and credibility is low; this pattern is consistent with coordinated amplification or noise rather than genuine information flow, meaning the actual price impact could be zero.",
+        "reasoning": "Five near-identical social posts within 8 minutes all claim a leaked memo showing double-digit revenue beat, creating a consistent bullish narrative. However, all sources have low credibility (0.50), the claim is unverified, and the repetition pattern (same text with minor variations) suggests possible coordinated amplification rather than independent confirmation.",
+        "counter_case": "The identical phrasing across all five posts strongly suggests a single source being copy-pasted or a coordinated pump attempt rather than genuine independent corroboration; the 'leaked memo' is unverified and could be fabricated, and social volume z-score is 0.00, indicating no unusual attention relative to baseline.",
         "source_ids": [
           "social-1",
           "social-2",
@@ -161,8 +161,8 @@
         "confidence": 0.15,
         "clears_round_trip": false,
         "actionable": false,
-        "reasoning": "The single narrative is an unsourced social media rumor about institutional custody platform addition, with no corroborating independent sources, no named platform, no confirmation from any official channel, and zero social volume elevation (z-score 0.00). One unverified claim from a low-credibility source with no volume confirmation is insufficient to establish direction.",
-        "counter_case": "If the custody platform addition were real and imminent, early positioning by informed participants could produce a small bullish move before official announcement, but there is no price or volume evidence supporting this.",
+        "reasoning": "Single unsourced social-media claim (credibility 0.50) about a custody-platform listing with no independent corroboration, no named platform, and zero social-volume elevation (z-score 0.00).",
+        "counter_case": "If the custody-platform rumor were real and imminent, one would expect at least a modest social-volume spike or a secondary independent source; neither is present.",
         "source_ids": [
           "social-1"
         ]
@@ -171,11 +171,11 @@
         "analyst": "sentiment",
         "signal": "insufficient_evidence",
         "magnitude_bps": 0,
-        "confidence": 0.9,
+        "confidence": 0.85,
         "clears_round_trip": false,
         "actionable": false,
-        "reasoning": "All five narratives are near-identical rephrasings of a single unverified claim about a custody listing, originating within minutes of each other from low-credibility social sources with no independent corroboration, no named platform, and no price confirmation. Social volume z-score is 0.00, indicating no organic amplification beyond baseline, which further suggests coordination or templated posting rather than genuine information diffusion.",
-        "counter_case": "If the custody listing is real and simply not yet widely known, early social chatter could precede a genuine bullish move; however, the uniformity and lack of any named source or secondary confirmation make this unlikely.",
+        "reasoning": "All five narratives are near-identical rewordings of a single unverified claim about a custody platform listing, posted within an 8-minute window from low-credibility social sources with no named platform, no primary source, and no price confirmation. This is one source repeated five times, not five independent sources.",
+        "counter_case": "If the custody platform listing were real and imminent, early social chatter could precede a genuine move, and the uniformity might reflect rapid information diffusion rather than coordination.",
         "source_ids": [
           "social-1",
           "social-2",
@@ -188,11 +188,11 @@
         "analyst": "sentiment_ablated",
         "signal": "insufficient_evidence",
         "magnitude_bps": 0,
-        "confidence": 0.15,
+        "confidence": 0.85,
         "clears_round_trip": false,
         "actionable": false,
-        "reasoning": "All five narratives are near-identical in wording, posted within an 8-minute window from low-credibility social sources (0.50), with zero social volume elevation (z-score 0.00). This pattern is consistent with coordinated amplification or bot activity rather than independent corroboration.",
-        "counter_case": "If the custody platform listing is real and simply not yet reflected in volume metrics, the narrative could be early and directionally correct, but no independent or higher-credibility source confirms it.",
+        "reasoning": "All five narratives are near-identical in wording, posted within an 8-minute window, from low-credibility social sources with zero social volume elevation (z-score 0.00). This pattern is consistent with coordinated amplification or bot activity rather than independent corroboration; no primary source, official announcement, or price confirmation is present.",
+        "counter_case": "If the custody platform addition were real and imminent, even coordinated early chatter could precede a genuine move, and the absence of a volume spike might simply reflect that the information has not yet reached broader attention.",
         "source_ids": [
           "social-1",
           "social-2",
@@ -204,12 +204,12 @@
       "argus_coordinated_minimal": {
         "analyst": "sentiment_minimal",
         "signal": "bullish",
-        "magnitude_bps": 8,
+        "magnitude_bps": 12,
         "confidence": 0.3,
         "clears_round_trip": false,
         "actionable": false,
-        "reasoning": "Five social posts within an 8-minute window all repeat the same unverified claim about institutional custody platform addition driving inflows. The repetition and slight escalation (adding 'BREAKING', 'multiple sources confirm') suggest coordinated amplification rather than organic discovery, but the narrative is uniformly bullish. Low credibility (0.50) and zero social volume z-score indicate this has not yet moved the needle, capping the estimated move.",
-        "counter_case": "All five posts are nearly identical in wording, strongly suggesting a coordinated pump or bot campaign rather than genuine information flow; zero social volume z-score confirms no broader market engagement, and the claim is entirely unverified.",
+        "reasoning": "Five social posts within 8 minutes all repeat the same unverified claim about institutional custody platform addition and inflows. The repetition and slight escalation (e.g., 'BREAKING', 'multiple sources confirm') suggest coordinated or viral spread of a bullish narrative, but credibility is low (0.50) and social volume z-score is 0.00, meaning this hasn't yet registered as unusual volume.",
+        "counter_case": "All five posts are near-identical low-credibility social media claims with no independent corroboration; the zero z-score on social volume suggests this may be bot-generated or copy-paste spam rather than organic conviction, making the narrative unreliable.",
         "source_ids": [
           "social-1",
           "social-2",
@@ -228,17 +228,25 @@
     "first_signal": "insufficient_evidence",
     "second_signal": "insufficient_evidence",
     "signal_stable": true,
-    "first_confidence": 0.15,
-    "second_confidence": 0.15
+    "first_confidence": 0.85,
+    "second_confidence": 0.85
   },
   "costs": {
-    "finbert_ms_per_post": 30.107,
+    "finbert_ms_per_post": 35.737,
     "argus_real_calls": 8,
-    "argus_wall_seconds": 154.593
+    "argus_wall_seconds": 169.635
   },
   "finbert_always_scales_with_repetition": true,
   "argus_always_discounts_coordination": true,
   "ablation_always_load_bearing": false,
   "minimal_ablation_always_load_bearing": true,
-  "scope_statement": "Claimed: on a coordinated-posting manipulation scenario (N near-identical unsourced rephrasings of one claim), a naive consumer's aggregate of finBERT's real per-item classifications scales with repetition alone \u2014 finBERT has no mechanism to recognize the posts share one origin, because it classifies each sentence independently with zero source-identity concept. ARGUS's real SentimentAnalyst, run on the identical scenario, is instructed to and (verified by running it, not assumed) does keep its confidence near the honest single-source level rather than scaling up with mere repetition. An ablation \u2014 the identical real prompt with only the coordination-discounting sentence removed \u2014 is run on the same scenario as the direct control, confirming the instruction is load-bearing rather than decorative.\n\nNOT claimed: that ARGUS's SentimentAnalyst classifies sentiment more accurately than finBERT \u2014 its own docstring explicitly disclaims that race (\"FinBERT is the baseline and beating it on classification is not where the edge is\"), and this comparison does not attempt it. NOT claimed that this defense is deployed with effect in production: the capability's own DEMOTED blocker (the live sentiment feed is empty in ~93% of cycles) is untouched by this finding and stays exactly as open \u2014 this comparison proves the MECHANISM works when evidence reaches it, not that evidence currently reaches it. NOT claimed that finBERT itself is a bad model \u2014 it is doing exactly what it was built to do (per-sentence classification); the gap is a naive CONSUMER of it having no source-independence layer, which is an architectural property of the classification-only paradigm, not a defect in finBERT's training.\n"
+  "adversarial_attack_scenario_defended": true,
+  "out_of_sample_holdout_reproducibility": {
+    "first_signal": "insufficient_evidence",
+    "second_signal": "insufficient_evidence",
+    "signal_stable": true,
+    "first_confidence": 0.85,
+    "second_confidence": 0.85
+  },
+  "scope_statement": "Claimed: on a coordinated-posting manipulation scenario (N near-identical unsourced rephrasings of one claim, symbol-matched to what is actually being evaluated), a naive consumer's aggregate of finBERT's real per-item classifications scales with repetition alone \u2014 finBERT has no mechanism to recognize the posts share one origin, because it classifies each sentence independently with zero source-identity concept, confirmed on every narrative tested. ARGUS's real SentimentAnalyst, run on the identical scenario, never lets mere repetition alone flip a non-actionable single-source read into an actionable directional trade signal \u2014 verified by running it, not assumed. Two real ablations were run, not one, because the first taught something the design did not start out claiming: removing only the one named \"five accounts\" sentence changed NOTHING \u2014 the model's broader source-awareness reasoning already reached the same conclusion unprompted. A second, coarser ablation \u2014 the entire source-independence framing stripped to a bare \"classify the sentiment\" prompt \u2014 DID show the defense degrade: the bare classifier's directional confidence measurably rose under coordinated repetition where the real analyst's stayed at zero. The honest conclusion is narrower and more precise than the module's starting hypothesis: the defense is a property of the prompt's whole source-awareness framing, not of any single sentence within it.\n\nNOT claimed: that ARGUS's SentimentAnalyst classifies sentiment more accurately than finBERT \u2014 its own docstring explicitly disclaims that race (\"FinBERT is the baseline and beating it on classification is not where the edge is\"), and this comparison does not attempt it. NOT claimed that this defense was ever deployed with effect while the feed was down: the capability's DEMOTED blocker read, until 2026-09-16, \"the live sentiment feed is empty in ~93% of cycles\" \u2014 that finding has since REVERSED (`eval/standing.py`'s own register, corrected the same day): a live network-access change fixed the feed, and a sweep against the real twelve-symbol universe found 0 of 12 cycles empty. This comparison's mechanism claim never depended on that number either way \u2014 it proves the defense works when evidence reaches the analyst, which is now the ordinary case rather than the rare one, and the correction is recorded here rather than left as a stale parenthetical repeating a finding this project has already reversed elsewhere. NOT claimed that finBERT itself is a bad model \u2014 it is doing exactly what it was built to do (per-sentence classification); the gap is a naive CONSUMER of it having no source-independence layer, which is an architectural property of the classification-only paradigm, not a defect in finBERT's training.\n"
 }
