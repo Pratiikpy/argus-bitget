@@ -11,6 +11,7 @@ data would use), on hand-verified event sequences where the correct `Episode` th
 
 from __future__ import annotations
 
+import json
 from decimal import Decimal
 
 import pytest
@@ -21,15 +22,19 @@ from argus.eval.mbo_queueproof import (
     MboEvent,
     MboQueueProofError,
     _from_mbo_msg,
+    dominant_instrument,
     episodes_from_mbo,
     read_dbn,
 )
 from argus.eval.queueproof import OUR_QTY, score
 
 
-def _event(action: str, order_id: str, price: str, size: str, *, side: str = "B") -> MboEvent:
+def _event(
+    action: str, order_id: str, price: str, size: str, *, side: str = "B",
+    instrument_id: int = 1,
+) -> MboEvent:
     return MboEvent(
-        ts_recv=0, action=action, side=side, order_id=order_id,
+        ts_recv=0, action=action, side=side, order_id=order_id, instrument_id=instrument_id,
         price=Decimal(price), size=Decimal(size),
     )
 
@@ -50,6 +55,7 @@ class TestFromMboMsg:
         assert event.action == "A"
         assert event.side == "B"
         assert event.order_id == "7"
+        assert event.instrument_id == 42
         assert event.price == Decimal("4500250000000") * PRICE_SCALE
         assert event.price == Decimal("4500.25")
         assert event.size == Decimal("3")
@@ -183,3 +189,63 @@ class TestJoinEveryIsRespected:
         events = [_event("A", "a", "100", "10")]
         episodes = episodes_from_mbo(events, join_every=JOIN_EVERY, min_observations=1)
         assert episodes == []
+
+
+class TestInstrumentFiltering:
+    """A single `.dbn` file can carry more than one instrument even when its filename names
+    only one -- this is the guard that stops two unrelated order books from being replayed as
+    if they were the same market."""
+
+    def test_dominant_instrument_is_the_busiest_one(self) -> None:
+        events = (
+            [_event("A", f"a{i}", "100", "1", instrument_id=1) for i in range(5)]
+            + [_event("A", f"b{i}", "200", "1", instrument_id=2) for i in range(2)]
+        )
+        assert dominant_instrument(events) == 1
+
+    def test_a_second_instruments_price_levels_never_leak_into_the_replay(self) -> None:
+        """Instrument 2's price "100" (same numeral as instrument 1's real level) must never be
+        treated as the same book -- if it were, this would corrupt `ahead_of` with a stranger's
+        resting quantity that was never really in the queue our order joined."""
+        events = [
+            _event("A", "a", "100", "30", instrument_id=1),
+            _event("A", "b", "100", "20", instrument_id=1),
+            # A same-priced order on a DIFFERENT instrument -- must be invisible to instrument 1.
+            _event("A", "x", "100", "999", instrument_id=2),
+        ]
+        episodes = episodes_from_mbo(events, instrument_id=1, join_every=2, min_observations=1)
+        assert episodes[0].entry_level == pytest.approx(50.0)  # not 50 + 999
+
+    def test_defaults_to_the_dominant_instrument_when_none_is_named(self) -> None:
+        events = (
+            [_event("A", f"a{i}", "100", "1", instrument_id=7) for i in range(4)]
+            + [_event("A", "x", "200", "1", instrument_id=9)]
+        )
+        episodes = episodes_from_mbo(events, join_every=2, min_observations=1)
+        # Only instrument 7's adds (4 of them) count toward join_every=2 -> exactly 2 episodes.
+        assert len(episodes) == 2
+
+
+class TestTheRealArtefact:
+    """The one committed record of a real run -- `data/mbo_queue_proof.json`, from a real
+    2023-12-25 GLBX.MDP3 ESH4 session (nautilus_trader's own public DataBento-adapter test
+    fixture, not a paid purchase). Skipped, not failed, on a machine that never generated it --
+    the raw `.dbn.zst` this came from is deliberately not vendored into this repo (data, not
+    code; cited by source rather than redistributed)."""
+
+    def test_the_stored_report_is_readable_and_honest(self) -> None:
+        from pathlib import Path
+
+        from argus.eval.mbo_queueproof import REPORT_PATH
+
+        if not REPORT_PATH.exists():
+            pytest.skip("no real-MBO artefact on this machine")
+        blob = json.loads(Path(REPORT_PATH).read_text(encoding="utf-8"))
+        assert blob["episodes"] > 0
+        assert len(blob["results"]) == 10  # 6 real models + 4 ablations, same as the synthetic run
+        # The significance block is the load-bearing honesty check: a real win over the shipped
+        # default, reported with its own confidence interval rather than a bare ranking.
+        sig = blob.get("significance", {})
+        if "best_vs_shipped_default" in sig:
+            row = sig["best_vs_shipped_default"]
+            assert row["ci_lo"] <= row["mean"] <= row["ci_hi"]

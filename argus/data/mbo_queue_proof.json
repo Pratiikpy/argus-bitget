@@ -1,0 +1,99 @@
+{
+  "generated_at": "2026-09-22T11:31:31.549183+00:00",
+  "source_file": "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/develop/test_data/databento/esh4-glbx-mdp3-20231225.mbo.dbn.zst",
+  "instrument_id": 17077,
+  "raw_events": 68756,
+  "events_for_instrument": 68756,
+  "episodes": 1366,
+  "results": [
+    {
+      "model": "LogProbability2",
+      "episodes": 1366,
+      "queue_error": 0.04708,
+      "fill_error": 0.04109,
+      "cost_bps": 0.0088
+    },
+    {
+      "model": "PowerProbability3 n=2",
+      "episodes": 1366,
+      "queue_error": 0.04799,
+      "fill_error": 0.03842,
+      "cost_bps": 0.0124
+    },
+    {
+      "model": "ABLATION: every cancel is behind you",
+      "episodes": 1366,
+      "queue_error": 0.05448,
+      "fill_error": 0.06808,
+      "cost_bps": 0.0
+    },
+    {
+      "model": "ABLATION: RiskAdverse (trades only)",
+      "episodes": 1366,
+      "queue_error": 0.05448,
+      "fill_error": 0.06808,
+      "cost_bps": 0.0
+    },
+    {
+      "model": "PowerProbability n=2",
+      "episodes": 1366,
+      "queue_error": 0.05949,
+      "fill_error": 0.03484,
+      "cost_bps": 0.0505
+    },
+    {
+      "model": "PowerProbability n=1",
+      "episodes": 1366,
+      "queue_error": 0.06215,
+      "fill_error": 0.03548,
+      "cost_bps": 0.0541
+    },
+    {
+      "model": "LogProbability",
+      "episodes": 1366,
+      "queue_error": 0.0666,
+      "fill_error": 0.03867,
+      "cost_bps": 0.0627
+    },
+    {
+      "model": "ABLATION: coin",
+      "episodes": 1366,
+      "queue_error": 0.0707,
+      "fill_error": 0.04209,
+      "cost_bps": 0.0673
+    },
+    {
+      "model": "PowerProbability2 n=2",
+      "episodes": 1366,
+      "queue_error": 0.08222,
+      "fill_error": 0.03645,
+      "cost_bps": 0.1004
+    },
+    {
+      "model": "ABLATION: every cancel is ahead of you",
+      "episodes": 1366,
+      "queue_error": 0.11371,
+      "fill_error": 0.04319,
+      "cost_bps": 0.1464
+    }
+  ],
+  "significance": {
+    "best_vs_shipped_default": {
+      "best": "LogProbability2",
+      "shipped_default": "PowerProbability n=1",
+      "ci_lo": 0.01212,
+      "mean": 0.01508,
+      "ci_hi": 0.01803,
+      "significant": true
+    },
+    "best_vs_best_ablation": {
+      "best": "LogProbability2",
+      "best_ablation": "ABLATION: every cancel is behind you",
+      "ci_lo": 0.00456,
+      "mean": 0.0074,
+      "ci_hi": 0.01024,
+      "significant": true
+    }
+  },
+  "scope_statement": "Real GLBX.MDP3 market-by-order events, replayed through the SAME L3FIFOQueue class this project's own synthetic ground truth (eval/queueproof.py) is built on, scored by the SAME score() function. NOT CLAIMED: that Modify handling matches CME's own primary spec exactly (see this module's docstring) \u2014 the size-decrease-preserves-priority rule is the standard L3 convention, not independently confirmed against CME's own documentation. NOT CLAIMED: that this file's session is representative of every session \u2014 one file is one sample, and different real samples read this session has disagreed on which specific model wins (see this module's own docstring for the cross-file finding)."
+}
