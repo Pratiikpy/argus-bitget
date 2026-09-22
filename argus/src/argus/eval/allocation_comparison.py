@@ -108,6 +108,7 @@ from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
+from statistics import fmean
 from typing import Any
 
 from argus.desk.allocation import (
@@ -991,6 +992,116 @@ def run_failure_cases(columns: Mapping[str, Sequence[float]]) -> dict[str, Any]:
     }
 
 
+ADVERSARIAL_TRIALS = 20
+"""How many near-singular covariance matrices to construct. Added 2026-09-22 to close this
+capability's own `adversarial_test` condition, previously unproven: `run_failure_cases` above
+exercises HRP (which never inverts a matrix — recursive bisection has no equivalent failure mode)
+but never NCO, the allocator this capability's TIED verdict is actually about. `minimum_variance_
+weights` inverts a cluster sub-covariance; a near-singular one is exactly the adversarial input
+that mechanism can fail on, and until this function existed nothing had ever tried it."""
+
+ADVERSARIAL_NOISE_LEVELS = (0.0, 1e-8, 1e-6, 1e-4)
+"""0.0 is an exact duplicate (mathematically singular, matching `run_failure_cases`'s
+`duplicated_column` case but run against NCO instead of HRP). The other three push a clone
+progressively further from exact collinearity, spanning "numerically indistinguishable from
+singular" (1e-8) through "measurably distinct but still ill-conditioned" (1e-4)."""
+
+
+def run_adversarial_covariance(
+    columns: Mapping[str, Sequence[float]], *,
+    trials: int = ADVERSARIAL_TRIALS, seed: int = 2026,
+) -> dict[str, Any]:
+    """Near-singular covariance matrices, constructed and run against ARGUS's real `nco_weights`
+    and Riskfolio's real NCO — the adversarial input `run_failure_cases` never reaches.
+
+    Each trial clones a randomly chosen asset (four others plus the clone, five total) at a
+    randomly chosen noise level, so the resulting covariance ranges from exactly singular
+    (noise 0.0) to merely ill-conditioned (noise 1e-4). Both allocators run on the identical
+    matrix; the finding is not "ARGUS's weights are more correct" -- there is no ground truth for
+    a near-singular minimum-variance problem, and small numerical differences between two valid
+    solvers on an ill-posed problem are expected, not a defect on either side. The finding is
+    about FAILURE MODE: whether each side proceeds at all, and whether proceeding is honest about
+    having done so on a covariance its own math cannot trust.
+    """
+    import numpy as np
+
+    names_pool = sorted(columns)
+    rng = np.random.default_rng(seed)
+    results: list[dict[str, Any]] = []
+    for trial in range(trials):
+        base = [str(n) for n in rng.choice(names_pool, size=4, replace=False)]
+        clone_of = str(rng.choice(base))
+        noise = float(rng.choice(ADVERSARIAL_NOISE_LEVELS))
+        source = columns[clone_of]
+        clone = (
+            list(source) if noise == 0.0
+            else [v * (1.0 + float(rng.normal(0, noise))) for v in source]
+        )
+        adversarial = {**{n: columns[n] for n in base}, "CLONE": clone}
+        built = covariance_matrix(adversarial)
+        if built is None:
+            continue
+        names, matrix = built
+        min_eigenvalue = float(min(np.linalg.eigvalsh(np.array(matrix))))
+
+        argus_weights: dict[str, float] | None = None
+        argus_status = "ok"
+        try:
+            argus_weights = nco_weights(names, matrix)
+        except AllocationError:
+            argus_status = "refused"
+
+        riskfolio_weights_result: dict[str, float] | None = None
+        riskfolio_status = "ok"
+        riskfolio_noise = ""
+        try:
+            riskfolio_weights_result, riskfolio_noise = riskfolio_weights(
+                adversarial, model="NCO", linkage="ward",
+            )
+        except Exception as exc:  # the outcome is the finding either way
+            riskfolio_status = f"crashed:{type(exc).__name__}"
+
+        max_weight_diff = None
+        if argus_status == "ok" and riskfolio_status == "ok":
+            assert argus_weights is not None and riskfolio_weights_result is not None
+            max_weight_diff = max(
+                abs(argus_weights[n] - riskfolio_weights_result[n]) for n in names
+            )
+
+        results.append({
+            "trial": trial, "clone_of": clone_of, "noise": noise, "min_eigenvalue": min_eigenvalue,
+            "argus_status": argus_status, "riskfolio_status": riskfolio_status,
+            "riskfolio_flagged_not_positive_definite": "positive definite" in riskfolio_noise
+                or "singular" in riskfolio_noise.lower(),
+            "max_weight_diff_when_both_succeeded": max_weight_diff,
+        })
+
+    argus_refused = sum(1 for r in results if r["argus_status"] == "refused")
+    riskfolio_refused_or_crashed = sum(1 for r in results if r["riskfolio_status"] != "ok")
+    riskfolio_proceeded_despite_flag = sum(
+        1 for r in results
+        if r["riskfolio_status"] == "ok" and r["riskfolio_flagged_not_positive_definite"]
+    )
+    both_ok_diffs = [
+        r["max_weight_diff_when_both_succeeded"] for r in results
+        if r["max_weight_diff_when_both_succeeded"] is not None
+    ]
+    return {
+        "n_trials": len(results),
+        "trials": results,
+        "argus_refused": argus_refused,
+        "riskfolio_refused_or_crashed": riskfolio_refused_or_crashed,
+        "riskfolio_proceeded_despite_flagging_not_positive_definite": (
+            riskfolio_proceeded_despite_flag
+        ),
+        "both_succeeded": {
+            "n": len(both_ok_diffs),
+            "mean_max_weight_diff": round(fmean(both_ok_diffs), 4) if both_ok_diffs else None,
+            "worst_max_weight_diff": round(max(both_ok_diffs), 4) if both_ok_diffs else None,
+        },
+    }
+
+
 def measure_costs(columns: Mapping[str, Sequence[float]], repeats: int = 3) -> dict[str, Any]:
     """Wall-clock on both sides, over the same window, reported plainly."""
     window = _window(columns, 0, TRAIN_BARS)
@@ -1266,6 +1377,7 @@ def main() -> int:  # pragma: no cover - CLI
         "sharpe_sensitivity": run_sharpe_sensitivity(columns),
         "rebalance_sweep": run_rebalance_sweep(columns),
         "failure_cases": run_failure_cases(columns),
+        "adversarial_covariance": run_adversarial_covariance(columns),
         "costs": measure_costs(columns),
         "reproducibility": run_reproducibility_check(columns),
         "scope_statement": SCOPE_STATEMENT,
@@ -1283,6 +1395,8 @@ if __name__ == "__main__":  # pragma: no cover - CLI
 
 
 __all__ = [
+    "ADVERSARIAL_NOISE_LEVELS",
+    "ADVERSARIAL_TRIALS",
     "DAYS",
     "HORIZON_BARS",
     "RISKFOLIO_VARIANTS",
@@ -1297,6 +1411,7 @@ __all__ = [
     "measure_costs",
     "render",
     "riskfolio_weights",
+    "run_adversarial_covariance",
     "run_convex_rebalance",
     "run_failure_cases",
     "run_oos_variance",

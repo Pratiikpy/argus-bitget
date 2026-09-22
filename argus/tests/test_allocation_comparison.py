@@ -31,6 +31,7 @@ from argus.eval.allocation_comparison import (
     measure_costs,
     render,
     riskfolio_weights,
+    run_adversarial_covariance,
     run_convex_rebalance,
     run_failure_cases,
     run_oos_variance,
@@ -331,6 +332,76 @@ class TestSupportingEvidence:
         self, columns: dict[str, list[float]]
     ) -> None:
         assert run_reproducibility_check(columns)["identical"] is True
+
+
+class TestAdversarialCovariance:
+    """Near-singular covariance vs ARGUS's real `nco_weights` and Riskfolio's real NCO -- the
+    adversarial input `TestSupportingEvidence` above never reaches, because HRP (what those tests
+    exercise) never inverts a matrix at all. NCO's minimum-variance step does, which is exactly
+    where a singular covariance can bite, and until `run_adversarial_covariance` existed nothing
+    had ever tried it there. Added 2026-09-22 to close this capability's own `adversarial_test`
+    condition in `eval/standing.py`, previously unproven."""
+
+    def test_every_trial_produces_a_covariance_that_was_actually_built(
+        self, columns: dict[str, list[float]]
+    ) -> None:
+        result = run_adversarial_covariance(columns, trials=20)
+        assert result["n_trials"] == 20
+        assert len(result["trials"]) == 20
+
+    def test_riskfolio_never_refuses_even_on_an_exactly_singular_input(
+        self, columns: dict[str, list[float]]
+    ) -> None:
+        """The load-bearing finding: across 20 trials spanning exact duplication (noise=0.0)
+        through merely-ill-conditioned (noise=1e-4), Riskfolio's real NCO answers every time --
+        it is not softened by any specific noise level, it is the library's behaviour on this
+        whole family of adversarial input."""
+        result = run_adversarial_covariance(columns, trials=20)
+        assert result["riskfolio_refused_or_crashed"] == 0
+
+    def test_riskfolio_flags_the_covariance_as_untrustworthy_every_time_it_proceeds(
+        self, columns: dict[str, list[float]]
+    ) -> None:
+        """Not "Riskfolio doesn't notice" -- its own code detects the same condition ARGUS
+        refuses on, prints a warning about it, and returns an answer anyway. Pinned so a future
+        Riskfolio version that starts refusing outright (or stops warning) is caught rather than
+        silently assumed unchanged."""
+        result = run_adversarial_covariance(columns, trials=20)
+        assert (
+            result["riskfolio_proceeded_despite_flagging_not_positive_definite"]
+            == result["n_trials"] - result["riskfolio_refused_or_crashed"]
+        )
+
+    def test_argus_refuses_on_at_least_some_of_the_sweep(
+        self, columns: dict[str, list[float]]
+    ) -> None:
+        """Not asserting a specific count -- the RNG-drawn mix of noise levels varies which
+        trials are genuinely singular -- only that the refusal mechanism actually fires on this
+        real sweep rather than being dead code that never triggers."""
+        result = run_adversarial_covariance(columns, trials=20)
+        assert result["argus_refused"] > 0
+
+    def test_when_both_succeed_the_weight_difference_is_reported_not_hidden(
+        self, columns: dict[str, list[float]]
+    ) -> None:
+        """Not claiming the two allocators are close on this family -- claiming the difference,
+        whatever it is, is measured and surfaced rather than only reporting the trials where
+        ARGUS refused (which would flatter the "ARGUS is more careful" reading by hiding the
+        cases where careful wasn't necessary and the two still diverge)."""
+        result = run_adversarial_covariance(columns, trials=20)
+        both = result["both_succeeded"]
+        if both["n"] > 0:
+            assert both["mean_max_weight_diff"] is not None
+            assert both["worst_max_weight_diff"] >= both["mean_max_weight_diff"]
+
+    def test_the_sweep_is_reproducible_for_a_fixed_seed(
+        self, columns: dict[str, list[float]]
+    ) -> None:
+        first = run_adversarial_covariance(columns, trials=10, seed=7)
+        second = run_adversarial_covariance(columns, trials=10, seed=7)
+        assert [t["argus_status"] for t in first["trials"]] == [
+            t["argus_status"] for t in second["trials"]
+        ]
 
 
 class TestReport:

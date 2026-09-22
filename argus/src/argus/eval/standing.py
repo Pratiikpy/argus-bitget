@@ -4377,6 +4377,25 @@ REGISTER: tuple[Capability, ...] = (
                 artefact="data/allocation_comparison.json",
             ),
             Proof(
+                condition="adversarial_test",
+                how="added 2026-09-22: 20 near-singular covariance matrices (a real asset cloned "
+                    "at noise levels from exact duplication to merely ill-conditioned), run "
+                    "against ARGUS's real nco_weights and Riskfolio's real NCO. Riskfolio's "
+                    "real NCO refuses/crashes 0/20 times — it proceeds on every input, including "
+                    "exact duplicates — while flagging internally ('you must convert self.cov to "
+                    "a positive definite matrix' / a LinAlgWarning on a singular matrix) on all "
+                    "20/20 trials it still answers. ARGUS's own nco_weights refuses cleanly "
+                    "(AllocationError) on 16/20 — the genuinely singular ones. On the 4/20 where "
+                    "both succeeded, weights diverge meaningfully (mean 8.5pp, worst 16.9pp max "
+                    "difference) — expected on an ill-posed problem with two different solvers, "
+                    "not a correctness defect on either side. NOT claimed as an accuracy win: "
+                    "there is no ground truth for a near-singular minimum-variance problem, only "
+                    "a measured, reproducible difference in whether each side proceeds and "
+                    "whether proceeding is honest about the covariance being untrustworthy",
+                artefact="data/allocation_comparison.json",
+                test="test_allocation_comparison.py::TestAdversarialCovariance",
+            ),
+            Proof(
                 condition="out_of_sample_test",
                 how="walk-forward realised OOS volatility over non-overlapping held-out "
                     "windows, real, live-fetched: ARGUS's own NCO and Riskfolio's real NCO both "
@@ -4407,9 +4426,19 @@ REGISTER: tuple[Capability, ...] = (
             "leaf_order=True default) still loses to both NCO variants decisively — the tie is "
             "specifically ARGUS's own NCO against Riskfolio's, not a claim that every ARGUS "
             "allocator matches every Riskfolio one.",
-            "adversarial_test is not proven: no adversarial covariance (near-singular, one "
-            "dominant eigenvalue) has been run against either allocator specifically, only the "
-            "ordinary failure-case inputs above.",
+            "The adversarial-covariance sweep (2026-09-22) is a real, measured, reproducible "
+            "finding and it is NOT counted as a win — the near-singular family it tests is "
+            "genuinely ill-posed (no ground truth for what a minimum-variance solve should "
+            "return there), so 'ARGUS refuses more often' is a documented behavioural "
+            "difference, not evidence ARGUS's weights are more correct. What it establishes: "
+            "Riskfolio's real NCO never refuses across the sweep (0/20) and flags its own "
+            "covariance as untrustworthy every time it proceeds anyway (20/20); ARGUS's "
+            "nco_weights refuses cleanly on the genuinely singular cases (16/20) rather than "
+            "returning a number its own math cannot stand behind. Whether that is better for a "
+            "real user is a judgement about what they want from a tool facing bad input — an "
+            "always-an-answer library or a sometimes-refuses one — not a fact this sweep alone "
+            "settles, which is why the state stays TIED rather than moving to OWNED on the "
+            "strength of this one axis.",
             "best_method_studied is not proven beyond reproducing NCO's own default "
             "configuration (MinRisk/MV, Ward linkage, two-diff gap statistic for k): NCO's own "
             "clustering hyperparameters were not swept for sensitivity, so it is not "
@@ -4435,7 +4464,19 @@ REGISTER: tuple[Capability, ...] = (
              "1.3e-05 on the real book, wired it into the SAME live walk-forward comparison this "
              "capability was measured LOST on, and re-ran it live: a genuine tie, 8.203bps both, "
              "ratio 1.0000. LOST -> TIED, on a freshly-run comparison, not a reinterpretation of "
-             "the old one.",
+             "the old one. Third update, also 2026-09-22, after the regime-boundary-detection and "
+             "LUI capabilities were each closed the same day: this capability's own "
+             "adversarial_test condition was still unproven, and `run_failure_cases` — the "
+             "existing degenerate-input harness — only ever exercised HRP, which cannot fail this "
+             "way (recursive bisection never inverts a matrix). Built `run_adversarial_covariance` "
+             "(20 near-singular covariance matrices, real assets cloned at noise levels from "
+             "exact duplication to merely ill-conditioned), run against ARGUS's real nco_weights "
+             "and Riskfolio's real NCO for the first time. Closes the condition honestly: real, "
+             "systematic, reproducible evidence of a genuine failure-mode difference (Riskfolio "
+             "never refuses and flags trouble every time it proceeds anyway; ARGUS refuses "
+             "cleanly on the genuinely singular cases) — reported as exactly that, not inflated "
+             "into a claim that ARGUS's weights are more correct, since there is no ground truth "
+             "for a near-singular allocation problem to check either side against.",
     ),
     Capability(
         name="Regime-boundary detection, measured against stumpy FLUSS and ruptures",
