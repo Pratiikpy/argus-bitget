@@ -26,6 +26,17 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+FAVICON = (
+    "data:image/svg+xml,"
+    "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E"
+    "%3Crect width='32' height='32' rx='7' fill='%231a5fb4'/%3E"
+    "%3Ctext x='16' y='23' font-family='ui-monospace,monospace' font-size='18' "
+    "font-weight='700' fill='%23fff' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E"
+)
+"""Kept identical to (and duplicated from, rather than imported from) `lui/server.py`'s constant
+of the same name: `server.py` only imports this module lazily, inside a route handler, so a
+module-level import in the other direction here is avoidable risk for six lines of duplication."""
+
 
 @dataclass(frozen=True, slots=True)
 class Correction:
@@ -219,6 +230,7 @@ def render(corrections: list[Correction]) -> str:
     )
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="{FAVICON}">
 <title>ARGUS — what we got wrong</title>
 <style>
  :root {{ --ink:#12161c; --dim:#5b6470; --line:#dfe3e8; --bg:#f7f8fa; --panel:#fff;

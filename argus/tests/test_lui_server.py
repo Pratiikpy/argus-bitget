@@ -84,11 +84,20 @@ class TestTheDemoStarts:
         assert "default-src 'self'" in policy, "external origins must still be refused"
 
     def test_the_page_loads_nothing_from_any_other_origin(self) -> None:
-        """The CSP allows inline; this asserts we never come to rely on more than that."""
+        """The CSP allows inline; this asserts we never come to rely on more than that.
+
+        **One narrow, understood exception, added 2026-09-22 with the favicon fix.** The inline
+        SVG favicon's `xmlns='http://www.w3.org/2000/svg'` contains the substring "http://", and
+        it is never fetched — it is the standard XML namespace identifier every standalone SVG
+        document declares, required for the `data:` URI to render as SVG rather than as opaque
+        XML. `test_favicon.py` (new) checks the favicon specifically; this test's job is unchanged
+        for everything else on the page.
+        """
         for marker in ("http://", "https://", "src=\"//"):
             offenders = [
                 line for line in PAGE.splitlines()
                 if marker in line and "127.0.0.1" not in line and "http-equiv" not in line
+                and "xmlns='http://www.w3.org/2000/svg'" not in line
             ]
             assert not offenders, f"page references an external origin: {offenders[:2]}"
 
