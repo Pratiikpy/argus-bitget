@@ -199,17 +199,48 @@ PHRASES: dict[str, dict[Language, str]] = {
     "integ.explain": {
         Language.EN: (
             "Each row carries the hash of the previous one, so editing any historical row breaks "
-            "every hash after it. Settlement fields are deliberately excluded from the hash, which "
-            "is why attaching an outcome does not invalidate the chain."
+            "every hash after it. Settlement fields are deliberately excluded from that hash, so "
+            "attaching an outcome does not invalidate the chain — but they are not unprotected: "
+            "a separate settlement-seal row commits to each outcome the moment it is attached, "
+            "and editing a settled trade's P&L after the fact breaks that seal's own chain link "
+            "the same way tampering with a decision does."
         ),
         Language.ZH: (
             "每一行都带有上一行的哈希，因此修改任何一条历史记录都会破坏其后的全部哈希。"
-            "结算字段被有意排除在哈希之外，所以补录结果不会使链失效。"
+            "结算字段被有意排除在该哈希之外，所以补录结果不会使链失效——但它们并非不受保护："
+            "每次补录结果时都会写入一条独立的结算封存记录，事后修改已结算交易的盈亏"
+            "同样会破坏该封存记录自身的链接，与篡改决策记录时的效果相同。"
         ),
     },
     "integ.head": {
         Language.EN: "Head hash {hash}.",
         Language.ZH: "链头哈希 {hash}。",
+    },
+    "integ.settlement_tampered": {
+        Language.EN: (
+            "Settlement seal mismatch on decision(s) {seqs}: the outcome recorded now does not "
+            "match what was sealed at settlement time. That is what real tampering with a "
+            "settled trade's P&L looks like from here."
+        ),
+        Language.ZH: (
+            "决策 {seqs} 的结算封存不匹配：当前记录的结算结果与结算时封存的内容不一致。"
+            "这正是已结算交易盈亏遭到真实篡改时的表现。"
+        ),
+    },
+    "integ.settlement_unsealed": {
+        Language.EN: (
+            "Decision(s) {seqs} are marked settled with no settlement seal at all — either "
+            "written before this record started sealing outcomes, or settled by a path that "
+            "bypassed the ledger's own settle() entirely."
+        ),
+        Language.ZH: (
+            "决策 {seqs} 被标记为已结算，但完全没有结算封存记录——"
+            "要么是在本记录开始封存结算结果之前写入的，要么是绕过账本自身 settle() 的方式结算的。"
+        ),
+    },
+    "integ.truncated": {
+        Language.EN: "The anchor disagrees with the log: {note}",
+        Language.ZH: "锚点记录与日志不一致：{note}",
     },
     # --- positions ---------------------------------------------------------------------------
     "pos.none": {Language.EN: "No open positions.", Language.ZH: "当前没有持仓。"},

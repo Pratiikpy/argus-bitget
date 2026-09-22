@@ -268,11 +268,23 @@ def answer_integrity(ledger: PaperLedger, question: Question) -> Answer:
     state = t("integ.state_intact" if intact else "integ.state_broken", lang)
     lines = [t("integ.header", lang, state=state, count=len(ledger.entries))]
     if not intact:
-        lines.append(t("integ.break_at", lang, at=report.get("first_break_at")))
+        if report.get("first_break_at") is not None:
+            lines.append(t("integ.break_at", lang, at=report["first_break_at"]))
+        tampered = report.get("tampered_settlements") or []
+        if tampered:
+            lines.append(t("integ.settlement_tampered", lang, seqs=", ".join(map(str, tampered))))
+        unsealed = report.get("unsealed_settlements") or []
+        if unsealed:
+            lines.append(t("integ.settlement_unsealed", lang, seqs=", ".join(map(str, unsealed))))
+        if report.get("truncated") and not tampered and not unsealed:
+            lines.append(t("integ.truncated", lang, note=report.get("anchor", "")))
     else:
         lines.append(t("integ.explain", lang))
-    if ledger.entries:
-        lines.append(t("integ.head", lang, hash=ledger.entries[-1].content_hash[:16]))
+    # `report["head_hash"]`, not `ledger.entries[-1].content_hash`: the actual chain head is
+    # frequently a settlement seal now (appended right after the decision it seals), and reading
+    # the last *decision*'s hash instead would show a stale, no-longer-current head.
+    if ledger.entries or ledger.seals:
+        lines.append(t("integ.head", lang, hash=report["head_hash"]))
     return Answer(question=question, lines=lines,
                   sources=[Source("computation", "argus.paper.ledger:PaperLedger.verify")],
                   data={k: str(v) for k, v in report.items()})
