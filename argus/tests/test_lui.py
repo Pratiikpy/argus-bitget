@@ -137,6 +137,46 @@ class TestRefusalIsAnAnswer:
         assert "Answerable today" in " ".join(a.lines)
 
 
+class TestANegativeDecisionNumberIsRefusedNotSilentlyReplaced:
+    """Found by the 2026-09-22 ADVERSARIAL LENS pass: "decision -1" used to answer with the LATEST
+    decision, undisclosed, because `_SEQ` could not capture the sign, so the "-1" was silently
+    dropped rather than parsed and refused — the exact silent-reinterpretation this project's
+    other rules exist to catch, just reached through a regex gap instead of a routing one."""
+
+    def test_a_negative_decision_number_is_refused_like_decision_zero_already_was(
+        self, weekend_ledger: PaperLedger
+    ) -> None:
+        zero = answer(weekend_ledger, classify("show me decision 0", now=NOW))
+        negative = answer(weekend_ledger, classify("show me decision -1", now=NOW))
+        assert zero.refused
+        assert negative.refused
+        assert negative.reason == zero.reason
+
+    def test_it_is_not_silently_answered_with_the_most_recent_decision(
+        self, weekend_ledger: PaperLedger
+    ) -> None:
+        q = classify("show me decision -1", now=NOW)
+        assert q.seq == -1
+        a = answer(weekend_ledger, q)
+        assert a.refused
+        assert "seq 9" not in " ".join(a.lines)  # 9 is the latest row in weekend_ledger
+
+    def test_a_genuinely_absent_seq_still_falls_back_to_the_most_recent_decision(
+        self, weekend_ledger: PaperLedger
+    ) -> None:
+        """The fallback itself is correct and intentional when no number was ever given — only a
+        malformed-but-present number (a negative one) must not be swallowed by it the same way."""
+        q = classify("explain the reasoning", now=NOW)
+        assert q.seq is None
+        a = answer(weekend_ledger, q)
+        assert not a.refused
+        assert "seq 9" in " ".join(a.lines)
+
+    def test_a_large_negative_number_beyond_the_six_digit_cap_is_not_captured_either(self) -> None:
+        q = classify("show me decision -9999999", now=NOW)
+        assert q.seq is None
+
+
 class TestAnInstructionIsNeverReinterpretedAsAQuestion:
     """Found by driving the judge session: "sell half of that" returned a past decision's thesis.
 

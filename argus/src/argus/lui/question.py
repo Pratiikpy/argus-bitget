@@ -702,13 +702,29 @@ _COMPILED: tuple[tuple[re.Pattern[str], Intent], ...] = tuple(
 )
 
 _SEQ = re.compile(
-    r"\b(?:seq|sequence|decisions?|decided\s+on|deciding\s+on|entry|row|#)\s*#?\s*(\d{1,6})\b",
+    r"\b(?:seq|sequence|decisions?|decided\s+on|deciding\s+on|entry|row|#)\s*#?\s*(-?\d{1,6})\b",
     re.I,
 )
 """How a decision is named. The verb forms matter: LUI-BENCH asked "what did it read before
 deciding on 12", which names row 12 as plainly as "decision 12" does — and the noun-only pattern
 missed it, so the question reached EVIDENCE and was then downgraded to AMBIGUOUS by the
-dangling-"it" guard for having nothing to point at. It was pointing at 12."""
+dangling-"it" guard for having nothing to point at. It was pointing at 12.
+
+**The leading `-?`, added 2026-09-22 by the ADVERSARIAL LENS pass.** Without it, "show me decision
+-1" does not fail to match a decision — it fails to match a *number* at all: `\d{1,6}` cannot
+consume the sign, so `seq` comes out `None`, the question still reaches DECISION_WHY on the bare
+word "decision", and `answer_decision_why` falls back to its no-seq-given default, the most recent
+entry. The console then answers with the latest decision as though it were directly responsive to
+"-1", with nothing said about the number that was silently dropped — a real user typo (a stray
+Python/array-indexing instinct, or a fat-fingered minus) gets a confident, on-topic-looking answer
+to a question that was never actually asked. Capturing the sign makes `seq == -1` an explicit,
+real value, which the existing `rows = [e for e in rows if e.seq == question.seq]` filter in
+`answer.py` already refuses cleanly — the identical path "decision 0" (a parseable, in-range-of-
+the-pattern, but nonexistent seq) already used. No new refusal logic was needed, only a number
+that had been silently unparsed becoming a number that is honestly wrong. `\d{1,6}`'s existing
+6-digit cap is unaffected and still rejects longer digit runs (positive or negative) outright,
+falling through to DECISION_LIST rather than any specific-decision claim — unchanged behaviour,
+checked directly rather than assumed."""
 
 _VAGUE_REFERENCE = re.compile(
     # "that" is a demonstrative *and* a relativiser, and only the first one dangles. In
