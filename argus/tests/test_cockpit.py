@@ -167,10 +167,12 @@ class TestThePanelCanActuallyPopulate:
         path = tmp_path / "ledger.jsonl"
         ledger = PaperLedger(path=path)
         pnls = pnl_sequence or ["120", "-40", "65"]
-        object.__setattr__(ledger, "entries", [
+        # `entries` is a read-only, decisions-only *view* over `_raw_entries` (2026-09-22,
+        # settlement seals) — injecting a synthetic fixture writes the real backing field instead.
+        ledger._raw_entries = [
             _entry(i + 1, day + timedelta(days=i), day + timedelta(days=i + 1), p)
             for i, p in enumerate(pnls)
-        ])
+        ]
         monkeypatch.setattr(mod, "_absent", mod._absent)
         monkeypatch.setattr("argus.paper.runner.LEDGER_PATH", path)
         path.write_text("", encoding="utf-8")
