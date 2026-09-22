@@ -23,6 +23,7 @@ from argus.eval.quarantine_comparison import (
     CANONICAL,
     NEAR_MISS_PROSE,
     PARAPHRASES,
+    _count_desk_notes,
     load_corpus,
     load_live_headlines,
     load_production_withholdings,
@@ -308,3 +309,67 @@ class TestTheArtefactAndTheMachinery:
         assert stored["recall"]["totals"] == fresh["totals"]
         assert stored["precision"]["negatives_withheld_after"] == 0
         assert stored["corpus_verification"]["all_templates_present_in_clone"] is True
+
+
+class TestTheDenominatorIsComputedNotHandTyped:
+    """`desk_runs_total`/`withholding_notes` drifted three times in three days as a hand-typed
+    snapshot (385 -> 433 -> 445 -> caught stale at 481) because the desk keeps running and nobody
+    remembered to bump two numbers nothing about the audit actually depended on. Fixed 2026-09-22:
+    both are computed live; see `load_production_withholdings`'s docstring."""
+
+    def test_count_desk_notes_matches_a_hand_verified_synthetic_log(self, tmp_path: Path) -> None:
+        notes_path = tmp_path / "desk_notes.jsonl"
+        notes_path.write_text(
+            "\n".join([
+                json.dumps({"notes": ["nothing here"]}),
+                json.dumps({"notes": ["[quarantine] withheld for hidden_characters: twitter-1"]}),
+                json.dumps({
+                    "notes": [
+                        "[quarantine] withheld for directed_trading_order: reddit-1, reddit-2",
+                        "unrelated note",
+                    ]
+                }),
+                "",  # a blank line, as a real jsonl tail sometimes has — must not count as a run
+            ]),
+            encoding="utf-8",
+        )
+        runs, withholding_notes, ids = _count_desk_notes(notes_path)
+        assert runs == 3
+        assert withholding_notes == 2
+        assert ids == {"twitter-1", "reddit-1", "reddit-2"}
+
+    def test_load_production_withholdings_reports_the_live_count_not_a_stored_one(self) -> None:
+        production = load_production_withholdings()
+        real_path = Path(__file__).resolve().parents[1] / "data" / "desk_notes.jsonl"
+        live_runs, live_notes, _ = _count_desk_notes(real_path)
+        assert production["desk_runs_total"] == live_runs
+        assert production["withholding_notes"] == live_notes
+        stored_raw = json.loads(
+            (Path(__file__).resolve().parents[1] / "data"
+             / "quarantine_production_withholdings.json").read_text(encoding="utf-8")
+        )
+        assert "desk_runs_total" not in stored_raw, (
+            "the file must not carry a hand-typed number the function silently overrides — "
+            "that is exactly the drift this fix exists to stop"
+        )
+
+    def test_a_withholding_naming_an_unaudited_id_raises_rather_than_inflating_the_denominator(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The one case that genuinely needs a human: a 7th evidence id nobody has judged yet.
+        Silently accepting it into desk_runs_total would let a real false-negative (something
+        withheld and never checked) hide inside a bigger, innocent-looking run count."""
+        import argus.eval.quarantine_comparison as qc
+
+        raw = json.loads(
+            (Path(__file__).resolve().parents[1] / "data"
+             / "quarantine_production_withholdings.json").read_text(encoding="utf-8")
+        )
+        audited = {item["id"] for item in raw["items"]}
+
+        def fake_count(path: Path | None = None) -> tuple[int, int, set[str]]:
+            return 999, 99, audited | {"twitter-never-audited"}
+
+        monkeypatch.setattr(qc, "_count_desk_notes", fake_count)
+        with pytest.raises(qc.QuarantineComparisonError, match="twitter-never-audited"):
+            qc.load_production_withholdings()

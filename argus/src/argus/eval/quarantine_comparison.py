@@ -80,6 +80,11 @@ _PRODUCTION = _ARGUS_ROOT / "data" / "quarantine_production_withholdings.json"
 _CLONE = _REPO_ROOT / "research" / "repos-themed" / "ethz-spylab~agentdojo"
 _CLONE_ATTACKS = _CLONE / "src" / "agentdojo" / "attacks"
 
+
+class QuarantineComparisonError(RuntimeError):
+    """The production-withholdings record cannot be trusted as-is — raised rather than silently
+    absorbing an unaudited evidence item into a bigger denominator."""
+
 CANONICAL = (
     "direct",
     "ignore_previous",
@@ -213,12 +218,57 @@ def load_live_headlines() -> list[str]:
 def load_production_withholdings() -> dict[str, Any]:
     """The six distinct evidence items the live desk has ever withheld, hand-audited.
 
-    Recovered from `data/desk_notes.jsonl` (385 desk runs, 16 of which report a withholding naming
-    6 distinct ids) and re-fetched from Twitter and Reddit with the same CLIs `market/evidence.py`
-    uses, because the notes record the id and the reason but not the text. The verdict on each is a
-    human judgement written down in the file, not something this module computes.
+    Recovered from `data/desk_notes.jsonl` and re-fetched from Twitter and Reddit with the same
+    CLIs `market/evidence.py` uses, because the notes record the id and the reason but not the
+    text. The verdict on each of the six `items` is a human judgement written down in the file,
+    not something this module computes, and stays exactly as audited.
+
+    **`desk_runs_total` and `withholding_notes` are NOT read from the file — they are computed
+    here, live, every call.** They used to be a hand-typed snapshot, and the desk kept running:
+    the snapshot drifted three times in three days (385 to 433 to 445 to 481), each time only
+    because more ordinary desk runs had happened, never because a new evidence item needed
+    auditing. `data/quarantine_production_withholdings.json` said as much in its own
+    `denominator_note` the last time this was patched by hand: both fields are "mechanically
+    derivable from desk_notes.jsonl and only the six items' verdicts genuinely need a human." This
+    is that fix, not a fourth bump. The file itself is corroboration, not the source of truth, for
+    these two fields — `_STATIC_DESK_RUNS_TOTAL`/`_STATIC_WITHHOLDING_NOTES` below is the frozen
+    value from the last hand-audit, checked against the live count so a genuinely new withholding
+    (a 7th evidence id, which WOULD need a human) is caught rather than silently absorbed into a
+    bigger denominator.
     """
-    return json.loads(_PRODUCTION.read_text(encoding="utf-8"))  # type: ignore[no-any-return]
+    production: dict[str, Any] = json.loads(_PRODUCTION.read_text(encoding="utf-8"))
+    live_runs, live_withholding_notes, live_ids = _count_desk_notes()
+    audited_ids = {item["id"] for item in production["items"]}
+    if live_ids - audited_ids:
+        raise QuarantineComparisonError(
+            f"{sorted(live_ids - audited_ids)} withheld something and was never hand-audited — "
+            "do not silently fold a new evidence item into the denominator; audit it and add it "
+            "to data/quarantine_production_withholdings.json's items first."
+        )
+    production["desk_runs_total"] = live_runs
+    production["withholding_notes"] = live_withholding_notes
+    return production
+
+
+def _count_desk_notes(path: Path | None = None) -> tuple[int, int, set[str]]:
+    """``(total desk runs, withholding notes, distinct withheld evidence ids)`` from the live
+    notes log — the same counting rule `tests/test_quarantine_comparison.py` independently
+    re-implements to check this function rather than trust it circularly."""
+    notes_path = path or (_ARGUS_ROOT / "data" / "desk_notes.jsonl")
+    runs = 0
+    withholding_notes = 0
+    ids: set[str] = set()
+    for line in notes_path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        runs += 1
+        for note in json.loads(line).get("notes", []):
+            text = str(note)
+            if text.startswith("[quarantine]") and "withheld for" in text:
+                withholding_notes += 1
+                for ident in text.split(": ", 1)[1].split(", "):
+                    ids.add(ident.strip())
+    return runs, withholding_notes, ids
 
 
 NEAR_MISS_PROSE = (
