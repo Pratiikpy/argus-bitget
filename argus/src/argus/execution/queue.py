@@ -263,6 +263,21 @@ class RiskAdverseQueue(QueueModel):
     Understates fills by construction — real books lose orders ahead of you to cancellation all
     day. Use it when a strategy's viability must not depend on an assumption about other people's
     cancellations.
+
+    **RIVAL LENS check, 2026-09-22: read `queue.rs` again with fresh eyes looking for an hftbacktest
+    model ARGUS had not ported.** This one was already ported, already wired into
+    `eval/queueproof.py::_models()`, and already correctly labelled an ablation rather than a
+    contender — verified rather than assumed. Its measured `queue_error`/`fill_error` are exactly
+    identical, to five decimal places, to the `"every cancel is behind you"` constant-probability
+    ablation in every regime tested — both synthetic (`data/queue_proof.json`, all five regimes,
+    including the two where both score a perfect 0.0) and the real 2023-12-25 ESH4 MBO session
+    (`data/mbo_queue_proof.json`: 0.05448 both). That is not a coincidence to re-derive next time:
+    never attributing a cancellation to the front of the queue is mathematically the same policy
+    as `const(1)`'s probability function, so the two models make identical predictions on every
+    input this project's harness can construct. Neither beats the current best model
+    (`LogProbability2`) on either the synthetic or the real data. A genuinely different algorithm
+    from the rival's own source, checked and confirmed not to unlock a win here — logged so the
+    next RIVAL LENS pass on this capability does not spend an afternoon re-confirming it.
     """
 
     name = "risk_adverse"
