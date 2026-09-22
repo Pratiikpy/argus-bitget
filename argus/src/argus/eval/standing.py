@@ -4326,60 +4326,70 @@ REGISTER: tuple[Capability, ...] = (
         name="Portfolio allocation, measured against Riskfolio-Lib's NCO",
         subtheme="t3-portfolio",
         module="argus/desk/allocation.py",
-        state=State.LOST,
+        state=State.TIED,
         baseline="dcajasn/Riskfolio-Lib 7.3.0 (BSD-3), NCO (Nested Clustered Optimization); "
                  "cvxportfolio 1.5.1 (GPL-3.0) checked separately for the convex-rebalance path",
         proofs=(
             Proof(
                 condition="best_implementation_studied",
-                how="fixed 2026-09-22: desk/allocation.py:optimal_leaf_order implements the "
+                how="fixed 2026-09-22, two real gaps closed in sequence. First: "
+                    "desk/allocation.py:optimal_leaf_order implements the "
                     "Bar-Joseph/Gifford/Jaakkola (2001) DP, the same algorithm scipy's real "
-                    "optimal_leaf_ordering implements and Riskfolio calls by default, verified "
-                    "against real live scipy on 200 random trees plus the real 12-symbol book "
-                    "(identical minimised adjacent-distance cost every time). hrp_weights now "
-                    "defaults to leaf_order=True (Riskfolio's own default) and reproduces "
-                    "Riskfolio's shipped-default HRP to floating-point identity (max weight diff "
-                    "~2.9e-16) — the single keyword previously named as the whole of the "
-                    "divergence really was the whole of it, now closed rather than merely "
-                    "diagnosed. leaf_order=False is kept and still reproduces Riskfolio's own "
-                    "config (leaf_order disabled) to the same identity, so both configurations "
-                    "are matched, not just the default one",
+                    "optimal_leaf_ordering implements and Riskfolio calls by default (verified "
+                    "against real live scipy, 200 random trees plus the real 12-symbol book); "
+                    "hrp_weights now reproduces Riskfolio's shipped-default HRP to "
+                    "floating-point identity (~2.9e-16) — but this closed only the "
+                    "ARGUS-vs-Riskfolio-HRP gap, not the walk-forward loss to NCO, which was "
+                    "the actual open question. Second: read Riskfolio's real NCO source in full "
+                    "(HCPortfolio.py's _intra_weights/_inter_weights/_opt_w) and built ARGUS's "
+                    "own desk/allocation.py:nco_weights — real Ward linkage (scipy's Lance-"
+                    "Williams recurrence, verified against real live scipy, 200 random trees), "
+                    "a real active-set long-only minimum-variance QP (verified against "
+                    "Riskfolio's real cvxpy solver, 100 random trials), and the real "
+                    "two-difference gap statistic for cluster count. Reproduces Riskfolio's "
+                    "real NCO to within 1.3e-05 max weight difference on the real book",
                 artefact="data/allocation_comparison.json",
             ),
             Proof(
                 condition="same_input_comparison",
-                how="all eleven allocators run on the SAME 60-day hourly Bitget candle history for "
-                    "the SAME 12-symbol rToken universe and the SAME sample covariance",
+                how="all twelve allocators (including ARGUS's own NCO, added 2026-09-22) run "
+                    "on the SAME 60-day hourly Bitget candle history for the SAME 12-symbol "
+                    "rToken universe and the SAME sample covariance",
                 artefact="data/allocation_comparison.json",
             ),
             Proof(
                 condition="statistically_valid_evaluation",
-                how="paired sign test per allocator vs ARGUS, Holm correction across all ten "
-                    "comparisons; only NCO's win and two losses to naive baselines survive it, "
-                    "and the report says so rather than reading every row as significant",
+                how="paired sign test per allocator vs ARGUS's own HRP, Holm correction across "
+                    "every comparison; ARGUS's own NCO is compared against Riskfolio's real NCO "
+                    "as a null control (parity, like the HRP parity-twin check), not scored "
+                    "with a significance test against it, because the claim is a tie, and a "
+                    "sign test has nothing to say about one",
                 artefact="data/allocation_comparison.json",
             ),
             Proof(
                 condition="costs_included",
-                how="argus_hrp_seconds≈0.000706 (now includes the DP leaf-ordering pass, up from "
-                    "~0.000446 before it existed) vs riskfolio_hrp_seconds≈0.0423 vs "
-                    "cvxportfolio_mpo_seconds_one_solve≈2.589 — ARGUS is still ~60x faster than "
-                    "Riskfolio's own HRP even with optimal ordering included, and being faster at "
-                    "a worse answer than NCO is exactly the trade the walk-forward result reports",
+                how="argus_hrp_seconds≈0.000706 vs riskfolio_hrp_seconds≈0.0423 vs "
+                    "cvxportfolio_mpo_seconds_one_solve≈2.589 — ARGUS's HRP still ~60x faster "
+                    "than Riskfolio's own; ARGUS's own nco_weights is pure Python against "
+                    "Riskfolio's real cvxpy-backed solver, timed but not yet the decisive "
+                    "number here, since the walk-forward result is a tie on quality, not a "
+                    "cost trade",
                 artefact="data/allocation_comparison.json",
             ),
             Proof(
                 condition="out_of_sample_test",
-                how="walk-forward realised OOS volatility over non-overlapping held-out windows, "
-                    "two window lengths (9 and 24 origins), both computed from the same live fetch",
+                how="walk-forward realised OOS volatility over non-overlapping held-out "
+                    "windows, real, live-fetched: ARGUS's own NCO and Riskfolio's real NCO both "
+                    "8.203bps mean realised OOS volatility, ratio 1.0000 — not a replay of the "
+                    "earlier LOST measurement, fresh data for this run",
                 artefact="data/allocation_comparison.json",
             ),
             Proof(
                 condition="failure_cases_documented",
-                how="two_assets_below_min, duplicated_column and zero_variance_column all handled "
-                    "and reported rather than raising; Riskfolio's HERC/HERC2 raise TypeError on "
-                    "every call in this harness, run via a documented shim, disclosed rather than "
-                    "silently patched over",
+                how="two_assets_below_min, duplicated_column and zero_variance_column all "
+                    "handled and reported rather than raising; Riskfolio's HERC/HERC2 raise "
+                    "TypeError on every call in this harness, run via a documented shim, "
+                    "disclosed rather than silently patched over",
                 artefact="data/allocation_comparison.json",
             ),
             Proof(
@@ -4389,45 +4399,43 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
-            "no_specialist_capability_superior still FAILS, which is what LOST means, even after "
-            "the leaf-ordering fix below: on the 24-window walk-forward, Riskfolio's NCO beats "
-            "ARGUS's HRP (leaf_order=True, ARGUS's real current default) in 23 of 24 windows at "
-            "0.626x ARGUS's realised OOS volatility (8.222bps vs ARGUS's 13.125bps), sign-test "
-            "p≈2.98e-06, significant after Holm correction (threshold 0.00625); on the 9-window "
-            "walk-forward NCO beats ARGUS 9 of 9 at 0.584x (8.210bps vs 14.052bps), p=0.00390625, "
-            "also significant. ARGUS now ranks 4th of eleven on the dense grid and 5th on the "
-            "sparse one (previously 6th on both, before the fix below) — a real but partial "
-            "ranking improvement, since several baselines that used to place between old-ARGUS "
-            "and NCO no longer do. NCO still wins every walk-forward this module has been run on, "
-            "at both window lengths.",
+            "no_specialist_capability_superior is now a TIE, not a FAIL or a PASS — the state "
+            "this project's own vocabulary has a name for. ARGUS's own NCO does not beat "
+            "Riskfolio's real NCO (8.203bps vs 8.203bps, ratio 1.0000 on the real walk-forward "
+            "book): it matches it, using an ARGUS-owned implementation rather than a dependency "
+            "on the library. ARGUS's HRP (the older, simpler allocator, still the module's "
+            "leaf_order=True default) still loses to both NCO variants decisively — the tie is "
+            "specifically ARGUS's own NCO against Riskfolio's, not a claim that every ARGUS "
+            "allocator matches every Riskfolio one.",
             "adversarial_test is not proven: no adversarial covariance (near-singular, one "
-            "dominant eigenvalue) has been run against the allocator specifically, only the "
+            "dominant eigenvalue) has been run against either allocator specifically, only the "
             "ordinary failure-case inputs above.",
-            "best_method_studied is not proven: NCO's own clustering hyperparameters were not "
-            "swept for sensitivity, so it is not established that NCO's win is robust to its own "
-            "tuning rather than a property of this one configuration.",
-            "Fixed and tested 2026-09-22 — the exact question this blocker previously posed, now "
-            "answered: optimal leaf ordering (desk/allocation.py:optimal_leaf_order) was "
-            "implemented, verified against real scipy, and wired as hrp_weights's new default. It "
-            "closes the ARGUS-vs-Riskfolio-HRP divergence completely (floating-point identity, "
-            "~2.9e-16) but does NOT recover the walk-forward loss to NCO — the margin is "
-            "essentially unchanged from before the fix (was 0.611x/22-of-24/p=3.59e-05 at the "
-            "dense grid; now 0.626x/23-of-24/p≈2.98e-06). Leaf ordering was never the source of "
-            "the NCO-specific loss, only of the smaller ARGUS-vs-Riskfolio-HRP one. What remains "
-            "unclosed and untried: NCO's real edge is its nested clustering + convex "
-            "sub-optimization, which the scope statement notes achieves its lower variance partly "
-            "by concentrating into ~3.4-3.5 effective positions of 12 and leaning harder on an "
-            "internal QQQ/SQQQ hedge than any other allocator — a real trade-off a judge would "
-            "want stated, not a free win to copy uncritically, and not yet implemented or tested "
-            "inside ARGUS.",
+            "best_method_studied is not proven beyond reproducing NCO's own default "
+            "configuration (MinRisk/MV, Ward linkage, two-diff gap statistic for k): NCO's own "
+            "clustering hyperparameters were not swept for sensitivity, so it is not "
+            "established that the tie is robust to configuration choices NCO itself exposes.",
+            "Answered 2026-09-22 — this capability's own prior blocker asked whether optimal "
+            "leaf ordering alone would recover the walk-forward gap before reaching for NCO's "
+            "own clustering mechanism. It did not (leaf ordering closed only the smaller "
+            "HRP-vs-HRP gap), so the harder thing was built: NCO's real mechanism itself, read "
+            "from Riskfolio's real source and reproduced from scratch. What remains open: this "
+            "is a TIE, not a WIN — the goal (per this project's own standing instruction to keep "
+            "trying LOST capabilities until a real algorithmic idea either flips them or is "
+            "shown not to) would be an ARGUS allocator that beats Riskfolio's NCO outright, not "
+            "only matches it. No such idea has been tried yet.",
         ),
         note="Published because `data/allocation_comparison.json` already said 'this capability is "
              "LOST to the specialist on its own criterion' in its own scope_statement, and nothing "
-             "read that field into this register until now. Updated 2026-09-22: implemented and "
-             "verified optimal leaf ordering, the fix this capability's own blocker text had named "
-             "as the next thing to try — it closes the HRP-vs-HRP gap to floating-point identity "
-             "but leaves the NCO loss essentially unchanged, a real, tested, negative answer to an "
-             "explicitly open question rather than an assumption either way.",
+             "read that field into this register until now. Updated twice on 2026-09-22: first, "
+             "optimal leaf ordering closed the HRP-vs-HRP gap to floating-point identity but left "
+             "the NCO loss essentially unchanged — a real, tested, negative answer to an "
+             "explicitly open question. Second, later the same day: built ARGUS's own NCO from "
+             "Riskfolio's real source (Ward linkage, active-set min-variance QP, the real "
+             "two-difference gap statistic), verified it reproduces Riskfolio's real NCO to "
+             "1.3e-05 on the real book, wired it into the SAME live walk-forward comparison this "
+             "capability was measured LOST on, and re-ran it live: a genuine tie, 8.203bps both, "
+             "ratio 1.0000. LOST -> TIED, on a freshly-run comparison, not a reinterpretation of "
+             "the old one.",
     ),
     Capability(
         name="Regime-boundary detection, measured against stumpy FLUSS and ruptures",

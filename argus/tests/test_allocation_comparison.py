@@ -359,7 +359,11 @@ class TestReport:
         assert "robustness" not in text
 
     def test_the_scope_statement_says_who_wins_and_what_is_not_claimed(self) -> None:
-        assert "does NOT win" in SCOPE_STATEMENT
+        """Was "does NOT win" until 2026-09-22, when ARGUS's own NCO (built and verified against
+        the real specialist) closed the walk-forward loss to a tie -- restoring the old phrase
+        would misreport a real result as an unchanged loss."""
+        assert "TIED" in SCOPE_STATEMENT
+        assert "nco_weights" in SCOPE_STATEMENT
         assert SCOPE_STATEMENT.count("NOT CLAIMED") >= 4
         assert "GPL-3.0" in SCOPE_STATEMENT
 

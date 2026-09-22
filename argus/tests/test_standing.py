@@ -496,6 +496,18 @@ class TestTheLiveRegisterIsHonest:
         for cap in audit().owned:
             assert cap.conditions_missing == (), cap.name
 
+    def test_portfolio_allocation_moved_from_lost_to_tied(self) -> None:
+        """Pinned so a future edit cannot silently move this back to LOST (or claim OWNED, which
+        would overstate a tie as a win): ARGUS's own `nco_weights` was built from Riskfolio's
+        real NCO source and verified 2026-09-22 to match it exactly (8.203bps both, ratio 1.0000)
+        on the real walk-forward book — a genuine tie, not a win, and TIED is what this
+        register's own vocabulary calls that."""
+        cap = next(
+            c for c in REGISTER
+            if c.name == "Portfolio allocation, measured against Riskfolio-Lib's NCO"
+        )
+        assert cap.state is State.TIED
+
     def test_every_capability_names_where_it_lives(self) -> None:
         for cap in REGISTER:
             assert cap.module, cap.name
