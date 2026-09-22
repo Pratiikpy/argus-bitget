@@ -4430,14 +4430,22 @@ REGISTER: tuple[Capability, ...] = (
             Proof(
                 condition="same_input_comparison",
                 how="ARGUS's offline FLUSS, real stumpy, real ruptures and the real incumbent rule "
-                    "all run on the SAME 60-day hourly Bitget market series for all 12 rTokens",
+                    "all run on the SAME 60-day hourly Bitget market series for all 12 rTokens, "
+                    "plus all three budgeted methods (ARGUS, stumpy, ruptures) run on the SAME 100 "
+                    "synthetic trials (ruptures.pw_constant, 25 seeds x 4 noise levels) with KNOWN "
+                    "injected changepoints — added 2026-09-22 (Finding 8)",
                 artefact="data/regime_comparison.json",
             ),
             Proof(
                 condition="statistically_valid_evaluation",
                 how="one-sided binomial test of novelty rate against the incumbent's own coverage "
-                    "as the null (66.9%): FLUSS's 17.6% novel-boundary rate scores p=0.954 against "
-                    "that null — below chance, not merely non-significant above it",
+                    "as the null (66.9%): FLUSS's own-run novelty rate scores non-significant "
+                    "against that null on every run to date. Separately, a real ground-truth test "
+                    "added 2026-09-22 (Finding 8): paired sign test of per-trial F1 against KNOWN "
+                    "synthetic changepoints (ruptures.metrics.precision_recall at margin=WINDOW) "
+                    "across 100 trials — ARGUS loses to ruptures decisively (mean F1 0.443 vs "
+                    "0.975, 1 win/89 losses/10 ties, p=1.5e-25) and beats stumpy significantly "
+                    "(mean F1 0.443 vs 0.330, 55 wins/0 losses/45 ties, p=5.6e-17)",
                 artefact="data/regime_comparison.json",
             ),
             Proof(
@@ -4470,29 +4478,42 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
-            "no_specialist_capability_superior FAILS, which is what LOST means, on three of four "
-            "measured fronts at once: (1) FLUSS finds fewer boundaries the incumbent rule would "
-            "call novel than a uniformly random comparable bar would (17.6% vs a 66.9%-coverage "
-            "null, one-sided binomial p=0.954 — below chance); the unrestricted, less favourable "
-            "reading (8 of 23 against a 40.5% null) is published alongside it rather than hidden. "
-            "(2) the matrix profile is exact but ~306x slower than warm stumpy for identical "
-            "output. (3) on the QQQ/TQQQ/-3x family, ruptures' boundaries collapse to 0-1 bars "
-            "spread while ARGUS's and stumpy's spread 50-122, which the scope statement reads as "
-            "ruptures being MORE coherent under leverage, not less — a case where the specialist's "
-            "answer is the one a reader should trust more, not ours.",
-            "The one front ARGUS is not beaten on: a flat/constant input, where it refuses to "
-            "report a boundary and stumpy fabricates one. That is real and is the direction any "
-            "fix should preserve, not trade away for novelty rate.",
+            "no_specialist_capability_superior FAILS, which is what LOST means, and Finding 8 "
+            "(2026-09-22) made it fail more decisively, not less: against 100 SYNTHETIC trials "
+            "with KNOWN injected changepoints — the real ground-truth benchmark this blocker had "
+            "asked for — ARGUS's mean F1 is 0.443 against ruptures' 0.975 (1 win/89 losses/10 "
+            "ties, sign-test p=1.5e-25) and mean Hausdorff 111.9 bars against ruptures' 5.4: an "
+            "order of magnitude worse localisation. The other, older fronts stand too: (1) FLUSS's "
+            "novelty rate against the incumbent has never cleared its own null on any run to date "
+            "(most recent: 37.5% against a 31.3% null, p=0.384 — not significant either way, and "
+            "the historical run read 17.6% against a 66.9% null, p=0.954 — below chance; every "
+            "run's own number is published rather than the most favourable one kept). (2) the "
+            "matrix profile is exact but two-plus orders of magnitude slower than warm stumpy for "
+            "identical output. (3) on the QQQ/TQQQ/-3x family, ruptures' boundaries spread far "
+            "less than ARGUS's or stumpy's, which the scope statement reads as ruptures being MORE "
+            "coherent under leverage, not less.",
+            "What ARGUS is not beaten on: a flat/constant input, where it refuses to report a "
+            "boundary and stumpy fabricates one (Finding 5) — and now, Finding 8's genuine, "
+            "significant win over stumpy on real ground truth (mean F1 0.443 vs 0.330, 55 wins/0 "
+            "losses/45 ties, p=5.6e-17), the one place ARGUS's documented departure from stumpy "
+            "(Finding 4's parabola IAC) pays off against known changepoints rather than only "
+            "tying on a shared step. Real, and not enough: ARGUS itself reports zero boundaries on "
+            "24 of the 100 synthetic trials — the same conservative-refusal behaviour that was a "
+            "virtue in Finding 5 directly costs recall here.",
             "best_implementation_studied and best_method_studied are not proven beyond the base "
             "FLUSS/Pelt/KernelCPD calls run here — no sweep of ruptures' own penalty selection or "
             "stumpy's exclusion-zone parameter has been run to check whether ARGUS's loss is a "
             "property of the method or of this one configuration of it.",
-            "What would close the gap: stop treating novelty-vs-incumbent as the target metric — "
-            "the incumbent is a two-line volatility rule, not a validated ground truth, and losing "
-            "to 'finds what the simple rule already finds' is a different and weaker claim than "
-            "losing on a real forward-looking regime-change benchmark. Read ruptures' own "
+            "Tested and answered 2026-09-22 — the exact question this blocker previously posed: "
+            "'stop treating novelty-vs-incumbent as the target metric... read ruptures' own "
             "evaluation methodology (Truong, Oudre & Vayatis 2020) for what that benchmark should "
-            "be before re-running this comparison.",
+            "be before re-running this comparison.' Done — ruptures.pw_constant (that literature's "
+            "own canonical synthetic generator) and ruptures.metrics (precision_recall, hausdorff) "
+            "are both shipped in the library already installed and were run as shipped, not "
+            "reimplemented. The answer sharpens the loss rather than closing it: on real ground "
+            "truth ARGUS decisively loses to ruptures (p=1.5e-25) while genuinely beating stumpy "
+            "(p=5.6e-17) — a real, mixed, honest result, not the free win a passing ground-truth "
+            "test might have been assumed to be.",
         ),
         note="Published because `data/regime_comparison.json`'s own who_wins field already read "
              "'baseline — ruptures is more coherent... stumpy is bit-identical and faster... FLUSS "
@@ -4501,7 +4522,15 @@ REGISTER: tuple[Capability, ...] = (
              "figure from before a code fix that already read 310x / 5.25s; regenerated on "
              "2026-09-21, it now reads ~306x / 4.72s. The small further drift between 310x and "
              "306x across the two regenerations is ordinary wall-clock variance in a timing "
-             "measurement, not a second stale figure — the loss verdict is unaffected either way.",
+             "measurement, not a second stale figure — the loss verdict is unaffected either way. "
+             "Updated 2026-09-22: implemented Finding 8, the synthetic-ground-truth benchmark this "
+             "capability's own blocker text had named as the next thing to try "
+             "(ruptures.pw_constant + ruptures.metrics, the changepoint literature's own canonical "
+             "evaluation protocol, run as shipped). It sharpens the loss to ruptures from 'no "
+             "ground-truth-free test available' to 'decisively loses the ground-truth one too' "
+             "(p=1.5e-25), while "
+             "surfacing a genuine, previously-unmeasured win over stumpy (p=5.6e-17) — a real, "
+             "tested, mixed result rather than an assumption in either direction.",
     ),
     # **Found by a JUDGE-lens pass, not by searching for a rival first.** Driving the deployed
     # console as a real user surfaced two things on the same day: a live truncation bug

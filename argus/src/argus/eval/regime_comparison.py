@@ -107,23 +107,59 @@ as a number rather than a verdict.
 takes 0.017 s for the bit-identical answer — a measured 310x — and ruptures' PELT 0.43 s. Two
 orders of magnitude, for output that agrees exactly.
 
+**Finding 8 — the real ground-truth test Finding 7 explicitly said this module did not have, and
+its answer is more nuanced than either the novelty test or the family test alone.** Truong, Oudre
+& Vayatis (2020, "Selective review of offline change point detection methods", Signal Processing)
+is the changepoint-detection literature's own survey of how these methods are actually evaluated:
+against SYNTHETIC signals with KNOWN, injected changepoints, scored by margin-based precision/
+recall and Hausdorff distance. `ruptures.pw_constant` is that generator, `ruptures.metrics` those
+scorers, both shipped in the library already installed — run as shipped, not reimplemented, the
+same discipline `stumpy_run`/`ruptures_fixed` already apply above. 100 trials (25 seeds x 4 noise
+levels spanning clean to genuinely hard, `noise_std` 0.5-4.0, against `pw_constant`'s own default
+per-segment jump of `uniform(1,10)`), each a 400-sample piecewise-constant signal with 2 known
+changepoints, all three methods budgeted to the same 2-boundary count, scored at margin=WINDOW
+(the same one-window tolerance used everywhere else in this module). **ARGUS beats stumpy here,
+significantly: mean F1 0.443 against stumpy's 0.330 (55 wins, 0 losses, 45 ties, sign-test
+p=5.6e-17) — the one place in this entire comparison where ARGUS's documented departure from
+stumpy (Finding 4's parabola over the fitted-beta IAC) pays off against real, known changepoints
+rather than only against a curve-correlation number.** It does not beat ruptures: mean F1 0.443
+against ruptures' 0.975 (1 win, 89 losses, 10 ties, p=1.5e-25), mean Hausdorff 111.9 bars against
+ruptures' 5.4 — an order of magnitude worse localisation on the trials ARGUS could even be scored.
+**The reason ARGUS's own number is lower than the win over stumpy might suggest: it reports zero
+boundaries at all on 24 of 100 trials** (`found_none_count`), the SAME conservative-refusal
+behaviour Finding 5 measured as a genuine virtue on a degenerate input — here, on real injected
+regime changes, that same refusal directly costs recall. Both are true at once: the refusal
+machinery is not a defect invented for this test, and on this test it is not free.
+
 **Every figure above is from the published `data/regime_comparison.json`, and every figure moves.**
 The series are fetched live on each run, so boundary counts and the ablation's own totals shift
 between passes (the same ablation read 4-of-16 one pass and 5-of-24 the next). What has not moved
 across passes is every direction: parity exact, novelty below its null, family spread worse than
-ruptures'. The artefact is the source of truth; this docstring is a reading of it.
+ruptures', synthetic F1 above stumpy's and below ruptures'. The artefact is the source of truth;
+this docstring is a reading of it.
 
-**Verdict: the baseline wins.** ruptures is better where a ground-truth-free test can be run,
-stumpy is bit-identical where the machinery is shared and two orders of magnitude faster, and
-against the two-line incumbent this capability has no measurable edge at all. The one thing that is
-ARGUS's own is the narrow degenerate-curve guard in Finding 5, which does not extend to degenerate
-price input. Per this project's own standing rule that a weak capability is demoted rather than
-shipped as filler, `desk/regime.py` should be recorded as LOST.
+**Verdict: the baseline wins.** ruptures is better where a ground-truth-free test can be run AND
+where one with real known changepoints can be — decisively so on the second, p=1.5e-25. stumpy is
+bit-identical where the machinery is shared and two orders of magnitude faster, though it is now
+also the one FLUSS beats outright on real ground truth, not merely ties on parity. Against the
+two-line incumbent this capability still has no measurable edge at all. What is ARGUS's own: the
+narrow degenerate-curve guard in Finding 5, which does not extend to degenerate price input, and
+now Finding 8's genuine, significant win over stumpy specifically — real, and not enough. Per this
+project's own standing rule that a weak capability is demoted rather than shipped as filler,
+`desk/regime.py` should be recorded as LOST.
 
 **What would change the verdict**, stated in advance so it cannot be moved afterwards: FLUSS's
-novelty rate clearing the null at 5% on the comparable region (Finding 2), or ARGUS's family spread
-falling at or below ruptures' (Finding 7). Both are asserted by `tests/test_regime_comparison.py`
-in their current direction, so either would surface as a test failure rather than as silence.
+novelty rate clearing the null at 5% on the comparable region (Finding 2), ARGUS's family spread
+falling at or below ruptures' (Finding 7), or ARGUS's synthetic-groundtruth mean F1 beating
+ruptures' rather than only stumpy's (Finding 8). All three are asserted by
+`tests/test_regime_comparison.py` in their current direction, so any would surface as a test
+failure rather than as silence. Finding 8 is itself the answer to an EARLIER version of this same
+promise — this capability's own `eval/standing.py` entry named "read ruptures' own evaluation
+methodology... before re-running this comparison" as the next thing to try, and it has now been
+tried: a real, ground-truth-bearing benchmark, honestly scored, which sharpens the loss to
+ruptures from "no ground-truth-free test available" to "decisively loses the ground-truth one
+too" while also surfacing the one genuine win this capability has never had before — over stumpy,
+not merely a tie with it.
 
     python -m argus.eval.regime_comparison
 """
@@ -139,10 +175,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
+from statistics import fmean
 from typing import Any
 
 import numpy as np
 import ruptures
+import ruptures.metrics
 import stumpy
 from scipy.stats import binomtest
 from stumpy.floss import _cac, _rea
@@ -762,6 +800,244 @@ def run_family_coherence(
     }
 
 
+# ---------------------------------------------------------------------------------------------
+# Finding 8: a synthetic ground truth, not a proxy for one
+# ---------------------------------------------------------------------------------------------
+#
+# Finding 7's own text says what it is not: "a necessary condition with no ground truth behind
+# it." Nobody knows where a real regime boundary is in `argus/data`'s live candles, so the family
+# trick substitutes correlated instruments for a referee. That is honest, but it is not the
+# benchmark the changepoint-detection literature actually uses to answer "who finds a real
+# boundary" — Truong, Oudre & Vayatis (2020, "Selective review of offline change point detection
+# methods", Signal Processing) evaluate every method surveyed against SYNTHETIC signals with
+# KNOWN, injected changepoints, scored with the same package's own `ruptures.metrics` (Hausdorff
+# distance, margin-based precision/recall). `ruptures.pw_constant` is that generator, shipped in
+# the exact library already installed and already run above — not reimplemented, run as shipped,
+# the same discipline `stumpy_run`/`ruptures_fixed` already apply to the other two references.
+
+SYNTHETIC_SAMPLES = 400
+"""Comfortably above `MIN_BARS`=240 with room either side for the head/tail pin
+(`window * EXCLUSION_FACTOR` = 120 bars); short enough that the pure-Python O(n^2 m) profile
+stays cheap across the whole sweep below (~0.4s/trial, measured, against ~5.25s at real-symbol
+length)."""
+
+SYNTHETIC_BKPS = REGIMES - 1
+"""Two true changepoints, three regimes — the exact budget every method above is already asked
+for on real data (`REGIMES`), so this is not a different granularity in disguise."""
+
+SYNTHETIC_NOISE_LEVELS = (0.5, 1.0, 2.0, 4.0)
+"""A sweep, not a single hand-picked value. `ruptures.pw_constant`'s own default per-segment mean
+jump is `uniform(1, 10)`, so `noise_std=0.5` is a clean, easy problem and `4.0` is comparable in
+scale to the jump itself — genuinely hard, not rigged either way. Reporting the whole curve is
+what makes this credible rather than convenient: a single chosen point could flatter either side,
+deliberately or not."""
+
+SYNTHETIC_SEEDS: tuple[int, ...] = tuple(range(25))
+"""25 independent draws per noise level, 100 trials in all — enough for the paired sign test
+below to say something at conventional significance if the win rate is not close to 50%."""
+
+SYNTHETIC_MARGIN = WINDOW
+"""The tolerance a detected boundary must fall within to count as matching a true one: `WINDOW`,
+the same one-window-length standard `desk/regime.py`'s own `threshold_agrees` and this module's
+`TOLERANCE_BARS` already use elsewhere — not a separately chosen number for this test alone."""
+
+
+def synthetic_series(
+    *, n_samples: int, n_bkps: int, noise_std: float, seed: int,
+) -> tuple[list[float], list[int]]:
+    """One piecewise-constant signal with KNOWN changepoints.
+
+    `ruptures.datasets.pw_constant` is the changepoint-detection literature's canonical synthetic
+    benchmark generator, used here as shipped — a 1-D signal (`n_features=1`) so it feeds the same
+    price-like input every segmenter above already takes, and `bkps` already carries the ruptures
+    convention (ends with `n_samples`) that `ruptures.metrics` requires of both sides.
+    """
+    signal, bkps = ruptures.pw_constant(
+        n_samples=n_samples, n_features=1, n_bkps=n_bkps, noise_std=noise_std, seed=seed,
+    )
+    return [float(v) for v in signal[:, 0]], [int(b) for b in bkps]
+
+
+def _f1(precision: float, recall: float) -> float:
+    return 0.0 if precision + recall == 0 else 2 * precision * recall / (precision + recall)
+
+
+@dataclass(frozen=True, slots=True)
+class SyntheticTrial:
+    """One synthetic series, scored for all three methods against its own known changepoints."""
+
+    noise_std: float
+    seed: int
+    true_bkps: tuple[int, ...]
+    argus_bkps: tuple[int, ...]
+    stumpy_bkps: tuple[int, ...]
+    ruptures_bkps: tuple[int, ...]
+    argus_f1: float
+    stumpy_f1: float
+    ruptures_f1: float
+    argus_hausdorff: float | None
+    """`None` when the method proposed zero boundaries — ruptures' own `hausdorff` cannot score an
+    empty prediction (it takes `.max()` of an empty array and raises), and fabricating a sentinel
+    distance here would misreport a refusal as a distant guess. `precision_recall` scores this case
+    correctly on its own (0 precision, 0 recall), so F1 stays a number; only Hausdorff is affected,
+    and how often each method finds nothing is reported separately rather than folded silently into
+    a mean that would otherwise quietly exclude its worst rows."""
+    stumpy_hausdorff: float | None
+    ruptures_hausdorff: float | None
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "noise_std": self.noise_std,
+            "seed": self.seed,
+            "true_bkps": list(self.true_bkps),
+            "argus_bkps": list(self.argus_bkps),
+            "stumpy_bkps": list(self.stumpy_bkps),
+            "ruptures_bkps": list(self.ruptures_bkps),
+            "argus_f1": round(self.argus_f1, 4),
+            "stumpy_f1": round(self.stumpy_f1, 4),
+            "ruptures_f1": round(self.ruptures_f1, 4),
+            "argus_hausdorff": self.argus_hausdorff,
+            "stumpy_hausdorff": self.stumpy_hausdorff,
+            "ruptures_hausdorff": self.ruptures_hausdorff,
+        }
+
+
+def run_synthetic_trial(
+    *, n_samples: int, n_bkps: int, noise_std: float, seed: int, window: int = WINDOW,
+) -> SyntheticTrial:
+    """ARGUS, stumpy and ruptures — the SAME three arms Finding 7 already budgets identically —
+    scored against a KNOWN, injected changepoint set rather than against each other or against a
+    two-line incumbent."""
+    values, true_bkps = synthetic_series(
+        n_samples=n_samples, n_bkps=n_bkps, noise_std=noise_std, seed=seed,
+    )
+    regimes = n_bkps + 1
+    index, _ = argus_profile(values, window=window)
+    argus_cuts, _ = argus_boundaries(index, window=window, regimes=regimes)
+    _, _, stumpy_cuts, _ = stumpy_run(values, window=window, regimes=regimes)
+    ruptures_cuts = ruptures_fixed(values, window=window, regimes=regimes)
+
+    def scored(cuts: Sequence[int]) -> tuple[list[int], float, float | None]:
+        # Every wrapper above (argus_boundaries/stumpy_run/ruptures_fixed) strips the terminal
+        # n_samples marker for consistency with each other; ruptures.metrics requires it back on
+        # BOTH sides or raises rather than silently misscoring — restored here, not assumed. Built
+        # as a set: Finding 5 already documents stumpy's real `_rea` fabricating the SAME index
+        # twice ([0, 0]) on a curve with no genuine dip, and sanity_check correctly rejects a
+        # repeated index as not a valid partition. Deduplicating is a neutral formatting step
+        # applied identically to all three methods, not a fix to that defect — the repeat still
+        # shows up as one boundary claim scored on its merits, not as a crash.
+        padded = sorted({*cuts, n_samples})
+        precision, recall = ruptures.metrics.precision_recall(
+            true_bkps, padded, margin=SYNTHETIC_MARGIN,
+        )
+        # ruptures.metrics.hausdorff strips the terminal marker internally (bkps[:-1]) and then
+        # takes .max() of the resulting pairwise-distance array — a genuine crash, not a formatting
+        # mistake, when a side proposed zero real boundaries. Checked directly against the real
+        # function's source before writing this guard.
+        hausdorff = None if len(padded) <= 1 else ruptures.metrics.hausdorff(true_bkps, padded)
+        return padded, _f1(precision, recall), hausdorff
+
+    argus_padded, argus_f1, argus_haus = scored(argus_cuts)
+    stumpy_padded, stumpy_f1, stumpy_haus = scored(stumpy_cuts)
+    ruptures_padded, ruptures_f1, ruptures_haus = scored(ruptures_cuts)
+    return SyntheticTrial(
+        noise_std=noise_std, seed=seed, true_bkps=tuple(true_bkps),
+        argus_bkps=tuple(argus_padded), stumpy_bkps=tuple(stumpy_padded),
+        ruptures_bkps=tuple(ruptures_padded),
+        argus_f1=argus_f1, stumpy_f1=stumpy_f1, ruptures_f1=ruptures_f1,
+        argus_hausdorff=argus_haus, stumpy_hausdorff=stumpy_haus, ruptures_hausdorff=ruptures_haus,
+    )
+
+
+def _paired_wins(a: Sequence[float], b: Sequence[float]) -> tuple[int, int, int]:
+    """(a_wins, b_wins, ties) by paired greater-than — higher F1 wins its trial."""
+    a_wins = sum(1 for x, y in zip(a, b, strict=True) if x > y)
+    b_wins = sum(1 for x, y in zip(a, b, strict=True) if y > x)
+    return a_wins, b_wins, len(a) - a_wins - b_wins
+
+
+def _sign_test_p(wins: int, losses: int) -> float | None:
+    decisive = wins + losses
+    return None if decisive == 0 else float(binomtest(wins, decisive, 0.5).pvalue)
+
+
+def _hausdorff_stats(values: Sequence[float | None]) -> dict[str, Any]:
+    """Mean over the trials that could be scored, plus how many could not be — never a mean that
+    silently drops a method's worst rows (the ones where it found nothing) without saying so."""
+    scored = [v for v in values if v is not None]
+    return {
+        "mean": round(fmean(scored), 2) if scored else None,
+        "found_none_count": sum(1 for v in values if v is None),
+        "n_scored": len(scored),
+    }
+
+
+def _synthetic_summary(trials: Sequence[SyntheticTrial]) -> dict[str, Any]:
+    argus_f1 = [t.argus_f1 for t in trials]
+    stumpy_f1 = [t.stumpy_f1 for t in trials]
+    ruptures_f1 = [t.ruptures_f1 for t in trials]
+    a_wins_s, s_wins_a, ties_s = _paired_wins(argus_f1, stumpy_f1)
+    a_wins_r, r_wins_a, ties_r = _paired_wins(argus_f1, ruptures_f1)
+    by_noise: dict[str, dict[str, Any]] = {}
+    for noise in sorted({t.noise_std for t in trials}):
+        subset = [t for t in trials if t.noise_std == noise]
+        by_noise[str(noise)] = {
+            "n_trials": len(subset),
+            "argus_mean_f1": round(fmean(t.argus_f1 for t in subset), 4),
+            "stumpy_mean_f1": round(fmean(t.stumpy_f1 for t in subset), 4),
+            "ruptures_mean_f1": round(fmean(t.ruptures_f1 for t in subset), 4),
+            "argus_hausdorff": _hausdorff_stats([t.argus_hausdorff for t in subset]),
+            "stumpy_hausdorff": _hausdorff_stats([t.stumpy_hausdorff for t in subset]),
+            "ruptures_hausdorff": _hausdorff_stats([t.ruptures_hausdorff for t in subset]),
+        }
+    return {
+        "n_trials": len(trials),
+        "overall": {
+            "argus_mean_f1": round(fmean(argus_f1), 4),
+            "stumpy_mean_f1": round(fmean(stumpy_f1), 4),
+            "ruptures_mean_f1": round(fmean(ruptures_f1), 4),
+            "argus_hausdorff": _hausdorff_stats([t.argus_hausdorff for t in trials]),
+            "stumpy_hausdorff": _hausdorff_stats([t.stumpy_hausdorff for t in trials]),
+            "ruptures_hausdorff": _hausdorff_stats([t.ruptures_hausdorff for t in trials]),
+        },
+        "by_noise_level": by_noise,
+        "argus_vs_stumpy": {
+            "argus_wins": a_wins_s, "stumpy_wins": s_wins_a, "ties": ties_s,
+            "sign_test_p": _sign_test_p(a_wins_s, s_wins_a),
+        },
+        "argus_vs_ruptures": {
+            "argus_wins": a_wins_r, "ruptures_wins": r_wins_a, "ties": ties_r,
+            "sign_test_p": _sign_test_p(a_wins_r, r_wins_a),
+        },
+    }
+
+
+def run_synthetic_groundtruth(
+    *, n_samples: int = SYNTHETIC_SAMPLES, n_bkps: int = SYNTHETIC_BKPS,
+    noise_levels: Sequence[float] = SYNTHETIC_NOISE_LEVELS,
+    seeds: Sequence[int] = SYNTHETIC_SEEDS, window: int = WINDOW,
+) -> dict[str, Any]:
+    """Finding 8, aggregated across the full noise sweep. The real answer to what Finding 7 could
+    not settle: scored against KNOWN changepoints rather than a proxy for them."""
+    trials = [
+        run_synthetic_trial(
+            n_samples=n_samples, n_bkps=n_bkps, noise_std=noise, seed=seed, window=window,
+        )
+        for noise in noise_levels
+        for seed in seeds
+    ]
+    return {
+        "n_samples": n_samples,
+        "n_bkps": n_bkps,
+        "window": window,
+        "noise_levels": list(noise_levels),
+        "seeds_per_level": len(seeds),
+        "margin_bars": SYNTHETIC_MARGIN,
+        "trials": [t.as_dict() for t in trials],
+        **_synthetic_summary(trials),
+    }
+
+
 _TIMING_FIELDS = frozenset({"argus_seconds", "stumpy_seconds", "ruptures_seconds"})
 
 
@@ -1067,7 +1343,8 @@ SCOPE_STATEMENT = (
     "and the REAL incumbent two-line rule (strategies/track1_suite.py's own "
     "rotation_regime_switch, driven over real Bar objects) "
     "are all run on the SAME real 60-day hourly Bitget MARKET series "
-    "for all 12 rTokens. "
+    "for all 12 rTokens, PLUS 100 synthetic trials with KNOWN changepoints (ruptures.pw_constant) "
+    "for the three budgeted methods. "
     "CLAIMED, and this is the decisive finding: the capability LOSES. (1) FLUSS places 23 "
     "boundaries, 6 of them inside the incumbent's own 240-bar warmup where that rule cannot flip "
     "at all; of the 17 genuinely comparable boundaries, 3 (17.6%) have no real incumbent flip "
@@ -1091,6 +1368,13 @@ SCOPE_STATEMENT = (
     "2.94/-2.93 -- ruptures' boundaries spread 0 and 1 bars across the three while ARGUS's and "
     "stumpy's spread 50 and 122, and 50/122 persists on the same-sign QQQ-vs-TQQQ pair alone, "
     "which z-normalisation IS invariant to. "
+    "(5) Against 100 SYNTHETIC trials with KNOWN, injected changepoints (ruptures.pw_constant, "
+    "ruptures' own canonical benchmark generator, 25 seeds x 4 noise levels, scored by "
+    "ruptures.metrics at margin=WINDOW) -- the real ground-truth test Finding 7 explicitly said "
+    "this module lacked -- ARGUS's mean F1 is 0.443 against ruptures' 0.975 (1 win, 89 losses, 10 "
+    "ties, sign-test p=1.5e-25) and mean Hausdorff 111.9 bars against ruptures' 5.4: an order of "
+    "magnitude worse localisation, decisively confirming the loss to ruptures on real ground truth "
+    "and not only on the ground-truth-free family test. "
     "NOT claimed that ruptures is better at regime detection in general: PELT at the "
     "BIC penalty returns 44-50 boundaries per symbol that pile onto the weekly market-hours "
     "calendar (one hour-of-week bucket holds 38 of 552 against a uniform expectation of 3.3), and "
@@ -1111,7 +1395,16 @@ SCOPE_STATEMENT = (
     "defect found here and left unfixed on purpose: on a constant series ARGUS fabricates two "
     "boundaries (335, 456), stumpy two others (291, 411) and ruptures two more (26, 574) -- all "
     "three read structure into pure tie-breaking, ARGUS only less confidently (arc-curve minimum "
-    "0.63 against stumpy's 0.03). NOT claimed these boundary locations are permanent -- fetched "
+    "0.63 against stumpy's 0.03). "
+    "NOT claimed ARGUS loses to EVERY reference: on the same 100 synthetic trials, ARGUS beats "
+    "stumpy significantly (mean F1 0.443 vs 0.330, 55 wins / 0 losses / 45 ties, p=5.6e-17) -- the "
+    "one place in this whole comparison where ARGUS's documented departure from stumpy (Finding "
+    "4's parabola over the fitted-beta IAC) pays off against real known changepoints, not merely "
+    "ties on a shared step. NOT hidden either: ARGUS itself reports zero boundaries on 24 of the "
+    "100 trials, the SAME conservative-refusal behaviour Finding 5 measured as a genuine virtue on "
+    "a degenerate input -- on real injected regime changes that same refusal directly costs "
+    "recall, which is why the win over stumpy does not close the loss to ruptures. "
+    "NOT claimed these boundary locations are permanent -- fetched "
     "live and will move with the venue."
 )
 
@@ -1177,6 +1470,19 @@ def render(report: dict[str, Any]) -> str:
     holds = report["oos_check"]["verdict_holds_in_both_halves"]
     lines.append(f"  out-of-sample verdict holds: {holds}")
     lines.append(f"  reproducible: {report['reproducibility']['identical']}")
+    synthetic = report["synthetic_groundtruth"]
+
+    def _p(value: float | None) -> str:
+        return "no decisive trials" if value is None else f"p={value:.1e}"
+
+    lines.append(
+        f"\n  SYNTHETIC GROUND TRUTH ({synthetic['n_trials']} trials, known changepoints): "
+        f"argus F1 {synthetic['overall']['argus_mean_f1']}, "
+        f"stumpy {synthetic['overall']['stumpy_mean_f1']}, "
+        f"ruptures {synthetic['overall']['ruptures_mean_f1']} "
+        f"(argus vs stumpy {_p(synthetic['argus_vs_stumpy']['sign_test_p'])}, "
+        f"argus vs ruptures {_p(synthetic['argus_vs_ruptures']['sign_test_p'])})"
+    )
     lines.append(f"\n  WHO WINS: {report['who_wins']}")
     return "\n".join(lines)
 
@@ -1190,10 +1496,15 @@ def main() -> int:  # pragma: no cover - CLI
     base = run_base_case()
     novelty = base["novelty_vs_incumbent"]
     costs = measure_costs()
+    synthetic = run_synthetic_groundtruth()
     # The speedup in the verdict is read from the run that just happened, never written in as a
     # remembered constant — a stale multiplier in a sentence claiming to report a measurement is
     # exactly the kind of unevidenced number this module was built to catch.
     speedup = costs["stumpy_speedup"]
+    argus_wins_synthetic = (
+        synthetic["overall"]["argus_mean_f1"] > synthetic["overall"]["stumpy_mean_f1"]
+        and synthetic["overall"]["argus_mean_f1"] > synthetic["overall"]["ruptures_mean_f1"]
+    )
     report: dict[str, Any] = {
         "base_case": base,
         "ablation": run_ablation(),
@@ -1201,16 +1512,26 @@ def main() -> int:  # pragma: no cover - CLI
         "oos_check": run_oos_check(),
         "costs": costs,
         "reproducibility": run_reproducibility_check(),
+        "synthetic_groundtruth": synthetic,
         # A demotion needs no significance test — "we could not show an edge" is the default and
         # the honest one. Promotion does: FLUSS only wins here if its novelty clears the null at
-        # 5%, not merely by sitting a point or two above a null computed from 23 boundaries.
+        # 5% AND its own F1 against KNOWN changepoints beats both references outright — either
+        # ground-truth-free or ground-truth-bearing evidence pointing the other way is enough to
+        # keep the demotion, since a promotion only one of two real tests supports is not one.
         "who_wins": (
             "argus — FLUSS finds boundaries the incumbent misses at better than chance "
-            f"(p={novelty['binomial_p_novelty_above_chance']})"
-            if not _no_significant_edge(novelty)
-            else "baseline — ruptures is more coherent on the one ground-truth-free test, stumpy "
-            f"is bit-identical and {speedup:.0f}x faster, and FLUSS shows no measurable edge "
-            "over the two-line incumbent"
+            f"(p={novelty['binomial_p_novelty_above_chance']}) and against KNOWN synthetic "
+            f"changepoints it beats both references on mean F1 "
+            f"({synthetic['overall']['argus_mean_f1']} vs stumpy "
+            f"{synthetic['overall']['stumpy_mean_f1']}, ruptures "
+            f"{synthetic['overall']['ruptures_mean_f1']})"
+            if not _no_significant_edge(novelty) and argus_wins_synthetic
+            else "baseline — ruptures is more coherent on the ground-truth-free family test, "
+            f"stumpy is bit-identical and {speedup:.0f}x faster, FLUSS shows no measurable edge "
+            "over the two-line incumbent, and against KNOWN synthetic changepoints (100 trials, "
+            f"noise 0.5-4.0) ARGUS's mean F1 is {synthetic['overall']['argus_mean_f1']} against "
+            f"stumpy's {synthetic['overall']['stumpy_mean_f1']} and ruptures' "
+            f"{synthetic['overall']['ruptures_mean_f1']}"
         ),
         "scope_statement": SCOPE_STATEMENT,
     }
@@ -1236,9 +1557,15 @@ __all__ = [
     "REGIMES",
     "SCOPE_STATEMENT",
     "SIGNIFICANCE",
+    "SYNTHETIC_BKPS",
+    "SYNTHETIC_MARGIN",
+    "SYNTHETIC_NOISE_LEVELS",
+    "SYNTHETIC_SAMPLES",
+    "SYNTHETIC_SEEDS",
     "TOLERANCE_BARS",
     "WINDOW",
     "SymbolRun",
+    "SyntheticTrial",
     "ablate_idealised_curve",
     "argus_boundaries",
     "argus_profile",
@@ -1256,7 +1583,10 @@ __all__ = [
     "run_oos_check",
     "run_reproducibility_check",
     "run_symbol",
+    "run_synthetic_groundtruth",
+    "run_synthetic_trial",
     "ruptures_bic",
     "ruptures_fixed",
     "stumpy_run",
+    "synthetic_series",
 ]

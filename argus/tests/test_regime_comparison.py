@@ -21,8 +21,15 @@ import pytest
 from argus.eval.regime_comparison import (
     FAMILY,
     SCOPE_STATEMENT,
+    SYNTHETIC_MARGIN,
     TOLERANCE_BARS,
     WINDOW,
+    SyntheticTrial,
+    _f1,
+    _hausdorff_stats,
+    _paired_wins,
+    _sign_test_p,
+    _synthetic_summary,
     argus_boundaries,
     argus_profile,
     comparable_region,
@@ -34,9 +41,12 @@ from argus.eval.regime_comparison import (
     run_base_case,
     run_oos_check,
     run_reproducibility_check,
+    run_synthetic_groundtruth,
+    run_synthetic_trial,
     ruptures_bic,
     ruptures_fixed,
     stumpy_run,
+    synthetic_series,
 )
 
 
@@ -68,6 +78,16 @@ def costs() -> dict[str, Any]:
 @pytest.fixture(scope="module")
 def reproducibility() -> dict[str, Any]:
     return run_reproducibility_check()
+
+
+@pytest.fixture(scope="module")
+def synthetic_groundtruth() -> dict[str, Any]:
+    # A reduced sweep for test speed: 2 noise levels x 5 seeds = 10 trials, not the published
+    # module's full 100. The mechanics under test (schema, scoring, aggregation) do not need 100
+    # trials to exercise correctly; the full sweep's own statistical power is verified by running
+    # `python -m argus.eval.regime_comparison` and reading `data/regime_comparison.json`, not by
+    # this suite re-computing it on every test run.
+    return run_synthetic_groundtruth(noise_levels=(1.0, 2.0), seeds=tuple(range(5)))
 
 
 class TestUniverse:
@@ -553,6 +573,7 @@ class TestReportingHonesty:
     def test_render_prints_the_owed_number_and_the_null(
         self, base_case: dict[str, Any], ablation: dict[str, Any], adversarial: dict[str, Any],
         oos: dict[str, Any], costs: dict[str, Any], reproducibility: dict[str, Any],
+        synthetic_groundtruth: dict[str, Any],
     ) -> None:
         text = render({
             "base_case": base_case,
@@ -561,12 +582,140 @@ class TestReportingHonesty:
             "oos_check": oos,
             "costs": costs,
             "reproducibility": reproducibility,
+            "synthetic_groundtruth": synthetic_groundtruth,
             "who_wins": "baseline",
         })
         assert "THE OWED NUMBER" in text
         assert "chance novelty" in text
         assert "PROXY DEFECT" in text
         assert str(TOLERANCE_BARS) in text
+        assert "SYNTHETIC GROUND TRUTH" in text
 
     def test_the_family_constant_is_the_one_the_test_reasons_about(self) -> None:
         assert FAMILY == ("QQQUSDT", "TQQQUSDT", "SQQQUSDT")
+
+
+class TestFinding8SyntheticGroundtruth:
+    """The real ground-truth test Finding 7 explicitly said this module did not have — synthetic
+    signals with KNOWN changepoints, scored by ruptures' own `ruptures.metrics`, not by agreement
+    with a proxy or a two-line incumbent."""
+
+    def test_synthetic_series_carries_the_ruptures_terminal_convention(self) -> None:
+        values, true_bkps = synthetic_series(n_samples=200, n_bkps=2, noise_std=1.0, seed=0)
+        assert len(values) == 200
+        assert true_bkps[-1] == 200
+        assert len(true_bkps) == 3  # 2 changepoints plus the terminal marker
+
+    def test_synthetic_series_is_reproducible_for_the_same_seed(self) -> None:
+        first = synthetic_series(n_samples=200, n_bkps=2, noise_std=1.0, seed=7)
+        second = synthetic_series(n_samples=200, n_bkps=2, noise_std=1.0, seed=7)
+        assert first == second
+
+    def test_f1_matches_a_hand_computation(self) -> None:
+        assert _f1(1.0, 1.0) == pytest.approx(1.0)
+        assert _f1(0.0, 0.0) == 0.0
+        assert _f1(0.5, 0.5) == pytest.approx(0.5)
+        assert _f1(1.0, 0.0) == 0.0
+
+    def test_paired_wins_counts_strictly_greater_not_greater_equal(self) -> None:
+        wins_a, wins_b, ties = _paired_wins([0.9, 0.1, 0.5], [0.1, 0.9, 0.5])
+        assert (wins_a, wins_b, ties) == (1, 1, 1)
+
+    def test_sign_test_p_is_none_with_no_decisive_trials(self) -> None:
+        assert _sign_test_p(0, 0) is None
+
+    def test_sign_test_p_is_small_for_a_lopsided_record(self) -> None:
+        p = _sign_test_p(19, 1)
+        assert p is not None
+        assert p < 0.001
+
+    def test_hausdorff_stats_excludes_none_from_the_mean_but_counts_it(self) -> None:
+        stats = _hausdorff_stats([10.0, 20.0, None, 30.0])
+        assert stats["mean"] == pytest.approx(20.0)
+        assert stats["found_none_count"] == 1
+        assert stats["n_scored"] == 3
+
+    def test_hausdorff_stats_all_none_reports_no_mean_rather_than_zero(self) -> None:
+        """A fabricated 0.0 would read as perfect localisation, the opposite of what 'every trial
+        found nothing' means."""
+        stats = _hausdorff_stats([None, None])
+        assert stats["mean"] is None
+        assert stats["found_none_count"] == 2
+
+    def test_a_trial_where_argus_finds_nothing_is_scored_not_skipped(self) -> None:
+        """ARGUS's own `find_boundaries` can legitimately return zero cuts (Finding 5). This must
+        not crash `ruptures.metrics.hausdorff`, which cannot score an empty prediction on its own —
+        checked directly against the real function's source before this guard was written."""
+        found_a_none = False
+        for seed in range(15):
+            trial = run_synthetic_trial(n_samples=300, n_bkps=2, noise_std=3.0, seed=seed)
+            assert 0.0 <= trial.argus_f1 <= 1.0
+            if trial.argus_hausdorff is None:
+                found_a_none = True
+                assert len(trial.argus_bkps) == 1  # only the terminal marker survives padding
+        assert found_a_none, "this seed/noise sweep is expected to hit the empty-prediction case"
+
+    def test_true_and_predicted_bkps_both_carry_the_terminal_marker(self) -> None:
+        trial = run_synthetic_trial(n_samples=300, n_bkps=2, noise_std=1.0, seed=1)
+        assert trial.true_bkps[-1] == 300
+        assert trial.argus_bkps[-1] == 300
+        assert trial.stumpy_bkps[-1] == 300
+        assert trial.ruptures_bkps[-1] == 300
+
+    def test_run_synthetic_groundtruth_shape(
+        self, synthetic_groundtruth: dict[str, Any],
+    ) -> None:
+        result = synthetic_groundtruth
+        assert result["n_trials"] == 10  # 2 noise levels x 5 seeds, per the module-scoped fixture
+        assert len(result["trials"]) == result["n_trials"]
+        assert result["margin_bars"] == SYNTHETIC_MARGIN
+        assert set(result["by_noise_level"]) == {"1.0", "2.0"}
+
+    def test_wins_plus_losses_plus_ties_equals_every_trial(
+        self, synthetic_groundtruth: dict[str, Any],
+    ) -> None:
+        n = synthetic_groundtruth["n_trials"]
+        vs_stumpy = synthetic_groundtruth["argus_vs_stumpy"]
+        vs_ruptures = synthetic_groundtruth["argus_vs_ruptures"]
+        assert vs_stumpy["argus_wins"] + vs_stumpy["stumpy_wins"] + vs_stumpy["ties"] == n
+        assert vs_ruptures["argus_wins"] + vs_ruptures["ruptures_wins"] + vs_ruptures["ties"] == n
+
+    def test_ruptures_wins_the_synthetic_groundtruth_test_on_the_published_record(self) -> None:
+        """Pinned in the LOSING direction, per this module's own falsifiability promise: if
+        ARGUS's mean F1 ever equals or beats ruptures' on the full published sweep, that is exactly
+        the event `eval/regime_comparison.py`'s own docstring names as changing the verdict, and it
+        should surface here as a failure rather than silently in a JSON file nobody reads."""
+        full = run_synthetic_groundtruth()
+        assert full["overall"]["ruptures_mean_f1"] > full["overall"]["argus_mean_f1"]
+
+    def test_argus_beats_stumpy_on_the_published_record(self) -> None:
+        """The one genuine win Finding 8 found. Pinned so a future change that quietly erodes it
+        (e.g. reverting Finding 4's parabola IAC) is caught rather than assumed still true."""
+        full = run_synthetic_groundtruth()
+        assert full["overall"]["argus_mean_f1"] > full["overall"]["stumpy_mean_f1"]
+        assert full["argus_vs_stumpy"]["sign_test_p"] is not None
+        assert full["argus_vs_stumpy"]["sign_test_p"] < 0.01
+
+    def test_synthetic_trial_is_a_frozen_dataclass_with_a_matching_dict(self) -> None:
+        trial = run_synthetic_trial(n_samples=250, n_bkps=2, noise_std=1.0, seed=3)
+        assert isinstance(trial, SyntheticTrial)
+        as_dict = trial.as_dict()
+        assert as_dict["seed"] == 3
+        assert as_dict["noise_std"] == 1.0
+
+    def test_synthetic_summary_is_what_run_synthetic_groundtruth_returns(
+        self, synthetic_groundtruth: dict[str, Any],
+    ) -> None:
+        """`_synthetic_summary` is the aggregation `run_synthetic_groundtruth` bundles in — checked
+        directly so a future refactor of one cannot silently diverge from the other."""
+        trials = [
+            run_synthetic_trial(n_samples=400, n_bkps=2, noise_std=noise, seed=seed)
+            for noise in (1.0, 2.0)
+            for seed in range(5)
+        ]
+        direct = _synthetic_summary(trials)
+        assert direct["n_trials"] == synthetic_groundtruth["n_trials"]
+        assert (
+            direct["overall"]["argus_mean_f1"]
+            == synthetic_groundtruth["overall"]["argus_mean_f1"]
+        )
