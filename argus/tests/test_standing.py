@@ -416,7 +416,32 @@ class TestTheLiveRegisterIsHonest:
         assumed from reading the formula. A capability appearing here that is NOT in this exact
         set is the real regression this test exists to catch — add it to the set only after
         checking its thirteen the same way these twenty-eight were checked, never to make a test
-        pass."""
+        pass. Restored to OWNED the same day three more times, all found by the same AUDIT
+        sweep: rather than trusting `conditions_missing` (which only checks a `Proof` object
+        exists per condition, never that it actually verifies), every remaining IMPLEMENTED
+        capability's thirteen proofs were independently re-run through the real `verify()`
+        function. Three — "Overfitting gates that raise instead of returning NaN"
+        (`t1-validation`), "Risk layer proved by domain sweep" (`t2-riskcontrol`), and
+        "Session-aware execution that refuses to solve through a boundary" (`t3-execution`) —
+        each still carried a `state=State.IMPLEMENTED` line and a demotion comment dated
+        2026-09-20 naming one specific unproven condition, but an earlier pass had already fixed
+        each named artefact (adding `failure_cases` to `overfit_gates.json`, wiring real evidence
+        into `risk_layer_comparison.json`, filling in the ablation/same_input_comparison
+        artefacts for the execution guard) without ever flipping the `state` line back — the
+        exact same class of miss "Self-evolving review rules" turned out to be two iterations
+        earlier, just undiscovered until this sweep checked every remaining entry rather than
+        one at a time as each ledger row happened to need it. All three: thirteen VERIFIED or
+        ATTESTED, zero UNPROVEN, confirmed by direct `verify()` calls before editing anything. A
+        fourth, "Queue-position modelling ported from hftbacktest and measured against it"
+        (`t2-execution`), was checked the same way and correctly NOT promoted — its own
+        `blockers` already document in detail why `no_specialist_capability_superior` is
+        genuinely unestablished (hftbacktest's real ground truth is paid, real CME
+        market-by-order data; ARGUS's is a constructed simulator, and the gap cannot be closed
+        with crypto data by either party) — a real, substantive, already-honest blocker, not a
+        stale comment, and left exactly as it was. A capability appearing here that is NOT in
+        this exact set is the real regression this test exists to catch — add it to the set only
+        after checking its thirteen the same way these thirty-one were checked, never to make a
+        test pass."""
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
             "Abstention scored as a decision",
@@ -431,13 +456,16 @@ class TestTheLiveRegisterIsHonest:
             "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
             "Net executable arbitrage vs. a fee-blind detector",
             "Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal",
+            "Overfitting gates that raise instead of returning NaN",
             "Path-shape matching with a calibrated null",
             "Per-profile mandate that changes the verdict",
             "Perception layer: what the desk can see",
             "Point-in-time correctness vs. OpenBB's real, ungated live-API agent",
             "Pre-registered trading protocol, hash-committed",
             "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
+            "Risk layer proved by domain sweep",
             "Self-evolving review rules",
+            "Session-aware execution that refuses to solve through a boundary",
             "Structured filing extraction vs. FinanceBench's real, published LLM measurement",
             "Typed factor grammar with no execution surface",
             "rToken factor divergence vs. Alphalens' real Information Coefficient",

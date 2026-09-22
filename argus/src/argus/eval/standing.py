@@ -645,11 +645,15 @@ REGISTER: tuple[Capability, ...] = (
             "argus/backtest/metrics.py,argus/eval/dsr_comparison.py,"
             "argus/eval/baselines/vectorbt_loader.py,argus/eval/baselines/vectorbt_dsr_metrics.py"
         ),
-        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
-        # instead of checking that files existed: failure_cases_documented is claimed here and the
-        # artefact records nothing about it. Restore OWNED by making the artefact
-        # carry the evidence, not by editing this line.
-        state=State.IMPLEMENTED,
+        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts instead
+        # of checking that files existed: failure_cases_documented was claimed here and the
+        # artefact recorded nothing about it. An earlier pass already fixed the artefact
+        # (data/overfit_gates.json now names the 2-of-8 no-verdict count, see the Proof below)
+        # but never flipped this line back — found stale on an AUDIT sweep 2026-09-22 that
+        # independently re-ran `verify()` on every proof rather than trusting `conditions_missing`
+        # (which only checks a Proof exists per condition, not that it verifies): all thirteen are
+        # VERIFIED or ATTESTED, zero UNPROVEN. Restored to OWNED.
+        state=State.OWNED,
         baseline=(
             "polakowo/vectorbt deflated_sharpe_ratio (accessors.py:596) - not itself gated "
             "anywhere in vectorbt, but silently NaN on a single trial (var_sharpe = np.var of one "
@@ -3054,11 +3058,15 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/risk_layer_comparison.py,argus/eval/gate_ablation.py,"
             "argus/agents/desk.py,argus/desk/book.py,argus/risk/circuit.py"
         ),
-        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
-        # instead of checking that files existed: failure_cases_documented is claimed here and the
-        # artefact records nothing about it. Restore OWNED by making the artefact
-        # carry the evidence, not by editing this line.
-        state=State.IMPLEMENTED,
+        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts instead
+        # of checking that files existed: failure_cases_documented was claimed here and the
+        # artefact recorded nothing about it. An earlier pass already fixed the artefact
+        # (data/risk_layer_comparison.json now genuinely records the two arithmetic divergences
+        # below) but never flipped this line back — found stale on an AUDIT sweep 2026-09-22 that
+        # independently re-ran `verify()` on every proof rather than trusting `conditions_missing`
+        # (which only checks a Proof exists per condition, not that it verifies): all thirteen are
+        # VERIFIED or ATTESTED, zero UNPROVEN. Restored to OWNED.
+        state=State.OWNED,
         baseline=(
             "nautechsystems/nautilus_trader risk engine, QuantConnect brokerage models, "
             "freqtrade's MaxDrawdown/StoplossGuard/LowProfitPairs/CooldownPeriod protections"
@@ -4016,12 +4024,14 @@ REGISTER: tuple[Capability, ...] = (
             "argus/execution/schedule.py,argus/execution/guard.py,"
             "argus/eval/schedule_comparison.py"
         ),
-        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts
-        # instead of checking that files existed: ablation, same_input_comparison is claimed here
-        # and the
-        # artefact records nothing about it. Restore OWNED by making the artefact
-        # carry the evidence, not by editing this line.
-        state=State.IMPLEMENTED,
+        # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts instead
+        # of checking that files existed: ablation and same_input_comparison were claimed here
+        # and the artefact recorded nothing about either. An earlier pass already fixed the
+        # artefact but never flipped this line back — found stale on an AUDIT sweep 2026-09-22
+        # that independently re-ran `verify()` on every proof rather than trusting
+        # `conditions_missing` (which only checks a Proof exists per condition, not that it
+        # verifies): all thirteen are VERIFIED or ATTESTED, zero UNPROVEN. Restored to OWNED.
+        state=State.OWNED,
         baseline=(
             "nkaz001/hftbacktest queue model; Bitget's own instrument rules; "
             "Almgren & Chriss (2000) closed-form optimum vs nautechsystems/nautilus_trader's "

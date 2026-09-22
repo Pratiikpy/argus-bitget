@@ -218,7 +218,7 @@
       "name": "Overfitting gates that raise instead of returning NaN",
       "subtheme": "t1-validation",
       "module": "argus/backtest/metrics.py,argus/eval/dsr_comparison.py,argus/eval/baselines/vectorbt_loader.py,argus/eval/baselines/vectorbt_dsr_metrics.py",
-      "state": "implemented",
+      "state": "owned",
       "baseline": "polakowo/vectorbt deflated_sharpe_ratio (accessors.py:596) - not itself gated anywhere in vectorbt, but silently NaN on a single trial (var_sharpe = np.var of one value, ddof=1); a caller filtering with a negated < comparison admits it",
       "conditions_met": [
         "best_implementation_studied",
@@ -1722,7 +1722,7 @@
       "name": "Risk layer proved by domain sweep",
       "subtheme": "t2-riskcontrol",
       "module": "argus/eval/riskproof.py,argus/eval/freqtrade_baseline.py,argus/eval/risk_layer_comparison.py,argus/eval/gate_ablation.py,argus/agents/desk.py,argus/desk/book.py,argus/risk/circuit.py",
-      "state": "implemented",
+      "state": "owned",
       "baseline": "nautechsystems/nautilus_trader risk engine, QuantConnect brokerage models, freqtrade's MaxDrawdown/StoplossGuard/LowProfitPairs/CooldownPeriod protections",
       "conditions_met": [
         "best_implementation_studied",
@@ -2369,7 +2369,7 @@
       "name": "Session-aware execution that refuses to solve through a boundary",
       "subtheme": "t3-execution",
       "module": "argus/execution/schedule.py,argus/execution/guard.py,argus/eval/schedule_comparison.py",
-      "state": "implemented",
+      "state": "owned",
       "baseline": "nkaz001/hftbacktest queue model; Bitget's own instrument rules; Almgren & Chriss (2000) closed-form optimum vs nautechsystems/nautilus_trader's real TwapAlgorithm as the field's stated default",
       "conditions_met": [
         "best_implementation_studied",
@@ -3223,8 +3223,8 @@
   "by_state": {
     "lost": 3,
     "tied": 0,
-    "implemented": 6,
-    "owned": 22
+    "implemented": 3,
+    "owned": 25
   },
   "findings": [
     {
