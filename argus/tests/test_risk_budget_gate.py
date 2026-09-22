@@ -245,8 +245,20 @@ class TestTheGateOrder:
 
     def test_the_absolute_cap_still_binds_last(self) -> None:
         """`max_position` is a hard ceiling that must never be diluted by a multiplier, so it sits
-        after the budget — and with no book state the budget does not fire at all."""
-        policy = ConstitutionPolicy(book_state=None, max_unhedged_notional=Decimal("10000000"))
+        after the budget — and with no book state the budget does not fire at all.
+
+        **`reference_price` fixed 2026-09-22.** Every notional-gated ceiling in `rule()` — this
+        one included — requires `price is not None`, and `reference_price` defaults to `None`;
+        without setting it this test's own `max_position` gate was silently skipped along with
+        every other notional gate, and the chain fell through to the terminal `binding_constraint
+        == "none"` — the exact "an absent cap that reads like a satisfied one" failure mode
+        `rule()`'s own `unpriced` comment warns about, reached here by the test itself rather than
+        by production code (which always back-fills `reference_price` before calling `rule()`).
+        `price=1` makes notional equal quantity, the simplest value that still exercises the gate."""
+        policy = ConstitutionPolicy(
+            book_state=None, max_unhedged_notional=Decimal("10000000"),
+            reference_price=Decimal("1"),
+        )
         ruling = policy.rule(_intent("999999"), session=SESSION, hedges=SURFACE)
         assert ruling.binding_constraint == "max_position"
 
@@ -275,8 +287,19 @@ class TestTheGateOrder:
         The position is not being *covered*, it is being *sized*, and 5,000 is the only size every
         constraint permits. The hedgeability fact is not lost: it is named in the reason on every
         ruling now, instead of only when it happened to be evaluated first.
+
+        **`reference_price` fixed 2026-09-22.** This test's own docstring says the ceilings ARE
+        unhedgeable_gap at 20,000 and risk_budget at 5,000 — but `unhedgeable_gap` is a notional
+        gate, gated on `price is not None`, and this policy never set `reference_price` (default
+        `None`), so `unhedgeable_gap` never actually entered `ceilings` and could not appear in
+        the "also computed" trail the last assertion below checks for. The ruling was still
+        correct (risk_budget doesn't need a price, and it was the only ceiling that fired either
+        way) — only the reason string's completeness went untested. `price=1` makes notional equal
+        quantity: `max_unhedged_notional / 1 == 20000`, matching the docstring's own numbers.
         """
-        policy = ConstitutionPolicy(book_state=_book(), graded_predictions=[])
+        policy = ConstitutionPolicy(
+            book_state=_book(), graded_predictions=[], reference_price=Decimal("1"),
+        )
         ruling = policy.rule(_intent("999999"), session=SESSION, hedges=SURFACE)
         assert ruling.binding_constraint == "risk_budget"
         assert ruling.resulting_intent.quantity == Decimal("5000.00")
