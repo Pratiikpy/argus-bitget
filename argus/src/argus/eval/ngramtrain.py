@@ -12,12 +12,32 @@ trains on the **dev** half only, plus the in-repo labelled corpora, and chooses 
 and the abstention threshold by 5-fold cross-validation **within that half**. The test half is
 untouched here and is read exactly once, by `eval/ngrambench.py`.
 
-**Why the threshold is 0.20 and not a higher, safer-looking number.** The rule was fixed before
-looking: take the lowest threshold whose CV result beats the incumbent pattern layer on *both*
-axes at once — more correct answers **and** no more confident errors. On the dev CV that is 0.20,
-where the model answers 211 of 234 with 169 correct and 42 wrong, against the pattern layer's 52
-correct and 46 wrong. Choosing a threshold that merely maximised accuracy would have buried the
-error count, which on a console sitting in front of an account is the number that hurts.
+**Why the threshold is 0.15 and not a higher, safer-looking number.** The rule, unchanged since the
+logistic-head version: take the lowest threshold whose out-of-fold CV result beats the incumbent
+pattern layer on *both* axes at once — more correct answers **and** no more confident errors.
+Re-run after the classifier head changed (see below), because a linear-SVM margin softmax is not
+the same number as a log-odds softmax and 0.20 does not transfer: out-of-fold 5-fold CV over all
+334 training rows (`class_weight="balanced"`) answers 169 correct and 50 wrong at 0.15, against the
+pattern layer's 94 correct and 50 wrong **on the identical rows**. Checked for fold-split
+sensitivity across three CV seeds (20260921/1/42): the lowest qualifying threshold lands at
+0.145-0.155 every time, so 0.15 is not an artefact of one particular split. Choosing a threshold
+that merely maximised accuracy would have buried the error count, which on a console sitting in
+front of an account is the number that hurts.
+
+**Why the head is a linear SVM and not the multinomial logistic regression this shipped with until
+2026-09-22.** Dev-half 5-fold CV, mean over 10 fold-split seeds: 76.71% for
+`LinearSVC(C=5.0, class_weight="balanced")` against 72.28% for the logistic head it replaced — the
+SVM wins on every one of the 10 seeds tested, not just on average. A calibrated variant
+(`CalibratedClassifierCV` wrapping the same `LinearSVC`) was tried first and also won (75.36%
+mean) but the plain, uncalibrated margin scored higher still and needs no k-fold Platt-scaling
+machinery to reimplement in the stdlib scorer. Word-level TF-IDF features stacked onto the existing
+character n-grams were tried too and **hurt**: 73.35% down to 66.77%/66.16% — the working
+hypothesis is that word-level tokenisation is a poor fit for the un-spaced half of this corpus.
+`lui/ngram.py`'s scoring code needed no change at all: it was already a generic
+"linear-scores-then-softmax" implementation, and `LinearSVC.coef_`/`.intercept_` carry the
+identical shape and class ordering `LogisticRegression` did — confirmed directly before this
+change was made, and confirmed again by 0 argmax mismatches between the pure-Python scorer and
+real `sklearn.svm.LinearSVC.decision_function()` on all 334 training rows.
 
     python -m argus.eval.ngramtrain
 """
@@ -59,12 +79,14 @@ The unigram floor is doing real work rather than padding the feature count — a
 character is a morpheme, so ``n=1`` is to Chinese roughly what a word unigram is to English."""
 
 REGULARISATION = 5.0
-"""``C`` for the logistic head. CV is flat from 5.0 to 20.0 (77.3% either way), so the more
-regularised end is taken: with 234 training rows the looser fit buys nothing measurable and
-would only be harder to defend."""
+"""``C`` for the linear-SVM head. Unchanged from the logistic head's value: a dedicated sweep for
+`LinearSVC` (0.5/1/2/5/10/20, mean over 10 CV fold-split seeds) is flat within 0.1 points across
+5.0-20.0 (76.71%/76.74%/76.83%), so the same more-regularised end is kept rather than chasing noise
+with a new number to defend."""
 
-ABSTAIN_THRESHOLD = 0.20
-"""See the module docstring. Fixed by a rule stated before the sweep, not picked from the table."""
+ABSTAIN_THRESHOLD = 0.15
+"""See the module docstring. Fixed by a rule stated before the sweep, not picked from the table —
+re-derived, by the same rule, when the classifier head changed on 2026-09-22."""
 
 EXCLUDED_LABELS = frozenset({
     "unknown", "ambiguous", "unsupported", "integrity", "risk_control", "order", "market",
@@ -125,10 +147,16 @@ def training_rows() -> tuple[list[str], list[str]]:
 
 
 def fit(texts: Sequence[str], labels: Sequence[str]) -> Any:
-    """The scikit-learn pipeline, fitted. Returns ``(vectorizer, classifier)``."""
+    """The scikit-learn pipeline, fitted. Returns ``(vectorizer, classifier)``.
+
+    ``LinearSVC``, not ``LogisticRegression`` — see the module docstring for the CV evidence. The
+    exported shape (``coef_``/``intercept_``, one row per class, same ordering) is identical either
+    way, so `lui/ngram.py`'s scorer needed no change: it has always been a generic linear-scores-
+    then-softmax implementation, never one written against log-odds specifically.
+    """
     try:
         from sklearn.feature_extraction.text import TfidfVectorizer
-        from sklearn.linear_model import LogisticRegression
+        from sklearn.svm import LinearSVC
     except ImportError as exc:  # pragma: no cover - developer environment only
         raise NgramTrainError(
             "scikit-learn is needed to FIT the model. It is deliberately absent from the deployed "
@@ -142,8 +170,14 @@ def fit(texts: Sequence[str], labels: Sequence[str]) -> Any:
     # class_weight="balanced" because the pool is uneven by intent (performance 13, decision_why
     # 31 in the dev half). Without it the head would learn the prior and answer the common intent
     # when unsure, which is exactly the confident-wrong failure the threshold exists to prevent.
-    classifier = LogisticRegression(
-        C=REGULARISATION, max_iter=3000, class_weight="balanced",
+    # random_state matters here in a way it did not for the logistic head: liblinear's dual
+    # coordinate descent uses a random number generator for tie-breaking, and on this small,
+    # wide problem (334 rows, ~15k features) that produced a genuinely different fitted model on
+    # every call when unset -- checked directly (5 fits, 5 different weight hashes) before this
+    # line was added. Fixed to the project's standard split seed so training is reproducible,
+    # not because that seed was chosen for its result.
+    classifier = LinearSVC(
+        C=REGULARISATION, class_weight="balanced", max_iter=5000, random_state=20260921,
     ).fit(matrix, list(labels))
     return vectorizer, classifier
 

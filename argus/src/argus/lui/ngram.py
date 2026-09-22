@@ -13,8 +13,12 @@ threshold separates them.** It would also cost 13.4 MB of token table in a bundl
 carries none.
 
 **What this does instead, and why it is the right shape for the constraint.** A TF-IDF character
-n-gram model with a multinomial logistic head is the standard strong baseline for short-text intent
-classification, and it happens to fit every constraint this deployment has:
+n-gram model with a linear classifier head is the standard strong baseline for short-text intent
+classification, and it happens to fit every constraint this deployment has. The head was a
+multinomial logistic regression until 2026-09-22, when dev-CV (10 fold-split seeds) showed a
+linear SVM head answers 76.71% against 72.28%, winning on every seed — see `eval/ngramtrain.py`
+for the sweep. The scoring code below did not need to change: it was already generic linear-
+scores-then-softmax, and both heads export the identical ``coef_``/``intercept_`` shape.
 
 * **Character n-grams need no tokeniser**, so Chinese is handled by the same code path as English
   rather than by the separate, space-free pattern list `lui/question.py` needs. Half the training
@@ -133,11 +137,16 @@ class Prediction:
 
 
 class NgramClassifier:
-    """A fitted TF-IDF character n-gram model with a multinomial logistic head.
+    """A fitted TF-IDF character n-gram model with a linear classifier head (a linear SVM as of
+    2026-09-22; a multinomial logistic regression before that — see `eval/ngramtrain.py`).
 
     Construction takes the exported weights rather than training data: training needs
     scikit-learn, and the deployed bundle has no dependencies at all. `eval/ngramtrain.py` is the
-    only thing that fits a model; this only ever evaluates one.
+    only thing that fits a model; this only ever evaluates one. The scoring below — a linear score
+    per class, then softmax — was never written against log-odds specifically, so it reads either
+    head's exported weights unchanged; a softmax over SVM margins is a usable, monotonic
+    confidence proxy for thresholding even though it is not a calibrated probability the way a
+    logistic head's softmax is.
     """
 
     def __init__(self, blob: dict[str, Any]) -> None:

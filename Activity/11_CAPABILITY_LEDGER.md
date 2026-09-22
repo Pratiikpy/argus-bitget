@@ -33,23 +33,29 @@ carries a result.**
 | 16 | `portfolio-copilot` | T3 | subtheme | **TIED** | Riskfolio-Lib NCO | **yes** | tie (8.203bps both, ratio 1.0000) — optimal leaf ordering closed the separate ARGUS-vs-Riskfolio-HRP gap but left the NCO loss unchanged; built ARGUS's own `nco_weights` from Riskfolio's real NCO source (Ward linkage, active-set min-variance QP, two-diff gap statistic), verified to reproduce Riskfolio's real NCO to 1.3e-05 on the real book, wired into the same live walk-forward test that measured the loss and re-run fresh: a genuine tie, not a win | 2026-09-22 |
 | 17 | `t3-source-depth` | T3 | judging | IMPLEMENTED | OpenBB (real provider count) | **yes** | **specialist** — OpenBB (32 real providers vs ARGUS's 12) on raw count, honestly; ARGUS's sources are each live health-classified rather than counted from a list (effectiveness half of the criterion) — same evidence as row 14, synced here since this is the row the handbook actually names "count" | 2026-09-22 |
 | 18 | `t3-research-quality` | T3 | judging | IMPLEMENTED | QuantConnect Lean + statsmodels (two rivals) | **yes** | ARGUS (0 FDR/Bonferroni survivors vs Lean's uncorrected 7-of-190, ~9.5 expected FPs) | 2026-09-21 |
-| 19 | `t3-lui` | T3 | judging | **LOST** on accuracy, **WON** on safety | RasaHQ/rasa DIET (Apache-2.0) | **yes** | split — Rasa (accuracy, p=0.0014); ARGUS (OOS refusal, p=0.031) | 2026-09-21 |
+| 19 | `t3-lui` | T3 | judging | **TIED** on accuracy, **WON** on safety | RasaHQ/rasa DIET (Apache-2.0) | **yes** | split — classifier head rebuilt 2026-09-22 (logistic → linear SVM, dev-CV picked it on 10/10 seeds); accuracy gap narrowed from significant (p=0.0014) to not-significant (p=0.0576, Rasa still numerically ahead 81.91% vs 77.82%) — a real, fragile tie, not a win; ARGUS's OOS-refusal win got stronger in the same rebuild (p=0.0156, was p=0.031) | 2026-09-22 |
 | 20 | `t3-personal-thesis` | T3 | judging | IMPLEMENTED | OpenBB (real agent + data platform) | **yes** | split — same evidence as row 14 (`j_t3_personal_thesis` literally delegates to `t3_personal_workbench`): OpenBB wins raw source breadth; ARGUS wins point-in-time correctness, the property a personalized thesis needs to backtest without look-ahead. Core personalisation claim itself (2 mandates, 100% disagreement, measured not asserted) is ARGUS's own self-measurement, no rival needed for that fact | 2026-09-22 |
 
 ## The column that decides everything
 
-**`rival run` is `yes` on 18 of 20 as of 2026-09-22: 4 LOST (one of them split — LUI intent
-accuracy loses to Rasa's DIET classifier, p=0.0014, while ARGUS wins out-of-scope refusal
-separately and significantly, p=0.031, neither laundering the other; the 4th is
-t3-source-depth — OpenBB's real 32-provider count genuinely beats ARGUS's 12, no split
-framing applies to a row whose entire ask is count), 2 more splits
-(personal-workbench and t3-personal-thesis, both wired against the same underlying
+**`rival run` is `yes` on 18 of 20 as of 2026-09-22: 2 clean LOSSES to a named specialist
+(stress-testing vs ruptures, decisively, p=1.5e-25; t3-source-depth — OpenBB's real
+32-provider count genuinely beats ARGUS's 12, no split framing applies to a row whose entire
+ask is count), 1 standalone TIE (portfolio-copilot vs Riskfolio-Lib's real NCO: 8.203bps
+both, ratio 1.0000, an exact match on the live walk-forward test that used to be the loss),
+3 splits (personal-workbench and t3-personal-thesis, both wired against the same underlying
 evidence — `j_t3_personal_thesis` literally delegates to `t3_personal_workbench` in
 `themeaudit.py`, and the ledger counts each named row as its own unit per its own opening
 rule: OpenBB genuinely wins on raw source breadth, 32 real providers vs ARGUS's
 12, reported honestly rather than omitted; ARGUS wins on point-in-time correctness, a property
 OpenBB's real agent source has zero representation of anywhere, verified sharp to the exact
-day on real live SEC data), 11 real wins (sentiment vs the real, installed ProsusAI/finBERT —
+day on real live SEC data — plus t3-lui, whose losing half was closed this week: the
+classifier head was rebuilt 2026-09-22, multinomial logistic → linear SVM, picked by 10-seed
+dev-CV (10/10 wins, mean 76.71% vs 72.28%), narrowing the sealed-accuracy gap against Rasa's
+DIET from significant (p=0.0014) to not-significant (p=0.0576) — Rasa is still numerically
+ahead (81.91% vs 77.82%), so this is TIED not OWNED, reported as a fragile non-loss rather
+than rounded up to a win; ARGUS's separate out-of-scope-refusal win strengthened in the same
+rebuild, p=0.0156, was p=0.031), 11 real wins (sentiment vs the real, installed ProsusAI/finBERT —
 FinBERT's naive per-post aggregate scales with N copies of one coordinated post, ARGUS's real
 analyst never does, on every narrative and reconfirmed on a fresh real run, 2026-09-22 — earnings vs
 QuantConnect, factor-discovery vs Microsoft RD-Agent, risk-control vs freqtrade's real
@@ -116,11 +122,14 @@ appear at all, and that is the single most likely way this ledger is wrong.
 **Tested and rejected, 2026-09-21 — expanding the OOS negative set to fix `t3-lui`'s Chinese
 over-firing.** 24 new structurally-casual/rhetorical Chinese negatives added to
 `oblique_out_of_scope.json`, retrained, single honest held-out check. Made both axes worse
-(accuracy 74.06%→68.9%, OOS recall 85.71%→79%), not better. Reverted; `t3-lui` stays LOST as
-measured. `TUNED`/`CASES` deliberately not touched — both are independence-valued benchmarks with
-cited historical figures, and engineering cases into them with knowledge of the gap would have
-compromised the one property that makes them worth anything. The design lever named in the RIVAL
-finding is not solved; it is now a *tested* open problem rather than an untested one.
+(accuracy 74.06%→68.9%, OOS recall 85.71%→79%), not better. Reverted. `TUNED`/`CASES` deliberately
+not touched — both are independence-valued benchmarks with cited historical figures, and
+engineering cases into them with knowledge of the gap would have compromised the one property that
+makes them worth anything. **This specific lever is still untried and still open** — what actually
+moved `t3-lui` from LOST to TIED on 2026-09-22 was a different, orthogonal fix (the classifier head
+itself: multinomial logistic → linear SVM, picked by 10-seed dev-CV), not this one. The Chinese
+over-firing root cause named by the RIVAL finding was not touched by that fix either — it is real,
+it is still there, and closing it remains the honest next lever if TIED is ever to become OWNED.
 
 **9 comparisons on disk map to no Bitget-taxonomy row** (all Track-1 or cross-cutting; found by the
 CONNECT lens, 2026-09-21): `arbitrage_comparison.json` (maxme/bitcoin-arbitrage), `rotation_comparison.json`

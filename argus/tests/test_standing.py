@@ -508,6 +508,20 @@ class TestTheLiveRegisterIsHonest:
         )
         assert cap.state is State.TIED
 
+    def test_lui_routing_moved_from_lost_to_tied(self) -> None:
+        """Pinned so a future edit cannot silently move this back to LOST or claim OWNED.
+
+        The 2026-09-22 rebuild (logistic head -> linear SVM head, re-derived threshold) closed
+        the sealed-accuracy gap from significant (p=0.0014) to not-significant (p=0.0576) against
+        this register's own p<0.05 bar. Rasa is still numerically ahead (81.91% vs 77.82%) — this
+        is 'not proven to be a loss', a real but fragile tie, not a claim that ARGUS matches or
+        beats Rasa's accuracy. TIED, not OWNED, is what this register's vocabulary calls that."""
+        cap = next(
+            c for c in REGISTER
+            if c.name == "LUI intent routing, measured against Rasa's real DIET classifier"
+        )
+        assert cap.state is State.TIED
+
     def test_every_capability_names_where_it_lives(self) -> None:
         for cap in REGISTER:
             assert cap.module, cap.name

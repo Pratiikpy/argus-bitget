@@ -63,27 +63,48 @@ class TestItMatchesScikitLearn:
         for text in texts:
             assert analyzer(text) == char_wb_ngrams(text.lower(), 1, 5), text
 
+    def _reference_softmax(
+        self, classifier: object, vectorizer: object, texts: list[str]
+    ) -> list[list[float]]:
+        """Margin -> softmax, computed directly from `LinearSVC.decision_function`.
+
+        **Not `predict_proba`: `LinearSVC` does not have one.** Calibrated probabilities
+        (`CalibratedClassifierCV`) were measured and rejected in favour of the plain margin
+        (`eval/ngramtrain.py`'s module docstring), so the correct reference to match the
+        pure-Python scorer against is the same softmax-over-margins it actually computes, not a
+        Platt-scaled number neither side produces.
+        """
+        raw = classifier.decision_function(vectorizer.transform(texts))  # type: ignore[attr-defined]
+        out: list[list[float]] = []
+        for row in raw:
+            top = max(row)
+            exps = [math.exp(v - top) for v in row]
+            total = sum(exps)
+            out.append([e / total for e in exps])
+        return out
+
     def test_argmax_agrees_on_every_training_row(
         self, fitted: tuple[object, object, list[str], list[str]], model: NgramClassifier
     ) -> None:
         """Rounding coefficients to six decimals must not move a single decision."""
         vectorizer, classifier, texts, _ = fitted
         classes = list(classifier.classes_)  # type: ignore[attr-defined]
-        proba = classifier.predict_proba(vectorizer.transform(texts))  # type: ignore[attr-defined]
+        proba = self._reference_softmax(classifier, vectorizer, texts)
         for i, text in enumerate(texts):
             predicted = model.predict(text)
             if predicted.intent is None:
                 continue
-            assert predicted.intent == classes[int(proba[i].argmax())], text
+            top_index = proba[i].index(max(proba[i]))
+            assert predicted.intent == classes[top_index], text
 
     def test_confidences_agree_to_five_decimals(
         self, fitted: tuple[object, object, list[str], list[str]], model: NgramClassifier
     ) -> None:
         vectorizer, classifier, texts, _ = fitted
-        proba = classifier.predict_proba(vectorizer.transform(texts))  # type: ignore[attr-defined]
+        proba = self._reference_softmax(classifier, vectorizer, texts)
         for i, text in enumerate(texts):
             assert model.predict(text).confidence == pytest.approx(
-                float(proba[i].max()), abs=1e-5
+                max(proba[i]), abs=1e-5
             ), text
 
 
