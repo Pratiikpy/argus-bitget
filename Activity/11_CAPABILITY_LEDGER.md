@@ -30,7 +30,7 @@ carries a result.**
 | 13 | `stress-testing` | T3 | subtheme | **LOST** | stumpy FLUSS + ruptures + incumbent rule | **yes** | specialist | 2026-09-21 |
 | 14 | `personal-workbench` | T3 | subtheme | IMPLEMENTED | OpenBB (real agent + data platform) | **yes** | split — OpenBB (32 real sources vs ARGUS's 12); ARGUS (point-in-time gating OpenBB's real source has zero representation of, verified sharp to the exact day) | 2026-09-22 |
 | 15 | `execution-assistance` | T3 | subtheme | IMPLEMENTED | hftbacktest (real LatencyModel) | **yes** | ARGUS (prices real deliberation delay hftbacktest's real trait has zero representation of; sqrt(t) scaling confirmed numerically) | 2026-09-22 |
-| 16 | `portfolio-copilot` | T3 | subtheme | **LOST** | Riskfolio-Lib NCO | **yes** | specialist (p=3.6e-05) | 2026-09-21 |
+| 16 | `portfolio-copilot` | T3 | subtheme | **LOST** | Riskfolio-Lib NCO | **yes** | specialist (p≈3.0e-06, 23/24 windows) — implemented real optimal leaf ordering (Bar-Joseph 2001, verified vs live scipy), closes the separate ARGUS-vs-Riskfolio-HRP gap to float identity, but the NCO loss itself is unchanged (was p=3.6e-05/22-of-24): leaf ordering was never the cause of it | 2026-09-22 |
 | 17 | `t3-source-depth` | T3 | judging | IMPLEMENTED | OpenBB (real provider count) | **yes** | **specialist** — OpenBB (32 real providers vs ARGUS's 12) on raw count, honestly; ARGUS's sources are each live health-classified rather than counted from a list (effectiveness half of the criterion) — same evidence as row 14, synced here since this is the row the handbook actually names "count" | 2026-09-22 |
 | 18 | `t3-research-quality` | T3 | judging | IMPLEMENTED | QuantConnect Lean + statsmodels (two rivals) | **yes** | ARGUS (0 FDR/Bonferroni survivors vs Lean's uncorrected 7-of-190, ~9.5 expected FPs) | 2026-09-21 |
 | 19 | `t3-lui` | T3 | judging | **LOST** on accuracy, **WON** on safety | RasaHQ/rasa DIET (Apache-2.0) | **yes** | split — Rasa (accuracy, p=0.0014); ARGUS (OOS refusal, p=0.031) | 2026-09-21 |
@@ -91,7 +91,7 @@ number beats theirs, and no fabricated score is recorded for it).** That is this
 scoreboard — it names whether
 *this specific Bitget-taxonomy row* has a rival comparison wired in, which is a narrower and
 different question from `eval/standing.py`'s own register (31 capabilities across the whole
-codebase, 22 OWNED, 3 LOST, independently verified as of 2026-09-22 — do not read "0" here as
+codebase, 25 OWNED, 3 LOST, independently verified as of 2026-09-22 — do not read "0" here as
 "0 OWNED anywhere," an earlier session conflated the two and said so wrongly to the owner; this
 count moves almost every iteration and this line is a snapshot, not a live figure — read
 `eval/standing.py`'s own output for the current number). What this ledger's `rival run` column

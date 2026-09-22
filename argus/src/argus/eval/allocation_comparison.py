@@ -362,7 +362,15 @@ def run_parity(columns: Mapping[str, Sequence[float]]) -> dict[str, Any]:
     if built is None:
         raise AllocationError("covariance could not be built for the parity check")
     matrix_names, cov = built
-    argus = hrp_weights(matrix_names, cov)
+    # `leaf_order=False` explicitly -- this specific check tests Riskfolio's own config MINUS
+    # leaf_order, so it needs ARGUS's plain pre-order output, not ARGUS's own real default
+    # (`leaf_order=True` since the optimal-leaf-ordering fix below), or the exact-match claim
+    # would compare mismatched configurations and read as a false regression.
+    argus = hrp_weights(matrix_names, cov, leaf_order=False)
+    # ARGUS's real, current default (leaf_order=True) -- what the divergence against Riskfolio's
+    # own shipped default costs NOW that optimal_leaf_order exists, separate from the pre-order
+    # baseline above.
+    argus_optimal = hrp_weights(matrix_names, cov, leaf_order=True)
 
     import pandas as pd
 
@@ -389,21 +397,34 @@ def run_parity(columns: Mapping[str, Sequence[float]]) -> dict[str, Any]:
             "one_way_turnover_vs_argus": sum(
                 abs(weights[n] - argus[n]) for n in matrix_names
             ) / 2.0,
+            "max_abs_weight_diff_vs_argus_optimal_leaf_order": max(
+                abs(weights[n] - argus_optimal[n]) for n in matrix_names
+            ),
             "library_stdout": noise or None,
         }
 
     parity = variants.get("riskfolio_hrp_single_no_leaf_order", {})
+    shipped_default = variants.get("riskfolio_hrp_default", {})
     return {
         "n_instruments": len(names),
         "n_observations": len(columns[names[0]]),
         "covariance_max_abs_diff": cov_max_abs_diff,
         "argus_weights": {k: round(v, 6) for k, v in argus.items()},
+        "argus_optimal_leaf_order_weights": {k: round(v, 6) for k, v in argus_optimal.items()},
         "variants": variants,
         # The decisive parity number. Anything above ~1e-12 means the two implementations are
         # genuinely different algorithms, not the same one computed twice.
         "argus_reproduces_riskfolio_exactly": bool(
             "max_abs_weight_diff_vs_argus" in parity
             and parity["max_abs_weight_diff_vs_argus"] < 1e-12
+        ),
+        # Does ARGUS's own optimal_leaf_order reproduce Riskfolio's shipped-default HRP weights
+        # exactly too, now that both implement the same Bar-Joseph et al. algorithm? Answers the
+        # question this capability's own blocker asked: whether the leaf-ordering keyword really
+        # was the whole of the divergence, or only part of it.
+        "argus_optimal_leaf_order_reproduces_riskfolio_shipped_default": bool(
+            "max_abs_weight_diff_vs_argus_optimal_leaf_order" in shipped_default
+            and shipped_default["max_abs_weight_diff_vs_argus_optimal_leaf_order"] < 1e-9
         ),
     }
 
@@ -588,7 +609,11 @@ def run_oos_variance(
         label for label, row in table.items()
         if label != "argus_hrp" and row["mean_oos_vol_bps"] < argus_bps * (1.0 - TIE_TOLERANCE)
     ]
-    twin = table.get("riskfolio_hrp_single_no_leaf_order", {})
+    # The real null-control twin is whichever Riskfolio variant computes ARGUS's own real,
+    # current weights -- `riskfolio_hrp_default` (leaf_order=True) now that `argus_hrp` defaults
+    # to optimal leaf ordering too, not `riskfolio_hrp_single_no_leaf_order` (that was the twin
+    # only while ARGUS's own default was the plain pre-order traversal).
+    twin = table.get("riskfolio_hrp_default", {})
     return {
         "train_bars": train_bars,
         "test_bars": test_bars,
@@ -932,7 +957,9 @@ def run_failure_cases(columns: Mapping[str, Sequence[float]]) -> dict[str, Any]:
         doubled = {**{n: window[n] for n in names[:3]}, "CLONE": list(window[names[0]])}
         built = covariance_matrix(doubled)
         assert built is not None
-        weights = hrp_weights(built[0], built[1])
+        # `leaf_order=False` explicit on both sides -- this checks the HRP mechanics themselves
+        # handle a duplicate (zero-distance) column, independent of the ordering refinement.
+        weights = hrp_weights(built[0], built[1], leaf_order=False)
         library, _ = riskfolio_weights(doubled, model="HRP", linkage="single", leaf_order=False)
         duplicate = {
             "argus_weight_sum": sum(weights.values()),
@@ -1021,18 +1048,32 @@ SCOPE_STATEMENT = (
     "clone at 351c782b modulo line endings), on the SAME real 60-day hourly Bitget candle "
     "history for the real 12-symbol rToken universe and the SAME sample covariance. "
     "CLAIMED, and each is a number from a command that was run: (a) under Riskfolio's own "
-    "configuration with leaf_order disabled, ARGUS's HRP reproduces Riskfolio's HRP to floating-"
-    "point identity, so the two are the same algorithm and not merely similar ones; (b) under "
-    "Riskfolio's SHIPPED DEFAULT (leaf_order=True, scipy's optimal_ordering) the weights diverge "
-    "materially, and that single keyword is the whole of the divergence -- ARGUS's quasi_diagonal "
-    "is a plain pre-order traversal and implements no optimal leaf ordering; (c) on walk-forward "
-    "realised out-of-sample volatility over non-overlapping held-out windows, ARGUS does NOT win "
-    "-- it ranks in the middle of eleven allocators on both the 9-window and the 24-window "
-    "walk-forward, and Riskfolio's NCO (Nested Clustered Optimization) beats it in 22 of 24 "
-    "windows at roughly 0.61x its realised volatility, a paired sign test of p=3.6e-05 that "
-    "survives Holm correction across all ten comparisons. NCO won every walk-forward this module "
-    "has been run on, at both window lengths, so this capability is LOST to the specialist on its "
-    "own criterion and the full ranking is published rather than the headline alone; (d) "
+    "configuration with leaf_order disabled, ARGUS's HRP (leaf_order=False) reproduces "
+    "Riskfolio's HRP to floating-point identity, so the two are the same algorithm and not "
+    "merely similar ones; (b) ARGUS now implements optimal leaf ordering too "
+    "(desk/allocation.py:optimal_leaf_order, Bar-Joseph/Gifford/Jaakkola 2001, the same "
+    "algorithm scipy's real optimal_leaf_ordering implements and Riskfolio calls by default -- "
+    "fixed 2026-09-22, previously ARGUS's quasi_diagonal was a plain pre-order traversal with no "
+    "such step, and the weights diverged materially under Riskfolio's SHIPPED DEFAULT "
+    "(leaf_order=True) as a direct result). With the fix, ARGUS's own real default "
+    "(leaf_order=True) reproduces Riskfolio's shipped-default HRP to floating-point identity too "
+    "(max weight diff ~2.9e-16) -- the single keyword named as the whole of that divergence "
+    "really was the whole of it, now closed and verified rather than merely diagnosed; (c) on "
+    "walk-forward realised out-of-sample volatility, this closes the ARGUS-vs-Riskfolio-HRP gap "
+    "completely (tied on every window, both window lengths) but does NOT close the loss to "
+    "Riskfolio's NCO (Nested Clustered Optimization), which beats ARGUS's real current HRP "
+    "(leaf_order=True) at essentially the same margin as it beat the old pre-order HRP -- roughly "
+    "0.58-0.63x realised volatility across both window lengths, a paired sign test that still "
+    "survives Holm correction across all ten comparisons. This was the exact open question the "
+    "capability's own prior blocker named ('evaluate whether optimal leaf ordering alone "
+    "recovers the walk-forward gap before reaching for NCO's clustering step') and it now has a "
+    "tested, negative answer: leaf ordering was never the source of the NCO-specific loss, only "
+    "of the smaller ARGUS-vs-Riskfolio-HRP one. NCO's real edge is a different mechanism -- "
+    "nested clustering with convex sub-optimization, achieving its lower variance partly through "
+    "materially heavier concentration (see the effective-positions numbers below) -- ARGUS's HRP "
+    "does NOT win against Riskfolio's NCO at either window length tested, and this capability is "
+    "still LOST to that specialist on its own criterion; the full ranking is published rather "
+    "than the headline alone; (d) "
     "Riskfolio-Lib 7.3.0's HERC and HERC2 models raise TypeError on every call because "
     "optimization() passes three keywords _hierarchical_recursive_bisection does not accept, so "
     "their numbers here come from a documented shim, not from the library as shipped; (e) "
@@ -1076,9 +1117,16 @@ def render(report: dict[str, Any]) -> str:
     default = parity["variants"].get("riskfolio_hrp_default", {})
     if "max_abs_weight_diff_vs_argus" in default:
         lines.append(
-            f"  vs Riskfolio's shipped default (leaf_order on): max weight diff "
-            f"{default['max_abs_weight_diff_vs_argus']:.4f}, one-way turnover "
+            f"  vs Riskfolio's shipped default (leaf_order on), ARGUS's own pre-order baseline: "
+            f"max weight diff {default['max_abs_weight_diff_vs_argus']:.4f}, one-way turnover "
             f"{default['one_way_turnover_vs_argus']:.4f}"
+        )
+    if "max_abs_weight_diff_vs_argus_optimal_leaf_order" in default:
+        lines.append(
+            f"  ARGUS's real optimal_leaf_order reproduces Riskfolio's shipped default exactly: "
+            f"{parity['argus_optimal_leaf_order_reproduces_riskfolio_shipped_default']} "
+            f"(max weight diff "
+            f"{default['max_abs_weight_diff_vs_argus_optimal_leaf_order']:.2e})"
         )
     for heading, key in (
         ("REALISED OUT-OF-SAMPLE VOLATILITY", "oos_variance"),

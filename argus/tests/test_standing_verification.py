@@ -27,7 +27,6 @@ from argus.eval.standing import (
     JUDGEMENT_CONDITIONS,
     OWNED_CONDITIONS,
     Proof,
-    State,
     audit,
     verify,
 )
@@ -170,10 +169,30 @@ class TestTheLiveRegister:
 
     def test_the_demoted_seven_are_still_in_the_register(self) -> None:
         """Demotion, not deletion. A capability removed from the register stops being measured,
-        which is the quiet way a bad result disappears."""
+        which is the quiet way a bad result disappears.
+
+        Named explicitly rather than counted: the original assertion was `count(IMPLEMENTED) >=
+        7`, which silently inverted this test's own intent the first time real work promoted one
+        of the seven back to OWNED — fewer capabilities stuck at IMPLEMENTED is the project
+        succeeding, not the register losing entries, and a passing count-based test cannot tell
+        those apart. Caught 2026-09-22 when the AUDIT sweep two iterations earlier had already
+        promoted three of the seven and this file was not in the suite that sweep ran. Pinning
+        the seven by name is correct in both directions and does not need updating on a
+        promotion — only if one of these seven names is ever removed from the register outright.
+        """
         report = audit()
-        implemented = {c.name for c in report.capabilities if c.state is State.IMPLEMENTED}
-        assert len(implemented) >= 7
+        present = {c.name for c in report.capabilities}
+        demoted_2026_09_20 = {
+            "Deliberation priced as a trading cost",
+            "Overfitting gates that raise instead of returning NaN",
+            "Risk layer proved by domain sweep",
+            "Perception layer: what the desk can see",
+            "Market sentiment",
+            "Self-evolving review rules",
+            "Session-aware execution that refuses to solve through a boundary",
+        }
+        missing = demoted_2026_09_20 - present
+        assert not missing, f"demoted capability removed from the register outright: {missing}"
 
 
 class TestTheVocabularyIsWideEnoughButNotWider:

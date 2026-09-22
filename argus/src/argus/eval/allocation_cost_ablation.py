@@ -253,8 +253,11 @@ def _allocators(w_max: float | None) -> list[Allocator]:
         )
 
     def hrp_twin(train: Mapping[str, Sequence[float]]) -> dict[str, float]:
+        # `leaf_order=True` to match `argus()`'s own real default above (ARGUS now implements
+        # optimal leaf ordering too) -- this stays "ARGUS's own algorithm run through Riskfolio"
+        # only if both sides use the same configuration.
         return _riskfolio_allocation(
-            train, w_max=w_max, model="HRP", linkage="single", leaf_order=False,
+            train, w_max=w_max, model="HRP", linkage="single", leaf_order=True,
         )
 
     return [

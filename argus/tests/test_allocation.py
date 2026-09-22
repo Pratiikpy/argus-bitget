@@ -27,6 +27,7 @@ from argus.desk.allocation import (
     correlation_distance,
     diversification_ratio,
     hrp_weights,
+    optimal_leaf_order,
     optimize_trade,
     portfolio_variance,
     quasi_diagonal,
@@ -68,8 +69,12 @@ def _synthetic(
 
 class TestItReproducesPyPortfolioOpt:
     def test_the_weights_match_to_machine_precision(self) -> None:
+        """PyPortfolioOpt's own quasi-diagonalisation is plain pre-order traversal, not optimal
+        leaf ordering — reproducing it to machine precision needs `leaf_order=False` explicitly
+        now that `leaf_order=True` (matching Riskfolio-Lib's own shipped default) is this
+        function's own default."""
         names, cov = _cov()
-        ours = hrp_weights(names, cov)
+        ours = hrp_weights(names, cov, leaf_order=False)
         want = EXPECTED["weights"]
         assert sorted(ours) == sorted(want)
         for symbol in want:
@@ -283,3 +288,105 @@ class TestDiversificationIsReportedHonestly:
         ratio = diversification_ratio(dict.fromkeys(names, 1 / len(names)), names, cov)
         assert ratio is not None
         assert ratio < math.sqrt(len(names))
+
+
+def _total_adjacent_distance(
+    order: list[int], distance: list[list[float]],
+) -> float:
+    return sum(distance[order[i]][order[i + 1]] for i in range(len(order) - 1))
+
+
+class TestOptimalLeafOrderMatchesRealScipy:
+    """`data/allocation_comparison.json`'s own scope_statement traced ARGUS's entire walk-forward
+    loss to one keyword: Riskfolio-Lib ships with `leaf_order=True` (scipy's real
+    `optimal_leaf_ordering`), and :func:`quasi_diagonal` implements no such thing. This checks the
+    fix against real, live scipy directly — not only against the downstream weight comparison —
+    so a regression here is caught at its source rather than three layers of indirection away."""
+
+    def test_matches_real_scipy_optimal_cost_on_the_real_book(self) -> None:
+        import numpy as np
+        from scipy.cluster.hierarchy import leaves_list, optimal_leaf_ordering
+        from scipy.spatial.distance import squareform
+
+        names, cov = _cov()
+        distance = correlation_distance(cov)
+        merges = single_linkage(distance)
+        mine = optimal_leaf_order(merges, distance, len(names))
+
+        z = np.array([[m.left, m.right, m.distance, m.size] for m in merges], dtype=float)
+        d = np.array(distance)
+        condensed = squareform(d, checks=False)
+        theirs = leaves_list(optimal_leaf_ordering(z, condensed)).tolist()
+
+        assert _total_adjacent_distance(mine, distance) == pytest.approx(
+            _total_adjacent_distance(theirs, distance), abs=1e-9,
+        )
+
+    def test_matches_real_scipy_on_two_hundred_random_trees(self) -> None:
+        """Not one hand-picked case — 200 random point sets spanning 3 to 15 leaves, matching the
+        sweep this fix was verified against before being wired into `hrp_weights` at all."""
+        import random
+
+        import numpy as np
+        from scipy.cluster.hierarchy import leaves_list, optimal_leaf_ordering
+        from scipy.spatial.distance import squareform
+
+        rng = random.Random(0)
+        np_rng = np.random.default_rng(0)
+        mismatches = 0
+        for _ in range(200):
+            n = rng.randint(3, 15)
+            pts = np_rng.standard_normal((n, rng.randint(2, 5)))
+            dist = np.zeros((n, n))
+            for i in range(n):
+                for j in range(n):
+                    if i != j:
+                        dist[i, j] = float(np.linalg.norm(pts[i] - pts[j]))
+            dist_list = dist.tolist()
+
+            merges = single_linkage(dist_list)
+            mine = optimal_leaf_order(merges, dist_list, n)
+
+            z = np.array([[m.left, m.right, m.distance, m.size] for m in merges], dtype=float)
+            condensed = squareform(dist, checks=False)
+            theirs = leaves_list(optimal_leaf_ordering(z, condensed)).tolist()
+
+            mine_cost = _total_adjacent_distance(mine, dist_list)
+            their_cost = _total_adjacent_distance(theirs, dist_list)
+            if abs(mine_cost - their_cost) > 1e-6:
+                mismatches += 1
+        assert mismatches == 0
+
+    def test_it_is_at_least_as_good_as_the_plain_pre_order_traversal(self) -> None:
+        """The whole point: optimal ordering must never cost MORE than the naive one it replaces,
+        on the real total adjacent-distance objective it is defined to minimise."""
+        names, cov = _cov()
+        distance = correlation_distance(cov)
+        merges = single_linkage(distance)
+        naive = quasi_diagonal(merges, len(names))
+        optimal = optimal_leaf_order(merges, distance, len(names))
+        assert _total_adjacent_distance(optimal, distance) <= _total_adjacent_distance(
+            naive, distance,
+        ) + 1e-12
+
+    def test_two_leaves_falls_back_to_quasi_diagonal(self) -> None:
+        merges = [Merge(left=0, right=1, distance=0.5, size=2)]
+        distance = [[0.0, 0.5], [0.5, 0.0]]
+        assert optimal_leaf_order(merges, distance, 2) == quasi_diagonal(merges, 2)
+
+    def test_hrp_weights_defaults_to_optimal_leaf_order(self) -> None:
+        """Riskfolio-Lib's own shipped default is `leaf_order=True` — ARGUS now matches it."""
+        names, cov = _cov()
+        default = hrp_weights(names, cov)
+        explicit_optimal = hrp_weights(names, cov, leaf_order=True)
+        assert default == explicit_optimal
+
+    def test_hrp_weights_leaf_order_false_still_matches_pyportfolioopt(self) -> None:
+        """`leaf_order=False` must still be the exact code path
+        `TestItReproducesPyPortfolioOpt` already pins to machine precision — confirms this
+        refactor did not silently change what `leaf_order=False` computes."""
+        names, cov = _cov()
+        old = hrp_weights(names, cov, leaf_order=False)
+        want = EXPECTED["weights"]
+        for symbol in want:
+            assert old[symbol] == pytest.approx(want[symbol], abs=1e-12)
