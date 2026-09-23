@@ -1,7 +1,8 @@
 {
   "real_symbols": {
-    "generated_at": "2026-09-21T11:25:09.967097+00:00",
+    "generated_at": "2026-09-23T09:28:02.604420+00:00",
     "days": 90,
+    "frozen": true,
     "symbols_compared": 7,
     "symbols_failed": {
       "TSLAUSDT": "overnight_volume_shock run failed: Sharpe is undefined for a zero-variance series (sd=0.000e+00 is floating-point noise around mean 0.000e+00)",
@@ -14,37 +15,37 @@
       "NVDAUSDT": {
         "variant": "execution_aware_low_turnover",
         "bars": 2159,
-        "trades": 22,
-        "oos_boundary": "2026-08-20T22:00:00+00:00",
+        "trades": 19,
+        "oos_boundary": "2026-08-22T20:00:00+00:00",
         "contingency": {
-          "n": 22,
-          "both_locked": 7,
-          "argus_only": 7,
-          "freqtrade_only": 1,
-          "neither": 7,
-          "agreement_rate": 0.6364
+          "n": 19,
+          "both_locked": 2,
+          "argus_only": 1,
+          "freqtrade_only": 0,
+          "neither": 16,
+          "agreement_rate": 0.9474
         },
         "protection_ablation": {
-          "n": 22,
+          "n": 19,
           "fires": {
             "drawdown": 0,
             "stoploss": 0,
-            "low_profit": 8
+            "low_profit": 2
           },
           "unique_contribution": {
             "drawdown": 0,
             "stoploss": 0,
-            "low_profit": 8
+            "low_profit": 2
           },
           "fire_rate": {
             "drawdown": 0.0,
             "stoploss": 0.0,
-            "low_profit": 0.3636
+            "low_profit": 0.1053
           },
           "unique_share": {
             "drawdown": 0.0,
             "stoploss": 0.0,
-            "low_profit": 0.3636
+            "low_profit": 0.1053
           }
         },
         "cooldown_locked_share": 1.0
@@ -53,36 +54,36 @@
         "variant": "rtoken_session_boundary",
         "bars": 2159,
         "trades": 64,
-        "oos_boundary": "2026-08-20T22:00:00+00:00",
+        "oos_boundary": "2026-08-22T20:00:00+00:00",
         "contingency": {
           "n": 64,
-          "both_locked": 32,
-          "argus_only": 4,
-          "freqtrade_only": 10,
-          "neither": 18,
-          "agreement_rate": 0.7812
+          "both_locked": 34,
+          "argus_only": 3,
+          "freqtrade_only": 12,
+          "neither": 15,
+          "agreement_rate": 0.7656
         },
         "protection_ablation": {
           "n": 64,
           "fires": {
             "drawdown": 0,
-            "stoploss": 39,
-            "low_profit": 16
+            "stoploss": 41,
+            "low_profit": 18
           },
           "unique_contribution": {
             "drawdown": 0,
-            "stoploss": 26,
-            "low_profit": 3
+            "stoploss": 28,
+            "low_profit": 5
           },
           "fire_rate": {
             "drawdown": 0.0,
-            "stoploss": 0.6094,
-            "low_profit": 0.25
+            "stoploss": 0.6406,
+            "low_profit": 0.2812
           },
           "unique_share": {
             "drawdown": 0.0,
-            "stoploss": 0.4062,
-            "low_profit": 0.0469
+            "stoploss": 0.4375,
+            "low_profit": 0.0781
           }
         },
         "cooldown_locked_share": 1.0
@@ -90,37 +91,37 @@
       "MSFTUSDT": {
         "variant": "execution_aware_low_turnover",
         "bars": 2159,
-        "trades": 21,
-        "oos_boundary": "2026-08-20T22:00:00+00:00",
+        "trades": 20,
+        "oos_boundary": "2026-08-22T20:00:00+00:00",
         "contingency": {
-          "n": 21,
-          "both_locked": 7,
-          "argus_only": 4,
+          "n": 20,
+          "both_locked": 5,
+          "argus_only": 1,
           "freqtrade_only": 1,
-          "neither": 9,
-          "agreement_rate": 0.7619
+          "neither": 13,
+          "agreement_rate": 0.9
         },
         "protection_ablation": {
-          "n": 21,
+          "n": 20,
           "fires": {
             "drawdown": 0,
             "stoploss": 0,
-            "low_profit": 8
+            "low_profit": 6
           },
           "unique_contribution": {
             "drawdown": 0,
             "stoploss": 0,
-            "low_profit": 8
+            "low_profit": 6
           },
           "fire_rate": {
             "drawdown": 0.0,
             "stoploss": 0.0,
-            "low_profit": 0.381
+            "low_profit": 0.3
           },
           "unique_share": {
             "drawdown": 0.0,
             "stoploss": 0.0,
-            "low_profit": 0.381
+            "low_profit": 0.3
           }
         },
         "cooldown_locked_share": 1.0
@@ -128,37 +129,37 @@
       "GOOGLUSDT": {
         "variant": "fitted_trend",
         "bars": 2159,
-        "trades": 48,
-        "oos_boundary": "2026-08-20T22:00:00+00:00",
+        "trades": 49,
+        "oos_boundary": "2026-08-22T20:00:00+00:00",
         "contingency": {
-          "n": 48,
-          "both_locked": 23,
-          "argus_only": 6,
-          "freqtrade_only": 1,
-          "neither": 18,
-          "agreement_rate": 0.8542
+          "n": 49,
+          "both_locked": 22,
+          "argus_only": 5,
+          "freqtrade_only": 2,
+          "neither": 20,
+          "agreement_rate": 0.8571
         },
         "protection_ablation": {
-          "n": 48,
+          "n": 49,
           "fires": {
             "drawdown": 3,
-            "stoploss": 21,
+            "stoploss": 22,
             "low_profit": 16
           },
           "unique_contribution": {
             "drawdown": 0,
             "stoploss": 8,
-            "low_profit": 3
+            "low_profit": 2
           },
           "fire_rate": {
-            "drawdown": 0.0625,
-            "stoploss": 0.4375,
-            "low_profit": 0.3333
+            "drawdown": 0.0612,
+            "stoploss": 0.449,
+            "low_profit": 0.3265
           },
           "unique_share": {
             "drawdown": 0.0,
-            "stoploss": 0.1667,
-            "low_profit": 0.0625
+            "stoploss": 0.1633,
+            "low_profit": 0.0408
           }
         },
         "cooldown_locked_share": 1.0
@@ -167,36 +168,36 @@
         "variant": "hold_through_closure",
         "bars": 2159,
         "trades": 65,
-        "oos_boundary": "2026-08-20T22:00:00+00:00",
+        "oos_boundary": "2026-08-22T20:00:00+00:00",
         "contingency": {
           "n": 65,
-          "both_locked": 39,
-          "argus_only": 12,
-          "freqtrade_only": 4,
-          "neither": 10,
-          "agreement_rate": 0.7538
+          "both_locked": 33,
+          "argus_only": 14,
+          "freqtrade_only": 6,
+          "neither": 12,
+          "agreement_rate": 0.6923
         },
         "protection_ablation": {
           "n": 65,
           "fires": {
             "drawdown": 21,
-            "stoploss": 30,
-            "low_profit": 31
+            "stoploss": 28,
+            "low_profit": 27
           },
           "unique_contribution": {
             "drawdown": 0,
             "stoploss": 7,
-            "low_profit": 13
+            "low_profit": 11
           },
           "fire_rate": {
             "drawdown": 0.3231,
-            "stoploss": 0.4615,
-            "low_profit": 0.4769
+            "stoploss": 0.4308,
+            "low_profit": 0.4154
           },
           "unique_share": {
             "drawdown": 0.0,
             "stoploss": 0.1077,
-            "low_profit": 0.2
+            "low_profit": 0.1692
           }
         },
         "cooldown_locked_share": 1.0
@@ -204,37 +205,37 @@
       "QQQUSDT": {
         "variant": "fitted_trend",
         "bars": 2159,
-        "trades": 52,
-        "oos_boundary": "2026-08-20T22:00:00+00:00",
+        "trades": 48,
+        "oos_boundary": "2026-08-22T20:00:00+00:00",
         "contingency": {
-          "n": 52,
-          "both_locked": 29,
-          "argus_only": 1,
-          "freqtrade_only": 9,
-          "neither": 13,
-          "agreement_rate": 0.8077
+          "n": 48,
+          "both_locked": 17,
+          "argus_only": 0,
+          "freqtrade_only": 10,
+          "neither": 21,
+          "agreement_rate": 0.7917
         },
         "protection_ablation": {
-          "n": 52,
+          "n": 48,
           "fires": {
             "drawdown": 0,
-            "stoploss": 27,
-            "low_profit": 20
+            "stoploss": 18,
+            "low_profit": 10
           },
           "unique_contribution": {
             "drawdown": 0,
-            "stoploss": 18,
-            "low_profit": 11
+            "stoploss": 17,
+            "low_profit": 9
           },
           "fire_rate": {
             "drawdown": 0.0,
-            "stoploss": 0.5192,
-            "low_profit": 0.3846
+            "stoploss": 0.375,
+            "low_profit": 0.2083
           },
           "unique_share": {
             "drawdown": 0.0,
-            "stoploss": 0.3462,
-            "low_profit": 0.2115
+            "stoploss": 0.3542,
+            "low_profit": 0.1875
           }
         },
         "cooldown_locked_share": 1.0
@@ -243,111 +244,113 @@
         "variant": "fitted_trend",
         "bars": 2159,
         "trades": 53,
-        "oos_boundary": "2026-08-20T22:00:00+00:00",
+        "oos_boundary": "2026-08-22T20:00:00+00:00",
         "contingency": {
           "n": 53,
-          "both_locked": 27,
-          "argus_only": 10,
-          "freqtrade_only": 2,
-          "neither": 14,
-          "agreement_rate": 0.7736
+          "both_locked": 29,
+          "argus_only": 7,
+          "freqtrade_only": 10,
+          "neither": 7,
+          "agreement_rate": 0.6792
         },
         "protection_ablation": {
           "n": 53,
           "fires": {
-            "drawdown": 0,
+            "drawdown": 13,
             "stoploss": 24,
-            "low_profit": 6
+            "low_profit": 10
           },
           "unique_contribution": {
-            "drawdown": 0,
-            "stoploss": 23,
-            "low_profit": 5
+            "drawdown": 5,
+            "stoploss": 24,
+            "low_profit": 2
           },
           "fire_rate": {
-            "drawdown": 0.0,
+            "drawdown": 0.2453,
             "stoploss": 0.4528,
-            "low_profit": 0.1132
+            "low_profit": 0.1887
           },
           "unique_share": {
-            "drawdown": 0.0,
-            "stoploss": 0.434,
-            "low_profit": 0.0943
+            "drawdown": 0.0943,
+            "stoploss": 0.4528,
+            "low_profit": 0.0377
           }
         },
         "cooldown_locked_share": 1.0
       }
     },
     "overall": {
-      "n": 325,
-      "both_locked": 164,
-      "argus_only": 44,
-      "freqtrade_only": 28,
-      "neither": 89,
-      "agreement_rate": 0.7785
+      "n": 318,
+      "both_locked": 142,
+      "argus_only": 31,
+      "freqtrade_only": 41,
+      "neither": 104,
+      "agreement_rate": 0.7736
     },
     "in_sample": {
-      "n": 199,
-      "both_locked": 94,
-      "argus_only": 24,
-      "freqtrade_only": 13,
-      "neither": 68,
-      "agreement_rate": 0.8141
+      "n": 193,
+      "both_locked": 73,
+      "argus_only": 18,
+      "freqtrade_only": 23,
+      "neither": 79,
+      "agreement_rate": 0.7876
     },
     "out_of_sample": {
-      "n": 126,
-      "both_locked": 70,
-      "argus_only": 20,
-      "freqtrade_only": 15,
-      "neither": 21,
-      "agreement_rate": 0.7222
+      "n": 125,
+      "both_locked": 69,
+      "argus_only": 13,
+      "freqtrade_only": 18,
+      "neither": 25,
+      "agreement_rate": 0.752
     },
     "protection_ablation": {
-      "n": 325,
+      "n": 318,
       "fires": {
-        "drawdown": 24,
-        "stoploss": 141,
-        "low_profit": 105
+        "drawdown": 37,
+        "stoploss": 133,
+        "low_profit": 89
       },
       "unique_contribution": {
-        "drawdown": 0,
-        "stoploss": 82,
-        "low_profit": 51
+        "drawdown": 5,
+        "stoploss": 84,
+        "low_profit": 37
       },
       "fire_rate": {
-        "drawdown": 0.0738,
-        "stoploss": 0.4338,
-        "low_profit": 0.3231
+        "drawdown": 0.1164,
+        "stoploss": 0.4182,
+        "low_profit": 0.2799
       },
       "unique_share": {
-        "drawdown": 0.0,
-        "stoploss": 0.2523,
-        "low_profit": 0.1569
+        "drawdown": 0.0157,
+        "stoploss": 0.2642,
+        "low_profit": 0.1164
       }
     },
     "failure_cases": {
       "definition": "checkpoints where freqtrade locked the book and ARGUS did not",
-      "count": 28,
-      "of_checkpoints": 325,
-      "rate": 0.0862,
+      "count": 41,
+      "of_checkpoints": 318,
+      "rate": 0.1289,
       "by_symbol": {
-        "AAPLUSDT": 10,
-        "QQQUSDT": 9,
-        "COINUSDT": 4,
-        "SQQQUSDT": 2,
-        "NVDAUSDT": 1,
-        "MSFTUSDT": 1,
-        "GOOGLUSDT": 1
+        "AAPLUSDT": 12,
+        "QQQUSDT": 10,
+        "SQQQUSDT": 10,
+        "COINUSDT": 6,
+        "GOOGLUSDT": 2,
+        "MSFTUSDT": 1
       },
-      "symbols_with_none": [],
+      "symbols_with_none": [
+        "NVDAUSDT"
+      ],
       "scope_statement": "NOT CLAIMED: that every one is an ARGUS defect. The two systems measure drawdown differently \u2014 ARGUS from realised equity, freqtrade inferred from closed trades \u2014 so some of these are the baseline locking on a signal that was not there. NOT CLAIMED: that the converse column (argus_only) cancels them out; a miss and an extra catch are different events and averaging them into an agreement rate hides both."
     },
     "cost_bps_applied_per_trade": "12",
-    "checkpoints_total": 325
+    "checkpoints_total": 318
   },
   "combined_book": {
-    "generated_at": "2026-09-21T11:27:15.188201+00:00",
+    "generated_at": "2026-09-23T09:28:03.471824+00:00",
     "days": 90,
+    "frozen": true,
     "symbols_combined": [
       "AAPLUSDT",
       "COINUSDT",
@@ -365,67 +368,67 @@
       "TQQQUSDT": "crossmarket_stale_corrected run failed: Sharpe is undefined for a zero-variance series (sd=0.000e+00 is floating-point noise around mean 0.000e+00)"
     },
     "equity_share_per_symbol": "14285.71428571428571428571429",
-    "oos_boundary": "2026-08-20T22:00:00+00:00",
+    "oos_boundary": "2026-08-22T20:00:00+00:00",
     "checkpoints_per_symbol": {
-      "GOOGLUSDT": 48,
-      "QQQUSDT": 52,
+      "SQQQUSDT": 53,
+      "QQQUSDT": 48,
       "AAPLUSDT": 64,
       "COINUSDT": 65,
-      "SQQQUSDT": 53,
-      "MSFTUSDT": 21,
-      "NVDAUSDT": 22
+      "GOOGLUSDT": 49,
+      "MSFTUSDT": 20,
+      "NVDAUSDT": 19
     },
     "overall": {
-      "n": 325,
-      "both_locked": 98,
+      "n": 318,
+      "both_locked": 93,
       "argus_only": 0,
-      "freqtrade_only": 223,
-      "neither": 4,
-      "agreement_rate": 0.3138
+      "freqtrade_only": 225,
+      "neither": 0,
+      "agreement_rate": 0.2925
     },
     "in_sample": {
-      "n": 199,
-      "both_locked": 70,
+      "n": 193,
+      "both_locked": 65,
       "argus_only": 0,
-      "freqtrade_only": 125,
-      "neither": 4,
-      "agreement_rate": 0.3719
+      "freqtrade_only": 128,
+      "neither": 0,
+      "agreement_rate": 0.3368
     },
     "out_of_sample": {
-      "n": 126,
+      "n": 125,
       "both_locked": 28,
       "argus_only": 0,
-      "freqtrade_only": 98,
+      "freqtrade_only": 97,
       "neither": 0,
-      "agreement_rate": 0.2222
+      "agreement_rate": 0.224
     },
     "protection_ablation": {
-      "n": 325,
+      "n": 318,
       "fires": {
-        "drawdown": 301,
-        "stoploss": 312,
-        "low_profit": 105
+        "drawdown": 314,
+        "stoploss": 306,
+        "low_profit": 89
       },
       "unique_contribution": {
-        "drawdown": 0,
-        "stoploss": 10,
-        "low_profit": 9
+        "drawdown": 1,
+        "stoploss": 0,
+        "low_profit": 4
       },
       "fire_rate": {
-        "drawdown": 0.9262,
-        "stoploss": 0.96,
-        "low_profit": 0.3231
+        "drawdown": 0.9874,
+        "stoploss": 0.9623,
+        "low_profit": 0.2799
       },
       "unique_share": {
-        "drawdown": 0.0,
-        "stoploss": 0.0308,
-        "low_profit": 0.0277
+        "drawdown": 0.0031,
+        "stoploss": 0.0,
+        "low_profit": 0.0126
       }
     },
     "cost_bps_applied_per_trade": "12",
-    "checkpoints_total": 325,
-    "max_true_drawdown_pct": 0.043615,
-    "freqtrade_risk_locked_share": 0.9877
+    "checkpoints_total": 318,
+    "max_true_drawdown_pct": 0.047524,
+    "freqtrade_risk_locked_share": 1.0
   },
   "adversarial": {
     "three_losses_no_streak_halt": {
@@ -629,66 +632,66 @@
     }
   },
   "measurement_architecture": {
-    "n_checkpoints": 325,
+    "n_checkpoints": 318,
     "argus_measures_ground_truth_directly": true,
-    "freqtrade_proxy_vs_truth_correlation": 0.2641,
+    "freqtrade_proxy_vs_truth_correlation": 0.2333,
     "freqtrade_curve": [
       {
         "threshold": 0.005,
-        "precision": 0.17846153846153845,
+        "precision": 0.17405063291139242,
         "recall": 1.0
       },
       {
         "threshold": 0.01,
-        "precision": 0.17846153846153845,
+        "precision": 0.17405063291139242,
         "recall": 1.0
       },
       {
         "threshold": 0.02,
-        "precision": 0.17901234567901234,
+        "precision": 0.1746031746031746,
         "recall": 1.0
       },
       {
         "threshold": 0.03,
-        "precision": 0.18238993710691823,
+        "precision": 0.1746031746031746,
         "recall": 1.0
       },
       {
         "threshold": 0.04,
-        "precision": 0.18354430379746836,
+        "precision": 0.1751592356687898,
         "recall": 1.0
       },
       {
         "threshold": 0.06,
-        "precision": 0.18471337579617833,
+        "precision": 0.1751592356687898,
         "recall": 1.0
       },
       {
         "threshold": 0.08,
-        "precision": 0.1853035143769968,
+        "precision": 0.1751592356687898,
         "recall": 1.0
       },
       {
         "threshold": 0.1,
-        "precision": 0.19269102990033224,
+        "precision": 0.1751592356687898,
         "recall": 1.0
       },
       {
         "threshold": 0.15,
-        "precision": 0.24358974358974358,
-        "recall": 0.9827586206896551
+        "precision": 0.21940928270042195,
+        "recall": 0.9454545454545454
       },
       {
         "threshold": 0.2,
-        "precision": 0.24867724867724866,
-        "recall": 0.8103448275862069
+        "precision": 0.2222222222222222,
+        "recall": 0.7636363636363637
       }
     ],
     "argus_real_point": {
-      "precision": 0.5918,
+      "precision": 0.5914,
       "recall": 1.0
     },
-    "freqtrade_best_precision_at_full_recall": 0.1927,
+    "freqtrade_best_precision_at_full_recall": 0.1752,
     "argus_dominates_every_swept_threshold": true,
     "verdict": "WEAK correlation (|r| < 0.3): freqtrade's proxy is not meaningfully informed by the ground truth it approximates, so no threshold re-tuning could make its near-constant lock read as a deliberate conservative-margin CHOICE rather than a measurement gap \u2014 the 'conservative by design' framing is ruled out by this evidence, not merely disfavoured"
   }

@@ -71,7 +71,30 @@ proven less accurate than the alternative is a judgement call this module states
 rather than makes unilaterally — see `Activity/PROGRESS.md`'s entry the same day for where that
 judgement currently stands.
 
+**Fixed 2026-09-23: the headline number used to drift run to run, and now does not.**
+`_fetch_symbol_trades` always called `market.history.fetch_range`, which walks back from
+``datetime.now()`` — a rolling window, not a fixed one. Three same-day runs of `VERIFY.md`'s
+documented reproduction command produced three different `freqtrade-only` precision figures
+(59.2%/100%/66.7%): not noise in the comparison logic, but three genuinely different 90-day
+windows of real market history, each containing a different mix of real drawdown episodes.
+A number a reader cannot reproduce is not evidence, however honestly it was computed.
+
+The fix is the same one `tests/data/allocation_fixture.json` already established for
+`eval/allocation_comparison.py`: fetch real market data once, freeze it to
+`data/risk_layer_candles_fixture.json`, and read from that frozen file by default
+(``frozen=True``, both `compare_real_symbols` and `compare_combined_book`) rather than
+re-fetching live on every run. `--live` (equivalently ``frozen=False``) is kept, not removed —
+anyone who wants to check the comparison still holds on fresh data can ask for that explicitly;
+the default just stops silently being a different comparison every time it runs. The frozen
+window is real Bitget history, fetched the normal way, on one real date — never synthesized —
+exactly as `allocation_fixture.json` is real historical returns, not fabricated ones. Refresh it
+deliberately with ``--freeze-fixture`` when a genuinely fresh read is wanted; it is committed
+data, not regenerated on every test run, so a reader diffing two reports across time is comparing
+the same underlying trades unless they explicitly asked for new ones.
+
     python -m argus.eval.risk_layer_comparison
+    python -m argus.eval.risk_layer_comparison --live       # re-fetch fresh data instead
+    python -m argus.eval.risk_layer_comparison --freeze-fixture   # refresh the frozen fixture
 """
 
 from __future__ import annotations
@@ -88,6 +111,7 @@ from typing import Any
 from argus.backtest.engine import Bar, SyntheticTrade, extract_trades, run
 from argus.backtest.metrics import HOURLY_PER_YEAR, MetricError
 from argus.cost.model import CostModel
+from argus.eval import artefact
 from argus.eval.freqtrade_baseline import (
     freqtrade_cooldown_period,
     freqtrade_low_profit_pairs,
@@ -110,6 +134,11 @@ from argus.strategies.track1_suite import TRACK1_VARIANTS
 DATA = Path(__file__).resolve().parents[3] / "data"
 REPORT_PATH = DATA / "risk_layer_comparison.json"
 TRACK1_STUDY_PATH = DATA / "track1_study.json"
+CANDLES_FIXTURE_PATH = DATA / "risk_layer_candles_fixture.json"
+FIXTURE_DAYS = 90
+"""The frozen fixture is fetched once at this window and reused by every `frozen=True` run
+(the default). Matches this module's own historical default `days=90` — the only value any real
+caller (the CLI default, `compare_real_symbols`, `compare_combined_book`) has ever passed."""
 
 STARTING_EQUITY = Decimal("100000")
 
@@ -456,27 +485,93 @@ def _winners_from(track1_study_path: Path) -> dict[str, str]:
     return {row["symbol"]: row["best_variant"] for row in study["per_symbol"]}
 
 
-def _fetch_symbol_trades(
-    symbol: str, *, days: int, winners: Mapping[str, str],
-) -> tuple[str, list[Bar], list[SyntheticTrade]]:
-    """Fetch one symbol's real market history, reproduce its already-known winning backtest, and
-    reconstruct its real trades. Raises :class:`RiskLayerComparisonError` naming exactly why on
-    any failure — never a bare exception — so a caller can record the reason and continue with
-    the rest of the symbols rather than losing the whole run.
-    """
-    variant_name = winners.get(symbol)
-    if variant_name is None or variant_name not in ALL_VARIANTS:
-        raise RiskLayerComparisonError(
-            f"no known-good variant ({variant_name!r} not in ALL_VARIANTS)"
-        )
+def _live_bars(symbol: str, *, days: int) -> list[Bar]:
+    """The original, always-fresh path: page Bitget's real market endpoint back `days` from
+    right now. A rolling window — two calls minutes apart can return different data — which is
+    exactly why `frozen=True` (the default everywhere this is called from) does not use it."""
     try:
         candles = fetch_range(symbol, days=days, interval="1H", candle_type=CandleType.MARKET)
     except Exception as exc:
         raise RiskLayerComparisonError(f"fetch failed: {str(exc)[:120]}") from exc
     if len(candles) < 200:
         raise RiskLayerComparisonError(f"only {len(candles)} candles")
+    return [Bar(ts=c.ts, close=c.close) for c in candles]
 
-    bars = [Bar(ts=c.ts, close=c.close) for c in candles]
+
+def _frozen_bars(symbol: str, *, fixture_path: Path) -> list[Bar]:
+    """Read one symbol's real, once-fetched candles back from the frozen fixture — the same real
+    numbers every time, from every machine, forever, until `--freeze-fixture` is run again on
+    purpose. Raises :class:`RiskLayerComparisonError` naming exactly what is missing, never a
+    bare `KeyError`/`FileNotFoundError`, matching `_live_bars`'s own failure contract."""
+    if not fixture_path.exists():
+        raise RiskLayerComparisonError(
+            f"{fixture_path} does not exist; run `python -m argus.eval.risk_layer_comparison "
+            f"--freeze-fixture` first, or pass frozen=False / --live to fetch fresh data instead"
+        )
+    fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+    rows = fixture.get("candles", {}).get(symbol)
+    if not rows:
+        raise RiskLayerComparisonError(f"{symbol} not present in {fixture_path}")
+    return [Bar(ts=datetime.fromisoformat(ts), close=Decimal(close)) for ts, close in rows]
+
+
+def freeze_candles(
+    symbols: Sequence[str] = RTOKEN_SYMBOLS, *, days: int = FIXTURE_DAYS,
+    fixture_path: Path = CANDLES_FIXTURE_PATH,
+) -> dict[str, Any]:
+    """The one deliberate live fetch this module still makes by default: pull every symbol's
+    real candles once and write them to `fixture_path`, so every later `frozen=True` run reads
+    the identical real data instead of re-fetching a different rolling window each time. A
+    symbol that fails to fetch is recorded under `failures` and simply absent from the fixture's
+    `candles` map — `_frozen_bars` then raises by name for that symbol specifically, rather than
+    this function silently producing a fixture with fewer symbols than it looks like it has.
+    """
+    candles_out: dict[str, list[list[str]]] = {}
+    failures: dict[str, str] = {}
+    for symbol in symbols:
+        try:
+            bars = _live_bars(symbol, days=days)
+        except RiskLayerComparisonError as exc:
+            failures[symbol] = str(exc)
+            continue
+        candles_out[symbol] = [[b.ts.isoformat(), str(b.close)] for b in bars]
+
+    fixture = {
+        "generated_at": datetime.now(UTC).isoformat(),
+        "days": days,
+        "symbols_fetched": sorted(candles_out),
+        "symbols_failed": failures,
+        "candles": candles_out,
+    }
+    fixture_path.write_text(json.dumps(fixture, indent=2), encoding="utf-8")
+    return fixture
+
+
+def _fetch_symbol_trades(
+    symbol: str, *, days: int, winners: Mapping[str, str], frozen: bool = True,
+    fixture_path: Path = CANDLES_FIXTURE_PATH,
+) -> tuple[str, list[Bar], list[SyntheticTrade]]:
+    """Load one symbol's real market history (frozen fixture by default, live fetch on request),
+    reproduce its already-known winning backtest, and reconstruct its real trades. Raises
+    :class:`RiskLayerComparisonError` naming exactly why on any failure — never a bare exception
+    — so a caller can record the reason and continue with the rest of the symbols rather than
+    losing the whole run.
+    """
+    variant_name = winners.get(symbol)
+    if variant_name is None or variant_name not in ALL_VARIANTS:
+        raise RiskLayerComparisonError(
+            f"no known-good variant ({variant_name!r} not in ALL_VARIANTS)"
+        )
+    if frozen:
+        if days != FIXTURE_DAYS:
+            raise RiskLayerComparisonError(
+                f"frozen=True only serves the fixture's own {FIXTURE_DAYS}d window, not "
+                f"days={days}; pass frozen=False (--live) for a different window"
+            )
+        bars = _frozen_bars(symbol, fixture_path=fixture_path)
+    else:
+        bars = _live_bars(symbol, days=days)
+
     try:
         result = run(
             variant_name, symbol, bars, ALL_VARIANTS[variant_name],
@@ -498,11 +593,13 @@ def _fetch_symbol_trades(
 
 def compare_real_symbols(
     symbols: Sequence[str] = RTOKEN_SYMBOLS, *, days: int = 90,
-    track1_study_path: Path = TRACK1_STUDY_PATH,
+    track1_study_path: Path = TRACK1_STUDY_PATH, frozen: bool = True,
+    fixture_path: Path = CANDLES_FIXTURE_PATH,
 ) -> dict[str, Any]:
-    """Fetch each symbol's real market history, reproduce its already-known winning backtest,
-    and walk the resulting real trades through both risk systems, each as its own single-symbol
-    book — see :func:`compare_combined_book` for the whole-book counterpart.
+    """Load each symbol's real market history (frozen fixture by default — see module docstring
+    — pass ``frozen=False`` for a fresh live fetch), reproduce its already-known winning
+    backtest, and walk the resulting real trades through both risk systems, each as its own
+    single-symbol book — see :func:`compare_combined_book` for the whole-book counterpart.
     """
     winners = _winners_from(track1_study_path)
 
@@ -512,7 +609,9 @@ def compare_real_symbols(
 
     for symbol in symbols:
         try:
-            variant_name, bars, trades = _fetch_symbol_trades(symbol, days=days, winners=winners)
+            variant_name, bars, trades = _fetch_symbol_trades(
+                symbol, days=days, winners=winners, frozen=frozen, fixture_path=fixture_path,
+            )
         except RiskLayerComparisonError as exc:
             failures[symbol] = str(exc)
             continue
@@ -537,7 +636,8 @@ def compare_real_symbols(
 
     return {
         "generated_at": datetime.now(UTC).isoformat(),
-        "days": days, "symbols_compared": len(per_symbol), "symbols_failed": failures,
+        "days": days, "frozen": frozen, "symbols_compared": len(per_symbol),
+        "symbols_failed": failures,
         "per_symbol": per_symbol,
         "overall": _tally(all_checkpoints).as_dict(),
         "in_sample": _tally(is_checkpoints).as_dict(),
@@ -597,11 +697,12 @@ def _failure_cases(
 
 def _combined_book_checkpoints(
     symbols: Sequence[str] = RTOKEN_SYMBOLS, *, days: int = 90,
-    track1_study_path: Path = TRACK1_STUDY_PATH,
+    track1_study_path: Path = TRACK1_STUDY_PATH, frozen: bool = True,
+    fixture_path: Path = CANDLES_FIXTURE_PATH,
 ) -> tuple[list[Checkpoint], dict[str, list[SyntheticTrade]], dict[str, str], datetime]:
     """The fetch-and-walk pipeline :func:`compare_combined_book` reports on, factored out so a
     caller that wants the raw per-checkpoint data (not just the aggregate tallies) — e.g.
-    :func:`measurement_architecture_analysis` — does not have to duplicate the live fetch loop."""
+    :func:`measurement_architecture_analysis` — does not have to duplicate the fetch loop."""
     winners = _winners_from(track1_study_path)
     failures: dict[str, str] = {}
     per_symbol_trades: dict[str, list[SyntheticTrade]] = {}
@@ -609,7 +710,9 @@ def _combined_book_checkpoints(
 
     for symbol in symbols:
         try:
-            _variant_name, bars, trades = _fetch_symbol_trades(symbol, days=days, winners=winners)
+            _variant_name, bars, trades = _fetch_symbol_trades(
+                symbol, days=days, winners=winners, frozen=frozen, fixture_path=fixture_path,
+            )
         except RiskLayerComparisonError as exc:
             failures[symbol] = str(exc)
             continue
@@ -634,20 +737,22 @@ def _combined_book_checkpoints(
 
 def compare_combined_book(
     symbols: Sequence[str] = RTOKEN_SYMBOLS, *, days: int = 90,
-    track1_study_path: Path = TRACK1_STUDY_PATH,
+    track1_study_path: Path = TRACK1_STUDY_PATH, frozen: bool = True,
+    fixture_path: Path = CANDLES_FIXTURE_PATH,
 ) -> dict[str, Any]:
-    """The whole-book counterpart to :func:`compare_real_symbols`: every successfully-fetched
+    """The whole-book counterpart to :func:`compare_real_symbols`: every successfully-loaded
     symbol's real trades interleaved into ONE combined equity curve, matching the scope real
     freqtrade's global protections and ARGUS's whole-book breaker actually operate at — see
     :func:`walk_combined_book`'s own docstring for exactly why and how capital is split.
 
-    Fetches independently from :func:`compare_real_symbols` (a second live pass over the same
-    symbols) rather than sharing state with it — public, read-only market data, cheap enough
-    that keeping the two entry points independent and simple wins over threading a cache through
-    both for one call each.
+    Loads independently from :func:`compare_real_symbols` (a second pass over the same symbols,
+    against the same frozen fixture by default) rather than sharing state with it — cheap enough,
+    either from the fixture or from public read-only market data, that keeping the two entry
+    points independent and simple wins over threading a cache through both for one call each.
     """
     checkpoints, per_symbol_trades, failures, boundary_ts = _combined_book_checkpoints(
-        symbols, days=days, track1_study_path=track1_study_path,
+        symbols, days=days, track1_study_path=track1_study_path, frozen=frozen,
+        fixture_path=fixture_path,
     )
     is_checkpoints = [c for c in checkpoints if not c.is_oos]
     oos_checkpoints = [c for c in checkpoints if c.is_oos]
@@ -658,7 +763,8 @@ def compare_combined_book(
 
     return {
         "generated_at": datetime.now(UTC).isoformat(),
-        "days": days, "symbols_combined": sorted(per_symbol_trades), "symbols_failed": failures,
+        "days": days, "frozen": frozen, "symbols_combined": sorted(per_symbol_trades),
+        "symbols_failed": failures,
         "equity_share_per_symbol": str(STARTING_EQUITY / Decimal(len(per_symbol_trades))),
         "oos_boundary": boundary_ts.isoformat(),
         "checkpoints_per_symbol": per_symbol_checkpoints,
@@ -950,11 +1056,12 @@ def adversarial_scenarios() -> dict[str, Any]:
 
 
 def render(report: dict[str, Any], adversarial: dict[str, Any]) -> list[str]:
+    source = "frozen fixture" if report.get("frozen", True) else "LIVE fetch"
     lines = [
         "RISK LAYER COMPARISON — ARGUS circuit breaker vs freqtrade's ported protections",
         f"  {report['symbols_compared']} symbol(s), {report['checkpoints_total']} real trade "
-        f"checkpoint(s), {report['days']}d each, cost {report['cost_bps_applied_per_trade']}bps "
-        f"round trip applied per trade",
+        f"checkpoint(s), {report['days']}d each ({source}), cost "
+        f"{report['cost_bps_applied_per_trade']}bps round trip applied per trade",
     ]
     overall = report["overall"]
     lines.append(
@@ -988,8 +1095,9 @@ def render(report: dict[str, Any], adversarial: dict[str, Any]) -> list[str]:
 
 
 def render_combined(report: dict[str, Any]) -> list[str]:
+    source = "frozen fixture" if report.get("frozen", True) else "LIVE fetch"
     lines = [
-        "COMBINED BOOK — same symbols, interleaved into one whole-book equity curve",
+        f"COMBINED BOOK ({source}) — same symbols, interleaved into one whole-book equity curve",
         f"  {len(report['symbols_combined'])} symbol(s) combined "
         f"({', '.join(report['symbols_combined'])}), {report['checkpoints_total']} checkpoint(s), "
         f"{report['equity_share_per_symbol']} equity share each",
@@ -1019,12 +1127,29 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="ARGUS vs freqtrade risk-layer run comparison")
     parser.add_argument("--days", type=int, default=90)
     parser.add_argument("--save", default=str(REPORT_PATH))
+    parser.add_argument(
+        "--live", action="store_true",
+        help="fetch fresh market data instead of reading the frozen fixture (drifts run to run)",
+    )
+    parser.add_argument(
+        "--freeze-fixture", action="store_true",
+        help=f"refresh {CANDLES_FIXTURE_PATH.name} with a fresh live fetch, then exit",
+    )
     args = parser.parse_args(argv)
 
-    report = compare_real_symbols(days=args.days)
-    combined = compare_combined_book(days=args.days)
+    if args.freeze_fixture:
+        fixture = freeze_candles(days=args.days)
+        print(
+            f"froze {len(fixture['symbols_fetched'])} symbol(s) -> {CANDLES_FIXTURE_PATH} "
+            f"(failed: {fixture['symbols_failed'] or 'none'})"
+        )
+        return 0
+
+    frozen = not args.live
+    report = compare_real_symbols(days=args.days, frozen=frozen)
+    combined = compare_combined_book(days=args.days, frozen=frozen)
     adversarial = adversarial_scenarios()
-    checkpoints, _, _, _ = _combined_book_checkpoints(days=args.days)
+    checkpoints, _, _, _ = _combined_book_checkpoints(days=args.days, frozen=frozen)
     measurement = measurement_architecture_analysis(checkpoints)
     for line in render(report, adversarial):
         print(line)
@@ -1039,21 +1164,28 @@ def main(argv: list[str] | None = None) -> int:
     print(f"ARGUS dominates every swept threshold: {dominates}")
     print(f"verdict: {measurement['verdict']}")
     if args.save:
-        Path(args.save).write_text(
-            json.dumps(
-                {
-                    "real_symbols": report, "combined_book": combined, "adversarial": adversarial,
-                    "measurement_architecture": measurement,
-                },
-                indent=2, default=str,
-            ),
-            encoding="utf-8",
+        # `argus.eval.artefact.write` (strict JSON: non-finite floats -> null, key path recorded)
+        # rather than raw `json.dumps` — this module's own values are already pre-stringified
+        # where they're Decimal (`equity_share_per_symbol`, `cost_bps_applied_per_trade`), so no
+        # `default=str` fallback is needed; kept parity with `allocation_comparison.py`'s and
+        # `pead_study.py`'s writers rather than being the next file that silently drifts back to
+        # the raw-json.dumps pattern the project is working through file by file.
+        undefined = artefact.write(
+            Path(args.save),
+            {
+                "real_symbols": report, "combined_book": combined, "adversarial": adversarial,
+                "measurement_architecture": measurement,
+            },
         )
+        if undefined:
+            print(f"non-finite values written as null: {undefined}")
         print(f"saved -> {args.save}")
     return 0
 
 
 __all__ = [
+    "CANDLES_FIXTURE_PATH",
+    "FIXTURE_DAYS",
     "REPORT_PATH",
     "Checkpoint",
     "Contingency",
@@ -1062,6 +1194,7 @@ __all__ = [
     "argus_measures_ground_truth_directly",
     "compare_combined_book",
     "compare_real_symbols",
+    "freeze_candles",
     "main",
     "measurement_architecture_analysis",
     "protection_ablation",

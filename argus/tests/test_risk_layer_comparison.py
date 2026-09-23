@@ -7,6 +7,7 @@ orchestration is exercised (not unit-tested directly, only its pure helpers are)
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -14,10 +15,14 @@ from pathlib import Path
 import pytest
 
 from argus.backtest.engine import SyntheticTrade
+from argus.eval import risk_layer_comparison as rlc_module
 from argus.eval.risk_layer_comparison import (
+    FIXTURE_DAYS,
     Checkpoint,
     Contingency,
     RiskLayerComparisonError,
+    _fetch_symbol_trades,
+    _frozen_bars,
     _net_return_pct,
     _oos_boundary,
     _pearson,
@@ -27,6 +32,7 @@ from argus.eval.risk_layer_comparison import (
     argus_measures_ground_truth_directly,
     compare_combined_book,
     compare_real_symbols,
+    freeze_candles,
     measurement_architecture_analysis,
     protection_ablation,
     walk_combined_book,
@@ -511,3 +517,110 @@ class TestMeasurementArchitectureAnalysis:
         result = measurement_architecture_analysis(checkpoints)
         assert result["argus_real_point"]["recall"] == 1.0
         assert result["argus_dominates_every_swept_threshold"] is True
+
+
+class TestFrozenFixtureFixesTheRunToRunDrift:
+    """The fix logged 2026-09-23: `VERIFY.md` documented three same-day runs of the live-fetch
+    path producing three different precision figures (59.2%/100%/66.7%) because `fetch_range`
+    walks back from `datetime.now()` — a different 90-day window each time. These tests cover the
+    frozen-fixture path deterministically (no live venue fetch, matching this module's own stated
+    "deterministic pieces only" testing policy), not the live path itself."""
+
+    def _write_fixture(self, tmp_path: Path, *, days: int = FIXTURE_DAYS) -> Path:
+        path = tmp_path / "candles.json"
+        path.write_text(json.dumps({
+            "generated_at": "2026-09-23T00:00:00+00:00",
+            "days": days,
+            "symbols_fetched": ["NVDAUSDT"],
+            "symbols_failed": {},
+            "candles": {
+                "NVDAUSDT": [
+                    ["2026-06-01T00:00:00+00:00", "100.50"],
+                    ["2026-06-01T01:00:00+00:00", "101.25"],
+                ],
+            },
+        }), encoding="utf-8")
+        return path
+
+    def test_missing_fixture_file_raises_by_name(self, tmp_path: Path) -> None:
+        with pytest.raises(RiskLayerComparisonError, match="freeze-fixture"):
+            _frozen_bars("NVDAUSDT", fixture_path=tmp_path / "missing.json")
+
+    def test_symbol_absent_from_fixture_raises_by_name(self, tmp_path: Path) -> None:
+        path = self._write_fixture(tmp_path)
+        with pytest.raises(RiskLayerComparisonError, match="TSLAUSDT"):
+            _frozen_bars("TSLAUSDT", fixture_path=path)
+
+    def test_bars_round_trip_with_exact_decimal_precision(self, tmp_path: Path) -> None:
+        path = self._write_fixture(tmp_path)
+        bars = _frozen_bars("NVDAUSDT", fixture_path=path)
+        assert [b.close for b in bars] == [Decimal("100.50"), Decimal("101.25")]
+        assert bars[0].ts == datetime(2026, 6, 1, tzinfo=UTC)
+
+    def test_two_reads_of_the_same_fixture_are_identical(self, tmp_path: Path) -> None:
+        """The actual property the fix buys: unlike `_live_bars`, calling this twice does not
+        depend on when it is called."""
+        path = self._write_fixture(tmp_path)
+        assert _frozen_bars("NVDAUSDT", fixture_path=path) == _frozen_bars(
+            "NVDAUSDT", fixture_path=path,
+        )
+
+    def test_frozen_with_a_different_window_refuses_rather_than_silently_mismatching(
+        self, tmp_path: Path,
+    ) -> None:
+        """`frozen=True` only ever serves the fixture's own window. A caller asking for a
+        different `days` must be told to freeze a new fixture or pass `--live`, not silently
+        handed the wrong window back."""
+        with pytest.raises(RiskLayerComparisonError, match="frozen=True"):
+            _fetch_symbol_trades(
+                "NVDAUSDT", days=30, winners={"NVDAUSDT": "calm_tape_trend"}, frozen=True,
+            )
+
+    def test_freeze_candles_writes_a_fixture_frozen_bars_can_then_read(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """No live venue fetch — `fetch_range` is monkeypatched at the name `risk_layer_
+        comparison` itself resolved it to (it imports the name directly, so patching
+        `argus.market.history.fetch_range` would not be seen here)."""
+        from argus.market.history import Candle
+
+        base = datetime(2026, 6, 1, tzinfo=UTC)
+
+        def _fake_fetch_range(symbol: str, **kwargs: object) -> list[Candle]:
+            return [
+                Candle(
+                    ts=base + timedelta(hours=h), open=Decimal("10"),
+                    high=Decimal("11"), low=Decimal("9"), close=Decimal("10.5"),
+                    volume=Decimal("1000"),
+                )
+                for h in range(250)
+            ]
+
+        monkeypatch.setattr(rlc_module, "fetch_range", _fake_fetch_range)
+        fixture_path = tmp_path / "candles.json"
+
+        fixture = freeze_candles(
+            symbols=("NVDAUSDT", "TSLAUSDT"), days=90, fixture_path=fixture_path,
+        )
+        assert fixture["symbols_fetched"] == ["NVDAUSDT", "TSLAUSDT"]
+        assert fixture["symbols_failed"] == {}
+        assert fixture_path.exists()
+
+        bars = _frozen_bars("NVDAUSDT", fixture_path=fixture_path)
+        assert len(bars) == 250
+        assert bars[0].close == Decimal("10.5")
+
+    def test_freeze_candles_records_a_failed_symbol_by_name_not_silently(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        def _empty_fetch_range(symbol: str, **kwargs: object) -> list[object]:
+            return []
+
+        monkeypatch.setattr(rlc_module, "fetch_range", _empty_fetch_range)
+        fixture_path = tmp_path / "candles.json"
+
+        fixture = freeze_candles(symbols=("NVDAUSDT",), days=90, fixture_path=fixture_path)
+        assert fixture["symbols_fetched"] == []
+        assert "NVDAUSDT" in fixture["symbols_failed"]
+        with pytest.raises(RiskLayerComparisonError, match="NVDAUSDT"):
+            _frozen_bars("NVDAUSDT", fixture_path=fixture_path)

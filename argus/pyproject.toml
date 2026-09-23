@@ -102,6 +102,14 @@ dev = [
     # loads it from a local clone instead. Same "eval-only, never imported by argus's own src/
     # code" reasoning as pandas/scipy above.
     "exchange_calendars>=4.5",
+    # Needed for `register/anchorcheck.py`'s real, published `opentimestamps` PyPI package (its
+    # own real `DetachedTimestampFile`/notary verification, not vendored), which independently
+    # re-verifies the Bitcoin-anchor proofs `paper/anchor.py` submits over raw HTTP. Unlike every
+    # other entry above, the importing module lives under `src/register/`, not `eval/` — but its
+    # only real caller is `eval/docclaims.py`'s standalone verification run, never the live desk
+    # or paper-trading path, so it stays a dev/eval dependency rather than moving to the minimal
+    # top-level `dependencies` list.
+    "opentimestamps>=0.4.5",
 ]
 
 [tool.hatch.build.targets.wheel]
