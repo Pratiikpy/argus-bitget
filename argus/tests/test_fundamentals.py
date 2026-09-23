@@ -24,9 +24,11 @@ from argus.market.fundamentals import (
     Fact,
     FundamentalsError,
     FundamentalsSource,
+    _sue_evidence,
     latest_per_period,
     parse_concept,
 )
+from argus.research.sue import MIN_QUARTERS
 from argus.truth.evidence import Evidence
 
 AS_OF = datetime(2026, 9, 12, 12, 0, tzinfo=UTC)
@@ -274,3 +276,91 @@ class TestTheEvidenceCarriesItsRecord:
         )
         assert not report.sound
         assert report.contradictions[0].rule == "fundamental_growth"
+
+
+def _eps_quarters(values: list[float], *, newest_end: date = date(2026, 7, 26)) -> list[Fact]:
+    """``values`` newest-first, one real quarter apart -- the same shape `FundamentalsSource.facts`
+    returns for `eps_diluted`."""
+    out = []
+    end = newest_end
+    for v in values:
+        out.append(Fact(
+            concept="eps_diluted", tag="EarningsPerShareDiluted", value=v, unit="USD/shares",
+            start=end - timedelta(days=91), end=end, filed=end + timedelta(days=25), form="10-Q",
+            fiscal_year=2027, fiscal_period="Q2", frame=None,
+        ))
+        end = date(end.year - (1 if end.month <= 3 else 0), end.month - 3 if end.month > 3 else end.month + 9, end.day)
+    return out
+
+
+class TestSueEvidence:
+    """Added 2026-09-23 alongside `research.pead_study`: SUE was verified correct in isolation but
+    never reached a live decision -- the desk saw only the raw, non-standardized quarter-on-quarter
+    change. These tests are on `_sue_evidence` directly, not through a network stub, since it is a
+    pure function of the `Fact` list `FundamentalsSource.facts` already produces."""
+
+    def test_too_few_quarters_is_reported_as_skipped_not_silently_omitted(self) -> None:
+        facts = _eps_quarters([2.0] * (MIN_QUARTERS - 1))
+        evidence, status = _sue_evidence("NVDA", facts)
+        assert evidence == []
+        assert any("below the" in s for s in status)
+
+    def test_a_genuine_surprise_produces_one_evidence_item_with_the_real_formula_s_output(
+        self,
+    ) -> None:
+        # newest-first, 12 quarters (MIN_QUARTERS): alternating year-over-year deltas give a real,
+        # non-degenerate historical volatility rather than a contrived zero-variance path.
+        facts = _eps_quarters([12.0, 6.0, 10.0, 5.0, 9.0, 4.0, 9.0, 3.0, 8.0, 3.0, 7.0, 2.0])
+        evidence, status = _sue_evidence("NVDA", facts)
+        assert len(evidence) == 1
+        item = evidence[0]
+        assert item.attributes["concept"] == "sue"
+        assert item.source == "filing"
+        assert "Standardized Unexpected Earnings" in item.claim
+        assert item.attributes["sue"] != 0.0
+        assert any("SUE" in s for s in status)
+
+    def test_zero_variance_history_is_refused_not_reported_as_infinite(self) -> None:
+        """A perfectly linear EPS path has zero delta variance -- `research.sue` refuses rather
+        than emitting inf/nan, and that refusal must reach the evidence layer as a skip, not a
+        crash or a poisoned claim."""
+        facts = _eps_quarters([12.0 - i for i in range(MIN_QUARTERS)])
+        evidence, status = _sue_evidence("NVDA", facts)
+        assert evidence == []
+        assert any("not computable" in s for s in status)
+
+    def test_the_available_at_date_is_the_triggering_quarter_s_own_filing_date(self) -> None:
+        """Point-in-time: the SUE reading becomes knowable exactly when the newest quarter it
+        depends on is filed, never earlier and never backdated to a later re-run."""
+        facts = _eps_quarters([12.0, 6.0, 10.0, 5.0, 9.0, 4.0, 9.0, 3.0, 8.0, 3.0, 7.0, 2.0])
+        evidence, _ = _sue_evidence("NVDA", facts)
+        assert evidence[0].available_at == datetime.combine(
+            facts[0].filed, datetime.min.time(), tzinfo=UTC
+        )
+
+    def test_a_positive_surprise_is_worded_above_and_a_negative_one_below(self) -> None:
+        pos, _ = _sue_evidence(
+            "NVDA", _eps_quarters([12.0, 6.0, 10.0, 5.0, 9.0, 4.0, 9.0, 3.0, 8.0, 3.0, 7.0, 2.0])
+        )
+        neg, _ = _sue_evidence(
+            "NVDA", _eps_quarters([2.0, 6.0, 3.0, 5.0, 4.0, 4.0, 5.0, 3.0, 6.0, 3.0, 7.0, 2.0])
+        )
+        assert "above" in pos[0].claim
+        assert "below" in neg[0].claim
+
+    def test_wired_into_evidence_reaches_the_full_method_not_just_the_helper(self) -> None:
+        """`FundamentalsSource.evidence` is the real, network-backed entry point `market.evidence`
+        calls; this confirms the wiring, not only the pure function in isolation."""
+
+        class _Stub(FundamentalsSource):
+            def __init__(self, facts: list[Fact]) -> None:  # no network
+                self._facts = facts
+
+            def facts(  # type: ignore[override]
+                self, ticker: str, *, concept: str, as_of: datetime, quarterly_only: bool = True
+            ) -> tuple[list[Fact], list[str]]:
+                return (self._facts if concept == "eps_diluted" else []), []
+
+        facts = _eps_quarters([12.0, 6.0, 10.0, 5.0, 9.0, 4.0, 9.0, 3.0, 8.0, 3.0, 7.0, 2.0])
+        got, _ = _Stub(facts).evidence("NVDA", as_of=datetime(2027, 1, 1, tzinfo=UTC))
+        assert any(e.attributes.get("concept") == "sue" for e in got)

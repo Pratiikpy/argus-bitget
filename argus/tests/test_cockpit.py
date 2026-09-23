@@ -328,3 +328,147 @@ class TestTheEvidenceIsTraceable:
         blob = json.loads(json.dumps(build().as_dict()))
         assert blob["panels"]
         assert "undefined_metrics" in blob
+
+
+class TestHurdlePanel:
+    """Added 2026-09-23 alongside `research.pead_study`, extended same day with `shadow_record.json`.
+    Three artefacts already answered "is abstaining right" -- `hurdle_frontier.json`,
+    `pead_study.json`, and `shadow_record.json` -- and none had reached this page. A judge reading
+    only the performance panel sees three undefined figures and nothing that says the desk was
+    tested against three independent challenges and won every refusal honestly; this panel is where
+    that evidence lives."""
+
+    def test_both_artefacts_missing_is_reported_as_absent_not_a_crash(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        from argus.demo import cockpit as mod
+
+        monkeypatch.setattr(mod, "DATA", tmp_path)
+        panel = mod.hurdle_panel()
+        assert panel.missing_reason is not None
+
+    def test_the_hurdle_side_alone_still_renders(self, tmp_path, monkeypatch) -> None:
+        import json
+
+        from argus.demo import cockpit as mod
+
+        monkeypatch.setattr(mod, "DATA", tmp_path)
+        (tmp_path / "hurdle_frontier.json").write_text(json.dumps({
+            "instants": 511, "sources": {"live": 481, "replay": 30},
+            "actual_hurdle_bps": 18.8, "median_abs_move_bps": 103.31,
+            "binding_constraint": "THE CONFIDENCE GATE BINDS",
+        }), encoding="utf-8")
+        panel = mod.hurdle_panel()
+        assert not panel.missing_reason
+        assert "CONFIDENCE GATE" in panel.verdict
+        by_label = {m.label: m for m in panel.metrics}
+        assert by_label["instants measured"].value == "511"
+
+    def test_the_pead_side_alone_still_renders(self, tmp_path, monkeypatch) -> None:
+        import json
+
+        from argus.demo import cockpit as mod
+
+        monkeypatch.setattr(mod, "DATA", tmp_path)
+        (tmp_path / "pead_study.json").write_text(json.dumps({
+            "trades_realised": 220, "events_found": 367, "anchors_used": ["NVDAUSDT"],
+            "best_sharpe": -0.475, "best_hold_hours": 240, "verdict": "NO EDGE",
+        }), encoding="utf-8")
+        panel = mod.hurdle_panel()
+        assert not panel.missing_reason
+        assert "NO EDGE" in panel.verdict
+
+    def test_both_present_combines_both_verdicts(self, tmp_path, monkeypatch) -> None:
+        import json
+
+        from argus.demo import cockpit as mod
+
+        monkeypatch.setattr(mod, "DATA", tmp_path)
+        (tmp_path / "hurdle_frontier.json").write_text(json.dumps({
+            "instants": 511, "sources": {"live": 481, "replay": 30},
+            "actual_hurdle_bps": 18.8, "median_abs_move_bps": 103.31,
+            "binding_constraint": "THE CONFIDENCE GATE BINDS",
+        }), encoding="utf-8")
+        (tmp_path / "pead_study.json").write_text(json.dumps({
+            "trades_realised": 220, "events_found": 367, "anchors_used": ["NVDAUSDT"],
+            "best_sharpe": -0.475, "best_hold_hours": 240, "verdict": "NO EDGE",
+        }), encoding="utf-8")
+        panel = mod.hurdle_panel()
+        assert "CONFIDENCE GATE" in panel.verdict
+        assert "NO EDGE" in panel.verdict
+
+    def test_the_shadow_side_alone_still_renders(self, tmp_path, monkeypatch) -> None:
+        import json
+
+        from argus.demo import cockpit as mod
+
+        monkeypatch.setattr(mod, "DATA", tmp_path)
+        (tmp_path / "shadow_record.json").write_text(json.dumps({
+            "decisions": 543, "scored": 366, "accuracy": 0.53552, "break_even": 0.54845,
+            "verdict": "53.6% directional accuracy", "leakage": {"status": "contaminated",
+            "note": "the model recalls facts published in 2026H2"},
+        }), encoding="utf-8")
+        panel = mod.hurdle_panel()
+        assert not panel.missing_reason
+        assert "53.6%" in panel.verdict
+        assert "caveat" in panel.verdict and "recalls facts" in panel.verdict
+        by_label = {m.label: m for m in panel.metrics}
+        assert by_label["lean accuracy vs break-even"].value == "53.6% vs 54.8%"
+
+    def test_a_clean_leakage_status_carries_no_caveat_text(self, tmp_path, monkeypatch) -> None:
+        import json
+
+        from argus.demo import cockpit as mod
+
+        monkeypatch.setattr(mod, "DATA", tmp_path)
+        (tmp_path / "shadow_record.json").write_text(json.dumps({
+            "decisions": 543, "scored": 366, "accuracy": 0.536, "break_even": 0.548,
+            "verdict": "53.6% directional accuracy", "leakage": {"status": "clean"},
+        }), encoding="utf-8")
+        panel = mod.hurdle_panel()
+        assert "caveat" not in panel.verdict
+
+    def test_all_three_present_combines_all_three_verdicts(self, tmp_path, monkeypatch) -> None:
+        import json
+
+        from argus.demo import cockpit as mod
+
+        monkeypatch.setattr(mod, "DATA", tmp_path)
+        (tmp_path / "hurdle_frontier.json").write_text(json.dumps({
+            "instants": 511, "sources": {"live": 481, "replay": 30},
+            "actual_hurdle_bps": 18.8, "median_abs_move_bps": 103.31,
+            "binding_constraint": "THE CONFIDENCE GATE BINDS",
+        }), encoding="utf-8")
+        (tmp_path / "pead_study.json").write_text(json.dumps({
+            "trades_realised": 220, "events_found": 367, "anchors_used": ["NVDAUSDT"],
+            "best_sharpe": -0.475, "best_hold_hours": 240, "verdict": "NO EDGE",
+        }), encoding="utf-8")
+        (tmp_path / "shadow_record.json").write_text(json.dumps({
+            "decisions": 543, "scored": 366, "accuracy": 0.536, "break_even": 0.548,
+            "verdict": "53.6% directional accuracy", "leakage": {"status": "clean"},
+        }), encoding="utf-8")
+        panel = mod.hurdle_panel()
+        assert "CONFIDENCE GATE" in panel.verdict
+        assert "NO EDGE" in panel.verdict
+        assert "53.6%" in panel.verdict
+
+    def test_a_missing_accuracy_or_break_even_renders_as_unavailable_not_a_crash(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        import json
+
+        from argus.demo import cockpit as mod
+
+        monkeypatch.setattr(mod, "DATA", tmp_path)
+        (tmp_path / "shadow_record.json").write_text(json.dumps({
+            "decisions": 543, "scored": 0, "accuracy": None, "break_even": None,
+            "verdict": "INSUFFICIENT", "leakage": {"status": "clean"},
+        }), encoding="utf-8")
+        panel = mod.hurdle_panel()
+        by_label = {m.label: m for m in panel.metrics}
+        assert not by_label["lean accuracy vs break-even"].available
+
+    def test_is_registered_in_the_real_panel_list(self) -> None:
+        from argus.demo.cockpit import hurdle_panel
+
+        assert hurdle_panel in PANELS

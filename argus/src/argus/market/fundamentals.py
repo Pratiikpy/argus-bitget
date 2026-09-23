@@ -42,6 +42,7 @@ from datetime import UTC, date, datetime
 from typing import Any
 
 from argus.market.evidence import _UA, EdgarSource
+from argus.research.sue import MIN_QUARTERS, SueError, read as sue_read
 from argus.truth.evidence import Evidence
 
 TIMEOUT = 15
@@ -213,6 +214,56 @@ def latest_per_period(facts: list[Fact]) -> tuple[list[Fact], int]:
     return sorted(best.values(), key=lambda f: f.end, reverse=True), superseded
 
 
+def _sue_evidence(ticker: str, eps_facts: list[Fact]) -> tuple[list[Evidence], list[str]]:
+    """The Standardized Unexpected Earnings reading, if the real EPS history covers it.
+
+    Added 2026-09-23. `research.sue` verified the SUE formula to floating-point identity against
+    QuantConnect's own reference but was never wired to a live decision: the desk saw only the raw
+    quarter-on-quarter EPS change above, which is not standardized by the company's own earnings
+    volatility and is not comparable across tickers or across a single ticker's own history — the
+    exact gap SUE exists to close. This closes it with the same facts already fetched for the
+    quarter-on-quarter figure, at no extra network cost.
+
+    Deliberately makes no return-predictiveness claim in the rendered text — see
+    `research.pead_study` for whether one is warranted, and cite it explicitly here only once a
+    result is verified, not assumed.
+    """
+    if len(eps_facts) < MIN_QUARTERS:
+        return [], [
+            f"xbrl:{ticker}: {len(eps_facts)} quarter(s) of EPS, below the {MIN_QUARTERS} SUE needs"
+        ]
+    window = eps_facts[:MIN_QUARTERS]
+    try:
+        sue = sue_read(ticker, [f.value for f in window])
+    except SueError as exc:
+        return [], [f"xbrl:{ticker}: SUE not computable ({exc})"]
+    direction = "above" if sue.sue > 0 else "below" if sue.sue < 0 else "in line with"
+    magnitude = "many" if abs(sue.sue) >= 3 else "several" if abs(sue.sue) >= 1 else "under one"
+    return [
+        Evidence(
+            id=f"xbrl-{ticker}-sue-{window[0].end.isoformat()}",
+            claim=(
+                f"Standardized Unexpected Earnings for the quarter ending "
+                f"{window[0].end.isoformat()}: {sue.sue:+.2f} standard deviations "
+                f"{direction} this company's own trailing year-over-year EPS-change volatility "
+                f"({magnitude} standard deviation(s) of surprise, EPS change "
+                f"{sue.eps_change:+.4f} vs a historical deviation of {sue.eps_std:.4f})"
+            ),
+            source="filing",
+            available_at=datetime.combine(window[0].filed, datetime.min.time(), tzinfo=UTC),
+            credibility=1.0,
+            attributes={
+                "concept": "sue",
+                "sue": sue.sue,
+                "eps_change": sue.eps_change,
+                "eps_std": sue.eps_std,
+                "period_end": window[0].end.isoformat(),
+                "quarters_used": sue.quarters_used,
+            },
+        )
+    ], [f"xbrl:{ticker}: SUE {sue.sue:+.2f} from {sue.quarters_used} quarter(s)"]
+
+
 class FundamentalsSource:
     """SEC XBRL company concepts, keyless."""
 
@@ -317,6 +368,10 @@ class FundamentalsSource:
         for concept in ("revenue", "net_income", "eps_diluted"):
             facts, st = self.facts(ticker, concept=concept, as_of=as_of)
             status.extend(st)
+            if concept == "eps_diluted":
+                sue_evidence, sue_status = _sue_evidence(ticker, facts)
+                out.extend(sue_evidence)
+                status.extend(sue_status)
             recent = facts[:periods]
             for fact in recent:
                 out.append(
