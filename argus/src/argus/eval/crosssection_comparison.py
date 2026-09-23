@@ -354,14 +354,16 @@ def render(report: dict[str, Any]) -> str:
 
 
 if __name__ == "__main__":
-    import json
     from pathlib import Path
+
+    from argus.eval.artefact import write as write_artefact
 
     result = main()
     print(render(result))
     out_path = Path(__file__).resolve().parents[3] / "data" / "crosssection_comparison.json"
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    undefined = write_artefact(out_path, result)
+    if undefined:
+        print(f"\nnon-finite (written as null): {', '.join(undefined)}")
     print(f"\nsaved -> {out_path}")
 
 

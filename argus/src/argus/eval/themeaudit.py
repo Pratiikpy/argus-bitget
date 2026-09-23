@@ -760,20 +760,28 @@ def j_t2_risk_control() -> Finding:
     comp = _load_json("risk_layer_comparison.json")
     if comp is not None:
         ma = comp["measurement_architecture"]
-        # freqtrade's own PrecisionRecallProtection is a PROXY (a simulated equity curve) for the
-        # thing that actually matters — the real drawdown ground truth. ARGUS measures the ground
-        # truth directly. The correlation between freqtrade's proxy and that ground truth is the
-        # whole question: a weak one means no amount of re-tuning freqtrade's threshold reads as a
+        # freqtrade's own MaxDrawdown protection (ported in eval/freqtrade_baseline.py, read from
+        # freqtrade's real source — not the invented "PrecisionRecallProtection" this comment and
+        # the string below both said until a 2026-09-23 adversarial re-check caught it: freqtrade
+        # ships no class by that name) is a PROXY (a simulated equity curve) for the thing that
+        # actually matters — the real drawdown ground truth. ARGUS measures the ground truth
+        # directly. The correlation between freqtrade's proxy and that ground truth is the whole
+        # question: a weak one means no amount of re-tuning freqtrade's threshold reads as a
         # deliberate design choice, because the signal it is tuned against barely tracks reality.
+        # Recall is reported here too, but is 1.0 for ARGUS by construction — the ground truth is
+        # defined as crossing ARGUS's own threshold, so ARGUS cannot fail to recall it. Precision
+        # is the only half of this pair a rival could actually have won.
         rival = (
-            f" · measured against freqtrade's real PrecisionRecallProtection on "
+            f" · measured against a faithful port of freqtrade's real drawdown protections "
+            f"(MaxDrawdown/StoplossGuard/LowProfitPairs/CooldownPeriod) on "
             f"{ma['n_checkpoints']} checkpoints: freqtrade's own proxy correlates with the real "
-            f"drawdown ground truth at r={ma['freqtrade_proxy_vs_truth_correlation']} (weak); at "
-            f"full recall ARGUS's real precision is {ma['argus_real_point']['precision']:.1%} "
-            f"against freqtrade's best swept precision of "
-            f"{ma['freqtrade_best_precision_at_full_recall']:.1%}, dominating every threshold "
-            f"swept ({ma['argus_dominates_every_swept_threshold']}). Out-of-sample agreement "
-            f"between the two systems' real lock decisions: "
+            f"drawdown ground truth at r={ma['freqtrade_proxy_vs_truth_correlation']} (weak); "
+            f"ARGUS's real precision is {ma['argus_real_point']['precision']:.1%} against "
+            f"freqtrade's best swept precision of "
+            f"{ma['freqtrade_best_precision_at_full_recall']:.1%} (recall is 1.0 for ARGUS by "
+            f"construction, not an earned result — precision is the real comparison), dominating "
+            f"every threshold swept ({ma['argus_dominates_every_swept_threshold']}). Out-of-sample "
+            f"agreement between the two systems' real lock decisions: "
             f"{comp['real_symbols']['out_of_sample']['agreement_rate']:.1%} on "
             f"{comp['real_symbols']['out_of_sample']['n']} held-out checkpoints"
         )

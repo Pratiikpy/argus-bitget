@@ -3638,8 +3638,17 @@ REGISTER: tuple[Capability, ...] = (
                     "the coordinated-posting manipulation scenario itself IS the adversarial "
                     "test — N near-identical unsourced posts, symbol-matched, run against both "
                     "real systems; finBERT's naive aggregate scales with repetition on every "
-                    "narrative, ARGUS's real analyst never flips to actionable on repetition "
-                    "alone on any narrative tested"
+                    "narrative, ARGUS's real categorical judgment never flips to actionable on "
+                    "repetition alone on any narrative tested. Precise, not overclaimed, after an "
+                    "independent adversarial re-check (2026-09-23): CONFIDENCE is not immune — it "
+                    "moved from 0.05 to 0.85 on the tested narrative, a real, large move the "
+                    "second ablation below already disclosed — only the categorical signal held. "
+                    "The tested attack is also the easier case: N near-identical template "
+                    "mutations of one sentence, no source/account field to dedup against, checked "
+                    "on 2 narratives. A harder attack — textually diverse paraphrases from "
+                    "distinct personas, the way a real coordinated campaign would actually read — "
+                    "was not tested and is named here as the honest limit of this condition, not "
+                    "quietly left for a reader to assume was covered"
                 ),
                 artefact="data/sentiment_comparison.json",
             ),
@@ -3660,8 +3669,11 @@ REGISTER: tuple[Capability, ...] = (
                     "running it twice); ARGUS's real LLM call is not byte-deterministic, so "
                     "reproducibility here means the SIGNAL, not the exact confidence, is stable "
                     "across a genuine re-run — verified by actually calling the real analyst "
-                    "twice on the identical scenario, not assumed: same signal, confidence "
-                    "0.15 both times"
+                    "twice on the identical (coordinated) scenario, not assumed: same signal, "
+                    "confidence 0.85 both times (`out_of_sample_holdout_reproducibility` in the "
+                    "artefact; this line previously said 0.15, transcribed wrong against its own "
+                    "cited evidence and never caught until an independent adversarial re-check "
+                    "actually opened the artefact, 2026-09-23 — corrected here)"
                 ),
                 artefact="data/sentiment_comparison.json",
             ),

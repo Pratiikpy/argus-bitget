@@ -51,9 +51,13 @@ class TestTheServiceIsReachableWithoutACredential:
     def test_the_equity_category_carries_the_anchor_data(
         self, service: BitgetDataService
     ) -> None:
-        """rTokens track US equities. The venue's book cannot show an earnings date."""
+        """rTokens track US equities. The venue's book cannot show an earnings date.
+
+        ``equity_calendar``, not ``equity_calendar_earnings`` — the earlier name was never real,
+        caught only once this test and `next_earnings` were actually run against the live catalog
+        (2026-09-23) rather than trusted from an earlier reading."""
         ids = {e.entry_id for e in service.entries("equity")}
-        assert "equity_calendar_earnings" in ids
+        assert "equity_calendar" in ids
         assert "equity_estimates_consensus" in ids
         assert "equity_ownership_form_13f" in ids
 

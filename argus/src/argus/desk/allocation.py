@@ -37,7 +37,13 @@ the move costs, and on this venue the move costs 6bps per side of everything you
 :func:`optimize_trade` prices the turnover, computes the variance reduction it buys, and reports the
 **break-even holding period**: how long the improved book must be held before the rebalance pays for
 itself, at a stated Sharpe assumption. Where that period exceeds the horizon, the honest answer is
-*do not rebalance*, and it is the answer this module gives most of the time on these instruments.
+*do not rebalance* — but that is the **minority** outcome on these instruments, not the majority.
+Checked directly, not assumed: swept across 8 windows x 2 books x 4 Sharpe assumptions (224
+non-trivial cells), `eval/allocation_comparison.py` found "do not rebalance" fires on roughly a
+quarter of cells, two independent live-data runs giving 24.6% and 25.4% — a real, corrected claim
+this docstring carried wrong (as "most of the time") until 2026-09-23. The break-even framing itself
+is the useful thing this module adds; how often it resolves either way on real data is a fact to
+re-measure via that comparison, not to hardcode here.
 """
 
 from __future__ import annotations
