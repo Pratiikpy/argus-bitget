@@ -479,7 +479,9 @@ def _theme(text: str) -> tuple[str, tuple[str, ...]] | None:
 _OUTLOOK = re.compile(r"\b(?:outlook|next\s+(?:week|month|quarter))\b", re.I)
 """A soft question about what lies ahead — answered with base rates, labelled as not a forecast."""
 _PRICE_FORECAST = re.compile(
-    r"\b(?:forecast\w*|predict\w*|price\s+target|where\s+will\s+\w+\s+(?:be|go|trade|close)|"
+    r"\b(?:what\s+will\s+(?:\w+\s+){0,3}(?:price|be\s+(?:worth|at|trading))|exact(?:ly)?\s+"
+    r"(?:\w+\s+){0,2}(?:price|level)|(?:a|one|\d+)\s+(?:years?|months?)\s+from\s+now|"
+    r"forecast\w*|predict\w*|price\s+target|where\s+will\s+\w+\s+(?:be|go|trade|close)|"
     r"give\s+me\s+a\s+number|how\s+(?:high|low|far)\s+will|kitna\s+hoga|gonna\s+moon)\b", re.I)
 """A request for a price at a future time. Refused — the blind corpora mark these must-refuse, and a
 number here would be the one thing in the console not computed from data."""

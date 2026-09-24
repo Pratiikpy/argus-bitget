@@ -383,14 +383,13 @@ def handle_ask(
         if planned is not None:
             return _research_payload(text, prior, planned, ledger, started, "research-model",
                                      audit)
-    said = str(((audit.get("model") or {}) if isinstance(audit, dict) else {}).get("why") or "")
     # **The kind model's "not research" is binding on the research patterns.** Told a question is
     # off-topic, a trade instruction or a price forecast ("what will gold be a year from now"),
     # the patterns still found a price word and quoted it; told it is about the desk's record
     # ("the rationale logged for skipping SPY"), they found a ticker and sized a position. Where
     # the patterns name the one engine that answers exactly (`pattern_reading_wins`) they still
     # stand, as they do over the language model.
-    kind_said = _kind_verdict(said)
+    kind_said = _not_research(audit)
     patterned_only = detect_research(text)
     if kind_said is not None and (patterned_only is None
                                   or kind_said[1] >= BINDING_KIND_CONFIDENCE):
@@ -510,6 +509,27 @@ def _kind_verdict(why: str) -> tuple[str, float] | None:
     """("refuse" | "record", confidence) from the local planner's audit line, else None."""
     match = re.match(r"kind model: (refuse|record) at ([0-9.]+)", why)
     return None if match is None else (match.group(1), float(match.group(2)))
+
+
+def _not_research(audit: Any) -> tuple[str, float] | None:
+    """Either reader's confident verdict that a question is not a research question.
+
+    The kind model says so in its audit line; the language model says so as ``kind: none`` or
+    ``kind: record`` with a confidence. Found on the live console (2026-09-25): Qwen read "what will
+    gold price be exactly one year from now" as a price forecast at 0.95 — correctly — and the
+    name-only fallback still answered it as a risk profile of gold."""
+    view = (audit.get("model") or {}) if isinstance(audit, dict) else {}
+    local = _kind_verdict(str(view.get("why") or ""))
+    if local is not None:
+        return local
+    kind = str(view.get("kind") or "").strip().lower()
+    try:
+        confidence = float(view.get("confidence") or 0.0)
+    except (TypeError, ValueError):
+        confidence = 0.0
+    if kind in ("none", "record") and confidence >= UNRELATED_CONFIDENCE:
+        return ("refuse" if kind == "none" else "record"), confidence
+    return None
 
 
 _DOMAIN = re.compile(

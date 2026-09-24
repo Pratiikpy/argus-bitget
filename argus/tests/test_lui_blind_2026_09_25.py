@@ -177,3 +177,32 @@ class TestHoldingsStatedAsAmounts:
         request = _detect("sell 500 shares mstr without tanking the price, how")
         assert request is not None and request.kind is ResearchKind.EXECUTION
         assert not request.book
+
+
+class TestEitherReaderCanSayNotResearch:
+    def test_the_language_models_confident_none_is_binding(self) -> None:
+        from argus.lui.server import _not_research
+
+        audit = {"model": {"kind": "none", "confidence": 0.95, "why": "a price forecast"}}
+        assert _not_research(audit) == ("refuse", 0.95)
+
+    def test_an_unsure_language_model_is_not(self) -> None:
+        from argus.lui.server import _not_research
+
+        assert _not_research({"model": {"kind": "none", "confidence": 0.5}}) is None
+        assert _not_research({"model": {"kind": "quote", "confidence": 0.99}}) is None
+
+    def test_the_kind_models_verdict_is_read_from_its_audit_line(self) -> None:
+        from argus.lui.server import _not_research
+
+        assert _not_research({"model": {"why": "kind model: record at 0.41"}}) == ("record", 0.41)
+
+    @pytest.mark.parametrize("text", [
+        "what will gold price be exactly one year from now",
+        "what will ETH be trading at in 3 months",
+        "give me the exact price of BTC two months from now",
+    ])
+    def test_forecast_phrasings_are_forecasts(self, text: str) -> None:
+        from argus.lui.research import _PRICE_FORECAST
+
+        assert _PRICE_FORECAST.search(text)
