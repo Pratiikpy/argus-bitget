@@ -44,7 +44,7 @@ python -m argus.status          # module + sub-theme coverage, resolved by impor
 pytest -q                       # 6,542 tests collected
 ```
 
-Nothing above needs a credential.
+Nothing above needs a credential. The full run took 2h15m from a fresh clone on 2026-09-24 (the rival comparisons re-fetch live Bitget data, and one comparison installs its locked Node packages on first use); tests that need a rival's source cloned beside the repository skip and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so a test that reaches the network shows itself.
 
 ---
 
