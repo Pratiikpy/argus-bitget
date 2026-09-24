@@ -234,3 +234,27 @@ class TestExecutionAssistance:
         big = plan_execution(symbol="rNVDA", notional=Decimal("400000"),
                              adv_notional=Decimal("10000000"))
         assert big.expected_total_cost_bps > small.expected_total_cost_bps
+
+
+class TestATinyOrderIsSentWhole:
+    """Asking the hosted console how to sell $800 of AAPL returned a two-slice plan for an order
+    worth 0.01% of the day's volume. Splitting cannot pay for itself at that size."""
+
+    def test_below_the_threshold_there_is_one_slice(self) -> None:
+        from decimal import Decimal
+
+        from argus.desk.workbench import plan_execution
+
+        plan = plan_execution(symbol="AAPLUSDT", notional=Decimal("800"),
+                              adv_notional=Decimal("8000000"), anchor_asleep=True)
+        assert len(plan.slices) == 1
+        assert plan.slices[0].fraction == 1
+
+    def test_a_large_order_is_still_split(self) -> None:
+        from decimal import Decimal
+
+        from argus.desk.workbench import plan_execution
+
+        plan = plan_execution(symbol="AAPLUSDT", notional=Decimal("500000"),
+                              adv_notional=Decimal("8000000"))
+        assert len(plan.slices) > 1

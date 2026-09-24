@@ -634,20 +634,20 @@
   },
   "costs": {
     "repeats": 20,
-    "v1_seconds_per_headline": 3.744408165161707e-05,
-    "seconds_per_headline": 0.00025440755101842615,
-    "v1_seconds_per_attack_string": 0.00016216506622770233,
-    "seconds_per_attack_string": 0.0010810937417230866,
+    "v1_seconds_per_headline": 4.3638265211781374e-05,
+    "seconds_per_headline": 0.000329975714332101,
+    "v1_seconds_per_attack_string": 0.0002000390397213609,
+    "seconds_per_attack_string": 0.0013538132615954867,
     "headlines": 49,
     "attack_strings": 302,
     "scaling_seconds_by_input_bytes": {
-      "6000": 0.016333800042048097,
-      "24000": 0.06456029997207224,
-      "96000": 0.26379820000147447
+      "6000": 0.020126800052821636,
+      "24000": 0.0857382999965921,
+      "96000": 0.3613605999853462
     },
     "scaling_ratios_per_4x_input": [
-      3.9525584864437353,
-      4.086074570836712
+      4.259907177076179,
+      4.214692850216408
     ],
     "scales_linearly": true
   },

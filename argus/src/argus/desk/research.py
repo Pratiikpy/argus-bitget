@@ -46,7 +46,6 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from decimal import Decimal
 from enum import StrEnum
-from itertools import pairwise
 from typing import Any
 
 MIN_STEPS_FOR_A_VERDICT = 4
@@ -866,7 +865,7 @@ def main(argv: list[str] | None = None) -> int:
     attempted_analogue = False
     attempted_shape = False
     try:
-        from argus.desk.analogue import Observation
+        from argus.desk.analogue import corpus_from_closes
         from argus.desk.analogue import find as find_analogue
         from argus.desk.shapematch import find as find_shape
         from argus.market.history import CandleType, fetch_range
@@ -874,28 +873,8 @@ def main(argv: list[str] | None = None) -> int:
         bars = fetch_range(args.symbol, interval="1H", days=args.days,
                            candle_type=CandleType.MARKET)
         closes = [(c.ts, float(c.close)) for c in bars]
-        corpus: list[Observation] = []
         window, horizon = 24, 24
-        for i in range(window, len(closes) - horizon):
-            past = [closes[j][1] for j in range(i - window, i + 1)]
-            rets = [b / a - 1.0 for a, b in pairwise(past)]
-            mean = sum(rets) / len(rets)
-            vol = (sum((r - mean) ** 2 for r in rets) / len(rets)) ** 0.5
-            # Not `price`: that name already holds a Decimal from the stress block above, and
-            # reusing it made mypy infer this whole arithmetic as Decimal-over-float. The second
-            # name collision of this kind in the project; both were caught by the type checker
-            # rather than at runtime, which is the argument for running it in strict mode.
-            close_now = closes[i][1]
-            if close_now <= 0:
-                continue
-            corpus.append(Observation(
-                as_of=closes[i][0], symbol=args.symbol,
-                features={
-                    "trailing_return": (close_now / past[0] - 1.0) * 10_000,
-                    "volatility_bps": vol * 10_000,
-                },
-                forward_return_bps=(closes[i + horizon][1] / close_now - 1.0) * 10_000,
-            ))
+        corpus = corpus_from_closes(closes, symbol=args.symbol, window=window, horizon=horizon)
         if len(corpus) > horizon:
             attempted_analogue = True
             # The query is the most recent reconstructible state, and every observation in the

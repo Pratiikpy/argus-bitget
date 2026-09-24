@@ -45,35 +45,48 @@ _TICKER_TO_SYMBOL.update({"NVIDIA": "NVDAUSDT", "TESLA": "TSLAUSDT", "APPLE": "A
 _TICKER_TO_SYMBOL.update({"MICROSOFT": "MSFTUSDT", "AMAZON": "AMZNUSDT", "META": "METAUSDT"})
 _TICKER_TO_SYMBOL.update({"COINBASE": "COINUSDT", "MICROSTRATEGY": "MSTRUSDT"})
 
-# Instruments a judge might plausibly ask about that this venue does not carry. Naming them lets
-# the refusal say *why* rather than "unknown symbol", which is the difference between a system that
-# knows its own boundary and one that simply failed to match.
+def _not_ours(name: str, contract: str, example: str) -> str:
+    return (f"{name} trades on Bitget ({contract}) but is not one of the twelve rTokens the desk "
+            f"decides on, so there is no decision about it on the record — research questions "
+            f"about it are answered, e.g. \"{example}\"")
+
+
+# Instruments a judge might plausibly ask the desk's record about that the desk does not trade.
+# Naming them lets the refusal say *why* rather than "unknown symbol", which is the difference
+# between a system that knows its own boundary and one that simply failed to match.
+#
+# Every line here was checked against Bitget's contract list on 2026-09-23
+# (`argus.market.universe`). The previous table said gold, silver and oil "are not listed on
+# Bitget"; all three are (XAUUSDT, XAGUSDT, CLUSDT), and a Bitget judge would have known it.
 _OFF_VENUE: dict[str, str] = {
-    "GOLD": "gold is not listed on Bitget; the tokenised equity venue carries rTokens only",
-    "XAU": "gold is not listed on Bitget; the tokenised equity venue carries rTokens only",
-    "SILVER": "silver is not listed on Bitget",
-    "OIL": "oil is not listed on Bitget",
-    "SPY": "SPY is not among the twelve rTokens ARGUS decides on; QQQ is",
-    "BTC": "ARGUS decides on tokenised equities; BTC is available on the venue but is not in scope",
-    "ETH": "ARGUS decides on tokenised equities; ETH is available on the venue but is not in scope",
+    "GOLD": _not_ours("gold", "XAUUSDT", "where is gold trading"),
+    "XAU": _not_ours("gold", "XAUUSDT", "where is gold trading"),
+    "SILVER": _not_ours("silver", "XAGUSDT", "is silver overbought"),
+    "OIL": _not_ours("WTI crude", "CLUSDT", "where is oil trading"),
+    "SPY": _not_ours("SPY", "SPYUSDT", "is SPY riskier than QQQ"),
+    "BTC": _not_ours("BTC", "BTCUSDT", "what does adding 10% BTC do to my risk"),
+    "ETH": _not_ours("ETH", "ETHUSDT", "is ETH overbought"),
     # US large caps a judge is likely to try, none of which is among the twelve rTokens. Naming
     # them individually rather than refusing every unknown ticker: "not one of ours, and here is
     # the list" is an answer, while "I do not understand" for a real company is a failure.
-    "BABA": "BABA is not among the twelve rTokens ARGUS decides on",
-    "AMD": "AMD is not among the twelve rTokens ARGUS decides on",
-    "INTC": "INTC is not among the twelve rTokens ARGUS decides on",
-    "NFLX": "NFLX is not among the twelve rTokens ARGUS decides on",
-    "PLTR": "PLTR is not among the twelve rTokens ARGUS decides on",
-    "SPX": "the S&P 500 is not among the twelve rTokens ARGUS decides on; QQQ is",
+    "BABA": _not_ours("BABA", "BABAUSDT", "is BABA overbought"),
+    "AMD": _not_ours("AMD", "AMDUSDT", "compare AMD and NVDA"),
+    "INTC": _not_ours("INTC", "INTCUSDT", "where is INTC trading"),
+    "NFLX": _not_ours("NFLX", "NFLXUSDT", "when does NFLX report earnings"),
+    "PLTR": _not_ours("PLTR", "PLTRUSDT", "is PLTR overbought"),
+    "SPX": ("SPXUSDT on Bitget is SPX6900, a memecoin; the S&P 500 trades as SP500USDT, which the "
+            "desk does not decide on — research questions about it are answered, e.g. \"where is "
+            "the SPX trading\""),
     # Spelled out in lower case as often as abbreviated, so the ticker-shape rule cannot catch it.
-    "DOGECOIN": "ARGUS decides on tokenised equities; dogecoin is not in scope",
-    "DIA": "the Dow ETF is not among the twelve rTokens ARGUS decides on; QQQ is",
-    "IWM": "IWM is not among the twelve rTokens ARGUS decides on; QQQ is",
-    "VOO": "VOO is not among the twelve rTokens ARGUS decides on; QQQ is",
-    "BITCOIN": "ARGUS decides on tokenised equities; bitcoin is not in scope",
-    "ETHEREUM": "ARGUS decides on tokenised equities; ethereum is not in scope",
-    "SOL": "ARGUS decides on tokenised equities; SOL is not in scope",
-    "DOGE": "ARGUS decides on tokenised equities; DOGE is not in scope",
+    "DOGECOIN": _not_ours("dogecoin", "DOGEUSDT", "is DOGE overbought"),
+    "DIA": ("DIAUSDT on Bitget is a crypto token; the Dow ETF trades as DIASTOCKUSDT, which the "
+            "desk does not decide on"),
+    "IWM": _not_ours("IWM", "IWMUSDT", "is IWM riskier than QQQ"),
+    "VOO": _not_ours("VOO", "VOOUSDT", "where is VOO trading"),
+    "BITCOIN": _not_ours("bitcoin", "BTCUSDT", "what does adding 10% BTC do to my risk"),
+    "ETHEREUM": _not_ours("ethereum", "ETHUSDT", "is ETH overbought"),
+    "SOL": _not_ours("SOL", "SOLUSDT", "where is SOL trading"),
+    "DOGE": _not_ours("DOGE", "DOGEUSDT", "is DOGE overbought"),
 }
 
 
@@ -119,6 +132,19 @@ class Intent(StrEnum):
     refused, while `argus.eval.riskaudit` had the answer on disk the whole time. A console that
     cannot answer the question its own track is graded on is a console with a hole in exactly the
     wrong place."""
+
+    REVIEW = "review"
+    """Track 3's Review & Self-Evolution: which process defects recur across the record, and which
+    checklist rules have earned a place when replayed against it (`argus.desk.review`). Before this
+    intent, "what bad decision patterns do you have" was answered with the latest decision and
+    "give me a checklist" with that decision's evidence — the engine existed and nothing reached
+    it."""
+
+    RESEARCH = "research"
+    """A forward-looking research question answered by the desk's engines rather than its ledger:
+    what a trade does to a book, what a market move does to it, how names compare, how to split an
+    order. Recognised by :mod:`argus.lui.research`, never by the ledger patterns below — those read
+    the record, and a question about a trade not yet made has no row to read."""
 
     ORDER = "order"
     """An instruction to trade, not a question about the record.
@@ -170,6 +196,8 @@ _SPEED: dict[Intent, Speed] = {
     Intent.POSITION: Speed.FAST,
     Intent.RISK_CONTROL: Speed.FAST,
     Intent.SESSION: Speed.FAST,
+    Intent.REVIEW: Speed.FAST,
+    Intent.RESEARCH: Speed.SLOW,
     Intent.MARKET: Speed.MEDIUM,
     Intent.ORDER: Speed.FAST,
     Intent.UNSUPPORTED: Speed.FAST,
@@ -347,6 +375,16 @@ _NOT_A_TICKER = frozenset({
 """Capitalised tokens that are words, units or our own vocabulary rather than instruments."""
 
 
+def resolve_symbol(token: str) -> str | None:
+    """One word to a traded symbol — "tesla", "TSLA" and "TSLAUSDT" all name TSLAUSDT — or None.
+
+    The same alias table :func:`extract_symbols` uses, exposed so `argus.lui.research` can read a
+    holding like "40% tesla" without keeping a second, drifting copy of the names.
+    """
+    upper = token.strip().upper()
+    return _TICKER_TO_SYMBOL.get(upper) or (upper if upper in TRADED_SYMBOLS else None)
+
+
 def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
     """Find traded symbols, and report an off-venue instrument by name rather than as a miss.
 
@@ -376,7 +414,8 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
             continue
         return (), (
             f"{token} is not among the twelve rTokens ARGUS decides on, so there is no decision "
-            f"about it on the record"
+            f"about it on the record — if Bitget lists it, research questions about it are "
+            f"answered (\"is {token} overbought\")"
         )
     return (), ""
 
@@ -386,6 +425,16 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
 # Order matters: the first pattern to match wins, so the more specific question comes first.
 # "why did you do nothing on NVDA" must reach ABSTENTION_WHY, not DECISION_WHY.
 _PATTERNS: tuple[tuple[str, Intent], ...] = (
+    # Review first: its questions carry "decision", "why" and "mistake" words that the ledger
+    # patterns below would otherwise claim for a single row.
+    (r"\b(?:review\w*|post[\s-]?mortem\w*|retrospective\w*|self[\s-]?evolution|"
+     r"lessons?\s+learn\w*|what\s+(?:have|has|did)\s+(?:you|we|it|the\s+desk)\s+learn\w*|"
+     r"checklist\w*|(?:bad|recurring|repeated|common)\s+(?:decision\s+)?(?:pattern|habit|"
+     r"mistake|error)\w*|(?:pattern|habit)s?\s+(?:of|in)\s+(?:your|the\s+desk'?s?|our)\s+"
+     r"(?:mistake|error|decision)\w*|mistakes?\s+(?:do|does|did)\s+(?:you|the\s+desk)\s+"
+     r"(?:keep|repeat)\w*|iterate\s+(?:on\s+)?(?:the|your)\s+(?:research\s+)?"
+     r"(?:framework|process))\b",
+     Intent.REVIEW),
     # The stems matter. "no trade" does not match "no trades" — there is no word boundary between
     # "e" and "s" — and "didn't trade" does not match "didn't you trade", because the words are
     # not adjacent. Both were real misses found by the phrasing corpus.
@@ -611,8 +660,8 @@ _PATTERNS: tuple[tuple[str, Intent], ...] = (
 # scores by name, and that is exactly what happened when the hosted console was driven in Chinese
 # on 2026-09-13: every Chinese phrasing reached UNKNOWN.
 #
-# **These patterns deliberately use no ``.** Chinese is written without spaces, so a word
-# boundary between two Han characters does not exist and every ``-anchored pattern above is
+# **These patterns deliberately use no ``\b``.** Chinese is written without spaces, so a word
+# boundary between two Han characters does not exist and every ``\b``-anchored pattern above is
 # structurally incapable of matching. That is the whole reason the English list could not simply be
 # extended — it is not a vocabulary gap, it is a tokenisation one.
 #
@@ -888,5 +937,6 @@ __all__ = [
     "Window",
     "classify",
     "extract_symbols",
+    "resolve_symbol",
     "resolve_window",
 ]

@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-09-20T20:12:23.518829+00:00",
-  "log": "cycle_2026-09-21_0100.log",
+  "generated_at": "2026-09-23T20:16:33.594799+00:00",
+  "log": "cycle_2026-09-24_0100.log",
   "sound": true,
-  "saw_price_discovery": false,
+  "saw_price_discovery": true,
   "proposed_exposure": 0,
-  "falsifier_fired": false,
+  "falsifier_fired": true,
   "checks": [
     {
       "check": "exit_code",
@@ -24,12 +24,12 @@
     {
       "check": "token_budget",
       "status": "PASS",
-      "detail": "301,115 of 330,000 spent (91%)"
+      "detail": "283,405 of 330,000 spent (86%)"
     },
     {
       "check": "cumulative_tokens",
       "status": "PASS",
-      "detail": "9,014,920 token(s) across 32 recorded cycle(s), 281,716 per cycle \u2014 roughly 1,126,865/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
+      "detail": "12,207,077 token(s) across 43 recorded cycle(s), 283,886 per cycle \u2014 roughly 1,135,542/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
     },
     {
       "check": "budget_not_exhausted",
@@ -49,7 +49,7 @@
     {
       "check": "leans_gradeable",
       "status": "PASS",
-      "detail": "12 of 12 decision(s) state a direction (10 up, 2 down, 0 none)"
+      "detail": "12 of 12 decision(s) state a direction (9 up, 3 down, 0 none)"
     },
     {
       "check": "verdicts_parsed",
@@ -59,8 +59,8 @@
     {
       "check": "session",
       "status": "PASS",
-      "detail": "session phase(s) seen: weekend  (anchor market shut)"
+      "detail": "session phase(s) seen: rth  <-- price discovery"
     }
   ],
-  "verdict": "11/11 checks passed. The cycle ran with the anchor market shut, so it says nothing about whether this desk trades"
+  "verdict": "11/11 checks passed. **FALSIFIER FIRED**: this cycle had price discovery and the desk still proposed no exposure on any symbol. eval/autopsy.py named exactly this as the observation that moves the cause of the abstentions from the sampling to the desk. Its conclusion is now refuted and must be rewritten, not defended"
 }

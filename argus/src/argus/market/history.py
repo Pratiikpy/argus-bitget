@@ -39,6 +39,13 @@ from typing import Any
 
 BASE_URL = "https://api.bitget.com"
 HISTORY_PATH = "/api/v3/market/history-candles"
+RECENT_PATH = "/api/v3/market/candles"
+RECENT_LIMIT = 1000
+RECENT_REACH_DAYS = 55
+"""The recent-candles endpoint returns up to 1,000 bars in one call — measured 2026-09-23, although
+`agent-skill/references/commands.md:131` lists its maximum as 100 — against 100 per page from
+history-candles. It reaches back roughly 55 days (a window starting 55 days ago answered, one
+starting 62 days ago came back empty), so it serves the recent end and history-candles the rest."""
 # Measured, not documented: the openapi spec states no cap, but limit=200 returns
 # code 40020 "Parameter limit error" while 100 succeeds.
 MAX_LIMIT = 100
@@ -159,8 +166,9 @@ def _px(value: Any, *, field: str, symbol: str) -> Decimal:
     return got
 
 
-def _get(params: dict[str, str], *, timeout: float = 30.0) -> list[list[str]]:
-    url = f"{BASE_URL}{HISTORY_PATH}?{urllib.parse.urlencode(params)}"
+def _get(params: dict[str, str], *, timeout: float = 30.0,
+         path: str = HISTORY_PATH) -> list[list[str]]:
+    url = f"{BASE_URL}{path}?{urllib.parse.urlencode(params)}"
     req = urllib.request.Request(url, headers={"Accept": "application/json"}, method="GET")
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -183,17 +191,24 @@ def fetch(
     candle_type: CandleType = CandleType.MARKET,
     end: datetime | None = None,
     limit: int = MAX_LIMIT,
+    recent: bool = False,
+    start: datetime | None = None,
 ) -> list[Candle]:
-    """One page of history, oldest first."""
+    """One page of history, oldest first. ``recent`` reads the recent-candles endpoint instead,
+    which takes up to :data:`RECENT_LIMIT` bars per call. That endpoint ignores ``startTime``
+    unless ``endTime`` is sent with it (measured 2026-09-23: a start 55 days back alone returned the
+    latest 1,000 bars), so pass both to read a window."""
     params = {
         "category": "USDT-FUTURES",
         "symbol": symbol,
         "interval": interval,
         "type": str(candle_type),
-        "limit": str(min(limit, MAX_LIMIT)),
+        "limit": str(min(limit, RECENT_LIMIT if recent else MAX_LIMIT)),
     }
     if end is not None:
         params["endTime"] = str(int(end.timestamp() * 1000))
+    if start is not None:
+        params["startTime"] = str(int(start.timestamp() * 1000))
 
     # PREMIUM is a signed fraction, not a price: it is negative whenever the token trades below its
     # index, so the positivity guard does not apply to it. Every series still refuses an absent or
@@ -201,7 +216,7 @@ def fetch(
     parse = _number if candle_type is CandleType.PREMIUM else _px
 
     out: list[Candle] = []
-    for row in _get(params):
+    for row in _get(params, path=RECENT_PATH if recent else HISTORY_PATH):
         if len(row) < 5:
             continue
         out.append(Candle(
@@ -224,18 +239,33 @@ def fetch_range(
     candle_type: CandleType = CandleType.MARKET,
     pause: float = 0.15,
 ) -> list[Candle]:
-    """Page backwards to cover ``days``. The endpoint documents a 90-day maximum range.
+    """Page backwards to cover ``days``. The endpoint documents a 90-day maximum range."""
+    return fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=days), interval=interval,
+                        candle_type=candle_type, pause=pause)
+
+
+def fetch_window(
+    symbol: str,
+    *,
+    start: datetime,
+    end: datetime | None = None,
+    interval: str = "1H",
+    candle_type: CandleType = CandleType.MARKET,
+    pause: float = 0.15,
+) -> list[Candle]:
+    """Every candle from ``start`` up to ``end`` (now when None), paging backwards.
 
     Pages by walking ``endTime`` back to the oldest candle already retrieved. A page that returns
     nothing, or fails to move the window, ends the walk — otherwise a venue that clamps silently
-    would spin here forever.
+    would spin here forever. Taking an explicit ``end`` lets a caller split a long range into
+    windows fetched side by side: ninety days of hourly bars is eleven sequential pages, measured
+    at 18.8s on 2026-09-23, too slow for a question someone is waiting on.
     """
-    cutoff = datetime.now(UTC) - timedelta(days=days)
     seen: dict[datetime, Candle] = {}
-    end: datetime | None = None
+    cursor = end
 
     while True:
-        page = fetch(symbol, interval=interval, candle_type=candle_type, end=end)
+        page = fetch(symbol, interval=interval, candle_type=candle_type, end=cursor)
         if not page:
             break
         new = {c.ts: c for c in page if c.ts not in seen}
@@ -243,14 +273,15 @@ def fetch_range(
             break
         seen.update(new)
         oldest = min(page, key=lambda c: c.ts).ts
-        if oldest <= cutoff:
+        if oldest <= start:
             break
-        if end is not None and oldest >= end:
+        if cursor is not None and oldest >= cursor:
             break  # the window stopped moving; the venue is clamping
-        end = oldest
+        cursor = oldest
         time.sleep(pause)
 
-    return sorted((c for ts, c in seen.items() if ts >= cutoff), key=lambda c: c.ts)
+    return sorted((c for ts, c in seen.items() if ts >= start and (end is None or ts <= end)),
+                  key=lambda c: c.ts)
 
 
 def fetch_basis(

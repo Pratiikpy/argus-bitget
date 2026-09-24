@@ -511,7 +511,8 @@ def hurdle_panel() -> Panel:
                    f"{hurdle.get('sources', {}).get('live', 0)} live, "
                    f"{hurdle.get('sources', {}).get('replay', 0)} replayed"),
             Metric("median move vs hurdle",
-                   f"{hurdle.get('median_abs_move_bps')}bps vs {hurdle.get('actual_hurdle_bps')}bps",
+                   f"{hurdle.get('median_abs_move_bps')}bps vs "
+                   f"{hurdle.get('actual_hurdle_bps')}bps",
                    "data/hurdle_frontier.json"),
         ])
     if pead is not None:

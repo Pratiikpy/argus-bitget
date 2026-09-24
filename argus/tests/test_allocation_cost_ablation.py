@@ -136,7 +136,14 @@ class TestTheWeightCapIsReal:
     def test_the_capped_run_reports_weights_inside_the_cap(
         self, capped: dict[str, Any],
     ) -> None:
+        """Only the rows Riskfolio's bound applies to. `argus_hrp` is ARGUS's own allocator and
+        has no cap by design — its capped twin is `riskfolio_hrp_argus_equivalent` (see the
+        module docstring). Asserting the cap on it passed only while its largest weight happened
+        to sit under 25%; on 2026-09-23 live data put it at 25.14% and the test failed on a row the
+        cap was never applied to."""
         for label, row in capped["results"].items():
+            if label == "argus_hrp":
+                continue
             assert row["mean_largest_weight"] <= WEIGHT_CAP + 1e-6, label
 
     def test_the_capped_run_is_less_concentrated_than_the_uncapped_one(

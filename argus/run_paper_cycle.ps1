@@ -74,3 +74,31 @@ python -m argus.register.resolve 2>&1 | ForEach-Object { $_ | Out-String -Stream
 
 python -m argus.eval.cyclecheck 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
 "check_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8
+$checkExit = $LASTEXITCODE
+
+# Publish the new decisions to the hosted console. The hosted console reads a bundled, read-only copy
+# of the ledger, so without this step it froze at whatever the last manual deploy carried — it was 40
+# hours and 42 decisions behind on 2026-09-23 — and a judge compares the page against the record.
+# Added 2026-09-23 with the project owner's approval. Gated on the cycle check passing, so a broken
+# cycle or a broken chain is never shipped: the page keeps the last good record and the log says why.
+# `deploysync` copies only its two manifests and never `.secrets/`; the model key lives in Vercel's
+# server environment, not in the bundle.
+# The cockpit page is generated from the artefacts, and `test_cockpit` fails the moment the ledger
+# grows past the figures it prints -- which every cycle does, whether or not its check passes.
+# Regenerated on every cycle, before the publish gate, so the committed page never lags the record.
+python -m argus.demo.cockpit 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
+"cockpit_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8
+
+if ($checkExit -eq 0) {
+  python -m argus.demo.deploysync 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
+  $syncExit = $LASTEXITCODE
+  "deploysync_exit=$syncExit" | Add-Content -Path $log -Encoding utf8
+  if ($syncExit -eq 0) {
+    Push-Location "$root\deploy"
+    & "$env:APPDATA\npm\vercel.cmd" deploy --prod --yes 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
+    "publish_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8
+    Pop-Location
+  }
+} else {
+  "publish_skipped: cycle check exit $checkExit" | Add-Content -Path $log -Encoding utf8
+}

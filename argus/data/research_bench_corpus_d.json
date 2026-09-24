@@ -1,0 +1,732 @@
+{
+  "written_by": "fourth blind agent, 2026-09-23, never shown the repository",
+  "questions": [
+    {
+      "text": "if i add 5k of nvda to my book how much does that move my overall vol",
+      "label": "impact",
+      "symbols": [
+        "NVDA"
+      ]
+    },
+    {
+      "text": "bhai agar main 2 lakh ka SMCI le lu to mera portfolio ka risk kitna badhega",
+      "label": "impact",
+      "symbols": [
+        "SMCI"
+      ]
+    },
+    {
+      "text": "i want buy some coin coinbase stock but scared how it change my risk in existing holdings pls explain simple",
+      "label": "impact",
+      "symbols": [
+        "COIN"
+      ]
+    },
+    {
+      "text": "Please assess the marginal risk contribution to the fund if we initiate a 3% NAV position in Broadcom.",
+      "label": "impact",
+      "symbols": [
+        "AVGO"
+      ]
+    },
+    {
+      "text": "adding palantir to my book, whats that do to my drawdown and correlation with what i already hold",
+      "label": "impact",
+      "symbols": [
+        "PLTR"
+      ]
+    },
+    {
+      "text": "quiero comprar mas ETH pero no se como afecta mi riesgo total del portfolio, ya tengo BTC y SOL",
+      "label": "impact",
+      "symbols": [
+        "ETH",
+        "BTC",
+        "SOL"
+      ]
+    },
+    {
+      "text": "so confusd if i buy tesla shares will my whole account get more risky than now i already own apple and msft",
+      "label": "impact",
+      "symbols": [
+        "TSLA",
+        "AAPL",
+        "MSFT"
+      ]
+    },
+    {
+      "text": "increasing my mstr position by 10 btc equivalent, need updated portfolio beta and concentration numbers after",
+      "label": "impact",
+      "symbols": [
+        "MSTR",
+        "BTC"
+      ]
+    },
+    {
+      "text": "im holding a bunch of tech stocks already thinking of adding some oracle shares does that make things worse or does it diversify",
+      "label": "impact",
+      "symbols": [
+        "ORCL"
+      ]
+    },
+    {
+      "text": "Team, before we allocate to XRP, run the incremental VaR impact against the current crypto sleeve.",
+      "label": "impact",
+      "symbols": [
+        "XRP"
+      ]
+    },
+    {
+      "text": "whats nvda's beta and worst single day drop ever",
+      "label": "profile",
+      "symbols": [
+        "NVDA"
+      ]
+    },
+    {
+      "text": "gme kitna volatile hai like historically pagal wala stock hai kya",
+      "label": "profile",
+      "symbols": [
+        "GME"
+      ]
+    },
+    {
+      "text": "can u tell me how risky is silver as investment like does it swing a lot i never traded commodities before",
+      "label": "profile",
+      "symbols": [
+        "XAG"
+      ]
+    },
+    {
+      "text": "Requesting a standalone risk profile on Coinbase, annualized vol, tail metrics, and max historical single day loss.",
+      "label": "profile",
+      "symbols": [
+        "COIN"
+      ]
+    },
+    {
+      "text": "hows the skew look on doge, is it more up moves or crash risk",
+      "label": "profile",
+      "symbols": [
+        "DOGE"
+      ]
+    },
+    {
+      "text": "necesito saber la volatilidad de tesla y su peor dia en la historia, es para un reporte",
+      "label": "profile",
+      "symbols": [
+        "TSLA"
+      ]
+    },
+    {
+      "text": "is intel a scary stock to hold like whats its typical daily swing",
+      "label": "profile",
+      "symbols": [
+        "INTC"
+      ]
+    },
+    {
+      "text": "give me sol standalone vol, beta to btc, and tail risk numbers",
+      "label": "profile",
+      "symbols": [
+        "SOL",
+        "BTC"
+      ]
+    },
+    {
+      "text": "meta ka historical worst day kitna tha aur uska skew kaisa hai",
+      "label": "profile",
+      "symbols": [
+        "META"
+      ]
+    },
+    {
+      "text": "whats micron... wait sorry i mean SMCI's historical drawdown profile and daily volatility percentile",
+      "label": "profile",
+      "symbols": [
+        "SMCI"
+      ]
+    },
+    {
+      "text": "if nasdaq drops 10% tomorrow what happens to my nvda tsla and amd positions",
+      "label": "stress",
+      "symbols": [
+        "NVDA",
+        "TSLA",
+        "AMD"
+      ]
+    },
+    {
+      "text": "agar crypto crash ho gaya to mera btc aur sol ka kya hoga bhai bata do",
+      "label": "stress",
+      "symbols": [
+        "BTC",
+        "SOL"
+      ]
+    },
+    {
+      "text": "scared about a market crash, i hold apple google and some spy, how bad would it get for me",
+      "label": "stress",
+      "symbols": [
+        "AAPL",
+        "GOOGL",
+        "SPY"
+      ]
+    },
+    {
+      "text": "Please run a scenario: S&P down 15%, tech heavy selloff, impact on our QQQ, MSFT, and AVGO exposure.",
+      "label": "stress",
+      "symbols": [
+        "QQQ",
+        "MSFT",
+        "AVGO"
+      ]
+    },
+    {
+      "text": "que pasaria con mi coin y mstr si el mercado de tech se cae fuerte esta semana",
+      "label": "stress",
+      "symbols": [
+        "COIN",
+        "MSTR"
+      ]
+    },
+    {
+      "text": "if the whole crypto market crashes 30% what happens to my eth doge and xrp bags",
+      "label": "stress",
+      "symbols": [
+        "ETH",
+        "DOGE",
+        "XRP"
+      ]
+    },
+    {
+      "text": "worried nasdaq gonna tank, i own pltr hood and uber, how much would i lose roughly",
+      "label": "stress",
+      "symbols": [
+        "PLTR",
+        "HOOD",
+        "UBER"
+      ]
+    },
+    {
+      "text": "stress test my book against a 20% qqq drawdown, holdings are nvda meta and netflix",
+      "label": "stress",
+      "symbols": [
+        "NVDA",
+        "META",
+        "NFLX"
+      ]
+    },
+    {
+      "text": "market wide selloff incoming maybe, i have jpm and orcl, kitna nuksan hoga",
+      "label": "stress",
+      "symbols": [
+        "JPM",
+        "ORCL"
+      ]
+    },
+    {
+      "text": "Model a 2022 style tech crash across the current book: current holdings are AMZN, GOOGL, and COIN.",
+      "label": "stress",
+      "symbols": [
+        "AMZN",
+        "GOOGL",
+        "COIN"
+      ]
+    },
+    {
+      "text": "nvda vs amd which has better risk adjusted returns",
+      "label": "compare",
+      "symbols": [
+        "NVDA",
+        "AMD"
+      ]
+    },
+    {
+      "text": "tesla aur nvidia dono me se konsa zyada volatile hai",
+      "label": "compare",
+      "symbols": [
+        "TSLA",
+        "NVDA"
+      ]
+    },
+    {
+      "text": "can you compare gold and silver for me which is safer to hold long term im new to this",
+      "label": "compare",
+      "symbols": [
+        "XAU",
+        "XAG"
+      ]
+    },
+    {
+      "text": "Please provide a side by side comparison of AAPL and MSFT on valuation multiples and volatility.",
+      "label": "compare",
+      "symbols": [
+        "AAPL",
+        "MSFT"
+      ]
+    },
+    {
+      "text": "btc vs eth vs sol whats the risk return look like across all three",
+      "label": "compare",
+      "symbols": [
+        "BTC",
+        "ETH",
+        "SOL"
+      ]
+    },
+    {
+      "text": "comparame oro y bitcoin como reserva de valor cual es mejor",
+      "label": "compare",
+      "symbols": [
+        "XAU",
+        "BTC"
+      ]
+    },
+    {
+      "text": "whats better long term amazon or google i cant decide between the two",
+      "label": "compare",
+      "symbols": [
+        "AMZN",
+        "GOOGL"
+      ]
+    },
+    {
+      "text": "compare wti and brent spreads right now",
+      "label": "compare",
+      "symbols": [
+        "CL",
+        "BZ"
+      ]
+    },
+    {
+      "text": "coin ya hood dono agar dekhu to kaunsa zyada stable hai trading ke liye",
+      "label": "compare",
+      "symbols": [
+        "COIN",
+        "HOOD"
+      ]
+    },
+    {
+      "text": "Run a comparative analysis of PLTR, SMCI, and ORCL, growth, volatility, and momentum.",
+      "label": "compare",
+      "symbols": [
+        "PLTR",
+        "SMCI",
+        "ORCL"
+      ]
+    },
+    {
+      "text": "need to execute a 500k buy in nvda without moving the tape, how should i slice it",
+      "label": "execution",
+      "symbols": [
+        "NVDA"
+      ]
+    },
+    {
+      "text": "mujhe 50000 dollars ka btc kharidna hai market me bina price hilaye kaise kare",
+      "label": "execution",
+      "symbols": [
+        "BTC"
+      ]
+    },
+    {
+      "text": "i have like 10000 to put into tesla stock all at once, is that ok or should i split it somehow im nervous about it",
+      "label": "execution",
+      "symbols": [
+        "TSLA"
+      ]
+    },
+    {
+      "text": "Please recommend an execution schedule for a $2M block purchase of QQQ, minimizing market impact over the session.",
+      "label": "execution",
+      "symbols": [
+        "QQQ"
+      ]
+    },
+    {
+      "text": "quiero comprar 200k dolares de eth como deberia dividir la orden para no mover el precio",
+      "label": "execution",
+      "symbols": [
+        "ETH"
+      ]
+    },
+    {
+      "text": "whats the best way to work a 1.2m sell order in msft twap or vwap",
+      "label": "execution",
+      "symbols": [
+        "MSFT"
+      ]
+    },
+    {
+      "text": "trying to buy 75k of coin stock without spiking the price how should i break it up",
+      "label": "execution",
+      "symbols": [
+        "COIN"
+      ]
+    },
+    {
+      "text": "im scared to buy 20k of gme in one go will that crash or spike the price how should i do it slowly",
+      "label": "execution",
+      "symbols": [
+        "GME"
+      ]
+    },
+    {
+      "text": "need a slicing plan for 300k order in avgo over the next two hours",
+      "label": "execution",
+      "symbols": [
+        "AVGO"
+      ]
+    },
+    {
+      "text": "Team requests optimal execution strategy for a $5M sell in MSTR, targeting minimal slippage across the trading day.",
+      "label": "execution",
+      "symbols": [
+        "MSTR"
+      ]
+    },
+    {
+      "text": "whats spot btc trading at right now and current funding rate",
+      "label": "quote",
+      "symbols": [
+        "BTC"
+      ]
+    },
+    {
+      "text": "aaple ka abhi price kya chal raha hai",
+      "label": "quote",
+      "symbols": [
+        "AAPL"
+      ]
+    },
+    {
+      "text": "can u tell me current price of gold and the bid ask spread pls im just curious",
+      "label": "quote",
+      "symbols": [
+        "XAU"
+      ]
+    },
+    {
+      "text": "Please provide the current market price and spread for SPY.",
+      "label": "quote",
+      "symbols": [
+        "SPY"
+      ]
+    },
+    {
+      "text": "eth perp funding rate right now and mark price",
+      "label": "quote",
+      "symbols": [
+        "ETH"
+      ]
+    },
+    {
+      "text": "cual es el precio actual de doge y el spread bid ask",
+      "label": "quote",
+      "symbols": [
+        "DOGE"
+      ]
+    },
+    {
+      "text": "quick one wheres natural gas trading and hows the spread looking",
+      "label": "quote",
+      "symbols": [
+        "NG"
+      ]
+    },
+    {
+      "text": "need live price and funding for sol perp asap",
+      "label": "quote",
+      "symbols": [
+        "SOL"
+      ]
+    },
+    {
+      "text": "silver ka rate kya hai abhi aur spread kitna hai",
+      "label": "quote",
+      "symbols": [
+        "XAG"
+      ]
+    },
+    {
+      "text": "hi sorry quick question whats copper trading at right now",
+      "label": "quote",
+      "symbols": [
+        "HG"
+      ]
+    },
+    {
+      "text": "is nvda overbought on the daily rsi right now",
+      "label": "technicals",
+      "symbols": [
+        "NVDA"
+      ]
+    },
+    {
+      "text": "tsla ka macd bullish crossover dikh raha hai kya abhi",
+      "label": "technicals",
+      "symbols": [
+        "TSLA"
+      ]
+    },
+    {
+      "text": "can u explain if apple is oversold like whats the rsi saying im trying to learn technicals",
+      "label": "technicals",
+      "symbols": [
+        "AAPL"
+      ]
+    },
+    {
+      "text": "Please provide current RSI, MACD signal, and key support/resistance levels for QQQ.",
+      "label": "technicals",
+      "symbols": [
+        "QQQ"
+      ]
+    },
+    {
+      "text": "btc support and resistance levels on the 4h chart",
+      "label": "technicals",
+      "symbols": [
+        "BTC"
+      ]
+    },
+    {
+      "text": "el rsi de eth esta en sobrecompra o sobreventa ahora mismo",
+      "label": "technicals",
+      "symbols": [
+        "ETH"
+      ]
+    },
+    {
+      "text": "whats the momentum look like on coin stock lately still trending up",
+      "label": "technicals",
+      "symbols": [
+        "COIN"
+      ]
+    },
+    {
+      "text": "sol ka support level kaha hai chart pe abhi",
+      "label": "technicals",
+      "symbols": [
+        "SOL"
+      ]
+    },
+    {
+      "text": "im confused about macd can someone check if netflix has a bearish crossover happening",
+      "label": "technicals",
+      "symbols": [
+        "NFLX"
+      ]
+    },
+    {
+      "text": "Requesting technical read on PLTR: RSI level, MACD histogram trend, and nearest resistance.",
+      "label": "technicals",
+      "symbols": [
+        "PLTR"
+      ]
+    },
+    {
+      "text": "whens nvda next earnings date and whats the analyst eps estimate",
+      "label": "fundamentals",
+      "symbols": [
+        "NVDA"
+      ]
+    },
+    {
+      "text": "tesla ne last quarter earnings beat kiya tha ya miss",
+      "label": "fundamentals",
+      "symbols": [
+        "TSLA"
+      ]
+    },
+    {
+      "text": "can u tell me who are the big institutional holders of apple stock im curious about who owns it",
+      "label": "fundamentals",
+      "symbols": [
+        "AAPL"
+      ]
+    },
+    {
+      "text": "Please pull the next earnings date, consensus estimates, and current forward P/E for MSFT.",
+      "label": "fundamentals",
+      "symbols": [
+        "MSFT"
+      ]
+    },
+    {
+      "text": "did palantir beat or miss on their last earnings surprise",
+      "label": "fundamentals",
+      "symbols": [
+        "PLTR"
+      ]
+    },
+    {
+      "text": "cuando es la proxima fecha de resultados de amazon y cual es el estimado de los analistas",
+      "label": "fundamentals",
+      "symbols": [
+        "AMZN"
+      ]
+    },
+    {
+      "text": "whats smci valuation look like right now is it expensive compared to history",
+      "label": "fundamentals",
+      "symbols": [
+        "SMCI"
+      ]
+    },
+    {
+      "text": "jpm ke institutional holders kaun kaun hai aur unka stake kitna hai",
+      "label": "fundamentals",
+      "symbols": [
+        "JPM"
+      ]
+    },
+    {
+      "text": "im nervous about earnings season when does hood report and what are people expecting",
+      "label": "fundamentals",
+      "symbols": [
+        "HOOD"
+      ]
+    },
+    {
+      "text": "Requesting a fundamentals summary for ORCL: next earnings date, analyst estimate range, and institutional ownership breakdown.",
+      "label": "fundamentals",
+      "symbols": [
+        "ORCL"
+      ]
+    },
+    {
+      "text": "last time nvda rsi hit this level after an ai rally what happened next historically",
+      "label": "analogue",
+      "symbols": [
+        "NVDA"
+      ]
+    },
+    {
+      "text": "pehle bhi kabhi btc aise hi halving ke baad pump hua tha kya history me kya hua tha",
+      "label": "analogue",
+      "symbols": [
+        "BTC"
+      ]
+    },
+    {
+      "text": "has tesla ever had a setup like this before like similar volume and price pattern what happened after",
+      "label": "analogue",
+      "symbols": [
+        "TSLA"
+      ]
+    },
+    {
+      "text": "Please identify prior instances where QQQ exhibited a similar overbought RSI plus volume divergence, and the subsequent 30 day performance.",
+      "label": "analogue",
+      "symbols": [
+        "QQQ"
+      ]
+    },
+    {
+      "text": "when gme squeezed before what happened in the days after historically is this happening again",
+      "label": "analogue",
+      "symbols": [
+        "GME"
+      ]
+    },
+    {
+      "text": "alguna vez el oro tuvo un patron similar a este antes de una subida de tasas que paso despues",
+      "label": "analogue",
+      "symbols": [
+        "XAU"
+      ]
+    },
+    {
+      "text": "sol ka pichli baar jab aise consolidation hua tha to uske baad kya hua tha",
+      "label": "analogue",
+      "symbols": [
+        "SOL"
+      ]
+    },
+    {
+      "text": "coin stock right now looks like it did before a big spike last year did that pattern actually predict anything",
+      "label": "analogue",
+      "symbols": [
+        "COIN"
+      ]
+    },
+    {
+      "text": "im seeing this weird pattern on eth similar to early 2021 curious what came after that time historically",
+      "label": "analogue",
+      "symbols": [
+        "ETH"
+      ]
+    },
+    {
+      "text": "Has AVGO shown a comparable technical setup in the past following a large index rebalance, and what was the historical forward return?",
+      "label": "analogue",
+      "symbols": [
+        "AVGO"
+      ]
+    },
+    {
+      "text": "buy 500 nvda for me right now",
+      "label": "none",
+      "symbols": [
+        "NVDA"
+      ]
+    },
+    {
+      "text": "kal btc ka price kitna hoga bata do",
+      "label": "none",
+      "symbols": [
+        "BTC"
+      ]
+    },
+    {
+      "text": "just sell all my tesla shares immediately",
+      "label": "none",
+      "symbols": [
+        "TSLA"
+      ]
+    },
+    {
+      "text": "not sure what to buy honestly could you just tell me a good pick to get started im totally new to this",
+      "label": "none",
+      "symbols": []
+    },
+    {
+      "text": "yo whats up how was your weekend lol anyway also whats good stock",
+      "label": "none",
+      "symbols": []
+    },
+    {
+      "text": "whats the price target for eth in 2027 gonna moon or what",
+      "label": "none",
+      "symbols": [
+        "ETH"
+      ]
+    },
+    {
+      "text": "can you place a limit order for 10000 shares of aapl at market open",
+      "label": "none",
+      "symbols": [
+        "AAPL"
+      ]
+    },
+    {
+      "text": "everyone keeps saying crypto is the future so what should i actually put my money into",
+      "label": "none",
+      "symbols": []
+    },
+    {
+      "text": "que va a pasar con el precio de bitcoin el proximo mes va a subir o bajar",
+      "label": "none",
+      "symbols": [
+        "BTC"
+      ]
+    },
+    {
+      "text": "can you check price for ZzzCoin ticker ZZZC its supposed to be huge",
+      "label": "none",
+      "symbols": []
+    }
+  ]
+}

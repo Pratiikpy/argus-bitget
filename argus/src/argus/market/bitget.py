@@ -37,9 +37,11 @@ BASE_URL = "https://api.bitget.com"
 # MARSCOINUSDT, which it did on the first attempt.
 # SPXUSDT was here and was WRONG. It trades at $0.49 — it is SPX6900, a memecoin holding the
 # ticker, not a tokenized S&P 500. A backtest variant scored 179% and Sharpe 4.32 on it before the
-# error was caught. Bitget's contract metadata does not distinguish them (every one reports
-# symbolType "perpetual"), so membership is now verified behaviourally by session attenuation:
-# see argus.market.validation. Genuine rTokens attenuate 3.6-8.8x; SPXUSDT attenuates 1.43x.
+# error was caught. Every one reports symbolType "perpetual", so membership is verified
+# behaviourally by session attenuation: see argus.market.validation. Genuine rTokens attenuate
+# 3.6-8.8x; SPXUSDT attenuates 1.43x. (Checked again 2026-09-23: the contracts endpoint also
+# carries `isRwa`, "NO" for SPXUSDT and "YES" for the tokenised S&P 500, SP500USDT — the venue's
+# own flag now agrees with the measurement; `argus.market.universe` reads it.)
 RTOKEN_SYMBOLS: tuple[str, ...] = (
     "NVDAUSDT", "TSLAUSDT", "AAPLUSDT", "MSFTUSDT", "METAUSDT",
     "GOOGLUSDT", "AMZNUSDT", "COINUSDT", "MSTRUSDT",

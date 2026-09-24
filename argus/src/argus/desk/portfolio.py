@@ -875,12 +875,137 @@ def parse_book(pairs: Sequence[str]) -> dict[str, float]:
     return book
 
 
+@dataclass(frozen=True, slots=True)
+class CopilotReport:
+    """One complete answer to *what does this trade do to this book* — the research task the
+    Track 3 Open Theme names, as data rather than as printed text.
+
+    Built by :func:`copilot`, which is pure: it takes aligned returns and never fetches. The CLI
+    (:func:`main`) and the natural-language console (`argus.lui.research`) both call it, so a judge
+    typing a question and a reader running the command get the same numbers from the same code.
+    An empty ``weights_before`` is legal and means "no book given": the report is then a standalone
+    risk profile of the one symbol, which is the honest answer when nobody has said what they own.
+    """
+
+    symbol: str
+    benchmark: str
+    weights_before: Mapping[str, float]
+    weights_after: Mapping[str, float]
+    bars_aligned: int
+    bars_open_session: int
+    impact: TradeImpact
+    risk_after: RiskDecomposition | None
+    stress: tuple[StressOutcome, ...]
+    worst: WorstWindow
+    exposures: tuple[FactorExposure, ...]
+    session_beta: Mapping[Session, Exposure]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "symbol": self.symbol,
+            "benchmark": self.benchmark,
+            "weights_before": dict(self.weights_before),
+            "weights_after": {k: round(v, 4) for k, v in self.weights_after.items()},
+            "bars_aligned": self.bars_aligned,
+            "bars_open_session": self.bars_open_session,
+            "impact": self.impact.as_dict(),
+            "risk_after": None if self.risk_after is None else self.risk_after.as_dict(),
+            "stress_by_beta": [s.as_dict() for s in self.stress],
+            "worst_window": self.worst.as_dict(),
+            "factor_exposures": [e.as_dict() for e in self.exposures],
+            "session_beta": {
+                str(k): (None if v.beta is None else round(v.beta, 4))
+                for k, v in self.session_beta.items()
+            },
+        }
+
+
+def rebalance(before: Mapping[str, float], add: str, size: float) -> dict[str, float]:
+    """The book after buying ``add`` to a target weight of ``size``, the rest scaled pro rata.
+
+    An empty book becomes ``{add: 1.0}`` — a standalone position — rather than ``{add: size}``,
+    because a book that sums to ``size`` is not a book, and every risk share computed from it would
+    be read as a fraction of a whole that does not exist.
+    """
+    if not 0.0 < size <= 1.0:
+        raise PortfolioError(f"target weight must be in (0, 1], got {size}")
+    if not before:
+        return {add: 1.0}
+    after = {s: w * (1.0 - size) for s, w in before.items()}
+    after[add] = after.get(add, 0.0) + size
+    return after
+
+
+def copilot(
+    *,
+    add: str,
+    before: Mapping[str, float],
+    size: float,
+    raw: Mapping[str, Mapping[datetime, float]],
+    benchmark: str,
+    is_open: Any,
+) -> CopilotReport:
+    """The whole portfolio-copilot research task over already-fetched returns.
+
+    ``raw`` maps each symbol (the book, the candidate and the benchmark) to its per-bar returns.
+    ``is_open`` is the session predicate — injected, as in :func:`session_betas`, so the clock
+    stays the clock's business. Impact and beta-propagated stress are read over **open-session**
+    bars only (see this module's docstring for why the blended figure misleads); the realised
+    worst window and factor exposures use every aligned bar, because the book is exposed to the
+    shut session too and a stress test that skipped 82% of the hours would understate it.
+    """
+    after = rebalance(before, add, size)
+    stamps, columns = align(raw)
+    if benchmark not in columns:
+        raise PortfolioError(f"no aligned returns for the benchmark {benchmark}")
+    open_rows = [i for i, t in enumerate(stamps) if is_open(t)]
+    open_columns = {k: [v[i] for i in open_rows] for k, v in columns.items()}
+
+    impact = assess(
+        symbol=add, weights_before=before, weights_after=after,
+        columns=open_columns, benchmark=open_columns[benchmark], session=Session.OPEN,
+    )
+    # Exposure to our own session-structural factors. These are slices of the same market series,
+    # so they overlap heavily and each figure is a TOTAL exposure, not a residual — see
+    # `factor_exposures` for why that is the right answer for a copilot. Built over `columns`, the
+    # SAME aligned bars the book series uses: an earlier version built it from the open-session
+    # subset and regressed it against the full book, pairing two different periods and reporting
+    # exposures of about zero. Truncating two series to a common length is not aligning them.
+    market = portfolio_returns({s: 1.0 / len(columns) for s in columns}, columns)
+    exposures = factor_exposures(
+        weights=after, columns=columns,
+        factors={
+            "equal-weight market": market,
+            "open session only": [
+                m if is_open(stamps[i]) else 0.0 for i, m in enumerate(market[: len(stamps)])
+            ],
+            "shut session only": [
+                0.0 if is_open(stamps[i]) else m for i, m in enumerate(market[: len(stamps)])
+            ],
+        },
+    )
+    return CopilotReport(
+        symbol=add, benchmark=benchmark,
+        weights_before=dict(before), weights_after=after,
+        bars_aligned=len(stamps), bars_open_session=len(open_rows),
+        impact=impact,
+        risk_after=decompose(after, open_columns),
+        stress=tuple(stress_by_beta(
+            weights=after, columns=open_columns, benchmark=open_columns[benchmark],
+        )),
+        worst=worst_window(weights=after, columns=columns),
+        exposures=tuple(exposures),
+        session_beta=session_betas(raw[add], raw[benchmark], symbol=add, is_open=is_open),
+    )
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """One complete research task: what does this trade do to this book?
 
     Track 3 asks for a full flow from question to actionable insight. The question here is the one
     a portfolio-aware copilot exists to answer — *should I add this, given what I already own* —
-    and every number printed is computed from live Bitget candles rather than asserted.
+    and every number printed is computed from live Bitget candles rather than asserted. The
+    arithmetic is :func:`copilot`; this function only fetches and prints.
     """
     import argparse
 
@@ -906,61 +1031,39 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     before = parse_book(args.book)
     add = args.add.upper()
-    scale = 1.0 - args.size
-    after = {s: w * scale for s, w in before.items()}
-    after[add] = after.get(add, 0.0) + args.size
-
-    wanted = sorted({*before, add, args.benchmark})
     raw: dict[str, dict[datetime, float]] = {}
-    for symbol in wanted:
+    for symbol in sorted({*before, add, args.benchmark}):
         candles = fetch_range(
             symbol, days=args.days, interval="1H", candle_type=CandleType.MARKET
         )
         raw[symbol] = returns([(c.ts, float(c.close)) for c in candles])
 
-    stamps, columns = align(raw)
     clock = DualClock()
-    open_rows = [i for i, t in enumerate(stamps) if clock.phase(t).has_price_discovery]
-    open_columns = {k: [v[i] for i in open_rows] for k, v in columns.items()}
-
-    impact = assess(
-        symbol=add, weights_before=before, weights_after=after,
-        columns=open_columns, benchmark=open_columns[args.benchmark],
-        session=Session.OPEN,
+    report = copilot(
+        add=add, before=before, size=args.size, raw=raw, benchmark=args.benchmark,
+        is_open=lambda t: clock.phase(t).has_price_discovery,
     )
-    after_risk = decompose(after, open_columns)
-    shocks = stress_by_beta(
-        weights=after, columns=open_columns, benchmark=open_columns[args.benchmark]
-    )
-    window = worst_window(weights=after, columns=columns)
 
     if args.json:
-        print(json.dumps({
-            "question": f"should I add {add} to this book?",
-            "bars_aligned": len(stamps),
-            "bars_open_session": len(open_rows),
-            "impact": impact.as_dict(),
-            "risk_after": None if after_risk is None else after_risk.as_dict(),
-            "stress_by_beta": [s.as_dict() for s in shocks],
-            "worst_window": window.as_dict(),
-        }, indent=2))
+        payload = {"question": f"should I add {add} to this book?", **report.as_dict()}
+        print(json.dumps(payload, indent=2))
         return 0
 
     print(f"question: should I add {add} to this book?")
     print(
-        f"{len(stamps)} aligned hourly bars, {len(open_rows)} of them while the anchor market "
-        f"was open; benchmark {args.benchmark}"
+        f"{report.bars_aligned} aligned hourly bars, {report.bars_open_session} of them while the "
+        f"anchor market was open; benchmark {args.benchmark}"
     )
     print()
-    for line in impact.render():
+    for line in report.impact.render():
         print(" ", line)
-    if after_risk is not None:
+    if report.risk_after is not None:
         print("\n  weight against risk, after the trade:")
-        for item in sorted(after_risk.contributions, key=lambda c: -c.contribution):
-            share = item.contribution / after_risk.volatility
+        for item in sorted(report.risk_after.contributions, key=lambda c: -c.contribution):
+            share = item.contribution / report.risk_after.volatility
             print(f"    {item.symbol:10} weight {item.weight:6.1%}   risk {share:6.1%}")
     print("\n  if the benchmark moves (through each position's open-session beta):")
-    for outcome in shocks:
+    for outcome in report.stress:
         if outcome.portfolio_move_pct is None:
             print(f"    {outcome.shock:16} unavailable — {outcome.reason}")
             continue
@@ -968,33 +1071,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         tail = f"   worst {worst[0]} {worst[1]:+.2f}%" if worst else ""
         print(f"    {outcome.shock:16} book {outcome.portfolio_move_pct:+7.2f}%{tail}")
     print()
-    print(" ", window.render())
-
-    # Exposure to our own session-structural factors. These are slices of the same market series,
-    # so they overlap heavily and each figure is a TOTAL exposure, not a residual — see
-    # `factor_exposures` for why that is the right answer for a copilot.
-    # Built over `columns`, the SAME aligned bars the book series uses. An earlier version built
-    # it from `open_columns` (126 bars) and regressed it against a 718-bar book, which silently
-    # paired the book's first 126 bars with a different period entirely and reported exposures of
-    # about zero. Truncating two series to a common length is not the same as aligning them.
-    market = portfolio_returns({s: 1.0 / len(columns) for s in columns}, columns)
-    exposures = factor_exposures(
-        weights=after, columns=columns,
-        factors={
-            "equal-weight market": market,
-            "open session only": [
-                m if clock.phase(stamps[i]).has_price_discovery else 0.0
-                for i, m in enumerate(market[: len(stamps)])
-            ],
-            "shut session only": [
-                0.0 if clock.phase(stamps[i]).has_price_discovery else m
-                for i, m in enumerate(market[: len(stamps)])
-            ],
-        },
-    )
+    print(" ", report.worst.render())
     print()
     print("  factor exposure (univariate, so each is a total rather than a residual):")
-    for exposure in exposures:
+    for exposure in report.exposures:
         if exposure.exposure is None:
             print(f"    {exposure.factor:22} unavailable — {exposure.reason}")
         else:
@@ -1012,6 +1092,7 @@ __all__ = [
     "STANDARD_SHOCKS",
     "WORST_WINDOW_BARS",
     "Contribution",
+    "CopilotReport",
     "Exposure",
     "FactorExposure",
     "PortfolioError",
@@ -1024,6 +1105,7 @@ __all__ = [
     "align",
     "assess",
     "beta",
+    "copilot",
     "correlation",
     "covariance",
     "covariance_matrix",
@@ -1032,6 +1114,7 @@ __all__ = [
     "main",
     "parse_book",
     "portfolio_returns",
+    "rebalance",
     "returns",
     "session_betas",
     "stress_by_beta",

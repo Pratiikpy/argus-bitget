@@ -39,6 +39,7 @@ import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from itertools import pairwise
 from typing import Any
 
 MIN_ANALOGUES = 8
@@ -307,6 +308,57 @@ def find(
     return AnalogueReport(matches, distribution)
 
 
+def corpus_from_closes(
+    closes: Sequence[tuple[datetime, float]], *, symbol: str, window: int = 24, horizon: int = 24,
+) -> list[Observation]:
+    """Every bar of an hourly history as a state and the move that followed it.
+
+    The state is the trailing ``window``-bar return and realised volatility, both in bps; the
+    forward ``horizon``-bar return is the answer and is never a feature. Factored out of
+    `desk/research.py`'s research chain on 2026-09-23 so the console's analogue answers and the
+    chain's are built by one function rather than two copies that could drift apart.
+    """
+    corpus: list[Observation] = []
+    for i in range(window, len(closes) - horizon):
+        past = [closes[j][1] for j in range(i - window, i + 1)]
+        rets = [b / a - 1.0 for a, b in pairwise(past) if a > 0]
+        if not rets:
+            continue
+        mean = sum(rets) / len(rets)
+        vol = (sum((r - mean) ** 2 for r in rets) / len(rets)) ** 0.5
+        close_now = closes[i][1]
+        if close_now <= 0 or past[0] <= 0:
+            continue
+        corpus.append(Observation(
+            as_of=closes[i][0], symbol=symbol,
+            features={
+                "trailing_return": (close_now / past[0] - 1.0) * 10_000,
+                "volatility_bps": vol * 10_000,
+            },
+            forward_return_bps=(closes[i + horizon][1] / close_now - 1.0) * 10_000,
+        ))
+    return corpus
+
+
+def current_state(
+    closes: Sequence[tuple[datetime, float]], *, window: int = 24,
+) -> dict[str, float] | None:
+    """The state right now, described exactly as :func:`corpus_from_closes` describes the past —
+    the query an analogue search needs. None when there is not a full window yet."""
+    if len(closes) <= window:
+        return None
+    past = [c for _, c in closes[-(window + 1):]]
+    rets = [b / a - 1.0 for a, b in pairwise(past) if a > 0]
+    if not rets or past[0] <= 0:
+        return None
+    mean = sum(rets) / len(rets)
+    vol = (sum((r - mean) ** 2 for r in rets) / len(rets)) ** 0.5
+    return {
+        "trailing_return": (past[-1] / past[0] - 1.0) * 10_000,
+        "volatility_bps": vol * 10_000,
+    }
+
+
 __all__ = [
     "DEFAULT_MAX_DISTANCE",
     "MIN_ANALOGUES",
@@ -316,5 +368,7 @@ __all__ = [
     "Distribution",
     "Match",
     "Observation",
+    "corpus_from_closes",
+    "current_state",
     "find",
 ]

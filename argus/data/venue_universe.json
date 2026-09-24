@@ -1,0 +1,2421 @@
+{
+ "generated_at": "2026-09-23T13:32:24.380716+00:00",
+ "source": "https://api.bitget.com/api/v2/mix/market/contracts?productType=USDT-FUTURES",
+ "contracts": {
+  "0GUSDT": {
+   "rwa": false
+  },
+  "1000000MOGUSDT": {
+   "rwa": false
+  },
+  "10000NEXUSDT": {
+   "rwa": false
+  },
+  "1000BONKUSDT": {
+   "rwa": false
+  },
+  "1000CATUSDT": {
+   "rwa": false
+  },
+  "1000RATSUSDT": {
+   "rwa": false
+  },
+  "1000SATSUSDT": {
+   "rwa": false
+  },
+  "1000XECUSDT": {
+   "rwa": false
+  },
+  "1INCHUSDT": {
+   "rwa": false
+  },
+  "1MBABYDOGEUSDT": {
+   "rwa": false
+  },
+  "1MCHEEMSUSDT": {
+   "rwa": false
+  },
+  "2ZUSDT": {
+   "rwa": false
+  },
+  "AALUSDT": {
+   "rwa": true
+  },
+  "AAOIUSDT": {
+   "rwa": true
+  },
+  "AAPLUSDT": {
+   "rwa": true
+  },
+  "AAPUUSDT": {
+   "rwa": true
+  },
+  "AAVEUSDT": {
+   "rwa": false
+  },
+  "ABNBUSDT": {
+   "rwa": true
+  },
+  "ACEUSDT": {
+   "rwa": false
+  },
+  "ACHRUSDT": {
+   "rwa": true
+  },
+  "ACHUSDT": {
+   "rwa": false
+  },
+  "ACTUSDT": {
+   "rwa": false
+  },
+  "ACUUSDT": {
+   "rwa": false
+  },
+  "ADAUSDT": {
+   "rwa": false
+  },
+  "ADBEUSDT": {
+   "rwa": true
+  },
+  "ADIUSDT": {
+   "rwa": true
+  },
+  "ADVANTESTUSDT": {
+   "rwa": true
+  },
+  "AEHRUSDT": {
+   "rwa": true
+  },
+  "AEONUSDT": {
+   "rwa": false
+  },
+  "AEROUSDT": {
+   "rwa": false
+  },
+  "AEVOUSDT": {
+   "rwa": false
+  },
+  "AGLDUSDT": {
+   "rwa": false
+  },
+  "AGPUUSDT": {
+   "rwa": true
+  },
+  "AIOUSDT": {
+   "rwa": false
+  },
+  "AIXBTUSDT": {
+   "rwa": false
+  },
+  "AKEUSDT": {
+   "rwa": false
+  },
+  "AKTUSDT": {
+   "rwa": false
+  },
+  "ALABUSDT": {
+   "rwa": true
+  },
+  "ALCHUSDT": {
+   "rwa": false
+  },
+  "ALGOUSDT": {
+   "rwa": false
+  },
+  "ALICEUSDT": {
+   "rwa": false
+  },
+  "ALLOUSDT": {
+   "rwa": false
+  },
+  "ALTUSDT": {
+   "rwa": false
+  },
+  "AMATUSDT": {
+   "rwa": true
+  },
+  "AMCUSDT": {
+   "rwa": true
+  },
+  "AMDUSDT": {
+   "rwa": true
+  },
+  "AMGNUSDT": {
+   "rwa": true
+  },
+  "AMKRUSDT": {
+   "rwa": true
+  },
+  "AMZNUSDT": {
+   "rwa": true
+  },
+  "AMZUUSDT": {
+   "rwa": true
+  },
+  "ANETUSDT": {
+   "rwa": true
+  },
+  "ANIMEUSDT": {
+   "rwa": false
+  },
+  "ANKRUSDT": {
+   "rwa": false
+  },
+  "ANTHROPICUSDT": {
+   "rwa": true
+  },
+  "APDUSDT": {
+   "rwa": true
+  },
+  "APEUSDT": {
+   "rwa": false
+  },
+  "API3USDT": {
+   "rwa": false
+  },
+  "APLDUSDT": {
+   "rwa": true
+  },
+  "APPUSDT": {
+   "rwa": true
+  },
+  "APRUSDT": {
+   "rwa": false
+  },
+  "APTUSDT": {
+   "rwa": false
+  },
+  "ARBUSDT": {
+   "rwa": false
+  },
+  "ARCUSDT": {
+   "rwa": false
+  },
+  "ARIAUSDT": {
+   "rwa": false
+  },
+  "ARKMUSDT": {
+   "rwa": false
+  },
+  "ARKUSDT": {
+   "rwa": false
+  },
+  "ARMUSDT": {
+   "rwa": true
+  },
+  "ARPAUSDT": {
+   "rwa": false
+  },
+  "ARQQUSDT": {
+   "rwa": true
+  },
+  "ARUSDT": {
+   "rwa": false
+  },
+  "ARXUSDT": {
+   "rwa": false
+  },
+  "ASMLUSDT": {
+   "rwa": true
+  },
+  "ASRUSDT": {
+   "rwa": false
+  },
+  "ASTERUSDT": {
+   "rwa": false
+  },
+  "ASTRUSDT": {
+   "rwa": false
+  },
+  "ASTSUSDT": {
+   "rwa": true
+  },
+  "ASXUSDT": {
+   "rwa": true
+  },
+  "ATHUSDT": {
+   "rwa": false
+  },
+  "ATOMUSDT": {
+   "rwa": false
+  },
+  "ATUSDT": {
+   "rwa": false
+  },
+  "AUCTIONUSDT": {
+   "rwa": false
+  },
+  "AUSDT": {
+   "rwa": false
+  },
+  "AVAUSDT": {
+   "rwa": false
+  },
+  "AVAVUSDT": {
+   "rwa": true
+  },
+  "AVAXUSDT": {
+   "rwa": false
+  },
+  "AVGOUSDT": {
+   "rwa": true
+  },
+  "AVNTUSDT": {
+   "rwa": false
+  },
+  "AWEUSDT": {
+   "rwa": false
+  },
+  "AXLUSDT": {
+   "rwa": false
+  },
+  "AXONUSDT": {
+   "rwa": true
+  },
+  "AXSUSDT": {
+   "rwa": false
+  },
+  "AXTIUSDT": {
+   "rwa": true
+  },
+  "AZTECUSDT": {
+   "rwa": false
+  },
+  "B200USDT": {
+   "rwa": true
+  },
+  "B2USDT": {
+   "rwa": false
+  },
+  "BABAUSDT": {
+   "rwa": true
+  },
+  "BABYUSDT": {
+   "rwa": false
+  },
+  "BACUSDT": {
+   "rwa": true
+  },
+  "BANANAS31USDT": {
+   "rwa": false
+  },
+  "BANANAUSDT": {
+   "rwa": false
+  },
+  "BANDUSDT": {
+   "rwa": false
+  },
+  "BANKUSDT": {
+   "rwa": false
+  },
+  "BANUSDT": {
+   "rwa": false
+  },
+  "BARDUSDT": {
+   "rwa": false
+  },
+  "BASEDUSDT": {
+   "rwa": false
+  },
+  "BATUSDT": {
+   "rwa": false
+  },
+  "BAUSDT": {
+   "rwa": true
+  },
+  "BBSTOCKUSDT": {
+   "rwa": true
+  },
+  "BBUSDT": {
+   "rwa": false
+  },
+  "BCHUSDT": {
+   "rwa": false
+  },
+  "BEAMUSDT": {
+   "rwa": false
+  },
+  "BEATUSDT": {
+   "rwa": false
+  },
+  "BERAUSDT": {
+   "rwa": false
+  },
+  "BEUSDT": {
+   "rwa": true
+  },
+  "BGBUSDT": {
+   "rwa": false
+  },
+  "BHPUSDT": {
+   "rwa": true
+  },
+  "BICOUSDT": {
+   "rwa": false
+  },
+  "BIGTIMEUSDT": {
+   "rwa": false
+  },
+  "BILLUSDT": {
+   "rwa": false
+  },
+  "BIOUSDT": {
+   "rwa": false
+  },
+  "BIRBUSDT": {
+   "rwa": false
+  },
+  "BITOUSDT": {
+   "rwa": true
+  },
+  "BKNGUSDT": {
+   "rwa": true
+  },
+  "BLESSUSDT": {
+   "rwa": false
+  },
+  "BLSHUSDT": {
+   "rwa": true
+  },
+  "BLURUSDT": {
+   "rwa": false
+  },
+  "BMNRUSDT": {
+   "rwa": true
+  },
+  "BNBUSDT": {
+   "rwa": false
+  },
+  "BNCUSDT": {
+   "rwa": true
+  },
+  "BNTUSDT": {
+   "rwa": false
+  },
+  "BOMEUSDT": {
+   "rwa": false
+  },
+  "BOTUSDT": {
+   "rwa": true
+  },
+  "BOTZUSDT": {
+   "rwa": true
+  },
+  "BRETTUSDT": {
+   "rwa": false
+  },
+  "BREVUSDT": {
+   "rwa": false
+  },
+  "BRKBUSDT": {
+   "rwa": true
+  },
+  "BROCCOLIUSDT": {
+   "rwa": false
+  },
+  "BRUSDT": {
+   "rwa": false
+  },
+  "BSBUSDT": {
+   "rwa": false
+  },
+  "BSPUSDT": {
+   "rwa": true
+  },
+  "BSVUSDT": {
+   "rwa": false
+  },
+  "BTCUSDT": {
+   "rwa": false
+  },
+  "BTWUSDT": {
+   "rwa": false
+  },
+  "BUDUSDT": {
+   "rwa": true
+  },
+  "BUSDT": {
+   "rwa": false
+  },
+  "BXUSDT": {
+   "rwa": true
+  },
+  "BYDUSDT": {
+   "rwa": true
+  },
+  "BZUSDT": {
+   "rwa": true
+  },
+  "C98USDT": {
+   "rwa": false
+  },
+  "CAKEUSDT": {
+   "rwa": false
+  },
+  "CAPUSDT": {
+   "rwa": false
+  },
+  "CARVUSDT": {
+   "rwa": false
+  },
+  "CATIUSDT": {
+   "rwa": false
+  },
+  "CATUSDT": {
+   "rwa": true
+  },
+  "CBRSUSDT": {
+   "rwa": true
+  },
+  "CCLUSDT": {
+   "rwa": true
+  },
+  "CCUSDT": {
+   "rwa": false
+  },
+  "CELOUSDT": {
+   "rwa": false
+  },
+  "CELRUSDT": {
+   "rwa": false
+  },
+  "CETUSUSDT": {
+   "rwa": false
+  },
+  "CFGUSDT": {
+   "rwa": false
+  },
+  "CFXUSDT": {
+   "rwa": false
+  },
+  "CGNXUSDT": {
+   "rwa": true
+  },
+  "CGPTUSDT": {
+   "rwa": false
+  },
+  "CHILLGUYUSDT": {
+   "rwa": false
+  },
+  "CHIPUSDT": {
+   "rwa": false
+  },
+  "CHRUSDT": {
+   "rwa": false
+  },
+  "CHZUSDT": {
+   "rwa": false
+  },
+  "CIENUSDT": {
+   "rwa": true
+  },
+  "CKBUSDT": {
+   "rwa": false
+  },
+  "CLANKERUSDT": {
+   "rwa": false
+  },
+  "CLSKUSDT": {
+   "rwa": true
+  },
+  "CLUSDT": {
+   "rwa": true
+  },
+  "CMCSAUSDT": {
+   "rwa": true
+  },
+  "COAIUSDT": {
+   "rwa": false
+  },
+  "COHRUSDT": {
+   "rwa": true
+  },
+  "COINUSDT": {
+   "rwa": true
+  },
+  "COMPUSDT": {
+   "rwa": false
+  },
+  "CONLUSDT": {
+   "rwa": true
+  },
+  "COOKIEUSDT": {
+   "rwa": false
+  },
+  "COPPERUSDT": {
+   "rwa": true
+  },
+  "COPUSDT": {
+   "rwa": true
+  },
+  "CORZUSDT": {
+   "rwa": true
+  },
+  "COSTUSDT": {
+   "rwa": true
+  },
+  "COTIUSDT": {
+   "rwa": false
+  },
+  "COWUSDT": {
+   "rwa": false
+  },
+  "CPNGUSDT": {
+   "rwa": true
+  },
+  "CPUSDT": {
+   "rwa": false
+  },
+  "CRCLUSDT": {
+   "rwa": true
+  },
+  "CRDOUSDT": {
+   "rwa": true
+  },
+  "CRMUSDT": {
+   "rwa": true
+  },
+  "CROSSUSDT": {
+   "rwa": false
+  },
+  "CROUSDT": {
+   "rwa": false
+  },
+  "CRVUSDT": {
+   "rwa": false
+  },
+  "CRWDUSDT": {
+   "rwa": true
+  },
+  "CRWVUSDT": {
+   "rwa": true
+  },
+  "CSCOUSDT": {
+   "rwa": true
+  },
+  "CSOPSK2LHKDUSDT": {
+   "rwa": true
+  },
+  "CSOPSS2LHKDUSDT": {
+   "rwa": true
+  },
+  "CTKUSDT": {
+   "rwa": false
+  },
+  "CTRUSDT": {
+   "rwa": false
+  },
+  "CTSIUSDT": {
+   "rwa": false
+  },
+  "CUSDT": {
+   "rwa": false
+  },
+  "CVCUSDT": {
+   "rwa": false
+  },
+  "CVXSTOCKUSDT": {
+   "rwa": true
+  },
+  "CVXUSDT": {
+   "rwa": false
+  },
+  "CXMTUSDT": {
+   "rwa": true
+  },
+  "CYBERUSDT": {
+   "rwa": false
+  },
+  "CYPHUSDT": {
+   "rwa": true
+  },
+  "CYSUSDT": {
+   "rwa": false
+  },
+  "DASHUSDT": {
+   "rwa": false
+  },
+  "DATAUSDT": {
+   "rwa": false
+  },
+  "DDOGUSDT": {
+   "rwa": true
+  },
+  "DEEPUSDT": {
+   "rwa": false
+  },
+  "DELLUSDT": {
+   "rwa": true
+  },
+  "DEUSDT": {
+   "rwa": true
+  },
+  "DEXEUSDT": {
+   "rwa": false
+  },
+  "DFENUSDT": {
+   "rwa": true
+  },
+  "DGAIUSDT": {
+   "rwa": false
+  },
+  "DIASTOCKUSDT": {
+   "rwa": true
+  },
+  "DIAUSDT": {
+   "rwa": false
+  },
+  "DISKUSDT": {
+   "rwa": true
+  },
+  "DJTUSDT": {
+   "rwa": true
+  },
+  "DKNGUSDT": {
+   "rwa": true
+  },
+  "DOGEUSDT": {
+   "rwa": false
+  },
+  "DOGSUSDT": {
+   "rwa": false
+  },
+  "DOLOUSDT": {
+   "rwa": false
+  },
+  "DOODUSDT": {
+   "rwa": false
+  },
+  "DOOSBOTUSDT": {
+   "rwa": true
+  },
+  "DOOSENERUSDT": {
+   "rwa": true
+  },
+  "DOSUSDT": {
+   "rwa": false
+  },
+  "DOTUSDT": {
+   "rwa": false
+  },
+  "DRAMUSDT": {
+   "rwa": true
+  },
+  "DRIFTUSDT": {
+   "rwa": false
+  },
+  "DXYZUSDT": {
+   "rwa": true
+  },
+  "DYDXUSDT": {
+   "rwa": false
+  },
+  "DYMUSDT": {
+   "rwa": false
+  },
+  "ECHOUSDT": {
+   "rwa": true
+  },
+  "EDGEUSDT": {
+   "rwa": false
+  },
+  "EGLDUSDT": {
+   "rwa": false
+  },
+  "EIGENUSDT": {
+   "rwa": false
+  },
+  "ELSAUSDT": {
+   "rwa": false
+  },
+  "ENAUSDT": {
+   "rwa": false
+  },
+  "ENJUSDT": {
+   "rwa": false
+  },
+  "ENSOUSDT": {
+   "rwa": false
+  },
+  "ENSUSDT": {
+   "rwa": false
+  },
+  "EPICUSDT": {
+   "rwa": false
+  },
+  "ERAUSDT": {
+   "rwa": false
+  },
+  "ESPUSDT": {
+   "rwa": false
+  },
+  "ETCUSDT": {
+   "rwa": false
+  },
+  "ETHFIUSDT": {
+   "rwa": false
+  },
+  "ETHUSDT": {
+   "rwa": false
+  },
+  "ETHWUSDT": {
+   "rwa": false
+  },
+  "ETNUSDT": {
+   "rwa": true
+  },
+  "EULUSDT": {
+   "rwa": false
+  },
+  "EURUSDUSDT": {
+   "rwa": true
+  },
+  "EUVUSDT": {
+   "rwa": true
+  },
+  "EVAAUSDT": {
+   "rwa": false
+  },
+  "EVEXUSDT": {
+   "rwa": true
+  },
+  "EWHUSDT": {
+   "rwa": true
+  },
+  "EWJUSDT": {
+   "rwa": true
+  },
+  "EWTUSDT": {
+   "rwa": true
+  },
+  "EWYUSDT": {
+   "rwa": true
+  },
+  "EWZUSDT": {
+   "rwa": true
+  },
+  "FARTCOINUSDT": {
+   "rwa": false
+  },
+  "FCXUSDT": {
+   "rwa": true
+  },
+  "FETUSDT": {
+   "rwa": false
+  },
+  "FFUSDT": {
+   "rwa": false
+  },
+  "FIDAUSDT": {
+   "rwa": false
+  },
+  "FIGHTUSDT": {
+   "rwa": false
+  },
+  "FILUSDT": {
+   "rwa": false
+  },
+  "FLEXUSDT": {
+   "rwa": true
+  },
+  "FLNCUSDT": {
+   "rwa": true
+  },
+  "FLOCKUSDT": {
+   "rwa": false
+  },
+  "FLOKIUSDT": {
+   "rwa": false
+  },
+  "FLUIDUSDT": {
+   "rwa": false
+  },
+  "FLUXUSDT": {
+   "rwa": false
+  },
+  "FLYUSDT": {
+   "rwa": true
+  },
+  "FOGOUSDT": {
+   "rwa": false
+  },
+  "FOLKSUSDT": {
+   "rwa": false
+  },
+  "FORMUSDT": {
+   "rwa": false
+  },
+  "FOXAUSDT": {
+   "rwa": true
+  },
+  "FRAXUSDT": {
+   "rwa": false
+  },
+  "FUSDT": {
+   "rwa": false
+  },
+  "FUTUUSDT": {
+   "rwa": true
+  },
+  "FWDIUSDT": {
+   "rwa": true
+  },
+  "GALAUSDT": {
+   "rwa": false
+  },
+  "GASUSDT": {
+   "rwa": false
+  },
+  "GBPUSDUSDT": {
+   "rwa": true
+  },
+  "GDXUSDT": {
+   "rwa": true
+  },
+  "GENIUSUSDT": {
+   "rwa": false
+  },
+  "GEUSDT": {
+   "rwa": true
+  },
+  "GEVUSDT": {
+   "rwa": true
+  },
+  "GFSUSDT": {
+   "rwa": true
+  },
+  "GGLLUSDT": {
+   "rwa": true
+  },
+  "GIGADEVICEUSDT": {
+   "rwa": true
+  },
+  "GIGGLEUSDT": {
+   "rwa": false
+  },
+  "GILDUSDT": {
+   "rwa": true
+  },
+  "GLMUSDT": {
+   "rwa": false
+  },
+  "GLWUSDT": {
+   "rwa": true
+  },
+  "GMEUSDT": {
+   "rwa": true
+  },
+  "GMTUSDT": {
+   "rwa": false
+  },
+  "GMXUSDT": {
+   "rwa": false
+  },
+  "GNRCUSDT": {
+   "rwa": true
+  },
+  "GOOGLUSDT": {
+   "rwa": true
+  },
+  "GPROUSDT": {
+   "rwa": true
+  },
+  "GPSUSDT": {
+   "rwa": false
+  },
+  "GRAMUSDT": {
+   "rwa": false
+  },
+  "GRASSUSDT": {
+   "rwa": false
+  },
+  "GRIFFAINUSDT": {
+   "rwa": false
+  },
+  "GRTUSDT": {
+   "rwa": false
+  },
+  "GRVTUSDT": {
+   "rwa": false
+  },
+  "GSUSDT": {
+   "rwa": true
+  },
+  "GTLBUSDT": {
+   "rwa": true
+  },
+  "GUNUSDT": {
+   "rwa": false
+  },
+  "GUSDT": {
+   "rwa": false
+  },
+  "GWEIUSDT": {
+   "rwa": false
+  },
+  "H100USDT": {
+   "rwa": true
+  },
+  "HAEDALUSDT": {
+   "rwa": false
+  },
+  "HANMIUSDT": {
+   "rwa": true
+  },
+  "HBARUSDT": {
+   "rwa": false
+  },
+  "HIVEUSDT": {
+   "rwa": false
+  },
+  "HOLOUSDT": {
+   "rwa": false
+  },
+  "HOMEUSDT": {
+   "rwa": false
+  },
+  "HOODUSDT": {
+   "rwa": true
+  },
+  "HOTUSDT": {
+   "rwa": false
+  },
+  "HPEUSDT": {
+   "rwa": true
+  },
+  "HPQUSDT": {
+   "rwa": true
+  },
+  "HSIUSDT": {
+   "rwa": true
+  },
+  "HUMAUSDT": {
+   "rwa": false
+  },
+  "HUSDT": {
+   "rwa": false
+  },
+  "HUTUSDT": {
+   "rwa": true
+  },
+  "HYPERUSDT": {
+   "rwa": false
+  },
+  "HYPEUSDT": {
+   "rwa": false
+  },
+  "HYUNDAIUSDT": {
+   "rwa": true
+  },
+  "IBBUSDT": {
+   "rwa": true
+  },
+  "IBITUSDT": {
+   "rwa": true
+  },
+  "IBMUSDT": {
+   "rwa": true
+  },
+  "ICNTUSDT": {
+   "rwa": false
+  },
+  "ICPUSDT": {
+   "rwa": false
+  },
+  "IDOLUSDT": {
+   "rwa": false
+  },
+  "IDUSDT": {
+   "rwa": false
+  },
+  "ILVUSDT": {
+   "rwa": false
+  },
+  "IMXUSDT": {
+   "rwa": false
+  },
+  "INDAUSDT": {
+   "rwa": true
+  },
+  "INFQUSDT": {
+   "rwa": true
+  },
+  "INITUSDT": {
+   "rwa": false
+  },
+  "INJUSDT": {
+   "rwa": false
+  },
+  "INTCUSDT": {
+   "rwa": true
+  },
+  "INTWUSDT": {
+   "rwa": true
+  },
+  "INUSDT": {
+   "rwa": false
+  },
+  "INXUSDT": {
+   "rwa": false
+  },
+  "IONQUSDT": {
+   "rwa": true
+  },
+  "IOSTUSDT": {
+   "rwa": false
+  },
+  "IOTAUSDT": {
+   "rwa": false
+  },
+  "IOTXUSDT": {
+   "rwa": false
+  },
+  "IOUSDT": {
+   "rwa": false
+  },
+  "IRENUSDT": {
+   "rwa": true
+  },
+  "IRYSUSDT": {
+   "rwa": false
+  },
+  "ISRGUSDT": {
+   "rwa": true
+  },
+  "IWMUSDT": {
+   "rwa": true
+  },
+  "JASMYUSDT": {
+   "rwa": false
+  },
+  "JCTUSDT": {
+   "rwa": false
+  },
+  "JDUSDT": {
+   "rwa": true
+  },
+  "JEPQUSDT": {
+   "rwa": true
+  },
+  "JMKEUSDT": {
+   "rwa": true
+  },
+  "JOBYUSDT": {
+   "rwa": true
+  },
+  "JOEUSDT": {
+   "rwa": false
+  },
+  "JP225USDT": {
+   "rwa": true
+  },
+  "JPMUSDT": {
+   "rwa": true
+  },
+  "JSTUSDT": {
+   "rwa": false
+  },
+  "JTOUSDT": {
+   "rwa": false
+  },
+  "JUPUSDT": {
+   "rwa": false
+  },
+  "KAIAUSDT": {
+   "rwa": false
+  },
+  "KAITOUSDT": {
+   "rwa": false
+  },
+  "KASUSDT": {
+   "rwa": false
+  },
+  "KATUSDT": {
+   "rwa": false
+  },
+  "KAVAUSDT": {
+   "rwa": false
+  },
+  "KERNELUSDT": {
+   "rwa": false
+  },
+  "KGENUSDT": {
+   "rwa": false
+  },
+  "KIOXIAUSDT": {
+   "rwa": true
+  },
+  "KITEUSDT": {
+   "rwa": false
+  },
+  "KLACUSDT": {
+   "rwa": true
+  },
+  "KMNOUSDT": {
+   "rwa": false
+  },
+  "KNCUSDT": {
+   "rwa": false
+  },
+  "KOPNUSDT": {
+   "rwa": true
+  },
+  "KORUUSDT": {
+   "rwa": true
+  },
+  "KOUSDT": {
+   "rwa": true
+  },
+  "KR200USDT": {
+   "rwa": true
+  },
+  "KSMUSDT": {
+   "rwa": false
+  },
+  "KSTRUSDT": {
+   "rwa": true
+  },
+  "KTOSUSDT": {
+   "rwa": true
+  },
+  "KUAISHOUUSDT": {
+   "rwa": true
+  },
+  "KWEBUSDT": {
+   "rwa": true
+  },
+  "LABUSDT": {
+   "rwa": false
+  },
+  "LASERTECUSDT": {
+   "rwa": true
+  },
+  "LAUSDT": {
+   "rwa": false
+  },
+  "LAYERUSDT": {
+   "rwa": false
+  },
+  "LDOUSDT": {
+   "rwa": false
+  },
+  "LENOVOHKDUSDT": {
+   "rwa": true
+  },
+  "LGELECTRONICSUSDT": {
+   "rwa": true
+  },
+  "LINEAUSDT": {
+   "rwa": false
+  },
+  "LINKUSDT": {
+   "rwa": false
+  },
+  "LINUSDT": {
+   "rwa": true
+  },
+  "LISTAUSDT": {
+   "rwa": false
+  },
+  "LITEUSDT": {
+   "rwa": true
+  },
+  "LITUSDT": {
+   "rwa": false
+  },
+  "LLYUSDT": {
+   "rwa": true
+  },
+  "LMTUSDT": {
+   "rwa": true
+  },
+  "LPTUSDT": {
+   "rwa": false
+  },
+  "LQTYUSDT": {
+   "rwa": false
+  },
+  "LRCXUSDT": {
+   "rwa": true
+  },
+  "LSKUSDT": {
+   "rwa": false
+  },
+  "LTCUSDT": {
+   "rwa": false
+  },
+  "LUMIAUSDT": {
+   "rwa": false
+  },
+  "LUNAUSDT": {
+   "rwa": false
+  },
+  "LUNCUSDT": {
+   "rwa": false
+  },
+  "LWLGUSDT": {
+   "rwa": true
+  },
+  "LYNUSDT": {
+   "rwa": false
+  },
+  "LYTEUSDT": {
+   "rwa": true
+  },
+  "MAGICUSDT": {
+   "rwa": false
+  },
+  "MAGMAUSDT": {
+   "rwa": false
+  },
+  "MANAUSDT": {
+   "rwa": false
+  },
+  "MANTAUSDT": {
+   "rwa": false
+  },
+  "MANTRAUSDT": {
+   "rwa": false
+  },
+  "MARAUSDT": {
+   "rwa": true
+  },
+  "MARSCOINUSDT": {
+   "rwa": false
+  },
+  "MARUSDT": {
+   "rwa": true
+  },
+  "MASKUSDT": {
+   "rwa": false
+  },
+  "MAVUSDT": {
+   "rwa": false
+  },
+  "MCDUSDT": {
+   "rwa": true
+  },
+  "MDBUSDT": {
+   "rwa": true
+  },
+  "MEGAUSDT": {
+   "rwa": false
+  },
+  "MEITUANUSDT": {
+   "rwa": true
+  },
+  "MELANIAUSDT": {
+   "rwa": false
+  },
+  "MELIUSDT": {
+   "rwa": true
+  },
+  "MEMEUSDT": {
+   "rwa": false
+  },
+  "MERLUSDT": {
+   "rwa": false
+  },
+  "METAUSDT": {
+   "rwa": true
+  },
+  "METISUSDT": {
+   "rwa": false
+  },
+  "METUSDT": {
+   "rwa": false
+  },
+  "METUUSDT": {
+   "rwa": true
+  },
+  "MEUSDT": {
+   "rwa": false
+  },
+  "MEWUSDT": {
+   "rwa": false
+  },
+  "MINAUSDT": {
+   "rwa": false
+  },
+  "MINIMAXHKDUSDT": {
+   "rwa": true
+  },
+  "MINIMAXUSDT": {
+   "rwa": true
+  },
+  "MIRAUSDT": {
+   "rwa": false
+  },
+  "MMTUSDT": {
+   "rwa": false
+  },
+  "MOCAUSDT": {
+   "rwa": false
+  },
+  "MONUSDT": {
+   "rwa": false
+  },
+  "MOODENGUSDT": {
+   "rwa": false
+  },
+  "MOONSHOTUSDT": {
+   "rwa": true
+  },
+  "MORPHOUSDT": {
+   "rwa": false
+  },
+  "MOVEUSDT": {
+   "rwa": false
+  },
+  "MOVRUSDT": {
+   "rwa": false
+  },
+  "MPUSDT": {
+   "rwa": true
+  },
+  "MRKUSDT": {
+   "rwa": true
+  },
+  "MRNAUSDT": {
+   "rwa": true
+  },
+  "MRVLUSDT": {
+   "rwa": true
+  },
+  "MSFTUSDT": {
+   "rwa": true
+  },
+  "MSFUUSDT": {
+   "rwa": true
+  },
+  "MSTRUSDT": {
+   "rwa": true
+  },
+  "MSTUUSDT": {
+   "rwa": true
+  },
+  "MTLUSDT": {
+   "rwa": false
+  },
+  "MUBARAKUSDT": {
+   "rwa": false
+  },
+  "MUFGUSDT": {
+   "rwa": true
+  },
+  "MUSDT": {
+   "rwa": false
+  },
+  "MUUSDT": {
+   "rwa": true
+  },
+  "MUUUSDT": {
+   "rwa": true
+  },
+  "MVLLUSDT": {
+   "rwa": true
+  },
+  "MYXUSDT": {
+   "rwa": false
+  },
+  "NAORISUSDT": {
+   "rwa": false
+  },
+  "NATGASUSDT": {
+   "rwa": true
+  },
+  "NAVERUSDT": {
+   "rwa": true
+  },
+  "NBISUSDT": {
+   "rwa": true
+  },
+  "NDX100USDT": {
+   "rwa": true
+  },
+  "NEARUSDT": {
+   "rwa": false
+  },
+  "NEIROCTOUSDT": {
+   "rwa": false
+  },
+  "NEOUSDT": {
+   "rwa": false
+  },
+  "NETEASEUSDT": {
+   "rwa": true
+  },
+  "NETUSDT": {
+   "rwa": true
+  },
+  "NEWTUSDT": {
+   "rwa": false
+  },
+  "NFLXUSDT": {
+   "rwa": true
+  },
+  "NIGHTUSDT": {
+   "rwa": false
+  },
+  "NILUSDT": {
+   "rwa": false
+  },
+  "NIOUSDT": {
+   "rwa": true
+  },
+  "NKEUSDT": {
+   "rwa": true
+  },
+  "NMRUSDT": {
+   "rwa": false
+  },
+  "NOCUSDT": {
+   "rwa": true
+  },
+  "NOKSTOCKUSDT": {
+   "rwa": true
+  },
+  "NOTUSDT": {
+   "rwa": false
+  },
+  "NOWUSDT": {
+   "rwa": true
+  },
+  "NTAPUSDT": {
+   "rwa": true
+  },
+  "NVDAUSDT": {
+   "rwa": true
+  },
+  "NVDLUSDT": {
+   "rwa": true
+  },
+  "NVSUSDT": {
+   "rwa": true
+  },
+  "NXPCUSDT": {
+   "rwa": false
+  },
+  "OGNUSDT": {
+   "rwa": false
+  },
+  "OGUSDT": {
+   "rwa": false
+  },
+  "OKLOUSDT": {
+   "rwa": true
+  },
+  "OKTAUSDT": {
+   "rwa": true
+  },
+  "ONDOUSDT": {
+   "rwa": false
+  },
+  "ONDSUSDT": {
+   "rwa": true
+  },
+  "ONEUSDT": {
+   "rwa": false
+  },
+  "ONGUSDT": {
+   "rwa": false
+  },
+  "ONTUSDT": {
+   "rwa": false
+  },
+  "OPENAIUSDT": {
+   "rwa": true
+  },
+  "OPENUSDT": {
+   "rwa": false
+  },
+  "OPGUSDT": {
+   "rwa": false
+  },
+  "OPNUSDT": {
+   "rwa": false
+  },
+  "OPUSDT": {
+   "rwa": false
+  },
+  "ORCAUSDT": {
+   "rwa": false
+  },
+  "ORCLUSDT": {
+   "rwa": true
+  },
+  "ORDERUSDT": {
+   "rwa": false
+  },
+  "ORDIUSDT": {
+   "rwa": false
+  },
+  "OSSUSDT": {
+   "rwa": true
+  },
+  "OURAUSDT": {
+   "rwa": true
+  },
+  "OUSDT": {
+   "rwa": false
+  },
+  "OUSTUSDT": {
+   "rwa": true
+  },
+  "OXYUSDT": {
+   "rwa": true
+  },
+  "PANWUSDT": {
+   "rwa": true
+  },
+  "PARTIUSDT": {
+   "rwa": false
+  },
+  "PATHUSDT": {
+   "rwa": true
+  },
+  "PAXGUSDT": {
+   "rwa": true
+  },
+  "PDDUSDT": {
+   "rwa": true
+  },
+  "PENDLEUSDT": {
+   "rwa": false
+  },
+  "PENGUSDT": {
+   "rwa": true
+  },
+  "PENGUUSDT": {
+   "rwa": false
+  },
+  "PEOPLEUSDT": {
+   "rwa": false
+  },
+  "PEPEUSDT": {
+   "rwa": false
+  },
+  "PEPUSDT": {
+   "rwa": true
+  },
+  "PHAUSDT": {
+   "rwa": false
+  },
+  "PIEVERSEUSDT": {
+   "rwa": false
+  },
+  "PIPPINUSDT": {
+   "rwa": false
+  },
+  "PIUSDT": {
+   "rwa": false
+  },
+  "PIXELUSDT": {
+   "rwa": false
+  },
+  "PLTRUSDT": {
+   "rwa": true
+  },
+  "PLUMEUSDT": {
+   "rwa": false
+  },
+  "PLUSDT": {
+   "rwa": true
+  },
+  "PNUTUSDT": {
+   "rwa": false
+  },
+  "POETUSDT": {
+   "rwa": true
+  },
+  "POLUSDT": {
+   "rwa": false
+  },
+  "POLYMARKETUSDT": {
+   "rwa": true
+  },
+  "POLYXUSDT": {
+   "rwa": false
+  },
+  "PONSUSDT": {
+   "rwa": false
+  },
+  "POPCATUSDT": {
+   "rwa": false
+  },
+  "POPMARTUSDT": {
+   "rwa": true
+  },
+  "POWERUSDT": {
+   "rwa": false
+  },
+  "POWRUSDT": {
+   "rwa": false
+  },
+  "PRLUSDT": {
+   "rwa": false
+  },
+  "PROMUSDT": {
+   "rwa": false
+  },
+  "PROSUSDT": {
+   "rwa": false
+  },
+  "PROVEUSDT": {
+   "rwa": false
+  },
+  "PUMPUSDT": {
+   "rwa": false
+  },
+  "PUNDIXUSDT": {
+   "rwa": false
+  },
+  "PURRUSDT": {
+   "rwa": true
+  },
+  "PYPLUSDT": {
+   "rwa": true
+  },
+  "PYTHUSDT": {
+   "rwa": false
+  },
+  "QBTSUSDT": {
+   "rwa": true
+  },
+  "QCOMUSDT": {
+   "rwa": true
+  },
+  "QLDUSDT": {
+   "rwa": true
+  },
+  "QNTSTOCKUSDT": {
+   "rwa": true
+  },
+  "QNTUSDT": {
+   "rwa": false
+  },
+  "QQQUSDT": {
+   "rwa": true
+  },
+  "QTUMUSDT": {
+   "rwa": false
+  },
+  "QUBTUSDT": {
+   "rwa": true
+  },
+  "QUSDT": {
+   "rwa": false
+  },
+  "RAMUSDT": {
+   "rwa": true
+  },
+  "RAREUSDT": {
+   "rwa": false
+  },
+  "RAVEUSDT": {
+   "rwa": false
+  },
+  "RAYUSDT": {
+   "rwa": false
+  },
+  "RDDTUSDT": {
+   "rwa": true
+  },
+  "RDWUSDT": {
+   "rwa": true
+  },
+  "RECALLUSDT": {
+   "rwa": false
+  },
+  "REDUSDT": {
+   "rwa": false
+  },
+  "RENDERUSDT": {
+   "rwa": false
+  },
+  "RESOLVUSDT": {
+   "rwa": false
+  },
+  "REUSDT": {
+   "rwa": false
+  },
+  "REZUSDT": {
+   "rwa": false
+  },
+  "RGTIUSDT": {
+   "rwa": true
+  },
+  "RIOUSDT": {
+   "rwa": true
+  },
+  "RIVERUSDT": {
+   "rwa": false
+  },
+  "RKLBUSDT": {
+   "rwa": true
+  },
+  "ROBOUSDT": {
+   "rwa": false
+  },
+  "ROKUSDT": {
+   "rwa": true
+  },
+  "ROSEUSDT": {
+   "rwa": false
+  },
+  "RPLUSDT": {
+   "rwa": false
+  },
+  "RSRUSDT": {
+   "rwa": false
+  },
+  "RTXSTOCKUSDT": {
+   "rwa": true
+  },
+  "RUNEUSDT": {
+   "rwa": false
+  },
+  "RVNUSDT": {
+   "rwa": false
+  },
+  "SAFEUSDT": {
+   "rwa": false
+  },
+  "SAHARAUSDT": {
+   "rwa": false
+  },
+  "SAMSUNGEMUSDT": {
+   "rwa": true
+  },
+  "SAMSUNGUSDT": {
+   "rwa": true
+  },
+  "SANDUSDT": {
+   "rwa": false
+  },
+  "SANTOSUSDT": {
+   "rwa": false
+  },
+  "SAPIENUSDT": {
+   "rwa": false
+  },
+  "SATLUSDT": {
+   "rwa": true
+  },
+  "SDGRUSDT": {
+   "rwa": true
+  },
+  "SECZUSDT": {
+   "rwa": true
+  },
+  "SEIUSDT": {
+   "rwa": false
+  },
+  "SENTUSDT": {
+   "rwa": false
+  },
+  "SFPUSDT": {
+   "rwa": false
+  },
+  "SGOVUSDT": {
+   "rwa": true
+  },
+  "SHAZUSDT": {
+   "rwa": true
+  },
+  "SHEINHKDUSDT": {
+   "rwa": true
+  },
+  "SHEINUSDT": {
+   "rwa": true
+  },
+  "SHELLUSDT": {
+   "rwa": false
+  },
+  "SHIBUSDT": {
+   "rwa": false
+  },
+  "SHOPUSDT": {
+   "rwa": true
+  },
+  "SIGNUSDT": {
+   "rwa": false
+  },
+  "SIMOUSDT": {
+   "rwa": true
+  },
+  "SIRENUSDT": {
+   "rwa": false
+  },
+  "SITMUSDT": {
+   "rwa": true
+  },
+  "SKDDUSDT": {
+   "rwa": true
+  },
+  "SKHYNIXUSDT": {
+   "rwa": true
+  },
+  "SKHYUSDT": {
+   "rwa": true
+  },
+  "SKLUSDT": {
+   "rwa": false
+  },
+  "SKRUSDT": {
+   "rwa": false
+  },
+  "SKUUUSDT": {
+   "rwa": true
+  },
+  "SKYAIUSDT": {
+   "rwa": false
+  },
+  "SKYUSDT": {
+   "rwa": false
+  },
+  "SLPUSDT": {
+   "rwa": false
+  },
+  "SLXUSDT": {
+   "rwa": false
+  },
+  "SMCIUSDT": {
+   "rwa": true
+  },
+  "SMHUSDT": {
+   "rwa": true
+  },
+  "SMICUSDT": {
+   "rwa": true
+  },
+  "SMRUSDT": {
+   "rwa": true
+  },
+  "SNDKUSDT": {
+   "rwa": true
+  },
+  "SNOWUSDT": {
+   "rwa": true
+  },
+  "SNXUSDT": {
+   "rwa": false
+  },
+  "SNXXUSDT": {
+   "rwa": true
+  },
+  "SOFIUSDT": {
+   "rwa": true
+  },
+  "SOFTBANKUSDT": {
+   "rwa": true
+  },
+  "SOLUSDT": {
+   "rwa": false
+  },
+  "SOMIUSDT": {
+   "rwa": false
+  },
+  "SONICUSDT": {
+   "rwa": false
+  },
+  "SONYUSDT": {
+   "rwa": true
+  },
+  "SOONUSDT": {
+   "rwa": false
+  },
+  "SOPHUSDT": {
+   "rwa": false
+  },
+  "SOXLUSDT": {
+   "rwa": true
+  },
+  "SOXSUSDT": {
+   "rwa": true
+  },
+  "SOXXUSDT": {
+   "rwa": true
+  },
+  "SP500USDT": {
+   "rwa": true
+  },
+  "SPACEUSDT": {
+   "rwa": false
+  },
+  "SPCHUSDT": {
+   "rwa": true
+  },
+  "SPCXUSDT": {
+   "rwa": true
+  },
+  "SPELLUSDT": {
+   "rwa": false
+  },
+  "SPIRUSDT": {
+   "rwa": true
+  },
+  "SPKUSDT": {
+   "rwa": false
+  },
+  "SPXUSDT": {
+   "rwa": false
+  },
+  "SPYUSDT": {
+   "rwa": true
+  },
+  "SQDUSDT": {
+   "rwa": false
+  },
+  "SQQQUSDT": {
+   "rwa": true
+  },
+  "SSPCUSDT": {
+   "rwa": true
+  },
+  "SSVUSDT": {
+   "rwa": false
+  },
+  "STABLEUSDT": {
+   "rwa": false
+  },
+  "STEEMUSDT": {
+   "rwa": false
+  },
+  "STGUSDT": {
+   "rwa": false
+  },
+  "STONKUSDT": {
+   "rwa": false
+  },
+  "STOUSDT": {
+   "rwa": false
+  },
+  "STRCUSDT": {
+   "rwa": true
+  },
+  "STRKUSDT": {
+   "rwa": false
+  },
+  "STXSTOCKUSDT": {
+   "rwa": true
+  },
+  "STXUSDT": {
+   "rwa": false
+  },
+  "SUIUSDT": {
+   "rwa": false
+  },
+  "SUMIELECUSDT": {
+   "rwa": true
+  },
+  "SUNUSDT": {
+   "rwa": false
+  },
+  "SUPERUSDT": {
+   "rwa": false
+  },
+  "SUSDT": {
+   "rwa": false
+  },
+  "SUSHIUSDT": {
+   "rwa": false
+  },
+  "SXTUSDT": {
+   "rwa": false
+  },
+  "SYNUSDT": {
+   "rwa": false
+  },
+  "SYRUPUSDT": {
+   "rwa": false
+  },
+  "TAGUSDT": {
+   "rwa": false
+  },
+  "TAIKOUSDT": {
+   "rwa": false
+  },
+  "TAOUSDT": {
+   "rwa": false
+  },
+  "TBTUSDT": {
+   "rwa": true
+  },
+  "TEAMUSDT": {
+   "rwa": true
+  },
+  "TEMUSDT": {
+   "rwa": true
+  },
+  "TENCENTHKDUSDT": {
+   "rwa": true
+  },
+  "TENCENTUSDT": {
+   "rwa": true
+  },
+  "TERUSDT": {
+   "rwa": true
+  },
+  "THETAUSDT": {
+   "rwa": false
+  },
+  "THEUSDT": {
+   "rwa": false
+  },
+  "TIAUSDT": {
+   "rwa": false
+  },
+  "TLMUSDT": {
+   "rwa": false
+  },
+  "TLTUSDT": {
+   "rwa": true
+  },
+  "TMFUSDT": {
+   "rwa": true
+  },
+  "TMUSDT": {
+   "rwa": true
+  },
+  "TNSRUSDT": {
+   "rwa": false
+  },
+  "TOKYOELUSDT": {
+   "rwa": true
+  },
+  "TOSHIUSDT": {
+   "rwa": false
+  },
+  "TOWNSUSDT": {
+   "rwa": false
+  },
+  "TQQQUSDT": {
+   "rwa": true
+  },
+  "TRBUSDT": {
+   "rwa": false
+  },
+  "TREEUSDT": {
+   "rwa": false
+  },
+  "TRIAUSDT": {
+   "rwa": false
+  },
+  "TRUMPUSDT": {
+   "rwa": false
+  },
+  "TRUSTUSDT": {
+   "rwa": false
+  },
+  "TRXUSDT": {
+   "rwa": false
+  },
+  "TSEMUSDT": {
+   "rwa": true
+  },
+  "TSLAUSDT": {
+   "rwa": true
+  },
+  "TSLLUSDT": {
+   "rwa": true
+  },
+  "TSMUSDT": {
+   "rwa": true
+  },
+  "TTWOUSDT": {
+   "rwa": true
+  },
+  "TURBOUSDT": {
+   "rwa": false
+  },
+  "TUSDT": {
+   "rwa": false
+  },
+  "TUTUSDT": {
+   "rwa": false
+  },
+  "TWLOUSDT": {
+   "rwa": true
+  },
+  "TXNUSDT": {
+   "rwa": true
+  },
+  "TZAUSDT": {
+   "rwa": true
+  },
+  "UAIUSDT": {
+   "rwa": false
+  },
+  "UBERUSDT": {
+   "rwa": true
+  },
+  "UBUSDT": {
+   "rwa": false
+  },
+  "UMAUSDT": {
+   "rwa": false
+  },
+  "UNHUSDT": {
+   "rwa": true
+  },
+  "UNITASUSDT": {
+   "rwa": false
+  },
+  "UNITREEUSDT": {
+   "rwa": true
+  },
+  "UNIUSDT": {
+   "rwa": false
+  },
+  "URNMUSDT": {
+   "rwa": true
+  },
+  "USARUSDT": {
+   "rwa": true
+  },
+  "USDBRLUSDT": {
+   "rwa": true
+  },
+  "USDCUSDT": {
+   "rwa": false
+  },
+  "USDJPYUSDT": {
+   "rwa": true
+  },
+  "USELESSUSDT": {
+   "rwa": false
+  },
+  "USTCUSDT": {
+   "rwa": false
+  },
+  "USUALUSDT": {
+   "rwa": false
+  },
+  "USUSDT": {
+   "rwa": false
+  },
+  "UVXYUSDT": {
+   "rwa": true
+  },
+  "VALEUSDT": {
+   "rwa": true
+  },
+  "VANAUSDT": {
+   "rwa": false
+  },
+  "VEEVUSDT": {
+   "rwa": true
+  },
+  "VELODROMEUSDT": {
+   "rwa": false
+  },
+  "VELVETUSDT": {
+   "rwa": false
+  },
+  "VETUSDT": {
+   "rwa": false
+  },
+  "VIRTUALUSDT": {
+   "rwa": false
+  },
+  "VOOUSDT": {
+   "rwa": true
+  },
+  "VRTUSDT": {
+   "rwa": true
+  },
+  "VSTUSDT": {
+   "rwa": true
+  },
+  "VTHOUSDT": {
+   "rwa": false
+  },
+  "VUSDT": {
+   "rwa": true
+  },
+  "VVVUSDT": {
+   "rwa": false
+  },
+  "WALUSDT": {
+   "rwa": false
+  },
+  "WAXPUSDT": {
+   "rwa": false
+  },
+  "WBDUSDT": {
+   "rwa": true
+  },
+  "WCTUSDT": {
+   "rwa": false
+  },
+  "WDCUSDT": {
+   "rwa": true
+  },
+  "WENUSDT": {
+   "rwa": true
+  },
+  "WETUSDT": {
+   "rwa": false
+  },
+  "WIFUSDT": {
+   "rwa": false
+  },
+  "WLDUSDT": {
+   "rwa": false
+  },
+  "WLFIUSDT": {
+   "rwa": false
+  },
+  "WMTUSDT": {
+   "rwa": true
+  },
+  "WOOUSDT": {
+   "rwa": false
+  },
+  "WUSDT": {
+   "rwa": false
+  },
+  "XAGUSDT": {
+   "rwa": true
+  },
+  "XAIUSDT": {
+   "rwa": false
+  },
+  "XANUSDT": {
+   "rwa": false
+  },
+  "XAUTUSDT": {
+   "rwa": true
+  },
+  "XAUUSDT": {
+   "rwa": true
+  },
+  "XBIUSDT": {
+   "rwa": true
+  },
+  "XIAOMIHKDUSDT": {
+   "rwa": true
+  },
+  "XIAOMIUSDT": {
+   "rwa": true
+  },
+  "XLEUSDT": {
+   "rwa": true
+  },
+  "XLKUSDT": {
+   "rwa": true
+  },
+  "XLMUSDT": {
+   "rwa": false
+  },
+  "XLUUSDT": {
+   "rwa": true
+  },
+  "XLVUSDT": {
+   "rwa": true
+  },
+  "XMRUSDT": {
+   "rwa": false
+  },
+  "XNDUUSDT": {
+   "rwa": true
+  },
+  "XOMUSDT": {
+   "rwa": true
+  },
+  "XPDUSDT": {
+   "rwa": true
+  },
+  "XPINUSDT": {
+   "rwa": false
+  },
+  "XPLUSDT": {
+   "rwa": false
+  },
+  "XPTUSDT": {
+   "rwa": true
+  },
+  "XRPUSDT": {
+   "rwa": false
+  },
+  "XTZUSDT": {
+   "rwa": false
+  },
+  "XVGUSDT": {
+   "rwa": false
+  },
+  "XVSUSDT": {
+   "rwa": false
+  },
+  "YBUSDT": {
+   "rwa": false
+  },
+  "YGGUSDT": {
+   "rwa": false
+  },
+  "ZAMAUSDT": {
+   "rwa": false
+  },
+  "ZBTUSDT": {
+   "rwa": false
+  },
+  "ZECUSDT": {
+   "rwa": false
+  },
+  "ZENUSDT": {
+   "rwa": false
+  },
+  "ZESTUSDT": {
+   "rwa": false
+  },
+  "ZETAUSDT": {
+   "rwa": false
+  },
+  "ZHIPUHKDUSDT": {
+   "rwa": true
+  },
+  "ZHIPUUSDT": {
+   "rwa": true
+  },
+  "ZHONGJIUSDT": {
+   "rwa": true
+  },
+  "ZILUSDT": {
+   "rwa": false
+  },
+  "ZKCUSDT": {
+   "rwa": false
+  },
+  "ZKPUSDT": {
+   "rwa": false
+  },
+  "ZKUSDT": {
+   "rwa": false
+  },
+  "ZMUSDT": {
+   "rwa": true
+  },
+  "ZORAUSDT": {
+   "rwa": false
+  },
+  "ZROUSDT": {
+   "rwa": false
+  },
+  "ZRXUSDT": {
+   "rwa": false
+  },
+  "ZSUSDT": {
+   "rwa": true
+  },
+  "\u54c8\u57fa\u7c73USDT": {
+   "rwa": false
+  },
+  "\u725b\u6765USDT": {
+   "rwa": false
+  },
+  "\u9f99\u867eUSDT": {
+   "rwa": false
+  }
+ }
+}

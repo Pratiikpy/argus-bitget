@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from argus.eval.baselines.qlib_loader import QlibCrossSectionSymbols, load_qlib_baseline
 from argus.eval.crosssection_comparison import (
-    scope_statement,
     ablation_cases,
     compare_ordering,
     designed_panels,
@@ -12,6 +11,7 @@ from argus.eval.crosssection_comparison import (
     render,
     run_argus,
     run_qlib,
+    scope_statement,
     single_name_distortion_cost,
     swept_panels,
 )

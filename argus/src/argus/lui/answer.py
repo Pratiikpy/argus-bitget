@@ -404,6 +404,94 @@ def _risk_records_path() -> Path:
     return RISK_PATH
 
 
+def _notes_path() -> Path:
+    """The desk's per-decision notes, with the same data-dir override as the risk records."""
+    override = os.environ.get("ARGUS_DATA_DIR", "").strip()
+    if override:
+        return Path(override) / "desk_notes.jsonl"
+
+    from argus.paper.runner import NOTES_PATH
+
+    return NOTES_PATH
+
+
+_DEFECT_WORDS: dict[str, str] = {
+    "grounding": "a figure in the thesis that traces to nothing the desk was given",
+    "conflict": "analysts who disagreed, or agreed only because they ran in sequence",
+    "contradiction": "a thesis contradicted by its own evidence or by itself",
+    "risk_intervention": "the risk layer having to reduce the decision",
+    "outcome": "a settled call that was wrong",
+}
+"""What each checker in `argus.desk.review.DefectKind` means, in the reader's words — the enum
+value alone ("conflict") names the checker, not the fault."""
+
+
+def answer_review(ledger: PaperLedger, question: Question) -> Answer:
+    """The desk's review of itself: recurring defects and a checklist graded against the record.
+
+    Everything is computed by `argus.desk.review` from the desk's own notes, risk records and
+    ledger at request time. The checklist is the part most review tools stop short of — each rule
+    is replayed against every past decision and keeps its place only if it fires selectively and
+    is usually right when it does. On this record none has earned a place, and the answer says so
+    rather than printing the rules as if they were validated.
+    """
+    import json
+
+    from argus.desk.review import review
+
+    notes_path, risk_path = _notes_path(), _risk_records_path()
+    if not notes_path.exists():
+        return _refuse(
+            question,
+            "No desk notes are bundled with this console, so there is nothing to review.",
+            suggestion="Run a decision cycle; every decision writes its notes.",
+        )
+
+    def rows(path: Path) -> list[dict[str, Any]]:
+        if not path.exists():
+            return []
+        return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()
+                if line.strip()]
+
+    report = review(notes=rows(notes_path), risk=rows(risk_path), entries=ledger.entries)
+    flagged = len({d.seq for d in report.defects})
+    lines = [
+        f"{report.decisions} decisions with desk notes reviewed; {flagged} carried at least one "
+        f"defect the desk's own checkers observed ({report.clean_rate:.0%} clean).",
+    ]
+    if report.recurring:
+        worst, count = report.recurring[0]
+        lines.insert(0, (
+            f"Actionable: the most common failure is {_DEFECT_WORDS.get(worst, worst)} ({count} "
+            f"decisions) — check for it first when reading any thesis here."
+        ))
+        lines.append("Recurring patterns: " + ", ".join(
+            f"{k.replace('_', ' ')} x{v}" for k, v in report.recurring) + ".")
+    if report.checklist:
+        lines.append("Checklist items that earned their place: " + "; ".join(
+            p.rule for p in report.checklist) + ".")
+    else:
+        lines.append(
+            f"Checklist: none of the {len(report.performance)} candidate rules has earned a place "
+            f"— each was replayed against every past decision, and a rule stays only if it fires "
+            f"selectively and is usually right when it does."
+        )
+    for p in report.rejected[:3]:
+        lines.append(f"{p.rule}: {str(p.status).lower()} — {p.note}.")
+    for item in report.unassessable:
+        lines.append(f"Cannot assess yet: {item}.")
+    return Answer(
+        question=question,
+        lines=lines,
+        sources=[
+            Source("computation", "argus.desk.review:review"),
+            Source("artefact", notes_path.name, f"{report.decisions} decision note(s)"),
+            Source("artefact", risk_path.name, "risk records"),
+        ],
+        data=report.as_dict(),
+    )
+
+
 def answer_risk_control(ledger: PaperLedger, question: Question) -> Answer:
     """What the risk layer actually did — counted from its own records, never asserted.
 
@@ -479,6 +567,7 @@ _ANSWERERS = {
     Intent.POSITION: answer_position,
     Intent.SESSION: answer_session,
     Intent.RISK_CONTROL: answer_risk_control,
+    Intent.REVIEW: answer_review,
 }
 
 
@@ -497,7 +586,9 @@ def answer(ledger: PaperLedger, question: Question) -> Answer:
             question, question.reason,
             suggestion=(
                 "Orders are placed by the desk itself, through the risk layer, and recorded in "
-                "the ledger. Ask why a decision was taken, or what the desk is holding."
+                "the ledger. To see what a trade would do before anyone makes it, ask it as a "
+                "question: \"what would adding 20% NVDA do to my risk? I hold 50% AAPL, 50% "
+                "MSFT\"."
             ),
         )
     if question.intent is Intent.MARKET:
@@ -513,9 +604,14 @@ def answer(ledger: PaperLedger, question: Question) -> Answer:
             question,
             "I did not recognise that question well enough to answer it from the record.",
             suggestion=(
-                "Answerable today: performance, why a decision was taken, why the desk stood "
-                "aside, the evidence behind a decision, calibration, chain integrity, open "
-                "positions, session state, what the risk layer did."
+                "Answerable today, for any contract Bitget lists — stocks, ETFs, gold, oil, "
+                "crypto. Research: its price and trading cost, its technicals, its earnings "
+                "date, whether it has been here before, what adding it does to your book, what "
+                "a market drop does to your book, how two names compare, how to split an order. "
+                "The record: performance, why "
+                "a decision was taken, why the desk stood aside, the evidence behind it, "
+                "calibration, chain integrity, open positions, session state, what the risk "
+                "layer did."
             ),
         )
     return handler(ledger, question)

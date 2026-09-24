@@ -1,0 +1,167 @@
+{
+  "mode": "model+patterns",
+  "research_bench_corpus_a": {
+    "correct": 60,
+    "total": 60,
+    "by_label": {
+      "impact": {
+        "correct": 16,
+        "total": 16
+      },
+      "stress": {
+        "correct": 12,
+        "total": 12
+      },
+      "compare": {
+        "correct": 11,
+        "total": 11
+      },
+      "execution": {
+        "correct": 8,
+        "total": 8
+      },
+      "profile": {
+        "correct": 6,
+        "total": 6
+      },
+      "none": {
+        "correct": 7,
+        "total": 7
+      }
+    },
+    "must_refuse_refused": 7,
+    "must_refuse_total": 7,
+    "misses": []
+  },
+  "research_bench_corpus_b": {
+    "correct": 60,
+    "total": 60,
+    "by_label": {
+      "impact": {
+        "correct": 16,
+        "total": 16
+      },
+      "stress": {
+        "correct": 12,
+        "total": 12
+      },
+      "compare": {
+        "correct": 10,
+        "total": 10
+      },
+      "execution": {
+        "correct": 8,
+        "total": 8
+      },
+      "profile": {
+        "correct": 6,
+        "total": 6
+      },
+      "none": {
+        "correct": 8,
+        "total": 8
+      }
+    },
+    "must_refuse_refused": 8,
+    "must_refuse_total": 8,
+    "misses": []
+  },
+  "research_bench_corpus_c": {
+    "correct": 90,
+    "total": 90,
+    "by_label": {
+      "impact": {
+        "correct": 9,
+        "total": 9
+      },
+      "profile": {
+        "correct": 9,
+        "total": 9
+      },
+      "stress": {
+        "correct": 9,
+        "total": 9
+      },
+      "compare": {
+        "correct": 9,
+        "total": 9
+      },
+      "execution": {
+        "correct": 9,
+        "total": 9
+      },
+      "quote": {
+        "correct": 9,
+        "total": 9
+      },
+      "technicals": {
+        "correct": 9,
+        "total": 9
+      },
+      "fundamentals": {
+        "correct": 9,
+        "total": 9
+      },
+      "analogue": {
+        "correct": 9,
+        "total": 9
+      },
+      "none": {
+        "correct": 9,
+        "total": 9
+      }
+    },
+    "must_refuse_refused": 9,
+    "must_refuse_total": 9,
+    "misses": []
+  },
+  "research_bench_corpus_d": {
+    "correct": 100,
+    "total": 100,
+    "by_label": {
+      "impact": {
+        "correct": 10,
+        "total": 10
+      },
+      "profile": {
+        "correct": 10,
+        "total": 10
+      },
+      "stress": {
+        "correct": 10,
+        "total": 10
+      },
+      "compare": {
+        "correct": 10,
+        "total": 10
+      },
+      "execution": {
+        "correct": 10,
+        "total": 10
+      },
+      "quote": {
+        "correct": 10,
+        "total": 10
+      },
+      "technicals": {
+        "correct": 10,
+        "total": 10
+      },
+      "fundamentals": {
+        "correct": 10,
+        "total": 10
+      },
+      "analogue": {
+        "correct": 10,
+        "total": 10
+      },
+      "none": {
+        "correct": 10,
+        "total": 10
+      }
+    },
+    "must_refuse_refused": 10,
+    "must_refuse_total": 10,
+    "misses": []
+  }
+}

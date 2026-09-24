@@ -229,7 +229,10 @@ class Entry:
         if self.kind == "settlement_seal":
             payload["_seal_hash"] = hashlib.sha256(
                 json.dumps(
-                    {"target_seq": self.target_seq, "settlement_seal_hash": self.settlement_seal_hash},
+                    {
+                        "target_seq": self.target_seq,
+                        "settlement_seal_hash": self.settlement_seal_hash,
+                    },
                     sort_keys=True, separators=(",", ":"),
                 ).encode()
             ).hexdigest()[:16]

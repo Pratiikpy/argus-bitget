@@ -25,6 +25,7 @@ from __future__ import annotations
 import html
 import json
 import os
+from dataclasses import replace
 from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -34,7 +35,10 @@ from urllib.parse import parse_qs, urlparse
 from argus.lui.answer import answer
 from argus.lui.cli import BUDGET_MS
 from argus.lui.ngram import reclassify
-from argus.lui.question import Conversation, classify
+from argus.lui.question import Conversation, Intent, classify
+from argus.lui.research import detect as detect_research
+from argus.lui.research import plan_with_model, with_book, worth_asking_the_model
+from argus.lui.research import run as run_research
 from argus.lui.router import Router, build_router, route
 from argus.paper.ledger import PaperLedger
 
@@ -96,11 +100,26 @@ PAGE = """<!doctype html>
     font:11.5px/1.5 var(--mono); color:var(--dim) }
   .src b { color:var(--ok); font-weight:600 }
   .empty { color:var(--dim); font-size:13.5px }
+  .book { display:flex; gap:8px; align-items:center; margin:-6px 0 16px; flex-wrap:wrap }
+  .book label { font-size:12.5px; color:var(--dim); white-space:nowrap }
+  .book input { flex:1 1 280px; min-width:0; padding:7px 10px; border:1px solid var(--line);
+    border-radius:7px; background:var(--panel); color:var(--ink); font:13px var(--mono) }
+  .book .saved { font-size:12px; color:var(--ok) }
+  .group { font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim);
+    margin:0 0 6px }
+  .line.act { font-weight:600; color:var(--accent) }
+  .line.hedge { font-weight:600 }
+  .line.fine { color:var(--dim); font-size:13px }
 </style></head><body><div class="wrap">
 <h1>ARGUS desk console</h1>
-<p class="sub">Every answer is reconstructed from the hash-chained decision ledger and cites the
-rows it was built from. When the record cannot support an answer you get a refusal and the reason,
-never a guess. <span id="stat"></span></p>
+<p class="sub">Ask about any contract Bitget lists — stocks, ETFs, gold, oil, crypto: what a trade
+would do to your portfolio, what a market drop would cost you, how names compare, where it trades,
+its technicals and earnings date, whether it has been here before, or how to split an order.
+Every figure is computed by the desk's own engines from Bitget data and names its source; the
+language model only works out what you asked, and
+never writes a number. Ask about the desk's own decisions and every answer cites the
+hash-chained ledger row it came from. When nothing can support an answer you get a refusal and the
+reason, never a guess. <span id="stat"></span></p>
 <p class="sub" style="margin-top:-14px">Track 3 asks for one complete research task, question to
 actionable insight: <a href="/research" style="color:var(--accent)">see the full chain</a> &mdash;
 eleven steps, each naming the module that produced it. And the other half of the story:
@@ -108,28 +127,67 @@ eleven steps, each naming the module that produced it. And the other half of the
 claim and lost comparison, read live from its own artefact.</p>
 
 <form class="bar" id="f">
-  <input type="text" id="q" placeholder="why did you do nothing all weekend" autocomplete="off">
+  <input type="text" id="q" autocomplete="off"
+    placeholder="I hold 50% NVDA, 50% AAPL — what does adding 20% TSLA do to my risk?">
   <button id="go">Ask</button>
 </form>
+<div class="book">
+  <label for="book">My book</label>
+  <input type="text" id="book" autocomplete="off"
+    placeholder="optional, e.g. 40% NVDA, 30% MSFT, 30% AAPL, risk budget 20%"
+    title="Used by every research question that does not name its own holdings">
+  <span class="saved" id="saved"></span>
+</div>
+<p class="group">Research</p>
+<div class="chips" id="chips-research"></div>
+<p class="group">The desk's own record</p>
 <div class="chips" id="chips"></div>
 <div id="out"><p class="empty">Ask something, or pick one of the suggestions above.</p></div>
 </div><script>
-// Two of these are deliberately questions the console REFUSES — a live quote, and an order — so
-// a visitor who only clicks chips still meets the refusals rather than only the happy path.
+// "sell half of that" is deliberately a question the console REFUSES — an order — so a visitor who
+// only clicks chips still meets a refusal rather than only the happy path. (A second chip, "what
+// is gold trading at", used to be refused too; gold trades on Bitget and is now answered, so it
+// moved to research as a non-desk example.)
 // "what did the risk layer block" is here because Track 2 scores risk-control effectiveness and a
 // capability nobody can find is a capability nobody credits.
+// Research first: Track 3 judges a question-to-insight workbench, and these are the questions its
+// Open Theme names — trade impact on a book, stress, comparison, execution — then the Bitget
+// Skills and data server by name: technicals, the earnings calendar, and past analogues.
+const RESEARCH = ["I hold 50% NVDA, 50% AAPL — what does adding 20% TSLA do to my risk?",
+  "what if the Nasdaq drops 10%? I hold 40% MSFT, 30% META, 30% GOOGL",
+  "is TSLA riskier than NVDA", "should I buy MSTR", "where is NVDA trading right now",
+  "how should I split a $50k order in NVDA", "is TSLA overbought",
+  "when does NVDA report earnings", "has COIN been here before", "compare gold and bitcoin"];
 const SUGGEST = ["why did you do nothing all weekend","what is the sharpe","show me decision 25",
   "what did the risk layer block","what evidence backed that","is the log tamper-evident",
-  "are you well calibrated","what is my position","what is gold trading at","sell half of that"];
+  "are you well calibrated","what bad decision patterns do you have","what is my position",
+  "sell half of that"];
 const out = document.getElementById('out'), qEl = document.getElementById('q');
+const bookEl = document.getElementById('book'), savedEl = document.getElementById('saved');
 let turns = [], first = true;
 
-document.getElementById('chips').innerHTML =
-  SUGGEST.map(s => `<span class="chip">${s}</span>`).join('');
-document.getElementById('chips').addEventListener('click', e => {
-  if (!e.target.classList.contains('chip')) return;
-  qEl.value = e.target.textContent; document.getElementById('f').requestSubmit();
+// The book is the visitor's own and stays in their browser; it is sent with each question and
+// never stored on the server.
+try { bookEl.value = localStorage.getItem('argus.book') || ''; } catch (e) {}
+bookEl.addEventListener('change', () => {
+  try { localStorage.setItem('argus.book', bookEl.value.trim()); } catch (e) {}
+  savedEl.textContent = bookEl.value.trim() ? 'saved in this browser' : '';
 });
+
+for (const [id, list] of [['chips-research', RESEARCH], ['chips', SUGGEST]]) {
+  const el = document.getElementById(id);
+  el.innerHTML = list.map(s => `<span class="chip">${esc0(s)}</span>`).join('');
+  el.addEventListener('click', e => {
+    if (!e.target.classList.contains('chip')) return;
+    qEl.value = e.target.textContent; document.getElementById('f').requestSubmit();
+  });
+}
+function esc0(s) {
+  return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+const lineClass = l => l.startsWith('Actionable:') ? 'line act'
+  : l.startsWith('Hedge:') ? 'line hedge'
+  : (l.startsWith('Assumed:') || l.startsWith('Data:')) ? 'line fine' : 'line';
 
 fetch('status').then(r => r.json()).then(s => {
   // The age is shown unconditionally, not only when stale. A figure with no date beside it invites
@@ -138,9 +196,13 @@ fetch('status').then(r => r.json()).then(s => {
   if (s.age_hours === null || s.age_hours === undefined) {
     age = ' Age unknown \u2014 which is not the same as current.';
   } else if (s.stale) {
-    age = ` \u26a0 Last decision ${s.age_hours}h ago \u2014 this record has stopped moving.`;
+    age = ` \u26a0 Last decision ${s.age_hours}h ago \u2014 a scheduled cycle was missed, ` +
+      `so this record is behind.`;
   } else {
-    age = ` Last decision ${s.age_hours}h ago.`;
+    const next = s.next_cycle_at ? new Date(s.next_cycle_at) : null;
+    const until = next ? Math.max(0, Math.round((next - Date.now()) / 36e5 * 10) / 10) : null;
+    age = ` Last decision ${s.age_hours}h ago; the desk decides four times a day during US ` +
+      `market hours` + (until !== null ? `, next in ${until}h.` : '.');
   }
   document.getElementById('stat').textContent =
     `${s.entries} decisions on record, chain ${s.chain_intact ? 'intact' : 'BROKEN'}.` + age;
@@ -154,7 +216,8 @@ document.getElementById('f').addEventListener('submit', async ev => {
   qEl.value = ''; document.getElementById('go').disabled = true;
   if (first) { out.innerHTML = ''; first = false; }
   try {
-    const r = await fetch('ask?' + new URLSearchParams({q: text, turns: JSON.stringify(turns)}));
+    const r = await fetch('ask?' + new URLSearchParams(
+      {q: text, turns: JSON.stringify(turns), book: bookEl.value.trim()}));
     const a = await r.json();
     turns = a.turns || turns;
     const over = a.elapsed_ms > a.budget_ms;
@@ -167,7 +230,7 @@ document.getElementById('f').addEventListener('submit', async ev => {
             ${a.budget_ms}ms${over ? ' OVER BUDGET' : ''}</span>
           ${a.refused ? '<span class="tag over">refused</span>' : ''}
         </div>
-        ${a.lines.map(l => `<div class="line">${esc(l)}</div>`).join('')}
+        ${a.lines.map(l => `<div class="${lineClass(l)}">${esc(l)}</div>`).join('')}
         ${a.sources.length ? `<div class="src">sources:<br>` +
           a.sources.map(s => `&nbsp;&nbsp;<b>${esc(s.kind)}</b>:${esc(s.ref)}` +
             (s.detail ? ' — ' + esc(s.detail) : '')).join('<br>') + `</div>` : ''}
@@ -244,7 +307,10 @@ def repair_mojibake(text: str) -> str:
     return repaired if any(ord(c) > 0xFF for c in repaired) else text
 
 
-def handle_ask(text: str, prior: list[str], *, now: datetime | None = None) -> dict[str, Any]:
+def handle_ask(
+    text: str, prior: list[str], *, now: datetime | None = None, visitor: str = "local",
+    book: str = "",
+) -> dict[str, Any]:
     """Answer one question, replaying the client's turn history to resolve references.
 
     The client owns the history. Keeping it on the server would mean two readers of the same page
@@ -259,6 +325,32 @@ def handle_ask(text: str, prior: list[str], *, now: datetime | None = None) -> d
         conversation.remember(classify(earlier, now=clock, conversation=conversation))
 
     started = time.perf_counter()
+    # **Research questions first, and the model reads them first when there is one.** "What would
+    # adding 20% TSLA do to my risk?" is about a trade not yet made, so no ledger row can answer
+    # it; left to the ledger patterns it was answered "Sharpe not available". Two readers can build
+    # the research request: the model (`plan_with_model`) and the deterministic patterns
+    # (`detect_research`). Measured on two corpora written blind, by agents that never saw the
+    # parser, the patterns alone read 73% and 58% correctly and occasionally claimed a question for
+    # the wrong engine; the model, once its confidence field stopped being copied from the prompt
+    # template, read the ones they missed. So the model goes first whenever the question names a
+    # traded instrument and is not about the desk's own record, and the patterns are the instant,
+    # free, offline path — the whole answer when no key is configured or a visitor has used their
+    # hourly allowance. Neither ever writes a figure: both only fill in the request.
+    audit: dict[str, Any] = {"attempted": False, "applied": False,
+                             "detail": "no model consulted"}
+    model = _model_for(visitor) if worth_asking_the_model(text, now=clock) else None
+    if model is not None:
+        planned, audit = plan_with_model(text, model)
+        planned = with_book(planned, book)
+        if planned is not None:
+            return _research_payload(text, prior, planned, ledger, started, "research-model",
+                                     audit)
+    request = with_book(detect_research(text), book)
+    if request is not None:
+        audit = {**audit, "detail": "recognised by the research patterns"}
+        return _research_payload(text, prior, request, ledger, started, "research-patterns",
+                                 audit)
+
     question = classify(text, now=clock, conversation=conversation)
     # **The n-gram model sits between the patterns and the router, and it is what a judge meets.**
     # The hosted console deploys no model key, so `route()` below returns untouched and the
@@ -267,8 +359,27 @@ def handle_ask(text: str, prior: list[str], *, now: datetime | None = None) -> d
     # step the same corpus reads 80.9% correct and 35 errors. It costs one JSON file and no
     # dependency; see `eval/ngrambench.py`.
     question, classified_by = reclassify(question)
+    # **A confident "unrelated" from the model overrules the n-gram layer's guess.** The n-gram
+    # layer has no notion of topic, only of wording, and "tell me a joke about NVDA" reached
+    # `decision_why` and was answered with a decision's thesis. The planner above already read the
+    # question; when it said, with confidence, that the question is neither research nor about the
+    # desk's record, the n-gram guess is withdrawn and the question goes to the refusal. The
+    # hand-written patterns are never overruled this way — only the statistical layer is.
+    model_view = (audit.get("model") or {}) if isinstance(audit, dict) else {}
+    try:
+        model_confidence = float(model_view.get("confidence") or 0.0)
+    except (TypeError, ValueError):
+        model_confidence = 0.0
+    if (
+        classified_by == "ngram"
+        and str(model_view.get("kind", "")).lower() == "none"
+        and model_confidence >= UNRELATED_CONFIDENCE
+    ):
+        question = replace(question, intent=Intent.UNKNOWN,
+                           reason="the model read this as unrelated to research or the record")
+        classified_by = "declined-by-model"
     question, routing = route(
-        question, client=_router(), now=clock, conversation=conversation
+        question, client=_model_for(visitor), now=clock, conversation=conversation
     )
     result = answer(ledger, question)
     elapsed = (time.perf_counter() - started) * 1000
@@ -286,6 +397,58 @@ def handle_ask(text: str, prior: list[str], *, now: datetime | None = None) -> d
     payload["matched"] = question.matched
     payload["turns"] = [*prior, text][-12:]
     return payload
+
+
+def _research_payload(
+    text: str, prior: list[str], request: Any, ledger: PaperLedger, started: float,
+    classified_by: str, audit: dict[str, Any],
+) -> dict[str, Any]:
+    """One research answer in the same envelope every other answer uses, so the page and any
+    client reading ``/ask`` need no second code path."""
+    import time
+
+    result = run_research(text, request, ledger=ledger)
+    payload = result.as_dict()
+    payload["elapsed_ms"] = (time.perf_counter() - started) * 1000
+    payload["budget_ms"] = BUDGET_MS[result.question.speed]
+    payload["routing"] = audit
+    payload["classified_by"] = classified_by
+    payload["matched"] = result.question.matched
+    payload["turns"] = [*prior, text][-12:]
+    return payload
+
+
+UNRELATED_CONFIDENCE = 0.8
+"""How sure the planner must be that a question is unrelated before its view overrules the n-gram
+layer. High on purpose: withdrawing a guess that was right costs a real answer."""
+
+MODEL_CALLS_PER_VISITOR_PER_HOUR = 30
+"""How many model-assisted questions one visitor may ask per hour, per server instance.
+
+**Why there is a limit at all.** The hosted console now carries the hackathon Qwen key in its
+server environment — never in the bundle — so that a judge's oddly-phrased question is understood.
+That key has a finite balance, and an unauthenticated page that spends it on every request is a page
+anyone can drain. Thirty an hour is far above what a person reading answers asks, and far below
+what a script would try. Over the limit the console does not fail: it answers from its
+deterministic layers alone, exactly as it did before the key was deployed. Per instance because a
+serverless platform keeps no shared memory; the process's own :class:`~argus.llm.qwen.TokenBudget`
+bounds the total spend of each instance independently of who asked."""
+
+_VISITS: dict[str, list[float]] = {}
+
+
+def _model_for(visitor: str) -> Router | None:
+    """The model client, or None for a visitor who has used their hourly allowance."""
+    import time
+
+    now = time.monotonic()
+    recent = [t for t in _VISITS.get(visitor, []) if now - t < 3600.0]
+    if len(recent) >= MODEL_CALLS_PER_VISITOR_PER_HOUR:
+        _VISITS[visitor] = recent
+        return None
+    recent.append(now)
+    _VISITS[visitor] = recent
+    return _router()
 
 
 _ROUTER: Router | None = None
@@ -306,12 +469,53 @@ def _router() -> Router | None:
     return _ROUTER
 
 
-STALE_AFTER_HOURS = 12.0
-"""Beyond this the console says so instead of letting the reader assume it is current.
+CYCLE_TIMES_UTC: tuple[tuple[int, int], ...] = ((13, 30), (15, 30), (17, 30), (19, 30))
+"""When the desk decides: the four daily runs of the scheduled `ARGUS Paper Cycle` task
+(19:00, 21:00, 23:00 and 01:00 IST), all inside US regular hours because that is when the anchor
+market has price discovery. Read from the task's own trigger list, not assumed."""
 
-Twelve hours is two scheduled cycles. One missed cycle is a blip; two is a record that has stopped
-moving, and a reader deserves to be told rather than to infer it from a number that looks fine.
-"""
+CYCLE_GRACE_HOURS = 1.0
+"""How long after a scheduled run its decisions may take to land before it counts as missed. A
+twelve-symbol cycle with model calls takes minutes, not hours."""
+
+STALE_AFTER_HOURS = 12.0
+"""Kept for callers that read it; staleness itself is now decided against the schedule.
+
+**The old rule was wrong in a way the page announced every morning.** "Stale after 12 hours" assumed
+cycles spaced evenly through the day. They are not: all four run in the US session, so there is an
+18-hour overnight gap by design, and from roughly 07:30 UTC every day the console told every
+visitor that "this record has stopped moving" while the desk was on schedule. A staleness flag that
+fires on schedule is a false alarm, and a false alarm that fires daily teaches a reader to ignore
+the real one. :func:`_last_scheduled_cycle` replaces it: the record is stale only when a scheduled
+cycle has passed (plus :data:`CYCLE_GRACE_HOURS`) with no decision newer than it."""
+
+
+def _last_scheduled_cycle(now: datetime) -> datetime:
+    """The most recent scheduled cycle that should, by now, have written its decisions."""
+    from datetime import timedelta
+
+    cutoff = now - timedelta(hours=CYCLE_GRACE_HOURS)
+    best: datetime | None = None
+    for day_offset in (0, 1):
+        day = (cutoff - timedelta(days=day_offset)).date()
+        for hour, minute in CYCLE_TIMES_UTC:
+            slot = datetime(day.year, day.month, day.day, hour, minute, tzinfo=UTC)
+            if slot <= cutoff and (best is None or slot > best):
+                best = slot
+    assert best is not None  # four slots a day; one within the last 48h always exists
+    return best
+
+
+def _next_scheduled_cycle(now: datetime) -> datetime:
+    from datetime import timedelta
+
+    for day_offset in (0, 1):
+        day = (now + timedelta(days=day_offset)).date()
+        for hour, minute in CYCLE_TIMES_UTC:
+            slot = datetime(day.year, day.month, day.day, hour, minute, tzinfo=UTC)
+            if slot > now:
+                return slot
+    raise AssertionError("unreachable: a slot exists within two days")
 
 
 def _research_report() -> dict[str, Any]:
@@ -482,13 +686,17 @@ def _status() -> dict[str, Any]:
     # of misleading-because-inconsistent figure this function's own docstring exists to prevent.
     rounded_age = None if age_hours is None else round(age_hours, 1)
 
+    now = datetime.now(UTC)
+    expected = _last_scheduled_cycle(now)
     return {
         "entries": len(ledger.entries),
         "chain_intact": bool(report["chain_intact"]),
         "newest_decision_at": None if newest is None else newest.isoformat(),
         "age_hours": rounded_age,
         # `None` means the record carries no timestamp to judge by, which is NOT the same as fresh.
-        "stale": None if rounded_age is None else rounded_age > STALE_AFTER_HOURS,
+        "stale": None if newest is None else newest < expected,
+        "last_expected_cycle_at": expected.isoformat(),
+        "next_cycle_at": _next_scheduled_cycle(now).isoformat(),
     }
 
 
@@ -599,7 +807,10 @@ class Handler(BaseHTTPRequestHandler):
                     self._send(json.dumps({"error": "empty question"}).encode(),
                                "application/json", 400)
                     return
-                payload = handle_ask(text, prior)
+                visitor = (self.headers.get("x-forwarded-for") or "").split(",")[0].strip() \
+                    or self.client_address[0]
+                book = repair_mojibake((params.get("book") or [""])[0])[:300]
+                payload = handle_ask(text, prior, visitor=visitor, book=book)
                 self._send(json.dumps(payload, default=str).encode(), "application/json")
                 return
             self._send(b'{"error":"not found"}', "application/json", 404)

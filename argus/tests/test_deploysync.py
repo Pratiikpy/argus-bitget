@@ -155,19 +155,25 @@ class TestTheConsoleDeclaresItsOwnAge:
         from argus.lui.server import PAGE
 
         assert "Last decision" in PAGE
-        assert "stopped moving" in PAGE, "the stale branch must be visibly different, not a nuance"
+        assert "a scheduled cycle was missed" in PAGE, (
+            "the stale branch must be visibly different, not a nuance"
+        )
 
-    def test_the_threshold_is_two_scheduled_cycles(self) -> None:
-        """One missed cycle is a blip; two is a record that has stopped moving."""
+    def test_the_old_fixed_threshold_is_kept_for_callers_only(self) -> None:
+        """Staleness moved from a fixed 12 hours to the desk's schedule on 2026-09-23 (the fixed
+        figure told morning visitors the record had stopped moving while every cycle had run).
+        The constant stays exported for callers that read it."""
         assert STALE_AFTER_HOURS == 12.0
 
-    def test_a_fresh_record_is_not_flagged(self) -> None:
+    def test_stale_means_a_scheduled_cycle_passed_with_nothing_newer(self) -> None:
         from argus.lui.server import _status
 
         got = _status()
-        if got["age_hours"] is None:
+        if got["newest_decision_at"] is None:
             pytest.skip("no timestamped decisions on this machine")
-        assert got["stale"] == (got["age_hours"] > STALE_AFTER_HOURS)
+        newest = datetime.fromisoformat(got["newest_decision_at"])
+        expected = datetime.fromisoformat(got["last_expected_cycle_at"])
+        assert got["stale"] == (newest < expected)
 
 
 class TestTheManifestRecordsWhatWasCopied:

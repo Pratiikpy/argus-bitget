@@ -93,10 +93,14 @@ def _crypto_sor_pick(leg_a: HedgeLegQuote, leg_b: HedgeLegQuote) -> str:
 # --- base case -------------------------------------------------------------------------------
 
 
-def run_base_case(rtoken: str = "NVDAUSDT", crypto: str = "BTCUSDT") -> dict[str, Any]:
-    """The single, real, live-data demonstration."""
-    rtoken_leg = _real_leg(rtoken)
-    crypto_leg = _real_leg(crypto)
+def run_base_case(
+    rtoken: str = "NVDAUSDT", crypto: str = "BTCUSDT",
+    *, legs: tuple[HedgeLegQuote, HedgeLegQuote] | None = None,
+) -> dict[str, Any]:
+    """The single, real, live-data demonstration — or, with ``legs``, the same comparison on legs
+    the caller supplies (the tests pin the recorded measurement this way; see
+    `tests/test_execution_comparison.py`). The real crypto_sor router runs either way."""
+    rtoken_leg, crypto_leg = legs if legs is not None else (_real_leg(rtoken), _real_leg(crypto))
 
     real_pick_now = _crypto_sor_pick(rtoken_leg, crypto_leg)
     decision_now = choose_hedge_leg(
@@ -138,12 +142,13 @@ def run_base_case(rtoken: str = "NVDAUSDT", crypto: str = "BTCUSDT") -> dict[str
 
 def run_divergence_sweep(
     rtoken: str = "NVDAUSDT", crypto: str = "BTCUSDT",
+    *, legs: tuple[HedgeLegQuote, HedgeLegQuote] | None = None,
 ) -> dict[str, Any]:
     """Sweeps `holding_days`. crypto_sor's real pick is constant (no holding-time concept);
     ARGUS's real pick changes once funding overtakes the entry saving. Counts how often they
     disagree — the statistically-valid-evaluation proof."""
-    rtoken_leg = _real_leg(rtoken)
-    crypto_leg = _real_leg(crypto)
+    rtoken_leg, crypto_leg = legs if legs is not None else (_real_leg(rtoken), _real_leg(crypto))
+    rtoken, crypto = rtoken_leg.symbol, crypto_leg.symbol
     real_pick = _crypto_sor_pick(rtoken_leg, crypto_leg)
 
     points = []

@@ -31,8 +31,9 @@ flag Bitget's own server sets on a failed call (`agent-mcp/src/server.ts:119-124
 
 from __future__ import annotations
 
+import itertools
 import json
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
@@ -413,19 +414,134 @@ def evidence(report: SkillReport, *, as_of: datetime) -> list[Evidence]:
     """
     out: list[Evidence] = []
     for row in report.answered:
+        payload = row.payload
+        if (row.probe.tool, row.probe.action) == ("technical_analysis", "macd") and isinstance(
+                payload, dict):
+            payload = correct_macd(payload)
         out.append(Evidence(
             id=f"skill-{row.probe.tool}-{row.probe.action}-{int(as_of.timestamp())}",
             claim=(
                 f"[{row.probe.skill}] {row.probe.yields}: "
-                f"{json.dumps(row.payload, default=str)[:300]}"
+                f"{json.dumps(payload, default=str)[:300]}"
             ),
             source="macro" if row.probe.skill == "macro-analyst" else "social",
             available_at=as_of,
             # A vendor-computed indicator is a real reading of a real series, but it is one
             # provider's arithmetic on one provider's bars — below a filing, above a headline.
             credibility=0.75,
-            attributes=row.payload if isinstance(row.payload, dict) else {},
+            attributes=payload if isinstance(payload, dict) else {},
         ))
+    return out
+
+
+def macd_fields(payload: Mapping[str, Any],
+                 recomputed_signal: float | None) -> tuple[float, float, bool] | None:
+    """(signal line, histogram, swapped) from a bitget-signal MACD reading, checked against a
+    recomputation from Bitget's own candles; None when it cannot be checked.
+
+    The Skill documents MACD(12,26,9) with DIF, DEA and HIST (`bitget-signal/skills/
+    technical-analysis/references/indicators.md:45-53`). Measured live on 2026-09-23 its ``signal``
+    field carries the histogram and its ``histogram`` field the signal line: BTCUSDT came back
+    ``macd 1568.0, signal -148.3, histogram 1716.3`` while Bitget's 4h candles give DIF 1568, DEA
+    1715 and a DIF path of 1567 to 1924 over the last twelve bars — a signal line of -148 is
+    impossible there. NVDA, TSLA and META showed the same exchange. Arithmetic cannot catch it,
+    because DIF - DEA = HIST and DIF - HIST = DEA are both true either way round, so the check is
+    the recomputation: whichever field sits nearer the recomputed signal line is the signal line.
+    The Skill's ``cross`` flag is built from the swapped pair and is replaced whenever the swap is
+    seen. The day the Skill is fixed this reads it straight with no change here.
+    """
+    if recomputed_signal is None:
+        return None
+    signal = float(payload.get("signal") or 0.0)
+    histogram = float(payload.get("histogram") or 0.0)
+    if abs(histogram - recomputed_signal) < abs(signal - recomputed_signal):
+        return histogram, signal, True
+    return signal, histogram, False
+
+
+MIN_INDICATOR_BARS = 36
+"""MACD(12,26,9) needs 26 bars for its slow average and nine more for the signal line. A contract
+listed a week ago (CVXSTOCKUSDT: 49 four-hour bars on 2026-09-23) still gets a reading, with its
+short history stated; below this there is nothing honest to compute."""
+
+SHORT_HISTORY_BARS = 120
+"""Under twenty days of 4h bars the answer says the readings rest on a short history."""
+
+
+def indicators(symbol: str) -> dict[str, float | str] | None:
+    """RSI(14), MACD(12,26,9) and ATR(14) on Bitget's 4h candles — the settings the Skill reports
+    (`timeframe: 4h`, `period: 14`), so the two describe the same thing and can be compared.
+
+    RSI is :func:`rsi`, Wilder's definition, already cross-checked against the Skill
+    to within 2.4 points on four rTokens (see that module). MACD seeds each EMA with the simple mean
+    of its first window, as TA-Lib does; ATR uses Wilder's smoothing, as he defined it.
+    """
+    from argus.market.history import CandleType, fetch
+
+    try:
+        bars = fetch(symbol, interval="4H", candle_type=CandleType.MARKET, recent=True, limit=300)
+    except Exception:
+        return None
+    if len(bars) < MIN_INDICATOR_BARS:
+        return None
+    closes = [float(b.close) for b in bars]
+
+    def ema(values: list[float], n: int) -> list[float]:
+        alpha = 2.0 / (n + 1)
+        out = [sum(values[:n]) / n]
+        for v in values[n:]:
+            out.append(out[-1] + alpha * (v - out[-1]))
+        return out
+
+    fast, slow = ema(closes, 12), ema(closes, 26)
+    dif = [f - sl for f, sl in zip(fast[26 - 12:], slow, strict=False)]
+    dea = ema(dif, 9)
+    histogram = dif[-1] - dea[-1]
+    previous = dif[-2] - dea[-2]
+    ranges = [max(float(b.high) - float(b.low), abs(float(b.high) - float(a.close)),
+                  abs(float(b.low) - float(a.close))) for a, b in itertools.pairwise(bars)]
+    atr = sum(ranges[:14]) / 14
+    for r in ranges[14:]:
+        atr = (atr * 13 + r) / 14
+    value = rsi(closes, 14)
+    out: dict[str, float | str] = {
+        "dif": dif[-1], "dea": dea[-1], "histogram": histogram, "atr": atr,
+        "close": closes[-1], "bars": float(len(bars)), "since": bars[0].ts.isoformat(),
+        "cross": ("golden cross" if previous <= 0 < histogram else
+                  "death cross" if previous >= 0 > histogram else ""),
+    }
+    if value is not None:
+        out["rsi"] = value
+    return out
+
+
+def correct_macd(payload: dict[str, Any]) -> dict[str, Any]:
+    """A `technical_analysis.macd` payload with its fields checked before anything reads it.
+
+    The desk hands Skill readings to the model as evidence, and on 2026-09-23 decision 586's thesis
+    cited "golden cross MACD" on NVDA — the Skill's cross, built from its swapped fields (see
+    :func:`macd_fields`). Every MACD payload is recomputed from Bitget's 4h candles here: the
+    fields are put the right way round and the cross replaced, with ``corrected`` saying so; if the
+    candles cannot be read, the unverifiable signal line, histogram and cross are removed rather
+    than passed on.
+    """
+    symbol = str(payload.get("symbol") or "")
+    if not symbol or payload.get("macd") is None:
+        return payload
+    mine = indicators(symbol)
+    checked = macd_fields(payload, None if mine is None else float(mine["dea"]))
+    out = dict(payload)
+    if checked is None or mine is None:
+        for key in ("signal", "histogram", "cross"):
+            out.pop(key, None)
+        out["unverified"] = "signal line and cross removed: could not be recomputed from candles"
+        return out
+    line, hist, swapped = checked
+    out["signal"], out["histogram"] = line, hist
+    if swapped:
+        out["cross"] = str(mine["cross"]).replace(" ", "_") or "none"
+        out["corrected"] = ("the Skill returned signal and histogram in each other's fields; "
+                            "restored and cross recomputed from Bitget 4h candles")
     return out
 
 
@@ -561,10 +677,13 @@ __all__ = [
     "SkillClient",
     "SkillReport",
     "ToolHealth",
+    "correct_macd",
     "cross_check_rsi",
     "evidence",
     "hollow",
+    "indicators",
     "load",
+    "macd_fields",
     "main",
     "probe",
     "rsi",

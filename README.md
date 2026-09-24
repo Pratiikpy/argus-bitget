@@ -11,12 +11,21 @@ Built for the Bitget AI Base Camp / Genesis Hackathon Season 2. **The engine cov
 tracks and all eighteen sub-themes; exactly one track is entered.** Track 3 (AI Trading Desk)
 is filed. Track 2 (Agentic Trading) is **not**, and the reason is the thesis rather than the
 deadline: it is 50% quantitative, scored on paper-trading Sharpe, drawdown and win rate, and
-this desk has refused every one of its 495 decisions. Filing it would mean loosening the risk
+this desk has refused every one of its 585 decisions. Filing it would mean loosening the risk
 layer to manufacture a track record — breaking the exact property the system exists to hold.
 
 ---
 
 ## Start here
+
+**Try it first: the live research console — https://deploy-topaz-seven-64.vercel.app**
+
+Ask it in plain English. *"I hold 50% NVDA, 50% AAPL — what does adding 20% TSLA do to my risk?"*
+· *"What if the Nasdaq drops 10%? I hold 40% MSFT, 30% META, 30% GOOGL"* · *"Is TSLA riskier than
+NVDA?"* · *"How should I split a $50k order in NVDA?"* · *"Where is NVDA trading right now?"* ·
+*"Why did you pass on NVDA?"* Every figure comes from the desk's own engines on live Bitget data and
+names its source; the language model only works out what you asked and never writes a number. Save
+your holdings (and your own risk budget) in the "My book" field and every answer uses them.
 
 | | |
 |---|---|
@@ -29,7 +38,7 @@ layer to manufacture a track record — breaking the exact property the system e
 cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module + sub-theme coverage, resolved by import
-pytest -q                       # 5,946 tests collected
+pytest -q                       # 6,420 tests collected
 ```
 
 Nothing above needs a credential.
@@ -40,8 +49,8 @@ Nothing above needs a credential.
 
 | | |
 |---|---|
-| Tests | **5,946 tests collected**, 33 skipped — run `pytest -q` |
-| Type checking | **`mypy --strict` clean on 303 source files** |
+| Tests | **6,420 tests collected** — run `pytest -q` |
+| Type checking | **`mypy --strict` clean on 307 source files** |
 | Lint | `ruff` clean |
 | Module health | **131/131 modules importable**, checked by `python -m argus.status` |
 | Sub-theme coverage | **18/18 sub-themes**, resolved by import at runtime — not claimed in prose |

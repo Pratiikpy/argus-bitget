@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 
 from argus.paper.ledger import PaperLedger
-from argus.paper.migrate_settlement_seals import Migration, MigrationError, migrate
+from argus.paper.migrate_settlement_seals import MigrationError, migrate
 
 T0 = datetime(2026, 3, 9, 14, 0, tzinfo=UTC)
 
@@ -130,7 +130,9 @@ class TestItRefusesToGuess:
         )
         led.settle(1, exit_price=Decimal("230"))
         lines = path.read_text(encoding="utf-8").splitlines()
-        seal_idx = next(i for i, ln in enumerate(lines) if json.loads(ln)["kind"] == "settlement_seal")
+        seal_idx = next(
+            i for i, ln in enumerate(lines) if json.loads(ln)["kind"] == "settlement_seal"
+        )
         seal = json.loads(lines[seal_idx])
         seal["settlement_seal_hash"] = "0" * 16
         lines[seal_idx] = json.dumps(seal, separators=(",", ":"))

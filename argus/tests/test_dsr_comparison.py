@@ -10,7 +10,6 @@ from argus.eval.baselines.vectorbt_loader import (
     vectorbt_var_sharpe,
 )
 from argus.eval.dsr_comparison import (
-    scope_statement,
     DsrCase,
     ablation_cases,
     compare,
@@ -21,6 +20,7 @@ from argus.eval.dsr_comparison import (
     run_designed,
     run_sweep,
     run_vectorbt_dsr,
+    scope_statement,
     silent_nan_cost,
     swept_cases,
 )

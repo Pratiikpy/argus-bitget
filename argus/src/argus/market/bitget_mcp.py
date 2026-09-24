@@ -16,7 +16,7 @@ executes one catalog entry. Behind them sit **67 entries in five categories** �
 
 The 21 equity entries matter most here, because ARGUS's universe is twelve tokenized US equities
 and the *anchor* is exactly what a tokenized-equity desk cannot see from the venue's own book:
-``equity_calendar_earnings``, ``equity_estimates_consensus``, ``equity_ownership_form_13f``,
+``equity_calendar``, ``equity_estimates_consensus``, ``equity_ownership_form_13f``,
 ``equity_fundamental_*`` and the rest.
 
 **Two things were found by probing that no document states, and both would cost an afternoon:**
@@ -196,21 +196,55 @@ class BitgetDataService:
         return rows[0] if rows else {}
 
     def next_earnings(self, symbol: str) -> dict[str, Any]:
-        """The next scheduled report. A date, from the source, rather than an inference.
+        """The most recently known scheduled report. A date, from the source, rather than an
+        inference — **not guaranteed to be in the future**: the source (``equity_calendar``, not
+        ``equity_calendar_earnings`` — the catalog's real entry name, found by listing it live
+        rather than assumed from this method's own prior code) returns quarterly history sorted
+        newest-first and does not always carry a not-yet-happened row, so the caller must check the
+        date rather than assume "returned" means "upcoming".
 
         Directly relevant to the risk layer's event-window reasoning: a position held across an
-        earnings print is a different risk from the same position held the week before."""
-        rows = self.results("equity_calendar_earnings", symbol=symbol)
-        return rows[0] if rows else {}
+        earnings print is a different risk from the same position held the week before.
+
+        ``report_date`` is a normalised field this method adds — the real source has no single
+        date column, only ``perf_brief_dsclsr_date`` (confirmed) and
+        ``perf_briefing_fore_dsclsr_date`` (forecast, present before the confirmed one is). The
+        confirmed date wins when both exist.
+        """
+        rows = self.results("equity_calendar", symbol=symbol)
+        if not rows:
+            return {}
+        row = rows[0]
+        report_date = row.get("perf_brief_dsclsr_date") or row.get("perf_briefing_fore_dsclsr_date")
+        return {**row, "report_date": report_date} if report_date else dict(row)
 
     def consensus(self, symbol: str) -> dict[str, Any]:
         """Analyst consensus and price targets."""
         rows = self.results("equity_estimates_consensus", symbol=symbol)
         return rows[0] if rows else {}
 
+    def price_targets(self, symbol: str) -> list[dict[str, Any]]:
+        """Every analyst price-target action on file, newest first
+        (``equity_estimates_price_target``). Measured 2026-09-23: 972 rows for NVDA reaching back to
+        2016, the latest dated 2026-09-09 — current, unlike ``consensus``, whose NVDA row was
+        scraped in 2024. Ratings arrive in Chinese; see :data:`RATING_STANCE`."""
+        return self.results("equity_estimates_price_target", symbol=symbol)
+
     def institutional_holdings(self, symbol: str) -> list[dict[str, Any]]:
         """13F filings. Who owns it, at the last reporting period."""
         return self.results("equity_ownership_form_13f", symbol=symbol)
+
+
+RATING_STANCE: dict[str, str] = {
+    "强力买进": "buy", "买入": "buy", "增持": "buy", "跑赢大盘": "buy", "积极": "buy",
+    "持有": "hold", "中性": "hold", "持股观望": "hold", "市场持平": "hold",
+    "减持": "sell", "卖出": "sell", "逊于大盘": "sell",
+}
+"""The rating vocabulary ``equity_estimates_price_target`` returns, read into three stances.
+Built from the full set of values on NVDA's 972 rows (2026-09-23): strong buy, buy, overweight,
+outperform and positive are buy; hold, neutral, wait-and-see and market-perform are hold;
+underweight, sell and underperform are sell. An unlisted value is left out of the count rather
+than guessed."""
 
 
 def underlying_of(rtoken: str) -> str:

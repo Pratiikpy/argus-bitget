@@ -428,6 +428,11 @@ def _hedge_surface(session_asleep: bool, symbol: str) -> HedgeabilitySurface:
     )
 
 
+DEBATE_TOKENS = 12_000
+"""What holding a debate adds to one symbol's cost. The single live measurement (`agents/desk.py`)
+was 20,714 -> 27,691 tokens, about 7,000; 12,000 is headroom. Used to decide whether a split panel
+can be argued without leaving a later symbol undecided."""
+
 PER_SYMBOL_TOKENS = 25_000
 """The **marginal** cost of adding one symbol to a cycle. Measured at 20,838; 25,000 is headroom.
 
@@ -641,7 +646,7 @@ def run_once(
     written: list[dict[str, object]] = []
 
     stopped_early = ""
-    for symbol in symbols:
+    for index, symbol in enumerate(symbols):
         if symbol not in tickers:
             continue
         # Stop cleanly with what has been written rather than dying with nothing. A cycle that
@@ -754,8 +759,14 @@ def run_once(
             book_state=_book_state(ledger),
             graded_predictions=_graded_predictions(ledger),
         )
+        # Enough left for this symbol's debate AND for every symbol still to come at its base cost.
+        still_to_decide = len(symbols) - index
+        debate_affordable = client.budget is None or (
+            client.budget.remaining >= PER_SYMBOL_TOKENS * still_to_decide + DEBATE_TOKENS
+        )
         run = desk.run(
             symbol=symbol,
+            debate_affordable=debate_affordable,
             session=session,
             token_price=ticker.last,
             position=Decimal("0"),

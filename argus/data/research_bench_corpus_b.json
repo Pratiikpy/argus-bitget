@@ -1,0 +1,528 @@
+{
+  "written_by": "second blind agent",
+  "questions": [
+    {
+      "text": "I currently hold roughly $2,000 in AAPL and $1,500 in QQQ... if I add another $500 into NVDA, would that make my account swing more?",
+      "label": "impact",
+      "symbols": [
+        "AAPL",
+        "QQQ",
+        "NVDA"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "If I buy a little bit of TSLA, will that make my whole account bounce around more than it does now?",
+      "label": "impact",
+      "symbols": [
+        "TSLA"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "If I decided to put some money into COIN, would that shake up my risk by a lot or just a little bit?",
+      "label": "impact",
+      "symbols": [
+        "COIN"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "If the Nasdaq has one of those really bad red days, what would happen to my QQQ and META shares?",
+      "label": "stress",
+      "symbols": [
+        "QQQ",
+        "META"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "People keep saying tech might crash soon... if that happens, what does it do to AAPL and MSFT since I own both?",
+      "label": "stress",
+      "symbols": [
+        "AAPL",
+        "MSFT"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Between NVDA and AMZN, which one jumps around more from day to day?",
+      "label": "compare",
+      "symbols": [
+        "NVDA",
+        "AMZN"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "I want to sell about $800 worth of my AAPL, what's the safest way to actually do that without messing it up?",
+      "label": "execution",
+      "symbols": [
+        "AAPL"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Is MSTR one of those really scary volatile stocks, or is it actually pretty calm?",
+      "label": "profile",
+      "symbols": [
+        "MSTR"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "Can you just go ahead and sell every share of TSLA I own, I don't need it explained.",
+      "label": "none",
+      "symbols": [
+        "TSLA"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Hi! How's the market feeling today, just wanted to say hello before I ask anything.",
+      "label": "none",
+      "symbols": [],
+      "holdings_stated": false
+    },
+    {
+      "text": "Book is 20% NVDA, 15% MSFT. Sizing up COIN 8%. Risk delta?",
+      "label": "impact",
+      "symbols": [
+        "NVDA",
+        "MSFT",
+        "COIN"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Adding TQQQ exposure. Portfolio risk impact?",
+      "label": "impact",
+      "symbols": [
+        "TQQQ"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "Nasdaq -3% tape. Effect on my QQQ/META sleeve?",
+      "label": "stress",
+      "symbols": [
+        "QQQ",
+        "META"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Broad tech selloff scenario. Impact on AAPL, MSFT, GOOGL book?",
+      "label": "stress",
+      "symbols": [
+        "AAPL",
+        "MSFT",
+        "GOOGL"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Rank NVDA, AMZN, META by vol contribution.",
+      "label": "compare",
+      "symbols": [
+        "NVDA",
+        "AMZN",
+        "META"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "COIN vs MSTR correlation to BTC proxy risk, which is tighter?",
+      "label": "compare",
+      "symbols": [
+        "COIN",
+        "MSTR"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "Exiting $2M TSLA notional. Best order type, min impact?",
+      "label": "execution",
+      "symbols": [
+        "TSLA"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Unwinding SQQQ hedge, $750k. TWAP or VWAP?",
+      "label": "execution",
+      "symbols": [
+        "SQQQ"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "MSTR standalone beta and realized vol, quick read.",
+      "label": "profile",
+      "symbols": [
+        "MSTR"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "SPY beta vs QQQ for the hedge sleeve?",
+      "label": "compare",
+      "symbols": [
+        "SPY",
+        "QQQ"
+      ],
+      "holdings_stated": false,
+      "original_label": "none",
+      "relabelled": "relabelled 2026-09-23 from 'none': the corpus author labelled it a refusal because the console then refused instruments outside its twelve rTokens as off-venue. The instrument is listed on Bitget (checked against /api/v2/mix/market/contracts), and the console now answers research questions about any listed contract."
+    },
+    {
+      "text": "bag is like 40% NVDA 30% TQQQ rn, if i ape another chunk into COIN does my risk get nuked or nah",
+      "label": "impact",
+      "symbols": [
+        "NVDA",
+        "TQQQ",
+        "COIN"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "if i throw some cash into MSTR does my whole portfolio get way more degen risky",
+      "label": "impact",
+      "symbols": [
+        "MSTR"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "im holding mostly AMZN and GOOGL, roughly even split, what happens to my risk if i rotate some into TQQQ",
+      "label": "impact",
+      "symbols": [
+        "AMZN",
+        "GOOGL",
+        "TQQQ"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "if nasdaq just dumps hard one day what happens to my QQQ and NVDA stack",
+      "label": "stress",
+      "symbols": [
+        "QQQ",
+        "NVDA"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "tech sector gets rekt scenario, what does that do to my META and AAPL bags",
+      "label": "stress",
+      "symbols": [
+        "META",
+        "AAPL"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "which is more unhinged volatility wise, COIN or MSTR",
+      "label": "compare",
+      "symbols": [
+        "COIN",
+        "MSTR"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "wanna exit like $3k of my TSLA position, whats the move so i dont get rekt on slippage",
+      "label": "execution",
+      "symbols": [
+        "TSLA"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "trying to dump $1500 of SQQQ, market order fine or should i be smarter about it",
+      "label": "execution",
+      "symbols": [
+        "SQQQ"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "yo is COIN gonna moon to like $400 by friday or what",
+      "label": "none",
+      "symbols": [
+        "COIN"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "yo whats good market fam, crazy week huh",
+      "label": "none",
+      "symbols": [],
+      "holdings_stated": false
+    },
+    {
+      "text": "In my account I have NVDA 25 percent and QQQ 20 percent, now I want add more AMZN, this change my risk how much?",
+      "label": "impact",
+      "symbols": [
+        "NVDA",
+        "QQQ",
+        "AMZN"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "If I am buying some COIN stock, this making my portfolio more risky or not so much?",
+      "label": "impact",
+      "symbols": [
+        "COIN"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "My portfolio is only AAPL and MSFT, half half, what is happen to risk if I put money in TQQQ also?",
+      "label": "impact",
+      "symbols": [
+        "AAPL",
+        "MSFT",
+        "TQQQ"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "If whole market for technology is going down bad, what is happen with my GOOGL and META shares?",
+      "label": "stress",
+      "symbols": [
+        "GOOGL",
+        "META"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Nasdaq have big crash, this is affecting my QQQ position how much, please explain simple.",
+      "label": "stress",
+      "symbols": [
+        "QQQ"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "NVDA and TSLA, which one have more big movement up and down, please tell difference.",
+      "label": "compare",
+      "symbols": [
+        "NVDA",
+        "TSLA"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "Please compare for me AMZN and GOOGL, which one is safer to hold together.",
+      "label": "compare",
+      "symbols": [
+        "AMZN",
+        "GOOGL"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "I want sell my TSLA for value $1200, what is best way, not lose too much money on fees?",
+      "label": "execution",
+      "symbols": [
+        "TSLA"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Before, what did you decide to do with my AAPL position last time, can you tell history?",
+      "label": "none",
+      "symbols": [
+        "AAPL"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "What about Alibaba stock, is this good company for buying now?",
+      "label": "profile",
+      "symbols": [
+        "BABA"
+      ],
+      "holdings_stated": false,
+      "original_label": "none",
+      "relabelled": "relabelled 2026-09-24 from none: the author labelled it a refusal because the console then refused instruments outside its twelve rTokens. BABA is listed on Bitget (BABAUSDT); the console answers research questions about any listed contract, and \"is this a good company for buying now\" is answered as the name's risk profile, like the should-I-buy-MSTR question."
+    },
+    {
+      "text": "My retirement account holds $40,000 in QQQ and $15,000 in MSFT. If I were to place $5,000 into NVDA, how would that affect the overall risk I'm carrying?",
+      "label": "impact",
+      "symbols": [
+        "QQQ",
+        "MSFT",
+        "NVDA"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "If I were to purchase a modest position in COIN, would that meaningfully increase the risk profile of my account?",
+      "label": "impact",
+      "symbols": [
+        "COIN"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "If I were to introduce a position in AMZN into my savings, how would that affect my overall risk exposure?",
+      "label": "impact",
+      "symbols": [
+        "AMZN"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "Should there be a significant downturn across the broader Nasdaq, what would happen to the QQQ and MSFT I'm holding for retirement?",
+      "label": "stress",
+      "symbols": [
+        "QQQ",
+        "MSFT"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "If the technology sector experiences a sustained pullback, how exposed would my AAPL and GOOGL holdings be?",
+      "label": "stress",
+      "symbols": [
+        "AAPL",
+        "GOOGL"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Between MSFT and AAPL, which would you consider the steadier holding for someone who cannot afford large swings?",
+      "label": "compare",
+      "symbols": [
+        "MSFT",
+        "AAPL"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "I'd like to sell $6,000 worth of my MSFT shares. What is the most careful way to do this without disrupting the price I receive?",
+      "label": "execution",
+      "symbols": [
+        "MSFT"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Would you characterize TQQQ as appropriate for a conservative investor, or is it considerably more volatile than a typical holding?",
+      "label": "profile",
+      "symbols": [
+        "TQQQ"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "Please simply sell all of my MSTR shares, I don't require any further explanation.",
+      "label": "none",
+      "symbols": [
+        "MSTR"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Do you believe AAPL will reach $300 sometime next year?",
+      "label": "none",
+      "symbols": [
+        "AAPL"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "Current book: NVDA 22%, QQQ 18%, GOOGL 12%, remainder cash. Marginal contribution to portfolio variance from a 5% COIN add?",
+      "label": "impact",
+      "symbols": [
+        "NVDA",
+        "QQQ",
+        "GOOGL",
+        "COIN"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Incremental portfolio VaR from introducing a TQQQ position, holding all else constant?",
+      "label": "impact",
+      "symbols": [
+        "TQQQ"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "Apply a -400bps Nasdaq composite shock, propagate through my QQQ and META weights, expected drawdown?",
+      "label": "stress",
+      "symbols": [
+        "QQQ",
+        "META"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Sector-wide tech beta shock of 2 std devs, effect on AAPL/MSFT/AMZN sleeve P&L?",
+      "label": "stress",
+      "symbols": [
+        "AAPL",
+        "MSFT",
+        "AMZN"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "Pairwise correlation matrix for NVDA, AMZN, META over trailing regime, plus rolling vol ranking.",
+      "label": "compare",
+      "symbols": [
+        "NVDA",
+        "AMZN",
+        "META"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "COIN vs MSTR, decompose systematic vs idiosyncratic vol contribution.",
+      "label": "compare",
+      "symbols": [
+        "COIN",
+        "MSTR"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "Liquidating $1.2M TSLA notional, minimize implementation shortfall, recommend algo and participation rate.",
+      "label": "execution",
+      "symbols": [
+        "TSLA"
+      ],
+      "holdings_stated": true
+    },
+    {
+      "text": "MSTR realized vol, skew, and kurtosis over trailing 90 sessions.",
+      "label": "profile",
+      "symbols": [
+        "MSTR"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "GOOGL beta estimate against QQQ, plus R-squared of the regression.",
+      "label": "profile",
+      "symbols": [
+        "GOOGL",
+        "QQQ"
+      ],
+      "holdings_stated": false
+    },
+    {
+      "text": "What was the realized slippage on the last GOOGL execution the desk ran?",
+      "label": "none",
+      "symbols": [
+        "GOOGL"
+      ],
+      "holdings_stated": false
+    }
+  ]
+}

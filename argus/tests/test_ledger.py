@@ -596,7 +596,9 @@ class TestSettlementSeals:
         led.settle(1, exit_price=Decimal("230"))
 
         lines = led.path.read_text(encoding="utf-8").splitlines()
-        seal_idx = next(i for i, ln in enumerate(lines) if json.loads(ln)["kind"] == "settlement_seal")
+        seal_idx = next(
+            i for i, ln in enumerate(lines) if json.loads(ln)["kind"] == "settlement_seal"
+        )
         seal = json.loads(lines[seal_idx])
         seal["settlement_seal_hash"] = "0" * 16  # a fabricated hash matching nothing real
         lines[seal_idx] = json.dumps(seal, separators=(",", ":"))

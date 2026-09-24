@@ -150,7 +150,7 @@ def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI
     return 0
 
 
-__all__ = ["DEFAULT_PATH", "Migration", "MigrationError", "migrate", "main"]
+__all__ = ["DEFAULT_PATH", "Migration", "MigrationError", "main", "migrate"]
 
 
 if __name__ == "__main__":  # pragma: no cover

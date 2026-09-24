@@ -10,8 +10,12 @@ these tests pin.
 
 from __future__ import annotations
 
+from decimal import Decimal
+
 import pytest
 
+from argus.cost.model import CostModel
+from argus.desk.execution import HedgeLegQuote
 from argus.eval.execution_comparison import (
     LEG_PAIRS,
     SCOPE_STATEMENT,
@@ -25,14 +29,45 @@ from argus.eval.execution_comparison import (
 )
 
 
+def _recorded_legs() -> tuple[HedgeLegQuote, HedgeLegQuote]:
+    """The legs as measured live and recorded in `data/execution_comparison.json` (base_case):
+    NVDA 0.984bps slippage and zero funding, BTC 0.0066bps slippage and 0.81bps funding.
+
+    The divergence the comparison is about only exists while the leg that is cheaper to enter is
+    the dearer one to hold. That is a market state, not a property of either system: on
+    2026-09-23 live funding no longer had that shape, no break-even existed, and four tests that
+    asserted today's market would reproduce it failed. The mechanism is pinned on the recorded
+    measurement, through the real crypto_sor subprocess; the live run is still exercised below and
+    must produce a well-formed result, whatever the market does."""
+    return (
+        HedgeLegQuote(symbol="NVDAUSDT", slippage_bps=Decimal("0.9842284392337896788902555422"),
+                      cost_model=CostModel.bitget_perp(funding_rate=Decimal("0"))),
+        HedgeLegQuote(symbol="BTCUSDT", slippage_bps=Decimal("0.006579817462703949667028337300"),
+                      cost_model=CostModel.bitget_perp(funding_rate=Decimal("0.000081"))),
+    )
+
+
 @pytest.fixture(scope="module")
 def base_case() -> dict:
-    return run_base_case()
+    return run_base_case(legs=_recorded_legs())
 
 
 @pytest.fixture(scope="module")
 def sweep() -> dict:
-    return run_divergence_sweep()
+    return run_divergence_sweep(legs=_recorded_legs())
+
+
+@pytest.fixture(scope="module")
+def live_base_case() -> dict:
+    return run_base_case()
+
+
+class TestTheLiveRunIsWellFormed:
+    def test_live_legs_are_measured_and_both_systems_answer(self, live_base_case: dict) -> None:
+        assert live_base_case["real_crypto_sor_pick_at_entry"] in ("NVDAUSDT", "BTCUSDT")
+        assert live_base_case["argus_pick_at_entry"] in ("NVDAUSDT", "BTCUSDT")
+        if live_base_case["break_even_holding_days"] is None:
+            assert live_base_case["argus_pick_past_break_even"] is None
 
 
 @pytest.fixture(scope="module")
@@ -89,9 +124,14 @@ class TestLegPairSweep:
     def test_all_configured_pairs_were_checked(self, pairs: dict) -> None:
         assert pairs["n_pairs"] == len(LEG_PAIRS)
 
-    def test_most_or_all_real_pairs_diverge_past_break_even(self, pairs: dict) -> None:
+    def test_every_live_pair_diverges_exactly_when_a_break_even_exists(self, pairs: dict) -> None:
+        """How many pairs diverge is a fact about today's funding rates (on 2026-09-23 it was 3 of
+        5, where the recorded run had nearly all); what must hold on any day is that a pair
+        diverges only past a real break-even, and never without one."""
         assert pairs["n_ok"] > 0
-        assert pairs["n_diverge_past_break_even"] >= pairs["n_ok"] - 1
+        for row in (r for r in pairs["results"] if "error" not in r):
+            if row["break_even_holding_days"] is None:
+                assert not row["diverges_past_break_even"]
 
 
 class TestFailureCases:

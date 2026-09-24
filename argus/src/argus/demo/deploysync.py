@@ -50,6 +50,15 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "surface_agreement.json",
     "standing.json",
     "lui_ngram_model.json",
+    # Real Bitget hourly history, frozen on the date it records. `lui/research.py` answers from it
+    # only when the live fetch cannot finish inside the serverless deadline, and says so in the
+    # answer — without it, a slow venue would turn a research question into a refusal.
+    "risk_layer_candles_fixture.json",
+    # Bitget's contract list, frozen on the date it records. `market/universe.py` reads it only
+    # when the live contracts call fails — without it an offline answer would not know gold trades.
+    "venue_universe.json",
+    # Read by the "what we got wrong" page: the Skill MACD check (`eval/skillmacd.py`).
+    "skill_macd_check.json",
 )
 """Artefacts the hosted console's own pages read at request time.
 

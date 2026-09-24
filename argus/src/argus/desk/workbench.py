@@ -588,6 +588,12 @@ def _passive_rate(
     return fill.fee_bps, label
 
 
+SINGLE_ORDER_PARTICIPATION = Decimal("0.001")
+"""Below a tenth of a percent of 24h volume an order is sent whole. Impact at that size is under
+the fee by orders of magnitude (the impact term is superlinear in participation), so no split can
+pay for its extra slices."""
+
+
 def plan_execution(
     *,
     symbol: str,
@@ -620,7 +626,19 @@ def plan_execution(
     participation = (notional / adv_notional) if adv_notional > 0 else Decimal("1")
     slices: tuple[ExecutionSlice, ...]
 
-    if urgency == "high" or participation > Decimal("0.05"):
+    if participation < SINGLE_ORDER_PARTICIPATION:
+        # An order this small cannot move the price, so splitting it only adds time in the market
+        # and a fee per slice. Found by asking the hosted console how to sell $800 of AAPL: it
+        # answered with a two-slice "thin book" plan for an order worth 0.01% of the day's volume.
+        slices = (
+            ExecutionSlice(1, Decimal("1"), "single order: near-touch limit, market if unfilled",
+                           model.taker_bps),
+        )
+        rationale = (
+            f"at {participation:.3%} of 24h volume the order cannot move the price; one order is "
+            f"cheapest — splitting would only add time in the market and a fee per slice"
+        )
+    elif urgency == "high" or participation > Decimal("0.05"):
         opp_rate, opp_label = _passive_rate(
             model, book, fraction=Decimal("0.2"), notional=notional
         )
@@ -670,6 +688,7 @@ def plan_execution(
 
 
 __all__ = [
+    "SINGLE_ORDER_PARTICIPATION",
     "STANDARD_SCENARIOS",
     "Autopsy",
     "ClaimGraph",

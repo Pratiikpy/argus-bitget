@@ -19,6 +19,7 @@ from __future__ import annotations
 import json
 import threading
 from collections.abc import Iterator
+from datetime import UTC, datetime
 from http.server import ThreadingHTTPServer
 from typing import Any
 from urllib.parse import urlencode
@@ -124,7 +125,7 @@ class TestTheAskEndpoint:
         assert payload["elapsed_ms"] <= payload["budget_ms"]
 
     def test_a_refusal_is_carried_as_a_refusal_not_an_error(self, base_url: str) -> None:
-        payload = _ask(base_url, "what is gold trading at")
+        payload = _ask(base_url, "what is XYZQ trading at")
         assert payload["refused"] is True
         assert "Bitget" in payload["reason"]
 
@@ -343,3 +344,33 @@ class TestTheLossesPage:
         matches = [c for c in found if "cannot claim OWNED" in c.headline]
         assert len(matches) == 1
         assert "2 of 4 capabilities cannot claim OWNED" in matches[0].headline
+
+
+class TestStalenessFollowsTheSchedule:
+    """The desk decides at 13:30, 15:30, 17:30 and 19:30 UTC. The old 12-hour rule called the
+    record stale every morning during the designed overnight gap."""
+
+    def test_the_overnight_gap_is_not_stale(self) -> None:
+        from argus.lui.server import _last_scheduled_cycle
+
+        morning = datetime(2026, 9, 23, 10, 0, tzinfo=UTC)
+        assert _last_scheduled_cycle(morning) == datetime(2026, 9, 22, 19, 30, tzinfo=UTC)
+
+    def test_a_missed_afternoon_cycle_is_caught(self) -> None:
+        from argus.lui.server import _last_scheduled_cycle
+
+        after_two_runs = datetime(2026, 9, 23, 16, 45, tzinfo=UTC)
+        assert _last_scheduled_cycle(after_two_runs) == datetime(2026, 9, 23, 15, 30, tzinfo=UTC)
+
+    def test_a_cycle_still_inside_its_grace_is_not_yet_expected(self) -> None:
+        from argus.lui.server import _last_scheduled_cycle
+
+        just_after = datetime(2026, 9, 23, 13, 50, tzinfo=UTC)
+        assert _last_scheduled_cycle(just_after) == datetime(2026, 9, 22, 19, 30, tzinfo=UTC)
+
+    def test_next_cycle(self) -> None:
+        from argus.lui.server import _next_scheduled_cycle
+
+        assert _next_scheduled_cycle(datetime(2026, 9, 23, 20, 0, tzinfo=UTC)) == datetime(
+            2026, 9, 24, 13, 30, tzinfo=UTC
+        )

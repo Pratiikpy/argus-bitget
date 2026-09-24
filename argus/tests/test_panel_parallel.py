@@ -360,6 +360,19 @@ class TestTheDebateRunsInsideTheDesk:
         run = self._split_run()
         assert any("[debate]" in n for n in run.notes)
 
+    def test_a_split_panel_the_cycle_cannot_afford_is_not_argued_and_says_so(self) -> None:
+        """Two cycles on 2026-09-23 held five debates in nine symbols and left three symbols
+        undecided. When the runner says the budget is reserved, the split is decided without a
+        debate — and the record says it was a budget call, not an agreeing panel."""
+        model = RecordingModel(split=True)
+        run = self._split_run(model=model, debate_affordable=False)
+        assert run.debate is not None and run.debate.ending is Ending.NOT_HELD
+        assert any("budget" in n and "split" in n for n in run.notes)
+        assert not any("already agree" in n for n in run.notes)
+        argued = RecordingModel(split=True)
+        self._split_run(model=argued)
+        assert len(model.calls) < len(argued.calls), "no debate seat was paid"
+
     def test_a_zero_budget_holds_no_debate_and_says_why(self) -> None:
         run = self._split_run(debate_budget=Decimal("0"))
         assert run.debate is not None

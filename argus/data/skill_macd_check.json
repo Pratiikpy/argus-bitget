@@ -1,0 +1,302 @@
+{
+  "generated_at": "2026-09-23T13:56:48.201707+00:00",
+  "what": "Bitget technical-analysis Skill MACD(12,26,9) vs MACD recomputed by ARGUS from Bitget 4H candles (argus.market.skills.indicators)",
+  "definition": "bitget-signal/skills/technical-analysis/references/indicators.md:45-53",
+  "symbols": 14,
+  "swapped": 10,
+  "straight": 0,
+  "unchecked": 4,
+  "cross_flag_contradicts_lines": 6,
+  "rows": [
+    {
+      "symbol": "NVDAUSDT",
+      "skill_status": "bitget:technical_analysis: ok",
+      "skill": {
+        "symbol": "NVDAUSDT",
+        "timeframe": "4h",
+        "macd": 2.068996,
+        "signal": -0.038849,
+        "histogram": 2.107845,
+        "cross": "golden_cross"
+      },
+      "ours": {
+        "dif": 2.0602199006125375,
+        "dea": 2.1046100549120306,
+        "histogram": -0.04439015429949311,
+        "cross": "death cross"
+      },
+      "dif_relative_gap": 0.00426,
+      "verdict": "swapped",
+      "skill_cross": "golden_cross",
+      "cross_wrong": true
+    },
+    {
+      "symbol": "TSLAUSDT",
+      "skill_status": "bitget:technical_analysis: ok",
+      "skill": {
+        "symbol": "TSLAUSDT",
+        "timeframe": "4h",
+        "macd": 4.208856,
+        "signal": 0.61506,
+        "histogram": 3.593796,
+        "cross": "golden_cross"
+      },
+      "ours": {
+        "dif": 4.195361075241067,
+        "dea": 3.574537596989689,
+        "histogram": 0.6208234782513777,
+        "cross": ""
+      },
+      "dif_relative_gap": 0.00322,
+      "verdict": "swapped",
+      "skill_cross": "golden_cross",
+      "cross_wrong": false
+    },
+    {
+      "symbol": "AAPLUSDT",
+      "skill_status": "bitget:technical_analysis: ok",
+      "skill": {
+        "symbol": "AAPLUSDT",
+        "timeframe": "4h",
+        "macd": 1.401223,
+        "signal": -0.056969,
+        "histogram": 1.458192,
+        "cross": "golden_cross"
+      },
+      "ours": {
+        "dif": 1.408361799223826,
+        "dea": 1.4667647649441764,
+        "histogram": -0.05840296572035042,
+        "cross": "death cross"
+      },
+      "dif_relative_gap": 0.00507,
+      "verdict": "swapped",
+      "skill_cross": "golden_cross",
+      "cross_wrong": true
+    },
+    {
+      "symbol": "MSFTUSDT",
+      "skill_status": "bitget:technical_analysis: ok",
+      "skill": {
+        "symbol": "MSFTUSDT",
+        "timeframe": "4h",
+        "macd": 1.700358,
+        "signal": 0.404088,
+        "histogram": 1.29627,
+        "cross": "golden_cross"
+      },
+      "ours": {
+        "dif": 1.677774277035553,
+        "dea": 1.2924042921282877,
+        "histogram": 0.3853699849072654,
+        "cross": ""
+      },
+      "dif_relative_gap": 0.01346,
+      "verdict": "swapped",
+      "skill_cross": "golden_cross",
+      "cross_wrong": false
+    },
+    {
+      "symbol": "METAUSDT",
+      "skill_status": "bitget:technical_analysis: ok",
+      "skill": {
+        "symbol": "METAUSDT",
+        "timeframe": "4h",
+        "macd": 19.334603,
+        "signal": 1.764164,
+        "histogram": 17.57044,
+        "cross": "golden_cross"
+      },
+      "ours": {
+        "dif": 19.347338163094605,
+        "dea": 17.57972613133317,
+        "histogram": 1.767612031761434,
+        "cross": ""
+      },
+      "dif_relative_gap": 0.00066,
+      "verdict": "swapped",
+      "skill_cross": "golden_cross",
+      "cross_wrong": false
+    },
+    {
+      "symbol": "GOOGLUSDT",
+      "skill_status": "bitget:technical_analysis: ok",
+      "skill": {
+        "symbol": "GOOGLUSDT",
+        "timeframe": "4h",
+        "macd": 0.079325,
+        "signal": -1.089638,
+        "histogram": 1.168963,
+        "cross": "golden_cross"
+      },
+      "ours": {
+        "dif": 0.08106666087871872,
+        "dea": 1.1761659254851364,
+        "histogram": -1.0950992646064177,
+        "cross": ""
+      },
+      "dif_relative_gap": 0.02148,
+      "verdict": "unchecked",
+      "note": "MACD lines disagree, so the fields cannot be compared"
+    },
+    {
+      "symbol": "AMZNUSDT",
+      "skill_status": "bitget:technical_analysis: ok",
+      "skill": {
+        "symbol": "AMZNUSDT",
+        "timeframe": "4h",
+        "macd": 0.15579,
+        "signal": -0.685243,
+        "histogram": 0.841033,
+        "cross": "golden_cross"
+      },
+      "ours": {
+        "dif": 0.14522403843844245,
+        "dea": 0.8403295327662423,
+        "histogram": -0.6951054943277999,
+        "cross": ""
+      },
+      "dif_relative_gap": 0.07276,
+      "verdict": "unchecked",
+      "note": "MACD lines disagree, so the fields cannot be compared"
+    },
+    {
+      "symbol": "COINUSDT",
+      "skill_status": "bitget:technical_analysis: ok",
+      "skill": {
+        "symbol": "COINUSDT",
+        "timeframe": "4h",
+        "macd": 3.070956,
+        "signal": -0.632263,
+        "histogram": 3.703219,
+        "cross": "golden_cross"
+      },
+      "ours": {
+        "dif": 3.085870236353969,
+        "dea": 3.716587028129435,
+        "histogram": -0.6307167917754657,
+        "cross": ""
+      },
+      "dif_relative_gap": 0.00483,
+      "verdict": "swapped",
+      "skill_cross": "golden_cross",
+      "cross_wrong": true
+    },
+    {
+      "symbol": "MSTRUSDT",
+      "skill_status": "bitget:technical_analysis: ok",
+      "skill": {
+        "symbol": "MSTRUSDT",
+        "timeframe": "4h",
+        "macd": 5.10524,
+        "signal": -0.736064,
+        "histogram": 5.841304,
+        "cross": "golden_cross"
+      },
+      "ours": {
+        "dif": 5.117418558208868,
+        "dea": 5.850813505378283,
+        "histogram": -0.7333949471694146,
+        "cross": ""
+      },
+      "dif_relative_gap": 0.00238,
+      "verdict": "swapped",
+      "skill_cross": "golden_cross",
+      "cross_wrong": true
+    },
+    {
+      "symbol": "QQQUSDT",
+      "skill_status": "bitget:technical_analysis: ok",
+      "skill": {
+        "symbol": "QQQUSDT",
+        "timeframe": "4h",
+        "macd": 6.976469,
+        "signal": 0.036004,
+        "histogram": 6.940465,
+        "cross": "golden_cross"
+      },
+      "ours": {
+        "dif": 6.929744840378703,
+        "dea": 6.902286666519556,
+        "histogram": 0.02745817385914684,
+        "cross": ""
+      },
+      "dif_relative_gap": 0.00674,
+      "verdict": "swapped",
+      "skill_cross": "golden_cross",
+      "cross_wrong": false
+    },
+    {
+      "symbol": "TQQQUSDT",
+      "skill_status": "bitget:technical_analysis: reachable, returned no data",
+      "skill": {
+        "error": "No OHLCV data for TQQQUSDT/4h"
+      },
+      "ours": {
+        "dif": 2.137406166468807,
+        "dea": 2.132716683139826,
+        "histogram": 0.0046894833289812254,
+        "cross": ""
+      },
+      "verdict": "unchecked"
+    },
+    {
+      "symbol": "SQQQUSDT",
+      "skill_status": "bitget:technical_analysis: reachable, returned no data",
+      "skill": {
+        "error": "No OHLCV data for SQQQUSDT/4h"
+      },
+      "ours": {
+        "dif": -1.2139328870166608,
+        "dea": -1.1605636480457122,
+        "histogram": -0.053369238970948585,
+        "cross": ""
+      },
+      "verdict": "unchecked"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "skill_status": "bitget:technical_analysis: ok",
+      "skill": {
+        "symbol": "BTCUSDT",
+        "timeframe": "4h",
+        "macd": 1562.220076,
+        "signal": -152.96472,
+        "histogram": 1715.184796,
+        "cross": "golden_cross"
+      },
+      "ours": {
+        "dif": 1563.1509652713285,
+        "dea": 1714.7864045572487,
+        "histogram": -151.63543928592026,
+        "cross": ""
+      },
+      "dif_relative_gap": 0.0006,
+      "verdict": "swapped",
+      "skill_cross": "golden_cross",
+      "cross_wrong": true
+    },
+    {
+      "symbol": "ETHUSDT",
+      "skill_status": "bitget:technical_analysis: ok",
+      "skill": {
+        "symbol": "ETHUSDT",
+        "timeframe": "4h",
+        "macd": 41.152634,
+        "signal": -8.238243,
+        "histogram": 49.390877,
+        "cross": "golden_cross"
+      },
+      "ours": {
+        "dif": 41.19993950271646,
+        "dea": 49.406811218685576,
+        "histogram": -8.206871715969115,
+        "cross": ""
+      },
+      "dif_relative_gap": 0.00115,
+      "verdict": "swapped",
+      "skill_cross": "golden_cross",
+      "cross_wrong": true
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-21T06:55:30.773254+00:00",
+  "as_of": "2026-09-21T13:54:11.655080+00:00",
   "measures": "the deterministic pattern layer alone \u2014 NOT the deployed console",
   "superseded_by": "data/ngram_bench.json",
   "note": "TUNED is the corpus the patterns were widened against and measures fit. HELDOUT was burned on 2026-09-21 \u2014 its misses were read during the widening \u2014 and is retained only as a historical figure. FRESH was authored by openai/gpt-oss-20b, which has never seen lui/question.py. The +76% gap between TUNED and FRESH is what motivated lui/ngram.py: the patterns memorise and do not generalise. Since that model was added the hosted console is a cascade, not these patterns alone, so the figure describing what a judge meets lives in data/ngram_bench.json (80.9% on 351 questions). This artefact is the before.",

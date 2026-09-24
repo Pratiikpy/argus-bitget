@@ -326,7 +326,8 @@ class PeadStudy:
             else:
                 lines.append(
                     f"  {h:>4}h   n={p.trades:<4} sharpe={p.sharpe:>7.3f}  "
-                    f"win_rate={100 * p.win_rate:>5.1f}%  total_return={100 * p.total_return:>7.2f}%"
+                    f"win_rate={100 * p.win_rate:>5.1f}%  "
+                    f"total_return={100 * p.total_return:>7.2f}%"
                 )
         lines.append("")
         if self.best_hold_hours is not None:
@@ -334,12 +335,16 @@ class PeadStudy:
                 f"  best: {self.best_hold_hours}h, Sharpe {self.best_sharpe:.3f}, "
                 f"deflated {self.deflated_sharpe:.4f}"
                 if self.deflated_sharpe is not None
-                else f"  best: {self.best_hold_hours}h, Sharpe {self.best_sharpe:.3f} (not deflated)"
+                else f"  best: {self.best_hold_hours}h, Sharpe {self.best_sharpe:.3f} "
+                     f"(not deflated)"
             )
         if self.pbo is not None:
             lines.append(f"  PBO: {self.pbo.pbo:.3f} over {self.pbo.splits} splits")
         if self.min_track_record_years is not None:
-            lines.append(f"  min track record to trust this Sharpe: {self.min_track_record_years:.2f} years")
+            lines.append(
+                f"  min track record to trust this Sharpe: "
+                f"{self.min_track_record_years:.2f} years"
+            )
         lines += ["", f"  VERDICT: {self.verdict}"]
         return "\n".join(lines)
 
@@ -506,7 +511,8 @@ def _verdict(
     return (
         f"SURVIVES — best net Sharpe {best_sharpe:.3f} (hold {best_hold}h) deflates to "
         f"P={deflated:.4f} across {len(HOLD_HOURS)} trials"
-        + (f", PBO={pbo.pbo:.3f}" if pbo is not None else ", PBO not computable at this sample size")
+        + (f", PBO={pbo.pbo:.3f}" if pbo is not None
+           else ", PBO not computable at this sample size")
         + f", on {len(trades)} real trade(s) pooled across {len({t.event.anchor for t in trades})} "
         f"anchor(s) — the first quantitative signal on this venue to clear this bar"
     )

@@ -213,6 +213,31 @@ def collect(data_dir: Path) -> list[Correction]:
             ),
             artefact="data/surface_agreement.json", kind="bug",
         ))
+
+    # 7. A vendor reading the desk trusted without checking.
+    macd = _read(data_dir, "skill_macd_check.json")
+    if macd is None:
+        out.append(missing("skill_macd_check.json", "The unchecked MACD reading"))
+    else:
+        out.append(Correction(
+            headline=(
+                f"The desk believed Bitget's MACD — its fields are swapped on "
+                f"{macd.get('swapped', '?')} of "
+                f"{int(macd.get('swapped', 0)) + int(macd.get('straight', 0))} symbols we "
+                f"could check"
+            ),
+            detail=(
+                f"We recomputed the technical-analysis Skill's RSI before trusting it, and never "
+                f"did the same for its MACD. The Skill returns the signal line in its "
+                f"`histogram` field and the histogram in `signal`, and its cross flag "
+                f"contradicted the recomputed lines on "
+                f"{macd.get('cross_flag_contradicts_lines', '?')} symbols. The desk passed those "
+                f"payloads to the model as evidence, and decision theses cited the crosses. "
+                f"Every MACD payload is now recomputed from Bitget's 4h candles before the desk "
+                f"or the console reads it; past theses stay in the chain as written."
+            ),
+            artefact="data/skill_macd_check.json", kind="bug",
+        ))
     return out
 
 

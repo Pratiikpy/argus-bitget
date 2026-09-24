@@ -142,9 +142,16 @@ def _from_mbo_msg(msg: Any) -> MboEvent:
 def read_dbn(path: Path) -> list[MboEvent]:
     """Real GLBX.MDP3 MBO records for one file, read via the real `databento` SDK and reduced to
     :class:`MboEvent`. Sorted by `ts_recv` because DBN files are ordered by capture time, which
-    for a single-venue file is receipt order — the order the book actually changed in."""
+    for a single-venue file is receipt order — the order the book actually changed in.
+
+    The missing-file check comes first: a path that does not exist is the more basic fault, and
+    reporting a missing optional package instead sends the caller to install something that would
+    not have helped."""
+    if not path.exists():
+        raise MboQueueProofError(f"{path} does not exist")
     try:
-        import databento
+        # Optional by design (see the error below); not installed where the console runs.
+        import databento  # type: ignore[import-not-found, unused-ignore]
     except ImportError as exc:
         raise MboQueueProofError(
             "the `databento` package is needed to read a .dbn/.dbn.zst file "
@@ -152,8 +159,6 @@ def read_dbn(path: Path) -> list[MboEvent]:
             "console, matching how this project already keeps scikit-learn and riskfolio out of "
             "the shipped bundle"
         ) from exc
-    if not path.exists():
-        raise MboQueueProofError(f"{path} does not exist")
     store = databento.DBNStore.from_file(path)
     events = [
         _from_mbo_msg(record) for record in store

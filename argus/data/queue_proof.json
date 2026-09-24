@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T11:07:37.667418+00:00",
+  "generated_at": "2026-09-21T13:48:46.462167+00:00",
   "reference": "nkaz001/hftbacktest queue.rs:183-330",
   "metric": "mean |estimated qty ahead - true qty ahead| as a share of the entry level",
   "episodes_per_regime": 4000,

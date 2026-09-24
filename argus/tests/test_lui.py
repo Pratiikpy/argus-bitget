@@ -94,10 +94,15 @@ def weekend_ledger(tmp_path: Path) -> PaperLedger:
 class TestRefusalIsAnAnswer:
     """The judge questions that are supposed to be refused. Answering them anyway is the bug."""
 
-    def test_an_instrument_the_venue_does_not_carry_is_named_not_guessed(self) -> None:
+    def test_an_instrument_the_desk_does_not_trade_is_named_not_guessed(self) -> None:
+        """The ledger has no row on gold, so the record layer refuses — and says what is true:
+        gold trades on Bitget, the desk does not trade it, and the research layer (which runs
+        first in the console) answers it. The reason once said gold was "not listed on Bitget",
+        which XAUUSDT on the live contract list disproves."""
         q = classify("what's gold trading at?", now=NOW)
         assert q.intent is Intent.UNSUPPORTED
-        assert "not listed on Bitget" in q.reason
+        assert "trades on Bitget (XAUUSDT)" in q.reason
+        assert "not listed" not in q.reason
 
     def test_the_refusal_lists_what_can_be_asked_about_instead(
         self, weekend_ledger: PaperLedger
@@ -659,7 +664,8 @@ class TestIntegrityAnswers:
         got = self._answer("is the log tamper-evident?", bypassed)
         text = " ".join(got.lines)
         assert "1" in text
-        assert "no settlement seal" in text.lower() or "unsealed" in text.lower() or "bypass" in text.lower()
+        lowered = text.lower()
+        assert "no settlement seal" in lowered or "unsealed" in lowered or "bypass" in lowered
 
     def test_the_head_hash_shown_is_the_real_head_not_a_stale_decision_hash(
         self, tmp_path: Path
@@ -797,3 +803,45 @@ class TestVoidedRowsAreNotCountedAsTrades:
             assert voided.seq in present, (
                 f"seq {voided.seq} was deleted; corrections.py forbids that"
             )
+
+
+class TestReviewReachesTheReviewEngine:
+    """Track 3's Review & Self-Evolution. These questions used to be answered with the latest
+    decision or its evidence — the review engine existed and nothing typed reached it."""
+
+    @pytest.mark.parametrize("text", [
+        "what bad decision patterns do you have",
+        "what have you learned from your mistakes",
+        "give me a checklist from your reviews",
+        "review the desk's decisions",
+        "run a post-mortem on the desk",
+    ])
+    def test_review_questions_are_review(self, text: str) -> None:
+        assert classify(text, now=NOW).intent is Intent.REVIEW
+
+    @pytest.mark.parametrize("text", [
+        "why did you pass on NVDA", "what is the sharpe", "what did the risk layer block",
+    ])
+    def test_record_questions_are_untouched(self, text: str) -> None:
+        assert classify(text, now=NOW).intent is not Intent.REVIEW
+
+    def test_the_answer_is_computed_from_the_desks_own_notes(
+        self, weekend_ledger: PaperLedger, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        import json
+        notes = [{"seq": i, "grounding": {"ungrounded": ["9.9%"]} if i % 2 else {}}
+                 for i in range(1, 10)]
+        (tmp_path / "desk_notes.jsonl").write_text(
+            "\n".join(json.dumps(n) for n in notes), encoding="utf-8")
+        monkeypatch.setenv("ARGUS_DATA_DIR", str(tmp_path))
+        a = answer(weekend_ledger, classify("what bad decision patterns do you have", now=NOW))
+        assert not a.refused and a.is_grounded
+        assert "reviewed" in " ".join(a.lines)
+        assert any("Checklist" in line for line in a.lines)
+
+    def test_no_notes_is_a_refusal_not_an_empty_review(
+        self, weekend_ledger: PaperLedger, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("ARGUS_DATA_DIR", str(tmp_path))
+        a = answer(weekend_ledger, classify("give me a checklist", now=NOW))
+        assert a.refused

@@ -331,7 +331,8 @@ class TestTheEvidenceIsTraceable:
 
 
 class TestHurdlePanel:
-    """Added 2026-09-23 alongside `research.pead_study`, extended same day with `shadow_record.json`.
+    """Added 2026-09-23 alongside `research.pead_study`, extended the same day with
+    `shadow_record.json`.
     Three artefacts already answered "is abstaining right" -- `hurdle_frontier.json`,
     `pead_study.json`, and `shadow_record.json` -- and none had reached this page. A judge reading
     only the performance panel sees three undefined figures and nothing that says the desk was

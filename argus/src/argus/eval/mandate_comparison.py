@@ -16,15 +16,15 @@ defense-in-depth check, and (skipped here — see :mod:`argus.eval.baselines`) m
 floors. ARGUS's ``Mandate.out_of_mandate`` checks holding horizon, position-size percentage of
 capital, an excluded-symbol list, hedge availability, a confidence floor, and a concurrent-position
 cap, and — unlike Vibe-Trading — collects every applicable reason rather than stopping at the
-first. Two of ARGUS's six dimensions overlap Vibe-Trading's, or nearly so (notional/position-size, the
-excluded-symbol list); the other four — horizon, hedge availability, the confidence floor, the
-concurrent-position cap — have no Vibe-Trading equivalent at all. ``no_specialist_capability_superior``
-at the bottom of this module states the scope this is honestly claimed over, not "ARGUS wins
-everything a pre-trade gate could check" — portfolio-wide leverage and gross exposure are a
-*different* ARGUS capability's job (``agents.desk.ConstitutionPolicy.max_gross_exposure_notional``
-/ ``max_signed_exposure_notional`` — the class at ``agents/desk.py:865``, its ``rule()`` method
-that enforces the exposure ceiling at ``agents/desk.py:1042`` — checked directly before this claim
-was written), not this one's.
+first. Two of ARGUS's six dimensions overlap Vibe-Trading's, or nearly so (notional/position-size,
+the excluded-symbol list); the other four — horizon, hedge availability, the confidence floor, the
+concurrent-position cap — have no Vibe-Trading equivalent at all.
+``no_specialist_capability_superior`` at the bottom of this module states the scope this is honestly
+claimed over, not "ARGUS wins everything a pre-trade gate could check" — portfolio-wide leverage and
+gross exposure are a *different* ARGUS capability's job
+(``agents.desk.ConstitutionPolicy.max_gross_exposure_notional`` / ``max_signed_exposure_notional`` —
+the class at ``agents/desk.py:865``, its ``rule()`` method that enforces the exposure ceiling at
+``agents/desk.py:1042`` — checked directly before this claim was written), not this one's.
 
 Also see ``research/architecture/personalisation-audit.md`` for the corrected record of two
 FABRICATED citations this project previously carried about Vibe-Trading (a mandate-injection

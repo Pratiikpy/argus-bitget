@@ -289,7 +289,11 @@ def _eps_quarters(values: list[float], *, newest_end: date = date(2026, 7, 26)) 
             start=end - timedelta(days=91), end=end, filed=end + timedelta(days=25), form="10-Q",
             fiscal_year=2027, fiscal_period="Q2", frame=None,
         ))
-        end = date(end.year - (1 if end.month <= 3 else 0), end.month - 3 if end.month > 3 else end.month + 9, end.day)
+        end = date(
+            end.year - (1 if end.month <= 3 else 0),
+            end.month - 3 if end.month > 3 else end.month + 9,
+            end.day,
+        )
     return out
 
 

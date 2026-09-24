@@ -254,7 +254,8 @@ class TestTheGateOrder:
         == "none"` — the exact "an absent cap that reads like a satisfied one" failure mode
         `rule()`'s own `unpriced` comment warns about, reached here by the test itself rather than
         by production code (which always back-fills `reference_price` before calling `rule()`).
-        `price=1` makes notional equal quantity, the simplest value that still exercises the gate."""
+        `price=1` makes notional equal quantity, the simplest value that still exercises the
+        gate."""
         policy = ConstitutionPolicy(
             book_state=None, max_unhedged_notional=Decimal("10000000"),
             reference_price=Decimal("1"),

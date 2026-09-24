@@ -217,6 +217,7 @@ class TradingDesk:
         profile: TraderProfile | None = None,
         history: Sequence[Any] = (),
         debate_budget: Decimal | None = None,
+        debate_affordable: bool = True,
         underlying_halted: bool = False,
         halt_reason: str = "",
     ) -> DeskRun:
@@ -495,6 +496,14 @@ class TradingDesk:
         # are being paid to settle. A debate skipped for this reason is recorded as skipped, with
         # the reason, so a thin record is never mistaken for a thin market.
         worth_arguing = conflicts.has_directional_split
+        # A split panel is argued only if the cycle can still afford every decision after it.
+        # Debates are the one expensive step that is optional; a decision is not. On 2026-09-23
+        # two cycles held five debates in their first nine symbols and ran out of tokens before
+        # the last three were decided at all — three undecided names bought three debates.
+        # The caller (`paper/runner.py`) says whether the budget can carry one.
+        budget_reserved = worth_arguing and not debate_affordable
+        if budget_reserved:
+            worth_arguing = False
         debate = hold_debate(
             symbol=symbol,
             horizon_hours=session.hours_to_next_discovery,
@@ -506,7 +515,13 @@ class TradingDesk:
             # two calls to one model is self-consistency rather than corroboration.
             shared_model=self.critic is self._client,
         )
-        if not worth_arguing:
+        if budget_reserved:
+            notes.append(
+                "[debate] not held — the panel split on direction, but the cycle's token budget "
+                "is reserved for the symbols still to decide; this decision was taken without "
+                "the debate, and that is recorded rather than hidden."
+            )
+        elif not worth_arguing:
             notes.append(
                 f"[debate] not held — the panel agreed on direction across "
                 f"{len(panel.views)} analyst(s), and a debate between two seats that already "

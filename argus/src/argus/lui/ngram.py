@@ -277,7 +277,7 @@ class NgramClassifier:
 _CACHED: NgramClassifier | None = None
 
 PATTERN_WINS: frozenset[str] = frozenset(
-    {"integrity", "risk_control", "order", "unsupported"}
+    {"integrity", "risk_control", "order", "unsupported", "review"}
 )
 """The only intents where `lui/question.py` overrules a confident model answer.
 
