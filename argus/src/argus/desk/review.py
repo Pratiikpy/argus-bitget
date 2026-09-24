@@ -44,9 +44,10 @@ import argparse
 import json
 import re
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from enum import StrEnum
+from math import comb
 from pathlib import Path
 from typing import Any
 
@@ -67,7 +68,25 @@ NEVER_FIRES = 0.0
 """A rule that never fired on the reviewed set tells us nothing about itself, good or bad."""
 
 MIN_PRECISION = 0.5
-"""Below this a firing rule is wrong more often than right, and not worth a trader's attention."""
+"""Kept for callers that report it; no longer a grading threshold.
+
+It used to decide MISLEADING on its own, and an absolute precision floor ignores the base rate: a
+rule firing at random on decisions where the targeted defect runs at 72% scores 72% "precision",
+and was graded ACTIVE on 1,000 of 1,000 random seeds, while a rule catching every one of a defect
+that occurs on 1% of decisions, at 20% precision (18.8 times the base rate), was graded MISLEADING
+(rival review, 2026-09-24). Grading is now by lift over the base rate and its significance."""
+
+ALPHA = 0.05
+"""Significance a rule's lift needs, after the Benjamini-Hochberg correction across every rule
+graded together, to be ACTIVE. Twelve rules tested at 5% each would crown one by chance in half
+of all reviews; the correction is what keeps a checklist from being a list of coincidences."""
+
+SUGGESTIVE = 0.2
+"""A lift above :data:`MIN_LIFT` with an uncorrected p-value below this is EARNING — worth watching,
+not yet evidence. Above it the rule is indistinguishable from chance and is named that way."""
+
+MIN_LIFT = 1.2
+"""The smallest lift over the base rate worth a trader's attention at all."""
 
 MIN_FIRINGS = 5
 """Firings below which a rule that looks right is called EARNING rather than ACTIVE.
@@ -261,6 +280,22 @@ class RulePerformance:
 
     status: Status
     note: str = ""
+    base_rate: float | None = None
+    """Share of reviewed decisions that carried a targeted defect, whether or not the rule fired."""
+
+    p_value: float | None = None
+    """One-sided Fisher exact p-value that the rule fires on the defect more than chance would."""
+
+    q_value: float | None = None
+    """``p_value`` after the Benjamini-Hochberg correction across the rules reviewed together."""
+
+    @property
+    def lift(self) -> float | None:
+        """Precision over the base rate: how much likelier a firing is to meet the defect than a
+        decision picked at random. 1.0 is a coin; below 1.0 the rule points away from it."""
+        if self.precision is None or not self.base_rate:
+            return None
+        return self.precision / self.base_rate
 
     @property
     def fire_rate(self) -> float:
@@ -279,9 +314,10 @@ class RulePerformance:
     def render(self) -> str:
         precision = "n/a" if self.precision is None else f"{self.precision:.0%}"
         recall = "n/a" if self.recall is None else f"{self.recall:.0%}"
+        lift = "n/a" if self.lift is None else f"{self.lift:.1f}x"
         return (
             f"{self.status.upper():17} {self.rule}: fired {self.fired}/{self.decisions} "
-            f"({self.fire_rate:.0%}), precision {precision}, recall {recall}"
+            f"({self.fire_rate:.0%}), precision {precision}, recall {recall}, lift {lift}"
             + (f" — {self.note}" if self.note else "")
         )
 
@@ -291,7 +327,8 @@ class RulePerformance:
             "decisions": self.decisions, "fired": self.fired, "caught": self.caught,
             "false_alarms": self.false_alarms, "missed": self.missed,
             "fire_rate": self.fire_rate, "precision": self.precision, "recall": self.recall,
-            "note": self.note,
+            "base_rate": self.base_rate, "lift": self.lift, "p_value": self.p_value,
+            "q_value": self.q_value, "note": self.note,
         }
 
 
@@ -315,13 +352,18 @@ def evaluate(
         if hit:
             fired_on.add(int(record.get("seq", 0)))
 
+    reviewed = {int(record.get("seq", 0)) for record in records}
+    targeted &= reviewed  # a defect on a decision outside this review is not part of its base rate
     total = len(records)
     fired = len(fired_on)
     caught = len(fired_on & targeted)
+    base = len(targeted) / total if total else None
+    p_value = (_upper_tail(total, len(targeted), fired, caught)
+               if total and fired and targeted else None)
     performance = RulePerformance(
         rule=rule.name, prompt=rule.prompt, decisions=total, fired=fired, caught=caught,
         false_alarms=fired - caught, missed=len(targeted - fired_on),
-        status=Status.PROPOSED,
+        status=Status.PROPOSED, base_rate=base, p_value=p_value,
     )
     status, note = _status_for(
         performance, min_decisions=min_decisions, targeted_total=len(targeted)
@@ -329,8 +371,40 @@ def evaluate(
     return RulePerformance(
         rule=performance.rule, prompt=performance.prompt, decisions=total, fired=fired,
         caught=caught, false_alarms=performance.false_alarms, missed=performance.missed,
-        status=status, note=note,
+        status=status, note=note, base_rate=base, p_value=p_value,
     )
+
+
+def _hypergeometric(total: int, marked: int, drawn: int, hit: int) -> float:
+    return (comb(marked, hit) * comb(total - marked, drawn - hit)) / comb(total, drawn)
+
+
+def _upper_tail(total: int, marked: int, drawn: int, hit: int) -> float:
+    """P(at least ``hit`` marked items in ``drawn`` draws without replacement) — the one-sided
+    Fisher exact test that a rule's firings meet the defect more often than chance."""
+    top = min(marked, drawn)
+    return min(1.0, sum(_hypergeometric(total, marked, drawn, i) for i in range(hit, top + 1)))
+
+
+def _lower_tail(total: int, marked: int, drawn: int, hit: int) -> float:
+    """P(at most ``hit``): the test that a rule avoids the defect more than chance would."""
+    bottom = max(0, drawn - (total - marked))
+    return min(1.0, sum(_hypergeometric(total, marked, drawn, i) for i in range(bottom, hit + 1)))
+
+
+def benjamini_hochberg(p_values: Sequence[float]) -> list[float]:
+    """Benjamini-Hochberg (1995) adjusted q-values, in the order given."""
+    m = len(p_values)
+    if m == 0:
+        return []
+    order = sorted(range(m), key=lambda i: p_values[i])
+    adjusted = [0.0] * m
+    running = 1.0
+    for rank in range(m, 0, -1):
+        i = order[rank - 1]
+        running = min(running, p_values[i] * m / rank)
+        adjusted[i] = min(1.0, running)
+    return adjusted
 
 
 def _status_for(
@@ -357,17 +431,35 @@ def _status_for(
             f"identifying a problem"
         )
     precision = p.precision or 0.0
-    if precision < MIN_PRECISION:
-        return Status.MISLEADING, (
-            f"right {precision:.0%} of the times it fires; below {MIN_PRECISION:.0%} it sends the "
-            f"reader to the wrong place more often than the right one"
+    base = p.base_rate or 0.0
+    lift = p.lift if p.lift is not None else 0.0
+    against = (f"right {precision:.0%} of the times it fires against a {base:.0%} base rate "
+               f"(lift {lift:.1f}x)")
+    if lift < 1.0:
+        below = _lower_tail(p.decisions, targeted_total, p.fired, p.caught)
+        if below < ALPHA:
+            return Status.MISLEADING, (
+                f"{against}: it fires on clean decisions more than chance would (p={below:.3f}), "
+                f"so it sends the reader away from the problem"
+            )
+        return Status.NO_DISCRIMINATION, (
+            f"{against}: no better than picking decisions at random (p={below:.2f})"
+        )
+    p_value = p.p_value if p.p_value is not None else 1.0
+    if lift < MIN_LIFT or p_value >= SUGGESTIVE:
+        return Status.NO_DISCRIMINATION, (
+            f"{against}: indistinguishable from chance on this record (p={p_value:.2f})"
         )
     if p.fired < MIN_FIRINGS:
         return Status.EARNING, (
-            f"fires selectively and is right {precision:.0%} of the time, but on only {p.fired} "
-            f"firing(s); below {MIN_FIRINGS} the rate is not yet evidence"
+            f"{against}, but on only {p.fired} firing(s); below {MIN_FIRINGS} the rate is not yet "
+            f"evidence"
         )
-    return Status.ACTIVE, "fires selectively and is usually right when it does"
+    if p_value >= ALPHA:
+        return Status.EARNING, (
+            f"{against}; suggestive (p={p_value:.3f}) but not yet evidence"
+        )
+    return Status.ACTIVE, f"{against}; significant on its own (p={p_value:.2g})"
 
 
 @dataclass
@@ -598,7 +690,8 @@ def review(
         *defects_from_risk(risk),
         *defects_from_outcomes(entries),
     ]
-    performance = [evaluate(r, notes, defects, min_decisions=min_decisions) for r in rules]
+    performance = _corrected([evaluate(r, notes, defects, min_decisions=min_decisions)
+                              for r in rules])
     report = ReviewReport(
         generated_at=now or datetime.now(UTC),
         decisions=len(notes),
@@ -620,6 +713,24 @@ def review(
             "so nothing has tested them"
         )
     return report
+
+
+def _corrected(performance: list[RulePerformance]) -> list[RulePerformance]:
+    """Benjamini-Hochberg across every rule that was graded, and ACTIVE only where it survives."""
+    graded = [i for i, perf in enumerate(performance) if perf.p_value is not None]
+    q_values = benjamini_hochberg([performance[i].p_value or 1.0 for i in graded])
+    out = list(performance)
+    for i, q in zip(graded, q_values, strict=True):
+        perf = out[i]
+        status, note = perf.status, perf.note
+        if status is Status.ACTIVE and q >= ALPHA:
+            status = Status.EARNING
+            note = (f"{note}, but not after correcting for the {len(graded)} rules graded "
+                    f"together (q={q:.3f})")
+        elif status is Status.ACTIVE:
+            note = f"{note}; survives the correction across {len(graded)} rules (q={q:.2g})"
+        out[i] = replace(perf, status=status, note=note, q_value=q)
+    return out
 
 
 def _load(path: Path) -> list[dict[str, Any]]:

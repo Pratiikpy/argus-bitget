@@ -76,6 +76,36 @@ class TestTheLookaheadGate:
         for match in report.matches:
             assert "forward_return_bps" not in match.contributions
 
+    def test_an_outcome_not_yet_realised_is_invisible(self) -> None:
+        """A state from before the decision whose forward window ends after it would leak the
+        future; the rival review of 2026-09-24 found `find` let it through."""
+        corpus = _corpus()
+        pending = [
+            Observation(
+                as_of=NOW - timedelta(hours=i), symbol="NVDAUSDT",
+                features={"vol": 20, "momentum": 0.0, "spread_bps": 4},
+                forward_return_bps=9_999, realised_at=NOW - timedelta(hours=i) + timedelta(days=1),
+            )
+            for i in range(1, 6)
+        ]
+        report = find(query={"vol": 20, "momentum": 0.0, "spread_bps": 4},
+                      corpus=[*corpus, *pending], as_of=NOW)
+        assert report.usable
+        assert 9_999 not in report.distribution.returns_bps  # type: ignore[union-attr]
+
+    def test_corpus_from_closes_stamps_when_each_outcome_was_known(self) -> None:
+        from argus.desk.analogue import corpus_from_closes
+
+        closes = [(NOW + timedelta(hours=i), 100.0 + (i % 7)) for i in range(80)]
+        corpus = corpus_from_closes(closes, symbol="NVDAUSDT", window=24, horizon=24)
+        assert corpus
+        assert all(o.realised_at == o.as_of + timedelta(hours=24) for o in corpus)
+
+    def test_an_outcome_before_its_state_is_refused(self) -> None:
+        with pytest.raises(AnalogueError, match="realised before"):
+            Observation(as_of=NOW, symbol="NVDAUSDT", features={"vol": 20},
+                        forward_return_bps=1, realised_at=NOW - timedelta(hours=1))
+
     def test_a_naive_clock_is_refused(self) -> None:
         with pytest.raises(AnalogueError, match="timezone-aware"):
             find(query={"vol": 20}, corpus=_corpus(), as_of=datetime(2026, 9, 14, 15, 0))

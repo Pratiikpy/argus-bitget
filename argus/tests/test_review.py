@@ -114,11 +114,19 @@ class TestTheRefusalsAreNamedNotQuiet:
         assert got.status is Status.NO_DISCRIMINATION
         assert got.fire_rate >= ALWAYS_FIRES
 
-    def test_a_rule_that_is_usually_wrong_when_it_fires_is_misleading(self) -> None:
-        """Worse than absent: it spends attention and points the wrong way."""
-        # fires on 30 of 60; only 2 of those coincide with a targeted defect -> precision ~0.07
-        got = evaluate(_rule(), _records(60, flag_to=30), _defects([0, 1]))
+    def test_a_rule_that_avoids_the_defect_is_misleading(self) -> None:
+        """Worse than absent: it spends attention and points the wrong way. Half the decisions
+        carry the defect and the rule fires on twenty clean ones — far fewer hits than chance."""
+        got = evaluate(_rule(), _records(60, flag_to=20), _defects(list(range(30, 60))))
         assert got.status is Status.MISLEADING
+        assert got.lift == 0.0 and "more than chance would" in got.note
+
+    def test_low_precision_on_a_common_defect_is_chance_not_misleading(self) -> None:
+        """Fires on half the record and meets both of two defects: 7% precision, but twice the
+        base rate and nowhere near significant. An absolute 50% precision bar called this
+        MISLEADING; the base rate says it is indistinguishable from chance."""
+        got = evaluate(_rule(), _records(60, flag_to=30), _defects([0, 1]))
+        assert got.status is Status.NO_DISCRIMINATION
         assert got.precision is not None and got.precision < MIN_PRECISION
 
     def test_misleading_and_dead_weight_do_not_keep_their_place(self) -> None:
@@ -138,7 +146,7 @@ class TestFailureCasesAreDocumentedNotJustCounted:
 
     def test_a_misleading_rule_appears_in_failure_cases_with_its_own_why(self) -> None:
         rule = _rule(name="misleading-one")
-        performance = evaluate(rule, _records(60, flag_to=30), _defects([0, 1]))
+        performance = evaluate(rule, _records(60, flag_to=20), _defects(list(range(30, 60))))
         report = review(notes=_records(60))
         report.performance.append(performance)
         cases = report.failure_cases
@@ -198,11 +206,47 @@ class TestARuleCanEarnItsPlace:
         got = evaluate(_rule(), _records(60, flag_to=10), _defects(list(range(8))))
         assert got.status is Status.ACTIVE
 
-    def test_firing_selectively_and_catching_nothing_is_misleading_not_earning(self) -> None:
-        """With the targeted defect observed elsewhere, a rule that fires ten times and catches
-        none of them is not unproven — it is pointing the wrong way."""
+    def test_catching_nothing_in_ten_firings_is_not_yet_evidence_either_way(self) -> None:
+        """The defect runs at one decision in six, so ten firings expect under two hits; catching
+        none happens by chance 14% of the time. That is no better than chance — not proof that the
+        rule points the wrong way."""
         got = evaluate(_rule(), _records(60, flag_to=10), _defects(list(range(40, 50))))
-        assert got.status is Status.MISLEADING
+        assert got.status is Status.NO_DISCRIMINATION
+        assert not got.status.keeps_its_place
+
+
+class TestTheBaseRateDecides:
+    """The two cases the rival review of 2026-09-24 used to show absolute precision grading was
+    broken: noise crowned on a common defect, signal refused on a rare one."""
+
+    def test_a_coin_flip_on_a_common_defect_is_never_active(self) -> None:
+        import random
+
+        crowned = 0
+        for seed in range(200):
+            rng = random.Random(seed)
+            records = [{"seq": i, "symbol": "NVDAUSDT", "mark": rng.random() < 0.5}
+                       for i in range(200)]
+            defects = _defects([i for i in range(200) if rng.random() < 0.72])
+            got = evaluate(_rule(), records, defects)
+            crowned += got.status is Status.ACTIVE
+        # a fair coin can reach significance by chance; at 5% that is about ten seeds in 200
+        assert crowned <= 20, crowned
+
+    def test_a_rule_catching_a_rare_defect_at_low_precision_is_active(self) -> None:
+        # 565 decisions, a defect on 6 of them (1.06%); the rule fires on those 6 and 24 clean ones
+        records = [{"seq": i, "symbol": "NVDAUSDT", "mark": i < 30} for i in range(565)]
+        got = evaluate(_rule(), records, _defects(list(range(6))))
+        assert got.precision == pytest.approx(0.2)
+        assert got.lift is not None and got.lift == pytest.approx(18.83, abs=0.01)
+        assert got.status is Status.ACTIVE
+
+    def test_a_rule_significant_alone_is_not_active_after_correcting_for_many(self) -> None:
+        from argus.desk.review import benjamini_hochberg
+
+        q = benjamini_hochberg([0.04, 0.5, 0.6, 0.7, 0.8, 0.9])
+        assert q[0] == pytest.approx(0.24)
+        assert all(0.0 <= v <= 1.0 for v in q)
 
 
 class TestABrokenRuleDoesNotTakeTheReviewDown:

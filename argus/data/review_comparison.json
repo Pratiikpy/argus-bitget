@@ -23,6 +23,10 @@
         "status": "misleading"
       },
       {
+        "case": "fires_selectively_no_better_than_chance",
+        "status": "no_discrimination"
+      },
+      {
         "case": "fires_selectively_always_right_below_min_firings",
         "status": "earning"
       },
@@ -36,9 +40,9 @@
   },
   "ablations": [
     {
-      "dimension": "min_precision",
+      "dimension": "alpha",
       "real_status": "active",
-      "ablated_status": "misleading",
+      "ablated_status": "earning",
       "differs": true
     },
     {

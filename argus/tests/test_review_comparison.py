@@ -53,7 +53,7 @@ class TestThresholdAblations:
         results = run_threshold_ablations()
         by_dim = {r.dimension: r for r in results}
         assert set(by_dim) == {
-            "min_precision", "always_fires_ceiling", "never_fires_floor", "min_firings_floor",
+            "alpha", "always_fires_ceiling", "never_fires_floor", "min_firings_floor",
         }
         for r in results:
             assert r.differs, r.dimension

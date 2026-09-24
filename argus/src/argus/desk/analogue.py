@@ -68,10 +68,23 @@ class Observation:
     symbol: str
     features: Mapping[str, float]
     forward_return_bps: float
+    realised_at: datetime | None = None
+    """When ``forward_return_bps`` became known — the end of its forward window. ``None`` means
+    the caller did not say, and :func:`find` then treats the outcome as known at ``as_of``, the
+    behaviour before this field existed.
+
+    Added 2026-09-24 after a rival review found the look-ahead this closes: :func:`find` gated only
+    ``as_of < decision``, so an observation stamped fewer than ``horizon`` bars before the decision
+    carried a forward return that had not happened yet. The live console was safe —
+    :func:`corpus_from_closes` stops ``horizon`` bars before the series ends — but a backtest
+    passing a full-history corpus and an ``as_of`` cut leaked up to ``horizon`` bars of future.
+    AnalogDesk's retrieval embargoes the same way (``jHi = q - H``, ``src/engine/analog.mjs``)."""
 
     def __post_init__(self) -> None:
         if self.as_of.tzinfo is None:
             raise AnalogueError("observation timestamps must be timezone-aware")
+        if self.realised_at is not None and self.realised_at < self.as_of:
+            raise AnalogueError("an outcome cannot be realised before its state was observed")
 
 
 @dataclass(frozen=True)
@@ -251,7 +264,9 @@ def find(
     if not keys:
         return AnalogueReport((), None, refused="no query feature appears in the corpus")
 
-    eligible = [o for o in corpus if o.as_of < as_of]
+    # A state before the decision is not enough: its outcome must also be known by then.
+    eligible = [o for o in corpus
+                if o.as_of < as_of and (o.realised_at or o.as_of) <= as_of]
     if len(eligible) < MIN_ANALOGUES:
         return AnalogueReport(
             (), None,
@@ -336,6 +351,7 @@ def corpus_from_closes(
                 "volatility_bps": vol * 10_000,
             },
             forward_return_bps=(closes[i + horizon][1] / close_now - 1.0) * 10_000,
+            realised_at=closes[i + horizon][0],
         ))
     return corpus
 

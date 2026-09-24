@@ -155,14 +155,23 @@ def run_lifecycle_cases() -> tuple[LifecycleCase, ...]:
     perf = evaluate(rule, always, [Defect(0, "X", DefectKind.GROUNDING, "x")])
     cases.append(LifecycleCase("fires_on_almost_everything", perf.status))
 
-    # MISLEADING: fires selectively, mostly wrong.
+    # MISLEADING: fires selectively on clean decisions while the defect sits elsewhere. Half the
+    # record carries the defect and the rule's ten firings meet none of it — far below chance.
+    # (Before 2026-09-24 this case was "2 of 10 right", graded MISLEADING by an absolute 50%
+    # precision floor; against a 2-in-30 base rate that rule is three times better than chance.)
     n = MIN_DECISIONS + 10
     fires = set(range(10))
     misleading_records = _records(n, fires_on=fires)
-    # Only 2 of the 10 fired decisions actually carried the defect -> precision 20% < MIN_PRECISION.
-    misleading_defects = [Defect(i, "X", DefectKind.GROUNDING, "x") for i in range(2)]
+    misleading_defects = [Defect(i, "X", DefectKind.GROUNDING, "x") for i in range(15, 30)]
     perf = evaluate(rule, misleading_records, misleading_defects)
     cases.append(LifecycleCase("fires_selectively_mostly_wrong", perf.status))
+
+    # NO_DISCRIMINATION by chance: fires on a third of the record and meets the defect at its
+    # base rate — no better than picking decisions at random.
+    chance_records = _records(n, fires_on=set(range(0, 30, 3)))
+    chance_defects = [Defect(i, "X", DefectKind.GROUNDING, "x") for i in range(0, 30, 2)]
+    perf = evaluate(rule, chance_records, chance_defects)
+    cases.append(LifecycleCase("fires_selectively_no_better_than_chance", perf.status))
 
     # EARNING: fires selectively, always right, but below MIN_FIRINGS.
     n = MIN_DECISIONS + 10
@@ -192,6 +201,7 @@ _EXPECTED_LIFECYCLE = {
     "never_fires": Status.DEAD_WEIGHT,
     "fires_on_almost_everything": Status.NO_DISCRIMINATION,
     "fires_selectively_mostly_wrong": Status.MISLEADING,
+    "fires_selectively_no_better_than_chance": Status.NO_DISCRIMINATION,
     "fires_selectively_always_right_below_min_firings": Status.EARNING,
     "fires_selectively_always_right_at_min_firings": Status.ACTIVE,
 }
@@ -263,33 +273,33 @@ def run_threshold_ablations() -> tuple[ThresholdAblation, ...]:
     rule = _rule()
     results = []
 
-    # MIN_PRECISION: a rule at exactly 60% precision is ACTIVE under the real 50% floor;
-    # patching the floor to 70% should flip it to MISLEADING.
+    # ALPHA (replaced the absolute MIN_PRECISION ablation on 2026-09-24, when grading moved to
+    # lift over the base rate): 5 of 7 firings meet a defect that runs at 10 in 30 — lift 2.1,
+    # one-sided Fisher p = 0.026. ACTIVE at the real 5%; at 1% the same rule is only EARNING.
     n = MIN_DECISIONS + 10
-    fires = set(range(10))
-    records = _records(n, fires_on=fires)
-    defects = [Defect(i, "X", DefectKind.GROUNDING, "x") for i in range(6)]  # 6/10 = 60%
+    records = _records(n, fires_on={0, 1, 2, 3, 4, 20, 21})
+    defects = [Defect(i, "X", DefectKind.GROUNDING, "x") for i in range(10)]
     real_perf = evaluate(rule, records, defects)
-    original = review_module.MIN_PRECISION
+    original = review_module.ALPHA
     try:
-        review_module.MIN_PRECISION = 0.7
-        ablated_perf = evaluate(
-            replace(rule, name=rule.name), records, defects,
-        )
+        review_module.ALPHA = 0.01
+        ablated_perf = evaluate(replace(rule, name=rule.name), records, defects)
     finally:
-        review_module.MIN_PRECISION = original
-    results.append(ThresholdAblation("min_precision", real_perf.status, ablated_perf.status))
+        review_module.ALPHA = original
+    results.append(ThresholdAblation("alpha", real_perf.status, ablated_perf.status))
 
-    # ALWAYS_FIRES: a rule firing on 85% is NOT no-discrimination under the real 90% ceiling;
-    # patching the ceiling to 80% should flip it to NO_DISCRIMINATION.
+    # ALWAYS_FIRES: a rule firing on 80% is NOT no-discrimination under the real 90% ceiling;
+    # patching the ceiling to 75% should flip it to NO_DISCRIMINATION. (80% rather than the 85%
+    # used before: a rule firing on 85% of decisions cannot reach the 1.2x MIN_LIFT, since its
+    # precision is at most 1/0.85 of the base rate.)
     n = 20
-    fires = set(range(17))  # 17/20 = 85%
+    fires = set(range(16))  # 16/20 = 80%
     records2 = _records(n, fires_on=fires)
-    defects2 = [Defect(i, "X", DefectKind.GROUNDING, "x") for i in range(17)]
+    defects2 = [Defect(i, "X", DefectKind.GROUNDING, "x") for i in range(16)]
     real_perf2 = evaluate(rule, records2, defects2, min_decisions=20)
     original_af = review_module.ALWAYS_FIRES
     try:
-        review_module.ALWAYS_FIRES = 0.8
+        review_module.ALWAYS_FIRES = 0.75
         ablated_perf2 = evaluate(rule, records2, defects2, min_decisions=20)
     finally:
         review_module.ALWAYS_FIRES = original_af
