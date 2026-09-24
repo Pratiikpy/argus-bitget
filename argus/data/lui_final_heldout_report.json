@@ -1,0 +1,42 @@
+{
+  "measured_at": "2026-09-25",
+  "corpus": "data/lui_final_heldout_2026-09-25.jsonl",
+  "written_by": "a blind writer (never read this repository), 240 rows, 12 languages",
+  "scored": "once, after training; misses not read before this report",
+  "kind_model_alone": {
+    "correct": 219,
+    "rows": 240,
+    "accuracy": 0.9125,
+    "by_lang": {
+      "ar": "3/7",
+      "de": "7/7",
+      "en": "102/108",
+      "es": "8/8",
+      "fr": "7/8",
+      "hi": "7/7",
+      "ja": "5/7",
+      "ko": "6/7",
+      "pt": "6/7",
+      "vi": "6/7",
+      "zh-Hans": "56/60",
+      "zh-Hant": "6/7"
+    }
+  },
+  "console_before": {
+    "no_book": "125/240 (52.1%)",
+    "saved_book": "126/240 (52.5%)",
+    "code": "argus-bitget 3a2ef98, patterns only"
+  },
+  "console_after": {
+    "no_book": "196/240 (81.7%)",
+    "saved_book": "204/240 (85.0%)",
+    "code": "patterns + kind model (eval/kindtrain.py) + 2026-09-25 pattern fixes",
+    "note": "First scoring read 198 and 205. Two regressions then caught by existing tests were fixed (an index shock read a held name as the shocked one; an order was shown to the kind model before being refused), and the set was re-scored once. These are the shipped figures."
+  },
+  "saved_book_used": "40% NVDA, 30% MSFT, 30% AAPL",
+  "earlier_sets": {
+    "lui_blind_corpus_2026-09-25": "dev: patterns 66.2% -> 85.0% after fixes (fit to it; not a test)",
+    "lui_heldout_corpus_2026-09-25": "held-out once: patterns 55.0% before, 63.5% after pattern fixes; kind model alone 88.5%; then used as dev and training"
+  },
+  "not_covered": "No model key in either run. Arabic 3/7 for the model alone. The four older research-bench corpora (patterns-only) are unchanged at 220/310."
+}

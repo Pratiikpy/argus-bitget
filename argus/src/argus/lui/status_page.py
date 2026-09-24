@@ -144,6 +144,20 @@ def sweep_lines(data: Path) -> list[tuple[str, str]]:
                     f"returned data; {len(skills.get('skills_reached') or [])} of "
                     f"{len(skills.get('skills_available') or [])} Skills returned data from at "
                     f"least one tool — swept {str(skills.get('checked_at', ''))[:10]}"))
+    mirror = _load(data, "skill_mirror.json")
+    if mirror:
+        substitutes = (mirror.get("answered_by_mirror", 0)
+                       - mirror.get("answered_by_mirror_same_upstream", 0))
+        out.append(("bitget-signal, covered",
+                    f"Bitget's server answered {mirror.get('answered_by_bitget')} of "
+                    f"{mirror.get('tools_probed')}; ARGUS read "
+                    f"{mirror.get('answered_by_mirror')} more straight from the sources those "
+                    f"Skills name ({mirror.get('answered_by_mirror_same_upstream')} the same "
+                    f"source, "
+                    f"{substitutes} a named substitute) — {mirror.get('answered_total')} of "
+                    f"{mirror.get('tools_probed')} answered, "
+                    f"{len(mirror.get('skills_answered_in_total') or [])} of 5 Skills — swept "
+                    f"{str(mirror.get('checked_at', ''))[:10]}"))
     reliability = _load(data, "skill_reliability.json")
     if reliability:
         verdicts = reliability.get("by_verdict") or {}

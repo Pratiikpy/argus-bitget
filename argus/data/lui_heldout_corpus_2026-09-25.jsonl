@@ -1,0 +1,200 @@
+{"id": 1, "lang": "en", "persona": "PM", "text": "if I add 500 shares of NVDA to the book what does that do to my beta and sector concentration", "expected": "impact"}
+{"id": 2, "lang": "zh", "persona": "retail beginner", "text": "我想再买100股AAPL，会不会让我的仓位太集中在科技股？", "expected": "impact"}
+{"id": 3, "lang": "other", "persona": "retail beginner", "text": "agar main 2 BTC aur le lu to mera portfolio ka risk kitna badhega", "expected": "impact"}
+{"id": 4, "lang": "en", "persona": "degen", "text": "yolo add 50k of MSTR to the stack what happens to my drawdown", "expected": "impact"}
+{"id": 5, "lang": "zh", "persona": "quant", "text": "在现有组合中加入200股TSLA，对组合的因子暴露（动量、波动率）有何影响？", "expected": "impact"}
+{"id": 6, "lang": "en", "persona": "non-native", "text": "if I removing my SPY position full, what happen to my book diversification", "expected": "impact"}
+{"id": 7, "lang": "other", "persona": "retiree", "text": "Si agrego 3 onzas de oro a mi cartera de jubilación, ¿cómo cambia el riesgo general?", "expected": "impact"}
+{"id": 8, "lang": "en", "persona": "PM", "text": "trim QQQ by 30% and show me the resulting net exposure", "expected": "impact"}
+{"id": 9, "lang": "zh", "persona": "retail beginner", "text": "卖掉一半的ETH对我整体的账户波动有什么影响", "expected": "impact"}
+{"id": 10, "lang": "en", "persona": "quant", "text": "adding 1000 shares AVGO, recompute portfolio VaR at 95%", "expected": "impact"}
+{"id": 11, "lang": "other", "persona": "degen", "text": "포트폴리오에 SOL 500개 추가하면 변동성이 얼마나 커져?", "expected": "impact"}
+{"id": 12, "lang": "en", "persona": "retiree", "text": "My advisor suggested I add some silver to my account, about $10,000 worth. Could you tell me how that would change the overall risk of what I already hold?", "expected": "impact"}
+{"id": 13, "lang": "en", "persona": "PM", "text": "run a -10% NVDA shock and show book impact", "expected": "stress"}
+{"id": 14, "lang": "zh", "persona": "quant", "text": "假设黄金一天内下跌5%，对我的组合会造成多大回撤？", "expected": "stress"}
+{"id": 15, "lang": "en", "persona": "retail beginner", "text": "what happens to my stuff if the market crashes like 2020 again", "expected": "stress"}
+{"id": 16, "lang": "mixed", "persona": "degen", "text": "如果BTC突然dump 20%我的仓位会爆吗", "expected": "stress"}
+{"id": 17, "lang": "en", "persona": "non-native", "text": "if oil price drop suddenly 15%, how my book will suffering", "expected": "stress"}
+{"id": 18, "lang": "zh", "persona": "PM", "text": "对科技股整体施加-8%的冲击，我的QQQ和TSLA敞口会亏多少？", "expected": "stress"}
+{"id": 19, "lang": "en", "persona": "quant", "text": "simulate a 3-sigma move in AMD and report P&L impact on current holdings", "expected": "stress"}
+{"id": 20, "lang": "other", "persona": "retiree", "text": "¿Qué pasaría con mi cuenta si el mercado de acciones cae un 20% como en 2008?", "expected": "stress"}
+{"id": 21, "lang": "en", "persona": "degen", "text": "black swan scenario, ETH tanks 40% overnight, how rekt am I", "expected": "stress"}
+{"id": 22, "lang": "zh", "persona": "retail beginner", "text": "如果特斯拉一天跌15%，我的持仓会亏多少钱", "expected": "stress"}
+{"id": 23, "lang": "en", "persona": "PM", "text": "stress test the book against a Fed surprise 75bp hike, what's the drawdown", "expected": "stress"}
+{"id": 24, "lang": "other", "persona": "quant", "text": "SPY가 하루에 -7% 움직이면 내 포트폴리오 손실은 얼마야?", "expected": "stress"}
+{"id": 25, "lang": "en", "persona": "PM", "text": "compare vol and beta on NVDA vs AMD, which is the cleaner semis trade right now", "expected": "compare"}
+{"id": 26, "lang": "zh", "persona": "quant", "text": "比较COIN和MSTR的风险特征，哪个的尾部风险更大？", "expected": "compare"}
+{"id": 27, "lang": "en", "persona": "retail beginner", "text": "should i buy apple or microsoft which one is safer", "expected": "compare"}
+{"id": 28, "lang": "other", "persona": "degen", "text": "SOL vs ETH kaunsa zyada risky hai abhi", "expected": "compare"}
+{"id": 29, "lang": "en", "persona": "non-native", "text": "please compare risk of TQQQ and SQQQ for me, which more dangerous", "expected": "compare"}
+{"id": 30, "lang": "zh", "persona": "retiree", "text": "请帮我比较一下黄金和白银，哪个更适合长期持有养老金账户？", "expected": "compare"}
+{"id": 31, "lang": "en", "persona": "quant", "text": "side by side drawdown and correlation for META, GOOGL, AMZN over the last year", "expected": "compare"}
+{"id": 32, "lang": "other", "persona": "PM", "text": "比較一下NVDA同AVGO嘅估值同波動性，邊隻風險較低？", "expected": "compare"}
+{"id": 33, "lang": "en", "persona": "retail beginner", "text": "netflix or amazon which is a better buy right now, wanna see them side by side", "expected": "compare"}
+{"id": 34, "lang": "zh", "persona": "degen", "text": "PLTR和COIN比谁更能打，波动率谁大", "expected": "compare"}
+{"id": 35, "lang": "en", "persona": "PM", "text": "compare HOOD and COIN on liquidity and beta to crypto prices", "expected": "compare"}
+{"id": 36, "lang": "other", "persona": "quant", "text": "금과 은의 변동성을 비교해줘, 어느 쪽이 헤지에 더 효과적이야?", "expected": "compare"}
+{"id": 37, "lang": "en", "persona": "PM", "text": "need to work 200k of QQQ, how would you slice this to minimize impact", "expected": "execution"}
+{"id": 38, "lang": "zh", "persona": "quant", "text": "我要买入5万股AAPL，应该分几笔、用什么算法执行以减少市场冲击？", "expected": "execution"}
+{"id": 39, "lang": "en", "persona": "retail beginner", "text": "i want to buy 100 shares of tesla is it ok to just buy it all at once", "expected": "execution"}
+{"id": 40, "lang": "other", "persona": "degen", "text": "5k ka NVDA lena hai ekdum se ya thoda thoda karke", "expected": "execution"}
+{"id": 41, "lang": "en", "persona": "non-native", "text": "how I should split my order of 2 BTC buy so price not moving against me", "expected": "execution"}
+{"id": 42, "lang": "zh", "persona": "PM", "text": "卖出30万股MSTR，建议用TWAP还是VWAP，时间窗口多长合适？", "expected": "execution"}
+{"id": 43, "lang": "en", "persona": "quant", "text": "optimal execution schedule for 10,000 shares of AMD over 2 hours, participation rate constraints", "expected": "execution"}
+{"id": 44, "lang": "other", "persona": "retiree", "text": "Quiero comprar 100 acciones de Amazon, ¿debería hacerlo todo de una vez o poco a poco?", "expected": "execution"}
+{"id": 45, "lang": "en", "persona": "degen", "text": "aping into 50k of SOL, should i just market buy or ladder in", "expected": "execution"}
+{"id": 46, "lang": "zh", "persona": "retail beginner", "text": "我想卖掉我所有的AAPL股票，一次性卖还是分批卖比较好", "expected": "execution"}
+{"id": 47, "lang": "en", "persona": "PM", "text": "work an order to sell 1.2m shares of SPY over the day without moving the tape", "expected": "execution"}
+{"id": 48, "lang": "other", "persona": "quant", "text": "TSLA 3000주 매수 주문을 어떻게 나눠서 실행하는 게 최적이야?", "expected": "execution"}
+{"id": 49, "lang": "en", "persona": "retail beginner", "text": "what's tesla trading at right now", "expected": "quote"}
+{"id": 50, "lang": "zh", "persona": "degen", "text": "现在btc多少钱了", "expected": "quote"}
+{"id": 51, "lang": "en", "persona": "quant", "text": "give me the bid-ask spread and current funding rate on BTC perp", "expected": "quote"}
+{"id": 52, "lang": "other", "persona": "retail beginner", "text": "abhi gold ka price kya chal raha hai", "expected": "quote"}
+{"id": 53, "lang": "en", "persona": "non-native", "text": "what is round trip cost if I buy and sell AAPL same day", "expected": "quote"}
+{"id": 54, "lang": "zh", "persona": "PM", "text": "现在NVDA的买卖价差多大，流动性怎么样", "expected": "quote"}
+{"id": 55, "lang": "en", "persona": "retiree", "text": "Could you tell me the current price of silver, please?", "expected": "quote"}
+{"id": 56, "lang": "other", "persona": "degen", "text": "而家ETH幾錢一隻？", "expected": "quote"}
+{"id": 57, "lang": "en", "persona": "quant", "text": "current funding rate and open interest on ETH perp", "expected": "quote"}
+{"id": 58, "lang": "zh", "persona": "retail beginner", "text": "亚马逊现在股价是多少", "expected": "quote"}
+{"id": 59, "lang": "en", "persona": "degen", "text": "what's spy at rn and whats the spread looking like", "expected": "quote"}
+{"id": 60, "lang": "other", "persona": "retail beginner", "text": "지금 코인베이스 주가가 얼마야?", "expected": "quote"}
+{"id": 61, "lang": "en", "persona": "quant", "text": "what's RSI and MACD reading on NVDA daily right now", "expected": "technicals"}
+{"id": 62, "lang": "zh", "persona": "PM", "text": "TSLA的均线系统现在是什么形态，是不是超买了？", "expected": "technicals"}
+{"id": 63, "lang": "en", "persona": "retail beginner", "text": "is apple overbought right now", "expected": "technicals"}
+{"id": 64, "lang": "other", "persona": "degen", "text": "AMD ka RSI kitna hai abhi, overbought hai kya", "expected": "technicals"}
+{"id": 65, "lang": "en", "persona": "non-native", "text": "please tell me support and resistance level for META stock", "expected": "technicals"}
+{"id": 66, "lang": "zh", "persona": "quant", "text": "COIN的MACD出现死叉了吗？RSI处于什么区间？", "expected": "technicals"}
+{"id": 67, "lang": "en", "persona": "degen", "text": "SOL chart looking overbought or we still pumping", "expected": "technicals"}
+{"id": 68, "lang": "other", "persona": "retiree", "text": "¿El oro está en una zona de sobrecompra según los indicadores técnicos?", "expected": "technicals"}
+{"id": 69, "lang": "en", "persona": "PM", "text": "where's the key support level on QQQ into next week", "expected": "technicals"}
+{"id": 70, "lang": "zh", "persona": "retail beginner", "text": "英伟达现在技术指标显示是超买还是超卖", "expected": "technicals"}
+{"id": 71, "lang": "en", "persona": "quant", "text": "50 and 200 day moving average crossover status on AVGO", "expected": "technicals"}
+{"id": 72, "lang": "other", "persona": "degen", "text": "비트코인 지금 과매수 구간이야?", "expected": "technicals"}
+{"id": 73, "lang": "en", "persona": "retail beginner", "text": "when does nvidia report earnings", "expected": "fundamentals"}
+{"id": 74, "lang": "zh", "persona": "quant", "text": "AAPL目前的市盈率和分析师目标价是多少？", "expected": "fundamentals"}
+{"id": 75, "lang": "en", "persona": "PM", "text": "who are the top institutional holders in PLTR right now", "expected": "fundamentals"}
+{"id": 76, "lang": "other", "persona": "retail beginner", "text": "Tesla ka earnings date kab hai", "expected": "fundamentals"}
+{"id": 77, "lang": "en", "persona": "non-native", "text": "what analyst say about target price for AMD stock", "expected": "fundamentals"}
+{"id": 78, "lang": "zh", "persona": "retiree", "text": "苹果公司的股息收益率是多少？适合养老账户长期持有吗？", "expected": "fundamentals"}
+{"id": 79, "lang": "en", "persona": "quant", "text": "ORCL forward P/E versus sector average and consensus EPS estimate", "expected": "fundamentals"}
+{"id": 80, "lang": "other", "persona": "PM", "text": "META嘅機構持股比例同分析師平均目標價係幾多？", "expected": "fundamentals"}
+{"id": 81, "lang": "en", "persona": "degen", "text": "when's coinbase next earnings drop", "expected": "fundamentals"}
+{"id": 82, "lang": "zh", "persona": "retail beginner", "text": "微软下一次财报是什么时候，分析师预期怎么样", "expected": "fundamentals"}
+{"id": 83, "lang": "en", "persona": "PM", "text": "give me the valuation multiples on MSFT vs its 5yr average", "expected": "fundamentals"}
+{"id": 84, "lang": "other", "persona": "quant", "text": "AVGO의 컨센서스 목표주가랑 실적 발표일이 언제야?", "expected": "fundamentals"}
+{"id": 85, "lang": "en", "persona": "PM", "text": "how does QQQ typically react in the 48 hours after a hot CPI print", "expected": "event"}
+{"id": 86, "lang": "zh", "persona": "quant", "text": "历史上NVDA在美联储议息会议后的平均波动是多少？", "expected": "event"}
+{"id": 87, "lang": "en", "persona": "retail beginner", "text": "will bitcoin go crazy when the fed meets next week", "expected": "event"}
+{"id": 88, "lang": "other", "persona": "degen", "text": "CPI aane par BTC kaisa react karta hai generally", "expected": "event"}
+{"id": 89, "lang": "en", "persona": "non-native", "text": "how TSLA stock usually move after its own earnings report", "expected": "event"}
+{"id": 90, "lang": "zh", "persona": "PM", "text": "黄金在非农数据公布后通常会怎么走？", "expected": "event"}
+{"id": 91, "lang": "en", "persona": "quant", "text": "historical price reaction of AMD around its earnings beats vs misses", "expected": "event"}
+{"id": 92, "lang": "other", "persona": "retiree", "text": "¿Cómo suele reaccionar el oro cuando la Reserva Federal sube las tasas?", "expected": "event"}
+{"id": 93, "lang": "en", "persona": "degen", "text": "how does coin usually move on fomc days", "expected": "event"}
+{"id": 94, "lang": "zh", "persona": "retail beginner", "text": "特斯拉财报公布后股价一般会大涨大跌吗", "expected": "event"}
+{"id": 95, "lang": "en", "persona": "PM", "text": "what's the typical move in oil around OPEC meeting announcements", "expected": "event"}
+{"id": 96, "lang": "other", "persona": "quant", "text": "FOMC 발표 이후 SOL이 보통 어떻게 반응해?", "expected": "event"}
+{"id": 97, "lang": "en", "persona": "PM", "text": "how would you hedge a 2m long NVDA book into earnings", "expected": "hedge"}
+{"id": 98, "lang": "zh", "persona": "quant", "text": "我持有大量AAPL多头，应该用什么工具对冲下行风险？", "expected": "hedge"}
+{"id": 99, "lang": "en", "persona": "retail beginner", "text": "i have a lot of tesla stock and im scared of a crash how do i protect it", "expected": "hedge"}
+{"id": 100, "lang": "other", "persona": "degen", "text": "mera BTC ka position hai, market girne se bachne ke liye kya karu", "expected": "hedge"}
+{"id": 101, "lang": "en", "persona": "non-native", "text": "how I can hedge my gold holding against price going down", "expected": "hedge"}
+{"id": 102, "lang": "zh", "persona": "PM", "text": "如果要对冲科技股组合的系统性风险，用QQQ空头还是期权更合适？", "expected": "hedge"}
+{"id": 103, "lang": "en", "persona": "quant", "text": "optimal hedge ratio using SQQQ against a long QQQ/TQQQ book", "expected": "hedge"}
+{"id": 104, "lang": "other", "persona": "retiree", "text": "Tengo acciones de Amazon y me preocupa una caída, ¿cómo puedo protegerlas?", "expected": "hedge"}
+{"id": 105, "lang": "en", "persona": "degen", "text": "how do i hedge my solana bag without selling it", "expected": "hedge"}
+{"id": 106, "lang": "zh", "persona": "retail beginner", "text": "我有一些黄金，怎么对冲价格下跌的风险", "expected": "hedge"}
+{"id": 107, "lang": "en", "persona": "PM", "text": "cross-hedge a MSTR position using BTC perp shorts, what ratio", "expected": "hedge"}
+{"id": 108, "lang": "other", "persona": "quant", "text": "ETH 롱 포지션을 헤지하려면 어떤 방법이 가장 효율적이야?", "expected": "hedge"}
+{"id": 109, "lang": "en", "persona": "PM", "text": "what's the read on rate cut odds for the next fed meeting", "expected": "macro"}
+{"id": 110, "lang": "zh", "persona": "quant", "text": "当前美元指数和十年期美债收益率的走势对风险资产意味着什么？", "expected": "macro"}
+{"id": 111, "lang": "en", "persona": "retail beginner", "text": "is the fed gonna cut rates soon", "expected": "macro"}
+{"id": 112, "lang": "other", "persona": "retail beginner", "text": "Fed rate cut hone wala hai kya isbaar", "expected": "macro"}
+{"id": 113, "lang": "en", "persona": "non-native", "text": "what is current inflation situation and how it affect stock market", "expected": "macro"}
+{"id": 114, "lang": "zh", "persona": "PM", "text": "美联储如果暂停加息，对科技股和黄金分别意味着什么？", "expected": "macro"}
+{"id": 115, "lang": "en", "persona": "quant", "text": "current 2s10s spread and what it implies for recession risk", "expected": "macro"}
+{"id": 116, "lang": "other", "persona": "retiree", "text": "¿Qué está pasando con la inflación en Estados Unidos ahora mismo?", "expected": "macro"}
+{"id": 117, "lang": "en", "persona": "degen", "text": "is the dollar getting wrecked rn, good for crypto or nah", "expected": "macro"}
+{"id": 118, "lang": "zh", "persona": "retail beginner", "text": "现在美国通胀情况怎么样，对股市有什么影响", "expected": "macro"}
+{"id": 119, "lang": "en", "persona": "PM", "text": "where do fed funds futures see rates by year end", "expected": "macro"}
+{"id": 120, "lang": "other", "persona": "quant", "text": "현재 달러 인덱스 강세가 리스크 자산에 어떤 영향을 미쳐?", "expected": "macro"}
+{"id": 121, "lang": "en", "persona": "degen", "text": "is crypto twitter still bullish on sol or did everyone capitulate", "expected": "sentiment"}
+{"id": 122, "lang": "zh", "persona": "retail beginner", "text": "现在市场对英伟达的情绪是乐观还是悲观", "expected": "sentiment"}
+{"id": 123, "lang": "en", "persona": "PM", "text": "what's positioning look like on NVDA, are funds crowded long", "expected": "sentiment"}
+{"id": 124, "lang": "other", "persona": "degen", "text": "abhi market ka mood kaisa hai crypto ke liye, bullish ya bearish", "expected": "sentiment"}
+{"id": 125, "lang": "en", "persona": "non-native", "text": "what people feeling about bitcoin right now, positive or negative", "expected": "sentiment"}
+{"id": 126, "lang": "zh", "persona": "quant", "text": "当前期权市场隐含的看涨看跌情绪比率是多少？", "expected": "sentiment"}
+{"id": 127, "lang": "en", "persona": "retail beginner", "text": "is everyone hyped about tesla again or did the hype die", "expected": "sentiment"}
+{"id": 128, "lang": "other", "persona": "retiree", "text": "¿Cuál es el sentimiento general del mercado hacia el oro ahora?", "expected": "sentiment"}
+{"id": 129, "lang": "en", "persona": "degen", "text": "coin sentiment looking spicy or dead rn", "expected": "sentiment"}
+{"id": 130, "lang": "zh", "persona": "retail beginner", "text": "散户对比特币现在是恐慌还是贪婪", "expected": "sentiment"}
+{"id": 131, "lang": "en", "persona": "PM", "text": "give me the put/call skew and crowd positioning on QQQ", "expected": "sentiment"}
+{"id": 132, "lang": "other", "persona": "degen", "text": "지금 이더리움에 대한 커뮤니티 분위기가 어때?", "expected": "sentiment"}
+{"id": 133, "lang": "en", "persona": "retail beginner", "text": "why did tesla drop today", "expected": "news"}
+{"id": 134, "lang": "zh", "persona": "degen", "text": "今天比特币为什么突然跌了", "expected": "news"}
+{"id": 135, "lang": "en", "persona": "PM", "text": "what's driving the move in NVDA this morning", "expected": "news"}
+{"id": 136, "lang": "other", "persona": "retail beginner", "text": "aaj Amazon ka stock kyun gira", "expected": "news"}
+{"id": 137, "lang": "en", "persona": "non-native", "text": "why oil price jumping so much today, what news", "expected": "news"}
+{"id": 138, "lang": "zh", "persona": "quant", "text": "COIN今天异动上涨的具体新闻催化剂是什么？", "expected": "news"}
+{"id": 139, "lang": "en", "persona": "degen", "text": "why is sol pumping right now what happened", "expected": "news"}
+{"id": 140, "lang": "other", "persona": "retiree", "text": "¿Por qué subió tanto el precio del oro hoy?", "expected": "news"}
+{"id": 141, "lang": "en", "persona": "retail beginner", "text": "whats going on with meta stock today it's all over the news", "expected": "news"}
+{"id": 142, "lang": "zh", "persona": "retail beginner", "text": "今天苹果股票为什么大跌", "expected": "news"}
+{"id": 143, "lang": "en", "persona": "PM", "text": "what's the catalyst behind AMD's move today", "expected": "news"}
+{"id": 144, "lang": "other", "persona": "retail beginner", "text": "오늘 비트코인이 왜 이렇게 올랐어?", "expected": "news"}
+{"id": 145, "lang": "en", "persona": "PM", "text": "why didn't the desk take that NVDA signal yesterday", "expected": "record"}
+{"id": 146, "lang": "zh", "persona": "quant", "text": "上周为什么风险层拦截了那笔BTC交易？", "expected": "record"}
+{"id": 147, "lang": "en", "persona": "retail beginner", "text": "did you guys actually trade anything this week", "expected": "record"}
+{"id": 148, "lang": "other", "persona": "retail beginner", "text": "pichle hafte kitna profit hua tha desk ka", "expected": "record"}
+{"id": 149, "lang": "en", "persona": "non-native", "text": "why the system not trade even when signal was strong last time", "expected": "record"}
+{"id": 150, "lang": "zh", "persona": "PM", "text": "我们的决策日志是防篡改的吗？能给我证明吗？", "expected": "record"}
+{"id": 151, "lang": "en", "persona": "quant", "text": "show me the sharpe and drawdown of the desk's paper trades this week", "expected": "record"}
+{"id": 152, "lang": "other", "persona": "retiree", "text": "¿Qué decisiones tomó el sistema la semana pasada y por qué?", "expected": "record"}
+{"id": 153, "lang": "en", "persona": "degen", "text": "why'd the risk layer block my mstr trade last night", "expected": "record"}
+{"id": 154, "lang": "zh", "persona": "retail beginner", "text": "为什么这周没有交易任何东西", "expected": "record"}
+{"id": 155, "lang": "en", "persona": "PM", "text": "what was the rationale logged for skipping the SPY entry on Tuesday", "expected": "record"}
+{"id": 156, "lang": "other", "persona": "quant", "text": "지난 결정 로그가 변조되지 않았다는 걸 어떻게 증명할 수 있어?", "expected": "record"}
+{"id": 157, "lang": "en", "persona": "retail beginner", "text": "hey how's your day going", "expected": "refuse"}
+{"id": 158, "lang": "zh", "persona": "retail beginner", "text": "今天天气怎么样", "expected": "refuse"}
+{"id": 159, "lang": "en", "persona": "non-native", "text": "can you help me write python code to sort a list", "expected": "refuse"}
+{"id": 160, "lang": "other", "persona": "retail beginner", "text": "mujhe college assignment ke liye ek essay likh do", "expected": "refuse"}
+{"id": 161, "lang": "en", "persona": "degen", "text": "yo what's the capital of france", "expected": "refuse"}
+{"id": 162, "lang": "zh", "persona": "degen", "text": "帮我写一首关于爱情的诗", "expected": "refuse"}
+{"id": 163, "lang": "en", "persona": "PM", "text": "just go ahead and buy 500 shares of NVDA for me right now", "expected": "refuse"}
+{"id": 164, "lang": "zh", "persona": "retiree", "text": "请直接帮我卖出我所有的黄金", "expected": "refuse"}
+{"id": 165, "lang": "en", "persona": "retail beginner", "text": "where will bitcoin be next week", "expected": "refuse"}
+{"id": 166, "lang": "other", "persona": "retail beginner", "text": "¿Dónde estará el precio de Tesla el próximo mes?", "expected": "refuse"}
+{"id": 167, "lang": "en", "persona": "quant", "text": "what's the current price of ZYXQ coin", "expected": "refuse"}
+{"id": 168, "lang": "zh", "persona": "degen", "text": "帮我查一下XYZCOIN这个币的价格", "expected": "refuse"}
+{"id": 169, "lang": "en", "persona": "non-native", "text": "can you fix bug in my javascript function please", "expected": "refuse"}
+{"id": 170, "lang": "other", "persona": "retail beginner", "text": "오늘 저녁 뭐 먹을까?", "expected": "refuse"}
+{"id": 171, "lang": "en", "persona": "degen", "text": "lol tell me a joke about wall street", "expected": "refuse"}
+{"id": 172, "lang": "zh", "persona": "retail beginner", "text": "你觉得我应该辞职去炒股吗", "expected": "refuse"}
+{"id": 173, "lang": "en", "persona": "PM", "text": "execute a buy order for 10000 shares of AAPL immediately", "expected": "refuse"}
+{"id": 174, "lang": "other", "persona": "degen", "text": "mera liye trade kar do abhi NVDA mein 5k ka", "expected": "refuse"}
+{"id": 175, "lang": "en", "persona": "retiree", "text": "What's a good recipe for banana bread?", "expected": "refuse"}
+{"id": 176, "lang": "zh", "persona": "quant", "text": "帮我解一道微积分题目", "expected": "refuse"}
+{"id": 177, "lang": "en", "persona": "retail beginner", "text": "will apple stock hit $500 by december", "expected": "refuse"}
+{"id": 178, "lang": "other", "persona": "retiree", "text": "¿Puedes hacer la compra de oro por mí directamente?", "expected": "refuse"}
+{"id": 179, "lang": "en", "persona": "degen", "text": "what's the price prediction for sol end of year", "expected": "refuse"}
+{"id": 180, "lang": "zh", "persona": "retail beginner", "text": "帮我调试一下这个SQL查询语句", "expected": "refuse"}
+{"id": 181, "lang": "en", "persona": "non-native", "text": "can you tell me how photosynthesis works", "expected": "refuse"}
+{"id": 182, "lang": "other", "persona": "quant", "text": "내일 나스닥 지수가 몇 포인트일지 정확히 맞춰줄 수 있어?", "expected": "refuse"}
+{"id": 183, "lang": "en", "persona": "PM", "text": "place the trade, don't just tell me the analysis", "expected": "refuse"}
+{"id": 184, "lang": "zh", "persona": "retail beginner", "text": "帮我写一个React组件", "expected": "refuse"}
+{"id": 185, "lang": "en", "persona": "retail beginner", "text": "is FAKECOIN a good buy", "expected": "refuse"}
+{"id": 186, "lang": "other", "persona": "retail beginner", "text": "GHOSTSTOCK ka price kya hai", "expected": "refuse"}
+{"id": 187, "lang": "en", "persona": "degen", "text": "what's your favorite movie", "expected": "refuse"}
+{"id": 188, "lang": "zh", "persona": "degen", "text": "给我讲个笑话呗", "expected": "refuse"}
+{"id": 189, "lang": "en", "persona": "non-native", "text": "please write my homework essay about world war 2", "expected": "refuse"}
+{"id": 190, "lang": "other", "persona": "degen", "text": "¿Cuál será el precio exacto de ETH en 3 meses?", "expected": "refuse"}
+{"id": 191, "lang": "en", "persona": "quant", "text": "buy 2 BTC on my account right now, execute it", "expected": "refuse"}
+{"id": 192, "lang": "zh", "persona": "PM", "text": "帮我直接下单卖出所有TSLA持仓", "expected": "refuse"}
+{"id": 193, "lang": "en", "persona": "retiree", "text": "How do I set up a Gmail account?", "expected": "refuse"}
+{"id": 194, "lang": "other", "persona": "retail beginner", "text": "내 대신 주식 좀 사줘", "expected": "refuse"}
+{"id": 195, "lang": "en", "persona": "retail beginner", "text": "what will gold price be exactly one year from now", "expected": "refuse"}
+{"id": 196, "lang": "zh", "persona": "retail beginner", "text": "QUANTUMCOIN这个币怎么样", "expected": "refuse"}
+{"id": 197, "lang": "en", "persona": "degen", "text": "sell my whole book, just do it, no questions", "expected": "refuse"}
+{"id": 198, "lang": "other", "persona": "retail beginner", "text": "aaj IPL ka match kaun jeetega", "expected": "refuse"}
+{"id": 199, "lang": "en", "persona": "non-native", "text": "can you translate this sentence to french for me", "expected": "refuse"}
+{"id": 200, "lang": "zh", "persona": "retiree", "text": "帮我把这段话翻译成英文", "expected": "refuse"}

@@ -1,0 +1,240 @@
+{"id": 1, "lang": "zh", "text": "我持有200股苹果和50股特斯拉,现在加仓英伟达合适吗?", "expected": "impact"}
+{"id": 2, "lang": "en", "text": "already got a full COIN bag, is adding more MSTR going to blow up my correlation", "expected": "impact"}
+{"id": 3, "lang": "en", "text": "holding spy etf 30% of book, thinking of adding qqq too, too much overlap?", "expected": "impact"}
+{"id": 4, "lang": "mixed", "text": "我现在有100股英伟达和50股特斯拉,加仓Meta会不会让组合风险太集中?", "expected": "impact"}
+{"id": 5, "lang": "en", "text": "if I sell half my TSLA and put it into GOOGL what happens to my book", "expected": "impact"}
+{"id": 6, "lang": "en", "text": "portfolio is nvda 40%, msft 20%, cash rest — want to add 5k of coin, bad idea?", "expected": "impact"}
+{"id": 7, "lang": "en", "text": "swapping some SPY for QQQ, portfolio impact?", "expected": "impact"}
+{"id": 8, "lang": "mixed", "text": "手上有2 BTC和一些ETH,想加$50,000的AAPL,对整体有什么影响", "expected": "impact"}
+{"id": 9, "lang": "en", "text": "got aapl msft googl amzn — the big 4 basically — should I add meta or is that redundant", "expected": "impact"}
+{"id": 10, "lang": "en", "text": "I want to trim mstr and rotate into gold, how does that change my risk", "expected": "impact"}
+{"id": 11, "lang": "en", "text": "thinking of dropping my oil position entirely and doubling tsla, sanity check?", "expected": "impact"}
+{"id": 12, "lang": "en", "text": "currently 60% crypto (btc+eth), 40% tech stocks — adding coin on top, too much?", "expected": "impact"}
+{"id": 13, "lang": "mixed", "text": "加仓100股AMZN对我现有持仓(70%QQQ, 30%ETH)有什么影响", "expected": "impact"}
+{"id": 14, "lang": "en", "text": "removing my gold hedge and adding more nvda — good or bad move for the book", "expected": "impact"}
+{"id": 15, "lang": "en", "text": "I hold a chunky COIN position already, if i add mstr does that just double my crypto beta", "expected": "impact"}
+{"id": 16, "lang": "zh", "text": "如果标普明天跌5%,我的账户会亏多少", "expected": "stress"}
+{"id": 17, "lang": "en", "text": "if btc dumps 15% overnight what's the damage to my portfolio", "expected": "stress"}
+{"id": 18, "lang": "en", "text": "qqq -10% scenario, how bad is my drawdown", "expected": "stress"}
+{"id": 19, "lang": "zh", "text": "假如原油一天跌15%,我的账户受多大影响", "expected": "stress"}
+{"id": 20, "lang": "en", "text": "stress test my positions against a 2008-style crash", "expected": "stress"}
+{"id": 21, "lang": "en", "text": "what if nasdaq tanks 12% like march 2020, what happens to my nvda+coin heavy book", "expected": "stress"}
+{"id": 22, "lang": "en", "text": "gold spikes 10% (flight to safety) — what does that do to my equity longs", "expected": "stress"}
+{"id": 23, "lang": "en", "text": "oil -20% shock, how does that hit my book", "expected": "stress"}
+{"id": 24, "lang": "en", "text": "worst case if fed surprises hawkish and spy sells off 7%", "expected": "stress"}
+{"id": 25, "lang": "zh", "text": "假如比特币一天内跌20%,我这个仓位会怎样", "expected": "stress"}
+{"id": 26, "lang": "en", "text": "run a -6% spy stress on my current positions pls", "expected": "stress"}
+{"id": 27, "lang": "en", "text": "if eth drops 25% what's my max drawdown look like", "expected": "stress"}
+{"id": 28, "lang": "en", "text": "suppose mstr craters 30% in a day, how much of my book gets wiped", "expected": "stress"}
+{"id": 29, "lang": "en", "text": "stress my book against a 3% overnight gap down in aapl and msft together", "expected": "stress"}
+{"id": 30, "lang": "zh", "text": "假设纳指暴跌10%,我的组合大概会跌多少", "expected": "stress"}
+{"id": 31, "lang": "zh", "text": "英伟达和特斯拉比,哪个波动更大", "expected": "compare"}
+{"id": 32, "lang": "en", "text": "compare risk on coin and mstr, which is the wilder ride", "expected": "compare"}
+{"id": 33, "lang": "en", "text": "googl vs meta — better risk adjusted right now?", "expected": "compare"}
+{"id": 34, "lang": "en", "text": "aapl vs msft, which is safer to hold overnight", "expected": "compare"}
+{"id": 35, "lang": "zh", "text": "比较一下亚马逊和谷歌,哪个风险更大", "expected": "compare"}
+{"id": 36, "lang": "en", "text": "spy vs qqq — which has more drawdown risk in a selloff", "expected": "compare"}
+{"id": 37, "lang": "en", "text": "btc vs eth vol comparison this month", "expected": "compare"}
+{"id": 38, "lang": "en", "text": "is amzn riskier than googl right now", "expected": "compare"}
+{"id": 39, "lang": "en", "text": "gold vs oil, which is more correlated to my equity book", "expected": "compare"}
+{"id": 40, "lang": "mixed", "text": "对比一下coin和mstr的波动性,哪个更疯", "expected": "compare"}
+{"id": 41, "lang": "en", "text": "comparing tsla msft and nvda risk side by side", "expected": "compare"}
+{"id": 42, "lang": "en", "text": "which is riskier to hold into earnings, meta or amzn", "expected": "compare"}
+{"id": 43, "lang": "en", "text": "mstr vs btc directly — is mstr just leveraged btc at this point", "expected": "compare"}
+{"id": 44, "lang": "en", "text": "spy vs gold as a risk comparison for the next month", "expected": "compare"}
+{"id": 45, "lang": "mixed", "text": "苹果和微软比,哪个的beta更低", "expected": "compare"}
+{"id": 46, "lang": "zh", "text": "我想买5000美元的英伟达,应该怎么拆单避免冲击价格", "expected": "execution"}
+{"id": 47, "lang": "en", "text": "want to buy $50,000 of aapl, how do I execute without slippage", "expected": "execution"}
+{"id": 48, "lang": "en", "text": "100 shares tsla, best way to work this order", "expected": "execution"}
+{"id": 49, "lang": "mixed", "text": "我要买2个BTC,应该怎么拆单执行", "expected": "execution"}
+{"id": 50, "lang": "en", "text": "need to sell my whole coin position, 3000 shares, how do i do it cleanly", "expected": "execution"}
+{"id": 51, "lang": "en", "text": "how do I scale into a 20k qqq position", "expected": "execution"}
+{"id": 52, "lang": "en", "text": "want to dca into eth with 10k over the week, how should I split it", "expected": "execution"}
+{"id": 53, "lang": "mixed", "text": "想买$100,000的spy,应该怎么分批下单", "expected": "execution"}
+{"id": 54, "lang": "en", "text": "sell 500 shares mstr without tanking the price, how", "expected": "execution"}
+{"id": 55, "lang": "en", "text": "buying gold exposure with 15k, twap or just market it", "expected": "execution"}
+{"id": 56, "lang": "en", "text": "how should I break up a large googl order into smaller clips", "expected": "execution"}
+{"id": 57, "lang": "en", "text": "execute a 30k oil position entry, chunks or all at once", "expected": "execution"}
+{"id": 58, "lang": "mixed", "text": "我想卖出全部amzn持仓(约80股),怎么执行比较好", "expected": "execution"}
+{"id": 59, "lang": "en", "text": "want to add 5 btc, best execution approach given current liquidity", "expected": "execution"}
+{"id": 60, "lang": "en", "text": "splitting a 200 share msft order into smaller lots, how many clips", "expected": "execution"}
+{"id": 61, "lang": "zh", "text": "英伟达现在多少钱", "expected": "quote"}
+{"id": 62, "lang": "en", "text": "what's aapl trading at", "expected": "quote"}
+{"id": 63, "lang": "en", "text": "btc quote", "expected": "quote"}
+{"id": 64, "lang": "mixed", "text": "现在eth多少钱", "expected": "quote"}
+{"id": 65, "lang": "en", "text": "where's gold trading", "expected": "quote"}
+{"id": 66, "lang": "en", "text": "spy live price", "expected": "quote"}
+{"id": 67, "lang": "en", "text": "coin quote plus round trip cost", "expected": "quote"}
+{"id": 68, "lang": "en", "text": "what's the round trip cost on mstr right now", "expected": "quote"}
+{"id": 69, "lang": "en", "text": "tsla price and spread?", "expected": "quote"}
+{"id": 70, "lang": "zh", "text": "现在原油多少钱一桶", "expected": "quote"}
+{"id": 71, "lang": "en", "text": "qqq bid ask", "expected": "quote"}
+{"id": 72, "lang": "en", "text": "give me meta's live quote", "expected": "quote"}
+{"id": 73, "lang": "en", "text": "amzn price check", "expected": "quote"}
+{"id": 74, "lang": "mixed", "text": "现在googl报价多少", "expected": "quote"}
+{"id": 75, "lang": "en", "text": "eth round trip cost if I buy and sell right now", "expected": "quote"}
+{"id": 76, "lang": "mixed", "text": "英伟达的RSI现在是多少", "expected": "technicals"}
+{"id": 77, "lang": "en", "text": "is tsla overbought", "expected": "technicals"}
+{"id": 78, "lang": "en", "text": "macd on coin, bullish or bearish crossover", "expected": "technicals"}
+{"id": 79, "lang": "mixed", "text": "苹果的RSI现在多少", "expected": "technicals"}
+{"id": 80, "lang": "en", "text": "what's support and resistance on spy", "expected": "technicals"}
+{"id": 81, "lang": "en", "text": "is btc oversold on the daily", "expected": "technicals"}
+{"id": 82, "lang": "en", "text": "qqq macd signal", "expected": "technicals"}
+{"id": 83, "lang": "en", "text": "mstr technicals looking stretched?", "expected": "technicals"}
+{"id": 84, "lang": "zh", "text": "特斯拉现在是不是超买了", "expected": "technicals"}
+{"id": 85, "lang": "en", "text": "eth support levels", "expected": "technicals"}
+{"id": 86, "lang": "en", "text": "googl rsi + macd combined read", "expected": "technicals"}
+{"id": 87, "lang": "en", "text": "gold technicals, is it overbought", "expected": "technicals"}
+{"id": 88, "lang": "en", "text": "amzn resistance level above current price?", "expected": "technicals"}
+{"id": 89, "lang": "zh", "text": "黄金的支撑位在哪", "expected": "technicals"}
+{"id": 90, "lang": "en", "text": "oil rsi reading right now", "expected": "technicals"}
+{"id": 91, "lang": "zh", "text": "英伟达的下次财报是什么时候", "expected": "fundamentals"}
+{"id": 92, "lang": "en", "text": "aapl analyst price targets", "expected": "fundamentals"}
+{"id": 93, "lang": "en", "text": "who are tsla's top holders", "expected": "fundamentals"}
+{"id": 94, "lang": "zh", "text": "特斯拉的估值现在贵不贵", "expected": "fundamentals"}
+{"id": 95, "lang": "en", "text": "msft pe ratio vs history", "expected": "fundamentals"}
+{"id": 96, "lang": "en", "text": "when does coin report earnings", "expected": "fundamentals"}
+{"id": 97, "lang": "en", "text": "meta valuation, is it expensive here", "expected": "fundamentals"}
+{"id": 98, "lang": "en", "text": "googl analyst targets, bull vs bear", "expected": "fundamentals"}
+{"id": 99, "lang": "zh", "text": "亚马逊下次财报是什么时候", "expected": "fundamentals"}
+{"id": 100, "lang": "en", "text": "mstr fundamentals, does it even matter given the btc holdings", "expected": "fundamentals"}
+{"id": 101, "lang": "en", "text": "amzn institutional holders list", "expected": "fundamentals"}
+{"id": 102, "lang": "en", "text": "spy's underlying constituents pe", "expected": "fundamentals"}
+{"id": 103, "lang": "en", "text": "qqq weighted avg valuation?", "expected": "fundamentals"}
+{"id": 104, "lang": "zh", "text": "微软的机构持仓情况怎么样", "expected": "fundamentals"}
+{"id": 105, "lang": "en", "text": "aapl next earnings date and consensus eps", "expected": "fundamentals"}
+{"id": 106, "lang": "mixed", "text": "英伟达在CPI公布当天通常怎么波动", "expected": "event"}
+{"id": 107, "lang": "en", "text": "what happens to tsla on fed days", "expected": "event"}
+{"id": 108, "lang": "en", "text": "coin's typical earnings day move?", "expected": "event"}
+{"id": 109, "lang": "zh", "text": "英伟达财报当天通常波动多大", "expected": "event"}
+{"id": 110, "lang": "en", "text": "how did spy react to the last cpi print", "expected": "event"}
+{"id": 111, "lang": "en", "text": "btc reaction to fomc historically", "expected": "event"}
+{"id": 112, "lang": "en", "text": "meta earnings day average move", "expected": "event"}
+{"id": 113, "lang": "en", "text": "how does gold react when fed cuts rates", "expected": "event"}
+{"id": 114, "lang": "zh", "text": "加息对特斯拉这种股票通常影响多大", "expected": "event"}
+{"id": 115, "lang": "en", "text": "msft reaction to a hot cpi number", "expected": "event"}
+{"id": 116, "lang": "en", "text": "oil's typical move on a big opec decision day", "expected": "event"}
+{"id": 117, "lang": "en", "text": "aapl earnings day historical move size", "expected": "event"}
+{"id": 118, "lang": "en", "text": "amzn's reaction pattern to fed rate decisions", "expected": "event"}
+{"id": 119, "lang": "zh", "text": "比特币在美联储议息会议时通常怎么走", "expected": "event"}
+{"id": 120, "lang": "en", "text": "how does qqq typically behave the week of cpi", "expected": "event"}
+{"id": 121, "lang": "zh", "text": "我的仓位英伟达占比很高,应该怎么对冲", "expected": "hedge"}
+{"id": 122, "lang": "en", "text": "want to hedge overnight risk on my coin rtoken holding", "expected": "hedge"}
+{"id": 123, "lang": "en", "text": "best way to hedge a big tsla position going into earnings", "expected": "hedge"}
+{"id": 124, "lang": "zh", "text": "我想对冲一下我的比特币仓位,怎么做", "expected": "hedge"}
+{"id": 125, "lang": "en", "text": "hedge my whole book against a market crash", "expected": "hedge"}
+{"id": 126, "lang": "en", "text": "protect my mstr position from a btc drawdown", "expected": "hedge"}
+{"id": 127, "lang": "en", "text": "how to hedge overnight risk holding qqq rtoken", "expected": "hedge"}
+{"id": 128, "lang": "en", "text": "gold as a hedge for my tech-heavy book, does it work", "expected": "hedge"}
+{"id": 129, "lang": "mixed", "text": "持有大量AAPL,想找个对冲方案", "expected": "hedge"}
+{"id": 130, "lang": "en", "text": "hedge amzn earnings risk without selling the position", "expected": "hedge"}
+{"id": 131, "lang": "en", "text": "using oil to hedge inflation risk in my book, good idea?", "expected": "hedge"}
+{"id": 132, "lang": "en", "text": "what's the cheapest way to hedge my spy exposure this week", "expected": "hedge"}
+{"id": 133, "lang": "mixed", "text": "我持有eth的rToken过夜,想对冲一下风险", "expected": "hedge"}
+{"id": 134, "lang": "en", "text": "hedge my googl position against a rate hike", "expected": "hedge"}
+{"id": 135, "lang": "en", "text": "protective hedge for meta going into cpi week", "expected": "hedge"}
+{"id": 136, "lang": "zh", "text": "美联储这周有什么动作", "expected": "macro"}
+{"id": 137, "lang": "en", "text": "how are rates looking right now", "expected": "macro"}
+{"id": 138, "lang": "en", "text": "dollar strength, what's DXY doing", "expected": "macro"}
+{"id": 139, "lang": "zh", "text": "美联储最近的政策方向是什么", "expected": "macro"}
+{"id": 140, "lang": "en", "text": "macro backdrop for risk assets right now", "expected": "macro"}
+{"id": 141, "lang": "en", "text": "is the fed cutting or holding next meeting", "expected": "macro"}
+{"id": 142, "lang": "en", "text": "how's the yield curve looking", "expected": "macro"}
+{"id": 143, "lang": "zh", "text": "现在美元指数怎么样", "expected": "macro"}
+{"id": 144, "lang": "en", "text": "overall macro picture — rates, inflation, dollar", "expected": "macro"}
+{"id": 145, "lang": "en", "text": "what's driving the macro narrative this week", "expected": "macro"}
+{"id": 146, "lang": "zh", "text": "加息还是降息,现在市场预期是什么", "expected": "macro"}
+{"id": 147, "lang": "en", "text": "how does the current rate environment affect risk assets", "expected": "macro"}
+{"id": 148, "lang": "en", "text": "dollar strength effect on crypto lately", "expected": "macro"}
+{"id": 149, "lang": "en", "text": "macro conditions for tech stocks this quarter?", "expected": "macro"}
+{"id": 150, "lang": "zh", "text": "现在的宏观环境对科技股有利吗", "expected": "macro"}
+{"id": 151, "lang": "zh", "text": "特斯拉的热度是真的还是散户炒作", "expected": "sentiment"}
+{"id": 152, "lang": "en", "text": "coin sentiment right now, bullish or overhyped", "expected": "sentiment"}
+{"id": 153, "lang": "en", "text": "is nvda overhyped at these levels", "expected": "sentiment"}
+{"id": 154, "lang": "zh", "text": "现在市场对特斯拉的情绪是什么样", "expected": "sentiment"}
+{"id": 155, "lang": "en", "text": "mstr sentiment — is the btc treasury story still working", "expected": "sentiment"}
+{"id": 156, "lang": "en", "text": "is the ai trade in nvda getting overheated sentiment-wise", "expected": "sentiment"}
+{"id": 157, "lang": "en", "text": "meta sentiment check, is the hype justified", "expected": "sentiment"}
+{"id": 158, "lang": "en", "text": "btc sentiment index right now", "expected": "sentiment"}
+{"id": 159, "lang": "en", "text": "is tsla cooked", "expected": "sentiment"}
+{"id": 160, "lang": "zh", "text": "大家现在对比特币是看多还是看空", "expected": "sentiment"}
+{"id": 161, "lang": "en", "text": "sentiment on googl after the ai announcements", "expected": "sentiment"}
+{"id": 162, "lang": "en", "text": "is the amzn rally just hype or is it real", "expected": "sentiment"}
+{"id": 163, "lang": "en", "text": "gold sentiment, is safe haven demand genuine right now", "expected": "sentiment"}
+{"id": 164, "lang": "zh", "text": "市场对英伟达的情绪是不是太乐观了", "expected": "sentiment"}
+{"id": 165, "lang": "en", "text": "coin hype real or bubble", "expected": "sentiment"}
+{"id": 166, "lang": "zh", "text": "英伟达今天为什么大跌", "expected": "news"}
+{"id": 167, "lang": "en", "text": "what's going on with tsla, why's it down", "expected": "news"}
+{"id": 168, "lang": "en", "text": "why is coin pumping right now", "expected": "news"}
+{"id": 169, "lang": "zh", "text": "今天特斯拉为什么大涨", "expected": "news"}
+{"id": 170, "lang": "en", "text": "any news on mstr today", "expected": "news"}
+{"id": 171, "lang": "en", "text": "why did meta drop this morning", "expected": "news"}
+{"id": 172, "lang": "en", "text": "what happened to btc overnight", "expected": "news"}
+{"id": 173, "lang": "zh", "text": "今天英伟达为什么跌了", "expected": "news"}
+{"id": 174, "lang": "en", "text": "why is gold spiking today", "expected": "news"}
+{"id": 175, "lang": "en", "text": "what's the news on amzn today", "expected": "news"}
+{"id": 176, "lang": "en", "text": "oil news today, why the move", "expected": "news"}
+{"id": 177, "lang": "en", "text": "why did googl gap up", "expected": "news"}
+{"id": 178, "lang": "zh", "text": "今天以太坊为什么波动这么大", "expected": "news"}
+{"id": 179, "lang": "en", "text": "spy news catalyst today", "expected": "news"}
+{"id": 180, "lang": "en", "text": "msft news, why's it moving", "expected": "news"}
+{"id": 181, "lang": "zh", "text": "这个系统自己的夏普比率是多少", "expected": "record"}
+{"id": 182, "lang": "en", "text": "show me the desk's past decisions", "expected": "record"}
+{"id": 183, "lang": "en", "text": "what has the risk layer blocked recently", "expected": "record"}
+{"id": 184, "lang": "zh", "text": "系统自己的交易记录表现怎么样", "expected": "record"}
+{"id": 185, "lang": "en", "text": "is the desk's log tamper-evident", "expected": "record"}
+{"id": 186, "lang": "en", "text": "what's the max drawdown on the desk's own trades", "expected": "record"}
+{"id": 187, "lang": "en", "text": "how calibrated is the desk's confidence vs actual outcomes", "expected": "record"}
+{"id": 188, "lang": "zh", "text": "风险层最近拦截了哪些交易", "expected": "record"}
+{"id": 189, "lang": "en", "text": "show me the desk's win rate", "expected": "record"}
+{"id": 190, "lang": "en", "text": "what decisions has the desk made this week", "expected": "record"}
+{"id": 191, "lang": "en", "text": "is the trading log verifiable / hash-committed", "expected": "record"}
+{"id": 192, "lang": "mixed", "text": "这个系统自己的sharpe和回撤是多少", "expected": "record"}
+{"id": 193, "lang": "en", "text": "what's the desk's track record on nvda calls specifically", "expected": "record"}
+{"id": 194, "lang": "en", "text": "how does the desk's calibration look, overconfident or accurate", "expected": "record"}
+{"id": 195, "lang": "zh", "text": "系统的决策日志能不能防篡改", "expected": "record"}
+{"id": 196, "lang": "zh", "text": "明天纽约天气怎么样", "expected": "refuse"}
+{"id": 197, "lang": "en", "text": "can you help me debug this python function, it keeps throwing a typeerror", "expected": "refuse"}
+{"id": 198, "lang": "en", "text": "who won the lakers game last night", "expected": "refuse"}
+{"id": 199, "lang": "zh", "text": "我应该和男朋友分手吗", "expected": "refuse"}
+{"id": 200, "lang": "en", "text": "buy 1 btc for me right now with real money, execute it", "expected": "refuse"}
+{"id": 201, "lang": "en", "text": "what's pltr trading at", "expected": "refuse"}
+{"id": 202, "lang": "en", "text": "recommend a good hotel in tokyo for a week in october", "expected": "refuse"}
+{"id": 203, "lang": "zh", "text": "帮我写一段python爬虫代码", "expected": "refuse"}
+{"id": 204, "lang": "en", "text": "help me write a sql query to join these two tables", "expected": "refuse"}
+{"id": 205, "lang": "en", "text": "what's amd's rsi looking like these days", "expected": "refuse"}
+{"id": 206, "lang": "zh", "text": "我家wifi老是断线,怎么修", "expected": "refuse"}
+{"id": 207, "lang": "en", "text": "write me a poem about the ocean", "expected": "refuse"}
+{"id": 208, "lang": "en", "text": "should i propose to my girlfriend this weekend", "expected": "refuse"}
+{"id": 209, "lang": "zh", "text": "法国的首都是哪里", "expected": "refuse"}
+{"id": 210, "lang": "en", "text": "who's going to win the super bowl this year", "expected": "refuse"}
+{"id": 211, "lang": "en", "text": "place a live order for 500 shares of nvda on my real account right now, execute it", "expected": "refuse"}
+{"id": 212, "lang": "en", "text": "give me legal advice on breaking my apartment lease", "expected": "refuse"}
+{"id": 213, "lang": "zh", "text": "帮我查一下台积电现在多少钱", "expected": "refuse"}
+{"id": 214, "lang": "en", "text": "help me plan a birthday party for my kid, any ideas", "expected": "refuse"}
+{"id": 215, "lang": "en", "text": "translate 'good morning, how are you' into spanish", "expected": "refuse"}
+{"id": 216, "lang": "zh", "text": "帮我看看这段代码报错是什么问题", "expected": "refuse"}
+{"id": 217, "lang": "en", "text": "what's a good recipe for pasta carbonara", "expected": "refuse"}
+{"id": 218, "lang": "en", "text": "fantasy football lineup advice for this week", "expected": "refuse"}
+{"id": 219, "lang": "mixed", "text": "PLTR现在能买吗,帮我实盘下单买入", "expected": "refuse"}
+{"id": 220, "lang": "en", "text": "should I take this new job offer, the pay is a bit lower", "expected": "refuse"}
+{"id": 221, "lang": "en", "text": "what movie should I watch tonight", "expected": "refuse"}
+{"id": 222, "lang": "zh", "text": "帮我写一首关于大海的诗", "expected": "refuse"}
+{"id": 223, "lang": "en", "text": "how do I fix a leaking kitchen faucet", "expected": "refuse"}
+{"id": 224, "lang": "en", "text": "what's rivian's technical setup look like", "expected": "refuse"}
+{"id": 225, "lang": "zh", "text": "昨晚的篮球比赛谁赢了", "expected": "refuse"}
+{"id": 226, "lang": "en", "text": "should I get a dog or a cat, I live in an apartment", "expected": "refuse"}
+{"id": 227, "lang": "en", "text": "buy palantir for me, real trade, execute it now with my funds", "expected": "refuse"}
+{"id": 228, "lang": "zh", "text": "帮我规划一下去意大利十天的旅行行程", "expected": "refuse"}
+{"id": 229, "lang": "en", "text": "who's the best nba player of all time", "expected": "refuse"}
+{"id": 230, "lang": "en", "text": "help me with my resume, can you review it for a swe role", "expected": "refuse"}
+{"id": 231, "lang": "zh", "text": "帮我用真实资金买两个以太坊,现在就下单", "expected": "refuse"}
+{"id": 232, "lang": "en", "text": "recommend a good workout routine for beginners", "expected": "refuse"}
+{"id": 233, "lang": "en", "text": "diagnose my knee pain, it's been hurting for a week", "expected": "refuse"}
+{"id": 234, "lang": "zh", "text": "我该买房还是继续租房比较好", "expected": "refuse"}
+{"id": 235, "lang": "en", "text": "write a react component for a login form", "expected": "refuse"}
+{"id": 236, "lang": "en", "text": "what's the score of the world cup match today", "expected": "refuse"}
+{"id": 237, "lang": "zh", "text": "15乘以37等于多少", "expected": "refuse"}
+{"id": 238, "lang": "en", "text": "is sofi a buy right now", "expected": "refuse"}
+{"id": 239, "lang": "en", "text": "explain quantum computing to me like i'm five", "expected": "refuse"}
+{"id": 240, "lang": "en", "text": "buy 2 eth with my real funds, place the order now for real", "expected": "refuse"}

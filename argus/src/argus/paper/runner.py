@@ -53,6 +53,8 @@ from argus.market.microstructure import (
 )
 from argus.market.microstructure import evidence as micro_evidence
 from argus.market.microstructure import status as micro_status
+from argus.market.skill_mirror import evidence as mirror_evidence
+from argus.market.skill_mirror import fill_missing as mirror_missing
 from argus.market.skills import evidence as skill_evidence
 from argus.market.skills import load as load_skill_health
 from argus.market.skills import probe as probe_skills
@@ -730,6 +732,10 @@ def run_once(
         # paying that per symbol per cycle would make the cycle unrunnable. What is skipped is
         # skipped on measured evidence, and the measurement is on disk beside the ledger.
         live = usable_probes(load_skill_health(SKILL_HEALTH_PATH))
+        # What the Skills measured as dark is read from the upstream each Skill names
+        # (`market/skill_mirror.py`), labelled as such in every claim — never as a Skill answer.
+        mirrored = mirror_missing({p.ident for p in live}, symbol=symbol)
+        evidence.extend(mirror_evidence(mirrored, as_of=now))
         if live:
             skill_report = probe_skills(
                 BitgetSkillSource(), symbol=symbol, at=now, probes=live, timeout=10
@@ -740,6 +746,11 @@ def run_once(
             skill_notes = [
                 "[skills] no Bitget Skill tool is recorded as answering; none called this cycle"
             ]
+        if mirrored:
+            got = sum(row.answered for row in mirrored)
+            skill_notes.append(
+                f"[skills] {got} of {len(mirrored)} dark Skill call(s) read from their own "
+                f"upstreams instead")
         # Feed health is itself evidence: a dark source is a fact the decision-maker was told
         # about, not a silent gap. Rendered as a low-credibility note, not as a market claim.
         evidence.append(Evidence(

@@ -10,6 +10,8 @@ construction.
 
 from __future__ import annotations
 
+import sys
+
 import pytest
 
 from argus.eval.baselines.serenity_loader import load_chained_journal_class
@@ -30,6 +32,16 @@ from argus.eval.journal_comparison import (
     swept_entry_counts,
 )
 
+# The CRLF bug this whole module exists to reproduce is genuinely Windows-only, per
+# `journal_comparison.SCOPE_STATEMENT` (which already said, before this file was made
+# platform-aware, "not re-tested on a non-Windows platform"): text-mode `open(path, "a")` only
+# performs universal-newline translation on Windows. POSIX write() never turns `\n` into `\r\n`,
+# so on Linux `disk_bytes_contain_crlf` is honestly `False` for both systems, and with no CRLF
+# on disk there is nothing for serenity-guardrails' raw-bytes-hashing bug to trip on — its
+# `verify()` reports clean too. The assertions below check the platform-true fact either way,
+# rather than assuming the Windows finding generalises.
+IS_WINDOWS = sys.platform == "win32"
+
 
 @pytest.fixture
 def chained_journal_class() -> type:
@@ -41,19 +53,24 @@ class TestCrlfCase:
         self, chained_journal_class: type
     ) -> None:
         case = run_serenity_crlf_case(chained_journal_class)
-        assert case.disk_bytes_contain_crlf is True
+        assert case.disk_bytes_contain_crlf is IS_WINDOWS
 
     def test_serenitys_own_real_verify_rejects_its_own_untampered_write(
         self, chained_journal_class: type
     ) -> None:
-        """The core finding: zero tampering, real code on both ends, and verify() still raises."""
+        """The core finding: zero tampering, real code on both ends, and verify() still raises —
+        on Windows. On POSIX there is no CRLF translation to corrupt the hash, so the identical
+        untampered write verifies clean, which is the true, unbroken behaviour there."""
         case = run_serenity_crlf_case(chained_journal_class)
-        assert case.verify_reports_clean is False
-        assert "mismatch" in case.detail or "GuardError" in case.detail
+        if IS_WINDOWS:
+            assert case.verify_reports_clean is False
+            assert "mismatch" in case.detail or "GuardError" in case.detail
+        else:
+            assert case.verify_reports_clean is True
 
     def test_argus_paper_ledger_also_writes_crlf_on_this_platform(self) -> None:
         case = run_argus_crlf_case()
-        assert case.disk_bytes_contain_crlf is True
+        assert case.disk_bytes_contain_crlf is IS_WINDOWS
 
     def test_argus_paper_ledger_verifies_clean_under_the_identical_condition(self) -> None:
         case = run_argus_crlf_case()
@@ -75,17 +92,31 @@ class TestTamperComparison:
 class TestAblation:
     def test_the_hashing_design_choice_is_load_bearing(self, chained_journal_class: type) -> None:
         result = run_ablation(chained_journal_class)
-        assert result.hashing_raw_disk_bytes_is_fragile is True
-        assert result.hashing_parsed_content_is_robust is True
-        assert result.the_design_choice_is_load_bearing is True
+        if IS_WINDOWS:
+            assert result.hashing_raw_disk_bytes_is_fragile is True
+            assert result.hashing_parsed_content_is_robust is True
+            assert result.the_design_choice_is_load_bearing is True
+        else:
+            # Both flags require `disk_bytes_contain_crlf` (see `run_ablation`), which is honestly
+            # False here — there is no CRLF on POSIX and so nothing to demonstrate the ablation
+            # with. The design choice's load-bearing-ness is NOT VERIFIED on this platform, not
+            # false — it simply has no case to exercise it, exactly as `SCOPE_STATEMENT` says.
+            assert result.hashing_raw_disk_bytes_is_fragile is False
+            assert result.hashing_parsed_content_is_robust is False
+            assert result.the_design_choice_is_load_bearing is False
 
 
 class TestSweptEntryCounts:
     def test_serenity_fails_at_every_swept_entry_count(self, chained_journal_class: type) -> None:
-        """The CRLF bug is not a fluke of N=2 — it fires from N=1 through N=50."""
+        """The CRLF bug is not a fluke of N=2 — it fires from N=1 through N=50, on Windows. On
+        POSIX there is no CRLF translation at any entry count, so serenity's real verify() is
+        clean throughout — the true behaviour there, not a weaker claim."""
         results = swept_entry_counts(chained_journal_class)
         assert [r.entry_count for r in results] == list(SWEPT_ENTRY_COUNTS)
-        assert all(not r.serenity_clean for r in results)
+        if IS_WINDOWS:
+            assert all(not r.serenity_clean for r in results)
+        else:
+            assert all(r.serenity_clean for r in results)
 
     def test_argus_is_clean_at_every_swept_entry_count(self, chained_journal_class: type) -> None:
         results = swept_entry_counts(chained_journal_class)
@@ -122,11 +153,11 @@ class TestCosts:
 class TestMainAndRender:
     def test_main_runs_the_whole_comparison(self) -> None:
         report = main()
-        assert report["serenity_crlf_case"]["verify_reports_clean"] is False
+        assert report["serenity_crlf_case"]["verify_reports_clean"] is (not IS_WINDOWS)
         assert report["argus_crlf_case"]["verify_reports_clean"] is True
         assert report["tamper_comparison"]["both_detect_genuine_tampering"] is True
-        assert report["ablation"]["the_design_choice_is_load_bearing"] is True
-        assert report["swept_serenity_always_fails"] is True
+        assert report["ablation"]["the_design_choice_is_load_bearing"] is IS_WINDOWS
+        assert report["swept_serenity_always_fails"] is IS_WINDOWS
         assert report["swept_argus_always_clean"] is True
         assert report["truncation_comparison"]["argus_detects_truncation"] is True
         assert report["costs"]["write_ms_per_entry"] > 0
@@ -136,7 +167,7 @@ class TestMainAndRender:
         text = render(report)
         assert "ARGUS PaperLedger" in text
         assert "serenity-guardrails" in text
-        assert "serenity clean: False" in text
+        assert f"serenity clean: {not IS_WINDOWS}" in text
         assert "ARGUS clean: True" in text
 
     def test_scope_statement_names_the_platform_boundary(self) -> None:

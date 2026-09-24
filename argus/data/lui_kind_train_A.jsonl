@@ -1,0 +1,480 @@
+{"text": "if I add 200 shares of TSLA how does that change my portfolio beta", "label": "impact", "lang": "en"}
+{"text": "如果把英伟达仓位减半,对我整体风险敞口有什么影响", "label": "impact", "lang": "zh"}
+{"text": "what happens to my drawdown if I size up BTC perp to 3x", "label": "impact", "lang": "en"}
+{"text": "trimming half my AAPL position, does that lower my portfolio vol much", "label": "impact", "lang": "en"}
+{"text": "我想加仓黄金到组合的20%,风险会变成什么样", "label": "impact", "lang": "zh"}
+{"text": "adding 5000 NVDA shares — how much does that move my concentration risk", "label": "impact", "lang": "en"}
+{"text": "把特斯拉全部平仓之后我的beta会降到多少", "label": "impact", "lang": "zh"}
+{"text": "if i close out my SOL longs what's left exposed in the book", "label": "impact", "lang": "en"}
+{"text": "增持苹果1000股对我现在的组合波动率有多大影响", "label": "impact", "lang": "zh"}
+{"text": "sizing my oil position down to 2% — meaningful risk reduction?", "label": "impact", "lang": "en"}
+{"text": "如果我把比特币仓位从10%提到25%,整体风险怎么变化", "label": "impact", "lang": "zh"}
+{"text": "what does doubling my GOOGL stake do to sector concentration", "label": "impact", "lang": "en"}
+{"text": "removing the ETH position entirely, how does that shift my risk profile", "label": "impact", "lang": "en"}
+{"text": "我把原油多头砍掉一半,组合的方差会降多少", "label": "impact", "lang": "zh"}
+{"text": "if i add 300k notional to my AMZN long what's the new VaR", "label": "impact", "lang": "en"}
+{"text": "加了两倍杠杆买微软之后我的最大回撤会到多少", "label": "impact", "lang": "zh"}
+{"text": "trimming crypto exposure by 30% — how does my sharpe change", "label": "impact", "lang": "en"}
+{"text": "what's the risk impact of rotating out of MSFT into gold", "label": "impact", "lang": "en"}
+{"text": "把谷歌仓位从5%砍到0,组合的相关性风险有变化吗", "label": "impact", "lang": "zh"}
+{"text": "buying another 2 BTC perp contracts, how leveraged does that make me", "label": "impact", "lang": "en"}
+{"text": "trimming my TSLA weight to 10% of book — is that enough to cut tail risk", "label": "impact", "lang": "en"}
+{"text": "what happens to my net delta if I short 100 AAPL shares against the long", "label": "impact", "lang": "en"}
+{"text": "如果卖出一半以太坊,我的组合集中度会改善多少", "label": "impact", "lang": "zh"}
+{"text": "adding a fresh 10k USDT to BTC-perp, how does margin usage change", "label": "impact", "lang": "en"}
+{"text": "把英伟达从15%降到5%,对整体beta有多大帮助", "label": "impact", "lang": "zh"}
+{"text": "what's the marginal risk of stacking another oil futures contract", "label": "impact", "lang": "en"}
+{"text": "亚马逊仓位加倍之后,组合的行业集中度会不会太高", "label": "impact", "lang": "zh"}
+{"text": "cutting my gold hedge in half, does my book get riskier", "label": "impact", "lang": "en"}
+{"text": "if I flip from long to flat on SOL what changes in my exposure", "label": "impact", "lang": "en"}
+{"text": "我把特斯拉仓位全部清空,剩下的组合风险主要来自哪里", "label": "impact", "lang": "zh"}
+{"text": "resizing NVDA from 8% to 20% of the book, what's the new concentration number", "label": "impact", "lang": "en"}
+{"text": "把黄金多头再加一倍,组合的整体波动率会涨多少", "label": "impact", "lang": "zh"}
+{"text": "what happens to my book if BTC drops 20% overnight", "label": "stress", "lang": "en"}
+{"text": "如果原油一夜暴跌15%,我的组合会怎样", "label": "stress", "lang": "zh"}
+{"text": "how does my portfolio react to a sudden 10% selloff in tech stocks", "label": "stress", "lang": "en"}
+{"text": "if the Fed shocks the market tomorrow, how bad does my book get hit", "label": "stress", "lang": "en"}
+{"text": "假如英伟达单日暴跌30%,我的持仓损失会有多少", "label": "stress", "lang": "zh"}
+{"text": "simulate a flash crash in ETH, what's my drawdown", "label": "stress", "lang": "en"}
+{"text": "如果黄金突然大跌8%,我的组合会受多大冲击", "label": "stress", "lang": "zh"}
+{"text": "stress test my book against a 2020-style crypto crash", "label": "stress", "lang": "en"}
+{"text": "假设特斯拉一天内跌20%,对我现在的仓位影响多大", "label": "stress", "lang": "zh"}
+{"text": "what's my exposure if oil spikes 25% on a supply shock", "label": "stress", "lang": "en"}
+{"text": "如果比特币突然崩盘40%,我的账户会亏多少", "label": "stress", "lang": "zh"}
+{"text": "how would my portfolio hold up during a repeat of the March 2020 crash", "label": "stress", "lang": "en"}
+{"text": "shock scenario: SOL falls 50% in a day, what's the damage to my book", "label": "stress", "lang": "en"}
+{"text": "假如苹果财报暴雷股价跳水,我的组合会怎么变化", "label": "stress", "lang": "zh"}
+{"text": "if the dollar spikes hard overnight what happens to my gold position", "label": "stress", "lang": "en"}
+{"text": "如果美联储突然加息导致市场恐慌,我的持仓会怎样", "label": "stress", "lang": "zh"}
+{"text": "what's my worst case loss if NVDA gaps down 15% at open", "label": "stress", "lang": "en"}
+{"text": "stress my book for a sudden China tariff shock hitting AMZN", "label": "stress", "lang": "en"}
+{"text": "假设原油因为地缘冲突暴涨20%,我的空头会亏多少", "label": "stress", "lang": "zh"}
+{"text": "how bad is my drawdown if crypto has another Luna-style event", "label": "stress", "lang": "en"}
+{"text": "如果谷歌突然被反垄断罚款,股价暴跌,组合损失多大", "label": "stress", "lang": "zh"}
+{"text": "shock test: rates spike 100bps overnight, how's my book affected", "label": "stress", "lang": "en"}
+{"text": "假如比特币出现闪崩,我持有的仓位会受到多大冲击", "label": "stress", "lang": "zh"}
+{"text": "what happens to my portfolio if there's a sudden banking crisis like SVB again", "label": "stress", "lang": "en"}
+{"text": "如果特斯拉CEO突然辞职导致股价暴跌,我的账户会怎样", "label": "stress", "lang": "zh"}
+{"text": "run a scenario where oil crashes to $40, what's my P&L hit", "label": "stress", "lang": "en"}
+{"text": "if BTC whales dump and price craters 30%, how exposed am I", "label": "stress", "lang": "en"}
+{"text": "假设黄金因为避险情绪骤降,组合会受到什么影响", "label": "stress", "lang": "zh"}
+{"text": "what's the impact on my book from a sudden Taiwan conflict headline", "label": "stress", "lang": "en"}
+{"text": "如果微软突然出现重大安全漏洞导致股价暴跌,我会亏多少", "label": "stress", "lang": "zh"}
+{"text": "stress scenario: a major exchange hack drains liquidity, ETH craters — book impact?", "label": "stress", "lang": "en"}
+{"text": "假如原油因OPEC增产暴跌,我的组合会承受多大损失", "label": "stress", "lang": "zh"}
+{"text": "compare volatility of AAPL vs MSFT over the last month", "label": "compare", "lang": "en"}
+{"text": "英伟达和特斯拉哪个波动更大", "label": "compare", "lang": "zh"}
+{"text": "which is riskier right now, BTC or ETH", "label": "compare", "lang": "en"}
+{"text": "side by side, how does GOOGL's beta stack up against AMZN's", "label": "compare", "lang": "en"}
+{"text": "比较一下黄金和原油最近的波动率", "label": "compare", "lang": "zh"}
+{"text": "NVDA vs AMD, which has more downside risk this quarter", "label": "compare", "lang": "en"}
+{"text": "苹果跟微软比,哪个估值风险更大", "label": "compare", "lang": "zh"}
+{"text": "how do TSLA and RIVN compare on drawdown risk", "label": "compare", "lang": "en"}
+{"text": "比特币和以太坊现在哪个更容易大幅波动", "label": "compare", "lang": "zh"}
+{"text": "comparing gold and oil, which is the more volatile hedge right now", "label": "compare", "lang": "en"}
+{"text": "谷歌和亚马逊哪个的beta更高", "label": "compare", "lang": "zh"}
+{"text": "SOL vs BTC — which has higher realized vol this week", "label": "compare", "lang": "en"}
+{"text": "put AAPL and NVDA side by side on correlation to the Nasdaq", "label": "compare", "lang": "en"}
+{"text": "英伟达跟微软相比,谁的相关性风险更高", "label": "compare", "lang": "zh"}
+{"text": "which name has fatter tails, TSLA or MSFT", "label": "compare", "lang": "en"}
+{"text": "比较一下特斯拉和苹果最近30天的波动率", "label": "compare", "lang": "zh"}
+{"text": "comparing crypto majors, is SOL or ETH more correlated to BTC", "label": "compare", "lang": "en"}
+{"text": "黄金和比特币,哪个跟标普的相关性更低", "label": "compare", "lang": "zh"}
+{"text": "how does AMZN's risk profile compare to GOOGL's right now", "label": "compare", "lang": "en"}
+{"text": "between oil and gold, which one has been more volatile this month", "label": "compare", "lang": "en"}
+{"text": "亚马逊跟谷歌相比,谁的下行风险更大", "label": "compare", "lang": "zh"}
+{"text": "compare implied vol between AAPL and TSLA", "label": "compare", "lang": "en"}
+{"text": "比较一下原油和黄金作为避险资产的表现", "label": "compare", "lang": "zh"}
+{"text": "which is safer to hold, MSFT or GOOGL, on a risk-adjusted basis", "label": "compare", "lang": "en"}
+{"text": "英伟达和苹果谁的beta更高", "label": "compare", "lang": "zh"}
+{"text": "BTC vs gold as a hedge — which shows lower drawdown historically", "label": "compare", "lang": "en"}
+{"text": "how correlated are NVDA and AMD compared to NVDA and TSLA", "label": "compare", "lang": "en"}
+{"text": "比特币跟以太坊现在的波动率差多少", "label": "compare", "lang": "zh"}
+{"text": "comparing my two crypto longs, ETH vs SOL, which is more concentrated risk", "label": "compare", "lang": "en"}
+{"text": "特斯拉和英伟达比,哪个财报后波动更大", "label": "compare", "lang": "zh"}
+{"text": "risk comparison: is holding oil or gold currently the safer hedge", "label": "compare", "lang": "en"}
+{"text": "苹果跟亚马逊比较起来,谁的估值风险更高", "label": "compare", "lang": "zh"}
+{"text": "how should I work a 50k share order in AMZN without moving the market", "label": "execution", "lang": "en"}
+{"text": "我要买100万美元比特币,怎么分批执行", "label": "execution", "lang": "zh"}
+{"text": "best way to split a large NVDA buy order over the day", "label": "execution", "lang": "en"}
+{"text": "should I use a TWAP or VWAP to unload 20000 shares of TSLA", "label": "execution", "lang": "en"}
+{"text": "想卖出500个比特币,怎么拆单才不会砸盘", "label": "execution", "lang": "zh"}
+{"text": "how do I work into a 2 million dollar gold position without slippage", "label": "execution", "lang": "en"}
+{"text": "买入英伟达10万股,应该怎么分批下单", "label": "execution", "lang": "zh"}
+{"text": "what's the right way to execute a large oil futures order without spooking the book", "label": "execution", "lang": "en"}
+{"text": "我要一次性平掉所有以太坊仓位,怎么执行比较好", "label": "execution", "lang": "zh"}
+{"text": "how should I slice a 100k order in GOOGL across the session", "label": "execution", "lang": "en"}
+{"text": "想买300万美元苹果股票,分几笔比较合适", "label": "execution", "lang": "zh"}
+{"text": "iceberg or TWAP for offloading a big SOL position", "label": "execution", "lang": "en"}
+{"text": "我要建仓黄金50万美元,怎么分批比较不会推高价格", "label": "execution", "lang": "zh"}
+{"text": "what's the ideal order size to avoid slippage buying MSFT", "label": "execution", "lang": "en"}
+{"text": "卖出200万美元特斯拉股票该怎么拆单执行", "label": "execution", "lang": "zh"}
+{"text": "how do I minimize market impact unwinding a huge BTC perp position", "label": "execution", "lang": "en"}
+{"text": "should I break up my AAPL order into 10 clips or use algo execution", "label": "execution", "lang": "en"}
+{"text": "买入比特币300个,一次性下单还是分批比较好", "label": "execution", "lang": "zh"}
+{"text": "what's a good execution strategy for a large block trade in oil", "label": "execution", "lang": "en"}
+{"text": "英伟达要买5万股,应该用什么方式分批建仓", "label": "execution", "lang": "zh"}
+{"text": "how would you work a 1 million dollar ETH buy without moving price", "label": "execution", "lang": "en"}
+{"text": "我想卖掉手上全部黄金持仓,怎么执行才不会砸盘", "label": "execution", "lang": "zh"}
+{"text": "best execution approach for a large sell order in NVDA into earnings", "label": "execution", "lang": "en"}
+{"text": "how to work a big AMZN order using limit clips vs market orders", "label": "execution", "lang": "en"}
+{"text": "买入亚马逊20万股,怎么切分订单比较合理", "label": "execution", "lang": "zh"}
+{"text": "should I use POV execution for a large crude oil position", "label": "execution", "lang": "en"}
+{"text": "特斯拉股票要卖10万股,应该怎么分批操作", "label": "execution", "lang": "zh"}
+{"text": "how do I dollar cost into a 500k BTC position over the week", "label": "execution", "lang": "en"}
+{"text": "想一次买入很大量的比特币,担心滑点,应该怎么处理", "label": "execution", "lang": "zh"}
+{"text": "what execution style keeps slippage low when buying 30000 shares of GOOGL", "label": "execution", "lang": "en"}
+{"text": "我要卖出原油期货大单,怎么分批避免冲击价格", "label": "execution", "lang": "zh"}
+{"text": "working a large TSLA order into close — TWAP the whole thing or wait", "label": "execution", "lang": "en"}
+{"text": "what's the current funding rate on BTC perp", "label": "quote", "lang": "en"}
+{"text": "英伟达现在多少钱一股", "label": "quote", "lang": "zh"}
+{"text": "bid ask spread on AAPL right now", "label": "quote", "lang": "en"}
+{"text": "what's TSLA trading at", "label": "quote", "lang": "en"}
+{"text": "比特币现在的价格是多少", "label": "quote", "lang": "zh"}
+{"text": "current funding on ETH perp", "label": "quote", "lang": "en"}
+{"text": "黄金现在的现价是多少", "label": "quote", "lang": "zh"}
+{"text": "what's the round trip cost to trade SOL perp", "label": "quote", "lang": "en"}
+{"text": "原油期货现在的买卖价差是多少", "label": "quote", "lang": "zh"}
+{"text": "spot price of gold right now", "label": "quote", "lang": "en"}
+{"text": "特斯拉现在的报价", "label": "quote", "lang": "zh"}
+{"text": "what's the spread on the oil futures contract", "label": "quote", "lang": "en"}
+{"text": "苹果最新股价多少", "label": "quote", "lang": "zh"}
+{"text": "current bid/ask on MSFT", "label": "quote", "lang": "en"}
+{"text": "微软现在多少钱一股", "label": "quote", "lang": "zh"}
+{"text": "how much is BTC perp funding costing me right now", "label": "quote", "lang": "en"}
+{"text": "what's AMZN quoting at right now", "label": "quote", "lang": "en"}
+{"text": "现在买以太坊要多少手续费", "label": "quote", "lang": "zh"}
+{"text": "quote me the current price on GOOGL", "label": "quote", "lang": "en"}
+{"text": "谷歌现在的股价是多少", "label": "quote", "lang": "zh"}
+{"text": "what's the current NVDA bid and ask", "label": "quote", "lang": "en"}
+{"text": "现在比特币永续合约的资金费率是多少", "label": "quote", "lang": "zh"}
+{"text": "spot vs futures spread on crude oil right now", "label": "quote", "lang": "en"}
+{"text": "current price on the SOL perp contract", "label": "quote", "lang": "en"}
+{"text": "亚马逊现在股价多少钱", "label": "quote", "lang": "zh"}
+{"text": "what's the total round trip cost on a TSLA options trade", "label": "quote", "lang": "en"}
+{"text": "英伟达现在的买卖价差大不大", "label": "quote", "lang": "zh"}
+{"text": "gimme the current quote on ETH", "label": "quote", "lang": "en"}
+{"text": "黄金现在的点差是多少", "label": "quote", "lang": "zh"}
+{"text": "what's the funding rate look like for oil perps", "label": "quote", "lang": "en"}
+{"text": "现在原油的现货价格是多少", "label": "quote", "lang": "zh"}
+{"text": "current spread and last price on AAPL", "label": "quote", "lang": "en"}
+{"text": "is TSLA overbought on the daily RSI", "label": "technicals", "lang": "en"}
+{"text": "黄金现在处于什么趋势,有没有突破阻力位", "label": "technicals", "lang": "zh"}
+{"text": "what's the MACD saying on NVDA right now", "label": "technicals", "lang": "en"}
+{"text": "where's the key support level on AAPL", "label": "technicals", "lang": "en"}
+{"text": "比特币日线RSI是不是超买了", "label": "technicals", "lang": "zh"}
+{"text": "is BTC showing a bullish crossover on the 4h chart", "label": "technicals", "lang": "en"}
+{"text": "特斯拉现在的支撑位和阻力位在哪", "label": "technicals", "lang": "zh"}
+{"text": "what's the trend on GOOGL, still in an uptrend", "label": "technicals", "lang": "en"}
+{"text": "英伟达的MACD最近有金叉吗", "label": "technicals", "lang": "zh"}
+{"text": "is oil oversold based on RSI", "label": "technicals", "lang": "en"}
+{"text": "原油现在处于上升趋势还是下降趋势", "label": "technicals", "lang": "zh"}
+{"text": "where's the 50 day moving average sitting on MSFT", "label": "technicals", "lang": "en"}
+{"text": "苹果股价有没有跌破关键支撑", "label": "technicals", "lang": "zh"}
+{"text": "does ETH look overextended on the weekly chart", "label": "technicals", "lang": "en"}
+{"text": "黄金的MACD指标显示什么信号", "label": "technicals", "lang": "zh"}
+{"text": "what's the RSI reading on AMZN this week", "label": "technicals", "lang": "en"}
+{"text": "is SOL forming a bullish pattern on the daily", "label": "technicals", "lang": "en"}
+{"text": "比特币最近有没有突破前高阻力位", "label": "technicals", "lang": "zh"}
+{"text": "MACD divergence on NVDA — bearish signal forming?", "label": "technicals", "lang": "en"}
+{"text": "特斯拉的RSI现在是超买还是超卖", "label": "technicals", "lang": "zh"}
+{"text": "what's the trend structure on gold, higher highs?", "label": "technicals", "lang": "en"}
+{"text": "谷歌股价现在是不是在下降通道里", "label": "technicals", "lang": "zh"}
+{"text": "is crude oil breaking above resistance", "label": "technicals", "lang": "en"}
+{"text": "where's support on TSLA if it keeps selling off", "label": "technicals", "lang": "en"}
+{"text": "以太坊现在的均线排列是多头还是空头", "label": "technicals", "lang": "zh"}
+{"text": "is AAPL showing overbought signals on RSI", "label": "technicals", "lang": "en"}
+{"text": "英伟达跌破50日均线了吗", "label": "technicals", "lang": "zh"}
+{"text": "does BTC's chart show a golden cross forming", "label": "technicals", "lang": "en"}
+{"text": "原油RSI现在多少,超买了吗", "label": "technicals", "lang": "zh"}
+{"text": "what technical levels matter for MSFT this week", "label": "technicals", "lang": "en"}
+{"text": "黄金有没有形成头肩顶形态", "label": "technicals", "lang": "zh"}
+{"text": "is GOOGL trending or ranging right now on the daily", "label": "technicals", "lang": "en"}
+{"text": "when does NVDA report earnings next", "label": "fundamentals", "lang": "en"}
+{"text": "苹果的市盈率现在多少,分析师目标价是多少", "label": "fundamentals", "lang": "zh"}
+{"text": "what's the current analyst price target on TSLA", "label": "fundamentals", "lang": "en"}
+{"text": "who are the biggest 13F holders in AAPL", "label": "fundamentals", "lang": "en"}
+{"text": "英伟达下一次财报是什么时候", "label": "fundamentals", "lang": "zh"}
+{"text": "what's MSFT's forward P/E right now", "label": "fundamentals", "lang": "en"}
+{"text": "特斯拉的每股收益预期是多少", "label": "fundamentals", "lang": "zh"}
+{"text": "any recent insider selling at AMZN", "label": "fundamentals", "lang": "en"}
+{"text": "微软最新的机构持仓13F报告显示什么", "label": "fundamentals", "lang": "zh"}
+{"text": "what's the EPS estimate for GOOGL this quarter", "label": "fundamentals", "lang": "en"}
+{"text": "苹果最近有没有内部人减持", "label": "fundamentals", "lang": "zh"}
+{"text": "who's the largest institutional holder of NVDA", "label": "fundamentals", "lang": "en"}
+{"text": "亚马逊的估值现在算贵吗,市盈率多少", "label": "fundamentals", "lang": "zh"}
+{"text": "what's the consensus analyst rating on TSLA right now", "label": "fundamentals", "lang": "en"}
+{"text": "谷歌下次财报日期是什么时候", "label": "fundamentals", "lang": "zh"}
+{"text": "is AAPL's valuation stretched relative to its earnings growth", "label": "fundamentals", "lang": "en"}
+{"text": "what's the price target range analysts have on MSFT", "label": "fundamentals", "lang": "en"}
+{"text": "英伟达的机构持股比例是多少", "label": "fundamentals", "lang": "zh"}
+{"text": "when's TSLA's next earnings call", "label": "fundamentals", "lang": "en"}
+{"text": "特斯拉最近有内部人卖出股票吗", "label": "fundamentals", "lang": "zh"}
+{"text": "what's NVDA trading at relative to its forward earnings", "label": "fundamentals", "lang": "en"}
+{"text": "苹果分析师目标价共识是多少", "label": "fundamentals", "lang": "zh"}
+{"text": "any notable 13F changes in AMZN holders last quarter", "label": "fundamentals", "lang": "en"}
+{"text": "微软的每股收益预期跟去年比怎么样", "label": "fundamentals", "lang": "zh"}
+{"text": "what's GOOGL's current valuation multiple vs peers", "label": "fundamentals", "lang": "en"}
+{"text": "insider selling activity at MSFT lately", "label": "fundamentals", "lang": "en"}
+{"text": "英伟达的市值现在多少,估值合理吗", "label": "fundamentals", "lang": "zh"}
+{"text": "what's the EPS beat/miss history for TSLA", "label": "fundamentals", "lang": "en"}
+{"text": "谷歌最新13F机构持仓有变化吗", "label": "fundamentals", "lang": "zh"}
+{"text": "when does AAPL report next quarter earnings", "label": "fundamentals", "lang": "en"}
+{"text": "特斯拉的分析师评级现在是买入还是卖出", "label": "fundamentals", "lang": "zh"}
+{"text": "what's the analyst consensus target price for NVDA", "label": "fundamentals", "lang": "en"}
+{"text": "how does gold usually move on CPI day", "label": "event", "lang": "en"}
+{"text": "特斯拉财报当天历史上平均涨跌多少", "label": "event", "lang": "zh"}
+{"text": "historically how does BTC react to FOMC meetings", "label": "event", "lang": "en"}
+{"text": "what happens to oil on OPEC decision days", "label": "event", "lang": "en"}
+{"text": "英伟达财报公布后通常股价怎么走", "label": "event", "lang": "zh"}
+{"text": "how does the dollar typically react to a Fed rate decision", "label": "event", "lang": "en"}
+{"text": "CPI数据公布那天黄金一般怎么走", "label": "event", "lang": "zh"}
+{"text": "what's NVDA's average move on earnings day historically", "label": "event", "lang": "en"}
+{"text": "美联储议息会议对比特币历史上有什么影响", "label": "event", "lang": "zh"}
+{"text": "how does crude oil usually trade around OPEC meetings", "label": "event", "lang": "en"}
+{"text": "苹果财报日历史平均波动是多少", "label": "event", "lang": "zh"}
+{"text": "how did tech stocks react during the last few CPI prints", "label": "event", "lang": "en"}
+{"text": "what's TSLA's historical earnings day volatility", "label": "event", "lang": "en"}
+{"text": "原油在OPEC增产消息公布后一般怎么走", "label": "event", "lang": "zh"}
+{"text": "how does gold typically behave around FOMC announcements", "label": "event", "lang": "en"}
+{"text": "英伟达在美联储加息日通常怎么反应", "label": "event", "lang": "zh"}
+{"text": "what happened to crypto during the last Fed rate cut", "label": "event", "lang": "en"}
+{"text": "特斯拉在CPI公布当天历史表现如何", "label": "event", "lang": "zh"}
+{"text": "how does AAPL usually move the day after earnings", "label": "event", "lang": "en"}
+{"text": "what's BTC's historical reaction to jobs report days", "label": "event", "lang": "en"}
+{"text": "黄金在美联储议息会议前后通常怎么波动", "label": "event", "lang": "zh"}
+{"text": "how do oil prices typically react to OPEC production cuts", "label": "event", "lang": "en"}
+{"text": "谷歌财报公布日的历史平均涨跌幅是多少", "label": "event", "lang": "zh"}
+{"text": "what's the historical pattern for gold on FOMC days", "label": "event", "lang": "en"}
+{"text": "比特币在CPI数据发布当天一般涨还是跌", "label": "event", "lang": "zh"}
+{"text": "how does MSFT usually trade around its earnings release", "label": "event", "lang": "en"}
+{"text": "what's the typical market reaction to a surprise rate hike", "label": "event", "lang": "en"}
+{"text": "原油在地缘政治冲突事件后历史上怎么反应", "label": "event", "lang": "zh"}
+{"text": "how did NVDA react the last three times it reported earnings", "label": "event", "lang": "en"}
+{"text": "特斯拉CEO推特发言历史上对股价影响大吗", "label": "event", "lang": "zh"}
+{"text": "what's oil's average move on days OPEC surprises the market", "label": "event", "lang": "en"}
+{"text": "美联储降息历史上对黄金价格影响如何", "label": "event", "lang": "zh"}
+{"text": "what's the best way to hedge my long AAPL position", "label": "hedge", "lang": "en"}
+{"text": "我持有大量比特币,怎么对冲下跌风险", "label": "hedge", "lang": "zh"}
+{"text": "how should I protect my TSLA holding into earnings", "label": "hedge", "lang": "en"}
+{"text": "what options strategy hedges a big NVDA long", "label": "hedge", "lang": "en"}
+{"text": "我想给我的黄金多头买个保险,怎么操作", "label": "hedge", "lang": "zh"}
+{"text": "should I use gold to hedge my crypto exposure", "label": "hedge", "lang": "en"}
+{"text": "特斯拉仓位太大了,怎么对冲比较合适", "label": "hedge", "lang": "zh"}
+{"text": "how do I hedge oil exposure without closing the position", "label": "hedge", "lang": "en"}
+{"text": "我的以太坊仓位怎么对冲下跌风险比较好", "label": "hedge", "lang": "zh"}
+{"text": "what's a cheap way to hedge my tech-heavy portfolio", "label": "hedge", "lang": "en"}
+{"text": "苹果持仓想对冲一下财报风险,有什么办法", "label": "hedge", "lang": "zh"}
+{"text": "how can I protect my BTC long against a sudden crash", "label": "hedge", "lang": "en"}
+{"text": "原油多头仓位太大,想找个对冲工具", "label": "hedge", "lang": "zh"}
+{"text": "should I buy puts on GOOGL to hedge downside", "label": "hedge", "lang": "en"}
+{"text": "我想用黄金对冲我持有的美股组合", "label": "hedge", "lang": "zh"}
+{"text": "what's the best hedge for my crypto book right now", "label": "hedge", "lang": "en"}
+{"text": "how do I protect my AMZN position going into the Fed meeting", "label": "hedge", "lang": "en"}
+{"text": "英伟达仓位太集中了,应该怎么对冲风险", "label": "hedge", "lang": "zh"}
+{"text": "using futures to hedge my spot BTC holdings — how would that work", "label": "hedge", "lang": "en"}
+{"text": "我持有的比特币想部分对冲一下,应该怎么做", "label": "hedge", "lang": "zh"}
+{"text": "what's a good hedge against a dollar spike hurting my gold position", "label": "hedge", "lang": "en"}
+{"text": "特斯拉财报前想买保护性期权,怎么设置比较好", "label": "hedge", "lang": "zh"}
+{"text": "how do I hedge my MSFT position against a broad market selloff", "label": "hedge", "lang": "en"}
+{"text": "should I short SOL to hedge my ETH long", "label": "hedge", "lang": "en"}
+{"text": "我想对冲一下原油多头的下行风险,有什么建议", "label": "hedge", "lang": "zh"}
+{"text": "what's the cheapest way to protect my NVDA gains", "label": "hedge", "lang": "en"}
+{"text": "苹果股票涨了很多,想锁定利润又不想卖,怎么对冲", "label": "hedge", "lang": "zh"}
+{"text": "how can I hedge my whole book against a rate hike shock", "label": "hedge", "lang": "en"}
+{"text": "我的黄金仓位想对冲美元走强的风险", "label": "hedge", "lang": "zh"}
+{"text": "protective put strategy for a large TSLA long, thoughts", "label": "hedge", "lang": "en"}
+{"text": "what's the right hedge ratio for my oil position", "label": "hedge", "lang": "en"}
+{"text": "比特币仓位很重,想用期权做一个保护性对冲", "label": "hedge", "lang": "zh"}
+{"text": "what's the Fed's current stance on rate cuts", "label": "macro", "lang": "en"}
+{"text": "美元指数现在怎么样,对黄金有什么影响", "label": "macro", "lang": "zh"}
+{"text": "where are the 10 year yields sitting right now", "label": "macro", "lang": "en"}
+{"text": "is a recession still on the table this year", "label": "macro", "lang": "en"}
+{"text": "现在通胀数据怎么样,对市场有什么影响", "label": "macro", "lang": "zh"}
+{"text": "what's the outlook on inflation heading into next quarter", "label": "macro", "lang": "en"}
+{"text": "美联储现在对降息是什么态度", "label": "macro", "lang": "zh"}
+{"text": "how strong is the dollar right now relative to other majors", "label": "macro", "lang": "en"}
+{"text": "十年期美债收益率现在多少", "label": "macro", "lang": "zh"}
+{"text": "what's the market pricing for the next FOMC decision", "label": "macro", "lang": "en"}
+{"text": "现在市场对衰退的担忧大不大", "label": "macro", "lang": "zh"}
+{"text": "is the yield curve still inverted", "label": "macro", "lang": "en"}
+{"text": "美元最近走强还是走弱,对风险资产有什么影响", "label": "macro", "lang": "zh"}
+{"text": "what's the current macro backdrop for risk assets", "label": "macro", "lang": "en"}
+{"text": "现在的通胀预期对黄金和比特币有什么影响", "label": "macro", "lang": "zh"}
+{"text": "how does the current rate environment compare to last year", "label": "macro", "lang": "en"}
+{"text": "what's DXY doing this week", "label": "macro", "lang": "en"}
+{"text": "美联储加息周期结束了吗", "label": "macro", "lang": "zh"}
+{"text": "is the economy showing signs of slowing down", "label": "macro", "lang": "en"}
+{"text": "现在的利率环境对科技股有什么压力", "label": "macro", "lang": "zh"}
+{"text": "what's the Fed likely to do at the next meeting", "label": "macro", "lang": "en"}
+{"text": "美元指数和黄金现在是什么相关性", "label": "macro", "lang": "zh"}
+{"text": "how's global growth looking heading into year end", "label": "macro", "lang": "en"}
+{"text": "what's happening with real yields right now", "label": "macro", "lang": "en"}
+{"text": "现在美国经济衰退的概率有多大", "label": "macro", "lang": "zh"}
+{"text": "is the dollar strength going to keep pressuring gold", "label": "macro", "lang": "en"}
+{"text": "美联储的鹰派立场对市场影响有多大", "label": "macro", "lang": "zh"}
+{"text": "what's the macro read on rate cut odds for December", "label": "macro", "lang": "en"}
+{"text": "十年期和两年期国债利差现在是什么情况", "label": "macro", "lang": "zh"}
+{"text": "how's inflation trending versus the Fed's target", "label": "macro", "lang": "en"}
+{"text": "现在全球经济增长放缓会怎么影响资产价格", "label": "macro", "lang": "zh"}
+{"text": "what's the current stance from central banks globally on rates", "label": "macro", "lang": "en"}
+{"text": "what's the crypto fear and greed index right now", "label": "sentiment", "lang": "en"}
+{"text": "现在原油的多空持仓比是多少", "label": "sentiment", "lang": "zh"}
+{"text": "how crowded is the long BTC trade right now", "label": "sentiment", "lang": "en"}
+{"text": "what's retail sentiment looking like on TSLA", "label": "sentiment", "lang": "en"}
+{"text": "现在市场对英伟达的情绪是看多还是看空", "label": "sentiment", "lang": "zh"}
+{"text": "is there a lot of hype around SOL right now", "label": "sentiment", "lang": "en"}
+{"text": "比特币现在的恐惧贪婪指数是多少", "label": "sentiment", "lang": "zh"}
+{"text": "how bullish is positioning on gold right now", "label": "sentiment", "lang": "en"}
+{"text": "特斯拉现在的散户情绪怎么样", "label": "sentiment", "lang": "zh"}
+{"text": "what's the crowd doing with NVDA options positioning", "label": "sentiment", "lang": "en"}
+{"text": "现在加密市场是不是过度看涨了", "label": "sentiment", "lang": "zh"}
+{"text": "is sentiment on oil bearish or bullish at the moment", "label": "sentiment", "lang": "en"}
+{"text": "how crowded is the short position on AAPL", "label": "sentiment", "lang": "en"}
+{"text": "黄金现在的多空比是多少", "label": "sentiment", "lang": "zh"}
+{"text": "what's the social media hype level on ETH right now", "label": "sentiment", "lang": "en"}
+{"text": "现在原油市场的情绪偏多还是偏空", "label": "sentiment", "lang": "zh"}
+{"text": "is everyone piling into the same trade on BTC perps", "label": "sentiment", "lang": "en"}
+{"text": "英伟达最近的社交媒体讨论热度怎么样", "label": "sentiment", "lang": "zh"}
+{"text": "what's the put/call ratio telling us about GOOGL sentiment", "label": "sentiment", "lang": "en"}
+{"text": "比特币现在的持仓集中度是不是太高了", "label": "sentiment", "lang": "zh"}
+{"text": "how euphoric is crypto twitter about SOL right now", "label": "sentiment", "lang": "en"}
+{"text": "is there fear or greed dominating the gold market", "label": "sentiment", "lang": "en"}
+{"text": "特斯拉最近的期权情绪偏看涨还是看跌", "label": "sentiment", "lang": "zh"}
+{"text": "what's the current positioning skew in oil futures", "label": "sentiment", "lang": "en"}
+{"text": "现在市场对美联储降息的乐观情绪高不高", "label": "sentiment", "lang": "zh"}
+{"text": "how crowded is the AI trade in NVDA right now", "label": "sentiment", "lang": "en"}
+{"text": "以太坊现在的散户情绪是不是很亢奋", "label": "sentiment", "lang": "zh"}
+{"text": "is the market overly complacent on tech stocks right now", "label": "sentiment", "lang": "en"}
+{"text": "黄金现在的避险情绪浓不浓", "label": "sentiment", "lang": "zh"}
+{"text": "what's the long/short ratio on BTC perps look like", "label": "sentiment", "lang": "en"}
+{"text": "现在比特币的杠杆多头拥挤程度高吗", "label": "sentiment", "lang": "zh"}
+{"text": "how bearish has sentiment gotten on oil lately", "label": "sentiment", "lang": "en"}
+{"text": "why is TSLA down 5% today", "label": "news", "lang": "en"}
+{"text": "英伟达今天为什么大涨", "label": "news", "lang": "zh"}
+{"text": "what's the news behind BTC's move today", "label": "news", "lang": "en"}
+{"text": "why did oil spike this morning", "label": "news", "lang": "en"}
+{"text": "苹果今天股价为什么跌了这么多", "label": "news", "lang": "zh"}
+{"text": "what happened to cause AAPL to gap down", "label": "news", "lang": "en"}
+{"text": "比特币今天为什么突然暴跌", "label": "news", "lang": "zh"}
+{"text": "why is gold rallying so hard today", "label": "news", "lang": "en"}
+{"text": "特斯拉今天为什么大跌", "label": "news", "lang": "zh"}
+{"text": "what's driving the move in NVDA right now", "label": "news", "lang": "en"}
+{"text": "黄金今天为什么大涨这么多", "label": "news", "lang": "zh"}
+{"text": "any catalyst behind ETH's pump today", "label": "news", "lang": "en"}
+{"text": "why did GOOGL sell off after hours", "label": "news", "lang": "en"}
+{"text": "原油今天为什么突然暴涨", "label": "news", "lang": "zh"}
+{"text": "what's the reason behind MSFT's rally today", "label": "news", "lang": "en"}
+{"text": "微软今天为什么股价上涨", "label": "news", "lang": "zh"}
+{"text": "why is crude oil crashing this afternoon", "label": "news", "lang": "en"}
+{"text": "谷歌盘后为什么大跌", "label": "news", "lang": "zh"}
+{"text": "what news is moving AMZN right now", "label": "news", "lang": "en"}
+{"text": "亚马逊今天为什么突然拉升", "label": "news", "lang": "zh"}
+{"text": "why is SOL pumping hard today", "label": "news", "lang": "en"}
+{"text": "what's behind the sudden drop in BTC an hour ago", "label": "news", "lang": "en"}
+{"text": "以太坊今天为什么突然大跌", "label": "news", "lang": "zh"}
+{"text": "any headline explaining TSLA's rally today", "label": "news", "lang": "en"}
+{"text": "英伟达盘前为什么大跌", "label": "news", "lang": "zh"}
+{"text": "what caused gold to spike overnight", "label": "news", "lang": "en"}
+{"text": "比特币今天暴涨的原因是什么", "label": "news", "lang": "zh"}
+{"text": "why did oil futures jump on the open", "label": "news", "lang": "en"}
+{"text": "what's the catalyst for NVDA's move after earnings", "label": "news", "lang": "en"}
+{"text": "特斯拉今天股价异动的原因是什么", "label": "news", "lang": "zh"}
+{"text": "苹果今天为什么突然被砸盘", "label": "news", "lang": "zh"}
+{"text": "any news explaining why AAPL is spiking right now", "label": "news", "lang": "en"}
+{"text": "what's the desk's Sharpe ratio this month", "label": "record", "lang": "en"}
+{"text": "系统上周为什么没有交易", "label": "record", "lang": "zh"}
+{"text": "what did the risk layer block this week", "label": "record", "lang": "en"}
+{"text": "show me the desk's win rate over the last 30 days", "label": "record", "lang": "en"}
+{"text": "策略上个月的最大回撤是多少", "label": "record", "lang": "zh"}
+{"text": "why didn't the agent trade during that BTC dip yesterday", "label": "record", "lang": "en"}
+{"text": "风控层这周拦截了哪些交易", "label": "record", "lang": "zh"}
+{"text": "how is our own trading log tamper-evident", "label": "record", "lang": "en"}
+{"text": "我们系统上个月的胜率是多少", "label": "record", "lang": "zh"}
+{"text": "what's the desk's current drawdown from peak", "label": "record", "lang": "en"}
+{"text": "为什么昨天系统没有对英伟达下单", "label": "record", "lang": "zh"}
+{"text": "how well calibrated has our own confidence scoring been lately", "label": "record", "lang": "en"}
+{"text": "系统这个月的Sharpe比率是多少", "label": "record", "lang": "zh"}
+{"text": "what trades has the desk made in the last week", "label": "record", "lang": "en"}
+{"text": "我们的交易记录有没有被篡改的可能", "label": "record", "lang": "zh"}
+{"text": "why did the risk layer reject that oil trade this morning", "label": "record", "lang": "en"}
+{"text": "what's the desk's performance versus benchmark this quarter", "label": "record", "lang": "en"}
+{"text": "系统这个月的表现跟基准比怎么样", "label": "record", "lang": "zh"}
+{"text": "show me every decision the agent blocked and why", "label": "record", "lang": "en"}
+{"text": "为什么上周三系统一笔单都没下", "label": "record", "lang": "zh"}
+{"text": "how tamper-evident is the desk's decision log", "label": "record", "lang": "en"}
+{"text": "我们的风控系统这周挡下了几笔交易", "label": "record", "lang": "zh"}
+{"text": "what's our own strategy's realized volatility this month", "label": "record", "lang": "en"}
+{"text": "系统的历史胜率和盈亏比是多少", "label": "record", "lang": "zh"}
+{"text": "why has the agent been sitting flat for the past three days", "label": "record", "lang": "en"}
+{"text": "what's the calibration quality of our own confidence scores lately", "label": "record", "lang": "en"}
+{"text": "上次比特币暴跌时我们的系统为什么没有平仓", "label": "record", "lang": "zh"}
+{"text": "give me the desk's max drawdown and recovery time this quarter", "label": "record", "lang": "en"}
+{"text": "系统的交易日志能不能验证没有被改过", "label": "record", "lang": "zh"}
+{"text": "what did our own risk gate flag as too risky this week", "label": "record", "lang": "en"}
+{"text": "为什么系统这周的交易次数这么少", "label": "record", "lang": "zh"}
+{"text": "how has our desk's performance compared to a simple buy and hold", "label": "record", "lang": "en"}
+{"text": "what's the capital of France", "label": "refuse", "lang": "en"}
+{"text": "帮我写个python冒泡排序", "label": "refuse", "lang": "zh"}
+{"text": "place a real order for 10 BTC right now", "label": "refuse", "lang": "en"}
+{"text": "what will BTC be worth in 2030", "label": "refuse", "lang": "en"}
+{"text": "今天天气怎么样", "label": "refuse", "lang": "zh"}
+{"text": "can you help me with my calculus homework", "label": "refuse", "lang": "en"}
+{"text": "帮我写一篇关于秋天的作文", "label": "refuse", "lang": "zh"}
+{"text": "buy me 500 shares of AAPL right now for real", "label": "refuse", "lang": "en"}
+{"text": "what's TSLA going to be trading at next year", "label": "refuse", "lang": "en"}
+{"text": "比特币明年会涨到多少钱", "label": "refuse", "lang": "zh"}
+{"text": "write me a poem about the ocean", "label": "refuse", "lang": "en"}
+{"text": "帮我翻译一下这句话成英语", "label": "refuse", "lang": "zh"}
+{"text": "how do I make pasta carbonara", "label": "refuse", "lang": "en"}
+{"text": "predict the price of gold in 5 years", "label": "refuse", "lang": "en"}
+{"text": "帮我调试一下这段java代码", "label": "refuse", "lang": "zh"}
+{"text": "what's the meaning of life", "label": "refuse", "lang": "en"}
+{"text": "给我推荐几本科幻小说", "label": "refuse", "lang": "zh"}
+{"text": "execute a live sell order on my account for ETH", "label": "refuse", "lang": "en"}
+{"text": "who won the world cup in 2018", "label": "refuse", "lang": "en"}
+{"text": "明天股市会涨还是跌", "label": "refuse", "lang": "zh"}
+{"text": "what's the best gym routine for beginners", "label": "refuse", "lang": "en"}
+{"text": "帮我写一份简历模板", "label": "refuse", "lang": "zh"}
+{"text": "how do I fix a null pointer exception in java", "label": "refuse", "lang": "en"}
+{"text": "can you place a buy order for GOONER coin", "label": "refuse", "lang": "en"}
+{"text": "GOONER币现在多少钱", "label": "refuse", "lang": "zh"}
+{"text": "what's the weather like in Tokyo tomorrow", "label": "refuse", "lang": "en"}
+{"text": "帮我算一下这道数学题", "label": "refuse", "lang": "zh"}
+{"text": "please execute a market buy of 5 BTC on my exchange account", "label": "refuse", "lang": "en"}
+{"text": "will NVDA hit $2000 by next month", "label": "refuse", "lang": "en"}
+{"text": "帮我写个React组件的代码", "label": "refuse", "lang": "zh"}
+{"text": "what's a good recipe for banana bread", "label": "refuse", "lang": "en"}
+{"text": "MOONROCKET代币值得买吗", "label": "refuse", "lang": "zh"}
+{"text": "how do neural networks work, explain simply", "label": "refuse", "lang": "en"}
+{"text": "buy real gold bars for me right now", "label": "refuse", "lang": "en"}
+{"text": "帮我规划一下巴黎五天旅游行程", "label": "refuse", "lang": "zh"}
+{"text": "what's the plot of the movie Inception", "label": "refuse", "lang": "en"}
+{"text": "特斯拉股价下个月会到多少", "label": "refuse", "lang": "zh"}
+{"text": "can you debug my SQL query for me", "label": "refuse", "lang": "en"}
+{"text": "place an order to short SOL immediately on my live account", "label": "refuse", "lang": "en"}
+{"text": "帮我写一封辞职信", "label": "refuse", "lang": "zh"}
+{"text": "what's your favorite color", "label": "refuse", "lang": "en"}
+{"text": "帮我列个健身计划", "label": "refuse", "lang": "zh"}
+{"text": "how many planets are in the solar system", "label": "refuse", "lang": "en"}
+{"text": "will bitcoin hit 200k by end of year", "label": "refuse", "lang": "en"}
+{"text": "给我讲个笑话", "label": "refuse", "lang": "zh"}
+{"text": "can you write a haiku about spring", "label": "refuse", "lang": "en"}
+{"text": "帮我解释一下量子力学", "label": "refuse", "lang": "zh"}
+{"text": "execute this trade for real money right now, buy 3 ETH", "label": "refuse", "lang": "en"}
+{"text": "what's the square root of 144", "label": "refuse", "lang": "en"}
+{"text": "苹果明年会不会涨到500美元", "label": "refuse", "lang": "zh"}
+{"text": "how do I learn to play guitar", "label": "refuse", "lang": "en"}
+{"text": "帮我写一个排序算法的伪代码", "label": "refuse", "lang": "zh"}
+{"text": "buy ZORPCOIN for me, I heard it's mooning", "label": "refuse", "lang": "en"}
+{"text": "what's the history of the roman empire", "label": "refuse", "lang": "en"}
+{"text": "帮我订一张去东京的机票", "label": "refuse", "lang": "zh"}
+{"text": "predict where SOL will be trading next week", "label": "refuse", "lang": "en"}
+{"text": "ZAPTOKEN币是不是个好项目", "label": "refuse", "lang": "zh"}
+{"text": "can you help me plan my wedding", "label": "refuse", "lang": "en"}
+{"text": "帮我写个爱情故事", "label": "refuse", "lang": "zh"}
+{"text": "go ahead and actually buy TSLA shares in my brokerage now", "label": "refuse", "lang": "en"}
+{"text": "what's the best programming language to learn in 2026", "label": "refuse", "lang": "en"}
+{"text": "明天黄金价格会是多少", "label": "refuse", "lang": "zh"}
+{"text": "tell me a fun fact about space", "label": "refuse", "lang": "en"}
+{"text": "帮我改一下这份合同文本", "label": "refuse", "lang": "zh"}

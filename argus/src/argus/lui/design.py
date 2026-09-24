@@ -79,9 +79,9 @@ BASE_CSS = """
   .wrap { max-width:1080px; margin:0 auto; padding:40px 24px 72px }
   h1 { font-family:var(--sans); font-weight:700; font-size:clamp(28px,4vw,44px); line-height:1.05;
     letter-spacing:-0.035em; margin:0 0 12px; text-wrap:balance }
-  h2 { font-family:var(--sans); font-weight:700; letter-spacing:-0.025em; line-height:1.15;
+  h2 { font-family:var(--sans); font-weight:700; letter-spacing:-0.01em; line-height:1.15;
     text-wrap:balance }
-  h3 { font-family:var(--sans); font-weight:600; letter-spacing:-0.01em }
+  h3 { font-family:var(--sans); font-weight:600; letter-spacing:0 }
   .sub { color:var(--dim); font-size:15.5px; max-width:760px }
   .wrap p, .wrap li, .wrap dd, .wrap td { overflow-wrap:anywhere }
   a { color:var(--accent); text-underline-offset:3px }
@@ -132,6 +132,7 @@ LINKS: tuple[tuple[str, str], ...] = (
     ("/research", "Research task"),
     ("/proof", "What we beat"),
     ("/wrong", "What we got wrong"),
+    ("/agent", "Live agent"),
     ("/status", "Status"),
     ("/brand", "Brand"),
 )

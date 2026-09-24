@@ -1,0 +1,102 @@
+{
+  "training_rows": 2960,
+  "per_label": {
+    "compare": 187,
+    "event": 187,
+    "execution": 187,
+    "fundamentals": 187,
+    "hedge": 186,
+    "impact": 188,
+    "macro": 186,
+    "news": 187,
+    "quote": 187,
+    "record": 276,
+    "refuse": 441,
+    "sentiment": 186,
+    "stress": 188,
+    "technicals": 187
+  },
+  "grid": [
+    {
+      "ngrams": [
+        1,
+        4
+      ],
+      "C": 1.0,
+      "cv_accuracy": 0.9081
+    },
+    {
+      "ngrams": [
+        1,
+        4
+      ],
+      "C": 2.0,
+      "cv_accuracy": 0.9111
+    },
+    {
+      "ngrams": [
+        1,
+        4
+      ],
+      "C": 5.0,
+      "cv_accuracy": 0.9115
+    },
+    {
+      "ngrams": [
+        1,
+        4
+      ],
+      "C": 10.0,
+      "cv_accuracy": 0.9111
+    },
+    {
+      "ngrams": [
+        1,
+        5
+      ],
+      "C": 1.0,
+      "cv_accuracy": 0.9101
+    },
+    {
+      "ngrams": [
+        1,
+        5
+      ],
+      "C": 2.0,
+      "cv_accuracy": 0.9118
+    },
+    {
+      "ngrams": [
+        1,
+        5
+      ],
+      "C": 5.0,
+      "cv_accuracy": 0.9115
+    },
+    {
+      "ngrams": [
+        1,
+        5
+      ],
+      "C": 10.0,
+      "cv_accuracy": 0.9101
+    }
+  ],
+  "chosen": {
+    "ngrams": [
+      1,
+      5
+    ],
+    "C": 2.0,
+    "cv_accuracy": 0.9118243243243244
+  },
+  "threshold": {
+    "threshold": 0.12,
+    "answered": 2666,
+    "correct": 2558,
+    "wrong": 108,
+    "coverage": 0.9006756756756756,
+    "accuracy_answered": 0.959489872468117
+  },
+  "error_cost": 3.0
+}

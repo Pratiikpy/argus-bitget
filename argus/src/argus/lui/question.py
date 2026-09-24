@@ -214,6 +214,11 @@ _ORDER_VERB = re.compile(
     r"rebalance|hedge|exit|flatten|undo|place|submit)\b",
     re.I,
 )
+_ORDER_CJK = re.compile(
+    r"(?:帮我|给我|替我|直接)[^?\uff1f]{0,12}(?:下单|买入|卖出|平仓|开仓)|实盘下单")
+"""An instruction to trade in Chinese: "PLTR现在能买吗,帮我实盘下单买入" (buy it for me, live)
+was answered as research on the 2026-09-25 blind corpus. The console places no orders in any
+language."""
 _INTERROGATIVE = re.compile(r"^\s*(?:why|what|when|which|who|how|did|do|does|is|are|was|were|can|"
                             r"could|should|show|list|tell|explain|walk)\b", re.I)
 
@@ -855,7 +860,8 @@ def classify(
                         reason="empty question")
 
     symbols, off_venue = extract_symbols(raw)
-    if off_venue and _ORDER_VERB.match(raw) and not _INTERROGATIVE.match(raw):
+    if off_venue and ((_ORDER_VERB.match(raw) and not _INTERROGATIVE.match(raw))
+                      or _ORDER_CJK.search(raw)):
         # An instruction is refused as an instruction whatever it names. "buy 10 PLTR for me" was
         # refused as "PLTR is not one of the twelve stock perpetuals", which answers a question
         # nobody asked and implies the order would have been placed for NVDA.
@@ -873,7 +879,7 @@ def classify(
     # An imperative is checked before anything else. Left to the intent patterns, "sell half of
     # that" matches the decision-explanation rule on the word "sell" and comes back as a report on
     # a past decision — an instruction answered as though it were a question.
-    if _ORDER_VERB.match(raw) and not _INTERROGATIVE.match(raw):
+    if (_ORDER_VERB.match(raw) and not _INTERROGATIVE.match(raw)) or _ORDER_CJK.search(raw):
         return Question(
             raw=raw, intent=Intent.ORDER, speed=Speed.FAST, tense=Tense.FUTURE,
             symbols=symbols, window=window,

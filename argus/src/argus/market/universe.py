@@ -70,6 +70,11 @@ class Contract:
 # point at a memecoin the way SPX once did.
 ALIASES: dict[str, str] = {
     "GOLD": "XAUUSDT",          # 4,316
+    # Spanish, Portuguese and Hindi names a trader types in the Latin alphabet.
+    "ORO": "XAUUSDT", "OURO": "XAUUSDT", "SONA": "XAUUSDT", "PLATA": "XAGUSDT",
+    "PRATA": "XAGUSDT", "PETROLEO": "CLUSDT", "PETRÓLEO": "CLUSDT",
+    "TESLA": "TSLAUSDT", "APPLE": "AAPLUSDT",
+    "MICROSOFT": "MSFTUSDT", "GOOGLE": "GOOGLUSDT", "COINBASE": "COINUSDT",
     "XAU": "XAUUSDT",
     "SILVER": "XAGUSDT",        # 65.37
     "XAG": "XAGUSDT",
@@ -135,6 +140,20 @@ CJK_ALIASES: dict[str, str] = {
     "英特尔": "INTCUSDT", "奈飞": "NFLXUSDT", "阿里巴巴": "BABAUSDT", "比特币": "BTCUSDT",
     "以太坊": "ETHUSDT", "黄金": "XAUUSDT", "白银": "XAGUSDT", "原油": "CLUSDT",
     "纳斯达克": "NDX100USDT", "标普": "SP500USDT", "微策略": "MSTRUSDT",
+    # Traditional Chinese and Cantonese spellings.
+    "輝達": "NVDAUSDT", "特斯拉汽車": "TSLAUSDT", "蘋果": "AAPLUSDT", "微軟": "MSFTUSDT",
+    "亞馬遜": "AMZNUSDT", "比特幣": "BTCUSDT", "以太幣": "ETHUSDT", "以太坊幣": "ETHUSDT",
+    "黃金": "XAUUSDT", "白銀": "XAGUSDT", "納斯達克": "NDX100USDT", "標普": "SP500USDT",
+    # Korean.
+    "엔비디아": "NVDAUSDT", "테슬라": "TSLAUSDT", "애플": "AAPLUSDT", "마이크로소프트": "MSFTUSDT",
+    "구글": "GOOGLUSDT", "아마존": "AMZNUSDT", "메타": "METAUSDT", "코인베이스": "COINUSDT",
+    "비트코인": "BTCUSDT", "이더리움": "ETHUSDT", "솔라나": "SOLUSDT", "원유": "CLUSDT",
+    "나스닥": "NDX100USDT", "브로드컴": "AVGOUSDT", "로빈후드": "HOODUSDT",
+    # Japanese.
+    "エヌビディア": "NVDAUSDT", "テスラ": "TSLAUSDT", "アップル": "AAPLUSDT",
+    "マイクロソフト": "MSFTUSDT", "グーグル": "GOOGLUSDT", "アマゾン": "AMZNUSDT",
+    "ビットコイン": "BTCUSDT", "イーサリアム": "ETHUSDT", "ソラナ": "SOLUSDT", "原油価格": "CLUSDT",
+    "ナスダック": "NDX100USDT", "コインベース": "COINUSDT",
 }
 """Chinese names for the contracts a Chinese-speaking trader asks about most. "英伟达现在值得买吗?"
 (is Nvidia worth buying now?) was answered with the session clock because no Latin ticker appeared

@@ -292,3 +292,20 @@ def test_the_stress_band_uses_the_frozen_head_to_head_scale() -> None:
     chosen = report["after_absorbing"]["selection"]["chosen"]
     frozen = report["predictors"][chosen]["frozen_scale"]
     assert abs(research.STRESS_BLEND_SCALE - frozen) < 1e-4
+
+
+def test_a_long_thesis_is_cut_at_a_sentence_never_mid_clause() -> None:
+    from argus.lui.research import _sentence_cut
+
+    short_first = ("General mandate: nothing applies. TSLA shows mild bullish momentum (price "
+                   "above all MAs, RSI 65.9, strong Q2 beat) but the forward consensus "
+                   "revisions are heavily negative (4 up / 15 down current quarter, 3 up / 12 "
+                   "down next), so the setup does not clear the bar. More text follows here.")
+    out = _sentence_cut(short_first)
+    assert out.endswith("clear the bar.") and "…" not in out and "..." not in out
+    many = "Short one. " + "Second sentence runs on here. " * 12
+    assert _sentence_cut(many).endswith(".") and len(_sentence_cut(many)) <= 240
+    endless = "word " * 200
+    assert _sentence_cut(endless).endswith("…")
+    clipped = "No specific constraint applies. Revisions are negative (4 up / 15 down, 3..."
+    assert _sentence_cut(clipped) == "No specific constraint applies."

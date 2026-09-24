@@ -1,0 +1,480 @@
+{"text": "agar main 5 TSLAX aur add karu book mein, risk kitna badhega?", "label": "impact", "lang": "hi-en"}
+{"text": "size karne ka plan hai 0.3 BTC position, isse overall exposure pe kya asar padega bhai", "label": "impact", "lang": "hi-en"}
+{"text": "Si vendo la mitad de mi posicion en NVDAX, como cambia el riesgo de la cartera?", "label": "impact", "lang": "es"}
+{"text": "Quiero anadir 200 XRPUSDT al libro, cuanto sube mi exposicion neta a cripto?", "label": "impact", "lang": "es"}
+{"text": "Se eu aumentar minha posicao em AAPLX para 1000 acoes tokenizadas, o risco da carteira sobe quanto?", "label": "impact", "lang": "pt"}
+{"text": "reduzindo pela metade minha posicao short em WTIUSDT, isso muda meu drawdown maximo?", "label": "impact", "lang": "pt"}
+{"text": "SOLUSDT 포지션을 두 배로 늘리면 전체 계좌 리스크가 어떻게 바뀌나요?", "label": "impact", "lang": "ko"}
+{"text": "테슬라 토큰 주식 300주 추가하면 제 노출도가 얼마나 커지나요", "label": "impact", "lang": "ko"}
+{"text": "ETHUSDTのポジションを半分に減らしたら口座全体のドローダウンはどう変わりますか", "label": "impact", "lang": "ja"}
+{"text": "エヌビディアの株を追加で50株買うと、今のポートフォリオのリスクはどのくらい増える？", "label": "impact", "lang": "ja"}
+{"text": "neu em them 2 BTCUSDT vao so nua, rui ro tong the tang bao nhieu phan tram", "label": "impact", "lang": "vi"}
+{"text": "toi dinh dong bot vi the AMZNX xuong con mot nua, danh gia gium tac dong len danh muc", "label": "impact", "lang": "vi"}
+{"text": "如果我把特斯拉代幣股票倉位加倉到三千股,整體帳戶的風險會變成怎樣", "label": "impact", "lang": "zh-tw"}
+{"text": "我想把DOGEUSDT的空單減碼一半,對我整體曝險有什麼影響", "label": "impact", "lang": "zh-tw"}
+{"text": "Если я добавлю ещё 400 METAX в портфель, насколько вырастет общий риск позиции?", "label": "impact", "lang": "ru"}
+{"text": "сокращаю шорт по XAUUSDT наполовину, как это скажется на максимальной просадке счёта", "label": "impact", "lang": "ru"}
+{"text": "GOOGLX pozisyonumu ikiye katlarsam portfoyun toplam riski ne kadar artar", "label": "impact", "lang": "tr"}
+{"text": "BNBUSDT'de 3 lot daha eklersem hesabin genel maruziyeti nasil degisir emekli birikimim icin endiseliyim", "label": "impact", "lang": "tr"}
+{"text": "kalau saya tambah posisi BTCUSDT jadi dua kali lipat, seberapa besar risiko portofolio saya naik", "label": "impact", "lang": "id"}
+{"text": "mau kurangi separuh posisi short di COINX, dampaknya ke drawdown maksimum akun gimana ya", "label": "impact", "lang": "id"}
+{"text": "如果我 add 800 shares AAPLX 进 book, overall exposure 会涨多少", "label": "impact", "lang": "zh-en"}
+{"text": "退休金账户里 reduce 掉一半 TSLAX position, risk 会降多少 explain please", "label": "impact", "lang": "zh-en"}
+{"text": "boss main apna BTCUSDT ka size double karu toh new margin risk kya hoga", "label": "impact", "lang": "hi-en"}
+{"text": "adding 150 MSFTX shares to my small account, retiree here, how much does that move total risk", "label": "impact", "lang": "hi-en"}
+{"text": "voy a cerrar 30% de mi posicion en ETHUSDT, dime el nuevo nivel de riesgo del libro", "label": "impact", "lang": "es"}
+{"text": "day trader aqui, si abro 2x en SOLUSDT ahora mismo cuanto sube mi exposicion", "label": "impact", "lang": "es"}
+{"text": "aumentando posicao XAUUSDT para cobrir 10k, qual e o novo risco liquido", "label": "impact", "lang": "pt"}
+{"text": "sou trader novato, se eu zerar metade da posicao AMZNX o que acontece com o risco geral", "label": "impact", "lang": "pt"}
+{"text": "은퇴자입니다 GOOGLX 100주 추가하면 계좌 전체 변동성 리스크가 얼마나 커지는지 알려주세요", "label": "impact", "lang": "ko"}
+{"text": "크립토 데젠인데 DOGEUSDT 롱 3배 늘리면 청산가까지 얼마나 가까워지나요", "label": "impact", "lang": "ko"}
+{"text": "デイトレーダーです、BTCUSDTのショートを2倍にしたら口座のリスク量はどのくらい増加しますか", "label": "impact", "lang": "ja"}
+{"text": "退職資金でMSFTXを80株買い増ししたいのですが、ポートフォリオのリスクはどう変わりますか", "label": "impact", "lang": "ja"}
+{"text": "अगर CPI shock आ जाए 6% पर, मेरे BTCUSDT aur ETHUSDT wale book pे kya असर होगा", "label": "stress", "lang": "hi-en"}
+{"text": "fed rate hike surprise shock ho jaye 75bps ka, mera TSLAX heavy portfolio kaise react karega", "label": "stress", "lang": "hi-en"}
+{"text": "si el petroleo cae 15% de golpe manana, como afecta eso a mi posicion en WTIUSDT", "label": "stress", "lang": "es"}
+{"text": "supongamos un shock en NVDAX de -20% en un dia, cual seria el dano a mi cartera actual", "label": "stress", "lang": "es"}
+{"text": "se o ouro subir 8% de repente por causa de guerra, o que acontece com minha posicao curta em XAUUSDT", "label": "stress", "lang": "pt"}
+{"text": "um choque de -30% no BTC amanha, quanto meu book perderia hoje", "label": "stress", "lang": "pt"}
+{"text": "만약 나스닥이 하루에 5% 폭락하면 제 AAPLX 포지션은 얼마나 손실이 날까요", "label": "stress", "lang": "ko"}
+{"text": "비트코인 급락 시나리오 -25%로 가정하면 제 크립토 북 전체가 어떻게 되나요", "label": "stress", "lang": "ko"}
+{"text": "もし日銀が突然利上げしたら、私のドル建てポートフォリオはどんな影響を受けますか", "label": "stress", "lang": "ja"}
+{"text": "原油が地政学ショックで急騰した場合、私のWTIUSDTショートポジションはどうなりますか", "label": "stress", "lang": "ja"}
+{"text": "neu FOMC gay bat ngo tang lai suat manh, danh muc XAUUSDT cua toi anh huong the nao", "label": "stress", "lang": "vi"}
+{"text": "gia su BTC sap 20 phan tram trong mot dem, tai khoan cua toi mat bao nhieu", "label": "stress", "lang": "vi"}
+{"text": "假設比特幣一天內暴跌30%,我目前持有的ETHUSDT多單會虧多少", "label": "stress", "lang": "zh-tw"}
+{"text": "如果聯準會突然升息一碼半,我的科技股代幣倉位受到的衝擊有多大", "label": "stress", "lang": "zh-tw"}
+{"text": "если ФРС резко поднимет ставку на 100 базисных пунктов, как это ударит по моему портфелю", "label": "stress", "lang": "ru"}
+{"text": "предположим шок нефти минус 12 процентов за день, что случится с моей позицией в WTIUSDT", "label": "stress", "lang": "ru"}
+{"text": "Fed beklenmedik sekilde 50 baz puan faiz artirirsa BTCUSDT pozisyonuma etkisi ne olur", "label": "stress", "lang": "tr"}
+{"text": "altin bir gunde yuzde 10 dusse XAUUSDT short pozisyonum ne kadar zarar eder", "label": "stress", "lang": "tr"}
+{"text": "kalau the Fed tiba tiba naikkan suku bunga 75bps, apa dampaknya ke posisi NVDAX saya", "label": "stress", "lang": "id"}
+{"text": "misalnya minyak WTI jatuh 18% dalam sehari akibat berita OPEC, portofolio saya rugi berapa", "label": "stress", "lang": "id"}
+{"text": "如果 CPI 数据 shock 到 6%, 我的 crypto book 会受到多大 impact", "label": "stress", "lang": "zh-en"}
+{"text": "假设 nasdaq 一天跌 8%, 我的 TSLAX heavy portfolio 会亏多少钱", "label": "stress", "lang": "zh-en"}
+{"text": "retiree yahan, agar market crash ho jaye jaise 2020 wala, mera conservative book kitna gira jayega", "label": "stress", "lang": "hi-en"}
+{"text": "crypto degen here, ETH ka flash crash -40% ho jaye 10 minute mein toh mera leveraged book bachega kya", "label": "stress", "lang": "hi-en"}
+{"text": "soy retirado, si hay un shock en la tasa de interes de la Fed, mi cartera conservadora que tan mal la pasa", "label": "stress", "lang": "es"}
+{"text": "degen de cripto, si SOL cae 35% de golpe en una hora que le pasa a mi posicion apalancada", "label": "stress", "lang": "es"}
+{"text": "sou aposentado, um choque geopolitico no petroleo, o quanto minha carteira conservadora cairia", "label": "stress", "lang": "pt"}
+{"text": "trader do dia aqui, se DOGE despencar 50% num flash crash, minha posicao alavancada sobrevive", "label": "stress", "lang": "pt"}
+{"text": "은퇴자입니다 연준이 갑자기 긴축하면 제 보수적인 포트폴리오는 얼마나 타격받나요", "label": "stress", "lang": "ko"}
+{"text": "크립토 데젠 여기, SOL이 한시간만에 40% 급락하면 제 레버리지 포지션 청산되나요", "label": "stress", "lang": "ko"}
+{"text": "退職者です、FRBが急激に利上げしたら保守的な私のポートフォリオはどれほど下がりますか", "label": "stress", "lang": "ja"}
+{"text": "クリプト degen だけど、DOGEが1時間で50%暴落したらレバレッジポジションは清算されますか", "label": "stress", "lang": "ja"}
+{"text": "TSLAX aur NVDAX mein volatility zyada kiska hai, side by side dikhao na risk metrics", "label": "compare", "lang": "hi-en"}
+{"text": "BTCUSDT vs ETHUSDT vs SOLUSDT, teeno ka risk compare karo mujhe jo sabse safe lage select karna hai", "label": "compare", "lang": "hi-en"}
+{"text": "compara la volatilidad de AAPLX contra GOOGLX en el ultimo mes por favor", "label": "compare", "lang": "es"}
+{"text": "quiero ver riesgo lado a lado entre XAUUSDT y WTIUSDT, cual es mas estable ahora mismo", "label": "compare", "lang": "es"}
+{"text": "compare o risco entre TSLAX e AMZNX, qual tem beta maior nos ultimos 30 dias", "label": "compare", "lang": "pt"}
+{"text": "me mostre lado a lado a volatilidade de BNBUSDT e DOGEUSDT, qual e mais arriscada", "label": "compare", "lang": "pt"}
+{"text": "AAPLX와 MSFTX 변동성 나란히 비교해줘 어느게 더 위험한지", "label": "compare", "lang": "ko"}
+{"text": "BTCUSDT랑 XRPUSDT 리스크 지표 같이 보여줘 뭐가 더 안전해요", "label": "compare", "lang": "ko"}
+{"text": "NVDAXとAAPLXのボラティリティを並べて比較してください、どちらがリスクが高いですか", "label": "compare", "lang": "ja"}
+{"text": "ETHUSDTとSOLUSDT、どちらのほうがリスクが高いか並べて教えてください", "label": "compare", "lang": "ja"}
+{"text": "so sanh do bien dong giua TSLAX va NVDAX trong 30 ngay qua giup toi", "label": "compare", "lang": "vi"}
+{"text": "cho toi xem rui ro cua BTCUSDT va ETHUSDT canh nhau, cai nao on dinh hon", "label": "compare", "lang": "vi"}
+{"text": "幫我比較蘋果代幣股AAPLX跟輝達代幣股NVDAX的波動度誰比較高", "label": "compare", "lang": "zh-tw"}
+{"text": "把比特幣跟以太坊的風險指標並排列給我看,哪個現在比較穩", "label": "compare", "lang": "zh-tw"}
+{"text": "сравни волатильность TSLAX и AAPLX за последний месяц бок о бок", "label": "compare", "lang": "ru"}
+{"text": "покажи риск METAX против GOOGLX рядом, что менее рискованно сейчас", "label": "compare", "lang": "ru"}
+{"text": "BTCUSDT ile ETHUSDT riskini yan yana karsilastir hangisi daha guvenli", "label": "compare", "lang": "tr"}
+{"text": "XAUUSDT ve WTIUSDT volatilitesini karsilastirir misin hangisi daha az riskli", "label": "compare", "lang": "tr"}
+{"text": "bandingkan volatilitas TSLAX dan NVDAX dalam sebulan terakhir dong", "label": "compare", "lang": "id"}
+{"text": "tolong tampilkan risiko BTCUSDT dan SOLUSDT berdampingan, mana yang lebih aman buat pensiunan seperti saya", "label": "compare", "lang": "id"}
+{"text": "compare 一下 BTCUSDT 跟 ETHUSDT 的 volatility side by side, 哪个 risk 更低", "label": "compare", "lang": "zh-en"}
+{"text": "AAPLX vs MSFTX vs GOOGLX 三个 risk metrics 都放一起给我看看", "label": "compare", "lang": "zh-en"}
+{"text": "retiree hu, XAUUSDT aur bond-like AAPLX mein se kaunsa kam risky hai side by side batao", "label": "compare", "lang": "hi-en"}
+{"text": "day trader ke liye SOLUSDT vs DOGEUSDT ka intraday risk compare karo turant", "label": "compare", "lang": "hi-en"}
+{"text": "soy jubilado, entre XAUUSDT y AAPLX cual tiene menor riesgo lado a lado por favor", "label": "compare", "lang": "es"}
+{"text": "trader intradia aqui, riesgo de SOLUSDT versus DOGEUSDT comparado ahora mismo", "label": "compare", "lang": "es"}
+{"text": "sou aposentado, comparando XAUUSDT com AAPLX qual tem menos risco no momento", "label": "compare", "lang": "pt"}
+{"text": "trader intraday aqui, compare o risco de SOLUSDT contra DOGEUSDT agora", "label": "compare", "lang": "pt"}
+{"text": "은퇴자입니다 XAUUSDT랑 AAPLX 중에 리스크 더 낮은게 뭔지 나란히 비교해주세요", "label": "compare", "lang": "ko"}
+{"text": "데이트레이더인데 SOLUSDT랑 DOGEUSDT 인트라데이 리스크 지금 바로 비교해줘요", "label": "compare", "lang": "ko"}
+{"text": "退職者ですXAUUSDTとAAPLX、どちらがリスクが低いか並べて教えてください", "label": "compare", "lang": "ja"}
+{"text": "デイトレーダーですSOLUSDTとDOGEUSDTのイントラデイリスクを今すぐ比較して", "label": "compare", "lang": "ja"}
+{"text": "50000 USDT ka BTCUSDT order kaise split karu taaki slippage kam ho", "label": "execution", "lang": "hi-en"}
+{"text": "2000 TSLAX shares ka bada order hai, TWAP use karu ya VWAP bhai suggest karo", "label": "execution", "lang": "hi-en"}
+{"text": "necesito trabajar una orden de 30000 dolares en NVDAX sin mover mucho el precio, como lo divido", "label": "execution", "lang": "es"}
+{"text": "quiero ejecutar 5 BTC en varios tramos, cual es la mejor forma de trocear la orden", "label": "execution", "lang": "es"}
+{"text": "tenho que executar uma ordem grande de 15000 ETHUSDT, como fatio isso ao longo do dia", "label": "execution", "lang": "pt"}
+{"text": "qual a melhor forma de trabalhar uma ordem de 800 AAPLX sem impactar o preco de tela", "label": "execution", "lang": "pt"}
+{"text": "3만 달러 규모 BTCUSDT 주문 슬리피지 최소화하려면 어떻게 쪼개야 하나요", "label": "execution", "lang": "ko"}
+{"text": "TSLAX 1500주 큰 주문인데 TWAP이랑 VWAP 중에 뭐가 나을까요", "label": "execution", "lang": "ko"}
+{"text": "3万ドル分のBTCUSDT注文をスリッページ最小限で分割する方法を教えてください", "label": "execution", "lang": "ja"}
+{"text": "AAPLXを1200株大口で執行したいのですが、TWAPとVWAPどちらが良いですか", "label": "execution", "lang": "ja"}
+{"text": "toi can chia lenh 40000 USDT BTCUSDT thanh nhieu phan de giam truot gia", "label": "execution", "lang": "vi"}
+{"text": "lenh lon 900 co phieu TSLAX, nen dung TWAP hay VWAP de thuc thi tot nhat", "label": "execution", "lang": "vi"}
+{"text": "我要把三萬美元的BTCUSDT訂單拆分執行,避免滑價太大該怎麼分批", "label": "execution", "lang": "zh-tw"}
+{"text": "1200股TSLAX的大單,用TWAP還是VWAP執行比較好幫我分析一下", "label": "execution", "lang": "zh-tw"}
+{"text": "мне нужно разбить ордер на 30000 долларов BTCUSDT чтобы минимизировать проскальзывание", "label": "execution", "lang": "ru"}
+{"text": "крупный ордер на 1000 акций TSLAX, что лучше использовать TWAP или VWAP", "label": "execution", "lang": "ru"}
+{"text": "30 bin dolarlik BTCUSDT emrimi kaymayi azaltmak icin nasil parcalara bolmeliyim", "label": "execution", "lang": "tr"}
+{"text": "1000 hisse TSLAX buyuk emrim var TWAP mi VWAP mi kullanmaliyim", "label": "execution", "lang": "tr"}
+{"text": "saya mau pecah order 30000 dolar BTCUSDT supaya slippage minim, gimana caranya", "label": "execution", "lang": "id"}
+{"text": "order besar 1000 lembar TSLAX, sebaiknya pakai TWAP atau VWAP untuk eksekusi", "label": "execution", "lang": "id"}
+{"text": "我要 split 一个 30k USDT 的 BTCUSDT order 减少 slippage 怎么弄", "label": "execution", "lang": "zh-en"}
+{"text": "1000股 TSLAX 大单, TWAP 还是 VWAP 执行更好帮我 analyze", "label": "execution", "lang": "zh-en"}
+{"text": "crypto degen yahan, 10x leverage ke saath 100k USDT DOGEUSDT order kaise chalau bina market move kiye", "label": "execution", "lang": "hi-en"}
+{"text": "retiree hu, chhota order hai 50 AAPLX shares ka, limit order best rahega ya market", "label": "execution", "lang": "hi-en"}
+{"text": "degen de cripto, orden de 100k en DOGEUSDT con leverage sin mover el mercado, como lo hago", "label": "execution", "lang": "es"}
+{"text": "soy jubilado, orden pequena de 50 acciones AAPLX, mejor limite o mercado", "label": "execution", "lang": "es"}
+{"text": "degen cripto aqui, ordem de 100 mil em DOGEUSDT alavancado sem mexer o preco, como executo", "label": "execution", "lang": "pt"}
+{"text": "sou aposentado, ordem pequena de 50 acoes AAPLX, melhor limite ou a mercado", "label": "execution", "lang": "pt"}
+{"text": "크립토 데젠인데 레버리지 걸고 10만 달러 DOGEUSDT 주문 가격 안 움직이게 어떻게 넣어요", "label": "execution", "lang": "ko"}
+{"text": "은퇴자예요 소액 AAPLX 50주 주문인데 지정가가 나을까요 시장가가 나을까요", "label": "execution", "lang": "ko"}
+{"text": "クリプトdegenですレバレッジ10万ドル分のDOGEUSDT注文を価格を動かさず入れる方法は", "label": "execution", "lang": "ja"}
+{"text": "退職者です少額のAAPLX50株注文は指値と成行どちらがいいですか", "label": "execution", "lang": "ja"}
+{"text": "BTCUSDT ka abhi bid ask spread kitna hai aur funding rate kya chal raha hai", "label": "quote", "lang": "hi-en"}
+{"text": "TSLAX ka current price batao aur round trip cost kitna aayega mujhe", "label": "quote", "lang": "hi-en"}
+{"text": "cual es el precio actual de NVDAX y el spread bid ask ahora mismo", "label": "quote", "lang": "es"}
+{"text": "dime la tasa de financiamiento actual de ETHUSDT por favor", "label": "quote", "lang": "es"}
+{"text": "qual o preco de tela agora do AAPLX e o spread compra venda", "label": "quote", "lang": "pt"}
+{"text": "me diga a funding rate atual do BTCUSDT nos perps", "label": "quote", "lang": "pt"}
+{"text": "지금 TSLAX 현재가랑 매수매도 스프레드 얼마인지 알려줘요", "label": "quote", "lang": "ko"}
+{"text": "BTCUSDT 펀딩비 지금 몇 퍼센트인지 확인해줘", "label": "quote", "lang": "ko"}
+{"text": "今のTSLAXの価格とビッドアスクスプレッドを教えてください", "label": "quote", "lang": "ja"}
+{"text": "BTCUSDTの現在のファンディングレートはいくらですか", "label": "quote", "lang": "ja"}
+{"text": "cho toi biet gia hien tai cua TSLAX va chenh lech mua ban", "label": "quote", "lang": "vi"}
+{"text": "funding rate hien tai cua BTCUSDT tren perp la bao nhieu", "label": "quote", "lang": "vi"}
+{"text": "現在TSLAX的價格是多少,買賣價差是多少幫我看一下", "label": "quote", "lang": "zh-tw"}
+{"text": "BTCUSDT現在的資金費率是多少告訴我一下", "label": "quote", "lang": "zh-tw"}
+{"text": "какая сейчас цена TSLAX и спред между бид и аск", "label": "quote", "lang": "ru"}
+{"text": "какая сейчас ставка финансирования по BTCUSDT на перпетуале", "label": "quote", "lang": "ru"}
+{"text": "TSLAX'in su anki fiyati ve alis satis spreadi nedir", "label": "quote", "lang": "tr"}
+{"text": "BTCUSDT perpetual icin su anki funding orani nedir", "label": "quote", "lang": "tr"}
+{"text": "berapa harga TSLAX sekarang dan spread bid ask nya", "label": "quote", "lang": "id"}
+{"text": "funding rate BTCUSDT saat ini di perp berapa ya", "label": "quote", "lang": "id"}
+{"text": "TSLAX 现在 price 是多少, bid ask spread 多大", "label": "quote", "lang": "zh-en"}
+{"text": "BTCUSDT perp 现在 funding rate 是多少 tell me quick", "label": "quote", "lang": "zh-en"}
+{"text": "retiree hu, XAUUSDT ka spot price aur round trip cost kitna hoga estimate karo", "label": "quote", "lang": "hi-en"}
+{"text": "day trader, SOLUSDT ka bid ask spread abhi kitna tight hai batao jaldi", "label": "quote", "lang": "hi-en"}
+{"text": "soy jubilado, precio spot de XAUUSDT y costo de ida y vuelta estimado por favor", "label": "quote", "lang": "es"}
+{"text": "trader intradia, spread bid ask de SOLUSDT que tan ajustado esta ahora", "label": "quote", "lang": "es"}
+{"text": "sou aposentado, preco a vista do XAUUSDT e custo de ida e volta estimado", "label": "quote", "lang": "pt"}
+{"text": "trader do dia, spread bid ask do SOLUSDT esta apertado agora", "label": "quote", "lang": "pt"}
+{"text": "은퇴자예요 XAUUSDT 현물가랑 왕복 비용 대략 얼마인지 알려주세요", "label": "quote", "lang": "ko"}
+{"text": "데이트레이더 SOLUSDT 스프레드 지금 타이트한가요", "label": "quote", "lang": "ko"}
+{"text": "退職者ですXAUUSDTの現物価格と往復コストの見積もりを教えてください", "label": "quote", "lang": "ja"}
+{"text": "デイトレーダーですSOLUSDTのスプレッドは今タイトですか", "label": "quote", "lang": "ja"}
+{"text": "TSLAX ka RSI abhi overbought zone mein hai kya, chart dekh ke batao", "label": "technicals", "lang": "hi-en"}
+{"text": "BTCUSDT ka MACD crossover ho raha hai kya, support resistance bhi batao", "label": "technicals", "lang": "hi-en"}
+{"text": "el RSI de NVDAX esta en zona de sobrecompra ahora mismo", "label": "technicals", "lang": "es"}
+{"text": "dime el soporte y resistencia clave para ETHUSDT esta semana", "label": "technicals", "lang": "es"}
+{"text": "o MACD de AAPLX esta cruzando para cima, isso e sinal de compra", "label": "technicals", "lang": "pt"}
+{"text": "qual o nivel de suporte e resistencia do BTCUSDT agora", "label": "technicals", "lang": "pt"}
+{"text": "TSLAX RSI 지금 과매수 구간인가요 차트 보고 알려줘요", "label": "technicals", "lang": "ko"}
+{"text": "BTCUSDT MACD 골든크로스 나왔는지 지지저항선도 같이 봐줘", "label": "technicals", "lang": "ko"}
+{"text": "TSLAXのRSIは今買われすぎゾーンに入っていますか", "label": "technicals", "lang": "ja"}
+{"text": "BTCUSDTのサポートとレジスタンスの主要ラインを教えてください", "label": "technicals", "lang": "ja"}
+{"text": "RSI cua TSLAX co dang o vung qua mua khong xem giup", "label": "technicals", "lang": "vi"}
+{"text": "MACD cua BTCUSDT co dang cat len khong, ho tro khang cu the nao", "label": "technicals", "lang": "vi"}
+{"text": "TSLAX的RSI現在是不是在超買區幫我看圖", "label": "technicals", "lang": "zh-tw"}
+{"text": "BTCUSDT的MACD有沒有黃金交叉,支撐壓力位在哪", "label": "technicals", "lang": "zh-tw"}
+{"text": "находится ли RSI TSLAX сейчас в зоне перекупленности", "label": "technicals", "lang": "ru"}
+{"text": "есть ли пересечение MACD у BTCUSDT и где ключевая поддержка сопротивление", "label": "technicals", "lang": "ru"}
+{"text": "TSLAX'in RSI'si su anda asiri alim bolgesinde mi", "label": "technicals", "lang": "tr"}
+{"text": "BTCUSDT'de MACD kesisimi var mi destek direnc seviyeleri neler", "label": "technicals", "lang": "tr"}
+{"text": "apakah RSI TSLAX sekarang di zona overbought", "label": "technicals", "lang": "id"}
+{"text": "MACD BTCUSDT ada golden cross ga, level support resistance nya berapa", "label": "technicals", "lang": "id"}
+{"text": "TSLAX RSI 现在是不是 overbought zone 帮我看下 chart", "label": "technicals", "lang": "zh-en"}
+{"text": "BTCUSDT MACD 有没有 crossover, support resistance level 也讲一下", "label": "technicals", "lang": "zh-en"}
+{"text": "crypto degen, SOLUSDT trend abhi bullish hai ya bearish moving average pe dekho", "label": "technicals", "lang": "hi-en"}
+{"text": "retiree, AAPLX ka 200 day moving average abhi kaha chal raha hai", "label": "technicals", "lang": "hi-en"}
+{"text": "degen de cripto, la tendencia de SOLUSDT es alcista o bajista segun medias moviles", "label": "technicals", "lang": "es"}
+{"text": "jubilado aqui, donde esta la media movil de 200 dias de AAPLX ahora", "label": "technicals", "lang": "es"}
+{"text": "degen cripto, a tendencia de SOLUSDT esta de alta ou baixa pelas medias moveis", "label": "technicals", "lang": "pt"}
+{"text": "aposentado aqui, onde esta a media movel de 200 dias de AAPLX agora", "label": "technicals", "lang": "pt"}
+{"text": "크립토 데젠인데 SOLUSDT 이동평균선 보면 지금 상승추세예요 하락추세예요", "label": "technicals", "lang": "ko"}
+{"text": "은퇴자인데 AAPLX 200일 이동평균선 지금 어디 있나요", "label": "technicals", "lang": "ko"}
+{"text": "クリプトdegenですSOLUSDTの移動平均線で見て今上昇トレンドですか下降トレンドですか", "label": "technicals", "lang": "ja"}
+{"text": "退職者ですAAPLXの200日移動平均線は今どこにありますか", "label": "technicals", "lang": "ja"}
+{"text": "TSLAX ka next earnings date kab hai aur analyst target price kya hai", "label": "fundamentals", "lang": "hi-en"}
+{"text": "NVDAX ke insider selling ka data hai kya recent mein aur 13F holders kaun hain", "label": "fundamentals", "lang": "hi-en"}
+{"text": "cuando es la proxima fecha de resultados de AAPLX y cual es el precio objetivo de analistas", "label": "fundamentals", "lang": "es"}
+{"text": "hay ventas internas recientes en NVDAX y quienes son los principales tenedores 13F", "label": "fundamentals", "lang": "es"}
+{"text": "qual a data do proximo earnings de MSFTX e o preco alvo dos analistas", "label": "fundamentals", "lang": "pt"}
+{"text": "teve venda de insiders recentemente na TSLAX e quem sao os principais acionistas 13F", "label": "fundamentals", "lang": "pt"}
+{"text": "TSLAX 다음 실적발표일이 언제고 애널리스트 목표가는 얼마인가요", "label": "fundamentals", "lang": "ko"}
+{"text": "NVDAX 최근 내부자 매도 있었나요 주요 13F 보유자는 누구인가요", "label": "fundamentals", "lang": "ko"}
+{"text": "TSLAXの次の決算発表日はいつでアナリストの目標株価はいくらですか", "label": "fundamentals", "lang": "ja"}
+{"text": "NVDAXで最近インサイダー売却がありましたか主要な13F保有者は誰ですか", "label": "fundamentals", "lang": "ja"}
+{"text": "ngay bao cao loi nhuan tiep theo cua TSLAX la khi nao va gia muc tieu cua nha phan tich", "label": "fundamentals", "lang": "vi"}
+{"text": "gan day co insider ban co phieu NVDAX khong va ai la cac co dong lon 13F", "label": "fundamentals", "lang": "vi"}
+{"text": "TSLAX下次財報公布日期是什麼時候分析師目標價多少", "label": "fundamentals", "lang": "zh-tw"}
+{"text": "NVDAX最近有內部人拋售嗎主要13F持股人是誰", "label": "fundamentals", "lang": "zh-tw"}
+{"text": "когда следующая дата отчетности TSLAX и какая целевая цена у аналитиков", "label": "fundamentals", "lang": "ru"}
+{"text": "были ли недавние продажи инсайдеров по NVDAX и кто основные держатели 13F", "label": "fundamentals", "lang": "ru"}
+{"text": "TSLAX'in bir sonraki kazanc tarihi ne zaman analist hedef fiyati nedir", "label": "fundamentals", "lang": "tr"}
+{"text": "NVDAX'ta yakin zamanda icerden satis oldu mu ana 13F hissedarlari kim", "label": "fundamentals", "lang": "tr"}
+{"text": "kapan tanggal earnings berikutnya untuk TSLAX dan berapa target harga analis", "label": "fundamentals", "lang": "id"}
+{"text": "apakah ada penjualan insider baru baru ini di NVDAX dan siapa pemegang 13F utamanya", "label": "fundamentals", "lang": "id"}
+{"text": "TSLAX 下一个 earnings date 是什么时候, analyst target price 多少", "label": "fundamentals", "lang": "zh-en"}
+{"text": "NVDAX 最近有 insider selling 吗, 主要 13F holders 有哪些", "label": "fundamentals", "lang": "zh-en"}
+{"text": "retiree hu, AAPLX ka valuation abhi overvalued hai kya PE ratio ke hisaab se", "label": "fundamentals", "lang": "hi-en"}
+{"text": "crypto degen, MSFTX ka EPS estimate next quarter ke liye kya hai", "label": "fundamentals", "lang": "hi-en"}
+{"text": "jubilado aqui, la valoracion de AAPLX esta cara segun el PE ratio actual", "label": "fundamentals", "lang": "es"}
+{"text": "degen de cripto, cual es el estimado de EPS de MSFTX para el proximo trimestre", "label": "fundamentals", "lang": "es"}
+{"text": "aposentado aqui, a avaliacao de AAPLX esta cara pelo indice PE atual", "label": "fundamentals", "lang": "pt"}
+{"text": "degen cripto, qual a estimativa de EPS da MSFTX para o proximo trimestre", "label": "fundamentals", "lang": "pt"}
+{"text": "은퇴자예요 AAPLX PER 기준으로 지금 고평가된 건가요", "label": "fundamentals", "lang": "ko"}
+{"text": "크립토 데젠인데 MSFTX 다음 분기 EPS 예상치가 얼마예요", "label": "fundamentals", "lang": "ko"}
+{"text": "退職者ですAAPLXは現在PER的に割高ですか", "label": "fundamentals", "lang": "ja"}
+{"text": "クリプトdegenですMSFTXの来四半期のEPS予想はいくらですか", "label": "fundamentals", "lang": "ja"}
+{"text": "pichli teen CPI release ke din TSLAX historically kaise react karta tha", "label": "event", "lang": "hi-en"}
+{"text": "FOMC announcement ke din BTCUSDT usually kitna move karta hai historically batao", "label": "event", "lang": "hi-en"}
+{"text": "como reacciono historicamente NVDAX en los ultimos dias de CPI", "label": "event", "lang": "es"}
+{"text": "que tanto se mueve BTCUSDT en promedio durante los dias de la Fed", "label": "event", "lang": "es"}
+{"text": "como a AAPLX reagiu historicamente em dias de divulgacao do CPI", "label": "event", "lang": "pt"}
+{"text": "qual a movimentacao media do BTCUSDT nos dias de reuniao do FOMC", "label": "event", "lang": "pt"}
+{"text": "지난 CPI 발표일마다 TSLAX가 역사적으로 어떻게 반응했나요", "label": "event", "lang": "ko"}
+{"text": "FOMC 발표 있는 날 BTCUSDT 평균적으로 얼마나 움직이나요", "label": "event", "lang": "ko"}
+{"text": "過去のCPI発表日にTSLAXは歴史的にどう反応しましたか", "label": "event", "lang": "ja"}
+{"text": "FOMC発表の日、BTCUSDTは平均どのくらい動きますか", "label": "event", "lang": "ja"}
+{"text": "vao nhung ngay CPI truoc day TSLAX thuong phan ung the nao", "label": "event", "lang": "vi"}
+{"text": "trung binh BTCUSDT bien dong bao nhieu vao ngay hop FOMC", "label": "event", "lang": "vi"}
+{"text": "過去CPI公布當天TSLAX歷史上通常怎麼反應", "label": "event", "lang": "zh-tw"}
+{"text": "FOMC公布當天BTCUSDT平均會波動多少", "label": "event", "lang": "zh-tw"}
+{"text": "как исторически реагировала TSLAX в предыдущие дни публикации CPI", "label": "event", "lang": "ru"}
+{"text": "насколько в среднем движется BTCUSDT в дни заседания ФРС", "label": "event", "lang": "ru"}
+{"text": "TSLAX gecmis CPI aciklama gunlerinde nasil tepki verirdi", "label": "event", "lang": "tr"}
+{"text": "FOMC toplanti gunlerinde BTCUSDT ortalama ne kadar hareket eder", "label": "event", "lang": "tr"}
+{"text": "gimana reaksi historis TSLAX di hari hari rilis CPI sebelumnya", "label": "event", "lang": "id"}
+{"text": "rata rata BTCUSDT bergerak berapa persen di hari rapat FOMC", "label": "event", "lang": "id"}
+{"text": "过去 CPI release 那几天, TSLAX historically 怎么 react 的", "label": "event", "lang": "zh-en"}
+{"text": "FOMC meeting day BTCUSDT 平均 move 多少 historically", "label": "event", "lang": "zh-en"}
+{"text": "OPEC meeting days pe WTIUSDT ka historical average move kya raha hai", "label": "event", "lang": "hi-en"}
+{"text": "TSLAX apne khud ke earnings ke agle din average kitna gap up ya down karta hai", "label": "event", "lang": "hi-en"}
+{"text": "en los dias de reunion de la OPEP como se mueve historicamente WTIUSDT en promedio", "label": "event", "lang": "es"}
+{"text": "al dia siguiente de sus propios resultados cuanto suele saltar TSLAX en promedio", "label": "event", "lang": "es"}
+{"text": "nos dias de reuniao da OPEP como o WTIUSDT costuma se mover em media", "label": "event", "lang": "pt"}
+{"text": "no dia seguinte ao proprio earnings quanto a TSLAX costuma gapear em media", "label": "event", "lang": "pt"}
+{"text": "OPEC 회의날 WTIUSDT 평균적으로 역사적으로 얼마나 움직였나요", "label": "event", "lang": "ko"}
+{"text": "자기 실적발표 다음날 TSLAX 평균 갭업 갭다운이 얼마나 되나요", "label": "event", "lang": "ko"}
+{"text": "OPEC会合の日WTIUSDTは歴史的に平均どのくらい動きますか", "label": "event", "lang": "ja"}
+{"text": "自社決算翌日TSLAXは平均でどのくらいギャップしますか", "label": "event", "lang": "ja"}
+{"text": "mera BTCUSDT aur ETHUSDT ka heavy book hai, isko hedge kaise karu downside se", "label": "hedge", "lang": "hi-en"}
+{"text": "TSLAX position bahut bada hai, options se hedge karne ka best tarika kya hai", "label": "hedge", "lang": "hi-en"}
+{"text": "tengo mucho NVDAX concentrado, como cubro el riesgo a la baja de forma barata", "label": "hedge", "lang": "es"}
+{"text": "cual es la mejor manera de proteger mi cartera de cripto contra una caida fuerte", "label": "hedge", "lang": "es"}
+{"text": "tenho muito AAPLX concentrado, como protejo contra queda de forma barata", "label": "hedge", "lang": "pt"}
+{"text": "qual a melhor forma de proteger minha carteira cripto contra uma queda forte", "label": "hedge", "lang": "pt"}
+{"text": "NVDAX에 집중돼있는데 저렴하게 하방 헤지하는 방법이 뭐가 있나요", "label": "hedge", "lang": "ko"}
+{"text": "제 크립토 포트폴리오를 큰 하락으로부터 보호하는 가장 좋은 방법이 뭔가요", "label": "hedge", "lang": "ko"}
+{"text": "NVDAXに集中投資していて下落リスクを安く抑える方法はありますか", "label": "hedge", "lang": "ja"}
+{"text": "私の暗号資産ポートフォリオを大暴落から守る最良の方法は何ですか", "label": "hedge", "lang": "ja"}
+{"text": "toi tap trung nhieu vao NVDAX, cach nao re nhat de phong ngua rui ro giam gia", "label": "hedge", "lang": "vi"}
+{"text": "cach tot nhat de bao ve danh muc crypto cua toi khoi mot cu sap manh la gi", "label": "hedge", "lang": "vi"}
+{"text": "我大量集中在NVDAX,有什麼便宜的方法可以對沖下跌風險", "label": "hedge", "lang": "zh-tw"}
+{"text": "保護我的加密貨幣投資組合免受大跌的最佳方法是什麼", "label": "hedge", "lang": "zh-tw"}
+{"text": "у меня сильно сконцентрирован NVDAX, как дешево захеджировать риск падения", "label": "hedge", "lang": "ru"}
+{"text": "какой лучший способ защитить мой криптопортфель от сильного обвала", "label": "hedge", "lang": "ru"}
+{"text": "NVDAX'ta yogun pozisyonum var ucuz sekilde asagi yonlu riski nasil hedge ederim", "label": "hedge", "lang": "tr"}
+{"text": "kripto portfoyumu buyuk bir cokuse karsi korumanin en iyi yolu nedir", "label": "hedge", "lang": "tr"}
+{"text": "saya terkonsentrasi banyak di NVDAX, cara murah untuk hedge risiko penurunan gimana", "label": "hedge", "lang": "id"}
+{"text": "cara terbaik melindungi portofolio kripto saya dari crash besar apa ya", "label": "hedge", "lang": "id"}
+{"text": "我 heavy concentrated 在 NVDAX, cheap way to hedge downside risk 是什么", "label": "hedge", "lang": "zh-en"}
+{"text": "best way to protect 我的 crypto portfolio from 大 crash 是什么", "label": "hedge", "lang": "zh-en"}
+{"text": "retiree hu, apna XAUUSDT ka position inflation se protect karne ke liye kya karu", "label": "hedge", "lang": "hi-en"}
+{"text": "day trader, agar market gap down ho jaye overnight toh mera SOLUSDT book kaise protect karu", "label": "hedge", "lang": "hi-en"}
+{"text": "soy jubilado, como protejo mi posicion en XAUUSDT contra la inflacion", "label": "hedge", "lang": "es"}
+{"text": "trader intradia, si el mercado abre con hueco bajista, como protejo mi libro de SOLUSDT", "label": "hedge", "lang": "es"}
+{"text": "sou aposentado, como protejo minha posicao XAUUSDT contra a inflacao", "label": "hedge", "lang": "pt"}
+{"text": "trader do dia, se o mercado abrir com gap para baixo, como protejo meu livro SOLUSDT", "label": "hedge", "lang": "pt"}
+{"text": "은퇴자예요 XAUUSDT 포지션을 인플레이션으로부터 어떻게 보호하나요", "label": "hedge", "lang": "ko"}
+{"text": "데이트레이더인데 오버나이트 갭다운 대비 SOLUSDT 북을 어떻게 보호하나요", "label": "hedge", "lang": "ko"}
+{"text": "退職者ですXAUUSDTのポジションをインフレから守るにはどうすればいいですか", "label": "hedge", "lang": "ja"}
+{"text": "デイトレーダーです翌朝ギャップダウンした場合SOLUSDTのポジションをどう守りますか", "label": "hedge", "lang": "ja"}
+{"text": "Fed abhi kitna hawkish stance pe hai, rate cut kab expect karu", "label": "macro", "lang": "hi-en"}
+{"text": "dollar strong ho raha hai ya weak, DXY ka trend kya bata raha hai abhi", "label": "macro", "lang": "hi-en"}
+{"text": "cual es la postura actual de la Fed sobre las tasas de interes", "label": "macro", "lang": "es"}
+{"text": "como esta el rendimiento del bono a 10 anos ahora y que dice sobre recesion", "label": "macro", "lang": "es"}
+{"text": "qual a postura atual do Fed em relacao aos juros esse mes", "label": "macro", "lang": "pt"}
+{"text": "como esta o rendimento do titulo de 10 anos agora e o que isso indica sobre recessao", "label": "macro", "lang": "pt"}
+{"text": "연준이 지금 얼마나 매파적인지 금리 인하는 언제쯤 예상되나요", "label": "macro", "lang": "ko"}
+{"text": "달러 지수 DXY 추세가 지금 강세인가요 약세인가요", "label": "macro", "lang": "ko"}
+{"text": "FRBは今どれくらいタカ派的な姿勢ですか利下げはいつ頃予想されますか", "label": "macro", "lang": "ja"}
+{"text": "ドル指数DXYの今のトレンドは強いですか弱いですか", "label": "macro", "lang": "ja"}
+{"text": "Fed hien tai dang hawkish co so nao, khi nao co the cat lai suat", "label": "macro", "lang": "vi"}
+{"text": "xu huong chi so dola DXY hien tai la manh len hay yeu di", "label": "macro", "lang": "vi"}
+{"text": "聯準會現在鷹派程度多高,降息大概什麼時候可以期待", "label": "macro", "lang": "zh-tw"}
+{"text": "美元指數DXY現在的走勢是走強還是走弱", "label": "macro", "lang": "zh-tw"}
+{"text": "насколько сейчас ястребиная позиция ФРС, когда ожидать снижения ставки", "label": "macro", "lang": "ru"}
+{"text": "тренд индекса доллара DXY сейчас укрепляется или слабеет", "label": "macro", "lang": "ru"}
+{"text": "Fed su anda ne kadar sahin bir duruşta, faiz indirimi ne zaman beklenir", "label": "macro", "lang": "tr"}
+{"text": "dolar endeksi DXY su anki trendi guclenme mi zayiflama mi", "label": "macro", "lang": "tr"}
+{"text": "seberapa hawkish sikap the Fed sekarang, kapan penurunan suku bunga bisa diharapkan", "label": "macro", "lang": "id"}
+{"text": "tren indeks dolar DXY sekarang menguat atau melemah", "label": "macro", "lang": "id"}
+{"text": "Fed 现在 hawkish 到什么程度, rate cut 什么时候 expect", "label": "macro", "lang": "zh-en"}
+{"text": "DXY dollar index trend 现在是走强还是走弱", "label": "macro", "lang": "zh-en"}
+{"text": "retiree hu, agar recession aa gaya toh mera diversified book kaisa perform karega macro se", "label": "macro", "lang": "hi-en"}
+{"text": "inflation data ka latest reading kya hai aur uska crypto pe effect kaisa hota hai", "label": "macro", "lang": "hi-en"}
+{"text": "soy jubilado, si llega una recesion como se comporta mi cartera diversificada desde el punto macro", "label": "macro", "lang": "es"}
+{"text": "cual es el ultimo dato de inflacion y como afecta eso al mercado cripto en general", "label": "macro", "lang": "es"}
+{"text": "sou aposentado, se vier uma recessao como minha carteira diversificada se comporta do ponto de vista macro", "label": "macro", "lang": "pt"}
+{"text": "qual e o dado mais recente de inflacao e como isso afeta o mercado cripto em geral", "label": "macro", "lang": "pt"}
+{"text": "은퇴자예요 경기침체 오면 제 분산투자 포트폴리오가 매크로적으로 어떻게 될까요", "label": "macro", "lang": "ko"}
+{"text": "최신 인플레이션 수치가 어떻게 되고 그게 크립토 시장에 어떤 영향을 주나요", "label": "macro", "lang": "ko"}
+{"text": "退職者ですもし景気後退が来たら分散型ポートフォリオはマクロ的にどうなりますか", "label": "macro", "lang": "ja"}
+{"text": "最新のインフレデータはどうで、それが暗号資産市場全体にどう影響しますか", "label": "macro", "lang": "ja"}
+{"text": "abhi social media pe crowd sentiment BTCUSDT ke liye greedy hai ya fearful", "label": "sentiment", "lang": "hi-en"}
+{"text": "TSLAX pe retail positioning kaisa hai, log long crowded hain ya short", "label": "sentiment", "lang": "hi-en"}
+{"text": "cual es el sentimiento de la multitud en redes sociales sobre NVDAX ahora mismo", "label": "sentiment", "lang": "es"}
+{"text": "el indice de miedo y codicia para cripto esta en que nivel esta semana", "label": "sentiment", "lang": "es"}
+{"text": "qual o sentimento do mercado nas redes sociais para AAPLX agora", "label": "sentiment", "lang": "pt"}
+{"text": "o indice de medo e ganancia para cripto esta em que nivel essa semana", "label": "sentiment", "lang": "pt"}
+{"text": "지금 소셜미디어에서 NVDAX에 대한 군중심리가 탐욕적인가요 공포적인가요", "label": "sentiment", "lang": "ko"}
+{"text": "이번주 크립토 공포탐욕지수는 몇인가요", "label": "sentiment", "lang": "ko"}
+{"text": "今ソーシャルメディアでNVDAXに対する群衆心理は強欲ですか恐怖ですか", "label": "sentiment", "lang": "ja"}
+{"text": "今週の暗号資産のフィアアンドグリード指数はいくつですか", "label": "sentiment", "lang": "ja"}
+{"text": "tam ly dam dong tren mang xa hoi ve NVDAX hien tai la tham lam hay so hai", "label": "sentiment", "lang": "vi"}
+{"text": "chi so so hai tham lam crypto tuan nay dang o muc bao nhieu", "label": "sentiment", "lang": "vi"}
+{"text": "現在社群媒體上對NVDAX的群眾情緒是貪婪還是恐懼", "label": "sentiment", "lang": "zh-tw"}
+{"text": "這週加密貨幣恐懼貪婪指數是多少", "label": "sentiment", "lang": "zh-tw"}
+{"text": "какие сейчас настроения толпы в соцсетях по NVDAX жадность или страх", "label": "sentiment", "lang": "ru"}
+{"text": "на каком уровне индекс страха и жадности для крипты на этой неделе", "label": "sentiment", "lang": "ru"}
+{"text": "sosyal medyada NVDAX icin kalabalik duygusu su anda acgozlu mu korkulu mu", "label": "sentiment", "lang": "tr"}
+{"text": "bu hafta kripto korku ve acgozluluk endeksi kacta", "label": "sentiment", "lang": "tr"}
+{"text": "sentimen crowd di sosmed buat NVDAX sekarang lagi greedy atau fearful", "label": "sentiment", "lang": "id"}
+{"text": "fear and greed index kripto minggu ini di level berapa", "label": "sentiment", "lang": "id"}
+{"text": "现在 social media 上 crowd sentiment 对 NVDAX 是 greedy 还是 fearful", "label": "sentiment", "lang": "zh-en"}
+{"text": "本周 crypto fear and greed index 是多少", "label": "sentiment", "lang": "zh-en"}
+{"text": "retiree hu, GOOGLX pe institutional positioning ka mood kaisa hai abhi", "label": "sentiment", "lang": "hi-en"}
+{"text": "crypto degen, SOLUSDT par funding aur positioning se crowd kitna long crowded hai", "label": "sentiment", "lang": "hi-en"}
+{"text": "jubilado aqui, cual es el animo institucional en GOOGLX ahora mismo", "label": "sentiment", "lang": "es"}
+{"text": "degen de cripto, segun el funding y posicionamiento que tan crowded esta el long en SOLUSDT", "label": "sentiment", "lang": "es"}
+{"text": "aposentado aqui, qual o humor institucional em GOOGLX agora", "label": "sentiment", "lang": "pt"}
+{"text": "degen cripto, pelo funding e posicionamento quao lotado esta o long em SOLUSDT", "label": "sentiment", "lang": "pt"}
+{"text": "은퇴자예요 GOOGLX 기관 포지셔닝 분위기가 지금 어떤가요", "label": "sentiment", "lang": "ko"}
+{"text": "크립토 데젠, SOLUSDT 펀딩이랑 포지셔닝 보면 롱 쏠림이 얼마나 심한가요", "label": "sentiment", "lang": "ko"}
+{"text": "退職者ですGOOGLXの機関投資家のポジショニングムードは今どうですか", "label": "sentiment", "lang": "ja"}
+{"text": "クリプトdegenですファンディングとポジショニングで見てSOLUSDTのロングはどれくらい混雑していますか", "label": "sentiment", "lang": "ja"}
+{"text": "TSLAX aaj kyun 8% girgaya, kya news hai koi catalyst", "label": "news", "lang": "hi-en"}
+{"text": "BTCUSDT ne suddenly pump kyun kiya abhi, koi khabar aayi kya", "label": "news", "lang": "hi-en"}
+{"text": "por que NVDAX subio 6% hoy, hay alguna noticia detras", "label": "news", "lang": "es"}
+{"text": "que catalizador esta moviendo a ETHUSDT hacia arriba en este momento", "label": "news", "lang": "es"}
+{"text": "por que a AAPLX caiu tanto hoje, tem alguma noticia por tras", "label": "news", "lang": "pt"}
+{"text": "qual catalisador esta movendo o BTCUSDT para cima agora", "label": "news", "lang": "pt"}
+{"text": "TSLAX가 오늘 왜 8퍼센트나 급락했나요 어떤 뉴스가 있었나요", "label": "news", "lang": "ko"}
+{"text": "BTCUSDT가 갑자기 왜 펌핑했나요 무슨 소식 있었어요", "label": "news", "lang": "ko"}
+{"text": "TSLAXが今日なぜ8パーセントも下落したのですか何かニュースがありましたか", "label": "news", "lang": "ja"}
+{"text": "BTCUSDTが急にポンプした理由は何かニュースがありましたか", "label": "news", "lang": "ja"}
+{"text": "tai sao TSLAX hom nay giam 8 phan tram, co tin tuc gi khong", "label": "news", "lang": "vi"}
+{"text": "tai sao BTCUSDT dot nhien tang manh, co tin gi vua ra khong", "label": "news", "lang": "vi"}
+{"text": "TSLAX今天為什麼跌了8%,有什麼新聞嗎", "label": "news", "lang": "zh-tw"}
+{"text": "BTCUSDT為什麼突然暴拉,是不是有什麼消息", "label": "news", "lang": "zh-tw"}
+{"text": "почему TSLAX сегодня упала на 8 процентов, есть какие новости", "label": "news", "lang": "ru"}
+{"text": "почему BTCUSDT внезапно резко вырос, что за новость вышла", "label": "news", "lang": "ru"}
+{"text": "TSLAX bugun neden yuzde 8 dustu bir haber mi var", "label": "news", "lang": "tr"}
+{"text": "BTCUSDT birden neden pompalandi bir haber mi cikti", "label": "news", "lang": "tr"}
+{"text": "kenapa TSLAX turun 8 persen hari ini, ada berita apa", "label": "news", "lang": "id"}
+{"text": "kenapa BTCUSDT tiba tiba pump, ada kabar apa nih", "label": "news", "lang": "id"}
+{"text": "TSLAX 今天为什么跌了 8%, 有没有什么 news catalyst", "label": "news", "lang": "zh-en"}
+{"text": "BTCUSDT 突然 pump 是为什么, 有没有 breaking news", "label": "news", "lang": "zh-en"}
+{"text": "retiree hu, AAPLX ke stock split rumor pe koi confirmed news mili kya", "label": "news", "lang": "hi-en"}
+{"text": "crypto degen, DOGEUSDT elon musk tweet ke baad kyun move kar raha hai", "label": "news", "lang": "hi-en"}
+{"text": "jubilado aqui, hay noticia confirmada sobre el rumor de split de AAPLX", "label": "news", "lang": "es"}
+{"text": "degen de cripto, por que DOGEUSDT se esta moviendo despues del tweet de elon", "label": "news", "lang": "es"}
+{"text": "aposentado aqui, tem noticia confirmada sobre o boato de split da AAPLX", "label": "news", "lang": "pt"}
+{"text": "degen cripto, por que DOGEUSDT esta se movendo apos o tweet do elon", "label": "news", "lang": "pt"}
+{"text": "은퇴자예요 AAPLX 액면분할 루머에 대한 확인된 뉴스가 있나요", "label": "news", "lang": "ko"}
+{"text": "크립토 데젠, 일론 트윗 이후에 DOGEUSDT가 왜 움직이나요", "label": "news", "lang": "ko"}
+{"text": "退職者ですAAPLXの株式分割の噂について確定したニュースはありますか", "label": "news", "lang": "ja"}
+{"text": "クリプトdegenですイーロンのツイート後DOGEUSDTがなぜ動いているのですか", "label": "news", "lang": "ja"}
+{"text": "desk ka Sharpe ratio pichle mahine kitna tha, compare karo overall", "label": "record", "lang": "hi-en"}
+{"text": "kya risk layer ne kal koi trade block kiya tha, kyun block hua batao", "label": "record", "lang": "hi-en"}
+{"text": "cual fue el sharpe ratio del escritorio el mes pasado, comparalo con el objetivo", "label": "record", "lang": "es"}
+{"text": "la capa de riesgo bloqueo alguna operacion ayer, por que la bloqueo", "label": "record", "lang": "es"}
+{"text": "qual foi o sharpe ratio da mesa no mes passado comparado com a meta", "label": "record", "lang": "pt"}
+{"text": "a camada de risco bloqueou alguma operacao ontem, por que foi bloqueada", "label": "record", "lang": "pt"}
+{"text": "지난달 데스크 샤프비율이 얼마였고 목표치랑 비교하면 어떤가요", "label": "record", "lang": "ko"}
+{"text": "어제 리스크 레이어가 어떤 거래를 차단했나요 왜 차단했나요", "label": "record", "lang": "ko"}
+{"text": "先月のデスクのシャープレシオはいくらで目標と比較してどうでしたか", "label": "record", "lang": "ja"}
+{"text": "昨日リスクレイヤーが何かの取引をブロックしましたか、なぜブロックされたのですか", "label": "record", "lang": "ja"}
+{"text": "ty le Sharpe cua ban giao dich thang truoc la bao nhieu so voi muc tieu", "label": "record", "lang": "vi"}
+{"text": "lop rui ro co chan giao dich nao hom qua khong, tai sao bi chan", "label": "record", "lang": "vi"}
+{"text": "上個月桌面的夏普比率是多少,跟目標比較怎麼樣", "label": "record", "lang": "zh-tw"}
+{"text": "昨天風控層有擋下什麼交易嗎,為什麼被擋下來", "label": "record", "lang": "zh-tw"}
+{"text": "какой был коэффициент шарпа деска в прошлом месяце по сравнению с целью", "label": "record", "lang": "ru"}
+{"text": "риск слой заблокировал какую то сделку вчера, почему она была заблокирована", "label": "record", "lang": "ru"}
+{"text": "gecen ay masanin sharpe orani neydi hedefle karsilastirinca nasil", "label": "record", "lang": "tr"}
+{"text": "risk katmani dun herhangi bir islemi engelledi mi neden engellendi", "label": "record", "lang": "tr"}
+{"text": "sharpe ratio desk bulan lalu berapa dibandingkan targetnya", "label": "record", "lang": "id"}
+{"text": "apakah risk layer memblokir trade kemarin, kenapa diblokir", "label": "record", "lang": "id"}
+{"text": "desk 上个月 Sharpe ratio 是多少, 跟 target 比较怎么样", "label": "record", "lang": "zh-en"}
+{"text": "risk layer 昨天有 block 哪个 trade 吗, 为什么 block 的", "label": "record", "lang": "zh-en"}
+{"text": "desk ka past decision log tamper evident hai kya, verify kaise karu", "label": "record", "lang": "hi-en"}
+{"text": "agent ne kal trade kyun nahi kiya, koi reason record mein hai kya", "label": "record", "lang": "hi-en"}
+{"text": "el registro de decisiones pasadas del escritorio es a prueba de manipulacion, como lo verifico", "label": "record", "lang": "es"}
+{"text": "por que el agente no operó ayer, hay alguna razon en el registro", "label": "record", "lang": "es"}
+{"text": "o log de decisoes passadas da mesa e a prova de adulteracao, como verifico isso", "label": "record", "lang": "pt"}
+{"text": "por que o agente nao operou ontem, tem algum motivo no registro", "label": "record", "lang": "pt"}
+{"text": "데스크의 과거 결정 로그가 위변조 방지가 되나요 어떻게 검증하나요", "label": "record", "lang": "ko"}
+{"text": "에이전트가 어제 왜 거래를 안 했나요 기록에 이유가 있나요", "label": "record", "lang": "ko"}
+{"text": "デスクの過去の意思決定ログは改ざん検知可能ですかどう検証しますか", "label": "record", "lang": "ja"}
+{"text": "エージェントは昨日なぜ取引しなかったのですかログに理由がありますか", "label": "record", "lang": "ja"}
+{"text": "aaj weather kaisa hai bhai batao mausam ka haal", "label": "refuse", "lang": "hi-en"}
+{"text": "mere liye python mein bubble sort ka code likh do please", "label": "refuse", "lang": "hi-en"}
+{"text": "TSLAX ke liye asli order abhi place kar do mere account se", "label": "refuse", "lang": "hi-en"}
+{"text": "MOONXCOIN naam ka ticker hai kya, uska price batao", "label": "refuse", "lang": "hi-en"}
+{"text": "BTC price agle hafte 100k jayega kya, prediction do exact number", "label": "refuse", "lang": "hi-en"}
+{"text": "meri college assignment complete kar do, calculus ka homework hai", "label": "refuse", "lang": "hi-en"}
+{"text": "cual es la capital de francia dime rapido", "label": "refuse", "lang": "es"}
+{"text": "escribeme un poema sobre el amor por favor", "label": "refuse", "lang": "es"}
+{"text": "coloca una orden real de compra de TSLAX ahora mismo en mi cuenta", "label": "refuse", "lang": "es"}
+{"text": "existe un ticker llamado ROCKETMOON, dame el precio", "label": "refuse", "lang": "es"}
+{"text": "dime el precio exacto que tendra BTC el proximo mes", "label": "refuse", "lang": "es"}
+{"text": "ayudame con mi tarea de matematicas del colegio por favor", "label": "refuse", "lang": "es"}
+{"text": "qual e a capital da franca me diga rapido", "label": "refuse", "lang": "pt"}
+{"text": "escreva um poema sobre amor para mim", "label": "refuse", "lang": "pt"}
+{"text": "coloque uma ordem real de compra de TSLAX agora na minha conta", "label": "refuse", "lang": "pt"}
+{"text": "existe um ticker chamado ROCKETMOON, me diga o preco", "label": "refuse", "lang": "pt"}
+{"text": "qual sera o preco exato do BTC no mes que vem", "label": "refuse", "lang": "pt"}
+{"text": "me ajude com minha licao de matematica da escola por favor", "label": "refuse", "lang": "pt"}
+{"text": "오늘 날씨 어때요 알려주세요", "label": "refuse", "lang": "ko"}
+{"text": "파이썬으로 버블정렬 코드 짜주세요", "label": "refuse", "lang": "ko"}
+{"text": "제 계좌로 TSLAX 실제 매수 주문 지금 바로 넣어주세요", "label": "refuse", "lang": "ko"}
+{"text": "MOONXCOIN이라는 티커 있나요 가격 알려줘요", "label": "refuse", "lang": "ko"}
+{"text": "다음달 비트코인 가격 정확히 얼마 될지 예측해줘요", "label": "refuse", "lang": "ko"}
+{"text": "제 수학 숙제 대신 풀어주세요 미적분이에요", "label": "refuse", "lang": "ko"}
+{"text": "今日の天気はどうですか教えてください", "label": "refuse", "lang": "ja"}
+{"text": "パイソンでバブルソートのコードを書いてください", "label": "refuse", "lang": "ja"}
+{"text": "私の口座で今すぐTSLAXの実際の買い注文を入れてください", "label": "refuse", "lang": "ja"}
+{"text": "MOONXCOINというティッカーはありますか価格を教えてください", "label": "refuse", "lang": "ja"}
+{"text": "来月BTCの価格が正確にいくらになるか予測してください", "label": "refuse", "lang": "ja"}
+{"text": "私の微積分の宿題を手伝ってください学校の課題です", "label": "refuse", "lang": "ja"}
+{"text": "hom nay thoi tiet the nao noi cho toi biet", "label": "refuse", "lang": "vi"}
+{"text": "viet giup toi code bubble sort bang python", "label": "refuse", "lang": "vi"}
+{"text": "dat lenh mua thuc te TSLAX ngay bay gio trong tai khoan cua toi", "label": "refuse", "lang": "vi"}
+{"text": "co ma ticker nao ten MOONXCOIN khong, cho gia di", "label": "refuse", "lang": "vi"}
+{"text": "du doan chinh xac gia BTC thang toi la bao nhieu", "label": "refuse", "lang": "vi"}
+{"text": "giup toi lam bai tap toan giai tich o truong voi", "label": "refuse", "lang": "vi"}
+{"text": "今天天氣怎樣告訴我一下", "label": "refuse", "lang": "zh-tw"}
+{"text": "幫我用python寫一個氣泡排序的程式碼", "label": "refuse", "lang": "zh-tw"}
+{"text": "現在幫我在我帳戶下一筆TSLAX的真實買單", "label": "refuse", "lang": "zh-tw"}
+{"text": "有沒有一個叫MOONXCOIN的代號,告訴我價格", "label": "refuse", "lang": "zh-tw"}
+{"text": "下個月比特幣確切會漲到多少錢預測給我", "label": "refuse", "lang": "zh-tw"}
+{"text": "幫我做學校的微積分作業", "label": "refuse", "lang": "zh-tw"}
+{"text": "какая сегодня погода скажи быстро", "label": "refuse", "lang": "ru"}
+{"text": "напиши мне код пузырьковой сортировки на питоне", "label": "refuse", "lang": "ru"}
+{"text": "разместите реальный ордер на покупку TSLAX прямо сейчас на моем счете", "label": "refuse", "lang": "ru"}
+{"text": "есть ли тикер под названием MOONXCOIN, скажи цену", "label": "refuse", "lang": "ru"}
+{"text": "какая будет точная цена биткоина в следующем месяце", "label": "refuse", "lang": "ru"}
+{"text": "помоги мне с домашним заданием по математике в школе", "label": "refuse", "lang": "ru"}
+{"text": "bugun hava nasil soyle bana", "label": "refuse", "lang": "tr"}
+{"text": "python ile kabarcik siralama kodu yaz bana", "label": "refuse", "lang": "tr"}
+{"text": "hesabimda simdi gercek TSLAX alim emri ver", "label": "refuse", "lang": "tr"}
+{"text": "MOONXCOIN diye bir ticker var mi fiyatini soyle", "label": "refuse", "lang": "tr"}
+{"text": "gelecek ay BTC fiyati tam olarak kac olacak tahmin et", "label": "refuse", "lang": "tr"}
+{"text": "okul kalkulus odevimi benim yerime yap lutfen", "label": "refuse", "lang": "tr"}
+{"text": "cuaca hari ini gimana kasih tau dong", "label": "refuse", "lang": "id"}
+{"text": "tolong tuliskan kode bubble sort pakai python", "label": "refuse", "lang": "id"}
+{"text": "taruh order beli TSLAX beneran sekarang di akun saya", "label": "refuse", "lang": "id"}
+{"text": "ada ga ticker namanya MOONXCOIN, kasih tau harganya", "label": "refuse", "lang": "id"}
+{"text": "harga BTC bulan depan pasti berapa prediksi dong", "label": "refuse", "lang": "id"}
+{"text": "bantuin pr kalkulus sekolah saya dong", "label": "refuse", "lang": "id"}
+{"text": "今天天气怎么样 tell me quick", "label": "refuse", "lang": "zh-en"}
+{"text": "帮我写一个 python bubble sort code please", "label": "refuse", "lang": "zh-en"}
+{"text": "现在帮我在我账户 place 一个 real TSLAX buy order", "label": "refuse", "lang": "zh-en"}
+{"text": "有没有一个 ticker 叫 MOONXCOIN, 价格多少", "label": "refuse", "lang": "zh-en"}

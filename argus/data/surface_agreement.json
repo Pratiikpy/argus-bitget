@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T11:47:47.696817+00:00",
+  "generated_at": "2026-09-24T18:54:31.984962+00:00",
   "facts_checked": 5,
   "agree": 5,
   "disagree": 0,
@@ -16,8 +16,8 @@
     },
     {
       "fact": "decisions on record",
-      "console": 495,
-      "artefact": 495,
+      "console": 663,
+      "artefact": 663,
       "console_source": "lui.answer:answer_decision_list count",
       "artefact_source": "paper.ledger entries",
       "agrees": true,
@@ -34,8 +34,8 @@
     },
     {
       "fact": "abstentions",
-      "console": 493,
-      "artefact": 493,
+      "console": 661,
+      "artefact": 661,
       "console_source": "lui.answer:answer_decision_list verdict breakdown",
       "artefact_source": "eval.performance abstentions, less the voided rows",
       "agrees": true,
@@ -43,8 +43,8 @@
     },
     {
       "fact": "count: page header vs list",
-      "console": 495,
-      "artefact": 495,
+      "console": 663,
+      "artefact": 663,
       "console_source": "lui.server:_status (the page header)",
       "artefact_source": "lui.answer:answer_decision_list (the list itself)",
       "agrees": true,

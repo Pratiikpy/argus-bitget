@@ -56,7 +56,8 @@ def render() -> str:
     border-bottom:1px solid var(--line) }}
   .meta {{ font:500 11.5px/1.6 var(--mono); letter-spacing:.14em; text-transform:uppercase;
     color:var(--dim); padding-top:10px }}
-  .sec h2 {{ font-size:clamp(28px,4vw,52px); line-height:1; margin:0 0 14px }}
+  .sec h2 {{ font-size:clamp(28px,4vw,52px); line-height:1; margin:0 0 14px;
+    letter-spacing:-0.03em }}
   .sec p {{ color:var(--dim); max-width:680px; margin:0 0 28px }}
   .lock {{ display:flex; align-items:center; gap:18px; padding:48px; border:1px solid var(--line);
     border-radius:16px; background:var(--halo) }}

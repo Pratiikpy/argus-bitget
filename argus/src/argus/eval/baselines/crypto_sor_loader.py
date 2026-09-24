@@ -15,12 +15,23 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
+import sys
 import threading
 from pathlib import Path
 from typing import Any
 
 _SHIM_DIR = Path(__file__).resolve().parent / "crypto_sor_shim"
 _INSTALL_LOCK = threading.Lock()
+
+# `npm`/`npx` are `.cmd` shims on Windows, and `subprocess.run` can only resolve those through a
+# shell — hence `shell=True` below. On POSIX, `shell=True` with a *list* of args means something
+# different: per the `subprocess` docs, only `args[0]` becomes the shell command string, and every
+# other list item is passed as a positional parameter to the shell itself (`$1`, `$2`, ...), never
+# appended to the command line. So on Linux CI this silently ran bare `npm` with no arguments —
+# which exits 1 — instead of `npm ci --no-audit --no-fund --loglevel=error`, and `npx --no-install
+# ts-node harness.ts` had the same problem. Gate `shell=True` to Windows, where the list form is
+# converted to a full command string before being handed to the shell either way.
+_USE_SHELL = sys.platform == "win32"
 
 
 class CryptoSorSubprocessError(RuntimeError):
@@ -52,7 +63,7 @@ def ensure_installed(timeout: float = 600.0) -> None:
         try:
             result = subprocess.run(
                 ["npm", "ci", "--no-audit", "--no-fund", "--loglevel=error"], cwd=_SHIM_DIR,
-                capture_output=True, text=True, timeout=timeout, shell=True, check=False,
+                capture_output=True, text=True, timeout=timeout, shell=_USE_SHELL, check=False,
             )
         except (OSError, subprocess.TimeoutExpired) as exc:
             raise CryptoSorSubprocessError(f"npm ci failed to run: {exc}") from exc
@@ -94,7 +105,7 @@ def run_new_order(
             capture_output=True,
             text=True,
             timeout=timeout,
-            shell=True,  # npx.cmd resolution on Windows needs the shell
+            shell=_USE_SHELL,  # npx.cmd resolution on Windows needs the shell
             check=False,
         )
     except (OSError, subprocess.TimeoutExpired) as exc:

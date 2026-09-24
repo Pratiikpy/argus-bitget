@@ -464,7 +464,7 @@ class TradeImpact:
         lines: list[str] = []
         if self.beta_before is not None and self.beta_after is not None:
             lines.append(
-                f"[portfolio] {self.session}-session beta {self.beta_before:.2f} -> "
+                f"[portfolio] {self.session}-session beta {self.beta_before:.2f} → "
                 f"{self.beta_after:.2f}"
             )
         if self.risk_share_after is not None:
@@ -482,7 +482,7 @@ class TradeImpact:
             and self.effective_positions_after is not None
         ):
             lines.append(
-                f"[portfolio] risk spread across {self.effective_positions_before:.1f} -> "
+                f"[portfolio] risk spread across {self.effective_positions_before:.1f} → "
                 f"{self.effective_positions_after:.1f} effective position(s)"
             )
         if self.max_correlation is not None:

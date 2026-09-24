@@ -50,6 +50,9 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "surface_agreement.json",
     "standing.json",
     "lui_ngram_model.json",
+    # The research-kind model (`lui/kindmodel.py`): how the hosted console reads a question when no
+    # language model is configured. Without it the console falls back to the patterns alone.
+    "lui_kind_model.json",
     # Real Bitget hourly history, frozen on the date it records. `lui/research.py` answers from it
     # only when the live fetch cannot finish inside the serverless deadline, and says so in the
     # answer — without it, a slow venue would turn a research question into a refusal.
@@ -66,6 +69,7 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     # Read by the status page (`lui/status_page.py`): the dated sweeps of every Bitget toolkit
     # surface, shown beside the live checks.
     "bitget_skills_health.json",
+    "skill_mirror.json",
     "skill_reliability.json",
     "data_coverage.json",
     "source_health.json",

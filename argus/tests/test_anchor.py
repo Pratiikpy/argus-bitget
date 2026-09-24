@@ -83,11 +83,19 @@ class TestTheSubmission:
     def test_the_digest_size_is_the_protocol_size(self) -> None:
         assert DIGEST_BYTES == hashlib.sha256(b"").digest_size == 32
 
-    def test_hex_and_bytes_are_both_accepted(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_hex_and_bytes_are_both_accepted(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
         import argus.paper.anchor as mod
 
+        # The directory only needs to exist so `_store` can write to it — this test is about
+        # digest-form acceptance, not storage, so it uses `tmp_path` like every other test in
+        # this file rather than a placeholder path. `Path("/nonexistent-x")` used to stand in
+        # here: on Windows that resolves under the current drive and `mkdir` silently succeeds
+        # (leaving a stray directory behind), but on Linux `/` is root-owned and `mkdir` raises
+        # `PermissionError` — a platform difference this test never meant to exercise.
         monkeypatch.setattr(mod, "_submit", lambda cal, d, *, timeout: b"\xf0\x08proof")
-        as_bytes = anchor(DIGEST, calendars=("https://x",), directory=Path("/nonexistent-x"))
+        as_bytes = anchor(DIGEST, calendars=("https://x",), directory=tmp_path)
         assert as_bytes.digest_hex == binascii.hexlify(DIGEST).decode()
 
     def test_every_calendar_is_tried_even_after_one_fails(

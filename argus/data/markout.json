@@ -1,41 +1,41 @@
 {
   "symbol": "MSTRUSDT",
   "phase": "rth",
-  "started_at": "2026-09-24T17:30:04.122927+00:00",
+  "started_at": "2026-09-24T19:30:03.953560+00:00",
   "window_seconds": 90,
   "samples": 68,
-  "prints_seen": 46,
-  "rpi_share": 0.0435,
+  "prints_seen": 99,
+  "rpi_share": 0.0,
   "maker_bps": 2.0,
   "markouts": [
     {
       "horizon_seconds": 5,
-      "prints": 45,
-      "median_bps": -0.0,
-      "mean_bps": 0.3419,
-      "worst_bps": -4.3102
+      "prints": 82,
+      "median_bps": 0.3065,
+      "mean_bps": 0.0936,
+      "worst_bps": -5.5145
     },
     {
       "horizon_seconds": 15,
-      "prints": 34,
-      "median_bps": 0.0,
-      "mean_bps": 0.0091,
-      "worst_bps": -8.0047
+      "prints": 79,
+      "median_bps": -0.0,
+      "mean_bps": -0.066,
+      "worst_bps": -7.9715
     },
     {
       "horizon_seconds": 30,
-      "prints": 23,
-      "median_bps": -0.6158,
-      "mean_bps": 0.4151,
-      "worst_bps": -9.2367
+      "prints": 72,
+      "median_bps": 2.2986,
+      "mean_bps": 0.9794,
+      "worst_bps": -9.506
     },
     {
       "horizon_seconds": 60,
-      "prints": 7,
-      "median_bps": 1.2314,
-      "mean_bps": 2.332,
-      "worst_bps": -9.2407
+      "prints": 50,
+      "median_bps": 4.9051,
+      "mean_bps": 0.6316,
+      "worst_bps": -6.131
     }
   ],
-  "verdict": "Resting on MSTRUSDT (rth) cost a median 0.62bps of adverse selection over 30s across 23 print(s), worst 9.24bps. That is inside the 2bps maker fee it would save, so the blanket refusal to credit maker treatment is now costing measurable edge and deserves a number rather than a rule"
+  "verdict": "Over 60s the passive side of 50 print(s) gained a median +4.91bps on MSTRUSDT (rth). No measurable adverse selection in this window \u2014 which is a statement about 90 seconds, not about the instrument"
 }

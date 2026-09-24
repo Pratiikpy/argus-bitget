@@ -35,6 +35,7 @@ from urllib.parse import parse_qs, urlparse
 from argus.lui import design
 from argus.lui.answer import Answer, answer
 from argus.lui.cli import BUDGET_MS
+from argus.lui.kindmodel import LocalPlanner, kind_model
 from argus.lui.ngram import reclassify
 from argus.lui.question import TRADED_SYMBOLS, Conversation, Intent, classify
 from argus.lui.research import (
@@ -354,6 +355,16 @@ def handle_ask(
         return _research_payload(text, prior, followed, ledger, started, "research-follow-up",
                                  {**audit, "detail": "a follow-up to the previous question"})
     model = _model_for(visitor) if worth_asking_the_model(text, now=clock) else None
+    instruction = classify(text, now=clock, conversation=conversation).intent is Intent.ORDER
+    if model is None and not instruction:
+        # **No language model: the trained kind model reads the question instead.** It fills the
+        # same slot and goes through the same validation (`plan_with_model`), deciding only which
+        # engine answers; names, weights and the shock are read from the text by the pattern
+        # extractors. On the 2026-09-25 held-out set (200 questions, a writer who never saw this
+        # repository, twelve languages) it read 88.5% correctly where the patterns alone read
+        # 63.5% (`eval/kindtrain.py`). It costs no token, so every question is shown to it.
+        local = kind_model()
+        model = LocalPlanner(local) if local is not None else None
     if model is not None:
         planned, audit = plan_with_model(text, model)
         planned = with_book(planned, book, text)
@@ -372,7 +383,25 @@ def handle_ask(
         if planned is not None:
             return _research_payload(text, prior, planned, ledger, started, "research-model",
                                      audit)
-    request = with_book(detect_research(text), book, text)
+    said = str(((audit.get("model") or {}) if isinstance(audit, dict) else {}).get("why") or "")
+    # **The kind model's "not research" is binding on the research patterns.** Told a question is
+    # off-topic, a trade instruction or a price forecast ("what will gold be a year from now"),
+    # the patterns still found a price word and quoted it; told it is about the desk's record
+    # ("the rationale logged for skipping SPY"), they found a ticker and sized a position. Where
+    # the patterns name the one engine that answers exactly (`pattern_reading_wins`) they still
+    # stand, as they do over the language model.
+    kind_said = _kind_verdict(said)
+    patterned_only = detect_research(text)
+    if kind_said is not None and (patterned_only is None
+                                  or kind_said[1] >= BINDING_KIND_CONFIDENCE):
+        # Binding only when the patterns found nothing, or when the model is sure: "could you
+        # tell me the current price of silver" is refused by the model at 0.19 — it has learnt
+        # that price questions are often forecasts — and the patterns' quote is the right answer.
+        request = (with_book(patterned_only, book, text)
+                   if pattern_reading_wins(patterned_only, text) else None)
+    else:
+        kind_said = None
+        request = with_book(patterned_only, book, text)
     if request is None and _PRICE_FORECAST.search(text) and research_symbols(text)[0]:
         # A price forecast is refused plainly and pointed at what the console can say instead.
         # Before, "forecast BTC price for next week" was refused as "BTC is not one of the desk's
@@ -395,7 +424,7 @@ def handle_ask(
         payload["turns"] = [*prior, text][-12:]
         return payload
     is_order = classify(text, now=clock, conversation=conversation).intent is Intent.ORDER
-    if request is None and not about_the_record(text) and not is_order:
+    if request is None and not about_the_record(text) and not is_order and kind_said is None:
         # A question that names a listed contract the desk does not trade, in words no research
         # kind recognises ("give me a thesis on Solana for a conservative investor"), used to fall
         # through to the ledger and come back as the latest decision on an unrelated rToken. The
@@ -420,6 +449,18 @@ def handle_ask(
     # step the same corpus reads 80.9% correct and 35 errors. It costs one JSON file and no
     # dependency; see `eval/ngrambench.py`.
     question, classified_by = reclassify(question)
+    if (classified_by == "ngram" or (classified_by == "patterns" and not prior)) and not in_domain(
+            text):
+        # **The n-gram layer only knows wording, so it needs a topic gate.** It answers with a
+        # class for any text at all, and on the 2026-09-25 blind corpus "who won the lakers game
+        # last night" reached `decision_why` at 0.19 and was answered with a decision, as were a
+        # CV review and "explain quantum computing" (which the hand-written patterns claimed on
+        # the one word "explain"). A question with no market, trading or desk word in it is not a
+        # question about the record. A follow-up ("explain that") is exempt: it inherits the topic
+        # of the turn before it.
+        question = replace(question, intent=Intent.UNKNOWN,
+                           reason="nothing in the question is about markets or the desk's record")
+        classified_by = "declined-off-topic"
     # **A confident "unrelated" from the model overrules the n-gram layer's guess.** The n-gram
     # layer has no notion of topic, only of wording, and "tell me a joke about NVDA" reached
     # `decision_why` and was answered with a decision's thesis. The planner above already read the
@@ -458,6 +499,49 @@ def handle_ask(
     payload["matched"] = question.matched
     payload["turns"] = [*prior, text][-12:]
     return payload
+
+
+BINDING_KIND_CONFIDENCE = 0.25
+"""The kind model's "refuse" or "record" overrules a research reading the patterns found only at
+or above this confidence. Below it, a pattern reading stands."""
+
+
+def _kind_verdict(why: str) -> tuple[str, float] | None:
+    """("refuse" | "record", confidence) from the local planner's audit line, else None."""
+    match = re.match(r"kind model: (refuse|record) at ([0-9.]+)", why)
+    return None if match is None else (match.group(1), float(match.group(2)))
+
+
+_DOMAIN = re.compile(
+    r"\b(?:trad\w*|decision\w*|decid\w*|desk|positions?|holding\w*|risk\w*|sharpe|sortino|"
+    r"drawdown|pnl|p&l|profit\w*|loss\w*|lose|lost|losing|money|returns?|orders?|fills?|filled|"
+    r"log|ledger|record|calibrat\w*|confiden\w*|abstain\w*|abstention|pass(?:ed|es)?|skip\w*|"
+    r"nothing|evidence|sources?|thesis|signals?|strateg\w*|model|hash\w*|tamper\w*|anchor\w*|"
+    r"block\w*|kernel|guard\w*|weekend|sessions?|hours|market\w*|prices?|stocks?|shares?|"
+    r"crypto\w*|coins?|bitcoin|hedg\w*|portfolio|book|fees?|costs?|win\s+rate|exposure|"
+    r"leverage|long|short|buy\w*|sell\w*|bought|sold|calls?|bets?|accura\w*|wrong|right|"
+    r"perform\w*|history|past|latest|recent|last\s+(?:call|decision|trade|week|month)|why|"
+    r"rtokens?|perp\w*|futures|equit\w*|index|nasdaq|volatil\w*|beta|you|your|yours)\b|"
+    r"交易|决策|仓位|持仓|风险|收益|盈亏|亏损|盈利|订单|市场|价格|策略|对冲|股票|币|夏普|回撤|记录|"
+    r"为什么|理由|证据|校准|你", re.I)
+"""Words that make a question about markets or the desk. Deliberately wide — it exists to stop
+the n-gram layer answering chit-chat, not to judge a trading question."""
+
+
+def in_domain(text: str) -> bool:
+    if research_symbols(text)[0]:
+        return True
+    hit = _DOMAIN.search(text)
+    if hit is None:
+        return False
+    # "you" alone is not a desk word: "can you review my resume" is not about the record. It
+    # counts only with a second domain word or when the question is addressed to the desk's
+    # conduct ("why did you ...", "what did you ...").
+    words = {m.group(0).lower() for m in _DOMAIN.finditer(text)}
+    if words <= {"you", "your", "yours", "你"}:
+        return bool(re.search(r"\b(?:why|what|when|how)\s+(?:did|do|have|were)\s+you\b", text,
+                              re.I))
+    return True
 
 
 def _research_payload(
@@ -752,6 +836,13 @@ class Handler(BaseHTTPRequestHandler):
                     )
                     return
                 self._send(render_wrong(found).encode(), "text/html; charset=utf-8")
+                return
+            if path == "/agent":
+                # The Track 2 agent's run, read from its own hourly public record — never
+                # recomputed here, so this page cannot disagree with the record it shows.
+                from argus.lui.agent_page import render as render_agent
+
+                self._send(render_agent().encode(), "text/html; charset=utf-8")
                 return
             if path == "/brand":
                 from argus.lui.brand_page import render as render_brand

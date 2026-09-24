@@ -1,0 +1,600 @@
+{"text": "비트코인 2개 추가로 매수하면 내 포지션 리스크가 어떻게 변해?", "label": "impact", "lang": "ko"}
+{"text": "테슬라 물량 절반을 줄이면 포트폴리오 노출이 얼마나 줄어드는지 알려줘", "label": "impact", "lang": "ko"}
+{"text": "엔비디아 숏 포지션을 더 키우면 전체 북의 베타가 어떻게 바뀌나요", "label": "impact", "lang": "ko"}
+{"text": "이더리움 포지션을 청산하면 내 계좌 리스크는 어느 정도 낮아져?", "label": "impact", "lang": "ko"}
+{"text": "ビットコインを2枚追加したらポジションのリスクはどう変わる?", "label": "impact", "lang": "ja"}
+{"text": "テスラの持ち高を半分に減らしたらポートフォリオのエクスポージャーはどうなる", "label": "impact", "lang": "ja"}
+{"text": "エヌビディアのショートを増やすと全体のベータはどう動きますか", "label": "impact", "lang": "ja"}
+{"text": "イーサリアムを全部手仕舞いしたら口座のリスクはどれくらい下がる?", "label": "impact", "lang": "ja"}
+{"text": "Si agrego 2 BTC más a mi libro, ¿cómo cambia mi riesgo?", "label": "impact", "lang": "es"}
+{"text": "¿Qué pasa con mi exposición si cierro la mitad de mi posición en Tesla?", "label": "impact", "lang": "es"}
+{"text": "Si aumento el short en Nvidia, ¿cómo afecta el beta de mi cartera?", "label": "impact", "lang": "es"}
+{"text": "¿Cuánto baja el riesgo de mi cuenta si liquido toda mi posición en Ethereum?", "label": "impact", "lang": "es"}
+{"text": "Se eu adicionar mais 2 BTC na minha carteira, como fica meu risco?", "label": "impact", "lang": "pt"}
+{"text": "O que acontece com minha exposição se eu reduzir pela metade a posição em Tesla?", "label": "impact", "lang": "pt"}
+{"text": "Se eu aumentar o short em Nvidia, como isso muda o beta do meu book?", "label": "impact", "lang": "pt"}
+{"text": "Quanto cai o risco da minha conta se eu zerar minha posição em Ethereum?", "label": "impact", "lang": "pt"}
+{"text": "Agar main apne book mein 2 BTC aur add karu, risk kitna badhega?", "label": "impact", "lang": "hi"}
+{"text": "Tesla ki half position close karu to portfolio exposure kitna kam hoga?", "label": "impact", "lang": "hi"}
+{"text": "Nvidia short badhane se mere book ka overall risk kaise change hota hai?", "label": "impact", "lang": "hi"}
+{"text": "Nếu tôi mua thêm 2 BTC vào sổ, rủi ro danh mục thay đổi thế nào?", "label": "impact", "lang": "vi"}
+{"text": "Đóng một nửa vị thế Tesla thì exposure của tôi giảm bao nhiêu?", "label": "impact", "lang": "vi"}
+{"text": "Tăng short Nvidia thì beta tổng thể của book tôi thay đổi ra sao?", "label": "impact", "lang": "vi"}
+{"text": "لو أضفت 2 بيتكوين لمحفظتي، كيف يتغير مستوى المخاطرة؟", "label": "impact", "lang": "ar"}
+{"text": "إذا أغلقت نصف مركزي في تسلا، كم ينخفض تعرضي للمخاطر؟", "label": "impact", "lang": "ar"}
+{"text": "لو زودت الشورت على إنفيديا، كيف يتأثر بيتا المحفظة كلها؟", "label": "impact", "lang": "ar"}
+{"text": "Si j'ajoute 2 BTC à mon book, comment mon risque évolue-t-il?", "label": "impact", "lang": "fr"}
+{"text": "Que devient mon exposition si je clôture la moitié de ma position Tesla?", "label": "impact", "lang": "fr"}
+{"text": "Si j'augmente le short sur Nvidia, comment ça change le bêta global?", "label": "impact", "lang": "fr"}
+{"text": "Wenn ich 2 BTC mehr ins Buch nehme, wie verändert sich mein Risiko?", "label": "impact", "lang": "de"}
+{"text": "Was passiert mit meinem Exposure, wenn ich die Hälfte meiner Tesla-Position schließe?", "label": "impact", "lang": "de"}
+{"text": "Wie ändert sich das Beta meines Portfolios, wenn ich den Nvidia-Short vergrößere?", "label": "impact", "lang": "de"}
+{"text": "如果我在倉位裡再加2個比特幣,整體風險會怎麼變?", "label": "impact", "lang": "zh"}
+{"text": "把特斯拉的部位平掉一半,我的曝險會降多少?", "label": "impact", "lang": "zh"}
+{"text": "加碼輝達的空頭,對整個組合的beta有什麼影響?", "label": "impact", "lang": "zh"}
+{"text": "Kitabıma 2 BTC daha eklersem riskim nasıl değişir?", "label": "impact", "lang": "tr"}
+{"text": "Tesla pozisyonumun yarısını kapatırsam maruziyetim ne kadar azalır?", "label": "impact", "lang": "tr"}
+{"text": "Nvidia short'umu büyütürsem portföyümün betası nasıl etkilenir?", "label": "impact", "lang": "tr"}
+{"text": "Kalau saya tambah 2 BTC lagi ke posisi, risikonya berubah berapa banyak?", "label": "impact", "lang": "id"}
+{"text": "Kalau saya tutup setengah posisi Tesla, eksposur portofolio turun berapa?", "label": "impact", "lang": "id"}
+{"text": "Kalau short Nvidia saya perbesar, beta keseluruhan book saya jadi gimana?", "label": "impact", "lang": "id"}
+{"text": "비트코인이 하루만에 20% 폭락하면 내 포트폴리오는 어떻게 되나요?", "label": "stress", "lang": "ko"}
+{"text": "연준 충격으로 시장 전체가 흔들리면 내 북에 어떤 영향이 있어?", "label": "stress", "lang": "ko"}
+{"text": "테슬라에 갑자기 악재가 터지면 내 계좌 손실이 얼마나 될까?", "label": "stress", "lang": "ko"}
+{"text": "ビットコインが一日で20%暴落したら私のポートフォリオはどうなる?", "label": "stress", "lang": "ja"}
+{"text": "FRBショックで市場全体が揺れたら私の口座にどう響く?", "label": "stress", "lang": "ja"}
+{"text": "テスラに突然の悪材料が出たら私のアカウントはどれだけ損する?", "label": "stress", "lang": "ja"}
+{"text": "Si Bitcoin se desploma 20% en un día, ¿qué le pasa a mi cartera?", "label": "stress", "lang": "es"}
+{"text": "Con un shock de la Fed sacudiendo todo el mercado, ¿cómo golpea mi libro?", "label": "stress", "lang": "es"}
+{"text": "Si a Tesla le cae una mala noticia de golpe, ¿cuánto pierdo?", "label": "stress", "lang": "es"}
+{"text": "Se o Bitcoin despencar 20% num dia, o que acontece com minha carteira?", "label": "stress", "lang": "pt"}
+{"text": "Com um choque do Fed sacudindo o mercado todo, como isso atinge meu book?", "label": "stress", "lang": "pt"}
+{"text": "Se a Tesla levar uma notícia ruim de repente, quanto eu perco?", "label": "stress", "lang": "pt"}
+{"text": "Agar Bitcoin ek din mein 20% crash ho jaye, mera portfolio kaise hit hoga?", "label": "stress", "lang": "hi"}
+{"text": "Fed se koi bada shock aaye aur pura market hile, mere book pe kya asar padega?", "label": "stress", "lang": "hi"}
+{"text": "Tesla mein achanak koi bad news aa jaye to mera loss kitna ho sakta hai?", "label": "stress", "lang": "hi"}
+{"text": "Agar oil ka price shock se 15% gir jaye, mera crude exposure kaise affect hoga?", "label": "stress", "lang": "hi"}
+{"text": "Nếu Bitcoin sập 20% trong một ngày, danh mục của tôi sẽ ra sao?", "label": "stress", "lang": "vi"}
+{"text": "Fed gây sốc khiến cả thị trường rung lắc, book của tôi bị ảnh hưởng thế nào?", "label": "stress", "lang": "vi"}
+{"text": "Nếu Tesla bất ngờ dính tin xấu, tôi có thể lỗ bao nhiêu?", "label": "stress", "lang": "vi"}
+{"text": "Giá dầu sốc giảm 15%, phần nắm giữ dầu thô của tôi bị tác động ra sao?", "label": "stress", "lang": "vi"}
+{"text": "لو انهار بيتكوين 20٪ في يوم واحد، إيش اللي بيصير لمحفظتي؟", "label": "stress", "lang": "ar"}
+{"text": "لو صدمة من الفدرالي هزت السوق كله، كيف تأثر محفظتي؟", "label": "stress", "lang": "ar"}
+{"text": "لو طلعت خبر سيء مفاجئ عن تسلا، قد إيه ممكن أخسر؟", "label": "stress", "lang": "ar"}
+{"text": "لو سعر النفط انهار 15٪ فجأة، كيف يتأثر مركزي فيه؟", "label": "stress", "lang": "ar"}
+{"text": "Si le Bitcoin s'effondre de 20% en une journée, que devient mon portefeuille?", "label": "stress", "lang": "fr"}
+{"text": "Avec un choc de la Fed qui secoue tout le marché, comment ça frappe mon book?", "label": "stress", "lang": "fr"}
+{"text": "Si une mauvaise nouvelle tombe soudainement sur Tesla, combien je perds?", "label": "stress", "lang": "fr"}
+{"text": "Si le pétrole chute brutalement de 15%, comment ça touche ma position?", "label": "stress", "lang": "fr"}
+{"text": "Wenn Bitcoin an einem Tag um 20% abstürzt, was passiert mit meinem Portfolio?", "label": "stress", "lang": "de"}
+{"text": "Bei einem Fed-Schock, der den ganzen Markt erschüttert, wie trifft das mein Buch?", "label": "stress", "lang": "de"}
+{"text": "Wenn bei Tesla plötzlich schlechte Nachrichten kommen, wie hoch wäre mein Verlust?", "label": "stress", "lang": "de"}
+{"text": "如果比特幣一天內暴跌20%,我的投資組合會怎樣?", "label": "stress", "lang": "zh"}
+{"text": "聯準會衝擊震動整個市場的話,對我的倉位有什麼影響?", "label": "stress", "lang": "zh"}
+{"text": "特斯拉突然爆出利空,我的帳戶可能虧多少?", "label": "stress", "lang": "zh"}
+{"text": "Bitcoin bir günde %20 çökerse portföyüm ne durumda olur?", "label": "stress", "lang": "tr"}
+{"text": "Fed şoku tüm piyasayı sarsarsa kitabım nasıl etkilenir?", "label": "stress", "lang": "tr"}
+{"text": "Tesla'ya aniden kötü haber gelirse ne kadar zarar ederim?", "label": "stress", "lang": "tr"}
+{"text": "Kalau Bitcoin ambruk 20% dalam sehari, portofolio saya jadi gimana?", "label": "stress", "lang": "id"}
+{"text": "Kalau ada shock dari The Fed yang guncang seluruh pasar, book saya kena dampak apa?", "label": "stress", "lang": "id"}
+{"text": "Kalau Tesla tiba-tiba kena kabar buruk, potensi kerugian saya berapa?", "label": "stress", "lang": "id"}
+{"text": "비트코인이랑 이더리움 중에 변동성이 더 큰 건 뭐야?", "label": "compare", "lang": "ko"}
+{"text": "테슬라와 엔비디아 리스크를 나란히 비교해줘", "label": "compare", "lang": "ko"}
+{"text": "솔라나, 비트코인, 이더리움 셋 중에 제일 위험한 건?", "label": "compare", "lang": "ko"}
+{"text": "ビットコインとイーサリアム、ボラティリティが高いのはどっち?", "label": "compare", "lang": "ja"}
+{"text": "テスラとエヌビディアのリスクを並べて比較して", "label": "compare", "lang": "ja"}
+{"text": "ソラナ、ビットコイン、イーサリアムで一番リスクが高いのは?", "label": "compare", "lang": "ja"}
+{"text": "¿Qué tiene más volatilidad, Bitcoin o Ethereum?", "label": "compare", "lang": "es"}
+{"text": "Compárame el riesgo de Tesla y Nvidia lado a lado", "label": "compare", "lang": "es"}
+{"text": "Entre Solana, Bitcoin y Ethereum, ¿cuál es el más riesgoso?", "label": "compare", "lang": "es"}
+{"text": "O que tem mais volatilidade, Bitcoin ou Ethereum?", "label": "compare", "lang": "pt"}
+{"text": "Compara o risco da Tesla com o da Nvidia lado a lado", "label": "compare", "lang": "pt"}
+{"text": "Entre Solana, Bitcoin e Ethereum, qual é o mais arriscado?", "label": "compare", "lang": "pt"}
+{"text": "Bitcoin aur Ethereum mein zyada volatile kaun sa hai?", "label": "compare", "lang": "hi"}
+{"text": "Tesla aur Nvidia ka risk side by side compare karo", "label": "compare", "lang": "hi"}
+{"text": "Solana, Bitcoin, Ethereum teeno mein sabse risky kaun hai?", "label": "compare", "lang": "hi"}
+{"text": "Bitcoin và Ethereum, cái nào biến động mạnh hơn?", "label": "compare", "lang": "vi"}
+{"text": "So sánh rủi ro giữa Tesla và Nvidia giúp tôi", "label": "compare", "lang": "vi"}
+{"text": "Trong Solana, Bitcoin, Ethereum thì cái nào rủi ro nhất?", "label": "compare", "lang": "vi"}
+{"text": "أيهما أكثر تقلباً، بيتكوين ولا إيثيريوم؟", "label": "compare", "lang": "ar"}
+{"text": "قارن لي مخاطر تسلا وإنفيديا جنب بعض", "label": "compare", "lang": "ar"}
+{"text": "بين سولانا وبيتكوين وإيثيريوم، أيهم الأكثر خطورة؟", "label": "compare", "lang": "ar"}
+{"text": "Entre Bitcoin et Ethereum, lequel est le plus volatil?", "label": "compare", "lang": "fr"}
+{"text": "Compare-moi le risque de Tesla et Nvidia côte à côte", "label": "compare", "lang": "fr"}
+{"text": "Entre Solana, Bitcoin et Ethereum, lequel est le plus risqué?", "label": "compare", "lang": "fr"}
+{"text": "Was ist volatiler, Bitcoin oder Ethereum?", "label": "compare", "lang": "de"}
+{"text": "Vergleiche mir das Risiko von Tesla und Nvidia nebeneinander", "label": "compare", "lang": "de"}
+{"text": "Zwischen Solana, Bitcoin und Ethereum, was ist am riskantesten?", "label": "compare", "lang": "de"}
+{"text": "Wie unterscheidet sich die Volatilität von Gold und Öl gerade?", "label": "compare", "lang": "de"}
+{"text": "比特幣跟以太坊,哪個波動比較大?", "label": "compare", "lang": "zh"}
+{"text": "幫我把特斯拉和輝達的風險並排比較一下", "label": "compare", "lang": "zh"}
+{"text": "索拉納、比特幣、以太坊這三個,哪個最危險?", "label": "compare", "lang": "zh"}
+{"text": "黃金跟原油現在的波動率差多少?", "label": "compare", "lang": "zh"}
+{"text": "Bitcoin mi Ethereum mu daha oynak?", "label": "compare", "lang": "tr"}
+{"text": "Tesla ile Nvidia'nın riskini yan yana karşılaştır", "label": "compare", "lang": "tr"}
+{"text": "Solana, Bitcoin, Ethereum arasında en riskli hangisi?", "label": "compare", "lang": "tr"}
+{"text": "Altın ile petrolün oynaklığı şu an nasıl karşılaştırılıyor?", "label": "compare", "lang": "tr"}
+{"text": "Mana yang lebih volatile, Bitcoin atau Ethereum?", "label": "compare", "lang": "id"}
+{"text": "Bandingkan risiko Tesla dan Nvidia berdampingan dong", "label": "compare", "lang": "id"}
+{"text": "Di antara Solana, Bitcoin, Ethereum, mana yang paling berisiko?", "label": "compare", "lang": "id"}
+{"text": "Volatilitas emas dan minyak sekarang bedanya berapa?", "label": "compare", "lang": "id"}
+{"text": "비트코인 50개 매수 주문을 어떻게 쪼개서 체결하는 게 좋을까?", "label": "execution", "lang": "ko"}
+{"text": "테슬라 대량 매도할 때 시장 충격 줄이는 최선의 방법은?", "label": "execution", "lang": "ko"}
+{"text": "엔비디아 물량을 TWAP으로 나눠서 넣으면 어떤 시간대가 좋아?", "label": "execution", "lang": "ko"}
+{"text": "이더리움 대형 주문을 아이스버그로 처리하는 법 알려줘", "label": "execution", "lang": "ko"}
+{"text": "ビットコイン50枚の買い注文をどう分割して執行すべき?", "label": "execution", "lang": "ja"}
+{"text": "テスラを大量に売るとき、マーケットインパクトを抑える最善策は?", "label": "execution", "lang": "ja"}
+{"text": "エヌビディアをTWAPで分割するならどの時間帯がいい?", "label": "execution", "lang": "ja"}
+{"text": "イーサリアムの大口注文をアイスバーグで処理する方法を教えて", "label": "execution", "lang": "ja"}
+{"text": "¿Cómo debería dividir una orden de compra de 50 BTC para ejecutarla bien?", "label": "execution", "lang": "es"}
+{"text": "¿Cuál es la mejor forma de vender mucho Tesla sin mover el mercado?", "label": "execution", "lang": "es"}
+{"text": "Si divido Nvidia con TWAP, ¿qué horario conviene más?", "label": "execution", "lang": "es"}
+{"text": "Explícame cómo trabajar una orden grande de Ethereum con iceberg", "label": "execution", "lang": "es"}
+{"text": "Como eu deveria dividir uma ordem de compra de 50 BTC para executar bem?", "label": "execution", "lang": "pt"}
+{"text": "Qual a melhor forma de vender muito Tesla sem mover o mercado?", "label": "execution", "lang": "pt"}
+{"text": "Se eu dividir Nvidia com TWAP, qual horário é melhor?", "label": "execution", "lang": "pt"}
+{"text": "Me explica como trabalhar uma ordem grande de Ethereum com iceberg", "label": "execution", "lang": "pt"}
+{"text": "50 BTC ka buy order best tarike se kaise split karke execute karu?", "label": "execution", "lang": "hi"}
+{"text": "Tesla ka bulk sell market impact kam karke kaise karu?", "label": "execution", "lang": "hi"}
+{"text": "Nvidia order ko TWAP se chunks mein daalne ka best time kya hai?", "label": "execution", "lang": "hi"}
+{"text": "Nên chia lệnh mua 50 BTC ra sao để thực thi tốt?", "label": "execution", "lang": "vi"}
+{"text": "Cách bán số lượng lớn Tesla mà ít tác động thị trường nhất là gì?", "label": "execution", "lang": "vi"}
+{"text": "Nếu chia lệnh Nvidia bằng TWAP thì khung giờ nào tốt hơn?", "label": "execution", "lang": "vi"}
+{"text": "كيف أقسم أمر شراء 50 بيتكوين عشان ينفذ بشكل أفضل؟", "label": "execution", "lang": "ar"}
+{"text": "إيش أفضل طريقة أبيع فيها كمية كبيرة من تسلا بدون ما أحرك السوق؟", "label": "execution", "lang": "ar"}
+{"text": "لو قسمت أمر إنفيديا بـTWAP، أي وقت أفضل؟", "label": "execution", "lang": "ar"}
+{"text": "Comment devrais-je découper un ordre d'achat de 50 BTC pour bien l'exécuter?", "label": "execution", "lang": "fr"}
+{"text": "Quelle est la meilleure façon de vendre beaucoup de Tesla sans bouger le marché?", "label": "execution", "lang": "fr"}
+{"text": "Si je découpe Nvidia en TWAP, quel créneau horaire est préférable?", "label": "execution", "lang": "fr"}
+{"text": "Wie sollte ich eine Kauforder über 50 BTC aufteilen, um sie gut auszuführen?", "label": "execution", "lang": "de"}
+{"text": "Was ist der beste Weg, viel Tesla zu verkaufen, ohne den Markt zu bewegen?", "label": "execution", "lang": "de"}
+{"text": "Wenn ich Nvidia per TWAP aufteile, welche Uhrzeit ist am besten?", "label": "execution", "lang": "de"}
+{"text": "50顆比特幣的買單要怎麼拆單執行比較好?", "label": "execution", "lang": "zh"}
+{"text": "大量賣出特斯拉時,怎麼做才能減少對市場的衝擊?", "label": "execution", "lang": "zh"}
+{"text": "輝達用TWAP拆單的話,哪個時段比較適合?", "label": "execution", "lang": "zh"}
+{"text": "50 BTC alım emrini en iyi şekilde nasıl bölüp uygulamalıyım?", "label": "execution", "lang": "tr"}
+{"text": "Tesla'da büyük satışı piyasayı hareket ettirmeden yapmanın en iyi yolu ne?", "label": "execution", "lang": "tr"}
+{"text": "Nvidia'yı TWAP ile bölersem hangi saat aralığı daha iyi olur?", "label": "execution", "lang": "tr"}
+{"text": "Order beli 50 BTC sebaiknya dipecah gimana biar eksekusinya bagus?", "label": "execution", "lang": "id"}
+{"text": "Cara terbaik jual Tesla dalam jumlah besar tanpa menggerakkan pasar itu apa?", "label": "execution", "lang": "id"}
+{"text": "Kalau order Nvidia dipecah pakai TWAP, jam berapa yang paling pas?", "label": "execution", "lang": "id"}
+{"text": "비트코인 지금 가격이 얼마야?", "label": "quote", "lang": "ko"}
+{"text": "이더리움 현재 매수/매도 스프레드 좀 보여줘", "label": "quote", "lang": "ko"}
+{"text": "솔라나 펀딩비율 지금 몇 프로야?", "label": "quote", "lang": "ko"}
+{"text": "ビットコインの今の値段いくら?", "label": "quote", "lang": "ja"}
+{"text": "イーサリアムの今のビッド/アスクスプレッド見せて", "label": "quote", "lang": "ja"}
+{"text": "ソラナの今のファンディングレートは何パーセント?", "label": "quote", "lang": "ja"}
+{"text": "¿A cuánto está Bitcoin ahora mismo?", "label": "quote", "lang": "es"}
+{"text": "Muéstrame el spread bid/ask actual de Ethereum", "label": "quote", "lang": "es"}
+{"text": "¿Cuál es la tasa de funding actual de Solana?", "label": "quote", "lang": "es"}
+{"text": "Quanto está o Bitcoin agora?", "label": "quote", "lang": "pt"}
+{"text": "Me mostra o spread bid/ask atual do Ethereum", "label": "quote", "lang": "pt"}
+{"text": "Qual a taxa de funding atual da Solana?", "label": "quote", "lang": "pt"}
+{"text": "Bitcoin ka price abhi kitna chal raha hai?", "label": "quote", "lang": "hi"}
+{"text": "Ethereum ka current bid/ask spread dikhao zara", "label": "quote", "lang": "hi"}
+{"text": "Solana ka funding rate abhi kitna hai?", "label": "quote", "lang": "hi"}
+{"text": "Tesla stock ka round-trip trading cost kitna aata hai abhi?", "label": "quote", "lang": "hi"}
+{"text": "Giá Bitcoin bây giờ là bao nhiêu?", "label": "quote", "lang": "vi"}
+{"text": "Cho tôi xem spread bid/ask hiện tại của Ethereum", "label": "quote", "lang": "vi"}
+{"text": "Funding rate hiện tại của Solana là bao nhiêu phần trăm?", "label": "quote", "lang": "vi"}
+{"text": "Chi phí round-trip giao dịch cổ phiếu Tesla hiện tại là bao nhiêu?", "label": "quote", "lang": "vi"}
+{"text": "كم سعر بيتكوين الآن؟", "label": "quote", "lang": "ar"}
+{"text": "وريني سبريد البيع والشراء الحالي لإيثيريوم", "label": "quote", "lang": "ar"}
+{"text": "معدل التمويل الحالي لسولانا كم؟", "label": "quote", "lang": "ar"}
+{"text": "كم تكلفة الدخول والخروج الحالية لسهم تسلا؟", "label": "quote", "lang": "ar"}
+{"text": "C'est combien le Bitcoin en ce moment?", "label": "quote", "lang": "fr"}
+{"text": "Montre-moi le spread bid/ask actuel d'Ethereum", "label": "quote", "lang": "fr"}
+{"text": "C'est quoi le taux de funding actuel de Solana?", "label": "quote", "lang": "fr"}
+{"text": "C'est quoi le coût aller-retour actuel pour trader l'action Tesla?", "label": "quote", "lang": "fr"}
+{"text": "Was kostet Bitcoin gerade?", "label": "quote", "lang": "de"}
+{"text": "Zeig mir den aktuellen Bid/Ask-Spread von Ethereum", "label": "quote", "lang": "de"}
+{"text": "Wie hoch ist die aktuelle Funding-Rate von Solana?", "label": "quote", "lang": "de"}
+{"text": "比特幣現在多少錢?", "label": "quote", "lang": "zh"}
+{"text": "給我看以太坊現在的買賣價差", "label": "quote", "lang": "zh"}
+{"text": "索拉納現在的資金費率是多少?", "label": "quote", "lang": "zh"}
+{"text": "Bitcoin şu an kaç para?", "label": "quote", "lang": "tr"}
+{"text": "Ethereum'un şu anki alış/satış spread'ini göster", "label": "quote", "lang": "tr"}
+{"text": "Solana'nın şu anki funding oranı ne kadar?", "label": "quote", "lang": "tr"}
+{"text": "Bitcoin sekarang harganya berapa?", "label": "quote", "lang": "id"}
+{"text": "Tunjukin spread bid/ask Ethereum yang sekarang", "label": "quote", "lang": "id"}
+{"text": "Funding rate Solana saat ini berapa persen?", "label": "quote", "lang": "id"}
+{"text": "비트코인 RSI 지금 과매수 구간이야?", "label": "technicals", "lang": "ko"}
+{"text": "테슬라 지지선이 어디쯤이야?", "label": "technicals", "lang": "ko"}
+{"text": "엔비디아 MACD 골든크로스 났어?", "label": "technicals", "lang": "ko"}
+{"text": "ビットコインのRSIは今買われすぎ?", "label": "technicals", "lang": "ja"}
+{"text": "テスラのサポートラインはどのあたり?", "label": "technicals", "lang": "ja"}
+{"text": "エヌビディアのMACDはゴールデンクロスした?", "label": "technicals", "lang": "ja"}
+{"text": "¿El RSI de Bitcoin está en sobrecompra ahora?", "label": "technicals", "lang": "es"}
+{"text": "¿Dónde está el soporte de Tesla?", "label": "technicals", "lang": "es"}
+{"text": "¿El MACD de Nvidia hizo cruce alcista?", "label": "technicals", "lang": "es"}
+{"text": "O RSI do Bitcoin está em sobrecompra agora?", "label": "technicals", "lang": "pt"}
+{"text": "Onde fica o suporte da Tesla?", "label": "technicals", "lang": "pt"}
+{"text": "O MACD da Nvidia deu cruzamento de alta?", "label": "technicals", "lang": "pt"}
+{"text": "Bitcoin ka RSI abhi overbought zone mein hai kya?", "label": "technicals", "lang": "hi"}
+{"text": "Tesla ka support level kahan hai?", "label": "technicals", "lang": "hi"}
+{"text": "Nvidia ka MACD golden cross de chuka hai kya?", "label": "technicals", "lang": "hi"}
+{"text": "RSI của Bitcoin đang ở vùng quá mua không?", "label": "technicals", "lang": "vi"}
+{"text": "Ngưỡng hỗ trợ của Tesla nằm ở đâu?", "label": "technicals", "lang": "vi"}
+{"text": "MACD của Nvidia đã cắt lên chưa?", "label": "technicals", "lang": "vi"}
+{"text": "مؤشر RSI لبيتكوين حالياً في منطقة تشبع شرائي؟", "label": "technicals", "lang": "ar"}
+{"text": "وين مستوى الدعم لسهم تسلا؟", "label": "technicals", "lang": "ar"}
+{"text": "MACD لإنفيديا عمل تقاطع صعودي؟", "label": "technicals", "lang": "ar"}
+{"text": "Le RSI du Bitcoin est-il en surachat en ce moment?", "label": "technicals", "lang": "fr"}
+{"text": "Où se situe le support de Tesla?", "label": "technicals", "lang": "fr"}
+{"text": "Le MACD de Nvidia a-t-il fait un croisement haussier?", "label": "technicals", "lang": "fr"}
+{"text": "Ist der RSI von Bitcoin gerade überkauft?", "label": "technicals", "lang": "de"}
+{"text": "Wo liegt die Unterstützung bei Tesla?", "label": "technicals", "lang": "de"}
+{"text": "Hat der MACD von Nvidia einen Golden Cross gemacht?", "label": "technicals", "lang": "de"}
+{"text": "Ist Ethereum gerade im Aufwärtstrend oder seitwärts?", "label": "technicals", "lang": "de"}
+{"text": "比特幣的RSI現在是超買嗎?", "label": "technicals", "lang": "zh"}
+{"text": "特斯拉的支撐位大概在哪裡?", "label": "technicals", "lang": "zh"}
+{"text": "輝達的MACD出現黃金交叉了嗎?", "label": "technicals", "lang": "zh"}
+{"text": "以太坊現在是上升趨勢還是盤整?", "label": "technicals", "lang": "zh"}
+{"text": "Bitcoin'in RSI'si şu an aşırı alım bölgesinde mi?", "label": "technicals", "lang": "tr"}
+{"text": "Tesla'nın destek seviyesi nerede?", "label": "technicals", "lang": "tr"}
+{"text": "Nvidia'nın MACD'si altın kesişim yaptı mı?", "label": "technicals", "lang": "tr"}
+{"text": "Ethereum şu an yükseliş trendinde mi yoksa yatay mı?", "label": "technicals", "lang": "tr"}
+{"text": "RSI Bitcoin sekarang lagi overbought nggak?", "label": "technicals", "lang": "id"}
+{"text": "Level support Tesla ada di mana?", "label": "technicals", "lang": "id"}
+{"text": "MACD Nvidia udah golden cross belum?", "label": "technicals", "lang": "id"}
+{"text": "Ethereum sekarang lagi uptrend atau sideways?", "label": "technicals", "lang": "id"}
+{"text": "테슬라 다음 실적 발표일이 언제야?", "label": "fundamentals", "lang": "ko"}
+{"text": "엔비디아 애널리스트 목표주가는 평균 얼마야?", "label": "fundamentals", "lang": "ko"}
+{"text": "애플 주당순이익(EPS) 최근 수치 알려줘", "label": "fundamentals", "lang": "ko"}
+{"text": "테슬라 내부자 매도 최근에 있었어?", "label": "fundamentals", "lang": "ko"}
+{"text": "テスラの次の決算発表はいつ?", "label": "fundamentals", "lang": "ja"}
+{"text": "エヌビディアのアナリスト目標株価は平均いくら?", "label": "fundamentals", "lang": "ja"}
+{"text": "アップルの直近のEPSを教えて", "label": "fundamentals", "lang": "ja"}
+{"text": "テスラで最近インサイダー売却あった?", "label": "fundamentals", "lang": "ja"}
+{"text": "¿Cuándo es el próximo reporte de earnings de Tesla?", "label": "fundamentals", "lang": "es"}
+{"text": "¿Cuál es el precio objetivo promedio de los analistas para Nvidia?", "label": "fundamentals", "lang": "es"}
+{"text": "¿Cuál es el EPS más reciente de Apple?", "label": "fundamentals", "lang": "es"}
+{"text": "¿Ha habido venta de insiders en Tesla últimamente?", "label": "fundamentals", "lang": "es"}
+{"text": "Quando é o próximo balanço da Tesla?", "label": "fundamentals", "lang": "pt"}
+{"text": "Qual o preço-alvo médio dos analistas para a Nvidia?", "label": "fundamentals", "lang": "pt"}
+{"text": "Qual o EPS mais recente da Apple?", "label": "fundamentals", "lang": "pt"}
+{"text": "Teve venda de insider na Tesla recentemente?", "label": "fundamentals", "lang": "pt"}
+{"text": "Tesla ki agli earnings date kab hai?", "label": "fundamentals", "lang": "hi"}
+{"text": "Nvidia ka average analyst target price kitna hai?", "label": "fundamentals", "lang": "hi"}
+{"text": "Apple ka latest EPS kya hai?", "label": "fundamentals", "lang": "hi"}
+{"text": "Ngày công bố lợi nhuận tiếp theo của Tesla là khi nào?", "label": "fundamentals", "lang": "vi"}
+{"text": "Giá mục tiêu trung bình của các nhà phân tích cho Nvidia là bao nhiêu?", "label": "fundamentals", "lang": "vi"}
+{"text": "EPS gần nhất của Apple là bao nhiêu?", "label": "fundamentals", "lang": "vi"}
+{"text": "متى موعد إعلان أرباح تسلا القادم؟", "label": "fundamentals", "lang": "ar"}
+{"text": "كم متوسط السعر المستهدف من المحللين لإنفيديا؟", "label": "fundamentals", "lang": "ar"}
+{"text": "كم آخر ربحية سهم (EPS) لآبل؟", "label": "fundamentals", "lang": "ar"}
+{"text": "C'est quand la prochaine publication de résultats de Tesla?", "label": "fundamentals", "lang": "fr"}
+{"text": "Quel est l'objectif de cours moyen des analystes pour Nvidia?", "label": "fundamentals", "lang": "fr"}
+{"text": "Quel est le dernier BPA (EPS) d'Apple?", "label": "fundamentals", "lang": "fr"}
+{"text": "Wann ist der nächste Earnings-Termin von Tesla?", "label": "fundamentals", "lang": "de"}
+{"text": "Wie hoch ist das durchschnittliche Kursziel der Analysten für Nvidia?", "label": "fundamentals", "lang": "de"}
+{"text": "Wie hoch ist der aktuelle EPS von Apple?", "label": "fundamentals", "lang": "de"}
+{"text": "特斯拉下一次財報公布日是什麼時候?", "label": "fundamentals", "lang": "zh"}
+{"text": "分析師對輝達的平均目標價是多少?", "label": "fundamentals", "lang": "zh"}
+{"text": "蘋果最新的每股盈餘(EPS)是多少?", "label": "fundamentals", "lang": "zh"}
+{"text": "Tesla'nın bir sonraki bilanço tarihi ne zaman?", "label": "fundamentals", "lang": "tr"}
+{"text": "Nvidia için analistlerin ortalama hedef fiyatı ne kadar?", "label": "fundamentals", "lang": "tr"}
+{"text": "Apple'ın son hisse başı kârı (EPS) ne kadar?", "label": "fundamentals", "lang": "tr"}
+{"text": "Kapan tanggal laporan laba Tesla berikutnya?", "label": "fundamentals", "lang": "id"}
+{"text": "Berapa rata-rata target harga analis untuk Nvidia?", "label": "fundamentals", "lang": "id"}
+{"text": "Berapa EPS terbaru Apple?", "label": "fundamentals", "lang": "id"}
+{"text": "비트코인은 CPI 발표 때 보통 어떻게 반응해?", "label": "event", "lang": "ko"}
+{"text": "테슬라는 자기 실적 발표 후에 역사적으로 어떻게 움직였어?", "label": "event", "lang": "ko"}
+{"text": "FOMC 때마다 엔비디아 주가 흐름이 어땠어?", "label": "event", "lang": "ko"}
+{"text": "ビットコインはCPI発表のとき普段どう反応する?", "label": "event", "lang": "ja"}
+{"text": "テスラは決算発表後、過去にどう動いてきた?", "label": "event", "lang": "ja"}
+{"text": "FOMCのたびにエヌビディアの株価はどう動いてきた?", "label": "event", "lang": "ja"}
+{"text": "¿Cómo suele reaccionar Bitcoin cuando sale el dato de CPI?", "label": "event", "lang": "es"}
+{"text": "¿Cómo se ha movido históricamente Tesla después de sus propios earnings?", "label": "event", "lang": "es"}
+{"text": "¿Cómo se ha comportado Nvidia en cada FOMC?", "label": "event", "lang": "es"}
+{"text": "Como o Bitcoin costuma reagir quando sai o CPI?", "label": "event", "lang": "pt"}
+{"text": "Como a Tesla costuma se mover historicamente depois do próprio balanço?", "label": "event", "lang": "pt"}
+{"text": "Como a Nvidia se comportou historicamente em cada FOMC?", "label": "event", "lang": "pt"}
+{"text": "CPI print aane par Bitcoin usually kaise react karta hai?", "label": "event", "lang": "hi"}
+{"text": "Tesla apni earnings ke baad historically kaise move karta raha hai?", "label": "event", "lang": "hi"}
+{"text": "Har FOMC ke time Nvidia ka stock kaisa behave karta hai?", "label": "event", "lang": "hi"}
+{"text": "OPEC meeting ke baad oil price historically kaise react karta hai?", "label": "event", "lang": "hi"}
+{"text": "Bitcoin thường phản ứng thế nào khi có số liệu CPI?", "label": "event", "lang": "vi"}
+{"text": "Tesla thường biến động ra sao sau các đợt công bố lợi nhuận của chính nó?", "label": "event", "lang": "vi"}
+{"text": "Nvidia thường phản ứng thế nào trong mỗi kỳ họp FOMC?", "label": "event", "lang": "vi"}
+{"text": "Giá dầu thường phản ứng thế nào sau các cuộc họp OPEC lịch sử?", "label": "event", "lang": "vi"}
+{"text": "كيف يتفاعل بيتكوين عادة عند صدور بيانات التضخم CPI؟", "label": "event", "lang": "ar"}
+{"text": "كيف تتحرك تسلا تاريخياً بعد إعلان أرباحها؟", "label": "event", "lang": "ar"}
+{"text": "كيف يتصرف سهم إنفيديا عادة في كل اجتماع FOMC؟", "label": "event", "lang": "ar"}
+{"text": "كيف يتفاعل سعر النفط تاريخياً بعد اجتماعات أوبك؟", "label": "event", "lang": "ar"}
+{"text": "Comment le Bitcoin réagit-il en général à la publication du CPI?", "label": "event", "lang": "fr"}
+{"text": "Comment Tesla a-t-il l'habitude de bouger après ses propres résultats?", "label": "event", "lang": "fr"}
+{"text": "Comment Nvidia se comporte-t-il historiquement à chaque FOMC?", "label": "event", "lang": "fr"}
+{"text": "Comment le pétrole réagit-il historiquement après les réunions de l'OPEP?", "label": "event", "lang": "fr"}
+{"text": "Wie reagiert Bitcoin normalerweise auf CPI-Daten?", "label": "event", "lang": "de"}
+{"text": "Wie hat sich Tesla historisch nach eigenen Earnings bewegt?", "label": "event", "lang": "de"}
+{"text": "Wie verhält sich Nvidia normalerweise bei jedem FOMC-Meeting?", "label": "event", "lang": "de"}
+{"text": "CPI數據公布時比特幣通常會怎麼反應?", "label": "event", "lang": "zh"}
+{"text": "特斯拉在自己公布財報後歷史上通常怎麼走?", "label": "event", "lang": "zh"}
+{"text": "每次FOMC會議輝達股價historically表現如何?", "label": "event", "lang": "zh"}
+{"text": "CPI verisi açıklandığında Bitcoin genelde nasıl tepki verir?", "label": "event", "lang": "tr"}
+{"text": "Tesla kendi bilançosundan sonra geçmişte genelde nasıl hareket etti?", "label": "event", "lang": "tr"}
+{"text": "Her FOMC toplantısında Nvidia hissesi tarihsel olarak nasıl davrandı?", "label": "event", "lang": "tr"}
+{"text": "Bitcoin biasanya bereaksi gimana pas rilis data CPI?", "label": "event", "lang": "id"}
+{"text": "Tesla secara historis biasanya bergerak gimana setelah earnings-nya sendiri?", "label": "event", "lang": "id"}
+{"text": "Setiap FOMC, saham Nvidia biasanya bergerak seperti apa secara historis?", "label": "event", "lang": "id"}
+{"text": "비트코인 포지션을 어떻게 헤지하는 게 좋을까?", "label": "hedge", "lang": "ko"}
+{"text": "테슬라 보유분 하락 리스크 보호할 방법 알려줘", "label": "hedge", "lang": "ko"}
+{"text": "엔비디아 익스포저를 옵션으로 헤지하는 법 알려줘", "label": "hedge", "lang": "ko"}
+{"text": "ビットコインのポジションはどうヘッジすればいい?", "label": "hedge", "lang": "ja"}
+{"text": "テスラの保有分の下落リスクを守る方法教えて", "label": "hedge", "lang": "ja"}
+{"text": "エヌビディアのエクスポージャーをオプションでヘッジする方法教えて", "label": "hedge", "lang": "ja"}
+{"text": "¿Cómo debería cubrir mi posición en Bitcoin?", "label": "hedge", "lang": "es"}
+{"text": "¿Cómo protejo mi tenencia de Tesla de una caída?", "label": "hedge", "lang": "es"}
+{"text": "¿Cómo cubro mi exposición a Nvidia con opciones?", "label": "hedge", "lang": "es"}
+{"text": "Como devo fazer hedge da minha posição em Bitcoin?", "label": "hedge", "lang": "pt"}
+{"text": "Como protejo minha posição em Tesla de uma queda?", "label": "hedge", "lang": "pt"}
+{"text": "Como faço hedge da minha exposição em Nvidia com opções?", "label": "hedge", "lang": "pt"}
+{"text": "Bitcoin position ko best tarike se hedge kaise karu?", "label": "hedge", "lang": "hi"}
+{"text": "Tesla holding ko gir jaane se bachane ka tarika kya hai?", "label": "hedge", "lang": "hi"}
+{"text": "Nvidia exposure ko options se hedge kaise karu?", "label": "hedge", "lang": "hi"}
+{"text": "Tôi nên hedge vị thế Bitcoin của mình như thế nào?", "label": "hedge", "lang": "vi"}
+{"text": "Làm sao bảo vệ phần nắm giữ Tesla khỏi giảm giá?", "label": "hedge", "lang": "vi"}
+{"text": "Làm sao để hedge exposure Nvidia bằng quyền chọn?", "label": "hedge", "lang": "vi"}
+{"text": "كيف أحوط مركزي في بيتكوين بأفضل طريقة؟", "label": "hedge", "lang": "ar"}
+{"text": "كيف أحمي حيازتي من تسلا من الانخفاض؟", "label": "hedge", "lang": "ar"}
+{"text": "كيف أحوط تعرضي لإنفيديا باستخدام الخيارات؟", "label": "hedge", "lang": "ar"}
+{"text": "Comment devrais-je couvrir ma position Bitcoin?", "label": "hedge", "lang": "fr"}
+{"text": "Comment je protège ma position Tesla d'une baisse?", "label": "hedge", "lang": "fr"}
+{"text": "Comment couvrir mon exposition à Nvidia avec des options?", "label": "hedge", "lang": "fr"}
+{"text": "Wie sollte ich meine Bitcoin-Position absichern?", "label": "hedge", "lang": "de"}
+{"text": "Wie schütze ich meinen Tesla-Bestand vor einem Kursrückgang?", "label": "hedge", "lang": "de"}
+{"text": "Wie hedge ich mein Nvidia-Exposure mit Optionen?", "label": "hedge", "lang": "de"}
+{"text": "Was ist der beste Weg, mein gesamtes Krypto-Buch gegen einen Crash abzusichern?", "label": "hedge", "lang": "de"}
+{"text": "我的比特幣部位該怎麼避險比較好?", "label": "hedge", "lang": "zh"}
+{"text": "怎麼保護我持有的特斯拉不受下跌影響?", "label": "hedge", "lang": "zh"}
+{"text": "怎麼用選擇權避險我的輝達曝險?", "label": "hedge", "lang": "zh"}
+{"text": "整個加密貨幣部位要怎麼防範暴跌最好?", "label": "hedge", "lang": "zh"}
+{"text": "Bitcoin pozisyonumu en iyi nasıl hedge ederim?", "label": "hedge", "lang": "tr"}
+{"text": "Tesla elimdeki hisseyi düşüşten nasıl korurum?", "label": "hedge", "lang": "tr"}
+{"text": "Nvidia maruziyetimi opsiyonlarla nasıl hedge ederim?", "label": "hedge", "lang": "tr"}
+{"text": "Tüm kripto kitabımı bir çöküşe karşı korumanın en iyi yolu nedir?", "label": "hedge", "lang": "tr"}
+{"text": "Gimana cara hedge posisi Bitcoin saya yang paling baik?", "label": "hedge", "lang": "id"}
+{"text": "Gimana cara lindungi kepemilikan Tesla saya dari penurunan?", "label": "hedge", "lang": "id"}
+{"text": "Gimana cara hedge eksposur Nvidia saya pakai opsi?", "label": "hedge", "lang": "id"}
+{"text": "Cara terbaik lindungi seluruh book kripto saya dari crash itu apa?", "label": "hedge", "lang": "id"}
+{"text": "연준 지금 금리 스탠스가 어때?", "label": "macro", "lang": "ko"}
+{"text": "달러 인덱스 흐름이 요즘 어떤 상황이야?", "label": "macro", "lang": "ko"}
+{"text": "지금 인플레이션 수치가 시장에 어떤 배경이 되고 있어?", "label": "macro", "lang": "ko"}
+{"text": "미국 국채 수익률 곡선 지금 어떤 모양이야?", "label": "macro", "lang": "ko"}
+{"text": "FRBの今の金利スタンスはどう?", "label": "macro", "lang": "ja"}
+{"text": "ドル指数の最近の動きはどんな感じ?", "label": "macro", "lang": "ja"}
+{"text": "今のインフレ状況が市場の背景としてどう影響してる?", "label": "macro", "lang": "ja"}
+{"text": "米国債の利回り曲線は今どんな形?", "label": "macro", "lang": "ja"}
+{"text": "¿Cuál es la postura actual de la Fed sobre las tasas?", "label": "macro", "lang": "es"}
+{"text": "¿Cómo está el índice del dólar últimamente?", "label": "macro", "lang": "es"}
+{"text": "¿Cómo influye la inflación actual como contexto del mercado?", "label": "macro", "lang": "es"}
+{"text": "¿Cómo está la curva de rendimientos ahora mismo?", "label": "macro", "lang": "es"}
+{"text": "Qual a postura atual do Fed sobre as taxas de juros?", "label": "macro", "lang": "pt"}
+{"text": "Como está o índice do dólar ultimamente?", "label": "macro", "lang": "pt"}
+{"text": "Como a inflação atual está influenciando o pano de fundo do mercado?", "label": "macro", "lang": "pt"}
+{"text": "Como está a curva de juros americana agora?", "label": "macro", "lang": "pt"}
+{"text": "Fed ka abhi interest rates par kya stance hai?", "label": "macro", "lang": "hi"}
+{"text": "Dollar index ka recent trend kaisa chal raha hai?", "label": "macro", "lang": "hi"}
+{"text": "Abhi ka inflation data market ke liye kaisa backdrop bana raha hai?", "label": "macro", "lang": "hi"}
+{"text": "Lập trường hiện tại của Fed về lãi suất là gì?", "label": "macro", "lang": "vi"}
+{"text": "Chỉ số đô la gần đây diễn biến ra sao?", "label": "macro", "lang": "vi"}
+{"text": "Lạm phát hiện tại đang tạo bối cảnh thế nào cho thị trường?", "label": "macro", "lang": "vi"}
+{"text": "إيش موقف الفدرالي الحالي من أسعار الفائدة؟", "label": "macro", "lang": "ar"}
+{"text": "كيف أداء مؤشر الدولار مؤخراً؟", "label": "macro", "lang": "ar"}
+{"text": "كيف يشكل التضخم الحالي خلفية للسوق الآن؟", "label": "macro", "lang": "ar"}
+{"text": "Quelle est la position actuelle de la Fed sur les taux?", "label": "macro", "lang": "fr"}
+{"text": "Comment évolue l'indice dollar ces derniers temps?", "label": "macro", "lang": "fr"}
+{"text": "Comment l'inflation actuelle influence-t-elle le contexte du marché?", "label": "macro", "lang": "fr"}
+{"text": "Wie ist die aktuelle Haltung der Fed zu den Zinsen?", "label": "macro", "lang": "de"}
+{"text": "Wie entwickelt sich der Dollarindex zuletzt?", "label": "macro", "lang": "de"}
+{"text": "Wie prägt die aktuelle Inflation das gesamte Marktumfeld?", "label": "macro", "lang": "de"}
+{"text": "聯準會現在對利率的立場是什麼?", "label": "macro", "lang": "zh"}
+{"text": "美元指數最近走勢如何?", "label": "macro", "lang": "zh"}
+{"text": "現在的通膨數據對市場背景有什麼影響?", "label": "macro", "lang": "zh"}
+{"text": "Fed'in şu anki faiz duruşu nedir?", "label": "macro", "lang": "tr"}
+{"text": "Dolar endeksi son zamanlarda nasıl gidiyor?", "label": "macro", "lang": "tr"}
+{"text": "Mevcut enflasyon piyasa için nasıl bir arka plan oluşturuyor?", "label": "macro", "lang": "tr"}
+{"text": "Sikap The Fed soal suku bunga sekarang gimana?", "label": "macro", "lang": "id"}
+{"text": "Indeks dolar belakangan ini pergerakannya gimana?", "label": "macro", "lang": "id"}
+{"text": "Inflasi sekarang jadi latar belakang seperti apa buat pasar?", "label": "macro", "lang": "id"}
+{"text": "비트코인에 대한 지금 시장 심리는 어때?", "label": "sentiment", "lang": "ko"}
+{"text": "공포탐욕지수 지금 어디쯤이야?", "label": "sentiment", "lang": "ko"}
+{"text": "엔비디아에 요즘 과열된 하이프 있어?", "label": "sentiment", "lang": "ko"}
+{"text": "ビットコインに対する今の市場心理はどう?", "label": "sentiment", "lang": "ja"}
+{"text": "恐怖と欲望指数は今どのあたり?", "label": "sentiment", "lang": "ja"}
+{"text": "エヌビディアに最近過熱気味のハイプある?", "label": "sentiment", "lang": "ja"}
+{"text": "¿Cómo está el ánimo del mercado con Bitcoin ahora mismo?", "label": "sentiment", "lang": "es"}
+{"text": "¿Dónde está el índice de miedo y codicia ahora?", "label": "sentiment", "lang": "es"}
+{"text": "¿Hay hype exagerado en Nvidia últimamente?", "label": "sentiment", "lang": "es"}
+{"text": "Como está o clima do mercado com o Bitcoin agora?", "label": "sentiment", "lang": "pt"}
+{"text": "Onde está o índice de medo e ganância agora?", "label": "sentiment", "lang": "pt"}
+{"text": "Tem hype exagerado na Nvidia ultimamente?", "label": "sentiment", "lang": "pt"}
+{"text": "Bitcoin ko lekar abhi crowd ka mood kaisa hai?", "label": "sentiment", "lang": "hi"}
+{"text": "Fear and greed index abhi kahan par hai?", "label": "sentiment", "lang": "hi"}
+{"text": "Nvidia mein aajkal zyada hype ban raha hai kya?", "label": "sentiment", "lang": "hi"}
+{"text": "Community ka BTC ko lekar positioning bullish hai ya bearish?", "label": "sentiment", "lang": "hi"}
+{"text": "Tâm lý đám đông với Bitcoin lúc này thế nào?", "label": "sentiment", "lang": "vi"}
+{"text": "Chỉ số sợ hãi và tham lam đang ở đâu?", "label": "sentiment", "lang": "vi"}
+{"text": "Nvidia dạo này có bị thổi phồng quá mức không?", "label": "sentiment", "lang": "vi"}
+{"text": "Cộng đồng đang định vị bullish hay bearish với BTC?", "label": "sentiment", "lang": "vi"}
+{"text": "كيف مزاج السوق تجاه بيتكوين الآن؟", "label": "sentiment", "lang": "ar"}
+{"text": "مؤشر الخوف والطمع وين واصل الحين؟", "label": "sentiment", "lang": "ar"}
+{"text": "فيه ضجة مبالغ فيها حول إنفيديا مؤخراً؟", "label": "sentiment", "lang": "ar"}
+{"text": "المجتمع متمركز صاعد ولا هابط تجاه بيتكوين حالياً؟", "label": "sentiment", "lang": "ar"}
+{"text": "Quel est le sentiment du marché sur Bitcoin en ce moment?", "label": "sentiment", "lang": "fr"}
+{"text": "Où en est l'indice peur et cupidité actuellement?", "label": "sentiment", "lang": "fr"}
+{"text": "Il y a un hype excessif autour de Nvidia dernièrement?", "label": "sentiment", "lang": "fr"}
+{"text": "Le positionnement de la communauté sur BTC est plutôt haussier ou baissier?", "label": "sentiment", "lang": "fr"}
+{"text": "Wie ist die Marktstimmung bei Bitcoin gerade?", "label": "sentiment", "lang": "de"}
+{"text": "Wo steht der Fear-and-Greed-Index momentan?", "label": "sentiment", "lang": "de"}
+{"text": "Gibt es gerade übertriebenen Hype um Nvidia?", "label": "sentiment", "lang": "de"}
+{"text": "現在市場對比特幣的情緒怎麼樣?", "label": "sentiment", "lang": "zh"}
+{"text": "恐懼貪婪指數現在在哪個位置?", "label": "sentiment", "lang": "zh"}
+{"text": "輝達最近是不是有過熱的炒作?", "label": "sentiment", "lang": "zh"}
+{"text": "Bitcoin'e karşı piyasa duyarlılığı şu an nasıl?", "label": "sentiment", "lang": "tr"}
+{"text": "Korku ve açgözlülük endeksi şu anda nerede?", "label": "sentiment", "lang": "tr"}
+{"text": "Nvidia'da son zamanlarda abartılı bir hype var mı?", "label": "sentiment", "lang": "tr"}
+{"text": "Sentimen pasar terhadap Bitcoin sekarang gimana?", "label": "sentiment", "lang": "id"}
+{"text": "Fear and greed index sekarang ada di posisi mana?", "label": "sentiment", "lang": "id"}
+{"text": "Nvidia belakangan ini lagi kena hype berlebihan nggak?", "label": "sentiment", "lang": "id"}
+{"text": "비트코인 오늘 왜 떨어지고 있어?", "label": "news", "lang": "ko"}
+{"text": "테슬라 오늘 움직인 뉴스 촉매가 뭐야?", "label": "news", "lang": "ko"}
+{"text": "엔비디아 오늘 왜 이렇게 튀어올랐어?", "label": "news", "lang": "ko"}
+{"text": "ビットコイン今日なんで下がってるの?", "label": "news", "lang": "ja"}
+{"text": "テスラを動かした今日のニュース材料は何?", "label": "news", "lang": "ja"}
+{"text": "エヌビディア今日なんでこんなに急騰した?", "label": "news", "lang": "ja"}
+{"text": "¿Por qué está bajando Bitcoin hoy?", "label": "news", "lang": "es"}
+{"text": "¿Qué noticia movió a Tesla hoy?", "label": "news", "lang": "es"}
+{"text": "¿Por qué se disparó Nvidia hoy?", "label": "news", "lang": "es"}
+{"text": "Por que o Bitcoin está caindo hoje?", "label": "news", "lang": "pt"}
+{"text": "Qual notícia moveu a Tesla hoje?", "label": "news", "lang": "pt"}
+{"text": "Por que a Nvidia disparou hoje?", "label": "news", "lang": "pt"}
+{"text": "Bitcoin aaj neeche kyu ja raha hai?", "label": "news", "lang": "hi"}
+{"text": "Tesla ko aaj move karne wali news kya thi?", "label": "news", "lang": "hi"}
+{"text": "Nvidia aaj itna upar kyu chal gaya?", "label": "news", "lang": "hi"}
+{"text": "Sao Bitcoin hôm nay lại giảm vậy?", "label": "news", "lang": "vi"}
+{"text": "Tin tức gì làm Tesla biến động hôm nay?", "label": "news", "lang": "vi"}
+{"text": "Sao Nvidia hôm nay tăng vọt vậy?", "label": "news", "lang": "vi"}
+{"text": "ليش بيتكوين نازل اليوم؟", "label": "news", "lang": "ar"}
+{"text": "إيش الخبر اللي حرك تسلا اليوم؟", "label": "news", "lang": "ar"}
+{"text": "ليش إنفيديا طلع فوق كذا اليوم؟", "label": "news", "lang": "ar"}
+{"text": "Pourquoi le Bitcoin baisse aujourd'hui?", "label": "news", "lang": "fr"}
+{"text": "C'est quelle news qui a bougé Tesla aujourd'hui?", "label": "news", "lang": "fr"}
+{"text": "Pourquoi Nvidia a-t-il bondi aujourd'hui?", "label": "news", "lang": "fr"}
+{"text": "Warum fällt Bitcoin heute?", "label": "news", "lang": "de"}
+{"text": "Welche Nachricht hat Tesla heute bewegt?", "label": "news", "lang": "de"}
+{"text": "Warum ist Nvidia heute so gestiegen?", "label": "news", "lang": "de"}
+{"text": "Was war der Auslöser für den Ölpreisanstieg heute?", "label": "news", "lang": "de"}
+{"text": "比特幣今天為什麼在跌?", "label": "news", "lang": "zh"}
+{"text": "今天是什麼消息帶動特斯拉波動?", "label": "news", "lang": "zh"}
+{"text": "輝達今天為什麼漲這麼多?", "label": "news", "lang": "zh"}
+{"text": "今天油價上漲的催化劑是什麼?", "label": "news", "lang": "zh"}
+{"text": "Bitcoin bugün neden düşüyor?", "label": "news", "lang": "tr"}
+{"text": "Tesla'yı bugün hareket ettiren haber neydi?", "label": "news", "lang": "tr"}
+{"text": "Nvidia bugün neden bu kadar fırladı?", "label": "news", "lang": "tr"}
+{"text": "Petrol fiyatındaki bugünkü yükselişin katalizörü neydi?", "label": "news", "lang": "tr"}
+{"text": "Kenapa Bitcoin turun hari ini?", "label": "news", "lang": "id"}
+{"text": "Berita apa yang menggerakkan Tesla hari ini?", "label": "news", "lang": "id"}
+{"text": "Kenapa Nvidia melonjak segini hari ini?", "label": "news", "lang": "id"}
+{"text": "Apa katalis kenaikan harga minyak hari ini?", "label": "news", "lang": "id"}
+{"text": "데스크가 최근에 실행한 거래 5개 보여줘", "label": "record", "lang": "ko"}
+{"text": "어제 비트코인 안 산 이유가 뭐야, 리스크 레이어가 막았어?", "label": "record", "lang": "ko"}
+{"text": "이 데스크의 의사결정 로그는 위변조가 불가능한 구조야?", "label": "record", "lang": "ko"}
+{"text": "지난달 데스크 성과가 어땠는지 알려줘", "label": "record", "lang": "ko"}
+{"text": "デスクが最近実行した取引を5件見せて", "label": "record", "lang": "ja"}
+{"text": "昨日ビットコインを買わなかった理由は?リスクレイヤーが止めたの?", "label": "record", "lang": "ja"}
+{"text": "このデスクの意思決定ログは改ざん不可能な仕組みになってる?", "label": "record", "lang": "ja"}
+{"text": "先月のデスクのパフォーマンスを教えて", "label": "record", "lang": "ja"}
+{"text": "Muéstrame las últimas 5 operaciones que hizo el escritorio", "label": "record", "lang": "es"}
+{"text": "¿Por qué no compró Bitcoin ayer? ¿Lo bloqueó la capa de riesgo?", "label": "record", "lang": "es"}
+{"text": "¿El registro de decisiones de este escritorio es a prueba de manipulación?", "label": "record", "lang": "es"}
+{"text": "¿Cómo fue el rendimiento del escritorio el mes pasado?", "label": "record", "lang": "es"}
+{"text": "Me mostra as últimas 5 operações que a mesa fez", "label": "record", "lang": "pt"}
+{"text": "Por que ela não comprou Bitcoin ontem? A camada de risco bloqueou?", "label": "record", "lang": "pt"}
+{"text": "O registro de decisões dessa mesa é à prova de adulteração?", "label": "record", "lang": "pt"}
+{"text": "Como foi a performance da mesa no mês passado?", "label": "record", "lang": "pt"}
+{"text": "Desk ne recently jo 5 trades kiye hai wo dikhao", "label": "record", "lang": "hi"}
+{"text": "Kal Bitcoin kyun nahi khareeda, risk layer ne block kiya tha kya?", "label": "record", "lang": "hi"}
+{"text": "Is desk ka decision log tamper-proof hai kya?", "label": "record", "lang": "hi"}
+{"text": "Cho tôi xem 5 giao dịch gần nhất mà bàn giao dịch đã thực hiện", "label": "record", "lang": "vi"}
+{"text": "Sao hôm qua không mua Bitcoin, có phải lớp rủi ro chặn không?", "label": "record", "lang": "vi"}
+{"text": "Nhật ký quyết định của bàn giao dịch này có chống giả mạo không?", "label": "record", "lang": "vi"}
+{"text": "وريني آخر 5 صفقات نفذها المكتب", "label": "record", "lang": "ar"}
+{"text": "ليش ما اشترى بيتكوين أمس، هل طبقة المخاطر منعته؟", "label": "record", "lang": "ar"}
+{"text": "سجل القرارات لهذا المكتب مضمون ضد التلاعب؟", "label": "record", "lang": "ar"}
+{"text": "Montre-moi les 5 dernières transactions exécutées par le desk", "label": "record", "lang": "fr"}
+{"text": "Pourquoi n'a-t-il pas acheté de Bitcoin hier, la couche de risque l'a bloqué?", "label": "record", "lang": "fr"}
+{"text": "Le journal de décisions de ce desk est-il inviolable?", "label": "record", "lang": "fr"}
+{"text": "Zeig mir die letzten 5 Trades, die das Desk ausgeführt hat", "label": "record", "lang": "de"}
+{"text": "Warum hat es gestern kein Bitcoin gekauft, hat die Risikoschicht das blockiert?", "label": "record", "lang": "de"}
+{"text": "Ist das Entscheidungsprotokoll dieses Desks manipulationssicher?", "label": "record", "lang": "de"}
+{"text": "給我看看這個交易台最近執行的5筆交易", "label": "record", "lang": "zh"}
+{"text": "昨天為什麼沒買比特幣,是風控層擋下來的嗎?", "label": "record", "lang": "zh"}
+{"text": "這個交易台的決策紀錄是防篡改的嗎?", "label": "record", "lang": "zh"}
+{"text": "Masanın son yaptığı 5 işlemi göster bana", "label": "record", "lang": "tr"}
+{"text": "Dün neden Bitcoin almadı, risk katmanı mı engelledi?", "label": "record", "lang": "tr"}
+{"text": "Bu masanın karar günlüğü kurcalamaya karşı korumalı mı?", "label": "record", "lang": "tr"}
+{"text": "Tunjukin 5 transaksi terakhir yang dieksekusi desk ini", "label": "record", "lang": "id"}
+{"text": "Kenapa kemarin nggak beli Bitcoin, apa diblokir sama risk layer?", "label": "record", "lang": "id"}
+{"text": "Log keputusan desk ini anti-tamper nggak sih?", "label": "record", "lang": "id"}
+{"text": "오늘 날씨 어때?", "label": "refuse", "lang": "ko"}
+{"text": "파이썬으로 정렬 함수 하나 짜줘", "label": "refuse", "lang": "ko"}
+{"text": "지금 당장 비트코인 10개 실제로 사줘", "label": "refuse", "lang": "ko"}
+{"text": "$FAKEMOON123 코인 지금 얼마야?", "label": "refuse", "lang": "ko"}
+{"text": "비트코인이 12월 25일에 정확히 얼마가 될지 알려줘", "label": "refuse", "lang": "ko"}
+{"text": "프랑스 수도가 어디야?", "label": "refuse", "lang": "ko"}
+{"text": "今日の天気どう?", "label": "refuse", "lang": "ja"}
+{"text": "Pythonでソート関数書いて", "label": "refuse", "lang": "ja"}
+{"text": "今すぐ本物のビットコインを10枚買ってきて", "label": "refuse", "lang": "ja"}
+{"text": "$FAKEMOON123って今いくら?", "label": "refuse", "lang": "ja"}
+{"text": "ビットコインが12月25日にちょうどいくらになるか教えて", "label": "refuse", "lang": "ja"}
+{"text": "フランスの首都はどこ?", "label": "refuse", "lang": "ja"}
+{"text": "¿Qué tiempo hace hoy?", "label": "refuse", "lang": "es"}
+{"text": "Escríbeme una función de ordenamiento en Python", "label": "refuse", "lang": "es"}
+{"text": "Cómprame 10 BTC de verdad ahora mismo", "label": "refuse", "lang": "es"}
+{"text": "¿Cuánto vale la moneda $FAKEMOON123 ahora?", "label": "refuse", "lang": "es"}
+{"text": "Dime exactamente cuánto valdrá Bitcoin el 25 de diciembre", "label": "refuse", "lang": "es"}
+{"text": "¿Cuál es la capital de Francia?", "label": "refuse", "lang": "es"}
+{"text": "Como está o tempo hoje?", "label": "refuse", "lang": "pt"}
+{"text": "Escreve uma função de ordenação em Python pra mim", "label": "refuse", "lang": "pt"}
+{"text": "Compra 10 BTC de verdade agora mesmo pra mim", "label": "refuse", "lang": "pt"}
+{"text": "Quanto vale a moeda $FAKEMOON123 agora?", "label": "refuse", "lang": "pt"}
+{"text": "Me diz exatamente quanto o Bitcoin vai valer no dia 25 de dezembro", "label": "refuse", "lang": "pt"}
+{"text": "Qual é a capital da França?", "label": "refuse", "lang": "pt"}
+{"text": "Aaj weather kaisa hai?", "label": "refuse", "lang": "hi"}
+{"text": "Python mein ek sorting function likh do mere liye", "label": "refuse", "lang": "hi"}
+{"text": "Abhi turant 10 BTC real mein khareed do mere liye", "label": "refuse", "lang": "hi"}
+{"text": "$FAKEMOON123 coin ka price abhi kya hai?", "label": "refuse", "lang": "hi"}
+{"text": "Bitcoin 25 December ko exact kitna hoga bata do", "label": "refuse", "lang": "hi"}
+{"text": "France ki capital kya hai?", "label": "refuse", "lang": "hi"}
+{"text": "Mera homework help kar do, calculus ka sawaal hai", "label": "refuse", "lang": "hi"}
+{"text": "Hôm nay thời tiết thế nào?", "label": "refuse", "lang": "vi"}
+{"text": "Viết giúp tôi một hàm sắp xếp bằng Python", "label": "refuse", "lang": "vi"}
+{"text": "Mua thật cho tôi 10 BTC ngay bây giờ", "label": "refuse", "lang": "vi"}
+{"text": "Đồng $FAKEMOON123 bây giờ giá bao nhiêu?", "label": "refuse", "lang": "vi"}
+{"text": "Nói chính xác Bitcoin sẽ giá bao nhiêu vào ngày 25 tháng 12", "label": "refuse", "lang": "vi"}
+{"text": "Thủ đô của Pháp là gì?", "label": "refuse", "lang": "vi"}
+{"text": "Giúp tôi làm bài tập về nhà môn giải tích được không?", "label": "refuse", "lang": "vi"}
+{"text": "الجو كيف اليوم؟", "label": "refuse", "lang": "ar"}
+{"text": "اكتب لي دالة ترتيب بلغة بايثون", "label": "refuse", "lang": "ar"}
+{"text": "اشتر لي 10 بيتكوين حقيقي الآن فوراً", "label": "refuse", "lang": "ar"}
+{"text": "كم سعر عملة $FAKEMOON123 الآن؟", "label": "refuse", "lang": "ar"}
+{"text": "قول لي بالضبط كم سيكون سعر بيتكوين في 25 ديسمبر", "label": "refuse", "lang": "ar"}
+{"text": "إيش عاصمة فرنسا؟", "label": "refuse", "lang": "ar"}
+{"text": "ساعدني في واجب التفاضل والتكامل", "label": "refuse", "lang": "ar"}
+{"text": "Il fait quel temps aujourd'hui?", "label": "refuse", "lang": "fr"}
+{"text": "Écris-moi une fonction de tri en Python", "label": "refuse", "lang": "fr"}
+{"text": "Achète-moi vraiment 10 BTC tout de suite", "label": "refuse", "lang": "fr"}
+{"text": "C'est combien la pièce $FAKEMOON123 en ce moment?", "label": "refuse", "lang": "fr"}
+{"text": "Dis-moi exactement combien vaudra le Bitcoin le 25 décembre", "label": "refuse", "lang": "fr"}
+{"text": "Quelle est la capitale de la France?", "label": "refuse", "lang": "fr"}
+{"text": "Aide-moi avec mon devoir de calcul", "label": "refuse", "lang": "fr"}
+{"text": "Wie ist das Wetter heute?", "label": "refuse", "lang": "de"}
+{"text": "Schreib mir eine Sortierfunktion in Python", "label": "refuse", "lang": "de"}
+{"text": "Kauf mir jetzt sofort echte 10 BTC", "label": "refuse", "lang": "de"}
+{"text": "Was kostet die Münze $FAKEMOON123 gerade?", "label": "refuse", "lang": "de"}
+{"text": "Sag mir genau, wie viel Bitcoin am 25. Dezember kosten wird", "label": "refuse", "lang": "de"}
+{"text": "Was ist die Hauptstadt von Frankreich?", "label": "refuse", "lang": "de"}
+{"text": "Hilf mir bei meiner Analysis-Hausaufgabe", "label": "refuse", "lang": "de"}
+{"text": "今天天氣怎麼樣?", "label": "refuse", "lang": "zh"}
+{"text": "幫我用Python寫一個排序函數", "label": "refuse", "lang": "zh"}
+{"text": "現在馬上幫我真的買10顆比特幣", "label": "refuse", "lang": "zh"}
+{"text": "$FAKEMOON123這個幣現在多少錢?", "label": "refuse", "lang": "zh"}
+{"text": "告訴我比特幣12月25日確切會是多少錢", "label": "refuse", "lang": "zh"}
+{"text": "法國首都是哪裡?", "label": "refuse", "lang": "zh"}
+{"text": "幫我寫微積分作業", "label": "refuse", "lang": "zh"}
+{"text": "Bugün hava nasıl?", "label": "refuse", "lang": "tr"}
+{"text": "Bana Python'da bir sıralama fonksiyonu yaz", "label": "refuse", "lang": "tr"}
+{"text": "Şimdi hemen gerçekten 10 BTC satın al benim için", "label": "refuse", "lang": "tr"}
+{"text": "$FAKEMOON123 coin şu an kaç para?", "label": "refuse", "lang": "tr"}
+{"text": "Bitcoin'in 25 Aralık'ta tam olarak kaç olacağını söyle", "label": "refuse", "lang": "tr"}
+{"text": "Fransa'nın başkenti neresi?", "label": "refuse", "lang": "tr"}
+{"text": "Kalkülüs ödevimde bana yardım et", "label": "refuse", "lang": "tr"}
+{"text": "Cuaca hari ini gimana?", "label": "refuse", "lang": "id"}
+{"text": "Tolong tuliskan fungsi sorting pakai Python", "label": "refuse", "lang": "id"}
+{"text": "Belikan saya 10 BTC beneran sekarang juga", "label": "refuse", "lang": "id"}
+{"text": "Koin $FAKEMOON123 sekarang harganya berapa?", "label": "refuse", "lang": "id"}
+{"text": "Kasih tau persis berapa harga Bitcoin tanggal 25 Desember nanti", "label": "refuse", "lang": "id"}
+{"text": "Ibu kota Perancis itu apa?", "label": "refuse", "lang": "id"}
+{"text": "Bantuin saya kerjain PR kalkulus dong", "label": "refuse", "lang": "id"}
