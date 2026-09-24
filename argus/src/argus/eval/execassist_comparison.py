@@ -65,6 +65,12 @@ _HFTBACKTEST_GREP_TERMS: tuple[str, ...] = (
 def run_baseline_read() -> dict[str, Any]:
     """Exhaustive grep of hftbacktest's real repository for any decision/deliberation-latency
     concept, run fresh against the local clone rather than trusted from an earlier read."""
+    if not _HFTBACKTEST_REPO.is_dir():
+        # Without the clone, grep finds nothing and "zero hits" would read as a finding. The
+        # absence of the source is not evidence about the source.
+        raise FileNotFoundError(
+            f"hftbacktest is not cloned at {_HFTBACKTEST_REPO}; clone nkaz001/hftbacktest there "
+            f"to re-run the baseline read (data/execassist_comparison.json holds the recorded one)")
     hits: dict[str, list[str]] = {}
     for term in _HFTBACKTEST_GREP_TERMS:
         proc = subprocess.run(

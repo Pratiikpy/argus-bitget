@@ -564,16 +564,20 @@ def hurdle_clearing_range() -> tuple[int, int]:
     return round(min(clearing)), round(max(clearing))
 
 
-def teardown_count() -> int:
+def teardown_count() -> int | None:
     """Code-level teardowns in `research/architecture/`, excluding the consolidated ledger.
 
     Added after the number drifted from 29 to 32 unnoticed: every count a document quotes has to
     have a producer here, or it silently rots the moment the tree grows.
+
+    ``None`` (reported UNCHECKED) in a checkout without the consolidated ledger: the public
+    repository carries only the teardowns its own evidence cites, so counting what is present
+    there would call a true figure stale.
     """
     folder = ROOT / "research" / "architecture"
-    return sum(
-        1 for path in folder.glob("*.md") if not path.name.startswith("_")
-    ) if folder.exists() else 0
+    if not (folder / "_CONSOLIDATED-LEDGER.md").is_file():
+        return None
+    return sum(1 for path in folder.glob("*.md") if not path.name.startswith("_"))
 
 
 def overfit_counts() -> tuple[int, int]:

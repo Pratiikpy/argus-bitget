@@ -13,15 +13,52 @@ exactly which real methods it calls.
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
+import threading
 from pathlib import Path
 from typing import Any
 
 _SHIM_DIR = Path(__file__).resolve().parent / "crypto_sor_shim"
+_INSTALL_LOCK = threading.Lock()
 
 
 class CryptoSorSubprocessError(RuntimeError):
     """The real ts-node subprocess failed or returned something that could not be parsed."""
+
+
+class CryptoSorUnavailable(CryptoSorSubprocessError):
+    """Node.js is not installed here, so the real TypeScript cannot run at all."""
+
+
+def node_available() -> bool:
+    return shutil.which("npm") is not None and shutil.which("npx") is not None
+
+
+def ensure_installed(timeout: float = 600.0) -> None:
+    """Install the shim's pinned dependencies from its lockfile on first use.
+
+    ``node_modules`` is not committed, and a fresh clone used to fail here: ``npx ts-node`` with no
+    local install fetches whatever ts-node is current, without the pinned TypeScript it needs, and
+    dies inside its own configuration loader. ``npm ci`` installs exactly the locked versions."""
+    if (_SHIM_DIR / "node_modules" / "ts-node").is_dir():
+        return
+    if not node_available():
+        raise CryptoSorUnavailable("Node.js (npm and npx) is required to run the real crypto_sor "
+                                   "TypeScript; install Node 18 or later")
+    with _INSTALL_LOCK:
+        if (_SHIM_DIR / "node_modules" / "ts-node").is_dir():
+            return
+        try:
+            result = subprocess.run(
+                ["npm", "ci", "--no-audit", "--no-fund", "--loglevel=error"], cwd=_SHIM_DIR,
+                capture_output=True, text=True, timeout=timeout, shell=True, check=False,
+            )
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise CryptoSorSubprocessError(f"npm ci failed to run: {exc}") from exc
+        if result.returncode != 0:
+            raise CryptoSorSubprocessError(
+                f"npm ci exited {result.returncode}: {result.stderr[-2000:]}")
 
 
 def run_new_order(
@@ -44,13 +81,14 @@ def run_new_order(
     """
     if not _SHIM_DIR.exists():
         raise CryptoSorSubprocessError(f"shim directory not found: {_SHIM_DIR}")
+    ensure_installed()
     request = {
         "symbol": symbol, "side": side, "orderQty": order_qty,
         "exchanges": exchanges, "levels": levels,
     }
     try:
         result = subprocess.run(
-            ["npx", "ts-node", "harness.ts"],
+            ["npx", "--no-install", "ts-node", "harness.ts"],
             cwd=_SHIM_DIR,
             input=json.dumps(request),
             capture_output=True,
@@ -73,4 +111,5 @@ def run_new_order(
         ) from exc
 
 
-__all__ = ["CryptoSorSubprocessError", "run_new_order"]
+__all__ = ["CryptoSorSubprocessError", "CryptoSorUnavailable", "ensure_installed",
+           "node_available", "run_new_order"]

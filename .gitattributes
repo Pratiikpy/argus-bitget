@@ -1,0 +1,4 @@
+# Store every file byte for byte. Several vendored upstream excerpts under
+# argus/src/argus/eval/baselines/ are pinned by SHA-256 of their exact bytes, including the
+# original CRLF line endings; end-of-line conversion on checkout would break those pins.
+* -text

@@ -9,6 +9,8 @@ function's real output exactly. No live network calls. See
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from argus.eval.baselines.lean_pairs_ranking_loader import load_pairs_ranking_module
@@ -50,9 +52,15 @@ class TestSelfInclusionBias:
         import types
 
         root = (
-            r"research\corpus\repos\FinceptTerminal\fincept-qt\scripts"
-            r"\agents\hedgeFundAgents\renaissance_technologies_hedge_fund_agent\strategies"
+            Path(__file__).resolve().parents[2] / "research" / "corpus" / "repos"
+            / "FinceptTerminal" / "fincept-qt" / "scripts" / "agents" / "hedgeFundAgents"
+            / "renaissance_technologies_hedge_fund_agent" / "strategies"
         )
+        if not root.is_dir():
+            # FinceptTerminal is AGPL-3.0, so it is never vendored here; this check runs only
+            # where it has been cloned beside the repository. The comparison's recorded result
+            # stays covered by the tests below, which need no third-party source.
+            pytest.skip("FinceptTerminal is not cloned at research/corpus/repos/FinceptTerminal")
         for name in (
             "renaissance_technologies_hedge_fund_agent",
             "renaissance_technologies_hedge_fund_agent.strategies",
@@ -69,11 +77,11 @@ class TestSelfInclusionBias:
 
         load(
             "renaissance_technologies_hedge_fund_agent.strategies.mean_reversion",
-            root + r"\mean_reversion.py",
+            str(root / "mean_reversion.py"),
         )
         stat_arb = load(
             "renaissance_technologies_hedge_fund_agent.strategies.statistical_arbitrage",
-            root + r"\statistical_arbitrage.py",
+            str(root / "statistical_arbitrage.py"),
         )
 
         a = [100.0, 99.5, 101.2, 98.7, 100.3, 99.9, 101.5, 100.1, 99.4, 100.8] * 4

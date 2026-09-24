@@ -90,6 +90,10 @@ $checkExit = $LASTEXITCODE
 # The cockpit page is generated from the artefacts, and `test_cockpit` fails the moment the ledger
 # grows past the figures it prints -- which every cycle does, whether or not its check passes.
 # Regenerated on every cycle, before the publish gate, so the committed page never lags the record.
+# The refusal grading goes first: the cockpit prints its figures, and a grading run by hand after
+# the page was built left the two disagreeing.
+python -m argus.eval.refusal 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
+"refusal_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8
 python -m argus.demo.cockpit 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
 "cockpit_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8
 

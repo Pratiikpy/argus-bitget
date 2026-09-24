@@ -33,6 +33,14 @@ from argus.demo.deploysync import (
 from argus.lui.server import STALE_AFTER_HOURS
 
 
+def _needs_the_bundle() -> None:
+    """The bundle-drift guards compare the working tree with the maintainer's `deploy/` bundle,
+    which is built locally and never committed. A clean checkout has nothing to compare."""
+    from argus.demo.deploysync import DEPLOY
+
+    if not DEPLOY.is_dir():
+        pytest.skip("no deploy/ bundle in this checkout; these guards run where it is built")
+
 class TestCountLinesCountsDecisionsOnly:
     """Added 2026-09-22 alongside settlement seals: a raw line count of paper_ledger.jsonl was
     exactly the decision count until seals added a second row kind, at which point the printed
@@ -81,6 +89,7 @@ class TestTheSyncReportsTheGapRatherThanHidingIt:
         assert "DRY RUN" in SyncResult(dry_run=True).render()
 
     def test_a_dry_run_changes_nothing(self) -> None:
+        _needs_the_bundle()
         before = MANIFEST_PATH.read_bytes() if MANIFEST_PATH.exists() else None
         sync(dry_run=True)
         after = MANIFEST_PATH.read_bytes() if MANIFEST_PATH.exists() else None
@@ -105,6 +114,7 @@ class TestNothingSecretCanReachAPublicBundle:
 class TestTheBundleIsNotSilentlyBehind:
     def test_the_live_bundle_is_close_to_the_working_tree(self) -> None:
         """The regression guard. If this fails, the shop window has drifted again."""
+        _needs_the_bundle()
         got = sync(dry_run=True)
         if got.ledger_after == 0:
             pytest.skip("no ledger in the working tree on this machine")
@@ -118,6 +128,7 @@ class TestTheBundleIsNotSilentlyBehind:
     def test_nothing_in_the_bundle_is_absent_upstream(self) -> None:
         """A file the bundle carries and the tree does not is a stale copy surviving a refresh —
         which is exactly how 126 decisions survived three days."""
+        _needs_the_bundle()
         got = sync(dry_run=True)
         assert not got.missing_upstream, (
             f"carried in the bundle but absent from data/: {', '.join(got.missing_upstream)}"

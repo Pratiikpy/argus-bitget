@@ -25,7 +25,10 @@ from argus.eval.execassist_comparison import (
 
 @pytest.fixture(scope="module")
 def baseline() -> dict:
-    return run_baseline_read()
+    try:
+        return run_baseline_read()
+    except FileNotFoundError as exc:
+        pytest.skip(str(exc))
 
 
 @pytest.fixture(scope="module")
