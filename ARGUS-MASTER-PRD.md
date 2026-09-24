@@ -5,7 +5,7 @@
 retractions recorded since. **Read the plan sections as history, not as the entry:** they name
 Agentic Trading (Track 2) as the primary submission; the entry actually filed is **Track 3 (AI
 Trading Desk) only**, and the README explains why Track 2 was withheld.
-**Owner:** the owner (github.com/Pratiikpy)
+**Owner:** github.com/Pratiikpy
 **Written:** 2026-09-12
 
 ---

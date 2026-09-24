@@ -1,6 +1,6 @@
 # ARGUS paper-trading cycle — scheduled entry point.
 # Loads credentials from .secrets/*.env (gitignored), runs one cycle on the full rToken universe,
-# appends a dated log. Created 2026-09-12 with the owner's explicit permission.
+# appends a dated log. Created 2026-09-12.
 $ErrorActionPreference = "Continue"
 # Derived from this script's own location rather than hardcoded: the scheduled task, a clone
 # on another machine and a developer running it by hand must all resolve the same root.
