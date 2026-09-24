@@ -492,10 +492,12 @@ def main() -> dict[str, Any]:
         "self_inclusion_cases": [c.as_dict() for c in self_inclusion_cases],
         "window_size_ablation": [p.as_dict() for p in window_ablation],
         "multiple_testing": multiple_testing.as_dict(),
-        "lean_alphas_dir_checked": str(_LEAN_ALPHAS_DIR),
+        "lean_alphas_dir_checked": _LEAN_ALPHAS_DIR.relative_to(
+            Path(__file__).resolve().parents[4]).as_posix(),
         "lean_alphas_dir_exists": _LEAN_ALPHAS_DIR.is_dir(),
         "lean_correction_grep_hits": lean_grep_hits,
-        "lean_has_no_correction": not lean_grep_hits,
+        # Only a read of the real source can say "none"; a missing clone says nothing.
+        "lean_has_no_correction": (not lean_grep_hits) if _LEAN_ALPHAS_DIR.is_dir() else None,
         "failure_cases": [f.as_dict() for f in failure_cases],
         "costs": costs,
         "reproducibility": reproducibility,

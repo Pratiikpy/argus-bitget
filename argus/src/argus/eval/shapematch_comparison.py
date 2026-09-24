@@ -259,15 +259,20 @@ def run_exclusion_zone_sweep(
 class SignificanceScanResult:
     terms_searched: tuple[str, ...]
     files_matched: tuple[str, ...]
+    files_scanned: int = 0
+    source: str = ""
 
     @property
     def stumpy_has_no_significance_machinery(self) -> bool:
-        return not self.files_matched
+        # A scan of nothing also matches nothing; only a scan that read files can say "none".
+        return self.files_scanned > 0 and not self.files_matched
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "terms_searched": list(self.terms_searched),
             "files_matched": list(self.files_matched),
+            "files_scanned": self.files_scanned,
+            "source": self.source,
             "stumpy_has_no_significance_machinery": self.stumpy_has_no_significance_machinery,
         }
 
@@ -281,13 +286,31 @@ def run_significance_scan() -> SignificanceScanResult:
     """Exhaustive grep of STUMPY's real, local source tree — not one file, the whole package —
     for any statistical-significance machinery. Zero matches confirms Finding 4 by search, not by
     absence-of-evidence."""
+    root, source = stumpy_source()
     matched: list[str] = []
+    if root is None:
+        return SignificanceScanResult(_SIGNIFICANCE_TERMS, (), 0, source)
+    files = sorted(root.rglob("*.py"))
+    for path in files:
+        text = path.read_text(encoding="utf-8", errors="replace").lower()
+        if any(term in text for term in _SIGNIFICANCE_TERMS):
+            matched.append(path.relative_to(root.parent).as_posix())
+    return SignificanceScanResult(_SIGNIFICANCE_TERMS, tuple(matched), len(files), source)
+
+
+def stumpy_source() -> tuple[Path | None, str]:
+    """The STUMPY package source to scan: the pinned clone when present, else the installed
+    package — the same published library, and a dependency of this project, so a fresh checkout
+    can repeat the scan without cloning anything."""
     if _STUMPY_SOURCE.is_dir():
-        for path in sorted(_STUMPY_SOURCE.rglob("*.py")):
-            text = path.read_text(encoding="utf-8", errors="replace").lower()
-            if any(term in text for term in _SIGNIFICANCE_TERMS):
-                matched.append(str(path.relative_to(_STUMPY_SOURCE.parent)))
-    return SignificanceScanResult(_SIGNIFICANCE_TERMS, tuple(matched))
+        return _STUMPY_SOURCE, "clone TDAmeritrade/stumpy@e4caf8a"
+    try:
+        import stumpy
+    except ImportError:
+        return None, "stumpy is not installed"
+    from importlib.metadata import version
+
+    return Path(stumpy.__file__).resolve().parent, f"installed stumpy {version('stumpy')}"
 
 
 # =================================================================================================

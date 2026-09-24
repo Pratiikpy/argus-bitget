@@ -25,12 +25,18 @@ from argus.eval.workbench_comparison import (
 
 @pytest.fixture(scope="module")
 def breadth() -> dict:
-    return run_source_breadth()
+    try:
+        return run_source_breadth()
+    except FileNotFoundError as exc:
+        pytest.skip(str(exc))
 
 
 @pytest.fixture(scope="module")
 def openbb_read() -> dict:
-    return run_openbb_source_read()
+    try:
+        return run_openbb_source_read()
+    except FileNotFoundError as exc:
+        pytest.skip(str(exc))
 
 
 @pytest.fixture(scope="module")

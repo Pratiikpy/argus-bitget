@@ -66,6 +66,11 @@ def run_source_breadth() -> dict[str, Any]:
         Path(__file__).resolve().parents[4]
         / "research" / "repos" / "OpenBB-upstream" / "openbb_platform" / "providers"
     )
+    if not providers_dir.is_dir():
+        raise FileNotFoundError(
+            f"OpenBB is not cloned at {providers_dir.parents[1]}; clone OpenBB-finance/OpenBB "
+            f"there to re-count its providers (data/workbench_comparison.json holds the recorded "
+            f"count)")
     provider_dirs = sorted(
         p.name for p in providers_dir.iterdir() if p.is_dir() and p.name != "tests"
     )
@@ -94,6 +99,12 @@ def run_source_breadth() -> dict[str, Any]:
 def run_openbb_source_read() -> dict[str, Any]:
     """Exhaustive grep of OpenBB Agents' real source for any point-in-time concept, run fresh
     against the local clone rather than trusted from an earlier read."""
+    if not (_OPENBB_AGENTS_REPO / "openbb_agents").is_dir():
+        # Without the clone, grep finds nothing and "no point-in-time concept" would read as a
+        # finding. The absence of the source is not evidence about the source.
+        raise FileNotFoundError(
+            f"OpenBB Agents is not cloned at {_OPENBB_AGENTS_REPO}; clone OpenBB-finance/"
+            f"openbb-agents there to re-run the source read")
     hits: dict[str, list[str]] = {}
     for term in _OPENBB_GREP_TERMS:
         proc = subprocess.run(

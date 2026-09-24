@@ -54,6 +54,8 @@
       "significance_test"
     ],
     "files_matched": [],
+    "files_scanned": 46,
+    "source": "clone TDAmeritrade/stumpy@e4caf8a",
     "stumpy_has_no_significance_machinery": true
   },
   "costs": {

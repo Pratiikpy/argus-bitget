@@ -88,12 +88,8 @@ class TestSignificanceScan:
     def test_the_scan_actually_searched_real_files(self) -> None:
         """A scan of zero files would also report `files_matched == ()` — assert it genuinely
         found and read source files, not that the directory was empty or missing."""
-        from pathlib import Path
-
-        from argus.eval.shapematch_comparison import _STUMPY_SOURCE
-
-        assert _STUMPY_SOURCE.is_dir()
-        assert list(Path(_STUMPY_SOURCE).rglob("*.py"))
+        result = run_significance_scan()
+        assert result.files_scanned > 20, result.source
 
 
 class TestCosts:

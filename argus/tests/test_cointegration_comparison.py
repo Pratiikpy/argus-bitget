@@ -152,7 +152,8 @@ class TestMainAndRender:
     def test_main_returns_a_complete_serialisable_report(self) -> None:
         report = main()
         assert report["all_adf_cases_agree"]
-        assert report["lean_has_no_correction"]
+        expected = True if report["lean_alphas_dir_exists"] else None
+        assert report["lean_has_no_correction"] is expected
         assert report["multiple_testing"]["naive_selection_exceeds_the_corrected_ones"]
         assert report["scope_statement"] == SCOPE_STATEMENT
         import json
