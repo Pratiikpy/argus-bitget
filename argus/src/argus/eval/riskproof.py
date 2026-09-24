@@ -782,6 +782,29 @@ def _policy_for(base: ConstitutionPolicy, state: State) -> ConstitutionPolicy:
     )
 
 
+_THROTTLES: dict[tuple[Any, ...], Any] = {}
+"""Session throttles by (profile, start, horizon). The throttle is a pure function of those three,
+and the sweep asks it about the same few combinations two million times over. The profile is keyed
+by its values, not its identity: `_policy_for` builds a fresh one per state, and a recycled `id()`
+would hand one state another's throttle."""
+
+
+def _throttle(policy: ConstitutionPolicy, start: datetime) -> Any:
+    from argus.risk.session_risk import throttle as session_throttle
+
+    risk = policy.session_risk
+    assert risk is not None
+    key = (risk.symbol, tuple(sorted(risk.phase_bps.items())),
+           tuple(sorted(risk.phase_counts.items())), risk.reopen_bps, risk.reopens,
+           risk.measured_at, risk.window_days, start, policy.session_horizon_bars)
+    if key not in _THROTTLES:
+        if len(_THROTTLES) > 200_000:
+            _THROTTLES.clear()
+        _THROTTLES[key] = session_throttle(policy.session_risk, start=start,
+                                           horizon_bars=policy.session_horizon_bars)
+    return _THROTTLES[key]
+
+
 def _applicable(policy: ConstitutionPolicy, state: State, intent: Intent) -> set[str]:
     """Which rules *could* have bound at this state, evaluated independently of order.
 
@@ -893,12 +916,7 @@ def _applicable(policy: ConstitutionPolicy, state: State, intent: Intent) -> set
             could.add("risk_budget")
 
     if policy.session_risk is not None:
-        from argus.risk.session_risk import throttle as session_throttle
-
-        scaled = session_throttle(
-            policy.session_risk, start=session.as_of,
-            horizon_bars=policy.session_horizon_bars,
-        )
+        scaled = _throttle(policy, session.as_of)
         if scaled.multiplier < 1 and intent.quantity * scaled.multiplier < intent.quantity:
             could.add("session_volatility")
 

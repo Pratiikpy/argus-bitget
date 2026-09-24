@@ -36,6 +36,13 @@ from argus.truth.clocks import SessionPhase, SessionState
 NOW = datetime(2026, 9, 13, 12, 0, tzinfo=UTC)
 
 
+@pytest.fixture(scope="module")
+def proof() -> RiskProof:
+    """The full sweep, once. It covers 2,177,280 states and takes minutes; eleven tests used to run
+    it again each, which made this one file most of a fresh clone's test time."""
+    return sweep(now=NOW)
+
+
 def _state(**over: object) -> State:
     base: dict[str, object] = {
         "verdict": Verdict.TRADE, "side": Side.BUY, "quantity": Decimal("100"),
@@ -81,43 +88,39 @@ class TestTheDomainIsCoveredHonestly:
         assert abstentions
         assert {s.quantity for s in abstentions} == {Decimal("0")}
 
-    def test_the_no_new_trade_invariant_has_states_to_run_against(self) -> None:
-        proof = sweep(now=NOW)
+    def test_the_no_new_trade_invariant_has_states_to_run_against(self, proof: RiskProof) -> None:
         assert proof.swept > 0
         assert any(not s.verdict.opens_exposure for s in states())
 
 
 class TestTheRealPolicyIsSound:
-    def test_no_invariant_is_violated_anywhere_in_the_domain(self) -> None:
-        proof = sweep(now=NOW)
+    def test_no_invariant_is_violated_anywhere_in_the_domain(self, proof: RiskProof) -> None:
         assert proof.violations == [], proof.violations[:5]
         assert proof.sound
 
-    def test_the_sweep_produces_no_errors(self) -> None:
-        assert sweep(now=NOW).errors == []
+    def test_the_sweep_produces_no_errors(self, proof: RiskProof) -> None:
+        assert proof.errors == []
 
-    def test_every_configured_rule_binds_somewhere(self) -> None:
+    def test_every_configured_rule_binds_somewhere(self, proof: RiskProof) -> None:
         """The shadowing check: a rule that never fires is a protection that does not exist."""
-        assert sweep(now=NOW).unreachable == ()
+        assert proof.unreachable == ()
 
-    def test_the_layer_actually_narrows_a_substantial_share_of_proposals(self) -> None:
-        proof = sweep(now=NOW)
+    def test_the_layer_actually_narrows_a_substantial_share_of_proposals(
+        self, proof: RiskProof
+    ) -> None:
         assert 0.1 < proof.intervention_rate < 0.95
 
-    def test_precedence_is_recorded_where_rules_overlap(self) -> None:
-        proof = sweep(now=NOW)
+    def test_precedence_is_recorded_where_rules_overlap(self, proof: RiskProof) -> None:
         assert proof.precedence
         assert proof.precedence["min_confidence+oracle_stale"] == "min_confidence"
 
-    def test_confidence_outranks_every_other_rule(self) -> None:
+    def test_confidence_outranks_every_other_rule(self, proof: RiskProof) -> None:
         """Documented from the sweep, not from reading the source."""
-        proof = sweep(now=NOW)
         for combo, winner in proof.precedence.items():
             if "min_confidence" in combo.split("+"):
                 assert winner == "min_confidence", combo
 
-    def test_the_report_renders_and_serialises(self) -> None:
-        proof = sweep(now=NOW)
+    def test_the_report_renders_and_serialises(self, proof: RiskProof) -> None:
         text = " ".join(proof.render())
         assert "no invariant violated" in text
         assert "none is shadowed" in text
@@ -201,30 +204,50 @@ class _Shadowed(ConstitutionPolicy):
         )
 
 
+@pytest.fixture(scope="module")
+def slice_of_the_domain() -> list[State]:
+    """Every 25th state. The prover's teeth are about detection, not coverage, and each broken
+    policy below used to be swept over all 2,177,280 states — five full sweeps to show five
+    violations that the first few hundred states already exhibit."""
+    from itertools import islice
+
+    return list(islice(states(), 0, None, 25))
+
+
 class TestTheProverHasTeeth:
-    def test_a_policy_that_enlarges_a_position_is_caught(self) -> None:
-        proof = sweep(_Enlarging(), now=NOW)
+    def test_a_policy_that_enlarges_a_position_is_caught(
+        self, slice_of_the_domain: list[State]
+    ) -> None:
+        proof = sweep(_Enlarging(), state_pool=slice_of_the_domain, now=NOW)
         assert not proof.sound
         assert any(v.invariant == "never_increases" for v in proof.violations)
 
-    def test_a_policy_that_reverses_a_side_is_caught(self) -> None:
-        proof = sweep(_Reversing(), now=NOW)
+    def test_a_policy_that_reverses_a_side_is_caught(
+        self, slice_of_the_domain: list[State]
+    ) -> None:
+        proof = sweep(_Reversing(), state_pool=slice_of_the_domain, now=NOW)
         assert not proof.sound
         assert any(v.invariant == "never_reverses" for v in proof.violations)
 
-    def test_a_shadowing_policy_is_reported_as_unreachable_rules(self) -> None:
-        proof = sweep(_Shadowed(), now=NOW)
+    def test_a_shadowing_policy_is_reported_as_unreachable_rules(
+        self, slice_of_the_domain: list[State]
+    ) -> None:
+        proof = sweep(_Shadowed(), state_pool=slice_of_the_domain, now=NOW)
         assert set(proof.unreachable) >= {"oracle_stale", "unhedgeable_gap", "max_position"}
         assert "UNREACHABLE" in " ".join(proof.render())
 
-    def test_a_shadowing_policy_still_obeys_the_asymmetry_invariants(self) -> None:
+    def test_a_shadowing_policy_still_obeys_the_asymmetry_invariants(
+        self, slice_of_the_domain: list[State]
+    ) -> None:
         """Shadowing is a coverage bug, not an asymmetry bug; the two must be reported apart."""
-        proof = sweep(_Shadowed(), now=NOW)
+        proof = sweep(_Shadowed(), state_pool=slice_of_the_domain, now=NOW)
         assert proof.violations == []
         assert proof.unreachable
 
-    def test_the_violation_names_the_state_it_was_found_at(self) -> None:
-        proof = sweep(_Enlarging(), now=NOW)
+    def test_the_violation_names_the_state_it_was_found_at(
+        self, slice_of_the_domain: list[State]
+    ) -> None:
+        proof = sweep(_Enlarging(), state_pool=slice_of_the_domain, now=NOW)
         assert "q=" in proof.violations[0].state and "c=" in proof.violations[0].state
 
 
@@ -351,7 +374,17 @@ def test_an_empty_sweep_is_sound_but_says_nothing() -> None:
 
 
 def test_the_proof_is_reproducible() -> None:
-    first, second = sweep(now=NOW), sweep(now=NOW)
+    """Two runs from cold over the same every-25th slice of the domain agree exactly. A slice,
+    because the property is determinism, not coverage — the full domain is swept once above."""
+    from itertools import islice
+
+    from argus.eval import riskproof
+
+    pool = list(islice(states(), 0, None, 25))
+    riskproof._THROTTLES.clear()
+    first = sweep(state_pool=pool, now=NOW)
+    riskproof._THROTTLES.clear()  # from cold again, so the cache is not what makes them agree
+    second = sweep(state_pool=pool, now=NOW)
     assert first.as_dict()["bindings"] == second.as_dict()["bindings"]
     assert first.swept == second.swept
 
