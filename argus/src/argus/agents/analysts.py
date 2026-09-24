@@ -190,7 +190,10 @@ For the event given, work through the transmission chain explicitly:
   which asset prices it -> which assets CANNOT price it right now -> expected magnitude.
 
 State plainly whether the move is already priced. An event everyone has read is not an edge.
-Add a "chain" key to your JSON: an array of short strings, one per link, in order."""
+Add a "chain" key to your JSON: an array of short strings, one per link, in order.
+Add a "chain_falsifiers" key: an array the same length as "chain". For each link, one observable
+condition that would prove that link wrong — a price level, a data print, a filing, a date — stated
+so it can be checked after the fact. A link you cannot falsify is a link you should not claim."""
 
     def analyse(
         self, symbol: str, session: SessionState, evidence: list[Evidence]
@@ -211,11 +214,27 @@ EVENTS AND EVIDENCE (each was available at or before the decision instant):
         failure, and only this path can record that."""
         view = self.analyse(symbol, session, evidence)
         chain = chain_from_response(
-            event=evidence[0].claim if evidence else symbol,
+            event=chain_event(symbol, evidence),
             as_of=session.as_of,
             response=view.raw,
         )
         return view, chain
+
+
+def chain_event(symbol: str, evidence: list[Evidence]) -> str:
+    """The event a chain starts from: the first item that is news, a filing, a transcript or a
+    macro print, in that order of preference — not the price line (which the runner files
+    under `news`, so it is recognised by its `mkt-` id).
+
+    The runner puts the `mkt-{symbol}` quote first, and the chain used `evidence[0]`, so all 138
+    recorded chains (2026-09-14 to 09-23) named a price as their event; together with the prompt
+    never asking for `chain_falsifiers`, no link was ever gradable. Found by the rival review of
+    2026-09-24."""
+    rank = {"filing": 0, "sec-edgar": 0, "transcript": 0, "news": 1, "social": 2, "macro": 3}
+    events = [item for item in evidence if not item.id.startswith("mkt-")]
+    if events:
+        return min(events, key=lambda item: rank.get(item.source, 4)).claim
+    return evidence[0].claim if evidence else symbol
 
 
 class SentimentAnalyst(Analyst):

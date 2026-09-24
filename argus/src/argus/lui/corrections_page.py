@@ -280,6 +280,28 @@ def collect(data_dir: Path) -> list[Correction]:
         ),
         artefact="data/theme_audit.json", kind="bug",
     ))
+
+    # 10. Wins claimed against the wrong rival, withdrawn. Read from the register's own blockers,
+    #     so a re-grade appears here the moment the register records it.
+    if standing is not None:
+        regraded = [c for c in standing.get("capabilities", [])
+                    if any(str(b).startswith("RE-GRADED") for b in c.get("blockers", []))]
+        if regraded:
+            names = "; ".join(str(c.get("name")) for c in regraded)
+            out.append(Correction(
+                headline=f"{len(regraded)} OWNED claims withdrawn: they beat a rival that does not "
+                         f"lead the sub-theme",
+                detail=(
+                    f"A review of the right rivals for each Track 2 and Track 3 sub-theme "
+                    f"(2026-09-24) found these wins were measured against a "
+                    f"weak, archived or adjacent system, or proved only that the rival could not "
+                    f"express the quantity: {names}. Each is IMPLEMENTED until it is run against "
+                    f"the systems that lead its sub-theme, on the same input. The same review "
+                    f"found the event agent had never asked for the falsifiers its chain grading "
+                    f"needs, so no recorded causal link had ever been graded."
+                ),
+                artefact="data/standing.json", kind="withdrawn",
+            ))
     return out
 
 

@@ -963,7 +963,8 @@ REGISTER: tuple[Capability, ...] = (
         ),
     ),
     Capability(
-        name="Factor discovery with no execution surface and trial-corrected selection",
+        name=("Factor-discovery safety: no execution surface and trial-corrected selection, "
+              "vs. RD-Agent"),
         subtheme="t2-factordiscovery",
         module=(
             "argus/research/searchoff.py,argus/research/grammar.py,"
@@ -1773,7 +1774,7 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/whale_signals_event_study.py,"
             "argus/eval/baselines/whale_signals_event_study_loader.py"
         ),
-        state=State.OWNED,
+        state=State.IMPLEMENTED,
         baseline=(
             "whale-signals real fixed-null hit-rate test "
             "(compute_hit_rates/compute_base_rate)"
@@ -1933,6 +1934,15 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: whale-signals tests one significance "
+            "method; the Event-Driven Agent sub-theme asks for event -> decision -> trade, and "
+            "the rivals that do that (JohnboscoE/slimon and Ritapossible/Ballast, both S2 entries "
+            "with executed demo orders; HKUDS/Vibe-Trading's event skill; "
+            "TauricResearch/TradingAgents; Nicholas-03/trading-bot) have not been run on the same "
+            "input. Two defects found in the same review: the EventAnalyst prompt never asked for "
+            "`chain_falsifiers`, so 0 of 138 recorded chains carried one and every link graded "
+            "UNSUPPORTED, and the chain's event field held the price line in 138 of 138 "
+            "(rival review of 2026-09-24). OWNED returns only when they are.",
             "The placebo events are constructed (real timestamps, zero true edge by "
             "construction), not whale-signals' own real 646,442-transaction Dune dataset, which "
             "needs a paid API key this project does not have — their own already-published "
@@ -1951,7 +1961,7 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/crypto_sor_shim/src/lib/common.ts,"
             "argus/eval/baselines/crypto_sor_loader.py"
         ),
-        state=State.OWNED,
+        state=State.IMPLEMENTED,
         baseline="crypto_sor real composite order-book router (CompositeOrderBook.newOrder)",
         proofs=(
             Proof(
@@ -2092,6 +2102,12 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: crypto_sor is a same-instrument, "
+            "cross-venue router, and this entry's own scope says the leg is not claimed to be a "
+            "validated hedge. The rivals that lead Cross-Asset Execution (HedgeAgents via the "
+            "JansenAnalytics replication; CryptoCT01/Crossfire, Jayanng/Omni, norbert351/vigil "
+            "and danielamodu/Triad from S2) have not been run on the same input "
+            "(rival review of 2026-09-24). OWNED returns only when they are.",
             "crypto_sor's real multi-exchange feed handlers (Binance/Coinbase/Kraken/OKX/Mango) "
             "were not exercised — this comparison drives its real composite-book/newOrder() core "
             "directly with constructed-from-real-data levels, since ARGUS has live access to "
@@ -3519,7 +3535,7 @@ REGISTER: tuple[Capability, ...] = (
         ),
     ),
     Capability(
-        name="Market sentiment",
+        name="Sentiment integrity: resistance to coordinated posting, vs. finBERT",
         subtheme="t2-sentiment",
         module=(
             "argus/agents/analysts.py,argus/market/macro.py,"
@@ -3750,7 +3766,7 @@ REGISTER: tuple[Capability, ...] = (
         # of every rejected rule's own measured failure mode (status, precision, why), not a
         # rename of the existing `rejected` field — to `desk/review.py::as_dict()`. All thirteen
         # conditions now VERIFIED or ATTESTED; restored to OWNED.
-        state=State.OWNED,
+        state=State.IMPLEMENTED,
         baseline="TauricResearch/TradingAgents reflection memory",
         proofs=(
             Proof(
@@ -3896,6 +3912,13 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: TradingAgents' reflection memory is "
+            "not the specialist for Review & Self-Evolution; mnemox-ai/tradememory-protocol, "
+            "cholhwanjung/trading-agent (a statistical rule lifecycle), OpenByteInc/QuantDinger "
+            "and the S2 entry Azedfx/TradePilot-AI have not been run on the same input. The same "
+            "review reported that `desk/review.py` grades a coin-flip rule ACTIVE, a base-rate "
+            "defect that must be fixed before any rerun "
+            "(rival review of 2026-09-24). OWNED returns only when they are.",
             "The checklist is honest and currently empty: no rule has earned promotion, so this "
             "is a mechanism for learning rules rather than a set of learned rules, and it is "
             "described that way everywhere it appears.",
@@ -4067,7 +4090,7 @@ REGISTER: tuple[Capability, ...] = (
         # that independently re-ran `verify()` on every proof rather than trusting
         # `conditions_missing` (which only checks a Proof exists per condition, not that it
         # verifies): all thirteen are VERIFIED or ATTESTED, zero UNPROVEN. Restored to OWNED.
-        state=State.OWNED,
+        state=State.IMPLEMENTED,
         baseline=(
             "nkaz001/hftbacktest queue model; Bitget's own instrument rules; "
             "Almgren & Chriss (2000) closed-form optimum vs nautechsystems/nautilus_trader's "
@@ -4206,6 +4229,13 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: Almgren-Chriss minimises its own "
+            "mean-variance objective by construction, so beating TWAP on that objective proves "
+            "the algebra, not execution quality. The rivals that lead Execution Assistance (PACE; "
+            "TradeMaster's order-execution agents; the S2 entries "
+            "zz-0816/bitget-s2-execution-aware-alpha and Ritapossible/Egress; Bitget's native "
+            "TWAP/Iceberg) have not been run on the same fills "
+            "(rival review of 2026-09-24). OWNED returns only when they are.",
             "no live fills exist to compare against, so execution realism is argued from the "
             "venue's rules rather than measured against our own fills — the thirteen conditions "
             "are about a valid experiment, and a live-fills comparison remains a further, "
@@ -4992,7 +5022,7 @@ REGISTER: tuple[Capability, ...] = (
         module=(
             "argus/market/fundamentals.py,argus/eval/infoextract_comparison.py"
         ),
-        state=State.OWNED,
+        state=State.IMPLEMENTED,
         baseline=(
             "FinanceBench's own real, published metrics-generated results (Patronus AI, "
             "arXiv 2311.11944, 16 real model/retrieval-condition combinations graded "
@@ -5129,6 +5159,13 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: the comparison set ARGUS's lookups "
+            "on its own case set against FinanceBench's published numbers on a different question "
+            "set, and the capability ledger already carried it as IMPLEMENTED. The rivals that "
+            "lead Information Extraction (anthropics/financial-services earnings-reviewer, CAMEF, "
+            "GeoRisk, the S2 entries RESIDUAL, optic-bitget and postbell) have not been run on "
+            "the same input (rival review of 2026-09-24). OWNED returns only when "
+            "they are.",
             "FinanceBench's own 150-question open-source set and its results/*.jsonl transcripts "
             "carry no LICENSE file, so the exact questions and gold answers are cited and "
             "recomputed from rather than vendored into this repo or run against ARGUS directly — "
@@ -5146,7 +5183,7 @@ REGISTER: tuple[Capability, ...] = (
             "argus/market/evidence.py,argus/market/fundamentals.py,"
             "argus/eval/workbench_comparison.py"
         ),
-        state=State.OWNED,
+        state=State.IMPLEMENTED,
         baseline=(
             "OpenBB's real, published agent (openbb-finance/openbb-agents) and data platform "
             "(openbb-finance/OpenBBTerminal), both read in full and neither vendored"
@@ -5283,6 +5320,11 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: openbb-agents is an archived 2024 "
+            "repository; the current OpenBB stack (ODP, openbb-mcp-server, Agent Rita), "
+            "TraderAlice/OpenAlice, HKUDS/Vibe-Trading, ginlix-ai/LangAlpha and the S2 entry "
+            "Abd00lmalik/Lumen-Terminal have not been run on the same input "
+            "(rival review of 2026-09-24). OWNED returns only when they are.",
             "OpenBB genuinely wins on raw data-source breadth (32 real providers, 21 keyless, "
             "vs ARGUS's 12 live-verified) — closing that gap is a separate, already-named, "
             "unimplemented improvement (BLS employment data, Fama-French factors, CFTC "
@@ -5300,7 +5342,7 @@ REGISTER: tuple[Capability, ...] = (
         module=(
             "argus/execution/latency.py,argus/eval/execassist_comparison.py"
         ),
-        state=State.OWNED,
+        state=State.IMPLEMENTED,
         baseline="hftbacktest's real LatencyModel trait (nkaz001/hftbacktest, MIT)",
         proofs=(
             Proof(
@@ -5438,6 +5480,11 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: the result is that the rival has no "
+            "input for the quantity, which is a gap in its scope rather than a measured "
+            "superiority, and hftbacktest does install from a prebuilt wheel (2.4.4, verified "
+            "2026-09-24) — the blocker below said otherwise. Not rerun on the same input "
+            "(rival review of 2026-09-24). OWNED returns only when they are.",
             "hftbacktest's real latency model is a compiled Rust crate exposed to Python via "
             "PyO3 bindings; no prebuilt wheel exists for this machine and building one would "
             "need a full Rust toolchain, so its real code was read rather than run — sufficient "
@@ -5446,6 +5493,40 @@ REGISTER: tuple[Capability, ...] = (
             "real IntpOrderLatency (historical network-latency interpolation) is a genuine "
             "capability this comparison does not evaluate at all — this capability is scoped to "
             "decision latency specifically, not the full latency-modelling surface",
+        ),
+    ),
+    Capability(
+        name="Market sentiment",
+        subtheme="t2-sentiment",
+        module="argus/agents/analysts.py,argus/agents/desk.py,argus/lui/research.py",
+        state=State.IMPLEMENTED,
+        baseline=(
+            "Santiment crowd-sentiment contrarian signals; Augmento; Bitget's own bitget-signal "
+            "sentiment-analyst Skill; TauricResearch/TradingAgents v0.4 sentiment analyst; the S2 "
+            "entry Jfash-cmd/sentinel-bitget-hackathon"
+        ),
+        blockers=(
+            "The sub-theme asks how real-time social sentiment becomes a position signal. What is "
+            "proven is narrower (the integrity row above: coordinated posting does not move the "
+            "desk's analyst). The desk has opened no position from a sentiment read, and the "
+            "rivals that lead the sub-theme have not been run on the same input "
+            "(rival review of 2026-09-24)",
+        ),
+    ),
+    Capability(
+        name="Factor Discovery Agent: hypothesis to tradable factor",
+        subtheme="t2-factordiscovery",
+        module="argus/research/searchoff.py,argus/research/grammar.py,argus/research/factor_lab.py",
+        state=State.IMPLEMENTED,
+        baseline=(
+            "minihellboy/FactorMiner (arXiv 2602.14670); bigcan/sharpen Crucible; "
+            "rookiewu417/FactorZen; QuantaAlpha/QuantaAlpha; microsoft/RD-Agent fin_factor"
+        ),
+        blockers=(
+            "What is proven is the safety of the search (the row above). Factor quality — whether "
+            "the factors found carry out-of-sample edge after costs — has not been compared with "
+            "the systems that lead on it, and no certified factor has been traded "
+            "(rival review of 2026-09-24)",
         ),
     ),
 )

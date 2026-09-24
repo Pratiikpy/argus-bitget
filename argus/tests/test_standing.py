@@ -463,33 +463,33 @@ class TestTheLiveRegisterIsHonest:
         this exact set is the real regression this test exists to catch — add it to the set only
         after checking its thirteen the same way these thirty-three were checked, never to make a
         test pass."""
+        # 2026-09-24: seven grades withdrawn because the rival they beat does not lead the
+        # sub-theme (the rival review of 2026-09-24), and sentiment and factor
+        # discovery narrowed to what was proven. Each withdrawn row stays in the register as
+        # IMPLEMENTED with the reason as its first blocker.
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
             "Abstention scored as a decision",
-            "Clustering-corrected, base-rate-honest event significance vs. a fixed-null test",
             "Cross-market cointegration with corrected multiple testing",
             "Cross-sectional factor evaluation",
             "Data-honest cross-asset breadth rotation vs. a silently-dropping reference",
-            "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel",
             "Deliberation priced as a trading cost",
             "Episodic memory across decisions",
-            "Factor discovery with no execution surface and trial-corrected selection",
-            "Funding-aware cross-asset hedge routing vs. a fee-blind composite router",
+            (
+                "Factor-discovery safety: no execution surface and "
+                "trial-corrected selection, vs. RD-Agent"
+            ),
             "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
-            "Market sentiment",
+            "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
             "Net executable arbitrage vs. a fee-blind detector",
             "Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal",
             "Overfitting gates that raise instead of returning NaN",
             "Path-shape matching with a calibrated null",
             "Per-profile mandate that changes the verdict",
             "Perception layer: what the desk can see",
-            "Point-in-time correctness vs. OpenBB's real, ungated live-API agent",
             "Pre-registered trading protocol, hash-committed",
             "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
             "Risk layer proved by domain sweep",
-            "Self-evolving review rules",
-            "Session-aware execution that refuses to solve through a boundary",
-            "Structured filing extraction vs. FinanceBench's real, published LLM measurement",
             "Typed factor grammar with no execution surface",
             "rToken factor divergence vs. Alphalens' real Information Coefficient",
         }
@@ -553,7 +553,7 @@ class TestTheLiveRegisterIsHonest:
         live cycle, and swept at 0 of 12 empty on both — a genuine fix, not a claim to leave
         standing unexamined. The blockers still quote the original 93% figure as history, and the
         real, still-open limitation (no in-house scoring model) is still disclosed."""
-        cap = next(c for c in REGISTER if c.name == "Market sentiment")
+        cap = next(c for c in REGISTER if c.name.startswith("Sentiment integrity"))
         assert any("93%" in b for b in cap.blockers)
         assert any("TwitterSource" in b for b in cap.blockers)
         assert any("RedditSource" in b for b in cap.blockers)
@@ -561,7 +561,7 @@ class TestTheLiveRegisterIsHonest:
 
     def test_sentiment_carries_the_experiment_that_would_promote_it(self) -> None:
         """A demotion without a route back is a deletion with extra steps."""
-        cap = next(c for c in REGISTER if c.name == "Market sentiment")
+        cap = next(c for c in REGISTER if c.name.startswith("Sentiment integrity"))
         assert "ablation" in cap.note and "30" in cap.note
 
     def test_the_review_checklist_is_recorded_as_not_yet_earned(self) -> None:
@@ -569,7 +569,8 @@ class TestTheLiveRegisterIsHonest:
         underlying fact this test protects is unchanged: the checklist itself is still honestly
         empty, and OWNED does not launder that away."""
         cap = next(c for c in REGISTER if c.name == "Self-evolving review rules")
-        assert cap.state is State.OWNED
+        assert cap.state is State.IMPLEMENTED
+        assert cap.blockers[0].startswith("RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED")
         assert any("no rule has earned promotion" in b for b in cap.blockers)
 
     def test_the_grammar_records_its_remaining_breadth_gap(self) -> None:
@@ -593,65 +594,21 @@ class TestTheLiveRegisterIsHonest:
     def test_the_report_names_the_owned_capability_explicitly_not_by_omission(self) -> None:
         """`render()` used to simply omit the "Nothing is OWNED" paragraph once something
         cleared all thirteen, leaving a genuinely earned claim stated nowhere as clearly as the
-        "nothing yet" case had been — fixed the same day this first became true."""
+        "nothing yet" case had been — fixed the same day this first became true. The closing
+        paragraph names every OWNED capability, and after the 2026-09-24 re-grade none of the
+        withdrawn ones."""
         rendered = audit().render()
         assert "Nothing is OWNED" not in rendered
         assert f"{len(audit().earned)} capability(ies) OWNED" in rendered
-        assert "Session-aware execution that refuses to solve through a boundary" in rendered
-        assert "Per-profile mandate that changes the verdict" in rendered
-        assert "Cross-sectional factor evaluation" in rendered
-        assert "Overfitting gates that raise instead of returning NaN" in rendered
-        assert "Episodic memory across decisions" in rendered
-        assert "Self-evolving review rules" in rendered
-        assert "Pre-registered trading protocol, hash-committed" in rendered
-        assert "Perception layer: what the desk can see" in rendered
-        assert "Risk layer proved by domain sweep" in rendered
-        assert "Market sentiment" in rendered
-        assert "Deliberation priced as a trading cost" in rendered
-        assert "Abstention scored as a decision" in rendered
-        assert "Typed factor grammar with no execution surface" in rendered
-        assert (
-            "Factor discovery with no execution surface and trial-corrected selection" in rendered
-        )
-        assert "Path-shape matching with a calibrated null" in rendered
-        assert "Cross-market cointegration with corrected multiple testing" in rendered
-        assert "Net executable arbitrage vs. a fee-blind detector" in rendered
-        assert (
-            "Data-honest cross-asset breadth rotation vs. a silently-dropping reference"
-            in rendered
-        )
-        assert (
-            "Clustering-corrected, base-rate-honest event significance vs. a fixed-null test"
-            in rendered
-        )
-        assert (
-            "Funding-aware cross-asset hedge routing vs. a fee-blind composite router"
-            in rendered
-        )
-        assert (
-            "Refusal-first earnings surprise ranking vs. a silently-exploding factor"
-            in rendered
-        )
-        assert (
-            "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias"
-            in rendered
-        )
-        assert "rToken factor divergence vs. Alphalens' real Information Coefficient" in rendered
-        assert (
-            "Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal"
-            in rendered
-        )
-        assert (
-            "Structured filing extraction vs. FinanceBench's real, published LLM measurement"
-            in rendered
-        )
-        assert (
-            "Point-in-time correctness vs. OpenBB's real, ungated live-API agent" in rendered
-        )
-        assert (
-            "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel"
-            in rendered
-        )
+        closing = rendered.split(" capability(ies) OWNED", 1)[1]
+        for cap in audit().owned:
+            assert cap.name in closing, cap.name
+        for name in (
+            "Clustering-corrected, base-rate-honest event significance vs. a fixed-null test",
+            "Self-evolving review rules",
+            "Structured filing extraction vs. FinanceBench's real, published LLM measurement",
+        ):
+            assert name in rendered and name not in closing, name
 
     def test_the_summary_is_one_line(self) -> None:
         assert "\n" not in summary(audit())

@@ -397,7 +397,7 @@ The largest package in the system, deliberately.
 
 **The capability ladder** is enforced in code: LOST → TIED → IMPLEMENTED → OWNED, with OWNED requiring
 thirteen conditions including a reproduced baseline, same-input comparison, out-of-sample test,
-ablation and adversarial test. Live: **27 of 31 capabilities are OWNED**, 3 TIED, 1 IMPLEMENTED,
+ablation and adversarial test. Live: **20 of 33 capabilities are OWNED**, 3 TIED, 1 IMPLEMENTED,
 0 LOST (`data/standing.json`, re-derived by `python -m argus.eval.standing` from the artefacts).
 
 ---

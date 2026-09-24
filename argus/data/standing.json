@@ -430,7 +430,7 @@
       "note": ""
     },
     {
-      "name": "Factor discovery with no execution surface and trial-corrected selection",
+      "name": "Factor-discovery safety: no execution surface and trial-corrected selection, vs. RD-Agent",
       "subtheme": "t2-factordiscovery",
       "module": "argus/research/searchoff.py,argus/research/grammar.py,argus/eval/rdagent_comparison.py,argus/eval/baselines/rdagent_experiment.py,argus/eval/baselines/rdagent_factor.py,argus/eval/baselines/rdagent_costeer_task.py,argus/eval/baselines/rdagent_exception.py,argus/eval/baselines/rdagent_cache_utils.py,argus/eval/baselines/rdagent_factor_loader.py",
       "state": "owned",
@@ -970,7 +970,7 @@
       "name": "Clustering-corrected, base-rate-honest event significance vs. a fixed-null test",
       "subtheme": "t2-event",
       "module": "argus/research/eventstudy.py,argus/eval/eventdriven_comparison.py,argus/eval/baselines/whale_signals_event_study.py,argus/eval/baselines/whale_signals_event_study_loader.py",
-      "state": "owned",
+      "state": "implemented",
       "baseline": "whale-signals real fixed-null hit-rate test (compute_hit_rates/compute_base_rate)",
       "conditions_met": [
         "best_implementation_studied",
@@ -1069,6 +1069,7 @@
         }
       ],
       "blockers": [
+        "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: whale-signals tests one significance method; the Event-Driven Agent sub-theme asks for event -> decision -> trade, and the rivals that do that (JohnboscoE/slimon and Ritapossible/Ballast, both S2 entries with executed demo orders; HKUDS/Vibe-Trading's event skill; TauricResearch/TradingAgents; Nicholas-03/trading-bot) have not been run on the same input. Two defects found in the same review: the EventAnalyst prompt never asked for `chain_falsifiers`, so 0 of 138 recorded chains carried one and every link graded UNSUPPORTED, and the chain's event field held the price line in 138 of 138 (rival review of 2026-09-24). OWNED returns only when they are.",
         "The placebo events are constructed (real timestamps, zero true edge by construction), not whale-signals' own real 646,442-transaction Dune dataset, which needs a paid API key this project does not have \u2014 their own already-published real results (results/published_yearly_edges.csv in the cloned repo) independently show the same qualitative pattern (tiny, sign-flipping year-over-year edges) but were not re-run here. The false-positive rate measured is specific to this real 90-day ETHUSDT window's own drift and will vary with the window and period tested"
       ],
       "note": ""
@@ -1077,7 +1078,7 @@
       "name": "Funding-aware cross-asset hedge routing vs. a fee-blind composite router",
       "subtheme": "t2-crossexecution",
       "module": "argus/desk/execution.py,argus/eval/execution_comparison.py,argus/eval/baselines/crypto_sor_shim/src/lib/CompositeOrderBook.ts,argus/eval/baselines/crypto_sor_shim/src/lib/common.ts,argus/eval/baselines/crypto_sor_loader.py",
-      "state": "owned",
+      "state": "implemented",
       "baseline": "crypto_sor real composite order-book router (CompositeOrderBook.newOrder)",
       "conditions_met": [
         "best_implementation_studied",
@@ -1176,6 +1177,7 @@
         }
       ],
       "blockers": [
+        "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: crypto_sor is a same-instrument, cross-venue router, and this entry's own scope says the leg is not claimed to be a validated hedge. The rivals that lead Cross-Asset Execution (HedgeAgents via the JansenAnalytics replication; CryptoCT01/Crossfire, Jayanng/Omni, norbert351/vigil and danielamodu/Triad from S2) have not been run on the same input (rival review of 2026-09-24). OWNED returns only when they are.",
         "crypto_sor's real multi-exchange feed handlers (Binance/Coinbase/Kraken/OKX/Mango) were not exercised \u2014 this comparison drives its real composite-book/newOrder() core directly with constructed-from-real-data levels, since ARGUS has live access to only one venue (Bitget) and the sub-theme this closes is a cross-ASSET-CLASS question, not a cross-exchange one. The Node/ts-node subprocess adds a real, external-process dependency (Node 22, npm packages pinned in crypto_sor_shim/package.json) that the rest of this pure-Python project does not otherwise carry"
       ],
       "note": ""
@@ -2044,7 +2046,7 @@
       "note": ""
     },
     {
-      "name": "Market sentiment",
+      "name": "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
       "subtheme": "t2-sentiment",
       "module": "argus/agents/analysts.py,argus/market/macro.py,argus/eval/sentiment_comparison.py,argus/eval/baselines/finbert_loader.py",
       "state": "owned",
@@ -2156,7 +2158,7 @@
       "name": "Self-evolving review rules",
       "subtheme": "t3-review",
       "module": "argus/desk/review.py,argus/eval/review_comparison.py,argus/eval/baselines/tradingagents_loader.py,argus/eval/baselines/tradingagents_memory.py,argus/eval/baselines/tradingagents_rating.py",
-      "state": "owned",
+      "state": "implemented",
       "baseline": "TauricResearch/TradingAgents reflection memory",
       "conditions_met": [
         "best_implementation_studied",
@@ -2255,6 +2257,7 @@
         }
       ],
       "blockers": [
+        "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: TradingAgents' reflection memory is not the specialist for Review & Self-Evolution; mnemox-ai/tradememory-protocol, cholhwanjung/trading-agent (a statistical rule lifecycle), OpenByteInc/QuantDinger and the S2 entry Azedfx/TradePilot-AI have not been run on the same input. The same review reported that `desk/review.py` grades a coin-flip rule ACTIVE, a base-rate defect that must be fixed before any rerun (rival review of 2026-09-24). OWNED returns only when they are.",
         "The checklist is honest and currently empty: no rule has earned promotion, so this is a mechanism for learning rules rather than a set of learned rules, and it is described that way everywhere it appears."
       ],
       "note": ""
@@ -2370,7 +2373,7 @@
       "name": "Session-aware execution that refuses to solve through a boundary",
       "subtheme": "t3-execution",
       "module": "argus/execution/schedule.py,argus/execution/guard.py,argus/eval/schedule_comparison.py",
-      "state": "owned",
+      "state": "implemented",
       "baseline": "nkaz001/hftbacktest queue model; Bitget's own instrument rules; Almgren & Chriss (2000) closed-form optimum vs nautechsystems/nautilus_trader's real TwapAlgorithm as the field's stated default",
       "conditions_met": [
         "best_implementation_studied",
@@ -2469,6 +2472,7 @@
         }
       ],
       "blockers": [
+        "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: Almgren-Chriss minimises its own mean-variance objective by construction, so beating TWAP on that objective proves the algebra, not execution quality. The rivals that lead Execution Assistance (PACE; TradeMaster's order-execution agents; the S2 entries zz-0816/bitget-s2-execution-aware-alpha and Ritapossible/Egress; Bitget's native TWAP/Iceberg) have not been run on the same fills (rival review of 2026-09-24). OWNED returns only when they are.",
         "no live fills exist to compare against, so execution realism is argued from the venue's rules rather than measured against our own fills \u2014 the thirteen conditions are about a valid experiment, and a live-fills comparison remains a further, separate strengthening this capability does not yet have, named here so OWNED is not read as 'nothing more could ever be measured'"
       ],
       "note": ""
@@ -2910,7 +2914,7 @@
       "name": "Structured filing extraction vs. FinanceBench's real, published LLM measurement",
       "subtheme": "t3-infoextract",
       "module": "argus/market/fundamentals.py,argus/eval/infoextract_comparison.py",
-      "state": "owned",
+      "state": "implemented",
       "baseline": "FinanceBench's own real, published metrics-generated results (Patronus AI, arXiv 2311.11944, 16 real model/retrieval-condition combinations graded Correct/Incorrect/Refusal by human review)",
       "conditions_met": [
         "best_implementation_studied",
@@ -3009,6 +3013,7 @@
         }
       ],
       "blockers": [
+        "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: the comparison set ARGUS's lookups on its own case set against FinanceBench's published numbers on a different question set, and the capability ledger already carried it as IMPLEMENTED. The rivals that lead Information Extraction (anthropics/financial-services earnings-reviewer, CAMEF, GeoRisk, the S2 entries RESIDUAL, optic-bitget and postbell) have not been run on the same input (rival review of 2026-09-24). OWNED returns only when they are.",
         "FinanceBench's own 150-question open-source set and its results/*.jsonl transcripts carry no LICENSE file, so the exact questions and gold answers are cited and recomputed from rather than vendored into this repo or run against ARGUS directly \u2014 the comparison is same-task-class on freshly-designed real cases, not the identical question set. ARGUS's five supported concepts (revenue, net_income, operating_income, eps_diluted, gross_profit) do not cover FinanceBench's harder derived-ratio questions (fixed-asset turnover, operating cash flow ratio) or its prose-reasoning questions (domain-relevant, novel-generated) at all"
       ],
       "note": ""
@@ -3017,7 +3022,7 @@
       "name": "Point-in-time correctness vs. OpenBB's real, ungated live-API agent",
       "subtheme": "t3-workbench",
       "module": "argus/market/evidence.py,argus/market/fundamentals.py,argus/eval/workbench_comparison.py",
-      "state": "owned",
+      "state": "implemented",
       "baseline": "OpenBB's real, published agent (openbb-finance/openbb-agents) and data platform (openbb-finance/OpenBBTerminal), both read in full and neither vendored",
       "conditions_met": [
         "best_implementation_studied",
@@ -3116,6 +3121,7 @@
         }
       ],
       "blockers": [
+        "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: openbb-agents is an archived 2024 repository; the current OpenBB stack (ODP, openbb-mcp-server, Agent Rita), TraderAlice/OpenAlice, HKUDS/Vibe-Trading, ginlix-ai/LangAlpha and the S2 entry Abd00lmalik/Lumen-Terminal have not been run on the same input (rival review of 2026-09-24). OWNED returns only when they are.",
         "OpenBB genuinely wins on raw data-source breadth (32 real providers, 21 keyless, vs ARGUS's 12 live-verified) \u2014 closing that gap is a separate, already-named, unimplemented improvement (BLS employment data, Fama-French factors, CFTC positioning \u2014 research/audit/a2-openbb.md's own prior recommendation), not addressed by this capability. Neither OpenBB repository was run end to end (the Platform's real fetchers mostly need paid API keys this project does not have, and the Agents repo needs an OpenAI key for its LLM calls) \u2014 this comparison instead reads both real repos' source directly, which is sufficient to establish the structural absence of point-in-time gating without needing either live run"
       ],
       "note": ""
@@ -3124,7 +3130,7 @@
       "name": "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel",
       "subtheme": "t3-execassist",
       "module": "argus/execution/latency.py,argus/eval/execassist_comparison.py",
-      "state": "owned",
+      "state": "implemented",
       "baseline": "hftbacktest's real LatencyModel trait (nkaz001/hftbacktest, MIT)",
       "conditions_met": [
         "best_implementation_studied",
@@ -3223,7 +3229,64 @@
         }
       ],
       "blockers": [
+        "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: the result is that the rival has no input for the quantity, which is a gap in its scope rather than a measured superiority, and hftbacktest does install from a prebuilt wheel (2.4.4, verified 2026-09-24) \u2014 the blocker below said otherwise. Not rerun on the same input (rival review of 2026-09-24). OWNED returns only when they are.",
         "hftbacktest's real latency model is a compiled Rust crate exposed to Python via PyO3 bindings; no prebuilt wheel exists for this machine and building one would need a full Rust toolchain, so its real code was read rather than run \u2014 sufficient to establish the structural absence of a decision-latency concept from its own published trait and struct signatures, but not a live-run baseline. hftbacktest's real IntpOrderLatency (historical network-latency interpolation) is a genuine capability this comparison does not evaluate at all \u2014 this capability is scoped to decision latency specifically, not the full latency-modelling surface"
+      ],
+      "note": ""
+    },
+    {
+      "name": "Market sentiment",
+      "subtheme": "t2-sentiment",
+      "module": "argus/agents/analysts.py,argus/agents/desk.py,argus/lui/research.py",
+      "state": "implemented",
+      "baseline": "Santiment crowd-sentiment contrarian signals; Augmento; Bitget's own bitget-signal sentiment-analyst Skill; TauricResearch/TradingAgents v0.4 sentiment analyst; the S2 entry Jfash-cmd/sentinel-bitget-hackathon",
+      "conditions_met": [],
+      "conditions_missing": [
+        "best_implementation_studied",
+        "best_method_studied",
+        "baseline_reproduced",
+        "implementation_complete",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "failure_cases_documented",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [],
+      "blockers": [
+        "The sub-theme asks how real-time social sentiment becomes a position signal. What is proven is narrower (the integrity row above: coordinated posting does not move the desk's analyst). The desk has opened no position from a sentiment read, and the rivals that lead the sub-theme have not been run on the same input (rival review of 2026-09-24)"
+      ],
+      "note": ""
+    },
+    {
+      "name": "Factor Discovery Agent: hypothesis to tradable factor",
+      "subtheme": "t2-factordiscovery",
+      "module": "argus/research/searchoff.py,argus/research/grammar.py,argus/research/factor_lab.py",
+      "state": "implemented",
+      "baseline": "minihellboy/FactorMiner (arXiv 2602.14670); bigcan/sharpen Crucible; rookiewu417/FactorZen; QuantaAlpha/QuantaAlpha; microsoft/RD-Agent fin_factor",
+      "conditions_met": [],
+      "conditions_missing": [
+        "best_implementation_studied",
+        "best_method_studied",
+        "baseline_reproduced",
+        "implementation_complete",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "failure_cases_documented",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [],
+      "blockers": [
+        "What is proven is the safety of the search (the row above). Factor quality \u2014 whether the factors found carry out-of-sample edge after costs \u2014 has not been compared with the systems that lead on it, and no certified factor has been traded (rival review of 2026-09-24)"
       ],
       "note": ""
     }
@@ -3231,8 +3294,8 @@
   "by_state": {
     "lost": 0,
     "tied": 3,
-    "implemented": 1,
-    "owned": 27
+    "implemented": 10,
+    "owned": 20
   },
   "findings": [],
   "clean": true,

@@ -627,9 +627,11 @@ A judge should not have to discover these.
   to it — rather than the earlier and false "no hedge placeable".
 - **No usage data.** This has not been put in front of traders yet. The plan is ten supervised
   sessions measuring whether the risk-share figure changes the ticket.
-- **Superiority is claimed only where a named competitor was run on the same input.** 27 of 31
+- **Superiority is claimed only where a named competitor was run on the same input.** 20 of 33
   capabilities are OWNED under that rule; the rest are TIED or IMPLEMENTED and are called that, and
-  every comparison we lost is published on `/wrong`.
+  every comparison we lost is published on `/wrong`. On 2026-09-24 seven earlier OWNED grades were
+  withdrawn because the rival they beat does not lead its sub-theme; they stay IMPLEMENTED until
+  the systems that do lead it are run on the same input.
 
 ---
 
@@ -1318,7 +1320,7 @@ route to it — is now what the layer sees.
 - **One model, no ensemble, no adversarial overturn.**
 - **"Owned" is a conjunction, not a score.** An owned capability needs a reproduced baseline, a
   same-input comparison, an out-of-sample test, an ablation and an adversarial test, among thirteen
-  conditions. On 2026-09-12 zero met that bar; the register now reads 27 of 31 capabilities are
+  conditions. On 2026-09-12 zero met that bar; the register now reads 20 of 33 capabilities are
   OWNED, each re-derived from its artefacts by `eval/standing.py`, never from prose.
 
 ---
@@ -1978,14 +1980,16 @@ source is a build failure, not a typo.
 | Tradeable-session replay frames, point-in-time | 30 reconstructed, **0 positions opened** |
 | Hurdle frontier | 39 instants / 25 effective, median move 137bps vs an 18.8bps hurdle |
 | Directional accuracy at which trading beats abstaining | **56.0%** |
-| Capabilities proven better than a named competitor | **27 of 31** |
+| Capabilities proven better than a named competitor | **20 of 33** |
 
 That last row is the one to read twice. An *owned* capability needs a reproduced baseline, a
 same-input comparison, an out-of-sample test, an ablation and an adversarial test — thirteen
 conditions in all, enforced in code by `argus/eval/standing.py`, which raises at import if anything
-claims OWNED without them. It read zero when this table was first written; today 27 of 31
-capabilities are OWNED, 3 are TIED and 1 is IMPLEMENTED, and the three that were once LOST are the
-ties.
+claims OWNED without them. It read zero when this table was first written; today 20 of 33
+capabilities are OWNED, 3 are TIED and 10 are IMPLEMENTED, and the three that were once LOST are the
+ties. It read 27 of 31 until 2026-09-24, when a review of the right rivals per sub-theme withdrew
+seven OWNED grades won against a rival that does not lead the sub-theme, and split two more into
+the narrow thing proven (OWNED) and the sub-theme itself (IMPLEMENTED).
 
 ## Part 26 — What we checked the competition and found
 

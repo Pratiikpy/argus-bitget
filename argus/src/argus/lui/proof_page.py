@@ -93,6 +93,8 @@ IN_THE_CONSOLE: dict[str, tuple[str, str]] = {
     "LUI intent routing, measured against Rasa's real DIET classifier":
         ("wut abt nvda earnigns when", ""),
     "Market sentiment": ("is the hype on NVDA real", ""),
+    "Sentiment integrity: resistance to coordinated posting, vs. finBERT":
+        ("is the hype on NVDA real", ""),
     "Clustering-corrected, base-rate-honest event significance vs. a fixed-null test":
         ("how does NVDA react to CPI", ""),
     "Path-shape matching with a calibrated null": ("has NVDA been here before", ""),
@@ -132,6 +134,7 @@ class Win:
     console: tuple[str, str] | None
     proofs: tuple[tuple[str, str], ...]
     note: str
+    blockers: tuple[str, ...] = ()
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -195,6 +198,7 @@ def collect(data_dir: Path) -> tuple[list[Win], dict[str, int]]:
             console=IN_THE_CONSOLE.get(cap["name"]),
             proofs=tuple((p["condition"], p["how"]) for p in proofs),
             note=cap.get("note", ""),
+            blockers=tuple(str(b) for b in cap.get("blockers", [])),
         ))
     return wins, dict(report.get("by_state", {}))
 
@@ -225,10 +229,18 @@ def _card(win: Win) -> str:
     note = f"<p class='note'>{esc(win.note)}</p>" if win.note else ""
     tested = (f"<p><span class='lbl'>Same-input test</span>{esc(win.tested)}</p>"
               if win.tested else "")
+    if win.state != "owned" and win.blockers:
+        reason = win.blockers[0]
+        if len(reason) > 900:
+            reason = reason[:900].rsplit(" ", 1)[0] + "…"
+        tested += (f"<p class='why'><span class='lbl'>Why not OWNED</span>{esc(reason)}</p>")
     return (
         f"<article class='w {esc(win.state)}'>"
         f"<div class='head'><span class='st {esc(win.state)}'>{esc(win.state.upper())}</span>"
-        f"<span class='cn'>{win.conditions} of 13 conditions</span></div>"
+        f"<span class='cn'>{win.conditions} of 13 conditions"
+        + (" — against a rival that does not lead the sub-theme"
+           if win.state != "owned" and win.conditions == 13 else "")
+        + "</span></div>"
         f"<h3>{esc(win.name)}</h3>"
         f"<p><span class='lbl'>Rival</span>{esc(win.rival)}</p>{tested}"
         f"<div class='links'>{' '.join(links)}</div>{rerun}"
@@ -309,6 +321,7 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  details li {{ margin-bottom:6px; overflow-wrap:anywhere }}
  details b {{ color:var(--ink); font-weight:600 }}
  .note {{ font-size:12.5px; overflow-wrap:anywhere }}
+ .why {{ color:var(--warn) }}
  a {{ color:var(--accent) }}
  a:focus-visible, summary:focus-visible {{ outline:2px solid var(--accent); outline-offset:2px }}
  @media (max-width:520px) {{ .lbl {{ display:block; min-width:0 }} }}

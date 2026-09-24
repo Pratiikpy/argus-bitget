@@ -220,3 +220,34 @@ class TestGradableOutputs:
         view = _parse_view("event", {"signal": "neutral", "confidence": 0.3, "reasoning": "r"})
         assert chain_from_response("e", SUNDAY, view.raw).links == []
         assert from_response("x", view.raw).direction == "neutral"
+
+
+class TestTheChainIsGradable:
+    """All 138 recorded chains named the price line as their event and carried no falsifier, so
+    no link was ever graded (the rival review, 2026-09-24). Both halves are pinned here."""
+
+    def test_the_prompt_asks_for_a_falsifier_per_link(self) -> None:
+        from argus.agents.analysts import EventAnalyst
+
+        assert '"chain_falsifiers"' in EventAnalyst.role
+        assert "same length" in EventAnalyst.role
+
+    def test_the_event_is_the_filing_or_headline_not_the_price(self) -> None:
+        from datetime import UTC, datetime
+
+        from argus.agents.analysts import chain_event
+        from argus.truth.evidence import Evidence
+
+        at = datetime(2026, 9, 24, tzinfo=UTC)
+        price = Evidence(id="mkt-NVDAUSDT", claim="NVDAUSDT last 180", source="news",
+                         available_at=at)
+        vix = Evidence(id="vix-1", claim="VIX 14.2", source="macro", available_at=at)
+        headline = Evidence(id="rss-1", claim="Nvidia wins a contract", source="news",
+                            available_at=at)
+        filing = Evidence(id="sec-1", claim="NVDA filed 8-K item 2.02", source="filing",
+                          available_at=at)
+        assert chain_event("NVDAUSDT", [price, vix, headline, filing]) == filing.claim
+        assert chain_event("NVDAUSDT", [price, vix, headline]) == headline.claim
+        assert chain_event("NVDAUSDT", [price, vix]) == vix.claim
+        assert chain_event("NVDAUSDT", [price]) == price.claim
+        assert chain_event("NVDAUSDT", []) == "NVDAUSDT"

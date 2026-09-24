@@ -22,7 +22,7 @@
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 44,
+      "line": 47,
       "quoted": [
         "6,662"
       ],
@@ -33,7 +33,7 @@
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 55,
+      "line": 58,
       "quoted": [
         "6,662"
       ],
@@ -44,7 +44,7 @@
     {
       "claim": "tests_passing",
       "doc": "submission",
-      "line": 66,
+      "line": 68,
       "quoted": [
         "6,662"
       ],
@@ -55,7 +55,7 @@
     {
       "claim": "tests_passing",
       "doc": "submission",
-      "line": 409,
+      "line": 411,
       "quoted": [
         "6,662"
       ],
@@ -66,7 +66,7 @@
     {
       "claim": "tests_passing",
       "doc": "submission",
-      "line": 517,
+      "line": 519,
       "quoted": [
         "6,662"
       ],
@@ -77,7 +77,7 @@
     {
       "claim": "tests_passing",
       "doc": "submission",
-      "line": 610,
+      "line": 612,
       "quoted": [
         "6,662"
       ],
@@ -88,7 +88,7 @@
     {
       "claim": "tests_passing",
       "doc": "explained",
-      "line": 659,
+      "line": 661,
       "quoted": [
         "6,662"
       ],
@@ -99,7 +99,7 @@
     {
       "claim": "tests_passing",
       "doc": "explained",
-      "line": 1708,
+      "line": 1710,
       "quoted": [
         "6,662"
       ],
@@ -110,7 +110,7 @@
     {
       "claim": "tests_passing",
       "doc": "explained",
-      "line": 1957,
+      "line": 1959,
       "quoted": [
         "6,662"
       ],
@@ -134,7 +134,7 @@
     {
       "claim": "source_files",
       "doc": "public-readme",
-      "line": 56,
+      "line": 59,
       "quoted": [
         "314"
       ],
@@ -147,7 +147,7 @@
     {
       "claim": "source_files",
       "doc": "submission",
-      "line": 409,
+      "line": 411,
       "quoted": [
         "314"
       ],
@@ -160,7 +160,7 @@
     {
       "claim": "source_files",
       "doc": "submission",
-      "line": 610,
+      "line": 612,
       "quoted": [
         "314"
       ],
@@ -173,7 +173,7 @@
     {
       "claim": "source_files",
       "doc": "explained",
-      "line": 1954,
+      "line": 1956,
       "quoted": [
         "314"
       ],
@@ -223,7 +223,7 @@
     {
       "claim": "register_claims",
       "doc": "submission",
-      "line": 193,
+      "line": 195,
       "quoted": [
         "236"
       ],
@@ -236,7 +236,7 @@
     {
       "claim": "register_claims",
       "doc": "submission",
-      "line": 484,
+      "line": 486,
       "quoted": [
         "236"
       ],
@@ -249,7 +249,7 @@
     {
       "claim": "register_claims",
       "doc": "explained",
-      "line": 1818,
+      "line": 1820,
       "quoted": [
         "236"
       ],
@@ -318,7 +318,7 @@
     {
       "claim": "refusal_accuracy_2h",
       "doc": "public-readme",
-      "line": 113,
+      "line": 116,
       "quoted": [
         "169",
         "289"
@@ -346,7 +346,7 @@
     {
       "claim": "refusal_forgone_2h",
       "doc": "public-readme",
-      "line": 119,
+      "line": 122,
       "quoted": [
         "-6.7"
       ],
@@ -361,45 +361,45 @@
       "doc": "readme",
       "line": 274,
       "quoted": [
-        "27",
-        "31"
+        "20",
+        "33"
       ],
       "live": [
-        27,
-        31
+        20,
+        33
       ],
       "status": "OK",
-      "excerpt": "27 of 31 capabilities are OWNED"
+      "excerpt": "20 of 33 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
       "doc": "readme",
       "line": 445,
       "quoted": [
-        "27",
-        "31"
+        "20",
+        "33"
       ],
       "live": [
-        27,
-        31
+        20,
+        33
       ],
       "status": "OK",
-      "excerpt": "27 of 31 capabilities are OWNED"
+      "excerpt": "20 of 33 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
       "doc": "public-readme",
-      "line": 126,
+      "line": 129,
       "quoted": [
-        "27",
-        "31"
+        "20",
+        "33"
       ],
       "live": [
-        27,
-        31
+        20,
+        33
       ],
       "status": "OK",
-      "excerpt": "27 of 31 capabilities are OWNED"
+      "excerpt": "20 of 33 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -407,8 +407,8 @@
       "line": null,
       "quoted": [],
       "live": [
-        27,
-        31
+        20,
+        33
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -419,8 +419,8 @@
       "line": null,
       "quoted": [],
       "live": [
-        27,
-        31
+        20,
+        33
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -430,20 +430,20 @@
       "doc": "architecture",
       "line": 400,
       "quoted": [
-        "27",
-        "31"
+        "20",
+        "33"
       ],
       "live": [
-        27,
-        31
+        20,
+        33
       ],
       "status": "OK",
-      "excerpt": "27 of 31 capabilities are OWNED"
+      "excerpt": "20 of 33 capabilities are OWNED"
     },
     {
       "claim": "lui_router_fresh_accuracy",
       "doc": "submission",
-      "line": 344,
+      "line": 346,
       "quoted": [
         "23.5"
       ],
@@ -456,7 +456,7 @@
     {
       "claim": "lui_patterns_accuracy",
       "doc": "submission",
-      "line": 341,
+      "line": 343,
       "quoted": [
         "26.3"
       ],
@@ -469,7 +469,7 @@
     {
       "claim": "lui_cascade",
       "doc": "submission",
-      "line": 350,
+      "line": 352,
       "quoted": [
         "79.5",
         "41"
@@ -484,7 +484,7 @@
     {
       "claim": "lui_out_of_scope_recall",
       "doc": "submission",
-      "line": 370,
+      "line": 372,
       "quoted": [
         "93"
       ],
@@ -497,7 +497,7 @@
     {
       "claim": "reliable_skill_tools",
       "doc": "submission",
-      "line": 267,
+      "line": 269,
       "quoted": [
         "9",
         "19"
@@ -512,7 +512,7 @@
     {
       "claim": "answering_data_entries",
       "doc": "submission",
-      "line": 278,
+      "line": 280,
       "quoted": [
         "37",
         "67"
@@ -527,7 +527,7 @@
     {
       "claim": "governed_failure_rates",
       "doc": "submission",
-      "line": 629,
+      "line": 631,
       "quoted": [
         "99.5",
         "2.5"
@@ -592,7 +592,7 @@
     {
       "claim": "anchors_confirmed",
       "doc": "explained",
-      "line": 2550,
+      "line": 2554,
       "quoted": [
         "38",
         "64"
@@ -657,7 +657,7 @@
     {
       "claim": "modules_importable",
       "doc": "public-readme",
-      "line": 58,
+      "line": 61,
       "quoted": [
         "139",
         "139"
@@ -672,7 +672,7 @@
     {
       "claim": "modules_importable",
       "doc": "submission",
-      "line": 611,
+      "line": 613,
       "quoted": [
         "139",
         "139"
@@ -702,7 +702,7 @@
     {
       "claim": "subthemes",
       "doc": "public-readme",
-      "line": 59,
+      "line": 62,
       "quoted": [
         "18",
         "18"
@@ -717,7 +717,7 @@
     {
       "claim": "subthemes",
       "doc": "submission",
-      "line": 409,
+      "line": 411,
       "quoted": [
         "18",
         "18"
@@ -758,7 +758,7 @@
     {
       "claim": "ledger_entries",
       "doc": "submission",
-      "line": 587,
+      "line": 589,
       "quoted": [
         "627"
       ],
@@ -771,7 +771,7 @@
     {
       "claim": "ledger_entries",
       "doc": "explained",
-      "line": 1140,
+      "line": 1142,
       "quoted": [
         "627"
       ],
@@ -806,7 +806,7 @@
     {
       "claim": "settled_abstentions",
       "doc": "explained",
-      "line": 1140,
+      "line": 1142,
       "quoted": [
         "571"
       ],
@@ -854,7 +854,7 @@
     {
       "claim": "t1_beat_buy_and_hold",
       "doc": "explained",
-      "line": 1556,
+      "line": 1558,
       "quoted": [
         "12"
       ],
@@ -878,7 +878,7 @@
     {
       "claim": "t1_dsr_candidates",
       "doc": "explained",
-      "line": 1566,
+      "line": 1568,
       "quoted": [
         "2"
       ],
@@ -891,7 +891,7 @@
     {
       "claim": "t1_rolling_scorable",
       "doc": "explained",
-      "line": 1580,
+      "line": 1582,
       "quoted": [
         "1,107",
         "2,129"
@@ -906,7 +906,7 @@
     {
       "claim": "t1_rolling_scorable_worst",
       "doc": "explained",
-      "line": 1582,
+      "line": 1584,
       "quoted": [
         "308"
       ],
@@ -919,7 +919,7 @@
     {
       "claim": "t1_dsr_survivors",
       "doc": "explained",
-      "line": 2866,
+      "line": 2870,
       "quoted": [
         "Zero"
       ],
@@ -943,7 +943,7 @@
     {
       "claim": "t1_oos_breaches",
       "doc": "explained",
-      "line": 1602,
+      "line": 1604,
       "quoted": [
         "8"
       ],
@@ -978,7 +978,7 @@
     {
       "claim": "arbitrage_monetisable",
       "doc": "explained",
-      "line": 1446,
+      "line": 1448,
       "quoted": [
         "4.58"
       ],
@@ -1002,7 +1002,7 @@
     {
       "claim": "weekend_continuation",
       "doc": "explained",
-      "line": 1473,
+      "line": 1475,
       "quoted": [
         "57.7"
       ],
@@ -1041,7 +1041,7 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "submission",
-      "line": 235,
+      "line": 237,
       "quoted": [
         "10",
         "11"
@@ -1071,7 +1071,7 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "explained",
-      "line": 1503,
+      "line": 1505,
       "quoted": [
         "10",
         "11"
@@ -1114,7 +1114,7 @@
     {
       "claim": "aapl_beta_open",
       "doc": "submission",
-      "line": 235,
+      "line": 237,
       "quoted": [
         "0.675"
       ],
@@ -1164,7 +1164,7 @@
     {
       "claim": "aapl_beta_shut",
       "doc": "submission",
-      "line": 236,
+      "line": 238,
       "quoted": [
         "0.105"
       ],
@@ -1223,7 +1223,7 @@
     {
       "claim": "hurdle_symbols_clearing_rth",
       "doc": "explained",
-      "line": 1155,
+      "line": 1157,
       "quoted": [
         "eleven"
       ],
@@ -1289,7 +1289,7 @@
     {
       "claim": "hurdle_clearing_range",
       "doc": "explained",
-      "line": 1154,
+      "line": 1156,
       "quoted": [
         "61",
         "89"
@@ -1334,7 +1334,7 @@
     {
       "claim": "hurdle_qqq_rth",
       "doc": "submission",
-      "line": 602,
+      "line": 604,
       "quoted": [
         "48.3"
       ],
@@ -1397,7 +1397,7 @@
     {
       "claim": "pbo_range",
       "doc": "explained",
-      "line": 1969,
+      "line": 1971,
       "quoted": [
         "0.11",
         "0.77"
@@ -1412,7 +1412,7 @@
     {
       "claim": "pbo_worst",
       "doc": "explained",
-      "line": 2186,
+      "line": 2190,
       "quoted": [
         "0.77"
       ],
@@ -1425,7 +1425,7 @@
     {
       "claim": "fdr_trials",
       "doc": "explained",
-      "line": 2154,
+      "line": 2158,
       "quoted": [
         "0",
         "300"
@@ -1440,7 +1440,7 @@
     {
       "claim": "mintrl_range",
       "doc": "explained",
-      "line": 1971,
+      "line": 1973,
       "quoted": [
         "0.47",
         "3.52"
@@ -1455,7 +1455,7 @@
     {
       "claim": "brier_index",
       "doc": "explained",
-      "line": 1966,
+      "line": 1968,
       "quoted": [
         "51.8"
       ],
@@ -1468,7 +1468,7 @@
     {
       "claim": "brier_index",
       "doc": "explained",
-      "line": 2040,
+      "line": 2044,
       "quoted": [
         "51.8"
       ],
@@ -1481,7 +1481,7 @@
     {
       "claim": "skill_vs_climatology",
       "doc": "explained",
-      "line": 2042,
+      "line": 2046,
       "quoted": [
         "6.8"
       ],
@@ -1494,7 +1494,7 @@
     {
       "claim": "hurdle_break_even",
       "doc": "explained",
-      "line": 2230,
+      "line": 2234,
       "quoted": [
         "55.0"
       ],
@@ -1507,7 +1507,7 @@
     {
       "claim": "hurdle_median_move",
       "doc": "explained",
-      "line": 2228,
+      "line": 2232,
       "quoted": [
         "103"
       ],
@@ -1520,7 +1520,7 @@
     {
       "claim": "xs_trials",
       "doc": "explained",
-      "line": 1676,
+      "line": 1678,
       "quoted": [
         "80"
       ],
@@ -1533,7 +1533,7 @@
     {
       "claim": "xs_backtests",
       "doc": "explained",
-      "line": 1677,
+      "line": 1679,
       "quoted": [
         "1,336"
       ],
@@ -1546,7 +1546,7 @@
     {
       "claim": "xs_positive_gross",
       "doc": "explained",
-      "line": 1678,
+      "line": 1680,
       "quoted": [
         "31"
       ],
@@ -1559,7 +1559,7 @@
     {
       "claim": "xs_positive_net",
       "doc": "explained",
-      "line": 1679,
+      "line": 1681,
       "quoted": [
         "4"
       ],
@@ -1572,7 +1572,7 @@
     {
       "claim": "xs_phase_agreement",
       "doc": "explained",
-      "line": 1681,
+      "line": 1683,
       "quoted": [
         "0"
       ],
