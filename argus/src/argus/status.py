@@ -85,6 +85,7 @@ MODULES = (
     "argus.research.eventstudy", "argus.research.event_reactions",
     "argus.backtest.dependence",
     "argus.market.calendar", "argus.market.earnings_release", "argus.market.stories",
+    "argus.market.bitget_positioning",
     "argus.lui.question", "argus.lui.answer", "argus.lui.cli", "argus.lui.server",
     "argus.lui.phrasebook",
     "argus.lui.router", "argus.lui.research", "argus.lui.task", "argus.lui.status_page",

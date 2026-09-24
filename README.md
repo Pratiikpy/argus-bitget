@@ -44,7 +44,7 @@ your holdings (and your own risk budget) in the "My book" field and every answer
 cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module + sub-theme coverage, resolved by import
-pytest -q                       # 6,662 tests collected
+pytest -q                       # 6,682 tests collected
 ```
 
 Nothing above needs a credential. The full run took 1h16m from a fresh GitHub clone on 2026-09-24 — 6,457 passed, 85 skipped, 0 failed (the rival comparisons re-fetch live Bitget data, and one comparison installs its locked Node packages on first use); tests that need a rival's source cloned beside the repository skip and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so a test that reaches the network shows itself.
@@ -55,10 +55,10 @@ Nothing above needs a credential. The full run took 1h16m from a fresh GitHub cl
 
 | | |
 |---|---|
-| Tests | **6,662 tests collected** — run `pytest -q` |
-| Type checking | **`mypy --strict` clean on 314 source files** |
+| Tests | **6,682 tests collected** — run `pytest -q` |
+| Type checking | **`mypy --strict` clean on 315 source files** |
 | Lint | `ruff` clean |
-| Module health | **139/139 modules importable**, checked by `python -m argus.status` |
+| Module health | **140/140 modules importable**, checked by `python -m argus.status` |
 | Sub-theme coverage | **18/18 sub-themes**, resolved by import at runtime — not claimed in prose |
 | Data artefacts | **46 cited across these documents**, every one reproducible from a single named command, with a test that fails if a document cites an artefact nothing writes |
 | Quoted figures | **69 figures quoted in the five public documents are re-checked against their artefacts** by `python -m argus.eval.docclaims --tests` (counted 2026-09-24), which exits non-zero if any has drifted |

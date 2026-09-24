@@ -8,10 +8,10 @@ that produced them.
 
 | | |
 |---|---|
-| Source | **314 source files**, 21 packages, 125,835 lines (measured 2026-09-24) |
-| Registered and importable at runtime | **139/139** (`python -m argus.status`) |
-| Tests | **222 files, 6,662 tests collected**; a fresh GitHub clone of the earlier 6,542-test tree ran 6,457 passed, 85 skipped, 0 failed |
-| Static analysis | `ruff` clean; `mypy --strict` clean on 314 source files |
+| Source | **315 source files**, 21 packages, 126,483 lines (measured 2026-09-24) |
+| Registered and importable at runtime | **140/140** (`python -m argus.status`) |
+| Tests | **223 files, 6,682 tests collected**; a fresh GitHub clone of the earlier 6,542-test tree ran 6,457 passed, 85 skipped, 0 failed |
+| Static analysis | `ruff` clean; `mypy --strict` clean on 315 source files |
 | Artefacts | **162** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
 | External systems torn down at code level | **56 code-level teardowns** under `research/architecture/`, each citing `file:line` |
 | Runtime dependencies | **two** — `pydantic`, `python-dateutil` |

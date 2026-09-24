@@ -2320,14 +2320,26 @@ def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
             head += "."
         lines.insert(0, head)
     lines.extend(_event_lines(raw_text, always=True)[0])
+    try:
+        from argus.market.bitget_positioning import us_stock_brief
+
+        brief = us_stock_brief()
+    except Exception:
+        brief = None
+    if brief:
+        lines.append(brief)
     if _FRED_USED_SNAPSHOT:
         dated = sorted(set(_FRED_USED_SNAPSHOT.values()))
         lines.append(f"FRED did not answer from here just now, so these series are the desk "
                      f"cycle's last reading ({', '.join(dated)}), not this minute's.")
         _FRED_USED_SNAPSHOT.clear()
-    return lines, [Source(kind="venue", ref="FRED (St. Louis Fed) + Bitget TLTUSDT/EURUSDUSDT",
-                          detail="FRED series DGS10, DGS2, DFF, T10YIE, DTWEXBGS; Bitget hourly "
-                                 "candles; Federal Reserve press feed, live")], readings
+    macro_sources = [Source(kind="venue", ref="FRED (St. Louis Fed) + Bitget TLTUSDT/EURUSDUSDT",
+                            detail="FRED series DGS10, DGS2, DFF, T10YIE, DTWEXBGS; Bitget hourly "
+                                   "candles; Federal Reserve press feed, live")]
+    if brief:
+        macro_sources.append(Source(kind="venue", ref="bitget-mcp-server news_label_search",
+                                    detail="Bitget UEX Daily, the latest US-stock brief"))
+    return lines, macro_sources, readings
 
 
 def _rate_sensitivity(symbol: str, days: int = 90) -> dict[str, Any] | None:
@@ -2376,6 +2388,32 @@ def _rate_sensitivity(symbol: str, days: int = 90) -> dict[str, Any] | None:
 CRYPTO_LINKED = frozenset({"COINUSDT", "MSTRUSDT"})
 """Stocks whose price follows crypto closely enough that the crypto backdrop belongs in their
 sentiment answer: an exchange and a bitcoin treasury company."""
+
+
+def _bitcoin_treasury_line(ticker: str, market_cap: float) -> str | None:
+    """A listed company's bitcoin and what its market value pays for it, from Bitget's service
+    and Bitget's own BTC price."""
+    from argus.market.bitget import fetch_tickers
+    from argus.market.bitget_positioning import bitcoin_treasury
+
+    try:
+        btc = fetch_tickers().get("BTCUSDT")
+        price = float(btc.last) if btc is not None else None
+    except Exception:
+        price = None
+    try:
+        return bitcoin_treasury(ticker, market_cap, price)
+    except Exception:
+        return None
+
+
+def _ex_dividend_line(ticker: str) -> str | None:
+    from argus.market.bitget_positioning import next_ex_dividend
+
+    try:
+        return next_ex_dividend(ticker)
+    except Exception:
+        return None
 
 
 def _desk_integrity_read(symbol: str) -> dict[str, Any] | None:
@@ -2461,6 +2499,18 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
     from argus.market.stories import group
 
     def fear_greed() -> list[dict[str, Any]]:
+        # Bitget's own service first; alternative.me, the source its Skill wraps, behind it.
+        try:
+            from argus.market.bitget_positioning import crypto_mood
+
+            mood = crypto_mood()
+        except Exception:
+            mood = None
+        if mood is not None:
+            value, label, week = mood
+            return [{"value": v, "value_classification": label if i == 0 else "",
+                     "via": "bitget"} for i, v in enumerate(week)] or [
+                {"value": value, "value_classification": label, "via": "bitget"}]
         try:
             req = urllib.request.Request("https://api.alternative.me/fng/?limit=8",
                                          headers={"User-Agent": "argus-research/1.0"})
@@ -2469,16 +2519,34 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
         except Exception:
             return []
 
+    from argus.market import bitget_positioning
+
     named = symbol is not None and symbol != BENCHMARK and (
         symbol in TRADED_SYMBOLS or _is_equity(symbol))
-    with ThreadPoolExecutor(max_workers=2) as pool:
+    crypto_side = symbol is None or symbol in CRYPTO_LINKED or not named
+    base = "ETH" if symbol == "ETHUSDT" else "BTC"
+    with ThreadPoolExecutor(max_workers=4) as pool:
         index_job = pool.submit(fear_greed)
         news_job = pool.submit(_headlines_naming, symbol) if named and symbol else None
+        mood_job = pool.submit(bitget_positioning.stock_mood) if (named or symbol is None) \
+            else None
+        crowd_job = (pool.submit(bitget_positioning.positioning, base)
+                     if crypto_side and (symbol in (None, "BTCUSDT", "ETHUSDT")
+                                         or symbol in CRYPTO_LINKED) else None)
         rows = index_job.result()
         try:
             headlines, names = news_job.result() if news_job is not None else ([], set())
         except Exception:
             headlines, names = [], set()
+        try:
+            stock_line = mood_job.result() if mood_job is not None else None
+        except Exception:
+            stock_line = None
+        try:
+            crowd_lines = crowd_job.result().lines() if crowd_job is not None else []
+        except Exception:
+            crowd_lines = []
+    extra = [line for line in (stock_line, *crowd_lines) if line]
     integrity = _desk_integrity_read(symbol) if symbol else None
     tested = _coordination_test(symbol)
     story_line = None
@@ -2537,9 +2605,16 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
                "stretched toward greed — the side of the index where crypto has historically "
                "been more exposed to pullbacks" if now_value >= 70 else
                "stretched toward fear" if now_value <= 30 else "in its middle range")
-    sources = [Source(kind="venue", ref="alternative.me Fear & Greed + Bitget funding",
-                      detail="alternative.me fear & greed (the source Bitget's sentiment Skill "
-                             "wraps) and Bitget funding rates, live")]
+    index_source = (Source(kind="venue", ref="bitget-mcp-server crypto fear & greed + Bitget "
+                                             "funding",
+                           detail="crypto fear & greed from Bitget's data service and Bitget "
+                                  "funding rates, live")
+                    if rows and rows[0].get("via") == "bitget" else
+                    Source(kind="venue", ref="alternative.me Fear & Greed + Bitget funding",
+                           detail="alternative.me fear & greed (the source Bitget's sentiment "
+                                  "Skill wraps; Bitget's data service did not answer) and Bitget "
+                                  "funding rates, live"))
+    sources = [index_source]
     if named and symbol:
         ticker = _t(symbol)
         if symbol not in CRYPTO_LINKED:
@@ -2575,6 +2650,12 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
             sources.append(Source(kind="computation", ref="argus.market.stories",
                                   detail=f"{len(headlines)} headline(s) into {len(stories)} "
                                          f"story(ies)"))
+        for offset, line in enumerate(extra):
+            lines.insert(2 + offset, line)
+        if extra:
+            sources.append(Source(kind="venue", ref="bitget-mcp-server",
+                                  detail="sentiment_market_fear_greed, long/short ratios, "
+                                         "Hyperliquid whale positions, liquidations"))
         if tested is not None:
             lines.append(tested[0])
             sources.append(Source(kind="computation", ref="data/sentiment_comparison.json",
@@ -2583,6 +2664,7 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
         return lines, sources, {"index": now_value, "label": label, "week": week,
                                 "headlines": len(headlines), "stories": len(stories),
                                 "integrity": integrity}
+    lines[1:1] = extra
     if tested is not None:
         lines.append(tested[0])
     if own is not None:
@@ -2594,11 +2676,11 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
         lines.insert(0, f"Actionable: sentiment is {stretch}; read it as positioning, not a "
                         f"signal — this desk's own sentiment work found the index adds nothing on "
                         f"its own.")
-    return lines, [Source(kind="venue", ref="alternative.me Fear & Greed + Bitget funding",
-                          detail="alternative.me fear & greed (the source Bitget's sentiment "
-                                 "Skill wraps; the Skill returned no data today) and Bitget "
-                                 "funding rates, live")], {"index": now_value, "label": label,
-                                                          "week": week}
+    if extra:
+        sources.append(Source(kind="venue", ref="bitget-mcp-server",
+                              detail="stock-market fear & greed, long/short ratios, Hyperliquid "
+                                     "whale positions, liquidations"))
+    return lines, sources, {"index": now_value, "label": label, "week": week}
 
 
 NEWS_LOOKBACK_HOURS = 48
@@ -4238,6 +4320,18 @@ def _fundamentals(symbol: str, raw_text: str = "") -> tuple[list[str], list[Sour
                      + ".")
         sources.append(Source(kind="venue", ref="bitget-mcp-server quote",
                               detail=f"{ticker} fundamentals snapshot"))
+        if ticker in ("MSTR", "COIN"):
+            treasury = _bitcoin_treasury_line(ticker, cap)
+            if treasury:
+                lines.append(treasury)
+                sources.append(Source(kind="venue",
+                                      ref="bitget-mcp-server crypto_institutional_company_flow",
+                                      detail=f"{ticker} bitcoin holding"))
+    dividend = _ex_dividend_line(ticker)
+    if dividend:
+        lines.append(dividend)
+        sources.append(Source(kind="venue", ref="bitget-mcp-server equity_fundamental_dividends",
+                              detail=f"{ticker} ex-dividend date"))
     if ratio_row is not None:
         parts = [(label, ratio_row.get(key)) for label, key in (
             ("P/E (trailing 12m)", "pe_ttm_ed"), ("P/S (trailing 12m)", "ps_ttm_ed"),
