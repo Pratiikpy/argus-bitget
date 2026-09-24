@@ -627,7 +627,7 @@ A judge should not have to discover these.
   to it — rather than the earlier and false "no hedge placeable".
 - **No usage data.** This has not been put in front of traders yet. The plan is ten supervised
   sessions measuring whether the risk-share figure changes the ticket.
-- **Superiority is claimed only where a named competitor was run on the same input.** 20 of 33
+- **Superiority is claimed only where a named competitor was run on the same input.** 20 of 34
   capabilities are OWNED under that rule; the rest are TIED or IMPLEMENTED and are called that, and
   every comparison we lost is published on `/wrong`. On 2026-09-24 seven earlier OWNED grades were
   withdrawn because the rival they beat does not lead its sub-theme; they stay IMPLEMENTED until
@@ -658,8 +658,8 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 6,692 tests
-python -m argus.status    # 141/141 modules importable, 18/18 sub-themes, artefacts on disk
+pytest                    # 6,700 tests
+python -m argus.status    # 142/142 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
 ---
@@ -1320,7 +1320,7 @@ route to it — is now what the layer sees.
 - **One model, no ensemble, no adversarial overturn.**
 - **"Owned" is a conjunction, not a score.** An owned capability needs a reproduced baseline, a
   same-input comparison, an out-of-sample test, an ablation and an adversarial test, among thirteen
-  conditions. On 2026-09-12 zero met that bar; the register now reads 20 of 33 capabilities are
+  conditions. On 2026-09-12 zero met that bar; the register now reads 20 of 34 capabilities are
   OWNED, each re-derived from its artefacts by `eval/standing.py`, never from prose.
 
 ---
@@ -1705,10 +1705,10 @@ takes, and every artefact the system writes.
 
 | | |
 |---|---|
-| Source modules | **316** files across **21 packages**, 126,851 lines |
-| Registered and importable | **141/141** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **223 files**, **6,692 tests collected** |
-| Type and lint | `ruff` clean, `mypy --strict` clean on **316 source files** |
+| Source modules | **317** files across **21 packages**, 127,309 lines |
+| Registered and importable | **142/142** (`python -m argus.status` checks this at runtime) |
+| Test files / tests | **224 files**, **6,700 tests collected** |
+| Type and lint | `ruff` clean, `mypy --strict` clean on **317 source files** |
 | Artefacts written | **162** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
@@ -1941,7 +1941,7 @@ and each is treated as **absent rather than stale** past 36 hours — so a measu
 refreshing degrades the system into saying "not measured" rather than into using an old number.
 
 Also standing on its own: the factor lab's memory across runs, the Skill health sweep the cycle reads
-rather than waits on, and `python -m argus.status`, which checks at runtime that all 141 modules
+rather than waits on, and `python -m argus.status`, which checks at runtime that all 142 modules
 import, that all 18 sub-themes resolve to a symbol and a test file, and that every declared artefact
 is on disk.
 
@@ -1953,10 +1953,10 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 316 files, 21 packages, 126,851 lines; `mypy --strict` clean on 316 source files |
+| Source modules | 317 files, 21 packages, 127,309 lines; `mypy --strict` clean on 317 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
-| Modules registered and importable | 141/141 modules importable |
-| Tests | 6,692 tests collected, `ruff` clean |
+| Modules registered and importable | 142/142 modules importable |
+| Tests | 6,700 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 66, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
@@ -1980,13 +1980,13 @@ source is a build failure, not a typo.
 | Tradeable-session replay frames, point-in-time | 30 reconstructed, **0 positions opened** |
 | Hurdle frontier | 39 instants / 25 effective, median move 137bps vs an 18.8bps hurdle |
 | Directional accuracy at which trading beats abstaining | **56.0%** |
-| Capabilities proven better than a named competitor | **20 of 33** |
+| Capabilities proven better than a named competitor | **20 of 34** |
 
 That last row is the one to read twice. An *owned* capability needs a reproduced baseline, a
 same-input comparison, an out-of-sample test, an ablation and an adversarial test — thirteen
 conditions in all, enforced in code by `argus/eval/standing.py`, which raises at import if anything
-claims OWNED without them. It read zero when this table was first written; today 20 of 33
-capabilities are OWNED, 3 are TIED and 10 are IMPLEMENTED, and the three that were once LOST are the
+claims OWNED without them. It read zero when this table was first written; today 20 of 34
+capabilities are OWNED, 4 are TIED and 10 are IMPLEMENTED, and the three that were once LOST are the
 ties. It read 27 of 31 until 2026-09-24, when a review of the right rivals per sub-theme withdrew
 seven OWNED grades won against a rival that does not lead the sub-theme, and split two more into
 the narrow thing proven (OWNED) and the sub-theme itself (IMPLEMENTED).

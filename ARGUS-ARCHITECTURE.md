@@ -8,10 +8,10 @@ that produced them.
 
 | | |
 |---|---|
-| Source | **316 source files**, 21 packages, 126,851 lines (measured 2026-09-24) |
-| Registered and importable at runtime | **141/141** (`python -m argus.status`) |
-| Tests | **223 files, 6,692 tests collected**; a fresh GitHub clone of the earlier 6,542-test tree ran 6,457 passed, 85 skipped, 0 failed |
-| Static analysis | `ruff` clean; `mypy --strict` clean on 316 source files |
+| Source | **317 source files**, 21 packages, 127,309 lines (measured 2026-09-24) |
+| Registered and importable at runtime | **142/142** (`python -m argus.status`) |
+| Tests | **224 files, 6,700 tests collected**; a fresh GitHub clone of the earlier 6,542-test tree ran 6,457 passed, 85 skipped, 0 failed |
+| Static analysis | `ruff` clean; `mypy --strict` clean on 317 source files |
 | Artefacts | **162** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
 | External systems torn down at code level | **56 code-level teardowns** under `research/architecture/`, each citing `file:line` |
 | Runtime dependencies | **two** — `pydantic`, `python-dateutil` |
@@ -397,7 +397,7 @@ The largest package in the system, deliberately.
 
 **The capability ladder** is enforced in code: LOST → TIED → IMPLEMENTED → OWNED, with OWNED requiring
 thirteen conditions including a reproduced baseline, same-input comparison, out-of-sample test,
-ablation and adversarial test. Live: **20 of 33 capabilities are OWNED**, 3 TIED, 1 IMPLEMENTED,
+ablation and adversarial test. Live: **20 of 34 capabilities are OWNED**, 4 TIED, 10 IMPLEMENTED,
 0 LOST (`data/standing.json`, re-derived by `python -m argus.eval.standing` from the artefacts).
 
 ---

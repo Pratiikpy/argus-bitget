@@ -112,6 +112,8 @@ IN_THE_CONSOLE: dict[str, tuple[str, str]] = {
         ("why did you pass on NVDA", ""),
     "Episodic memory across decisions": ("why did you pass on NVDA", ""),
     "Perception layer: what the desk can see": ("/status", ""),
+    "Analogue stress bands vs. AnalogDesk (S2) on its own pre-registered test":
+        ("has NVDA been here before", ""),
 }
 """Capability name -> (question, saved book) whose console answer shows the capability. A value
 starting with "/" is a page of the console rather than a question."""

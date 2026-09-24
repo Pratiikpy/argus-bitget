@@ -1,207 +1,187 @@
 {
   "total": 99,
-  "checked": 99,
-  "ok": 99,
+  "checked": 89,
+  "ok": 89,
   "lagging": 0,
   "stale": 0,
   "absent": 24,
   "deleted": 0,
-  "unchecked": 0,
+  "unchecked": 10,
   "findings": [
     {
       "claim": "tests_passing",
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "6,692"
+        "6,700"
       ],
-      "live": [
-        6692
-      ],
-      "status": "OK",
-      "excerpt": "6,692 tests collected"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "6,700 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 47,
       "quoted": [
-        "6,692"
+        "6,700"
       ],
-      "live": [
-        6692
-      ],
-      "status": "OK",
-      "excerpt": "6,692 tests collected"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "6,700 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 58,
       "quoted": [
-        "6,692"
+        "6,700"
       ],
-      "live": [
-        6692
-      ],
-      "status": "OK",
-      "excerpt": "6,692 tests collected"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "6,700 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "submission",
       "line": 68,
       "quoted": [
-        "6,692"
+        "6,700"
       ],
-      "live": [
-        6692
-      ],
-      "status": "OK",
-      "excerpt": "6,692 tests"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "6,700 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "submission",
       "line": 411,
       "quoted": [
-        "6,692"
+        "6,700"
       ],
-      "live": [
-        6692
-      ],
-      "status": "OK",
-      "excerpt": "6,692 tests"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "6,700 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "submission",
       "line": 519,
       "quoted": [
-        "6,692"
+        "6,700"
       ],
-      "live": [
-        6692
-      ],
-      "status": "OK",
-      "excerpt": "6,692 tests"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "6,700 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "submission",
       "line": 612,
       "quoted": [
-        "6,692"
+        "6,700"
       ],
-      "live": [
-        6692
-      ],
-      "status": "OK",
-      "excerpt": "6,692 tests collected"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "6,700 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 661,
       "quoted": [
-        "6,692"
+        "6,700"
       ],
-      "live": [
-        6692
-      ],
-      "status": "OK",
-      "excerpt": "6,692 tests"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "6,700 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1710,
       "quoted": [
-        "6,692"
+        "6,700"
       ],
-      "live": [
-        6692
-      ],
-      "status": "OK",
-      "excerpt": "6,692 tests collected"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "6,700 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1959,
       "quoted": [
-        "6,692"
+        "6,700"
       ],
-      "live": [
-        6692
-      ],
-      "status": "OK",
-      "excerpt": "6,692 tests collected"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "6,700 tests collected"
     },
     {
       "claim": "source_files",
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "316"
+        "317"
       ],
       "live": [
-        316
+        317
       ],
       "status": "OK",
-      "excerpt": "strict clean on 316 source files"
+      "excerpt": "strict clean on 317 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 59,
       "quoted": [
-        "316"
+        "317"
       ],
       "live": [
-        316
+        317
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 316 source files"
+      "excerpt": "strict` clean on 317 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 411,
       "quoted": [
-        "316"
+        "317"
       ],
       "live": [
-        316
+        317
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 316 files"
+      "excerpt": "strict` clean on 317 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 612,
       "quoted": [
-        "316"
+        "317"
       ],
       "live": [
-        316
+        317
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 316 source files"
+      "excerpt": "strict` clean across 317 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 1956,
       "quoted": [
-        "316"
+        "317"
       ],
       "live": [
-        316
+        317
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 316 source files"
+      "excerpt": "strict` clean on 317 source files"
     },
     {
       "claim": "register_claims",
@@ -382,14 +362,14 @@
       "line": 274,
       "quoted": [
         "20",
-        "33"
+        "34"
       ],
       "live": [
         20,
-        33
+        34
       ],
       "status": "OK",
-      "excerpt": "20 of 33 capabilities are OWNED"
+      "excerpt": "20 of 34 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -397,14 +377,14 @@
       "line": 445,
       "quoted": [
         "20",
-        "33"
+        "34"
       ],
       "live": [
         20,
-        33
+        34
       ],
       "status": "OK",
-      "excerpt": "20 of 33 capabilities are OWNED"
+      "excerpt": "20 of 34 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -412,14 +392,14 @@
       "line": 129,
       "quoted": [
         "20",
-        "33"
+        "34"
       ],
       "live": [
         20,
-        33
+        34
       ],
       "status": "OK",
-      "excerpt": "20 of 33 capabilities are OWNED"
+      "excerpt": "20 of 34 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -428,7 +408,7 @@
       "quoted": [],
       "live": [
         20,
-        33
+        34
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -440,7 +420,7 @@
       "quoted": [],
       "live": [
         20,
-        33
+        34
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -451,14 +431,14 @@
       "line": 400,
       "quoted": [
         "20",
-        "33"
+        "34"
       ],
       "live": [
         20,
-        33
+        34
       ],
       "status": "OK",
-      "excerpt": "20 of 33 capabilities are OWNED"
+      "excerpt": "20 of 34 capabilities are OWNED"
     },
     {
       "claim": "lui_router_fresh_accuracy",
@@ -664,45 +644,45 @@
       "doc": "readme",
       "line": 70,
       "quoted": [
-        "141",
-        "141"
+        "142",
+        "142"
       ],
       "live": [
-        141,
-        141
+        142,
+        142
       ],
       "status": "OK",
-      "excerpt": "141/141 modules importable"
+      "excerpt": "142/142 modules importable"
     },
     {
       "claim": "modules_importable",
       "doc": "public-readme",
       "line": 61,
       "quoted": [
-        "141",
-        "141"
+        "142",
+        "142"
       ],
       "live": [
-        141,
-        141
+        142,
+        142
       ],
       "status": "OK",
-      "excerpt": "141/141 modules importable"
+      "excerpt": "142/142 modules importable"
     },
     {
       "claim": "modules_importable",
       "doc": "submission",
       "line": 613,
       "quoted": [
-        "141",
-        "141"
+        "142",
+        "142"
       ],
       "live": [
-        141,
-        141
+        142,
+        142
       ],
       "status": "OK",
-      "excerpt": "141/141 modules importable"
+      "excerpt": "142/142 modules importable"
     },
     {
       "claim": "subthemes",

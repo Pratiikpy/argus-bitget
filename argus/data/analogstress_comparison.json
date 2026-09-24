@@ -1,0 +1,256 @@
+{
+ "generated_at": "2026-09-24T13:01:39.441825+00:00",
+ "protocol": {
+  "horizon": 5,
+  "coverage": 0.8,
+  "k": 50,
+  "window": 20,
+  "calibration_queries": 1823,
+  "test_queries": 2698,
+  "eras": {
+   "calibration": {
+    "from": "2019-01-01",
+    "to": "2022-12-31"
+   },
+   "test": {
+    "from": "2023-01-01",
+    "to": null
+   }
+  },
+  "primary": "Winkler score at 80%, frozen scales"
+ },
+ "reproduced_rival": {
+  "available": true,
+  "predictors": {
+   "analogConformal": {
+    "scale": [
+     1.310234253013022,
+     1.310234253013022
+    ],
+    "coverage": [
+     0.80763528539659,
+     0.80763528539659
+    ],
+    "width": [
+     0.10396329682859885,
+     0.10396329682859885
+    ],
+    "matched_width": [
+     0.10200186376494223,
+     0.10200186376494223
+    ]
+   },
+   "analogRaw": {
+    "scale": [
+     1.0,
+     1
+    ],
+    "coverage": [
+     0.7309117865085248,
+     0.7309117865085248
+    ],
+    "width": [
+     0.08871318218788549,
+     0.08871318218788549
+    ],
+    "matched_width": [
+     0.10301091694607455,
+     0.10301091694607455
+    ]
+   },
+   "uncondNamePIT": {
+    "scale": [
+     1.0,
+     1
+    ],
+    "coverage": [
+     0.823943661971831,
+     0.823943661971831
+    ],
+    "width": [
+     0.10124539767614701,
+     0.10124539767614701
+    ],
+    "matched_width": [
+     0.0948283398072027,
+     0.0948283398072027
+    ]
+   },
+   "volHarness": {
+    "scale": [
+     1.1204264394155077,
+     1.1204264394155077
+    ],
+    "coverage": [
+     0.7742772424017791,
+     0.7742772424017791
+    ],
+    "width": [
+     0.096693703618575,
+     0.096693703618575
+    ],
+    "matched_width": [
+     0.10303623447442502,
+     0.10303623447442502
+    ]
+   },
+   "pooledUncond": {
+    "scale": [
+     1.094554676874782,
+     1.094554676874782
+    ],
+    "coverage": [
+     0.8313565604151223,
+     0.8313565604151223
+    ],
+    "width": [
+     0.10531722603647317,
+     0.10531722603647317
+    ],
+    "matched_width": [
+     0.09455965624028542,
+     0.09455965624028542
+    ]
+   }
+  },
+  "pit_chi_square": [
+   208.58265381764272,
+   208.58265381764272
+  ],
+  "max_abs_difference": 0.0,
+  "reproduced": true
+ },
+ "predictors": {
+  "analogConformal": {
+   "predictor": "analogConformal",
+   "frozen_scale": 1.3102,
+   "n": 2698,
+   "coverage_pct": 80.8,
+   "coverage_se_pct": 1.95,
+   "width_pct": 10.4,
+   "matched_width_pct": 10.2,
+   "winkler_pct": 15.253
+  },
+  "analogRaw": {
+   "predictor": "analogRaw",
+   "frozen_scale": 1.0,
+   "n": 2698,
+   "coverage_pct": 73.1,
+   "coverage_se_pct": 2.43,
+   "width_pct": 8.87,
+   "matched_width_pct": 10.3,
+   "winkler_pct": 15.845
+  },
+  "uncondNamePIT": {
+   "predictor": "uncondNamePIT",
+   "frozen_scale": 1.0,
+   "n": 2698,
+   "coverage_pct": 82.4,
+   "coverage_se_pct": 2.21,
+   "width_pct": 10.12,
+   "matched_width_pct": 9.48,
+   "winkler_pct": 15.141
+  },
+  "volHarness": {
+   "predictor": "volHarness",
+   "frozen_scale": 1.1204,
+   "n": 2698,
+   "coverage_pct": 77.4,
+   "coverage_se_pct": 2.31,
+   "width_pct": 9.67,
+   "matched_width_pct": 10.3,
+   "winkler_pct": 15.166
+  },
+  "pooledUncond": {
+   "predictor": "pooledUncond",
+   "frozen_scale": 1.0946,
+   "n": 2698,
+   "coverage_pct": 83.1,
+   "coverage_se_pct": 1.8,
+   "width_pct": 10.53,
+   "matched_width_pct": 9.46,
+   "winkler_pct": 16.763
+  },
+  "argusAnalogue": {
+   "predictor": "argusAnalogue",
+   "frozen_scale": 1.3928,
+   "n": 2690,
+   "coverage_pct": 84.8,
+   "coverage_se_pct": 1.51,
+   "width_pct": 11.69,
+   "matched_width_pct": 10.28,
+   "winkler_pct": 15.522
+  },
+  "argusShape": {
+   "predictor": "argusShape",
+   "frozen_scale": 1.4621,
+   "n": 2698,
+   "coverage_pct": 88.0,
+   "coverage_se_pct": 1.55,
+   "width_pct": 13.06,
+   "matched_width_pct": 10.03,
+   "winkler_pct": 16.396
+  }
+ },
+ "pit_chi_square": {
+  "analogConformal": 208.6,
+  "argusAnalogue": 92.0,
+  "argusShape": 91.0
+ },
+ "ranking_by_winkler": [
+  "uncondNamePIT",
+  "volHarness",
+  "analogConformal",
+  "argusAnalogue",
+  "analogRaw",
+  "argusShape",
+  "pooledUncond"
+ ],
+ "best_argus": "argusAnalogue",
+ "best_rival": "uncondNamePIT",
+ "diebold_mariano": {
+  "argusAnalogue vs analogConformal": {
+   "mean_diff_pct": 0.326,
+   "t": 1.353,
+   "p": 0.176,
+   "dates": 38,
+   "paired_queries": 2690
+  },
+  "argusAnalogue vs analogRaw": {
+   "mean_diff_pct": -0.283,
+   "t": -0.559,
+   "p": 0.5759,
+   "dates": 38,
+   "paired_queries": 2690
+  },
+  "argusAnalogue vs uncondNamePIT": {
+   "mean_diff_pct": 0.399,
+   "t": 1.051,
+   "p": 0.2932,
+   "dates": 38,
+   "paired_queries": 2690
+  },
+  "argusAnalogue vs volHarness": {
+   "mean_diff_pct": 0.387,
+   "t": 1.452,
+   "p": 0.1466,
+   "dates": 38,
+   "paired_queries": 2690
+  },
+  "argusAnalogue vs pooledUncond": {
+   "mean_diff_pct": -1.215,
+   "t": -2.558,
+   "p": 0.0105,
+   "dates": 38,
+   "paired_queries": 2690
+  }
+ },
+ "verdict": "NO SIGNIFICANT DIFFERENCE: argusAnalogue Winkler 15.52% against the best rival predictor uncondNamePIT at 15.14% (+0.38 points, Diebold-Mariano p=0.2932, clustered by date)",
+ "not_scored": "path-breach Brier at -5/-10/-20%: ARGUS's analogue engines return each analogue's forward return, not its intraday excursion",
+ "limitations": [
+  "every predictor fails PIT uniformity (5% critical value 16.92), ARGUS's included",
+  "the naive same-name band beats every retrieval method on Winkler, AnalogDesk's and ARGUS's alike \u2014 at five sessions, retrieval has not been shown to add information",
+  "one horizon (five sessions) and one grid; AnalogDesk's other horizons are not run",
+  "ARGUS's arms retrieve from the single name's own history; AnalogDesk retrieves across 71 names on 28 features, so this compares systems, not only methods"
+ ]
+}

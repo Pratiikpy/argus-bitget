@@ -5529,6 +5529,55 @@ REGISTER: tuple[Capability, ...] = (
             "(rival review of 2026-09-24)",
         ),
     ),
+    Capability(
+        name="Analogue stress bands vs. AnalogDesk (S2) on its own pre-registered test",
+        subtheme="t3-decisionstress",
+        module=("argus/desk/analogue.py,argus/desk/shapematch.py,"
+                "argus/eval/analogstress_comparison.py,argus/eval/baselines/analogdesk_export.mjs"),
+        state=State.TIED,
+        baseline=(
+            "lixinde586-afk/analogdesk — an S2 entry in this sub-theme — run unmodified from a "
+            "local clone on its own grid: 2,698 test queries, 71 US names, 2023-2026, H = 5"
+        ),
+        proofs=(
+            Proof("best_implementation_studied",
+                  "AnalogDesk's engine read at source (analog.mjs, distribution.mjs, "
+                  "validation.mjs) and chosen by the rival review of 2026-09-24 as the entry to "
+                  "beat in Decision Stress Testing", artefact="data/analogstress_comparison.json"),
+            Proof("baseline_reproduced",
+                  "our scorer, written from their protocol, reproduces their own published "
+                  "multipliers, coverage, width, matched width and PIT chi-square exactly (max "
+                  "difference 0.0)", artefact="data/analogstress_comparison.json"),
+            Proof("same_input_comparison",
+                  "ARGUS answers their exported queries from the same adjusted closes, truncated "
+                  "and embargoed at each query session",
+                  artefact="data/analogstress_comparison.json"),
+            Proof("statistically_valid_evaluation",
+                  "Winkler scores compared per query with a Diebold-Mariano test on differences "
+                  "clustered by query date; coverage standard errors clustered by date",
+                  artefact="data/analogstress_comparison.json"),
+            Proof("out_of_sample_test",
+                  "multipliers frozen on 2019-2022, scored on 2023-2026, as their protocol fixes",
+                  artefact="data/analogstress_comparison.json"),
+            Proof("failure_cases_documented",
+                  "every predictor fails PIT; the naive band beats every retrieval method",
+                  artefact="data/analogstress_comparison.json"),
+            Proof("reproducibility_proven",
+                  "deterministic: their engine, their grid, a fixed ARGUS configuration",
+                  artefact="data/analogstress_comparison.json"),
+            Proof("implementation_complete", "both ARGUS engines ran on every query",
+                  artefact="data/analogstress_comparison.json"),
+        ),
+        blockers=(
+            "TIED on the primary score: ARGUS's analogue band scores 15.52 Winkler against "
+            "AnalogDesk's 15.25 (AnalogDesk numerically ahead, Diebold-Mariano p = 0.18), and "
+            "both lose to the naive same-name band (15.14). ARGUS wins two secondary measures: "
+            "its raw analogue distribution is far better calibrated (PIT chi-square 92 against "
+            "208.6) and the path matcher's matched-coverage width is narrower (10.03% against "
+            "10.20%). Path-breach Brier is not scored: ARGUS's engines do not return intraday "
+            "excursions",
+        ),
+    ),
 )
 
 
