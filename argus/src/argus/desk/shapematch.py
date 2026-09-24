@@ -339,46 +339,73 @@ def _scan(
     returns, and a null computed by a second, subtly different code path would be measuring the
     difference between the two implementations rather than the difference between signal and noise.
     """
-    query = list(closes[-window:])
     query_start = len(closes) - window
-
-    scored: list[Analogue] = []
     # A candidate must END before the query begins, and leave room for its own forward window.
     last_start = query_start - horizon - window
-    for start in range(0, max(0, last_start) + 1):
-        candidate = closes[start:start + window]
-        if len(candidate) < window:
-            break
+    starts = range(0, max(0, last_start) + 1) if last_start >= 0 else range(0)
+    distances = _distances(closes, window, starts)
+
+    def analogue(start: int, dist: float) -> Analogue:
         forward_end = start + window + horizon - 1
         forward = None
         if forward_end < query_start:
             base = closes[start + window - 1]
             if base > 0:
                 forward = (closes[forward_end] - base) / base * 100.0
-        scored.append(Analogue(
+        return Analogue(
             ends_at=(
                 stamps[start + window - 1] if stamps is not None
                 else datetime.fromtimestamp(0, UTC)
             ),
-            distance=distance(query, candidate),
+            distance=dist,
             forward_pct=forward,
             start_index=start,
-        ))
+        )
 
-    scored.sort(key=lambda a: a.distance)
+    ranked = sorted(zip(distances, starts, strict=True))
 
     # Exclusion zone: a full window either side, so no two reported analogues share a bar. Without
     # this the top-5 is one event reported five times, and the outcome distribution is one outcome
     # counted five times.
     chosen: list[Analogue] = []
-    # `match`, not `candidate`: that name already holds a price window above, and reusing it made
-    # the checker read this loop as iterating over floats. Caught by mypy, never at runtime.
-    for match in scored:
-        if all(abs(match.start_index - kept.start_index) >= window for kept in chosen):
-            chosen.append(match)
+    for dist, start in ranked:
+        if all(abs(start - kept.start_index) >= window for kept in chosen):
+            chosen.append(analogue(start, dist))
         if len(chosen) == top:
             break
-    return chosen, len(scored)
+    return chosen, len(ranked)
+
+
+def _distances(closes: Sequence[float], window: int, starts: Sequence[int]) -> list[float]:
+    """:func:`distance` from the final ``window`` bars to the window at each start, all at once.
+
+    The same quantity by a cheaper route. For z-normalised windows the per-bar Euclidean distance
+    is ``sqrt(2 * (1 - rho))``, where ``rho`` is the Pearson correlation of the raw windows — the
+    identity `stumpy/core.py:_calculate_squared_distance` computes the matrix profile from, with
+    its sliding means and standard deviations. Scoring each candidate through :func:`distance`
+    re-normalised the query every time with the exact-arithmetic `statistics` functions, and 51
+    scans of ninety days took 17s on 2026-09-24 — too slow for a question someone is waiting on.
+    A flat window keeps :func:`znormalise`'s convention (all zeros): 1.0 against any shaped window,
+    0.0 against another flat one. `tests/test_shapematch.py` pins agreement with :func:`distance`
+    on real series to 1e-9.
+    """
+    query = closes[-window:]
+    q_mean = math.fsum(query) / window
+    q_dev = [v - q_mean for v in query]
+    q_ss = math.fsum(d * d for d in q_dev)
+    q_flat = q_ss <= 0.0
+    out: list[float] = []
+    for start in starts:
+        candidate = closes[start:start + window]
+        c_mean = math.fsum(candidate) / window
+        c_dev = [v - c_mean for v in candidate]
+        c_ss = math.fsum(d * d for d in c_dev)
+        if q_flat or c_ss <= 0.0:
+            out.append(0.0 if q_flat and c_ss <= 0.0 else 1.0)
+            continue
+        rho = math.fsum(a * b for a, b in zip(q_dev, c_dev, strict=True)) / math.sqrt(q_ss * c_ss)
+        out.append(math.sqrt(max(0.0, 2.0 * (1.0 - rho))))
+    return out
 
 
 def shuffled_closes(closes: Sequence[float], rng: random.Random) -> list[float]:

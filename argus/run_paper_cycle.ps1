@@ -59,6 +59,12 @@ python -m argus.market.validation --days 90 2>&1 | ForEach-Object { $_ | Out-Str
 python -m argus.market.calendar 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
 "calendar_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8
 
+# How each traded name reacts to CPI, Fed decisions and its own earnings (research/eventstudy.py).
+# A year of hourly bars for twelve names takes minutes, and a new event arrives at most daily, so
+# it refreshes only when the artefact is over 20 hours old.
+python -m argus.research.event_reactions --if-stale 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
+"event_reactions_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8
+
 # The macro series the hosted console falls back to when FRED does not answer from its network.
 python -c "from argus.lui.research import write_macro_snapshot; print(write_macro_snapshot(), 'macro readings written')" 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
 "macro_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8

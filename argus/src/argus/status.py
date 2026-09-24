@@ -82,11 +82,13 @@ MODULES = (
     "argus.demo.cockpit",
     "argus.research.overfitting_study",
     "argus.research.searchoff",
-    "argus.research.eventstudy",
+    "argus.research.eventstudy", "argus.research.event_reactions",
     "argus.backtest.dependence",
+    "argus.market.calendar", "argus.market.earnings_release", "argus.market.stories",
     "argus.lui.question", "argus.lui.answer", "argus.lui.cli", "argus.lui.server",
     "argus.lui.phrasebook",
-    "argus.lui.router",
+    "argus.lui.router", "argus.lui.research", "argus.lui.task", "argus.lui.status_page",
+    "argus.lui.proof_page",
 )
 
 ARTEFACTS = (

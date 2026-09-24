@@ -128,6 +128,12 @@ class ResearchKind(StrEnum):
     consensus when it is fresh enough to use, institutional (13F) holders and valuation, plus the
     rToken's premium to the stock."""
 
+    EVENT = "event"
+    """How a name has reacted to a scheduled event type — CPI releases, Fed decisions, its own
+    earnings — from `research/event_reactions.py`: the MacKinlay event study with the four tests
+    and the clustering correction (`research/eventstudy.py`, OWNED against whale-signals), and how
+    large its move on those days is against its ordinary 24 hours."""
+
     HEDGE = "hedge"
     """Which instrument to hedge a book with, measured: for each candidate (index, sector or crypto
     perpetual) the share of the book's variance a beta-sized short removes, and what it costs to
@@ -356,7 +362,10 @@ _ANALOGUE = re.compile(
     r"last\s+time\s+it|base\s+rate|(?:ever|previously)\s+(?:done|did|been|had|dropped|"
     r"rallied|pumped|looked)|(?:prior|previous|past)\s+(?:instances?|episodes?|occasions?)|"
     r"(?:comparable|similar)\s+(?:\w+\s+){0,3}(?:pattern|setup|move|drawdown|situation)|"
-    r"did\s+(?:that|this)\s+pattern|pehle\s+bhi|pichli\s+baar|alguna\s+vez)\b",
+    r"did\s+(?:that|this)\s+pattern|pehle\s+bhi|pichli\s+baar|alguna\s+vez|"
+    r"(?:last|ever)\s+(?:\w+\s+){0,2}look(?:s|ed)?\s+like\s+this|"
+    r"(?:look(?:s|ed)?|trad(?:es|ed|ing))\s+like\s+this\s+(?:before|last)|"
+    r"(?:same|similar)\s+(?:shape|path|chart))\b",
     re.I,
 )
 _FUNDAMENTALS = re.compile(
@@ -467,7 +476,9 @@ _SENTIMENT = re.compile(
     r"\b(?:fear\s*(?:&|and)?\s*greed|sentiment|market\s+mood|fomo|euphori\w*|"
     r"crowded|crowding|positioning|how\s+(?:bullish|bearish|greedy|fearful)\s+is|"
     r"(?:is|are)\s+(?:people|traders|everyone|the\s+market)\s+(?:bullish|bearish)|"
-    r"(?:bullish|bearish)\s+(?:on|about)|overheat\w*|froth\w*)\b",
+    r"(?:bullish|bearish)\s+(?:on|about)|overheat\w*|froth\w*|hype\w*|buzz\w*|chatter|"
+    r"rumou?rs?|pump(?:ed|ing)?|shill\w*|(?:social|twitter|reddit|x)\s+(?:is\s+)?"
+    r"(?:saying|posts?|talk))\b",
     re.I,
 )
 _MARKET_WIDE = re.compile(r"\b(?:the\s+market|markets|stocks|equities|nasdaq|s&p|wall\s+street|"
@@ -726,6 +737,146 @@ def _execution_request(raw: str, symbols: tuple[str, ...], *, urgent: bool,
                            urgent=urgent, notes=tuple(stated))
 
 
+_CONSERVATIVE = re.compile(r"\b(?:conservative|cautious|careful|low[\s-]+risk|risk[\s-]+averse|"
+                           r"retire\w*|capital\s+preservation|safe(?:ty)?[\s-]+first)\b", re.I)
+_AGGRESSIVE = re.compile(r"\b(?:aggressive|high[\s-]+risk|risk[\s-]+(?:taker|seeking|on)|yolo|"
+                         r"degen\w*|momentum\s+trader|day[\s-]*trader)\b", re.I)
+_MAX_POSITION = re.compile(
+    r"\b(?:max(?:imum)?|no\s+more\s+than|at\s+most|cap(?:ped)?\s+(?:at)?|up\s+to|limit\s+"
+    r"(?:of|is)?)\s*(\d+(?:\.\d+)?)\s*%\s*(?:in\s+|of\s+my\s+(?:book|portfolio)\s+in\s+)?"
+    r"(?:per|in\s+any|any|a|one|each)\s+(?:single\s+)?(?:name|position|stock|holding|trade)", re.I)
+_LOSS = re.compile(
+    r"\b(?:(?:can(?:'|no)?t|cannot)\s+(?:afford\s+to\s+)?lose\s+(?:more\s+than\s+)?|lose\s+"
+    r"(?:no\s+)?more\s+than\s+|max(?:imum)?\s+(?:loss|drawdown)\s+(?:of\s+)?|loss\s+"
+    r"tolerance\s+(?:of\s+|is\s+)?|stop(?:[\s-]+loss)?\s+at\s+)(\d+(?:\.\d+)?)\s*%", re.I)
+_HORIZON = re.compile(r"\b(?:hold(?:ing)?(?:\s+it)?|for|over|horizon\s+(?:of|is))\s+(?:about\s+|"
+                      r"around\s+)?(\d+)\s*(hours?|days?|weeks?|months?)\b", re.I)
+_MANDATE_HORIZON = re.compile(r"\b(?:my\s+)?(?:horizon|holding\s+period)\s+(?:is\s+|of\s+)?"
+                              r"(?:about\s+)?(\d+)\s*(hours?|days?|weeks?|months?)\b", re.I)
+"""The mandate's own horizon ("my horizon is 2 weeks"), as distinct from how long this one trade
+is meant to last ("hold it for 3 months"), which `_HORIZON` reads."""
+_HORIZON_HOURS = {"hour": 1, "day": 24, "week": 168, "month": 720}
+
+
+def stated_profile(text: str) -> Any:
+    """The trader's mandate, when the question states one — a preset named in words ("I'm a
+    conservative investor"), limits stated in numbers ("no more than 10% in any name", "can't lose
+    more than 5%", "holding for 2 weeks"), or both, the numbers overriding the preset. ``None``
+    when the question states no mandate: a limit nobody set is not applied."""
+    from dataclasses import replace as _replace
+
+    from argus.desk.workbench import TraderProfile
+
+    base: TraderProfile | None = None
+    if _CONSERVATIVE.search(text):
+        base = TraderProfile.conservative()
+    elif _AGGRESSIVE.search(text):
+        base = TraderProfile.aggressive()
+    position = _MAX_POSITION.search(text)
+    loss = _LOSS.search(text)
+    horizon = _MANDATE_HORIZON.search(text)
+    if base is None and not (position or loss):
+        return None
+    profile = base or TraderProfile(
+        name="your stated mandate", capital=Decimal("100000"), max_position_pct=Decimal("10"),
+        max_sector_pct=Decimal("40"), holding_horizon_hours=168, loss_tolerance_pct=Decimal("8"))
+    changes: dict[str, Any] = {}
+    if position:
+        changes["max_position_pct"] = Decimal(position.group(1))
+    if loss:
+        changes["loss_tolerance_pct"] = Decimal(loss.group(1))
+    if horizon:
+        unit = horizon.group(2).lower().rstrip("s")
+        changes["holding_horizon_hours"] = int(horizon.group(1)) * _HORIZON_HOURS[unit]
+    if changes and base is not None:
+        changes["name"] = f"{base.name}, with your stated limits"
+    return _replace(profile, **changes) if changes else profile
+
+
+def _worst_day_pct(symbol: str, raw_series: Mapping[str, Mapping[datetime, float]]) -> Decimal:
+    """The name's own worst 24 hours in the loaded history, as a positive percentage: the bad case
+    a long position has already had, which is what a loss tolerance is measured against."""
+    returns = [r for _, r in sorted(raw_series.get(symbol, {}).items())]
+    worst = 0.0
+    for start in range(0, max(0, len(returns) - 24) + 1):
+        level = 1.0
+        for r in returns[start:start + 24]:
+            level *= 1.0 + r
+        worst = min(worst, level - 1.0)
+    return Decimal(str(round(-worst * 100, 1)))
+
+
+MANDATE_DEFAULT_HOURS = 24.0
+"""The trade's horizon when the question does not say one: a day, the horizon its bad case is
+measured over. Using the stated profile's own horizon instead made every unstated trade pass that
+profile's horizon check and fail the other preset's (720h against a 48h mandate), so the side by
+side compared horizons nobody had mentioned."""
+
+
+def _mandate_lines(symbol: str, size: float, raw_series: Mapping[str, Mapping[datetime, float]],
+                   raw_text: str) -> list[str]:
+    """What the trader's own mandate does with this trade — and what the opposite preset does with
+    the identical trade, because personalisation is only real if the two can disagree.
+
+    `desk/personalisation.judge` is OWNED against vibe-trading's `check_mandate` (19,440 swept
+    scenarios, `eval/mandate_comparison.py`), and until 2026-09-24 no question could reach it:
+    "I'm a conservative investor — should I add 15% TSLA?" was answered exactly as it was for
+    anyone else. The bad case the loss tolerance is checked against is the name's own worst 24
+    hours in the history the answer already loaded, not a figure the model supplies."""
+    from argus.desk.personalisation import Outcome, Proposal, judge
+    from argus.desk.workbench import TraderProfile
+
+    profile = stated_profile(raw_text)
+    if profile is None:
+        return []
+    worst = _worst_day_pct(symbol, raw_series)
+    horizon = _HORIZON.search(raw_text)
+    hours = (float(int(horizon.group(1)) * _HORIZON_HOURS[horizon.group(2).lower().rstrip("s")])
+             if horizon else MANDATE_DEFAULT_HOURS)
+    notional = (profile.capital * Decimal(str(size))).quantize(Decimal("1"))
+    proposal = Proposal(symbol, "unclassified", notional, hours, worst)
+    mine = judge(profile, proposal)
+    other = (TraderProfile.aggressive() if "conservative" in profile.name
+             else TraderProfile.conservative())
+    theirs = judge(other, proposal)
+
+    asked = f"{size:.0%} (${float(notional):,.0f}) {_t(symbol)} position"
+
+    def said(verdict: Any) -> str:
+        if verdict.outcome is Outcome.REFUSED:
+            return f"no to a {asked}"
+        if verdict.outcome is Outcome.RESIZED:
+            return (f"yes to {_t(symbol)}, but at ${float(verdict.permitted_notional):,.0f} "
+                    f"rather than the {asked} asked")
+        return f"yes to a {asked}"
+
+    def why(verdict: Any) -> str:
+        # `judge` words a loss check for a thesis; here the bad case is the name's measured one.
+        text = "; ".join(re.sub(r"the thesis concedes ([\d.]+)% in its bad case",
+                                r"its bad case is a \1% fall", reason)
+                         .replace("the thesis needs", "the trade needs")
+                         for reason in verdict.reasons)
+        # `judge` prints its Decimals bare ("notional 30000 exceeds ... (25000) on 100000").
+        return re.sub(r"(?<![\d.$%])(\d{4,})(?![\d.%h])", lambda m: f"${int(m.group(1)):,}",
+                      text)
+
+    limits = (f"{profile.max_position_pct}% per name, {profile.loss_tolerance_pct}% loss "
+              f"tolerance, {profile.holding_horizon_hours}h horizon"
+              + (f", excludes {', '.join(_t(x) for x in profile.excluded_symbols)}"
+                 if profile.excluded_symbols else ""))
+    lines = [f"Actionable: for your mandate ({profile.name}: {limits}), {said(mine)} — "
+             f"{why(mine)}. The bad case is {_t(symbol)}'s own worst 24 hours in the history "
+             f"loaded here" + ("" if horizon else ", and the trade is read as a day long — say "
+                                                 "how long you would hold it to change that")
+             + "."]
+    if theirs.outcome is not mine.outcome or theirs.permitted_notional != mine.permitted_notional:
+        article = "an" if other.name[:1].lower() in "aeiou" else "a"
+        lines.append(f"The same trade under {article} {other.name} mandate: {said(theirs)} — "
+                     f"{why(theirs)}. Same market, same numbers, a different answer: the mandate, "
+                     f"not the model, decides.")
+    return lines
+
+
 def _parse_notional(text: str) -> Decimal | None:
     best: Decimal | None = None
     for match in _NOTIONAL.finditer(text):
@@ -847,6 +998,11 @@ def _detect(text: str) -> ResearchRequest | None:
                 kind=ResearchKind.CONSTRUCT, symbols=tuple(chosen),
                 notes=() if named else (f"the {theme[0] if theme else ''} theme read as "
                                         + ", ".join(_t(s) for s in chosen),))
+    if (symbols and not _pairs(raw) and _LINE_ITEM.search(raw) and not _EVENT_REACTION.search(raw)
+            and not about_the_record(raw) and _is_equity_or_traded(symbols[0])):
+        return ResearchRequest(kind=ResearchKind.FUNDAMENTALS, symbols=symbols[:1])
+    if symbols and not _pairs(raw) and _EVENT_REACTION.search(raw) and not about_the_record(raw):
+        return ResearchRequest(kind=ResearchKind.EVENT, symbols=symbols[:1])
     if (_HEDGE.search(raw) and not about_the_record(raw)
             and (not _is_an_order(raw) or _MY_BOOK.search(raw))
             and not _COMPARE.search(raw) and not _ADD_VERB.search(raw)
@@ -2217,30 +2373,140 @@ def _rate_sensitivity(symbol: str, days: int = 90) -> dict[str, Any] | None:
     return out
 
 
+CRYPTO_LINKED = frozenset({"COINUSDT", "MSTRUSDT"})
+"""Stocks whose price follows crypto closely enough that the crypto backdrop belongs in their
+sentiment answer: an exchange and a bitcoin treasury company."""
+
+
+def _desk_integrity_read(symbol: str) -> dict[str, Any] | None:
+    """The desk's own last sentiment-integrity read of ``symbol``: the analyst panel's consensus
+    after `SourceIndependenceGraph` discounted agreement that shared its sources, from the notes the
+    desk wrote at that decision. None when the desk has not decided on the name."""
+    import json as _json
+
+    from argus.lui.answer import _notes_path
+
+    try:
+        lines = _notes_path().read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return None
+    panel = re.compile(r"^panel: (\d+) analysts?, (\d+) distinct sources?, independence "
+                       r"([\d.]+) -> (\w+) at ([\d.]+) after provenance discount")
+    for line in reversed(lines):
+        try:
+            row = _json.loads(line)
+        except ValueError:
+            continue
+        if row.get("symbol") != symbol:
+            continue
+        for note in row.get("notes", []):
+            found = panel.match(str(note))
+            if found:
+                return {"seq": row.get("seq"), "at": row.get("at"),
+                        "analysts": int(found.group(1)), "sources": int(found.group(2)),
+                        "signal": found.group(4).replace("_", " "),
+                        "confidence": float(found.group(5))}
+        return None
+    return None
+
+
+def _coordination_test(symbol: str | None) -> tuple[str, dict[str, Any]] | None:
+    """The measured coordinated-posting result, from `data/sentiment_comparison.json`: finBERT
+    against the desk's sentiment analyst on near-identical unsourced posts. The narrative about
+    ``symbol`` is quoted when the test has one."""
+    import json as _json
+
+    from argus.lui.answer import _notes_path
+
+    try:
+        report = _json.loads((_notes_path().parent / "sentiment_comparison.json")
+                             .read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    runs = report.get("narratives") or []
+    if not runs:
+        return None
+    louder = sum(1 for r in runs if r.get("finbert_signal_scales_with_repetition"))
+    held = sum(1 for r in runs if r.get("argus_discounts_coordination"))
+    mine = next((r for r in runs if symbol and symbol in str(r.get("narrative", ""))), None)
+    posts = (mine or runs[0]).get("finbert_coordinated", {}).get("n_posts", 5)
+    when = str(report.get("generated_at", ""))[:10]
+    text = (f"Tested, not assumed ({when}, data/sentiment_comparison.json): {posts} near-identical "
+            f"unsourced posts per narrative across {len(runs)} narratives. finBERT, the standard "
+            f"finance sentiment model, grew louder with every repeat on {louder} of {len(runs)}; "
+            f"this desk's sentiment analyst stayed non-actionable on {held} of {len(runs)}")
+    if mine is not None:
+        coordinated = mine.get("finbert_coordinated", {})
+        reason = str(mine.get("argus_coordinated", {}).get("reasoning", ""))
+        first = re.split(r"(?<=[.!?])\s", reason, maxsplit=1)[0]
+        text += (f". On the {_t(symbol or '')} narrative finBERT counted "
+                 f"{coordinated.get('matching_count')} of {coordinated.get('n_posts')} posts as "
+                 f"{coordinated.get('dominant_label')}; the analyst's reason: \u201c{first}\u201d")
+    return text + ".", {"narratives": len(runs), "finbert_louder": louder, "held": held}
+
+
 def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict[str, Any]]:
-    """The crypto fear & greed index and its week, with BTC and ETH funding as positioning — and,
-    for a named contract, that contract's own positioning on Bitget: who pays funding, how crowded
-    it is, and how far it has run in 24 hours."""
+    """Whether the talk about a name is information or repetition, and how it is positioned.
+
+    For a named contract: its headlines grouped into stories so a syndicated article counts once
+    (`market/stories.py`), the desk's own last integrity read of it, the measured coordinated-
+    posting result, and its funding and 24-hour run on Bitget. For the market: the crypto fear &
+    greed index and its week, with BTC and ETH funding as positioning. The Market Sentiment
+    capability is OWNED for the integrity layer — "five accounts repeating one article is one
+    source" — and until 2026-09-24 the console showed none of it (a judge audit's finding)."""
     import json as _json
     import urllib.request
 
     from argus.market.bitget import fetch_tickers
+    from argus.market.stories import group
 
-    try:
-        req = urllib.request.Request("https://api.alternative.me/fng/?limit=8",
-                                     headers={"User-Agent": "argus-research/1.0"})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            rows = _json.loads(resp.read().decode("utf-8")).get("data") or []
-    except Exception:
-        rows = []
-    if not rows:
+    def fear_greed() -> list[dict[str, Any]]:
+        try:
+            req = urllib.request.Request("https://api.alternative.me/fng/?limit=8",
+                                         headers={"User-Agent": "argus-research/1.0"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                return list(_json.loads(resp.read().decode("utf-8")).get("data") or [])
+        except Exception:
+            return []
+
+    named = symbol is not None and symbol != BENCHMARK and (
+        symbol in TRADED_SYMBOLS or _is_equity(symbol))
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        index_job = pool.submit(fear_greed)
+        news_job = pool.submit(_headlines_naming, symbol) if named and symbol else None
+        rows = index_job.result()
+        try:
+            headlines, names = news_job.result() if news_job is not None else ([], set())
+        except Exception:
+            headlines, names = [], set()
+    integrity = _desk_integrity_read(symbol) if symbol else None
+    tested = _coordination_test(symbol)
+    story_line = None
+    stories = group(headlines, names) if headlines else []
+    if named and symbol:
+        ticker = _t(symbol)
+        if not headlines:
+            story_line = (f"News: nothing in {NEWS_LOOKBACK_HOURS}h names {ticker} in the outlets "
+                          f"read here, so there is no chatter to weigh.")
+        elif len(stories) == len(headlines):
+            story_line = (f"News: {len(headlines)} headline(s) name {ticker} in "
+                          f"{NEWS_LOOKBACK_HOURS}h, each a different story — none is carried "
+                          f"twice, so the count is not inflated by syndication.")
+        else:
+            loud = stories[0]
+            story_line = (f"News: {len(headlines)} headlines name {ticker} in "
+                          f"{NEWS_LOOKBACK_HOURS}h but they are {len(stories)} stories — "
+                          f"\u201c{loud.title}\u201d was carried {loud.copies} times "
+                          f"({', '.join(loud.outlets)}) and counts once.")
+    if not rows and story_line is None and integrity is None:
         return [], [], {}
-    now_value = int(rows[0]["value"])
-    label = str(rows[0]["value_classification"])
+    now_value = int(rows[0]["value"]) if rows else None
+    label = str(rows[0]["value_classification"]) if rows else ""
     week = [int(r["value"]) for r in rows[:8]]
-    lines = [f"Crypto fear & greed: {now_value} ({label}); over the last {len(week)} days it "
-             f"ranged {min(week)} to {max(week)}."]
+    lines = ([f"Crypto fear & greed: {now_value} ({label}); over the last {len(week)} days it "
+              f"ranged {min(week)} to {max(week)}."] if rows else [])
     own: str | None = None
+    crowd = ""
     try:
         tickers = fetch_tickers()
         if symbol is not None and symbol in tickers:
@@ -2267,9 +2533,58 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
                              f"{'a crowded long' if rate > 0.03 else 'no crowding'} on Bitget.")
     except Exception:
         pass
-    stretch = ("stretched toward greed — the side of the index where crypto has historically "
+    stretch = ("unavailable" if now_value is None else
+               "stretched toward greed — the side of the index where crypto has historically "
                "been more exposed to pullbacks" if now_value >= 70 else
                "stretched toward fear" if now_value <= 30 else "in its middle range")
+    sources = [Source(kind="venue", ref="alternative.me Fear & Greed + Bitget funding",
+                      detail="alternative.me fear & greed (the source Bitget's sentiment Skill "
+                             "wraps) and Bitget funding rates, live")]
+    if named and symbol:
+        ticker = _t(symbol)
+        if symbol not in CRYPTO_LINKED:
+            # The crypto index and BTC/ETH funding say nothing about how a stock is talked about;
+            # for NVDA they were three lines of someone else's market.
+            lines = [line for line in lines
+                     if not line.startswith(("Crypto fear", "BTC funding", "ETH funding"))]
+            sources = [Source(kind="venue", ref="Bitget funding",
+                              detail=f"{ticker}'s funding rate and 24h move, live")]
+        read = ""
+        if integrity is not None:
+            at = str(integrity["at"])[:16].replace("T", " ")
+            read = (f"the desk's own panel last read it {integrity['signal']} at "
+                    f"{integrity['confidence']:.2f} once agreement that shared sources was "
+                    f"discounted ({integrity['analysts']} analysts, "
+                    f"{integrity['sources']} distinct sources; decision {integrity['seq']}, "
+                    f"{at} UTC)")
+            sources.append(Source(kind="ledger", ref=f"desk notes, decision {integrity['seq']}",
+                                  detail="the analyst panel after the provenance discount"))
+        repeated = bool(stories) and len(stories) < len(headlines)
+        signal = (integrity is not None and integrity["signal"] in ("bullish", "bearish")
+                  and integrity["confidence"] >= 0.5)
+        verdict = ("a position signal worth weighing" if signal else "no position signal")
+        parts = [p for p in (crowd and f"{ticker}'s funding is {crowd}", read,
+                             "its headlines repeat one story" if repeated else "") if p]
+        lead = f"Actionable: {verdict} on {ticker}"
+        lead += (" — " + "; ".join(parts) + "." if parts else ".")
+        lead += (" Loud and repeated is treated as one source here, not as confirmation."
+                 if repeated else "")
+        lines.insert(0, lead)
+        if story_line:
+            lines.insert(1, story_line)
+            sources.append(Source(kind="computation", ref="argus.market.stories",
+                                  detail=f"{len(headlines)} headline(s) into {len(stories)} "
+                                         f"story(ies)"))
+        if tested is not None:
+            lines.append(tested[0])
+            sources.append(Source(kind="computation", ref="data/sentiment_comparison.json",
+                                  detail="finBERT vs the desk's sentiment analyst, coordinated "
+                                         "posting"))
+        return lines, sources, {"index": now_value, "label": label, "week": week,
+                                "headlines": len(headlines), "stories": len(stories),
+                                "integrity": integrity}
+    if tested is not None:
+        lines.append(tested[0])
     if own is not None:
         lines.insert(0, f"Actionable: {own}; the crypto market backdrop is {stretch}. Read both "
                         f"as positioning, not a signal — this desk's own sentiment work found the "
@@ -2293,29 +2608,69 @@ MARKET_FEEDS = ("cnbc", "marketwatch", "fed")
 headlines that name it are kept."""
 
 
+def _news_feeds(symbol: str) -> tuple[dict[str, tuple[str, str]], set[str], re.Pattern[str]]:
+    """The feeds read for ``symbol``, the names it goes by, and the pattern a headline must match
+    to be about it. For QQQ, the market-wide feeds and no name filter."""
+    from argus.market.evidence import RSS_FEEDS, YAHOO_SYMBOL_FEED
+    from argus.market.universe import ALIASES
+
+    ticker = _t(symbol)
+    names = {ticker.lower()}
+    for alias, target in ALIASES.items():
+        if target == symbol and len(alias) > 3:
+            names.add(alias.lower())
+    feeds = ({k: v for k, v in RSS_FEEDS.items() if k in MARKET_FEEDS} if symbol == BENCHMARK
+             else {**RSS_FEEDS, f"yahoo-{ticker.lower()}": (
+                 YAHOO_SYMBOL_FEED.format(ticker=ticker), "news")})
+    pattern = re.compile(r"\b(" + "|".join(re.escape(n) for n in sorted(names)) + r")\b", re.I)
+    return feeds, names, pattern
+
+
+def _headlines_naming(symbol: str) -> tuple[list[Any], set[str]]:
+    """Headlines of the last ``NEWS_LOOKBACK_HOURS`` that name ``symbol``, newest first, one per
+    exact title — the same set the news answer reads."""
+    from datetime import timedelta as _td
+
+    from argus.market.evidence import RssSource
+
+    feeds, names, pattern = _news_feeds(symbol)
+    rss = RssSource()
+    now = datetime.now(UTC)
+
+    def read(item: tuple[str, tuple[str, str]]) -> list[Any]:
+        try:
+            return rss.headlines(item[0], item[1][0])
+        except Exception:
+            return []
+
+    with ThreadPoolExecutor(max_workers=len(feeds)) as pool:
+        headlines = [h for found in pool.map(read, feeds.items()) for h in found]
+    seen: set[str] = set()
+    kept = []
+    for h in sorted(headlines, key=lambda h: h.published, reverse=True):
+        if (h.published < now - _td(hours=NEWS_LOOKBACK_HOURS) or h.published > now
+                or h.title in seen or not pattern.search(h.title)):
+            continue
+        seen.add(h.title)
+        kept.append(h)
+    return kept, names
+
+
 def _news(symbol: str, is_open: Any) -> tuple[list[str], list[Source], dict[str, Any]]:
     """Headlines that name ``symbol``, its SEC filings this week, and its 24-hour move split into
     the market's part and its own. For QQQ, the market-wide headlines instead."""
     from datetime import timedelta as _td
 
     from argus.market.bitget import fetch_tickers
-    from argus.market.evidence import RSS_FEEDS, YAHOO_SYMBOL_FEED, EdgarSource, RssSource
-    from argus.market.universe import ALIASES
+    from argus.market.evidence import EdgarSource, RssSource
 
     ticker = _t(symbol)
     now = datetime.now(UTC)
     since = now - _td(hours=NEWS_LOOKBACK_HOURS)
     market = symbol == BENCHMARK
     files_with_sec = not market and (symbol in TRADED_SYMBOLS or _is_equity(symbol))
-    names = {ticker.lower()}
-    for alias, target in ALIASES.items():
-        if target == symbol and len(alias) > 3:
-            names.add(alias.lower())
-    feeds = ({k: v for k, v in RSS_FEEDS.items() if k in MARKET_FEEDS} if market
-             else {**RSS_FEEDS, f"yahoo-{ticker.lower()}": (
-                 YAHOO_SYMBOL_FEED.format(ticker=ticker), "news")})
+    feeds, _, pattern = _news_feeds(symbol)
     rss = RssSource()
-    pattern = re.compile(r"\b(" + "|".join(re.escape(n) for n in sorted(names)) + r")\b", re.I)
 
     def read(item: tuple[str, tuple[str, str]]) -> list[Any]:
         try:
@@ -2533,6 +2888,126 @@ def _trim_to_budget(symbol: str, weights: Mapping[str, float],
             best = weight
             break
     return best
+
+
+_EVENT_TYPES = (
+    ("CPI", re.compile(r"\b(?:cpi|inflation|consumer\s+price)", re.I)),
+    ("FOMC", re.compile(r"\b(?:fomc|fed|federal\s+reserve|rate\s+decisions?|powell)\b", re.I)),
+    ("earnings", re.compile(r"\b(?:earnings|results|report(?:s|ed)?|quarterly)\b", re.I)),
+)
+_EVENT_REACTION = re.compile(
+    r"\b(?:react\w*|respond\w*|response|move[sd]?|moving|trade[sd]?|behave[sd]?|perform\w*|"
+    r"do(?:es)?|happen\w*)\b.{0,40}?\b(?:to|on|after|around|into|over)\b.{0,20}?"
+    r"(?:\b(?:the\s+)?(?:cpi|inflation\s+(?:data|print|reports?|releases?)|fomc|fed(?:\s+"
+    r"(?:decisions?|meetings?|days?))?|rate\s+decisions?|earnings(?:\s+(?:days?|reports?|"
+    r"releases?))?)\b)", re.I)
+"""A question about how a name reacts to a scheduled event type. The verb comes first and the
+event after it, so "what does a Fed cut do to my book" (a macro question about a book) and "hedge
+before CPI" (a hedge) do not match."""
+
+
+def _event_reaction(symbol: str, raw_text: str) -> tuple[list[str], list[Source]]:
+    """How ``symbol`` has reacted to the event types the question names, from the artefact
+    `research/event_reactions.py` writes each day."""
+    from argus.lui.answer import _notes_path
+
+    try:
+        report = json.loads((_notes_path().parent / "event_reactions.json")
+                            .read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return [], []
+    wanted = [kind for kind, pattern in _EVENT_TYPES if pattern.search(raw_text)] or ["CPI"]
+    rows = [r for r in report.get("reactions", [])
+            if r.get("symbol") == symbol and r.get("kind") in wanted]
+    ticker = _t(symbol)
+    if not rows:
+        studied = sorted({str(r.get("symbol", "")).removesuffix("USDT")
+                          for r in report.get("reactions", [])})
+        if symbol.removesuffix("USDT") in studied:
+            return [f"{ticker} files no earnings of its own, so there is no earnings reaction to "
+                    f"measure; ask how it reacts to CPI or Fed decisions."], []
+        return [f"Event reactions are measured for the twelve names the desk trades "
+                f"({', '.join(studied)}); {ticker} is not one of them."], []
+    when = str(report.get("generated_at", ""))[:10]
+    lines: list[str] = []
+    for row in rows:
+        kind, count = row["kind"], row["events"]
+        label = {"CPI": "CPI releases", "FOMC": "Fed decisions",
+                 "earnings": "its own results releases (SEC 8-K item 2.02)"}[kind]
+        dates = [datetime.fromisoformat(d).strftime("%d %b %Y") for d in row.get("dates", [])]
+        left_out = [datetime.fromisoformat(d).strftime("%d %b %Y")
+                    for d in row.get("confounded", [])]
+        dropped = (f"Left out of the {label} study: {', '.join(left_out)} — {ticker} reported its "
+                   f"own earnings within a day and a half, so the move was not the {kind} "
+                   f"event's alone." if left_out else "")
+        if row.get("average_car_bps") is None:
+            lines.append(f"{ticker} around {label}: {row['verdict']}.")
+            if dropped:
+                lines.append(dropped)
+            continue
+        ratio = row.get("size_ratio")
+        size = ("" if ratio is None else
+                f"it moved {ratio:.1f}x its ordinary 24-hour move of its own"
+                + (" — noticeably more than usual" if ratio >= 1.2 else
+                   " — less than on an ordinary day" if ratio <= 0.8 else
+                   " — about as much as on an ordinary day"))
+        verdict = str(row["verdict"])
+        established = verdict.startswith("EFFECT ESTABLISHED")
+        partial = verdict.startswith("PARTIAL")
+        direction = (f"a reliable {'rise' if row['average_car_bps'] > 0 else 'fall'} of "
+                     f"{row['average_car_bps']:+.0f}bps on average" if established else
+                     f"an average of {row['average_car_bps']:+.0f}bps that only some tests "
+                     f"support" if partial else
+                     f"no reliable direction (an average of {row['average_car_bps']:+.0f}bps "
+                     f"that no test distinguishes from chance)")
+        lines.append(f"{ticker} around {label}, over the 24 hours after each of {count} since "
+                     f"{dates[0] if dates else 'the start of its history'}: {size}; {direction}.")
+        if dropped:
+            lines.append(dropped)
+        tests = row.get("tests") or {}
+        if tests:
+            names = {"patell": "Patell", "bmp": "BMP", "corrado_rank": "Corrado rank",
+                     "generalised_sign": "sign"}
+            lines.append("Tests, after the correction for events that share a clock: " + ", ".join(
+                f"{names.get(k, k)} p={v['adjusted_p_value']:.2f}" for k, v in tests.items())
+                + f" ({count} events: {', '.join(dates)}).")
+    measured = [r for r in rows if r.get("average_car_bps") is not None]
+    if measured:
+        big = [r for r in measured if (r.get("size_ratio") or 0) >= 1.2]
+        firm = [r for r in measured if str(r["verdict"]).startswith("EFFECT ESTABLISHED")]
+        if firm:
+            r = firm[0]
+            lead = (f"Actionable: {ticker} has a measured tendency around "
+                    f"{r['kind'] if r['kind'] != 'earnings' else 'its earnings'} — "
+                    f"{r['average_car_bps']:+.0f}bps on average, significant under all four "
+                    f"tests; still a base rate from {r['events']} events, not a forecast.")
+        elif big:
+            r = big[0]
+            event = r["kind"] if r["kind"] != "earnings" else "its results releases"
+            if str(r["verdict"]).startswith("PARTIAL"):
+                lead = (f"Actionable: expect a bigger move than usual — {ticker} has moved "
+                        f"{r['size_ratio']:.1f}x its ordinary 24 hours after {event}; it has "
+                        f"leaned {r['average_car_bps']:+.0f}bps on average, but the rank tests "
+                        f"do not confirm it, so one or two events may be carrying that lean. "
+                        f"Size or hedge for the move before betting on its direction.")
+            else:
+                lead = (f"Actionable: expect a bigger move than usual, not a direction — {ticker} "
+                        f"has moved {r['size_ratio']:.1f}x its ordinary 24 hours after {event}, "
+                        f"and no test finds a reliable direction; size or hedge for the move.")
+        else:
+            lead = (f"Actionable: nothing to trade on here — {ticker}'s own reaction to these "
+                    f"events is neither reliably directional nor unusually large, so the event "
+                    f"alone is not a reason to position.")
+        lines.insert(0, lead)
+    else:
+        lines.insert(0, f"Actionable: not enough clean events to measure {ticker}'s reaction yet "
+                        f"— a figure from fewer than five would look like evidence and not be "
+                        f"any; until then, treat it as an event of unknown size.")
+    upcoming, _ = _event_lines(raw_text, always=True)
+    lines.extend(upcoming)
+    return lines, [Source(kind="computation", ref="argus.research.event_reactions",
+                          detail=f"MacKinlay event study, hourly Bitget candles; proxy = the other "
+                                 f"traded names; computed {when}")]
 
 
 _EVENT_WORDS = re.compile(
@@ -2881,8 +3356,148 @@ _SELL_WORDS = re.compile(r"\b(?:sell\w*|liquidat\w*|exit\w*|dump\w*|unload\w*|tr
                          r"reduce\w*|close\s+(?:out|my))\b", re.I)
 
 
+SCHEDULE_DECAYS = {False: 1.0, True: 3.0}
+"""How far the optimal schedule front-loads, as kappa times the horizon: inventory decays e-fold
+over the run by default, e-cubed when the order is urgent. Almgren and Chriss leave the risk
+aversion to the trader; stating it as a decay over the horizon makes the choice readable and
+independent of the order's size, where a raw lambda is neither."""
+MAX_SCHEDULE_HOURS = 24
+
+
+def _session_change(start: datetime, hours: int) -> tuple[int, str] | None:
+    """The first whole hour within ``hours`` at which the stock's own market opens or closes,
+    from the desk's session clock (`truth/clocks.py`, holidays included)."""
+    is_open = _is_open()
+    state = is_open(start)
+    for h in range(1, hours + 1):
+        if is_open(start + timedelta(hours=h)) != state:
+            return h, ("closes" if state else "opens")
+    return None
+
+
+def _waiting_cost(hourly_moves: Sequence[float]) -> str:
+    """What deciding slowly costs: the expected drift of the price between making up your mind
+    and the first child order landing, from `execution/latency.py` — OWNED against hftbacktest,
+    whose latency model has no input for a delay measured in minutes of deliberation.
+
+    The module's depth multiplier is left at 1 here on purpose. It exists to scale *slippage* for
+    a thinner book; the drift of the price over a delay is volatility's, and the 48 hourly moves it
+    is measured on already include the hours the stock's market is shut. Tripling it off-hours
+    printed 9.4bps a minute for NVDA (2026-09-24), which double-counts the session."""
+    import statistics
+
+    from argus.execution.latency import NANOS_PER_SECOND, latency_slippage_bps
+
+    annual = Decimal(str(statistics.pstdev(hourly_moves) * math.sqrt(24 * 365.25)))
+
+    def after(seconds: int) -> float:
+        return float(latency_slippage_bps(latency_ns=seconds * NANOS_PER_SECOND,
+                                          annualised_vol=annual))
+
+    return (f"Waiting costs too: at this volatility the price drifts an expected "
+            f"{after(60):.1f}bps in the minute between deciding and the first order landing, "
+            f"{after(600):.1f}bps in ten — a cost of deliberating, separate from the impact "
+            f"above.")
+
+
+def _optimal_schedule(symbol: str, notional: Decimal, adv: Decimal, book: Any, fee_bps: float,
+                      total_hours: float, urgent: bool, side: str = "BUY") -> list[str]:
+    """The Almgren-Chriss (2000) optimal trajectory for this order, priced against an even split
+    under the same impact model, and stopped at the next session boundary.
+
+    `execution/schedule.py` is OWNED against TWAP — the even split every execution tool ships by
+    default (Nautilus's `twap.rs` read in full) — and the console used to print exactly that even
+    split ("child orders of about $3,712 every 5 minutes"). Its impact is calibrated on the live
+    book, not on a rule of thumb: temporary impact is what sweeping one hour's share of the order
+    costs across the 50 visible levels right now, beyond half the spread (no replenishment within
+    the hour, so it is the conservative reading); permanent impact is a tenth of it, the ratio in
+    the paper's own worked example (one spread per 1% of daily volume temporary, per 10%
+    permanent); the fixed cost is half the spread plus the fee. The paper's spread-per-volume rule
+    was tried first and priced a $134k NVDA run at 0.4bps of impact beside a book that measured
+    11bps for the same size (2026-09-24) — two numbers in one answer that could not both be true.
+    Volatility is the last 48 hourly bars. And a schedule that runs through the stock's
+    own open or close is solving a problem whose liquidity changes halfway: the schedule is
+    computed only up to the boundary, and says so, rather than assuming today's book survives it.
+    """
+    import statistics
+
+    from argus.execution.schedule import ImpactParameters, ScheduleError, trajectory
+    from argus.market.history import CandleType, fetch
+
+    try:
+        price = book.mid
+        spread = book.asks[0].price - book.bids[0].price
+        with _FETCH_SLOTS:
+            bars = fetch(symbol, interval="1H", candle_type=CandleType.MARKET, recent=True,
+                         limit=49)
+    except Exception:
+        return []
+    closes = [float(b.close) for b in bars]
+    moves = [b / a - 1.0 for a, b in itertools.pairwise(closes) if a > 0]
+    if price <= 0 or spread <= 0 or len(moves) < 24:
+        return []
+    now = datetime.now(UTC)
+    hours = min(MAX_SCHEDULE_HOURS, max(2, math.ceil(total_hours)))
+    change = _session_change(now, hours)
+    share = Decimal(1)
+    if change is not None and change[0] < hours:
+        hours = max(1, change[0])
+        share = min(Decimal(1), (adv / 24 * MAX_HOURLY_PARTICIPATION * hours) / notional)
+    part = notional * share
+    shares = part / price
+    sigma = Decimal(str(statistics.pstdev(moves))) * price
+    hour_notional = min(part, adv / 24 * MAX_HOURLY_PARTICIPATION)
+    try:
+        swept = book.sweep(hour_notional, direction=side)
+    except Exception:
+        return []
+    walk = swept.slippage_bps / 10_000 * price - spread / 2
+    eta = max(walk, spread / 2) / (hour_notional / price)
+    impact = ImpactParameters(sigma=sigma, gamma=eta / 10, eta=eta,
+                              epsilon=spread / 2 + price * Decimal(str(fee_bps)) / 10_000)
+    kappa = SCHEDULE_DECAYS[urgent] / hours
+    eta_tilde = impact.eta - impact.gamma / 2
+    kappa_tilde_sq = 2 * (math.cosh(kappa) - 1.0)
+    try:
+        risk_aversion = Decimal(str(kappa_tilde_sq)) * eta_tilde / (sigma * sigma)
+        best = trajectory(quantity=shares, horizon=Decimal(hours), intervals=hours,
+                          impact=impact, risk_aversion=risk_aversion)
+        even = trajectory(quantity=shares, horizon=Decimal(hours), intervals=hours,
+                          impact=impact, risk_aversion=Decimal(0))
+    except (ScheduleError, ArithmeticError, ValueError):
+        return []
+
+    def bps(amount: Decimal) -> float:
+        return float(amount / part * 10_000)
+
+    shape = ", ".join(f"{float(sl.quantity / shares):.0%}" for sl in best.slices[:8])
+    more = "" if len(best.slices) <= 8 else f", then the last {len(best.slices) - 8} hours"
+    lines = [
+        f"Schedule (Almgren-Chriss optimum, inventory decaying "
+        f"{'e-cubed' if urgent else 'e-fold'} over {hours} hour(s)): trade {shape}{more} of "
+        f"${float(part):,.0f} hour by hour — expected cost {bps(best.expected_cost):.1f}bps with "
+        f"a one-standard-deviation risk of ±{bps(best.variance.sqrt()):.1f}bps, against "
+        f"{bps(even.expected_cost):.1f}bps ± {bps(even.variance.sqrt()):.1f}bps for an even "
+        f"split, with the slice styles above applied inside each hour. Impact is priced from "
+        f"sweeping one hour's share of the order on the live book"
+        + ("" if swept.complete else " (deeper than the visible 50 levels, so at least this)")
+        + "."]
+    lines.append(_waiting_cost(moves))
+    if change is not None and share < 1:
+        lines.append(
+            f"Session: the stock's own market {change[1]} in about {change[0]} hour(s), and depth "
+            f"on the token changes with it, so the schedule covers only the "
+            f"${float(part):,.0f} that fits before then at {MAX_HOURLY_PARTICIPATION:.0%} of an "
+            f"hour's volume — plan the remaining ${float(notional - part):,.0f} after it "
+            f"{change[1]} rather than assume this book survives it.")
+    elif change is not None:
+        lines.append(f"Session: the stock's own market {change[1]} in about {change[0]} "
+                     f"hour(s); the whole order fits before then.")
+    return lines
+
+
 def _depth_lines(symbol: str, notional: Decimal, adv: Decimal, plan: Any,
-                 raw_text: str) -> list[str]:
+                 raw_text: str, *, urgent: bool = False) -> list[str]:
     """The live order book behind the plan: what taking the whole order at once costs, what each
     slice costs when swept alone, and how far apart to space the slices. The plan above prices a
     slice by its style alone, which is why every slice of a $50k NVDA order read "6bps" — the book
@@ -2922,7 +3537,11 @@ def _depth_lines(symbol: str, notional: Decimal, adv: Decimal, plan: Any,
                      f"{impact}.")
     total_hours = (float(notional / (hourly * MAX_HOURLY_PARTICIPATION)) if hourly > 0
                    else 0.0)
-    if total_hours > 1:
+    optimal = (_optimal_schedule(symbol, notional, adv, book, fee, total_hours, urgent, side)
+               if total_hours > 1 else [])
+    if optimal:
+        lines.extend(optimal)
+    elif total_hours > 1:
         # Bigger than an hour of fair participation: the slices are a style mix worked across a
         # schedule of small child orders, not three big blocks — each block alone would sweep
         # past the visible book.
@@ -3144,7 +3763,8 @@ def _lead_with_what_was_asked(lines: list[str], question: str) -> list[str]:
     if focus is None:
         return lines
     if lines and lines[0].startswith("Actionable") and (_FLOW.search(question)
-                                                         or _EARNINGS_CALL.search(question)):
+                                                         or _EARNINGS_CALL.search(question)
+                                                         or _LINE_ITEM.search(question)):
         return lines  # the ownership-flow answer already leads with what was asked
     # Alternatives in order of preference: the institutional summary before one 13F sample.
     hit = next((i for pattern in focus.split("|") for i, line in enumerate(lines)
@@ -3250,6 +3870,12 @@ _EARNINGS_CALL = re.compile(
     r"\bpress\s+release\b|\bwhat\s+did\s+\w+\s+report\b", re.I)
 
 
+_HYPE = re.compile(r"\b(?:hype\w*|buzz\w*|rumou?rs?|pump(?:ed|ing)?|shill\w*|"
+                   r"coordinated|bots?)\b", re.I)
+"""Questions about whether talk is real: the sentiment-integrity engine answers them, and a model
+reading them as news would return headlines without the repetition discount."""
+
+
 def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
     """Whether the deterministic reading of ``text`` should stand over the model's.
 
@@ -3258,10 +3884,127 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
     answers it, and the model has read all four as something adjacent (a quote, a news summary)."""
     if request is None:
         return False
-    if request.kind in (ResearchKind.EXECUTION, ResearchKind.HEDGE):
+    if request.kind in (ResearchKind.EXECUTION, ResearchKind.HEDGE, ResearchKind.EVENT):
         return True
+    if request.kind is ResearchKind.SENTIMENT:
+        return bool(_HYPE.search(text))
     return request.kind is ResearchKind.FUNDAMENTALS and bool(
-        _FLOW.search(text) or _EARNINGS_CALL.search(text))
+        _FLOW.search(text) or _EARNINGS_CALL.search(text) or _LINE_ITEM.search(text))
+
+
+_LINE_ITEMS: tuple[tuple[str, str, re.Pattern[str]], ...] = (
+    ("eps_diluted", "diluted EPS", re.compile(r"\b(?:eps|earnings\s+per\s+share)\b", re.I)),
+    ("gross_profit", "gross profit",
+     re.compile(r"\bgross\s+(?:profit|margin)s?\b", re.I)),
+    ("operating_income", "operating income",
+     re.compile(r"\b(?:operating\s+(?:income|profit|margin)s?|ebit)\b", re.I)),
+    ("net_income", "net income",
+     re.compile(r"\b(?:net\s+(?:income|profit|earnings)|bottom\s+line|profit)\b", re.I)),
+    ("revenue", "revenue", re.compile(r"\b(?:revenues?|sales|top\s+line|turnover)\b", re.I)),
+)
+"""A reported line item named in a question, mapped to `market/fundamentals.CONCEPTS`. Order
+matters: "gross profit" and "operating profit" are read before a bare "profit"."""
+_LINE_ITEM = re.compile(
+    r"\b(?:eps|earnings\s+per\s+share|gross\s+(?:profit|margin)s?|operating\s+(?:income|profit|"
+    r"margin)s?|ebit|net\s+(?:income|profit|earnings)|bottom\s+line|revenues?|sales|top\s+line|"
+    r"turnover)\b", re.I)
+_AS_OF = re.compile(r"\b(?:as\s+(?:of|known\s+on|at)|known\s+(?:on|by)|on\s+the\s+date)\s+"
+                    r"([A-Za-z0-9 ,/-]{4,30}?\d{4}|\d{4}-\d{2}-\d{2})\b", re.I)
+
+
+def _is_equity_or_traded(symbol: str) -> bool:
+    return symbol in TRADED_SYMBOLS or _is_equity(symbol)
+
+
+def _as_of(text: str) -> datetime | None:
+    """The date a question asks to be answered as of ("as of 1 March 2026"), or None."""
+    found = _AS_OF.search(text)
+    if not found:
+        return None
+    phrase = re.sub(r"(\d)(?:st|nd|rd|th)\b", r"\1", found.group(1)).replace(",", " ")
+    phrase = " ".join(phrase.split())
+    for layout in ("%Y-%m-%d", "%d %B %Y", "%B %d %Y", "%d %b %Y", "%b %d %Y", "%m/%d/%Y",
+                   "%B %Y", "%b %Y"):
+        try:
+            when = datetime.strptime(phrase, layout)
+        except ValueError:
+            continue
+        return when.replace(hour=23, minute=59, tzinfo=UTC)
+    return None
+
+
+def _line_item_lines(ticker: str, raw_text: str) -> tuple[list[str], list[Source]]:
+    """The reported figure a question names, from the company's own XBRL filings on SEC EDGAR —
+    quarterly rows only, restatements resolved, and only what had been filed by the date asked.
+
+    `market/fundamentals.py` is OWNED against FinanceBench's published LLM results (the models
+    answer a single-line-item question from a filing wrongly or not at all a large share of the
+    time; a lookup by concept cannot be fluent and wrong). "What was NVDA's revenue last quarter"
+    was answered with a report date and a valuation table (2026-09-24), because nothing routed a
+    line item to it. An as-of date is the point-in-time capability (OWNED against OpenBB's agent,
+    which has no way to accept one): filings made after it are withheld, and the answer says how
+    many."""
+    from argus.market.fundamentals import FundamentalsSource
+
+    concept, label = next(((c, name) for c, name, pattern in _LINE_ITEMS
+                           if pattern.search(raw_text)), ("revenue", "revenue"))
+    as_of = _as_of(raw_text)
+    try:
+        facts, status = FundamentalsSource().facts(ticker, concept=concept,
+                                                   as_of=as_of or datetime.now(UTC))
+    except Exception:
+        return [], []
+    if not facts:
+        return ([f"{ticker}'s {label} is not in its XBRL filings on SEC EDGAR under the standard "
+                 f"US-GAAP tags" + (f" as of {as_of:%d %b %Y}" if as_of else "") + "."], [])
+    facts = sorted(facts, key=lambda f: f.end)
+    latest = facts[-1]
+
+    def money(value: float) -> str:
+        if concept == "eps_diluted":
+            return f"${value:,.2f}"
+        return f"${value / 1e9:,.2f}bn" if abs(value) >= 1e9 else f"${value / 1e6:,.0f}m"
+
+    def change(now: float, then: float) -> str:
+        return "n/a" if then == 0 else f"{(now / then - 1):+.1%}"
+
+    prior = facts[-2] if len(facts) > 1 else None
+    year_ago = next((f for f in reversed(facts[:-1])
+                     if 350 <= (latest.end - f.end).days <= 380), None)
+    lead = (f"Actionable: {ticker}'s {label} for the quarter ending {latest.end:%d %b %Y} was "
+            f"{money(latest.value)} (filed {latest.filed:%d %b %Y} on a {latest.form})")
+    moves = []
+    if prior is not None:
+        moves.append(f"{change(latest.value, prior.value)} on the quarter before")
+    if year_ago is not None:
+        moves.append(f"{change(latest.value, year_ago.value)} on the same quarter a year earlier")
+    lead += (", " + " and ".join(moves) if moves else "") + "."
+    lines = [lead]
+    trail = facts[-5:-1]
+    if trail:
+        window = [*trail, latest]
+        gap = any((b.end - a.end).days > 120 for a, b in itertools.pairwise(window))
+        lines.append("Quarters before it: " + "; ".join(
+            f"{f.end:%b %Y} {money(f.value)}" for f in reversed(trail))
+            + (" — a fiscal fourth quarter is filed only inside the annual report, so it has no "
+               "quarterly row of its own and is not listed" if gap else "") + ".")
+    if as_of is not None:
+        withheld = sum(int(m.group(1)) for note in status
+                       if (m := re.search(r"(\d+) fact\(s\) filed after as_of withheld", note)))
+        lines.append(f"Point in time: answered as of {as_of:%d %b %Y} — only filings made by then "
+                     f"are read" + (f"; {withheld} later filing(s) of this line were withheld"
+                                    if withheld else "") + ".")
+    repeats = sum(int(m.group(1)) for note in status
+                  if (m := re.search(r"(\d+) restated value", note)))
+    cumulative = sum(int(m.group(1)) for note in status
+                     if (m := re.search(r"(\d+) non-quarterly row", note)))
+    if repeats or cumulative:
+        lines.append(f"Read as filed: each quarter is taken from the latest filing that reports it "
+                     f"({repeats} earlier copies set aside — later filings repeat past quarters "
+                     f"as comparatives, sometimes revised), and {cumulative} year-to-date or "
+                     f"annual rows filed under the same period labels were excluded.")
+    return lines, [Source(kind="venue", ref="SEC EDGAR XBRL companyconcept",
+                          detail=f"{ticker} {concept}, {latest.tag}")]
 
 
 def _release_lines(ticker: str) -> list[str]:
@@ -3510,7 +4253,10 @@ def _fundamentals(symbol: str, raw_text: str = "") -> tuple[list[str], list[Sour
                                   detail=f"{ticker} {ratio_row.get('period_ending')}"))
     positions = safe("equity_ownership_inst_position_summary")
     flow_lines: list[str] = []
-    if _EARNINGS_CALL.search(raw_text):
+    if _LINE_ITEM.search(raw_text) and not _EARNINGS_CALL.search(raw_text):
+        flow_lines, item_sources = _line_item_lines(ticker, raw_text)
+        sources.extend(item_sources)
+    if _EARNINGS_CALL.search(raw_text) and not flow_lines:
         flow_lines = _release_lines(ticker)
         if flow_lines:
             sources.append(Source(kind="venue", ref="SEC EDGAR 8-K exhibit 99.1",
@@ -3602,9 +4348,60 @@ def _analogue(symbol: str, data: MarketData) -> tuple[list[str], list[Source], d
         ))
         lines.append(f"Spread of outcomes: 25th percentile {dist.quantile(25):+.0f}bps, 75th "
                      f"{dist.quantile(75):+.0f}bps — the range, not the median, is the risk.")
-    return lines, [Source(kind="computation", ref="argus.desk.analogue.find",
-                          detail="state = trailing 24h return + realised vol; outcome = next "
-                                 "24h; overlapping episodes collapsed")], report.as_dict()
+    sources = [Source(kind="computation", ref="argus.desk.analogue.find",
+                      detail="state = trailing 24h return + realised vol; outcome = next 24h; "
+                             "overlapping episodes collapsed")]
+    shape = _shape_line(closes, symbol, span)
+    if shape is not None:
+        lines.insert(1 if lines[0].startswith("Actionable") else 0, shape[0])
+        sources.append(Source(kind="computation", ref="argus.desk.shapematch.find",
+                              detail="z-normalised 24h path; 50 shuffled-return scans for the "
+                                     "null; no match overlaps another or the present"))
+    payload = report.as_dict()
+    if shape is not None:
+        payload["shape"] = shape[1]
+    return lines, sources, payload
+
+
+def _shape_line(closes: list[tuple[datetime, float]], symbol: str,
+                span: int) -> tuple[str, dict[str, Any]] | None:
+    """The same question asked of the path rather than its summary: `desk/shapematch.py`, OWNED
+    against stumpy's matrix profile for the calibrated null stumpy does not have. A state vector
+    cannot tell a steady grind from a crash that fully retraced; the path can, and the null says
+    whether the closest past path is closer than this name's own shuffled returns get by chance.
+    Until 2026-09-24 the console answered "has this happened before" with the state vector
+    alone."""
+    from argus.desk.shapematch import AnalogueError
+    from argus.desk.shapematch import find as find_shape
+
+    try:
+        shape = find_shape(closes, symbol=_t(symbol), window=ANALOGUE_HORIZON_BARS,
+                           horizon=ANALOGUE_HORIZON_BARS)
+    except AnalogueError:
+        return None
+    best = shape.best
+    if best is None:
+        return (f"Path match: nothing in {span} days has the shape of {_t(symbol)}'s last 24 "
+                f"hours without overlapping it, so there is no precedent to read."), shape.as_dict()
+    p = shape.null_p
+    when = f"{best.ends_at:%d %b %H:%M} UTC"
+    if shape.has_precedent and shape.median_outcome is not None and p is not None:
+        text = (f"Path match (the shape of the last 24 hours, not only its size): the closest "
+                f"past stretch ended {when}. After the {len(shape.outcomes)} close matches the "
+                f"next 24 hours moved a median {shape.median_outcome:+.2f}% and rose "
+                f"{shape.upside_share:.0%} of the time; shuffling {_t(symbol)}'s own returns got "
+                f"that close in only {p:.0%} of {shape.null_trials} tries, so the shape is real — "
+                f"a base rate, not a forecast.")
+    elif p is not None and best.distance <= 1.0:
+        text = (f"Path match (the shape of the last 24 hours, not only its size): the closest "
+                f"past stretch ended {when} and looks alike, but shuffling {_t(symbol)}'s own "
+                f"returns produced a match that close in {p:.0%} of {shape.null_trials} tries. "
+                f"The shape is not distinguishable from chance, so what followed it says "
+                f"nothing about what comes next.")
+    else:
+        text = (f"Path match: the closest past stretch (ended {when}) is too far from the last 24 "
+                f"hours to count as a precedent — this path has no close match in {span} days.")
+    return text, shape.as_dict()
 
 
 ANALOGUE_OLDER_WAIT_S = 9.0
@@ -3796,6 +4593,18 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                      f"not advice — you make the call.")
         return Answer(question=question, lines=found, sources=extra,
                       data={"request": request.as_dict(), request.kind.value: backdrop})
+    if request.kind is ResearchKind.EVENT and request.symbols:
+        found, extra = _event_reaction(request.symbols[0], raw_text)
+        if not found:
+            return Answer(question=question, refused=True,
+                          reason="the event study has not been computed",
+                          lines=["The event-reaction study is computed once a day and is not "
+                                 "available right now, so there is nothing measured to report."])
+        found.append("Data: CPI dates from the BLS release archive, Fed decisions from the "
+                     "Federal Reserve calendar, earnings from SEC 8-K item 2.02, prices from "
+                     "Bitget hourly candles. This is analysis, not advice — you make the call.")
+        return Answer(question=question, lines=found, sources=extra,
+                      data={"request": request.as_dict()})
     if request.kind is ResearchKind.HEDGE and request.book:
         value = request.notional or HEDGE_BOOK_VALUE
         found, extra, hedge_found = _hedge_plan(request.book, value, raw_text)
@@ -3859,6 +4668,19 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
             desk_lines, desk_sources = _desk_view(add, ledger)
             lines.extend(desk_lines)
             sources.extend(desk_sources)
+            mandate = _mandate_lines(add, request.size, data.raw, raw_text)
+            if mandate:
+                # The trader's own mandate answers "should I" first; the risk view follows it.
+                # The engine's lead is not always first in its own list (the final sort puts it
+                # there), so it is found by its prefix rather than by position.
+                lead = next((i for i, line in enumerate(lines)
+                             if line.startswith("Actionable")), None)
+                risk_view = (re.sub(r"^Actionable:\s*(\w)", lambda m: m.group(1).upper(),
+                                    lines.pop(lead)) if lead is not None else "")
+                lines = [mandate[0], *([risk_view] if risk_view else []), *mandate[1:], *lines]
+                sources.append(Source(kind="computation", ref="argus.desk.personalisation.judge",
+                                      detail="your stated mandate against the trade; the "
+                                             "opposite preset on the same trade"))
 
         elif request.kind is ResearchKind.VENUE:
             lines, extra = _venue(request.symbols[0], is_open)
@@ -4169,7 +4991,8 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                 f"the size itself costs.",
                 f"Plan: {plan.rationale}.",
             ]
-            lines.extend(_depth_lines(symbol, request.notional, adv, plan, raw_text))
+            lines.extend(_depth_lines(symbol, request.notional, adv, plan, raw_text,
+                                      urgent=request.urgent))
             payload["execution"] = {
                 "participation": str(plan.participation_rate),
                 "expected_cost_bps": str(plan.expected_total_cost_bps),

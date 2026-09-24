@@ -296,3 +296,32 @@ class TestTheShuffleKeepsTheSeriesAndDestroysTheOrder:
         rng = random.Random(6)
         closes = [100.0 + math.sin(i / 3.0) * 5 for i in range(200)]
         assert shuffled_closes(closes, rng) != closes
+
+
+class TestTheFastScanIsTheSameDistance:
+    """`_distances` replaced per-candidate `distance()` calls in the scan (17s to under a second on
+    ninety days, 2026-09-24). It must be the same quantity, not a similar one."""
+
+    def test_it_agrees_with_distance_on_real_hourly_series(self) -> None:
+        import json
+        from pathlib import Path
+
+        from argus.desk.shapematch import _distances
+
+        fixture = Path(__file__).resolve().parents[1] / "data" / "risk_layer_candles_fixture.json"
+        candles = json.loads(fixture.read_text(encoding="utf-8"))["candles"]
+        for symbol in ("NVDAUSDT", "COINUSDT", "SQQQUSDT"):
+            closes = [float(c) for _, c in candles[symbol]][-600:]
+            starts = range(0, len(closes) - 72)
+            query = closes[-24:]
+            for start, fast in zip(starts, _distances(closes, 24, starts), strict=True):
+                assert fast == pytest.approx(distance(query, closes[start:start + 24]), abs=1e-9)
+
+    def test_flat_windows_keep_the_znormalise_convention(self) -> None:
+        from argus.desk.shapematch import _distances
+
+        flat = [5.0] * 24
+        shaped = [float(i % 5) for i in range(24)]
+        assert _distances([*shaped, *flat], 24, [0]) == [pytest.approx(1.0)]
+        assert _distances([*flat, *flat], 24, [0]) == [0.0]
+        assert _distances([*flat, *shaped], 24, [0]) == [pytest.approx(1.0)]

@@ -656,8 +656,8 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 6,542 tests
-python -m argus.status    # 131/131 modules importable, 18/18 sub-themes, artefacts on disk
+pytest                    # 6,662 tests
+python -m argus.status    # 139/139 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
 ---
@@ -1703,10 +1703,10 @@ takes, and every artefact the system writes.
 
 | | |
 |---|---|
-| Source modules | **309** files across **21 packages**, 123,348 lines |
-| Registered and importable | **131/131** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **219 files**, **6,542 tests collected** |
-| Type and lint | `ruff` clean, `mypy --strict` clean on **309 source files** |
+| Source modules | **314** files across **21 packages**, 125,835 lines |
+| Registered and importable | **139/139** (`python -m argus.status` checks this at runtime) |
+| Test files / tests | **222 files**, **6,662 tests collected** |
+| Type and lint | `ruff` clean, `mypy --strict` clean on **314 source files** |
 | Artefacts written | **162** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
@@ -1939,7 +1939,7 @@ and each is treated as **absent rather than stale** past 36 hours — so a measu
 refreshing degrades the system into saying "not measured" rather than into using an old number.
 
 Also standing on its own: the factor lab's memory across runs, the Skill health sweep the cycle reads
-rather than waits on, and `python -m argus.status`, which checks at runtime that all 131 modules
+rather than waits on, and `python -m argus.status`, which checks at runtime that all 139 modules
 import, that all 18 sub-themes resolve to a symbol and a test file, and that every declared artefact
 is on disk.
 
@@ -1951,10 +1951,10 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 309 files, 21 packages, 123,348 lines; `mypy --strict` clean on 309 source files |
+| Source modules | 314 files, 21 packages, 125,835 lines; `mypy --strict` clean on 314 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
-| Modules registered and importable | 131/131 modules importable |
-| Tests | 6,542 tests collected, `ruff` clean |
+| Modules registered and importable | 139/139 modules importable |
+| Tests | 6,662 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 66, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |

@@ -136,7 +136,9 @@ actionable insight: <a href="/research" style="color:var(--accent)">run one now<
 seven engines answer "should I add 15% TSLA to my book?" live, each naming its source, and end in
 what to do. Change the name, size or book in the page. And the other half of the story:
 <a href="/wrong" style="color:var(--accent)">what we got wrong</a> &mdash; every bug, withdrawn
-claim and lost comparison, read live from its own artefact.</p>
+claim and lost comparison, read live from its own artefact &mdash; and
+<a href="/proof" style="color:var(--accent)">what we beat</a>: every capability measured against
+the specialist that leads its sub-theme, with the question that runs it here.</p>
 
 <form class="bar" id="f">
   <input type="text" id="q" autocomplete="off"
@@ -255,6 +257,13 @@ document.getElementById('f').addEventListener('submit', async ev => {
     document.getElementById('go').disabled = false; qEl.focus();
   }
 });
+// A link can carry a question (and a book) so it demonstrates an engine in one click: /proof
+// links every capability the console runs this way. The book fills the field for this visit
+// only; it is saved only if the visitor edits it.
+const asked = new URLSearchParams(location.search);
+if (asked.get('book')) bookEl.value = asked.get('book').slice(0, 300);
+if (asked.get('q')) { qEl.value = asked.get('q').slice(0, 500);
+  document.getElementById('f').requestSubmit(); }
 qEl.focus();
 </script></body></html>""".replace("__FAVICON__", FAVICON)
 # `.replace()`, not an f-string or `.format()`: the page above is thousands of characters of
@@ -746,6 +755,21 @@ class Handler(BaseHTTPRequestHandler):
                     )
                     return
                 self._send(render_wrong(found).encode(), "text/html; charset=utf-8")
+                return
+            if path == "/proof":
+                # **The wins, reachable.** Every comparison against a named rival, grouped by the
+                # sub-theme Bitget names, each with the console question that runs it — read from
+                # the standing register at request time, like `/wrong` is from its artefacts.
+                from argus.lui.proof_page import collect as collect_wins
+                from argus.lui.proof_page import render as render_proof
+
+                wins, counts = collect_wins(_ledger_path().parent)
+                if (parse_qs(route.query).get("format") or [""])[0] == "json":
+                    self._send(json.dumps({"by_state": counts,
+                                           "capabilities": [w.as_dict() for w in wins]},
+                                          ensure_ascii=False).encode(), "application/json")
+                    return
+                self._send(render_proof(wins, counts).encode(), "text/html; charset=utf-8")
                 return
             if path == "/research":
                 # **Track 3's required demo: one complete research task, question to actionable

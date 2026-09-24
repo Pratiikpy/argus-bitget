@@ -22,10 +22,13 @@ layer to manufacture a track record — breaking the exact property the system e
 
 **Or watch one whole research task run live, question to actionable insight — https://deploy-topaz-seven-64.vercel.app/research** (seven engines, about three seconds; change the name, size or book on the page).
 
+**Every capability measured against the specialist that leads its sub-theme, with the question that runs it in the console — https://deploy-topaz-seven-64.vercel.app/proof** (read from the standing register when the page loads; losses are on `/wrong`).
+
 Ask it in plain English. *"I hold 50% NVDA, 50% AAPL — what does adding 20% TSLA do to my risk?"*
 · *"What if the Nasdaq drops 10%? I hold 40% MSFT, 30% META, 30% GOOGL"* · *"Is TSLA riskier than
 NVDA?"* · *"How should I split a $50k order in NVDA?"* · *"Where is NVDA trading right now?"* ·
-*"Why did you pass on NVDA?"* Every figure comes from the desk's own engines on live Bitget data and
+*"How does NVDA react to CPI?"* · *"Is the hype on NVDA real?"* · *"I'm a conservative investor —
+should I add 15% TSLA?"* · *"Why did you pass on NVDA?"* Every figure comes from the desk's own engines on live Bitget data and
 names its source; the language model only works out what you asked and never writes a number. Save
 your holdings (and your own risk budget) in the "My book" field and every answer uses them.
 
@@ -41,7 +44,7 @@ your holdings (and your own risk budget) in the "My book" field and every answer
 cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module + sub-theme coverage, resolved by import
-pytest -q                       # 6,542 tests collected
+pytest -q                       # 6,662 tests collected
 ```
 
 Nothing above needs a credential. The full run took 1h16m from a fresh GitHub clone on 2026-09-24 — 6,457 passed, 85 skipped, 0 failed (the rival comparisons re-fetch live Bitget data, and one comparison installs its locked Node packages on first use); tests that need a rival's source cloned beside the repository skip and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so a test that reaches the network shows itself.
@@ -52,10 +55,10 @@ Nothing above needs a credential. The full run took 1h16m from a fresh GitHub cl
 
 | | |
 |---|---|
-| Tests | **6,542 tests collected** — run `pytest -q` |
-| Type checking | **`mypy --strict` clean on 309 source files** |
+| Tests | **6,662 tests collected** — run `pytest -q` |
+| Type checking | **`mypy --strict` clean on 314 source files** |
 | Lint | `ruff` clean |
-| Module health | **131/131 modules importable**, checked by `python -m argus.status` |
+| Module health | **139/139 modules importable**, checked by `python -m argus.status` |
 | Sub-theme coverage | **18/18 sub-themes**, resolved by import at runtime — not claimed in prose |
 | Data artefacts | **46 cited across these documents**, every one reproducible from a single named command, with a test that fails if a document cites an artefact nothing writes |
 | Quoted figures | **69 figures quoted in the five public documents are re-checked against their artefacts** by `python -m argus.eval.docclaims --tests` (counted 2026-09-24), which exits non-zero if any has drifted |

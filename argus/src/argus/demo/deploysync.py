@@ -71,6 +71,10 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "source_health.json",
     # Read by the hedge and macro answers: the scheduled CPI and FOMC dates (`market/calendar.py`).
     "event_calendar.json",
+    # Read by the sentiment answer: the coordinated-posting test (finBERT vs the desk's analyst).
+    "sentiment_comparison.json",
+    # Read by event questions: how each name reacted to CPI, Fed decisions and its earnings.
+    "event_reactions.json",
 )
 """Artefacts the hosted console's own pages read at request time.
 
