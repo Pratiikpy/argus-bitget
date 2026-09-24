@@ -238,6 +238,48 @@ def collect(data_dir: Path) -> list[Correction]:
             ),
             artefact="data/skill_macd_check.json", kind="bug",
         ))
+
+    # 8. The headline that answered "zero trades" overstated how much the leans know.
+    refusal = _read(data_dir, "refusal_alpha.json")
+    near = None if refusal is None else next(
+        (h for h in refusal.get("horizons", []) if h.get("horizon") == "about_2h"), None)
+    if near is None or near.get("naive_accuracy_pct") is None:
+        out.append(missing("refusal_alpha.json", "The overstated refusal-accuracy interval"))
+    else:
+        low, high = (near.get("accuracy_ci95") or ["?", "?"])[:2]
+        out.append(Correction(
+            headline=(
+                f"We said the desk's leans beat a coin flip; they do not beat always calling "
+                f"`{near.get('naive_lean')}`"
+            ),
+            detail=(
+                f"The page and the entry quoted {near.get('correct')} of "
+                f"{near.get('directional')} leans right at about 2 hours with a 95% interval of "
+                f"52.7-64.0%, computed as if every call were independent. They came from "
+                f"{near.get('cycles')} decision cycles whose symbols share one market move; "
+                f"resampling whole cycles gives {low}-{high}%. And the test was against 50%, when "
+                f"calling `{near.get('naive_lean')}` every time was right "
+                f"{near.get('naive_accuracy_pct')}% of the time: cycle by cycle the lean beat that "
+                f"naive call {near.get('cycles_lean_beat_naive')} times and lost "
+                f"{near.get('cycles_naive_beat_lean')}. An independent audit caught both on "
+                f"2026-09-24; `eval/refusal.py` now bootstraps over cycles and reports the naive "
+                f"baseline, and every document quoting the old interval was corrected."
+            ),
+            artefact="data/refusal_alpha.json", kind="withdrawn",
+        ))
+
+    # 9. A denominator that counted the wrong rows.
+    out.append(Correction(
+        headline="\"349 of 1200 decisions\" — the ledger holds 627",
+        detail=(
+            "The theme audit counted every ledger row as a decision, including the "
+            "settlement seal written when each decision settles, so its sentence about "
+            "tradeable sessions read 349 of 1200 against a 627-decision record. The counts in "
+            "the numerator were right; the denominator was not. Decisions are now filtered by "
+            "kind before anything is counted (caught 2026-09-24)."
+        ),
+        artefact="data/theme_audit.json", kind="bug",
+    ))
     return out
 
 

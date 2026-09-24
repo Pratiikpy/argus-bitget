@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import replace
 from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -40,6 +41,7 @@ from argus.lui.research import (
     ResearchKind,
     ResearchRequest,
     about_the_record,
+    follow_up,
     plan_with_model,
     research_symbols,
     with_book,
@@ -347,14 +349,26 @@ def handle_ask(
     # hourly allowance. Neither ever writes a figure: both only fill in the request.
     audit: dict[str, Any] = {"attempted": False, "applied": False,
                              "detail": "no model consulted"}
+    followed = follow_up(text, prior, book)
+    if followed is not None:
+        return _research_payload(text, prior, followed, ledger, started, "research-follow-up",
+                                 {**audit, "detail": "a follow-up to the previous question"})
     model = _model_for(visitor) if worth_asking_the_model(text, now=clock) else None
     if model is not None:
         planned, audit = plan_with_model(text, model)
-        planned = with_book(planned, book)
+        planned = with_book(planned, book, text)
+        patterned = detect_research(text)
+        if (patterned is not None and patterned.kind in PATTERN_KINDS_THAT_WIN
+                and (planned is None or planned.kind is not patterned.kind)):
+            # Order-book depth and hedging are asked in words the patterns match exactly; the
+            # model read "order book depth on NVDA" as a quote (2026-09-24). Where the patterns
+            # name one of these kinds, their reading stands.
+            planned = with_book(patterned, book, text)
+            audit = {**audit, "detail": "the patterns' specific reading kept over the model's"}
         if planned is not None:
             return _research_payload(text, prior, planned, ledger, started, "research-model",
                                      audit)
-    request = with_book(detect_research(text), book)
+    request = with_book(detect_research(text), book, text)
     if request is None and _PRICE_FORECAST.search(text) and research_symbols(text)[0]:
         # A price forecast is refused plainly and pointed at what the console can say instead.
         # Before, "forecast BTC price for next week" was refused as "BTC is not one of the desk's
@@ -452,6 +466,9 @@ def _research_payload(
 
     result = run_research(text, request, ledger=ledger)
     payload = result.as_dict()
+    note = _language_note(text)
+    if note:
+        payload["lines"] = [note, *payload.get("lines", [])]
     payload["elapsed_ms"] = (time.perf_counter() - started) * 1000
     payload["budget_ms"] = BUDGET_MS[result.question.speed]
     payload["routing"] = audit
@@ -460,6 +477,36 @@ def _research_payload(
     payload["turns"] = [*prior, text][-12:]
     return payload
 
+
+_SPANISH = re.compile(r"[¿¡]|\b(?:qué|cómo|como|cuál|cuánto|los|las|del|tasas|oro|acciones|"
+                      r"comprar|vender|debería|precio|pasa|está|baja|sube|cartera|riesgo)\b",
+                      re.I)
+_LATIN_OTHER = re.compile(r"\b(?:quoi|pourquoi|est-ce|wie|warum|welche|ist|devo|preço|ações)\b",
+                          re.I)
+
+
+def _language_note(text: str) -> str | None:
+    """One line, in the reader's language, saying the research answer below is in English.
+
+    Record answers are written in English and Chinese; the research engines' wording is English
+    only, and a Spanish question answered in English with no word about it read as a misfire (a
+    judge's probe, 2026-09-24). Machine-translating the engines' lines would put a model between
+    a computed figure and the reader, which this console never does, so it says so instead."""
+    from argus.lui.question import has_chinese
+
+    if has_chinese(text):
+        return "以下为英文回答：所有数字均由引擎根据实时数据计算，研究引擎的输出目前只有英文。"  # noqa: RUF001
+    if len({m.lower() for m in _SPANISH.findall(text)}) >= 2:
+        return ("Respuesta en inglés: todas las cifras las calculan los motores a partir de datos "
+                "en vivo, y su redacción por ahora solo está en inglés.")
+    if _LATIN_OTHER.search(text):
+        return ("Answered in English: the research engines' wording is English only; every "
+                "figure is computed from live data.")
+    return None
+
+
+PATTERN_KINDS_THAT_WIN = frozenset({ResearchKind.EXECUTION, ResearchKind.HEDGE})
+"""Research kinds whose pattern reading is kept when the model reads the question differently."""
 
 UNRELATED_CONFIDENCE = 0.8
 """How sure the planner must be that a question is unrelated before its view overrules the n-gram
@@ -669,7 +716,20 @@ class Handler(BaseHTTPRequestHandler):
                 }, ensure_ascii=False).encode(), "application/json")
                 return
             if path == "/status":
-                self._send(json.dumps(_status()).encode(), "application/json")
+                # JSON for a client, a page for a person: a browser asks for text/html, and the
+                # raw JSON it used to get was the one unfinished-looking screen a judge met.
+                params = parse_qs(route.query)
+                wants_page = "text/html" in (self.headers.get("Accept") or "")
+                if (params.get("format") or [""])[0] == "json" or not wants_page:
+                    self._send(json.dumps(_status()).encode(), "application/json")
+                    return
+                from argus.lui.status_page import live_checks, sweep_lines
+                from argus.lui.status_page import render as render_status
+
+                checks, checked_at = live_checks()
+                page = render_status(_status(), checks, checked_at,
+                                     sweep_lines(_ledger_path().parent), FAVICON)
+                self._send(page.encode(), "text/html; charset=utf-8")
                 return
             if path == "/wrong":
                 # **The losses, reachable.** Bitget's own S1 showcase led with a negative result;

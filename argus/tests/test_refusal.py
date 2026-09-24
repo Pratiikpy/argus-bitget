@@ -13,7 +13,7 @@ lie are all ways of turning an absence into a verdict:
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -31,8 +31,10 @@ AT = datetime(2026, 9, 15, 13, 30, tzinfo=UTC)
 
 
 def _mark(*, horizon: float, move: float, lean: str, seq: int = 1) -> Mark:
+    # Four symbols per decision cycle, cycles two hours apart, as the desk actually runs.
+    decided = (AT + timedelta(hours=2 * (seq // 4))).isoformat()
     return Mark(
-        seq=seq, symbol="NVDAUSDT", decided_at=AT.isoformat(), marked_at=AT.isoformat(),
+        seq=seq, symbol="NVDAUSDT", decided_at=decided, marked_at=decided,
         horizon_hours=horizon, entry_price="100", mark_price="101", move_bps=str(move), lean=lean,
     )
 
@@ -96,6 +98,50 @@ class TestASampleTooSmallSaysSo:
         row = next(r for r in score(marks, now=AT).horizons if r.horizon == "about_2h")
         assert row.beats_a_coin is True
         assert "excludes a coin flip" in score(marks, now=AT).verdict
+
+    def test_leaning_with_the_tape_does_not_count_as_knowing_something(self) -> None:
+        """38 of 40 right, every lean "up", in a tape that rose 38 of 40 times: it beats a coin
+        and knows nothing the naive always-up call did not. The verdict must say the second."""
+        marks = [
+            _mark(horizon=2.0, move=50.0 if i < 38 else -50.0, lean="up", seq=i)
+            for i in range(40)
+        ]
+        report = score(marks, now=AT)
+        row = next(r for r in report.horizons if r.horizon == "about_2h")
+        assert row.naive_accuracy == row.accuracy
+        assert row.beats_the_naive_call is False
+        assert "no evidence yet that the lean knows more" in report.verdict
+
+    def test_a_lean_that_calls_both_directions_right_beats_the_naive_call(self) -> None:
+        marks = [
+            _mark(horizon=2.0, move=50.0 if i % 2 else -50.0, lean="up" if i % 2 else "down",
+                  seq=i)
+            for i in range(80)
+        ]
+        row = next(r for r in score(marks, now=AT).horizons if r.horizon == "about_2h")
+        assert row.accuracy == 1.0
+        assert row.beats_the_naive_call is True
+
+
+class TestTheIntervalRespectsCycles:
+    def test_calls_in_one_cycle_are_not_independent_evidence(self) -> None:
+        """The same 60 calls read as 15 cycles give a wider interval than a per-call Wilson."""
+        marks = [
+            _mark(horizon=2.0, move=50.0 if (i // 4) % 3 else -50.0, lean="up", seq=i)
+            for i in range(60)
+        ]
+        row = next(r for r in score(marks, now=AT).horizons if r.horizon == "about_2h")
+        low, high = row.interval or (0.0, 0.0)
+        wlow, whigh = wilson(row.correct, row.directional) or (0.0, 0.0)
+        assert high - low > whigh - wlow
+        assert row.as_dict()["interval_method"] == "bootstrap over decision cycles"
+
+    def test_the_interval_is_reproducible(self) -> None:
+        marks = [_mark(horizon=2.0, move=50.0 if i % 3 else -50.0, lean="up", seq=i)
+                 for i in range(60)]
+        first = next(r for r in score(marks, now=AT).horizons if r.horizon == "about_2h")
+        second = next(r for r in score(marks, now=AT).horizons if r.horizon == "about_2h")
+        assert first.interval == second.interval
 
 
 class TestDecliningToCallIsNotAMiss:

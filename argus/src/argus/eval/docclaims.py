@@ -577,7 +577,17 @@ def teardown_count() -> int | None:
     folder = ROOT / "research" / "architecture"
     if not (folder / "_CONSOLIDATED-LEDGER.md").is_file():
         return None
-    return sum(1 for path in folder.glob("*.md") if not path.name.startswith("_"))
+    return sum(1 for path in folder.glob("*.md")
+               if not path.name.startswith("_") and path.name not in UNPUBLISHED_TEARDOWNS)
+
+
+UNPUBLISHED_TEARDOWNS = frozenset({
+    "okx-workspace-inventory.md", "kairos-nomos.md", "pod-sosovalue.md",
+    "kcnyu~clawock.md", "weak-subtheme-repo-hunt.md",
+})
+"""Teardowns kept in the research workspace: the owner's own projects on other venues, a rival
+Season-2 entry, and an internal planning list. The documents quote the count of the ones a reader
+of the public repository can open, so the same number is right in both places."""
 
 
 def overfit_counts() -> tuple[int, int]:
@@ -633,7 +643,8 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("refusal_forgone_2h", rf"forgave\s+(?P<q>[-{chr(0x2212)}]?[\d.]+)\s*bps of net edge",
           refusal_forgone_2h, ("readme", "public-readme")),
     Claim("standing_owned", r"(?P<q1>\d+) of (?P<q2>\d+) capabilities are OWNED",
-          standing_counts, ("readme", "public-readme", "submission", "explained")),
+          standing_counts, ("readme", "public-readme", "submission", "explained",
+                            "architecture")),
     # Both LUI figures are guarded because both are *losses*, and a losing number left ungated is
     # the one that quietly improves between drafts. The phrasings are anchored to the sentences
     # actually written in SUBMISSION-DRAFT.md.

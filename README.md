@@ -53,12 +53,12 @@ Nothing above needs a credential. The full run took 1h16m from a fresh GitHub cl
 | | |
 |---|---|
 | Tests | **6,542 tests collected** — run `pytest -q` |
-| Type checking | **`mypy --strict` clean on 308 source files** |
+| Type checking | **`mypy --strict` clean on 309 source files** |
 | Lint | `ruff` clean |
 | Module health | **131/131 modules importable**, checked by `python -m argus.status` |
 | Sub-theme coverage | **18/18 sub-themes**, resolved by import at runtime — not claimed in prose |
 | Data artefacts | **46 cited across these documents**, every one reproducible from a single named command, with a test that fails if a document cites an artefact nothing writes |
-| Quoted figures | **87 numbers in these documents are re-checked against their artefacts** by `python -m argus.eval.docclaims --tests`, which exits non-zero if any has drifted |
+| Quoted figures | **69 figures quoted in the five public documents are re-checked against their artefacts** by `python -m argus.eval.docclaims --tests` (counted 2026-09-24), which exits non-zero if any has drifted |
 
 The measurements behind the design are in the PRD, including the ones that went against us:
 
@@ -111,12 +111,16 @@ each sub-theme has passed, and several remain open. Two things are unproven rath
 has demonstrated nothing."* Every refusal carries a stated direction, hashed with the decision before
 the outcome exists, so the counterfactual was committed to rather than reconstructed. Graded against
 what actually happened (`python -m argus.eval.refusal`): at the ~2h horizon **169 of 289 directional
-calls were right — 58.5%, 95% Wilson interval 52.7–64.0%**, which excludes a coin flip but only
-barely, and the overnight horizon stands at *48.3%* (42 of 87) — not distinguishable from a coin
-flip. The decisive figure is the
-other one: **the median decision forgave -6.7bps of net edge after the 12bps round trip.** The
-typical refusal was not caution costing money — it was the trade being unprofitable. An empty ledger
-is the result here, not the gap.
+calls were right — 58.5%, 95% interval 50.3–66.4%**, bootstrapped over the 26 decision cycles they
+came from, because calls made in one cycle share one market move. That barely excludes a coin flip,
+and it does **not** beat the naive call: saying "up" every time was right 53.3% of the time, and
+cycle by cycle the lean beat it 11 times and lost 9. So the lean has not shown it knows more than
+the tape's direction, and the overnight horizon stands at *48.3%* (42 of 87). The decisive figure
+is the other one: **the median decision forgave -6.7bps of net edge after the 12bps round trip.**
+The typical refusal was not caution costing money — it was the trade being unprofitable. An empty
+ledger is the result here, not the gap. (An earlier version of this paragraph quoted a per-call
+Wilson interval, 52.7–64.0%, and no naive baseline; an independent audit caught both, and the
+correction is on `/wrong`.)
 
 
 **What the register says about itself, after it started checking.** ARGUS keeps a capability standing register with four states and thirteen conditions for OWNED. Until 2026-09-20 its audit checked that a file existed and that a test function's name appeared inside it — so *"same-input comparison run"*, *"out-of-sample test"* and *"ablation"* were each satisfied by a filename, and 23 of 24 entries carried the top grade. It now opens the artefacts. **27 of 31 capabilities are OWNED, 3 are TIED, and 0 are LOST.** Seven were demoted the first time the artefact-opening audit ran (2026-09-20), and every one has since been re-earned by making its artefact carry the evidence rather than by editing its state, because they claimed a condition their own artefact recorded nothing about. By 2026-09-20 three capabilities were genuinely LOST to a named specialist; within 48 hours every one moved to TIED, and none of the three ties is a rounded-up loss — each is published with the losing half still named as a loss where one exists. Portfolio allocation moved first: Riskfolio-Lib's real NCO beat ARGUS's HRP decisively on a 24-window walk-forward (p=3.6e-05), so ARGUS's own NCO was built from Riskfolio's real source — real Ward linkage, a real active-set minimum-variance solver, the real two-difference gap statistic for cluster count — verified to reproduce Riskfolio's real NCO to 1.3e-05 on the same book, then wired into the SAME live walk-forward test and re-run fresh: 8.203bps both, ratio 1.0000. A tie, not a win, and published as exactly that. LUI intent routing moved next: dev-half CV across 10 fold-split seeds found a linear-SVM classifier head beats the multinomial logistic head this shipped with on every seed (mean 76.71% vs 72.28%), so the model was rebuilt, its abstention threshold re-derived by the same rule that set the original, and re-measured exactly once on the same sealed corpus the old model was scored on. Rasa's DIET classifier is still numerically ahead on raw accuracy (81.91% vs 77.82% at that point), but the gap was no longer statistically significant (McNemar p=0.0576, down from a clearly significant p=0.0014 before the rebuild) — not proven equal, a real but fragile tie. A second rebuild the same day (a RIVAL LENS pass) tested a lever the first rebuild's own root-cause note had named and left untried: the out-of-scope training negatives were skewed 60 Chinese to 40 English, opposite the roughly-balanced in-scope pool. Dev-CV confirmed the mechanism directly (held-out Chinese in-scope rows wrongly refused as out-of-scope, 14.2% to 8.4%, McNemar p<0.0001) before touching production code; rebalancing the negatives took sealed accuracy to 79.52% and widened the margin against Rasa to a comfortable p=0.2649 — still a tie, no longer a fragile one. ARGUS's separate, significant win on out-of-scope refusal got stronger in the first rebuild and held steady through the second (92.86% vs Rasa's 42.86%, p=0.0156, was p=0.03125). Regime-boundary detection moved last, the same day it was sharpened: FLUSS, ARGUS's original segmenter, still loses to ruptures decisively (F1 0.443 vs 0.975, p=1.5e-25) — unchanged, and stated as a loss, not softened. What moved the *capability* is a second, different ARGUS tool: `ruptures/detection/dynp.py` and `costs/costl2.py` (BSD-2-Clause) were read in full to understand *why* FLUSS loses, and an exact L2 dynamic-program segmenter (`desk/regime.py::exact_partition`) was built, verified to reproduce ruptures' own real `Dynp` exactly on 120/120 trials and to match `KernelCPD`'s rbf-kernel result — the actual rival — on 10/10, then wired into the identical 100-trial synthetic ground truth that measured FLUSS's loss: 1 win, 0 losses, 99 ties, mean F1 0.98 against ruptures' 0.975 — nominally ahead, not significantly so on one discordant trial, reported as a tie. Three of the thirteen conditions — whether the *best* implementation and the *best* method were studied, and whether a specialist still beats us — are judgements about a field rather than properties of a file, so they are reported as **attested** and name where somebody looked, instead of being dressed up as machine-checked (`python -m argus.eval.standing`).

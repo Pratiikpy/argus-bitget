@@ -38,7 +38,7 @@ from argus.lui.research import (
     research_symbols,
     run,
 )
-from argus.market.universe import is_equity
+from argus.market.universe import contracts, is_equity
 
 DEFAULT_NAME = "TSLA"
 DEFAULT_SIZE_PCT = 15.0
@@ -68,6 +68,8 @@ class Step:
     refused: bool = False
     applicable: bool = True
     seconds: float = 0.0
+    chart: str = ""
+    """An inline SVG drawn from the same numbers the lines state, or empty."""
 
     @property
     def actionable(self) -> str | None:
@@ -109,6 +111,17 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
     question = (f"I hold {book_text.strip() or 'nothing yet'} — should I add "
                 f"{size:.0%} {symbol.removesuffix('USDT')}?")
     notional = (DEFAULT_BOOK_VALUE * Decimal(str(size))).quantize(Decimal("1"))
+    listed = contracts()
+    if listed and symbol not in listed:
+        # Seven engines run against a name Bitget does not list produced four refusals and one
+        # false sentence (a judge's probe, 2026-09-24). One honest line is the whole answer.
+        note = Step(title="Is it on Bitget?", engine="Bitget contract list",
+                    lines=[f"{symbol.removesuffix('USDT')} is not listed on Bitget — none of its "
+                           f"{len(listed)} contracts tracks it — so there is no price, order book "
+                           f"or filing feed to research. Try a listed name: NVDA, TSLA, gold "
+                           f"(XAU), BTC."], refused=True)
+        return Task(question=question, name=symbol.removesuffix("USDT"), size_pct=size * 100,
+                    book=book, steps=[note], seconds=time.perf_counter() - started)
 
     def one(step: tuple[str, ResearchKind, str]) -> Step:
         title, kind, engine = step
@@ -127,20 +140,100 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
             return Step(title=title, engine=engine, applicable=False,
                         lines=[f"{symbol.removesuffix('USDT')} is not a company's shares, so there "
                                f"is no earnings calendar, analyst target or 13F filing to read."])
+        chart = ""
         try:
             answer = run(question, request, ledger=ledger if kind is ResearchKind.IMPACT else None)
             # Every console answer ends with the analysis-not-advice line; the page says it once.
             lines = [line.replace(_DISCLAIMER, "").rstrip() for line in answer.lines]
             refused = answer.refused
+            if kind is ResearchKind.IMPACT and not refused:
+                chart = risk_chart(answer.data.get("report") or {})
         except Exception as exc:  # one engine failing must not take the task down
             lines, refused = [f"This step could not run just now ({type(exc).__name__})."], True
         return Step(title=title, engine=engine, lines=lines, refused=refused,
-                    seconds=time.perf_counter() - began)
+                    seconds=time.perf_counter() - began, chart=chart)
 
-    with ThreadPoolExecutor(max_workers=len(STEPS)) as pool:
+    with ThreadPoolExecutor(max_workers=len(STEPS) + 1) as pool:
+        path = pool.submit(_price_path, symbol)
         steps = list(pool.map(one, STEPS))
+        try:
+            steps[0].chart = price_chart(path.result(), symbol.removesuffix("USDT"))
+        except Exception:
+            steps[0].chart = ""  # the quote step stands without its chart
     return Task(question=question, name=symbol.removesuffix("USDT"), size_pct=size * 100,
                 book=book, steps=steps, seconds=time.perf_counter() - started)
+
+
+def _price_path(symbol: str) -> list[tuple[Any, float]]:
+    """Thirty days of 4-hour closes from Bitget, oldest first."""
+    from argus.market.history import CandleType, fetch
+
+    bars = fetch(symbol, interval="4H", candle_type=CandleType.MARKET, recent=True, limit=180)
+    return [(b.ts, float(b.close)) for b in bars]
+
+
+def price_chart(points: list[tuple[Any, float]], name: str) -> str:
+    """The name's last thirty days as a line with its range and last close marked."""
+    if len(points) < 2:
+        return ""
+    width, height, pad = 640.0, 150.0, 6.0
+    closes = [c for _, c in points]
+    low, high = min(closes), max(closes)
+    span = (high - low) or 1.0
+
+    def x(i: int) -> float:
+        return pad + (width - 2 * pad) * i / (len(points) - 1)
+
+    def y(value: float) -> float:
+        return pad + (height - 2 * pad) * (1 - (value - low) / span)
+
+    line = " ".join(f"{x(i):.1f},{y(c):.1f}" for i, c in enumerate(closes))
+    area = f"{x(0):.1f},{height - pad:.1f} {line} {x(len(closes) - 1):.1f},{height - pad:.1f}"
+    first, last = points[0][0], points[-1][0]
+    change = closes[-1] / closes[0] - 1
+    label = (f"{name}, 4-hour closes {first:%d %b} to {last:%d %b}: {closes[0]:,.2f} to "
+             f"{closes[-1]:,.2f} ({change:+.1%}); range {low:,.2f} to {high:,.2f}")
+    return (
+        f"<figure class='chart'><svg viewBox='0 0 {width:.0f} {height:.0f}' role='img' "
+        f"aria-label='{html.escape(label)}' preserveAspectRatio='none'>"
+        f"<polygon class='area' points='{area}'/>"
+        f"<polyline class='path' points='{line}'/>"
+        f"<circle class='dot' cx='{x(len(closes) - 1):.1f}' cy='{y(closes[-1]):.1f}' r='3.5'/>"
+        f"</svg><figcaption>{html.escape(label)}</figcaption></figure>"
+    )
+
+
+def risk_chart(report: dict[str, Any]) -> str:
+    """Each holding's share of the money beside its share of the risk, after the trade."""
+    risk = report.get("risk_after") or {}
+    vol = float(risk.get("volatility") or 0.0)
+    rows = risk.get("contributions") or []
+    if vol <= 0 or not rows:
+        return ""
+    data = sorted(((str(r["symbol"]).removesuffix("USDT"), float(r["weight"]),
+                    float(r["contribution"]) / vol) for r in rows), key=lambda r: -r[2])
+    top = max(max(w, abs(k)) for _, w, k in data) or 1.0
+    row_h, label_w, width = 30, 70, 640
+    height = row_h * len(data) + 8
+    bar_w = width - label_w - 60
+    parts = []
+    for i, (name, weight, share) in enumerate(data):
+        y0 = 4 + i * row_h
+        parts.append(
+            f"<text class='lbl' x='0' y='{y0 + 16}'>{html.escape(name)}</text>"
+            f"<rect class='w' x='{label_w}' y='{y0 + 3}' width='{bar_w * weight / top:.1f}' "
+            f"height='9' rx='2'/>"
+            f"<rect class='r' x='{label_w}' y='{y0 + 14}' width='{bar_w * max(share, 0) / top:.1f}'"
+            f" height='9' rx='2'/>"
+            f"<text class='val' x='{label_w + bar_w * max(weight, share, 0) / top + 6:.1f}' "
+            f"y='{y0 + 17}'>{weight:.0%} / {share:.0%}</text>")
+    summary = "; ".join(f"{n} {w:.0%} of the money, {k:.0%} of the risk" for n, w, k in data)
+    return (
+        f"<figure class='chart'><svg viewBox='0 0 {width} {height}' role='img' "
+        f"aria-label='{html.escape(summary)}'>{''.join(parts)}</svg>"
+        f"<figcaption><span class='key w'></span>share of the money "
+        f"<span class='key r'></span>share of the risk, after the trade</figcaption></figure>"
+    )
 
 
 def _line_class(line: str) -> str:
@@ -154,7 +247,9 @@ def render_task(task: Task, favicon: str) -> str:
     esc = html.escape
     conclusion = "".join(
         f"<li><b>{esc(title.rstrip('?'))}:</b> {esc(text[:1].upper() + text[1:])}</li>"
-        for title, text in task.conclusion)
+        for title, text in task.conclusion) or (
+        "<li>Nothing to act on: " + esc(task.steps[0].lines[0] if task.steps and task.steps[0].lines
+                                         else "no engine answered") + "</li>")
     cards = []
     for n, step in enumerate(task.steps, 1):
         body = "".join(f"<p class='{_line_class(line)}'>{esc(line)}</p>" for line in step.lines)
@@ -162,7 +257,7 @@ def render_task(task: Task, favicon: str) -> str:
         cards.append(
             f"<article class='{classes}'><div class='h'><span class='n'>{n}"
             f"</span><h2>{esc(step.title)}</h2><span class='e'>{esc(step.engine)} · "
-            f"{step.seconds:.1f}s</span></div>{body}</article>")
+            f"{step.seconds:.1f}s</span></div>{step.chart}{body}</article>")
     book_text = ", ".join(f"{w:.0%} {s.removesuffix('USDT')}" for s, w in task.book.items())
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -206,6 +301,16 @@ def render_task(task: Task, favicon: str) -> str:
  .s p {{ margin:4px 0; overflow-wrap:anywhere }}
  .act {{ font-weight:600; color:var(--accent) }} .fine {{ color:var(--dim); font-size:13px }}
  a {{ color:var(--accent) }}
+ .chart {{ margin:6px 0 10px }} .chart svg {{ width:100%; height:auto; display:block }}
+ .chart figcaption {{ font-size:12px; color:var(--dim); margin-top:4px }}
+ .chart .path {{ fill:none; stroke:var(--accent); stroke-width:1.6 }}
+ .chart .area {{ fill:var(--accent); opacity:.09 }} .chart .dot {{ fill:var(--accent) }}
+ .chart .lbl, .chart .val {{ font:12px system-ui,sans-serif; fill:var(--dim) }}
+ .chart .lbl {{ fill:var(--ink); font-weight:600 }}
+ .chart rect.w, .key.w {{ fill:var(--line); background:var(--line) }}
+ .chart rect.r, .key.r {{ fill:var(--accent); background:var(--accent) }}
+ .key {{ display:inline-block; width:10px; height:10px; border-radius:2px; margin:0 5px 0 10px;
+   vertical-align:-1px }}
 </style></head><body><div class="wrap">
 <h1>One research task, question to actionable insight — run live</h1>
 <p class="sub">Seven engines answer one trader's question in parallel, each the same engine the

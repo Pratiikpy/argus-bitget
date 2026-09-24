@@ -27,9 +27,13 @@ fetched after the outcomes were known.
 * **coverage** — how often the desk stated a direction at all. A desk that answers "none" every
   time cannot be wrong and has told you nothing; one that always calls a direction may just be
   guessing. This is the denominator every other number here depends on, so it is reported first.
-* **directional accuracy** — of the calls it did make, how many went the right way, with a Wilson
-  interval. Reported only when the interval actually excludes a coin flip; otherwise the finding is
-  that the sample cannot tell.
+* **directional accuracy** — of the calls it did make, how many went the right way. The interval
+  is a bootstrap over *cycles*, not over calls: the symbols decided in one cycle share one market
+  move, so 289 calls from 26 cycles are nowhere near 289 independent observations, and the per-call
+  Wilson interval once published here overstated the precision (52.7-64.0% against a cycle
+  bootstrap's 50.3-66.4%; found by an independent audit on 2026-09-24). It is also compared with
+  the naive call — the desk's own majority lean, stated every time — because a desk that leans up
+  in a rising tape beats a coin without knowing anything.
 * **hurdle clearance** — how often the move the desk passed on was even large enough to pay for the
   round trip. If it rarely cleared, abstaining was correct arithmetic, not timidity.
 * **forgone edge** — the signed move in the direction the desk leaned, net of the hurdle it would
@@ -45,9 +49,11 @@ the defect `eval/bookcalib.py` was found committing and which is not repeated he
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+import random
+from collections import defaultdict
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from math import sqrt
+from math import comb, sqrt
 from pathlib import Path
 from typing import Any
 
@@ -89,6 +95,11 @@ correct, which is the safe direction for a claim about our own desk.
 """
 
 
+BOOTSTRAP_RESAMPLES = 10_000
+BOOTSTRAP_SEED = 20260924
+"""Fixed, so the published interval is reproducible to the digit from the same marks."""
+
+
 class RefusalError(ValueError):
     """Raised rather than reporting refusal quality computed from nothing."""
 
@@ -117,6 +128,33 @@ def wilson(hits: int, n: int, *, z: float = 1.96) -> tuple[float, float] | None:
     return max(0.0, centre - margin), min(1.0, centre + margin)
 
 
+def cluster_interval(cycles: list[tuple[int, int]], *, resamples: int = BOOTSTRAP_RESAMPLES,
+                     seed: int = BOOTSTRAP_SEED) -> tuple[float, float] | None:
+    """A 95% percentile-bootstrap interval for a hit rate, resampling whole cycles.
+
+    ``cycles`` holds ``(hits, calls)`` per cycle. Resampling cycles rather than calls keeps the
+    calls that shared one market move together, which is what makes the interval honest here."""
+    usable = [c for c in cycles if c[1] > 0]
+    if len(usable) < 2:
+        return None
+    rng = random.Random(seed)
+    rates: list[float] = []
+    for _ in range(resamples):
+        draw = [usable[rng.randrange(len(usable))] for _ in usable]
+        rates.append(sum(h for h, _ in draw) / sum(n for _, n in draw))
+    rates.sort()
+    return rates[int(0.025 * resamples)], rates[int(0.975 * resamples) - 1]
+
+
+def sign_test(wins: int, losses: int) -> float | None:
+    """Two-sided exact binomial sign test p-value; ties are left out by the caller."""
+    n = wins + losses
+    if n == 0:
+        return None
+    tail: float = sum(comb(n, k) for k in range(min(wins, losses) + 1)) / float(2 ** n)
+    return min(1.0, 2.0 * tail)
+
+
 @dataclass(frozen=True, slots=True)
 class HorizonResult:
     """What the marks at one measured horizon say, and what they refuse to say."""
@@ -132,6 +170,12 @@ class HorizonResult:
     forgone_bps: tuple[float, ...]
     """Signed move in the leaned direction, net of the round trip, one per directional mark."""
 
+    cycles: tuple[tuple[int, int, int], ...] = field(default=())
+    """Per decision cycle: ``(lean hits, naive hits, directional calls)``. The naive call is the
+    desk's majority lean, stated every time."""
+
+    naive_lean: str = "up"
+
     @property
     def coverage(self) -> float | None:
         """Share of marks where a direction was stated. ``None`` when there are no marks."""
@@ -144,19 +188,48 @@ class HorizonResult:
 
     @property
     def interval(self) -> tuple[float, float] | None:
+        """The cycle-bootstrap interval; the per-call Wilson one only when no cycles are known."""
+        if self.cycles:
+            return cluster_interval([(hits, n) for hits, _, n in self.cycles])
         return wilson(self.correct, self.directional)
+
+    @property
+    def naive_correct(self) -> int:
+        return sum(naive for _, naive, _ in self.cycles)
+
+    @property
+    def naive_accuracy(self) -> float | None:
+        if not self.cycles or self.directional == 0:
+            return None
+        return self.naive_correct / self.directional
+
+    @property
+    def cycle_record(self) -> tuple[int, int, int]:
+        """Cycles where the lean beat the naive call, lost to it, and tied."""
+        wins = sum(1 for hits, naive, _ in self.cycles if hits > naive)
+        losses = sum(1 for hits, naive, _ in self.cycles if hits < naive)
+        return wins, losses, len(self.cycles) - wins - losses
 
     @property
     def beats_a_coin(self) -> bool | None:
         """Does the interval exclude 0.5? ``None`` when there is no interval to ask it of.
 
         Three states, never two: better than chance, not better than chance, and **not enough
-        evidence to tell** — which is where this desk currently is and which a boolean would hide.
+        evidence to tell** — which a boolean would hide.
         """
         bounds = self.interval
         if bounds is None or self.directional < MIN_FOR_A_RATE:
             return None
         return bounds[0] > 0.5
+
+    @property
+    def beats_the_naive_call(self) -> bool | None:
+        """Does the lean beat its own majority direction, cycle by cycle, at p < 0.05?"""
+        if not self.cycles or self.directional < MIN_FOR_A_RATE:
+            return None
+        wins, losses, _ = self.cycle_record
+        p = sign_test(wins, losses)
+        return p is not None and p < 0.05 and wins > losses
 
     @property
     def clearance(self) -> float | None:
@@ -192,7 +265,18 @@ class HorizonResult:
             "coverage_pct": pct(self.coverage),
             "accuracy_pct": pct(self.accuracy),
             "accuracy_ci95": None if bounds is None else [pct(bounds[0]), pct(bounds[1])],
+            "interval_method": ("bootstrap over decision cycles" if self.cycles
+                                else "Wilson, per call"),
+            "cycles": len(self.cycles),
             "beats_a_coin": self.beats_a_coin,
+            "naive_lean": self.naive_lean,
+            "naive_accuracy_pct": pct(self.naive_accuracy),
+            "cycles_lean_beat_naive": self.cycle_record[0],
+            "cycles_naive_beat_lean": self.cycle_record[1],
+            "cycles_tied": self.cycle_record[2],
+            "sign_test_p_vs_naive": (None if not self.cycles
+                                     else sign_test(*self.cycle_record[:2])),
+            "beats_the_naive_call": self.beats_the_naive_call,
             "hurdle_clearance_pct": pct(self.clearance),
             "median_forgone_bps": (
                 None if self.median_forgone_bps is None else round(self.median_forgone_bps, 2)
@@ -244,14 +328,25 @@ class RefusalReport:
         )
         bounds = row.interval
         if bounds is not None:
-            verdict += f" 95% Wilson interval {bounds[0]:.1%} to {bounds[1]:.1%}."
+            method = (f"bootstrap over {len(row.cycles)} decision cycles" if row.cycles
+                      else "Wilson")
+            verdict += f" 95% interval ({method}) {bounds[0]:.1%} to {bounds[1]:.1%}."
         if row.beats_a_coin is True:
-            verdict += " The interval excludes a coin flip, so the lean carries information."
+            verdict += " It excludes a coin flip."
         elif row.beats_a_coin is False:
+            verdict += (" It includes 0.5, so this sample does not show the lean beating a coin "
+                        "flip.")
+        naive = row.naive_accuracy
+        if naive is not None:
+            wins, losses, ties = row.cycle_record
             verdict += (
-                " The interval includes 0.5, so **this sample does not show the lean beating a "
-                "coin flip** — stated plainly rather than rounded up to a trend."
+                f" But calling `{row.naive_lean}` every time was right {naive:.1%} of the time, "
+                f"and cycle by cycle the lean beat that naive call {wins} times and lost {losses} "
+                f"({ties} tied)"
             )
+            verdict += (" — it beats the naive call." if row.beats_the_naive_call
+                        else " — so there is no evidence yet that the lean knows more than the "
+                             "direction of the tape.")
         forgone = row.median_forgone_bps
         if forgone is not None:
             verdict += (
@@ -316,6 +411,15 @@ def score(marks: list[Mark], *, now: datetime | None = None) -> RefusalReport:
         rows = buckets[name]
         directional = [r for r in rows if r.is_directional]
         correct = sum(1 for r in directional if r.lean_was_right)
+        ups = sum(1 for r in directional if r.lean == "up")
+        naive = "up" if ups * 2 >= len(directional) else "down"
+        per_cycle: dict[str, list[int]] = defaultdict(lambda: [0, 0, 0])
+        for r in directional:
+            # Cycles are two hours apart and take minutes, so the decision hour names the cycle.
+            cell = per_cycle[r.decided_at[:13]]
+            cell[0] += 1 if r.lean_was_right else 0
+            cell[1] += 1 if (r.move > 0 if naive == "up" else r.move < 0) else 0
+            cell[2] += 1
         cleared = sum(1 for r in rows if abs(r.move) > ROUND_TRIP_BPS)
         forgone = tuple(
             (r.move if r.lean == "up" else -r.move) - ROUND_TRIP_BPS for r in directional
@@ -327,6 +431,8 @@ def score(marks: list[Mark], *, now: datetime | None = None) -> RefusalReport:
             correct=correct,
             cleared_hurdle=cleared,
             forgone_bps=forgone,
+            cycles=tuple((c[0], c[1], c[2]) for _, c in sorted(per_cycle.items())),
+            naive_lean=naive,
         ))
     return RefusalReport(
         horizons=tuple(results),

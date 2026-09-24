@@ -569,7 +569,7 @@ all-eight verdict by an independent route. The correction made our own result wo
 only direction a correction is worth trusting in. That file is published, not buried:
 `argus/data/overfit_gates.json`.
 
-**4. We read the source before writing our own.** There are **61 code-level teardowns** in
+**4. We read the source before writing our own.** There are **56 code-level teardowns** in
 `research/architecture/`, each citing file and line. They have repeatedly changed what we built:
 
 - Our order state machine was written from memory with 11 states. Reading `nautilus_trader`'s own
@@ -627,8 +627,9 @@ A judge should not have to discover these.
   to it — rather than the earlier and false "no hedge placeable".
 - **No usage data.** This has not been put in front of traders yet. The plan is ten supervised
   sessions measuring whether the risk-share figure changes the ticket.
-- **Nothing here is proven better than a named competitor by a run experiment.** We use the word
-  *implemented*, not *best*, and the difference is deliberate.
+- **Superiority is claimed only where a named competitor was run on the same input.** 27 of 31
+  capabilities are OWNED under that rule; the rest are TIED or IMPLEMENTED and are called that, and
+  every comparison we lost is published on `/wrong`.
 
 ---
 
@@ -1315,11 +1316,10 @@ route to it — is now what the layer sees.
 - **No checkpoint and resume** of an interrupted cycle.
 - **No equity broker**, so hedges in the underlying stock are visible and unreachable.
 - **One model, no ensemble, no adversarial overturn.**
-- **Nothing is proven better than a named competitor by a run experiment.** The plan defines an
-  "owned" capability as one with a reproduced baseline, a same-input comparison, an out-of-sample
-  test, an ablation, and an adversarial test. As of this writing, **zero capabilities meet that
-  bar.** The word we use is *implemented*, and the gap between that and *owned* is written down as
-  the target rather than papered over.
+- **"Owned" is a conjunction, not a score.** An owned capability needs a reproduced baseline, a
+  same-input comparison, an out-of-sample test, an ablation and an adversarial test, among thirteen
+  conditions. On 2026-09-12 zero met that bar; the register now reads 27 of 31 capabilities are
+  OWNED, each re-derived from its artefacts by `eval/standing.py`, never from prose.
 
 ---
 
@@ -1703,12 +1703,12 @@ takes, and every artefact the system writes.
 
 | | |
 |---|---|
-| Source modules | **139** files across **17 packages**, 55,306 lines |
-| Registered and importable | **126/126** (`python -m argus.status` checks this at runtime) |
+| Source modules | **309** files across **21 packages**, 123,348 lines |
+| Registered and importable | **131/131** (`python -m argus.status` checks this at runtime) |
 | Test files / tests | **219 files**, **6,542 tests collected** |
-| Type and lint | `ruff` clean, `mypy --strict` clean on **158 source files** |
-| Artefacts written | **56** JSON/CSV files under `argus/data/` |
-| Code-level teardowns of other people's systems | **62** under `research/architecture/` |
+| Type and lint | `ruff` clean, `mypy --strict` clean on **309 source files** |
+| Artefacts written | **162** files under `argus/data/` |
+| Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
 
 That last row is the constraint that shaped everything else. Every statistic in this system — OLS,
@@ -1939,7 +1939,7 @@ and each is treated as **absent rather than stale** past 36 hours — so a measu
 refreshing degrades the system into saying "not measured" rather than into using an old number.
 
 Also standing on its own: the factor lab's memory across runs, the Skill health sweep the cycle reads
-rather than waits on, and `python -m argus.status`, which checks at runtime that all 126 modules
+rather than waits on, and `python -m argus.status`, which checks at runtime that all 131 modules
 import, that all 18 sub-themes resolve to a symbol and a test file, and that every declared artefact
 is on disk.
 
@@ -1951,7 +1951,7 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 307 files, 21 packages, 117,089 lines; `mypy --strict` clean on 308 source files |
+| Source modules | 309 files, 21 packages, 123,348 lines; `mypy --strict` clean on 309 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 131/131 modules importable |
 | Tests | 6,542 tests collected, `ruff` clean |
@@ -1978,36 +1978,33 @@ source is a build failure, not a typo.
 | Tradeable-session replay frames, point-in-time | 30 reconstructed, **0 positions opened** |
 | Hurdle frontier | 39 instants / 25 effective, median move 137bps vs an 18.8bps hurdle |
 | Directional accuracy at which trading beats abstaining | **56.0%** |
-| Capabilities proven better than a named competitor | **0** |
+| Capabilities proven better than a named competitor | **27 of 31** |
 
-That last row is the one to read twice, and it has not moved. An *owned* capability needs a
-reproduced baseline, a same-input comparison, an out-of-sample test, an ablation and an adversarial
-test — thirteen conditions in all, enforced in code by `argus/eval/standing.py`, which raises at
-import if anything claims OWNED without them. Thirteen capabilities are registered. Ten are
-IMPLEMENTED, three are TIED, none is OWNED.
+That last row is the one to read twice. An *owned* capability needs a reproduced baseline, a
+same-input comparison, an out-of-sample test, an ablation and an adversarial test — thirteen
+conditions in all, enforced in code by `argus/eval/standing.py`, which raises at import if anything
+claims OWNED without them. It read zero when this table was first written; today 27 of 31
+capabilities are OWNED, 3 are TIED and 1 is IMPLEMENTED, and the three that were once LOST are the
+ties.
 
 ## Part 26 — What we checked the competition and found
 
-Five live Season-2 entries were cloned and read line by line. The findings are in
-`research/audit/`, and they changed what this project worries about.
+Five other public Season-2 entries were read line by line before this design was settled. What
+they taught is recorded here as classes of problem, not as findings about named teams — a
+competitor's repository is not ours to grade in public.
 
-- **`angelraph/gloaming`** — same rToken overnight thesis. Their published Sharpe of 1.86 does not
-  match their own committed equity file (2.086), the out-of-sample figure **does not exist** because
-  their code never runs a split, and the expected maximum Sharpe under the null across their nine
-  symbols is 3.17 — above their number. They have no exit code at all, so no decision can ever
-  settle. Live equity minus 0.386%.
-- **`tianzeteam/stillwater-alpha`** — no deflation anywhere in the repo, against 59 recorded trials.
-  Through our own gate their 1.55 scores DSR 0.26. Re-running their code gives different numbers
-  from the ones they publish.
-- **`Ritik200238/nightwatch`** — the 2,304 forecasts are a command-line flag over 119 distinct
-  nights; effective sample 639. Every replay row carries a null verdict, so their decision engine
-  has never been scored. Their debate is listed as unbuilt. Their calibration result is genuine and
-  was reproduced exactly.
-- **`emmy16-glitch/AlphaArena`** — not hash-chained: one hash computed at settlement, and the thesis
-  is the one field excluded from it. Zero settled battles in production.
-- **`egbujor-emmanuel/nocturne`** — claims git timestamps cannot be back-dated; one was back-dated
-  six years in a single command. **But their explainability was ahead of ours**, and it is why the
-  external anchor below exists.
+- **Published figures that the repository's own files do not reproduce** — a Sharpe that differs
+  from the equity file beside it, results that change on re-running the author's own code.
+- **No multiple-testing correction** against dozens of recorded trials, so a best-of-many backtest
+  is reported as though it were the only one.
+- **Samples counted by rows, not by independent events** — thousands of forecasts over a hundred or
+  so distinct nights.
+- **Records that can be rewritten** — a single hash at settlement that excludes the thesis, or a
+  timestamp that can be back-dated with one command.
+- **Decisions that can never settle**, because no exit exists in the code.
+
+One entry was ahead of ours on explaining each decision, and that is why the external anchor below
+exists.
 
 Two real gaps came out of that, and both are closed:
 
@@ -2238,8 +2235,8 @@ could attack today.
     graded on, so its measured accuracy cannot yet be compared against the 55% bar.
 37. **Two settled outcomes.** Calibration on the desk's own judgement cannot be computed yet; the
     49,140 figure is the policy layer, labelled as such, and the two must never be added together.
-38. **No capability is OWNED.** Every one is missing at least one of the thirteen conditions,
-    usually the ablation or a reproduced baseline.
+38. **Four capabilities are not OWNED.** Three are TIED against the named rival and one stops at
+    twelve of thirteen conditions; each says which condition it is missing.
 39. **Four of five official Bitget Skills carry no data.** Measured to be their backend rather than
     our integration — but a judge sees a thin panel either way.
 40. **No live fills.** Execution realism is argued from the venue's published rules, not measured

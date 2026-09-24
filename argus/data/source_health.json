@@ -1,5 +1,5 @@
 {
-  "probed_at": "2026-09-22T01:20:35.590021+00:00",
+  "probed_at": "2026-09-24T09:02:33.327521+00:00",
   "total": 12,
   "live": 12,
   "empty": 0,
@@ -39,8 +39,8 @@
       "name": "US Treasury curve",
       "module": "market/macro.py",
       "health": "ok",
-      "detail": "181 item(s)",
-      "items": 181
+      "detail": "183 item(s)",
+      "items": 183
     },
     {
       "name": "Crypto Fear & Greed",
@@ -60,15 +60,15 @@
       "name": "FINRA short volume",
       "module": "market/microstructure.py",
       "health": "ok",
-      "detail": "12313 item(s)",
-      "items": 12313
+      "detail": "12387 item(s)",
+      "items": 12387
     },
     {
       "name": "Nasdaq halts",
       "module": "market/microstructure.py",
       "health": "ok",
-      "detail": "40 item(s)",
-      "items": 40
+      "detail": "14 item(s)",
+      "items": 14
     },
     {
       "name": "Yahoo consensus estimates",
@@ -92,5 +92,5 @@
       "items": 6
     }
   ],
-  "verdict": "12 of 12 source(s) answered with usable content at 2026-09-22T01:20:35+00:00. Every configured source is live in this run."
+  "verdict": "12 of 12 source(s) answered with usable content at 2026-09-24T09:02:33+00:00. Every configured source is live in this run."
 }

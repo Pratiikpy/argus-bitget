@@ -405,7 +405,12 @@ def refusal_panel() -> Panel:
             Metric("directional calls right (~2h)",
                    f"{near.get('correct')} of {near.get('directional')}", source),
             Metric("accuracy", _num(near.get("accuracy_pct"), suffix="%", places=1), source,
-                   "" if low is None else f"95% Wilson interval {low}%-{high}%"),
+                   "" if low is None else f"95% interval {low}%-{high}%, bootstrapped over "
+                                          f"{near.get('cycles')} decision cycles"),
+            Metric("calling the majority direction every time",
+                   _num(near.get("naive_accuracy_pct"), suffix="%", places=1), source,
+                   f"the lean beat it in {near.get('cycles_lean_beat_naive')} cycles and lost in "
+                   f"{near.get('cycles_naive_beat_lean')}"),
             Metric("median net edge forgone",
                    _num(near.get("median_forgone_bps"), suffix="bps", places=1), source,
                    f"after a {blob.get('round_trip_bps')}bps round trip; "

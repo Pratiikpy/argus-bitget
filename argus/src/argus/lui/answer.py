@@ -137,7 +137,18 @@ def _lean_grading() -> str | None:
     line = (f"Every refusal still states which way it leans, hashed before the outcome: at about "
             f"2 hours {short['correct']} of {short['directional']} leans went the right way "
             f"({short['accuracy_pct']:.1f}%"
-            + (f", 95% interval {low:.1f} to {high:.1f}%" if low is not None else "") + ")")
+            + (f", 95% interval {low:.1f} to {high:.1f}% over "
+               f"{short.get('cycles') or 'its'} decision cycles" if low is not None else "") + ")")
+    naive = short.get("naive_accuracy_pct")
+    if naive is not None:
+        naive_lean = short.get("naive_lean", "up")
+        beat = short.get("beats_the_naive_call")
+        line += (f", against {naive:.1f}% for simply calling `{naive_lean}` every time — the lean "
+                 f"beat that naive call in {short.get('cycles_lean_beat_naive')} cycles and lost "
+                 f"in {short.get('cycles_naive_beat_lean')}, "
+                 + ("so it knows more than the tape's direction" if beat
+                    else "so there is no evidence yet that it knows more than the tape's "
+                         "direction"))
     night = rows.get("overnight_12h_plus")
     if night and night.get("directional"):
         line += (f"; overnight {night['correct']} of {night['directional']} "

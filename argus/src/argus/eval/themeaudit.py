@@ -1213,7 +1213,10 @@ def _exposure_shape() -> ExposureShape:
     """
     ledger = DATA / "paper_ledger.jsonl"
     records = DATA / "risk_records.jsonl"
-    rows = _read_jsonl(ledger)
+    # Decisions only: the ledger also carries one `settlement_seal` row per settled decision, and
+    # counting those made the denominator read "349 of 1200 decisions" against a 627-decision
+    # ledger (caught 2026-09-24).
+    rows = [r for r in _read_jsonl(ledger) if r.get("kind", "decision") == "decision"]
     risk = len(_read_jsonl(records))
     if not rows:
         return ExposureShape(

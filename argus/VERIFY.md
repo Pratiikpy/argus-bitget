@@ -80,7 +80,7 @@ not the identical decimal.
 only affects `--live` and `--freeze-fixture`; if a couple of symbols fail to fetch, wait a minute
 and re-run. It does not affect the headline result, which does not depend on any single symbol.*
 
-## 3. Session-boundary changepoint detection vs ruptures (≈5–10 minutes — real compute, not a hang)
+## 3. Session-boundary changepoint detection vs ruptures (≈10–25 minutes — real compute, not a hang; measured 9 and 20+ minutes on two machines)
 
 ```
 python -m argus.eval.regime_comparison

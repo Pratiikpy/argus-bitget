@@ -468,7 +468,7 @@ Open source supplies foundations. These twenty-one are ours. The first five were
 | 2 | **Gap-risk engine** — marginal VaR/CVaR of a *proposed* trade across a closed session, under 100ms | t3-tdopen: 0/12 sources compute marginal risk of a proposed trade |
 | 3 | **Edge decomposition ledger** — every decision graded at next open, attributed to information / timing / execution / luck, feeding back into sizing | t3-review: 0/12 sources do post-trade edge attribution |
 | 4 | **Capital authority envelope** — competence certified per regime; authority expires; demotion is automatic | No source ties measured competence to bounded execution permission |
-| 5 | **Constructed-mandatory cost model** — a zero-fee backtest is structurally impossible to instantiate | Only 1 of 236 sources is cost-honest at the 0.12% threshold; the 77-study audit found 1/19 modelling costs at all; and across 103 defects catalogued from 61 code-level teardowns, **cost-blindness is the single most widespread defect class** — ahead of leakage and self-scoring. Two production engines fail it by default: Nautilus backtests at **zero fees** unless configured, and Qlib measures turnover as **gross notional rather than net delta**, overstating cost 2–3× on mean-reversion |
+| 5 | **Constructed-mandatory cost model** — a zero-fee backtest is structurally impossible to instantiate | Only 1 of 236 sources is cost-honest at the 0.12% threshold; the 77-study audit found 1/19 modelling costs at all; and across 103 defects catalogued from 56 code-level teardowns, **cost-blindness is the single most widespread defect class** — ahead of leakage and self-scoring. Two production engines fail it by default: Nautilus backtests at **zero fees** unless configured, and Qlib measures turnover as **gross notional rather than net delta**, overstating cost 2–3× on mean-reversion |
 
 **Extended contributions (6–18)**
 
@@ -987,7 +987,7 @@ A number without a comparison is not evidence. Every headline claim runs against
 
 **Baseline D is the one that matters most and the one most projects avoid.** If the LLM does not beat its own deterministic twin on identical data, we report that finding rather than hiding it. An honest negative on D is more credible than an unexplained positive on G.
 
-### 7.4 The twelve workbenches
+### 7.4 The thirteen workbenches
 
 One interface, twelve surfaces. A judge moves from evidence to reasoning to risk to execution to outcome without ever changing products:
 

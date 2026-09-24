@@ -63,6 +63,12 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "macro_snapshot.json",
     # How the desk's refusals' leans graded — the track-record answer reads it.
     "refusal_alpha.json",
+    # Read by the status page (`lui/status_page.py`): the dated sweeps of every Bitget toolkit
+    # surface, shown beside the live checks.
+    "bitget_skills_health.json",
+    "skill_reliability.json",
+    "data_coverage.json",
+    "source_health.json",
 )
 """Artefacts the hosted console's own pages read at request time.
 

@@ -9,12 +9,12 @@ equities — quotes, fundamentals, earnings calendar, institutional holdings and
 for the underlying stocks our rTokens track.
 
 **What is actually there, enumerated by calling it rather than by reading the docs.** The server
-(`bitget-mcp-server` v4.0.3 at ``https://agent.bitget.com/mcp``) exposes **two** tools, not the
+(`bitget-mcp-server` v4.0.5 at ``https://agent.bitget.com/mcp``) exposes **two** tools, not the
 long list the handbook's category table implies: ``guide`` walks a catalog, and ``do_query``
 executes one catalog entry. Behind them sit **67 entries in five categories** — crypto 40, equity
 21, ETF 3, news 1, sentiment 2.
 
-The 21 equity entries matter most here, because ARGUS's universe is twelve tokenized US equities
+The 22 equity entries matter most here, because ARGUS's universe is twelve tokenized US equities
 and the *anchor* is exactly what a tokenized-equity desk cannot see from the venue's own book:
 ``equity_calendar``, ``equity_estimates_consensus``, ``equity_ownership_form_13f``,
 ``equity_fundamental_*`` and the rest.

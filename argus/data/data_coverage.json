@@ -1,25 +1,25 @@
 {
-  "service": "bitget-mcp-server 4.0.3",
+  "service": "bitget-mcp-server 4.0.5",
   "probe_symbol": "NVDAUSDT",
   "underlying": "NVDA",
   "catalog": {
-    "crypto": 40,
-    "equity": 21,
+    "crypto": 39,
+    "equity": 22,
     "etf": 3,
     "news": 1,
     "sentiment": 2
   },
   "entries_probed": 67,
   "by_health": {
-    "ok": 34,
-    "error": 15,
-    "needs_params": 8,
-    "empty": 10
+    "ok": 37,
+    "empty": 19,
+    "error": 9,
+    "needs_params": 2
   },
-  "answering": 34,
-  "answering_rate": 0.5075,
-  "equity_entries": 21,
-  "equity_answering": 20,
+  "answering": 37,
+  "answering_rate": 0.5522,
+  "equity_entries": 22,
+  "equity_answering": 21,
   "probes": [
     {
       "entry_id": "crypto_market",
@@ -31,16 +31,16 @@
     {
       "entry_id": "crypto_coin_info",
       "category": "crypto",
-      "health": "error",
+      "health": "empty",
       "rows": 0,
-      "detail": "crypto_coin_info: service reported failure: {'success': False, 'status_code': 400, 'data': {'detail': 'CoinGecko API error -> Status 404 -> {\"error\":\"coin not found\"}'}, 'error': None}"
+      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
     },
     {
       "entry_id": "crypto_spot_kline",
       "category": "crypto",
-      "health": "needs_params",
-      "rows": 0,
-      "detail": "crypto_spot_kline: service reported failure: {'success': False, 'status_code': None, 'data': None, 'error': \"Missing required param: 'symbol'\"}"
+      "health": "ok",
+      "rows": 91,
+      "detail": "args={'symbol': 'BTCUSDT'}"
     },
     {
       "entry_id": "crypto_spot_ticker",
@@ -66,9 +66,9 @@
     {
       "entry_id": "crypto_spot_taker_volume",
       "category": "crypto",
-      "health": "needs_params",
+      "health": "error",
       "rows": 0,
-      "detail": "crypto_spot_taker_volume: service reported failure: {'success': False, 'status_code': None, 'data': None, 'error': \"Missing required param: 'symbol'\"}"
+      "detail": "crypto_spot_taker_volume: service reported failure: {'success': False, 'status_code': 400, 'data': {'detail': 'Gateway API error -> HTTP 400 -> {\"code\":400,\"message\":\"Parameter [exchange] is required\""
     },
     {
       "entry_id": "crypto_spot_big_trades",
@@ -87,9 +87,9 @@
     {
       "entry_id": "crypto_futures_kline",
       "category": "crypto",
-      "health": "needs_params",
-      "rows": 0,
-      "detail": "crypto_futures_kline: service reported failure: {'success': False, 'status_code': None, 'data': None, 'error': \"Missing required param: 'symbol'\"}"
+      "health": "ok",
+      "rows": 91,
+      "detail": "args={'symbol': 'BTCUSDT'}"
     },
     {
       "entry_id": "crypto_futures_ticker",
@@ -116,7 +116,7 @@
       "entry_id": "crypto_futures_funding_rate",
       "category": "crypto",
       "health": "ok",
-      "rows": 541,
+      "rows": 543,
       "detail": "args={'symbol': 'BTCUSDT'}"
     },
     {
@@ -157,9 +157,9 @@
     {
       "entry_id": "crypto_futures_taker_volume",
       "category": "crypto",
-      "health": "needs_params",
+      "health": "error",
       "rows": 0,
-      "detail": "crypto_futures_taker_volume: service reported failure: {'success': False, 'status_code': None, 'data': None, 'error': \"Missing required param: 'symbol'\"}"
+      "detail": "crypto_futures_taker_volume: service reported failure: {'success': False, 'status_code': 400, 'data': {'detail': 'Gateway API error -> HTTP 400 -> {\"code\":400,\"message\":\"Parameter [exchange] is requir"
     },
     {
       "entry_id": "crypto_futures_liquidations",
@@ -192,16 +192,9 @@
     {
       "entry_id": "crypto_onchain_exchange_flows",
       "category": "crypto",
-      "health": "error",
+      "health": "empty",
       "rows": 0,
-      "detail": "crypto_onchain_exchange_flows: service reported failure: {'success': False, 'status_code': 400, 'data': {'detail': 'CoinGlass API error -> Server Error'}, 'error': None}"
-    },
-    {
-      "entry_id": "crypto_onchain_active_addresses",
-      "category": "crypto",
-      "health": "ok",
-      "rows": 5878,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
     },
     {
       "entry_id": "crypto_onchain_stablecoin_flow",
@@ -227,9 +220,9 @@
     {
       "entry_id": "crypto_etf_flows",
       "category": "crypto",
-      "health": "error",
+      "health": "empty",
       "rows": 0,
-      "detail": "crypto_etf_flows: service reported failure: {'success': False, 'status_code': 422, 'data': {'detail': 'Unsupported symbol: BTCUSDT. Supported symbols: BITCOIN, BTC, ETH, ETHEREUM, HYPE, SOL, SOLANA, X"
+      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
     },
     {
       "entry_id": "crypto_institutional_mining_company_flow",
@@ -253,32 +246,32 @@
       "detail": "crypto_indicators_technical_indicators: service reported failure: {'success': False, 'status_code': None, 'data': None, 'error': \"Missing required param: 'symbols'\"}"
     },
     {
-      "entry_id": "crypto_hyperliquid_position_distribution_by_tag",
+      "entry_id": "crypto_hyperliquid_position_distribution_by_balance_tag",
       "category": "crypto",
-      "health": "needs_params",
+      "health": "empty",
       "rows": 0,
-      "detail": "crypto_hyperliquid_position_distribution_by_tag: service reported failure: {'success': False, 'status_code': None, 'data': None, 'error': \"Missing required param: 'wallet_tag'\"}"
+      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
     },
     {
-      "entry_id": "crypto_hyperliquid_wallet_pnl_distribution",
+      "entry_id": "crypto_hyperliquid_position_distribution_by_pnl_tag",
       "category": "crypto",
-      "health": "error",
+      "health": "empty",
       "rows": 0,
-      "detail": "crypto_hyperliquid_wallet_pnl_distribution: service reported failure: {'success': False, 'status_code': 404, 'data': {'detail': 'Not Found'}, 'error': None}"
+      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
     },
     {
-      "entry_id": "crypto_hyperliquid_wallet_position_distribution",
+      "entry_id": "crypto_hyperliquid_position_distribution_by_position_tag",
       "category": "crypto",
-      "health": "error",
+      "health": "empty",
       "rows": 0,
-      "detail": "crypto_hyperliquid_wallet_position_distribution: service reported failure: {'success': False, 'status_code': 404, 'data': {'detail': 'Not Found'}, 'error': None}"
+      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
     },
     {
       "entry_id": "crypto_indicators_hyperliquid_whale_sentiment",
       "category": "crypto",
-      "health": "error",
+      "health": "empty",
       "rows": 0,
-      "detail": "crypto_indicators_hyperliquid_whale_sentiment: service reported failure: {'success': False, 'status_code': 404, 'data': {'detail': 'Not Found'}, 'error': None}"
+      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
     },
     {
       "entry_id": "crypto_hyperliquid_whale_alert",
@@ -311,9 +304,9 @@
     {
       "entry_id": "equity_price_historical",
       "category": "equity",
-      "health": "ok",
-      "rows": 19,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "empty",
+      "rows": 0,
+      "detail": "answered with no rows; args={'symbol': 'NVDA'}"
     },
     {
       "entry_id": "equity_profile",
@@ -330,31 +323,31 @@
       "detail": "args={'symbol': 'NVDA'}"
     },
     {
-      "entry_id": "equity_calendar_earnings",
+      "entry_id": "equity_calendar",
       "category": "equity",
       "health": "ok",
-      "rows": 1,
+      "rows": 82,
       "detail": "args={'symbol': 'NVDA'}"
     },
     {
       "entry_id": "equity_fundamental_balance",
       "category": "equity",
       "health": "ok",
-      "rows": 5,
+      "rows": 50,
       "detail": "args={'symbol': 'NVDA'}"
     },
     {
       "entry_id": "equity_fundamental_income",
       "category": "equity",
       "health": "ok",
-      "rows": 5,
+      "rows": 50,
       "detail": "args={'symbol': 'NVDA'}"
     },
     {
       "entry_id": "equity_fundamental_cash",
       "category": "equity",
       "health": "ok",
-      "rows": 5,
+      "rows": 50,
       "detail": "args={'symbol': 'NVDA'}"
     },
     {
@@ -400,11 +393,18 @@
       "detail": "args={'symbol': 'NVDA'}"
     },
     {
-      "entry_id": "equity_ownership_institutional",
+      "entry_id": "equity_ownership_inst_position_detail",
       "category": "equity",
-      "health": "error",
-      "rows": 0,
-      "detail": "equity_ownership_institutional: service reported failure: {'success': False, 'status_code': 404, 'data': {'detail': 'Not Found'}, 'error': None}"
+      "health": "ok",
+      "rows": 38,
+      "detail": "args={'symbol': 'NVDA'}"
+    },
+    {
+      "entry_id": "equity_ownership_inst_position_summary",
+      "category": "equity",
+      "health": "ok",
+      "rows": 100,
+      "detail": "args={'symbol': 'NVDA'}"
     },
     {
       "entry_id": "equity_estimates_price_target",
@@ -458,9 +458,9 @@
     {
       "entry_id": "etf_holdings",
       "category": "etf",
-      "health": "error",
+      "health": "empty",
       "rows": 0,
-      "detail": "etf_holdings: service reported failure: {'success': False, 'status_code': 504, 'data': {'detail': 'Gateway request timed out -> http://data-internal-gateway.upex12.net:80/inner/agent-data-query/ths/et"
+      "detail": "answered with no rows; args={'symbol': 'QQQ'}"
     },
     {
       "entry_id": "etf_price_performance",
@@ -480,15 +480,15 @@
       "entry_id": "crypto_sentiment_crypto_fear_greed",
       "category": "sentiment",
       "health": "ok",
-      "rows": 3133,
+      "rows": 30,
       "detail": "args={}"
     },
     {
       "entry_id": "sentiment_market_fear_greed",
       "category": "sentiment",
-      "health": "needs_params",
-      "rows": 0,
-      "detail": "sentiment_market_fear_greed: service reported failure: {'success': False, 'status_code': None, 'data': None, 'error': \"Missing required param: 'provider'\"}"
+      "health": "ok",
+      "rows": 1,
+      "detail": "args={}"
     }
   ],
   "scope_statement": "Every catalog entry Bitget's own MCP data service publishes is called once, with an argument shape chosen per category and retried when the server rejects it, and the result is classified ok / empty / error / needs_params. NOT CLAIMED: that an empty result means the endpoint is broken \u2014 it means it had nothing for this symbol, which is a fact about coverage. NOT CLAIMED: that one symbol characterises an endpoint; these are single probes, and a wider sweep would move the empty count. The service needs no API key, which is why this is reproducible by a reader."
