@@ -675,7 +675,7 @@ def plan_execution(
 
     expected = sum(
         (s.fraction * s.expected_cost_bps for s in slices), _ZERO
-    ) + model.impact_coefficient * (participation ** model.gamma)
+    ) + model.impact_bps(participation)
 
     return ExecutionPlan(
         symbol=symbol,

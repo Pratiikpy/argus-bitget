@@ -110,16 +110,33 @@ class CostBreakdown:
 class CostModel:
     """Transaction costs with no frictionless default anywhere in its construction.
 
-    Market impact follows the square-root law with ``gamma`` defaulting to 1.5 — cvxportfolio's
-    default at ``costs.py:826`` with convexity enforced at >= 1.0 (``costs.py:845-848``). That is a
-    published, defensible exponent rather than an invented one. cvxportfolio itself is GPL, so this
-    is a reimplementation of the published functional form, not vendored code.
+    Market impact follows the square-root law as cvxportfolio states it (``costs.py``,
+    ``TransactionCost``; equation 2.2 of Boyd et al. 2017): ``b * sigma * |x|**1.5 / V**0.5`` in
+    dollars, which per dollar traded is ``b * sigma * participation ** 0.5``. cvxportfolio's 1.5
+    exponent (``exponent=1.5``, convexity enforced at >= 1) applies to the *dollar* quantity; per
+    dollar the exponent is 0.5, and :attr:`gamma` is that per-dollar exponent. cvxportfolio is GPL,
+    so this is a reimplementation of the published form, not vendored code.
+
+    **Corrected 2026-09-24.** This class charged ``impact_coefficient * participation ** 1.5`` per
+    dollar with a coefficient of 10 and no volatility — the dollar exponent applied to a per-dollar
+    quantity — and called it cvxportfolio's. On the twelve measured books that modelled 0.0005bps
+    where sweeping the same sizes cost a median 2.4bps (`eval/impact_calibration.py`). ``b`` is now
+    fitted on those sweeps (0.344, R-squared 0.76 over 48 sweeps; `data/impact_calibration.json`),
+    which makes it the urgent end of the range: a sweep takes the size at once, with no
+    replenishment.
     """
 
     taker_bps: Decimal
     maker_bps: Decimal
-    impact_coefficient: Decimal = Decimal("10")
-    gamma: Decimal = Decimal("1.5")
+    impact_coefficient: Decimal = Decimal("0.344")
+    """``b`` in the square-root law, fitted on Bitget's own books (see the class docstring)."""
+
+    gamma: Decimal = Decimal("0.5")
+    """Exponent on participation, per dollar traded. 0.5 is the square-root law."""
+
+    volatility_daily_bps: Decimal = Decimal("202")
+    """Daily return volatility, in bps, that scales impact. The default is the median of the twelve
+    traded names over 30 days on 2026-09-24; pass the name's own when it is known."""
     borrow_bps_annual: Decimal = Decimal("0")
 
     funding_bps_per_interval: Decimal = Decimal("0")
@@ -149,8 +166,12 @@ class CostModel:
             )
         if self.maker_bps < 0:
             raise ValueError("maker_bps may be zero (rebate-neutral) but never negative here")
-        if self.gamma < 1:
-            raise ValueError("gamma must be >= 1 for the impact term to stay convex")
+        if not Decimal("0") < self.gamma <= Decimal("1"):
+            raise ValueError(
+                "gamma is the per-dollar impact exponent and must lie in (0, 1]; the dollar cost "
+                "then grows with exponent 1 + gamma, which keeps the impact term convex")
+        if self.volatility_daily_bps < 0:
+            raise ValueError("volatility_daily_bps must be non-negative")
         if self.impact_coefficient < 0:
             raise ValueError("impact_coefficient must be non-negative")
         # Funding may be negative — a short is paid when the rate is positive, and pinning it to
@@ -179,6 +200,14 @@ class CostModel:
             ),
         )
 
+    def impact_bps(self, participation: Decimal,
+                   volatility_daily_bps: Decimal | None = None) -> Decimal:
+        """Impact per dollar traded, in bps: ``b * sigma * participation ** gamma``."""
+        if participation <= 0:
+            return Decimal("0")
+        sigma = self.volatility_daily_bps if volatility_daily_bps is None else volatility_daily_bps
+        return self.impact_coefficient * sigma * (participation ** self.gamma)
+
     def charge(
         self, fill: Fill, *, holding_days: Decimal = Decimal("0"), long: bool = True,
     ) -> CostBreakdown:
@@ -204,12 +233,7 @@ class CostModel:
 
         impact = Decimal("0")
         if fill.adv_participation > 0:
-            impact = (
-                fill.notional
-                * self.impact_coefficient
-                * (fill.adv_participation ** self.gamma)
-                / Decimal("10000")
-            )
+            impact = fill.notional * self.impact_bps(fill.adv_participation) / Decimal("10000")
 
         borrow = (
             fill.notional * self.borrow_bps_annual / Decimal("10000")

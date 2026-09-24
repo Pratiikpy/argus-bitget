@@ -11,21 +11,26 @@ and reports each with the same honesty rule: a criterion the record cannot suppo
 `research/architecture/agent-evaluation-harnesses.md` read every harness in the local corpus at
 source. On the five criteria:
 
-* **Consistency** — only AlphaForgeBench measures anything (`metrics.py:345-365`, Pass@k over five
-  samples), and Pass@k cannot see disagreement: three wrong samples out of five still score 1.0. It
-  measures execution robustness. `eval/bakeoff.py` measures verdict disagreement under replay,
-  which is the thing the criterion names.
+* **Consistency** — AlphaForgeBench (`metrics.py:345-365`) reports Pass@k over five samples,
+  which cannot see disagreement: three wrong samples out of five still score 1.0. It measures
+  execution robustness. SharpeBench, CLQT and mandate-bench do measure agreement across repeated
+  runs (found by the rival review of 2026-09-24; this bullet said AlphaForgeBench was the only one
+  until then). `eval/bakeoff.py` measures verdict disagreement under replay, which is the thing the
+  criterion names.
 * **Risk violations** — `agent-backtest-lab/abl/data/firewall.py:38-60` is the cleanest gate found,
   logging every access attempt. TraderHarness has gates that are never aggregated into a rate and
   one that the shipped baselines bypass entirely (`tools/trading.py:128-180`).
 * **Stress** — `agent-backtest-lab/abl/leakage/reward_hacking.py:57-172` is the only rigorous
   treatment: a chronological split with three degradation signals.
-* **Human takeover** — **nothing, in 140-plus repositories.** No harness measures it and none
-  defines when an agent must hand over. `decision/escalation.py` is built rather than copied for
-  that reason.
-* **Incremental value** — **nothing with a statistical test.** live-trade-bench names benchmarks in
-  comments and never computes them (`models_data.py:424-440`); AlphaForgeBench reports absolute
-  ratios with no reference point at all.
+* **Human takeover** — no *trading* harness in the local corpus measures it. Outside trading,
+  τ²-bench defines when an agent must transfer to a human (`airline/policy.md:15`,
+  `retail/policy.md:24`, `telecom/main_policy.md:13`) and scores 37 gold transfer tasks, and
+  HiL-Bench measures when an agent asks; this bullet said nothing anywhere did until the rival
+  review of 2026-09-24. `decision/escalation.py` brings the idea to trading, with risk conditions
+  rather than scope.
+* **Incremental value** — live-trade-bench names benchmarks in comments and never computes them
+  (`models_data.py:424-440`); AlphaForgeBench reports absolute ratios with no reference point.
+  SharpeBench and CLQT do test against baselines; this bullet said nothing did.
 
 **This scorecard is designed to be able to fail.** Four of the five criteria currently return a
 number that is unflattering, undefined, or both, and each says which. A benchmark that its author
@@ -365,31 +370,55 @@ def run() -> BenchReport:
     ))
 
 
-def write_takeover() -> dict[str, Any]:  # pragma: no cover - reads the live ledgers
-    """Compute the takeover rate over the recorded decisions and write it for the scorecard.
+def takeover_from_risk_records(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """The takeover rate as it happened: of the decisions where the model proposed size, how many
+    the desk handed to a human instead of sending.
 
-    Every recorded decision is replayed through `decision/escalation.py`. The signals available
-    from a ledger row are the ones the row carries, so this is a *lower bound* on what the policy
-    would raise on a live run with a full desk context, and the artefact says so.
+    Read from the risk layer's own per-decision record (`data/risk_records.jsonl`): a decision is
+    actionable when ``quantity_before`` — what the model asked for — is above zero, and handed over
+    when the final ``verdict`` is ``human_review``. This replaced a replay that passed every ledger
+    row through the escalation policy with no triggers at all, so it could never count one; the
+    record held two proposals, COIN and MSTR shorts on 2026-09-15 (seq 264 and 265), and both had
+    been handed to a human (rival review, 2026-09-24).
     """
-    from argus.decision.escalation import Escalation, takeover_rate
-    from argus.eval.collect import OPENING_VERDICTS, _ledger_rows
+    from argus.decision.escalation import TakeoverRate
 
-    rows = _ledger_rows()
-    outcomes: list[tuple[bool, Escalation]] = []
-    for _symbol, _at, _move, verdict, _side, quantity in rows:
+    # The handovers on this record came from the Meta-PM's structural checks (a verdict that opens
+    # exposure without naming a falsifier, or carries size while naming zero), not from the five
+    # risk triggers in `decision/escalation.py`, so they are counted by the risk layer's own
+    # binding constraint rather than forced into a trigger they did not come from.
+    actionable = 0
+    reasons: dict[str, int] = {}
+    seqs: list[int] = []
+    for row in rows:
         try:
-            size = float(quantity if quantity is not None else 0)
+            asked = float(row.get("quantity_before") or 0)
         except (TypeError, ValueError):
-            size = 0.0
-        reachable = verdict.strip().lower() in OPENING_VERDICTS and size > 0
-        outcomes.append((reachable, Escalation(triggers=(), detail=())))
-    rate = takeover_rate(outcomes)
-    payload = rate.as_dict()
+            asked = 0.0
+        if asked <= 0:
+            continue
+        actionable += 1
+        if str(row.get("verdict", "")).lower() == "human_review":
+            reason = str(row.get("binding_constraint") or "unstated")
+            reasons[reason] = reasons.get(reason, 0) + 1
+            seqs.append(int(row.get("seq", 0)))
+    payload = TakeoverRate(escalations=len(seqs), actionable=actionable,
+                           total_decisions=len(rows), by_trigger=reasons).as_dict()
+    payload["handed_over_seqs"] = seqs
+    payload["binding_constraints"] = reasons
+    return payload
+
+
+def write_takeover() -> dict[str, Any]:  # pragma: no cover - reads the live records
+    """Compute the takeover rate from the risk records and write it for the scorecard."""
+    path = DATA / "risk_records.jsonl"
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()
+            if line.strip()] if path.exists() else []
+    payload = takeover_from_risk_records(rows)
     payload["note"] = (
-        "Computed over the recorded ledger rows. A ledger row carries fewer signals than a live "
-        "desk run, so this is a lower bound on what the escalation policy would raise in "
-        "production, not a measurement of it."
+        "Read from the risk layer's per-decision record: actionable means the model proposed "
+        "size; handed over means the final verdict was human_review. Two proposals is a count, "
+        "not a rate a reader should generalise from."
     )
     payload["reachability"] = _trigger_reachability()
     return _write_takeover(payload)

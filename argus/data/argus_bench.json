@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-13T16:14:15.261032+00:00",
+  "generated_at": "2026-09-24T12:45:33.442631+00:00",
   "criteria": [
     {
       "name": "decision consistency",
@@ -14,7 +14,7 @@
       "grade": "pass",
       "value": 0.0,
       "unit": "",
-      "detail": "0 violation(s) across 6,720 swept states (2,928 of which the layer reduced). The sweep is exhaustive, so this is a property of the layer rather than of the traffic it happened to see",
+      "detail": "0 violation(s) across 2,177,280 swept states (1,335,312 of which the layer reduced). The sweep is exhaustive, so this is a property of the layer rather than of the traffic it happened to see",
       "source": "data/risk_proof.json"
     },
     {
@@ -27,10 +27,10 @@
     },
     {
       "name": "human-takeover rate",
-      "grade": "undefined",
-      "value": null,
+      "grade": "fail",
+      "value": 1.0,
       "unit": "",
-      "detail": "UNDEFINED over 57 decision(s): none would have reached the venue, so there was nothing a human could have been asked about. This is the state of a desk that has not yet traded, and it is not a takeover rate of zero. The policy is not dead code: across 88 recorded cycle(s), 2 of 5 escalation conditions have actually occurred \u2014 ungrounded_figure (21), unresolved_conflict (12) \u2014 each of which would have handed the decision to a human had it opened exposure.",
+      "detail": "100% of 2 actionable decision(s) were handed to a human. Above half, the desk is not operating unattended in any meaningful sense. The policy is not dead code: across 565 recorded cycle(s), 2 of 5 escalation conditions have actually occurred \u2014 ungrounded_figure (233), unresolved_conflict (173) \u2014 each of which would have handed the decision to a human had it opened exposure.",
       "source": "data/takeover.json"
     },
     {
@@ -43,7 +43,7 @@
     }
   ],
   "passing": 2,
-  "undefined": 1,
+  "undefined": 0,
   "total": 5,
-  "verdict": "2 of 5 criteria pass, 1 are undefined on this record. Weak: decision consistency, incremental value. Undefined: human-takeover rate \u2014 the record does not support these yet, which is a different statement from scoring zero on them. This benchmark is published having been run against its own author first, and four of the five criteria currently return something unflattering, undefined, or both."
+  "verdict": "2 of 5 criteria pass, 0 are undefined on this record. Failing: human-takeover rate. Weak: decision consistency, incremental value. This benchmark is published having been run against its own author first, and four of the five criteria currently return something unflattering, undefined, or both."
 }

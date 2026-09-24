@@ -3482,6 +3482,26 @@ def _waiting_cost(hourly_moves: Sequence[float]) -> str:
             f"above.")
 
 
+def _daily_volatility_bps(symbol: str, days: int = 30) -> Decimal | None:
+    """The name's daily return volatility over ``days`` daily bars, in bps — the sigma the
+    square-root impact law scales by (`cost/model.py`)."""
+    import statistics
+
+    from argus.market.history import CandleType, fetch
+
+    try:
+        with _FETCH_SLOTS:
+            bars = fetch(symbol, interval="1D", candle_type=CandleType.MARKET, recent=True,
+                         limit=days + 1)
+    except Exception:
+        return None
+    closes = [float(b.close) for b in bars]
+    moves = [b / a - 1.0 for a, b in itertools.pairwise(closes) if a > 0]
+    if len(moves) < 10:
+        return None
+    return Decimal(str(round(statistics.pstdev(moves) * 10_000, 1)))
+
+
 def _optimal_schedule(symbol: str, notional: Decimal, adv: Decimal, book: Any, fee_bps: float,
                       total_hours: float, urgent: bool, side: str = "BUY") -> list[str]:
     """The Almgren-Chriss (2000) optimal trajectory for this order, priced against an even split
@@ -5078,11 +5098,20 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
             plan = plan_execution(symbol=symbol, notional=request.notional, adv_notional=adv,
                                   urgency="high" if request.urgent else "low",
                                   anchor_asleep=asleep)
+            fees = sum((s.fraction * s.expected_cost_bps for s in plan.slices), Decimal(0))
+            own_sigma = _daily_volatility_bps(symbol)
+            from argus.cost.model import CostModel
+
+            modelled = CostModel.bitget_perp().impact_bps(plan.participation_rate, own_sigma)
             lines = [
                 f"A ${request.notional:,.0f} order is {plan.participation_rate:.2%} of "
-                f"{symbol.removesuffix('USDT')}'s 24h volume (${adv:,.0f}); the fees alone come "
-                f"to about {plan.expected_total_cost_bps:.1f}bps, and the book below adds what "
-                f"the size itself costs.",
+                f"{symbol.removesuffix('USDT')}'s 24h volume (${adv:,.0f}); the fees come to "
+                f"about {fees:.1f}bps, and the square-root impact law — calibrated on Bitget's "
+                f"own books"
+                + (f", at {symbol.removesuffix('USDT')}'s own {own_sigma:.0f}bps daily volatility"
+                   if own_sigma is not None else "")
+                + f" — puts this size's market impact near {modelled:.1f}bps; the live book "
+                  f"below shows what taking it at once costs.",
                 f"Plan: {plan.rationale}.",
             ]
             lines.extend(_depth_lines(symbol, request.notional, adv, plan, raw_text,

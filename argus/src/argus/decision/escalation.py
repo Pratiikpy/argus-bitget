@@ -1,10 +1,13 @@
 """When the desk must stop and ask a human — and the rate at which it does.
 
 Track 2's Open Theme names "human-takeover rate" as one of five things an agent benchmark should
-measure. A teardown of every harness in the local corpus found **nothing**: not one of 140-plus
-repositories measures how often an agent hands control to a human, and not one defines when it
-must. `research/architecture/agent-evaluation-harnesses.md` records the negative evidence file by
-file — `live-trade-bench/systems/stock_system.py:48-75` has no abort path,
+measure. A teardown of every *trading* harness in the local corpus found none that measures how
+often an agent hands control to a human or defines when it must. (Outside trading it exists:
+τ²-bench defines transfer to a human in its domain policies and scores gold transfer tasks, and
+HiL-Bench measures when an agent asks — an earlier version of this paragraph said no repository
+anywhere did, corrected after the rival review of 2026-09-24.)
+`research/architecture/agent-evaluation-harnesses.md` records the trading evidence file by file
+— `live-trade-bench/systems/stock_system.py:48-75` has no abort path,
 `TraderHarness/agents/protocol.py:12-21` returns `None` so there is nothing that *could* carry an
 escalation, `agent-backtest-lab/abl/types.py:13-31` has three directions and no fourth state, and
 `DARWIN/cto/llm.ts:66-72` clamps the model's output to a schema with no escalation verb.

@@ -300,10 +300,11 @@ def impact_check(
 ) -> list[dict[str, Any]]:
     """The square-root impact law against the real book, size by size.
 
-    `cost/model.py` charges ``coefficient * participation ** gamma`` with gamma 1.5 from
-    cvxportfolio (`costs.py:826`) and a coefficient of 10 that nobody on this project measured. The
-    comparison needs a participation rate, so an average daily notional is required to make the
-    model's term meaningful; without one only the measured column is reported, which is still the
+    `cost/model.py` charges ``b * sigma * participation ** 0.5`` per dollar — the square-root law
+    as cvxportfolio states it, with ``b`` fitted on these books (`eval/impact_calibration.py`).
+    Until 2026-09-24 it charged ``10 * participation ** 1.5``, which this table showed was
+    thousands of times too small. The comparison needs a participation rate, so an average daily
+    notional is required; without one only the measured column is reported, which is still the
     more useful half.
     """
     from argus.cost.model import CostModel
@@ -323,11 +324,9 @@ def impact_check(
         }
         if adv_notional and adv_notional > 0:
             participation = size / adv_notional
-            # `cost/model.py:charge` computes impact as
-            # notional * coefficient * participation**gamma / 10_000, i.e. the product is already
-            # in bps of notional. Written out here rather than reused because importing the charge
-            # would require building a Fill, and the point is to show the formula being compared.
-            modelled = model.impact_coefficient * (participation ** model.gamma)
+            # `CostModel.impact_bps` is the square-root law per dollar, b * sigma * sqrt(p), with
+            # b fitted on these same books (`eval/impact_calibration.py`).
+            modelled = model.impact_bps(participation)
             row["participation"] = float(round(participation, 8))
             row["modelled_impact_bps"] = float(round(modelled, 4))
         rows.append(row)

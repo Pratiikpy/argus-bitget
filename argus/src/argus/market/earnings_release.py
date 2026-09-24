@@ -2,10 +2,12 @@
 
 "Summarize NVDA's last earnings call and what management guided" was answered with an earnings date
 and a SUE figure (a critic's probe, 2026-09-24): nothing in the console read what the company said.
-Call transcripts are not free to fetch, but every US issuer files its earnings press release with
-the SEC as exhibit 99.1 to an 8-K under item 2.02 ("results of operations") — the same numbers and,
-for companies that give it, the same outlook management then discusses on the call. This module
-reads that exhibit.
+Every US issuer files its earnings press release with the SEC as exhibit 99.1 to an 8-K under
+item 2.02 ("results of operations") — the same numbers and, for companies that give it, the same
+outlook management then discusses on the call. This module reads that exhibit, the company's own
+filing. Call transcripts are available from keyless sources too (an earlier version of this
+paragraph said they were not free; the rival review of 2026-09-24 found otherwise); they are not
+read here yet, which is why the answer says it reads the release rather than the call.
 
 **Extraction is deterministic and quoted.** Figures are taken only from sentences in the release,
 and the outlook is returned as the release's own sentences, verbatim. Nothing is paraphrased by a

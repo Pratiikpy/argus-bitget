@@ -1,17 +1,26 @@
 {
-  "escalations": 0,
-  "actionable_decisions": 0,
-  "total_decisions": 57,
-  "rate": null,
-  "by_trigger": {},
-  "verdict": "UNDEFINED over 57 decision(s): none would have reached the venue, so there was nothing a human could have been asked about. This is the state of a desk that has not yet traded, and it is not a takeover rate of zero",
-  "note": "Computed over the recorded ledger rows. A ledger row carries fewer signals than a live desk run, so this is a lower bound on what the escalation policy would raise in production, not a measurement of it.",
+  "escalations": 2,
+  "actionable_decisions": 2,
+  "total_decisions": 545,
+  "rate": 1.0,
+  "by_trigger": {
+    "no_exposure": 2
+  },
+  "verdict": "100% of 2 actionable decision(s) were handed to a human. Above half, the desk is not operating unattended in any meaningful sense",
+  "handed_over_seqs": [
+    264,
+    265
+  ],
+  "binding_constraints": {
+    "no_exposure": 2
+  },
+  "note": "Read from the risk layer's per-decision record: actionable means the model proposed size; handed over means the final verdict was human_review. Two proposals is a count, not a rate a reader should generalise from.",
   "reachability": {
     "available": true,
-    "cycles_examined": 88,
+    "cycles_examined": 565,
     "conditions_observed": {
-      "ungrounded_figure": 21,
-      "unresolved_conflict": 12
+      "ungrounded_figure": 233,
+      "unresolved_conflict": 173
     },
     "observed": 2,
     "total_conditions": 5

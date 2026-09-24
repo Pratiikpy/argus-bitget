@@ -9,6 +9,8 @@ would read as a criterion met.
 
 from __future__ import annotations
 
+import pytest
+
 from argus.eval.bench import (
     BenchReport,
     Criterion,
@@ -148,7 +150,7 @@ class TestHumanTakeoverRate:
         assert human_takeover_rate({"rate": 0.8, "verdict": ""}).grade is Grade.FAIL
 
     def test_a_missing_artefact_is_undefined(self) -> None:
-        assert human_takeover_rate(None).grade is Grade.UNDEFINED
+        assert human_takeover_rate({}).grade is Grade.UNDEFINED
 
 
 class TestIncrementalValue:
@@ -239,3 +241,33 @@ class TestTheScorecard:
         assert got["total"] == 2
         assert got["passing"] == 1
         assert got["undefined"] == 1
+
+
+class TestTakeoverIsReadFromWhatHappened:
+    """The replay passed every ledger row through the policy with no triggers, so it could never
+    count a handover; the risk records held two, both handed to a human (2026-09-24)."""
+
+    def test_proposals_with_size_are_the_denominator_and_human_review_the_numerator(self) -> None:
+        from argus.eval.bench import takeover_from_risk_records
+
+        rows = [
+            {"seq": 1, "quantity_before": "0", "verdict": "no_trade"},
+            {"seq": 264, "quantity_before": "1", "verdict": "human_review",
+             "binding_constraint": "no_exposure"},
+            {"seq": 265, "quantity_before": "1", "verdict": "human_review",
+             "binding_constraint": "no_exposure"},
+            {"seq": 300, "quantity_before": "2", "verdict": "trade"},
+        ]
+        got = takeover_from_risk_records(rows)
+        assert got["actionable_decisions"] == 3
+        assert got["escalations"] == 2
+        assert got["handed_over_seqs"] == [264, 265]
+        assert got["binding_constraints"] == {"no_exposure": 2}
+        assert got["rate"] == pytest.approx(2 / 3, abs=1e-5)
+
+    def test_no_proposal_is_undefined_not_zero(self) -> None:
+        from argus.eval.bench import takeover_from_risk_records
+
+        got = takeover_from_risk_records([{"seq": 1, "quantity_before": "0",
+                                           "verdict": "no_trade"}])
+        assert got["rate"] is None and got["verdict"].startswith("UNDEFINED")

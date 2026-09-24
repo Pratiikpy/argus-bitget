@@ -28,8 +28,10 @@ SCOPE, stated explicitly:
   claim ARGUS's simple deliberation-cost model is a substitute for that — only that it prices a
   real, three-orders-of-magnitude-larger delay hftbacktest's model has no representation of at
   all.
-* Not run: hftbacktest's real code is a compiled Rust crate (via PyO3 bindings) with no prebuilt
-  wheel on this machine; running it would require a full Rust toolchain build. The trait/struct
+* Not run: hftbacktest's real code is a compiled Rust crate (via PyO3 bindings). This said no
+  prebuilt wheel existed for this machine; hftbacktest 2.4.4 installs from one (verified
+  2026-09-24), so the run is available and has not been done — which is part of why this
+  capability is IMPLEMENTED rather than OWNED. The trait/struct
   signatures read here are its real, published API surface, not paraphrased or guessed.
 * The VIX level used for the live comparison moves day to day; the comparison reports whatever is
   real and live the day it runs, not a fixed historical constant.

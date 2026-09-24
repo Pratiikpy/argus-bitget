@@ -37,8 +37,12 @@ class TestZeroFeeIsUnreachable:
         assert not hasattr(CostModel, "free")
 
     def test_non_convex_impact_exponent_is_rejected(self) -> None:
-        with pytest.raises(ValueError, match="convex"):
-            CostModel(taker_bps=Decimal("6"), maker_bps=Decimal("2"), gamma=Decimal("0.5"))
+        """gamma is the per-dollar exponent: 0 would make impact flat in size, above 1 the dollar
+        exponent passes 2. The square-root law (0.5) sits inside."""
+        for bad in (Decimal("0"), Decimal("1.5")):
+            with pytest.raises(ValueError, match="convex"):
+                CostModel(taker_bps=Decimal("6"), maker_bps=Decimal("2"), gamma=bad)
+        CostModel(taker_bps=Decimal("6"), maker_bps=Decimal("2"), gamma=Decimal("0.5"))
 
 
 class TestFrictionlessIsPoisoned:
@@ -114,15 +118,24 @@ class TestCharging:
         assert got.spread == Decimal("0")
         assert got.commission == Decimal("20")
 
-    def test_impact_is_superlinear_in_participation(self) -> None:
-        """Square-root law, gamma=1.5: doubling participation more than doubles impact."""
+    def test_impact_is_superlinear_in_the_order_size(self) -> None:
+        """The square-root law: doubling an order doubles its dollars and its participation, so
+        its impact grows by 2 ** 1.5 — more than double, as cvxportfolio's dollar exponent says."""
         small = self.model.charge(
             Fill(Decimal("100000"), Liquidity.TAKER, adv_participation=Decimal("0.01"))
         )
         big = self.model.charge(
-            Fill(Decimal("100000"), Liquidity.TAKER, adv_participation=Decimal("0.02"))
+            Fill(Decimal("200000"), Liquidity.TAKER, adv_participation=Decimal("0.02"))
         )
-        assert big.impact > small.impact * 2
+        assert big.impact / small.impact == pytest.approx(Decimal(2) ** Decimal("1.5"))
+
+    def test_impact_per_dollar_is_the_calibrated_square_root_law(self) -> None:
+        """b * sigma * sqrt(participation): at the calibrated b (0.344) and the median daily
+        volatility (202bps), trading 1% of a day's volume costs about 6.9bps per dollar."""
+        got = self.model.impact_bps(Decimal("0.01"))
+        assert got == pytest.approx(Decimal("0.344") * Decimal("202") * Decimal("0.1"))
+        assert self.model.impact_bps(Decimal("0.01"), Decimal("404")) == pytest.approx(got * 2)
+        assert self.model.impact_bps(Decimal("0")) == Decimal("0")
 
     def test_zero_participation_means_zero_impact(self) -> None:
         got = self.model.charge(Fill(Decimal("100000"), Liquidity.TAKER))

@@ -1,0 +1,349 @@
+{
+ "generated_at": "2026-09-24T12:40:41.608581+00:00",
+ "depth_measured_at": "2026-09-23T19:31:39.558060+00:00",
+ "points": 48,
+ "b": 0.3438445969185255,
+ "r_squared": 0.7624284786759247,
+ "free_exponent": 0.6894043760034014,
+ "median_sigma_daily_bps": 201.59692306773042,
+ "median_walk_bps": 2.43415,
+ "median_old_model_bps": 0.0004572089152898362,
+ "rows": [
+  {
+   "symbol": "NVDAUSDT",
+   "notional": 1000.0,
+   "participation": 8.885018834364123e-05,
+   "sigma_daily_bps": 186.99551294311647,
+   "walk_bps": 4.999999999999449e-05
+  },
+  {
+   "symbol": "NVDAUSDT",
+   "notional": 5000.0,
+   "participation": 0.0004442509417182061,
+   "sigma_daily_bps": 186.99551294311647,
+   "walk_bps": 0.32135
+  },
+  {
+   "symbol": "NVDAUSDT",
+   "notional": 25000.0,
+   "participation": 0.0022212547085910307,
+   "sigma_daily_bps": 186.99551294311647,
+   "walk_bps": 1.39195
+  },
+  {
+   "symbol": "NVDAUSDT",
+   "notional": 100000.0,
+   "participation": 0.008885018834364123,
+   "sigma_daily_bps": 186.99551294311647,
+   "walk_bps": 4.12005
+  },
+  {
+   "symbol": "TSLAUSDT",
+   "notional": 1000.0,
+   "participation": 3.91647006880366e-05,
+   "sigma_daily_bps": 259.46184583911514,
+   "walk_bps": 0.25060000000000004
+  },
+  {
+   "symbol": "TSLAUSDT",
+   "notional": 5000.0,
+   "participation": 0.000195823503440183,
+   "sigma_daily_bps": 259.46184583911514,
+   "walk_bps": 0.6795000000000001
+  },
+  {
+   "symbol": "TSLAUSDT",
+   "notional": 25000.0,
+   "participation": 0.000979117517200915,
+   "sigma_daily_bps": 259.46184583911514,
+   "walk_bps": 0.8811000000000001
+  },
+  {
+   "symbol": "TSLAUSDT",
+   "notional": 100000.0,
+   "participation": 0.00391647006880366,
+   "sigma_daily_bps": 259.46184583911514,
+   "walk_bps": 3.8501999999999996
+  },
+  {
+   "symbol": "AAPLUSDT",
+   "notional": 1000.0,
+   "participation": 0.00011235094277285693,
+   "sigma_daily_bps": 148.8435696243742,
+   "walk_bps": 0.5616000000000001
+  },
+  {
+   "symbol": "AAPLUSDT",
+   "notional": 5000.0,
+   "participation": 0.0005617547138642847,
+   "sigma_daily_bps": 148.8435696243742,
+   "walk_bps": 1.047
+  },
+  {
+   "symbol": "AAPLUSDT",
+   "notional": 25000.0,
+   "participation": 0.002808773569321423,
+   "sigma_daily_bps": 148.8435696243742,
+   "walk_bps": 2.5196
+  },
+  {
+   "symbol": "AAPLUSDT",
+   "notional": 100000.0,
+   "participation": 0.011235094277285692,
+   "sigma_daily_bps": 148.8435696243742,
+   "walk_bps": 6.4232
+  },
+  {
+   "symbol": "MSFTUSDT",
+   "notional": 1000.0,
+   "participation": 0.00031787460288533,
+   "sigma_daily_bps": 132.43887177038638,
+   "walk_bps": 0.36745
+  },
+  {
+   "symbol": "MSFTUSDT",
+   "notional": 5000.0,
+   "participation": 0.00158937301442665,
+   "sigma_daily_bps": 132.43887177038638,
+   "walk_bps": 0.39304999999999995
+  },
+  {
+   "symbol": "MSFTUSDT",
+   "notional": 25000.0,
+   "participation": 0.00794686507213325,
+   "sigma_daily_bps": 132.43887177038638,
+   "walk_bps": 3.13325
+  },
+  {
+   "symbol": "MSFTUSDT",
+   "notional": 100000.0,
+   "participation": 0.031787460288533,
+   "sigma_daily_bps": 132.43887177038638,
+   "walk_bps": 5.93715
+  },
+  {
+   "symbol": "METAUSDT",
+   "notional": 1000.0,
+   "participation": 6.914913132377394e-05,
+   "sigma_daily_bps": 216.1983331923444,
+   "walk_bps": 2.3109
+  },
+  {
+   "symbol": "METAUSDT",
+   "notional": 5000.0,
+   "participation": 0.0003457456566188697,
+   "sigma_daily_bps": 216.1983331923444,
+   "walk_bps": 2.7895
+  },
+  {
+   "symbol": "METAUSDT",
+   "notional": 25000.0,
+   "participation": 0.0017287282830943486,
+   "sigma_daily_bps": 216.1983331923444,
+   "walk_bps": 3.9059999999999997
+  },
+  {
+   "symbol": "METAUSDT",
+   "notional": 100000.0,
+   "participation": 0.006914913132377395,
+   "sigma_daily_bps": 216.1983331923444,
+   "walk_bps": 9.0333
+  },
+  {
+   "symbol": "GOOGLUSDT",
+   "notional": 1000.0,
+   "participation": 9.51341360989281e-05,
+   "sigma_daily_bps": 148.334298117889,
+   "walk_bps": 1.02595
+  },
+  {
+   "symbol": "GOOGLUSDT",
+   "notional": 5000.0,
+   "participation": 0.0004756706804946405,
+   "sigma_daily_bps": 148.334298117889,
+   "walk_bps": 2.41805
+  },
+  {
+   "symbol": "GOOGLUSDT",
+   "notional": 25000.0,
+   "participation": 0.0023783534024732025,
+   "sigma_daily_bps": 148.334298117889,
+   "walk_bps": 4.77555
+  },
+  {
+   "symbol": "GOOGLUSDT",
+   "notional": 100000.0,
+   "participation": 0.00951341360989281,
+   "sigma_daily_bps": 148.334298117889,
+   "walk_bps": 6.48845
+  },
+  {
+   "symbol": "AMZNUSDT",
+   "notional": 1000.0,
+   "participation": 0.00023559836062233796,
+   "sigma_daily_bps": 128.8313938370207,
+   "walk_bps": 1.51065
+  },
+  {
+   "symbol": "AMZNUSDT",
+   "notional": 5000.0,
+   "participation": 0.0011779918031116898,
+   "sigma_daily_bps": 128.8313938370207,
+   "walk_bps": 2.45025
+  },
+  {
+   "symbol": "AMZNUSDT",
+   "notional": 25000.0,
+   "participation": 0.00588995901555845,
+   "sigma_daily_bps": 128.8313938370207,
+   "walk_bps": 4.34535
+  },
+  {
+   "symbol": "AMZNUSDT",
+   "notional": 100000.0,
+   "participation": 0.0235598360622338,
+   "sigma_daily_bps": 128.8313938370207,
+   "walk_bps": 7.28345
+  },
+  {
+   "symbol": "COINUSDT",
+   "notional": 1000.0,
+   "participation": 0.00015224357491728575,
+   "sigma_daily_bps": 471.8343213300046,
+   "walk_bps": 1.0482
+  },
+  {
+   "symbol": "COINUSDT",
+   "notional": 5000.0,
+   "participation": 0.0007612178745864287,
+   "sigma_daily_bps": 471.8343213300046,
+   "walk_bps": 4.3117
+  },
+  {
+   "symbol": "COINUSDT",
+   "notional": 25000.0,
+   "participation": 0.0038060893729321434,
+   "sigma_daily_bps": 471.8343213300046,
+   "walk_bps": 5.9506
+  },
+  {
+   "symbol": "COINUSDT",
+   "notional": 100000.0,
+   "participation": 0.015224357491728574,
+   "sigma_daily_bps": 471.8343213300046,
+   "walk_bps": 23.62
+  },
+  {
+   "symbol": "MSTRUSDT",
+   "notional": 1000.0,
+   "participation": 1.3754407841621687e-05,
+   "sigma_daily_bps": 542.6963133727236,
+   "walk_bps": 0.38215
+  },
+  {
+   "symbol": "MSTRUSDT",
+   "notional": 5000.0,
+   "participation": 6.877203920810844e-05,
+   "sigma_daily_bps": 542.6963133727236,
+   "walk_bps": 1.90315
+  },
+  {
+   "symbol": "MSTRUSDT",
+   "notional": 25000.0,
+   "participation": 0.0003438601960405422,
+   "sigma_daily_bps": 542.6963133727236,
+   "walk_bps": 4.097449999999999
+  },
+  {
+   "symbol": "MSTRUSDT",
+   "notional": 100000.0,
+   "participation": 0.0013754407841621687,
+   "sigma_daily_bps": 542.6963133727236,
+   "walk_bps": 7.892049999999999
+  },
+  {
+   "symbol": "QQQUSDT",
+   "notional": 1000.0,
+   "participation": 0.000122346755940427,
+   "sigma_daily_bps": 73.00447798686929,
+   "walk_bps": 0.0008500000000000035
+  },
+  {
+   "symbol": "QQQUSDT",
+   "notional": 5000.0,
+   "participation": 0.000611733779702135,
+   "sigma_daily_bps": 73.00447798686929,
+   "walk_bps": 0.5146499999999999
+  },
+  {
+   "symbol": "QQQUSDT",
+   "notional": 25000.0,
+   "participation": 0.0030586688985106748,
+   "sigma_daily_bps": 73.00447798686929,
+   "walk_bps": 1.30205
+  },
+  {
+   "symbol": "QQQUSDT",
+   "notional": 100000.0,
+   "participation": 0.012234675594042699,
+   "sigma_daily_bps": 73.00447798686929,
+   "walk_bps": 2.45195
+  },
+  {
+   "symbol": "TQQQUSDT",
+   "notional": 1000.0,
+   "participation": 0.00015544654511815586,
+   "sigma_daily_bps": 219.50685042413096,
+   "walk_bps": 1.12835
+  },
+  {
+   "symbol": "TQQQUSDT",
+   "notional": 5000.0,
+   "participation": 0.0007772327255907793,
+   "sigma_daily_bps": 219.50685042413096,
+   "walk_bps": 2.09155
+  },
+  {
+   "symbol": "TQQQUSDT",
+   "notional": 25000.0,
+   "participation": 0.0038861636279538966,
+   "sigma_daily_bps": 219.50685042413096,
+   "walk_bps": 6.92135
+  },
+  {
+   "symbol": "TQQQUSDT",
+   "notional": 100000.0,
+   "participation": 0.015544654511815586,
+   "sigma_daily_bps": 219.50685042413096,
+   "walk_bps": 20.83805
+  },
+  {
+   "symbol": "SQQQUSDT",
+   "notional": 1000.0,
+   "participation": 0.000709098668969084,
+   "sigma_daily_bps": 221.94831518874454,
+   "walk_bps": 0.0
+  },
+  {
+   "symbol": "SQQQUSDT",
+   "notional": 5000.0,
+   "participation": 0.0035454933448454203,
+   "sigma_daily_bps": 221.94831518874454,
+   "walk_bps": 0.5397999999999996
+  },
+  {
+   "symbol": "SQQQUSDT",
+   "notional": 25000.0,
+   "participation": 0.017727466724227103,
+   "sigma_daily_bps": 221.94831518874454,
+   "walk_bps": 5.3302
+  },
+  {
+   "symbol": "SQQQUSDT",
+   "notional": 100000.0,
+   "participation": 0.07090986689690841,
+   "sigma_daily_bps": 221.94831518874454,
+   "walk_bps": 16.5773
+  }
+ ]
+}

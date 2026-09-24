@@ -2,10 +2,12 @@
 
 Every other baseline in this package is a verbatim copy sitting next to a provenance header,
 because `baselines/__init__.py` permits vendoring only when "(1) its licence permits
-redistribution". **Modemola/BITGET_HACK carries no licence at all** — no `LICENSE` file, and the
-GitHub API reports ``license: null`` (checked with ``gh api repos/Modemola/BITGET_HACK --jq
-.license`` while writing this). Under default copyright that means no redistribution right, so
-copying `hedges.py` into this repository is not available to us however convenient it would be.
+redistribution". **Modemola/BITGET_HACK carried no licence** at the commit this reads (0dfb298)
+— no `LICENSE` file, and the GitHub API reported ``license: null`` — so under default copyright
+there was no redistribution right, and copying `hedges.py` was not available to us. The repository
+has since added an MIT licence (``gh api repos/Modemola/BITGET_HACK --jq .license`` answers
+``mit`` on 2026-09-24), which would now permit vendoring; the loader keeps reading the original
+commit from a clone so the numbers already published stay reproducible.
 The route that remains is the one `eval/sentiment_comparison.py` already uses for finBERT: run the
 real published artefact where it lives, and record exactly which bytes ran.
 
