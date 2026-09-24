@@ -287,5 +287,5 @@ def test_the_stress_band_uses_the_frozen_head_to_head_scale() -> None:
     report = _json.loads((Path(__file__).resolve().parents[1] / "data"
                           / "analogstress_comparison.json").read_text(encoding="utf-8"))
     chosen = report["after_absorbing"]["selection"]["chosen"]
-    assert research.STRESS_BLEND_SCALE == pytest.approx(
-        report["predictors"][chosen]["frozen_scale"], abs=1e-4)
+    frozen = report["predictors"][chosen]["frozen_scale"]
+    assert abs(research.STRESS_BLEND_SCALE - frozen) < 1e-4
