@@ -279,3 +279,13 @@ def test_a_decision_is_explained_from_the_notes_the_desk_wrote(
     assert text.count("Grounding check:") == 1
     assert "Entity check: 2 instrument(s) named, 0 unsupported." in text
     assert _how_it_was_reached(1) == []
+
+
+def test_the_stress_band_uses_the_frozen_head_to_head_scale() -> None:
+    import json as _json
+
+    report = _json.loads((Path(__file__).resolve().parents[1] / "data"
+                          / "analogstress_comparison.json").read_text(encoding="utf-8"))
+    chosen = report["after_absorbing"]["selection"]["chosen"]
+    assert research.STRESS_BLEND_SCALE == pytest.approx(
+        report["predictors"][chosen]["frozen_scale"], abs=1e-4)

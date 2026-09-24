@@ -4465,6 +4465,12 @@ def _analogue(symbol: str, data: MarketData) -> tuple[list[str], list[Source], d
     sources = [Source(kind="computation", ref="argus.desk.analogue.find",
                       detail="state = trailing 24h return + realised vol; outcome = next 24h; "
                              "overlapping episodes collapsed")]
+    band = _stress_band(symbol)
+    if band is not None:
+        lines.insert(1 if lines and lines[0].startswith("Actionable") else 0, band)
+        sources.append(Source(kind="computation", ref="argus.eval.analogstress_comparison",
+                              detail="regime-scaled same-name 80% band, scale frozen on "
+                                     "2019-2022"))
     shape = _shape_line(closes, symbol, span)
     if shape is not None:
         lines.insert(1 if lines[0].startswith("Actionable") else 0, shape[0])
@@ -4475,6 +4481,45 @@ def _analogue(symbol: str, data: MarketData) -> tuple[list[str], list[Source], d
     if shape is not None:
         payload["shape"] = shape[1]
     return lines, sources, payload
+
+
+STRESS_HORIZON = 5
+STRESS_BLEND_SCALE = 0.9849
+"""The regime-scaled band's split-conformal multiplier, frozen on 2019-2022 in the head-to-head
+against AnalogDesk (`eval/analogstress_comparison.py`, `data/analogstress_comparison.json`)."""
+
+
+def _stress_band(symbol: str) -> str | None:
+    """The next five sessions' 80% band for ``symbol``: half its own unconditional band, half its
+    current 60-session volatility, centred on its own median five-session move — the predictor
+    that scored best (14.86 Winkler, 82.9% coverage) on AnalogDesk's 2,698-query test, ahead of
+    AnalogDesk's analogue band (15.25) though not significantly. Built from Bitget's daily bars."""
+    import statistics
+
+    from argus.eval.analogstress_comparison import NORMAL_80, quantile
+    from argus.market.history import CandleType, fetch_window
+
+    try:
+        with _FETCH_SLOTS:
+            bars = fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=500),
+                                interval="1D", candle_type=CandleType.MARKET, pause=0.05)
+    except Exception:
+        return None
+    closes = [float(b.close) for b in bars if float(b.close) > 0]
+    h = STRESS_HORIZON
+    moves = [closes[i + h] / closes[i] - 1 for i in range(len(closes) - h)]
+    logs = [math.log(b / a) for a, b in itertools.pairwise(closes[-61:])]
+    if len(moves) < 30 or len(logs) < 20:
+        return None
+    lo, hi = quantile(moves, 0.1), quantile(moves, 0.9)
+    centre = quantile(moves, 0.5)
+    half = 0.5 * (hi - lo) / 2 + 0.5 * NORMAL_80 * statistics.stdev(logs) * math.sqrt(h)
+    half *= STRESS_BLEND_SCALE
+    return (f"Next {h} sessions, 80% band: {centre - half:+.1%} to {centre + half:+.1%} — "
+            f"{_t(symbol)}'s own {len(moves)} past {h}-session moves, widened or narrowed by "
+            f"its current volatility. On AnalogDesk's own 2,698-query test this band scored "
+            f"best of every method tried, AnalogDesk's included, though not by a significant "
+            f"margin.")
 
 
 def _shape_line(closes: list[tuple[datetime, float]], symbol: str,
