@@ -1,0 +1,131 @@
+{
+ "generated_at": "2026-09-24T14:59:04+00:00",
+ "what": "argus.desk.portfolio.tail_contributions against skfolio's own Portfolio.contribution(RiskMeasure.CVAR) and measures.cvar, 20 random books, beta 0.95",
+ "reference": "skfolio measures/_measures.py:602-655 (CVaR), portfolio/_portfolio.py:1032-1082,1575-1603 (finite-difference contribution)",
+ "skfolio_version": "1.3.1",
+ "cases": 20,
+ "max_cvar_difference": 1.0408340855860843e-17,
+ "max_contribution_difference": 2.7517571554724896e-13,
+ "per_case": [
+  {
+   "n": 250,
+   "assets": 2,
+   "cvar_diff": 0.0,
+   "contribution_max_diff": 8.127179484951341e-14
+  },
+  {
+   "n": 719,
+   "assets": 4,
+   "cvar_diff": 0.0,
+   "contribution_max_diff": 1.8925833122906965e-14
+  },
+  {
+   "n": 250,
+   "assets": 3,
+   "cvar_diff": 6.938893903907228e-18,
+   "contribution_max_diff": 1.3359452433192587e-13
+  },
+  {
+   "n": 97,
+   "assets": 4,
+   "cvar_diff": 3.469446951953614e-18,
+   "contribution_max_diff": 8.90294782340817e-14
+  },
+  {
+   "n": 719,
+   "assets": 4,
+   "cvar_diff": 1.0408340855860843e-17,
+   "contribution_max_diff": 1.304650831812637e-13
+  },
+  {
+   "n": 719,
+   "assets": 3,
+   "cvar_diff": 0.0,
+   "contribution_max_diff": 7.222000775186643e-14
+  },
+  {
+   "n": 250,
+   "assets": 4,
+   "cvar_diff": 0.0,
+   "contribution_max_diff": 6.176135991520226e-14
+  },
+  {
+   "n": 719,
+   "assets": 3,
+   "cvar_diff": 0.0,
+   "contribution_max_diff": 1.549385619803445e-13
+  },
+  {
+   "n": 250,
+   "assets": 2,
+   "cvar_diff": 0.0,
+   "contribution_max_diff": 6.355419662762429e-14
+  },
+  {
+   "n": 250,
+   "assets": 4,
+   "cvar_diff": 6.938893903907228e-18,
+   "contribution_max_diff": 6.787279072106855e-14
+  },
+  {
+   "n": 250,
+   "assets": 3,
+   "cvar_diff": 0.0,
+   "contribution_max_diff": 7.554026848488604e-14
+  },
+  {
+   "n": 250,
+   "assets": 3,
+   "cvar_diff": 3.469446951953614e-18,
+   "contribution_max_diff": 1.6649355505382601e-13
+  },
+  {
+   "n": 97,
+   "assets": 4,
+   "cvar_diff": 0.0,
+   "contribution_max_diff": 8.321815458955939e-14
+  },
+  {
+   "n": 250,
+   "assets": 4,
+   "cvar_diff": 0.0,
+   "contribution_max_diff": 2.602813797825121e-13
+  },
+  {
+   "n": 719,
+   "assets": 4,
+   "cvar_diff": 6.938893903907228e-18,
+   "contribution_max_diff": 1.912150993099715e-13
+  },
+  {
+   "n": 97,
+   "assets": 4,
+   "cvar_diff": 3.469446951953614e-18,
+   "contribution_max_diff": 3.396024780832896e-14
+  },
+  {
+   "n": 97,
+   "assets": 2,
+   "cvar_diff": 0.0,
+   "contribution_max_diff": 1.5808188091881448e-13
+  },
+  {
+   "n": 250,
+   "assets": 4,
+   "cvar_diff": 6.938893903907228e-18,
+   "contribution_max_diff": 2.3277560434742384e-13
+  },
+  {
+   "n": 719,
+   "assets": 2,
+   "cvar_diff": 6.938893903907228e-18,
+   "contribution_max_diff": 9.794248745365053e-14
+  },
+  {
+   "n": 719,
+   "assets": 2,
+   "cvar_diff": 6.938893903907228e-18,
+   "contribution_max_diff": 2.7517571554724896e-13
+  }
+ ]
+}

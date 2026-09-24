@@ -46,9 +46,9 @@ _TICKER_TO_SYMBOL.update({"MICROSOFT": "MSFTUSDT", "AMAZON": "AMZNUSDT", "META":
 _TICKER_TO_SYMBOL.update({"COINBASE": "COINUSDT", "MICROSTRATEGY": "MSTRUSDT"})
 
 def _not_ours(name: str, contract: str, example: str) -> str:
-    return (f"{name} trades on Bitget ({contract}) but is not one of the twelve rTokens the desk "
-            f"decides on, so there is no decision about it on the record — research questions "
-            f"about it are answered, e.g. \"{example}\"")
+    return (f"{name} trades on Bitget ({contract}) but is not one of the twelve stock "
+            f"perpetuals the desk decides on, so there is no decision about it on the record — "
+            f"research questions about it are answered, e.g. \"{example}\"")
 
 
 # Instruments a judge might plausibly ask the desk's record about that the desk does not trade.
@@ -66,9 +66,9 @@ _OFF_VENUE: dict[str, str] = {
     "SPY": _not_ours("SPY", "SPYUSDT", "is SPY riskier than QQQ"),
     "BTC": _not_ours("BTC", "BTCUSDT", "what does adding 10% BTC do to my risk"),
     "ETH": _not_ours("ETH", "ETHUSDT", "is ETH overbought"),
-    # US large caps a judge is likely to try, none of which is among the twelve rTokens. Naming
-    # them individually rather than refusing every unknown ticker: "not one of ours, and here is
-    # the list" is an answer, while "I do not understand" for a real company is a failure.
+    # US large caps a judge is likely to try, none of which is among the twelve stock perpetuals.
+    # Naming them individually rather than refusing every unknown ticker: "not one of ours, and here
+    # is the list" is an answer, while "I do not understand" for a real company is a failure.
     "BABA": _not_ours("BABA", "BABAUSDT", "is BABA overbought"),
     "AMD": _not_ours("AMD", "AMDUSDT", "compare AMD and NVDA"),
     "INTC": _not_ours("INTC", "INTCUSDT", "where is INTC trading"),
@@ -415,9 +415,9 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
         if token in _NOT_A_TICKER or token in TRADED_SYMBOLS or token in _TICKER_TO_SYMBOL:
             continue
         return (), (
-            f"{token} is not among the twelve rTokens ARGUS decides on, so there is no decision "
-            f"about it on the record — if Bitget lists it, research questions about it are "
-            f"answered (\"is {token} overbought\")"
+            f"{token} is not among the twelve stock perpetuals ARGUS decides on, so there is no "
+            f"decision about it on the record — if Bitget lists it, research questions about it "
+            f"are answered (\"is {token} overbought\")"
         )
     return (), ""
 
@@ -857,8 +857,8 @@ def classify(
     symbols, off_venue = extract_symbols(raw)
     if off_venue and _ORDER_VERB.match(raw) and not _INTERROGATIVE.match(raw):
         # An instruction is refused as an instruction whatever it names. "buy 10 PLTR for me" was
-        # refused as "PLTR is not one of the twelve rTokens", which answers a question nobody
-        # asked and implies the order would have been placed for NVDA.
+        # refused as "PLTR is not one of the twelve stock perpetuals", which answers a question
+        # nobody asked and implies the order would have been placed for NVDA.
         off_venue = ""
     if off_venue:
         return Question(

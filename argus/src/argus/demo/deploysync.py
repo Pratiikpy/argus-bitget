@@ -75,6 +75,11 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "sentiment_comparison.json",
     # Read by event questions: how each name reacted to CPI, Fed decisions and its earnings.
     "event_reactions.json",
+    # Read by add-to-book questions: the post-trade beta's measured record against weekend-copilot.
+    "copilot_rivals.json",
+    "copilot_stress.json",
+    # Read by execution questions: one-minute against hourly children on a full-depth replay.
+    "execution_arena.json",
 )
 """Artefacts the hosted console's own pages read at request time.
 

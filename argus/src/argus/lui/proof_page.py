@@ -114,6 +114,15 @@ IN_THE_CONSOLE: dict[str, tuple[str, str]] = {
     "Perception layer: what the desk can see": ("/status", ""),
     "Analogue stress bands vs. AnalogDesk (S2) on its own pre-registered test":
         ("has NVDA been here before", ""),
+    "Portfolio copilot: post-trade beta and co-movement vs. weekend-copilot (S2)":
+        ("I hold 60% NVDA and 40% AAPL, should I add 20% TSLA?", ""),
+    "Portfolio stress: the book's move when QQQ falls, vs. skfolio's vine copula and "
+    "Entropy Pooling":
+        ("I hold 60% NVDA and 40% AAPL, should I add 20% TSLA?", ""),
+    "Order splitting on realised cost vs. Bitget's own TWAP, on a full-depth replay":
+        ("how should I split a $100k order in NVDA", ""),
+    "Overnight hedge for an rToken holder vs. Ballast (S2)":
+        ("I hold RNVDAUSDT, how do I protect it over the weekend?", ""),
 }
 """Capability name -> (question, saved book) whose console answer shows the capability. A value
 starting with "/" is a page of the console rather than a question."""

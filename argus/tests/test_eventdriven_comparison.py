@@ -29,7 +29,9 @@ def base_case() -> dict:
 
 @pytest.fixture(scope="module")
 def sweep() -> dict:
-    return run_false_positive_sweep(n_seeds=12, n_events=120)
+    # 40 draws, not 12: on 2026-09-24 twelve draws tied the two rates at 2 of 12 each, which says
+    # nothing about which test over-rejects; forty separated them (10% against 17.5%).
+    return run_false_positive_sweep(n_seeds=40, n_events=120)
 
 
 @pytest.fixture(scope="module")
@@ -95,17 +97,17 @@ class TestFalsePositiveSweep:
 
     def test_argus_full_agreement_rate_is_low(self, sweep: dict) -> None:
         """ARGUS requires all four clustering-adjusted tests to agree before claiming EFFECT
-        ESTABLISHED — on placebo data with no real BTC-adjusted signal, that bar should rarely
-        clear."""
+        ESTABLISHED — on placebo data it clears that bar less often than whale-signals' fixed-null
+        test calls a draw significant (it is not below the nominal 5%; see the module docstring)."""
         assert sweep["argus_full_agreement_rate"] < sweep["whale_signals_false_positive_rate"]
 
     def test_the_sweep_ran_the_requested_number_of_draws(self, sweep: dict) -> None:
-        assert sweep["n_seeds"] == 12
+        assert sweep["n_seeds"] == 40
         assert (
             sweep["argus_effect_established"]
             + sweep["argus_partial"]
             + sweep["argus_no_effect"]
-            == 12
+            == 40
         )
 
 

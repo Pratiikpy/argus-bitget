@@ -8,10 +8,10 @@ that produced them.
 
 | | |
 |---|---|
-| Source | **317 source files**, 21 packages, 127,309 lines (measured 2026-09-24) |
-| Registered and importable at runtime | **142/142** (`python -m argus.status`) |
+| Source | **325 source files**, 21 packages, 130,154 lines (measured 2026-09-24) |
+| Registered and importable at runtime | **150/150** (`python -m argus.status`) |
 | Tests | **224 files, 6,700 tests collected**; a fresh GitHub clone of the earlier 6,542-test tree ran 6,457 passed, 85 skipped, 0 failed |
-| Static analysis | `ruff` clean; `mypy --strict` clean on 317 source files |
+| Static analysis | `ruff` clean; `mypy --strict` clean on 325 source files |
 | Artefacts | **162** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
 | External systems torn down at code level | **56 code-level teardowns** under `research/architecture/`, each citing `file:line` |
 | Runtime dependencies | **two** — `pydantic`, `python-dateutil` |
@@ -167,7 +167,7 @@ window it was built to be watched during. `horizon_coverage()` measures exactly 
 **0 resolving inside the window, 0 still pending when it opens**; the cadence fixes it, and a test
 pins the failure shape so it cannot return unnoticed.
 
-**Live:** 236 claims across the twelve rTokens (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — the head at the moment of that anchoring, so that proof covers the first 36 claims and not the 120 registered since; each scheduled cycle appends and re-anchors, and 38 of the 60 proofs carry a Bitcoin block-header attestation (`python -m argus.register.anchorcheck`). Anchored to
+**Live:** 246 claims across the twelve stock perpetuals (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — the head at the moment of that anchoring, so that proof covers the first 36 claims and not the 120 registered since; each scheduled cycle appends and re-anchors, and 38 of the 60 proofs carry a Bitcoin block-header attestation (`python -m argus.register.anchorcheck`). Anchored to
 `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The resolver runs on
 every scheduled cycle.
@@ -369,7 +369,7 @@ otherwise.
 
 What *is* being closed meanwhile: `eval/bookcalib.py` appends a real order-book snapshot per
 instrument on every cycle, so the simulator's parameters stop being ours. The first tape already
-disagreed with them sharply — a near-touch rToken level holds a **median 1.95 contracts** and moves
+disagreed with them sharply — a near-touch stock-perpetual level holds a **median 1.95 contracts** and moves
 a **median 70% of itself per minute**, nothing like the large, slow levels the experiment assumed.
 
 ---
@@ -397,8 +397,8 @@ The largest package in the system, deliberately.
 
 **The capability ladder** is enforced in code: LOST → TIED → IMPLEMENTED → OWNED, with OWNED requiring
 thirteen conditions including a reproduced baseline, same-input comparison, out-of-sample test,
-ablation and adversarial test. Live: **20 of 34 capabilities are OWNED**, 4 TIED, 10 IMPLEMENTED,
-0 LOST (`data/standing.json`, re-derived by `python -m argus.eval.standing` from the artefacts).
+ablation and adversarial test. Live (`data/standing.json`): **20 of 38 capabilities are OWNED**,
+8 TIED, 10 IMPLEMENTED, 0 LOST — re-derived by `python -m argus.eval.standing` from the artefacts.
 
 ---
 

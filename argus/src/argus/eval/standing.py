@@ -5581,6 +5581,193 @@ REGISTER: tuple[Capability, ...] = (
             "Brier is not scored: ARGUS's engines do not return intraday excursions",
         ),
     ),
+    Capability(
+        name="Portfolio copilot: post-trade beta and co-movement vs. weekend-copilot (S2)",
+        subtheme="t3-portfolio",
+        module="argus/desk/portfolio.py,argus/eval/copilot_rivals.py",
+        state=State.TIED,
+        baseline=(
+            "PhiBao/weekend-copilot @461ad820 (MIT) — the S2 entry that answers this sub-theme's "
+            "exact question on Bitget rTokens — its risk engine ported line for line and run on "
+            "its own native snapshot; 1,800 books over nine monthly origins"
+        ),
+        proofs=(
+            Proof("best_implementation_studied",
+                  "weekend-copilot's delta.ts, stats.ts, stress.ts, hedge.ts and critic.ts read "
+                  "at source; chosen by the rival review of 2026-09-24 as the S2 entry to beat "
+                  "on this sub-theme", artefact="data/copilot_rivals.json"),
+            Proof("baseline_reproduced",
+                  "the port reproduces the beta before, beta after and max correlation its own "
+                  "engine printed for all three of its preset books (max difference 7e-18)",
+                  artefact="data/copilot_rivals.json"),
+            Proof("same_input_comparison",
+                  "both answer the same 1,800 books and proposed adds at the same origins; both "
+                  "are scored on Bitget daily, native daily and open-session hourly targets",
+                  artefact="data/copilot_rivals.json"),
+            Proof("statistically_valid_evaluation",
+                  "exact Wilcoxon signed-rank over per-origin mean errors; books inside one "
+                  "origin share a market path and are averaged before testing",
+                  artefact="data/copilot_rivals.json"),
+            Proof("out_of_sample_test",
+                  "every prediction uses data before its origin; every target is the 28 days "
+                  "after it", artefact="data/copilot_rivals.json"),
+            Proof("failure_cases_documented",
+                  "not significantly better than beta = 1.0; open-session beta no better than "
+                  "blended at forecasting", artefact="data/copilot_rivals.json"),
+            Proof("reproducibility_proven",
+                  "hash-pinned Bitget snapshot, hash-recorded rival data, fixed seed and "
+                  "pre-registered spec hash", artefact="data/copilot_rivals.json"),
+            Proof("implementation_complete",
+                  "the console's own copilot() produced every ARGUS figure",
+                  artefact="data/copilot_rivals.json"),
+        ),
+        blockers=(
+            "TIED on the pre-registered primary: ARGUS's post-trade beta misses the realised "
+            "Bitget daily beta by 0.241 on average against 0.360 for weekend-copilot's method "
+            "on the same benchmark, better on 7 of 9 origins, but p = 0.098 — not significant. "
+            "Against weekend-copilot as it ships (beta against SPY) ARGUS wins significantly "
+            "(0.241 against 0.554, 8 of 9 origins, p = 0.012), and it names the holding the new "
+            "position will move with most 42% of the time against 35% (chance 26%). Two losses "
+            "are published with it: ARGUS does not beat calling every beta 1.0 significantly "
+            "(0.241 against 0.298, p = 0.20), and its open-session beta forecasts no better than "
+            "its blended one. Factor attribution and the conversational copilot are not yet "
+            "compared (rival review of 2026-09-24: skfolio with toraniko factors, Wealthfolio); "
+            "stress and hedge are the two rows below",
+        ),
+    ),
+    Capability(
+        name="Portfolio stress: the book's move when QQQ falls, vs. skfolio's vine copula and "
+             "Entropy Pooling",
+        subtheme="t3-portfolio",
+        module=("argus/desk/portfolio.py,argus/eval/copilot_stress.py,"
+                "argus/eval/baselines/skfolio_stress.py"),
+        state=State.TIED,
+        baseline=(
+            "skfolio/skfolio 1.3.1 (BSD-3) VineCopula conditional sampling and EntropyPooling, "
+            "run unmodified in their own interpreter on the same Bitget daily history"
+        ),
+        proofs=(
+            Proof("best_implementation_studied",
+                  "skfolio's _vine_copula.py:518-595 and _entropy_pooling.py:436-590 read at "
+                  "source; named by the rival review of 2026-09-24 as the method rival for "
+                  "conditional stress", artefact="data/copilot_stress.json"),
+            Proof("best_method_studied",
+                  "regular-vine conditional sampling (Dissmann et al. 2013) and Entropy Pooling "
+                  "(Meucci 2008), the two conditional-scenario methods skfolio ships",
+                  artefact="data/copilot_stress.json"),
+            Proof("same_input_comparison",
+                  "every arm gets the same realised QQQUSDT move and the same traded-day history "
+                  "on 39 days with QQQUSDT down 1% or more, 200 books each",
+                  artefact="data/copilot_stress.json"),
+            Proof("statistically_valid_evaluation",
+                  "Wilcoxon signed-rank over per-day mean errors; a day a system cannot answer "
+                  "is dropped from that pair only", artefact="data/copilot_stress.json"),
+            Proof("out_of_sample_test",
+                  "every fit uses only days before the scored day",
+                  artefact="data/copilot_stress.json"),
+            Proof("failure_cases_documented",
+                  "stale weekend closes broke the first run and are removed for every arm; "
+                  "Entropy Pooling cannot answer a shock beyond its history",
+                  artefact="data/copilot_stress.json"),
+            Proof("reproducibility_proven",
+                  "hash-pinned Bitget snapshot, seeded vine, pre-registered spec hash",
+                  artefact="data/copilot_stress.json"),
+            Proof("implementation_complete",
+                  "the console's own stress_by_beta produced every ARGUS figure",
+                  artefact="data/copilot_stress.json"),
+        ),
+        blockers=(
+            "TIED on the pre-registered primary: ARGUS's beta stress misses the book's realised "
+            "move by 0.92 percentage points on average against 1.00 for skfolio's vine and 0.98 "
+            "for Entropy Pooling, better on 25 of 39 days, p = 0.095 — not significant. LOST on "
+            "the tail: ARGUS states a point and no downside, so skfolio's vine wins the 10% "
+            "quantile (pinball 0.23 against 0.43 for ARGUS's point). A residual band added after "
+            "that run (not pre-registered) scores 0.24, still behind the vine, and breaches "
+            "15.5% of the time against a 10% target. Entropy Pooling could not answer the one "
+            "shock larger than anything in its history (2026-06-05). Absorbed from skfolio the "
+            "same day: each position's share of the book's CVaR (historical, 95%), now in every "
+            "add-to-book answer beside its share of variance, matching skfolio's own "
+            "contribution(CVaR) to 3e-13 on 20 books (data/tail_contribution_oracle.json)",
+        ),
+    ),
+    Capability(
+        name="Order splitting on realised cost vs. Bitget's own TWAP, on a full-depth replay",
+        subtheme="t3-execassist",
+        module="argus/lui/research.py,argus/eval/execution_arena.py",
+        state=State.TIED,
+        baseline=(
+            "Bitget's native TWAP (equal market slices at a 60-second interval, its published "
+            "spec), the even eight-slice TWAP every execution tool ships, and trading at once — "
+            "replayed on Tardis's full-depth Bitget NVDAUSDT book for 2026-08-01"
+        ),
+        proofs=(
+            Proof("same_input_comparison",
+                  "every arm walks the same rebuilt book at the same instants; 80 parents per "
+                  "size, buy and sell, $5k to $250k", artefact="data/execution_arena.json"),
+            Proof("costs_included", "Bitget's 0.06% taker fee on every child",
+                  artefact="data/execution_arena.json"),
+            Proof("reproducibility_proven",
+                  "deterministic replay of a hash-recorded event file",
+                  artefact="data/execution_arena.json"),
+            Proof("failure_cases_documented",
+                  "the console's hourly schedule lost to Bitget's TWAP on every parent",
+                  artefact="data/execution_arena.json"),
+        ),
+        blockers=(
+            "LOST first, then TIED. The schedule the console printed — Almgren-Chriss in hourly "
+            "children — cost 12.2bps with fees on a $100k parent against 6.9bps for Bitget's own "
+            "60-second TWAP, dearer on all 80 parents: on this book the cadence, not the shape, "
+            "decides the cost. The same trajectory cut into one-minute children costs 6.9bps, a "
+            "hundredth of a point from Bitget's TWAP (dearer on 54 of 80 parents), while its "
+            "shortfall spreads 6% less (9.0 against 9.6bps standard deviation) — the trade-off "
+            "Almgren-Chriss exists to make. The console now tells the trader to send one-minute "
+            "children. One Saturday of one perpetual, taker children only, no impact beyond the "
+            "visible book: the forward tape (market/ws_tape.py) and passive arms come next",
+        ),
+    ),
+    Capability(
+        name="Overnight hedge for an rToken holder vs. Ballast (S2)",
+        subtheme="t3-portfolio",
+        module=("argus/market/rtoken_spot.py,argus/desk/rtoken_hedge.py,"
+                "argus/eval/copilot_hedge.py"),
+        state=State.TIED,
+        baseline=(
+            "Ritapossible/Ballast @5cf6759 (MIT) — an S2 entry — run unmodified; its README "
+            "figures reproduced (held-out R2 0.981 -> 0.997, tail cut 86.5% -> 95.1%, 12/12)"
+        ),
+        proofs=(
+            Proof("best_implementation_studied",
+                  "Ballast's universe.py, overnight.py, stats.py, costs.py, "
+                  "research/hedge_study.py and oos.py read at source",
+                  artefact="data/copilot_hedge.json"),
+            Proof("baseline_reproduced",
+                  "hedge_study.py and oos.py run unmodified; every README figure checked matched",
+                  artefact="data/copilot_hedge.json"),
+            Proof("same_input_comparison",
+                  "both scored on Ballast's own per-night series, 11 names, its 70/30 split",
+                  artefact="data/copilot_hedge.json"),
+            Proof("out_of_sample_test",
+                  "ratios fitted on the first 70% of nights, never refitted",
+                  artefact="data/copilot_hedge.json"),
+            Proof("failure_cases_documented",
+                  "the first run was a clean loss (index hedge 10.1% against 99.7%), published "
+                  "before the rebuild", artefact="data/copilot_hedge.json"),
+            Proof("implementation_complete",
+                  "the console's own overnight_hedge produced ARGUS's figures",
+                  artefact="data/copilot_hedge.json"),
+        ),
+        blockers=(
+            "TIED, and parity is the ceiling: ARGUS's console and Ballast fit the same slope, so "
+            "on Ballast's held-out nights both remove 99.7% of an rToken holder's overnight "
+            "variance (median of 11 names, largest per-name gap 0.0). The first run of this "
+            "comparison, the same day, was a clean LOSS and is kept on the record: ARGUS modelled "
+            "Bitget's stock perpetuals and not the spot rTokens, so the best hedge it could offer "
+            "an RTSLAUSDT holder was its QQQUSDT index leg, which removed 10.1% and lost on all 11 "
+            "names (p = 0.001). market/rtoken_spot.py (Ballast's pairing rule, calendar and "
+            "overnight return, MIT, reproducing its nights to 0.0) and desk/rtoken_hedge.py were "
+            "built from that loss",
+        ),
+    ),
 )
 
 

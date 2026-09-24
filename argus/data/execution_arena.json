@@ -1,0 +1,793 @@
+{
+ "generated_at": "2026-09-24T15:11:57+00:00",
+ "referee": {
+  "source": "Tardis bitget-futures incremental_book_L2, NVDAUSDT, 2026-08-01 (a Saturday), hftbacktest event format",
+  "events": 1610198,
+  "snapshots": 1439,
+  "npz_sha256": "2fc827bbe8a15048f4b054104cc30cb35c8968012130d871a16255553ac7d549",
+  "depletion": "a child's take stays out of a level until the venue re-reports it",
+  "fee_bps_per_side": 6.0
+ },
+ "design": {
+  "sizes_usdt": [
+   5000.0,
+   25000.0,
+   100000.0,
+   250000.0
+  ],
+  "horizon_minutes": 240,
+  "parent_every_minutes": 30,
+  "children": 8,
+  "ac_decay": 1.0,
+  "primary": "cost_bps (children vs mid at send, + fees)"
+ },
+ "by_size": {
+  "5,000": {
+   "parents": 80,
+   "cost_bps": {
+    "immediate": 9.355,
+    "twap_8": 6.972,
+    "bitget_twap_60s": 6.284,
+    "argus_ac": 7.598,
+    "argus_ac_60s": 6.284
+   },
+   "shortfall_bps": {
+    "immediate": 9.355,
+    "twap_8": 6.972,
+    "bitget_twap_60s": 6.284,
+    "argus_ac": 7.598,
+    "argus_ac_60s": 6.284
+   },
+   "shortfall_std_bps": {
+    "immediate": 0.966,
+    "twap_8": 8.664,
+    "bitget_twap_60s": 9.558,
+    "argus_ac": 7.146,
+    "argus_ac_60s": 8.988
+   },
+   "cost_comparisons": {
+    "argus_ac vs immediate": {
+     "mean_difference_bps": -1.757,
+     "parents_cheaper": 79,
+     "parents_dearer": 1,
+     "sign_test_p": 0.0
+    },
+    "argus_ac vs twap_8": {
+     "mean_difference_bps": 0.626,
+     "parents_cheaper": 0,
+     "parents_dearer": 80,
+     "sign_test_p": 0.0
+    },
+    "argus_ac vs bitget_twap_60s": {
+     "mean_difference_bps": 1.314,
+     "parents_cheaper": 0,
+     "parents_dearer": 80,
+     "sign_test_p": 0.0
+    },
+    "argus_ac_60s vs immediate": {
+     "mean_difference_bps": -3.072,
+     "parents_cheaper": 80,
+     "parents_dearer": 0,
+     "sign_test_p": 0.0
+    },
+    "argus_ac_60s vs twap_8": {
+     "mean_difference_bps": -0.689,
+     "parents_cheaper": 80,
+     "parents_dearer": 0,
+     "sign_test_p": 0.0
+    },
+    "argus_ac_60s vs bitget_twap_60s": {
+     "mean_difference_bps": -0.001,
+     "parents_cheaper": 43,
+     "parents_dearer": 37,
+     "sign_test_p": 0.57643
+    }
+   }
+  },
+  "25,000": {
+   "parents": 80,
+   "cost_bps": {
+    "immediate": 12.266,
+    "twap_8": 8.625,
+    "bitget_twap_60s": 6.391,
+    "argus_ac": 9.566,
+    "argus_ac_60s": 6.395
+   },
+   "shortfall_bps": {
+    "immediate": 12.266,
+    "twap_8": 8.625,
+    "bitget_twap_60s": 6.391,
+    "argus_ac": 9.565,
+    "argus_ac_60s": 6.395
+   },
+   "shortfall_std_bps": {
+    "immediate": 1.639,
+    "twap_8": 8.736,
+    "bitget_twap_60s": 9.572,
+    "argus_ac": 7.322,
+    "argus_ac_60s": 9.001
+   },
+   "cost_comparisons": {
+    "argus_ac vs immediate": {
+     "mean_difference_bps": -2.7,
+     "parents_cheaper": 76,
+     "parents_dearer": 4,
+     "sign_test_p": 0.0
+    },
+    "argus_ac vs twap_8": {
+     "mean_difference_bps": 0.94,
+     "parents_cheaper": 1,
+     "parents_dearer": 79,
+     "sign_test_p": 0.0
+    },
+    "argus_ac vs bitget_twap_60s": {
+     "mean_difference_bps": 3.174,
+     "parents_cheaper": 0,
+     "parents_dearer": 80,
+     "sign_test_p": 0.0
+    },
+    "argus_ac_60s vs immediate": {
+     "mean_difference_bps": -5.871,
+     "parents_cheaper": 80,
+     "parents_dearer": 0,
+     "sign_test_p": 0.0
+    },
+    "argus_ac_60s vs twap_8": {
+     "mean_difference_bps": -2.231,
+     "parents_cheaper": 80,
+     "parents_dearer": 0,
+     "sign_test_p": 0.0
+    },
+    "argus_ac_60s vs bitget_twap_60s": {
+     "mean_difference_bps": 0.003,
+     "parents_cheaper": 32,
+     "parents_dearer": 48,
+     "sign_test_p": 0.09291
+    }
+   }
+  },
+  "100,000": {
+   "parents": 80,
+   "cost_bps": {
+    "immediate": 19.565,
+    "twap_8": 10.519,
+    "bitget_twap_60s": 6.916,
+    "argus_ac": 12.15,
+    "argus_ac_60s": 6.929
+   },
+   "shortfall_bps": {
+    "immediate": 19.565,
+    "twap_8": 10.518,
+    "bitget_twap_60s": 6.916,
+    "argus_ac": 12.149,
+    "argus_ac_60s": 6.929
+   },
+   "shortfall_std_bps": {
+    "immediate": 4.52,
+    "twap_8": 8.829,
+    "bitget_twap_60s": 9.611,
+    "argus_ac": 7.205,
+    "argus_ac_60s": 9.036
+   },
+   "cost_comparisons": {
+    "argus_ac vs immediate": {
+     "mean_difference_bps": -7.415,
+     "parents_cheaper": 75,
+     "parents_dearer": 5,
+     "sign_test_p": 0.0
+    },
+    "argus_ac vs twap_8": {
+     "mean_difference_bps": 1.63,
+     "parents_cheaper": 1,
+     "parents_dearer": 79,
+     "sign_test_p": 0.0
+    },
+    "argus_ac vs bitget_twap_60s": {
+     "mean_difference_bps": 5.234,
+     "parents_cheaper": 0,
+     "parents_dearer": 80,
+     "sign_test_p": 0.0
+    },
+    "argus_ac_60s vs immediate": {
+     "mean_difference_bps": -12.636,
+     "parents_cheaper": 79,
+     "parents_dearer": 1,
+     "sign_test_p": 0.0
+    },
+    "argus_ac_60s vs twap_8": {
+     "mean_difference_bps": -3.591,
+     "parents_cheaper": 80,
+     "parents_dearer": 0,
+     "sign_test_p": 0.0
+    },
+    "argus_ac_60s vs bitget_twap_60s": {
+     "mean_difference_bps": 0.013,
+     "parents_cheaper": 26,
+     "parents_dearer": 54,
+     "sign_test_p": 0.00232
+    }
+   }
+  },
+  "250,000": {
+   "parents": 80,
+   "cost_bps": {
+    "immediate": 26.537,
+    "twap_8": 12.73,
+    "bitget_twap_60s": 7.662,
+    "argus_ac": 16.33,
+    "argus_ac_60s": 7.68
+   },
+   "shortfall_bps": {
+    "immediate": 26.537,
+    "twap_8": 12.729,
+    "bitget_twap_60s": 7.662,
+    "argus_ac": 16.329,
+    "argus_ac_60s": 7.68
+   },
+   "shortfall_std_bps": {
+    "immediate": 8.955,
+    "twap_8": 8.599,
+    "bitget_twap_60s": 9.623,
+    "argus_ac": 6.736,
+    "argus_ac_60s": 9.051
+   },
+   "cost_comparisons": {
+    "argus_ac vs immediate": {
+     "mean_difference_bps": -10.207,
+     "parents_cheaper": 75,
+     "parents_dearer": 5,
+     "sign_test_p": 0.0
+    },
+    "argus_ac vs twap_8": {
+     "mean_difference_bps": 3.6,
+     "parents_cheaper": 1,
+     "parents_dearer": 79,
+     "sign_test_p": 0.0
+    },
+    "argus_ac vs bitget_twap_60s": {
+     "mean_difference_bps": 8.668,
+     "parents_cheaper": 0,
+     "parents_dearer": 80,
+     "sign_test_p": 0.0
+    },
+    "argus_ac_60s vs immediate": {
+     "mean_difference_bps": -18.857,
+     "parents_cheaper": 79,
+     "parents_dearer": 1,
+     "sign_test_p": 0.0
+    },
+    "argus_ac_60s vs twap_8": {
+     "mean_difference_bps": -5.05,
+     "parents_cheaper": 80,
+     "parents_dearer": 0,
+     "sign_test_p": 0.0
+    },
+    "argus_ac_60s vs bitget_twap_60s": {
+     "mean_difference_bps": 0.018,
+     "parents_cheaper": 26,
+     "parents_dearer": 54,
+     "sign_test_p": 0.00232
+    }
+   }
+  }
+ },
+ "limitations": [
+  "one day, one symbol, a Saturday: weekend liquidity only",
+  "impact beyond the visible book is not modelled; other traders do not react",
+  "taker children only: no passive or maker arm is scored in this version"
+ ],
+ "rows_sample": [
+  {
+   "start": "2026-08-01T00:01+00:00",
+   "side": "BUY",
+   "size": 5000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 8.763834405676937,
+     "shortfall_bps": 8.763834405676937,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 7.081060955106139,
+     "shortfall_bps": 13.725188151358747,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 6.279639374317025,
+     "shortfall_bps": 13.348304140129423,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 7.430397083616466,
+     "shortfall_bps": 13.969820562539404,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 6.280905138505529,
+     "shortfall_bps": 12.719373035266452,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:01+00:00",
+   "side": "BUY",
+   "size": 25000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 12.036010600233844,
+     "shortfall_bps": 12.036010600233844,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 8.696737813398679,
+     "shortfall_bps": 15.341853094267544,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 6.3962676358216894,
+     "shortfall_bps": 13.465010994964207,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 9.174248146139416,
+     "shortfall_bps": 15.714889832921548,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 6.398247747967359,
+     "shortfall_bps": 12.836802202119511,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:01+00:00",
+   "side": "BUY",
+   "size": 100000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 21.15858365721725,
+     "shortfall_bps": 21.15858365721725,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 10.433972479064963,
+     "shortfall_bps": 17.080173601136234,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 6.922091478029725,
+     "shortfall_bps": 13.991226924641996,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 11.788036656560408,
+     "shortfall_bps": 18.330582988693713,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 6.929726906474228,
+     "shortfall_bps": 13.368668149614662,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:01+00:00",
+   "side": "BUY",
+   "size": 250000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 25.92579480284868,
+     "shortfall_bps": 25.92579480284868,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 12.787446027653278,
+     "shortfall_bps": 19.43528345028951,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 7.601416945727017,
+     "shortfall_bps": 14.671056786323321,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 15.709816963581991,
+     "shortfall_bps": 22.255178789895968,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 7.603860070137898,
+     "shortfall_bps": 14.04327500431091,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:01+00:00",
+   "side": "SELL",
+   "size": 5000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 9.550370572171019,
+     "shortfall_bps": 9.550370572171019,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 6.816423889071531,
+     "shortfall_bps": 0.17359899121946842,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 6.27362149256841,
+     "shortfall_bps": -0.7946755943784067,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 7.369803120178444,
+     "shortfall_bps": 0.8322470637414927,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 6.274112028828795,
+     "shortfall_bps": -0.16402142120469243,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:01+00:00",
+   "side": "SELL",
+   "size": 25000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 15.354070054110318,
+     "shortfall_bps": 15.354070054110318,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 8.779095827277496,
+     "shortfall_bps": 2.1375817886427537,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 6.347940829406243,
+     "shortfall_bps": -0.7202779189941131,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 9.94724929645568,
+     "shortfall_bps": 3.4116782708072044,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 6.3481673955605515,
+     "shortfall_bps": -0.08988659575059188,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:01+00:00",
+   "side": "SELL",
+   "size": 100000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 27.19077218748994,
+     "shortfall_bps": 27.19077218748994,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 10.82851374088692,
+     "shortfall_bps": 4.1887999419139526,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 6.8242912655971,
+     "shortfall_bps": -0.24357952889079382,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 13.562525822477589,
+     "shortfall_bps": 7.030389744850774,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 6.8221656867993765,
+     "shortfall_bps": 0.3844631503926106,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:01+00:00",
+   "side": "SELL",
+   "size": 250000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 33.33314409549507,
+     "shortfall_bps": 33.33314409549507,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 13.618427432589517,
+     "shortfall_bps": 6.9807304873014875,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 7.545398118236651,
+     "shortfall_bps": 0.4780246124785421,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 20.44446786511235,
+     "shortfall_bps": 13.91821809948184,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 7.54353934270337,
+     "shortfall_bps": 1.106311208141264,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:31+00:00",
+   "side": "BUY",
+   "size": 5000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 9.500856048764794,
+     "shortfall_bps": 9.500856048764794,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 7.039663199421984,
+     "shortfall_bps": 13.243910309313595,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 6.272599506084983,
+     "shortfall_bps": 12.72255200852505,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 7.8052164250480205,
+     "shortfall_bps": 11.20955042052792,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 6.2701134340271745,
+     "shortfall_bps": 11.971653201544724,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:31+00:00",
+   "side": "BUY",
+   "size": 25000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 13.612206690361024,
+     "shortfall_bps": 13.612206690361024,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 8.715365052439672,
+     "shortfall_bps": 14.920605747986247,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 6.404944591309806,
+     "shortfall_bps": 12.854964667348163,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 9.750946230985921,
+     "shortfall_bps": 13.15578018466473,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 6.400734440803027,
+     "shortfall_bps": 12.102351060164102,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:31+00:00",
+   "side": "BUY",
+   "size": 100000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 18.874754980961242,
+     "shortfall_bps": 18.874754980961242,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 10.388794470651563,
+     "shortfall_bps": 16.594995343127785,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 6.944564045750949,
+     "shortfall_bps": 13.394921004904738,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 12.791169809081985,
+     "shortfall_bps": 16.19699643355404,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 6.947416367472983,
+     "shortfall_bps": 12.649361715677104,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:31+00:00",
+   "side": "BUY",
+   "size": 250000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 22.188230083403184,
+     "shortfall_bps": 22.188230083403184,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 12.72227954027535,
+     "shortfall_bps": 18.929973860141974,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 7.6405017470407754,
+     "shortfall_bps": 14.091337923396337,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 16.09019157871129,
+     "shortfall_bps": 19.497309074006285,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 7.650076768793147,
+     "shortfall_bps": 13.352474068115995,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:31+00:00",
+   "side": "SELL",
+   "size": 5000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 9.46194151158747,
+     "shortfall_bps": 9.46194151158747,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 6.870985319761446,
+     "shortfall_bps": 0.6679872492070826,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 6.270452605444638,
+     "shortfall_bps": -0.17917177195947342,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 7.711997504683353,
+     "shortfall_bps": 4.309064191538978,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 6.268553004830193,
+     "shortfall_bps": 0.5672993340424828,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:31+00:00",
+   "side": "SELL",
+   "size": 25000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 11.93134365179818,
+     "shortfall_bps": 11.93134365179818,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 8.8782620231408,
+     "shortfall_bps": 2.676517302921211,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 6.3466852227692305,
+     "shortfall_bps": -0.1028564010615991,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 9.83732123513766,
+     "shortfall_bps": 6.435148243029508,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 6.354671061229568,
+     "shortfall_bps": 0.653514193018351,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:31+00:00",
+   "side": "SELL",
+   "size": 100000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 20.955215410654176,
+     "shortfall_bps": 20.955215410654176,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 10.563698962222993,
+     "shortfall_bps": 4.363198337639436,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 6.8338077256065715,
+     "shortfall_bps": 0.3846005489104414,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 12.23447118081617,
+     "shortfall_bps": 8.833366280099533,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 6.841445158230125,
+     "shortfall_bps": 1.1406199877674448,
+     "children": 240
+    }
+   }
+  },
+  {
+   "start": "2026-08-01T00:31+00:00",
+   "side": "SELL",
+   "size": 250000.0,
+   "arms": {
+    "immediate": {
+     "cost_bps": 33.69890338681178,
+     "shortfall_bps": 33.69890338681178,
+     "children": 1
+    },
+    "twap_8": {
+     "cost_bps": 13.190795931898123,
+     "shortfall_bps": 6.991927403904933,
+     "children": 8
+    },
+    "bitget_twap_60s": {
+     "cost_bps": 7.557511406694226,
+     "shortfall_bps": 1.1087471951215777,
+     "children": 240
+    },
+    "argus_ac": {
+     "cost_bps": 18.94139334183512,
+     "shortfall_bps": 15.542714516253646,
+     "children": 4
+    },
+    "argus_ac_60s": {
+     "cost_bps": 7.554304180871453,
+     "shortfall_bps": 1.8538824491447157,
+     "children": 240
+    }
+   }
+  }
+ ]
+}

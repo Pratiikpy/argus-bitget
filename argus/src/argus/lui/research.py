@@ -220,6 +220,10 @@ class ResearchRequest:
     """Fraction of the book's value held as cash or stablecoins. It carries no risk and is not a
     position, so it dilutes every risk figure rather than being scaled away."""
 
+    spot: str | None = None
+    """The spot rToken held (``RTSLAUSDT``) when the question is about owning the token rather than
+    trading the perpetual. Its hedge is a different answer: the same company's perpetual."""
+
     def as_dict(self) -> dict[str, Any]:
         return {
             "kind": str(self.kind),
@@ -237,6 +241,7 @@ class ResearchRequest:
             "cash": self.cash,
             "leverage": self.leverage,
             "side": self.side,
+            "spot": self.spot,
         }
 
 
@@ -519,8 +524,8 @@ is still reachable as ``NOWUSDT`` or ``ServiceNow``."""
 def _resolve(raw: str, *, trust_case: bool = True) -> tuple[str, str] | None:
     """One token to a listed contract and a note on how it was read, or None.
 
-    The twelve rTokens and their names ("tesla") resolve in any case, as do the unambiguous names
-    in `argus.market.universe.ALIASES` ("gold", "bitcoin") and a full symbol ("pltrusdt"). Any
+    The twelve stock perpetuals and their names ("tesla") resolve in any case, as do the unambiguous
+    names in `argus.market.universe.ALIASES` ("gold", "bitcoin") and a full symbol ("pltrusdt"). Any
     other listed ticker must be written the way tickers are written — in capitals — because Bitget
     lists tokens called US, ME and NOW, and "what should I buy now" is not a question about
     ServiceNow. ``trust_case=False`` (a question typed entirely in capitals) turns that last rule
@@ -678,6 +683,28 @@ _HEDGE = re.compile(
     r"\bhedg\w*\b|\bprotect\s+(?:my|the|this)\s+(?:book|portfolio|downside|positions?)\b",
     re.I,
 )
+_SPOT_RTOKEN = re.compile(
+    r"\br([A-Z]{1,6})\b"
+    r"|\b[Rr]([A-Z]{1,6})(?:USDT|/USDT)\b"
+    r"|\b([A-Z]{1,6})\s+[Rr]-?[Tt]okens?\b"
+    r"|\b[Rr]-?[Tt]okens?\s+(?:of\s+|for\s+)?([A-Z]{1,6})\b"
+    r"|\b[Tt]okeni[sz]ed\s+([A-Z]{1,6})\b"
+)
+"""A spot rToken named as a holding: ``rTSLA``, ``RTSLAUSDT``, ``TSLA rToken``, ``tokenized TSLA``.
+Case matters for the bare form — ``rTSLA`` is the token, a lower-case word is not."""
+_CLOSED_HOURS = re.compile(
+    r"\b(?:over\s*night|overnight|weekends?|while\s+(?:the\s+)?(?:us\s+)?market\s+is\s+"
+    r"(?:shut|closed)|protect|insure|downside)\b", re.I)
+_IMPERATIVE_HEDGE = re.compile(r"^\s*(?:please\s+)?(?:hedge|protect)\b", re.I)
+""""Hedge my TSLA" is a request for a hedge plan, not an order: the console places none."""
+
+
+def _spot_rtoken(raw: str) -> str | None:
+    """The ticker of a spot rToken named in ``raw``, or None."""
+    match = _SPOT_RTOKEN.search(raw)
+    if match is None:
+        return None
+    return next(g for g in match.groups() if g)
 HEDGE_HOLDING_DAYS = 7
 HEDGE_R2_TOLERANCE = 0.05
 HEDGE_BOOK_VALUE = Decimal("100000")
@@ -1003,8 +1030,16 @@ def _detect(text: str) -> ResearchRequest | None:
         return ResearchRequest(kind=ResearchKind.FUNDAMENTALS, symbols=symbols[:1])
     if symbols and not _pairs(raw) and _EVENT_REACTION.search(raw) and not about_the_record(raw):
         return ResearchRequest(kind=ResearchKind.EVENT, symbols=symbols[:1])
+    spot_ticker = _spot_rtoken(raw)
+    if (spot_ticker and (_HEDGE.search(raw) or _CLOSED_HOURS.search(raw))
+            and not about_the_record(raw)):
+        perp = f"{spot_ticker}USDT"
+        return ResearchRequest(
+            kind=ResearchKind.HEDGE, symbols=(perp,), book={perp: 1.0},
+            spot=f"R{spot_ticker}USDT",
+            notes=(f"R{spot_ticker}USDT read as the spot rToken you hold",))
     if (_HEDGE.search(raw) and not about_the_record(raw)
-            and (not _is_an_order(raw) or _MY_BOOK.search(raw))
+            and (not _is_an_order(raw) or _MY_BOOK.search(raw) or _IMPERATIVE_HEDGE.match(raw))
             and not _COMPARE.search(raw) and not _ADD_VERB.search(raw)
             and not (_STRESS.search(raw) or _STRESS_BARE.search(raw))
             and not re.search(r"\bhedged\s+with\b|\bas\s+a\s+hedge\b", raw, re.I)):
@@ -1921,8 +1956,8 @@ def _desk_view(symbol: str, ledger: Any) -> tuple[list[str], list[Source]]:
     if ledger is None:
         return [], []
     if symbol not in TRADED_SYMBOLS:
-        return [f"The desk itself trades twelve rTokens and {_t(symbol)} is not one of them, so "
-                f"there is no desk call on it — this answer is the analysis alone."], []
+        return [f"The desk itself trades twelve stock perpetuals and {_t(symbol)} is not one of "
+                f"them, so there is no desk call on it — this answer is the analysis alone."], []
     rows = [e for e in ledger.entries if e.symbol == symbol]
     if not rows:
         return [f"The desk has no recorded decision on {symbol} yet."], []
@@ -1978,13 +2013,26 @@ def _venue(symbol: str, is_open: Any) -> tuple[list[str], list[Source]]:
             kinds[universe.NOT_EQUITY.get(sym, "equity")] += 1
     crypto = sum(1 for c in listed.values() if not c.rwa)
     model = CostModel.bitget_perp()
+    base = symbol.removesuffix("USDT")
+    spot_count: int | None = None
+    try:
+        from argus.market.rtoken_spot import spot_rtokens
+
+        spot_count = len(spot_rtokens())
+    except Exception:
+        spot_count = None
     lines = [
-        f"Bitget lists {sum(kinds.values())} real-world-asset contracts beside {crypto} crypto "
-        f"ones: {kinds['equity']} stocks and ETFs, {kinds['commodity']} commodities, "
-        f"{kinds['fx']} currency pairs and {kinds['index']} index products — all USDT-margined "
-        f"perpetuals that trade around the clock, including when the stock's own market is shut.",
-        f"Trading costs {model.taker_bps:.0f}bps a side as taker ({model.round_trip_bps():.0f}bps "
-        f"a round trip).",
+        "Bitget offers a US stock two ways. The rToken is a spot token (R" + base + "USDT for "
+        + _t(symbol) + ") that you own outright: no leverage and no funding. The stock perpetual ("
+        + symbol + ") is a USDT-margined contract: leverage, shorting and a funding payment "
+        "every few hours. Both trade around the clock, including when the stock's own market "
+        "is shut, and this desk trades the perpetuals.",
+        (f"Listed now: {spot_count:,} spot rTokens, and " if spot_count else "Listed now: ")
+        + f"{sum(kinds.values())} real-world-asset perpetuals beside {crypto} crypto ones — "
+        f"{kinds['equity']} stocks and ETFs, {kinds['commodity']} commodities, {kinds['fx']} "
+        f"currency pairs and {kinds['index']} index products.",
+        f"A perpetual trade costs {model.taker_bps:.0f}bps a side as taker "
+        f"({model.round_trip_bps():.0f}bps a round trip).",
     ]
     ticker = None
     try:
@@ -2002,13 +2050,15 @@ def _venue(symbol: str, is_open: Any) -> tuple[list[str], list[Source]]:
         premium = _premium_line(symbol, ticker.last, is_open(datetime.now(UTC)))
         if premium is not None:
             lines.append(premium[0])
-    lines.append("What the token is not: a perpetual contract, not the share — no dividends, no "
-                 "vote, and outside US hours its price is discovered on Bitget's own book, not "
-                 "the exchange's.")
+    lines.append("Neither is the share: no vote, and outside US hours both are priced on "
+                 "Bitget's own books, not the exchange's. An rToken holder who wants protection "
+                 "while the US market is shut can short the same company's perpetual — ask "
+                 f"\"how do I hedge my r{base} over the weekend\" for the tested ratio.")
     lines.insert(0, (
-        "Actionable: use the token for exposure outside US market hours, for leverage, or to "
-        "hedge a book around the clock; for a buy-and-hold position the share is cheaper"
-        + (f" — at today's funding a long pays about {carry:.1f}% a year to hold."
+        "Actionable: use the perpetual for leverage, shorting, or to hedge a book around the "
+        "clock; the spot rToken to hold exposure without funding; for a long buy-and-hold "
+        "position the share itself costs least to carry"
+        + (f" — at today's funding a perpetual long pays about {carry:.1f}% a year."
            if carry is not None and carry > 0 else ".")))
     return lines, [Source(kind="venue", ref="bitget contracts + tickers + bitget-mcp-server",
                           detail=f"{len(listed)} contracts; {_t(symbol)} as the worked example")]
@@ -2446,6 +2496,102 @@ def _desk_integrity_read(symbol: str) -> dict[str, Any] | None:
                         "confidence": float(found.group(5))}
         return None
     return None
+
+
+SPOT_HEDGE_DAYS = 240
+"""Nights of history a spot hedge is fitted and tested on: about 165 sessions, enough for a held-out
+third of fifty nights and a dozen weekends, fetched in a few seconds."""
+
+
+def _spot_hedge_answer(question: Question, request: ResearchRequest) -> Answer:
+    """The same-company perpetual hedge for a spot rToken holder, tested on nights it had not seen,
+    set beside the index hedge ARGUS offered before it knew the spot token existed
+    (`eval/copilot_hedge.py`: 10.1% against 99.7% of the overnight swing on Ballast's nights)."""
+    from argus.desk.rtoken_hedge import HedgeUnavailable, overnight_hedge, render
+    from argus.market.rtoken_spot import SpotError, hourly_bars, overnight_returns
+
+    spot = request.spot or ""
+    perp = request.symbols[0]
+    ticker = perp.removesuffix("USDT")
+    legs = {spot: True, perp: False, "QQQUSDT": False}
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        futures = {name: pool.submit(hourly_bars, name, spot=is_spot, days=SPOT_HEDGE_DAYS)
+                   for name, is_spot in legs.items()}
+        nights: dict[str, Any] = {}
+        failures: dict[str, str] = {}
+        for name, future in futures.items():
+            try:
+                nights[name] = overnight_returns(future.result())
+            except (SpotError, OSError) as exc:
+                failures[name] = str(exc)
+    try:
+        if spot in failures or perp in failures:
+            raise HedgeUnavailable(failures.get(spot) or failures.get(perp) or "")
+        hedge = overnight_hedge(spot, perp, nights[spot], nights[perp])
+    except HedgeUnavailable as exc:
+        return Answer(question=question, refused=True,
+                      reason=f"no overnight hedge could be measured for {spot}: {exc}",
+                      lines=[f"I could not measure a hedge for {spot} ({exc}). Either it is not a "
+                             f"Bitget rToken with a {ticker} stock perpetual beside it, or its "
+                             f"history is too short to test a hedge on. Nothing is guessed."])
+    lines = render(hedge, ticker)
+    if "QQQUSDT" in nights:
+        try:
+            index = overnight_hedge(spot, "QQQUSDT", nights[spot], nights["QQQUSDT"])
+            lines.insert(2, f"Why not an index hedge: shorting QQQUSDT against the same token "
+                            f"removed only {index.held_out_variance_removed:.1%} of its "
+                            f"overnight swing on the same held-out nights — the other "
+                            f"{1 - index.held_out_variance_removed:.0%} is {ticker}'s own.")
+        except HedgeUnavailable:
+            pass
+    lines.extend(f"Assumed: {note}." for note in request.notes)
+    lines.append(f"Data: live Bitget hourly candles for {spot} (spot) and {perp} (perpetual), "
+                 f"{SPOT_HEDGE_DAYS} days, each night measured from the US close to the next "
+                 f"open. Method from Ballast (an S2 entry, MIT). This is analysis, not advice — "
+                 f"you make the call.")
+    sources = [
+        Source(kind="venue", ref=f"bitget history-candles {spot} (spot) + {perp}",
+               detail="public hourly candles, both legs"),
+        Source(kind="computation", ref="argus.desk.rtoken_hedge.overnight_hedge",
+               detail="minimum-variance ratio; fitted on 70% of nights, scored on the rest"),
+    ]
+    return Answer(question=question, lines=lines, sources=sources,
+                  data={"request": request.as_dict(), "hedge": hedge.as_dict()})
+
+
+def _beta_track_record() -> str | None:
+    """How far this copilot's post-trade beta has been from what books then did, measured against
+    weekend-copilot (an S2 entry answering the same question) in `data/copilot_rivals.json`. Both
+    of that run's losses are carried in the sentence, not only the win."""
+    import json as _json
+
+    from argus.lui.answer import _notes_path
+
+    try:
+        report = _json.loads((_notes_path().parent / "copilot_rivals.json")
+                             .read_text(encoding="utf-8"))
+        err = report["beta_error"]["bitget_daily"]["mean_abs_error"]
+        books = report["beta_error"]["bitget_daily"]["books_scored"]
+        shipped = report["comparisons"]["bitget_daily"]["argus_open vs rival_spy"]
+        same = report["comparisons"]["bitget_daily"]["argus_open vs rival_qqq"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+    text = (f"How far to trust that beta: on {books:,} test books, it missed the next four "
+            f"weeks' realised beta by {err['argus_open']:.2f} on average. weekend-copilot, an S2 "
+            f"entry answering this same question, missed by {err['rival_spy']:.2f} as it ships "
+            f"(p = {shipped['wilcoxon_p']:.2f}) and by {err['rival_qqq']:.2f} on the same "
+            f"benchmark (p = {same['wilcoxon_p']:.2f}, not significant); simply assuming a beta "
+            f"of 1.0 missed by {err['naive_one']:.2f}")
+    try:
+        stress = _json.loads((_notes_path().parent / "copilot_stress.json")
+                             .read_text(encoding="utf-8"))["down_1pct"]
+        miss = stress["mean_abs_error_pp"]
+        text += (f". The QQQ-fall lines were off by {miss['argus_beta']:.2f} points on the "
+                 f"{stress['days']} days QQQ really fell 1% or more (skfolio's vine copula: "
+                 f"{miss['skfolio_vine']:.2f}), and they are a centre, not a worst case")
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    return text
 
 
 def _coordination_test(symbol: str | None) -> tuple[str, dict[str, Any]] | None:
@@ -3320,6 +3466,17 @@ def _impact_lines(report: CopilotReport, request: ResearchRequest,
             parts.append(f"{item.symbol.removesuffix('USDT')} {item.weight:.0%} weight / "
                          f"{item.contribution / report.risk_after.volatility:.0%} risk")
         lines.append("After the trade: " + "; ".join(parts) + ".")
+        tail = report.tail
+        tail_share = None if tail is None else tail.share(add)
+        risk_share = impact.risk_share_after
+        if tail is not None and tail_share is not None and risk_share is not None:
+            lines.append(
+                f"In the book's worst 5% of hours (an average loss of {tail.cvar:.2%} an hour), "
+                f"{add.removesuffix('USDT')} would carry {tail_share:.0%} of the loss, against "
+                f"{risk_share:.0%} of the ordinary swing"
+                + (" — it concentrates in the bad hours" if tail_share > risk_share + 0.05
+                   else " — its bad hours are no worse than its ordinary ones"
+                   if tail_share < risk_share - 0.05 else "") + ".")
     for outcome in report.stress:
         if outcome.portfolio_move_pct is not None and outcome.shock in (
             "benchmark -5%", "benchmark -10%"
@@ -3584,6 +3741,9 @@ def _optimal_schedule(symbol: str, notional: Decimal, adv: Decimal, book: Any, f
         f"sweeping one hour's share of the order on the live book"
         + ("" if swept.complete else " (deeper than the visible 50 levels, so at least this)")
         + "."]
+    cadence = _cadence_line(float(part))
+    if cadence:
+        lines.append(cadence)
     lines.append(_waiting_cost(moves))
     if change is not None and share < 1:
         lines.append(
@@ -3596,6 +3756,28 @@ def _optimal_schedule(symbol: str, notional: Decimal, adv: Decimal, book: Any, f
         lines.append(f"Session: the stock's own market {change[1]} in about {change[0]} "
                      f"hour(s); the whole order fits before then.")
     return lines
+
+
+def _cadence_line(notional: float) -> str | None:
+    """How often to send the children inside each hour, from the full-depth replay in
+    `eval/execution_arena.py`: the hour's amount in one child paid about twice what one-minute
+    children paid on the same book, the same finding that makes Bitget's own 60-second TWAP the
+    incumbent to match."""
+    from argus.lui.answer import _notes_path
+
+    try:
+        report = json.loads((_notes_path().parent / "execution_arena.json")
+                            .read_text(encoding="utf-8"))
+        sizes = report["by_size"]
+    except (OSError, ValueError, KeyError):
+        return None
+    key = min(sizes, key=lambda k: abs(float(k.replace(",", "")) - notional))
+    cost = sizes[key]["cost_bps"]
+    return (f"Cadence: send each hour's share as one-minute children, as Bitget's own TWAP does at "
+            f"a 60-second interval. Replaying a full day of Bitget's NVDA order book, ${key} "
+            f"orders cost {cost['argus_ac_60s']:.1f}bps with fees in one-minute children against "
+            f"{cost['argus_ac']:.1f}bps in hourly ones (Bitget's TWAP: "
+            f"{cost['bitget_twap_60s']:.1f}bps; all at once: {cost['immediate']:.1f}bps).")
 
 
 def _depth_lines(symbol: str, notional: Decimal, adv: Decimal, plan: Any,
@@ -3701,10 +3883,10 @@ def _funding_meaning(symbol: str, rate_pct: float) -> str | None:
 def _session_line(symbol: str, *, anchor_open: bool, us_listed: bool) -> str:
     """What the clock means for this contract's price — which depends on what it tracks.
 
-    The twelve rTokens and every other US-listed stock have a US anchor whose hours are modelled
-    (`argus.truth.clocks`). A crypto contract has no anchor at all. Gold, oil, FX, index products
-    and Asian equities have anchors on other clocks that this console does not model, and saying
-    "the US market is shut" about gold would be a confident sentence about the wrong market.
+    The twelve stock perpetuals and every other US-listed stock have a US anchor whose hours are
+    modelled (`argus.truth.clocks`). A crypto contract has no anchor at all. Gold, oil, FX, index
+    products and Asian equities have anchors on other clocks that this console does not model, and
+    saying "the US market is shut" about gold would be a confident sentence about the wrong market.
     ``us_listed`` is whether `bitget-mcp-server` recognised the underlying as a US ticker.
     """
     from argus.market import universe
@@ -3713,8 +3895,9 @@ def _session_line(symbol: str, *, anchor_open: bool, us_listed: bool) -> str:
     if symbol in TRADED_SYMBOLS or (us_listed and universe.is_equity(symbol)):
         return ("The US anchor market is open, so this price has price discovery behind it."
                 if anchor_open else
-                "The US anchor market is shut: this rToken is trading without its anchor, so its "
-                "price is being discovered on a thinner book and can gap at the open.")
+                "The US anchor market is shut: this stock perpetual is trading without its "
+                "anchor, so its price is being discovered on a thinner book and can gap at the "
+                "open.")
     if contract is not None and not contract.rwa:
         return ("A crypto contract: it trades around the clock on its own market, with no "
                 "off-chain anchor to gap against.")
@@ -3788,7 +3971,7 @@ def _premium_line(symbol: str, rtoken_last: Decimal,
     clock = ("both live" if anchor_open else
              "the stock's price is its last close, so this includes the move since")
     return (
-        f"Versus the stock: {_t(symbol)} {last:g} → the rToken trades at a "
+        f"Versus the stock: {_t(symbol)} {last:g} → the perpetual trades at a "
         f"{abs(premium):.1f}bps {'premium' if premium >= 0 else 'discount'} ({clock}).",
         Source(kind="venue", ref="bitget-mcp-server quote", detail=f"{_t(symbol)} "
                f"last {last:g}"),
@@ -4261,9 +4444,9 @@ def _fundamentals(symbol: str, raw_text: str = "") -> tuple[list[str], list[Sour
             lines.append(f"Next report: {when.isoformat()}{', ' + session if session else ''} — "
                          f"{days} day(s) away (period ending {period}).")
             if days <= EARNINGS_NEAR_DAYS:
-                lines.insert(0, f"Actionable: {ticker} reports in {days} day(s) — an rToken "
-                                f"position held through it carries the earnings gap, and the "
-                                f"rToken can reprice before the stock does.")
+                lines.insert(0, f"Actionable: {ticker} reports in {days} day(s) — a position "
+                                f"in its perpetual or rToken held through it carries the "
+                                f"earnings gap, and both can reprice before the stock does.")
             else:
                 lines.insert(0, f"Actionable: no {ticker} report inside {EARNINGS_NEAR_DAYS} "
                                 f"days, so a position opened now does not carry an earnings gap "
@@ -4574,8 +4757,8 @@ def _analogue_data(symbol: str) -> MarketData:
 
     Three stretches, each from the endpoint that serves it fastest: the latest 1,000 bars and the
     window behind them back to day 55 from the recent-candles endpoint (one call each), and days 55
-    to 90 from history-candles. For the twelve rTokens the oldest stretch comes from the frozen
-    history file instead, which is legitimate here in a way it is not for the risk answers: a
+    to 90 from history-candles. For the twelve stock perpetuals the oldest stretch comes from the
+    frozen history file instead, which is legitimate here in a way it is not for the risk answers: a
     closed hourly candle never changes, so extending a live series backwards with closed candles
     recorded earlier is the same series, not a mix of two. Every join must be contiguous — a gap
     would put a fake return across it — or the older side is dropped and the answer says how many
@@ -4764,6 +4947,8 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                      "Bitget hourly candles. This is analysis, not advice — you make the call.")
         return Answer(question=question, lines=found, sources=extra,
                       data={"request": request.as_dict()})
+    if request.kind is ResearchKind.HEDGE and request.spot:
+        return _spot_hedge_answer(question, request)
     if request.kind is ResearchKind.HEDGE and request.book:
         value = request.notional or HEDGE_BOOK_VALUE
         found, extra, hedge_found = _hedge_plan(request.book, value, raw_text)
@@ -4784,8 +4969,8 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
             lines=[
                 "I can run that the moment I know what you hold — say it with weights, e.g. "
                 "\"what if the Nasdaq drops 10%? I hold 50% NVDA, 30% MSFT, 20% AAPL\".",
-                "Any contract Bitget lists can be named — the twelve rTokens the desk trades, "
-                "other US stocks and ETFs, gold, oil, index products and crypto.",
+                "Any contract Bitget lists can be named — the twelve stock perpetuals the desk "
+                "trades, other US stocks and ETFs, gold, oil, index products and crypto.",
             ],
         )
     try:
@@ -4824,6 +5009,13 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                 profile = _distribution_line(add, data.raw, columns)
                 if profile is not None:
                     lines.append(profile)
+            else:
+                record = _beta_track_record()
+                if record is not None:
+                    lines.append(record)
+                    sources.append(Source(kind="computation", ref="argus.eval.copilot_rivals",
+                                          detail="post-trade beta scored against the next 28 "
+                                                 "days, 1,800 books, vs weekend-copilot (S2)"))
             desk_lines, desk_sources = _desk_view(add, ledger)
             lines.extend(desk_lines)
             sources.extend(desk_sources)

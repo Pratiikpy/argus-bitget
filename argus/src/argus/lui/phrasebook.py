@@ -309,11 +309,12 @@ PHRASES: dict[str, dict[Language, str]] = {
     },
     "sess.explain": {
         Language.EN: (
-            "rTokens trade 7x24; the anchor US equity market does not. The gap between those two "
-            "clocks is why the desk prices deliberation differently by session phase."
+            "Bitget's US stock perpetuals trade 7x24; the anchor US equity market does not. "
+            "The gap between those two clocks is why the desk prices deliberation differently "
+            "by session phase."
         ),
         Language.ZH: (
-            "rToken 全天候 7x24 交易，而作为锚定标的的美股市场并非如此。"
+            "Bitget 的美股永续合约全天候 7x24 交易，而作为锚定标的的美股市场并非如此。"
             "正是这两个时钟之间的落差，使得交易台按时段对思考成本给出不同的定价。"
         ),
     },

@@ -146,7 +146,10 @@ def test_the_schedule_is_the_almgren_chriss_optimum_priced_against_an_even_split
     shares = [int(p.rstrip("%")) for p in
               lines[0].split("trade ", 1)[1].split(" of $", 1)[0].split(", ")]
     assert shares == sorted(shares, reverse=True) and shares[0] > shares[-1]
-    assert lines[1].startswith("Waiting costs too:")
+    # The cadence line (one-minute children, measured in eval/execution_arena.py) sits between
+    # the schedule and the waiting cost when the replay artefact is present.
+    rest = [line for line in lines[1:] if not line.startswith("Cadence:")]
+    assert rest[0].startswith("Waiting costs too:")
 
 
 def test_urgency_front_loads_harder(monkeypatch: pytest.MonkeyPatch) -> None:

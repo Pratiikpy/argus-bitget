@@ -457,11 +457,11 @@ one of them.
 
 #### The discovery behind this module
 
-An rToken trades 24/7. The US stock it tracks does not. So roughly **82% of hourly bars happen while
+A stock perpetual trades 24/7. The US stock it tracks does not. So roughly **82% of hourly bars happen while
 the American market is shut** — when there is no real price discovery.
 
 That means a beta measured over *all* bars is an average dominated by the hours that matter least.
-We measured it on 30 days of hourly candles for every rToken against QQQ:
+We measured it on 30 days of hourly candles for every stock perpetual against QQQ:
 
 | Symbol | Blended beta | Open-session beta | Shut-session beta |
 |---|---|---|---|
@@ -471,7 +471,7 @@ We measured it on 30 days of hourly candles for every rToken against QQQ:
 | MSFTUSDT | 0.340 | **0.577** | 0.245 |
 | NVDAUSDT | 1.412 | **1.709** | 1.296 |
 
-**Open-session beta is higher than shut-session beta on 10 of 11 rTokens.**
+**Open-session beta is higher than shut-session beta on 10 of 11 stock perpetuals.**
 
 AAPL is the extreme. Its blended beta of 0.254 would tell a trader the name is nearly
 market-neutral. During the session that actually prices it, the figure is **0.668** — more than two
@@ -627,7 +627,7 @@ A judge should not have to discover these.
   to it — rather than the earlier and false "no hedge placeable".
 - **No usage data.** This has not been put in front of traders yet. The plan is ten supervised
   sessions measuring whether the risk-share figure changes the ticket.
-- **Superiority is claimed only where a named competitor was run on the same input.** 20 of 34
+- **Superiority is claimed only where a named competitor was run on the same input.** 20 of 38
   capabilities are OWNED under that rule; the rest are TIED or IMPLEMENTED and are called that, and
   every comparison we lost is published on `/wrong`. On 2026-09-24 seven earlier OWNED grades were
   withdrawn because the rival they beat does not lead its sub-theme; they stay IMPLEMENTED until
@@ -659,7 +659,7 @@ And to check the whole thing is what this document says it is:
 
 ```bash
 pytest                    # 6,700 tests
-python -m argus.status    # 142/142 modules importable, 18/18 sub-themes, artefacts on disk
+python -m argus.status    # 150/150 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
 ---
@@ -987,7 +987,7 @@ refuses to schedule across a market-open boundary — both described in the Trac
 because they are the same code.
 
 **Where it stands.** The analyst, the menu and the residual pricing are live on every decision. The
-crypto side of "rToken and crypto simultaneously" is thin: we trade rTokens, and the crypto
+crypto side of "rToken and crypto simultaneously" is thin: we trade stock perpetuals, and the crypto
 instruments appear as hedge candidates and as Bitget-Skill sentiment inputs, not as positions the
 desk currently opens. We say that rather than imply a two-asset book we have not run.
 
@@ -1139,7 +1139,7 @@ why.
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 627 decisions on record. Every one of them is a refusal, and 571 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 655 decisions on record. Every one of them is a refusal, and 604 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
 zero trades, those three numbers **do not exist**. Not "are zero" — do not exist. Half of the track
@@ -1196,7 +1196,7 @@ with a fabricated one.
 
 **How they will be computed when they exist:**
 
-- **Annualised at 365 periods, not 252.** rTokens trade seven days a week. Using the equity-market
+- **Annualised at 365 periods, not 252.** The stock perpetuals trade seven days a week. Using the equity-market
   convention would overstate the Sharpe by the square root of 365/252.
 - **A Sharpe over too few days is refused.** Below the minimum, the module says "the window is N
   days; a standard deviation needs at least M" rather than printing a number from three data points.
@@ -1320,7 +1320,7 @@ route to it — is now what the layer sees.
 - **One model, no ensemble, no adversarial overturn.**
 - **"Owned" is a conjunction, not a score.** An owned capability needs a reproduced baseline, a
   same-input comparison, an out-of-sample test, an ablation and an adversarial test, among thirteen
-  conditions. On 2026-09-12 zero met that bar; the register now reads 20 of 34 capabilities are
+  conditions. On 2026-09-12 zero met that bar; the register now reads 20 of 38 capabilities are
   OWNED, each re-derived from its artefacts by `eval/standing.py`, never from prose.
 
 ---
@@ -1435,7 +1435,7 @@ same fee, lagged the same way, and split the same way. That is the point: one ga
 > mint/redeem.*
 
 **We studied it. It does not pay.** `argus/research/arbitrage_study.py` measured the apparent spread
-between rToken and its reference across 28,067 observations over four session phases:
+between the stock perpetual and its reference across 28,067 observations over four session phases:
 
 | Session | Observations | Median apparent spread | Monetisable after 12bps fee |
 |---|---|---|---|
@@ -1502,7 +1502,7 @@ session is a stale print, not a relationship. `crossmarket_basis_reversion` and
 taken while the anchor was asleep is weighted down rather than trusted.
 
 The session-beta finding in the Track 3 section is the same phenomenon measured from the other side:
-open-session beta exceeds shut-session beta on 10 of 11 rTokens. A cross-market strategy that
+open-session beta exceeds shut-session beta on 10 of 11 stock perpetuals. A cross-market strategy that
 uses one blended number is using the wrong one four days out of seven.
 
 ### 18.4 rToken Factor Strategies
@@ -1547,7 +1547,7 @@ is not the price you get, and the engine knows by how much.
 
 ## Part 19 — The Track 1 result, in full and without softening
 
-`argus/research/track1_study.py` ran every strategy on all twelve rTokens over 180 days of hourly
+`argus/research/track1_study.py` ran every strategy on all twelve stock perpetuals over 180 days of hourly
 data — 4,319 bars per symbol, 12bps round trip, chronological out-of-sample split, and every winner
 re-scored at five different fee levels. The file is `argus/data/track1_study.json`.
 
@@ -1641,7 +1641,7 @@ entered, that would need adding before the file was submitted.
 
 Every strategy above asks one question per instrument: should I be long this. A cross-sectional
 factor asks a different one: which of these twelve should I be long, and which short, right now.
-That distinction matters on this venue specifically, because the twelve rTokens share one dominant
+That distinction matters on this venue specifically, because the twelve stock perpetuals share one dominant
 driver. A long-only signal is mostly a bet on the US market; a rank-neutral book cancels that and
 bets only on the dispersion between the names.
 
@@ -1705,10 +1705,10 @@ takes, and every artefact the system writes.
 
 | | |
 |---|---|
-| Source modules | **317** files across **21 packages**, 127,309 lines |
-| Registered and importable | **142/142** (`python -m argus.status` checks this at runtime) |
+| Source modules | **325** files across **21 packages**, 130,154 lines |
+| Registered and importable | **150/150** (`python -m argus.status` checks this at runtime) |
 | Test files / tests | **224 files**, **6,700 tests collected** |
-| Type and lint | `ruff` clean, `mypy --strict` clean on **317 source files** |
+| Type and lint | `ruff` clean, `mypy --strict` clean on **325 source files** |
 | Artefacts written | **162** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
@@ -1817,7 +1817,7 @@ allocation → beta → portfolio → diversification → stress → cost), `por
 `resolve` — the auto-resolver and the scoreboard, structurally unable to answer early.
 `open_register` — commits a batch and submits its head to four Bitcoin calendars.
 
-Live: **236 claims across all twelve rTokens** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
+Live: **246 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
 2026-09-14. The resolver runs on every scheduled cycle.
 
 ### `eval/` — thirty-three ways to be wrong in public (33 modules)
@@ -1941,7 +1941,7 @@ and each is treated as **absent rather than stale** past 36 hours — so a measu
 refreshing degrades the system into saying "not measured" rather than into using an old number.
 
 Also standing on its own: the factor lab's memory across runs, the Skill health sweep the cycle reads
-rather than waits on, and `python -m argus.status`, which checks at runtime that all 142 modules
+rather than waits on, and `python -m argus.status`, which checks at runtime that all 150 modules
 import, that all 18 sub-themes resolve to a symbol and a test file, and that every declared artefact
 is on disk.
 
@@ -1953,9 +1953,9 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 317 files, 21 packages, 127,309 lines; `mypy --strict` clean on 317 source files |
+| Source modules | 325 files, 21 packages, 130,154 lines; `mypy --strict` clean on 325 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
-| Modules registered and importable | 142/142 modules importable |
+| Modules registered and importable | 150/150 modules importable |
 | Tests | 6,700 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 66, every one produced by running something |
@@ -1980,14 +1980,16 @@ source is a build failure, not a typo.
 | Tradeable-session replay frames, point-in-time | 30 reconstructed, **0 positions opened** |
 | Hurdle frontier | 39 instants / 25 effective, median move 137bps vs an 18.8bps hurdle |
 | Directional accuracy at which trading beats abstaining | **56.0%** |
-| Capabilities proven better than a named competitor | **20 of 34** |
+| Capabilities proven better than a named competitor | **20 of 38** |
 
 That last row is the one to read twice. An *owned* capability needs a reproduced baseline, a
 same-input comparison, an out-of-sample test, an ablation and an adversarial test — thirteen
 conditions in all, enforced in code by `argus/eval/standing.py`, which raises at import if anything
-claims OWNED without them. It read zero when this table was first written; today 20 of 34
-capabilities are OWNED, 4 are TIED and 10 are IMPLEMENTED, and the three that were once LOST are the
-ties. It read 27 of 31 until 2026-09-24, when a review of the right rivals per sub-theme withdrew
+claims OWNED without them. It read zero when this table was first written; today 20 of 38
+capabilities are OWNED, 8 are TIED, 10 are IMPLEMENTED and none is LOST. Five ties were losses first:
+the three from before 2026-09-22, order splitting against Bitget's own TWAP, and the rToken
+overnight hedge, lost to the S2 entry Ballast and
+rebuilt to parity on 2026-09-24. It read 27 of 31 until 2026-09-24, when a review of the right rivals per sub-theme withdrew
 seven OWNED grades won against a rival that does not lead the sub-theme, and split two more into
 the narrow thing proven (OWNED) and the sub-theme itself (IMPLEMENTED).
 
@@ -2117,7 +2119,7 @@ could attack today.
     count *and* effectiveness, and only the first is an inventory. `eval/sources.py` calls all
     twelve through the module the desk uses — not a raw URL, because an endpoint that answers
     while our parser raises is not a working source — and reports four honest states with a
-    timestamp. **12 of 12 answered with usable content**: 12 rToken tickers, 47 market and 47 index
+    timestamp. **12 of 12 answered with usable content**: 12 stock-perpetual tickers, 47 market and 47 index
     candles, 6 SEC filings, 175 Treasury curve points, Fear & Greed, VIX, 12,325 FINRA short-volume
     rows, 23 Nasdaq halts, 4 Yahoo consensus estimates, 67 XBRL facts and the Skill server's last
     probe. EMPTY is a distinct state from OK and does not count toward the live total, because a
@@ -2161,7 +2163,7 @@ could attack today.
     sample's own skew and kurtosis rather than assumed normal. Not one survives.
 27. **No simple rule is profitable on this venue, measured over 4,528 instants.** Five fixed
     rules — flat, always-long, momentum, reversion and volatility-gated — replayed at every
-    tradeable instant across all twelve rTokens, each scored on the realised move net of the same
+    tradeable instant across all twelve stock perpetuals, each scored on the realised move net of the same
     hurdle the desk faces. **Every one loses money.** The best directional accuracy is **50.6%
     against a break-even of 54.7%**, and no interval excludes zero once the overlapping
     twenty-four-hour horizons are accounted for by a stationary bootstrap. The paired comparison
@@ -2274,8 +2276,8 @@ never fire. It is now 1.0, with a test pinning it below the uncorrelated level o
 
 ### 2. Cointegration and mean reversion — `research/cointegration.py`
 
-Half of Track 1's named *Arbitrage* sub-theme was uncovered: we measured the rToken-versus-underlying
-basis and never asked whether two rTokens share a stochastic trend. ADF, Engle–Granger, the MacKinnon
+Half of Track 1's named *Arbitrage* sub-theme was uncovered: we measured the perpetual-versus-underlying
+basis and never asked whether two stock perpetuals share a stochastic trend. ADF, Engle–Granger, the MacKinnon
 tables and the Ornstein–Uhlenbeck half-life are now implemented in pure Python and **reproduce
 statsmodels 0.14.6 to 1e-12** on ten unit-root tests and three cointegration tests over real hourly
 closes — including its lag selection, its sample sizes, and its unexplained `nobs − 1` Stata quirk.
@@ -2551,7 +2553,7 @@ and anchored. That opening head is `bc36478291a06bc3`, submitted to four indepen
 calendars: `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The `.ots` proofs
 are in `argus/data/anchors/`, and anyone can verify them with the reference OpenTimestamps client
-without our cooperation. **38 of the 64 carry a Bitcoin block-header attestation** (blocks
+without our cooperation. **38 of the 68 carry a Bitcoin block-header attestation** (blocks
 966,822–967,736); the other 18 are still calendar-pending, which is what a proof honestly
 says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-counts both.
 
@@ -2563,7 +2565,7 @@ says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-c
 > changed; upgrading only appends the path from our digest to a block header.
 
 Each scheduled cycle appends and re-anchors, so the register grows: it now holds **156 falsifiable
-claims about all twelve rTokens**, head `51cacf4a30ce4503`. The opening figures above are kept as
+claims about all twelve stock perpetuals**, head `51cacf4a30ce4503`. The opening figures above are kept as
 the dated historical record — a register that quietly restates its own opening head would be
 defeating its own purpose — and `eval/docclaims.py` checks the live count on every run.
 

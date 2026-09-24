@@ -1,0 +1,402 @@
+{
+ "generated_at": "2026-09-24T14:43:10+00:00",
+ "rival": {
+  "name": "Ballast",
+  "repo": "https://github.com/Ritapossible/Ballast",
+  "licence": "MIT",
+  "commit": "5cf675904bbb27ea338377b4cfe01a79d880086f",
+  "baseline_reproduced": "README figures reproduced by running hedge_study.py and oos.py unmodified: held-out R2 0.981 -> 0.997, tail cut 86.5% -> 95.1%, 12/12 names"
+ },
+ "nights_sha256": "0419ad2aec2651796b26546deab45767f1990bd3905576d3e7aad4bdc3f37e50",
+ "protocol": {
+  "split": "first 70% of each name's nights fit, rest held out",
+  "source": "research/oos.py:63-87"
+ },
+ "names": 11,
+ "per_name": {
+  "TSLA": {
+   "spot": "RTSLAUSDT",
+   "perp": "TSLAUSDT",
+   "nights": 227,
+   "first": "2025-10-28",
+   "last": "2026-09-23",
+   "ballast_same_name": {
+    "ratio": -1.009514,
+    "held_out_variance_removed": 0.99837,
+    "held_out_tail_cut": 0.94478,
+    "cost_bp_per_night": 12.114,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_index": {
+    "ratio": -1.562009,
+    "in_sample_variance_removed": 0.43519,
+    "held_out_variance_removed": 0.27592,
+    "held_out_tail_cut": -0.04058,
+    "cost_bp_per_night": 18.744,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_same_name": {
+    "ratio": -1.009954,
+    "held_out_variance_removed": 0.99837,
+    "held_out_tail_cut": 0.94478,
+    "cost_bp_per_night": 12.119,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   }
+  },
+  "NVDA": {
+   "spot": "RNVDAUSDT",
+   "perp": "NVDAUSDT",
+   "nights": 227,
+   "first": "2025-10-28",
+   "last": "2026-09-23",
+   "ballast_same_name": {
+    "ratio": -1.016635,
+    "held_out_variance_removed": 0.99903,
+    "held_out_tail_cut": 0.95981,
+    "cost_bp_per_night": 12.2,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_index": {
+    "ratio": -1.4215,
+    "in_sample_variance_removed": 0.45092,
+    "held_out_variance_removed": 0.52654,
+    "held_out_tail_cut": 0.28066,
+    "cost_bp_per_night": 17.058,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_same_name": {
+    "ratio": -1.013585,
+    "held_out_variance_removed": 0.99903,
+    "held_out_tail_cut": 0.95981,
+    "cost_bp_per_night": 12.163,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   }
+  },
+  "AAPL": {
+   "spot": "RAAPLUSDT",
+   "perp": "AAPLUSDT",
+   "nights": 227,
+   "first": "2025-10-28",
+   "last": "2026-09-23",
+   "ballast_same_name": {
+    "ratio": -1.027276,
+    "held_out_variance_removed": 0.99723,
+    "held_out_tail_cut": 0.92254,
+    "cost_bp_per_night": 12.327,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_index": {
+    "ratio": -0.51984,
+    "in_sample_variance_removed": 0.15005,
+    "held_out_variance_removed": -0.18499,
+    "held_out_tail_cut": -0.30023,
+    "cost_bp_per_night": 6.238,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_same_name": {
+    "ratio": -1.023391,
+    "held_out_variance_removed": 0.99723,
+    "held_out_tail_cut": 0.92254,
+    "cost_bp_per_night": 12.281,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   }
+  },
+  "MSFT": {
+   "spot": "RMSFTUSDT",
+   "perp": "MSFTUSDT",
+   "nights": 227,
+   "first": "2025-10-28",
+   "last": "2026-09-23",
+   "ballast_same_name": {
+    "ratio": -1.006233,
+    "held_out_variance_removed": 0.97782,
+    "held_out_tail_cut": 0.95642,
+    "cost_bp_per_night": 12.075,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_index": {
+    "ratio": -0.6014,
+    "in_sample_variance_removed": 0.15825,
+    "held_out_variance_removed": 0.10104,
+    "held_out_tail_cut": -0.0572,
+    "cost_bp_per_night": 7.217,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_same_name": {
+    "ratio": -1.007238,
+    "held_out_variance_removed": 0.97782,
+    "held_out_tail_cut": 0.95642,
+    "cost_bp_per_night": 12.087,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   }
+  },
+  "AMZN": {
+   "spot": "RAMZNUSDT",
+   "perp": "AMZNUSDT",
+   "nights": 227,
+   "first": "2025-10-28",
+   "last": "2026-09-23",
+   "ballast_same_name": {
+    "ratio": -0.994296,
+    "held_out_variance_removed": 0.99718,
+    "held_out_tail_cut": 0.95516,
+    "cost_bp_per_night": 11.932,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_index": {
+    "ratio": -1.039301,
+    "in_sample_variance_removed": 0.41679,
+    "held_out_variance_removed": 0.04957,
+    "held_out_tail_cut": 0.2213,
+    "cost_bp_per_night": 12.472,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_same_name": {
+    "ratio": -1.000312,
+    "held_out_variance_removed": 0.99718,
+    "held_out_tail_cut": 0.95516,
+    "cost_bp_per_night": 12.004,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   }
+  },
+  "META": {
+   "spot": "RMETAUSDT",
+   "perp": "METAUSDT",
+   "nights": 227,
+   "first": "2025-10-28",
+   "last": "2026-09-23",
+   "ballast_same_name": {
+    "ratio": -1.060712,
+    "held_out_variance_removed": 0.99533,
+    "held_out_tail_cut": 0.94359,
+    "cost_bp_per_night": 12.729,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_index": {
+    "ratio": -0.887267,
+    "in_sample_variance_removed": 0.24636,
+    "held_out_variance_removed": -0.05962,
+    "held_out_tail_cut": 0.1337,
+    "cost_bp_per_night": 10.647,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_same_name": {
+    "ratio": -1.031803,
+    "held_out_variance_removed": 0.99533,
+    "held_out_tail_cut": 0.94359,
+    "cost_bp_per_night": 12.382,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   }
+  },
+  "GOOGL": {
+   "spot": "RGOOGLUSDT",
+   "perp": "GOOGLUSDT",
+   "nights": 227,
+   "first": "2025-10-28",
+   "last": "2026-09-23",
+   "ballast_same_name": {
+    "ratio": -1.013896,
+    "held_out_variance_removed": 0.99725,
+    "held_out_tail_cut": 0.94975,
+    "cost_bp_per_night": 12.167,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_index": {
+    "ratio": -1.017979,
+    "in_sample_variance_removed": 0.32577,
+    "held_out_variance_removed": -0.22135,
+    "held_out_tail_cut": -0.14283,
+    "cost_bp_per_night": 12.216,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_same_name": {
+    "ratio": -1.012824,
+    "held_out_variance_removed": 0.99725,
+    "held_out_tail_cut": 0.94975,
+    "cost_bp_per_night": 12.154,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   }
+  },
+  "SPY": {
+   "spot": "RSPYUSDT",
+   "perp": "SPYUSDT",
+   "nights": 155,
+   "first": "2026-02-11",
+   "last": "2026-09-23",
+   "ballast_same_name": {
+    "ratio": -1.010381,
+    "held_out_variance_removed": 0.99598,
+    "held_out_tail_cut": 0.93474,
+    "cost_bp_per_night": 12.125,
+    "fit_nights": 108,
+    "held_out_nights": 47
+   },
+   "argus_index": {
+    "ratio": -0.600258,
+    "in_sample_variance_removed": 0.82626,
+    "held_out_variance_removed": 0.70651,
+    "held_out_tail_cut": 0.54049,
+    "cost_bp_per_night": 7.203,
+    "fit_nights": 108,
+    "held_out_nights": 47
+   },
+   "argus_same_name": {
+    "ratio": -1.01329,
+    "held_out_variance_removed": 0.99598,
+    "held_out_tail_cut": 0.93474,
+    "cost_bp_per_night": 12.159,
+    "fit_nights": 108,
+    "held_out_nights": 47
+   }
+  },
+  "COIN": {
+   "spot": "RCOINUSDT",
+   "perp": "COINUSDT",
+   "nights": 227,
+   "first": "2025-10-28",
+   "last": "2026-09-23",
+   "ballast_same_name": {
+    "ratio": -1.012035,
+    "held_out_variance_removed": 0.99673,
+    "held_out_tail_cut": 0.94427,
+    "cost_bp_per_night": 12.144,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_index": {
+    "ratio": -1.976484,
+    "in_sample_variance_removed": 0.30319,
+    "held_out_variance_removed": 0.0476,
+    "held_out_tail_cut": 0.02587,
+    "cost_bp_per_night": 23.718,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   },
+   "argus_same_name": {
+    "ratio": -1.008348,
+    "held_out_variance_removed": 0.99673,
+    "held_out_tail_cut": 0.94427,
+    "cost_bp_per_night": 12.1,
+    "fit_nights": 158,
+    "held_out_nights": 69
+   }
+  },
+  "PLTR": {
+   "spot": "RPLTRUSDT",
+   "perp": "PLTRUSDT",
+   "nights": 215,
+   "first": "2025-11-13",
+   "last": "2026-09-23",
+   "ballast_same_name": {
+    "ratio": -0.999544,
+    "held_out_variance_removed": 0.9983,
+    "held_out_tail_cut": 0.96971,
+    "cost_bp_per_night": 11.995,
+    "fit_nights": 150,
+    "held_out_nights": 65
+   },
+   "argus_index": {
+    "ratio": -1.182939,
+    "in_sample_variance_removed": 0.17625,
+    "held_out_variance_removed": 0.1712,
+    "held_out_tail_cut": 0.05884,
+    "cost_bp_per_night": 14.195,
+    "fit_nights": 150,
+    "held_out_nights": 65
+   },
+   "argus_same_name": {
+    "ratio": -0.998751,
+    "held_out_variance_removed": 0.9983,
+    "held_out_tail_cut": 0.96971,
+    "cost_bp_per_night": 11.985,
+    "fit_nights": 150,
+    "held_out_nights": 65
+   }
+  },
+  "AMD": {
+   "spot": "RAMDUSDT",
+   "perp": "AMDUSDT",
+   "nights": 112,
+   "first": "2026-04-15",
+   "last": "2026-09-23",
+   "ballast_same_name": {
+    "ratio": -1.002906,
+    "held_out_variance_removed": 0.99916,
+    "held_out_tail_cut": 0.96829,
+    "cost_bp_per_night": 12.035,
+    "fit_nights": 78,
+    "held_out_nights": 34
+   },
+   "argus_index": {
+    "ratio": -3.091803,
+    "in_sample_variance_removed": 0.67011,
+    "held_out_variance_removed": 0.63081,
+    "held_out_tail_cut": 0.2988,
+    "cost_bp_per_night": 37.102,
+    "fit_nights": 78,
+    "held_out_nights": 34
+   },
+   "argus_same_name": {
+    "ratio": -1.003279,
+    "held_out_variance_removed": 0.99916,
+    "held_out_tail_cut": 0.96829,
+    "cost_bp_per_night": 12.039,
+    "fit_nights": 78,
+    "held_out_nights": 34
+   }
+  }
+ },
+ "median": {
+  "ballast_same_name": {
+   "held_out_variance_removed": 0.99723,
+   "held_out_tail_cut": 0.94975,
+   "cost_bp_per_night": 12.125
+  },
+  "argus_index": {
+   "held_out_variance_removed": 0.10104,
+   "held_out_tail_cut": 0.05884,
+   "cost_bp_per_night": 12.472
+  },
+  "argus_same_name": {
+   "held_out_variance_removed": 0.99723,
+   "held_out_tail_cut": 0.94975,
+   "cost_bp_per_night": 12.119
+  }
+ },
+ "argus_same_name_vs_ballast_max_abs_difference": 0.0,
+ "comparison": {
+  "argus_index vs ballast_same_name": {
+   "names_better": 0,
+   "names": 11,
+   "median_difference": -0.87678,
+   "wilcoxon_p": 0.00098
+  }
+ },
+ "verdict": "TIED: held-out overnight variance removed, median over 11 names \u2014 ARGUS's console now 99.7%, Ballast's same-name perp 99.7% (largest per-name gap 0.0e+00; the same arithmetic). Before the spot rToken was modelled ARGUS offered its index hedge, which removes 10.1% and lost on 11/11 names (Wilcoxon p=0.00098)",
+ "limitations": [
+  "parity is the ceiling on this measure: both sides fit the same slope, so ARGUS's claim here is only that its console now offers the hedge, tested, with the index alternative and the weekend split beside it",
+  "nights only (close to next open), Ballast's own window; intraday hedging not scored",
+  "gross taker cost; Ballast's funding credit (0.7 bp a night on average) not applied"
+ ]
+}

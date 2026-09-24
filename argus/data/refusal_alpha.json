@@ -1,32 +1,32 @@
 {
-  "as_of": "2026-09-24T08:29:02.000820+00:00",
+  "as_of": "2026-09-24T16:18:13.511496+00:00",
   "round_trip_bps": 12.0,
   "min_directional_for_a_rate": 30,
-  "total_marks": 382,
+  "total_marks": 406,
   "outside_buckets": 0,
   "horizons": [
     {
       "horizon": "about_2h",
-      "marks": 291,
-      "directional": 289,
-      "correct": 169,
+      "marks": 303,
+      "directional": 301,
+      "correct": 176,
       "coverage_pct": 99.3,
       "accuracy_pct": 58.5,
       "accuracy_ci95": [
-        50.3,
-        66.4
+        50.7,
+        66.2
       ],
       "interval_method": "bootstrap over decision cycles",
-      "cycles": 26,
+      "cycles": 27,
       "beats_a_coin": true,
       "naive_lean": "up",
-      "naive_accuracy_pct": 53.3,
-      "cycles_lean_beat_naive": 11,
+      "naive_accuracy_pct": 52.8,
+      "cycles_lean_beat_naive": 12,
       "cycles_naive_beat_lean": 9,
       "cycles_tied": 6,
-      "sign_test_p_vs_naive": 0.8238029479980469,
+      "sign_test_p_vs_naive": 0.6636238098144531,
       "beats_the_naive_call": false,
-      "hurdle_clearance_pct": 72.9,
+      "hurdle_clearance_pct": 73.6,
       "median_forgone_bps": -6.67,
       "enough_for_a_rate": true
     },
@@ -54,29 +54,29 @@
     },
     {
       "horizon": "overnight_12h_plus",
-      "marks": 90,
-      "directional": 87,
-      "correct": 42,
-      "coverage_pct": 96.7,
-      "accuracy_pct": 48.3,
+      "marks": 102,
+      "directional": 99,
+      "correct": 48,
+      "coverage_pct": 97.1,
+      "accuracy_pct": 48.5,
       "accuracy_ci95": [
-        32.2,
-        62.1
+        34.3,
+        60.6
       ],
       "interval_method": "bootstrap over decision cycles",
-      "cycles": 8,
+      "cycles": 9,
       "beats_a_coin": false,
       "naive_lean": "up",
-      "naive_accuracy_pct": 58.6,
-      "cycles_lean_beat_naive": 1,
+      "naive_accuracy_pct": 54.5,
+      "cycles_lean_beat_naive": 2,
       "cycles_naive_beat_lean": 4,
       "cycles_tied": 3,
-      "sign_test_p_vs_naive": 0.375,
+      "sign_test_p_vs_naive": 0.6875,
       "beats_the_naive_call": false,
-      "hurdle_clearance_pct": 88.9,
+      "hurdle_clearance_pct": 89.2,
       "median_forgone_bps": -18.11,
       "enough_for_a_rate": true
     }
   ],
-  "verdict": "At the `about_2h` horizon: 169 of 289 directional calls went the right way. 95% interval (bootstrap over 26 decision cycles) 50.3% to 66.4%. It excludes a coin flip. But calling `up` every time was right 53.3% of the time, and cycle by cycle the lean beat that naive call 11 times and lost 9 (6 tied) \u2014 so there is no evidence yet that the lean knows more than the direction of the tape. Median net edge forgone by standing aside: -6.7bps after a 12.0bps round trip \u2014 refusing saved money on the typical decision."
+  "verdict": "At the `about_2h` horizon: 176 of 301 directional calls went the right way. 95% interval (bootstrap over 27 decision cycles) 50.7% to 66.2%. It excludes a coin flip. But calling `up` every time was right 52.8% of the time, and cycle by cycle the lean beat that naive call 12 times and lost 9 (6 tied) \u2014 so there is no evidence yet that the lean knows more than the direction of the tape. Median net edge forgone by standing aside: -6.7bps after a 12.0bps round trip \u2014 refusing saved money on the typical decision."
 }

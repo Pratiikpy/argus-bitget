@@ -776,6 +776,83 @@ def worst_window(
 
 
 # =============================================================================================
+# Tail risk — who carries the loss in the worst hours, not only the variance
+# =============================================================================================
+
+TAIL_CONFIDENCE = 0.95
+"""The CVaR level: the average of the worst 5% of bars."""
+
+
+@dataclass(frozen=True, slots=True)
+class TailRisk:
+    """The book's historical CVaR and each position's share of it."""
+
+    confidence: float
+    cvar: float
+    """Average loss over the worst ``1 - confidence`` of bars, as a positive fraction."""
+
+    bars: int
+    contributions: tuple[tuple[str, float], ...]
+    """``(symbol, contribution)``; contributions sum to :attr:`cvar`."""
+
+    def share(self, symbol: str) -> float | None:
+        for name, value in self.contributions:
+            if name == symbol:
+                return value / self.cvar if self.cvar > 0 else None
+        return None
+
+    def as_dict(self) -> dict[str, Any]:
+        return {"confidence": self.confidence, "cvar": round(self.cvar, 8), "bars": self.bars,
+                "contributions": {k: round(v, 8) for k, v in self.contributions}}
+
+
+def tail_contributions(
+    weights: Mapping[str, float], columns: Mapping[str, Sequence[float]],
+    confidence: float = TAIL_CONFIDENCE,
+) -> TailRisk | None:
+    """Historical CVaR of the book and its exact Euler split across positions.
+
+    **The definition is skfolio's** (``measures/_measures.py:602-655``, BSD-3): with ``k = (1 -
+    beta) * n`` and ``ik = max(0, ceil(k) - 1)``, CVaR is minus the sum of the ``ik`` worst returns
+    over ``k``, plus the next-worst return weighted by ``(ik / k - 1)`` — the fractional bar a
+    finite sample needs. CVaR is positively homogeneous in the weights, so its gradient times the
+    weights sums to it exactly (Euler); the gradient is each name's return over those same bars in
+    the same proportions. skfolio's ``Portfolio.contribution(CVaR)`` estimates the same quantity by
+    central finite differences (``portfolio/_portfolio.py:1032-1082, 1575-1603``); the two agree
+    wherever the ordering of the worst bars does not change inside its step, and the agreement is
+    checked against skfolio itself (`data/tail_contribution_oracle.json`).
+
+    **Why beside the variance split.** Variance treats a name that jumps up like one that crashes.
+    A position can carry 19% of a book's variance and far more of its worst hours — the
+    concentration a trader actually feels. Computed over every aligned bar, open and shut, because
+    the losses that matter to a stock-perpetual holder are often the ones that land while the US
+    market is closed.
+    """
+    held = {s: list(c) for s, c in columns.items() if float(weights.get(s, 0.0)) != 0.0}
+    if not held:
+        return None
+    n = min(len(c) for c in held.values())
+    if n < MIN_OBSERVATIONS:
+        return None
+    book = [sum(float(weights[s]) * held[s][t] for s in held) for t in range(n)]
+    k = (1.0 - confidence) * n
+    ik = max(0, math.ceil(k) - 1)
+    order = sorted(range(n), key=lambda t: book[t])
+    worst, edge = order[:ik], order[ik]
+    tail_weight = ik / k - 1.0
+
+    def loss(series: Sequence[float]) -> float:
+        return -sum(series[t] for t in worst) / k + series[edge] * tail_weight
+
+    cvar = loss(book)
+    contributions = tuple((s, float(weights[s]) * loss(c)) for s, c in sorted(held.items()))
+    total = sum(v for _, v in contributions)
+    if abs(total - cvar) > max(IDENTITY_TOLERANCE, abs(cvar) * 1e-9):
+        raise PortfolioError(f"tail contributions sum to {total!r}, CVaR is {cvar!r}")
+    return TailRisk(confidence=confidence, cvar=cvar, bars=n, contributions=contributions)
+
+
+# =============================================================================================
 # Factor exposure — the last item on the Open Theme's list
 # =============================================================================================
 
@@ -899,6 +976,7 @@ class CopilotReport:
     worst: WorstWindow
     exposures: tuple[FactorExposure, ...]
     session_beta: Mapping[Session, Exposure]
+    tail: TailRisk | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -917,6 +995,7 @@ class CopilotReport:
                 str(k): (None if v.beta is None else round(v.beta, 4))
                 for k, v in self.session_beta.items()
             },
+            "tail": None if self.tail is None else self.tail.as_dict(),
         }
 
 
@@ -996,6 +1075,7 @@ def copilot(
         worst=worst_window(weights=after, columns=columns),
         exposures=tuple(exposures),
         session_beta=session_betas(raw[add], raw[benchmark], symbol=add, is_open=is_open),
+        tail=tail_contributions(after, columns),
     )
 
 
@@ -1100,6 +1180,7 @@ __all__ = [
     "Session",
     "Shock",
     "StressOutcome",
+    "TailRisk",
     "TradeImpact",
     "WorstWindow",
     "align",
@@ -1118,6 +1199,7 @@ __all__ = [
     "returns",
     "session_betas",
     "stress_by_beta",
+    "tail_contributions",
     "variance",
     "worst_window",
 ]

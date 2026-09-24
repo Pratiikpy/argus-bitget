@@ -241,8 +241,8 @@ class TestTheCascadeOrdering:
         ``unsupported`` appeared to be a loose pattern: it fired on 34 rows across the burned
         splits and "overrode a correct model answer" on every one. Reading the rows showed the
         opposite. They ask about ``EUR/USD``, ``BTC``, ``ABC``, ``PQR`` — tickers the corpus
-        generator invented, none among the twelve rTokens — and refusing them is correct. The
-        *labels* were wrong, not the pattern.
+        generator invented, none among the twelve stock perpetuals — and refusing them is correct.
+        The *labels* were wrong, not the pattern.
 
         The model has no concept of the traded universe, so it cannot make this judgement. With
         ``unsupported`` excluded, *"what is gold trading at"* stopped being refused.

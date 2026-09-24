@@ -27,9 +27,14 @@ same clustering this comparison's other functions measure, so an arbitrary extra
 score lower than the true rate by chance. The directional claim above does not share that
 fragility in any real run observed while building this.) ARGUS's market-relative abnormal-
 return test (ETH regressed on BTC, so common-market drift is removed before anything is tested)
-does not share this bias — run on the identical placebo draws, it almost never claims "EFFECT
-ESTABLISHED" (all four clustering-adjusted tests agreeing), because there genuinely is no
-BTC-adjusted signal in random real timestamps.
+is less exposed to this bias — run on the identical placebo draws, it claims "EFFECT ESTABLISHED"
+(all four clustering-adjusted tests agreeing) less often than whale-signals calls a draw
+significant, because there genuinely is no BTC-adjusted signal in random real timestamps. **It is
+not immune, and an earlier version of this sentence said it "almost never" does.** Two 40-draw
+runs on 2026-09-24: ARGUS agreed on 10% and 7.5% of placebo draws against whale-signals' 17.5%
+and 12.5%, both above the nominal 5%; on 12 draws the two tied at 2 of 12. The overlapping
+windows carry serial correlation the clustering correction does not fully remove, so ARGUS's
+false-agreement rate is reported as measured, not as near zero.
 
 SCOPE, stated explicitly:
 
@@ -422,7 +427,7 @@ def main() -> int:  # pragma: no cover - CLI
 
     report = {
         "base_rate_case": run_base_rate_case(),
-        "false_positive_sweep": run_false_positive_sweep(),
+        "false_positive_sweep": run_false_positive_sweep(n_seeds=40),
         "null_ablation": run_null_ablation(),
         "failure_cases": run_failure_cases(),
         "costs": measure_costs(),
