@@ -1,11 +1,11 @@
 {
-  "total": 95,
-  "checked": 85,
-  "ok": 71,
+  "total": 96,
+  "checked": 86,
+  "ok": 72,
   "lagging": 14,
   "stale": 0,
   "absent": 24,
-  "deleted": 3,
+  "deleted": 2,
   "unchecked": 10,
   "findings": [
     {
@@ -1050,14 +1050,17 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "explained",
-      "line": null,
-      "quoted": [],
+      "line": 474,
+      "quoted": [
+        "10",
+        "11"
+      ],
       "live": [
         10,
         11
       ],
-      "status": "DELETED",
-      "excerpt": "last seen at line 1505"
+      "status": "OK",
+      "excerpt": "on 10 of 11 rTokens"
     },
     {
       "claim": "session_beta_higher_open",

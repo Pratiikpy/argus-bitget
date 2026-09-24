@@ -471,7 +471,7 @@ We measured it on 30 days of hourly candles for every stock perpetual against QQ
 | MSFTUSDT | 0.340 | **0.577** | 0.245 |
 | NVDAUSDT | 1.412 | **1.709** | 1.296 |
 
-**Open-session beta is higher than shut-session beta on 10 of 11 stock perpetuals.**
+**Open-session beta is higher than shut-session beta on 10 of 11 rTokens** (the stock perpetuals).
 
 AAPL is the extreme. Its blended beta of 0.254 would tell a trader the name is nearly
 market-neutral. During the session that actually prices it, the figure is **0.668** — more than two
