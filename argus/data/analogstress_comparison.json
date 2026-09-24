@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-24T13:01:39.441825+00:00",
+ "generated_at": "2026-09-24T13:08:41.380299+00:00",
  "protocol": {
   "horizon": 5,
   "coverage": 0.8,
@@ -190,6 +190,16 @@
    "width_pct": 13.06,
    "matched_width_pct": 10.03,
    "winkler_pct": 16.396
+  },
+  "argusRegimeBlend50": {
+   "predictor": "argusRegimeBlend50",
+   "frozen_scale": 0.9849,
+   "n": 2698,
+   "coverage_pct": 82.9,
+   "coverage_se_pct": 2.03,
+   "width_pct": 10.43,
+   "matched_width_pct": 9.69,
+   "winkler_pct": 14.865
   }
  },
  "pit_chi_square": {
@@ -198,6 +208,7 @@
   "argusShape": 91.0
  },
  "ranking_by_winkler": [
+  "argusRegimeBlend50",
   "uncondNamePIT",
   "volHarness",
   "analogConformal",
@@ -243,9 +254,57 @@
    "p": 0.0105,
    "dates": 38,
    "paired_queries": 2690
+  },
+  "argusRegimeBlend50 vs analogConformal": {
+   "mean_diff_pct": -0.388,
+   "t": -1.42,
+   "p": 0.1555,
+   "dates": 38,
+   "paired_queries": 2698
+  },
+  "argusRegimeBlend50 vs analogRaw": {
+   "mean_diff_pct": -0.98,
+   "t": -2.372,
+   "p": 0.0177,
+   "dates": 38,
+   "paired_queries": 2698
+  },
+  "argusRegimeBlend50 vs uncondNamePIT": {
+   "mean_diff_pct": -0.277,
+   "t": -1.182,
+   "p": 0.2372,
+   "dates": 38,
+   "paired_queries": 2698
+  },
+  "argusRegimeBlend50 vs volHarness": {
+   "mean_diff_pct": -0.301,
+   "t": -2.09,
+   "p": 0.0366,
+   "dates": 38,
+   "paired_queries": 2698
+  },
+  "argusRegimeBlend50 vs pooledUncond": {
+   "mean_diff_pct": -1.898,
+   "t": -5.351,
+   "p": 0.0,
+   "dates": 38,
+   "paired_queries": 2698
   }
  },
  "verdict": "NO SIGNIFICANT DIFFERENCE: argusAnalogue Winkler 15.52% against the best rival predictor uncondNamePIT at 15.14% (+0.38 points, Diebold-Mariano p=0.2932, clustered by date)",
+ "after_absorbing": {
+  "selection": {
+   "chosen": "argusRegimeBlend50",
+   "calibration_split_winkler_pct": {
+    "argusRegimeBlend25": 16.736,
+    "argusRegimeBlend50": 16.699,
+    "argusRegimeBlend75": 16.779
+   }
+  },
+  "verdict_vs_analogdesk": "NO SIGNIFICANT DIFFERENCE: argusRegimeBlend50 Winkler 14.86% against the best rival predictor analogConformal at 15.25% (-0.39 points, Diebold-Mariano p=0.1555, clustered by date)",
+  "verdict_vs_best_rival": "NO SIGNIFICANT DIFFERENCE: argusRegimeBlend50 Winkler 14.86% against the best rival predictor uncondNamePIT at 15.14% (-0.28 points, Diebold-Mariano p=0.2372, clustered by date)",
+  "prompted_by_the_test_result": true
+ },
  "not_scored": "path-breach Brier at -5/-10/-20%: ARGUS's analogue engines return each analogue's forward return, not its intraday excursion",
  "limitations": [
   "every predictor fails PIT uniformity (5% critical value 16.92), ARGUS's included",

@@ -288,23 +288,71 @@ def run_argus(grid: dict[str, Any]) -> None:
                 row[f"{key}_pit"] = got["pit"]
 
 
+NORMAL_80 = 1.2815515655446004
+"""The standard normal's 90th percentile: the half-width of a central 80% band in sigmas."""
+BLEND_WEIGHTS = (0.25, 0.5, 0.75)
+SELECTION_SPLIT = "2021-01-01"
+"""Variants are compared on the calibration era only: multipliers fitted before this date,
+Winkler scored after it. The test era is scored once, for the variant chosen here."""
+
+
+def add_blends(rows: list[dict[str, Any]]) -> list[str]:
+    """Regime-scaled same-name bands: the name's own unconditional half-width blended with its
+    current volatility's, centred on the name's own median.
+
+    **Stated plainly: this idea came from the test result.** The naive same-name band beat every
+    retrieval method on the test era, AnalogDesk's and ARGUS's alike, and the obvious next
+    question is whether conditioning that band on the current volatility regime helps. Choosing
+    *among* the blends is done on the calibration era only (`select_variant`), and the test era
+    is scored once, for the one chosen; the prompt for trying them is still a look at the test.
+    """
+    names = []
+    for w in BLEND_WEIGHTS:
+        key = f"argusRegimeBlend{int(w * 100)}"
+        names.append(key)
+        for row in rows:
+            naive, vol = row.get("uncondNamePIT"), row.get("volHarness")
+            if not naive or not vol or not vol.get("hw") or not naive.get("hw"):
+                row[key] = None
+                continue
+            half = w * float(naive["hw"]) + (1 - w) * NORMAL_80 * float(vol["hw"])
+            row[key] = {"centre": float(naive["centre"]), "hw": half}
+    return names
+
+
+def select_variant(rows: list[dict[str, Any]], keys: list[str], target: float) -> dict[str, Any]:
+    """The variant with the lowest Winkler on 2021-2022, its multiplier fitted on 2019-2020."""
+    calib = [r for r in rows if r["era"] == "calibration"]
+    early = [r for r in calib if r["date"] < SELECTION_SPLIT]
+    late = [r for r in calib if r["date"] >= SELECTION_SPLIT]
+    by_key = {key: score(early, late, key, target).winkler for key in keys}
+    chosen = min(by_key, key=lambda k: by_key[k])
+    return {"chosen": chosen, "calibration_split_winkler_pct":
+            {k: round(v * 100, 3) for k, v in by_key.items()}}
+
+
 def compare(grid: dict[str, Any], rival_results: dict[str, Any] | None = None) -> dict[str, Any]:
     target = float(grid["coverage"])
     calib = [r for r in grid["rows"] if r["era"] == "calibration"]
     test = [r for r in grid["rows"] if r["era"] == "test"]
-    scored = {key: score(calib, test, key, target) for key in (*RIVAL, *ARGUS)
+    blends = add_blends(grid["rows"])
+    selection = select_variant(grid["rows"], blends, target)
+    arms = (*ARGUS, selection["chosen"])
+    scored = {key: score(calib, test, key, target) for key in (*RIVAL, *arms)
               if any(r.get(key) for r in test)}
     reproduced = reproduction(scored, test, rival_results, int(grid["horizon"]))
     ranking = sorted(scored.values(), key=lambda s: s.winkler)
     best_argus = min((scored[k] for k in ARGUS if k in scored), key=lambda s: s.winkler,
                      default=None)
+    blend = scored.get(selection["chosen"])
     best_rival = min((scored[k] for k in RIVAL if k in scored), key=lambda s: s.winkler)
     tests = {}
-    if best_argus is not None:
+    for mine in (best_argus, blend):
+        if mine is None:
+            continue
         for key in RIVAL:
             if key in scored:
-                tests[f"{best_argus.predictor} vs {key}"] = diebold_mariano(
-                    best_argus, scored[key], test)
+                tests[f"{mine.predictor} vs {key}"] = diebold_mariano(mine, scored[key], test)
     return {
         "generated_at": datetime.now(UTC).isoformat(),
         "protocol": {"horizon": grid["horizon"], "coverage": target, "k": TOP, "window": WINDOW,
@@ -319,6 +367,13 @@ def compare(grid: dict[str, Any], rival_results: dict[str, Any] | None = None) -
         "best_rival": best_rival.predictor,
         "diebold_mariano": tests,
         "verdict": _verdict(best_argus, best_rival, tests),
+        "after_absorbing": {
+            "selection": selection,
+            "verdict_vs_analogdesk": (None if blend is None else _verdict(
+                blend, scored["analogConformal"], tests)),
+            "verdict_vs_best_rival": None if blend is None else _verdict(blend, best_rival, tests),
+            "prompted_by_the_test_result": True,
+        },
         "not_scored": "path-breach Brier at -5/-10/-20%: ARGUS's analogue engines return each "
                       "analogue's forward return, not its intraday excursion",
         "limitations": [

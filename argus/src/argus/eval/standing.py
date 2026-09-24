@@ -5574,8 +5574,11 @@ REGISTER: tuple[Capability, ...] = (
             "both lose to the naive same-name band (15.14). ARGUS wins two secondary measures: "
             "its raw analogue distribution is far better calibrated (PIT chi-square 92 against "
             "208.6) and the path matcher's matched-coverage width is narrower (10.03% against "
-            "10.20%). Path-breach Brier is not scored: ARGUS's engines do not return intraday "
-            "excursions",
+            "10.20%). A regime-scaled same-name band, chosen among three variants on 2019-2022 "
+            "only (the idea itself prompted by the test result), scores 14.86 — ahead of "
+            "AnalogDesk (15.25) and the naive band (15.14), but not significantly (p = 0.16 and "
+            "0.24); it does beat the volatility harness significantly (p = 0.04). Path-breach "
+            "Brier is not scored: ARGUS's engines do not return intraday excursions",
         ),
     ),
 )
