@@ -659,7 +659,7 @@ And to check the whole thing is what this document says it is:
 
 ```bash
 pytest                    # 6,700 tests
-python -m argus.status    # 150/150 modules importable, 18/18 sub-themes, artefacts on disk
+python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
 ---
@@ -1139,7 +1139,7 @@ why.
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 655 decisions on record. Every one of them is a refusal, and 604 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 659 decisions on record. Every one of them is a refusal, and 604 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
 zero trades, those three numbers **do not exist**. Not "are zero" — do not exist. Half of the track
@@ -1705,10 +1705,10 @@ takes, and every artefact the system writes.
 
 | | |
 |---|---|
-| Source modules | **325** files across **21 packages**, 130,154 lines |
-| Registered and importable | **150/150** (`python -m argus.status` checks this at runtime) |
+| Source modules | **327** files across **21 packages**, 130,470 lines |
+| Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
 | Test files / tests | **224 files**, **6,700 tests collected** |
-| Type and lint | `ruff` clean, `mypy --strict` clean on **325 source files** |
+| Type and lint | `ruff` clean, `mypy --strict` clean on **327 source files** |
 | Artefacts written | **162** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
@@ -1941,7 +1941,7 @@ and each is treated as **absent rather than stale** past 36 hours — so a measu
 refreshing degrades the system into saying "not measured" rather than into using an old number.
 
 Also standing on its own: the factor lab's memory across runs, the Skill health sweep the cycle reads
-rather than waits on, and `python -m argus.status`, which checks at runtime that all 150 modules
+rather than waits on, and `python -m argus.status`, which checks at runtime that all 152 modules
 import, that all 18 sub-themes resolve to a symbol and a test file, and that every declared artefact
 is on disk.
 
@@ -1953,9 +1953,9 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 325 files, 21 packages, 130,154 lines; `mypy --strict` clean on 325 source files |
+| Source modules | 327 files, 21 packages, 130,470 lines; `mypy --strict` clean on 327 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
-| Modules registered and importable | 150/150 modules importable |
+| Modules registered and importable | 152/152 modules importable |
 | Tests | 6,700 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 66, every one produced by running something |

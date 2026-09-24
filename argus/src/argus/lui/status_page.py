@@ -31,6 +31,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from argus.lui import design
+
 PROBE_TIMEOUT_S = 12.0
 CACHE_SECONDS = 600.0
 _CACHE: dict[str, Any] = {}
@@ -195,17 +197,11 @@ def render(status: dict[str, Any], checks: list[Check], checked_at: float,
         due = datetime.fromisoformat(due).strftime("%d %b %H:%M UTC")
     except ValueError:
         due = due or "on schedule"
-    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">{design.FONTS}
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="{favicon}">
 <title>ARGUS — status</title>
-<style>
- :root {{ --ink:#12161c; --dim:#5b6470; --line:#dfe3e8; --bg:#f7f8fa; --panel:#fff;
-   --accent:#1a5fb4; --good:#1f7a3e; --bad:#a3261c;
-   --mono:ui-monospace,"SF Mono",Menlo,monospace; }}
- @media (prefers-color-scheme: dark) {{ :root {{ --ink:#e6e9ee; --dim:#98a2b0; --line:#2a313b;
-   --bg:#0f1318; --panel:#161b22; --accent:#7aa7ea; --good:#5cc486; --bad:#f08a80; }} }}
- * {{ box-sizing:border-box }}
+<style>{design.TOKENS_CSS}
  body {{ margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,sans-serif }}
  .wrap {{ max-width:900px; margin:0 auto; padding:28px 18px 64px }}
  h1 {{ font-size:21px; margin:0 0 6px }} h2 {{ font-size:15px; margin:26px 0 8px }}
@@ -228,7 +224,7 @@ def render(status: dict[str, Any], checks: list[Check], checked_at: float,
    tr {{ border-top:1px solid var(--line); padding:8px 0 }} tr:first-child {{ border-top:0 }}
    td {{ border:0; padding:2px 12px }} .n {{ text-align:left }}
  }}
-</style></head><body><div class="wrap">
+{design.BASE_CSS}</style></head><body>{design.nav('/status')}<div class="wrap">
 <h1>Status — the record and its sources</h1>
 <p class="sub">What the desk's hash-chained record holds, and which of Bitget's data surfaces
 this console answers from are answering right now. Live checks ran {esc(checked)}; the slow
@@ -246,7 +242,7 @@ sweeps say when they ran. <a href="/">Console</a> · <a href="/research">Researc
 <div class="tbl"><table>{sweep_rows}</table></div>
 <p class="sub" style="margin-top:14px">The desk decides four times a day during US market hours;
 the next cycle is due {esc(due)}.</p>
-</div></body></html>"""
+</div>{design.footer()}</body></html>"""
 
 
 __all__ = ["CHECKS", "Check", "live_checks", "render", "sweep_lines"]

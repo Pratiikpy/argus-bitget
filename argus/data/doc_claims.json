@@ -123,65 +123,65 @@
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "325"
+        "327"
       ],
       "live": [
-        325
+        327
       ],
       "status": "OK",
-      "excerpt": "strict clean on 325 source files"
+      "excerpt": "strict clean on 327 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 59,
       "quoted": [
-        "325"
+        "327"
       ],
       "live": [
-        325
+        327
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 325 source files"
+      "excerpt": "strict` clean on 327 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 412,
       "quoted": [
-        "325"
+        "327"
       ],
       "live": [
-        325
+        327
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 325 files"
+      "excerpt": "strict` clean on 327 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 613,
       "quoted": [
-        "325"
+        "327"
       ],
       "live": [
-        325
+        327
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 325 source files"
+      "excerpt": "strict` clean across 327 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 1956,
       "quoted": [
-        "325"
+        "327"
       ],
       "live": [
-        325
+        327
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 325 source files"
+      "excerpt": "strict` clean on 327 source files"
     },
     {
       "claim": "register_claims",
@@ -298,7 +298,7 @@
         344
       ],
       "status": "OK",
-      "excerpt": "349 of those 655 decisions were taken in a tradeable session with the anchor market open, and **344 of them"
+      "excerpt": "349 of those 659 decisions were taken in a tradeable session with the anchor market open, and **344 of them"
     },
     {
       "claim": "refusal_accuracy_2h",
@@ -609,13 +609,13 @@
       "doc": "readme",
       "line": 71,
       "quoted": [
-        "655"
+        "659"
       ],
       "live": [
-        655
+        659
       ],
       "status": "OK",
-      "excerpt": "655 decisions in the paper ledger"
+      "excerpt": "659 decisions in the paper ledger"
     },
     {
       "claim": "ledger_decisions",
@@ -623,7 +623,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        655
+        659
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -634,7 +634,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        655
+        659
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -644,45 +644,45 @@
       "doc": "readme",
       "line": 70,
       "quoted": [
-        "150",
-        "150"
+        "152",
+        "152"
       ],
       "live": [
-        150,
-        150
+        152,
+        152
       ],
       "status": "OK",
-      "excerpt": "150/150 modules importable"
+      "excerpt": "152/152 modules importable"
     },
     {
       "claim": "modules_importable",
       "doc": "public-readme",
       "line": 61,
       "quoted": [
-        "150",
-        "150"
+        "152",
+        "152"
       ],
       "live": [
-        150,
-        150
+        152,
+        152
       ],
       "status": "OK",
-      "excerpt": "150/150 modules importable"
+      "excerpt": "152/152 modules importable"
     },
     {
       "claim": "modules_importable",
       "doc": "submission",
       "line": 614,
       "quoted": [
-        "150",
-        "150"
+        "152",
+        "152"
       ],
       "live": [
-        150,
-        150
+        152,
+        152
       ],
       "status": "OK",
-      "excerpt": "150/150 modules importable"
+      "excerpt": "152/152 modules importable"
     },
     {
       "claim": "subthemes",
@@ -734,52 +734,52 @@
       "doc": "readme",
       "line": 71,
       "quoted": [
-        "655"
+        "659"
       ],
       "live": [
-        655
+        659
       ],
       "status": "OK",
-      "excerpt": "655 decisions"
+      "excerpt": "659 decisions"
     },
     {
       "claim": "ledger_entries",
       "doc": "readme",
       "line": 236,
       "quoted": [
-        "655"
+        "659"
       ],
       "live": [
-        655
+        659
       ],
       "status": "OK",
-      "excerpt": "655 ledger entries"
+      "excerpt": "659 ledger entries"
     },
     {
       "claim": "ledger_entries",
       "doc": "submission",
       "line": 590,
       "quoted": [
-        "655"
+        "659"
       ],
       "live": [
-        655
+        659
       ],
       "status": "OK",
-      "excerpt": "655 decisions"
+      "excerpt": "659 decisions"
     },
     {
       "claim": "ledger_entries",
       "doc": "explained",
       "line": 1142,
       "quoted": [
-        "655"
+        "659"
       ],
       "live": [
-        655
+        659
       ],
       "status": "OK",
-      "excerpt": "paper-trading log has 655 decisions"
+      "excerpt": "paper-trading log has 659 decisions"
     },
     {
       "claim": "settled_abstentions",
@@ -821,13 +821,13 @@
       "doc": "readme",
       "line": 247,
       "quoted": [
-        "488"
+        "492"
       ],
       "live": [
-        488
+        492
       ],
       "status": "OK",
-      "excerpt": "488 decisions carry a lean"
+      "excerpt": "492 decisions carry a lean"
     },
     {
       "claim": "leans_recorded",
@@ -835,7 +835,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        488
+        492
       ],
       "status": "ABSENT",
       "excerpt": ""

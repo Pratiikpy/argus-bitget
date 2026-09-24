@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
+from argus.lui import design
 from argus.lui.answer import Answer, answer
 from argus.lui.cli import BUDGET_MS
 from argus.lui.ngram import reclassify
@@ -56,13 +57,7 @@ from argus.paper.ledger import PaperLedger
 HOST = "127.0.0.1"
 PORT = 8765
 
-FAVICON = (
-    "data:image/svg+xml,"
-    "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E"
-    "%3Crect width='32' height='32' rx='7' fill='%231a5fb4'/%3E"
-    "%3Ctext x='16' y='23' font-family='ui-monospace,monospace' font-size='18' "
-    "font-weight='700' fill='%23fff' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E"
-)
+FAVICON = design.favicon()
 """An inline SVG, not a bundled file. Every route in this server is one string in one module —
 adding a binary asset and a route to serve it would be the first exception to that, for a mark a
 judge never consciously looks at. Its absence was not silent, though: an unstyled 404 for
@@ -72,18 +67,9 @@ a first-time judge would (2026-09-22) rather than by reading the code and assumi
 PAGE = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" href="__FAVICON__">
+<link rel="icon" href="__FAVICON__">__FONTS__
 <title>ARGUS desk console</title>
-<style>
-  :root {
-    --ink:#12161c; --dim:#5b6470; --line:#dfe3e8; --bg:#f7f8fa; --panel:#fff;
-    --accent:#1a5fb4; --warn:#8a4b00; --ok:#0f6b3f; --mono:ui-monospace,"SF Mono",Menlo,monospace;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --ink:#e6e9ee; --dim:#98a2b0; --line:#2a313b; --bg:#0f1318; --panel:#161b22;
-            --accent:#7aa7ea; --warn:#e0a15a; --ok:#5fd39a; }
-  }
-  * { box-sizing:border-box }
+<style>__TOKENS__
   body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,sans-serif; }
   .wrap { max-width:900px; margin:0 auto; padding:28px 18px 64px; }
   h1 { font-size:20px; margin:0 0 4px; letter-spacing:-0.01em }
@@ -107,9 +93,11 @@ PAGE = """<!doctype html>
   .over { color:var(--warn); border-color:var(--warn) }
   .refused .q { color:var(--warn) }
   .line { margin:3px 0; white-space:pre-wrap; overflow-wrap:anywhere }
-  .src { margin-top:10px; padding-top:9px; border-top:1px dashed var(--line);
-    font:11.5px/1.5 var(--mono); color:var(--dim) }
-  .src b { color:var(--ok); font-weight:600 }
+  .src { margin-top:14px; padding:12px 14px; border:1px solid var(--line); border-radius:10px;
+    background:var(--bg); font:11.5px/1.6 var(--mono); color:var(--dim); overflow-wrap:anywhere }
+  .src .rk { display:block; font:600 10.5px/1 var(--mono); letter-spacing:.14em;
+    text-transform:uppercase; color:var(--proof); margin-bottom:8px }
+  .src b { color:var(--ink); font-weight:600 }
   .empty { color:var(--dim); font-size:13.5px }
   .book { display:flex; gap:8px; align-items:center; margin:-6px 0 16px; flex-wrap:wrap }
   .book label { font-size:12.5px; color:var(--dim); white-space:nowrap }
@@ -121,24 +109,21 @@ PAGE = """<!doctype html>
   .line.act { font-weight:600; color:var(--accent) }
   .line.hedge { font-weight:600 }
   .line.fine { color:var(--dim); font-size:13px }
-</style></head><body><div class="wrap">
-<h1>ARGUS desk console</h1>
-<p class="sub">Ask about any contract Bitget lists — stocks, ETFs, gold, oil, crypto: what a trade
-would do to your portfolio, what a market drop would cost you, how names compare, where it trades,
-its technicals and earnings date, whether it has been here before, or how to split an order.
-Every figure is computed by the desk's own engines from Bitget data and names its source; the
-language model only works out what you asked, and
-never writes a number. Ask about the desk's own decisions and every answer cites the
-hash-chained ledger row it came from. When nothing can support an answer you get a refusal and the
-reason, never a guess. <span id="stat"></span></p>
-<p class="sub" style="margin-top:-14px">Track 3 asks for one complete research task, question to
-actionable insight: <a href="/research" style="color:var(--accent)">run one now</a> &mdash;
-seven engines answer "should I add 15% TSLA to my book?" live, each naming its source, and end in
-what to do. Change the name, size or book in the page. And the other half of the story:
-<a href="/wrong" style="color:var(--accent)">what we got wrong</a> &mdash; every bug, withdrawn
-claim and lost comparison, read live from its own artefact &mdash; and
-<a href="/proof" style="color:var(--accent)">what we beat</a>: every capability measured against
-the specialist that leads its sub-theme, with the question that runs it here.</p>
+  .stat { font:12px/1.6 var(--mono); color:var(--dim); margin:0 0 14px }
+  .jump { display:flex; gap:10px 22px; flex-wrap:wrap; margin:0 0 30px; font-weight:500 }
+  .jump a { text-decoration:none; color:var(--ink); border-bottom:1px solid var(--line);
+    padding-bottom:2px }
+  .jump a:hover { border-color:var(--ink) }
+__BASE__</style></head><body>__NAV__<div class="wrap">
+<p class="kicker">ARGUS · research workbench for Bitget</p>
+<h1>Ask the desk. Every number comes with its source.</h1>
+<p class="sub">Ask about anything Bitget lists — stocks, ETFs, gold, oil, crypto. The desk's own
+engines compute every figure from live data and name the source; the language model only reads your
+question and never writes a number. No source, no answer: you get a refusal and the reason.</p>
+<p class="stat"><span id="stat"></span></p>
+<p class="jump"><a href="/research">Run a full research task &rarr;</a>
+<a href="/proof">What we beat &rarr;</a><a href="/wrong">What we got wrong &rarr;</a>
+<a href="/status">What the desk can see &rarr;</a></p>
 
 <form class="bar" id="f">
   <input type="text" id="q" autocomplete="off"
@@ -245,7 +230,8 @@ document.getElementById('f').addEventListener('submit', async ev => {
           ${a.refused ? '<span class="tag over">refused</span>' : ''}
         </div>
         ${a.lines.map(l => `<div class="${lineClass(l)}">${esc(l)}</div>`).join('')}
-        ${a.sources.length ? `<div class="src">sources:<br>` +
+        ${a.sources.length ? `<div class="src"><span class="rk">Receipt · ${a.sources.length}` +
+          ` source${a.sources.length === 1 ? '' : 's'}</span>` +
           a.sources.map(s => `&nbsp;&nbsp;<b>${esc(s.kind)}</b>:${esc(s.ref)}` +
             (s.detail ? ' — ' + esc(s.detail) : '')).join('<br>') + `</div>` : ''}
       </div>`);
@@ -265,7 +251,11 @@ if (asked.get('book')) bookEl.value = asked.get('book').slice(0, 300);
 if (asked.get('q')) { qEl.value = asked.get('q').slice(0, 500);
   document.getElementById('f').requestSubmit(); }
 qEl.focus();
-</script></body></html>""".replace("__FAVICON__", FAVICON)
+</script>__FOOT__</body></html>"""
+for _token, _value in (("__FAVICON__", FAVICON), ("__TOKENS__", design.TOKENS_CSS),
+                       ("__BASE__", design.BASE_CSS), ("__NAV__", design.nav("/")),
+                       ("__FOOT__", design.footer()), ("__FONTS__", design.FONTS)):
+    PAGE = PAGE.replace(_token, _value)
 # `.replace()`, not an f-string or `.format()`: the page above is thousands of characters of
 # literal CSS and JS, and both of those already use `{`/`}` constantly — an f-string would need
 # every one of them doubled, and a plain `.format()` call would raise on the first unescaped
@@ -692,10 +682,13 @@ class Handler(BaseHTTPRequestHandler):
         # the page in a browser after the favicon fix and reading its console, not assumed clean
         # from the HTML alone. `data:` is not a network origin, so this does not reopen
         # `default-src`'s actual job of refusing every external one.
+        # The brand's two typefaces load from Google Fonts: its stylesheet host and its font-file
+        # host are the only external origins allowed, and only for styles and fonts.
         self.send_header(
             "Content-Security-Policy",
-            "default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; "
-            "img-src 'self' data:",
+            "default-src 'self'; script-src 'unsafe-inline'; "
+            "style-src 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src https://fonts.gstatic.com; img-src 'self' data:",
         )
         self.end_headers()
         self.wfile.write(body)
@@ -759,6 +752,11 @@ class Handler(BaseHTTPRequestHandler):
                     )
                     return
                 self._send(render_wrong(found).encode(), "text/html; charset=utf-8")
+                return
+            if path == "/brand":
+                from argus.lui.brand_page import render as render_brand
+
+                self._send(render_brand().encode(), "text/html; charset=utf-8")
                 return
             if path == "/proof":
                 # **The wins, reachable.** Every comparison against a named rival, grouped by the

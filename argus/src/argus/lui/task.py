@@ -31,6 +31,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Any
 
+from argus.lui import design
 from argus.lui.research import (
     ResearchKind,
     ResearchRequest,
@@ -259,18 +260,11 @@ def render_task(task: Task, favicon: str) -> str:
             f"</span><h2>{esc(step.title)}</h2><span class='e'>{esc(step.engine)} · "
             f"{step.seconds:.1f}s</span></div>{step.chart}{body}</article>")
     book_text = ", ".join(f"{w:.0%} {s.removesuffix('USDT')}" for s, w in task.book.items())
-    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">{design.FONTS}
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="{favicon}">
 <title>ARGUS — one research task, live</title>
-<style>
- :root {{ --ink:#12161c; --dim:#5b6470; --line:#dfe3e8; --bg:#f7f8fa; --panel:#fff;
-   --accent:#1a5fb4; --on-accent:#fff;
-   --warn:#8a4b00; --mono:ui-monospace,"SF Mono",Menlo,monospace; }}
- @media (prefers-color-scheme: dark) {{ :root {{ --ink:#e6e9ee; --dim:#98a2b0; --line:#2a313b;
-   --bg:#0f1318; --panel:#161b22; --accent:#7aa7ea; --on-accent:#0f1318;
-   --warn:#e0a15a; }} }}
- * {{ box-sizing:border-box }}
+<style>{design.TOKENS_CSS}
  body {{ margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,sans-serif }}
  .wrap {{ max-width:860px; margin:0 auto; padding:28px 18px 70px }}
  h1 {{ font-size:21px; margin:0 0 6px; letter-spacing:-.01em }}
@@ -311,7 +305,7 @@ def render_task(task: Task, favicon: str) -> str:
  .chart rect.r, .key.r {{ fill:var(--accent); background:var(--accent) }}
  .key {{ display:inline-block; width:10px; height:10px; border-radius:2px; margin:0 5px 0 10px;
    vertical-align:-1px }}
-</style></head><body><div class="wrap">
+{design.BASE_CSS}</style></head><body>{design.nav('/research')}<div class="wrap">
 <h1>One research task, question to actionable insight — run live</h1>
 <p class="sub">Seven engines answer one trader's question in parallel, each the same engine the
 <a href="/">console</a> uses, every figure from live Bitget, SEC, FRED or news data and every line
@@ -328,7 +322,7 @@ written by a language model. Change the name, the size or the book and run it ag
 {''.join(cards)}
 <p class="sub">Ran in {task.seconds:.1f}s. Execution is sized on a ${DEFAULT_BOOK_VALUE:,.0f} book.
 This is analysis, not advice — you make the call. <a href="/research?format=json">JSON</a></p>
-</div></body></html>"""
+</div>{design.footer()}</body></html>"""
 
 
 def as_dict(task: Task) -> dict[str, Any]:

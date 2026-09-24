@@ -56,9 +56,9 @@ Nothing above needs a credential. The full run took 1h16m from a fresh GitHub cl
 | | |
 |---|---|
 | Tests | **6,700 tests collected** — run `pytest -q` |
-| Type checking | **`mypy --strict` clean on 325 source files** |
+| Type checking | **`mypy --strict` clean on 327 source files** |
 | Lint | `ruff` clean |
-| Module health | **150/150 modules importable**, checked by `python -m argus.status` |
+| Module health | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-theme coverage | **18/18 sub-themes**, resolved by import at runtime — not claimed in prose |
 | Data artefacts | **46 cited across these documents**, every one reproducible from a single named command, with a test that fails if a document cites an artefact nothing writes |
 | Quoted figures | **69 figures quoted in the five public documents are re-checked against their artefacts** by `python -m argus.eval.docclaims --tests` (counted 2026-09-24), which exits non-zero if any has drifted |

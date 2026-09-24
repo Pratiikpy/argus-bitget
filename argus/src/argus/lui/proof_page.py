@@ -27,13 +27,9 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
 
-FAVICON = (
-    "data:image/svg+xml,"
-    "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E"
-    "%3Crect width='32' height='32' rx='7' fill='%231a5fb4'/%3E"
-    "%3Ctext x='16' y='23' font-family='ui-monospace,monospace' font-size='18' "
-    "font-weight='700' fill='%23fff' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E"
-)
+from argus.lui import design
+
+FAVICON = design.favicon()
 """Duplicated from `lui/server.py` for the reason `corrections_page.py` gives: the server imports
 this module lazily, and an import in the other direction is avoidable risk for six lines."""
 
@@ -72,10 +68,11 @@ SUBTHEMES: dict[str, tuple[str, str]] = {
 
 TRACK_ORDER = ("Track 2", "Track 3", "Track 1")
 TRACK_NOTE = {
-    "Track 2": "AI Trading Desk: the LLM decides and the agent trades. Judged half on paper "
+    "Track 2": "Agentic Trading: the LLM decides and the agent trades. Judged half on paper "
                "Sharpe, drawdown and win rate, half on explainability, architecture and the risk "
                "layer.",
-    "Track 3": "AI research workbench for a human trader, judged on feature depth, research "
+    "Track 3": "AI Trading Desk: a research workbench for a human trader, judged on feature "
+               "depth, research "
                "quality, LUI fluency and a personalised thesis.",
     "Track 1": "Not entered: Track 1 is scored on strategy returns alone. These capabilities sit "
                "underneath the other two and were measured the same way.",
@@ -289,18 +286,11 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
         body = (f"<p class='sub'>{reachable} of {len(wins)} run live from a question in the "
                 f"console; the rest are named as gaps below. Losses and withdrawn claims are on "
                 f"<a href='/wrong'>what we got wrong</a>.</p>" + "".join(sections))
-    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">{design.FONTS}
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="{FAVICON}">
 <title>ARGUS — measured against the specialists</title>
-<style>
- :root {{ --ink:#12161c; --dim:#5b6470; --line:#dfe3e8; --bg:#f7f8fa; --panel:#fff;
-   --accent:#1a5fb4; --warn:#8a4b00; --ok:#0f6b3f; --bad:#9b3a2f;
-   --mono:ui-monospace,"SF Mono",Menlo,monospace; }}
- @media (prefers-color-scheme: dark) {{ :root {{ --ink:#e6e9ee; --dim:#98a2b0; --line:#2a313b;
-   --bg:#0f1318; --panel:#161b22; --accent:#7aa7ea; --warn:#e0a15a; --ok:#5fd39a;
-   --bad:#d9796a; }} }}
- * {{ box-sizing:border-box }}
+<style>{design.TOKENS_CSS}
  body {{ margin:0; background:var(--bg); color:var(--ink); font:15px/1.6 system-ui,sans-serif }}
  .wrap {{ max-width:820px; margin:0 auto; padding:30px 18px 70px }}
  h1 {{ font-size:22px; margin:0 0 6px; letter-spacing:-.015em; text-wrap:balance }}
@@ -336,7 +326,7 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  a {{ color:var(--accent) }}
  a:focus-visible, summary:focus-visible {{ outline:2px solid var(--accent); outline-offset:2px }}
  @media (max-width:520px) {{ .lbl {{ display:block; min-width:0 }} }}
-</style></head><body><div class="wrap">
+{design.BASE_CSS}</style></head><body>{design.nav('/proof')}<div class="wrap">
 <h1>{esc(headline)}</h1>
 <p class="sub">OWNED means all thirteen conditions hold: the rival's best implementation read,
 its method reproduced, both run on the same input, a statistically valid evaluation with costs,
@@ -345,7 +335,7 @@ capability left superior without a stated reason. The register refuses to load a
 that is missing one. Everything below is read from that register when this page loads.
 <a href="/">Back to the console</a></p>
 {body}
-</div></body></html>"""
+</div>{design.footer()}</body></html>"""
 
 
 __all__ = ["IN_THE_CONSOLE", "SUBTHEMES", "Win", "collect", "render"]

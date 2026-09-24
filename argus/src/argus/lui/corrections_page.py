@@ -26,13 +26,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-FAVICON = (
-    "data:image/svg+xml,"
-    "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E"
-    "%3Crect width='32' height='32' rx='7' fill='%231a5fb4'/%3E"
-    "%3Ctext x='16' y='23' font-family='ui-monospace,monospace' font-size='18' "
-    "font-weight='700' fill='%23fff' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E"
-)
+from argus.lui import design
+
+FAVICON = design.favicon()
 """Kept identical to (and duplicated from, rather than imported from) `lui/server.py`'s constant
 of the same name: `server.py` only imports this module lazily, inside a route handler, so a
 module-level import in the other direction here is avoidable risk for six lines of duplication."""
@@ -317,18 +313,11 @@ def render(corrections: list[Correction]) -> str:
         f"<code>{esc(c.artefact)}</code></article>"
         for c in corrections
     )
-    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">{design.FONTS}
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="{FAVICON}">
 <title>ARGUS — what we got wrong</title>
-<style>
- :root {{ --ink:#12161c; --dim:#5b6470; --line:#dfe3e8; --bg:#f7f8fa; --panel:#fff;
-   --accent:#1a5fb4; --warn:#8a4b00; --ok:#0f6b3f; --bad:#9b3a2f;
-   --mono:ui-monospace,"SF Mono",Menlo,monospace; }}
- @media (prefers-color-scheme: dark) {{ :root {{ --ink:#e6e9ee; --dim:#98a2b0; --line:#2a313b;
-   --bg:#0f1318; --panel:#161b22; --accent:#7aa7ea; --warn:#e0a15a; --ok:#5fd39a;
-   --bad:#d9796a; }} }}
- * {{ box-sizing:border-box }}
+<style>{design.TOKENS_CSS}
  body {{ margin:0; background:var(--bg); color:var(--ink);
    font:15px/1.6 system-ui,sans-serif }}
  .wrap {{ max-width:760px; margin:0 auto; padding:30px 18px 70px }}
@@ -346,7 +335,7 @@ def render(corrections: list[Correction]) -> str:
  .c p {{ margin:0 0 10px; color:var(--dim); font-size:14.5px }}
  code {{ font:11.5px var(--mono); color:var(--dim) }}
  a {{ color:var(--accent) }}
-</style></head><body><div class="wrap">
+{design.BASE_CSS}</style></head><body>{design.nav('/wrong')}<div class="wrap">
 <h1>What we got wrong</h1>
 <p class="sub">Every entry is read out of the artefact that recorded it, at the moment you load
 this page &mdash; not written down once and left to drift. A finding whose artefact cannot be read
@@ -356,7 +345,7 @@ most flattering possible lie. <a href="/">back to the console</a></p>
 <p class="sub">This is not everything wrong with ARGUS &mdash; nothing could be, and claiming
 completeness would be its own overstatement. It is the set of findings that already have an
 artefact behind them.</p>
-</div></body></html>"""
+</div>{design.footer()}</body></html>"""
 
 
 __all__ = ["Correction", "collect", "render"]

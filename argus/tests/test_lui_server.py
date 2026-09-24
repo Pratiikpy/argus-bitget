@@ -94,13 +94,19 @@ class TestTheDemoStarts:
         XML. `test_favicon.py` (new) checks the favicon specifically; this test's job is unchanged
         for everything else on the page.
         """
-        for marker in ("http://", "https://", "src=\"//"):
-            offenders = [
-                line for line in PAGE.splitlines()
-                if marker in line and "127.0.0.1" not in line and "http-equiv" not in line
-                and "xmlns='http://www.w3.org/2000/svg'" not in line
-            ]
-            assert not offenders, f"page references an external origin: {offenders[:2]}"
+        # **Two more understood exceptions, added 2026-09-24 with the brand redesign.** The two
+        # typefaces load from Google Fonts — its stylesheet host and its font-file host, the only
+        # external origins the CSP now names, for styles and fonts only — and the nav links to
+        # the public GitHub repository, which is a link a reader follows, not a load. Every URL on
+        # the page must be one of these; anything else fails.
+        import re
+
+        allowed = ("https://fonts.googleapis.com", "https://fonts.gstatic.com",
+                   "https://github.com/Pratiikpy/argus-bitget", "http://www.w3.org/2000/svg")
+        urls = re.findall(r"https?://[^\s'\"<>)]+", PAGE)
+        offenders = [u for u in urls if not u.startswith(allowed) and "127.0.0.1" not in u]
+        assert not offenders, f"page references an external origin: {offenders[:3]}"
+        assert 'src="//' not in PAGE
 
     def test_the_page_is_served_whole(self, base_url: str) -> None:
         status, body, headers = _get(base_url + "/")
