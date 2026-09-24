@@ -656,8 +656,8 @@ def plan_execution(
             ExecutionSlice(2, Decimal("0.4"), "market", model.taker_bps),
         )
         rationale = (
-            "anchor asleep: book is thin and resting orders are adversely selected, so passive "
-            "styles are down-weighted rather than up-weighted"
+            "the stock's own market is shut, so this book is thin and resting orders tend to fill "
+            "only when the price moves against them — passive orders get less of the size, not more"
         )
     else:
         rate, label = _passive_rate(model, book, fraction=Decimal("0.34"), notional=notional)

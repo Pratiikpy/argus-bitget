@@ -769,7 +769,7 @@ _SEQ = re.compile(
     r"\b(?:seq|sequence|decisions?|decided\s+on|deciding\s+on|entry|row|#)\s*#?\s*(-?\d{1,6})\b",
     re.I,
 )
-"""How a decision is named. The verb forms matter: LUI-BENCH asked "what did it read before
+r"""How a decision is named. The verb forms matter: LUI-BENCH asked "what did it read before
 deciding on 12", which names row 12 as plainly as "decision 12" does — and the noun-only pattern
 missed it, so the question reached EVIDENCE and was then downgraded to AMBIGUOUS by the
 dangling-"it" guard for having nothing to point at. It was pointing at 12.

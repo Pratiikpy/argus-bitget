@@ -633,7 +633,7 @@ The politeness and sequencing prefixes are consumed first because *"Kindly set a
 *"Step one: transfer the funds"* are imperatives wearing a hat."""
 
 
-_SENTENCE_BREAK = re.compile("(?<=[.!?" + chr(10) + "])\s+")
+_SENTENCE_BREAK = re.compile(r"(?<=[.!?\n])\s+")
 """Split on sentence ends and hard line breaks alike: injected text is often one line."""
 
 _FOLLOWS = re.compile(

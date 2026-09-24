@@ -479,6 +479,13 @@ _BOOK_RISK = re.compile(
     re.I,
 )
 """A question about the book already held, with no new name being added."""
+_MY_BOOK = re.compile(
+    r"\bmy\s+(?:book|portfolio|holdings|positions|crypto|coins|stocks|bag)\b", re.I)
+"""The trader's own holdings, named without weights — the saved book is what they mean."""
+_BIGGEST_RISK = re.compile(
+    r"\b(?:biggest|main|largest|top|worst)\s+risks?\b|\bwhat\s+could\s+hurt\b|"
+    r"\bwhere\s+am\s+i\s+(?:exposed|vulnerable)\b", re.I)
+
 _URGENT = re.compile(r"\b(?:urgent\w*|asap|right\s+now|immediately|fast|quickly)\b", re.I)
 
 
@@ -661,6 +668,7 @@ _HEDGE = re.compile(
     re.I,
 )
 HEDGE_HOLDING_DAYS = 7
+HEDGE_R2_TOLERANCE = 0.05
 HEDGE_BOOK_VALUE = Decimal("100000")
 HEDGE_CANDIDATES_EQUITY = ("QQQUSDT", "SPYUSDT", "SMHUSDT")
 HEDGE_CANDIDATES_CRYPTO = ("BTCUSDT", "ETHUSDT")
@@ -839,7 +847,8 @@ def _detect(text: str) -> ResearchRequest | None:
                 kind=ResearchKind.CONSTRUCT, symbols=tuple(chosen),
                 notes=() if named else (f"the {theme[0] if theme else ''} theme read as "
                                         + ", ".join(_t(s) for s in chosen),))
-    if (_HEDGE.search(raw) and not about_the_record(raw) and not _is_an_order(raw)
+    if (_HEDGE.search(raw) and not about_the_record(raw)
+            and (not _is_an_order(raw) or _MY_BOOK.search(raw))
             and not _COMPARE.search(raw) and not _ADD_VERB.search(raw)
             and not (_STRESS.search(raw) or _STRESS_BARE.search(raw))
             and not re.search(r"\bhedged\s+with\b|\bas\s+a\s+hedge\b", raw, re.I)):
@@ -854,6 +863,8 @@ def _detect(text: str) -> ResearchRequest | None:
             hedge_book = _normalise(hedge_book, hedge_notes)
         elif symbols:
             hedge_book = {symbols[0]: 1.0}
+        elif _MY_BOOK.search(raw) and not _CRYPTO_WORD.search(raw):
+            hedge_book = {}  # the saved book fills it (`with_book`); none saved asks for one
         elif _CRYPTO_WORD.search(raw):
             hedge_book = {"BTCUSDT": 1.0}
             hedge_notes.append("crypto read as bitcoin")
@@ -900,6 +911,9 @@ def _detect(text: str) -> ResearchRequest | None:
             r"\b(?:my|i'?m|i\s+am|i\s+hold|i\s+own)\b", raw, re.I
         ):
             return ResearchRequest(kind=ResearchKind.STRESS, symbols=())
+        if ((_BOOK_RISK.search(raw) or _BIGGEST_RISK.search(raw)) and _MY_BOOK.search(raw)
+                and not about_the_record(raw)):
+            return ResearchRequest(kind=ResearchKind.BOOK, symbols=())
         if (_EXECUTION.search(raw) and _ORDER_WORDS.search(raw) and not about_the_record(raw)
                 and not _ORDER_STATUS.search(raw) and not _is_an_order(raw)):
             # "How should I split a large sell order to minimise slippage?" names no instrument
@@ -929,6 +943,12 @@ def _detect(text: str) -> ResearchRequest | None:
 
     simple = (not _ADD_VERB.search(raw) and not _STRESS.search(raw) and not pairs
               and not _EXECUTION.search(raw))
+    if (symbols and not pairs and (_EARNINGS_CALL.search(raw) or _FLOW.search(raw))
+            and (symbols[0] in TRADED_SYMBOLS or _is_equity(symbols[0]))):
+        # "Who is selling NVDA" found no pattern at all and the model read it as a news question,
+        # so the answer was headlines rather than the Form 4 filings that say who sold (live
+        # probe, 2026-09-24). Both phrasings are about the company's own filings.
+        return ResearchRequest(kind=ResearchKind.FUNDAMENTALS, symbols=symbols[:2])
     if symbols and not pairs and _OUTLOOK.search(raw) and not _PRICE_FORECAST.search(raw):
         # "What is the outlook for gold over the next month?" and "forecast BTC for next week" were
         # refused as questions about the desk's record. A forecast is not something this console
@@ -1160,7 +1180,13 @@ def with_book(request: ResearchRequest | None, book_text: str,
         return replace(request, book=book, symbols=tuple(book), notes=(*kept, note))
     if request.kind is ResearchKind.MACRO and not request.symbols:
         return replace(request, book=book, symbols=tuple(book), notes=(*kept, note))
-    if request.kind is ResearchKind.HEDGE and not request.symbols:
+    if request.kind is ResearchKind.HEDGE and (
+            not request.symbols
+            or (question and _MY_BOOK.search(question) and not _states_holdings(question)
+                and any("read as bitcoin" in n for n in request.notes))):
+        # "hedge my crypto" with a saved 60/40 BTC/ETH book was answered for BTC alone (critic,
+        # 2026-09-24): the default is only for a trader who has not said what they hold.
+        kept = tuple(n for n in kept if "read as bitcoin" not in n)
         return replace(request, book=book, symbols=tuple(book), notes=(*kept, note))
     return request
 
@@ -2137,6 +2163,7 @@ def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
         else:
             head += "."
         lines.insert(0, head)
+    lines.extend(_event_lines(raw_text, always=True)[0])
     if _FRED_USED_SNAPSHOT:
         dated = sorted(set(_FRED_USED_SNAPSHOT.values()))
         lines.append(f"FRED did not answer from here just now, so these series are the desk "
@@ -2508,6 +2535,46 @@ def _trim_to_budget(symbol: str, weights: Mapping[str, float],
     return best
 
 
+_EVENT_WORDS = re.compile(
+    r"\b(?:cpi|inflation|fomc|fed|rate\s+decision|powell|this\s+week|next\s+week|event|data\s+"
+    r"release)\b", re.I)
+
+
+def _event_lines(raw_text: str, *, always: bool = False) -> tuple[list[str], str | None]:
+    """The next CPI release and FOMC decision, from the official schedules' snapshot, when the
+    question is about them (or ``always``). Returns the lines and a short clause for a lead line."""
+    if not always and not _EVENT_WORDS.search(raw_text):
+        return [], None
+    from argus.market.calendar import upcoming
+
+    events, fetched = upcoming(days=60)
+    if not events:
+        return [], None
+    first = {e.kind: e for e in reversed(events)}
+    ordered = sorted(first.values(), key=lambda e: e.at)
+    line = "Scheduled: " + "; ".join(
+        f"{e.label} {e.at:%a %d %b} {e.at:%H:%M} UTC" for e in ordered) + (
+        f" (BLS and Federal Reserve schedules, read {fetched}).")
+    asked = next((e for e in ordered if e.kind.lower() in raw_text.lower()
+                  or (e.kind == "CPI" and "inflation" in raw_text.lower())
+                  or (e.kind == "FOMC" and re.search(r"\bfed\b|rate\s+decision", raw_text,
+                                                     re.I))), ordered[0])
+    clause = f"before the {asked.label} on {asked.at:%a %d %b} at {asked.at:%H:%M} UTC"
+    return [line], clause
+
+
+def _hedge_cost_text(total_bps: float, *, brief: bool = False) -> str:
+    """What the hedge costs over the holding period — or, when the funding it receives outweighs
+    its entry, what it earns."""
+    if brief:
+        return (f"(earns {abs(total_bps):.1f}bps net)" if total_bps < 0
+                else f"(costs {total_bps:.1f}bps)")
+    if total_bps < 0:
+        return (f", and over {HEDGE_HOLDING_DAYS} days its funding pays about "
+                f"{abs(total_bps):.1f}bps more than it costs to put on")
+    return f", for about {total_bps:.1f}bps to put on and hold {HEDGE_HOLDING_DAYS} days"
+
+
 def _hedge_plan(book: Mapping[str, float], value: Decimal,
                 raw_text: str) -> tuple[list[str], list[Source], dict[str, Any]]:
     """Every candidate hedge for ``book``, measured the same way, and the one to use.
@@ -2525,8 +2592,12 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
 
     crypto = [s for s in book if not _is_equity(s) and s not in TRADED_SYMBOLS]
     equity = [s for s in book if s not in crypto]
-    candidates = [c for c in ((HEDGE_CANDIDATES_EQUITY if equity else ())
-                              + (HEDGE_CANDIDATES_CRYPTO if crypto else ())) if c not in book]
+    # An equity book is hedged with an index it does not hold. A crypto book's cleanest hedges are
+    # the majors themselves — a short in a coin you hold is how that exposure is cut — and the
+    # Nasdaq, which crypto has traded with; so crypto candidates are not excluded for being held.
+    candidates = [c for c in HEDGE_CANDIDATES_EQUITY if equity and c not in book]
+    if crypto:
+        candidates += [c for c in (*HEDGE_CANDIDATES_CRYPTO, "QQQUSDT") if c not in candidates]
     if not candidates:
         return [], [], {}
     data = load([*book, *candidates])
@@ -2562,8 +2633,12 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
     if not rows:
         return [], [], {}
     rows.sort(key=lambda r: -r["r2"])
-    best = max(rows, key=lambda r: r["r2"] / max(r["total_bps"], 1.0) if r["r2"] >= 0.3
-               else -1.0)
+    # The pick: among the legs that remove nearly as much variance as the best one (within
+    # HEDGE_R2_TOLERANCE), the cheapest to hold — funding received counts as a negative cost. A
+    # ratio of variance to cost broke on legs that are paid to be held (a negative denominator).
+    top_r2 = rows[0]["r2"]
+    near = [r for r in rows if r["r2"] >= top_r2 - HEDGE_R2_TOLERANCE]
+    best = min(near, key=lambda r: r["total_bps"])
     lines = []
     for r in rows:
         funding = r["funding_bps"]
@@ -2574,7 +2649,8 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
             + (f", funding over {HEDGE_HOLDING_DAYS} days {abs(funding):.1f}bps "
                + ("paid" if funding > 0 else "received") if abs(funding) >= 0.05
                else ", no funding at the current rate")
-            + f" — {r['total_bps']:.1f}bps all in.")
+            + (f" — {r['total_bps']:.1f}bps all in." if r["total_bps"] >= 0
+               else f" — earns {abs(r['total_bps']):.1f}bps net."))
     if best["r2"] < 0.3:
         head = (f"Actionable: no listed hedge explains much of this book — the best, "
                 f"{_t(rows[0]['leg'])}, removes {rows[0]['r2']:.0%} of its variance — so the "
@@ -2583,13 +2659,17 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
         runner = next((r for r in rows if r is not best), None)
         head = (f"Actionable: hedge with a short in {_t(best['leg'])} of about "
                 f"${best['size']:,.0f} "
-                f"— it removes about {best['r2']:.0%} of the book's variance for "
-                f"{best['total_bps']:.1f}bps to put on and hold {HEDGE_HOLDING_DAYS} days")
+                f"— it removes about {best['r2']:.0%} of the book's variance"
+                f"{_hedge_cost_text(best['total_bps'])}")
         if runner is not None:
-            head += (f"; {_t(runner['leg'])} would remove {runner['r2']:.0%} for "
-                     f"{runner['total_bps']:.1f}bps")
+            head += (f"; {_t(runner['leg'])} would remove {runner['r2']:.0%} "
+                     f"{_hedge_cost_text(runner['total_bps'], brief=True)}")
         head += ". A beta hedge covers the market's part only, not single-name news."
+    events, clause = _event_lines(raw_text)
+    if clause is not None:
+        head = head.replace("Actionable: hedge with", f"Actionable: {clause}, hedge with", 1)
     lines.insert(0, head)
+    lines.extend(events)
     lines.append(f"Sized on a ${value:,.0f} book" + (" (stated)" if value != HEDGE_BOOK_VALUE
                                                       else " — say your book's value for its "
                                                            "own sizes") + ".")
@@ -3063,6 +3143,9 @@ def _lead_with_what_was_asked(lines: list[str], question: str) -> list[str]:
              else None)
     if focus is None:
         return lines
+    if lines and lines[0].startswith("Actionable") and (_FLOW.search(question)
+                                                         or _EARNINGS_CALL.search(question)):
+        return lines  # the ownership-flow answer already leads with what was asked
     # Alternatives in order of preference: the institutional summary before one 13F sample.
     hit = next((i for pattern in focus.split("|") for i, line in enumerate(lines)
                 if re.search(pattern, line)), None)
@@ -3116,7 +3199,160 @@ def _earnings_surprise(ticker: str) -> tuple[str, Source] | None:
     )
 
 
-def _fundamentals(symbol: str) -> tuple[list[str], list[Source]]:
+_VALUATION = re.compile(
+    r"\bvaluation\w*|\bexpensive\b|\bcheap(?:er)?\b|\bp\s*/?\s*e\b|\bmultiples?\b|"
+    r"\bover\s*valued\b|\bunder\s*valued\b|\bpricier\b", re.I)
+VALUATION_MEASURES: tuple[tuple[str, str], ...] = (
+    ("P/E (trailing 12m)", "pe_ttm_ed"), ("P/S (trailing 12m)", "ps_ttm_ed"),
+    ("P/B (latest quarter)", "pb_mrq"), ("EV/EBITDA", "ent_multi"))
+
+
+def _valuation_compare(symbols: tuple[str, ...]) -> list[str]:
+    """Two or more names side by side on the same valuation measures, from the same source and
+    date. "Is NVDA expensive versus MSFT on valuation" returned two separate fundamentals dumps
+    and never compared them (a critic's probe, 2026-09-24)."""
+    from argus.market.bitget_mcp import BitgetDataService
+
+    def latest(symbol: str) -> dict[str, Any] | None:
+        rows = BitgetDataService().results("equity_fundamental_ratios", symbol=_t(symbol))
+        return max(rows, key=lambda r: str(r.get("period_ending") or "")) if rows else None
+
+    with ThreadPoolExecutor(max_workers=len(symbols)) as pool:
+        rows = dict(zip(symbols, pool.map(latest, symbols), strict=True))
+    if any(r is None for r in rows.values()):
+        return []
+    names = [_t(s) for s in symbols]
+    table: list[str] = []
+    richer: dict[str, int] = {n: 0 for n in names}
+    counted = 0
+    for label, key in VALUATION_MEASURES:
+        values = [v for v in ((rows[s] or {}).get(key) for s in symbols)
+                  if isinstance(v, (int, float)) and v > 0]
+        if len(values) != len(symbols):
+            continue
+        counted += 1
+        richer[names[max(range(len(values)), key=lambda i: values[i])]] += 1
+        table.append(f"{label}: " + " vs ".join(f"{n} {v:.1f}"
+                                                 for n, v in zip(names, values, strict=True)))
+    if not table:
+        return []
+    top = max(richer, key=lambda n: richer[n])
+    dated = (rows[symbols[0]] or {}).get("period_ending")
+    lead = (f"Actionable: {top} is the more expensive on {richer[top]} of {counted} measures "
+            f"(bitget-mcp-server ratios, {dated}) — " + "; ".join(table) + ". A higher multiple "
+            "is a higher bar for growth to clear, not a verdict on its own.")
+    return [lead]
+
+
+_EARNINGS_CALL = re.compile(
+    r"\b(?:earnings|conference)\s+(?:call|release|report)|\bguid(?:ed|ance|es)\b|"
+    r"\bmanagement\s+(?:said|say|guided|expects?)\b|\bquarterly\s+results\b|"
+    r"\bpress\s+release\b|\bwhat\s+did\s+\w+\s+report\b", re.I)
+
+
+def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
+    """Whether the deterministic reading of ``text`` should stand over the model's.
+
+    Order-book depth and hedging are asked in words the patterns match exactly, and so are
+    questions about who is selling a stock and what a company reported: each has one engine that
+    answers it, and the model has read all four as something adjacent (a quote, a news summary)."""
+    if request is None:
+        return False
+    if request.kind in (ResearchKind.EXECUTION, ResearchKind.HEDGE):
+        return True
+    return request.kind is ResearchKind.FUNDAMENTALS and bool(
+        _FLOW.search(text) or _EARNINGS_CALL.search(text))
+
+
+def _release_lines(ticker: str) -> list[str]:
+    try:
+        from argus.market.earnings_release import answer_lines
+
+        return answer_lines(ticker)
+    except Exception:
+        return []
+
+
+_FLOW = re.compile(
+    r"\bwho\s+is\s+(?:selling|buying|dumping|accumulating)|\binsiders?\b|selling\s+pressure|"
+    r"\b(?:smart|institutional)\s+money\b|\binstitutions?\s+(?:selling|buying)\b", re.I)
+FLOW_LOOKBACK_DAYS = 90
+
+
+def _ownership_flow(ticker: str, positions: Any) -> tuple[list[str], list[Source]]:
+    """Who has been selling and who buying: insiders from their own Form 4 filings, read by
+    transaction code (open-market sales and purchases only; grants, tax withholding and 10b5-1
+    plans reported as such), and institutions from the change in their aggregate holding.
+
+    "Who is selling NVDA — insiders or institutions?" was answered with a holder count (a critic's
+    probe, 2026-09-24) while `market/insider.py` — which reads the codes that decide whether a Form
+    4 means anything — sat unused by the console."""
+    from argus.market.insider import InsiderSource
+
+    lines: list[str] = []
+    sources: list[Source] = []
+    since = datetime.now(UTC) - timedelta(days=FLOW_LOOKBACK_DAYS)
+    try:
+        trades, _ = InsiderSource().trades(ticker, since=since, limit=20)
+    except Exception:
+        trades = []
+    sold = [t for t in trades if t.code == "S" and not t.acquired]
+    bought = [t for t in trades if t.code == "P" and t.acquired]
+    planned = [t for t in sold if t.pre_arranged]
+    chose = [t for t in sold if not t.pre_arranged]
+    mechanical = [t for t in trades if t.code not in ("S", "P")]
+    insider_text = None
+    if trades:
+        sold_usd = sum(float(t.notional) for t in sold)
+        filings = len({t.accession for t in trades})
+        earliest = min(t.accepted_at for t in trades)
+        def count(n: int, one: str, many: str) -> str:
+            return f"{n} {one if n == 1 else many}"
+
+        scope = (f"in the latest Form 4 filing (filed {earliest:%d %b})" if filings == 1 else
+                 f"across the {filings} most recent Form 4 filings (since {earliest:%d %b})")
+        usd = (f"${sold_usd / 1e6:,.1f}m" if sold_usd >= 1e6 else f"${sold_usd:,.0f}")
+        insider_text = (
+            f"insiders sold {sum(float(t.shares) for t in sold):,.0f} shares "
+            f"({usd}) in the open market {scope} — "
+            f"{len(planned)} of {count(len(sold), 'sale', 'sales')} under pre-arranged 10b5-1 "
+            f"plans — and bought {sum(float(t.shares) for t in bought):,.0f}")
+        routine = count(len(mechanical), "grant, vest or tax withholding",
+                        "grants, vests and tax withholdings")
+        lines.append(
+            f"Insiders, from {count(filings, 'Form 4 filing', 'Form 4 filings')} since "
+            f"{earliest:%d %b}: {count(len(sold), 'open-market sale', 'open-market sales')}, "
+            f"{len(chose)} not pre-arranged; "
+            f"{count(len(bought), 'open-market purchase', 'open-market purchases')}; "
+            f"{routine}, which {'says' if len(mechanical) == 1 else 'say'} nothing about the "
+            f"business.")
+        sources.append(Source(kind="venue", ref="SEC EDGAR Form 4",
+                              detail=f"{ticker}, last {FLOW_LOOKBACK_DAYS} days, by code"))
+    inst_text = None
+    if isinstance(positions, list) and len(positions) > 1 and not inst_text:
+        rows = sorted(positions, key=lambda r: str(r.get("chg_date") or ""))
+        latest = rows[-1]
+        cutoff = (datetime.fromisoformat(str(latest.get("chg_date"))[:10])
+                  - timedelta(days=30)).date().isoformat()
+        earlier = next((r for r in reversed(rows) if str(r.get("chg_date") or "") <= cutoff),
+                       rows[0])
+        now_vol, then_vol = latest.get("holding_total_vol"), earlier.get("holding_total_vol")
+        if isinstance(now_vol, (int, float)) and isinstance(then_vol, (int, float)) and then_vol:
+            change = now_vol - then_vol
+            inst_text = (f"institutions' combined holding changed by {change:+,.0f} shares "
+                         f"({change / then_vol:+.2%}) from {earlier.get('chg_date')} to "
+                         f"{latest.get('chg_date')}")
+            lines.append(f"Institutions: {inst_text.removeprefix('institutions' + chr(39) + ' ')}"
+                         f", across {latest.get('holder_num', 0):,.0f} holders.")
+    if insider_text or inst_text:
+        lines.insert(0, "Actionable: " + "; ".join(t for t in (insider_text, inst_text) if t)
+                     + ". Insider sales under a pre-arranged plan and small institutional drifts "
+                       "are routine; an unplanned insider sale cluster or a fast institutional "
+                       "exit is the signal worth acting on.")
+    return lines, sources
+
+
+def _fundamentals(symbol: str, raw_text: str = "") -> tuple[list[str], list[Source]]:
     from datetime import date
 
     from argus.market import universe
@@ -3273,6 +3509,15 @@ def _fundamentals(symbol: str) -> tuple[list[str], list[Source]]:
             sources.append(Source(kind="venue", ref="bitget-mcp-server equity_fundamental_ratios",
                                   detail=f"{ticker} {ratio_row.get('period_ending')}"))
     positions = safe("equity_ownership_inst_position_summary")
+    flow_lines: list[str] = []
+    if _EARNINGS_CALL.search(raw_text):
+        flow_lines = _release_lines(ticker)
+        if flow_lines:
+            sources.append(Source(kind="venue", ref="SEC EDGAR 8-K exhibit 99.1",
+                                  detail=f"{ticker} earnings release, quoted"))
+    if _FLOW.search(raw_text) and not flow_lines:
+        flow_lines, flow_sources = _ownership_flow(ticker, positions)
+        sources.extend(flow_sources)
     if isinstance(positions, list) and positions:
         now_row = max(positions, key=lambda r: str(r.get("chg_date") or ""))
         holders_n, share = now_row.get("holder_num"), now_row.get("org_postion_calc")
@@ -3295,6 +3540,9 @@ def _fundamentals(symbol: str) -> tuple[list[str], list[Source]]:
             sources.append(Source(kind="venue",
                                   ref="bitget-mcp-server equity_ownership_insider_trading",
                                   detail=f"{ticker} Form 4, last 30 days"))
+    if flow_lines:
+        lines = [*flow_lines, *(re.sub(r"^Actionable:\s*(\w)", lambda m: m.group(1).upper(), line)
+                                for line in lines)]
     if not lines:
         lines.append(f"bitget-mcp-server covers US stocks and ETFs, and returned nothing for "
                      f"{ticker} just now — a non-US listing has no US filings to report.")
@@ -3857,7 +4105,8 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
         elif request.kind is ResearchKind.FUNDAMENTALS:
             if len(request.symbols) > 1:
                 with ThreadPoolExecutor(max_workers=len(request.symbols)) as pool:
-                    parts = list(pool.map(_fundamentals, request.symbols))
+                    parts = list(pool.map(lambda sym: _fundamentals(sym, raw_text),
+                                          request.symbols))
                 lines, extra = [], []
                 for symbol, (part_lines, part_sources) in zip(request.symbols, parts,
                                                                strict=True):
@@ -3866,8 +4115,16 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                                  for line in part_lines)
                     extra.extend(part_sources)
             else:
-                lines, extra = _fundamentals(request.symbols[0])
+                lines, extra = _fundamentals(request.symbols[0], raw_text)
             lines = _lead_with_what_was_asked(lines, raw_text)
+            if len(request.symbols) > 1 and _VALUATION.search(raw_text):
+                try:
+                    compared = _valuation_compare(request.symbols)
+                except Exception:
+                    compared = []
+                if compared:
+                    lines = [compared[0], *(re.sub(r"^Actionable(?: \(\w+\))?:\s*", "", line)
+                                            for line in lines)]
             sources.extend(extra)
             if not extra:
                 data = _no_candles("Bitget's contract list, which flags this contract as not a "

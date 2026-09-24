@@ -42,6 +42,7 @@ from argus.lui.research import (
     ResearchRequest,
     about_the_record,
     follow_up,
+    pattern_reading_wins,
     plan_with_model,
     research_symbols,
     with_book,
@@ -358,11 +359,11 @@ def handle_ask(
         planned, audit = plan_with_model(text, model)
         planned = with_book(planned, book, text)
         patterned = detect_research(text)
-        if (patterned is not None and patterned.kind in PATTERN_KINDS_THAT_WIN
+        if (patterned is not None and pattern_reading_wins(patterned, text)
                 and (planned is None or planned.kind is not patterned.kind)):
-            # Order-book depth and hedging are asked in words the patterns match exactly; the
-            # model read "order book depth on NVDA" as a quote (2026-09-24). Where the patterns
-            # name one of these kinds, their reading stands.
+            # The model read "order book depth on NVDA" as a quote and "who is selling NVDA" as
+            # a news question (2026-09-24). Where the patterns name the one engine that answers
+            # the question, their reading stands.
             planned = with_book(patterned, book, text)
             audit = {**audit, "detail": "the patterns' specific reading kept over the model's"}
         if planned is not None:
@@ -504,9 +505,6 @@ def _language_note(text: str) -> str | None:
                 "figure is computed from live data.")
     return None
 
-
-PATTERN_KINDS_THAT_WIN = frozenset({ResearchKind.EXECUTION, ResearchKind.HEDGE})
-"""Research kinds whose pattern reading is kept when the model reads the question differently."""
 
 UNRELATED_CONFIDENCE = 0.8
 """How sure the planner must be that a question is unrelated before its view overrules the n-gram

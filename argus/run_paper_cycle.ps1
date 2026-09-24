@@ -55,6 +55,10 @@ python -m argus.risk.session_risk --days 90 2>&1 | ForEach-Object { $_ | Out-Str
 python -m argus.market.validation --days 90 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
 "universe_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8
 
+# The scheduled CPI and FOMC dates the console cites, from the BLS and Federal Reserve schedules.
+python -m argus.market.calendar 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
+"calendar_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8
+
 # The macro series the hosted console falls back to when FRED does not answer from its network.
 python -c "from argus.lui.research import write_macro_snapshot; print(write_macro_snapshot(), 'macro readings written')" 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
 "macro_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8

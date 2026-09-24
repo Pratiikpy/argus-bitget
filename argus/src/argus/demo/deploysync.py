@@ -69,6 +69,8 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "skill_reliability.json",
     "data_coverage.json",
     "source_health.json",
+    # Read by the hedge and macro answers: the scheduled CPI and FOMC dates (`market/calendar.py`).
+    "event_calendar.json",
 )
 """Artefacts the hosted console's own pages read at request time.
 

@@ -180,7 +180,7 @@ class TestExecutionAssistance:
         passive_asleep = sum(s.fraction for s in asleep.slices if "passive" in s.style)
         passive_awake = sum(s.fraction for s in awake.slices if "passive" in s.style)
         assert passive_asleep < passive_awake
-        assert "adversely selected" in asleep.rationale
+        assert "moves against them" in asleep.rationale
 
     def test_a_passive_slice_without_a_book_is_quoted_at_taker(self) -> None:
         """The planner used to quote maker_bps on every slice it called "passive limit".
