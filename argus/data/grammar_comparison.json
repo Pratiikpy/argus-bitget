@@ -2021,12 +2021,12 @@
   "swept_n": 37,
   "agreement_all_match": true,
   "argus_execution_surface_scan": {
-    "path": "C:\\Users\\prate\\bitget\\argus\\src\\argus\\research\\grammar.py",
+    "path": "argus\\src\\argus\\research\\grammar.py",
     "forbidden_calls_found": [],
     "has_execution_surface": false
   },
   "qlib_execution_surface_scan": {
-    "path": "C:\\Users\\prate\\bitget\\argus\\src\\argus\\eval\\baselines\\qlib_eval_surface.py",
+    "path": "argus\\src\\argus\\eval\\baselines\\qlib_eval_surface.py",
     "forbidden_calls_found": [
       "eval"
     ],

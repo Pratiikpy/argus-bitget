@@ -1,9 +1,9 @@
 {
   "baselines_are_real": {
     "stumpy_version": "1.14.1",
-    "stumpy_path": "C:\\Users\\prate\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\stumpy\\__init__.py",
+    "stumpy_path": "site-packages/stumpy/__init__.py",
     "ruptures_version": "1.1.10",
-    "ruptures_path": "C:\\Users\\prate\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\ruptures\\__init__.py",
+    "ruptures_path": "site-packages/ruptures/__init__.py",
     "stumpy_executed": true,
     "ruptures_executed": true,
     "windows_compared": 937,
@@ -2567,56 +2567,55 @@
     "n_symbols": 12,
     "argus": {
       "family_spread": [
-        50,
-        122
+        559
       ],
-      "family_spread_total": 172,
+      "family_spread_total": 559,
       "non_family_triples": 219,
-      "non_family_median_total": 1077.0,
-      "non_family_min_total": 23,
-      "n_non_family_at_or_below_family": 15,
-      "family_percentile": 0.0684931506849315,
+      "non_family_median_total": 842.0,
+      "non_family_min_total": 21,
+      "n_non_family_at_or_below_family": 44,
+      "family_percentile": 0.2009132420091324,
       "non_family_triples_with_first_spread_zero": 0
     },
     "stumpy": {
       "family_spread": [
-        50,
-        122
+        1011,
+        251
       ],
-      "family_spread_total": 172,
+      "family_spread_total": 1262,
       "non_family_triples": 219,
-      "non_family_median_total": 1119.0,
-      "non_family_min_total": 170,
-      "n_non_family_at_or_below_family": 1,
-      "family_percentile": 0.0045662100456621,
+      "non_family_median_total": 975.0,
+      "non_family_min_total": 180,
+      "n_non_family_at_or_below_family": 192,
+      "family_percentile": 0.8767123287671232,
       "non_family_triples_with_first_spread_zero": 0
     },
     "ruptures": {
       "family_spread": [
-        0,
+        2,
         1
       ],
-      "family_spread_total": 1,
+      "family_spread_total": 3,
       "non_family_triples": 219,
-      "non_family_median_total": 676.0,
-      "non_family_min_total": 96,
+      "non_family_median_total": 1237.0,
+      "non_family_min_total": 48,
       "n_non_family_at_or_below_family": 0,
       "family_percentile": 0.0,
-      "non_family_triples_with_first_spread_zero": 1
+      "non_family_triples_with_first_spread_zero": 0
     },
-    "family_is_outlier_for_every_method": true
+    "family_is_outlier_for_every_method": false
   },
   "artefact_integrity": {
     "artefact": "data\\regime_comparison.json",
-    "parses_as_strict_json": false,
-    "bare_nan_tokens": 2,
-    "speedup_field": 310.3619817636603,
-    "speedup_recomputed": 310.36198176366025,
+    "parses_as_strict_json": true,
+    "bare_nan_tokens": 0,
+    "speedup_field": 266.36708707852443,
+    "speedup_recomputed": 266.36708707852443,
     "speedup_self_consistent": true,
-    "novelty_rate_field": 0.17647058823529413,
-    "novelty_rate_recomputed": 0.17647058823529413,
+    "novelty_rate_field": 0.26666666666666666,
+    "novelty_rate_recomputed": 0.26666666666666666,
     "novelty_rate_self_consistent": true,
-    "scope_statement_matches_current_source": false,
+    "scope_statement_matches_current_source": true,
     "measured_fields_reproduce": true
   },
   "determinism": {

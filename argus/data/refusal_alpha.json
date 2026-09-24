@@ -1,24 +1,24 @@
 {
-  "as_of": "2026-09-21T12:59:26.673011+00:00",
+  "as_of": "2026-09-24T02:23:58.741588+00:00",
   "round_trip_bps": 12.0,
   "min_directional_for_a_rate": 30,
-  "total_marks": 250,
+  "total_marks": 382,
   "outside_buckets": 0,
   "horizons": [
     {
       "horizon": "about_2h",
-      "marks": 195,
-      "directional": 193,
-      "correct": 115,
-      "coverage_pct": 99.0,
-      "accuracy_pct": 59.6,
+      "marks": 291,
+      "directional": 289,
+      "correct": 169,
+      "coverage_pct": 99.3,
+      "accuracy_pct": 58.5,
       "accuracy_ci95": [
-        52.5,
-        66.3
+        52.7,
+        64.0
       ],
       "beats_a_coin": true,
-      "hurdle_clearance_pct": 65.6,
-      "median_forgone_bps": -6.93,
+      "hurdle_clearance_pct": 72.9,
+      "median_forgone_bps": -6.67,
       "enough_for_a_rate": true
     },
     {
@@ -39,20 +39,20 @@
     },
     {
       "horizon": "overnight_12h_plus",
-      "marks": 54,
-      "directional": 52,
-      "correct": 21,
-      "coverage_pct": 96.3,
-      "accuracy_pct": 40.4,
+      "marks": 90,
+      "directional": 87,
+      "correct": 42,
+      "coverage_pct": 96.7,
+      "accuracy_pct": 48.3,
       "accuracy_ci95": [
-        28.2,
-        53.9
+        38.1,
+        58.6
       ],
       "beats_a_coin": false,
       "hurdle_clearance_pct": 88.9,
-      "median_forgone_bps": -31.93,
+      "median_forgone_bps": -18.11,
       "enough_for_a_rate": true
     }
   ],
-  "verdict": "At the `about_2h` horizon: 115 of 193 directional calls went the right way. 95% Wilson interval 52.5% to 66.3%. The interval excludes a coin flip, so the lean carries information. Median net edge forgone by standing aside: -6.9bps after a 12.0bps round trip \u2014 refusing saved money on the typical decision."
+  "verdict": "At the `about_2h` horizon: 169 of 289 directional calls went the right way. 95% Wilson interval 52.7% to 64.0%. The interval excludes a coin flip, so the lean carries information. Median net edge forgone by standing aside: -6.7bps after a 12.0bps round trip \u2014 refusing saved money on the typical decision."
 }

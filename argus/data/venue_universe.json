@@ -1,2421 +1,3226 @@
 {
- "generated_at": "2026-09-23T13:32:24.380716+00:00",
+ "generated_at": "2026-09-24T02:25:27.331500+00:00",
  "source": "https://api.bitget.com/api/v2/mix/market/contracts?productType=USDT-FUTURES",
  "contracts": {
   "0GUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "1000000MOGUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "10000NEXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "1000BONKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "1000CATUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "1000RATSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "1000SATSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "1000XECUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "1INCHUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "1MBABYDOGEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "1MCHEEMSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "2ZUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AALUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AAOIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AAPLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AAPUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AAVEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ABNBUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ACEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ACHRUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ACHUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ACTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ACUUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ADAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ADBEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ADIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ADVANTESTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AEHRUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AEONUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AEROUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AEVOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AGLDUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "AGPUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AIOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AIXBTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AKEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AKTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ALABUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ALCHUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ALGOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ALICEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ALLOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ALTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AMATUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AMCUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AMDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AMGNUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AMKRUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AMZNUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AMZUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ANETUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ANIMEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ANKRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ANTHROPICUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "APDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "APEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "API3USDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "APLDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "APPUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "APRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "APTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ARBUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ARCUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ARIAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ARKMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ARKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ARMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ARPAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ARQQUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ARUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ARXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ASMLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ASRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ASTERUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ASTRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ASTSUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ASXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ATHUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ATOMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ATUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AUCTIONUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AVAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AVAVUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AVAXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "AVGOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AVNTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AWEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AXLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AXONUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AXSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "AXTIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "AZTECUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "B200USDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "B2USDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BABAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BABYUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BACUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BANANAS31USDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BANANAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BANDUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "BANKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BANUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BARDUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BASEDUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BATUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "BAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BBSTOCKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BBUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BCHUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "BEAMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BEATUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BERAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BGBUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "BHPUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BICOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "BIGTIMEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BILLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BIOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BIRBUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BITOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BKNGUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BLESSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BLSHUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BLURUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BMNRUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BNBUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "BNCUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BNTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "BOMEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BOTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BOTZUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BRETTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BREVUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BRKBUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BROCCOLIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BSBUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BSPUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BSVUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BTCUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "BTWUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BUDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "BXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BYDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "BZUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "C98USDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "CAKEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CAPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CARVUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CATIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CATUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CBRSUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CCLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CCUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CELOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "CELRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "CETUSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CFGUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CFXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "CGNXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CGPTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CHILLGUYUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CHIPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CHRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "CHZUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "CIENUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CKBUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "CLANKERUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CLSKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "CMCSAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "COAIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "COHRUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "COINUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "COMPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "CONLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "COOKIEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "COPPERUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "COPUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CORZUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "COSTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "COTIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "COWUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CPNGUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CRCLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CRDOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CRMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CROSSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CROUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "CRVUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "CRWDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CRWVUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CSCOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CSOPSK2LHKDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CSOPSS2LHKDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CTKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CTRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CTSIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "CUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CVCUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CVXSTOCKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CVXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CXMTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CYBERUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "CYPHUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "CYSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "DASHUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "DATAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "DDOGUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "DEEPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "DELLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "DEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "DEXEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "DFENUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "DGAIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "DIASTOCKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "DIAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "DISKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "DJTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "DKNGUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "DOGEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "DOGSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "DOLOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "DOODUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "DOOSBOTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "DOOSENERUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "DOSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "DOTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "DRAMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "DRIFTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "DXYZUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "DYDXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "DYMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ECHOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "EDGEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "EGLDUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "EIGENUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ELSAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ENAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ENJUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ENSOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ENSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "EPICUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ERAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ESPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ETCUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ETHFIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ETHUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ETHWUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ETNUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "EULUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "EURUSDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "EUVUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "EVAAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "EVEXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "EWHUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "EWJUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "EWTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "EWYUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "EWZUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "FARTCOINUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "FCXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "FETUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "FFUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "FIDAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "FIGHTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "FILUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "FLEXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "FLNCUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "FLOCKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "FLOKIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "FLUIDUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "FLUXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "FLYUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "FOGOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "FOLKSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "FORMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "FOXAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "FRAXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "FUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "FUTUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "FWDIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GALAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "GASUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "GBPUSDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GDXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GENIUSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "GEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GEVUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GFSUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GGLLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GIGADEVICEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GIGGLEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "GILDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GLMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "GLWUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GMEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GMTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "GMXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "GNRCUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GOOGLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GPROUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GPSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "GRAMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "GRASSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "GRIFFAINUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "GRTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "GRVTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "GSUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GTLBUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "GUNUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "GUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 1
   },
   "GWEIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "H100USDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "HAEDALUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "HANMIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "HBARUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "HIVEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "HOLOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "HOMEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "HOODUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "HOTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "HPEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "HPQUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "HSIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "HUMAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "HUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "HUTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "HYPERUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "HYPEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "HYUNDAIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "IBBUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "IBITUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "IBMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ICNTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ICPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "IDOLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "IDUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ILVUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "IMXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "INDAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "INFQUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "INITUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "INJUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "INTCUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "INTWUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "INUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "INXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "IONQUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "IOSTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "IOTAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "IOTXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "IOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "IRENUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "IRYSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ISRGUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "IWMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "JASMYUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "JCTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "JDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "JEPQUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "JMKEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "JOBYUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "JOEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "JP225USDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "JPMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "JSTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "JTOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "JUPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "KAIAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "KAITOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "KASUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "KATUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "KAVAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "KERNELUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "KGENUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "KIOXIAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "KITEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "KLACUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "KMNOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "KNCUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "KOPNUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "KORUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "KOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "KR200USDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "KSMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "KSTRUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "KTOSUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "KUAISHOUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "KWEBUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "LABUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "LASERTECUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "LAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "LAYERUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "LDOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "LENOVOHKDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "LGELECTRONICSUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "LINEAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "LINKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "LINUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "LISTAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "LITEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "LITUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "LLYUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "LMTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "LPTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "LQTYUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "LRCXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "LSKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 1
   },
   "LTCUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "LUMIAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "LUNAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "LUNCUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "LWLGUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "LYNUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "LYTEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MAGICUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MAGMAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MANAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "MANTAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MANTRAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MARAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MARSCOINUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MARUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MASKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MAVUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "MCDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MDBUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MEGAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MEITUANUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MELANIAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MELIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MEMEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MERLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "METAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "METISUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "METUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "METUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MEWUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MINAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "MINIMAXHKDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MINIMAXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MIRAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MMTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MOCAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MONUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MOODENGUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MOONSHOTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MORPHOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MOVEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MOVRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MPUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MRKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MRNAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MRVLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MSFTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MSFUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MSTRUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MSTUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MTLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MUBARAKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MUFGUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "MUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MUUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MVLLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "MYXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "NAORISUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "NATGASUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "NAVERUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NBISUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NDX100USDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NEARUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "NEIROCTOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "NEOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "NETEASEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NETUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NEWTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "NFLXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NIGHTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "NILUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "NIOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NKEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NMRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "NOCUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NOKSTOCKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NOTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "NOWUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NTAPUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NVDAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NVDLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NVSUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "NXPCUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "OGNUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "OGUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "OKLOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "OKTAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ONDOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ONDSUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ONEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ONGUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ONTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "OPENAIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "OPENUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "OPGUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "OPNUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "OPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ORCAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ORCLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ORDERUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ORDIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "OSSUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "OURAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "OUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "OUSTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "OXYUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "PANWUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "PARTIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PATHUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "PAXGUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "PDDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "PENDLEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "PENGUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "PENGUUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PEOPLEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "PEPEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "PEPUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "PHAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PIEVERSEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PIPPINUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PIXELUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PLTRUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "PLUMEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "PNUTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "POETUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "POLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "POLYMARKETUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "POLYXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PONSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "POPCATUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "POPMARTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "POWERUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "POWRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PRLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PROMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PROSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PROVEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PUMPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PUNDIXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "PURRUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "PYPLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "PYTHUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "QBTSUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "QCOMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "QLDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "QNTSTOCKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "QNTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "QQQUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "QTUMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "QUBTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "QUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "RAMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "RAREUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "RAVEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "RAYUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "RDDTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "RDWUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "RECALLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "REDUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "RENDERUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "RESOLVUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "REUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "REZUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "RGTIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "RIOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "RIVERUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "RKLBUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ROBOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ROKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ROSEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "RPLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "RSRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "RTXSTOCKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "RUNEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "RVNUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SAFEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SAHARAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SAMSUNGEMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SAMSUNGUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "SANDUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "SANTOSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SAPIENUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SATLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SDGRUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SECZUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SEIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "SENTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SFPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "SGOVUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SHAZUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SHEINHKDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SHEINUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SHELLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SHIBUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "SHOPUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SIGNUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SIMOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SIRENUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SITMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SKDDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SKHYNIXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "SKHYUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SKLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SKRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SKUUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SKYAIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SKYUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SLPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SLXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SMCIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SMHUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SMICUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SMRUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SNDKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SNOWUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SNXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "SNXXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SOFIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SOFTBANKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SOLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "SOMIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SONICUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SONYUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SOONUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SOPHUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SOXLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SOXSUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SOXXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SP500USDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SPACEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SPCHUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SPCXUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SPELLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "SPIRUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SPKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SPXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SPYUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SQDUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SQQQUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SSPCUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SSVUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "STABLEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "STEEMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "STGUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "STONKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "STOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "STRCUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "STRKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "STXSTOCKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "STXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "SUIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "SUMIELECUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "SUNUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SUPERUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SUSHIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "SXTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SYNUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "SYRUPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TAGUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TAIKOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TAOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TBTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TEAMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TEMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TENCENTHKDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TENCENTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TERUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "THETAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "THEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TIAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TLMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TLTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TMFUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TNSRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TOKYOELUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TOSHIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TOWNSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TQQQUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TRBUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TREEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TRIAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TRUMPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TRUSTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TRXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "TSEMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TSLAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TSLLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TSMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TTWOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TURBOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TUTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "TWLOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TXNUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "TZAUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "UAIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "UBERUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "UBUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "UMAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "UNHUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "UNITASUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "UNITREEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "UNIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "URNMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "USARUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "USDBRLUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "USDCUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "USDJPYUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "USELESSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "USTCUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "USUALUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "USUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "UVXYUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "VALEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "VANAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "VEEVUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "VELODROMEUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "VELVETUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "VETUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "VIRTUALUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "VOOUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "VRTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "VSTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "VTHOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "VUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "VVVUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "WALUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "WAXPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "WBDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "WCTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "WDCUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "WENUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "WETUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "WIFUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "WLDUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "WLFIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "WMTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "WOOUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "WUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "XAGUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "XAIUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "XANUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "XAUTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "XAUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "XBIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "XIAOMIHKDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "XIAOMIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "XLEUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "XLKUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "XLMUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "XLUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "XLVUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "XMRUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "XNDUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "XOMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "XPDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "XPINUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "XPLUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "XPTUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 4
   },
   "XRPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "XTZUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "XVGUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "XVSUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "YBUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "YGGUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ZAMAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ZBTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ZECUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ZENUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 8
   },
   "ZESTUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ZETAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ZHIPUHKDUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ZHIPUUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ZHONGJIUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ZILUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ZKCUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ZKPUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ZKUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ZMUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "ZORAUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ZROUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ZRXUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "ZSUSDT": {
-   "rwa": true
+   "rwa": true,
+   "funding_hours": 8
   },
   "\u54c8\u57fa\u7c73USDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "\u725b\u6765USDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   },
   "\u9f99\u867eUSDT": {
-   "rwa": false
+   "rwa": false,
+   "funding_hours": 4
   }
  }
 }

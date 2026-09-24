@@ -1,11 +1,11 @@
 {
   "argus_execution_surface_scan": {
-    "path": "C:\\Users\\prate\\bitget\\argus\\src\\argus\\research\\searchoff.py",
+    "path": "argus\\src\\argus\\research\\searchoff.py",
     "forbidden_calls_found": [],
     "has_execution_surface": false
   },
   "rdagent_execution_surface_scan": {
-    "path": "C:\\Users\\prate\\bitget\\argus\\src\\argus\\eval\\baselines\\rdagent_factor.py",
+    "path": "argus\\src\\argus\\eval\\baselines\\rdagent_factor.py",
     "forbidden_calls_found": [
       "subprocess.check_output"
     ],
@@ -14,7 +14,7 @@
   "injection_proof": {
     "marker_written": true,
     "marker_contents": "ARGUS proof-of-execution - real subprocess ran real payload",
-    "workspace_path": "C:\\Users\\prate\\bitget\\argus\\data\\_rdagent_workspace_tmp\\ce6231c05f2a4a6e989b09d1bc0ceb3b",
+    "workspace_path": "argus\\data\\_rdagent_workspace_tmp\\ce6231c05f2a4a6e989b09d1bc0ceb3b",
     "execution_error": "NoOutputError: Execution succeeded without error.\nExpected output file not found.",
     "executed_attacker_code": true
   },

@@ -118,7 +118,7 @@
     "argus_reproducible": true
   },
   "out_of_sample": {
-    "path": "C:\\Users\\prate\\bitget\\argus\\data\\desk_notes.jsonl",
+    "path": "argus\\data\\desk_notes.jsonl",
     "cycles": 457,
     "distinct_sources_seen": 5,
     "checked": true

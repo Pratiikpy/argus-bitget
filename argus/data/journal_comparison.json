@@ -61,7 +61,7 @@
   "swept_serenity_always_fails": true,
   "swept_argus_always_clean": true,
   "out_of_sample": {
-    "ledger_path": "C:\\Users\\prate\\bitget\\argus\\data\\paper_ledger.jsonl",
+    "ledger_path": "argus\\data\\paper_ledger.jsonl",
     "entries": 519,
     "chain_intact": true,
     "checked": true

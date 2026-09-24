@@ -232,53 +232,53 @@ class TestThePageHoldsUpAtPhoneWidthAndInBothThemes:
 
 
 class TestTheResearchTaskIsReachable:
-    """**A required Track 3 material that had no route.**
+    """**Track 3's required demo: one complete research task, question to actionable insight.**
 
-    The handbook asks for "one complete research task (full flow from question to actionable
-    insight)". `desk/research.py` runs it and `data/research_report.json` records it — and the
-    file shipped inside the deploy bundle with nothing serving it. A deliverable a judge cannot
-    open is a deliverable that was not submitted.
+    The route used to render a chain recorded on 2026-09-14 whose verdict its own allocation step
+    contradicted. It now runs the task on request; these tests hold it to the three properties the
+    handbook line asks for — the whole flow, an actionable end, and reachable by a judge.
     """
 
-    def test_the_page_renders_the_whole_chain(self, base_url: str) -> None:
+    def test_the_page_runs_the_whole_chain(self, base_url: str) -> None:
         status, raw, headers = _get(base_url + "/research")
         body = raw.decode("utf-8")
         assert status == 200
         assert "text/html" in headers.get("Content-Type", "")
-        assert "One complete research task" in body
-        assert "Produced by" in body
+        assert "should I add 15% TSLA?" in body
+        assert "What to do" in body
+        assert body.count("<article") == 7
 
-    def test_the_artefact_is_available_as_json(self, base_url: str) -> None:
-        status, body, _ = _get(base_url + "/research?format=json")
-        assert status == 200
-        payload = json.loads(body)
-        assert payload["available"] is True
-        assert payload["findings"], "the chain must carry its steps"
-        assert payload["question"] and payload["verdict"]
-
-    def test_every_step_names_what_produced_it(self, base_url: str) -> None:
-        """The point of the page is provenance, not the verdict."""
+    def test_every_step_names_its_engine_and_answers(self, base_url: str) -> None:
         _, body, _ = _get(base_url + "/research?format=json")
-        for finding in json.loads(body)["findings"]:
-            assert finding.get("step"), finding
-            assert "source" in finding, finding
+        payload = json.loads(body)
+        assert len(payload["steps"]) == 7
+        for step in payload["steps"]:
+            assert step["engine"] and step["lines"], step
+
+    def test_it_ends_in_something_to_act_on(self, base_url: str) -> None:
+        """The conclusion leads with what was asked: how much of the name the book can carry."""
+        _, body, _ = _get(base_url + "/research?format=json")
+        conclusion = json.loads(body)["conclusion"]
+        assert conclusion, "a research task with no actionable end is not the task asked for"
+        assert conclusion[0]["step"] == "What the trade does to your book"
+
+    def test_the_name_size_and_book_come_from_the_url(self, base_url: str) -> None:
+        _, body, _ = _get(base_url + "/research?format=json&name=gold&size=10&book=50%25%20SPY"
+                                     "%2C%2050%25%20QQQ")
+        payload = json.loads(body)
+        assert payload["name"] == "XAU"
+        assert payload["size_pct"] == 10
+        assert set(payload["book"]) == {"SPYUSDT", "QQQUSDT"}
+
+    def test_nonsense_parameters_still_answer(self, base_url: str) -> None:
+        status, body, _ = _get(base_url + "/research?format=json&size=lots&name=")
+        assert status == 200
+        assert json.loads(body)["name"] == "TSLA"
 
     def test_the_console_links_to_it(self, base_url: str) -> None:
         """A route nobody can find is the same problem one step removed."""
         _, raw, _ = _get(base_url + "/")
         assert "/research" in raw.decode("utf-8")
-
-    def test_a_missing_artefact_is_a_stated_absence_not_an_empty_page(
-        self, tmp_path, monkeypatch
-    ) -> None:
-        """"Has not been run" and "ran and found nothing" are different claims."""
-        import argus.lui.server as mod
-
-        monkeypatch.setenv("ARGUS_DATA_DIR", str(tmp_path))
-        report = mod._research_report()
-        assert report["available"] is False
-        assert "looked_in" in report
-        assert "No research task on record" in mod._render_research(report)
 
 
 class TestTheLossesPage:

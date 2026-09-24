@@ -1,11 +1,11 @@
 {
-  "total": 96,
-  "checked": 87,
-  "ok": 87,
+  "total": 95,
+  "checked": 86,
+  "ok": 86,
   "lagging": 0,
   "stale": 0,
   "absent": 24,
-  "deleted": 0,
+  "deleted": 1,
   "unchecked": 9,
   "findings": [
     {
@@ -79,98 +79,98 @@
       "doc": "explained",
       "line": 656,
       "quoted": [
-        "5,946"
+        "6,496"
       ],
       "live": null,
       "status": "UNCHECKED",
-      "excerpt": "5,946 tests"
+      "excerpt": "6,496 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1710,
       "quoted": [
-        "5,946"
+        "6,496"
       ],
       "live": null,
       "status": "UNCHECKED",
-      "excerpt": "5,946 tests collected"
+      "excerpt": "6,496 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1959,
       "quoted": [
-        "5,946"
+        "6,496"
       ],
       "live": null,
       "status": "UNCHECKED",
-      "excerpt": "5,946 tests collected"
+      "excerpt": "6,496 tests collected"
     },
     {
       "claim": "source_files",
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "307"
+        "308"
       ],
       "live": [
-        307
+        308
       ],
       "status": "OK",
-      "excerpt": "strict clean on 307 source files"
+      "excerpt": "strict clean on 308 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 54,
       "quoted": [
-        "307"
+        "308"
       ],
       "live": [
-        307
+        308
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 307 source files"
+      "excerpt": "strict` clean on 308 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 299,
       "quoted": [
-        "307"
+        "308"
       ],
       "live": [
-        307
+        308
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 307 files"
+      "excerpt": "strict` clean on 308 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 500,
       "quoted": [
-        "307"
+        "308"
       ],
       "live": [
-        307
+        308
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 307 source files"
+      "excerpt": "strict` clean across 308 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 1956,
       "quoted": [
-        "307"
+        "308"
       ],
       "live": [
-        307
+        308
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 307 source files"
+      "excerpt": "strict` clean on 308 source files"
     },
     {
       "claim": "register_claims",
@@ -294,56 +294,56 @@
       "doc": "readme",
       "line": 177,
       "quoted": [
-        "115",
-        "193"
+        "169",
+        "289"
       ],
       "live": [
-        115,
-        193
+        169,
+        289
       ],
       "status": "OK",
-      "excerpt": "115 of 193 directional calls"
+      "excerpt": "169 of 289 directional calls"
     },
     {
       "claim": "refusal_accuracy_2h",
       "doc": "public-readme",
       "line": 111,
       "quoted": [
-        "115",
-        "193"
+        "169",
+        "289"
       ],
       "live": [
-        115,
-        193
+        169,
+        289
       ],
       "status": "OK",
-      "excerpt": "115 of 193 directional calls"
+      "excerpt": "169 of 289 directional calls"
     },
     {
       "claim": "refusal_forgone_2h",
       "doc": "readme",
       "line": 177,
       "quoted": [
-        "\u22126.9"
+        "-6.7"
       ],
       "live": [
-        -6.93
+        -6.67
       ],
       "status": "OK",
-      "excerpt": "forgave \u22126.9bps of net edge"
+      "excerpt": "forgave -6.7bps of net edge"
     },
     {
       "claim": "refusal_forgone_2h",
       "doc": "public-readme",
       "line": 115,
       "quoted": [
-        "\u22126.9"
+        "-6.7"
       ],
       "live": [
-        -6.93
+        -6.67
       ],
       "status": "OK",
-      "excerpt": "forgave \u22126.9bps of net edge"
+      "excerpt": "forgave -6.7bps of net edge"
     },
     {
       "claim": "standing_owned",
@@ -778,15 +778,13 @@
     {
       "claim": "leans_recorded",
       "doc": "readme",
-      "line": 247,
-      "quoted": [
-        "460"
-      ],
+      "line": null,
+      "quoted": [],
       "live": [
         460
       ],
-      "status": "OK",
-      "excerpt": "460 decisions carry a lean"
+      "status": "DELETED",
+      "excerpt": "last seen at line 247"
     },
     {
       "claim": "leans_recorded",
@@ -1343,7 +1341,7 @@
     {
       "claim": "teardowns",
       "doc": "prd",
-      "line": 468,
+      "line": 471,
       "quoted": [
         "61"
       ],

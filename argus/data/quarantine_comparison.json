@@ -3,11 +3,11 @@
     "repo": "ethz-spylab/agentdojo",
     "paper": "arXiv 2406.13352",
     "version": "0.1.35",
-    "clone": "C:\\Users\\prate\\bitget\\research\\repos-themed\\ethz-spylab~agentdojo"
+    "clone": "research\\repos-themed\\ethz-spylab~agentdojo"
   },
   "corpus_verification": {
     "clone_present": true,
-    "clone_path": "C:\\Users\\prate\\bitget\\research\\repos-themed\\ethz-spylab~agentdojo\\src\\agentdojo\\attacks",
+    "clone_path": "research\\repos-themed\\ethz-spylab~agentdojo\\src\\agentdojo\\attacks",
     "source_files": [
       "__init__.py",
       "attack_registry.py",

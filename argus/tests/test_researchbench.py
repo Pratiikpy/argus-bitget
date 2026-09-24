@@ -12,7 +12,7 @@ import pytest
 from argus.eval.researchbench import CORPORA, load, score
 
 
-@pytest.mark.parametrize(("path", "total"), zip(CORPORA, (7, 8, 9, 10), strict=True),
+@pytest.mark.parametrize(("path", "total"), list(zip(CORPORA, (7, 8, 9, 10), strict=True)),
                          ids=[p.stem for p in CORPORA])
 def test_every_must_refuse_question_is_refused(path, total) -> None:  # type: ignore[no-untyped-def]
     """Ten per corpus as written; four were relabelled on 2026-09-23 because the instruments they

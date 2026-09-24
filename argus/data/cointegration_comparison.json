@@ -84,7 +84,7 @@
     "argus_bonferroni_survivors": 0,
     "naive_selection_exceeds_the_corrected_ones": true
   },
-  "lean_alphas_dir_checked": "C:\\Users\\prate\\bitget\\research\\repos\\Lean-upstream\\Algorithm.Framework\\Alphas",
+  "lean_alphas_dir_checked": "research\\repos\\Lean-upstream\\Algorithm.Framework\\Alphas",
   "lean_alphas_dir_exists": true,
   "lean_correction_grep_hits": [],
   "lean_has_no_correction": true,

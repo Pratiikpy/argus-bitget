@@ -715,3 +715,318 @@ class TestAnalystPriceTargets:
     def test_nothing_recent_is_nothing_said(self) -> None:
         from datetime import date
         assert research._price_target_line("NVDA", self.ROWS[-1:], {}, date(2026, 9, 23)) is None
+
+
+class TestTheBookAsHeld:
+    """"How risky is my portfolio" is about the book held, not a proposal to add to it."""
+
+    @pytest.mark.parametrize("text", [
+        "I hold 60% BTC, 30% ETH, 10% SOL. How risky is my portfolio?",
+        "review my portfolio: 40% TSLA 30% COIN 30% MSTR",
+        "I hold 50% NVDA, 30% MSFT, 20% AAPL - should I rebalance?",
+    ])
+    def test_a_book_question_is_a_book_request(self, text: str) -> None:
+        req = detect(text)
+        assert req is not None and req.kind is ResearchKind.BOOK and req.book
+
+    def test_adding_a_name_is_still_impact(self) -> None:
+        req = detect("I hold 50% NVDA, 50% AAPL - how risky is my portfolio if I add 20% TSLA")
+        assert req is not None and req.kind is ResearchKind.IMPACT
+
+    def test_a_small_book_gets_an_equal_risk_rebalance_not_a_cash_pile(self) -> None:
+        answer = run("q", ResearchRequest(kind=ResearchKind.BOOK,
+                                          symbols=("NVDAUSDT", "MSFTUSDT", "AAPLUSDT"),
+                                          book={"NVDAUSDT": 0.5, "MSFTUSDT": 0.3,
+                                                "AAPLUSDT": 0.2}))
+        assert answer.lines[0].startswith("Actionable: the risk is concentrated in NVDA")
+        assert "equal-risk rebalance" in answer.lines[0] and "fully invested" in answer.lines[0]
+        assert any(line.startswith("Where the risk sits") for line in answer.lines)
+
+    def test_a_stated_budget_is_enforced_by_trimming(self) -> None:
+        answer = run("q", ResearchRequest(kind=ResearchKind.BOOK,
+                                          symbols=("NVDAUSDT", "MSFTUSDT", "AAPLUSDT"),
+                                          book={"NVDAUSDT": 0.5, "MSFTUSDT": 0.3,
+                                                "AAPLUSDT": 0.2},
+                                          budget=0.4, budget_stated=True))
+        assert "over your 40% budget" in answer.lines[0]
+
+    def test_equal_risk_weights_equalise_risk(self) -> None:
+        data = research.load(("NVDAUSDT", "MSFTUSDT", "AAPLUSDT"))
+        columns = research._open_columns(data.raw, research._is_open())
+        weights = research._equal_risk_weights(("NVDAUSDT", "MSFTUSDT", "AAPLUSDT"), columns)
+        assert weights is not None and sum(weights.values()) == pytest.approx(1.0)
+        risk = research.decompose(weights, columns)
+        assert risk is not None
+        for c in risk.contributions:
+            assert c.contribution / risk.volatility == pytest.approx(1 / 3, abs=0.01)
+
+    def test_units_and_cash_are_valued_not_counted(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setattr(research, "_last_price", lambda s: 80_000.0 if s == "BTCUSDT"
+                            else None)
+        notes: list[str] = []
+        book, cash = research._value_holdings(
+            {"holdings_usd": {"TSLA": 5000}, "holdings_units": {"BTC": 2}, "cash_usd": 10000},
+            notes)
+        total = 5000 + 160_000 + 10_000
+        assert book["BTCUSDT"] == pytest.approx(160_000 / total)
+        assert book["TSLAUSDT"] == pytest.approx(5000 / total)
+        assert cash == pytest.approx(10_000 / total)
+        assert any("2 BTC valued at $160,000" in n for n in notes)
+
+    def test_a_qqq_hedge_that_explains_little_says_so(self) -> None:
+        line = research._hedge_line(0.95, 0.16)
+        assert line is not None and "would remove little" in line
+        assert "neutralises" in (research._hedge_line(1.1, 0.56) or "")
+
+
+def _ticker(symbol: str, last: str = "100", change: str = "0.01", funding: str = "0.0001") -> Any:
+    from datetime import UTC, datetime
+    from decimal import Decimal
+
+    from argus.market.bitget import Ticker
+    return Ticker(symbol=symbol, last=Decimal(last), bid=Decimal(last), ask=Decimal(last),
+                  high_24h=Decimal(last), low_24h=Decimal(last), change_24h=Decimal(change),
+                  base_volume=Decimal("1000000"), funding_rate=Decimal(funding),
+                  fetched_at=datetime.now(UTC))
+
+
+class TestTheJudgesQuestionsRouteToTheRightEngine:
+    """Every question here was answered wrongly or refused on the live console in a judge's probe
+    on 2026-09-24."""
+
+    @pytest.mark.parametrize(("text", "kind"), [
+        ("Whats the news on NVDA today?", ResearchKind.NEWS),
+        ("why is COIN down today", ResearchKind.NEWS),
+        ("Why did the market drop today?", ResearchKind.NEWS),
+        ("What is the macro backdrop - Fed, yields, dollar, and how does it affect tech stocks?",
+         ResearchKind.MACRO),
+        ("What will the S&P 500 do after the next FOMC meeting?", ResearchKind.MACRO),
+        ("What is the fear and greed index right now?", ResearchKind.SENTIMENT),
+        ("Explain the risk in shorting DOGE with 20x leverage", ResearchKind.LEVERAGE),
+        ("Build me a portfolio of tech stocks", ResearchKind.CONSTRUCT),
+        ("build a portfolio with NVDA, gold and BTC", ResearchKind.CONSTRUCT),
+        ("I hold 60% BTC, 30% ETH, 10% SOL. How risky is my portfolio?", ResearchKind.BOOK),
+        ("Compare AAPL and MSFT fundamentals", ResearchKind.FUNDAMENTALS),
+    ])
+    def test_route(self, text: str, kind: ResearchKind) -> None:
+        req = detect(text)
+        assert req is not None and req.kind is kind
+
+    def test_why_did_a_price_move_is_news_but_why_did_you_is_the_record(self) -> None:
+        assert not research.about_the_record("why did NVDA fall today")
+        assert research.about_the_record("why did you pass on NVDA")
+        assert research.about_the_record("why did the desk skip TSLA yesterday")
+
+    def test_two_names_get_fundamentals_for_both(self) -> None:
+        req = detect("Compare AAPL and MSFT fundamentals")
+        assert req is not None and req.symbols == ("AAPLUSDT", "MSFTUSDT")
+
+    def test_leverage_and_side_are_read(self) -> None:
+        req = detect("Explain the risk in shorting DOGE with 20x leverage")
+        assert req is not None and req.leverage == 20.0 and req.side == "short"
+
+    def test_a_forecast_is_answered_as_a_backdrop_and_says_so(self) -> None:
+        req = detect("What will the S&P 500 do after the next FOMC meeting?")
+        assert req is not None and any("does not forecast" in n for n in req.notes)
+
+    def test_the_market_being_shocked_by_a_named_theme_is_not_a_construct(self) -> None:
+        req = detect("How should I split a $50k order in NVDA?")
+        assert req is not None and req.kind is ResearchKind.EXECUTION
+
+
+class TestLeverageArithmetic:
+    def test_liquidation_distance_and_survivable_multiple(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from datetime import datetime, timedelta
+        from decimal import Decimal
+        start = datetime(2026, 9, 1)
+        # A flat series with one 10% spike: a 20x short (5% distance) is liquidated in the windows
+        # that contain the spike; the worst adverse 24h move is 10%, so 10x is the survivable cap.
+        bars = []
+        for i in range(200):
+            high = Decimal("110") if i == 100 else Decimal("100")
+            bars.append(history.Candle(ts=start + timedelta(hours=i), open=Decimal(100),
+                                       high=high, low=Decimal(100), close=Decimal(100),
+                                       volume=Decimal(1)))
+        monkeypatch.setattr(history, "fetch", lambda *a, **k: bars)
+        from argus.market import bitget
+        monkeypatch.setattr(bitget, "fetch_tickers", lambda: {"DOGEUSDT": _ticker("DOGEUSDT")})
+        lines, _, payload = research._leverage("DOGEUSDT", 20.0, "short")
+        assert payload["liquidation_distance"] == pytest.approx(0.05)
+        assert payload["worst_adverse_24h"] == pytest.approx(0.10)
+        assert payload["survivable_leverage"] == 10
+        assert "only 10x or less would have survived" in lines[0]
+        assert any("shorts" in line or "short receives" in line for line in lines)
+
+
+class TestFundingMeaning:
+    def test_a_positive_rate_is_longs_paying_shorts_on_the_contracts_own_interval(self) -> None:
+        line = research._funding_meaning("XAUUSDT", 0.01)
+        assert line is not None and "longs pay shorts every 4h" in line
+        assert "0.060% of the position a day" in line
+
+    def test_a_flat_rate_is_flat(self) -> None:
+        assert "flat" in (research._funding_meaning("BTCUSDT", 0.0) or "")
+
+
+class TestExecutionReadsTheBook:
+    def test_a_size_beyond_the_visible_book_is_a_lower_bound(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from datetime import UTC, datetime
+        from decimal import Decimal
+
+        from argus.desk.workbench import plan_execution
+        from argus.market import depth
+        levels = tuple(depth.Level(Decimal(100.01 + i * 0.01), Decimal(10)) for i in range(50))
+        bids = tuple(depth.Level(Decimal(100 - i * 0.01), Decimal(10)) for i in range(50))
+        book = depth.OrderBook(symbol="PLTRUSDT", fetched_at=datetime.now(UTC), bids=bids,
+                               asks=levels)
+        monkeypatch.setattr(depth, "fetch_orderbook", lambda *a, **k: book)
+        plan = plan_execution(symbol="PLTRUSDT", notional=Decimal("2000000"),
+                              adv_notional=Decimal("6000000"))
+        lines = research._depth_lines("PLTRUSDT", Decimal("2000000"), Decimal("6000000"), plan,
+                                      "sell $2m of PLTR")
+        assert lines[0].startswith("Actionable: in one market order this costs at least")
+        assert any("sell side" in line for line in lines)
+        assert any("larger than the visible book" in line for line in lines)
+        assert any(line.startswith("Schedule:") and "days" in line for line in lines)
+
+
+class TestMacroAndSentiment:
+    def test_macro_reads_fred_and_states_the_curve(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        values = {"DGS10": 4.9, "DGS2": 4.7, "DFF": 3.9, "T10YIE": 2.3, "DTWEXBGS": 119.0}
+        monkeypatch.setattr(research, "_fred", lambda sid, days=45: [
+            ("2026-08-10", values[sid] - 0.1), ("2026-09-22", values[sid])])
+        monkeypatch.setattr(research, "_rate_sensitivity", lambda s: {
+            "days": 60, "corr_10y": -0.4, "pct_per_10bp": -1.1, "corr_dollar": -0.3})
+        from argus.market import evidence
+        monkeypatch.setattr(evidence.RssSource, "headlines", lambda self, k, u: [])
+        lines, _, readings = research._macro(None)
+        joined = " ".join(lines)
+        assert lines[0].startswith("Actionable: the 10-year is 4.90%")
+        assert "rates have been driving it" in lines[0]
+        assert "10-year minus 2-year is +20bp" in joined
+        assert readings["DGS10"]["value"] == pytest.approx(4.9)
+
+    def test_sentiment_reads_the_index_and_positioning(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        import io
+        import json as _json
+        import urllib.request
+        body = _json.dumps({"data": [{"value": str(v), "value_classification": "Greed"}
+                                     for v in (74, 70, 65, 60, 55, 52, 50, 48)]}).encode()
+        monkeypatch.setattr(urllib.request, "urlopen", lambda *a, **k: io.BytesIO(body))
+        from argus.market import bitget
+        monkeypatch.setattr(bitget, "fetch_tickers", lambda: {
+            "BTCUSDT": _ticker("BTCUSDT", funding="0.0005")})
+        lines, _, payload = research._sentiment()
+        assert payload["index"] == 74 and "greed" in lines[0]
+        assert any("crowded long" in line for line in lines)
+
+
+class TestTheRecordAnswersItsOwnQuestions:
+    def test_a_track_record_question_is_answered_first(self) -> None:
+        from datetime import UTC, datetime
+
+        from argus.lui.question import Intent, classify
+        assert classify("What is your track record?",
+                        now=datetime.now(UTC)).intent is Intent.PERFORMANCE
+
+    def test_what_we_got_wrong_reaches_the_review(self) -> None:
+        from datetime import UTC, datetime
+
+        from argus.lui.question import Intent, classify
+        assert classify("What did you get wrong recently?",
+                        now=datetime.now(UTC)).intent is Intent.REVIEW
+
+
+class TestSecondRoundOfJudgeQuestions:
+    @pytest.mark.parametrize(("text", "kind"), [
+        ("What is Bitget's tokenized stock offering and should I use it instead of buying stocks "
+         "directly?", ResearchKind.VENUE),
+        ("I'm a conservative investor with $20k. Build me a portfolio", ResearchKind.CONSTRUCT),
+        ("What is the outlook for gold over the next month?", ResearchKind.ANALOGUE),
+        ("英伟达现在值得买吗?", ResearchKind.IMPACT),
+        ("what is the analyst price target for NVDA", ResearchKind.FUNDAMENTALS),
+    ])
+    def test_route(self, text: str, kind: ResearchKind) -> None:
+        req = detect(text)
+        assert req is not None and req.kind is kind
+
+    def test_a_price_forecast_is_not_a_research_request(self) -> None:
+        assert detect("yo where will tsla be by friday closing lol give me a number") is None
+        assert research._PRICE_FORECAST.search("Forecast BTC price for next week")
+
+    def test_a_conservative_book_is_the_defensive_theme(self) -> None:
+        req = detect("I'm a conservative investor with $20k. Build me a portfolio")
+        assert req is not None and "SPYUSDT" in req.symbols and "XAUUSDT" in req.symbols
+
+    def test_the_line_that_answers_the_question_leads(self) -> None:
+        lines = ["Actionable: NVDA's next report date is not published yet.",
+                 "Institutional holders: the source returned one 13F record.",
+                 "Analyst price targets, last 90 days (21 firms): median 330."]
+        led = research._lead_with_what_was_asked(lines, "what are analysts' price targets")
+        assert led[0].startswith("Actionable: analyst price targets")
+        led = research._lead_with_what_was_asked(lines, "which 13F funds own NVDA")
+        assert led[0].startswith("Actionable: institutional holders")
+        assert research._lead_with_what_was_asked(lines, "when does NVDA report") == lines
+
+    def test_fred_falls_back_to_the_dated_snapshot(self, monkeypatch: pytest.MonkeyPatch,
+                                                   tmp_path: Any) -> None:
+        import json as _json
+
+        def unreachable(series: str, days: int) -> list[tuple[str, float]]:
+            raise TimeoutError("FRED did not answer")
+        snap = tmp_path / "macro_snapshot.json"
+        snap.write_text(_json.dumps({"generated_at": "2026-09-24T00:00:00+00:00",
+                                     "series": {"DGS10": [["2026-09-22", 4.96]]}}),
+                        encoding="utf-8")
+        monkeypatch.setattr(research, "_fred_live", unreachable)
+        monkeypatch.setattr(research, "FRED_SNAPSHOT", snap)
+        rows = research._fred("DGS10", days=10_000)
+        assert rows == [("2026-09-22", 4.96)]
+        assert research._FRED_USED_SNAPSHOT["DGS10"] == "2026-09-24"
+        research._FRED_USED_SNAPSHOT.clear()
+
+    def test_the_track_record_pattern_cannot_be_relabelled(self) -> None:
+        from datetime import UTC, datetime
+
+        from argus.lui.ngram import reclassify
+        from argus.lui.question import Intent, classify
+        q = classify("What is your track record? How many trades have you made?",
+                     now=datetime.now(UTC))
+        assert reclassify(q)[0].intent is Intent.PERFORMANCE
+
+
+class TestOrdersStayRefusedWhateverTheyName:
+    @pytest.mark.parametrize("text", ["Buy 0.5 BTC at market",
+                                      "Place a limit order to sell 10 ETH at 5000"])
+    def test_an_order_for_a_listed_name_is_refused(self, text: str) -> None:
+        """A name-only fallback answered these as a risk profile on 2026-09-24; an order is
+        refused as an order before any fallback."""
+        from argus.lui import server
+        payload = server.handle_ask(text, [])
+        assert payload["refused"] and payload["intent"] == "order"
+
+
+class TestFredBacksOff:
+    def test_after_one_failure_the_snapshot_is_used_without_waiting(
+            self, monkeypatch: pytest.MonkeyPatch, tmp_path: Any) -> None:
+        import json as _json
+        calls: list[str] = []
+
+        def slow_failure(series: str, days: int) -> list[tuple[str, float]]:
+            calls.append(series)
+            raise TimeoutError("FRED did not answer")
+        snap = tmp_path / "macro_snapshot.json"
+        snap.write_text(_json.dumps({"generated_at": "2026-09-24T00:00:00+00:00",
+                                     "series": {"DGS10": [["2026-09-22", 4.96]],
+                                                "DGS2": [["2026-09-22", 4.71]]}}),
+                        encoding="utf-8")
+        monkeypatch.setattr(research, "_fred_live", slow_failure)
+        monkeypatch.setattr(research, "FRED_SNAPSHOT", snap)
+        monkeypatch.setattr(research, "_FRED_DOWN_UNTIL", 0.0)
+        research._fred("DGS10", days=10_000)
+        research._fred("DGS2", days=10_000)
+        assert calls == ["DGS10"]
+        research._FRED_USED_SNAPSHOT.clear()

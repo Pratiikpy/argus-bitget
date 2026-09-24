@@ -125,12 +125,15 @@ class TestRefusalIsAnAnswer:
         assert "floor of 5" in joined
         assert "refusal to compute, not a missing feature" in joined
 
-    def test_a_live_quote_is_refused_because_it_is_not_in_the_record(
+    def test_a_quote_on_the_record_path_points_to_the_live_quote(
         self, weekend_ledger: PaperLedger
     ) -> None:
+        """The research layer quotes live prices first; the record layer only sees a price
+        question it did not recognise, and must not claim a listed name is unlisted."""
         a = answer(weekend_ledger, classify("what is NVDA trading at?", now=NOW))
         assert a.refused
-        assert "not part of the record" in a.reason
+        assert "where is NVDA trading right now" in a.reason
+        assert "not a contract Bitget lists" not in a.reason
 
     def test_an_unrecognised_question_does_not_get_routed_to_the_nearest_answerer(
         self, weekend_ledger: PaperLedger

@@ -433,10 +433,11 @@ def reclassify(question: Any, *, path: Path | None = None) -> tuple[Any, str]:
     """
     from dataclasses import replace
 
-    from argus.lui.question import Intent
+    from argus.lui.question import DECISIVE_PATTERNS, Intent
 
     reached = question.intent
-    if str(reached) in PATTERN_WINS or not available(path):
+    if (str(reached) in PATTERN_WINS or getattr(question, "matched", "") in DECISIVE_PATTERNS
+            or not available(path)):
         return question, "patterns"
     if str(reached) in _GAVE_UP and str(reached) not in MODEL_MAY_RESCUE:
         # AMBIGUOUS: the patterns understood the question and found a referent missing. See

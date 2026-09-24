@@ -111,6 +111,40 @@ def _src(entry: Entry) -> Source:
 # --- answerers ------------------------------------------------------------------------------
 
 
+def _data_path(name: str) -> Path:
+    override = os.environ.get("ARGUS_DATA_DIR", "").strip()
+    if override:
+        return Path(override) / name
+    from argus.paper.runner import LEDGER_PATH
+
+    return LEDGER_PATH.with_name(name)
+
+
+def _lean_grading() -> str | None:
+    """How the desk's refusals' stated directions graded against what happened, from
+    `eval/refusal.py`'s artefact — the one track record a desk that never traded has."""
+    import json
+
+    path = _data_path("refusal_alpha.json")
+    if not path.exists():
+        return None
+    report = json.loads(path.read_text(encoding="utf-8"))
+    rows = {h["horizon"]: h for h in report.get("horizons", [])}
+    short = rows.get("about_2h")
+    if not short or not short.get("directional"):
+        return None
+    low, high = short.get("accuracy_ci95") or (None, None)
+    line = (f"Every refusal still states which way it leans, hashed before the outcome: at about "
+            f"2 hours {short['correct']} of {short['directional']} leans went the right way "
+            f"({short['accuracy_pct']:.1f}%"
+            + (f", 95% interval {low:.1f} to {high:.1f}%" if low is not None else "") + ")")
+    night = rows.get("overnight_12h_plus")
+    if night and night.get("directional"):
+        line += (f"; overnight {night['correct']} of {night['directional']} "
+                 f"({night['accuracy_pct']:.1f}%)")
+    return line + f" — graded {str(report.get('as_of', ''))[:10]}, `python -m argus.eval.refusal`."
+
+
 def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
     """The three scored numbers, or a named reason why they do not exist yet."""
     perf = evaluate_ledger(ledger)
@@ -144,6 +178,16 @@ def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
                   share=perf.as_dict()["largest_symbol_share_pct"], trades=top.trades)
             )
     lines.append(t("perf.net_pnl", lang, net=perf.net_pnl, capital=perf.capital))
+    if perf.trades == 0 and lang == "en":
+        # A track-record question deserves its answer first, not a list of undefined ratios:
+        # zero trades, every decision a refusal, and how the refusals' leans have graded.
+        lines.insert(0, f"Track record: {len(ledger.entries)} decisions on the ledger and no "
+                        f"trade settled — every decision so far is a refusal, so there is no "
+                        f"Sharpe, drawdown or win rate to report.")
+        grading = _lean_grading()
+        if grading:
+            lines.insert(1, grading)
+            sources.append(Source("artefact", "refusal_alpha.json", "graded refusal leans"))
     for entry in [e for e in ledger.entries if e.is_settled and not e.is_abstention][:3]:
         sources.append(_src(entry))
     return Answer(question=question, lines=lines, sources=sources, data=perf.as_dict())
@@ -329,6 +373,9 @@ def answer_calibration(ledger: PaperLedger, question: Question) -> Answer:
             lines=[
                 t("calib.insufficient", question.language, graded=graded, floor=5),
                 t("calib.insufficient_why", question.language),
+                *([] if question.language != "en" or not _lean_grading() else [
+                    "What can be graded already is direction, not confidence: "
+                    + (_lean_grading() or "")]),
             ],
             sources=sources,
             data={"graded_predictions": graded},
@@ -454,19 +501,29 @@ def answer_review(ledger: PaperLedger, question: Question) -> Answer:
                 if line.strip()]
 
     report = review(notes=rows(notes_path), risk=rows(risk_path), entries=ledger.entries)
+    wrong = None
+    if "wrong" in question.raw.lower():
+        # "What did you get wrong?" is answered first from the corrections page: the bugs, the
+        # withdrawn claims and the lost comparisons, each read from its own artefact.
+        from argus.lui.corrections_page import collect
+
+        wrong = collect(notes_path.parent)
     flagged = len({d.seq for d in report.defects})
     lines = [
-        f"{report.decisions} decisions with desk notes reviewed; {flagged} carried at least one "
-        f"defect the desk's own checkers observed ({report.clean_rate:.0%} clean).",
+        f"{report.decisions} decisions with desk notes reviewed. The desk's own checkers "
+        f"raised a flag on {flagged} of them — a warning to whoever reads the thesis, not a "
+        f"failed decision: every one of those decisions was still a refusal, and the flag is "
+        f"what stops a reader over-trusting it.",
     ]
     if report.recurring:
         worst, count = report.recurring[0]
         lines.insert(0, (
-            f"Actionable: the most common failure is {_DEFECT_WORDS.get(worst, worst)} ({count} "
-            f"decisions) — check for it first when reading any thesis here."
+            f"Actionable: the flag raised most often is {_DEFECT_WORDS.get(worst, worst)} "
+            f"({count} decisions) — check for it first when reading any thesis here."
         ))
-        lines.append("Recurring patterns: " + ", ".join(
-            f"{k.replace('_', ' ')} x{v}" for k, v in report.recurring) + ".")
+        lines.append("Flags by kind: " + "; ".join(
+            f"{_DEFECT_WORDS.get(k, k.replace('_', ' '))}: {v}" for k, v in report.recurring)
+            + ".")
     if report.checklist:
         lines.append("Checklist items that earned their place: " + "; ".join(
             p.rule for p in report.checklist) + ".")
@@ -480,6 +537,11 @@ def answer_review(ledger: PaperLedger, question: Question) -> Answer:
         lines.append(f"{p.rule}: {str(p.status).lower()} — {p.note}.")
     for item in report.unassessable:
         lines.append(f"Cannot assess yet: {item}.")
+    if wrong:
+        found = [c for c in wrong if c.kind != "missing"][:4]
+        lines[0:0] = [f"What we got wrong — {len(wrong)} entries on the /wrong page, each read "
+                      f"from the artefact that records it:"] + [
+            f"{c.kind.upper()}: {c.headline}." for c in found]
     return Answer(
         question=question,
         lines=lines,
@@ -585,18 +647,31 @@ def answer(ledger: PaperLedger, question: Question) -> Answer:
         return _refuse(
             question, question.reason,
             suggestion=(
-                "Orders are placed by the desk itself, through the risk layer, and recorded in "
-                "the ledger. To see what a trade would do before anyone makes it, ask it as a "
-                "question: \"what would adding 20% NVDA do to my risk? I hold 50% AAPL, 50% "
-                "MSFT\"."
+                "This is a research desk: it analyses a trade and leaves the decision and the "
+                "order to you. The desk's own paper trades pass through its risk layer and are "
+                "recorded in the ledger. Ask it as a question to see what a trade would do first: "
+                "\"what would adding 20% NVDA do to my risk? I hold 50% AAPL, 50% MSFT\"."
             ),
         )
     if question.intent is Intent.MARKET:
+        # The research layer answers live quotes before this layer is reached, so a MARKET question
+        # arriving here either named nothing Bitget lists or was phrased so the quote reader did
+        # not recognise it. Both are said as they are; the old line — "a live quote is not part of
+        # the record" — was true of the ledger and false of the console a visitor is using.
+        if not question.symbols:
+            return _refuse(
+                question,
+                "That name is not a contract Bitget lists, so there is no price to quote.",
+                suggestion="Ask about any listed contract: \"where is NVDA trading\", \"where "
+                           "is gold trading\", \"what is BTC at right now\".",
+            )
+        names = ", ".join(s.removesuffix("USDT") for s in question.symbols)
         return _refuse(
             question,
-            "A live quote is not part of the record, so answering it here would mix a fact from "
-            "now into a report about then.",
-            suggestion="Ask about a decision, its evidence, or the performance of the log.",
+            f"Live prices come from the research console, not the decision record — ask "
+            f"\"where is {names} trading right now\" for the Bitget quote and what a round trip "
+            f"costs.",
+            suggestion="The record answers what the desk decided and why.",
         )
     handler = _ANSWERERS.get(question.intent)
     if handler is None:

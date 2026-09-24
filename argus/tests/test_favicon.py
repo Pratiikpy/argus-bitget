@@ -19,7 +19,8 @@ import pytest
 
 from argus.lui.corrections_page import FAVICON as WRONG_PAGE_FAVICON
 from argus.lui.corrections_page import render as render_wrong
-from argus.lui.server import FAVICON, PAGE, Handler, _render_research
+from argus.lui.server import FAVICON, PAGE, Handler
+from argus.lui.task import Step, Task, render_task
 
 
 @pytest.fixture(scope="module")
@@ -58,18 +59,10 @@ class TestEveryPageTemplateCarriesIt:
     def test_the_main_console_page(self) -> None:
         assert f'href="{FAVICON}"' in PAGE
 
-    def test_the_no_research_task_fallback_page(self) -> None:
-        page = _render_research({"available": False, "looked_in": "/x"})
-        assert f'href="{FAVICON}"' in page
-
-    def test_the_full_research_report_page(self) -> None:
-        report = {
-            "available": True, "question": "q", "verdict": "v", "rationale": "r",
-            "findings": [], "concerns": [], "missing": [], "coverage": "c",
-            "asked_at": "2026-01-01T00:00:00",
-        }
-        page = _render_research(report)
-        assert f'href="{FAVICON}"' in page
+    def test_the_research_task_page(self) -> None:
+        task = Task(question="q", name="TSLA", size_pct=15, book={},
+                    steps=[Step(title="t", engine="e", lines=["Actionable: x"])], seconds=0.1)
+        assert f'href="{FAVICON}"' in render_task(task, FAVICON)
 
     def test_the_wrong_page(self) -> None:
         assert f'href="{FAVICON}"' in render_wrong([])

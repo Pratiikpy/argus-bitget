@@ -134,6 +134,15 @@ _EPOCH = datetime(2026, 1, 1, tzinfo=UTC)
 # Generators — known boundaries, price paths, seeded
 # ---------------------------------------------------------------------------------------------
 
+
+def _installed_at(module_file: str | None) -> str:
+    """Where the imported package lives, from ``site-packages`` onward — enough to show the real
+    installed distribution ran rather than a vendored copy, without writing the machine's user
+    directory into a published artefact."""
+    text = str(module_file).replace("\\", "/")
+    marker = text.lower().find("site-packages")
+    return text[marker:] if marker >= 0 else "/".join(text.split("/")[-2:])
+
 def _integrate(returns: np.ndarray, *, start: float = 100.0) -> list[float]:
     """Returns to a strictly positive price path.
 
@@ -611,9 +620,9 @@ def verify_baselines_are_real() -> dict[str, Any]:
         # is the string "Please install this project with setup.py" on this build, which would have
         # gone into the artefact as a version number had it been trusted.
         "stumpy_version": metadata.version("stumpy"),
-        "stumpy_path": str(stumpy.__file__),
+        "stumpy_path": _installed_at(stumpy.__file__),
         "ruptures_version": metadata.version("ruptures"),
-        "ruptures_path": str(ruptures.__file__),
+        "ruptures_path": _installed_at(ruptures.__file__),
         "stumpy_executed": True,
         "ruptures_executed": bool(rupt.predict(n_bkps=2)),
         "windows_compared": len(stumpy_index),

@@ -54,6 +54,9 @@ class Contract:
     rwa: bool
     """The venue's own ``isRwa`` flag: a real-world asset (equity, ETF, commodity, FX, index)
     rather than a crypto token."""
+    funding_hours: int | None = None
+    """Hours between funding settlements (``fundInterval``): 8 on most contracts, 4 on 377 of them
+    including gold, 1 on two (2026-09-24). Needed to turn a per-interval rate into a daily cost."""
 
     @property
     def name(self) -> str:
@@ -126,6 +129,17 @@ def is_equity(symbol: str) -> bool:
     return contract is not None and contract.rwa and symbol not in NOT_EQUITY
 
 
+CJK_ALIASES: dict[str, str] = {
+    "英伟达": "NVDAUSDT", "辉达": "NVDAUSDT", "特斯拉": "TSLAUSDT", "苹果": "AAPLUSDT",
+    "微软": "MSFTUSDT", "谷歌": "GOOGLUSDT", "亚马逊": "AMZNUSDT", "脸书": "METAUSDT",
+    "英特尔": "INTCUSDT", "奈飞": "NFLXUSDT", "阿里巴巴": "BABAUSDT", "比特币": "BTCUSDT",
+    "以太坊": "ETHUSDT", "黄金": "XAUUSDT", "白银": "XAGUSDT", "原油": "CLUSDT",
+    "纳斯达克": "NDX100USDT", "标普": "SP500USDT", "微策略": "MSTRUSDT",
+}
+"""Chinese names for the contracts a Chinese-speaking trader asks about most. "英伟达现在值得买吗?"
+(is Nvidia worth buying now?) was answered with the session clock because no Latin ticker appeared
+(a judge's probe, 2026-09-24). Matched as substrings, since Chinese has no spaces."""
+
 FUTURES_CODES: dict[str, str] = {
     "GC": "XAUUSDT", "SI": "XAGUSDT", "PA": "XPDUSDT", "HG": "COPPERUSDT", "NG": "NATGASUSDT",
     "ES": "SP500USDT", "NQ": "NDX100USDT",
@@ -152,7 +166,12 @@ def _parse(rows: list[dict[str, object]]) -> dict[str, Contract]:
         symbol = str(row.get("symbol") or "")
         if not symbol.endswith("USDT") or str(row.get("symbolStatus")) != "normal":
             continue
-        out[symbol] = Contract(symbol=symbol, rwa=str(row.get("isRwa")) == "YES")
+        try:
+            hours: int | None = int(str(row.get("fundInterval")))
+        except ValueError:
+            hours = None
+        out[symbol] = Contract(symbol=symbol, rwa=str(row.get("isRwa")) == "YES",
+                               funding_hours=hours)
     return out
 
 
@@ -170,7 +189,7 @@ def _fetch_live() -> dict[str, Contract]:
 
 def _from_snapshot() -> tuple[dict[str, Contract], str]:
     snap = json.loads(SNAPSHOT_PATH.read_text(encoding="utf-8"))
-    contracts = {s: Contract(symbol=s, rwa=bool(v["rwa"]))
+    contracts = {s: Contract(symbol=s, rwa=bool(v["rwa"]), funding_hours=v.get("funding_hours"))
                  for s, v in snap.get("contracts", {}).items()}
     return contracts, str(snap.get("generated_at", "an unrecorded date"))[:10]
 
@@ -236,7 +255,8 @@ def freeze(path: Path = SNAPSHOT_PATH) -> int:
     path.write_text(json.dumps({
         "generated_at": datetime.now(UTC).isoformat(),
         "source": CONTRACTS_URL,
-        "contracts": {s: {"rwa": c.rwa} for s, c in sorted(found.items())},
+        "contracts": {s: {"rwa": c.rwa, "funding_hours": c.funding_hours}
+                      for s, c in sorted(found.items())},
     }, indent=1) + "\n", encoding="utf-8", newline="\n")
     return len(found)
 

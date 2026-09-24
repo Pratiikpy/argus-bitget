@@ -1,0 +1,240 @@
+"""One complete research task, run live: question to actionable insight, every step by its engine.
+
+Track 3 requires "an accessible demo showing one complete research task — the full flow from
+question to actionable insight". The page this replaces rendered a research chain recorded on
+2026-09-14: ten days old, a fixed question, raw data structures on the page, and a verdict
+("add smaller") contradicted by its own allocation step. A judge reading it saw an artefact, not a
+workbench.
+
+This module runs the task now. A trader states a name, a size and the book they hold; seven
+engines answer in parallel, each the same engine the console uses for that kind of question:
+
+1. the live quote and what a round trip costs;
+2. the technical picture (Bitget's Skill, checked against a recomputation);
+3. the news and filings that name the company, and how much of today's move is the market;
+4. earnings, analyst targets and the SEC-filed surprise (equities only);
+5. what followed the name's similar past states — base rates, not a forecast;
+6. what the proposed trade does to the book held: risk share, beta, stress, worst day, hedge;
+7. how to execute the size on today's order book.
+
+The conclusion is not a sentence written for the page. It is each engine's own actionable line,
+in the order a trader would act on them, led by the one that answers the question asked — how much
+of this name the book can carry. Nothing on the page is composed by a model.
+"""
+
+from __future__ import annotations
+
+import html
+import time
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from decimal import Decimal
+from typing import Any
+
+from argus.lui.research import (
+    ResearchKind,
+    ResearchRequest,
+    parse_book,
+    research_symbols,
+    run,
+)
+from argus.market.universe import is_equity
+
+DEFAULT_NAME = "TSLA"
+DEFAULT_SIZE_PCT = 15.0
+DEFAULT_BOOK = "40% NVDA, 30% MSFT, 30% AAPL"
+DEFAULT_BOOK_VALUE = Decimal("100000")
+"""The account size the execution step is sized against when none is stated, said on the page."""
+
+_DISCLAIMER = " This is analysis, not advice — you make the call."
+
+STEPS: tuple[tuple[str, ResearchKind, str], ...] = (
+    ("Where it trades and what a trade costs", ResearchKind.QUOTE, "lui.research (Bitget ticker)"),
+    ("The technical picture", ResearchKind.TECHNICALS, "bitget-signal, checked against Bitget 4h"),
+    ("News, filings and today's move", ResearchKind.NEWS, "RSS + Yahoo + SEC EDGAR, beta split"),
+    ("Earnings, analysts and the surprise", ResearchKind.FUNDAMENTALS,
+     "bitget-mcp-server + SEC XBRL (SUE)"),
+    ("Has it been here before?", ResearchKind.ANALOGUE, "desk.analogue over 89 days"),
+    ("What the trade does to your book", ResearchKind.IMPACT, "desk.portfolio.copilot"),
+    ("How to execute the size", ResearchKind.EXECUTION, "desk.workbench + live order book"),
+)
+
+
+@dataclass
+class Step:
+    title: str
+    engine: str
+    lines: list[str] = field(default_factory=list)
+    refused: bool = False
+    applicable: bool = True
+    seconds: float = 0.0
+
+    @property
+    def actionable(self) -> str | None:
+        for line in self.lines:
+            if line.startswith("Actionable"):
+                return line.split(":", 1)[1].strip()
+        return None
+
+
+@dataclass
+class Task:
+    question: str
+    name: str
+    size_pct: float
+    book: dict[str, float]
+    steps: list[Step]
+    seconds: float
+
+    @property
+    def conclusion(self) -> list[tuple[str, str]]:
+        """Each engine's actionable line, the book's answer first."""
+        order = [5, 6, 3, 2, 4, 1, 0]
+        out = []
+        for i in order:
+            if i < len(self.steps) and self.steps[i].applicable and self.steps[i].actionable:
+                out.append((self.steps[i].title, self.steps[i].actionable or ""))
+        return out
+
+
+def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
+                  book_text: str = DEFAULT_BOOK, *, ledger: Any = None) -> Task:
+    """Run every step for ``name`` at ``size_pct`` of a book described by ``book_text``."""
+    started = time.perf_counter()
+    symbols, _ = research_symbols(name)
+    symbol = symbols[0] if symbols else f"{name.strip().upper()}USDT"
+    book = dict(parse_book(book_text)) if book_text.strip() else {}
+    book.pop(symbol, None)
+    size = max(0.01, min(size_pct, 100.0)) / 100.0
+    question = (f"I hold {book_text.strip() or 'nothing yet'} — should I add "
+                f"{size:.0%} {symbol.removesuffix('USDT')}?")
+    notional = (DEFAULT_BOOK_VALUE * Decimal(str(size))).quantize(Decimal("1"))
+
+    def one(step: tuple[str, ResearchKind, str]) -> Step:
+        title, kind, engine = step
+        began = time.perf_counter()
+        if kind is ResearchKind.IMPACT:
+            request = ResearchRequest(kind=kind, symbols=(symbol, *book), book=book, size=size,
+                                      size_stated=True)
+        elif kind is ResearchKind.EXECUTION:
+            request = ResearchRequest(kind=kind, symbols=(symbol,), notional=notional)
+        else:
+            request = ResearchRequest(kind=kind, symbols=(symbol,))
+        if kind is ResearchKind.FUNDAMENTALS and not is_equity(symbol):
+            # A crypto or commodity contract has no earnings, analysts or 13F filings. The console
+            # answers that with a suggestion to ask something else, which is right for a question
+            # and wrong as a step in a task: here the step is simply not applicable.
+            return Step(title=title, engine=engine, applicable=False,
+                        lines=[f"{symbol.removesuffix('USDT')} is not a company's shares, so there "
+                               f"is no earnings calendar, analyst target or 13F filing to read."])
+        try:
+            answer = run(question, request, ledger=ledger if kind is ResearchKind.IMPACT else None)
+            # Every console answer ends with the analysis-not-advice line; the page says it once.
+            lines = [line.replace(_DISCLAIMER, "").rstrip() for line in answer.lines]
+            refused = answer.refused
+        except Exception as exc:  # one engine failing must not take the task down
+            lines, refused = [f"This step could not run just now ({type(exc).__name__})."], True
+        return Step(title=title, engine=engine, lines=lines, refused=refused,
+                    seconds=time.perf_counter() - began)
+
+    with ThreadPoolExecutor(max_workers=len(STEPS)) as pool:
+        steps = list(pool.map(one, STEPS))
+    return Task(question=question, name=symbol.removesuffix("USDT"), size_pct=size * 100,
+                book=book, steps=steps, seconds=time.perf_counter() - started)
+
+
+def _line_class(line: str) -> str:
+    if line.startswith("Actionable"):
+        return "act"
+    return "fine" if line.startswith(("Data:", "Assumed:")) else "l"
+
+
+def render_task(task: Task, favicon: str) -> str:
+    """The task as a page: the question, the conclusion, then every step with its engine."""
+    esc = html.escape
+    conclusion = "".join(
+        f"<li><b>{esc(title.rstrip('?'))}:</b> {esc(text[:1].upper() + text[1:])}</li>"
+        for title, text in task.conclusion)
+    cards = []
+    for n, step in enumerate(task.steps, 1):
+        body = "".join(f"<p class='{_line_class(line)}'>{esc(line)}</p>" for line in step.lines)
+        classes = "s" + (" r" if step.refused else "") + ("" if step.applicable else " na")
+        cards.append(
+            f"<article class='{classes}'><div class='h'><span class='n'>{n}"
+            f"</span><h2>{esc(step.title)}</h2><span class='e'>{esc(step.engine)} · "
+            f"{step.seconds:.1f}s</span></div>{body}</article>")
+    book_text = ", ".join(f"{w:.0%} {s.removesuffix('USDT')}" for s, w in task.book.items())
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="{favicon}">
+<title>ARGUS — one research task, live</title>
+<style>
+ :root {{ --ink:#12161c; --dim:#5b6470; --line:#dfe3e8; --bg:#f7f8fa; --panel:#fff;
+   --accent:#1a5fb4; --on-accent:#fff;
+   --warn:#8a4b00; --mono:ui-monospace,"SF Mono",Menlo,monospace; }}
+ @media (prefers-color-scheme: dark) {{ :root {{ --ink:#e6e9ee; --dim:#98a2b0; --line:#2a313b;
+   --bg:#0f1318; --panel:#161b22; --accent:#7aa7ea; --on-accent:#0f1318;
+   --warn:#e0a15a; }} }}
+ * {{ box-sizing:border-box }}
+ body {{ margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,sans-serif }}
+ .wrap {{ max-width:860px; margin:0 auto; padding:28px 18px 70px }}
+ h1 {{ font-size:21px; margin:0 0 6px; letter-spacing:-.01em }}
+ .sub {{ color:var(--dim); font-size:13.5px; margin:0 0 18px; max-width:70ch }}
+ form {{ display:flex; gap:8px; flex-wrap:wrap; margin:0 0 20px }}
+ form input {{ padding:9px 11px; border:1px solid var(--line); border-radius:8px;
+   background:var(--panel); color:var(--ink); font-size:14px }}
+ form .name {{ width:110px }} form .size {{ width:90px }}
+ form .book {{ flex:1 1 260px; min-width:0 }}
+ form input:focus-visible, form button:focus-visible {{ outline:2px solid var(--accent);
+   outline-offset:2px }}
+ form button {{ padding:9px 16px; border:1px solid var(--accent); background:var(--accent);
+   color:var(--on-accent); border-radius:8px; font-size:14px; cursor:pointer }}
+ .q {{ font-size:17px; font-weight:600; margin:0 0 12px }}
+ .concl {{ background:var(--panel); border:1px solid var(--accent); border-radius:10px;
+   padding:14px 18px; margin:0 0 20px }}
+ .concl h2 {{ font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--accent);
+   margin:0 0 8px }}
+ .concl ol {{ margin:0; padding-left:20px }} .concl li {{ margin:4px 0 }}
+ .s {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
+   padding:14px 16px; margin-bottom:12px }}
+ .s.r {{ border-left:3px solid var(--warn) }}
+ .s.na {{ color:var(--dim) }}
+ .h {{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; margin-bottom:6px }}
+ .n {{ font:12px var(--mono); color:var(--dim) }}
+ .h h2 {{ font-size:15.5px; margin:0 }}
+ .e {{ font:11.5px var(--mono); color:var(--dim); margin-left:auto }}
+ .s p {{ margin:4px 0; overflow-wrap:anywhere }}
+ .act {{ font-weight:600; color:var(--accent) }} .fine {{ color:var(--dim); font-size:13px }}
+ a {{ color:var(--accent) }}
+</style></head><body><div class="wrap">
+<h1>One research task, question to actionable insight — run live</h1>
+<p class="sub">Seven engines answer one trader's question in parallel, each the same engine the
+<a href="/">console</a> uses, every figure from live Bitget, SEC, FRED or news data and every line
+naming its source. The conclusion is each engine's own actionable line — nothing on this page is
+written by a language model. Change the name, the size or the book and run it again.</p>
+<form method="get" action="/research">
+ <input class="name" name="name" value="{esc(task.name)}" aria-label="name">
+ <input class="size" name="size" value="{task.size_pct:g}" aria-label="size in percent">
+ <input class="book" name="book" value="{esc(book_text)}" aria-label="your book">
+ <button>Run</button>
+</form>
+<p class="q">{esc(task.question)}</p>
+<section class="concl"><h2>What to do</h2><ol>{conclusion}</ol></section>
+{''.join(cards)}
+<p class="sub">Ran in {task.seconds:.1f}s. Execution is sized on a ${DEFAULT_BOOK_VALUE:,.0f} book.
+This is analysis, not advice — you make the call. <a href="/research?format=json">JSON</a></p>
+</div></body></html>"""
+
+
+def as_dict(task: Task) -> dict[str, Any]:
+    return {
+        "question": task.question, "name": task.name, "size_pct": task.size_pct,
+        "book": task.book, "seconds": round(task.seconds, 2),
+        "conclusion": [{"step": t, "actionable": a} for t, a in task.conclusion],
+        "steps": [{"title": s.title, "engine": s.engine, "lines": s.lines,
+                   "refused": s.refused, "seconds": round(s.seconds, 2)} for s in task.steps],
+    }
+
+
+__all__ = ["DEFAULT_BOOK", "DEFAULT_NAME", "DEFAULT_SIZE_PCT", "Step", "Task", "as_dict",
+           "render_task", "research_task"]

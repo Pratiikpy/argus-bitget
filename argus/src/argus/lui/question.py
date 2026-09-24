@@ -371,6 +371,8 @@ typo, and calling the second an instrument would refuse real questions over a st
 _NOT_A_TICKER = frozenset({
     "I", "A", "AI", "PM", "AM", "ET", "UTC", "US", "USD", "EPS", "PE", "ROI", "NAV", "LLM",
     "OK", "NO", "YES", "WHY", "HOW", "AND", "OR", "THE", "ARGUS", "IT", "WE", "Q", "FY",
+    "FOMC", "FED", "CPI", "PPI", "GDP", "PCE", "NFP", "ECB", "BOJ", "PMI", "ETF", "IPO", "CEO",
+    "RSI", "MACD", "ATR", "DXY", "VIX", "YTD", "EOD", "ATH",
 })
 """Capitalised tokens that are words, units or our own vocabulary rather than instruments."""
 
@@ -424,12 +426,23 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
 
 # Order matters: the first pattern to match wins, so the more specific question comes first.
 # "why did you do nothing on NVDA" must reach ABSTENTION_WHY, not DECISION_WHY.
+TRACK_RECORD = r"\btrack\s+record\b"
+DECISIVE_PATTERNS: frozenset[str] = frozenset({TRACK_RECORD})
+"""Patterns that name exactly what is asked, so the n-gram model may not relabel a question they
+matched (`lui/ngram.reclassify`). "What is your track record? How many trades have you made?" was
+relabelled a decision list by the model, which weighs the second sentence's words."""
+
 _PATTERNS: tuple[tuple[str, Intent], ...] = (
+    # A track-record question is a performance question whatever else it asks: "What is your
+    # track record? How many trades have you made?" was claimed by the decision-list pattern on
+    # "how many trades" and answered with a count (a judge's probe, 2026-09-24).
+    (TRACK_RECORD, Intent.PERFORMANCE),
     # Review first: its questions carry "decision", "why" and "mistake" words that the ledger
     # patterns below would otherwise claim for a single row.
     (r"\b(?:review\w*|post[\s-]?mortem\w*|retrospective\w*|self[\s-]?evolution|"
      r"lessons?\s+learn\w*|what\s+(?:have|has|did)\s+(?:you|we|it|the\s+desk)\s+learn\w*|"
-     r"checklist\w*|(?:bad|recurring|repeated|common)\s+(?:decision\s+)?(?:pattern|habit|"
+     r"checklist\w*|(?:get|got|gotten|went)\s+wrong|what\s+went\s+wrong|"
+     r"(?:bad|recurring|repeated|common)\s+(?:decision\s+)?(?:pattern|habit|"
      r"mistake|error)\w*|(?:pattern|habit)s?\s+(?:of|in)\s+(?:your|the\s+desk'?s?|our)\s+"
      r"(?:mistake|error|decision)\w*|mistakes?\s+(?:do|does|did)\s+(?:you|the\s+desk)\s+"
      r"(?:keep|repeat)\w*|iterate\s+(?:on\s+)?(?:the|your)\s+(?:research\s+)?"
@@ -495,7 +508,9 @@ _PATTERNS: tuple[tuple[str, Intent], ...] = (
      r"(?:red\s+or\s+(?:in\s+)?(?:the\s+)?black|black\s+or\s+(?:in\s+)?(?:the\s+)?red|"
      r"up\s+or\s+down|down\s+or\s+up)\b|"
      r"\bwhere\s+do\s+we\s+stand\b|"
-     r"\bhow\s+(?:are|'?re)\s+we\s+(?:sitting|looking|placed)\b",
+     r"\bhow\s+(?:are|'?re)\s+we\s+(?:sitting|looking|placed)\b|"
+     # "What is your track record?" reached "unrecognised" (a judge's probe, 2026-09-24).
+     r"\btrack\s+record\b|\bhow\s+(?:have|has)\s+(?:you|the\s+desk|argus)\s+(?:done|performed)\b",
      Intent.PERFORMANCE),
     (r"\b(?:calibrat\w*|brier|ece|overconfiden\w*|underconfiden\w*|accura\w*|"
      r"how often.*right|how good.*(?:predict\w*|forecast\w*|call\w*))\b",
@@ -840,6 +855,11 @@ def classify(
                         reason="empty question")
 
     symbols, off_venue = extract_symbols(raw)
+    if off_venue and _ORDER_VERB.match(raw) and not _INTERROGATIVE.match(raw):
+        # An instruction is refused as an instruction whatever it names. "buy 10 PLTR for me" was
+        # refused as "PLTR is not one of the twelve rTokens", which answers a question nobody
+        # asked and implies the order would have been placed for NVDA.
+        off_venue = ""
     if off_venue:
         return Question(
             raw=raw, intent=Intent.UNSUPPORTED, speed=Speed.FAST, tense=Tense.PRESENT,

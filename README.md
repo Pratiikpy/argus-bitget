@@ -51,7 +51,7 @@ Nothing above needs a credential.
 | | |
 |---|---|
 | Tests | **6,420 tests collected** — run `pytest -q` |
-| Type checking | **`mypy --strict` clean on 307 source files** |
+| Type checking | **`mypy --strict` clean on 308 source files** |
 | Lint | `ruff` clean |
 | Module health | **131/131 modules importable**, checked by `python -m argus.status` |
 | Sub-theme coverage | **18/18 sub-themes**, resolved by import at runtime — not claimed in prose |
@@ -108,11 +108,11 @@ each sub-theme has passed, and several remain open. Two things are unproven rath
 **The obvious attack, and the measurement that answers it.** *"Hundreds of decisions, zero trades — it
 has demonstrated nothing."* Every refusal carries a stated direction, hashed with the decision before
 the outcome exists, so the counterfactual was committed to rather than reconstructed. Graded against
-what actually happened (`python -m argus.eval.refusal`): at the ~2h horizon **115 of 193 directional
-calls were right — 59.6%, 95% Wilson interval 52.5–66.3%**, which excludes a coin flip but only
-barely, and the overnight horizon has *fallen to 40.4%* — below a coin flip, and still not
-distinguishable from one. The decisive figure is the
-other one: **the median decision forgave −6.9bps of net edge after the 12bps round trip.** The
+what actually happened (`python -m argus.eval.refusal`): at the ~2h horizon **169 of 289 directional
+calls were right — 58.5%, 95% Wilson interval 52.7–64.0%**, which excludes a coin flip but only
+barely, and the overnight horizon stands at *48.3%* (42 of 87) — not distinguishable from a coin
+flip. The decisive figure is the
+other one: **the median decision forgave -6.7bps of net edge after the 12bps round trip.** The
 typical refusal was not caution costing money — it was the trade being unprofitable. An empty ledger
 is the result here, not the gap.
 

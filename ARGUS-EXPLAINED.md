@@ -1,6 +1,7 @@
 # ARGUS, explained in plain English — the whole product
 
-ARGUS is one product. It enters two tracks, touches a third, and is built as a single system.
+ARGUS is one product, built as a single system. It is entered in Track 3; its Track 2 half is built,
+running and shown here, and not filed while the desk has no settled trades — the reason is in Part B.
 
 - **Part A is Track 3, AI Trading Desk** — the human decides, the AI researches. Judged 100% by
   people.
@@ -612,13 +613,14 @@ Of 16 systems read, one other does this properly.
 
 A judge should not have to discover these.
 
-- **The demo runs locally, not on a hosted URL.** You clone the repository and run one command. It
-  needs no API key for the console.
+- **The hosted console is a read-only view.** It answers research questions live and reads the
+  desk's ledger, but the paper-trading cycle itself runs on our machine and publishes to it.
 - **There is no correlation-aware "effective number of bets".** It needs a principal-component
   decomposition we have not built. We mark it not built rather than implying the number we do have
   means that.
-- **We cannot compute a classic earnings surprise**, for the reason given in 3.1 — no free source
-  publishes the consensus that existed for an already-reported quarter.
+- **We cannot compute a consensus earnings surprise**, for the reason given in 3.1 — no free source
+  publishes the consensus that existed for an already-reported quarter. We compute the time-series
+  one instead (standardised unexpected earnings from SEC filings), and say which it is.
 - **13 of Bitget's 19 Skill tools do not answer** from our network. We report six.
 - **We have no equity broker**, so a hedge in the underlying stock is visible but not reachable by
   us. During market hours the record now says exactly that — the hedge exists and *we* have no route
@@ -1259,12 +1261,8 @@ What we think makes it good, and what we know makes it weak:
   trustworthy than one whose builders can list none.
 
 **Weak, and stated.**
-- **The analysts run sequentially.** The correlation hazard — a later analyst influenced by an
-  earlier one — is measured and labelled, but the calls are still made one after another. Parallel
-  execution is not built.
 - **No checkpoint and resume.** A cycle interrupted mid-flight starts over. We read LangGraph's
   checkpointing in detail and have not built our own.
-- **No hosted deployment.** Everything runs locally.
 - **The model is one model.** There is no ensemble, no second opinion from a different model family,
   and no adversarial pass that can overturn a decision on its own counter-case. The desk generates a
   counter-case; nothing acts on it.
@@ -1953,7 +1951,7 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 307 files, 21 packages, 117,089 lines; `mypy --strict` clean on 307 source files |
+| Source modules | 307 files, 21 packages, 117,089 lines; `mypy --strict` clean on 308 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 131/131 modules importable |
 | Tests | 6,496 tests collected, `ruff` clean |

@@ -1,5 +1,5 @@
 {
-  "generated_from": "C:\\Users\\prate\\bitget\\argus\\data\\risk_records.jsonl",
+  "generated_from": "argus\\data\\risk_records.jsonl",
   "rows_read": 150,
   "dimensions": {
     "order_size": {
