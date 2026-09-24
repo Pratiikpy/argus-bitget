@@ -180,11 +180,18 @@ def test_the_real_documents_quote_no_stale_number() -> None:
 
 
 def test_the_real_documents_make_every_registered_claim_somewhere() -> None:
-    """A registered claim no document makes is dead weight; prune it or restore the prose."""
+    """A registered claim no document makes is dead weight; prune it or restore the prose.
+
+    Only claims with at least one of their documents present are expected: the public repository
+    does not carry the working documents (the submission draft, the master plan), so a claim made
+    only there cannot be made in a public checkout."""
+    from argus.eval.docclaims import DOCS
+
     report = audit()
     made = {f.claim for f in report.findings
             if f.status in {"OK", "LAGGING", "STALE", "UNCHECKED"}}
-    assert made == {c.name for c in CLAIMS}
+    expected = {c.name for c in CLAIMS if any(DOCS[d].is_file() for d in c.docs)}
+    assert made == expected
 
 
 class TestRepairWritesOnlyWhatTheArtefactSays:

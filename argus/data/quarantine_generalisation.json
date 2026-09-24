@@ -15,7 +15,7 @@
   },
   "deployed_snapshot": {
     "snapshot_present": true,
-    "path": "deploy\\api\\argus\\agents\\quarantine.py",
+    "path": "deploy/api/argus/agents/quarantine.py",
     "total": 302,
     "deployed_detected": 27,
     "frozen_v1_detected": 27,
@@ -264,7 +264,7 @@
   },
   "precision_at_scale": {
     "paper_ledger_theses": {
-      "n": 497,
+      "n": 627,
       "v1_withheld": 0,
       "detected": 0,
       "withheld": 0,

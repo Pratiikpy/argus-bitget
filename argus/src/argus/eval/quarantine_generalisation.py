@@ -234,7 +234,7 @@ def score_deployed_snapshot() -> dict[str, Any]:
     if detector is None:
         return {
             "snapshot_present": False,
-            "path": str(_DEPLOYED),
+            "path": _DEPLOYED.relative_to(_REPO_ROOT).as_posix(),
             "frozen_v1_detected": frozen,
             "total": len(strings),
         }
@@ -245,7 +245,7 @@ def score_deployed_snapshot() -> dict[str, Any]:
     }
     return {
         "snapshot_present": True,
-        "path": str(_DEPLOYED),
+        "path": _DEPLOYED.relative_to(_REPO_ROOT).as_posix(),
         "total": len(strings),
         "deployed_detected": deployed,
         "frozen_v1_detected": frozen,
