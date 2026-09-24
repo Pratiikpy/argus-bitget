@@ -20,6 +20,8 @@ layer to manufacture a track record — breaking the exact property the system e
 
 **Try it first: the live research console — https://deploy-topaz-seven-64.vercel.app**
 
+**Or watch one whole research task run live, question to actionable insight — https://deploy-topaz-seven-64.vercel.app/research** (seven engines, about three seconds; change the name, size or book on the page).
+
 Ask it in plain English. *"I hold 50% NVDA, 50% AAPL — what does adding 20% TSLA do to my risk?"*
 · *"What if the Nasdaq drops 10%? I hold 40% MSFT, 30% META, 30% GOOGL"* · *"Is TSLA riskier than
 NVDA?"* · *"How should I split a $50k order in NVDA?"* · *"Where is NVDA trading right now?"* ·
@@ -39,7 +41,7 @@ your holdings (and your own risk budget) in the "My book" field and every answer
 cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module + sub-theme coverage, resolved by import
-pytest -q                       # 6,420 tests collected
+pytest -q                       # 6,542 tests collected
 ```
 
 Nothing above needs a credential.
@@ -50,13 +52,13 @@ Nothing above needs a credential.
 
 | | |
 |---|---|
-| Tests | **6,420 tests collected** — run `pytest -q` |
+| Tests | **6,542 tests collected** — run `pytest -q` |
 | Type checking | **`mypy --strict` clean on 308 source files** |
 | Lint | `ruff` clean |
 | Module health | **131/131 modules importable**, checked by `python -m argus.status` |
 | Sub-theme coverage | **18/18 sub-themes**, resolved by import at runtime — not claimed in prose |
 | Data artefacts | **46 cited across these documents**, every one reproducible from a single named command, with a test that fails if a document cites an artefact nothing writes |
-| Quoted figures | **71 numbers in these documents are re-checked against their artefacts** by `python -m argus.eval.docclaims --tests`, which exits non-zero if any has drifted |
+| Quoted figures | **87 numbers in these documents are re-checked against their artefacts** by `python -m argus.eval.docclaims --tests`, which exits non-zero if any has drifted |
 
 The measurements behind the design are in the PRD, including the ones that went against us:
 

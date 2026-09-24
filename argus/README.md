@@ -66,7 +66,7 @@ Product requirements: [`../ARGUS-MASTER-PRD.md`](../ARGUS-MASTER-PRD.md)
 ## Status, measured on 2026-09-22
 
 ```
-6,420 tests collected   ruff clean   mypy --strict clean on 308 source files
+6,542 tests collected   ruff clean   mypy --strict clean on 308 source files
 131/131 modules importable           18/18 sub-themes resolve to a symbol and a test file
 627 decisions in the paper ledger (as of 2026-09-22)  chain verifies, head anchor agrees, no truncation
 0 settled trades (2 rows VOID — see the correction above)      100.0% abstention rate
@@ -244,8 +244,8 @@ that was read. None of them is claimed as *proven better* — see "The honest pa
   right 3.8% of the time against a base rate of up-moves of exactly 3.8% — a schema being filled in,
   not a view. So the desk now states a **lean** on every decision including the ones it refuses,
   covered by the chain through the intent hash and graded against the move that followed
-  (`eval/shadow.py`). The leans are UP and DOWN at differing confidences, where `side` never
-  varied, and they are now graded: 169 of 289 settled directional calls were right at the ~2h
+  (`eval/shadow.py`). **460 decisions carry a lean** in the shadow record, UP and DOWN at differing
+  confidences where `side` never varied, and they are now graded: 169 of 289 settled directional calls were right at the ~2h
   horizon (`data/refusal_alpha.json`, above).
 - The abstentions are correct rather than broken: the log begins on a weekend with the anchor market
   shut, and every thesis cites the session, the hours to price discovery, and a move below the total

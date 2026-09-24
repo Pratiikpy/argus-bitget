@@ -655,7 +655,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 6,496 tests
+pytest                    # 6,542 tests
 python -m argus.status    # 131/131 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1705,7 +1705,7 @@ takes, and every artefact the system writes.
 |---|---|
 | Source modules | **139** files across **17 packages**, 55,306 lines |
 | Registered and importable | **126/126** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **219 files**, **6,496 tests collected** |
+| Test files / tests | **219 files**, **6,542 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **158 source files** |
 | Artefacts written | **56** JSON/CSV files under `argus/data/` |
 | Code-level teardowns of other people's systems | **62** under `research/architecture/` |
@@ -1954,7 +1954,7 @@ source is a build failure, not a typo.
 | Source modules | 307 files, 21 packages, 117,089 lines; `mypy --strict` clean on 308 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 131/131 modules importable |
-| Tests | 6,496 tests collected, `ruff` clean |
+| Tests | 6,542 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 66, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
