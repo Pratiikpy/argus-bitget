@@ -129,3 +129,29 @@ def test_an_imperative_hedge_is_a_plan_request_not_an_order() -> None:
     request = detect("hedge my TSLA")
     assert request is not None and request.kind is ResearchKind.HEDGE
     assert request.spot is None
+
+
+def test_the_spot_holding_survives_a_model_reading_of_the_same_kind(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """On the live console the model read "I hold RNVDAUSDT, protect it over the weekend" as a
+    hedge with no holding and the answer was a refusal; the patterns' spot reading must stand."""
+    from argus.lui import research, server
+
+    class Hedger:
+        def complete_json(self, messages: object, **kwargs: object) -> dict[str, object]:
+            return {"kind": "hedge", "confidence": 0.95}
+
+    captured: dict[str, object] = {}
+
+    def fake_payload(text: str, prior: object, request: research.ResearchRequest, *args: object,
+                     **kwargs: object) -> dict[str, object]:
+        captured["request"] = request
+        return {}
+
+    monkeypatch.setattr(server, "_model_for", lambda visitor: Hedger())
+    monkeypatch.setattr(server, "worth_asking_the_model", lambda text, now=None: True)
+    monkeypatch.setattr(server, "_research_payload", fake_payload)
+    server.handle_ask("I hold RNVDAUSDT, how do I protect it over the weekend?", [])
+    request = captured["request"]
+    assert isinstance(request, research.ResearchRequest)
+    assert request.spot == "RNVDAUSDT"

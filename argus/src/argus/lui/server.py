@@ -368,8 +368,12 @@ def handle_ask(
         planned, audit = plan_with_model(text, model)
         planned = with_book(planned, book, text)
         patterned = detect_research(text)
+        # A spot rToken holding is a field the model's plan does not carry, so a model reading of
+        # the same kind still loses it: "I hold RNVDAUSDT, protect it over the weekend" came back
+        # as a hedge of nothing and was refused on the live console (2026-09-24).
         if (patterned is not None and pattern_reading_wins(patterned, text)
-                and (planned is None or planned.kind is not patterned.kind)):
+                and (planned is None or planned.kind is not patterned.kind
+                     or (patterned.spot is not None and planned.spot != patterned.spot))):
             # The model read "order book depth on NVDA" as a quote and "who is selling NVDA" as
             # a news question (2026-09-24). Where the patterns name the one engine that answers
             # the question, their reading stands.
