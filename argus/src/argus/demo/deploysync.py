@@ -70,6 +70,7 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     # surface, shown beside the live checks.
     "bitget_skills_health.json",
     "skill_mirror.json",
+    "lui_final_heldout_report.json",
     "skill_reliability.json",
     "data_coverage.json",
     "source_health.json",

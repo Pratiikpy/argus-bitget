@@ -206,3 +206,18 @@ class TestEitherReaderCanSayNotResearch:
         from argus.lui.research import _PRICE_FORECAST
 
         assert _PRICE_FORECAST.search(text)
+
+
+def test_the_status_page_reports_the_measured_understanding(tmp_path: Any) -> None:
+    import json
+
+    from argus.lui.status_page import sweep_lines
+
+    (tmp_path / "lui_final_heldout_report.json").write_text(json.dumps({
+        "measured_at": "2026-09-25", "written_by": "a blind writer",
+        "console_before": {"no_book": "125/240 (52.1%)"},
+        "console_after": {"no_book": "196/240 (81.7%)", "saved_book": "204/240 (85.0%)"},
+        "kind_model_alone": {"correct": 219, "rows": 240}}), encoding="utf-8")
+    line = dict(sweep_lines(tmp_path))["Understanding questions"]
+    assert "with no language model" in line
+    assert "125/240 (52.1%)" in line and "196/240 (81.7%)" in line and "219/240" in line
