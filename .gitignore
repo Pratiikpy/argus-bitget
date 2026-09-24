@@ -5,8 +5,8 @@
 *.key
 *.pem
 
-# the owner's private project instructions — never public. Leaked in once (commit 84a314d);
-# removed and ignored so a future broad sync cannot re-add it silently.
+# Private project instructions for the coding assistant — never public.
+# Ignored so a broad sync cannot add it.
 CLAUDE.md
 
 # Python
@@ -25,3 +25,11 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# Working documents kept in the private workspace, never published: the submission-form draft
+# and the build logs. They record process, not the product, and read as notes to one person.
+SUBMISSION-DRAFT.md
+Activity/10_LOOP_DESIGN.md
+Activity/12_DECISIONS_LOG.md
+Activity/13_GOAL_PROGRESS.md
+Activity/PROGRESS.md

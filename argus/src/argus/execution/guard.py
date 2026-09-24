@@ -3,7 +3,7 @@
 Three independent sources named the same gap. Nautilus runs a `RiskEngine` that denies an order
 before it leaves the process, with a named reason, on price precision, quantity precision, notional
 bounds and submission rate. Hummingbot's `BudgetChecker` locks collateral for a hypothetical order
-and refuses when the balance cannot cover it. And the owner's own Nomos hit three separate 10x sizing
+and refuses when the balance cannot cover it. The author's own Nomos hit three separate 10x sizing
 bugs that were only fixed by reading tick size, contract multiplier and minimum notional *live from
 the venue* rather than assuming them (`research/architecture/kairos-nomos.md`).
 

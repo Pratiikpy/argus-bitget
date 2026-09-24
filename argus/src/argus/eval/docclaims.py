@@ -995,7 +995,7 @@ def disagreements(report: Report) -> list[Disagreement]:
     return out
 
 
-def repair(report: Report) -> list[str]:
+def repair(report: Report, *, include_lagging: bool = False) -> list[str]:
     """Rewrite every STALE figure in place, to the value its own artefact reports.
 
     Added after the fourth manual pass over the same five numbers in one session. A counter that
@@ -1015,7 +1015,12 @@ def repair(report: Report) -> list[str]:
     """
     done: list[str] = []
     by_doc: dict[str, list[Finding]] = {}
-    for finding in report.stale:
+    # ``include_lagging`` also brings LAGGING figures current — used before a publish, so the copy
+    # a reader sees quotes today's counts rather than ones a few cycles behind. Still only ever the
+    # live value, at the exact quoted span.
+    lagging = [f for f in report.findings if f.status == "LAGGING"] if include_lagging else []
+    targets = [*report.stale, *lagging]
+    for finding in targets:
         by_doc.setdefault(finding.doc, []).append(finding)
     for doc, findings in by_doc.items():
         path = DOCS.get(doc)
@@ -1077,8 +1082,8 @@ def main(argv: list[str] | None = None) -> int:
     clashes = disagreements(report)
     for clash in clashes:
         print(f"DISAGREE  {clash.render()}")
-    if "--fix" in args:
-        repaired = repair(report)
+    if "--fix" in args or "--fix-all" in args:
+        repaired = repair(report, include_lagging="--fix-all" in args)
         for line in repaired:
             print(f"FIXED     {line}")
         if repaired:

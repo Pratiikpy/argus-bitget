@@ -11,7 +11,7 @@ Built for the Bitget AI Base Camp / Genesis Hackathon Season 2. **The engine cov
 tracks and all eighteen sub-themes; exactly one track is entered.** Track 3 (AI Trading Desk)
 is filed. Track 2 (Agentic Trading) is **not**, and the reason is the thesis rather than the
 deadline: it is 50% quantitative, scored on paper-trading Sharpe, drawdown and win rate, and
-this desk has refused every one of its 585 decisions. Filing it would mean loosening the risk
+this desk has refused every decision it has made. Filing it would mean loosening the risk
 layer to manufacture a track record — breaking the exact property the system exists to hold.
 
 ---
@@ -32,7 +32,8 @@ your holdings (and your own risk budget) in the "My book" field and every answer
 | **The code** | [`argus/`](argus/) — package, tests, runnable studies |
 | **Build status** | [`argus/STATUS.md`](argus/STATUS.md) — what runs, what is blocked, and on what |
 | **Design** | [`ARGUS-ARCHITECTURE.md`](ARGUS-ARCHITECTURE.md) — three products on one engine, six levels |
-| **Requirements + evidence** | [`ARGUS-MASTER-PRD.md`](ARGUS-MASTER-PRD.md) — including every measurement and every retraction |
+| **Requirements + evidence** | [`ARGUS-MASTER-PRD.md`](ARGUS-MASTER-PRD.md) — the original build plan (12 Sep), with every measurement and retraction since; the entry itself is Track 3 only |
+| **How to check it** | [`argus/VERIFY.md`](argus/VERIFY.md) — commands that reproduce each headline claim |
 
 ```bash
 cd argus
@@ -96,7 +97,7 @@ each sub-theme has passed, and several remain open. Two things are unproven rath
 
 1. **No position has settled.** The venue path itself is proven — the Bitget signature is accepted
    and a real demo order round-tripped, id `1482642956228374529`, productType `SUSDT-FUTURES`. What
-   does not exist is a *settled* trade: all 447 decisions on the paper ledger are refusals, so
+   does not exist is a *settled* trade: every decision on the paper ledger is a refusal, so
    Sharpe, max drawdown and win rate are undefined and the code prints the reason for each rather
    than a zero. Two earlier ledger rows appeared to be filled trades; they recorded positions the
    risk layer had refused, and they are void — kept in the chain, excluded from every figure, and
@@ -104,8 +105,8 @@ each sub-theme has passed, and several remain open. Two things are unproven rath
 2. **No certified alpha exists.** 0 of 8 factors and 0 of 12 strategies cleared the deflation gate.
    That is the finding, and it is reported as one.
 
-**The obvious attack, and the measurement that answers it.** *"447 decisions, zero trades — it has
-demonstrated nothing."* Every refusal carries a stated direction, hashed with the decision before
+**The obvious attack, and the measurement that answers it.** *"Hundreds of decisions, zero trades — it
+has demonstrated nothing."* Every refusal carries a stated direction, hashed with the decision before
 the outcome exists, so the counterfactual was committed to rather than reconstructed. Graded against
 what actually happened (`python -m argus.eval.refusal`): at the ~2h horizon **115 of 193 directional
 calls were right — 59.6%, 95% Wilson interval 52.5–66.3%**, which excludes a coin flip but only

@@ -10,7 +10,7 @@ that produced them.
 |---|---|
 | Source | **147 modules**, 20 packages, 59,069 lines |
 | Import graph | **162 modules**, 0 layering violations, 0 forbidden imports, 4 cycles (**0 at import time**) |
-| Registered and importable at runtime | **129/129** (`python -m argus.status`) |
+| Registered and importable at runtime | **131/131** (`python -m argus.status`) |
 | Tests | **118 files, 3,543 collected**, 33 skipped |
 | Static analysis | `ruff` clean; `mypy --strict` clean on **162 source files** |
 | Artefacts | **66** under `argus/data/`, each written by a named module |
@@ -168,7 +168,7 @@ window it was built to be watched during. `horizon_coverage()` measures exactly 
 **0 resolving inside the window, 0 still pending when it opens**; the cadence fixes it, and a test
 pins the failure shape so it cannot return unnoticed.
 
-**Live:** 216 claims across the twelve rTokens (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — the head at the moment of that anchoring, so that proof covers the first 36 claims and not the 120 registered since; each scheduled cycle appends and re-anchors, and 38 of the 60 proofs carry a Bitcoin block-header attestation (`python -m argus.register.anchorcheck`). Anchored to
+**Live:** 236 claims across the twelve rTokens (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — the head at the moment of that anchoring, so that proof covers the first 36 claims and not the 120 registered since; each scheduled cycle appends and re-anchors, and 38 of the 60 proofs carry a Bitcoin block-header attestation (`python -m argus.register.anchorcheck`). Anchored to
 `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The resolver runs on
 every scheduled cycle.

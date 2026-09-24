@@ -25,7 +25,7 @@ What this makes checkable, which was previously only assertable:
 
 **The design is taken from two places, both read before writing this.** Scientific
 pre-registration — the study protocol is deposited before data collection, and the analysis is
-then judged against what was deposited — and the owner's own Horos anchorer
+then judged against what was deposited — and the author's own Horos anchorer
 (``okx/finance-asp/service/core/commit.py:60-88``), which supplies three rules this module keeps:
 the committed payload has a canonical encoding; the verification path a sceptic walks
 (:func:`verify`) exists in code and is exercised by a test rather than described in prose; and a

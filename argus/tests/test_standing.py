@@ -447,7 +447,7 @@ class TestTheLiveRegisterIsHonest:
         `sentiment_comparison.py`'s own source (two derived keys added to its report dict, naming
         facts already true rather than inventing new ones), the fix verified by simulation against
         the existing artefact BEFORE spending anything, then the real comparison re-run for real
-        with real Qwen credits (8 calls, about 170s, the owner's explicit go-ahead) rather than
+        with real Qwen credits (8 calls, about 170s, the project owner's approval) rather than
         hand-editing the artefact — this project never hand-edits an artefact to match a claim.
         The fresh run reconfirms the original finding on both real narratives: finBERT's naive
         aggregate scales with repetition every time, ARGUS's real analyst never does,

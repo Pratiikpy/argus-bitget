@@ -653,8 +653,8 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 5,946 tests
-python -m argus.status    # 82/82 modules importable, 18/18 sub-themes, artefacts on disk
+pytest                    # 6,496 tests
+python -m argus.status    # 131/131 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
 ---
@@ -1134,7 +1134,7 @@ why.
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 585 decisions on record. Every one of them is a refusal, and 541 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 627 decisions on record. Every one of them is a refusal, and 571 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
 zero trades, those three numbers **do not exist**. Not "are zero" — do not exist. Half of the track
@@ -1360,8 +1360,8 @@ risk rather than its size, and is told plainly when something cannot be computed
 2 door, the model decides — what to trade, how much, how sure it is, and what would prove it wrong —
 and a risk layer that can only ever shrink or refuse makes sure the record afterwards is one you can
 trust. Both doors open onto the same evidence, the same analysts, the same checks against the
-model's own reasoning, and the same hash-chained ledger. The ledger currently holds 86 correct
-refusals and no trades, which makes half of Track 2 unscoreable today, and we have written that down
+model's own reasoning, and the same hash-chained ledger. Every decision on the ledger is a
+refusal and none is a trade, which makes half of Track 2 unscoreable today, and we have written that down
 in the same place we would have written a Sharpe ratio.
 
 
@@ -1707,7 +1707,7 @@ takes, and every artefact the system writes.
 |---|---|
 | Source modules | **139** files across **17 packages**, 55,306 lines |
 | Registered and importable | **126/126** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **126 files**, **5,946 tests collected**, 33 skipped |
+| Test files / tests | **219 files**, **6,496 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **158 source files** |
 | Artefacts written | **56** JSON/CSV files under `argus/data/` |
 | Code-level teardowns of other people's systems | **62** under `research/architecture/` |
@@ -1817,7 +1817,7 @@ allocation → beta → portfolio → diversification → stress → cost), `por
 `resolve` — the auto-resolver and the scoreboard, structurally unable to answer early.
 `open_register` — commits a batch and submits its head to four Bitcoin calendars.
 
-Live: **216 claims across all twelve rTokens** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
+Live: **236 claims across all twelve rTokens** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
 2026-09-14. The resolver runs on every scheduled cycle.
 
 ### `eval/` — thirty-three ways to be wrong in public (33 modules)
@@ -1953,16 +1953,16 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 303 files, 21 packages, 117,089 lines; `mypy --strict` clean on 307 source files |
+| Source modules | 307 files, 21 packages, 117,089 lines; `mypy --strict` clean on 307 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
-| Modules registered and importable | 129/129 modules importable |
-| Tests | 5,946 tests collected, 33 skipped, `ruff` clean |
+| Modules registered and importable | 131/131 modules importable |
+| Tests | 6,496 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 66, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
 | Competitor entries read at source | 5, each cloned and verified or refuted |
 | Live data sources reaching a decision | 15 |
-| Paper ledger | 166 decisions on record, chain intact, head anchored |
+| Paper ledger | every decision a refusal, chain intact, head anchored (live count on the console's `/status`) |
 | Scored policy forecasts | 49,142 raw / **32,196 effective** over 4,150 distinct instants |
 | Forecast calibration | Brier 0.2319, ECE 0.0109, reliability 0.0002 against resolution 0.0166 |
 | Forecast record on ForecastBench's scale | **Brier Index 51.8**, where 50 is a coin |
@@ -2211,7 +2211,7 @@ could attack today.
 ### Weakest — where a judge could attack today
 
 36. **No paper Sharpe, max drawdown or win rate — and the pre-registered excuse for it has now
-    been refuted by our own harness.** The ledger holds 166 decisions and every one is a refusal.
+    been refuted by our own harness.** Every decision on the ledger is a refusal.
     This is the single biggest exposure, because Track 2 is half quantitative.
 
     It was **pre-registered**: protocol v1 permits trading only in regular and extended hours,
@@ -2552,7 +2552,7 @@ and anchored. That opening head is `bc36478291a06bc3`, submitted to four indepen
 calendars: `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The `.ots` proofs
 are in `argus/data/anchors/`, and anyone can verify them with the reference OpenTimestamps client
-without our cooperation. **38 of the 60 carry a Bitcoin block-header attestation** (blocks
+without our cooperation. **38 of the 64 carry a Bitcoin block-header attestation** (blocks
 966,822–967,736); the other 18 are still calendar-pending, which is what a proof honestly
 says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-counts both.
 

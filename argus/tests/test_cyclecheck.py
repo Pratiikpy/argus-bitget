@@ -377,7 +377,7 @@ class TestReadingTheRealRun:
 
 
 class TestTheCycleScriptRunsTheCheck:
-    """The monitor must not depend on a Claude session being alive.
+    """The monitor must not depend on an interactive session being alive.
 
     The cron watcher is session-only and dies when the session does. The scheduled Windows task is
     not, so the verification is wired into the cycle script itself — whether or not anyone is

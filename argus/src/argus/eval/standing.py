@@ -832,7 +832,7 @@ REGISTER: tuple[Capability, ...] = (
                     "in full and vendored — base.py (Expression/ExpressionOps/Feature), ops.py "
                     "(1681 lines, every real Rolling/PairRolling operator incl. Rank/Mean/Std/"
                     "Corr), and the field-parsing path (utils/__init__.py's parse_field, "
-                    "data.py's ExpressionProvider) an earlier session wrongly marked "
+                    "data.py's ExpressionProvider) an earlier review wrongly marked "
                     "unvendorable — corrected 2026-09-16, see qlib_expression_base.py's own header"
                 ),
                 artefact="../research/architecture/factor-discovery-audit.md",
@@ -1925,7 +1925,7 @@ REGISTER: tuple[Capability, ...] = (
                     "raw hit-rate test and a market-relative abnormal-return test can and do "
                     "disagree in either direction on identical input. NOT claimed whale-signals' "
                     "own real, published 646,442-transaction results were reproduced — the real "
-                    "Dune dataset needs a paid API key this session does not have; their real "
+                    "Dune dataset needs a paid API key this project does not have; their real "
                     "significance-testing CODE was run instead, on ARGUS's own real candle "
                     "history with constructed placebo events"
                 ),
@@ -1935,7 +1935,7 @@ REGISTER: tuple[Capability, ...] = (
         blockers=(
             "The placebo events are constructed (real timestamps, zero true edge by "
             "construction), not whale-signals' own real 646,442-transaction Dune dataset, which "
-            "needs a paid API key this session does not have — their own already-published "
+            "needs a paid API key this project does not have — their own already-published "
             "real results (results/published_yearly_edges.csv in the cloned repo) independently "
             "show the same qualitative pattern (tiny, sign-flipping year-over-year edges) but "
             "were not re-run here. The false-positive rate measured is specific to this real "
@@ -3434,7 +3434,7 @@ REGISTER: tuple[Capability, ...] = (
             Proof(
                 condition="out_of_sample_test",
                 how=(
-                    "checked against the REAL, live-growing desk-notes log this session's actual "
+                    "checked against the REAL, live-growing desk-notes log this project's actual "
                     "decision cycles wrote — 194 real cycles, 5 distinct sources seen, confirming "
                     "the synthetic-fixture status-line shape this comparison exercises is the "
                     "same shape real production cycles produce"
@@ -3533,7 +3533,7 @@ REGISTER: tuple[Capability, ...] = (
         # exposed under vocabulary the verifier looks for. Fixed in source
         # (sentiment_comparison.py's report dict gained two derived keys naming the same facts),
         # simulated against the stale artefact to confirm the fix before spending anything, then
-        # regenerated for real with the owner's explicit go-ahead (8 real Qwen calls, ~170s). Fresh
+        # regenerated for real with the project owner's approval (8 real Qwen calls, ~170s). Fresh
         # run reconfirms the original finding on both narratives: finBERT's naive aggregate scales
         # with repetition every time, ARGUS's real analyst never does, reproducibility holds
         # (signal_stable=True across a genuine re-sample). All 13 conditions now verify.
@@ -4330,7 +4330,7 @@ REGISTER: tuple[Capability, ...] = (
             "Two routes remain, and both are outside code: real CME MBO data through a paid "
             "vendor, which would let our port run hftbacktest's own protocol on their own class "
             "of reference data; or our own orders resting in a real book, which is elapsed time "
-            "and the owner's decision, not more building.",
+            "and the project owner's decision, not more building.",
             "2026-09-22: the code side of the first route is built, AND has now been run against "
             "real CME data — not a paid purchase, DataBento's own public GitHub SDK fixtures plus "
             "a substantial real sample from `nautechsystems/nautilus_trader`'s (LGPL-3.0) own "
@@ -4803,7 +4803,7 @@ REGISTER: tuple[Capability, ...] = (
             "seed independent of the pool-split and fit seeds), retrained, and re-scored against "
             "sealed once — the legitimate one-read-per-rebuild this project's own established "
             "pattern allows (data/oblique_sealed.json's docstring: 'read exactly once' per model, "
-            "not per session; the SVM head-swap earlier this session already used this same "
+            "not per session; the SVM head-swap earlier already used this same "
             "pattern once). Result: sealed accuracy rose 77.82% to 79.52% and the McNemar margin "
             "against Rasa widened from borderline (p=0.0576) to comfortable (p=0.2649). Still not "
             "a win — Rasa's point estimate remains higher — but the untried lever this entry "

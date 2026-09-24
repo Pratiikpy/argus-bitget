@@ -38,10 +38,10 @@ The providers disagree in ways that matter and are worth recording rather than s
 
 A comparison that ignored those differences would be measuring plumbing, not intelligence.
 
-**Fallback ordering — the owner's explicit decision, 2026-09-22, recorded in
-``Activity/12_DECISIONS_LOG.md``.** Two different orders for two different purposes: testing
-conserves the metered Bitget key by trying free/other options first; submission leads with the
-Bitget key because that is the one actually tied to the hackathon. See :data:`FALLBACK_ORDER`.
+**Fallback ordering — the project owner's explicit decision, 2026-09-22.** Two different orders
+for two different purposes: testing conserves the metered Bitget key by trying free/other options
+first; submission leads with the Bitget key because that is the one actually tied to the hackathon.
+See :data:`FALLBACK_ORDER`.
 """
 
 from __future__ import annotations
@@ -168,7 +168,7 @@ def available() -> tuple[Provider, ...]:
 
 
 # ---------------------------------------------------------------------------------------------
-# Fallback chain — the owner's decision, 2026-09-22 (Activity/12_DECISIONS_LOG.md)
+# Fallback chain — the project owner's decision, 2026-09-22
 # ---------------------------------------------------------------------------------------------
 
 FALLBACK_ORDER: dict[Mode, tuple[Provider, ...]] = {

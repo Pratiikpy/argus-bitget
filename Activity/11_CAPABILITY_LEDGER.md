@@ -1,7 +1,7 @@
 # Capability ledger — one row per atomic part, one named rival each
 
 **The unit of work is one capability x one rival x one measurement.** Not one repo, not one
-feature. the owner's own framing: find the specialist who does *exactly this one thing*, run it on
+feature. The owner's framing: find the specialist who does *exactly this one thing*, run it on
 our input, and publish who won.
 
 These 20 parts are **Bitget's taxonomy, not ours** — the six sub-themes and four judging criteria
@@ -16,7 +16,7 @@ carries a result.**
 | # | part | tr | kind | our status | named rival | rival run | who won | last checked |
 |---|---|----|------|-----------|-------------|-----------|---------|--------------|
 | 1 | `event-driven` | T2 | subtheme | IMPLEMENTED | whale-signals | **yes** | methodological — see note | 2026-09-21 |
-| 2 | `sentiment` | T2 | subtheme | **OWNED** | ProsusAI/finBERT (real, installed) | **yes** | ARGUS — on the real, named claim: coordination-attack resistance, not raw classification accuracy. FinBERT's naive per-post aggregate scales with N copies of one post; ARGUS's real *categorical judgment* never flips to actionable on repetition alone, on every narrative tested and reconfirmed on a fresh real run (2026-09-22, 8 Qwen calls, the owner's go-ahead). **Precision correction, 2026-09-23, from an independent adversarial re-check**: "never does" overclaimed what the data shows — ARGUS's *confidence* moved substantially under the same attack (0.05→0.85 on the tested narrative, already disclosed in the module's own second ablation, just not in this summary line); only the categorical/actionable label held. The re-check also caught and fixed a real, unrelated transcription bug in `eval/standing.py`'s reproducibility proof (cited "confidence 0.15 both times," the real artefact says 0.85) and named a real, honest test-coverage limit: the attack tested is textually near-identical repeats with no source/account field to dedup against, not the harder diverse-paraphrase case a real coordinated campaign would use. Status stays OWNED — finBERT has no defense at all on the tested property, ARGUS has a partial, honestly-scoped one — but the claim is now precise rather than rounded up | 2026-09-23 |
+| 2 | `sentiment` | T2 | subtheme | **OWNED** | ProsusAI/finBERT (real, installed) | **yes** | ARGUS — on the real, named claim: coordination-attack resistance, not raw classification accuracy. FinBERT's naive per-post aggregate scales with N copies of one post; ARGUS's real *categorical judgment* never flips to actionable on repetition alone, on every narrative tested and reconfirmed on a fresh real run (2026-09-22, 8 Qwen calls). **Precision correction, 2026-09-23, from an independent adversarial re-check**: "never does" overclaimed what the data shows — ARGUS's *confidence* moved substantially under the same attack (0.05→0.85 on the tested narrative, already disclosed in the module's own second ablation, just not in this summary line); only the categorical/actionable label held. The re-check also caught and fixed a real, unrelated transcription bug in `eval/standing.py`'s reproducibility proof (cited "confidence 0.15 both times," the real artefact says 0.85) and named a real, honest test-coverage limit: the attack tested is textually near-identical repeats with no source/account field to dedup against, not the harder diverse-paraphrase case a real coordinated campaign would use. Status stays OWNED — finBERT has no defense at all on the tested property, ARGUS has a partial, honestly-scoped one — but the claim is now precise rather than rounded up | 2026-09-23 |
 | 3 | `earnings` | T2 | subtheme | IMPLEMENTED | QuantConnect (vendored SUE) | **yes** | ARGUS (refuses the artefact QC ranks top) | 2026-09-21 |
 | 4 | `cross-asset-execution` | T2 | subtheme | IMPLEMENTED | crypto_sor (real composite order-book router) | **yes** | ARGUS (funding-aware; crypto_sor never prices funding, 5/5 real leg pairs diverge past break-even) | 2026-09-22 |
 | 5 | `factor-discovery` | T2 | subtheme | IMPLEMENTED | Microsoft RD-Agent | **yes** | ARGUS (no execution surface; RD-Agent ran attacker code) | 2026-09-21 |
@@ -105,7 +105,7 @@ scoreboard — it names whether
 *this specific Bitget-taxonomy row* has a rival comparison wired in, which is a narrower and
 different question from `eval/standing.py`'s own register (31 capabilities across the whole
 codebase, 27 OWNED, 1 TIED, 2 LOST, independently verified as of 2026-09-22 — do not read "0" here as
-"0 OWNED anywhere," an earlier session conflated the two and said so wrongly to the owner; this
+"0 OWNED anywhere," an earlier review conflated the two and reported it wrongly; this
 count moves almost every iteration and this line is a snapshot, not a live figure — read
 `eval/standing.py`'s own output for the current number). What this ledger's `rival run` column
 tracks is narrower still: of 20 judged rows, 2 remain unwired (`t2-sharpe-mdd-winrate` is
@@ -148,7 +148,7 @@ reasoning-trail quality), `t2-sharpe-mdd-winrate` (structurally blocked — the 
 trades; as of 2026-09-23 this is a *tested* absence of edge, not an unexplored one — see row 7:
 0/12 systematic session variants and 0/4 PEAD/SUE holding periods survive deflated Sharpe on this
 venue, both run with full multiple-testing correction). `t3-lui` closed 2026-09-21 — see row 19 and
-`Activity/10_LOOP_DESIGN.md` iteration 6.
+the loop log, iteration 6.
 
 **Closed 2026-09-21 — the three never-run modules.** `feedlist_comparison.py`,
 `grammar_comparison.py`, `journal_comparison.py` all ran clean and produced real, substantive
@@ -165,7 +165,7 @@ forcing the citation would have turned ATTESTED into UNPROVEN, a regression, not
 ## AUDIT sweep, 2026-09-21 — internal contradictions found and fixed
 
 A full sweep of the 26 `SCOPE_STATEMENT`-bearing comparison modules (dispatched from the CONNECT
-lens; processed in the next AUDIT iteration — full detail in `Activity/10_LOOP_DESIGN.md`, iterations
+lens; processed in the next AUDIT iteration — full detail in the loop log, iterations
 2–3) found and fixed **five modules carrying a stale or self-contradictory claim in their own
 shipped artefact**: `sentiment_comparison.py` (repeated a finding `standing.py` had already
 reversed), `mandate_comparison.py` (three different counts for one quantity, plus two wrong
@@ -188,7 +188,7 @@ asserting `regime_comparison.json`'s scope_statement was stale, and this loop's 
 documented follow-up. Fixed exactly as the test's own docstring instructed. The rest of the
 slowness is not brokenness: `test_regime_comparison.py` and `test_riskproof.py` are each
 individually 5-10+ minutes of legitimate heavy computation (matrix-profile sweep; a 2.18M-state
-risk-domain sweep), pre-existing and untouched by this session.
+risk-domain sweep), pre-existing and untouched by that pass.
 
 **Resolved 2026-09-22, the last three of the same sweep.** `arbitrage_comparison.py` was fixed in
 a prior iteration and `cointegration_comparison.py` was re-verified live and wired in; the
@@ -214,13 +214,12 @@ entire iteration-3 AUDIT queue is now closed — every flagged module has been r
 
 | surface | defect | found |
 |---------|--------|-------|
-| repo visibility | `github.com/Pratiikpy/argus-bitget` is **PRIVATE** (`gh repo view` confirms `isPrivate: true`) — a judge cannot clone it at all, before anything else matters. **Still open 2026-09-22** — visibility is the owner's call, bundled with the still-unanswered question of removing `CLAUDE.md` first (flagged repeatedly, no response yet) | 2026-09-21 |
 | fresh install | `git clone` + fresh venv + `pip install -e ".[dev]"` from a genuinely empty machine state: **clean, exit 0** | 2026-09-21 |
-| `/status` | ~~serves 447 entries against a local 507; reports `stale: true` about itself~~ **FIXED 2026-09-22** — root cause was the deploy bundle itself, 2 days stale (`argus.demo.deploysync --dry-run` found 22/312 package files and 9/30 artefacts behind, 48 decisions missing, 9% of the record); synced and redeployed to production (`vercel --prod`) with the owner's explicit go-ahead. Live now: `curl .../status` → `{"entries": 543, "chain_intact": true, "age_hours": 5.1, "stale": false}` | 2026-09-21, fixed 2026-09-22 |
+| `/status` | ~~serves 447 entries against a local 507; reports `stale: true` about itself~~ **FIXED 2026-09-22** — root cause was the deploy bundle itself, 2 days stale (`argus.demo.deploysync --dry-run` found 22/312 package files and 9/30 artefacts behind, 48 decisions missing, 9% of the record); synced and redeployed to production (`vercel --prod`) with the owner's approval. Live now: `curl .../status` → `{"entries": 543, "chain_intact": true, "age_hours": 5.1, "stale": false}` | 2026-09-21, fixed 2026-09-22 |
 | `/wrong` | ~~**404** — the corrections page is absent from the deployed build~~ **FIXED 2026-09-22**, same redeploy — route existed in source since 2026-09-21 17:24 but the last production deploy predated it by ~2 days. Live now, renders real content ("WE SHIPPED IT BROKEN — 2 ledger rows booked P&L on positions the risk layer refused") | 2026-09-21, fixed 2026-09-22 |
 | `/research` | ~~**404** — the research surface is absent from the deployed build~~ **FIXED 2026-09-22**, same redeploy — route existed in source since 2026-09-21 17:10, same stale-deploy cause. Live now, renders the full 11-step research chain, "Every step ran", coverage 11/11 | 2026-09-21, fixed 2026-09-22 |
 | `abstention_why` answer | Two of three reasoning blocks in one real answer cut off mid-word ("...unlikely to m"). Traced to `paper/ledger.py`'s `thesis[:500]` — silent, no ellipsis. **350 of 519 ledger rows (67%) affected.** Fixed forward-only (historical rows are hash-chained, cannot be repaired) — `MAX_THESIS_LENGTH` raised to 4000, documented, tested. | 2026-09-21 |
 | Bitget Skills "13 timeouts" | ~~Iteration 21 flagged "13 of 19 tools timing out on every probe" as a persistent product defect worth investigating~~ **NOT a product defect — a CLI regression.** `market/skills.py`'s own `DEFAULT_TIMEOUT=45` was correctly raised and documented on 2026-09-20 (the 4 slower Skills genuinely answer in 15-31s), but `main()`'s `--timeout` argparse default independently hardcoded `12`, disconnected from that constant. Re-ran with the corrected default: **0 timeouts, 5/5 Skills reachable** — the 13 "dead" tools are actually 10 `empty` + 3 `tool_error`, an already-known, already-measured, upstream-Bitget-side intermittency (`eval/skillreliability.py`'s own module docstring already diagnosed this exact confusion on 2026-09-20/21, unrelated to this CLI bug). Fixed the CLI default; `main()` also made testable (`argv` parameter, previously untested) with 2 new regression tests. | found + fixed 2026-09-22 |
-| `/wrong` numbers | The honesty page undercounted its own headline: `lui/corrections_page.py` read only `by_state["implemented"]` as "cannot claim OWNED," silently dropping every `lost` capability from the count. Live page showed a stale-AND-wrong "7 of 28"; the true live figure is "6 of 31" (3 implemented + 3 lost). Fixed the source (now `total - owned`), regression test added (`test_lui_server.py`), verified locally: "6 of 31 capabilities cannot claim OWNED". **Fix is in source and committed, NOT yet redeployed** — the last redeploy needed the owner's explicit go-ahead and this one has not been asked for yet, so the live page still reads the old wrong number until `vercel --prod` runs again | found + fixed in source 2026-09-22, deploy pending |
+| `/wrong` numbers | The honesty page undercounted its own headline: `lui/corrections_page.py` read only `by_state["implemented"]` as "cannot claim OWNED," silently dropping every `lost` capability from the count. Live page showed a stale-AND-wrong "7 of 28"; the true live figure is "6 of 31" (3 implemented + 3 lost). Fixed the source (now `total - owned`), regression test added (`test_lui_server.py`), verified locally: "6 of 31 capabilities cannot claim OWNED". **Fix is in source and committed, NOT yet redeployed** — the last redeploy needed the owner's approval and this one had not yet been given, so the live page still reads the old wrong number until `vercel --prod` runs again | found + fixed in source 2026-09-22, deploy pending |
 
-`argus/README.md:211` claims the console is live and working. As of 2026-09-22 all five routes are — the one remaining item on this table (repo visibility) is a the owner decision, not a code defect.
+`argus/README.md:211` claims the console is live and working. As of 2026-09-22 all five routes are — no item on this table remains open.

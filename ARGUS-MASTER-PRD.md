@@ -1,9 +1,12 @@
 # ARGUS — Master Product Requirements & Build Specification
 ## Bitget AI Base Camp / Genesis Hackathon Season 2
 
-**Status:** Authoritative build document. Supersedes all prior planning notes.
-**Owner:** the owner
-**Last updated:** 2026-09-12
+**Status:** The original build specification, written 2026-09-12, with the measurements and
+retractions recorded since. **Read the plan sections as history, not as the entry:** they name
+Agentic Trading (Track 2) as the primary submission; the entry actually filed is **Track 3 (AI
+Trading Desk) only**, and the README explains why Track 2 was withheld.
+**Owner:** the owner (github.com/Pratiikpy)
+**Written:** 2026-09-12
 
 ---
 
@@ -164,7 +167,7 @@ Invalid submission: missing a compliant X post, the project description, or acce
 
 Rule 3 forbids porting an S1 entry with only renaming or minor edits, and requires describing **substantive new additions**, with judging evaluating the new content.
 
-NightDesk (the owner's S1 entry, featured on the official S2 landing page) graded *decisions* against the NYSE open with Ed25519 signing and 15 hard gates. ARGUS is not that. ARGUS decomposes *edge* across a closed window into information / timing / execution / luck, and feeds that decomposition back into how much authority an agent holds. Studying our own prior architecture, reusing our own code, and carrying forward what we learned is entirely legitimate; the submission will state plainly what is new. That statement is a scoring asset, not a liability.
+NightDesk (the author's S1 entry, featured on the official S2 landing page) graded *decisions* against the NYSE open with Ed25519 signing and 15 hard gates. ARGUS is not that. ARGUS decomposes *edge* across a closed window into information / timing / execution / luck, and feeds that decomposition back into how much authority an agent holds. Studying our own prior architecture, reusing our own code, and carrying forward what we learned is entirely legitimate; the submission will state plainly what is new. That statement is a scoring asset, not a liability.
 
 ---
 
@@ -1558,7 +1561,7 @@ Ordered by dependency, and by what fails loudest if left late.
 | `research/CORPUS_CALIBRATION.md` | The ~21% genuine rate that forced honest reading of the corpus |
 | `BITGET_AI_BASE_CAMP_S2_HANDBOOK_EN.md` | All rules, scoring and mechanics in §2 |
 | ARGUS PRIME concept document | Capital Passport/Licence framing, Constitution Kernel, Trade Certificate schema, order state machine, AnchorBench, the guarantee/non-guarantee framing |
-| `chat .md`, `chats.md` | The repository canon, BUILD/BENCH/STUDY/WATCH taxonomy, the acceptance-condition formalism |
+| Early design notes (not published) | The repository canon, BUILD/BENCH/STUDY/WATCH taxonomy, the acceptance-condition formalism |
 | Local licence audit, 2026-09-12 | §8, read from actual LICENSE files |
 | NightDesk, binance-governor, horos | Prior art in gating, signed decisions, and public accuracy records |
 
