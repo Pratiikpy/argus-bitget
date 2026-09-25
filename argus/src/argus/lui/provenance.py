@@ -56,7 +56,9 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     # A conclusion or a derived figure that quotes its inputs or its own record is still derived:
     # "Implied open: ... missed by 30bps" is the figure first and its record second.
     ("computed", re.compile(
-        r"^Actionable:|^Your premise\b|^Implied open:|^Versus the stock:|\bexplains [+-]\d|"
+        # A lead that is a live reading promoted to the top stays live.
+        r"^Actionable:(?!\s+(?:Open interest:|Crypto fear))|^Your premise\b|^Implied open:|"
+        r"^Versus the stock:|\bexplains [+-]\d|"
         r"^A \$[\d,]+ order is\b|^Order book \(|^Earnings surprise:", re.I)),
     ("desk", re.compile(
         r"^seq\s+\d+|^Stated confidence|^Thesis:|^Invalidation:|^Not yet settled|^Entry hash|"
@@ -83,7 +85,8 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"^Spread of outcomes\b",
         re.I)),
     ("live", re.compile(
-        r"\blast [\d,.]+ USDT on Bitget\b|^Open interest:|\bheld open\b|^Funding(?: is|:)|"
+        r"\blast [\d,.]+ USDT on Bitget\b|^(?:Actionable: )?Open interest:|\bheld open\b|"
+        r"^Funding(?: is|:)|"
         r"\bfunding [+-]?\d|^\d+h ago —|^Prediction market\b|\bfear & greed\b|"
         r"\b(?:Treasury|fed funds|breakeven|dollar index)\b.*\bon \d{4}-\d\d-\d\d\b|"
         r"^Scheduled:|\bspot BTC ETFs\b|\bheadlines? name\b|\b8-K\b|"

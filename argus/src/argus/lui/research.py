@@ -5390,6 +5390,17 @@ _GAP_Q = re.compile(r"\b(?:over|under|vs\.?|versus|against|premium|discount|basi
                     r"difference|spread\s+between)\b", re.I)
 
 
+def _lead_with(lines: list[str], prefix: str) -> list[str]:
+    """Move the line starting with ``prefix`` to the front as the answer's lead, demoting the
+    current lead to a plain line. Unchanged when no such line exists."""
+    plain = [re.sub(r"^Actionable(?: \(\w+\))?:\s*(\w)", lambda m: m.group(1).upper(), line)
+             for line in lines]
+    hit = next((i for i, line in enumerate(plain) if line.startswith(prefix)), None)
+    if hit is None:
+        return lines
+    return [f"Actionable: {plain[hit]}", *plain[:hit], *plain[hit + 1:]]
+
+
 def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
                   fee: float) -> tuple[list[str], list[Source], str | None]:
     """The quote figures a question asks for by name, beyond the standard quote: mark and index
@@ -7344,6 +7355,10 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             extra.append(Source(kind="computation", ref="argus.market.social_pulse",
                                 detail="X and Reddit posts grouped into stories by the desk's "
                                        "coordination detector; a dated snapshot"))
+        if request.kind is ResearchKind.SENTIMENT and OPEN_INTEREST_QUESTION.search(raw_text):
+            # "open interest on ETH futures" opened on the sentiment summary with the open
+            # interest four lines down (live, 2026-09-25): the figure asked for leads.
+            found = _lead_with(found, "Open interest:")
         found.extend(f"Assumed: {note}." for note in request.notes)
         found.append(f"Data: {extra[0].detail if extra else 'public sources'}. This is analysis, "
                      f"not advice — you make the call.")
@@ -7774,6 +7789,9 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                         sources.append(Source(kind="venue",
                                               ref="bitget /api/v2/mix/market/tickers",
                                               detail="holdingAmount, every USDT perpetual"))
+                if implied is not None and IMPLIED_OPEN_QUESTION.search(raw_text):
+                    # "where will NVDA open?" opened on the round-trip cost (live, 2026-09-25).
+                    lines = _lead_with(lines, "Implied open:")
                 extra_lines, extra_sources, asked = _quote_extras(raw_text, quoted, float(fee))
                 lines.extend(extra_lines)
                 sources.extend(extra_sources)
