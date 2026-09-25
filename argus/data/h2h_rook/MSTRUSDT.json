@@ -1,0 +1,56 @@
+{
+ "stdout_log": [
+  "[bitget] ticker v2 ok RMSTRUSDT",
+  "[bitget] candles ok RMSTRUSDT v2"
+ ],
+ "result": {
+  "symbol": "MSTRUSDT",
+  "snapshot": {
+   "symbol": "RMSTRUSDT",
+   "last": 161.84,
+   "bid": 161.93,
+   "ask": 162.14,
+   "change24hPct": 0,
+   "high24h": 163.93,
+   "low24h": 159.85,
+   "volumeBase": 7829839.5231,
+   "volumeQuote": 1268218386.4969609,
+   "realizedVol24hPct": 3.578611240308384,
+   "sma20": 161.2623,
+   "source": "v2/spot/market/tickers",
+   "asOf": "2026-09-25T05:01:32.641Z"
+  },
+  "report": {
+   "symbol": "RMSTRUSDT",
+   "horizon": "24h",
+   "bias": "long",
+   "confidence": 36,
+   "strategy": "The long thesis is conditional on price defending the SMA20 and 24h-low zone while converting the 162.14 ask area into accepted higher prices. It strengthens if RMSTRUSDT holds above 161.26, reclaims 162.14, and presses 163.93 with improving net demand. It weakens if heavy turnover remains flat under the 163.93 cap or if the SMA20 zone fails. Missing evidence includes taker-side flow, order-book depth, and a news or sector catalyst.",
+   "bull_summary": "Price is slightly above SMA20 and near defended range support, with deep turnover and a potential path to retest 163.93 if sellers fade.",
+   "bear_summary": "Zero 24h change and lack of catalysts suggest stagnation near the mean, while 163.93 is a supply shelf; failure at SMA20 could open the 159.85 low.",
+   "catalysts": [
+    "Sustained acceptance above 162.14",
+    "Defense of SMA20 around 161.26 and low near 159.85",
+    "Expansion in bid-side aggression or positive news"
+   ],
+   "risks": [
+    "Heavy volume with no net gain may indicate distribution",
+    "163.93 resistance may cap upside",
+    "Break below SMA20 could trigger range breakdown",
+    "No external headlines to support directional conviction"
+   ],
+   "i_am_wrong_if": [
+    "Price accepts below SMA20 and drifts toward the low",
+    "Turnover spikes while price fails to advance",
+    "A negative headline or broad risk-off move hits the token",
+    "Bid support disappears around 161-160"
+   ],
+   "invalidation_price": 159.8,
+   "invalidation_note": "Long is invalidated if last trades at or below 159.8 (adverse move below the 161.84 snapshot).",
+   "action": "hold",
+   "reason": "The requested long has mild structural support above SMA20 and near the range low, but flat 24h performance, thin external evidence, and clear overhead supply make the case tentative.",
+   "evidence_quality": 30,
+   "raw_text": "{\n  \"symbol\": \"RMSTRUSDT\",\n  \"horizon\": \"24h\",\n  \"bias\": \"long\",\n  \"confidence\": 36,\n  \"strategy\": \"The long thesis is conditional on price defending the SMA20 and 24h-low zone while converting the 162.14 ask area into accepted higher prices. It strengthens if RMSTRUSDT holds above 161.26, reclaims 162.14, and presses 163.93 with improving net demand. It weakens if heavy turnover remains flat under the 163.93 cap or if the SMA20 zone fails. Missing evidence includes taker-side flow, order-book depth, and a news or sector catalyst.\",\n  \"bull_summary\": \"Price is slightly above SMA20 and near defended range support, with deep turnover and a potential path to retest 163.93 if sellers fade.\",\n  \"bear_summary\": \"Zero 24h change and lack of catalysts suggest stagnation near the mean, while 163.93 is a supply shelf; failure at SMA20 could open the 159.85 low.\",\n  \"catalysts\": [\n    \"Sustained acceptance above 162.14\",\n    \"Defense of SMA20 around 161.26 and low near 159.85\",\n    \"Expansion in bid-side aggression or positive news\"\n  ],\n  \"risks\": [\n    \"Heavy volume with no net gain may indicate distribution\",\n    \"163.93 resistance may cap upside\",\n    \"Break below SMA20 could trigger range breakdown\",\n    \"No external headlines to support directional conviction\"\n  ],\n  \"i_am_wrong_if\": [\n    \"Price accepts below SMA20 and drifts toward the low\",\n    \"Turnover spikes while price fails to advance\",\n    \"A negative headline or broad risk-off move hits the token\",\n    \"Bid support disappears around 161-160\"\n  ],\n  \"invalidation_price\": 159.80,\n  \"invalidation_note\": \"Long thesis is invalidated if price closes at or below 159.80, breaking the 24h low support area.\",\n  \"action\": \"hold\",\n  \"reason\": \"The requested long has mild structural support above SMA20 and near the range low, but flat 24h performance, thin external evidence, and clear overhead supply make the case tentative.\",\n  \"evidence_quality\": 30\n}"
+  }
+ }
+}

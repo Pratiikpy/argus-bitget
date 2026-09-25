@@ -1,0 +1,53 @@
+{
+ "stdout_log": [
+  "[bitget] ticker v2 ok RCOINUSDT",
+  "[bitget] candles ok RCOINUSDT v2"
+ ],
+ "result": {
+  "symbol": "COINUSDT",
+  "snapshot": {
+   "symbol": "RCOINUSDT",
+   "last": 198.47,
+   "bid": 198.34,
+   "ask": 198.61,
+   "change24hPct": 0,
+   "high24h": 200.61,
+   "low24h": 195.59,
+   "volumeBase": 3964761.9842,
+   "volumeQuote": 788062240.0089487,
+   "realizedVol24hPct": 2.9869656849321573,
+   "sma20": 197.74777,
+   "source": "v2/spot/market/tickers",
+   "asOf": "2026-09-25T05:10:33.426Z"
+  },
+  "report": {
+   "symbol": "RCOINUSDT",
+   "horizon": "24h",
+   "bias": "long",
+   "confidence": 36,
+   "strategy": "The long case is conditional on price holding above the SMA20 near 197.75 and the 198.30 bid zone, with strength shown by acceptance above 200.61 on deeper, less churny volume. It weakens if the tape remains flat below the 24h high or loses the short-term average, because the range then favors mean reversion toward 195.59. Missing evidence includes a catalyst, order-book depth, and confirmation that current volume is accumulation rather than turnover.",
+   "bull_summary": "Price is above the SMA20 inside a tight range, with a narrow spread and meaningful volume; holding mid-range could allow a retest of 200.61.",
+   "bear_summary": "Zero 24h change, no headlines, and proximity to range resistance make the tape look like churn; loss of SMA20 could quickly expose the low.",
+   "catalysts": [],
+   "risks": [
+    "Rejection at 200.61",
+    "Loss of SMA20 support near 197.75",
+    "Volume may be churn rather than accumulation",
+    "No news catalyst for upside",
+    "Low realized volatility can snap higher if liquidity thins"
+   ],
+   "i_am_wrong_if": [
+    "A close below 197.70 breaks SMA20 support",
+    "Heavy sell-side volume appears near 200.61",
+    "Bid support at 198.34 fades and spreads widen",
+    "Unexpected negative headline or token-specific news hits"
+   ],
+   "invalidation_price": 197.7,
+   "invalidation_note": "Long is invalidated if last trades at or below 197.7 (adverse move below the 198.47 snapshot).",
+   "action": "watch",
+   "reason": "The lean is modestly long only because price is holding above SMA20 and inside a defended range, but flat momentum and absent catalyst keep conviction low.",
+   "evidence_quality": 32,
+   "raw_text": "{\n  \"symbol\": \"RCOINUSDT\",\n  \"horizon\": \"24h\",\n  \"bias\": \"long\",\n  \"confidence\": 36,\n  \"strategy\": \"The long case is conditional on price holding above the SMA20 near 197.75 and the 198.30 bid zone, with strength shown by acceptance above 200.61 on deeper, less churny volume. It weakens if the tape remains flat below the 24h high or loses the short-term average, because the range then favors mean reversion toward 195.59. Missing evidence includes a catalyst, order-book depth, and confirmation that current volume is accumulation rather than turnover.\",\n  \"bull_summary\": \"Price is above the SMA20 inside a tight range, with a narrow spread and meaningful volume; holding mid-range could allow a retest of 200.61.\",\n  \"bear_summary\": \"Zero 24h change, no headlines, and proximity to range resistance make the tape look like churn; loss of SMA20 could quickly expose the low.\",\n  \"catalysts\": [],\n  \"risks\": [\n    \"Rejection at 200.61\",\n    \"Loss of SMA20 support near 197.75\",\n    \"Volume may be churn rather than accumulation\",\n    \"No news catalyst for upside\",\n    \"Low realized volatility can snap higher if liquidity thins\"\n  ],\n  \"i_am_wrong_if\": [\n    \"A close below 197.70 breaks SMA20 support\",\n    \"Heavy sell-side volume appears near 200.61\",\n    \"Bid support at 198.34 fades and spreads widen\",\n    \"Unexpected negative headline or token-specific news hits\"\n  ],\n  \"invalidation_price\": 197.7,\n  \"invalidation_note\": \"The long thesis is invalid on a close at or below 197.70, because that breaks the SMA20 support zone and opens the path toward the 195.59 low.\",\n  \"action\": \"watch\",\n  \"reason\": \"The lean is modestly long only because price is holding above SMA20 and inside a defended range, but flat momentum and absent catalyst keep conviction low.\",\n  \"evidence_quality\": 32\n}"
+  }
+ }
+}

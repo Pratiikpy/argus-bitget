@@ -475,6 +475,21 @@ def standing_counts() -> tuple[Number, Number]:
     return len(report.earned), len(report.capabilities)
 
 
+def standing_tied() -> Number:
+    """Capabilities the register grades TIED. Pinned 2026-09-25: a new TIED entry moved the count
+    from 8 to 9 and three documents kept saying 8, because only the OWNED figure was checked."""
+    from argus.eval.standing import REGISTER, State
+
+    return sum(1 for cap in REGISTER if cap.state is State.TIED)
+
+
+def standing_implemented() -> Number:
+    """Capabilities the register grades IMPLEMENTED, gated for the reason `standing_tied` is."""
+    from argus.eval.standing import REGISTER, State
+
+    return sum(1 for cap in REGISTER if cap.state is State.IMPLEMENTED)
+
+
 def reliable_skill_tools() -> tuple[Number, Number]:
     """Bitget Skill tools that answer every attempt, and the total probed.
 
@@ -645,6 +660,12 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("standing_owned", r"(?P<q1>\d+) of (?P<q2>\d+) capabilities are OWNED",
           standing_counts, ("readme", "public-readme", "submission", "explained",
                             "architecture")),
+    Claim("standing_tied", r"(?P<q>\d+)\s+are\s+TIED",
+          standing_tied, ("readme", "public-readme", "submission", "explained",
+                          "architecture")),
+    Claim("standing_implemented", r"(?P<q>\d+)\s+are\s+IMPLEMENTED",
+          standing_implemented, ("readme", "public-readme", "submission", "explained",
+                                 "architecture")),
     # Both LUI figures are guarded because both are *losses*, and a losing number left ungated is
     # the one that quietly improves between drafts. The phrasings are anchored to the sentences
     # actually written in SUBMISSION-DRAFT.md.

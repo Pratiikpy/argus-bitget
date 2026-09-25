@@ -1,0 +1,66 @@
+{
+ "comparison": "thesis desk: ARGUS vs optic-bitget (neromtoobad, Season 2, MIT)",
+ "run_on": "2026-09-25",
+ "same_input": [
+  "Long MSTR perp into earnings — funding looks cheap",
+  "Long NVDA perp into earnings — funding looks cheap",
+  "Long TSLA perp into earnings — funding looks cheap"
+ ],
+ "optic_setup": "clone at research/repos-s2new/neromtoobad~optic-bitget, npm ci, full desk (read, evidence, Bull/Bear x2, Judge x3). LLM: the hackathon Qwen (qwen3.8-max) through an env-gated endpoint override added for this run only (its default is Venice gemini, for which we hold no key); three attempts per call, 300 s timeout, because Qwen returned a 504 on the first attempt. Its web-research row is Venice-only and errored. Windows broke its own CLI entry check, so a four-line harness (scripts/h2h-desk.ts) calls runDesk directly.",
+ "optic_results": {
+  "mstr": {
+   "call": "insufficient_evidence",
+   "p_thesis_holds": 0.42,
+   "confidence": 0.54,
+   "rows_ok": "7/13",
+   "qwen_tokens": 47150,
+   "funding_seen": "0.0216%/8h, 23.65%/yr",
+   "on_the_premise": "'not clearly cheap' (in the judge's reasoning)"
+  },
+  "nvda": {
+   "call": "priced_in (nothing contested, debate skipped)",
+   "p_thesis_holds": 0.5,
+   "rows_ok": "7/13",
+   "qwen_tokens": 1524,
+   "funding_seen": "0"
+  },
+  "tsla": {
+   "call": "insufficient_evidence",
+   "p_thesis_holds": 0.43,
+   "confidence": 0.62,
+   "rows_ok": "8/13",
+   "qwen_tokens": 48855,
+   "funding_seen": "0",
+   "on_the_premise": "'zero funding is neutral'"
+  }
+ },
+ "optic_missing_rows": "earnings, news, positioning and fear&greed errored on every thesis (the bitget-signal tools that are dark); both abstentions cite the missing earnings and positioning rows as decisive",
+ "argus_results": "argus.json: each answer leads with a measured verdict on the funding premise against the contract's last 100 settlements, then the earnings half — next report date (estimated when unpublished), analyst targets, SUE from SEC XBRL, 13F holders, Form 4 filings, valuation, and for MSTR its bitcoin holding against market value. 0 model tokens, 5-8 s each.",
+ "verdict": {
+  "where_ARGUS_is_ahead": [
+   "answers the earnings half optic reports as missing on all three",
+   "states a verdict on the premise measured against the contract's own history rather than leaving it to a model's reading",
+   "no model spend: 0 tokens vs ~97,500 Qwen tokens for the three"
+  ],
+  "where_optic_is_ahead": [
+   "synthesises everything into one call with a probability; ARGUS lists evidence and leaves the call to the reader — still true"
+  ],
+  "state": "TIED on the thesis-desk task as a whole: optic still leads on a single synthesised call; ARGUS leads on the evidence optic reported missing and on a measured premise verdict. Not OWNED — no outcome-graded comparison has been run, and the two gaps closed after the run have not been re-run head to head.",
+  "gaps_closed_after_the_run": [
+   "a Polymarket row: market/prediction.py, in fundamentals, news, sentiment and directional answers",
+   "a coverage count: truth/coverage.py, every research answer names the sources it reached and any that did not answer"
+  ]
+ },
+ "not_covered": "outcome grading (did each thesis hold) needs elapsed time; latency is not compared because optic ran on Qwen, which is slower than its default model",
+ "baseline_run": {
+  "what": "optic-bitget's own desk (src/desk/index.ts runDesk) executed end to end on the three theses, outputs saved verbatim as mstr.json, nvda.json, tsla.json",
+  "model": "qwen3.8-max via the hackathon endpoint",
+  "its_code_changed": "no; only the LLM endpoint/model/timeout became environment-overridable and a four-line runner was added"
+ },
+ "failure_cases": [
+  "the funding premise was ignored (fixed: _claim_check)",
+  "identical zero-funding cases got different verdicts through tied ranks (fixed the same day, before publishing)",
+  "ARGUS gives no single synthesised call or probability; a reader does the weighing",
+  "the Polymarket and coverage gaps were closed after this run and are not re-measured against optic"
+ ]
+}

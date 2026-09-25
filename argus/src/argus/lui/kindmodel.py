@@ -100,6 +100,14 @@ class LocalPlanner:
         }
         if candidate is not None:
             plan["candidate"] = candidate
+        patterned = research.detect(text)
+        if (patterned is not None and patterned.size_stated and patterned.symbols
+                and patterned.symbols[0] == candidate):
+            # "what does adding 15% TSLA do to my risk?" was answered for 20%: the 15% was read as
+            # a holding, and the plan carried no size, so the default applied (found through the
+            # Telegram bot's own help examples, 2026-09-25). The patterns' size reading is exact.
+            plan["size_percent"] = patterned.size * 100.0
+            holdings.pop(candidate, None)
         notional = research._parse_notional(text)
         if label == "execution" and notional is not None:
             plan["order_usd"] = str(notional)

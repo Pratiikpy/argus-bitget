@@ -1,0 +1,650 @@
+{
+  "query": "Long TSLA perp into earnings — funding looks cheap",
+  "resolved": {
+    "type": "desk",
+    "name": "Tesla"
+  },
+  "evidence": {
+    "thesis": "Long TSLA perp into earnings — funding looks cheap",
+    "ticker": "TSLA",
+    "company": "Tesla",
+    "symbol": "TSLAUSDT",
+    "rows": [
+      {
+        "id": "perp",
+        "source": "bitget-rest",
+        "label": "Bitget rToken perpetual TSLAUSDT",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:50:39.365Z",
+        "value": {
+          "symbol": "TSLAUSDT",
+          "venue": "perpetual",
+          "chain": "bitget-futures",
+          "address": "",
+          "price": 379.77,
+          "chg_24h": 0.2,
+          "liquidity": null,
+          "holders": null,
+          "mark_price": 379.91,
+          "index_price": 379.91,
+          "basis_pct": 0,
+          "funding_rate": 0,
+          "funding_interval_h": 8,
+          "funding_annualized_pct": 0,
+          "open_interest": 39331.75,
+          "open_interest_usdt": 14942525,
+          "volume_24h_usdt": 22434053,
+          "spread_bps": 1.1,
+          "us_session_open": false
+        }
+      },
+      {
+        "id": "cash",
+        "source": "yahoo",
+        "label": "Tesla, Inc. cash market (NMS)",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:50:39.365Z",
+        "value": {
+          "symbol": "TSLA",
+          "name": "Tesla, Inc.",
+          "exchange": "NMS",
+          "currency": "USD",
+          "price": 377.94,
+          "previous_close": 380.12,
+          "chg_pct": -0.57,
+          "day_high": 383.33,
+          "day_low": 375.7,
+          "volume": 25925858,
+          "week52_high": 498.83,
+          "week52_low": 297.38,
+          "as_of": "2026-09-24T20:00:00.000Z",
+          "closes": [
+            {
+              "date": "2026-09-11",
+              "close": 365.44
+            },
+            {
+              "date": "2026-09-14",
+              "close": 358.97
+            },
+            {
+              "date": "2026-09-15",
+              "close": 356.58
+            },
+            {
+              "date": "2026-09-16",
+              "close": 358.08
+            },
+            {
+              "date": "2026-09-17",
+              "close": 366.2
+            },
+            {
+              "date": "2026-09-18",
+              "close": 364.27
+            },
+            {
+              "date": "2026-09-21",
+              "close": 375.3
+            },
+            {
+              "date": "2026-09-22",
+              "close": 378.9
+            },
+            {
+              "date": "2026-09-23",
+              "close": 380.12
+            },
+            {
+              "date": "2026-09-24",
+              "close": 377.94
+            }
+          ]
+        }
+      },
+      {
+        "id": "session",
+        "source": "clock",
+        "label": "US cash session",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:50:39.365Z",
+        "value": {
+          "state": "closed",
+          "minutes_to_open": 580,
+          "checked_at": "2026-09-25T03:50:39.365Z",
+          "holidays_modelled": false
+        }
+      },
+      {
+        "id": "gap",
+        "source": "computed",
+        "label": "perp vs cash gap",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:50:39.365Z",
+        "value": {
+          "session": "closed",
+          "minutes_to_us_open": 580,
+          "perp_price": 379.77,
+          "cash_price": 377.94,
+          "cash_previous_close": 380.12,
+          "perp_vs_cash_pct": 0.484,
+          "basis_pct": 0,
+          "funding_rate": 0,
+          "funding_annualized_pct": 0,
+          "open_interest_usdt": 14942525,
+          "volume_24h_usdt": 22434053,
+          "spread_bps": 1.1
+        }
+      },
+      {
+        "id": "crosscheck",
+        "source": "bitget-signal:crypto_derivatives",
+        "label": "TSLAUSDT 24h ticker via bitget-signal",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:50:40.386Z",
+        "value": {
+          "symbol": "TSLA/USDT",
+          "last": 379.7,
+          "high": 383.5,
+          "low": 374.53,
+          "volume": 262884.58,
+          "quote_volume": 99499482.1315,
+          "change_pct": 0.156,
+          "timestamp": 1790308218749
+        }
+      },
+      {
+        "id": "news",
+        "source": "bitget-signal:tradfi_news",
+        "label": "news mentioning Tesla",
+        "computed": true,
+        "status": "error",
+        "fetched_at": "2026-09-25T03:50:55.272Z",
+        "value": null,
+        "note": "upstream error: (blank)"
+      },
+      {
+        "id": "earnings",
+        "source": "bitget-signal:tradfi_news",
+        "label": "TSLA company profile / earnings calendar",
+        "computed": true,
+        "status": "error",
+        "fetched_at": "2026-09-25T03:50:55.264Z",
+        "value": null,
+        "note": "upstream error: (blank)"
+      },
+      {
+        "id": "positioning",
+        "source": "bitget-signal:derivatives_sentiment",
+        "label": "TSLAUSDT long/short positioning",
+        "computed": true,
+        "status": "error",
+        "fetched_at": "2026-09-25T03:50:55.265Z",
+        "value": null,
+        "note": "upstream error: (blank)"
+      },
+      {
+        "id": "technicals",
+        "source": "bitget-signal:technical_analysis",
+        "label": "TSLAUSDT technical read (1h)",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:50:40.544Z",
+        "value": {
+          "symbol": "TSLAUSDT",
+          "timeframe": "1h",
+          "rsi": {
+            "rsi": 53.91,
+            "period": 14,
+            "signal": "neutral"
+          },
+          "macd": {
+            "macd": 0.132683,
+            "signal": 0.157529,
+            "histogram": -0.024845,
+            "cross": "death_cross"
+          },
+          "bollinger": {
+            "upper": 375.0953,
+            "middle": 378.378,
+            "lower": 381.6607,
+            "bandwidth": -0.0174,
+            "pct_b": 0.2986,
+            "position": "above_upper"
+          },
+          "ma": {
+            "price": 379.7,
+            "ma7": 378.86,
+            "ma25": 378.4264,
+            "ma99": 377.1155,
+            "trend": "bull"
+          },
+          "atr": {
+            "atr": 1.6665,
+            "atr_pct": 0.44,
+            "suggested_stop": 377.2003,
+            "period": 14
+          },
+          "support_resistance": {
+            "supports": [
+              375.77,
+              377.99,
+              378.39
+            ],
+            "resistances": [
+              382.6,
+              385.42
+            ],
+            "current_price": 379.7
+          },
+          "verdict": "BULLISH",
+          "bull_signals": 2,
+          "bear_signals": 1
+        }
+      },
+      {
+        "id": "macro",
+        "source": "bitget-signal:rates_yields",
+        "label": "rates snapshot",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:50:39.381Z",
+        "value": {
+          "fed_funds_target_upper": {
+            "error": ""
+          },
+          "fed_funds_target_lower": {
+            "error": ""
+          },
+          "t2y": {
+            "error": ""
+          },
+          "t10y": {
+            "error": ""
+          },
+          "t30y": {
+            "error": ""
+          },
+          "spread_10y2y": {
+            "error": ""
+          },
+          "breakeven_10y": {
+            "error": ""
+          },
+          "sofr": {
+            "error": ""
+          },
+          "mortgage_30y": {
+            "error": ""
+          },
+          "hy_spread": {
+            "error": ""
+          },
+          "ig_spread": {
+            "error": ""
+          },
+          "yield_curve_inverted": false
+        }
+      },
+      {
+        "id": "fear_greed",
+        "source": "bitget-signal:sentiment_index",
+        "label": "crypto fear & greed",
+        "computed": true,
+        "status": "error",
+        "fetched_at": "2026-09-25T03:51:04.386Z",
+        "value": null,
+        "note": "tool returned no result"
+      },
+      {
+        "id": "research",
+        "source": "research",
+        "label": "web-sourced equity research brief",
+        "computed": false,
+        "status": "error",
+        "fetched_at": "2026-09-25T03:51:04.386Z",
+        "value": null,
+        "note": "no sourced brief available"
+      },
+      {
+        "id": "prediction",
+        "source": "polymarket",
+        "label": "prediction markets on Tesla",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:51:04.386Z",
+        "value": [
+          {
+            "q": "Tesla and SpaceX merger officially announced by December 31, 2027?",
+            "yes": 0.655,
+            "chg24h": null,
+            "vol": 28587
+          },
+          {
+            "q": "Tesla and SpaceX merger officially announced by June 30, 2027?",
+            "yes": 0.525,
+            "chg24h": -0.01,
+            "vol": 20995
+          },
+          {
+            "q": "Will Tesla, Inc. (TSLA) hit (HIGH) $390 in September?",
+            "yes": 0.515,
+            "chg24h": -0.055,
+            "vol": 11209
+          },
+          {
+            "q": "Tesla and SpaceX merger officially announced by December 31?",
+            "yes": 0.185,
+            "chg24h": null,
+            "vol": 191469
+          },
+          {
+            "q": "Will Tesla release Optimus by December 31, 2026?",
+            "yes": 0.1265,
+            "chg24h": 0.004,
+            "vol": 30324
+          }
+        ]
+      }
+    ],
+    "coverage": {
+      "total": 13,
+      "ok": 8,
+      "empty": 0,
+      "error": 5,
+      "skipped": 0,
+      "computed_ok": 8,
+      "ratio": 0.62
+    },
+    "gap": {
+      "session": "closed",
+      "minutes_to_us_open": 580,
+      "perp_price": 379.77,
+      "cash_price": 377.94,
+      "cash_previous_close": 380.12,
+      "perp_vs_cash_pct": 0.484,
+      "basis_pct": 0,
+      "funding_rate": 0,
+      "funding_annualized_pct": 0,
+      "open_interest_usdt": 14942525,
+      "volume_24h_usdt": 22434053,
+      "spread_bps": 1.1
+    },
+    "gathered_at": "2026-09-25T03:51:04.386Z",
+    "perp": {
+      "symbol": "TSLAUSDT",
+      "venue": "perpetual",
+      "chain": "bitget-futures",
+      "address": "",
+      "price": 379.77,
+      "chg_24h": 0.2,
+      "liquidity": null,
+      "holders": null,
+      "mark_price": 379.91,
+      "index_price": 379.91,
+      "basis_pct": 0,
+      "funding_rate": 0,
+      "funding_interval_h": 8,
+      "funding_annualized_pct": 0,
+      "open_interest": 39331.75,
+      "open_interest_usdt": 14942525,
+      "volume_24h_usdt": 22434053,
+      "spread_bps": 1.1,
+      "us_session_open": false
+    },
+    "cash": {
+      "symbol": "TSLA",
+      "name": "Tesla, Inc.",
+      "exchange": "NMS",
+      "currency": "USD",
+      "price": 377.94,
+      "previous_close": 380.12,
+      "chg_pct": -0.57,
+      "day_high": 383.33,
+      "day_low": 375.7,
+      "volume": 25925858,
+      "week52_high": 498.83,
+      "week52_low": 297.38,
+      "as_of": "2026-09-24T20:00:00.000Z",
+      "closes": [
+        {
+          "date": "2026-08-25",
+          "close": 350.25
+        },
+        {
+          "date": "2026-08-26",
+          "close": 345.82
+        },
+        {
+          "date": "2026-08-27",
+          "close": 354.81
+        },
+        {
+          "date": "2026-08-28",
+          "close": 348.75
+        },
+        {
+          "date": "2026-08-31",
+          "close": 367.95
+        },
+        {
+          "date": "2026-09-01",
+          "close": 356.09
+        },
+        {
+          "date": "2026-09-02",
+          "close": 357.01
+        },
+        {
+          "date": "2026-09-03",
+          "close": 376.37
+        },
+        {
+          "date": "2026-09-04",
+          "close": 354.08
+        },
+        {
+          "date": "2026-09-08",
+          "close": 368.16
+        },
+        {
+          "date": "2026-09-09",
+          "close": 367.81
+        },
+        {
+          "date": "2026-09-10",
+          "close": 363.56
+        },
+        {
+          "date": "2026-09-11",
+          "close": 365.44
+        },
+        {
+          "date": "2026-09-14",
+          "close": 358.97
+        },
+        {
+          "date": "2026-09-15",
+          "close": 356.58
+        },
+        {
+          "date": "2026-09-16",
+          "close": 358.08
+        },
+        {
+          "date": "2026-09-17",
+          "close": 366.2
+        },
+        {
+          "date": "2026-09-18",
+          "close": 364.27
+        },
+        {
+          "date": "2026-09-21",
+          "close": 375.3
+        },
+        {
+          "date": "2026-09-22",
+          "close": 378.9
+        },
+        {
+          "date": "2026-09-23",
+          "close": 380.12
+        },
+        {
+          "date": "2026-09-24",
+          "close": 377.94
+        }
+      ]
+    },
+    "prediction": {
+      "markets": [
+        {
+          "question": "Tesla and SpaceX merger officially announced by December 31, 2027?",
+          "venue": "polymarket",
+          "yes_price": 0.655,
+          "yes_chg_24h": null,
+          "volume": 28587,
+          "url": "https://polymarket.com/market/tesla-and-spacex-merger-officially-announced-by-december-31-2027"
+        },
+        {
+          "question": "Tesla and SpaceX merger officially announced by June 30, 2027?",
+          "venue": "polymarket",
+          "yes_price": 0.525,
+          "yes_chg_24h": -0.01,
+          "volume": 20995,
+          "url": "https://polymarket.com/market/tesla-and-spacex-merger-officially-announced-by-june-30-2027"
+        },
+        {
+          "question": "Will Tesla, Inc. (TSLA) hit (HIGH) $390 in September?",
+          "venue": "polymarket",
+          "yes_price": 0.515,
+          "yes_chg_24h": -0.055,
+          "volume": 11209,
+          "url": "https://polymarket.com/market/will-tsla-reach-390-in-september-2026"
+        },
+        {
+          "question": "Tesla and SpaceX merger officially announced by December 31?",
+          "venue": "polymarket",
+          "yes_price": 0.185,
+          "yes_chg_24h": null,
+          "volume": 191469,
+          "url": "https://polymarket.com/market/tesla-and-spacex-merger-officially-announced-by-december-31"
+        },
+        {
+          "question": "Will Tesla release Optimus by December 31, 2026?",
+          "venue": "polymarket",
+          "yes_price": 0.1265,
+          "yes_chg_24h": 0.004,
+          "volume": 30324,
+          "url": "https://polymarket.com/market/will-tesla-release-optimus-by-december-31-2026"
+        }
+      ]
+    }
+  },
+  "transcript": [
+    {
+      "role": "bull",
+      "round": 0,
+      "probability": 0.56,
+      "confidence": 0.55,
+      "reasoning": "Funding is exactly zero and basis is zero on TSLAUSDT, so the perp long is not paying a carry premium into the event [perp]. With cash closed for another ~580 minutes, the perp is the only live Tesla price and is only +0.48% versus the last cash close, while cash closed -0.57% from the prior session, so the move has not become an aggressive premium [session], [gap], [cash]. The 1h technical read is bullish with price above key moving averages, and the market is liquid enough with tight 1.1bp spread and meaningful volume [technicals], [perp], [crosscheck]. The missing earnings calendar and positioning data are the main uncertainty; I would weaken if funding/basis turned positive or an event premium appeared before confirmation.",
+      "message_to_peer": "Zero funding is not just absence of cost; it means the crowd is not charging you to hold the earnings view [perp]. The perp has only a small +0.48% drift over stale cash [gap], and the nearby $390 prediction market is barely above a coin flip at 0.515 [prediction], so the upside is not fully priced. Show me a confirmed earnings date with rising funding or positive basis and I will move down.",
+      "citations": [
+        "perp",
+        "session",
+        "gap",
+        "cash",
+        "technicals",
+        "crosscheck",
+        "prediction"
+      ],
+      "struck": []
+    },
+    {
+      "role": "bear",
+      "round": 0,
+      "probability": 0.36,
+      "confidence": 0.62,
+      "reasoning": "The thesis leans on funding being cheap, but funding is exactly zero and basis is zero, so there is no financing edge or positive carry [perp][gap]. With the US cash session closed, the perp trades 0.48% above the last cash print after cash closed down -0.57% at 377.94, creating convergence risk into the open rather than free upside [session][gap][cash]. Prediction-market odds of TSLA hitting $390 in September are only 51.5% and fell 5.5 points in 24 hours, implying near-term upside is not strongly mispriced [prediction]. Technicals are mixed: price is above short-term MAs, but RSI is neutral and MACD shows a death cross, so momentum does not confirm a clean earnings long [technicals]. The table also lacks ok earnings or positioning evidence, so the catalyst and crowding claims are unproven.",
+      "message_to_peer": "Zero funding is not a subsidy; it is neutral carry, while the perp still carries a +0.48% premium to last cash after cash closed lower [gap][cash]. Unless you can show an ok earnings catalyst or positioning squeeze, the prediction-market coin flip on $390 suggests the upside is already fairly priced [prediction].",
+      "citations": [
+        "perp",
+        "gap",
+        "session",
+        "cash",
+        "prediction",
+        "technicals"
+      ],
+      "struck": []
+    },
+    {
+      "role": "bull",
+      "round": 1,
+      "probability": 0.55,
+      "confidence": 0.62,
+      "reasoning": "The cheap-funding mechanism is intact: TSLAUSDT shows 0 funding, 0 basis, and a 0% perp-vs-index gap, so holding the pre-earnings perp expression is not paying a crowded long premium [perp][gap]. The +0.48% gap is versus a stale cash close while the US session is closed for ~580 minutes, and the perp price remains below the prior cash close of 380.12, limiting the argument that upside is already embedded [gap][session][cash]. Technical momentum is supportive rather than stretched, with price above the 1h MA7/25/99 and a bullish verdict despite neutral RSI [technicals]. The $390 prediction market at 0.515 is a coin flip, not evidence that the perp crowd has fully paid for upside [prediction]. I would move lower on an ok earnings catalyst plus positive funding/basis or clear long-crowded positioning, but those rows are missing or errored.",
+      "message_to_peer": "Your premium point is real but it is measured against a stale close, not a live cash market; with the session closed, zero funding and zero basis are the cleaner crowding signals [gap][session][perp]. If the $390 upside were fully priced, I would expect the perp to charge longs via funding or basis, yet both remain zero while the 1h trend is bullish [perp][technicals]. The 0.515 $390 market shows uncertainty, not a crowded long already paid for [prediction].",
+      "citations": [
+        "perp",
+        "gap",
+        "session",
+        "cash",
+        "technicals",
+        "prediction"
+      ],
+      "struck": []
+    },
+    {
+      "role": "bear",
+      "round": 1,
+      "probability": 0.42,
+      "confidence": 0.62,
+      "reasoning": "The thesis needs a paid reason to be long into earnings, but zero funding and zero basis are not cheapness; they are no carry edge while the perp still sits +0.484% above the last cash print after cash closed down -0.57% [gap][cash][perp]. With the US session closed, that premium is drift the long must justify into the open, and the available technical read is not clean: RSI neutral and MACD death-cross despite a bullish verdict [technicals][session]. The $390 September prediction market at 0.515 and down 0.055 is a coin flip that has faded, not evidence of underpriced upside [prediction]. Earnings, news, and positioning evidence are missing, so the catalyst/squeeze leg is unsupported; an ok positioning or earnings row showing asymmetric squeeze would move me.",
+      "message_to_peer": "Zero funding and zero basis do not prove the trade is cheap; they show no one is currently paying to hold the position, while the +0.484% perp premium to last cash remains the actual cost/risk [gap][perp]. If the upside were genuinely underpriced, I’d want an ok positioning or earnings catalyst row, not a 0.515 fading $390 market [prediction].",
+      "citations": [
+        "perp",
+        "gap",
+        "cash",
+        "session",
+        "technicals",
+        "prediction"
+      ],
+      "struck": []
+    }
+  ],
+  "debated": true,
+  "judge": {
+    "call": "insufficient_evidence",
+    "p_thesis_holds": 0.43,
+    "confidence": 0.62,
+    "what_is_priced_in": "The perp market shows no financing premium into the event: funding and basis are zero [perp][gap]. The perp is only +0.48% versus last cash after cash closed lower, and September $390 odds sit near 51.5% after fading [gap][cash][prediction].",
+    "strongest_attack": "The thesis cannot be confirmed because the earnings catalyst and positioning/crowding rows are errored, and the small perp premium over stale cash may represent convergence risk rather than cheap upside [earnings][positioning][gap][cash].",
+    "reasoning": "The bull's zero-funding argument establishes absence of carry cost but not an earnings mispricing, while the bear correctly treats zero funding as neutral and highlights the +0.48% perp gap to last cash [perp][gap][cash]. Technicals are mixed and prediction odds are a fading coin flip, so neither side proves underpriced upside [technicals][prediction]. With earnings and positioning missing, the desk abstains rather than infer a catalyst [earnings][positioning].",
+    "citations": [
+      "perp",
+      "gap",
+      "cash",
+      "session",
+      "prediction",
+      "technicals"
+    ],
+    "struck": [],
+    "samples": 3
+  },
+  "replay": null,
+  "clarifying_question": null,
+  "read": {
+    "direction": "up",
+    "horizon_hours": 96
+  },
+  "generated_at": "2026-09-25T04:00:35.588Z",
+  "card_url": null,
+  "verdict_line": "TSLA: the evidence to judge this is missing — P(holds) 43%, confidence 62% on 8/13 rows.",
+  "llm_role": "Read the thesis (1 small call). Gathered 8/13 evidence rows (8 computed by code). Bull and Bear argued 4 turns citing only the table; 0 citation(s) struck. Judge sampled 3×, median reported, probability capped to [0.10, 0.90], confidence capped by coverage (0.62). Every number on the card was computed by code; the model interpreted and argued."
+}

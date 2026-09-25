@@ -1,0 +1,56 @@
+{
+ "stdout_log": [
+  "[bitget] ticker v2 ok RNVDAUSDT",
+  "[bitget] candles ok RNVDAUSDT v2"
+ ],
+ "result": {
+  "symbol": "NVDAUSDT",
+  "snapshot": {
+   "symbol": "RNVDAUSDT",
+   "last": 224.55,
+   "bid": 224.5,
+   "ask": 224.57,
+   "change24hPct": 0,
+   "high24h": 224.9,
+   "low24h": 222.05,
+   "volumeBase": 51776552.8229,
+   "volumeQuote": 11604993887.5523,
+   "realizedVol24hPct": 1.30688106986774,
+   "sma20": 223.70654499999995,
+   "source": "v2/spot/market/tickers",
+   "asOf": "2026-09-25T04:49:21.306Z"
+  },
+  "report": {
+   "symbol": "RNVDAUSDT",
+   "horizon": "24h",
+   "bias": "long",
+   "confidence": 35,
+   "strategy": "The long thesis is only constructive if compression above SMA20 turns into accepted strength above 224.90, with the high being tested and held rather than tapped. It strengthens if bid-side depth remains firm near 224.30-224.50 after the test and weakens if heavy volume continues to produce no net upside or if price closes below the SMA20 zone. Missing evidence includes order-flow imbalance, positioning or liquidation data, and a fresh catalyst. A failure to hold the 222.05 low area would negate the absorption argument.",
+   "bull_summary": "Price is above SMA20 and close to the 24h high after holding the 222.05 low, with tight quoting and low realized volatility leaving room for a breakout.",
+   "bear_summary": "Flat 24h performance despite large volume suggests balanced flow or distribution, and the thin cushion above SMA20 makes a failed test of 224.90 vulnerable to downside rotation.",
+   "catalysts": [
+    "Acceptance above the 24h high at 224.90",
+    "Sustained bid-side depth near 224.30-224.50",
+    "A fresh positive headline or broad risk-on impulse"
+   ],
+   "risks": [
+    "Heavy volume with 0% 24h change may indicate distribution rather than accumulation",
+    "Rejection at 224.90 could trap breakout attempts",
+    "Loss of SMA20 near 223.71 would expose the 222.05 low",
+    "No external headline support is available to confirm demand"
+   ],
+   "i_am_wrong_if": [
+    "Volume expands while price fails to hold above 224.90",
+    "Bid depth thins below 224.30 and offers dominate the tape",
+    "A negative headline or broad risk-off move appears",
+    "Price closes below SMA20 near 223.71 even before range-low failure"
+   ],
+   "invalidation_price": 222,
+   "invalidation_note": "Long is invalidated if last trades at or below 222 (adverse move below the 224.55 snapshot).",
+   "action": "watch",
+   "reason": "The tape is slightly constructive above SMA20 but lacks directional proof, with flat 24h performance, no headlines, and resistance nearby; confirmation above 224.90 is needed before the long case becomes compelling.",
+   "evidence_quality": 32,
+   "raw_text": "{\n  \"symbol\": \"RNVDAUSDT\",\n  \"horizon\": \"24h\",\n  \"bias\": \"long\",\n  \"confidence\": 35,\n  \"strategy\": \"The long thesis is only constructive if compression above SMA20 turns into accepted strength above 224.90, with the high being tested and held rather than tapped. It strengthens if bid-side depth remains firm near 224.30-224.50 after the test and weakens if heavy volume continues to produce no net upside or if price closes below the SMA20 zone. Missing evidence includes order-flow imbalance, positioning or liquidation data, and a fresh catalyst. A failure to hold the 222.05 low area would negate the absorption argument.\",\n  \"bull_summary\": \"Price is above SMA20 and close to the 24h high after holding the 222.05 low, with tight quoting and low realized volatility leaving room for a breakout.\",\n  \"bear_summary\": \"Flat 24h performance despite large volume suggests balanced flow or distribution, and the thin cushion above SMA20 makes a failed test of 224.90 vulnerable to downside rotation.\",\n  \"catalysts\": [\n    \"Acceptance above the 24h high at 224.90\",\n    \"Sustained bid-side depth near 224.30-224.50\",\n    \"A fresh positive headline or broad risk-on impulse\"\n  ],\n  \"risks\": [\n    \"Heavy volume with 0% 24h change may indicate distribution rather than accumulation\",\n    \"Rejection at 224.90 could trap breakout attempts\",\n    \"Loss of SMA20 near 223.71 would expose the 222.05 low\",\n    \"No external headline support is available to confirm demand\"\n  ],\n  \"i_am_wrong_if\": [\n    \"Volume expands while price fails to hold above 224.90\",\n    \"Bid depth thins below 224.30 and offers dominate the tape\",\n    \"A negative headline or broad risk-off move appears\",\n    \"Price closes below SMA20 near 223.71 even before range-low failure\"\n  ],\n  \"invalidation_price\": 222.00,\n  \"invalidation_note\": \"A close at or below 222.00 would break the 24h low support and invalidate the long absorption thesis.\",\n  \"action\": \"watch\",\n  \"reason\": \"The tape is slightly constructive above SMA20 but lacks directional proof, with flat 24h performance, no headlines, and resistance nearby; confirmation above 224.90 is needed before the long case becomes compelling.\",\n  \"evidence_quality\": 32\n}"
+  }
+ }
+}

@@ -41,9 +41,13 @@ Open the console and ask any of these. Each one exercises something different.
 | *How does NVDA react to CPI?* | An event study over past releases, with the tests that say whether the reaction is real. |
 | *Is the hype on NVDA real?* | Headlines grouped into stories, so five outlets repeating one article count once. |
 | *I hold NVDA r-token overnight — how do I hedge it?* | The spot rToken hedged with the same company's perpetual, tested on held-out nights. |
+| *Long MSTR perp into earnings — funding looks cheap* | Your own premise tested first — funding against the contract's last 100 settlements — then the earnings half: report date, analyst targets, the last surprise, holders, filings. |
+| *Will MSTR be higher in 48 hours?* | Not a forecast: how often it finished higher over every past 48-hour window, with an interval that counts overlapping windows honestly, the cost of holding, and what Polymarket prices. |
+| *What if I trim TSLA to 10% of my book?* | A resize, not an add: every other holding rescaled, risk share before and after, and the weight that fits your budget. |
 
-Put your holdings in **My book** once and every answer uses them. If the desk cannot source a
-figure, it refuses and says why.
+Put your holdings in **My book** once and every answer uses them. Every answer ends by naming the
+sources it reached and any that did not answer. If the desk cannot source a figure, it refuses and
+says why.
 
 **Who it is for:** a trader holding Bitget's tokenized US equities who wants a second desk that
 shows its work. **What it is not:** a signal service. No strategy here has cleared its own
@@ -55,7 +59,7 @@ deflation gate, and the console says so.
 
 Every capability is held against the specialist that leads its sub-theme, run on the same input,
 and graded by a register that opens the evidence rather than trusting a filename
-(`python -m argus.eval.standing`). **20 of 38 capabilities are OWNED, 8 are TIED, 10 are
+(`python -m argus.eval.standing`). **20 of 42 capabilities are OWNED, 11 are TIED, 11 are
 IMPLEMENTED, and 0 are LOST.** OWNED needs all thirteen conditions: the rival's best
 implementation read and reproduced, a same-input comparison with costs, out-of-sample, ablation,
 an adversarial test, documented failure cases and reproducibility.
@@ -64,6 +68,17 @@ Losses are published the moment they are found. Two were found and closed on 202
 own 60-second TWAP beat the schedule the console printed (6.9 against 12.2bps on a $100k order),
 and the S2 entry Ballast hedged an rToken holder's nights far better than ARGUS's index hedge.
 Both now tie, and both losses stay on [`/wrong`](https://deploy-topaz-seven-64.vercel.app/wrong).
+Two more S2 desks were run on the same input on 2026-09-25. MirrorLine checks a trader's claims
+about the tape: on the first run ARGUS gave a verdict on 18 of 38 claims to MirrorLine's 38, the
+fix went in the same morning, and the re-run tied at 30 of 30 gradable claims. optic-bitget debates
+a thesis with a model judge: it abstained on two of three theses for want of earnings and
+positioning data that ARGUS answered, while it still gives one synthesised call ARGUS does not — a
+tie, with the losing half named. baserate prices a leveraged weekend hold: ARGUS first answered a
+different question, then was rebuilt to read 1,443 NVDA weekends since 1999, the perpetual's own
+path through each weekend and Bitget's live margin tier — a tie, since baserate still matches the
+current regime to past weekends. Rook ends each thesis with an invalidation price: on six names its
+stops sat 0.1-1.7% away and ordinary movement reached them on 62% of held-out days, against 11%
+for ARGUS's measured stop, fitted out of sample — ahead on that one measure, six names, one run.
 The full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.vercel.app/proof).
 
 ---
@@ -125,7 +140,7 @@ a test that reaches the network shows itself.
 | | |
 |---|---|
 | Tests | **6,700 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 334 source files** |
+| Types | **`mypy --strict` clean on 341 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes**, resolved by import at runtime, not claimed in prose |

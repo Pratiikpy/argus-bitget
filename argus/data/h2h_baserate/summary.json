@@ -1,0 +1,49 @@
+{
+ "comparison": "a leveraged weekend hold: ARGUS vs baserate (Jayanng, Season 2, proprietary)",
+ "same_input": "long rNVDA over the weekend at 3x with 5,000 USDT",
+ "baseline_run": "baserate's own parseTradeIntent + buildDossier from its clone, on its pinned replay fixtures, exactly as its dossier page computes (h2h/run.mts, a runner only; no code taken into ARGUS)",
+ "first_run_loss": "ARGUS read the sentence as a request to hedge a spot rToken and answered with a hedge ratio; baserate answered the question asked. Kept as a loss.",
+ "baserate_results": {
+  "liquidation_distance_pct": -32.83,
+  "maintenance_margin_assumed": "0.5%, flat",
+  "funding_carry_pct": 0.164,
+  "funding_source": "pinned fixture rate 0.000219, not the live rate",
+  "worst_weekend_pct": -18.45,
+  "worst_weekend_date": "2020-03-13",
+  "episodes": 1227,
+  "gap_through_liquidation": 0,
+  "regime": "trend_down"
+ },
+ "argus_results": {
+  "liquidation_distance_pct": -32.7,
+  "maintenance_margin": "0.66%, Bitget's live tier for a 15,000 USDT position",
+  "stock_weekends": 1443,
+  "stock_weekends_since": 1999,
+  "worst_stock_weekend_pct": -14.7,
+  "worst_stock_weekend_date": "2019-01-25",
+  "perp_weekends": 57,
+  "perp_p90_adverse_pct": 4.0,
+  "perp_weekends_touching_liquidation": 0,
+  "funding": "live rate, flat at the run"
+ },
+ "definitions_differ": "baserate's weekend move runs from Friday's close to Monday's CLOSE (its 13 Mar 2020 -18.45% is that; the open-to-open gap was -11.8% by Yahoo); ARGUS reads Friday close to Monday OPEN for the stock, and the perpetual's own path through the weekend, which is where a Bitget liquidation happens",
+ "verified": "ARGUS's worst NVDA weekend (-14.74%, Fri 25 Jan 2019 close 4.00 to Mon open 3.41, split-adjusted) re-read from Yahoo's chart directly",
+ "verdict": {
+  "where_ARGUS_is_ahead": [
+   "the maintenance margin is Bitget's live tier for the position's size, not a flat assumption",
+   "funding is the live rate, not a pinned fixture",
+   "the perpetual's own intra-weekend path is measured, the thing that decides a liquidation on Bitget"
+  ],
+  "where_baserate_is_ahead": [
+   "it matches the current regime to past episodes (comparable-regime weekends); ARGUS gives the unconditional record",
+   "its own forecasts are kept in a hash-chained ledger and graded"
+  ],
+  "state": "TIED: ARGUS lost the first run outright and now answers the question with firmer inputs; baserate keeps a regime match and a self-grading ledger ARGUS's weekend answer does not have."
+ },
+ "failure_cases": [
+  "first run answered a different question",
+  "ARGUS has no regime-conditioned weekend record",
+  "neither desk's weekend call is outcome-graded here"
+ ],
+ "not_covered": "one sentence and one name; the regime match was not re-implemented"
+}

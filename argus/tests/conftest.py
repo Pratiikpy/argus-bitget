@@ -40,3 +40,13 @@ def _block_network_when_asked() -> Iterator[None]:
         yield
     finally:
         socket.socket.connect = original  # type: ignore[method-assign]
+
+
+@pytest.fixture(autouse=True)
+def _no_live_prediction_markets(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Polymarket is never read by the offline suite: research answers call it for fundamentals,
+    news, sentiment and directional questions, and a live market list would make their line
+    counts depend on the day. `tests/test_prediction.py` passes its own search function."""
+    from argus.market import prediction
+
+    monkeypatch.setattr(prediction, "_search", lambda term, **_: [])

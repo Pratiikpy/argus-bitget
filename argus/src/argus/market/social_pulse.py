@@ -9,7 +9,7 @@ reads, the same way it reads every other slow sweep. The answer states the snaps
 never passed off as live.
 
 **What is measured, not what is said.** Posts are grouped into stories by near-duplicate text with
-the desk's own detector (`agents/novelty.cluster`), with each post's *author* as its source, so five
+the desk's own detector (`truth/novelty.cluster`), with each post's *author* as its source, so five
 accounts posting one line are one story from five sources — and three or more distinct accounts
 inside two hours is flagged as coordinated, as it is everywhere else in ARGUS. The pulse reports
 volume, distinct stories, how many look coordinated, and the most-carried stories with their
@@ -35,7 +35,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from argus.agents.novelty import COORDINATION_WINDOW, MIN_COORDINATED_SOURCES, cluster
+from argus.truth.novelty import COORDINATION_WINDOW, MIN_COORDINATED_SOURCES, cluster
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 PULSE_PATH = DATA / "social_pulse.json"
@@ -49,7 +49,7 @@ STALE_AFTER = timedelta(hours=12)
 
 @dataclass(frozen=True, slots=True)
 class Post:
-    """One post in the shape `agents.novelty.cluster` reads: ``source`` is the author."""
+    """One post in the shape `truth.novelty.cluster` reads: ``source`` is the author."""
 
     id: str
     claim: str

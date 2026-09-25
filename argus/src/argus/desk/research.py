@@ -241,7 +241,7 @@ def evidence_step(evidence: Sequence[Any]) -> Finding:
 
     **The raw item count was the headline here and it is the wrong number when a feed
     syndicates.** Six wire copies of one story are six items and one piece of evidence, and every
-    downstream confidence built on the count inherits the error. `agents/novelty.py` clusters
+    downstream confidence built on the count inherits the error. `truth/novelty.py` clusters
     near-duplicates and the corrected count is reported beside the raw one whenever they differ.
     """
     if not evidence:
@@ -251,7 +251,7 @@ def evidence_step(evidence: Sequence[Any]) -> Finding:
     headline = f"{len(evidence)} item(s) across {len(sources)} channel(s): {', '.join(sources)}"
     concern = ""
     try:
-        from argus.agents.novelty import cluster as cluster_evidence
+        from argus.truth.novelty import cluster as cluster_evidence
 
         novelty = cluster_evidence(evidence)
     except Exception:
@@ -277,7 +277,7 @@ def evidence_step(evidence: Sequence[Any]) -> Finding:
     return Finding(
         step="evidence", available=True,
         headline=headline[:300],
-        source="market/evidence.py:gather + agents/novelty.py:cluster",
+        source="market/evidence.py:gather + truth/novelty.py:cluster",
         concern=concern,
         detail=detail,
     )

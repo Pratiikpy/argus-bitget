@@ -214,7 +214,7 @@ def t2_sentiment() -> Finding:
     if got.status == ABSENT:
         return got
     # The sentiment analyst is DEMOTED in our own register and the audit must not hide that behind
-    # a run count. The reason is the feed, and `agents/novelty.py` measures exactly how thin it is.
+    # a run count. The reason is the feed, and `truth/novelty.py` measures exactly how thin it is.
     return Finding(
         got.status,
         f"{got.evidence} — but DEMOTED in our own register: on the live feed the near-duplicate "

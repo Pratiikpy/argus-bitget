@@ -851,12 +851,20 @@ class TestLeverageArithmetic:
         monkeypatch.setattr(history, "fetch", lambda *a, **k: bars)
         from argus.market import bitget
         monkeypatch.setattr(bitget, "fetch_tickers", lambda: {"DOGEUSDT": _ticker("DOGEUSDT")})
+        monkeypatch.setattr(bitget, "maintenance_margin_rate", lambda symbol, notional: None)
         lines, _, payload = research._leverage("DOGEUSDT", 20.0, "short")
         assert payload["liquidation_distance"] == pytest.approx(0.05)
         assert payload["worst_adverse_24h"] == pytest.approx(0.10)
         assert payload["survivable_leverage"] == 10
         assert "only 10x or less would have survived" in lines[0]
         assert any("shorts" in line or "short receives" in line for line in lines)
+        # With Bitget's maintenance margin the line moves closer and the survivor count falls:
+        # 1/20 - 1% is 4%, and only 1/(10% + 1%) = 9x clears the 10% worst day.
+        monkeypatch.setattr(bitget, "maintenance_margin_rate", lambda symbol, notional: 0.01)
+        lines, _, payload = research._leverage("DOGEUSDT", 20.0, "short")
+        assert payload["liquidation_distance"] == pytest.approx(0.04)
+        assert payload["survivable_leverage"] == 9
+        assert any("1.00% maintenance margin" in line for line in lines)
 
 
 class TestFundingMeaning:

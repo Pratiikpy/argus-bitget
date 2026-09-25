@@ -1,10 +1,10 @@
 {
-  "total": 99,
-  "checked": 89,
-  "ok": 89,
+  "total": 105,
+  "checked": 95,
+  "ok": 95,
   "lagging": 0,
   "stale": 0,
-  "absent": 24,
+  "absent": 28,
   "deleted": 0,
   "unchecked": 10,
   "findings": [
@@ -22,7 +22,7 @@
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 105,
+      "line": 120,
       "quoted": [
         "6,700"
       ],
@@ -33,7 +33,7 @@
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 127,
+      "line": 142,
       "quoted": [
         "6,700"
       ],
@@ -123,65 +123,65 @@
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "334"
+        "341"
       ],
       "live": [
-        334
+        341
       ],
       "status": "OK",
-      "excerpt": "strict clean on 334 source files"
+      "excerpt": "strict clean on 341 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
-      "line": 128,
+      "line": 143,
       "quoted": [
-        "334"
+        "341"
       ],
       "live": [
-        334
+        341
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 334 source files"
+      "excerpt": "strict` clean on 341 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 419,
       "quoted": [
-        "334"
+        "341"
       ],
       "live": [
-        334
+        341
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 334 files"
+      "excerpt": "strict` clean on 341 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 620,
       "quoted": [
-        "334"
+        "341"
       ],
       "live": [
-        334
+        341
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 334 source files"
+      "excerpt": "strict` clean across 341 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 1956,
       "quoted": [
-        "334"
+        "341"
       ],
       "live": [
-        334
+        341
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 334 source files"
+      "excerpt": "strict` clean on 341 source files"
     },
     {
       "claim": "register_claims",
@@ -318,7 +318,7 @@
     {
       "claim": "refusal_accuracy_2h",
       "doc": "public-readme",
-      "line": 150,
+      "line": 165,
       "quoted": [
         "194",
         "325"
@@ -346,7 +346,7 @@
     {
       "claim": "refusal_forgone_2h",
       "doc": "public-readme",
-      "line": 152,
+      "line": 167,
       "quoted": [
         "-4.5"
       ],
@@ -362,14 +362,14 @@
       "line": 283,
       "quoted": [
         "20",
-        "38"
+        "42"
       ],
       "live": [
         20,
-        38
+        42
       ],
       "status": "OK",
-      "excerpt": "20 of 38 capabilities are OWNED"
+      "excerpt": "20 of 42 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -377,29 +377,29 @@
       "line": 454,
       "quoted": [
         "20",
-        "38"
+        "42"
       ],
       "live": [
         20,
-        38
+        42
       ],
       "status": "OK",
-      "excerpt": "20 of 38 capabilities are OWNED"
+      "excerpt": "20 of 42 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
       "doc": "public-readme",
-      "line": 58,
+      "line": 62,
       "quoted": [
         "20",
-        "38"
+        "42"
       ],
       "live": [
         20,
-        38
+        42
       ],
       "status": "OK",
-      "excerpt": "20 of 38 capabilities are OWNED"
+      "excerpt": "20 of 42 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -408,7 +408,7 @@
       "quoted": [],
       "live": [
         20,
-        38
+        42
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -420,7 +420,7 @@
       "quoted": [],
       "live": [
         20,
-        38
+        42
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -431,14 +431,136 @@
       "line": 400,
       "quoted": [
         "20",
-        "38"
+        "42"
       ],
       "live": [
         20,
-        38
+        42
       ],
       "status": "OK",
-      "excerpt": "20 of 38 capabilities are OWNED"
+      "excerpt": "20 of 42 capabilities are OWNED"
+    },
+    {
+      "claim": "standing_tied",
+      "doc": "readme",
+      "line": 454,
+      "quoted": [
+        "11"
+      ],
+      "live": [
+        11
+      ],
+      "status": "OK",
+      "excerpt": "11 are TIED"
+    },
+    {
+      "claim": "standing_tied",
+      "doc": "public-readme",
+      "line": 62,
+      "quoted": [
+        "11"
+      ],
+      "live": [
+        11
+      ],
+      "status": "OK",
+      "excerpt": "11 are TIED"
+    },
+    {
+      "claim": "standing_tied",
+      "doc": "submission",
+      "line": null,
+      "quoted": [],
+      "live": [
+        11
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "standing_tied",
+      "doc": "explained",
+      "line": 1989,
+      "quoted": [
+        "11"
+      ],
+      "live": [
+        11
+      ],
+      "status": "OK",
+      "excerpt": "11 are TIED"
+    },
+    {
+      "claim": "standing_tied",
+      "doc": "architecture",
+      "line": null,
+      "quoted": [],
+      "live": [
+        11
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "standing_implemented",
+      "doc": "readme",
+      "line": 454,
+      "quoted": [
+        "11"
+      ],
+      "live": [
+        11
+      ],
+      "status": "OK",
+      "excerpt": "11 are IMPLEMENTED"
+    },
+    {
+      "claim": "standing_implemented",
+      "doc": "public-readme",
+      "line": 62,
+      "quoted": [
+        "11"
+      ],
+      "live": [
+        11
+      ],
+      "status": "OK",
+      "excerpt": "11 are IMPLEMENTED"
+    },
+    {
+      "claim": "standing_implemented",
+      "doc": "submission",
+      "line": null,
+      "quoted": [],
+      "live": [
+        11
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
+    },
+    {
+      "claim": "standing_implemented",
+      "doc": "explained",
+      "line": 1989,
+      "quoted": [
+        "11"
+      ],
+      "live": [
+        11
+      ],
+      "status": "OK",
+      "excerpt": "11 are IMPLEMENTED"
+    },
+    {
+      "claim": "standing_implemented",
+      "doc": "architecture",
+      "line": null,
+      "quoted": [],
+      "live": [
+        11
+      ],
+      "status": "ABSENT",
+      "excerpt": ""
     },
     {
       "claim": "lui_router_fresh_accuracy",
@@ -657,7 +779,7 @@
     {
       "claim": "modules_importable",
       "doc": "public-readme",
-      "line": 130,
+      "line": 145,
       "quoted": [
         "152",
         "152"
@@ -702,7 +824,7 @@
     {
       "claim": "subthemes",
       "doc": "public-readme",
-      "line": 131,
+      "line": 146,
       "quoted": [
         "18",
         "18"

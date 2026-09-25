@@ -1,0 +1,75 @@
+{
+ "question": "long rNVDA over the weekend at 3x with 5,000 USDT",
+ "asked_at": "2026-09-25T04:47:27.966736+00:00",
+ "classified_by": "research-patterns",
+ "lines": [
+  "Actionable: at 3x long a 32.7% fall in NVDA wipes the margin — and NVDA moved that far against a long within 24 hours from 0% of the hourly entry points in the last 29 days. Its worst 24 hours against a long was 5.0%, so 3x would have survived every day in the window (anything up to 17x did).",
+  "NVDA's own weekends since 1999 (1,443 of them, Friday close to Monday open, split-adjusted): 23% opened more than 1% in a long's favour, 58% within 1%, 18% 1-5% against, 1% more than 5% against. The worst was -14.7% (25 Jan 2019); 0 of 1,443 opened past the 32.7% liquidation line.",
+  "On the perpetual, which trades through the weekend and is liquidated on its own path: in 90% of its last 57 weekends the worst point was within 4.0% of Friday's close, and 0 of 57 touched the 32.7% line.",
+  "Funding across the weekend (72h, 9 settlements) at today's rate: nothing — the rate is flat.",
+  "The liquidation distance is the 33.3% margin less Bitget's 0.66% maintenance margin at this position's tier, before fees, which bring it closer; hourly highs and lows understate the extremes inside each hour.",
+  "Assumed: RNVDAUSDT is a spot token with no leverage, so 3x is read as NVDAUSDT, Bitget's perpetual on the same company.",
+  "Assumed: 5,000 USDT read as the margin, so the position is 15,000 USDT.",
+  "Sources reached: 4 of 4 answered.",
+  "Data: live Bitget hourly candles (highs and lows) for 30 days, Bitget daily candles for the perpetual's weekends, the stock's daily history from Yahoo Finance, Bitget's maintenance-margin tiers, the live funding rate. This is analysis, not advice — you make the call."
+ ],
+ "sources": [
+  {
+   "kind": "venue",
+   "ref": "bitget /api/v3/market/candles",
+   "detail": "1H high/low, funding"
+  },
+  {
+   "kind": "computation",
+   "ref": "argus.lui.research._leverage",
+   "detail": "NVDAUSDT 1H highs/lows, 720 bars"
+  },
+  {
+   "kind": "venue",
+   "ref": "bitget /api/v2/mix/market/query-position-lever",
+   "detail": "NVDAUSDT maintenance margin tier"
+  },
+  {
+   "kind": "venue",
+   "ref": "Yahoo Finance daily chart",
+   "detail": "NVDA since 1999-01-22, adjusted"
+  },
+  {
+   "kind": "venue",
+   "ref": "bitget /api/v3/market/history-candles",
+   "detail": "NVDAUSDT 1D lows/highs, 57 weekends"
+  }
+ ],
+ "leverage": {
+  "leverage": 3.0,
+  "side": "long",
+  "liquidation_distance": 0.3267333333333333,
+  "maintenance_margin_rate": 0.0066,
+  "hit_rate_24h": 0.0,
+  "worst_adverse_24h": 0.0495844616677561,
+  "survivable_leverage": 17,
+  "closure": {
+   "closure": "weekend",
+   "stock_weekends": {
+    "n": 1443,
+    "since": "1999-01-22",
+    "up": 0.2259182259182259,
+    "flat": 0.5807345807345807,
+    "down_1_5": 0.18156618156618157,
+    "down_5": 0.01178101178101178,
+    "worst": {
+     "move": -0.14736193118051166,
+     "closed": "2019-01-25",
+     "reopened": "2019-01-28"
+    },
+    "beyond": 0
+   },
+   "perp_weekends": {
+    "windows": 57,
+    "p90_adverse_bps": -404.011019493949,
+    "touched_liquidation": 0
+   },
+   "funding_carry_of_margin": 0.0
+  }
+ }
+}

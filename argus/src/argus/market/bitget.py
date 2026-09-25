@@ -123,6 +123,27 @@ def _get(path: str, params: dict[str, str] | None = None, *, timeout: float = 30
     return payload.get("data")
 
 
+def maintenance_margin_rate(symbol: str, notional: float) -> float | None:
+    """Bitget's maintenance margin rate for a position of ``notional`` USDT in ``symbol``, from the
+    public tier table (``/api/v2/mix/market/query-position-lever``: ``startUnit``/``endUnit`` in
+    USDT, ``keepMarginRate`` a fraction — NVDAUSDT is 0.50% to $10,000 and 0.66% to $30,000 on
+    2026-09-25). None when the table does not answer, and callers then say the distance is before
+    maintenance margin rather than assume a rate."""
+    try:
+        rows = _get("/api/v2/mix/market/query-position-lever",
+                    {"symbol": symbol, "productType": "USDT-FUTURES"}, timeout=10.0)
+    except BitgetError:
+        return None
+    for row in rows or []:
+        try:
+            low, high = float(row["startUnit"]), float(row["endUnit"])
+            if low <= notional < high:
+                return float(row["keepMarginRate"])
+        except (KeyError, TypeError, ValueError):
+            continue
+    return None
+
+
 def _dec(value: Any, default: str = "0") -> Decimal:
     """Bitget returns numbers as strings, and occasionally as empty strings.
 

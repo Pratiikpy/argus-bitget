@@ -1,0 +1,52 @@
+{
+ "stdout_log": [
+  "[bitget] ticker v2 ok RTSLAUSDT",
+  "[bitget] candles ok RTSLAUSDT v2"
+ ],
+ "result": {
+  "symbol": "TSLAUSDT",
+  "snapshot": {
+   "symbol": "RTSLAUSDT",
+   "last": 379.29,
+   "bid": 379.25,
+   "ask": 379.42,
+   "change24hPct": 0,
+   "high24h": 383.34,
+   "low24h": 375.7,
+   "volumeBase": 15920270.5252,
+   "volumeQuote": 6042602018.028813,
+   "realizedVol24hPct": 2.3490557287737843,
+   "sma20": 378.2569849999999,
+   "source": "v2/spot/market/tickers",
+   "asOf": "2026-09-25T04:53:30.423Z"
+  },
+  "report": {
+   "symbol": "RTSLAUSDT",
+   "horizon": "24h",
+   "bias": "long",
+   "confidence": 42,
+   "strategy": "The long thesis is conditional on price holding above the SMA20 near 378.26 and the 375.70 low, then reclaiming 383.34 with stronger tape. It is strengthened by higher-low formation, improving bid depth, and volume converting into upside expansion; it weakens if churn persists below the high or SMA20 is lost. Missing evidence includes order-flow imbalance, taker buy/sell pressure, and a news or liquidity catalyst.",
+   "bull_summary": "Price is holding above SMA20 and near the 24h low, with a tight spread and substantial quote volume, suggesting compression above support that could resolve upward if 383.34 is reclaimed.",
+   "bear_summary": "Flat 24h change and failure to hold the 383.34 high show weak momentum; a loss of SMA20 or 375.70 could turn compression into downside expansion.",
+   "catalysts": [],
+   "risks": [
+    "No headline catalyst and zero 24h change leave the long dependent on technical compression",
+    "Failed reclaim of 383.34 could confirm supply overhead",
+    "Liquidity can thin quickly despite current volume",
+    "Break of SMA20 exposes the 375.70 low"
+   ],
+   "i_am_wrong_if": [
+    "Heavy sell volume appears on a break below SMA20",
+    "Price closes below the 24h low 375.70",
+    "Repeated rejections at 383.34 produce lower highs",
+    "Realized volatility expands while price trades lower"
+   ],
+   "invalidation_price": 375.6,
+   "invalidation_note": "Long is invalidated if last trades at or below 375.6 (adverse move below the 379.29 snapshot).",
+   "action": "watch",
+   "reason": "The lean is modestly long only because price remains above SMA20 and the 24h low has held, but confidence is limited by no catalyst, flat momentum, and lack of order-flow evidence.",
+   "evidence_quality": 35,
+   "raw_text": "{\n  \"symbol\": \"RTSLAUSDT\",\n  \"horizon\": \"24h\",\n  \"bias\": \"long\",\n  \"confidence\": 42,\n  \"strategy\": \"The long thesis is conditional on price holding above the SMA20 near 378.26 and the 375.70 low, then reclaiming 383.34 with stronger tape. It is strengthened by higher-low formation, improving bid depth, and volume converting into upside expansion; it weakens if churn persists below the high or SMA20 is lost. Missing evidence includes order-flow imbalance, taker buy/sell pressure, and a news or liquidity catalyst.\",\n  \"bull_summary\": \"Price is holding above SMA20 and near the 24h low, with a tight spread and substantial quote volume, suggesting compression above support that could resolve upward if 383.34 is reclaimed.\",\n  \"bear_summary\": \"Flat 24h change and failure to hold the 383.34 high show weak momentum; a loss of SMA20 or 375.70 could turn compression into downside expansion.\",\n  \"catalysts\": [],\n  \"risks\": [\n    \"No headline catalyst and zero 24h change leave the long dependent on technical compression\",\n    \"Failed reclaim of 383.34 could confirm supply overhead\",\n    \"Liquidity can thin quickly despite current volume\",\n    \"Break of SMA20 exposes the 375.70 low\"\n  ],\n  \"i_am_wrong_if\": [\n    \"Heavy sell volume appears on a break below SMA20\",\n    \"Price closes below the 24h low 375.70\",\n    \"Repeated rejections at 383.34 produce lower highs\",\n    \"Realized volatility expands while price trades lower\"\n  ],\n  \"invalidation_price\": 375.6,\n  \"invalidation_note\": \"Long is invalidated by a close at or below 375.60, just under the 24h low, indicating support failure.\",\n  \"action\": \"watch\",\n  \"reason\": \"The lean is modestly long only because price remains above SMA20 and the 24h low has held, but confidence is limited by no catalyst, flat momentum, and lack of order-flow evidence.\",\n  \"evidence_quality\": 35\n}"
+  }
+ }
+}

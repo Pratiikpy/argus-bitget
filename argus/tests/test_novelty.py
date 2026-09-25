@@ -13,7 +13,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from argus.agents.novelty import (
+from argus.truth.novelty import (
     COORDINATION_WINDOW,
     DUPLICATE_AT,
     MIN_COORDINATED_SOURCES,

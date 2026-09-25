@@ -1,0 +1,58 @@
+{
+ "META": [
+  "META is up today",
+  "META is down today",
+  "META rallied today because of strong earnings",
+  "META dropped today because of a downgrade"
+ ],
+ "MSTR": [
+  "MSTR is up today",
+  "MSTR is down today",
+  "MSTR rallied today because of strong earnings",
+  "MSTR dropped today because of a downgrade"
+ ],
+ "AMZN": [
+  "AMZN is up today",
+  "AMZN is down today",
+  "AMZN rallied today because of strong earnings",
+  "AMZN dropped today because of a downgrade"
+ ],
+ "GOOGL": [
+  "GOOGL is up today",
+  "GOOGL is down today",
+  "GOOGL rallied today because of strong earnings",
+  "GOOGL dropped today because of a downgrade"
+ ],
+ "COIN": [
+  "COIN is up today",
+  "COIN is down today",
+  "COIN rallied today because of strong earnings",
+  "COIN dropped today because of a downgrade"
+ ],
+ "AAPL": [
+  "AAPL is up today",
+  "AAPL is down today",
+  "AAPL rallied today because of strong earnings",
+  "AAPL dropped today because of a downgrade"
+ ],
+ "MSFT": [
+  "MSFT is up today",
+  "MSFT is down today",
+  "MSFT rallied today because of strong earnings",
+  "MSFT dropped today because of a downgrade"
+ ],
+ "NVDA": [
+  "NVDA is up today",
+  "NVDA is down today",
+  "NVDA rallied today because of strong earnings",
+  "NVDA dropped today because of a downgrade",
+  "The US stock market is closed right now, so NVDA is trading after hours",
+  "The US stock market is open right now"
+ ],
+ "TSLA": [
+  "TSLA is up today",
+  "TSLA is down today",
+  "TSLA rallied today because of strong earnings",
+  "TSLA dropped today because of a downgrade"
+ ]
+}

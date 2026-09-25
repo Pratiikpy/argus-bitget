@@ -1,0 +1,54 @@
+{
+ "stdout_log": [
+  "[bitget] ticker v2 ok RMETAUSDT",
+  "[bitget] candles ok RMETAUSDT v2"
+ ],
+ "result": {
+  "symbol": "METAUSDT",
+  "snapshot": {
+   "symbol": "RMETAUSDT",
+   "last": 778.27,
+   "bid": 778.27,
+   "ask": 778.59,
+   "change24hPct": 0,
+   "high24h": 779.82,
+   "low24h": 760.5,
+   "volumeBase": 17046251.818,
+   "volumeQuote": 13193785805.368294,
+   "realizedVol24hPct": 4.0893618272826755,
+   "sma20": 765.0085750000001,
+   "source": "v2/spot/market/tickers",
+   "asOf": "2026-09-25T04:56:09.891Z"
+  },
+  "report": {
+   "symbol": "RMETAUSDT",
+   "horizon": "24h",
+   "bias": "long",
+   "confidence": 36,
+   "strategy": "The long thesis is conditional on RMETA holding above the SMA20 and converting the 779.82 high into accepted trade, ideally with firmer bid depth and positive net 24h change. Strength would come from sustained acceptance above 779.82 and a higher-low response near 778 or the SMA20 area. Weakness appears if the market repeatedly rejects near the high, loses 778, and trades back toward 765. Missing evidence includes order-book imbalance, volume delta, and any external catalyst, so the tape alone is insufficient for high conviction.",
+   "bull_summary": "Price is above the SMA20 and near the 24h high after the market recovered from the 760.5 low, leaving a possible continuation setup if resistance is accepted.",
+   "bear_summary": "The 24h change is flat and price is pinned just under 779.82, making the long vulnerable to rejection, mean reversion toward the SMA20, and high realized volatility.",
+   "catalysts": [],
+   "risks": [
+    "Rejection at or near the 24h high of 779.82",
+    "Loss of the SMA20 support area around 765",
+    "High realized volatility can punish late continuation attempts",
+    "No external headlines are available to support the move",
+    "Heavy volume may represent churn rather than directional demand"
+   ],
+   "i_am_wrong_if": [
+    "Aggressive selling absorbs bids near 778-779.82",
+    "Volume spikes to the downside without quick recovery",
+    "Order flow shows persistent offer stacking and bid thinning",
+    "A negative token-specific headline appears",
+    "Price loses the SMA20 area and fails to reclaim it"
+   ],
+   "invalidation_price": 764.9,
+   "invalidation_note": "Long is invalidated if last trades at or below 764.9 (adverse move below the 778.27 snapshot).",
+   "action": "watch",
+   "reason": "The tape is modestly constructive because price is above the SMA20 and near the upper end of the range, but flat 24h performance and immediate resistance at 779.82 make the long low-conviction without fresh evidence.",
+   "evidence_quality": 34,
+   "raw_text": "{\n  \"symbol\": \"RMETAUSDT\",\n  \"horizon\": \"24h\",\n  \"bias\": \"long\",\n  \"confidence\": 36,\n  \"strategy\": \"The long thesis is conditional on RMETA holding above the SMA20 and converting the 779.82 high into accepted trade, ideally with firmer bid depth and positive net 24h change. Strength would come from sustained acceptance above 779.82 and a higher-low response near 778 or the SMA20 area. Weakness appears if the market repeatedly rejects near the high, loses 778, and trades back toward 765. Missing evidence includes order-book imbalance, volume delta, and any external catalyst, so the tape alone is insufficient for high conviction.\",\n  \"bull_summary\": \"Price is above the SMA20 and near the 24h high after the market recovered from the 760.5 low, leaving a possible continuation setup if resistance is accepted.\",\n  \"bear_summary\": \"The 24h change is flat and price is pinned just under 779.82, making the long vulnerable to rejection, mean reversion toward the SMA20, and high realized volatility.\",\n  \"catalysts\": [],\n  \"risks\": [\n    \"Rejection at or near the 24h high of 779.82\",\n    \"Loss of the SMA20 support area around 765\",\n    \"High realized volatility can punish late continuation attempts\",\n    \"No external headlines are available to support the move\",\n    \"Heavy volume may represent churn rather than directional demand\"\n  ],\n  \"i_am_wrong_if\": [\n    \"Aggressive selling absorbs bids near 778-779.82\",\n    \"Volume spikes to the downside without quick recovery\",\n    \"Order flow shows persistent offer stacking and bid thinning\",\n    \"A negative token-specific headline appears\",\n    \"Price loses the SMA20 area and fails to reclaim it\"\n  ],\n  \"invalidation_price\": 764.9,\n  \"invalidation_note\": \"The long thesis is invalid if the 24h close is at or below 764.90, below the SMA20 support zone.\",\n  \"action\": \"watch\",\n  \"reason\": \"The tape is modestly constructive because price is above the SMA20 and near the upper end of the range, but flat 24h performance and immediate resistance at 779.82 make the long low-conviction without fresh evidence.\",\n  \"evidence_quality\": 34\n}"
+  }
+ }
+}

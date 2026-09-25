@@ -1,0 +1,741 @@
+{
+"META": [
+{
+"claim": "META is up today",
+"asked_at": "2026-09-25T04:29:49.328076+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that META is up: holds — META is +5.82% over 24 hours.",
+"Actionable: 16 headlines name META in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"META is +5.82% over 24 hours on Bitget. QQQ moved +0.44%, which at META's beta of 1.01 explains +0.45%; the other +5.38% is META's own.",
+"1h ago — AMD, INTC Stocks Extend Rally As Meta's Muse Fuels Bets On An AI-Agent CPU Boom (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/amd-intc-stocks-extend-rally-as-meta-s-muse-fuels-bets-on-an-ai-agent-cpu-boom/cZMaHl9RBaJ?.tsrc=rss",
+"2h ago — JPMorgan sends strong message to Meta stock investors (Yahoo Finance) https://www.thestreet.com/investing/stocks/jpmorgan-sends-strong-message-to-meta-stock-investors?.tsrc=rss",
+"4h ago — Meta (META) Stock Is Up, What You Need To Know (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/meta-meta-stock-know-002458424.html?.tsrc=rss",
+"5h ago — META Stock Is Set For Its Best Month In Over 13 Years — It’s Inches Away From $2 Trillion Market Cap (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/meta-stock-is-set-for-its-best-month-in-over-13-years-it-s-inches-away-from-2-trillion-market-cap/cZMJ1cpRBab?.tsrc=rss",
+"5h ago — Mark Zuckerberg debuts $1,299 Meta VR Glasses and Muse Charm pendant as part of AI agent push (cnbc) https://www.cnbc.com/2026/09/23/mark-zuckerberg-1299-meta-vr-glasses-ai-agent.html",
+"Prediction market on META (Polymarket): \"Will the highest score achieved by a Meta model on Humanity’s Last Exam in 2026 be 55% or higher?\" priced at 34%, +14 points in 24h — $44,913 traded, closes 2027-01-01.",
+"Prediction market on META (Polymarket): \"Will the highest score achieved by a Meta model on Humanity’s Last Exam in 2026 be 60% or higher?\" priced at 24%, +12 points in 24h — $14,828 traded, closes 2027-01-01.",
+"Prediction market on META (Polymarket): \"Will Meta Platforms, Inc. (META) hit (HIGH) $820 in September?\" priced at 64%, +52 points in 24h — $10,765 traded, closes 2026-10-01.",
+"Sources reached: 13 of 13 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "META is down today",
+"asked_at": "2026-09-25T04:29:51.044325+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that META is down: does not hold — META is +5.82% over 24 hours, up, not down.",
+"Actionable: 16 headlines name META in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"META is +5.82% over 24 hours on Bitget. QQQ moved +0.44%, which at META's beta of 1.01 explains +0.45%; the other +5.38% is META's own.",
+"1h ago — AMD, INTC Stocks Extend Rally As Meta's Muse Fuels Bets On An AI-Agent CPU Boom (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/amd-intc-stocks-extend-rally-as-meta-s-muse-fuels-bets-on-an-ai-agent-cpu-boom/cZMaHl9RBaJ?.tsrc=rss",
+"2h ago — JPMorgan sends strong message to Meta stock investors (Yahoo Finance) https://www.thestreet.com/investing/stocks/jpmorgan-sends-strong-message-to-meta-stock-investors?.tsrc=rss",
+"4h ago — Meta (META) Stock Is Up, What You Need To Know (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/meta-meta-stock-know-002458424.html?.tsrc=rss",
+"5h ago — META Stock Is Set For Its Best Month In Over 13 Years — It’s Inches Away From $2 Trillion Market Cap (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/meta-stock-is-set-for-its-best-month-in-over-13-years-it-s-inches-away-from-2-trillion-market-cap/cZMJ1cpRBab?.tsrc=rss",
+"5h ago — Mark Zuckerberg debuts $1,299 Meta VR Glasses and Muse Charm pendant as part of AI agent push (cnbc) https://www.cnbc.com/2026/09/23/mark-zuckerberg-1299-meta-vr-glasses-ai-agent.html",
+"Prediction market on META (Polymarket): \"Will the highest score achieved by a Meta model on Humanity’s Last Exam in 2026 be 55% or higher?\" priced at 34%, +14 points in 24h — $44,913 traded, closes 2027-01-01.",
+"Prediction market on META (Polymarket): \"Will the highest score achieved by a Meta model on Humanity’s Last Exam in 2026 be 60% or higher?\" priced at 24%, +12 points in 24h — $14,828 traded, closes 2027-01-01.",
+"Prediction market on META (Polymarket): \"Will Meta Platforms, Inc. (META) hit (HIGH) $820 in September?\" priced at 64%, +52 points in 24h — $10,765 traded, closes 2026-10-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "META rallied today because of strong earnings",
+"asked_at": "2026-09-25T04:29:52.114367+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 16 headlines name META in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"META is +5.83% over 24 hours on Bitget. QQQ moved +0.44%, which at META's beta of 1.01 explains +0.45%; the other +5.38% is META's own.",
+"1h ago — AMD, INTC Stocks Extend Rally As Meta's Muse Fuels Bets On An AI-Agent CPU Boom (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/amd-intc-stocks-extend-rally-as-meta-s-muse-fuels-bets-on-an-ai-agent-cpu-boom/cZMaHl9RBaJ?.tsrc=rss",
+"2h ago — JPMorgan sends strong message to Meta stock investors (Yahoo Finance) https://www.thestreet.com/investing/stocks/jpmorgan-sends-strong-message-to-meta-stock-investors?.tsrc=rss",
+"4h ago — Meta (META) Stock Is Up, What You Need To Know (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/meta-meta-stock-know-002458424.html?.tsrc=rss",
+"5h ago — META Stock Is Set For Its Best Month In Over 13 Years — It’s Inches Away From $2 Trillion Market Cap (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/meta-stock-is-set-for-its-best-month-in-over-13-years-it-s-inches-away-from-2-trillion-market-cap/cZMJ1cpRBab?.tsrc=rss",
+"5h ago — Mark Zuckerberg debuts $1,299 Meta VR Glasses and Muse Charm pendant as part of AI agent push (cnbc) https://www.cnbc.com/2026/09/23/mark-zuckerberg-1299-meta-vr-glasses-ai-agent.html",
+"Prediction market on META (Polymarket): \"Will the highest score achieved by a Meta model on Humanity’s Last Exam in 2026 be 55% or higher?\" priced at 34%, +14 points in 24h — $44,913 traded, closes 2027-01-01.",
+"Prediction market on META (Polymarket): \"Will the highest score achieved by a Meta model on Humanity’s Last Exam in 2026 be 60% or higher?\" priced at 24%, +12 points in 24h — $14,828 traded, closes 2027-01-01.",
+"Prediction market on META (Polymarket): \"Will Meta Platforms, Inc. (META) hit (HIGH) $820 in September?\" priced at 64%, +52 points in 24h — $10,765 traded, closes 2026-10-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "META dropped today because of a downgrade",
+"asked_at": "2026-09-25T04:29:53.125748+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 16 headlines name META in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"META is +5.83% over 24 hours on Bitget. QQQ moved +0.44%, which at META's beta of 1.01 explains +0.45%; the other +5.38% is META's own.",
+"1h ago — AMD, INTC Stocks Extend Rally As Meta's Muse Fuels Bets On An AI-Agent CPU Boom (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/amd-intc-stocks-extend-rally-as-meta-s-muse-fuels-bets-on-an-ai-agent-cpu-boom/cZMaHl9RBaJ?.tsrc=rss",
+"2h ago — JPMorgan sends strong message to Meta stock investors (Yahoo Finance) https://www.thestreet.com/investing/stocks/jpmorgan-sends-strong-message-to-meta-stock-investors?.tsrc=rss",
+"4h ago — Meta (META) Stock Is Up, What You Need To Know (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/meta-meta-stock-know-002458424.html?.tsrc=rss",
+"5h ago — META Stock Is Set For Its Best Month In Over 13 Years — It’s Inches Away From $2 Trillion Market Cap (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/meta-stock-is-set-for-its-best-month-in-over-13-years-it-s-inches-away-from-2-trillion-market-cap/cZMJ1cpRBab?.tsrc=rss",
+"5h ago — Mark Zuckerberg debuts $1,299 Meta VR Glasses and Muse Charm pendant as part of AI agent push (cnbc) https://www.cnbc.com/2026/09/23/mark-zuckerberg-1299-meta-vr-glasses-ai-agent.html",
+"Prediction market on META (Polymarket): \"Will the highest score achieved by a Meta model on Humanity’s Last Exam in 2026 be 55% or higher?\" priced at 34%, +14 points in 24h — $44,913 traded, closes 2027-01-01.",
+"Prediction market on META (Polymarket): \"Will the highest score achieved by a Meta model on Humanity’s Last Exam in 2026 be 60% or higher?\" priced at 24%, +12 points in 24h — $14,828 traded, closes 2027-01-01.",
+"Prediction market on META (Polymarket): \"Will Meta Platforms, Inc. (META) hit (HIGH) $820 in September?\" priced at 64%, +52 points in 24h — $10,765 traded, closes 2026-10-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+}
+],
+"MSTR": [
+{
+"claim": "MSTR is up today",
+"asked_at": "2026-09-25T04:29:56.853570+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that MSTR is up: holds — MSTR is +1.43% over 24 hours.",
+"Actionable: MSTR filed an 8-K on 21 Sep (7.01 Regulation FD disclosure, 8.01 other events) — a company event is on the record; read it before trading the move.",
+"MSTR is +1.43% over 24 hours on Bitget. QQQ moved +0.44%, which at MSTR's beta of 1.75 explains +0.78%; the other +0.65% is MSTR's own.",
+"8h ago — Strategy Increases Its Bitcoin Holding By 950. How to Play MSTR Stock. (Yahoo Finance) https://www.barchart.com/story/news/4787063/strategy-increases-its-bitcoin-holding-by-950-how-to-play-mstr-stock?.tsrc=rss",
+"9h ago — Does Strategy (MSTR) Stock Look Different After Trump Linked Accounts Surfaced? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/does-strategy-mstr-stock-look-191122064.html?.tsrc=rss",
+"12h ago — MSTR Stock Has Become One of the Market’s Most Unusual Bets (Yahoo Finance) https://247wallst.com/investing/2026/09/24/mstr-stock-has-become-one-of-the-markets-most-unusual-bets/?.tsrc=rss",
+"18h ago — MSTR, COIN, CRCL Stocks Slide With Bitcoin Below $84K Amid Treasury Yields Spike (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/mstr-coin-crcl-stocks-slide-with-bitcoin-below-84k-amid-treasury-yields-spike/cZM7ysERB9T?.tsrc=rss",
+"20h ago — Donald Trump’s MSTR Trade Raises Eyebrows as Strategy Shares Rally 83% (Yahoo Finance) https://www.ccn.com/news/crypto/donald-trumps-mstr-trade-raises-eyebrows-as-strategy-shares-rally-83/?.tsrc=rss",
+"SEC filing: 8-K filed 2026-09-21 — 7.01 Regulation FD disclosure, 8.01 other events.",
+"Prediction market on MSTR (Polymarket): \"Microstrategy delisted from MSCI index by December 31?\" priced at 84%, +0 points in 24h — $37,827 traded, closes 2027-01-01.",
+"Sources reached: 13 of 13 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "MSTR is down today",
+"asked_at": "2026-09-25T04:29:58.291659+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that MSTR is down: does not hold — MSTR is +1.43% over 24 hours, up, not down.",
+"Actionable: MSTR filed an 8-K on 21 Sep (7.01 Regulation FD disclosure, 8.01 other events) — a company event is on the record; read it before trading the move.",
+"MSTR is +1.43% over 24 hours on Bitget. QQQ moved +0.45%, which at MSTR's beta of 1.75 explains +0.79%; the other +0.63% is MSTR's own.",
+"8h ago — Strategy Increases Its Bitcoin Holding By 950. How to Play MSTR Stock. (Yahoo Finance) https://www.barchart.com/story/news/4787063/strategy-increases-its-bitcoin-holding-by-950-how-to-play-mstr-stock?.tsrc=rss",
+"9h ago — Does Strategy (MSTR) Stock Look Different After Trump Linked Accounts Surfaced? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/does-strategy-mstr-stock-look-191122064.html?.tsrc=rss",
+"12h ago — MSTR Stock Has Become One of the Market’s Most Unusual Bets (Yahoo Finance) https://247wallst.com/investing/2026/09/24/mstr-stock-has-become-one-of-the-markets-most-unusual-bets/?.tsrc=rss",
+"18h ago — MSTR, COIN, CRCL Stocks Slide With Bitcoin Below $84K Amid Treasury Yields Spike (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/mstr-coin-crcl-stocks-slide-with-bitcoin-below-84k-amid-treasury-yields-spike/cZM7ysERB9T?.tsrc=rss",
+"20h ago — Donald Trump’s MSTR Trade Raises Eyebrows as Strategy Shares Rally 83% (Yahoo Finance) https://www.ccn.com/news/crypto/donald-trumps-mstr-trade-raises-eyebrows-as-strategy-shares-rally-83/?.tsrc=rss",
+"SEC filing: 8-K filed 2026-09-21 — 7.01 Regulation FD disclosure, 8.01 other events.",
+"Prediction market on MSTR (Polymarket): \"Microstrategy delisted from MSCI index by December 31?\" priced at 84%, +0 points in 24h — $37,827 traded, closes 2027-01-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "MSTR rallied today because of strong earnings",
+"asked_at": "2026-09-25T04:29:59.324698+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: MSTR filed an 8-K on 21 Sep (7.01 Regulation FD disclosure, 8.01 other events) — a company event is on the record; read it before trading the move.",
+"MSTR is +1.53% over 24 hours on Bitget. QQQ moved +0.45%, which at MSTR's beta of 1.75 explains +0.79%; the other +0.74% is MSTR's own.",
+"8h ago — Strategy Increases Its Bitcoin Holding By 950. How to Play MSTR Stock. (Yahoo Finance) https://www.barchart.com/story/news/4787063/strategy-increases-its-bitcoin-holding-by-950-how-to-play-mstr-stock?.tsrc=rss",
+"9h ago — Does Strategy (MSTR) Stock Look Different After Trump Linked Accounts Surfaced? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/does-strategy-mstr-stock-look-191122064.html?.tsrc=rss",
+"12h ago — MSTR Stock Has Become One of the Market’s Most Unusual Bets (Yahoo Finance) https://247wallst.com/investing/2026/09/24/mstr-stock-has-become-one-of-the-markets-most-unusual-bets/?.tsrc=rss",
+"18h ago — MSTR, COIN, CRCL Stocks Slide With Bitcoin Below $84K Amid Treasury Yields Spike (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/mstr-coin-crcl-stocks-slide-with-bitcoin-below-84k-amid-treasury-yields-spike/cZM7ysERB9T?.tsrc=rss",
+"20h ago — Donald Trump’s MSTR Trade Raises Eyebrows as Strategy Shares Rally 83% (Yahoo Finance) https://www.ccn.com/news/crypto/donald-trumps-mstr-trade-raises-eyebrows-as-strategy-shares-rally-83/?.tsrc=rss",
+"SEC filing: 8-K filed 2026-09-21 — 7.01 Regulation FD disclosure, 8.01 other events.",
+"Prediction market on MSTR (Polymarket): \"Microstrategy delisted from MSCI index by December 31?\" priced at 84%, +0 points in 24h — $37,827 traded, closes 2027-01-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "MSTR dropped today because of a downgrade",
+"asked_at": "2026-09-25T04:30:00.398252+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: MSTR filed an 8-K on 21 Sep (7.01 Regulation FD disclosure, 8.01 other events) — a company event is on the record; read it before trading the move.",
+"MSTR is +1.53% over 24 hours on Bitget. QQQ moved +0.45%, which at MSTR's beta of 1.75 explains +0.79%; the other +0.74% is MSTR's own.",
+"8h ago — Strategy Increases Its Bitcoin Holding By 950. How to Play MSTR Stock. (Yahoo Finance) https://www.barchart.com/story/news/4787063/strategy-increases-its-bitcoin-holding-by-950-how-to-play-mstr-stock?.tsrc=rss",
+"9h ago — Does Strategy (MSTR) Stock Look Different After Trump Linked Accounts Surfaced? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/does-strategy-mstr-stock-look-191122064.html?.tsrc=rss",
+"12h ago — MSTR Stock Has Become One of the Market’s Most Unusual Bets (Yahoo Finance) https://247wallst.com/investing/2026/09/24/mstr-stock-has-become-one-of-the-markets-most-unusual-bets/?.tsrc=rss",
+"18h ago — MSTR, COIN, CRCL Stocks Slide With Bitcoin Below $84K Amid Treasury Yields Spike (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/mstr-coin-crcl-stocks-slide-with-bitcoin-below-84k-amid-treasury-yields-spike/cZM7ysERB9T?.tsrc=rss",
+"20h ago — Donald Trump’s MSTR Trade Raises Eyebrows as Strategy Shares Rally 83% (Yahoo Finance) https://www.ccn.com/news/crypto/donald-trumps-mstr-trade-raises-eyebrows-as-strategy-shares-rally-83/?.tsrc=rss",
+"SEC filing: 8-K filed 2026-09-21 — 7.01 Regulation FD disclosure, 8.01 other events.",
+"Prediction market on MSTR (Polymarket): \"Microstrategy delisted from MSCI index by December 31?\" priced at 84%, +0 points in 24h — $37,827 traded, closes 2027-01-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+}
+],
+"AMZN": [
+{
+"claim": "AMZN is up today",
+"asked_at": "2026-09-25T04:30:03.156910+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that AMZN is up: holds — AMZN is +0.71% over 24 hours.",
+"Actionable: 7 headlines name AMZN in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"AMZN is +0.71% over 24 hours on Bitget. QQQ moved +0.45%, which at AMZN's beta of 1.07 explains +0.48%; the other +0.22% is AMZN's own.",
+"1h ago — Microsoft vs. Amazon: Which AI Cloud Stock Converts Capex Into Profits Better? (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/microsoft-vs-amazon-ai-cloud-035215434.html?.tsrc=rss",
+"8h ago — Shopify Opens Its Doors to Muse, Here’s Why Amazon Won’t (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/shopify-opens-doors-muse-why-204347730.html?.tsrc=rss",
+"8h ago — Amazon Stock Dips After $100 Million Indiana Manufacturing Push (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amazon-stock-dips-100-million-201553864.html?.tsrc=rss",
+"8h ago — Amazon Opens Seller Data to Claude Days After Blocking Meta’s Muse (Yahoo Finance) https://www.benzinga.com/markets/prediction-markets/26/09/61984835/amazon-claude-seller-data-meta-muse?utm_source=yahooFinance&utm_campaign=partner_feed&utm_medium=referral&.tsrc=rss",
+"8h ago — Amazon Faces Another Worker Lawsuit. Is Employment Scrutiny Becoming an Investor Risk? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amazon-faces-another-worker-lawsuit-200857426.html?.tsrc=rss",
+"Sources reached: 13 of 13 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "AMZN is down today",
+"asked_at": "2026-09-25T04:30:04.507354+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that AMZN is down: does not hold — AMZN is +0.71% over 24 hours, up, not down.",
+"Actionable: 7 headlines name AMZN in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"AMZN is +0.71% over 24 hours on Bitget. QQQ moved +0.45%, which at AMZN's beta of 1.07 explains +0.48%; the other +0.22% is AMZN's own.",
+"1h ago — Microsoft vs. Amazon: Which AI Cloud Stock Converts Capex Into Profits Better? (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/microsoft-vs-amazon-ai-cloud-035215434.html?.tsrc=rss",
+"8h ago — Shopify Opens Its Doors to Muse, Here’s Why Amazon Won’t (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/shopify-opens-doors-muse-why-204347730.html?.tsrc=rss",
+"8h ago — Amazon Stock Dips After $100 Million Indiana Manufacturing Push (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amazon-stock-dips-100-million-201553864.html?.tsrc=rss",
+"8h ago — Amazon Opens Seller Data to Claude Days After Blocking Meta’s Muse (Yahoo Finance) https://www.benzinga.com/markets/prediction-markets/26/09/61984835/amazon-claude-seller-data-meta-muse?utm_source=yahooFinance&utm_campaign=partner_feed&utm_medium=referral&.tsrc=rss",
+"8h ago — Amazon Faces Another Worker Lawsuit. Is Employment Scrutiny Becoming an Investor Risk? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amazon-faces-another-worker-lawsuit-200857426.html?.tsrc=rss",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "AMZN rallied today because of strong earnings",
+"asked_at": "2026-09-25T04:30:05.523942+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 7 headlines name AMZN in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"AMZN is +0.71% over 24 hours on Bitget. QQQ moved +0.45%, which at AMZN's beta of 1.07 explains +0.48%; the other +0.22% is AMZN's own.",
+"1h ago — Microsoft vs. Amazon: Which AI Cloud Stock Converts Capex Into Profits Better? (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/microsoft-vs-amazon-ai-cloud-035215434.html?.tsrc=rss",
+"8h ago — Shopify Opens Its Doors to Muse, Here’s Why Amazon Won’t (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/shopify-opens-doors-muse-why-204347730.html?.tsrc=rss",
+"8h ago — Amazon Stock Dips After $100 Million Indiana Manufacturing Push (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amazon-stock-dips-100-million-201553864.html?.tsrc=rss",
+"8h ago — Amazon Opens Seller Data to Claude Days After Blocking Meta’s Muse (Yahoo Finance) https://www.benzinga.com/markets/prediction-markets/26/09/61984835/amazon-claude-seller-data-meta-muse?utm_source=yahooFinance&utm_campaign=partner_feed&utm_medium=referral&.tsrc=rss",
+"8h ago — Amazon Faces Another Worker Lawsuit. Is Employment Scrutiny Becoming an Investor Risk? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amazon-faces-another-worker-lawsuit-200857426.html?.tsrc=rss",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "AMZN dropped today because of a downgrade",
+"asked_at": "2026-09-25T04:30:07.107913+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 7 headlines name AMZN in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"AMZN is +0.71% over 24 hours on Bitget. QQQ moved +0.45%, which at AMZN's beta of 1.07 explains +0.48%; the other +0.22% is AMZN's own.",
+"1h ago — Microsoft vs. Amazon: Which AI Cloud Stock Converts Capex Into Profits Better? (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/microsoft-vs-amazon-ai-cloud-035215434.html?.tsrc=rss",
+"8h ago — Shopify Opens Its Doors to Muse, Here’s Why Amazon Won’t (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/shopify-opens-doors-muse-why-204347730.html?.tsrc=rss",
+"8h ago — Amazon Stock Dips After $100 Million Indiana Manufacturing Push (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amazon-stock-dips-100-million-201553864.html?.tsrc=rss",
+"8h ago — Amazon Opens Seller Data to Claude Days After Blocking Meta’s Muse (Yahoo Finance) https://www.benzinga.com/markets/prediction-markets/26/09/61984835/amazon-claude-seller-data-meta-muse?utm_source=yahooFinance&utm_campaign=partner_feed&utm_medium=referral&.tsrc=rss",
+"8h ago — Amazon Faces Another Worker Lawsuit. Is Employment Scrutiny Becoming an Investor Risk? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amazon-faces-another-worker-lawsuit-200857426.html?.tsrc=rss",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+}
+],
+"GOOGL": [
+{
+"claim": "GOOGL is up today",
+"asked_at": "2026-09-25T04:30:10.667518+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that GOOGL is up: holds — GOOGL is +0.68% over 24 hours.",
+"Actionable: 4 headlines name GOOGL in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"GOOGL is +0.68% over 24 hours on Bitget. QQQ moved +0.45%, which at GOOGL's beta of 0.76 explains +0.34%; the other +0.34% is GOOGL's own.",
+"4h ago — S&P 500, Dow, Nasdaq Futures Ease As Treasury Yields Continue To Spike — ORCL, META, AKAM, GOOGL, MGM In Focus (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-nasdaq-futures-ease-as-us-treasury-yields-spike/cZMapaERBac?.tsrc=rss",
+"6h ago — Google is Changing Search to Avoid More EU Fines. Could Compliance Become the Bigger Risk? (Yahoo Finance) https://finance.yahoo.com/technology/articles/google-changing-search-avoid-more-224400641.html?.tsrc=rss",
+"9h ago — Google Prepares to Put AI Chips Into Space (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/google-prepares-put-ai-chips-195719251.html?.tsrc=rss",
+"9h ago — Google Is Taking a Major Step Forward Toward Space-Based AI Data Centers (Yahoo Finance) https://www.fool.com/investing/2026/09/24/google-is-taking-a-major-step-forward-toward-space-based-ai-data-centers/?.tsrc=rss",
+"Prediction market on GOOGL (Polymarket): \"Will the next Google Gemini Pro model be released by September 30, 2026?\" priced at 4% — $134,805 traded, closes 2026-10-01.",
+"Prediction market on GOOGL (Polymarket): \"Will there be no next Google Gemini Pro model release by September 30, 2026?\" priced at 97% — $123,358 traded, closes 2026-10-01.",
+"Prediction market on GOOGL (Polymarket): \"Will Donald Trump be the #1 searched person on Google in the US this year?\" priced at 6% — $87,062 traded, closes 2027-04-01.",
+"Sources reached: 13 of 13 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "GOOGL is down today",
+"asked_at": "2026-09-25T04:30:12.198143+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that GOOGL is down: does not hold — GOOGL is +0.68% over 24 hours, up, not down.",
+"Actionable: 4 headlines name GOOGL in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"GOOGL is +0.68% over 24 hours on Bitget. QQQ moved +0.45%, which at GOOGL's beta of 0.76 explains +0.34%; the other +0.34% is GOOGL's own.",
+"4h ago — S&P 500, Dow, Nasdaq Futures Ease As Treasury Yields Continue To Spike — ORCL, META, AKAM, GOOGL, MGM In Focus (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-nasdaq-futures-ease-as-us-treasury-yields-spike/cZMapaERBac?.tsrc=rss",
+"6h ago — Google is Changing Search to Avoid More EU Fines. Could Compliance Become the Bigger Risk? (Yahoo Finance) https://finance.yahoo.com/technology/articles/google-changing-search-avoid-more-224400641.html?.tsrc=rss",
+"9h ago — Google Prepares to Put AI Chips Into Space (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/google-prepares-put-ai-chips-195719251.html?.tsrc=rss",
+"9h ago — Google Is Taking a Major Step Forward Toward Space-Based AI Data Centers (Yahoo Finance) https://www.fool.com/investing/2026/09/24/google-is-taking-a-major-step-forward-toward-space-based-ai-data-centers/?.tsrc=rss",
+"Prediction market on GOOGL (Polymarket): \"Will the next Google Gemini Pro model be released by September 30, 2026?\" priced at 4% — $134,805 traded, closes 2026-10-01.",
+"Prediction market on GOOGL (Polymarket): \"Will there be no next Google Gemini Pro model release by September 30, 2026?\" priced at 97% — $123,358 traded, closes 2026-10-01.",
+"Prediction market on GOOGL (Polymarket): \"Will Donald Trump be the #1 searched person on Google in the US this year?\" priced at 6% — $87,062 traded, closes 2027-04-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "GOOGL rallied today because of strong earnings",
+"asked_at": "2026-09-25T04:30:13.333460+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 4 headlines name GOOGL in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"GOOGL is +0.68% over 24 hours on Bitget. QQQ moved +0.45%, which at GOOGL's beta of 0.76 explains +0.34%; the other +0.34% is GOOGL's own.",
+"4h ago — S&P 500, Dow, Nasdaq Futures Ease As Treasury Yields Continue To Spike — ORCL, META, AKAM, GOOGL, MGM In Focus (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-nasdaq-futures-ease-as-us-treasury-yields-spike/cZMapaERBac?.tsrc=rss",
+"6h ago — Google is Changing Search to Avoid More EU Fines. Could Compliance Become the Bigger Risk? (Yahoo Finance) https://finance.yahoo.com/technology/articles/google-changing-search-avoid-more-224400641.html?.tsrc=rss",
+"9h ago — Google Prepares to Put AI Chips Into Space (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/google-prepares-put-ai-chips-195719251.html?.tsrc=rss",
+"9h ago — Google Is Taking a Major Step Forward Toward Space-Based AI Data Centers (Yahoo Finance) https://www.fool.com/investing/2026/09/24/google-is-taking-a-major-step-forward-toward-space-based-ai-data-centers/?.tsrc=rss",
+"Prediction market on GOOGL (Polymarket): \"Will the next Google Gemini Pro model be released by September 30, 2026?\" priced at 4% — $134,805 traded, closes 2026-10-01.",
+"Prediction market on GOOGL (Polymarket): \"Will there be no next Google Gemini Pro model release by September 30, 2026?\" priced at 97% — $123,358 traded, closes 2026-10-01.",
+"Prediction market on GOOGL (Polymarket): \"Will Donald Trump be the #1 searched person on Google in the US this year?\" priced at 6% — $87,062 traded, closes 2027-04-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "GOOGL dropped today because of a downgrade",
+"asked_at": "2026-09-25T04:30:14.389682+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 4 headlines name GOOGL in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"GOOGL is +0.68% over 24 hours on Bitget. QQQ moved +0.45%, which at GOOGL's beta of 0.76 explains +0.34%; the other +0.34% is GOOGL's own.",
+"4h ago — S&P 500, Dow, Nasdaq Futures Ease As Treasury Yields Continue To Spike — ORCL, META, AKAM, GOOGL, MGM In Focus (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-nasdaq-futures-ease-as-us-treasury-yields-spike/cZMapaERBac?.tsrc=rss",
+"6h ago — Google is Changing Search to Avoid More EU Fines. Could Compliance Become the Bigger Risk? (Yahoo Finance) https://finance.yahoo.com/technology/articles/google-changing-search-avoid-more-224400641.html?.tsrc=rss",
+"9h ago — Google Prepares to Put AI Chips Into Space (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/google-prepares-put-ai-chips-195719251.html?.tsrc=rss",
+"9h ago — Google Is Taking a Major Step Forward Toward Space-Based AI Data Centers (Yahoo Finance) https://www.fool.com/investing/2026/09/24/google-is-taking-a-major-step-forward-toward-space-based-ai-data-centers/?.tsrc=rss",
+"Prediction market on GOOGL (Polymarket): \"Will the next Google Gemini Pro model be released by September 30, 2026?\" priced at 4% — $134,805 traded, closes 2026-10-01.",
+"Prediction market on GOOGL (Polymarket): \"Will there be no next Google Gemini Pro model release by September 30, 2026?\" priced at 97% — $123,358 traded, closes 2026-10-01.",
+"Prediction market on GOOGL (Polymarket): \"Will Donald Trump be the #1 searched person on Google in the US this year?\" priced at 6% — $87,062 traded, closes 2027-04-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+}
+],
+"COIN": [
+{
+"claim": "COIN is up today",
+"asked_at": "2026-09-25T04:30:17.075870+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that COIN is up: holds — COIN is +0.78% over 24 hours.",
+"Actionable: 13 headlines name COIN in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"COIN is +0.78% over 24 hours on Bitget. QQQ moved +0.45%, which at COIN's beta of 1.53 explains +0.69%; the other +0.08% is COIN's own.",
+"7h ago — Coinbase CEO Brian Armstrong Pushes Back on AI ‘Doomers’: ‘Slowing Progress Doesn’t Keep Us Safer’ (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/coinbase-ceo-brian-armstrong-pushes-213050758.html?.tsrc=rss",
+"8h ago — 100 Coinbase users lose millions to fake support calls (Yahoo Finance) https://www.thestreet.com/crypto/latest-news/100-coinbase-users-lose-millions-to-fake-support-calls?.tsrc=rss",
+"11h ago — What Coinbase's John D'Agostino thinks is behind crypto's rally (Yahoo Finance) https://finance.yahoo.com/video/coinbases-john-dagostino-thinks-behind-171246050.html?.tsrc=rss",
+"11h ago — Coinbase wants to become 'the everything exchange,' this exec. explains (Yahoo Finance) https://finance.yahoo.com/video/coinbase-wants-become-everything-exchange-170641249.html?.tsrc=rss",
+"17h ago — Brooklyn man sent to prison for 12 years for stealing $16M in a Coinbase phishing scheme (coindesk) https://www.coindesk.com/business/2026/09/24/brooklyn-man-sent-to-prison-for-12-years-for-stealing-usd16m-in-a-coinbase-phishing-scheme",
+"Prediction market on COIN (Polymarket): \"Over $1B raised on Coinbase in 2026?\" priced at 11% — $103,589 traded, closes 2027-01-01.",
+"Prediction market on COIN (Polymarket): \"Over $600M raised on Coinbase in 2026?\" priced at 34%, +3 points in 24h — $63,382 traded, closes 2027-01-01.",
+"Prediction market on COIN (Polymarket): \"Over $200M raised on Coinbase in 2026?\" priced at 42%, -2 points in 24h — $62,579 traded, closes 2027-01-01.",
+"Sources reached: 13 of 13 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "COIN is down today",
+"asked_at": "2026-09-25T04:30:18.527836+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that COIN is down: does not hold — COIN is +0.78% over 24 hours, up, not down.",
+"Actionable: 13 headlines name COIN in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"COIN is +0.78% over 24 hours on Bitget. QQQ moved +0.45%, which at COIN's beta of 1.53 explains +0.69%; the other +0.08% is COIN's own.",
+"7h ago — Coinbase CEO Brian Armstrong Pushes Back on AI ‘Doomers’: ‘Slowing Progress Doesn’t Keep Us Safer’ (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/coinbase-ceo-brian-armstrong-pushes-213050758.html?.tsrc=rss",
+"8h ago — 100 Coinbase users lose millions to fake support calls (Yahoo Finance) https://www.thestreet.com/crypto/latest-news/100-coinbase-users-lose-millions-to-fake-support-calls?.tsrc=rss",
+"11h ago — What Coinbase's John D'Agostino thinks is behind crypto's rally (Yahoo Finance) https://finance.yahoo.com/video/coinbases-john-dagostino-thinks-behind-171246050.html?.tsrc=rss",
+"11h ago — Coinbase wants to become 'the everything exchange,' this exec. explains (Yahoo Finance) https://finance.yahoo.com/video/coinbase-wants-become-everything-exchange-170641249.html?.tsrc=rss",
+"17h ago — Brooklyn man sent to prison for 12 years for stealing $16M in a Coinbase phishing scheme (coindesk) https://www.coindesk.com/business/2026/09/24/brooklyn-man-sent-to-prison-for-12-years-for-stealing-usd16m-in-a-coinbase-phishing-scheme",
+"Prediction market on COIN (Polymarket): \"Over $1B raised on Coinbase in 2026?\" priced at 11% — $103,589 traded, closes 2027-01-01.",
+"Prediction market on COIN (Polymarket): \"Over $600M raised on Coinbase in 2026?\" priced at 34%, +3 points in 24h — $63,382 traded, closes 2027-01-01.",
+"Prediction market on COIN (Polymarket): \"Over $200M raised on Coinbase in 2026?\" priced at 42%, -2 points in 24h — $62,579 traded, closes 2027-01-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "COIN rallied today because of strong earnings",
+"asked_at": "2026-09-25T04:30:19.574998+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 13 headlines name COIN in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"COIN is +0.78% over 24 hours on Bitget. QQQ moved +0.45%, which at COIN's beta of 1.53 explains +0.69%; the other +0.08% is COIN's own.",
+"7h ago — Coinbase CEO Brian Armstrong Pushes Back on AI ‘Doomers’: ‘Slowing Progress Doesn’t Keep Us Safer’ (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/coinbase-ceo-brian-armstrong-pushes-213050758.html?.tsrc=rss",
+"8h ago — 100 Coinbase users lose millions to fake support calls (Yahoo Finance) https://www.thestreet.com/crypto/latest-news/100-coinbase-users-lose-millions-to-fake-support-calls?.tsrc=rss",
+"11h ago — What Coinbase's John D'Agostino thinks is behind crypto's rally (Yahoo Finance) https://finance.yahoo.com/video/coinbases-john-dagostino-thinks-behind-171246050.html?.tsrc=rss",
+"11h ago — Coinbase wants to become 'the everything exchange,' this exec. explains (Yahoo Finance) https://finance.yahoo.com/video/coinbase-wants-become-everything-exchange-170641249.html?.tsrc=rss",
+"17h ago — Brooklyn man sent to prison for 12 years for stealing $16M in a Coinbase phishing scheme (coindesk) https://www.coindesk.com/business/2026/09/24/brooklyn-man-sent-to-prison-for-12-years-for-stealing-usd16m-in-a-coinbase-phishing-scheme",
+"Prediction market on COIN (Polymarket): \"Over $1B raised on Coinbase in 2026?\" priced at 11% — $103,589 traded, closes 2027-01-01.",
+"Prediction market on COIN (Polymarket): \"Over $600M raised on Coinbase in 2026?\" priced at 34%, +3 points in 24h — $63,382 traded, closes 2027-01-01.",
+"Prediction market on COIN (Polymarket): \"Over $200M raised on Coinbase in 2026?\" priced at 42%, -2 points in 24h — $62,579 traded, closes 2027-01-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "COIN dropped today because of a downgrade",
+"asked_at": "2026-09-25T04:30:20.705792+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 13 headlines name COIN in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"COIN is +0.78% over 24 hours on Bitget. QQQ moved +0.45%, which at COIN's beta of 1.53 explains +0.69%; the other +0.08% is COIN's own.",
+"7h ago — Coinbase CEO Brian Armstrong Pushes Back on AI ‘Doomers’: ‘Slowing Progress Doesn’t Keep Us Safer’ (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/coinbase-ceo-brian-armstrong-pushes-213050758.html?.tsrc=rss",
+"8h ago — 100 Coinbase users lose millions to fake support calls (Yahoo Finance) https://www.thestreet.com/crypto/latest-news/100-coinbase-users-lose-millions-to-fake-support-calls?.tsrc=rss",
+"11h ago — What Coinbase's John D'Agostino thinks is behind crypto's rally (Yahoo Finance) https://finance.yahoo.com/video/coinbases-john-dagostino-thinks-behind-171246050.html?.tsrc=rss",
+"11h ago — Coinbase wants to become 'the everything exchange,' this exec. explains (Yahoo Finance) https://finance.yahoo.com/video/coinbase-wants-become-everything-exchange-170641249.html?.tsrc=rss",
+"17h ago — Brooklyn man sent to prison for 12 years for stealing $16M in a Coinbase phishing scheme (coindesk) https://www.coindesk.com/business/2026/09/24/brooklyn-man-sent-to-prison-for-12-years-for-stealing-usd16m-in-a-coinbase-phishing-scheme",
+"Prediction market on COIN (Polymarket): \"Over $1B raised on Coinbase in 2026?\" priced at 11% — $103,589 traded, closes 2027-01-01.",
+"Prediction market on COIN (Polymarket): \"Over $600M raised on Coinbase in 2026?\" priced at 34%, +3 points in 24h — $63,382 traded, closes 2027-01-01.",
+"Prediction market on COIN (Polymarket): \"Over $200M raised on Coinbase in 2026?\" priced at 42%, -2 points in 24h — $62,579 traded, closes 2027-01-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+}
+],
+"AAPL": [
+{
+"claim": "AAPL is up today",
+"asked_at": "2026-09-25T04:30:23.409373+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that AAPL is up: does not hold — AAPL is -0.39% over 24 hours, down, not up.",
+"Actionable: 6 headlines name AAPL in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"AAPL is -0.39% over 24 hours on Bitget. QQQ moved +0.45%, which at AAPL's beta of 0.71 explains +0.32%; the other -0.71% is AAPL's own.",
+"5h ago — Could John Ternus’ Product Strategy Reshape Apple’s (AAPL) Next Growth Phase? (Yahoo Finance) https://finance.yahoo.com/technology/articles/could-john-ternus-product-strategy-230117249.html?.tsrc=rss",
+"6h ago — Apple's rumored iPhone 20 could change the phone's look in a big way (Yahoo Finance) https://www.thestreet.com/investing/apple-rumored-iphone-20-aapl-stock?.tsrc=rss",
+"8h ago — Chip Stocks Retreat. Qualcomm Secures Apple Licensing Deal. (Yahoo Finance) https://finance.yahoo.com/m/8ea0b1f5-46a4-34c2-85d6-4408049c70de/chip-stocks-retreat.-qualcomm.html?.tsrc=rss",
+"8h ago — Qualcomm Renews Deal With Apple. Why the Stock Is Dropping Anyway. (Yahoo Finance) https://finance.yahoo.com/m/0412a422-5fee-33a8-ab4d-b97c6520a9e0/qualcomm-renews-deal-with.html?.tsrc=rss",
+"8h ago — 3 Stocks Tied To Apple And Nvidia Supply Chain Demand (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/3-stocks-tied-apple-nvidia-201826012.html?.tsrc=rss",
+"Prediction market on AAPL (Polymarket): \"Will Apple release a new product line before 2027?\" priced at 22% — $312,668 traded, closes 2027-01-01.",
+"Prediction market on AAPL (Polymarket): \"Will Apple release a touchscreen MacBook in 2026?\" priced at 64%, -6 points in 24h — $76,556 traded, closes 2027-01-01.",
+"Prediction market on AAPL (Polymarket): \"Will Apple purchase memory CXMT chips in 2026?\" priced at 16% — $22,416 traded, closes 2027-01-01.",
+"Sources reached: 13 of 13 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "AAPL is down today",
+"asked_at": "2026-09-25T04:30:24.804314+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that AAPL is down: holds — AAPL is -0.39% over 24 hours.",
+"Actionable: 6 headlines name AAPL in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"AAPL is -0.39% over 24 hours on Bitget. QQQ moved +0.45%, which at AAPL's beta of 0.71 explains +0.32%; the other -0.71% is AAPL's own.",
+"5h ago — Could John Ternus’ Product Strategy Reshape Apple’s (AAPL) Next Growth Phase? (Yahoo Finance) https://finance.yahoo.com/technology/articles/could-john-ternus-product-strategy-230117249.html?.tsrc=rss",
+"6h ago — Apple's rumored iPhone 20 could change the phone's look in a big way (Yahoo Finance) https://www.thestreet.com/investing/apple-rumored-iphone-20-aapl-stock?.tsrc=rss",
+"8h ago — Chip Stocks Retreat. Qualcomm Secures Apple Licensing Deal. (Yahoo Finance) https://finance.yahoo.com/m/8ea0b1f5-46a4-34c2-85d6-4408049c70de/chip-stocks-retreat.-qualcomm.html?.tsrc=rss",
+"8h ago — Qualcomm Renews Deal With Apple. Why the Stock Is Dropping Anyway. (Yahoo Finance) https://finance.yahoo.com/m/0412a422-5fee-33a8-ab4d-b97c6520a9e0/qualcomm-renews-deal-with.html?.tsrc=rss",
+"8h ago — 3 Stocks Tied To Apple And Nvidia Supply Chain Demand (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/3-stocks-tied-apple-nvidia-201826012.html?.tsrc=rss",
+"Prediction market on AAPL (Polymarket): \"Will Apple release a new product line before 2027?\" priced at 22% — $312,668 traded, closes 2027-01-01.",
+"Prediction market on AAPL (Polymarket): \"Will Apple release a touchscreen MacBook in 2026?\" priced at 64%, -6 points in 24h — $76,556 traded, closes 2027-01-01.",
+"Prediction market on AAPL (Polymarket): \"Will Apple purchase memory CXMT chips in 2026?\" priced at 16% — $22,416 traded, closes 2027-01-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "AAPL rallied today because of strong earnings",
+"asked_at": "2026-09-25T04:30:25.824583+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 6 headlines name AAPL in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"AAPL is -0.39% over 24 hours on Bitget. QQQ moved +0.45%, which at AAPL's beta of 0.71 explains +0.32%; the other -0.71% is AAPL's own.",
+"5h ago — Could John Ternus’ Product Strategy Reshape Apple’s (AAPL) Next Growth Phase? (Yahoo Finance) https://finance.yahoo.com/technology/articles/could-john-ternus-product-strategy-230117249.html?.tsrc=rss",
+"6h ago — Apple's rumored iPhone 20 could change the phone's look in a big way (Yahoo Finance) https://www.thestreet.com/investing/apple-rumored-iphone-20-aapl-stock?.tsrc=rss",
+"8h ago — Chip Stocks Retreat. Qualcomm Secures Apple Licensing Deal. (Yahoo Finance) https://finance.yahoo.com/m/8ea0b1f5-46a4-34c2-85d6-4408049c70de/chip-stocks-retreat.-qualcomm.html?.tsrc=rss",
+"8h ago — Qualcomm Renews Deal With Apple. Why the Stock Is Dropping Anyway. (Yahoo Finance) https://finance.yahoo.com/m/0412a422-5fee-33a8-ab4d-b97c6520a9e0/qualcomm-renews-deal-with.html?.tsrc=rss",
+"8h ago — 3 Stocks Tied To Apple And Nvidia Supply Chain Demand (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/3-stocks-tied-apple-nvidia-201826012.html?.tsrc=rss",
+"Prediction market on AAPL (Polymarket): \"Will Apple release a new product line before 2027?\" priced at 22% — $312,668 traded, closes 2027-01-01.",
+"Prediction market on AAPL (Polymarket): \"Will Apple release a touchscreen MacBook in 2026?\" priced at 64%, -6 points in 24h — $76,556 traded, closes 2027-01-01.",
+"Prediction market on AAPL (Polymarket): \"Will Apple purchase memory CXMT chips in 2026?\" priced at 16% — $22,416 traded, closes 2027-01-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "AAPL dropped today because of a downgrade",
+"asked_at": "2026-09-25T04:30:27.209943+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 6 headlines name AAPL in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"AAPL is -0.39% over 24 hours on Bitget. QQQ moved +0.45%, which at AAPL's beta of 0.71 explains +0.32%; the other -0.71% is AAPL's own.",
+"5h ago — Could John Ternus’ Product Strategy Reshape Apple’s (AAPL) Next Growth Phase? (Yahoo Finance) https://finance.yahoo.com/technology/articles/could-john-ternus-product-strategy-230117249.html?.tsrc=rss",
+"6h ago — Apple's rumored iPhone 20 could change the phone's look in a big way (Yahoo Finance) https://www.thestreet.com/investing/apple-rumored-iphone-20-aapl-stock?.tsrc=rss",
+"8h ago — Chip Stocks Retreat. Qualcomm Secures Apple Licensing Deal. (Yahoo Finance) https://finance.yahoo.com/m/8ea0b1f5-46a4-34c2-85d6-4408049c70de/chip-stocks-retreat.-qualcomm.html?.tsrc=rss",
+"8h ago — Qualcomm Renews Deal With Apple. Why the Stock Is Dropping Anyway. (Yahoo Finance) https://finance.yahoo.com/m/0412a422-5fee-33a8-ab4d-b97c6520a9e0/qualcomm-renews-deal-with.html?.tsrc=rss",
+"8h ago — 3 Stocks Tied To Apple And Nvidia Supply Chain Demand (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/3-stocks-tied-apple-nvidia-201826012.html?.tsrc=rss",
+"Prediction market on AAPL (Polymarket): \"Will Apple release a new product line before 2027?\" priced at 22% — $312,668 traded, closes 2027-01-01.",
+"Prediction market on AAPL (Polymarket): \"Will Apple release a touchscreen MacBook in 2026?\" priced at 64%, -6 points in 24h — $76,556 traded, closes 2027-01-01.",
+"Prediction market on AAPL (Polymarket): \"Will Apple purchase memory CXMT chips in 2026?\" priced at 16% — $22,416 traded, closes 2027-01-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+}
+],
+"MSFT": [
+{
+"claim": "MSFT is up today",
+"asked_at": "2026-09-25T04:30:29.970243+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that MSFT is up: does not hold — MSFT is -0.33% over 24 hours, down, not up.",
+"Actionable: 4 headlines name MSFT in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"MSFT is -0.33% over 24 hours on Bitget. QQQ moved +0.45%, which at MSFT's beta of 0.57 explains +0.26%; the other -0.59% is MSFT's own.",
+"1h ago — Microsoft vs. Amazon: Which AI Cloud Stock Converts Capex Into Profits Better? (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/microsoft-vs-amazon-ai-cloud-035215434.html?.tsrc=rss",
+"8h ago — Can Microsoft (MSFT) Sustain its Recurring Cash Flows, Growing Payouts, and Azure Momentum? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/microsoft-msft-sustain-recurring-cash-202321015.html?.tsrc=rss",
+"10h ago — Microsoft Azure Red Hat OpenShift for Microsoft Azure Government Achieves IL5 Certification (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/microsoft-azure-red-hat-openshift-185100538.html?.tsrc=rss",
+"10h ago — Why These Wall Street Analysts Think Microsoft Stock Is ‘Getting Back on Track (Yahoo Finance) https://www.barchart.com/story/news/4785287/why-these-wall-street-analysts-think-microsoft-stock-is-getting-back-on-track?.tsrc=rss",
+"Sources reached: 13 of 13 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "MSFT is down today",
+"asked_at": "2026-09-25T04:30:31.505941+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that MSFT is down: holds — MSFT is -0.33% over 24 hours.",
+"Actionable: 4 headlines name MSFT in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"MSFT is -0.33% over 24 hours on Bitget. QQQ moved +0.45%, which at MSFT's beta of 0.57 explains +0.26%; the other -0.59% is MSFT's own.",
+"1h ago — Microsoft vs. Amazon: Which AI Cloud Stock Converts Capex Into Profits Better? (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/microsoft-vs-amazon-ai-cloud-035215434.html?.tsrc=rss",
+"8h ago — Can Microsoft (MSFT) Sustain its Recurring Cash Flows, Growing Payouts, and Azure Momentum? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/microsoft-msft-sustain-recurring-cash-202321015.html?.tsrc=rss",
+"10h ago — Microsoft Azure Red Hat OpenShift for Microsoft Azure Government Achieves IL5 Certification (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/microsoft-azure-red-hat-openshift-185100538.html?.tsrc=rss",
+"10h ago — Why These Wall Street Analysts Think Microsoft Stock Is ‘Getting Back on Track (Yahoo Finance) https://www.barchart.com/story/news/4785287/why-these-wall-street-analysts-think-microsoft-stock-is-getting-back-on-track?.tsrc=rss",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "MSFT rallied today because of strong earnings",
+"asked_at": "2026-09-25T04:30:35.617929+00:00",
+"classified_by": "research-patterns",
+"refused": false,
+"lines": [
+"Actionable: MSFT's next report date is not published yet. It reports quarterly, so expect it around 27 Oct — an estimate, not a date; confirm it before holding a position into that window.",
+"Most recent report on file: 2026-07-28 (period ending 2026-06-29); the source has not yet published the next date.",
+"The analyst consensus the source holds was scraped 2018-10-25 — too old to present as today's expectation, so it is withheld rather than quoted.",
+"Institutional holders: the source returned one 13F record for the period ending 2026-06-30 — ENVESTNET ASSET MANAGEMENT INC (11,497,807 sh). A sample of filers, not a full ownership table.",
+"Analyst price targets, last 90 days (23 firms, each firm's latest): median 550, range 480 to 700, +11% from the stock's 496.8; 23 buy, 0 hold, 0 sell; 11 raised and 5 cut their target.",
+"Earnings surprise: the quarter ending 2026-03-31 was a large beat — SUE +2.31, i.e. diluted EPS changed +1.04 year over year against a usual swing of 0.45 (SEC filing, filed 2026-04-29). Not the latest quarter: a fiscal fourth quarter is reported only inside the annual 10-K, which carries no separate quarterly figure, so this is the one before it.",
+"MSFT market cap $3,689bn.",
+"Valuation on 2026-09-24: P/E (trailing 12m) 27.8, P/S (trailing 12m) 11.2, P/B (latest quarter) 8.4, EV/EBITDA 23.8, dividend yield 0.73%.",
+"Institutions: 6,647 holders own 84.4% of the shares (as of 2026-09-23).",
+"Insider filings (SEC Form 4) in the last 30 days: Jolla Alice L. (Officer), filed 2026-09-15; Hood Amy (Officer), filed 2026-09-15; Mason Mark (Director), filed 2026-09-11 — read the filing for direction and size: https://www.sec.gov:443/Archives/edgar/data/789019/000078901926000214/0000789019-26-000214-index.htm",
+"Sources reached: 12 of 12 answered.",
+"Data: Bitget's bitget-mcp-server (US equity data) and the company's SEC filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "MSFT dropped today because of a downgrade",
+"asked_at": "2026-09-25T04:30:36.719714+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 4 headlines name MSFT in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"MSFT is -0.33% over 24 hours on Bitget. QQQ moved +0.45%, which at MSFT's beta of 0.57 explains +0.26%; the other -0.59% is MSFT's own.",
+"1h ago — Microsoft vs. Amazon: Which AI Cloud Stock Converts Capex Into Profits Better? (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/microsoft-vs-amazon-ai-cloud-035215434.html?.tsrc=rss",
+"8h ago — Can Microsoft (MSFT) Sustain its Recurring Cash Flows, Growing Payouts, and Azure Momentum? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/microsoft-msft-sustain-recurring-cash-202321015.html?.tsrc=rss",
+"10h ago — Microsoft Azure Red Hat OpenShift for Microsoft Azure Government Achieves IL5 Certification (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/microsoft-azure-red-hat-openshift-185100538.html?.tsrc=rss",
+"10h ago — Why These Wall Street Analysts Think Microsoft Stock Is ‘Getting Back on Track (Yahoo Finance) https://www.barchart.com/story/news/4785287/why-these-wall-street-analysts-think-microsoft-stock-is-getting-back-on-track?.tsrc=rss",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+}
+],
+"NVDA": [
+{
+"claim": "NVDA is up today",
+"asked_at": "2026-09-25T04:30:39.537000+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that NVDA is up: does not hold — NVDA is -0.17% over 24 hours, essentially flat and if anything down.",
+"Actionable: 2 headlines name NVDA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"NVDA is -0.17% over 24 hours on Bitget. QQQ moved +0.45%, which at NVDA's beta of 1.51 explains +0.69%; the other -0.86% is NVDA's own.",
+"1h ago — AMD vs. Nvidia: Which AI Stock Is the Better Buy? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amd-vs-nvidia-ai-stock-035909345.html?.tsrc=rss",
+"4h ago — How IonQ’s On‑Prem Quantum System At NVIDIA (NVDA) Has Changed Its Investment Story (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/ionq-prem-quantum-system-nvidia-002115947.html?.tsrc=rss",
+"Sources reached: 13 of 13 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "NVDA is down today",
+"asked_at": "2026-09-25T04:30:40.988532+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that NVDA is down: barely — NVDA is -0.17% over 24 hours, essentially flat.",
+"Actionable: 2 headlines name NVDA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"NVDA is -0.17% over 24 hours on Bitget. QQQ moved +0.45%, which at NVDA's beta of 1.51 explains +0.69%; the other -0.86% is NVDA's own.",
+"1h ago — AMD vs. Nvidia: Which AI Stock Is the Better Buy? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amd-vs-nvidia-ai-stock-035909345.html?.tsrc=rss",
+"4h ago — How IonQ’s On‑Prem Quantum System At NVIDIA (NVDA) Has Changed Its Investment Story (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/ionq-prem-quantum-system-nvidia-002115947.html?.tsrc=rss",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "NVDA rallied today because of strong earnings",
+"asked_at": "2026-09-25T04:30:41.958113+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 2 headlines name NVDA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"NVDA is -0.17% over 24 hours on Bitget. QQQ moved +0.45%, which at NVDA's beta of 1.51 explains +0.69%; the other -0.86% is NVDA's own.",
+"1h ago — AMD vs. Nvidia: Which AI Stock Is the Better Buy? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amd-vs-nvidia-ai-stock-035909345.html?.tsrc=rss",
+"4h ago — How IonQ’s On‑Prem Quantum System At NVIDIA (NVDA) Has Changed Its Investment Story (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/ionq-prem-quantum-system-nvidia-002115947.html?.tsrc=rss",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "NVDA dropped today because of a downgrade",
+"asked_at": "2026-09-25T04:30:42.959534+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 2 headlines name NVDA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"NVDA is -0.17% over 24 hours on Bitget. QQQ moved +0.45%, which at NVDA's beta of 1.51 explains +0.69%; the other -0.86% is NVDA's own.",
+"1h ago — AMD vs. Nvidia: Which AI Stock Is the Better Buy? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amd-vs-nvidia-ai-stock-035909345.html?.tsrc=rss",
+"4h ago — How IonQ’s On‑Prem Quantum System At NVIDIA (NVDA) Has Changed Its Investment Story (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/ionq-prem-quantum-system-nvidia-002115947.html?.tsrc=rss",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "The US stock market is closed right now, so NVDA is trading after hours",
+"asked_at": "2026-09-25T04:30:45.450061+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: no position signal on NVDA — NVDA's funding is not crowded either way; the desk's own panel last read it neutral at 0.53 once agreement that shared sources was discounted (4 analysts, 24 distinct sources; decision 664, 2026-09-24 19:41 UTC).",
+"News: 2 headline(s) name NVDA in 48h, each a different story — none is carried twice, so the count is not inflated by syndication.",
+"US stock-market fear & greed: 36 (fear); a week ago 30, a month ago 60 (Bitget's data service, bitget-mcp-server).",
+"NVDA on Bitget: funding +0.0000% per interval, -0.17% over 24h.",
+"Funding: flat, so holding NVDA costs nothing beyond fees.",
+"Tested, not assumed (2026-09-22, data/sentiment_comparison.json): 5 near-identical unsourced posts per narrative across 2 narratives. finBERT, the standard finance sentiment model, grew louder with every repeat on 2 of 2; this desk's sentiment analyst stayed non-actionable on 2 of 2. On the NVDA narrative finBERT counted 4 of 5 posts as positive; the analyst's reason: “All five narratives are variations of a single unsourced claim about a 'leaked internal memo,' posted within 8 minutes by low-credibility social accounts with no independent corroboration, no named source, and no price confirmation.”.",
+"Crowd on X and Reddit (25 Sep 03:03 UTC, 1h ago): 30 posts from 25 accounts (30 on Reddit) carry 26 distinct stories.",
+"None of them looks coordinated, so the volume is independent voices, not one line repeated.",
+"No story is carried by more than one account — the talk is scattered, not converging on a single narrative.",
+"Sources reached: 12 of 12 answered.",
+"Data: NVDA's funding rate and 24h move, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "The US stock market is open right now",
+"asked_at": "2026-09-25T04:30:47.976197+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: sentiment is stretched toward greed — the side of the index where crypto has historically been more exposed to pullbacks; read it as positioning, not a signal — this desk's own sentiment work found the index adds nothing on its own.",
+"Crypto fear & greed: 71 (Greed); over the last 8 days it ranged 56 to 78.",
+"US stock-market fear & greed: 36 (fear); a week ago 30, a month ago 60 (Bitget's data service, bitget-mcp-server).",
+"BTC positioning: 55% of all accounts are long, against 66% of the largest traders' positions — the largest traders are longer than the crowd (Binance, via Bitget's data service, bitget-mcp-server).",
+"Large Hyperliquid wallets hold $1,003m long and $730m short in BTC (Bitget's data service, bitget-mcp-server).",
+"BTC liquidations on 2026-09-24: $20.5m of longs and $14.4m of shorts forced out — the longs took the larger flush (Binance, via Bitget's data service, bitget-mcp-server).",
+"BTC funding +0.0049% per interval — longs pay shorts, no crowding on Bitget.",
+"ETH funding +0.0041% per interval — longs pay shorts, no crowding on Bitget.",
+"Tested, not assumed (2026-09-22, data/sentiment_comparison.json): 5 near-identical unsourced posts per narrative across 2 narratives. finBERT, the standard finance sentiment model, grew louder with every repeat on 2 of 2; this desk's sentiment analyst stayed non-actionable on 2 of 2.",
+"US spot BTC ETFs, 23 Sep: net +$347m (creations less redemptions), an ordinary day for it; five days +$2.65bn; 5 inflow days running; $109bn held (SoSoValue).",
+"Sources reached: 3 of 3 answered.",
+"Data: crypto fear & greed from Bitget's data service and Bitget funding rates, live. This is analysis, not advice — you make the call."
+]
+}
+],
+"TSLA": [
+{
+"claim": "TSLA is up today",
+"asked_at": "2026-09-25T04:30:50.750073+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that TSLA is up: barely — TSLA is +0.29% over 24 hours, essentially flat.",
+"Actionable: 10 headlines name TSLA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"TSLA is +0.29% over 24 hours on Bitget. QQQ moved +0.45%, which at TSLA's beta of 1.40 explains +0.64%; the other -0.34% is TSLA's own.",
+"1h ago — Dow Jones Futures: Market Rally Resilient As Yields, Oil Prices Keep Rising; Tesla Holds Semi Event (Yahoo Finance) https://finance.yahoo.com/m/f20152d5-c38c-3d1c-80ad-574b31be1248/dow-jones-futures%3A-market.html?.tsrc=rss",
+"3h ago — Tesla poised to scale production of heavy-duty Semi trucks with opening of Nevada factory (cnbc) https://www.cnbc.com/2026/09/24/tesla-aims-to-scale-semi-truck-production-with-nevada-factory-opening.html",
+"5h ago — Tesla (TSLA) vs Rivian (RIVN): Which is a Better EV Stock to Buy (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/tesla-tsla-vs-rivian-rivn-235302515.html?.tsrc=rss",
+"7h ago — Tesla's Roadster Reveal Is Oct. 1. The Real Story Is Optimus. (Yahoo Finance) https://www.fool.com/investing/2026/09/24/teslas-roadster-reveal-oct-1-real-optimus/?.tsrc=rss",
+"9h ago — Top Stock Reports for Tesla, Bank of America & Coca-Cola (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/top-stock-reports-tesla-bank-195500282.html?.tsrc=rss",
+"Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31?\" priced at 18% — $191,529 traded, closes 2027-01-01.",
+"Prediction market on TSLA (Polymarket): \"Will Tesla release Optimus by December 31, 2026?\" priced at 13% — $30,324 traded, closes 2027-01-01.",
+"Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31, 2027?\" priced at 66% — $28,587 traded, closes 2028-01-01.",
+"Sources reached: 13 of 13 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "TSLA is down today",
+"asked_at": "2026-09-25T04:30:52.252943+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Your premise that TSLA is down: does not hold — TSLA is +0.29% over 24 hours, essentially flat and if anything up.",
+"Actionable: 10 headlines name TSLA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"TSLA is +0.29% over 24 hours on Bitget. QQQ moved +0.45%, which at TSLA's beta of 1.40 explains +0.64%; the other -0.34% is TSLA's own.",
+"1h ago — Dow Jones Futures: Market Rally Resilient As Yields, Oil Prices Keep Rising; Tesla Holds Semi Event (Yahoo Finance) https://finance.yahoo.com/m/f20152d5-c38c-3d1c-80ad-574b31be1248/dow-jones-futures%3A-market.html?.tsrc=rss",
+"3h ago — Tesla poised to scale production of heavy-duty Semi trucks with opening of Nevada factory (cnbc) https://www.cnbc.com/2026/09/24/tesla-aims-to-scale-semi-truck-production-with-nevada-factory-opening.html",
+"5h ago — Tesla (TSLA) vs Rivian (RIVN): Which is a Better EV Stock to Buy (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/tesla-tsla-vs-rivian-rivn-235302515.html?.tsrc=rss",
+"7h ago — Tesla's Roadster Reveal Is Oct. 1. The Real Story Is Optimus. (Yahoo Finance) https://www.fool.com/investing/2026/09/24/teslas-roadster-reveal-oct-1-real-optimus/?.tsrc=rss",
+"9h ago — Top Stock Reports for Tesla, Bank of America & Coca-Cola (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/top-stock-reports-tesla-bank-195500282.html?.tsrc=rss",
+"Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31?\" priced at 18% — $191,529 traded, closes 2027-01-01.",
+"Prediction market on TSLA (Polymarket): \"Will Tesla release Optimus by December 31, 2026?\" priced at 13% — $30,324 traded, closes 2027-01-01.",
+"Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31, 2027?\" priced at 66% — $28,587 traded, closes 2028-01-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "TSLA rallied today because of strong earnings",
+"asked_at": "2026-09-25T04:30:53.283940+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 10 headlines name TSLA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"TSLA is +0.29% over 24 hours on Bitget. QQQ moved +0.45%, which at TSLA's beta of 1.40 explains +0.64%; the other -0.34% is TSLA's own.",
+"1h ago — Dow Jones Futures: Market Rally Resilient As Yields, Oil Prices Keep Rising; Tesla Holds Semi Event (Yahoo Finance) https://finance.yahoo.com/m/f20152d5-c38c-3d1c-80ad-574b31be1248/dow-jones-futures%3A-market.html?.tsrc=rss",
+"3h ago — Tesla poised to scale production of heavy-duty Semi trucks with opening of Nevada factory (cnbc) https://www.cnbc.com/2026/09/24/tesla-aims-to-scale-semi-truck-production-with-nevada-factory-opening.html",
+"5h ago — Tesla (TSLA) vs Rivian (RIVN): Which is a Better EV Stock to Buy (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/tesla-tsla-vs-rivian-rivn-235302515.html?.tsrc=rss",
+"7h ago — Tesla's Roadster Reveal Is Oct. 1. The Real Story Is Optimus. (Yahoo Finance) https://www.fool.com/investing/2026/09/24/teslas-roadster-reveal-oct-1-real-optimus/?.tsrc=rss",
+"9h ago — Top Stock Reports for Tesla, Bank of America & Coca-Cola (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/top-stock-reports-tesla-bank-195500282.html?.tsrc=rss",
+"Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31?\" priced at 18% — $191,529 traded, closes 2027-01-01.",
+"Prediction market on TSLA (Polymarket): \"Will Tesla release Optimus by December 31, 2026?\" priced at 13% — $30,324 traded, closes 2027-01-01.",
+"Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31, 2027?\" priced at 66% — $28,587 traded, closes 2028-01-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+},
+{
+"claim": "TSLA dropped today because of a downgrade",
+"asked_at": "2026-09-25T04:30:54.318906+00:00",
+"classified_by": "research-model",
+"refused": false,
+"lines": [
+"Actionable: 10 headlines name TSLA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+"TSLA is +0.29% over 24 hours on Bitget. QQQ moved +0.45%, which at TSLA's beta of 1.40 explains +0.64%; the other -0.34% is TSLA's own.",
+"1h ago — Dow Jones Futures: Market Rally Resilient As Yields, Oil Prices Keep Rising; Tesla Holds Semi Event (Yahoo Finance) https://finance.yahoo.com/m/f20152d5-c38c-3d1c-80ad-574b31be1248/dow-jones-futures%3A-market.html?.tsrc=rss",
+"3h ago — Tesla poised to scale production of heavy-duty Semi trucks with opening of Nevada factory (cnbc) https://www.cnbc.com/2026/09/24/tesla-aims-to-scale-semi-truck-production-with-nevada-factory-opening.html",
+"5h ago — Tesla (TSLA) vs Rivian (RIVN): Which is a Better EV Stock to Buy (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/tesla-tsla-vs-rivian-rivn-235302515.html?.tsrc=rss",
+"7h ago — Tesla's Roadster Reveal Is Oct. 1. The Real Story Is Optimus. (Yahoo Finance) https://www.fool.com/investing/2026/09/24/teslas-roadster-reveal-oct-1-real-optimus/?.tsrc=rss",
+"9h ago — Top Stock Reports for Tesla, Bank of America & Coca-Cola (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/top-stock-reports-tesla-bank-195500282.html?.tsrc=rss",
+"Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31?\" priced at 18% — $191,529 traded, closes 2027-01-01.",
+"Prediction market on TSLA (Polymarket): \"Will Tesla release Optimus by December 31, 2026?\" priced at 13% — $30,324 traded, closes 2027-01-01.",
+"Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31, 2027?\" priced at 66% — $28,587 traded, closes 2028-01-01.",
+"Sources reached: 11 of 11 answered.",
+"Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call."
+]
+}
+]
+}

@@ -1,0 +1,56 @@
+{
+ "stdout_log": [
+  "[bitget] ticker v2 ok RAAPLUSDT",
+  "[bitget] candles ok RAAPLUSDT v2"
+ ],
+ "result": {
+  "symbol": "AAPLUSDT",
+  "snapshot": {
+   "symbol": "RAAPLUSDT",
+   "last": 335.35,
+   "bid": 335.03,
+   "ask": 335.48,
+   "change24hPct": 0,
+   "high24h": 338.91,
+   "low24h": 334.9,
+   "volumeBase": 17236189.7844,
+   "volumeQuote": 5805921210.608363,
+   "realizedVol24hPct": 1.5243170355974665,
+   "sma20": 336.32048,
+   "source": "v2/spot/market/tickers",
+   "asOf": "2026-09-25T05:05:12.769Z"
+  },
+  "report": {
+   "symbol": "RAAPLUSDT",
+   "horizon": "24h",
+   "bias": "long",
+   "confidence": 38,
+   "strategy": "The long thesis is conditional on 334.90 holding as range support and on a reclaim of the SMA20 near 336.32. Strength would come from firm bids around 335.03, acceptance above 336.32, and expansion toward 338.91. Weakness appears if price stays below the SMA20 after repeated tests, loses the 335.03 bid, or prints lower closes near the 24h low. Missing evidence includes side-specific volume, order-book imbalance, and any news catalyst.",
+   "bull_summary": "Price is near the 24h low in a tight, liquid range, with low realized volatility and a reachable high at 338.91 if SMA20 is reclaimed.",
+   "bear_summary": "Price remains below SMA20 after a flat 24h despite heavy turnover, leaving overhead resistance intact and the nearby low vulnerable to a breakdown.",
+   "catalysts": [
+    "No external headlines available",
+    "Technical reclaim of SMA20 at 336.32",
+    "Defense of 24h low at 334.90"
+   ],
+   "risks": [
+    "Break below 334.90 removes the only visible support",
+    "Repeated rejection at 336.32 keeps sellers in control",
+    "Flat performance despite high quote turnover may indicate absorption",
+    "Low volatility can precede directional expansion lower"
+   ],
+   "i_am_wrong_if": [
+    "A close at or below 334.90 confirms support failure",
+    "Downside volume expands while bid support at 335.03 fades",
+    "Price rallies into SMA20 and is rejected with lower highs",
+    "New negative headline or market-wide risk-off tape appears"
+   ],
+   "invalidation_price": 334.9,
+   "invalidation_note": "Long is invalidated if last trades at or below 334.9 (adverse move below the 335.35 snapshot).",
+   "action": "hold",
+   "reason": "The snapshot supports only a conditional long near support, while SMA20 resistance, flat high-volume price action, and no catalysts keep conviction low.",
+   "evidence_quality": 35,
+   "raw_text": "{\n  \"symbol\": \"RAAPLUSDT\",\n  \"horizon\": \"24h\",\n  \"bias\": \"long\",\n  \"confidence\": 38,\n  \"strategy\": \"The long thesis is conditional on 334.90 holding as range support and on a reclaim of the SMA20 near 336.32. Strength would come from firm bids around 335.03, acceptance above 336.32, and expansion toward 338.91. Weakness appears if price stays below the SMA20 after repeated tests, loses the 335.03 bid, or prints lower closes near the 24h low. Missing evidence includes side-specific volume, order-book imbalance, and any news catalyst.\",\n  \"bull_summary\": \"Price is near the 24h low in a tight, liquid range, with low realized volatility and a reachable high at 338.91 if SMA20 is reclaimed.\",\n  \"bear_summary\": \"Price remains below SMA20 after a flat 24h despite heavy turnover, leaving overhead resistance intact and the nearby low vulnerable to a breakdown.\",\n  \"catalysts\": [\n    \"No external headlines available\",\n    \"Technical reclaim of SMA20 at 336.32\",\n    \"Defense of 24h low at 334.90\"\n  ],\n  \"risks\": [\n    \"Break below 334.90 removes the only visible support\",\n    \"Repeated rejection at 336.32 keeps sellers in control\",\n    \"Flat performance despite high quote turnover may indicate absorption\",\n    \"Low volatility can precede directional expansion lower\"\n  ],\n  \"i_am_wrong_if\": [\n    \"A close at or below 334.90 confirms support failure\",\n    \"Downside volume expands while bid support at 335.03 fades\",\n    \"Price rallies into SMA20 and is rejected with lower highs\",\n    \"New negative headline or market-wide risk-off tape appears\"\n  ],\n  \"invalidation_price\": 334.9,\n  \"invalidation_note\": \"Long is wrong if price closes at or below 334.90, the 24h low, because that breaks the range support underpinning the bounce thesis.\",\n  \"action\": \"hold\",\n  \"reason\": \"The snapshot supports only a conditional long near support, while SMA20 resistance, flat high-volume price action, and no catalysts keep conviction low.\",\n  \"evidence_quality\": 35\n}"
+  }
+ }
+}

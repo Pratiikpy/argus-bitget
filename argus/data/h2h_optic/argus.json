@@ -1,0 +1,239 @@
+{
+ "mstr": {
+  "question": "Long MSTR perp into earnings — funding looks cheap",
+  "asked_at": "2026-09-25T04:06:09.987471+00:00",
+  "seconds": 7.4,
+  "lines": [
+   "Your premise that funding looks cheap: does not hold. MSTR funding is +0.0045% per 8h — higher than 67% of its last 100 settlements (median +0.0000%); a long pays about 4.9% a year at this rate.",
+   "Actionable: MSTR's next report date is not published yet. It reports quarterly, so expect it around 28 Oct — an estimate, not a date; confirm it before holding a position into that window.",
+   "Most recent report on file: 2026-07-29 (period ending 2026-06-29); the source has not yet published the next date.",
+   "The analyst consensus the source holds was scraped 2019-02-09 — too old to present as today's expectation, so it is withheld rather than quoted.",
+   "Institutional holders: the source returned one 13F record for the period ending 2026-06-30 — QRG CAPITAL MANAGEMENT, INC. (6,258 sh). A sample of filers, not a full ownership table.",
+   "Analyst price targets, last 90 days (11 firms, each firm's latest): median 213, range 136 to 435, +31% from the stock's 162.1; 11 buy, 0 hold, 0 sell; 3 raised and 5 cut their target.",
+   "Earnings surprise: the quarter ending 2026-06-30 was a small shortfall — SUE -0.38, i.e. diluted EPS changed -7.96 year over year against a usual swing of 21.01 (SEC filing, filed 2026-08-03).",
+   "MSTR market cap $62bn.",
+   "Strategy holds 846,842 BTC, worth $71.3bn at $84,146; a $62.3bn market value is 0.87x its bitcoin (Bitget's data service, bitget-mcp-server).",
+   "Valuation on 2026-09-24: P/S (trailing 12m) 125.2, P/B (latest quarter) 1.4.",
+   "Institutions: 1,087 holders own 64.1% of the shares (as of 2026-09-23).",
+   "Insider filings (SEC Form 4) in the last 30 days: Patten Jarrod M (Director), filed 2026-09-23; Patten Jarrod M (Director), filed 2026-09-22; Chow Thomas C. (Officer), filed 2026-09-08 — read the filing for direction and size: https://www.sec.gov:443/Archives/edgar/data/1050446/000119312526399364/0001193125-26-399364-index.htm",
+   "Data: Bitget's bitget-mcp-server (US equity data) and the company's SEC filings, live. This is analysis, not advice — you make the call."
+  ],
+  "sources": [
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server",
+    "detail": "earnings calendar, consensus, 13F, quote"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_calendar",
+    "detail": "MSTR report 2026-07-29"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server consensus",
+    "detail": "scraped 2019-02-09"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server 13F holdings",
+    "detail": "MSTR period 2026-06-30"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_estimates_price_target",
+    "detail": "MSTR analyst targets, last 90 days"
+   },
+   {
+    "kind": "computation",
+    "ref": "argus.research.sue via SEC XBRL",
+    "detail": "MSTR eps_diluted, 12 quarters"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server quote",
+    "detail": "MSTR fundamentals snapshot"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server crypto_institutional_company_flow",
+    "detail": "MSTR bitcoin holding"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_fundamental_ratios",
+    "detail": "MSTR 2026-09-24"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_ownership_inst_position_summary",
+    "detail": "MSTR 2026-09-23"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_ownership_insider_trading",
+    "detail": "MSTR Form 4, last 30 days"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget /api/v3/market/history-fund-rate",
+    "detail": "MSTRUSDT; last 100 settlements and the live rate"
+   }
+  ],
+  "classified_by": "research-patterns"
+ },
+ "nvda": {
+  "question": "Long NVDA perp into earnings — funding looks cheap",
+  "asked_at": "2026-09-25T04:06:17.691795+00:00",
+  "seconds": 7.7,
+  "lines": [
+   "Your premise that funding looks cheap: holds in absolute terms — a long pays nothing — which is this contract's usual rate. NVDA funding is +0.0000% per 8h — higher than 34% of its last 100 settlements (median +0.0000%); holding costs nothing in funding at this rate.",
+   "Actionable: NVDA's next report date is not published yet. It reports quarterly, so expect it around 24 Nov — an estimate, not a date; confirm it before holding a position into that window.",
+   "Most recent report on file: 2026-08-25 (period ending 2026-07-29); the source has not yet published the next date.",
+   "The analyst consensus the source holds was scraped 2024-11-21 — too old to present as today's expectation, so it is withheld rather than quoted.",
+   "Institutional holders: the source returned one 13F record for the period ending 2026-06-30 — QRG CAPITAL MANAGEMENT, INC. (4,128,722 sh). A sample of filers, not a full ownership table.",
+   "Analyst price targets, last 90 days (21 firms, each firm's latest): median 330, range 300 to 515, +47% from the stock's 224.47; 21 buy, 0 hold, 0 sell; 12 raised and 0 cut their target.",
+   "Earnings surprise: the quarter ending 2026-07-26 was a large beat — SUE +2.84, i.e. diluted EPS changed +1.70 year over year against a usual swing of 0.60 (SEC filing, filed 2026-08-26).",
+   "NVDA market cap $5,410bn.",
+   "Valuation on 2026-09-24: P/E (trailing 12m) 28.2, P/S (trailing 12m) 17.9, P/B (latest quarter) 23.7, EV/EBITDA 64.8, dividend yield 0.12%.",
+   "Institutions: 6,353 holders own 79.6% of the shares (as of 2026-09-23).",
+   "Insider filings (SEC Form 4) in the last 30 days: Teter Timothy S. (Officer), filed 2026-09-23; STEVENS MARK A (Director), filed 2026-09-22; Kress Colette (Officer), filed 2026-09-18 — read the filing for direction and size: https://www.sec.gov:443/Archives/edgar/data/1045810/000169684126000014/0001696841-26-000014-index.htm",
+   "Data: Bitget's bitget-mcp-server (US equity data) and the company's SEC filings, live. This is analysis, not advice — you make the call."
+  ],
+  "sources": [
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server",
+    "detail": "earnings calendar, consensus, 13F, quote"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_calendar",
+    "detail": "NVDA report 2026-08-25"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server consensus",
+    "detail": "scraped 2024-11-21"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server 13F holdings",
+    "detail": "NVDA period 2026-06-30"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_estimates_price_target",
+    "detail": "NVDA analyst targets, last 90 days"
+   },
+   {
+    "kind": "computation",
+    "ref": "argus.research.sue via SEC XBRL",
+    "detail": "NVDA eps_diluted, 12 quarters"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server quote",
+    "detail": "NVDA fundamentals snapshot"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_fundamental_ratios",
+    "detail": "NVDA 2026-09-24"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_ownership_inst_position_summary",
+    "detail": "NVDA 2026-09-23"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_ownership_insider_trading",
+    "detail": "NVDA Form 4, last 30 days"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget /api/v3/market/history-fund-rate",
+    "detail": "NVDAUSDT; last 100 settlements and the live rate"
+   }
+  ],
+  "classified_by": "research-patterns"
+ },
+ "tsla": {
+  "question": "Long TSLA perp into earnings — funding looks cheap",
+  "asked_at": "2026-09-25T04:06:22.865040+00:00",
+  "seconds": 5.2,
+  "lines": [
+   "Your premise that funding looks cheap: holds in absolute terms — a long pays nothing — which is this contract's usual rate. TSLA funding is +0.0000% per 8h — higher than 39% of its last 100 settlements (median +0.0000%); holding costs nothing in funding at this rate.",
+   "Actionable: TSLA's next report date is not published yet. It reports quarterly, so expect it around 20 Oct — an estimate, not a date; confirm it before holding a position into that window.",
+   "Most recent report on file: 2026-07-21 (period ending 2026-06-29); the source has not yet published the next date.",
+   "The analyst consensus the source holds was scraped 2025-01-30 — too old to present as today's expectation, so it is withheld rather than quoted.",
+   "Institutional holders: the source returned one 13F record for the period ending 2026-06-30 — Envestnet Portfolio Solutions, Inc. (99,244 sh). A sample of filers, not a full ownership table.",
+   "Analyst price targets, last 90 days (19 firms, each firm's latest): median 420, range 24.86 to 505, +11% from the stock's 379.21; 9 buy, 8 hold, 2 sell; 4 raised and 10 cut their target.",
+   "Earnings surprise: the quarter ending 2026-06-30 was a small beat — SUE +0.83, i.e. diluted EPS changed +0.20 year over year against a usual swing of 0.24 (SEC filing, filed 2026-07-23).",
+   "TSLA market cap $1,498bn.",
+   "Valuation on 2026-09-24: P/E (trailing 12m) 394.5, P/S (trailing 12m) 14.5, P/B (latest quarter) 17.3, EV/EBITDA 149.9.",
+   "Institutions: 4,646 holders own 49.3% of the shares (as of 2026-09-23).",
+   "Insider filings (SEC Form 4) in the last 30 days: Taneja Vaibhav (Officer), filed 2026-09-09 — read the filing for direction and size: https://www.sec.gov:443/Archives/edgar/data/1318605/000110465926106432/0001104659-26-106432-index.htm",
+   "Data: Bitget's bitget-mcp-server (US equity data) and the company's SEC filings, live. This is analysis, not advice — you make the call."
+  ],
+  "sources": [
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server",
+    "detail": "earnings calendar, consensus, 13F, quote"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_calendar",
+    "detail": "TSLA report 2026-07-21"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server consensus",
+    "detail": "scraped 2025-01-30"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server 13F holdings",
+    "detail": "TSLA period 2026-06-30"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_estimates_price_target",
+    "detail": "TSLA analyst targets, last 90 days"
+   },
+   {
+    "kind": "computation",
+    "ref": "argus.research.sue via SEC XBRL",
+    "detail": "TSLA eps_diluted, 12 quarters"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server quote",
+    "detail": "TSLA fundamentals snapshot"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_fundamental_ratios",
+    "detail": "TSLA 2026-09-24"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_ownership_inst_position_summary",
+    "detail": "TSLA 2026-09-23"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget-mcp-server equity_ownership_insider_trading",
+    "detail": "TSLA Form 4, last 30 days"
+   },
+   {
+    "kind": "venue",
+    "ref": "bitget /api/v3/market/history-fund-rate",
+    "detail": "TSLAUSDT; last 100 settlements and the live rate"
+   }
+  ],
+  "classified_by": "research-patterns"
+ }
+}

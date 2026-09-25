@@ -191,7 +191,7 @@ class TestTheSurfaceIsReadOnly:
         for verb in ("do_PUT", "do_PATCH", "do_DELETE"):
             assert not hasattr(Handler, verb), f"{verb} would be a write path"
 
-    def test_post_is_answered_only_at_mcp(self, base_url: str) -> None:
+    def test_post_is_answered_only_at_mcp_and_the_telegram_webhook(self, base_url: str) -> None:
         import urllib.error
         import urllib.request
 
@@ -201,6 +201,22 @@ class TestTheSurfaceIsReadOnly:
             raise AssertionError("POST /ask was accepted")
         except urllib.error.HTTPError as exc:
             assert exc.code == 405
+        # The webhook answers nothing without Telegram's secret header (503 when the bot is not
+        # configured on this server at all, 403 when it is and the secret is wrong).
+        request = urllib.request.Request(base_url + "/telegram", data=b"{}", method="POST")
+        try:
+            urllib.request.urlopen(request, timeout=10)
+            raise AssertionError("POST /telegram without the secret was accepted")
+        except urllib.error.HTTPError as exc:
+            assert exc.code in (403, 503)
+
+    def test_an_order_through_telegram_is_refused_like_anywhere_else(self) -> None:
+        from argus.lui.telegram_bot import ChatState, handle_update
+
+        states: dict[int, ChatState] = {}
+        replies = handle_update({"message": {"chat": {"id": 7}, "text": "sell half of NVDA now"}},
+                                states)
+        assert replies and "does not place" in replies[0][1]
 
     def test_no_mcp_tool_writes_and_an_order_through_it_is_refused(self) -> None:
         from argus.lui.mcp_server import TOOLS, call_tool

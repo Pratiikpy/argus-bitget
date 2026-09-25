@@ -1,0 +1,119 @@
+{
+ "comparison": "stop placement: Rook's invalidation price vs ARGUS's measured stop distance",
+ "baseline": "iamsuperfly/Rook runDebate (bull/bear + judge) on the hackathon Qwen, long side, 24h horizon, from its clone",
+ "metric": "share of held-out 24h windows in which ordinary movement alone reached the stop (a long's stop: that day's low at or under prior close x (1 - distance))",
+ "argus_stop_is_out_of_sample": true,
+ "rows": [
+  {
+   "symbol": "AAPLUSDT",
+   "rook_bias": "long",
+   "rook_last": 335.35,
+   "rook_invalidation": 334.9,
+   "rook_distance": 0.0013418816162219516,
+   "rook_noise_hit_rate_oos": 0.8354430379746836,
+   "argus_distance_fit_on_first_60pct": 0.01837077924878172,
+   "argus_noise_hit_rate_oos": 0.12025316455696203,
+   "test_windows": 158,
+   "error": null
+  },
+  {
+   "symbol": "COINUSDT",
+   "rook_bias": "long",
+   "rook_last": 198.47,
+   "rook_invalidation": 197.7,
+   "rook_distance": 0.0038796795485463997,
+   "rook_noise_hit_rate_oos": 0.8734177215189873,
+   "argus_distance_fit_on_first_60pct": 0.061393991544764215,
+   "argus_noise_hit_rate_oos": 0.0949367088607595,
+   "test_windows": 158,
+   "error": null
+  },
+  {
+   "symbol": "METAUSDT",
+   "rook_bias": "long",
+   "rook_last": 778.27,
+   "rook_invalidation": 764.9,
+   "rook_distance": 0.01717912806609534,
+   "rook_noise_hit_rate_oos": 0.27848101265822783,
+   "argus_distance_fit_on_first_60pct": 0.02513518611670018,
+   "argus_noise_hit_rate_oos": 0.17088607594936708,
+   "test_windows": 158,
+   "error": null
+  },
+  {
+   "symbol": "MSTRUSDT",
+   "rook_bias": "long",
+   "rook_last": 161.84,
+   "rook_invalidation": 159.8,
+   "rook_distance": 0.012605042016806678,
+   "rook_noise_hit_rate_oos": 0.7215189873417721,
+   "argus_distance_fit_on_first_60pct": 0.06601897184822514,
+   "argus_noise_hit_rate_oos": 0.10126582278481013,
+   "test_windows": 158,
+   "error": null
+  },
+  {
+   "symbol": "NVDAUSDT",
+   "rook_bias": "long",
+   "rook_last": 224.55,
+   "rook_invalidation": 222,
+   "rook_distance": 0.011356045424181782,
+   "rook_noise_hit_rate_oos": 0.4658385093167702,
+   "argus_distance_fit_on_first_60pct": 0.03265836179115955,
+   "argus_noise_hit_rate_oos": 0.09937888198757763,
+   "test_windows": 161,
+   "error": null
+  },
+  {
+   "symbol": "TSLAUSDT",
+   "rook_bias": "long",
+   "rook_last": 379.29,
+   "rook_invalidation": 375.6,
+   "rook_distance": 0.009728703630467406,
+   "rook_noise_hit_rate_oos": 0.5714285714285714,
+   "argus_distance_fit_on_first_60pct": 0.03867178134739868,
+   "argus_noise_hit_rate_oos": 0.08074534161490683,
+   "test_windows": 161,
+   "error": null
+  }
+ ],
+ "argus_mean_noise_hit_rate": 0.11124433262573054,
+ "rook_mean_noise_hit_rate": 0.6243546400398353,
+ "failure_cases": [],
+ "not_covered": "whether either stop leaves the right trades on: the thesis outcome needs the next 24 hours; six names only",
+ "prospective": {
+  "recorded_at": "2026-09-25T05:16:27.319572+00:00",
+  "stops": {
+   "AAPLUSDT": {
+    "rook": 334.9,
+    "argus_distance": 0.01837077924878172,
+    "last": 335.35
+   },
+   "COINUSDT": {
+    "rook": 197.7,
+    "argus_distance": 0.061393991544764215,
+    "last": 198.47
+   },
+   "METAUSDT": {
+    "rook": 764.9,
+    "argus_distance": 0.02513518611670018,
+    "last": 778.27
+   },
+   "MSTRUSDT": {
+    "rook": 159.8,
+    "argus_distance": 0.06601897184822514,
+    "last": 161.84
+   },
+   "NVDAUSDT": {
+    "rook": 222,
+    "argus_distance": 0.03265836179115955,
+    "last": 224.55
+   },
+   "TSLAUSDT": {
+    "rook": 375.6,
+    "argus_distance": 0.03867178134739868,
+    "last": 379.29
+   }
+  }
+ }
+}

@@ -350,6 +350,30 @@ def handle_ask(
     # hourly allowance. Neither ever writes a figure: both only fill in the request.
     audit: dict[str, Any] = {"attempted": False, "applied": False,
                              "detail": "no model consulted"}
+    from argus.lui.research import (
+        _SESSION_CLAIM,
+        SESSION_QUESTION,
+        _session_claim_line,
+        session_status,
+    )
+
+    if SESSION_QUESTION.search(text) and not research_symbols(text)[0]:
+        # "Is the US market open right now?" names no instrument; it is answered from the
+        # session clock, not routed to an engine that needs one. Stated as a claim ("the US
+        # market is open right now") it gets the premise verdict first.
+        q = classify(text, now=clock, conversation=conversation)
+        lines, sources = session_status(clock)
+        claimed = _SESSION_CLAIM.search(text) if not text.rstrip().endswith("?") else None
+        if claimed is not None:
+            lines = [_session_claim_line(claimed), *lines]
+        note = _language_note(text)
+        if note:
+            lines = [note, *lines]
+        payload = Answer(question=q, lines=lines, sources=sources).as_dict()
+        payload.update(elapsed_ms=(time.perf_counter() - started) * 1000,
+                       budget_ms=BUDGET_MS[q.speed], routing=audit, classified_by="session-clock",
+                       matched=SESSION_QUESTION.pattern, turns=[*prior, text][-12:])
+        return payload
     followed = follow_up(text, prior, book)
     if followed is not None:
         return _research_payload(text, prior, followed, ledger, started, "research-follow-up",
@@ -385,7 +409,10 @@ def handle_ask(
         # as a hedge of nothing and was refused on the live console (2026-09-24).
         if (patterned is not None and pattern_reading_wins(patterned, text)
                 and (planned is None or planned.kind is not patterned.kind
-                     or (patterned.spot is not None and planned.spot != patterned.spot))):
+                     or (patterned.spot is not None and planned.spot != patterned.spot)
+                     or planned.horizon_hours != patterned.horizon_hours
+                     or planned.target != patterned.target
+                     or planned.resize_by != patterned.resize_by)):
             # The model read "order book depth on NVDA" as a quote and "who is selling NVDA" as
             # a news question (2026-09-24). Where the patterns name the one engine that answers
             # the question, their reading stands.
@@ -809,12 +836,23 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_POST(self) -> None:
-        """``/mcp`` only: the Model Context Protocol endpoint (`lui/mcp_server.py`). Every other
-        path is read-only and answers GET."""
+        """Two endpoints only: ``/mcp``, the Model Context Protocol (`lui/mcp_server.py`), and
+        ``/telegram``, the bot's webhook (`lui/telegram_bot.py`, rejected without Telegram's secret
+        header). Both answer questions; neither writes anything. Every other path answers GET."""
         from urllib.parse import urlparse
 
-        if urlparse(self.path).path.rstrip("/") != "/mcp":
-            self._send(b'{"error": "POST is accepted only at /mcp"}', "application/json", 405)
+        path = urlparse(self.path).path.rstrip("/")
+        if path == "/telegram":
+            from argus.lui.telegram_bot import handle_webhook
+
+            length = min(int(self.headers.get("Content-Length") or 0), 64_000)
+            status, body = handle_webhook(
+                self.rfile.read(length), self.headers.get("X-Telegram-Bot-Api-Secret-Token"))
+            self._send(body, "application/json", status)
+            return
+        if path != "/mcp":
+            self._send(b'{"error": "POST is accepted only at /mcp and /telegram"}',
+                       "application/json", 405)
             return
         from argus.lui.mcp_server import handle_body
 

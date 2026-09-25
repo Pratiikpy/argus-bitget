@@ -1,0 +1,571 @@
+{
+  "query": "Long MSTR perp into earnings — funding looks cheap",
+  "resolved": {
+    "type": "desk",
+    "name": "MicroStrategy"
+  },
+  "evidence": {
+    "thesis": "Long MSTR perp into earnings — funding looks cheap",
+    "ticker": "MSTR",
+    "company": "MicroStrategy",
+    "symbol": "MSTRUSDT",
+    "rows": [
+      {
+        "id": "perp",
+        "source": "bitget-rest",
+        "label": "Bitget rToken perpetual MSTRUSDT",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:40:21.731Z",
+        "value": {
+          "symbol": "MSTRUSDT",
+          "venue": "perpetual",
+          "chain": "bitget-futures",
+          "address": "",
+          "price": 162.99,
+          "chg_24h": 1.49,
+          "liquidity": null,
+          "holders": null,
+          "mark_price": 162.98,
+          "index_price": 162.74,
+          "basis_pct": 0.149,
+          "funding_rate": 0.000216,
+          "funding_interval_h": 8,
+          "funding_annualized_pct": 23.65,
+          "open_interest": 195070.41,
+          "open_interest_usdt": 31792575,
+          "volume_24h_usdt": 72478802,
+          "spread_bps": 0.6,
+          "us_session_open": false
+        }
+      },
+      {
+        "id": "cash",
+        "source": "yahoo",
+        "label": "Strategy Inc cash market (NMS)",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:40:21.731Z",
+        "value": {
+          "symbol": "MSTR",
+          "name": "Strategy Inc",
+          "exchange": "NMS",
+          "currency": "USD",
+          "price": 161.61,
+          "previous_close": 162.2,
+          "chg_pct": -0.36,
+          "day_high": 165.14,
+          "day_low": 158.29,
+          "volume": 16738047,
+          "week52_high": 365.21,
+          "week52_low": 81.81,
+          "as_of": "2026-09-24T20:00:01.000Z",
+          "closes": [
+            {
+              "date": "2026-09-11",
+              "close": 130.97
+            },
+            {
+              "date": "2026-09-14",
+              "close": 136.94
+            },
+            {
+              "date": "2026-09-15",
+              "close": 129.6
+            },
+            {
+              "date": "2026-09-16",
+              "close": 126.18
+            },
+            {
+              "date": "2026-09-17",
+              "close": 132.25
+            },
+            {
+              "date": "2026-09-18",
+              "close": 153.92
+            },
+            {
+              "date": "2026-09-21",
+              "close": 168.5
+            },
+            {
+              "date": "2026-09-22",
+              "close": 167.33
+            },
+            {
+              "date": "2026-09-23",
+              "close": 162.2
+            },
+            {
+              "date": "2026-09-24",
+              "close": 161.61
+            }
+          ]
+        }
+      },
+      {
+        "id": "session",
+        "source": "clock",
+        "label": "US cash session",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:40:21.731Z",
+        "value": {
+          "state": "closed",
+          "minutes_to_open": 590,
+          "checked_at": "2026-09-25T03:40:21.731Z",
+          "holidays_modelled": false
+        }
+      },
+      {
+        "id": "gap",
+        "source": "computed",
+        "label": "perp vs cash gap",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:40:21.731Z",
+        "value": {
+          "session": "closed",
+          "minutes_to_us_open": 590,
+          "perp_price": 162.99,
+          "cash_price": 161.61,
+          "cash_previous_close": 162.2,
+          "perp_vs_cash_pct": 0.854,
+          "basis_pct": 0.149,
+          "funding_rate": 0.000216,
+          "funding_annualized_pct": 23.65,
+          "open_interest_usdt": 31792575,
+          "volume_24h_usdt": 72478802,
+          "spread_bps": 0.6
+        }
+      },
+      {
+        "id": "crosscheck",
+        "source": "bitget-signal:crypto_derivatives",
+        "label": "MSTRUSDT 24h ticker via bitget-signal",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:40:22.858Z",
+        "value": {
+          "symbol": "MSTR/USDT",
+          "last": 162.88,
+          "high": 165.14,
+          "low": 156.09,
+          "volume": 1636649.22,
+          "quote_volume": 263533625.4854,
+          "change_pct": 1.496,
+          "timestamp": 1790307620958
+        }
+      },
+      {
+        "id": "news",
+        "source": "bitget-signal:tradfi_news",
+        "label": "news mentioning MicroStrategy",
+        "computed": true,
+        "status": "error",
+        "fetched_at": "2026-09-25T03:40:37.734Z",
+        "value": null,
+        "note": "upstream error: (blank)"
+      },
+      {
+        "id": "earnings",
+        "source": "bitget-signal:tradfi_news",
+        "label": "MSTR company profile / earnings calendar",
+        "computed": true,
+        "status": "error",
+        "fetched_at": "2026-09-25T03:40:37.743Z",
+        "value": null,
+        "note": "upstream error: (blank)"
+      },
+      {
+        "id": "positioning",
+        "source": "bitget-signal:derivatives_sentiment",
+        "label": "MSTRUSDT long/short positioning",
+        "computed": true,
+        "status": "error",
+        "fetched_at": "2026-09-25T03:40:37.520Z",
+        "value": null,
+        "note": "upstream error: (blank)"
+      },
+      {
+        "id": "technicals",
+        "source": "bitget-signal:technical_analysis",
+        "label": "MSTRUSDT technical read (1h)",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:40:22.769Z",
+        "value": {
+          "symbol": "MSTRUSDT",
+          "timeframe": "1h",
+          "rsi": {
+            "rsi": 54.39,
+            "period": 14,
+            "signal": "neutral"
+          },
+          "macd": {
+            "macd": 0.045415,
+            "signal": 0.364418,
+            "histogram": -0.319003,
+            "cross": "death_cross"
+          },
+          "bollinger": {
+            "upper": 158.0593,
+            "middle": 161.101,
+            "lower": 164.1427,
+            "bandwidth": -0.0378,
+            "pct_b": 0.2076,
+            "position": "above_upper"
+          },
+          "ma": {
+            "price": 162.88,
+            "ma7": 162.1286,
+            "ma25": 160.9928,
+            "ma99": 164.3174,
+            "trend": "mixed"
+          },
+          "atr": {
+            "atr": 1.9655,
+            "atr_pct": 1.21,
+            "suggested_stop": 159.9318,
+            "period": 14
+          },
+          "support_resistance": {
+            "supports": [
+              158.41,
+              161.24
+            ],
+            "resistances": [
+              162.62
+            ],
+            "current_price": 162.88
+          },
+          "verdict": "BEARISH",
+          "bull_signals": 0,
+          "bear_signals": 1
+        }
+      },
+      {
+        "id": "macro",
+        "source": "bitget-signal:rates_yields",
+        "label": "rates snapshot",
+        "computed": true,
+        "status": "ok",
+        "fetched_at": "2026-09-25T03:40:42.728Z",
+        "value": {
+          "fed_funds_target_upper": {
+            "error": ""
+          },
+          "fed_funds_target_lower": {
+            "error": ""
+          },
+          "t2y": {
+            "error": ""
+          },
+          "t10y": {
+            "error": ""
+          },
+          "t30y": {
+            "error": ""
+          },
+          "spread_10y2y": {
+            "error": ""
+          },
+          "breakeven_10y": {
+            "error": ""
+          },
+          "sofr": {
+            "error": ""
+          },
+          "mortgage_30y": {
+            "error": ""
+          },
+          "hy_spread": {
+            "error": ""
+          },
+          "ig_spread": {
+            "error": ""
+          },
+          "yield_curve_inverted": false
+        }
+      },
+      {
+        "id": "fear_greed",
+        "source": "bitget-signal:sentiment_index",
+        "label": "crypto fear & greed",
+        "computed": true,
+        "status": "error",
+        "fetched_at": "2026-09-25T03:40:46.751Z",
+        "value": null,
+        "note": "tool returned no result"
+      },
+      {
+        "id": "research",
+        "source": "research",
+        "label": "web-sourced equity research brief",
+        "computed": false,
+        "status": "error",
+        "fetched_at": "2026-09-25T03:40:46.751Z",
+        "value": null,
+        "note": "no sourced brief available"
+      },
+      {
+        "id": "prediction",
+        "source": "polymarket",
+        "label": "prediction markets on MicroStrategy",
+        "computed": true,
+        "status": "empty",
+        "fetched_at": "2026-09-25T03:40:46.751Z",
+        "value": null,
+        "note": "no prediction market prices this company"
+      }
+    ],
+    "coverage": {
+      "total": 13,
+      "ok": 7,
+      "empty": 1,
+      "error": 5,
+      "skipped": 0,
+      "computed_ok": 7,
+      "ratio": 0.54
+    },
+    "gap": {
+      "session": "closed",
+      "minutes_to_us_open": 590,
+      "perp_price": 162.99,
+      "cash_price": 161.61,
+      "cash_previous_close": 162.2,
+      "perp_vs_cash_pct": 0.854,
+      "basis_pct": 0.149,
+      "funding_rate": 0.000216,
+      "funding_annualized_pct": 23.65,
+      "open_interest_usdt": 31792575,
+      "volume_24h_usdt": 72478802,
+      "spread_bps": 0.6
+    },
+    "gathered_at": "2026-09-25T03:40:46.752Z",
+    "perp": {
+      "symbol": "MSTRUSDT",
+      "venue": "perpetual",
+      "chain": "bitget-futures",
+      "address": "",
+      "price": 162.99,
+      "chg_24h": 1.49,
+      "liquidity": null,
+      "holders": null,
+      "mark_price": 162.98,
+      "index_price": 162.74,
+      "basis_pct": 0.149,
+      "funding_rate": 0.000216,
+      "funding_interval_h": 8,
+      "funding_annualized_pct": 23.65,
+      "open_interest": 195070.41,
+      "open_interest_usdt": 31792575,
+      "volume_24h_usdt": 72478802,
+      "spread_bps": 0.6,
+      "us_session_open": false
+    },
+    "cash": {
+      "symbol": "MSTR",
+      "name": "Strategy Inc",
+      "exchange": "NMS",
+      "currency": "USD",
+      "price": 161.61,
+      "previous_close": 162.2,
+      "chg_pct": -0.36,
+      "day_high": 165.14,
+      "day_low": 158.29,
+      "volume": 16738047,
+      "week52_high": 365.21,
+      "week52_low": 81.81,
+      "as_of": "2026-09-24T20:00:01.000Z",
+      "closes": [
+        {
+          "date": "2026-08-25",
+          "close": 126.83
+        },
+        {
+          "date": "2026-08-26",
+          "close": 123.19
+        },
+        {
+          "date": "2026-08-27",
+          "close": 137.4
+        },
+        {
+          "date": "2026-08-28",
+          "close": 127.31
+        },
+        {
+          "date": "2026-08-31",
+          "close": 132.94
+        },
+        {
+          "date": "2026-09-01",
+          "close": 124.88
+        },
+        {
+          "date": "2026-09-02",
+          "close": 123.19
+        },
+        {
+          "date": "2026-09-03",
+          "close": 144.82
+        },
+        {
+          "date": "2026-09-04",
+          "close": 142.8
+        },
+        {
+          "date": "2026-09-08",
+          "close": 136.52
+        },
+        {
+          "date": "2026-09-09",
+          "close": 132.7
+        },
+        {
+          "date": "2026-09-10",
+          "close": 128.56
+        },
+        {
+          "date": "2026-09-11",
+          "close": 130.97
+        },
+        {
+          "date": "2026-09-14",
+          "close": 136.94
+        },
+        {
+          "date": "2026-09-15",
+          "close": 129.6
+        },
+        {
+          "date": "2026-09-16",
+          "close": 126.18
+        },
+        {
+          "date": "2026-09-17",
+          "close": 132.25
+        },
+        {
+          "date": "2026-09-18",
+          "close": 153.92
+        },
+        {
+          "date": "2026-09-21",
+          "close": 168.5
+        },
+        {
+          "date": "2026-09-22",
+          "close": 167.33
+        },
+        {
+          "date": "2026-09-23",
+          "close": 162.2
+        },
+        {
+          "date": "2026-09-24",
+          "close": 161.61
+        }
+      ]
+    },
+    "prediction": null
+  },
+  "transcript": [
+    {
+      "role": "bull",
+      "round": 0,
+      "probability": 0.56,
+      "confidence": 0.52,
+      "reasoning": "The thesis has a live structural edge because the US cash market is closed for about 590 minutes, leaving MSTRUSDT as the only continuous price and it is only 0.854% above the last cash print with a 0.149% basis, not a stretched premium [session][gap][perp]. Funding at 0.000216 per 8h, 23.65% annualized, is positive but not obviously prohibitive against a tape that recently moved from 126.18 to 168.50 before settling near 161.61 [perp][cash]. Liquidity is workable with $31.8m open interest, $72.5m volume and a 0.6bp spread [perp]. The main weaknesses are that the table lacks earnings and positioning confirmation, and the 1h technical verdict is bearish with a MACD death cross and resistance at 162.62 [technicals]. I would lower this if funding or basis widened sharply, because that would show the cheap-carry trade is already crowded.",
+      "message_to_peer": "Your strongest objection is the bearish 1h technical package, but price is only just above the 162.62 resistance and the perp premium is modest at 0.854% with basis 0.149%, so the long is not yet crowded [technicals][gap]. The real test is whether funding stays near 23.65% annualized; if it spikes while the gap widens, the cheap-funding thesis is gone [perp].",
+      "citations": [
+        "session",
+        "gap",
+        "perp",
+        "cash",
+        "technicals"
+      ],
+      "struck": []
+    },
+    {
+      "role": "bear",
+      "round": 0,
+      "probability": 0.34,
+      "confidence": 0.62,
+      "reasoning": "The thesis leans on cheap funding, but the perp shows longs paying 0.000216 per 8h, or 23.65% annualized [perp]. With the cash market closed [session], MSTRUSDT trades 0.854% above the last cash print and basis is positive at 0.149%, so the perp already carries an optimism premium rather than a neglected discount [gap]. The cash tape also shows a sharp run to 168.50 followed by a fade to 161.61, while the 1h technical verdict is bearish with a MACD death cross [cash][technicals]. The missing earnings-calendar and positioning data mean the event catalyst and crowded-short setup are not evidenced. I would move higher only if a confirmed near-term earnings date appeared together with funding/positioning showing shorts paying into the move.",
+      "message_to_peer": "Your cheap-funding claim runs into the actual carry: longs pay 23.65% annualized and the perp is already +0.854% versus last cash [perp][gap]. With no ok earnings or positioning rows, the event edge is unproven, and the 1h death-cross/bearish verdict makes paying funding into resistance a weak setup [technicals].",
+      "citations": [
+        "perp",
+        "session",
+        "gap",
+        "cash",
+        "technicals"
+      ],
+      "struck": []
+    },
+    {
+      "role": "bull",
+      "round": 1,
+      "probability": 0.55,
+      "confidence": 0.55,
+      "reasoning": "The thesis survives because the overnight premium is modest for a 24/7 instrument while cash is closed: perp is only +0.854% versus last cash and basis is 0.149%, not a stretched earnings long [gap][perp][session]. Funding at 0.000216 per 8h looks expensive only when annualized; against the cash session's 158.29-165.14 range and the perp's 156.09-165.14 24h range, the carry is small relative to tradable event volatility [perp][cash][crosscheck]. The 1h death cross is real, but RSI is neutral and price is above MA7/MA25 and just past the 162.62 resistance, so short-term momentum is not decisively short [technicals]. Missing earnings/positioning rows lower confidence; I would fade the thesis if funding and gap widen together while basis expands.",
+      "message_to_peer": "You are right that 23.65% annualized is not free carry, but the market is not paying for a crowded long: basis is only 0.149% and the closed-session gap is 0.854% [perp][gap]. The 1h death cross is outweighed by price holding above MA7/MA25 and just beyond the 162.62 resistance with neutral RSI [technicals]. If funding spikes while the gap widens beyond the recent 156.09-165.14 range, I will concede the cheap-funding read is gone [crosscheck][perp].",
+      "citations": [
+        "perp",
+        "cash",
+        "session",
+        "gap",
+        "crosscheck",
+        "technicals"
+      ],
+      "struck": []
+    },
+    {
+      "role": "bear",
+      "round": 1,
+      "probability": 0.36,
+      "confidence": 0.64,
+      "reasoning": "The thesis rests on cheap funding, but the perp carries +0.000216 per 8h, 23.65% annualized, so longs are paying meaningful carry into an event that the evidence table does not confirm [perp]. With the cash session closed, MSTRUSDT is +0.854% versus the last cash print and +0.149% versus index, meaning the perp already embeds a premium rather than a clean mispricing [session][gap]. The cash tape shows a sharp run to 168.50 followed by two lower closes at 162.20 and 161.61, so much of the recent move may already be expressed [cash]. The 1h read is bearish with a MACD death cross and price pressing the 162.62 resistance, while the 24h range shows upside has already probed 165.14 [technicals][crosscheck]. I would move up only if missing earnings/positioning evidence showed a confirmed near-term catalyst while funding stayed low and the gap expanded.",
+      "message_to_peer": "Your basis point is real, but 0.149% basis does not make 23.65% annualized funding cheap; it only says the premium is small right now [perp][gap]. The closed-session gap of +0.854% plus the bearish 1h death cross means the long is already paying up near resistance [gap][technicals]. Show confirmed earnings/positioning evidence before calling this an event edge.",
+      "citations": [
+        "perp",
+        "session",
+        "gap",
+        "cash",
+        "technicals",
+        "crosscheck"
+      ],
+      "struck": []
+    }
+  ],
+  "debated": true,
+  "judge": {
+    "call": "insufficient_evidence",
+    "p_thesis_holds": 0.42,
+    "confidence": 0.54,
+    "what_is_priced_in": "MSTRUSDT already carries a small premium to cash and index, with buyers paying positive funding, while the recent tape shows a run to 165.14 and a fade near 162 [perp][gap][cash].",
+    "strongest_attack": "The event edge is unverified because the earnings calendar and positioning rows are not ok, and positive annualized funding plus a closed-session premium means the trade is not clearly cheap [earnings][positioning][perp][gap].",
+    "reasoning": "The bull's modest basis and closed-session gap are real, but they do not confirm an earnings catalyst or prove funding is cheap when annualized carry is 23.65% [gap][perp]. The bearish 1h read and recent fade matter, yet the missing earnings, news, and positioning rows are decisive, so the desk should not infer an event edge [technicals][cash][earnings]. Both sides made valid points, but the table lacks the event and crowding data needed to settle the trade.",
+    "citations": [
+      "perp",
+      "gap",
+      "cash",
+      "session",
+      "technicals"
+    ],
+    "struck": [],
+    "samples": 3
+  },
+  "replay": null,
+  "clarifying_question": null,
+  "read": {
+    "direction": "up",
+    "horizon_hours": 96
+  },
+  "generated_at": "2026-09-25T03:49:48.457Z",
+  "card_url": null,
+  "verdict_line": "MSTR: the evidence to judge this is missing — P(holds) 42%, confidence 54% on 7/13 rows.",
+  "llm_role": "Read the thesis (1 small call). Gathered 7/13 evidence rows (7 computed by code). Bull and Bear argued 4 turns citing only the table; 0 citation(s) struck. Judge sampled 3×, median reported, probability capped to [0.10, 0.90], confidence capped by coverage (0.54). Every number on the card was computed by code; the model interpreted and argued."
+}

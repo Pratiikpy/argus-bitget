@@ -841,7 +841,7 @@ def screen(evidence: Sequence[Any]) -> tuple[list[Any], Screening]:
     """Replace the text of any hostile item, keep everything else, and report what happened.
 
     Returns evidence of the **same length, in the same order**. Dropping an item would shrink the
-    set without the caller knowing, and every downstream count — `agents/novelty.py`'s distinct
+    set without the caller knowing, and every downstream count — `truth/novelty.py`'s distinct
     stories, the research chain's evidence step, the confidence built on both — would inherit the
     error. The item survives with its id, source and timestamp; only its claim is withheld.
 

@@ -5768,6 +5768,153 @@ REGISTER: tuple[Capability, ...] = (
             "built from that loss",
         ),
     ),
+    Capability(
+        name="A trader's thesis tested on the same input as optic-bitget's desk",
+        subtheme="t3-personalisation",
+        module="argus/lui/research.py",
+        state=State.TIED,
+        baseline="neromtoobad/optic-bitget (Season 2, MIT): evidence table, Bull/Bear debate "
+                 "twice, Judge sampled three times, probability capped to 10-90%, run end to end",
+        proofs=(
+            Proof("best_implementation_studied",
+                  "optic-bitget's desk read in source (src/desk/index.ts, evidence.ts, judge.ts, "
+                  "src/lenses/prediction.ts) and its Polymarket selection rules taken for "
+                  "market/prediction.py",
+                  artefact="data/h2h_optic/summary.json"),
+            Proof("baseline_reproduced",
+                  "optic's own runDesk executed on three theses, outputs kept verbatim; its code "
+                  "unchanged except an environment-gated LLM endpoint so it could run on the "
+                  "hackathon Qwen",
+                  artefact="data/h2h_optic/summary.json"),
+            Proof("same_input_comparison",
+                  "the same three sentences ('Long MSTR/NVDA/TSLA perp into earnings — funding "
+                  "looks cheap') through both desks the same morning",
+                  artefact="data/h2h_optic/summary.json"),
+            Proof("implementation_complete",
+                  "the premise check found by this comparison, and tested",
+                  test="test_claim_check.py::test_cheap_funding_that_is_dear_for_this_contract_"
+                       "does_not_hold"),
+            Proof("failure_cases_documented",
+                  "optic still leads on a single synthesised call; two ARGUS defects the run "
+                  "exposed; two gaps closed afterwards and not re-measured",
+                  artefact="data/h2h_optic/summary.json"),
+        ),
+        blockers=(
+            "TIED: optic abstained on two of three theses because its earnings and positioning "
+            "rows errored, and ARGUS answered exactly those rows (report date, targets, "
+            "surprise, 13F, Form 4) plus a premise verdict measured against the contract's own "
+            "settlements, with no model spend against about 97,500 Qwen tokens. optic still "
+            "gives one synthesised call with a probability, which ARGUS does not",
+            "no outcome grading: whether each thesis held needs its horizon to pass, so neither "
+            "desk's call is scored yet",
+        ),
+    ),    Capability(
+        name="A trader's claims about the tape checked against it, measured against MirrorLine",
+        subtheme="t3-decisionstress",
+        module="argus/lui/research.py",
+        state=State.TIED,
+        baseline="PinnacleCryptNG/MirrorLine (Season 2, no licence file): its own challenge "
+                 "engine, getInterpretationChallenge, run from its clone on the same sentences",
+        proofs=(
+            Proof("best_implementation_studied",
+                  "MirrorLine's claim rules read in source (lib/challenge/rules.ts, engine.ts): "
+                  "direction, causation, session, reference tape, liquidity, depth, freshness, "
+                  "trade action; rebuilt from behaviour, no code taken",
+                  artefact="data/claimcheck_comparison.json"),
+            Proof("baseline_reproduced",
+                  "MirrorLine's engine run live on 38 claims across nine rTokens, raw output kept",
+                  artefact="data/claimcheck_comparison.json"),
+            Proof("same_input_comparison",
+                  "the same 38 sentences through both desks the same morning, the tape captured "
+                  "before and after; near-zero days reported apart rather than graded",
+                  artefact="data/claimcheck_comparison.json"),
+            Proof("implementation_complete",
+                  "direction, past-tense cause and session claims, tested",
+                  test="test_claim_check.py::test_a_past_tense_claim_with_a_cause_is_read"),
+            Proof("failure_cases_documented",
+                  "the first run was a loss (ARGUS read 18 of 38, MirrorLine 38) and is kept; the "
+                  "claim kinds only one desk reads are named",
+                  artefact="data/claimcheck_comparison.json"),
+        ),
+        blockers=(
+            "TIED: on the re-run both desks judged all 30 gradable claims correctly (direction "
+            "14/14, stated cause held back 14/14, US session 2/2); the first run was a clear "
+            "LOSS — ARGUS gave no verdict on any past-tense causal claim or either session "
+            "claim — and it is kept in data/h2h_mirrorline/argus_raw_first_run.json",
+            "MirrorLine still reads claim kinds ARGUS does not: 40-level book depth, liquidity "
+            "and trade-action language; ARGUS reads funding and the perpetual's premium, which "
+            "MirrorLine does not",
+        ),
+    ),    Capability(
+        name="A leveraged hold across the weekend, measured against baserate",
+        subtheme="t3-decisionstress",
+        module="argus/market/equity_history.py",
+        state=State.TIED,
+        baseline="Jayanng/baserate (Season 2, proprietary): its own trade parser and dossier "
+                 "builder on its pinned replay fixtures, 1,227 NVDA weekends",
+        proofs=(
+            Proof("best_implementation_studied",
+                  "baserate's parser, dossier builder, base-rate engine and fixtures read; its "
+                  "weekend move found to run Friday close to Monday CLOSE",
+                  artefact="data/h2h_baserate/summary.json"),
+            Proof("baseline_reproduced",
+                  "baserate's buildDossier run from its clone on the same sentence",
+                  artefact="data/h2h_baserate/summary.json"),
+            Proof("same_input_comparison",
+                  "'long rNVDA over the weekend at 3x with 5,000 USDT' through both desks",
+                  artefact="data/h2h_baserate/summary.json"),
+            Proof("implementation_complete",
+                  "split-adjusted stock weekends, closures only, read from the position's side",
+                  test="test_equity_history.py::test_a_split_weekend_is_not_a_crash"),
+            Proof("failure_cases_documented",
+                  "the first run answered a different question; no regime-conditioned record",
+                  artefact="data/h2h_baserate/summary.json"),
+        ),
+        blockers=(
+            "TIED: the first run was a LOSS (ARGUS answered a hedge question); rebuilt, ARGUS "
+            "prices liquidation at Bitget's live maintenance tier and live funding, reads 1,443 "
+            "NVDA weekends since 1999 and the perpetual's own path through 57 weekends, while "
+            "baserate keeps a regime match and a self-grading forecast ledger ARGUS lacks here",
+        ),
+    ),    Capability(
+        name="Where a stop sits in the noise, measured against Rook's invalidation price",
+        subtheme="t3-decisionstress",
+        module="argus/desk/odds.py",
+        state=State.IMPLEMENTED,
+        baseline="iamsuperfly/Rook (Season 2, MIT): runDebate (bull/bear + judge) on the hackathon "
+                 "Qwen, long side, 24h, six names, from its clone",
+        proofs=(
+            Proof("best_implementation_studied",
+                  "Rook's invalidation logic read (lib/desk/invalidation.ts: model proposal, "
+                  "overridden by the 24h low, SMA20 or 1% when on the wrong side)",
+                  artefact="data/stopquality_comparison.json"),
+            Proof("baseline_reproduced",
+                  "Rook's own runDebate executed on six names, outputs kept in data/h2h_rook/",
+                  artefact="data/stopquality_comparison.json"),
+            Proof("same_input_comparison",
+                  "both stops scored on the same held-out 40% of each name's Bitget daily bars",
+                  artefact="data/stopquality_comparison.json"),
+            Proof("out_of_sample_test",
+                  "ARGUS's distance fitted on the first 60% of history, scored on the last 40%",
+                  artefact="data/stopquality_comparison.json"),
+            Proof("implementation_complete",
+                  "the adverse-excursion measure, tested",
+                  test="test_odds.py::test_the_stop_line_reads_the_bars_lows_and_highs_not_the_"
+                       "closes"),
+            Proof("failure_cases_documented",
+                  "six names, one run; Rook's line is a thesis invalidation, not a noise stop",
+                  artefact="data/stopquality_comparison.json"),
+        ),
+        blockers=(
+            "ahead on the one metric measured, not OWNED: ordinary movement reached Rook's stops "
+            "on 62% of held-out days on average (28% to 87% by name) and ARGUS's out-of-sample "
+            "stop on 11% (8% to 17%), lower on all six names — but six names and one run, and "
+            "Rook's price marks where its thesis is wrong rather than where noise ends, so the "
+            "comparison says how often each line is hit by chance, not which desk trades better",
+            "prospective check pending: both stops were recorded at the run and are graded on "
+            "the next 24 hours",
+        ),
+    ),
 )
 
 

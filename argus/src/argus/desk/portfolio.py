@@ -1015,6 +1015,29 @@ def rebalance(before: Mapping[str, float], add: str, size: float) -> dict[str, f
     return after
 
 
+def resize(before: Mapping[str, float], name: str, target: float) -> dict[str, float]:
+    """The book after setting ``name`` to a final weight of ``target``, every other holding scaled
+    so the book still sums to one.
+
+    ``rebalance`` answers "buy ``size`` more": a held name ends at its scaled weight plus ``size``,
+    which is right for "add 10% NVDA" and wrong for "trim NVDA to 10%" or "take NVDA from 8% to
+    20%" — both name the weight the holding ends at. Before 2026-09-25 those questions were read as
+    adds of 20% (the default), because nothing expressed a target. ``target`` may be zero (sell it
+    all); the name then stays in the book at zero so the before/after comparison can name it.
+    """
+    if not 0.0 <= target < 1.0:
+        raise PortfolioError(f"target weight must be in [0, 1), got {target}")
+    held = before.get(name, 0.0)
+    rest = sum(w for s, w in before.items() if s != name)
+    if rest <= 0:
+        raise PortfolioError(f"a book of {name} alone cannot be resized against itself")
+    scale = (1.0 - target) / rest
+    after = {s: w * scale for s, w in before.items() if s != name}
+    after[name] = target
+    del held
+    return after
+
+
 def copilot(
     *,
     add: str,
@@ -1023,6 +1046,7 @@ def copilot(
     raw: Mapping[str, Mapping[datetime, float]],
     benchmark: str,
     is_open: Any,
+    target: float | None = None,
 ) -> CopilotReport:
     """The whole portfolio-copilot research task over already-fetched returns.
 
@@ -1033,7 +1057,7 @@ def copilot(
     worst window and factor exposures use every aligned bar, because the book is exposed to the
     shut session too and a stress test that skipped 82% of the hours would understate it.
     """
-    after = rebalance(before, add, size)
+    after = resize(before, add, target) if target is not None else rebalance(before, add, size)
     stamps, columns = align(raw)
     if benchmark not in columns:
         raise PortfolioError(f"no aligned returns for the benchmark {benchmark}")
