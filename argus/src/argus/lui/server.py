@@ -407,6 +407,13 @@ def handle_ask(
         # A spot rToken holding is a field the model's plan does not carry, so a model reading of
         # the same kind still loses it: "I hold RNVDAUSDT, protect it over the weekend" came back
         # as a hedge of nothing and was refused on the live console (2026-09-24).
+        if (planned is not None and planned.kind is ResearchKind.LEVERAGE
+                and not _LEVERAGE_WORDS.search(text)):
+            # The hosted model read "Long MSTR perp into earnings — funding looks cheap" as a 10x
+            # leverage question (live, 2026-09-25): "perp" is not leverage. With no multiple,
+            # margin or liquidation named, the leverage engine has nothing it was asked.
+            planned = with_book(patterned, book, text) if patterned is not None else None
+            audit = {**audit, "detail": "a leverage reading with no leverage named was dropped"}
         if (patterned is not None and pattern_reading_wins(patterned, text)
                 and (planned is None or planned.kind is not patterned.kind
                      or (patterned.spot is not None and planned.spot != patterned.spot)
@@ -584,6 +591,12 @@ _DOMAIN = re.compile(
     r"为什么|理由|证据|校准|你", re.I)
 """Words that make a question about markets or the desk. Deliberately wide — it exists to stop
 the n-gram layer answering chit-chat, not to judge a trading question."""
+
+
+_LEVERAGE_WORDS = re.compile(r"\b\d+(?:\.\d+)?\s*x\b|\bleverag\w*|\bliquidat\w*|\bmargin\b|"
+                             r"\u6760\u6746|\u7206\u4ed3|\u500d", re.I)
+"""What makes a question about leverage: a multiple, the word, liquidation or margin, or the
+Chinese for leverage, liquidation and "times"."""
 
 
 def in_domain(text: str) -> bool:

@@ -167,7 +167,7 @@ def lines_for(symbol: str, *, search: Any = _search, now: datetime | None = None
     lines = []
     for m in markets[:MAX_LINES]:
         move = (f", {m.change_24h * 100:+.0f} points in 24h"
-                if m.change_24h is not None and abs(m.change_24h) >= 0.005 else "")
+                if m.change_24h is not None and abs(m.change_24h) >= 0.01 else "")
         lines.append(f"Prediction market on {label} (Polymarket): \"{m.question}\" priced at "
                      f"{m.yes_price:.0%}{move} — ${m.volume:,.0f} traded, closes {m.ends}.")
     return lines

@@ -418,3 +418,27 @@ class TestStalenessFollowsTheSchedule:
         assert _next_scheduled_cycle(datetime(2026, 9, 23, 20, 0, tzinfo=UTC)) == datetime(
             2026, 9, 24, 13, 30, tzinfo=UTC
         )
+
+
+class TestAModelReadingIsHeldToTheWords:
+    def test_a_leverage_reading_with_no_leverage_named_is_dropped(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """The hosted model read "Long MSTR perp into earnings — funding looks cheap" as a 10x
+        leverage question (live, 2026-09-25). "Perp" is not leverage."""
+        from argus.lui import research, server
+
+        class Planner:
+            def complete_json(self, messages: list[dict[str, str]], **_: Any) -> dict[str, Any]:
+                return {"kind": "leverage", "names": ["MSTR"], "candidate": "MSTR",
+                        "confidence": 0.95, "why": "a perp position"}
+
+        seen: list[Any] = []
+        monkeypatch.setattr(server, "_model_for", lambda visitor: Planner())
+        monkeypatch.setattr(server, "worth_asking_the_model", lambda text, **_: True)
+        monkeypatch.setattr(server, "_research_payload",
+                            lambda text, prior, request, *a, **k: seen.append(request) or {})
+        handle_ask("Long MSTR perp into earnings — funding looks cheap", [])
+        assert seen and seen[0].kind is not research.ResearchKind.LEVERAGE
+        seen.clear()
+        handle_ask("10x long MSTR over the weekend", [])
+        assert seen and seen[0].kind is research.ResearchKind.LEVERAGE
