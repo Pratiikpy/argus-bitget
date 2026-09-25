@@ -471,7 +471,7 @@ We measured it on 30 days of hourly candles for every stock perpetual against QQ
 | MSFTUSDT | 0.340 | **0.577** | 0.245 |
 | NVDAUSDT | 1.412 | **1.709** | 1.296 |
 
-**Open-session beta is higher than shut-session beta on 10 of 11 rTokens** (the stock perpetuals).
+**Open-session beta is higher than shut-session beta on 10 of 11 stock perpetuals.**
 
 AAPL is the extreme. Its blended beta of 0.254 would tell a trader the name is nearly
 market-neutral. During the session that actually prices it, the figure is **0.668** — more than two
@@ -1139,7 +1139,7 @@ why.
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 659 decisions on record. Every one of them is a refusal, and 604 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 673 decisions on record. Every one of them is a refusal, and 625 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
 zero trades, those three numbers **do not exist**. Not "are zero" — do not exist. Half of the track
@@ -1817,7 +1817,7 @@ allocation → beta → portfolio → diversification → stress → cost), `por
 `resolve` — the auto-resolver and the scoreboard, structurally unable to answer early.
 `open_register` — commits a batch and submits its head to four Bitcoin calendars.
 
-Live: **246 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
+Live: **256 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
 2026-09-14. The resolver runs on every scheduled cycle.
 
 ### `eval/` — thirty-three ways to be wrong in public (33 modules)

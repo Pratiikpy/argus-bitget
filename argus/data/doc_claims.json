@@ -1,11 +1,11 @@
 {
-  "total": 96,
-  "checked": 86,
-  "ok": 72,
-  "lagging": 14,
+  "total": 99,
+  "checked": 89,
+  "ok": 89,
+  "lagging": 0,
   "stale": 0,
   "absent": 24,
-  "deleted": 2,
+  "deleted": 0,
   "unchecked": 10,
   "findings": [
     {
@@ -188,26 +188,26 @@
       "doc": "readme",
       "line": 12,
       "quoted": [
-        "246"
+        "256"
       ],
       "live": [
         256
       ],
-      "status": "LAGGING",
-      "excerpt": "246 claims across"
+      "status": "OK",
+      "excerpt": "256 claims across"
     },
     {
       "claim": "register_claims",
       "doc": "readme",
       "line": 179,
       "quoted": [
-        "246"
+        "256"
       ],
       "live": [
         256
       ],
-      "status": "LAGGING",
-      "excerpt": "246 falsifiable claims about"
+      "status": "OK",
+      "excerpt": "256 falsifiable claims about"
     },
     {
       "claim": "register_claims",
@@ -225,65 +225,65 @@
       "doc": "submission",
       "line": 196,
       "quoted": [
-        "246"
+        "256"
       ],
       "live": [
         256
       ],
-      "status": "LAGGING",
-      "excerpt": "246 claims across"
+      "status": "OK",
+      "excerpt": "256 claims across"
     },
     {
       "claim": "register_claims",
       "doc": "submission",
       "line": 494,
       "quoted": [
-        "246"
+        "256"
       ],
       "live": [
         256
       ],
-      "status": "LAGGING",
-      "excerpt": "246 claims across"
+      "status": "OK",
+      "excerpt": "256 claims across"
     },
     {
       "claim": "register_claims",
       "doc": "explained",
       "line": 1820,
       "quoted": [
-        "246"
+        "256"
       ],
       "live": [
         256
       ],
-      "status": "LAGGING",
-      "excerpt": "246 claims across"
+      "status": "OK",
+      "excerpt": "256 claims across"
     },
     {
       "claim": "register_claims",
       "doc": "master-plan",
       "line": 410,
       "quoted": [
-        "246"
+        "256"
       ],
       "live": [
         256
       ],
-      "status": "LAGGING",
-      "excerpt": "246 claims across"
+      "status": "OK",
+      "excerpt": "256 claims across"
     },
     {
       "claim": "register_claims",
       "doc": "architecture",
       "line": 170,
       "quoted": [
-        "246"
+        "256"
       ],
       "live": [
         256
       ],
-      "status": "LAGGING",
-      "excerpt": "246 claims across"
+      "status": "OK",
+      "excerpt": "256 claims across"
     },
     {
       "claim": "tradeable_sessions_with_lean",
@@ -298,7 +298,7 @@
         344
       ],
       "status": "OK",
-      "excerpt": "349 of those 659 decisions were taken in a tradeable session with the anchor market open, and **344 of them"
+      "excerpt": "349 of those 673 decisions were taken in a tradeable session with the anchor market open, and **344 of them"
     },
     {
       "claim": "refusal_accuracy_2h",
@@ -609,13 +609,13 @@
       "doc": "readme",
       "line": 71,
       "quoted": [
-        "659"
+        "673"
       ],
       "live": [
         673
       ],
-      "status": "LAGGING",
-      "excerpt": "659 decisions in the paper ledger"
+      "status": "OK",
+      "excerpt": "673 decisions in the paper ledger"
     },
     {
       "claim": "ledger_decisions",
@@ -734,52 +734,52 @@
       "doc": "readme",
       "line": 71,
       "quoted": [
-        "659"
+        "673"
       ],
       "live": [
         673
       ],
-      "status": "LAGGING",
-      "excerpt": "659 decisions"
+      "status": "OK",
+      "excerpt": "673 decisions"
     },
     {
       "claim": "ledger_entries",
       "doc": "readme",
       "line": 236,
       "quoted": [
-        "659"
+        "673"
       ],
       "live": [
         673
       ],
-      "status": "LAGGING",
-      "excerpt": "659 ledger entries"
+      "status": "OK",
+      "excerpt": "673 ledger entries"
     },
     {
       "claim": "ledger_entries",
       "doc": "submission",
       "line": 597,
       "quoted": [
-        "659"
+        "673"
       ],
       "live": [
         673
       ],
-      "status": "LAGGING",
-      "excerpt": "659 decisions"
+      "status": "OK",
+      "excerpt": "673 decisions"
     },
     {
       "claim": "ledger_entries",
       "doc": "explained",
       "line": 1142,
       "quoted": [
-        "659"
+        "673"
       ],
       "live": [
         673
       ],
-      "status": "LAGGING",
-      "excerpt": "paper-trading log has 659 decisions"
+      "status": "OK",
+      "excerpt": "paper-trading log has 673 decisions"
     },
     {
       "claim": "settled_abstentions",
@@ -808,26 +808,26 @@
       "doc": "explained",
       "line": 1142,
       "quoted": [
-        "604"
+        "625"
       ],
       "live": [
         625
       ],
-      "status": "LAGGING",
-      "excerpt": "604 have settled as abstentions"
+      "status": "OK",
+      "excerpt": "625 have settled as abstentions"
     },
     {
       "claim": "leans_recorded",
       "doc": "readme",
       "line": 247,
       "quoted": [
-        "492"
+        "506"
       ],
       "live": [
         506
       ],
-      "status": "LAGGING",
-      "excerpt": "492 decisions carry a lean"
+      "status": "OK",
+      "excerpt": "506 decisions carry a lean"
     },
     {
       "claim": "leans_recorded",
@@ -1026,26 +1026,32 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "readme",
-      "line": null,
-      "quoted": [],
+      "line": 225,
+      "quoted": [
+        "10",
+        "11"
+      ],
       "live": [
         10,
         11
       ],
-      "status": "DELETED",
-      "excerpt": "last seen at line 225"
+      "status": "OK",
+      "excerpt": "on 10 of 11 stock perpetuals"
     },
     {
       "claim": "session_beta_higher_open",
       "doc": "submission",
-      "line": null,
-      "quoted": [],
+      "line": 238,
+      "quoted": [
+        "10",
+        "11"
+      ],
       "live": [
         10,
         11
       ],
-      "status": "DELETED",
-      "excerpt": "last seen at line 238"
+      "status": "OK",
+      "excerpt": "on 10 of 11 stock perpetuals"
     },
     {
       "claim": "session_beta_higher_open",
@@ -1060,7 +1066,22 @@
         11
       ],
       "status": "OK",
-      "excerpt": "on 10 of 11 rTokens"
+      "excerpt": "on 10 of 11 stock perpetuals"
+    },
+    {
+      "claim": "session_beta_higher_open",
+      "doc": "explained",
+      "line": 1505,
+      "quoted": [
+        "10",
+        "11"
+      ],
+      "live": [
+        10,
+        11
+      ],
+      "status": "OK",
+      "excerpt": "on 10 of 11 stock perpetuals"
     },
     {
       "claim": "session_beta_higher_open",

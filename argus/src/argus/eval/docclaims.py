@@ -746,7 +746,7 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("weekend_continuation", r"(?P<q>\d+\.\d)% continuation",
           lambda: _json("weekend_significance.json")["test_1_significance"]["weekend"]["rate_pct"],
           ("explained", "master-plan")),
-    Claim("session_beta_higher_open", r"on (?P<q>\w+) of (?P<q2>\w+) rTokens",
+    Claim("session_beta_higher_open", r"on (?P<q>\w+) of (?P<q2>\w+) (?:rTokens|stock perpetuals)",
           lambda: (_json("session_beta.json")["symbols_higher_open"],
                    _json("session_beta.json")["symbols_compared"]),
           ("readme", "submission", "explained", "master-plan")),
