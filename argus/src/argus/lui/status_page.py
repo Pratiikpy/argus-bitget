@@ -149,12 +149,15 @@ def sweep_lines(data: Path) -> list[tuple[str, str]]:
         after = understanding.get("console_after") or {}
         before = understanding.get("console_before") or {}
         alone = understanding.get("kind_model_alone") or {}
+        qwen = understanding.get("console_with_qwen") or {}
         out.append(("Understanding questions",
                     f"{understanding.get('written_by', 'a blind writer')}: this console, with no "
                     f"language model, read {before.get('no_book', '?')} correctly before "
                     f"2026-09-25 and {after.get('no_book', '?')} after "
                     f"({after.get('saved_book', '?')} with a saved book); its question "
-                    f"classifier alone {alone.get('correct', '?')}/{alone.get('rows', '?')} — "
+                    f"classifier alone {alone.get('correct', '?')}/{alone.get('rows', '?')}; "
+                    f"with Qwen reading first "
+                    f"{qwen.get('no_book', 'not measured')} — "
                     f"measured {understanding.get('measured_at', '')}"))
     mirror = _load(data, "skill_mirror.json")
     if mirror:

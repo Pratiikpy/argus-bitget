@@ -119,7 +119,7 @@ a test that reaches the network shows itself.
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes**, resolved by import at runtime, not claimed in prose |
-| Understanding | 240 questions in 12 languages, written by an agent that never saw this repository, scored without reading its misses: the console, with no language model, read **52.1% → 81.7%** of them correctly after 2026-09-25 (85.0% with a saved book; on the live site Qwen reads first and this is the fallback); the trained question classifier alone reads 91.3% — `data/lui_final_heldout_report.json` |
+| Understanding | 240 questions in 12 languages, written by an agent that never saw this repository, scored without reading its misses: the console, with no language model, read **52.1% → 81.7%** of them correctly after 2026-09-25 (85.0% with a saved book; on the live site Qwen reads first and this is the fallback); the trained question classifier alone reads 91.3%; with Qwen reading first the console reads 85.0% — `data/lui_final_heldout_report.json` |
 | Quoted figures | Every figure these documents quote is re-checked against its artefact by `python -m argus.eval.docclaims --tests`, which fails if one has drifted |
 
 ## What the code will not let happen

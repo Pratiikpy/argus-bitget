@@ -38,5 +38,24 @@
     "lui_blind_corpus_2026-09-25": "dev: patterns 66.2% -> 85.0% after fixes (fit to it; not a test)",
     "lui_heldout_corpus_2026-09-25": "held-out once: patterns 55.0% before, 63.5% after pattern fixes; kind model alone 88.5%; then used as dev and training"
   },
-  "not_covered": "No model key in either run. Arabic 3/7 for the model alone. The four older research-bench corpora (patterns-only) are unchanged at 220/310."
+  "not_covered": "Arabic is the weakest language for the kind model (3/7) and is carried by Qwen (6/7). The four older research-bench corpora (patterns-only) are unchanged at 220/310.",
+  "console_with_qwen": {
+    "no_book": "204/240 (85.0%)",
+    "qwen_consulted": 213,
+    "by_lang": {
+      "ar": "6/7",
+      "de": "6/7",
+      "en": "89/108",
+      "es": "7/8",
+      "fr": "7/8",
+      "hi": "5/7",
+      "ja": "5/7",
+      "ko": "6/7",
+      "pt": "7/7",
+      "vi": "7/7",
+      "zh-Hans": "54/60",
+      "zh-Hant": "5/7"
+    },
+    "note": "Qwen (qwen3.8-max, thinking off) reads first, the kind model is the fallback. Measured with a 400k-token budget for the run; the live console caps Qwen at 20k tokens per server process, after which the kind model reads (81.7%)."
+  }
 }
