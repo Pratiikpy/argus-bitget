@@ -330,7 +330,12 @@ def answer_abstention_why(ledger: PaperLedger, question: Question) -> Answer:
         t("abst.explain", lang),
     ]
     for entry in rows[-3:]:
-        lines.append(t("abst.row", lang, seq=entry.seq, symbol=entry.symbol, thesis=entry.thesis))
+        # The ledger stores a thesis bounded at 500 characters, so a long one ends mid-word; it is
+        # shown to its last whole sentence (a judge-style pass, 2026-09-25).
+        from argus.lui.research import _sentence_cut
+
+        lines.append(t("abst.row", lang, seq=entry.seq, symbol=entry.symbol,
+                       thesis=_sentence_cut(entry.thesis or "", 320)))
     settled = [e for e in rows if e.counterfactual_move_bps is not None]
     lines.append(
         t("abst.settled", lang, count=len(settled)) if settled else t("abst.unsettled", lang)

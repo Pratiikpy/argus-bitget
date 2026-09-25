@@ -221,3 +221,42 @@ def test_the_status_page_reports_the_measured_understanding(tmp_path: Any) -> No
     line = dict(sweep_lines(tmp_path))["Understanding questions"]
     assert "with no language model" in line
     assert "125/240 (52.1%)" in line and "196/240 (81.7%)" in line and "219/240" in line
+
+
+class TestTheJudgePass:
+    """Found by reading twenty live answers as a judge would (2026-09-25)."""
+
+    def test_a_stated_add_keeps_the_impact_reading(self) -> None:
+        from argus.lui.research import detect, pattern_reading_wins
+
+        text = "I'm a conservative investor, should I add 15% TSLA?"
+        request = detect(text)
+        assert request is not None and pattern_reading_wins(request, text)
+
+    def test_a_dated_price_question_is_a_forecast(self) -> None:
+        from argus.lui.research import _PRICE_FORECAST
+
+        assert _PRICE_FORECAST.search("what will BTC be next Friday")
+
+    @pytest.mark.parametrize(("question", "rsi", "start"), [
+        ("is TSLA overbought", "63.4", "Actionable: No — TSLA is not overbought"),
+        ("is TSLA overbought", "74.0", "Actionable: Yes — TSLA is overbought"),
+        ("英伟达超卖了吗", "25.0", "Actionable: Yes — NVDA is oversold"),
+    ])
+    def test_the_overbought_question_gets_a_yes_or_no(self, question: str, rsi: str,
+                                                      start: str) -> None:
+        from argus.lui.research import _answer_the_state_asked
+
+        symbol = "NVDAUSDT" if "英伟达" in question else "TSLAUSDT"
+        lines = ["Actionable: momentum turning down.", f"RSI(14, 4h) {rsi} — neutral."]
+        out = _answer_the_state_asked(question, symbol, lines)
+        assert out[0].startswith(start) and "momentum turning down" in out[0]
+        assert len(out) == 2
+
+    def test_a_semicolon_inside_brackets_is_not_a_sentence_end(self) -> None:
+        from argus.lui.research import _sentence_cut
+
+        text = ("Stand aside: the social feed is chatter with nothing time-sensitive; the macro "
+                "backdrop (VIX 14.81, normal regime; F&G 71; nothing scheduled) gives no edge "
+                "either, and the anchor market is asleep for a long stretch of the weekend") * 2
+        assert not _sentence_cut(text, 200).endswith("F&G 71;")

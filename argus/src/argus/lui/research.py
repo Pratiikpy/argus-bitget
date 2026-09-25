@@ -479,7 +479,8 @@ def _theme(text: str) -> tuple[str, tuple[str, ...]] | None:
 _OUTLOOK = re.compile(r"\b(?:outlook|next\s+(?:week|month|quarter))\b", re.I)
 """A soft question about what lies ahead — answered with base rates, labelled as not a forecast."""
 _PRICE_FORECAST = re.compile(
-    r"\b(?:what\s+will\s+(?:\w+\s+){0,3}(?:price|be\s+(?:worth|at|trading))|exact(?:ly)?\s+"
+    r"\b(?:what\s+will\s+(?:\w+\s+){0,3}(?:price|be\s+(?:worth|at|trading))|"
+    r"what\s+will\s+\w+\s+be\s+(?:next|tomorrow|by|on|in|at\s+the)|exact(?:ly)?\s+"
     r"(?:\w+\s+){0,2}(?:price|level)|(?:a|one|\d+)\s+(?:years?|months?)\s+from\s+now|"
     r"forecast\w*|predict\w*|price\s+target|where\s+will\s+\w+\s+(?:be|go|trade|close)|"
     r"give\s+me\s+a\s+number|how\s+(?:high|low|far)\s+will|kitna\s+hoga|gonna\s+moon)\b", re.I)
@@ -2247,9 +2248,15 @@ def _sentence_cut(text: str, limit: int = 240) -> str:
             return text[: whole[-1] + 1].strip()
     if len(text) <= limit:
         return text
-    inside = [e for e in ends if 60 < e < limit]
-    if inside:
-        return text[: inside[-1] + 1].strip()
+    # A full stop beats a semicolon, and neither counts inside an open parenthesis: "(VIX 14.81,
+    # normal regime; F&G 71;" is a clause cut in half, not a sentence.
+    def closed(end: int) -> bool:
+        return text[:end].count("(") <= text[:end].count(")")
+
+    for mark in (".", ";"):
+        inside = [e for e in ends if 60 < e < limit and text[e] == mark and closed(e)]
+        if inside:
+            return text[: inside[-1] + 1].strip()
     # No sentence ends in the window: finish the sentence that is running if it ends soon, since
     # one whole long sentence reads better than a clipped one; clip at a word only as a last resort.
     after = [e for e in ends if limit <= e < limit * 2]
@@ -3770,6 +3777,40 @@ def _skill_calls(calls: Sequence[tuple[str, dict[str, Any]]],
         return list(pool.map(one, calls))
 
 
+_STATE_ASKED = re.compile(r"\b(overbought|oversold)\b|超买|超卖|과매수|과매도|"
+                          r"買われすぎ|売られすぎ|sobrecompra|sobreventa|sobrecomprad|sobrevendid",
+                          re.I)
+_RSI_LINE = re.compile(r"RSI\(14[^)]*\)\s+([\d.]+)")
+
+
+def _answer_the_state_asked(question: str, symbol: str, lines: list[str]) -> list[str]:
+    """Lead with a yes or no when the question asks whether a name is overbought or oversold.
+
+    "is TSLA overbought" was answered "Actionable: momentum turning down." followed by "RSI 63.4 —
+    neutral" — the answer was there, but a trader had to infer it (a judge-style pass,
+    2026-09-25). The verdict is read from the RSI line already computed; nothing new is fetched."""
+    asked = _STATE_ASKED.search(question)
+    reading = next((_RSI_LINE.search(line) for line in lines if _RSI_LINE.search(line)), None)
+    if asked is None or reading is None:
+        return lines
+    word = (asked.group(1) or "").lower()
+    wants_oversold = word == "oversold" or any(t in question for t in (
+        "超卖", "과매도", "売られすぎ", "sobreventa", "sobrevendid"))
+    rsi = float(reading.group(1))
+    if wants_oversold:
+        verdict = (f"Yes — {_t(symbol)} is oversold: RSI {rsi:.1f}, under 30." if rsi <= 30 else
+                   f"No — {_t(symbol)} is not oversold: RSI {rsi:.1f}, above the 30 line.")
+    else:
+        verdict = (f"Yes — {_t(symbol)} is overbought: RSI {rsi:.1f}, over 70." if rsi >= 70 else
+                   f"No — {_t(symbol)} is not overbought: RSI {rsi:.1f}, below the 70 line.")
+    lead = next((i for i, line in enumerate(lines) if line.startswith("Actionable:")), None)
+    if lead is None:
+        return [f"Actionable: {verdict}", *lines]
+    rest = lines[lead].removeprefix("Actionable:").strip()
+    merged = f"Actionable: {verdict.rstrip('.')}; {rest}" if rest else f"Actionable: {verdict}"
+    return [*lines[:lead], merged, *lines[lead + 1:]]
+
+
 def _technicals(symbol: str) -> tuple[list[str], list[Source]]:
     """RSI, MACD, support/resistance and ATR as `bitget-signal` reports them, and what they say
     together. Nothing here is recomputed: the figures are the Skill's, and each is sourced to it."""
@@ -4433,6 +4474,11 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
     if request is None:
         return False
     if request.kind in (ResearchKind.EXECUTION, ResearchKind.HEDGE, ResearchKind.EVENT):
+        return True
+    if request.kind is ResearchKind.IMPACT and request.size_stated and _ADD_VERB.search(text):
+        # "I'm a conservative investor, should I add 15% TSLA?" — the README's own example — was
+        # read by the live model as a fundamentals question and answered with TSLA's earnings
+        # date (a judge-style pass, 2026-09-25). A stated add of a stated size has one engine.
         return True
     if request.kind is ResearchKind.SENTIMENT:
         return bool(_HYPE.search(text))
@@ -5364,7 +5410,8 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                     f"If {shocked_name} moves {outcome.shock.removeprefix('benchmark ')}: your "
                     f"book moves "
                     f"about {outcome.portfolio_move_pct:+.2f}%"
-                    + (f", hardest hit {worst[0].removesuffix('USDT')} {worst[1]:+.2f}%"
+                    + (f", {'hardest hit' if worst[1] < 0 else 'biggest move'} "
+                       f"{worst[0].removesuffix('USDT')} {worst[1]:+.2f}%"
                        if worst else "") + " (market-driven part only, through each beta)."
                 )
             book_beta = 0.0
@@ -5393,9 +5440,15 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                         f"trimming any one name barely helps — the {shocked_name} hedge below is "
                         "the lever."
                     )
+            if shocked != BENCHMARK and abs(book_beta) < 0.2:
+                # "oil -20%, how does that hit my book" on a tech book printed three move lines and
+                # no verdict (a judge-style pass, 2026-09-25). The verdict is that it barely does.
+                lines.insert(0, f"Actionable: this book barely moves with {shocked_name} — its "
+                                f"beta to {shocked_name} is {book_beta:+.2f}, so the shock reaches "
+                                f"it only faintly and no hedge against it is needed.")
             if shocked == BENCHMARK:
                 hedge = _hedge_line(book_beta)
-            elif abs(book_beta) >= 0.05:
+            elif abs(book_beta) >= 0.2:
                 side = "short" if book_beta > 0 else "long"
                 hedge = (f"Hedge: {side} {shocked_name} worth about {abs(book_beta):.0%} of the "
                          f"book's value offsets the part of this shock that reaches the book "
@@ -5531,6 +5584,7 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
         elif request.kind is ResearchKind.TECHNICALS:
             lines, extra = _technicals(request.symbols[0])
             sources.extend(extra)
+            lines = _answer_the_state_asked(raw_text, request.symbols[0], lines)
             if not lines:
                 # The Skill has no series for some listed contracts (CVXSTOCKUSDT, SP500USDT —
                 # "No OHLCV data", measured 2026-09-23). The same indicators are computed from
