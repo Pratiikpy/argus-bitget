@@ -3,16 +3,18 @@
   "lines": 229,
   "content_lines": 176,
   "coverage": 1.0,
-  "agreement": 1.0,
+  "agreement": 0.977,
   "by_label": {
-    "computed": 89,
-    "live": 48,
+    "computed": 85,
+    "live": 52,
     "record": 14,
     "desk": 20,
     "assumed": 4,
     "missing": 1
   },
-  "disagreements": {},
+  "disagreements": {
+    "computed -> live": 4
+  },
   "limitations": "labels hand-reviewed after the rules were written: a regression check, not an independent accuracy estimate",
   "later_samples": [
     {

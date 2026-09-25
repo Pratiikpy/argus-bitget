@@ -38,7 +38,14 @@ from collections.abc import Sequence
 LABELS = ("live", "computed", "record", "desk", "assumed", "missing")
 
 _META = re.compile(r"^(?:Data:|Sources reached|Sources:|Quoted \d|Caveat:|Method:|Corrected:|"
+                   r"Computed by ARGUS\b|Read as filed:|"
                    r"以下|\(\d+ decisions? matched|Answerable today\b)", re.I)
+
+_LIVE_LEAD = re.compile(r"\S+ last [\d,.]+ USDT on Bitget\b|Open interest:|Crypto fear|"
+                        r"Long/short on Bitget\b|\S+ funding is [+-]?\d|RSI\(|"
+                        r"US spot (?:BTC|ETH) ETFs\b", re.I)
+"""A live reading moved to the lead unchanged — the price, open interest, the long/short split,
+the funding rate asked for — keeps its live label."""
 
 # Order matters: the first rule that matches decides. Missing and assumed come first because a
 # line that says it could not read something must never be labelled as if it had.
@@ -48,7 +55,9 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"\bunavailable\b|\bcould\s+not\s+(?:load|read|reach|fetch)\b|\btoo\s+few\b|"
         r"\bno\s+(?:data|reading|quote)\b|\bnothing\s+in\s+\d+h\b|\bso\s+I\s+need\s+what\s+you\s+"
         r"hold\b|\bnot\s+available\s+—|\b(?<!none )withheld\b|\bnot\s+(?:yet\s+)?published\b|"
-        r"^I did not recognise\b", re.I)),
+        r"^I did not recognise\b|^Missing:|\bholds no\b[^.;]{0,40}\bfigure\b|"
+        r"\bhas not verified\b|\bcould not be measured\b|\bwas not (?:read|measured|fetched)\b",
+        re.I)),
     ("assumed", re.compile(r"^Assumed:|\bno\s+\w+\s+was\s+(?:stated|given)\b|"
                            r"\bis\s+assessed\s+at\b|\bwere\s+scaled\s+to\s+100%|"
                            r"^Sized on a \$[\d,]+ book\b", re.I)),
@@ -82,12 +91,13 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"\brealised worst case\b|\bworst 24-bar window\b|"
         r"\bthe systematic signals this desk tested\b|\bleans went the right way\b|"
         r"^Where a stop sits in the noise\b|\bfinished (?:higher|lower) \d+% of [\d,]+ windows\b|"
-        r"^Spread of outcomes\b",
+        r"^Spread of outcomes\b|\boverlapping windows of its own history\b|"
+        r"\bdeepest fall from a high\b",
         re.I)),
     ("live", re.compile(
         r"\blast [\d,.]+ USDT on Bitget\b|^(?:Actionable: )?Open interest:|\bheld open\b|"
         r"^Funding(?: is|:)|"
-        r"\bfunding [+-]?\d|^\d+h ago —|^Prediction market\b|\bfear & greed\b|"
+        r"\bfunding (?:is )?[+-]?\d|^\d+h ago —|^Prediction market\b|\bfear & greed\b|"
         r"\b(?:Treasury|fed funds|breakeven|dollar index)\b.*\bon \d{4}-\d\d-\d\d\b|"
         r"^Scheduled:|\bspot BTC ETFs\b|\bheadlines? name\b|\b8-K\b|"
         r"\bis [+-]\d+\.\d+% over 24 hours\b|"
@@ -97,7 +107,9 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"^Valuation on \d{4}|^Institutions: [\d,]+ holders\b|^Insider filings\b|"
         r"^Analyst price targets\b|^Now: \w+ is [+-]\d|^Federal Reserve, \d+ \w+:|"
         r"^Bitget's own US-stock brief\b|^Crowd on X and Reddit\b|\bpositioning: \d+% of\b|"
-        r"\bwallets hold \$|\bliquidations on \d{4}-\d\d-\d\d\b", re.I)),
+        r"\bwallets hold \$|\bliquidations on \d{4}-\d\d-\d\d\b|^Long/short on Bitget\b|"
+        r"^Listed now:|\bright now\b[^.]{0,60}\ba year\b|^Quarters before it:|"
+        r"\bspot (?:BTC|ETH) ETFs?\b|^RSI\(14, 1D\)", re.I)),
     ("computed", re.compile(
         r"^Actionable:|^Your premise\b|^Implied open:|^Versus the stock:|\bbeta\b|^Hedge:|"
         r"^If \w+ (?:falls|moves|rises)\b|\bvalue at risk\b|\bexpected shortfall\b|"
@@ -110,7 +122,11 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"\brealised vol\b|^Cost:|^Why not\b|^Weekends \(|^Going into\b|^The liquidation\b|"
         r"\bthe worst point was within\b|^Neither is the share\b|^Bitget's stock perpetuals\b|"
         r"^The desk itself trades\b|^A crypto contract\b|^Funding means\b|\bfunding across\b|"
-        r"\bexpect it around\b|\blooks coordinated\b|^No story is carried\b",
+        r"\bexpect it around\b|\blooks coordinated\b|^No story is carried\b|"
+        r"^Shorter term \(4h\)|^At \S+ last \d+ days of volatility\b|^At \d+(?:\.\d+)?x\b|"
+        r"^Size \S+ so that\b|^(?:No|A) position signal\b|\bown positioning is\b|"
+        r"^Use the perpetual\b|^The formula uses\b|^Liquidation price:|\bmoving average is\b|"
+        r"^\S+'s 50-day average is\b|^Of the hedges you named\b|^Better than\b",
         re.I)),
 )
 
@@ -120,6 +136,19 @@ def label(line: str) -> str | None:
     text = line.strip()
     if not text or _META.search(text):
         return None
+    lead = re.match(r"^Actionable(?: \(\w+\))?:\s*(.+)$", text)
+    if lead is not None:
+        # A lead is labelled by what it is, not by being first: a live reading promoted to the
+        # top ("Actionable: NVDA last 226.3 USDT on Bitget") stays live, a record stays a record,
+        # and a lead that says a figure is missing is missing. Anything else a lead says is the
+        # answer's conclusion, computed for it.
+        rest = lead.group(1)[0].upper() + lead.group(1)[1:]
+        inner = label(rest)
+        if inner == "live":
+            # only a reading promoted as it was read; a conclusion drawn on live counts ("2
+            # headlines name NVDA ... so the move is sentiment") is computed, as reviewed
+            return "live" if _LIVE_LEAD.match(rest) else "computed"
+        return inner if inner in ("record", "missing", "desk") else "computed"
     for name, pattern in _RULES:
         if pattern.search(text):
             return name

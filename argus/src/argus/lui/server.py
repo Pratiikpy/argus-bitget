@@ -41,12 +41,14 @@ from argus.lui.provenance import labels as provenance_labels
 from argus.lui.question import TRADED_SYMBOLS, Conversation, Intent, classify
 from argus.lui.research import (
     _PRICE_FORECAST,
+    BARE_FOLLOW,
     ResearchKind,
     ResearchRequest,
     about_the_record,
     follow_up,
     pattern_reading_wins,
     plan_with_model,
+    price_forecast_asked,
     research_symbols,
     with_book,
     worth_asking_the_model,
@@ -356,6 +358,9 @@ def repair_mojibake(text: str) -> str:
 
 
 _PRONOUN = re.compile(r"\b(?:that|it|this|those|them|its)\b", re.I)
+_BARE_WHY = re.compile(r"^\s*(?:but\s+|and\s+|so\s+)?(?:why|how\s+come|what\s+was\s+the\s+"
+                       r"reason(?:ing)?|explain(?:\s+(?:that|it|why))?|reasoning)\s*[?.!]*\s*$",
+                       re.I)
 
 
 def _carry_prior_name(text: str, prior: list[str]) -> str | None:
@@ -470,6 +475,28 @@ def handle_ask(
         implied = ResearchRequest(kind=ResearchKind.QUOTE, symbols=tuple(opening[:4]))
         return _research_payload(text, prior, implied, ledger, started, "implied-open",
                                  {**audit, "detail": "an implied-open question"})
+    decision = _BARE_WHY.match(text) and next(
+        (m for m in (re.search(r"\bdecision\s*#?\s*(\d+)|\bseq\s*#?\s*(\d+)", earlier, re.I)
+                     for earlier in reversed(prior[-2:])) if m), None)
+    if decision:
+        # "why?" after "Show me decision 12" was answered with a summary of 673 abstentions
+        # (2026-09-25 audit, round 2): its subject is that decision.
+        return handle_ask(f"why was decision {decision.group(1) or decision.group(2)} made?",
+                          prior, now=now, visitor=visitor, book=book)
+    if BARE_FOLLOW.match(text) or _BARE_WHY.match(text):
+        # "what about that one?" or "why?" after a research question is that question again:
+        # re-asked whole, so the engines read its own words, and marked as a follow-up.
+        previous = next((e for e in reversed(prior[-4:]) if detect_research(e) is not None), None)
+        if previous is not None:
+            again = handle_ask(previous, prior, now=now, visitor=visitor, book=book)
+            note = (f"Assumed: read as the previous question again — \"{previous[:60]}\"; "
+                    + ("each line above says what it was computed from, which is the reasoning."
+                       if _BARE_WHY.match(text) else "ask it with a name to change the subject."))
+            lines = again.get("lines") or []
+            at = next((i for i, line in enumerate(lines) if line.startswith("Data:")), len(lines))
+            lines.insert(at, note)
+            again["classified_by"] = "research-follow-up"
+            return again
     carried = _carry_prior_name(text, prior)
     if carried is not None:
         # "and how does that compare to last week" after "whats bitcoin doing rn" was told no
@@ -499,7 +526,7 @@ def handle_ask(
         model = LocalPlanner(local) if local is not None else None
     if model is not None:
         planned, audit = plan_with_model(text, model)
-        if planned is not None and _PRICE_FORECAST.search(text):
+        if planned is not None and price_forecast_asked(text):
             # A price asked for a future time is refused whatever engine the model picked; it
             # read "比特币明年这个时候准确价格是多少" as a portfolio question (held-out corpus).
             planned, audit = None, {**audit, "detail": "a price forecast; refused below"}
@@ -544,6 +571,9 @@ def handle_ask(
                      or planned.horizon_hours != patterned.horizon_hours
                      or planned.target != patterned.target
                      or planned.resize_by != patterned.resize_by
+                     or planned.shock_pct != patterned.shock_pct
+                     or planned.shock_on != patterned.shock_on
+                     or planned.leverage != patterned.leverage
                      or (planned.kind is ResearchKind.IMPACT
                          and planned.symbols[:1] != patterned.symbols[:1]))):
             # The model read "order book depth on NVDA" as a quote and "who is selling NVDA" as
@@ -572,7 +602,7 @@ def handle_ask(
     else:
         kind_said = None
         request = with_book(patterned_only, book, text)
-    if request is None and _PRICE_FORECAST.search(text) and research_symbols(text)[0]:
+    if request is None and price_forecast_asked(text) and research_symbols(text)[0]:
         # A price forecast is refused plainly and pointed at what the console can say instead.
         # Before, "forecast BTC price for next week" was refused as "BTC is not one of the desk's
         # twelve rTokens", which answers a question nobody asked.
@@ -620,7 +650,9 @@ def handle_ask(
     # dependency; see `eval/ngrambench.py`.
     question, classified_by = reclassify(question)
     if (classified_by == "ngram" or (classified_by == "patterns" and not prior)) and not in_domain(
-            text):
+            text) and question.intent is not Intent.ORDER:
+        # An order is refused as an order whatever language it is in; "अभी 1 बिटकॉइन खरीद लो" was
+        # recognised as an order and then declined as off-topic (2026-09-25 audit, round 2).
         # **The n-gram layer only knows wording, so it needs a topic gate.** It answers with a
         # class for any text at all, and on the 2026-09-25 blind corpus "who won the lakers game
         # last night" reached `decision_why` at 0.19 and was answered with a decision, as were a

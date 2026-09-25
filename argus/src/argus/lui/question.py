@@ -210,7 +210,11 @@ _SPEED: dict[Intent, Speed] = {
 # question form must not be captured here. The distinguishing feature is the absence of an
 # interrogative: "sell half of that" commands, "why did you sell" asks.
 _ORDER_VERB = re.compile(
-    r"^\s*(?:please\s+)?(?:go\s+)?(?:buy|sell|short|long|close|open|cancel|reduce|add|trim|"
+    # A filler word in front does not make an instruction a question: "ok sell half of that",
+    # "yeah sell it", "go ahead and sell that" slipped past the refusal (2026-09-25 audit).
+    r"^\s*(?:(?:ok(?:ay)?|yeah|yes|yep|sure|alright|right|cool|fine|great|then|now|so|and|just|"
+    r"please|go\s+ahead\s+and|let'?s|lets)[\s,!.]+)*(?:go\s+)?"
+    r"(?:buy|sell|short|long|close|open|cancel|reduce|add|trim|"
     r"rebalance|hedge|exit|flatten|undo|place|submit)\b"
     # "open interest on ETH", "long short ratio for DOGE", "short interest" and "short squeeze"
     # name a market measure, not an instruction; they were refused as orders (2026-09-25 audit).
@@ -237,10 +241,29 @@ _INTERROGATIVE = re.compile(r"^\s*(?:why|what|when|which|who|how|did|do|does|is|
                             r"could|should|show|list|tell|explain|walk)\b", re.I)
 
 
+_ORDER_INTL = re.compile(
+    r"खरीद\s*(?:लो|दो|लीजिए|कर\s*दो)|बेच\s*(?:दो|डालो|दीजिए)|"          # Hindi
+    r"اشترِ?\s|اشتر\s+لي|بِعْ?\s|بع\s+لي|"                                 # Arabic
+    r"\bкупи(?:те)?\b|\bпродай(?:те)?\b|"                                  # Russian
+    r"\bsatın\s+al\b|\bbenim\s+için\s+(?:al|sat)\b|\bsat\s+(?:şunu|onu|hepsini|\d)|"  # Turkish
+    r"\bmua\s+(?:cho\s+tôi|giúp\s+tôi|ngay)|\bbán\s+(?:cho\s+tôi|giúp\s+tôi|ngay)|"   # Vietnamese
+    r"\bbelikan\b|\bjualkan\b|\btolong\s+(?:beli|jual)\b|"                 # Indonesian
+    r"사\s*줘|팔\s*아\s*줘|매수해\s*줘|매도해\s*줘|"                         # Korean
+    r"買って(?:ください)?|売って(?:ください)?|注文して|"                       # Japanese
+    r"\bach[eè]te(?:[sz])?[\s-]+moi\b|\bvends?[\s-]+moi\b|\bach[eè]tez\b|\bvendez\b|"  # French
+    r"\bc[oó]mprame\b|\bv[eé]ndeme\b|\bk[äa]uf(?:e)?\s+(?:mir|für\s+mich)\b|"   # es, de
+    r"\bverkauf(?:e)?\s+(?:mir|für\s+mich|alles)\b",
+    re.I)
+"""An instruction to trade in another language. The English, and Chinese, forms were refused with
+the reason; the same instruction in Hindi, Arabic, Russian or Turkish got "I did not recognise
+that question" (2026-09-25 audit, round 2) — the console never trades, but a refusal says why."""
+
+
 def is_order_instruction(raw: str) -> bool:
     """An instruction to trade, in any of the forms the console refuses."""
     return bool((_ORDER_VERB.match(raw) and not _INTERROGATIVE.match(raw))
-                or _ORDER_CJK.search(raw) or _ORDER_REQUEST.search(raw))
+                or _ORDER_CJK.search(raw) or _ORDER_REQUEST.search(raw)
+                or _ORDER_INTL.search(raw))
 
 
 class Tense(StrEnum):
@@ -402,6 +425,30 @@ _NOT_A_TICKER = frozenset({
 """Capitalised tokens that are words, units or our own vocabulary rather than instruments."""
 
 
+_PROSE_TICKERS = frozenset({"COIN", "COINS"})
+"""Traded tickers that are ordinary English words, read as tickers only when written in capitals
+("COIN") or by the company's name ("coinbase")."""
+
+
+_COIN_THE_WORD = re.compile(
+    r"\b(?:this|that|these|a|an|the|which|what|any|every|each|some|one|good|bad|best|new|small|"
+    r"meme|alt|stable|shit|privacy|gaming|ai|my|your|our|their|his|her|another|other|favorite|"
+    r"favourite|next|single|native|base|utility|governance|crypto)\s+coin\b", re.I)
+
+
+def coin_as_ticker(text: str) -> str:
+    """``text`` with a lowercase "coin" written as COIN unless the sentence uses it as the word.
+
+    Reading every "coin" as Coinbase put COIN stock data under "is this a good coin to buy", so the
+    word was dropped in round two of the answer audit — and that lost the stock in held-out
+    questions that did mean it ("macd on coin", "coin quote plus round trip cost", "对比一下coin和
+    mstr"). The word is the word after a determiner or a kind ("this coin", "a meme coin", "which
+    coin"); anywhere else a lowercase "coin" in a trading question is the ticker."""
+    if _COIN_THE_WORD.search(text):
+        return text
+    return re.sub(r"(?<![A-Za-z])coin(?![A-Za-z])", "COIN", text)
+
+
 def resolve_symbol(token: str) -> str | None:
     """One word to a traded symbol — "tesla", "TSLA" and "TSLAUSDT" all name TSLAUSDT — or None.
 
@@ -409,6 +456,10 @@ def resolve_symbol(token: str) -> str | None:
     holding like "40% tesla" without keeping a second, drifting copy of the names.
     """
     upper = token.strip().upper()
+    if upper in _PROSE_TICKERS and not token.strip().isupper():
+        # "coin" is a word before it is Coinbase: "whats the funding rate on this coin" and "is
+        # this a good coin to buy" were answered with COIN stock data (2026-09-25 audit, round 2).
+        return None
     return _TICKER_TO_SYMBOL.get(upper) or (upper if upper in TRADED_SYMBOLS else None)
 
 
@@ -426,9 +477,12 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
     off-venue. Case comes from the raw text because that is the signal: nobody writes a ticker in
     lower case, and lower-case unknown words stay unknown rather than being called instruments.
     """
+    text = coin_as_ticker(text)
     found: list[str] = []
     for raw in _WORD.findall(text):
         token = raw.upper()
+        if token in _PROSE_TICKERS and not raw.isupper():
+            continue
         if token in _OFF_VENUE:
             return (), _OFF_VENUE[token]
         symbol = _TICKER_TO_SYMBOL.get(token) or (token if token in TRADED_SYMBOLS else None)

@@ -22,7 +22,7 @@
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 142,
+      "line": 145,
       "quoted": [
         "6,700"
       ],
@@ -33,7 +33,7 @@
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 164,
+      "line": 167,
       "quoted": [
         "6,700"
       ],
@@ -123,65 +123,65 @@
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "350"
+        "352"
       ],
       "live": [
-        350
+        352
       ],
       "status": "OK",
-      "excerpt": "strict clean on 350 source files"
+      "excerpt": "strict clean on 352 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
-      "line": 165,
+      "line": 168,
       "quoted": [
-        "350"
+        "352"
       ],
       "live": [
-        350
+        352
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 350 source files"
+      "excerpt": "strict` clean on 352 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 419,
       "quoted": [
-        "350"
+        "352"
       ],
       "live": [
-        350
+        352
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 350 files"
+      "excerpt": "strict` clean on 352 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 620,
       "quoted": [
-        "350"
+        "352"
       ],
       "live": [
-        350
+        352
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 350 source files"
+      "excerpt": "strict` clean across 352 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 1956,
       "quoted": [
-        "350"
+        "352"
       ],
       "live": [
-        350
+        352
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 350 source files"
+      "excerpt": "strict` clean on 352 source files"
     },
     {
       "claim": "register_claims",
@@ -318,7 +318,7 @@
     {
       "claim": "refusal_accuracy_2h",
       "doc": "public-readme",
-      "line": 187,
+      "line": 190,
       "quoted": [
         "194",
         "325"
@@ -346,7 +346,7 @@
     {
       "claim": "refusal_forgone_2h",
       "doc": "public-readme",
-      "line": 189,
+      "line": 192,
       "quoted": [
         "-4.5"
       ],
@@ -389,7 +389,7 @@
     {
       "claim": "standing_owned",
       "doc": "public-readme",
-      "line": 76,
+      "line": 79,
       "quoted": [
         "20",
         "43"
@@ -456,7 +456,7 @@
     {
       "claim": "standing_tied",
       "doc": "public-readme",
-      "line": 76,
+      "line": 79,
       "quoted": [
         "11"
       ],
@@ -517,7 +517,7 @@
     {
       "claim": "standing_implemented",
       "doc": "public-readme",
-      "line": 76,
+      "line": 79,
       "quoted": [
         "12"
       ],
@@ -779,7 +779,7 @@
     {
       "claim": "modules_importable",
       "doc": "public-readme",
-      "line": 167,
+      "line": 170,
       "quoted": [
         "152",
         "152"
@@ -824,7 +824,7 @@
     {
       "claim": "subthemes",
       "doc": "public-readme",
-      "line": 168,
+      "line": 171,
       "quoted": [
         "18",
         "18"
