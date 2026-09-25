@@ -35,12 +35,21 @@ rToken prices). The session clock that picks which close to carry (a holiday Fri
 Thursday's), the exact close-bar selection and the arithmetic are the console's. The implied
 price is printed to the cent and read back from the sentence; the former in-module formula is
 kept as ``console_replay``'s comparison so any difference is on the record.
+
+**Runs without the clone (2026-09-26).** nocturne's two modules the harness imports are vendored
+verbatim under ``argus/vendor/nocturne`` with its MIT licence (byte-identical to the clone at
+``ac4ee255``), and what its ``core.observations()`` computes from 37 MB of its own hourly bars is
+frozen once into ``data/h2h_nocturne/nocturne_inputs.json`` (:func:`freeze`), with the rToken
+closes the console is anchored on. With the clone present the harness reads the clone, as before;
+without it (the public CI) it reads the vendored code and the frozen inputs, and a test holds the
+two paths to the same predictions.
 """
 
 from __future__ import annotations
 
 import ast
 import datetime as dt
+import functools
 import json
 import statistics as st
 import sys
@@ -59,8 +68,19 @@ MIN_TRAIN = 5
 """nocturne's own warm-up (`fairvalue_v2.py:8`) and training floor of 20 rows (`:15`)."""
 
 
+VENDORED = Path(__file__).resolve().parents[1] / "vendor" / "nocturne"
+"""nocturne's ``core.py`` and ``session.py``, verbatim, with its licence."""
+FROZEN = DATA / "nocturne_inputs.json"
+"""What nocturne's code computed from its own bars, frozen by :func:`freeze`."""
+
+
+def _has_clone() -> bool:
+    return (NOCTURNE / "scripts" / "core.py").is_file() and (NOCTURNE / "data" / "1h").is_dir()
+
+
 def _nocturne() -> Any:
-    scripts = str(NOCTURNE / "scripts")
+    """nocturne's ``core``: the clone's when it is on this machine, else the vendored copy."""
+    scripts = str(NOCTURNE / "scripts") if _has_clone() else str(VENDORED)
     if scripts not in sys.path:
         sys.path.insert(0, scripts)
     import core  # type: ignore[import-not-found]
@@ -68,11 +88,71 @@ def _nocturne() -> Any:
     return core
 
 
+@functools.lru_cache(maxsize=1)
+def _frozen() -> dict[str, Any]:
+    loaded: dict[str, Any] = json.loads(FROZEN.read_text("utf-8"))
+    return loaded
+
+
 def _large() -> set[str]:
+    if not _has_clone():
+        return set(_frozen()["large"])
     text = (NOCTURNE / "scripts" / "fairvalue_v2.py").read_text("utf-8")
     start = text.index("LARGE={") + len("LARGE=")
     names: set[str] = ast.literal_eval(text[start:text.index("}", start) + 1])
     return names
+
+
+def _observations(core: Any) -> list[dict[str, Any]]:
+    """nocturne's ``core.observations()``: computed from its bars, or the frozen result."""
+    if _has_clone():
+        rows: list[dict[str, Any]] = core.observations()
+        return rows
+    return [{**r, "fri": dt.date.fromisoformat(r["fri"])} for r in _frozen()["observations"]]
+
+
+def _rtoken_closes(core: Any, sym: str) -> list[tuple[dt.date, float]] | None:
+    """The rToken's 16:00 ET price per session day, read by nocturne's ``near``."""
+    if not _has_clone():
+        found = _frozen()["rtoken_closes"].get(sym)
+        return None if found is None else [(dt.date.fromisoformat(d), p) for d, p in found]
+    path = NOCTURNE / "data" / "1h" / f"{sym}USDT.json"
+    if not path.exists():
+        return None
+    bars = core.load_bars(str(path))
+    days = sorted({t.date() for t in bars if t.weekday() < 5})
+    return [(d, price) for d in days if (price := core.near(bars, d, 15)) is not None]
+
+
+def freeze() -> dict[str, Any]:
+    """Write :data:`FROZEN` from the clone: nocturne's observations, its large-cap set and the
+    rToken closes, with the clone's commit and the vendored files' hashes."""
+    import hashlib
+    import subprocess
+
+    if not _has_clone():
+        raise FileNotFoundError(f"nocturne clone not at {NOCTURNE}")
+    core = _nocturne()
+    large = _large()
+    commit = subprocess.run(["git", "-C", str(NOCTURNE), "rev-parse", "HEAD"],
+                            capture_output=True, text=True, check=False).stdout.strip()
+    vendored = {f.name: hashlib.sha256(f.read_bytes()).hexdigest()
+                for f in sorted(VENDORED.glob("*.py"))}
+    for name, digest in vendored.items():
+        clone = hashlib.sha256((NOCTURNE / "scripts" / name).read_bytes()).hexdigest()
+        if clone != digest:
+            raise ValueError(f"vendored {name} differs from the clone's")
+    closes = {}
+    for sym in sorted(large):
+        found = _rtoken_closes(core, sym)
+        if found is not None:
+            closes[sym] = [[d.isoformat(), p] for d, p in found]
+    blob = {"nocturne_commit": commit, "vendored_sha256": vendored, "large": sorted(large),
+            "observations": [{**r, "fri": r["fri"].isoformat()} for r in core.observations()],
+            "rtoken_closes": closes}
+    DATA.mkdir(parents=True, exist_ok=True)
+    FROZEN.write_text(json.dumps(blob, separators=(",", ":")), "utf-8")
+    return blob
 
 
 def collect(symbols: set[str]) -> dict[str, Any]:
@@ -140,12 +220,9 @@ def _console_inputs(core: Any, syms: set[str]) -> tuple[dict[str, list[tuple[flo
         if perp.exists():
             rows = json.loads(perp.read_text("utf-8"))
             hourly[perp.stem] = sorted((int(r[0]) / 1000 + 3600, float(r[4])) for r in rows)
-        rtoken = NOCTURNE / "data" / "1h" / f"{sym}USDT.json"
-        if rtoken.exists():
-            bars = core.load_bars(str(rtoken))
-            days = sorted({t.date() for t in bars if t.weekday() < 5})
-            closes[sym[1:]] = [(d, price) for d in days
-                               if (price := core.near(bars, d, 15)) is not None]
+        found = _rtoken_closes(core, sym)
+        if found is not None:
+            closes[sym[1:]] = found
     return hourly, closes
 
 
@@ -157,7 +234,7 @@ def predictions() -> list[dict[str, Any]]:
 
     core = _nocturne()
     large = _large()
-    rec = [r for r in core.observations() if r["sym"] in large]
+    rec = [r for r in _observations(core) if r["sym"] in large]
     weeks = sorted({r["fri"] for r in rec})
     hourly, closes = _console_inputs(core, {r["sym"] for r in rec})
     preds = []
@@ -326,6 +403,8 @@ def comparison_reports(report: dict[str, Any]) -> list[ComparisonReport]:
 def main() -> int:  # pragma: no cover - CLI
     if "--collect" in sys.argv:
         collect(_large())
+    if "--freeze" in sys.argv:
+        freeze()
     report = score()
     artefact.write(REPORT, report)
     print(json.dumps({k: report[k] for k in ("baseline_reproduced", "rows_both", "weekends",

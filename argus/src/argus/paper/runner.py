@@ -753,6 +753,16 @@ def pause_root(ledger_path: Path) -> Path:
     return ledger_path.with_name("pauses")
 
 
+def notice_path(ledger_path: Path) -> Path:
+    """Where the mode-change notice state for ``ledger_path`` lives: beside the ledger, as its
+    pause store does (:func:`pause_root`). For the live ledger this is
+    ``data/risk_mode_notice.json`` (`risk/modes.NOTICE_STATE`); a replay on a ledger of its own
+    keeps its own. Found on
+    2026-09-26 by the same check: the public CI's replay wrote ``risk_mode_notice.json.tmp`` under
+    ``data/``."""
+    return ledger_path.with_name("risk_mode_notice.json")
+
+
 def _resume_answered(
     desk: TradingDesk, store: PauseStore, *, now: datetime, priced: Collection[str],
 ) -> tuple[list[DeskRun], list[dict[str, object]]]:
@@ -946,7 +956,7 @@ def run_once(
     cycle_book = _book_state(ledger)
     mode_stack = stack_for_cycle(rules_loaded=guard is not None, rules_detail=guard_note,
                                  book=cycle_book if isinstance(cycle_book, BookState) else None)
-    mode_notice = persisted_notice(mode_stack)
+    mode_notice = persisted_notice(mode_stack, notice_path(ledger_path))
     open_positions = cycle_book.open_positions if isinstance(cycle_book, BookState) else 0
 
     client = QwenClient(budget=TokenBudget(limit=budget))

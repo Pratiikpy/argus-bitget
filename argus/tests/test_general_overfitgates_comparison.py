@@ -274,7 +274,12 @@ class TestCommittedArtefact:
 
 
 def _without_witnesses(report: dict[str, Any]) -> dict[str, Any]:
+    """The report without what depends on the machine rather than the code: the witness strings,
+    and the library versions it records for provenance (CI resolved hypothesis 6.168.1 where the
+    committed run had 6.168.0, 2026-09-26; the results were identical)."""
     out: dict[str, Any] = json.loads(json.dumps(report))
+    out.pop("versions", None)
+    out["hypothesis_search"].pop("hypothesis_version", None)
     for version in out["hypothesis_search"]["versions"].values():
         version["classes"] = {fn: sorted(kinds) for fn, kinds in version["classes"].items()}
     return out
