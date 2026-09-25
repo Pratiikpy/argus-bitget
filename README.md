@@ -82,7 +82,7 @@ deflation gate, and the console says so.
 
 Every capability is held against the specialist that leads its sub-theme, run on the same input,
 and graded by a register that opens the evidence rather than trusting a filename
-(`python -m argus.eval.standing`). **8 of 43 capabilities are OWNED, 11 are TIED, 24 are
+(`python -m argus.eval.standing`). **7 of 43 capabilities are OWNED, 12 are TIED, 24 are
 IMPLEMENTED, and 0 are LOST.** OWNED needs all thirteen conditions: the rival's best
 implementation read and reproduced, a same-input comparison with costs, out-of-sample, ablation,
 an adversarial test, documented failure cases and reproducibility.
@@ -92,7 +92,10 @@ population figure must now survive a per-group check — by symbol and by half o
 capabilities went back to IMPLEMENTED: five because their headline was carried by one symbol or
 flipped between halves, seven because their proof is a designed case set the new check cannot
 grade, which needs its own construction test before it can count again. Each row names its route
-back (`data/standing.json`).
+back (`data/standing.json`). One more went to TIED the same day: breadth rotation had beaten
+pytaa, which silently drops weight, but a general-purpose validator (pandera with pydantic)
+configured to the same contract handles the same 36 cases, so a margin over the specialist was
+not a margin over the best tool for the job.
 
 Losses are published the moment they are found. Two were found and closed on 2026-09-24: Bitget's
 own 60-second TWAP beat the schedule the console printed (6.9 against 12.2bps on a $100k order),
@@ -177,7 +180,7 @@ a test that reaches the network shows itself.
 | | |
 |---|---|
 | Tests | **6,700 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 473 source files** |
+| Types | **`mypy --strict` clean on 456 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes**, resolved by import at runtime, not claimed in prose |
@@ -215,7 +218,7 @@ a test that reaches the network shows itself.
 
 ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · AI Trading Desk）。用自然语言提问，
 七个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
-从不编写数字。43 项能力逐一与各子赛道领先的专业系统在相同输入上对比：8 项领先（OWNED）、11 项
+从不编写数字。43 项能力逐一与各子赛道领先的专业系统在相同输入上对比：7 项领先（OWNED）、12 项
 持平、24 项已实现、0 项落后，所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
 （t2-sentiment-agent，独立的代码库、交易日志与演示），不属于本仓库。
 

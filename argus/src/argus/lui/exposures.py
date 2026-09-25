@@ -967,7 +967,8 @@ def parse(text: str, book_text: str = "") -> tuple[dict[str, float], dict[str, f
         if saved:
             book = dict(saved)
             notes.append("used your saved book (" + ", ".join(f"{_pct(w)} {_t(s)}"
-                                                               for s, w in book.items()) + ")")
+                                                               for s, w in book.items())
+                         + research.book_pricing_note(book_text) + ")")
     if not book:
         named, _ = research.research_symbols(text[:cut])
         named = tuple(s for s in named if s not in proposed)

@@ -1,0 +1,1682 @@
+{
+  "generated_at": "2026-09-25T21:37:31.918910+00:00",
+  "inputs": {
+    "frames_quarters": [
+      "CY2022Q1",
+      "CY2022Q2",
+      "CY2022Q3",
+      "CY2022Q4",
+      "CY2023Q1",
+      "CY2023Q2",
+      "CY2023Q3",
+      "CY2023Q4",
+      "CY2024Q1",
+      "CY2024Q2",
+      "CY2024Q3",
+      "CY2024Q4",
+      "CY2025Q1",
+      "CY2025Q2",
+      "CY2025Q3",
+      "CY2025Q4",
+      "CY2026Q1",
+      "CY2026Q2"
+    ],
+    "frames_filers": 6729,
+    "frames_digest_sha256": "64c0e87803cf0f29772c1c0d25972f59ed7e522b7a6c625c7f70e9ab23548831",
+    "anchors_digest_sha256": "104da0b9b470817370e7d42da241b7acd630e10427a63a691f8787ebdc2adf8f",
+    "truth_yoy_days": [
+      320,
+      410
+    ],
+    "max_delta_span_days": 1096
+  },
+  "alignment": {
+    "pandas_calendar_collisions_anchors": {
+      "filers": 2,
+      "examples": [
+        {
+          "filer": "NVDA",
+          "name": "NVDA",
+          "period_ends_sharing_one_calendar_quarter": [
+            [
+              "2010-07-31",
+              "2010-08-01"
+            ]
+          ]
+        },
+        {
+          "filer": "AAPL",
+          "name": "AAPL",
+          "period_ends_sharing_one_calendar_quarter": [
+            [
+              "2017-07-01",
+              "2017-09-30"
+            ]
+          ]
+        }
+      ]
+    },
+    "pandas_calendar_collisions_frames": {
+      "filers": 168,
+      "examples": [
+        {
+          "filer": "2488",
+          "name": "ADVANCED MICRO DEVICES, INC",
+          "period_ends_sharing_one_calendar_quarter": [
+            [
+              "2023-07-01",
+              "2023-09-30"
+            ]
+          ]
+        },
+        {
+          "filer": "7536",
+          "name": "ARROW ELECTRONICS, INC",
+          "period_ends_sharing_one_calendar_quarter": [
+            [
+              "2023-07-01",
+              "2023-09-30"
+            ]
+          ]
+        },
+        {
+          "filer": "8063",
+          "name": "ASTRONICS CORPORATION",
+          "period_ends_sharing_one_calendar_quarter": [
+            [
+              "2023-07-01",
+              "2023-09-30"
+            ],
+            [
+              "2022-10-01",
+              "2022-12-31"
+            ]
+          ]
+        },
+        {
+          "filer": "8818",
+          "name": "AVERY DENNISON CORPORATION",
+          "period_ends_sharing_one_calendar_quarter": [
+            [
+              "2023-07-01",
+              "2023-09-30"
+            ]
+          ]
+        },
+        {
+          "filer": "8858",
+          "name": "AVNET, INC.",
+          "period_ends_sharing_one_calendar_quarter": [
+            [
+              "2022-10-01",
+              "2022-12-31"
+            ]
+          ]
+        },
+        {
+          "filer": "12040",
+          "name": "FLANIGAN'S ENTERPRISES, INC.",
+          "period_ends_sharing_one_calendar_quarter": [
+            [
+              "2023-07-01",
+              "2023-09-30"
+            ]
+          ]
+        },
+        {
+          "filer": "14930",
+          "name": "Brunswick Corporation",
+          "period_ends_sharing_one_calendar_quarter": [
+            [
+              "2023-07-01",
+              "2023-09-30"
+            ]
+          ]
+        },
+        {
+          "filer": "21344",
+          "name": "COCA COLA CO",
+          "period_ends_sharing_one_calendar_quarter": [
+            [
+              "2022-07-01",
+              "2022-09-30"
+            ]
+          ]
+        }
+      ]
+    },
+    "anchors": {
+      "argus_positional_before": {
+        "filers": 9,
+        "readings": 9,
+        "non_finite_readings": 0,
+        "refused": 0,
+        "crashed": 0,
+        "pairs_used": 72,
+        "pairs_genuinely_year_over_year": 0,
+        "share_of_pairs_year_over_year": 0.0,
+        "readings_with_all_pairs_year_over_year": 0,
+        "readings_with_no_pair_year_over_year": 9
+      },
+      "pandas_period_strict": {
+        "filers": 9,
+        "readings": 0,
+        "non_finite_readings": 0,
+        "refused": 7,
+        "crashed": 2,
+        "pairs_used": 0,
+        "pairs_genuinely_year_over_year": 0,
+        "share_of_pairs_year_over_year": null,
+        "readings_with_all_pairs_year_over_year": 0,
+        "readings_with_no_pair_year_over_year": 0
+      },
+      "pandas_period_lenient": {
+        "filers": 9,
+        "readings": 7,
+        "non_finite_readings": 0,
+        "refused": 0,
+        "crashed": 2,
+        "pairs_used": 56,
+        "pairs_genuinely_year_over_year": 56,
+        "share_of_pairs_year_over_year": 1.0,
+        "readings_with_all_pairs_year_over_year": 7,
+        "readings_with_no_pair_year_over_year": 0
+      },
+      "argus_dated_after": {
+        "filers": 9,
+        "readings": 9,
+        "non_finite_readings": 0,
+        "refused": 0,
+        "crashed": 0,
+        "pairs_used": 72,
+        "pairs_genuinely_year_over_year": 72,
+        "share_of_pairs_year_over_year": 1.0,
+        "readings_with_all_pairs_year_over_year": 9,
+        "readings_with_no_pair_year_over_year": 0
+      }
+    },
+    "anchor_detail": [
+      {
+        "symbol": "NVDA",
+        "facts": 67,
+        "argus_positional_before": {
+          "sue": 2.8407407533816267,
+          "refusal": null,
+          "pair_gaps_days": [
+            455,
+            546,
+            455,
+            455,
+            546,
+            455,
+            455,
+            546
+          ]
+        },
+        "pandas_period_strict": {
+          "sue": null,
+          "refusal": "ValueError: cannot reindex on an axis with duplicate labels",
+          "pair_gaps_days": []
+        },
+        "pandas_period_lenient": {
+          "sue": null,
+          "refusal": "ValueError: cannot reindex on an axis with duplicate labels",
+          "pair_gaps_days": []
+        },
+        "argus_dated_after": {
+          "sue": 2.3998695758496984,
+          "refusal": null,
+          "pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364
+          ]
+        }
+      },
+      {
+        "symbol": "TSLA",
+        "facts": 34,
+        "argus_positional_before": {
+          "sue": 0.8280047455157967,
+          "refusal": null,
+          "pair_gaps_days": [
+            456,
+            547,
+            457,
+            456,
+            548,
+            458,
+            457,
+            548
+          ]
+        },
+        "pandas_period_strict": {
+          "sue": null,
+          "refusal": "NaN",
+          "pair_gaps_days": []
+        },
+        "pandas_period_lenient": {
+          "sue": -0.060717674071891686,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366
+          ]
+        },
+        "argus_dated_after": {
+          "sue": -0.060717674071891686,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366
+          ]
+        }
+      },
+      {
+        "symbol": "AAPL",
+        "facts": 67,
+        "argus_positional_before": {
+          "sue": 0.5395856752901316,
+          "refusal": null,
+          "pair_gaps_days": [
+            455,
+            455,
+            546,
+            455,
+            455,
+            546,
+            455,
+            455
+          ]
+        },
+        "pandas_period_strict": {
+          "sue": null,
+          "refusal": "ValueError: cannot reindex on an axis with duplicate labels",
+          "pair_gaps_days": []
+        },
+        "pandas_period_lenient": {
+          "sue": null,
+          "refusal": "ValueError: cannot reindex on an axis with duplicate labels",
+          "pair_gaps_days": []
+        },
+        "argus_dated_after": {
+          "sue": 2.9909783587920655,
+          "refusal": null,
+          "pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364
+          ]
+        }
+      },
+      {
+        "symbol": "MSFT",
+        "facts": 70,
+        "argus_positional_before": {
+          "sue": 2.313575954062263,
+          "refusal": null,
+          "pair_gaps_days": [
+            455,
+            457,
+            548,
+            456,
+            458,
+            549,
+            456,
+            457
+          ]
+        },
+        "pandas_period_strict": {
+          "sue": null,
+          "refusal": "NaN",
+          "pair_gaps_days": []
+        },
+        "pandas_period_lenient": {
+          "sue": 1.6232955917037077,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366,
+            365
+          ]
+        },
+        "argus_dated_after": {
+          "sue": 1.6232955917037077,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366,
+            365
+          ]
+        }
+      },
+      {
+        "symbol": "META",
+        "facts": 46,
+        "argus_positional_before": {
+          "sue": -0.0991721935906074,
+          "refusal": null,
+          "pair_gaps_days": [
+            456,
+            547,
+            457,
+            456,
+            548,
+            458,
+            457,
+            548
+          ]
+        },
+        "pandas_period_strict": {
+          "sue": null,
+          "refusal": "NaN",
+          "pair_gaps_days": []
+        },
+        "pandas_period_lenient": {
+          "sue": -0.3687478199256408,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366
+          ]
+        },
+        "argus_dated_after": {
+          "sue": -0.3687478199256408,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366
+          ]
+        }
+      },
+      {
+        "symbol": "GOOGL",
+        "facts": 34,
+        "argus_positional_before": {
+          "sue": 3.3741168442007767,
+          "refusal": null,
+          "pair_gaps_days": [
+            456,
+            547,
+            457,
+            456,
+            548,
+            458,
+            457,
+            548
+          ]
+        },
+        "pandas_period_strict": {
+          "sue": null,
+          "refusal": "NaN",
+          "pair_gaps_days": []
+        },
+        "pandas_period_lenient": {
+          "sue": 3.334826776208135,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366
+          ]
+        },
+        "argus_dated_after": {
+          "sue": 3.334826776208135,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366
+          ]
+        }
+      },
+      {
+        "symbol": "AMZN",
+        "facts": 67,
+        "argus_positional_before": {
+          "sue": 3.7083133663304766,
+          "refusal": null,
+          "pair_gaps_days": [
+            456,
+            547,
+            457,
+            456,
+            548,
+            458,
+            457,
+            548
+          ]
+        },
+        "pandas_period_strict": {
+          "sue": null,
+          "refusal": "NaN",
+          "pair_gaps_days": []
+        },
+        "pandas_period_lenient": {
+          "sue": 3.525999044124541,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366
+          ]
+        },
+        "argus_dated_after": {
+          "sue": 3.525999044124541,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366
+          ]
+        }
+      },
+      {
+        "symbol": "COIN",
+        "facts": 20,
+        "argus_positional_before": {
+          "sue": -0.6437811670899574,
+          "refusal": null,
+          "pair_gaps_days": [
+            456,
+            547,
+            457,
+            456,
+            548,
+            458,
+            457,
+            548
+          ]
+        },
+        "pandas_period_strict": {
+          "sue": null,
+          "refusal": "NaN",
+          "pair_gaps_days": []
+        },
+        "pandas_period_lenient": {
+          "sue": -1.7382836746912727,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366
+          ]
+        },
+        "argus_dated_after": {
+          "sue": -1.7382836746912727,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366
+          ]
+        }
+      },
+      {
+        "symbol": "MSTR",
+        "facts": 61,
+        "argus_positional_before": {
+          "sue": -0.3789067533796619,
+          "refusal": null,
+          "pair_gaps_days": [
+            456,
+            547,
+            457,
+            456,
+            548,
+            458,
+            457,
+            548
+          ]
+        },
+        "pandas_period_strict": {
+          "sue": null,
+          "refusal": "NaN",
+          "pair_gaps_days": []
+        },
+        "pandas_period_lenient": {
+          "sue": -2.2182892328390333,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366
+          ]
+        },
+        "argus_dated_after": {
+          "sue": -2.218289232839033,
+          "refusal": null,
+          "pair_gaps_days": [
+            365,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366,
+            366
+          ]
+        }
+      }
+    ],
+    "frames_filers_with_12_or_more_quarters": 3997,
+    "frames": {
+      "argus_positional_before": {
+        "filers": 3997,
+        "readings": 3936,
+        "non_finite_readings": 0,
+        "refused": 61,
+        "crashed": 0,
+        "pairs_used": 31488,
+        "pairs_genuinely_year_over_year": 2346,
+        "share_of_pairs_year_over_year": 0.07450457317073171,
+        "readings_with_all_pairs_year_over_year": 159,
+        "readings_with_no_pair_year_over_year": 3528
+      },
+      "pandas_period_strict": {
+        "filers": 3997,
+        "readings": 148,
+        "non_finite_readings": 0,
+        "refused": 3681,
+        "crashed": 168,
+        "pairs_used": 1184,
+        "pairs_genuinely_year_over_year": 1182,
+        "share_of_pairs_year_over_year": 0.9983108108108109,
+        "readings_with_all_pairs_year_over_year": 147,
+        "readings_with_no_pair_year_over_year": 0
+      },
+      "pandas_period_lenient": {
+        "filers": 3997,
+        "readings": 3815,
+        "non_finite_readings": 63,
+        "refused": 14,
+        "crashed": 168,
+        "pairs_used": 30520,
+        "pairs_genuinely_year_over_year": 30398,
+        "share_of_pairs_year_over_year": 0.996002621231979,
+        "readings_with_all_pairs_year_over_year": 3758,
+        "readings_with_no_pair_year_over_year": 0
+      },
+      "argus_dated_after": {
+        "filers": 3997,
+        "readings": 3919,
+        "non_finite_readings": 0,
+        "refused": 78,
+        "crashed": 0,
+        "pairs_used": 31352,
+        "pairs_genuinely_year_over_year": 31352,
+        "share_of_pairs_year_over_year": 1.0,
+        "readings_with_all_pairs_year_over_year": 3919,
+        "readings_with_no_pair_year_over_year": 0
+      }
+    },
+    "argus_dated_vs_pandas_lenient": {
+      "both_finite": 3746,
+      "identical_pair_sets": 3687,
+      "identical_pair_sets_values_disagree": [],
+      "identical_pair_sets_values_disagree_count": 0,
+      "different_pair_sets": 59,
+      "different_pair_sets_pandas_has_a_non_year_over_year_pair": 54,
+      "different_pair_sets_argus_has_a_non_year_over_year_pair": 0,
+      "different_pair_sets_examples": [
+        {
+          "filer": "1000697",
+          "pandas_pair_gaps_days": [
+            277,
+            278,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366
+          ],
+          "argus_pair_gaps_days": [
+            369,
+            369,
+            365,
+            365,
+            365,
+            365,
+            366,
+            366
+          ]
+        },
+        {
+          "filer": "100493",
+          "pandas_pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            455,
+            364
+          ],
+          "argus_pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364
+          ]
+        },
+        {
+          "filer": "106040",
+          "pandas_pair_gaps_days": [
+            280,
+            280,
+            280,
+            364,
+            364,
+            364,
+            364,
+            364
+          ],
+          "argus_pair_gaps_days": [
+            371,
+            371,
+            371,
+            364,
+            364,
+            364,
+            364,
+            364
+          ]
+        },
+        {
+          "filer": "1069258",
+          "pandas_pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            371,
+            371,
+            364
+          ],
+          "argus_pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            371,
+            371
+          ]
+        },
+        {
+          "filer": "109177",
+          "pandas_pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            455,
+            455
+          ],
+          "argus_pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364
+          ]
+        },
+        {
+          "filer": "1094285",
+          "pandas_pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            455,
+            455,
+            364
+          ],
+          "argus_pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364
+          ]
+        },
+        {
+          "filer": "1096056",
+          "pandas_pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            455,
+            455,
+            280
+          ],
+          "argus_pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364
+          ]
+        },
+        {
+          "filer": "1110803",
+          "pandas_pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            455,
+            455,
+            364
+          ],
+          "argus_pair_gaps_days": [
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364,
+            364
+          ]
+        }
+      ],
+      "pandas_non_finite": 63,
+      "pandas_non_finite_argus_refused": 63
+    }
+  },
+  "degeneracy": {
+    "real_frames_windows": 4178,
+    "real_frames_degenerate_windows": 68,
+    "real_frames_degenerate_filers": [
+      "34285",
+      "315545",
+      "352991",
+      "724445",
+      "790273",
+      "820771",
+      "828530",
+      "862651",
+      "894501",
+      "918573",
+      "932021",
+      "943535"
+    ],
+    "real_frames": {
+      "quantconnect_reference": {
+        "correct_refusal": 0,
+        "fabricated_non_finite": 68,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 4110,
+        "wrong_value": 0
+      },
+      "sklearn_standard_scaler": {
+        "correct_refusal": 0,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 68,
+        "false_refusal": 0,
+        "correct_value": 4110,
+        "wrong_value": 0
+      },
+      "sklearn_variance_threshold": {
+        "correct_refusal": 68,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 4110,
+        "wrong_value": 0
+      },
+      "scipy_zscore_guard": {
+        "correct_refusal": 68,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 4110,
+        "wrong_value": 0
+      },
+      "argus_absolute_before": {
+        "correct_refusal": 68,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 4110,
+        "wrong_value": 0
+      },
+      "argus_relative_after": {
+        "correct_refusal": 68,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 4110,
+        "wrong_value": 0
+      }
+    },
+    "constructed_from_earnings_comparison": {
+      "quantconnect_reference": {
+        "correct_refusal": 0,
+        "fabricated_non_finite": 2,
+        "fabricated_finite": 1,
+        "false_refusal": 0,
+        "correct_value": 0,
+        "wrong_value": 0
+      },
+      "sklearn_standard_scaler": {
+        "correct_refusal": 0,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 3,
+        "false_refusal": 0,
+        "correct_value": 0,
+        "wrong_value": 0
+      },
+      "sklearn_variance_threshold": {
+        "correct_refusal": 2,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 1,
+        "false_refusal": 0,
+        "correct_value": 0,
+        "wrong_value": 0
+      },
+      "scipy_zscore_guard": {
+        "correct_refusal": 3,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 0,
+        "wrong_value": 0
+      },
+      "argus_absolute_before": {
+        "correct_refusal": 3,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 0,
+        "wrong_value": 0
+      },
+      "argus_relative_after": {
+        "correct_refusal": 3,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 0,
+        "wrong_value": 0
+      }
+    },
+    "constant_step_levels_from_panel": [
+      "1.27",
+      "8.80",
+      "680.23",
+      "937997.93",
+      "6110000.00"
+    ],
+    "constant_step_degenerate": {
+      "quantconnect_reference": {
+        "correct_refusal": 0,
+        "fabricated_non_finite": 6,
+        "fabricated_finite": 9,
+        "false_refusal": 0,
+        "correct_value": 0,
+        "wrong_value": 0
+      },
+      "sklearn_standard_scaler": {
+        "correct_refusal": 0,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 15,
+        "false_refusal": 0,
+        "correct_value": 0,
+        "wrong_value": 0
+      },
+      "sklearn_variance_threshold": {
+        "correct_refusal": 6,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 9,
+        "false_refusal": 0,
+        "correct_value": 0,
+        "wrong_value": 0
+      },
+      "scipy_zscore_guard": {
+        "correct_refusal": 7,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 8,
+        "false_refusal": 0,
+        "correct_value": 0,
+        "wrong_value": 0
+      },
+      "argus_absolute_before": {
+        "correct_refusal": 15,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 0,
+        "wrong_value": 0
+      },
+      "argus_relative_after": {
+        "correct_refusal": 15,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 0,
+        "wrong_value": 0
+      }
+    },
+    "constant_step_genuine_twins": {
+      "quantconnect_reference": {
+        "correct_refusal": 0,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 15,
+        "wrong_value": 0
+      },
+      "sklearn_standard_scaler": {
+        "correct_refusal": 0,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 15,
+        "wrong_value": 0
+      },
+      "sklearn_variance_threshold": {
+        "correct_refusal": 0,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 15,
+        "wrong_value": 0
+      },
+      "scipy_zscore_guard": {
+        "correct_refusal": 0,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 15,
+        "wrong_value": 0
+      },
+      "argus_absolute_before": {
+        "correct_refusal": 0,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 15,
+        "wrong_value": 0
+      },
+      "argus_relative_after": {
+        "correct_refusal": 0,
+        "fabricated_non_finite": 0,
+        "fabricated_finite": 0,
+        "false_refusal": 0,
+        "correct_value": 15,
+        "wrong_value": 0
+      }
+    },
+    "constant_step_cases": {
+      "step level=1.27 step=0.01": {
+        "quantconnect_reference": null,
+        "sklearn_standard_scaler": 0.010000000000000009,
+        "sklearn_variance_threshold": "refused",
+        "scipy_zscore_guard": "refused",
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=1.27 step=0.10": {
+        "quantconnect_reference": 900719925474100.0,
+        "sklearn_standard_scaler": 0.10000000000000009,
+        "sklearn_variance_threshold": 900719925474100.0,
+        "scipy_zscore_guard": 900719925474100.0,
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=1.27 step=1.00": {
+        "quantconnect_reference": 9007199254740992.0,
+        "sklearn_standard_scaler": 1.0,
+        "sklearn_variance_threshold": 9007199254740992.0,
+        "scipy_zscore_guard": "refused",
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=8.80 step=0.01": {
+        "quantconnect_reference": 17022006598036.053,
+        "sklearn_standard_scaler": 17022006598036.053,
+        "sklearn_variance_threshold": 17022006598036.053,
+        "scipy_zscore_guard": 17022006598036.053,
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=8.80 step=0.10": {
+        "quantconnect_reference": 170220065980363.56,
+        "sklearn_standard_scaler": 170220065980363.56,
+        "sklearn_variance_threshold": 170220065980363.56,
+        "scipy_zscore_guard": 170220065980363.56,
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=8.80 step=1.00": {
+        "quantconnect_reference": null,
+        "sklearn_standard_scaler": 1.0,
+        "sklearn_variance_threshold": "refused",
+        "scipy_zscore_guard": "refused",
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=680.23 step=0.01": {
+        "quantconnect_reference": null,
+        "sklearn_standard_scaler": 0.009999999999990905,
+        "sklearn_variance_threshold": "refused",
+        "scipy_zscore_guard": "refused",
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=680.23 step=0.10": {
+        "quantconnect_reference": 2031370669675.9731,
+        "sklearn_standard_scaler": 2031370669675.9731,
+        "sklearn_variance_threshold": 2031370669675.9731,
+        "scipy_zscore_guard": 2031370669675.9731,
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=680.23 step=1.00": {
+        "quantconnect_reference": null,
+        "sklearn_standard_scaler": 1.0,
+        "sklearn_variance_threshold": "refused",
+        "scipy_zscore_guard": "refused",
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=937997.93 step=0.01": {
+        "quantconnect_reference": 259735208.34181815,
+        "sklearn_standard_scaler": 259735208.34181815,
+        "sklearn_variance_threshold": 259735208.34181815,
+        "scipy_zscore_guard": 259735208.34181815,
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=937997.93 step=0.10": {
+        "quantconnect_reference": 1983760419.1431112,
+        "sklearn_standard_scaler": 1983760419.1431112,
+        "sklearn_variance_threshold": 1983760419.1431112,
+        "scipy_zscore_guard": 1983760419.1431112,
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=937997.93 step=1.00": {
+        "quantconnect_reference": null,
+        "sklearn_standard_scaler": 1.0,
+        "sklearn_variance_threshold": "refused",
+        "scipy_zscore_guard": "refused",
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=6110000.00 step=0.01": {
+        "quantconnect_reference": 32466903.310514107,
+        "sklearn_standard_scaler": 32466903.310514107,
+        "sklearn_variance_threshold": 32466903.310514107,
+        "scipy_zscore_guard": 32466903.310514107,
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=6110000.00 step=0.10": {
+        "quantconnect_reference": 221791156.6392769,
+        "sklearn_standard_scaler": 221791156.6392769,
+        "sklearn_variance_threshold": 221791156.6392769,
+        "scipy_zscore_guard": 221791156.6392769,
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      },
+      "step level=6110000.00 step=1.00": {
+        "quantconnect_reference": null,
+        "sklearn_standard_scaler": 1.0,
+        "sklearn_variance_threshold": "refused",
+        "scipy_zscore_guard": "refused",
+        "argus_absolute_before": "refused",
+        "argus_relative_after": "refused"
+      }
+    },
+    "constant_step_fabricated_magnitudes": {
+      "quantconnect_reference": {
+        "count": 9,
+        "min_abs": 32466903.310514107,
+        "max_abs": 9007199254740992.0
+      },
+      "sklearn_standard_scaler": {
+        "count": 15,
+        "min_abs": 0.009999999999990905,
+        "max_abs": 170220065980363.56
+      },
+      "sklearn_variance_threshold": {
+        "count": 9,
+        "min_abs": 32466903.310514107,
+        "max_abs": 9007199254740992.0
+      },
+      "scipy_zscore_guard": {
+        "count": 8,
+        "min_abs": 32466903.310514107,
+        "max_abs": 900719925474100.0
+      },
+      "argus_absolute_before": {
+        "count": 0,
+        "min_abs": null,
+        "max_abs": null
+      },
+      "argus_relative_after": {
+        "count": 0,
+        "min_abs": null,
+        "max_abs": null
+      }
+    },
+    "unit_sweep": {
+      "outcomes": {
+        "quantconnect_reference": {
+          "correct_refusal": 0,
+          "fabricated_non_finite": 21,
+          "fabricated_finite": 9,
+          "false_refusal": 0,
+          "correct_value": 90,
+          "wrong_value": 0
+        },
+        "sklearn_standard_scaler": {
+          "correct_refusal": 0,
+          "fabricated_non_finite": 0,
+          "fabricated_finite": 30,
+          "false_refusal": 0,
+          "correct_value": 90,
+          "wrong_value": 0
+        },
+        "sklearn_variance_threshold": {
+          "correct_refusal": 21,
+          "fabricated_non_finite": 0,
+          "fabricated_finite": 9,
+          "false_refusal": 0,
+          "correct_value": 90,
+          "wrong_value": 0
+        },
+        "scipy_zscore_guard": {
+          "correct_refusal": 30,
+          "fabricated_non_finite": 0,
+          "fabricated_finite": 0,
+          "false_refusal": 0,
+          "correct_value": 90,
+          "wrong_value": 0
+        },
+        "argus_absolute_before": {
+          "correct_refusal": 30,
+          "fabricated_non_finite": 0,
+          "fabricated_finite": 0,
+          "false_refusal": 13,
+          "correct_value": 77,
+          "wrong_value": 0
+        },
+        "argus_relative_after": {
+          "correct_refusal": 30,
+          "fabricated_non_finite": 0,
+          "fabricated_finite": 0,
+          "false_refusal": 0,
+          "correct_value": 90,
+          "wrong_value": 0
+        }
+      },
+      "non_correct_cases": {
+        "quantconnect_reference": [
+          "whole_dollar_linear x1E-12: fabricated_finite",
+          "all_flat x1E-12: fabricated_non_finite",
+          "decimal_linear x1E-12: fabricated_finite",
+          "whole_dollar_linear x1E-9: fabricated_finite",
+          "all_flat x1E-9: fabricated_non_finite",
+          "decimal_linear x1E-9: fabricated_finite",
+          "whole_dollar_linear x1E-6: fabricated_finite",
+          "all_flat x1E-6: fabricated_non_finite",
+          "decimal_linear x1E-6: fabricated_finite",
+          "whole_dollar_linear x1E-3: fabricated_finite",
+          "all_flat x1E-3: fabricated_non_finite",
+          "decimal_linear x1E-3: fabricated_finite",
+          "whole_dollar_linear: fabricated_non_finite",
+          "all_flat: fabricated_non_finite",
+          "decimal_linear: fabricated_finite",
+          "whole_dollar_linear x1E+2: fabricated_non_finite",
+          "all_flat x1E+2: fabricated_non_finite",
+          "decimal_linear x1E+2: fabricated_non_finite",
+          "whole_dollar_linear x1E+3: fabricated_non_finite",
+          "all_flat x1E+3: fabricated_non_finite",
+          "decimal_linear x1E+3: fabricated_non_finite",
+          "whole_dollar_linear x1E+6: fabricated_non_finite",
+          "all_flat x1E+6: fabricated_non_finite",
+          "decimal_linear x1E+6: fabricated_non_finite",
+          "whole_dollar_linear x1E+9: fabricated_non_finite",
+          "all_flat x1E+9: fabricated_non_finite",
+          "decimal_linear x1E+9: fabricated_non_finite",
+          "whole_dollar_linear x1E+12: fabricated_non_finite",
+          "all_flat x1E+12: fabricated_non_finite",
+          "decimal_linear x1E+12: fabricated_non_finite"
+        ],
+        "sklearn_standard_scaler": [
+          "whole_dollar_linear x1E-12: fabricated_finite",
+          "all_flat x1E-12: fabricated_finite",
+          "decimal_linear x1E-12: fabricated_finite",
+          "whole_dollar_linear x1E-9: fabricated_finite",
+          "all_flat x1E-9: fabricated_finite",
+          "decimal_linear x1E-9: fabricated_finite",
+          "whole_dollar_linear x1E-6: fabricated_finite",
+          "all_flat x1E-6: fabricated_finite",
+          "decimal_linear x1E-6: fabricated_finite",
+          "whole_dollar_linear x1E-3: fabricated_finite",
+          "all_flat x1E-3: fabricated_finite",
+          "decimal_linear x1E-3: fabricated_finite",
+          "whole_dollar_linear: fabricated_finite",
+          "all_flat: fabricated_finite",
+          "decimal_linear: fabricated_finite",
+          "whole_dollar_linear x1E+2: fabricated_finite",
+          "all_flat x1E+2: fabricated_finite",
+          "decimal_linear x1E+2: fabricated_finite",
+          "whole_dollar_linear x1E+3: fabricated_finite",
+          "all_flat x1E+3: fabricated_finite",
+          "decimal_linear x1E+3: fabricated_finite",
+          "whole_dollar_linear x1E+6: fabricated_finite",
+          "all_flat x1E+6: fabricated_finite",
+          "decimal_linear x1E+6: fabricated_finite",
+          "whole_dollar_linear x1E+9: fabricated_finite",
+          "all_flat x1E+9: fabricated_finite",
+          "decimal_linear x1E+9: fabricated_finite",
+          "whole_dollar_linear x1E+12: fabricated_finite",
+          "all_flat x1E+12: fabricated_finite",
+          "decimal_linear x1E+12: fabricated_finite"
+        ],
+        "sklearn_variance_threshold": [
+          "whole_dollar_linear x1E-12: fabricated_finite",
+          "decimal_linear x1E-12: fabricated_finite",
+          "whole_dollar_linear x1E-9: fabricated_finite",
+          "decimal_linear x1E-9: fabricated_finite",
+          "whole_dollar_linear x1E-6: fabricated_finite",
+          "decimal_linear x1E-6: fabricated_finite",
+          "whole_dollar_linear x1E-3: fabricated_finite",
+          "decimal_linear x1E-3: fabricated_finite",
+          "decimal_linear: fabricated_finite"
+        ],
+        "scipy_zscore_guard": [],
+        "argus_absolute_before": [
+          "NVDA x1e-12: false_refusal",
+          "NVDA x1e-9: false_refusal",
+          "TSLA x1e-12: false_refusal",
+          "TSLA x1e-9: false_refusal",
+          "AAPL x1e-12: false_refusal",
+          "AAPL x1e-9: false_refusal",
+          "MSFT x1e-12: false_refusal",
+          "MSFT x1e-9: false_refusal",
+          "META x1e-12: false_refusal",
+          "GOOGL x1e-12: false_refusal",
+          "AMZN x1e-12: false_refusal",
+          "COIN x1e-12: false_refusal",
+          "MSTR x1e-12: false_refusal"
+        ],
+        "argus_relative_after": []
+      }
+    }
+  },
+  "degenerate_filer_names": {
+    "34285": "RELIABILITY INCORPORATED",
+    "352991": "ADVANCED OXYGEN TECHNOLOGIES, INC.",
+    "790273": "CONECTISYS CORPORATION",
+    "828530": "ADMIRAL FINANCIAL CORP.",
+    "862651": "Investview, Inc.",
+    "1043150": "ELINE ENTERTAINMENT GROUP, INC.",
+    "1119190": "HUMBL,     Inc.",
+    "1119643": "NUTRA PHARMA CORP.",
+    "1121795": "GHST World Inc",
+    "1127475": "DIGITAL BRAND MEDIA & MARKETING GROUP, INC.",
+    "1138724": "GLOBAL ARENA HOLDING, INC.",
+    "1145604": "CENTENNIAL GROWTH EQUITIES INC.",
+    "1171326": "ENTREPRENEUR UNIVERSE BRIGHT GROUP",
+    "1290658": "IIOT-OXYS, Inc.",
+    "1362516": "Cleartronic, Inc.",
+    "1371128": "NEWHYDROGEN, INC.",
+    "1376793": "Cavitation Technologies, Inc.",
+    "1412126": "RemSleep Holdings Inc.",
+    "1471781": "GBT TECHNOLOGIES INC.",
+    "1481028": "SUNHYDROGEN, INC.",
+    "1506929": "Verde Resources, Inc.",
+    "1546853": "SKKYNET CLOUD SYSTEMS, INC.",
+    "1576197": "Strategic Environmental & Energy Resources, Inc.",
+    "1588014": "ADM ENDEAVORS, INC.",
+    "1593184": "FINDIT, INC.",
+    "1616156": "WEWARDS, INC.",
+    "1643154": "IANTHUS CAPITAL HOLDINGS, INC.",
+    "1643721": "LEAFBUYER TECHNOLOGIES, INC.",
+    "1697884": "VITASPRING BIOMEDICAL CO., LTD.",
+    "1720286": "INTERNET SCIENCES INC.",
+    "1721056": "HOOPS SCOUTING USA",
+    "1823635": "CXJ GROUP CO., Limited",
+    "1848334": "OKMIN RESOURCES INC.",
+    "1910975": "RAPID LINE INC.",
+    "315545": "PROVECTUS BIOPHARMACEUTICALS, INC.",
+    "724445": "BURZYNSKI RESEARCH INSTITUTE INC",
+    "820771": "GOLIATH FILM AND MEDIA HOLDINGS",
+    "894501": "GOLD ROCK HOLDINGS, INC.",
+    "943535": "WORLD HEALTH ENERGY HOLDINGS, INC.",
+    "1038277": "INTERNATIONAL ISOTOPES INC",
+    "1042418": "Inhibitor Therapeutics, Inc.",
+    "1141964": "PUBLIC CO MANAGEMENT CORP",
+    "1410738": "VoIP-PAL.COM INC.",
+    "1413119": "KRAIG BIOCRAFT LABORATORIES, INC.",
+    "1435617": "POWERDYNE INTERNATIONAL, INC.",
+    "1437517": "CYBERLOQ TECHNOLOGIES, INC.",
+    "1449349": "VIVOS INC",
+    "1463208": "Transportation and Logistics Systems, Inc.",
+    "1570132": "ANVI GLOBAL HOLDINGS, INC.",
+    "1572386": "GREENWAY TECHNOLOGIES, INC.",
+    "1673504": "ATLANTIS GLORY INC.",
+    "1816554": "EVENTIKO INC.",
+    "1854183": "ORION BLISS CORP.",
+    "1933359": "NATICS CORP.",
+    "918573": "GROOVE BOTANICALS, INC.",
+    "932021": "GLOBAL TECHNOLOGIES, LTD",
+    "1375348": "GOLDEN STAR RESOURCE CORP.",
+    "1433551": "SINO GREEN LAND CORPORATION",
+    "1690384": "BioCrude Technologies USA, Inc.",
+    "1751707": "United Express Inc.",
+    "1763660": "SEATECH VENTURES CORP.",
+    "1873213": "BIRDIE WIN CORPORATION",
+    "1897525": "KB Global Holdings Limited",
+    "1935033": "KEEMO FASHION GROUP LIMITED",
+    "1976900": "DFP HOLDINGS LIMITED",
+    "1977837": "ALIXO-YOLLOO CORP.",
+    "1978111": "NAPLOY CORP.",
+    "1397795": "BYRN INC."
+  },
+  "ranking": {
+    "quantconnect_positional": {
+      "ranked": 3936,
+      "top_50_non_year_over_year": 46,
+      "top_50_exactly_degenerate": 0,
+      "top_50_non_finite": 0,
+      "top_5": [
+        {
+          "cik": "1841156",
+          "name": "Paymentus Holdings, Inc.",
+          "sue": 7.3870441350131095
+        },
+        {
+          "cik": "1398659",
+          "name": "GENPACT LIMITED",
+          "sue": 6.412914726173365
+        },
+        {
+          "cik": "1125376",
+          "name": "ENSIGN GROUP, INC",
+          "sue": 5.9181971028015115
+        },
+        {
+          "cik": "1158895",
+          "name": "LEMAITRE VASCULAR, INC.",
+          "sue": 5.692757735641322
+        },
+        {
+          "cik": "9326",
+          "name": "Balchem Corp",
+          "sue": 5.510773761549321
+        }
+      ],
+      "spearman_vs_exact": {
+        "n": 3919,
+        "rho": 0.6683302409729812
+      }
+    },
+    "argus_positional_before": {
+      "ranked": 3936,
+      "top_50_non_year_over_year": 46,
+      "top_50_exactly_degenerate": 0,
+      "top_50_non_finite": 0,
+      "top_5": [
+        {
+          "cik": "1841156",
+          "name": "Paymentus Holdings, Inc.",
+          "sue": 7.3870441350131095
+        },
+        {
+          "cik": "1398659",
+          "name": "GENPACT LIMITED",
+          "sue": 6.412914726173365
+        },
+        {
+          "cik": "1125376",
+          "name": "ENSIGN GROUP, INC",
+          "sue": 5.9181971028015115
+        },
+        {
+          "cik": "1158895",
+          "name": "LEMAITRE VASCULAR, INC.",
+          "sue": 5.692757735641322
+        },
+        {
+          "cik": "9326",
+          "name": "Balchem Corp",
+          "sue": 5.510773761549321
+        }
+      ],
+      "spearman_vs_exact": {
+        "n": 3919,
+        "rho": 0.6683293971867467
+      }
+    },
+    "pandas_period_lenient": {
+      "ranked": 3752,
+      "top_50_non_year_over_year": 1,
+      "top_50_exactly_degenerate": 0,
+      "top_50_non_finite": 0,
+      "top_5": [
+        {
+          "cik": "1035267",
+          "name": "Intuitive Surgical, Inc.",
+          "sue": 7.04379684717171
+        },
+        {
+          "cik": "1468328",
+          "name": "ADDUS HOMECARE CORPORATION",
+          "sue": 5.5697826157011825
+        },
+        {
+          "cik": "9326",
+          "name": "Balchem Corp",
+          "sue": 5.510773761549321
+        },
+        {
+          "cik": "26324",
+          "name": "CURTISS-WRIGHT CORPORATION",
+          "sue": 5.282790710961037
+        },
+        {
+          "cik": "792966",
+          "name": "FARMERS & MERCHANTS BANCORP, INC.",
+          "sue": 5.057397023533076
+        }
+      ],
+      "spearman_vs_exact": {
+        "n": 3746,
+        "rho": 0.999329200165877
+      }
+    },
+    "pandas_then_sklearn_scaler": {
+      "ranked": 3815,
+      "top_50_non_year_over_year": 1,
+      "top_50_exactly_degenerate": 0,
+      "top_50_non_finite": 0,
+      "top_5": [
+        {
+          "cik": "1035267",
+          "name": "Intuitive Surgical, Inc.",
+          "sue": 7.04379684717171
+        },
+        {
+          "cik": "1468328",
+          "name": "ADDUS HOMECARE CORPORATION",
+          "sue": 5.5697826157011825
+        },
+        {
+          "cik": "9326",
+          "name": "Balchem Corp",
+          "sue": 5.510773761549321
+        },
+        {
+          "cik": "26324",
+          "name": "CURTISS-WRIGHT CORPORATION",
+          "sue": 5.282790710961037
+        },
+        {
+          "cik": "792966",
+          "name": "FARMERS & MERCHANTS BANCORP, INC.",
+          "sue": 5.057397023533076
+        }
+      ],
+      "spearman_vs_exact": {
+        "n": 3746,
+        "rho": 0.999329200165877
+      }
+    },
+    "argus_dated_after": {
+      "ranked": 3919,
+      "top_50_non_year_over_year": 0,
+      "top_50_exactly_degenerate": 0,
+      "top_50_non_finite": 0,
+      "top_5": [
+        {
+          "cik": "1035267",
+          "name": "Intuitive Surgical, Inc.",
+          "sue": 7.04379684717171
+        },
+        {
+          "cik": "1468328",
+          "name": "ADDUS HOMECARE CORPORATION",
+          "sue": 5.5697826157011825
+        },
+        {
+          "cik": "9326",
+          "name": "Balchem Corp",
+          "sue": 5.510773761549321
+        },
+        {
+          "cik": "26324",
+          "name": "CURTISS-WRIGHT CORPORATION",
+          "sue": 5.282790710961037
+        },
+        {
+          "cik": "792966",
+          "name": "FARMERS & MERCHANTS BANCORP, INC.",
+          "sue": 5.057397023533076
+        }
+      ],
+      "spearman_vs_exact": {
+        "n": 3919,
+        "rho": 0.9999999989532568
+      }
+    }
+  },
+  "costs": {
+    "argus_positional_before_seconds_per_reading": 0.00010777966662620504,
+    "pandas_period_strict_seconds_per_reading": 0.0011907226666032027,
+    "pandas_period_lenient_seconds_per_reading": 0.0009578606664823989,
+    "argus_dated_after_seconds_per_reading": 0.00015623099985532463
+  },
+  "reproducibility": {
+    "identical_on_same_fetched_inputs": true
+  },
+  "scope_statement": "Measured on live SEC EDGAR diluted EPS: the nine rToken anchors through the desk's own fetch, and every filer in the SEC's quarterly XBRL frames 2022Q1-2026Q2, against exact rational arithmetic on the filed decimals. Claimed: (1) pandas' calendar-period differencing beat ARGUS's positional lag, which paired different fiscal quarters for almost every filer because XBRL has no standalone fiscal Q4; ARGUS now pairs by date, agrees with pandas to 1e-9 on every filer where the two select the same quarter pairs, and also pairs 52/53-week fiscal quarters that straddle a calendar boundary, where pandas' PeriodIndex crashes on a duplicate label or pairs quarters that are not a year apart. (2) On refusing a degenerate scale, scikit-learn and SciPy lose: their delta-relative thresholds pass a constant yearly step on a real EPS level as a finite SUE between about 1e7 and 1e16, and StandardScaler returns a number for a constant history instead of refusing; their unit-invariance was adopted. On the real SEC panel VarianceThreshold, SciPy and ARGUS all refuse every exactly-degenerate filer (StandardScaler returns a number for each, the reference inf or nan), so ARGUS's margin over VarianceThreshold and SciPy rests on constructed constant-step windows at real EPS levels, not on a real filer. NOT claimed: that SUE predicts returns; that eight changes spanning eleven fiscal quarters (Q4 excluded) is the same estimator as the reference's eight consecutive quarters \u2014 it is the closest honest one XBRL allows; that the frames panel is point-in-time (it carries each period's latest filed value)."
+}

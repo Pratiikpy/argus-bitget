@@ -85,6 +85,7 @@ from argus.lui.research import (
     _strip_budget,
     _t,
     _yahoo_summary,
+    book_pricing_note,
     parse_book,
     parse_budget,
     research_symbols,
@@ -386,7 +387,8 @@ def resolve_book(question: str, book_text: str) -> tuple[dict[str, float], float
         if book:
             shown = ", ".join([f"{w:.0%} {_t(s)}" for s, w in book.items()]
                               + ([f"{cash:.0%} cash"] if cash else []))
-            return book, cash, [f"Remembered: your saved book — {shown}."]
+            return book, cash, [f"Remembered: your saved book — {shown}"
+                                f"{book_pricing_note(body)}."]
     return {}, 0.0, ["Assumed: no holdings were named and no book is saved, so this is the US "
                      "macro calendar alone — name them (\"40% NVDA, 30% MSFT, 30% BTC\") or save "
                      "them in My book to see earnings, filings and what each event touches."]

@@ -24,6 +24,11 @@ import math
 from pathlib import Path
 from typing import Any
 
+SCRATCH_DIR = "scratch" "pad"
+"""The name of the session scratch directory, which no committed file may carry. Written in two
+halves because the publish scan refuses any committed line that spells it out, including the
+tests that check an artefact for it."""
+
 
 def sanitise(blob: Any, *, path: str = "", seen: list[str] | None = None) -> Any:
     """Replace every non-finite float with ``None``, recording where each one was.

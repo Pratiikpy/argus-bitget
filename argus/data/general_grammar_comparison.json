@@ -1,0 +1,951 @@
+{
+  "rival_source": "live",
+  "rival_versions": {
+    "cel-expr-python": "0.1.3",
+    "polars": "1.44.2",
+    "sympy": "1.14.0"
+  },
+  "rival_python": "3.11.9",
+  "corpus_digest": "b58acfc8ad6cc6f9c34d4230a382da6726b9b48619f19f73474ea1efc02903ff",
+  "bars": 1439,
+  "symbol": "NVDAUSDT",
+  "same_trees": {
+    "slow_trend": true,
+    "slow_fade": true,
+    "vol_adjusted_momentum": true,
+    "vol_adjusted_reversion": true,
+    "range_breakout": true,
+    "stale_high_fade": true,
+    "fitted_trend": true,
+    "delta_momentum": true
+  },
+  "execution_surface_scan": {
+    "grammar.py": [],
+    "grammar_text.py": [],
+    "grammar_series.py": []
+  },
+  "typecheck": {
+    "argus": {
+      "ill_typed_rejected_statically": 10,
+      "ill_typed_rejected_at_runtime": 0,
+      "ill_typed_silently_evaluated": [],
+      "controls_falsely_rejected": [],
+      "rows": [
+        {
+          "id": "bool_op_on_number",
+          "outcome": "static",
+          "detail": "and needs two booleans at column 1"
+        },
+        {
+          "id": "number_as_condition",
+          "outcome": "static",
+          "detail": "the condition must be a boolean at column 1"
+        },
+        {
+          "id": "not_on_number",
+          "outcome": "static",
+          "detail": "not needs a boolean at column 1"
+        },
+        {
+          "id": "compare_boolean_to_number",
+          "outcome": "static",
+          "detail": "gt needs two numbers at column 1"
+        },
+        {
+          "id": "arithmetic_on_boolean",
+          "outcome": "static",
+          "detail": "add needs two numbers at column 1"
+        },
+        {
+          "id": "branches_disagree",
+          "outcome": "static",
+          "detail": "both branches must have the same kind at column 1"
+        },
+        {
+          "id": "or_on_numbers",
+          "outcome": "static",
+          "detail": "or needs two booleans at column 1"
+        },
+        {
+          "id": "negate_boolean",
+          "outcome": "static",
+          "detail": "neg needs a number at column 1"
+        },
+        {
+          "id": "abs_of_boolean",
+          "outcome": "static",
+          "detail": "abs needs a number at column 1"
+        },
+        {
+          "id": "undeclared_field",
+          "outcome": "static",
+          "detail": "unknown field 'closee'; declared fields: ['basis_bps', 'close', 'high', 'hours_to_discovery', 'low', 'range_bps', 'return_1', 'volume'] at column 4"
+        },
+        {
+          "id": "control_compare",
+          "outcome": "evaluated",
+          "detail": ""
+        },
+        {
+          "id": "control_if",
+          "outcome": "evaluated",
+          "detail": ""
+        },
+        {
+          "id": "control_and",
+          "outcome": "evaluated",
+          "detail": ""
+        },
+        {
+          "id": "control_arith",
+          "outcome": "evaluated",
+          "detail": ""
+        },
+        {
+          "id": "control_not",
+          "outcome": "evaluated",
+          "detail": ""
+        }
+      ]
+    },
+    "cel": {
+      "ill_typed_rejected_statically": 10,
+      "ill_typed_rejected_at_runtime": 0,
+      "ill_typed_silently_evaluated": [],
+      "controls_falsely_rejected": [],
+      "rows": [
+        {
+          "id": "bool_op_on_number",
+          "outcome": "static",
+          "detail": "INVALID_ARGUMENT: ERROR: <input>:1:8: found no matching overload for '_&&_' applied to '(double, bool)'"
+        },
+        {
+          "id": "number_as_condition",
+          "outcome": "static",
+          "detail": "INVALID_ARGUMENT: ERROR: <input>:1:8: found no matching overload for '_?_:_' applied to '(double, double, double)'"
+        },
+        {
+          "id": "not_on_number",
+          "outcome": "static",
+          "detail": "INVALID_ARGUMENT: ERROR: <input>:1:1: found no matching overload for '!_' applied to '(double)'"
+        },
+        {
+          "id": "compare_boolean_to_number",
+          "outcome": "static",
+          "detail": "INVALID_ARGUMENT: ERROR: <input>:1:16: found no matching overload for '_>_' applied to '(bool, double)'"
+        },
+        {
+          "id": "arithmetic_on_boolean",
+          "outcome": "static",
+          "detail": "INVALID_ARGUMENT: ERROR: <input>:1:16: found no matching overload for '_+_' applied to '(bool, double)'"
+        },
+        {
+          "id": "branches_disagree",
+          "outcome": "static",
+          "detail": "INVALID_ARGUMENT: ERROR: <input>:1:16: found no matching overload for '_?_:_' applied to '(bool, double, bool)'"
+        },
+        {
+          "id": "or_on_numbers",
+          "outcome": "static",
+          "detail": "INVALID_ARGUMENT: ERROR: <input>:1:9: found no matching overload for '_||_' applied to '(double, double)'"
+        },
+        {
+          "id": "negate_boolean",
+          "outcome": "static",
+          "detail": "INVALID_ARGUMENT: ERROR: <input>:1:1: found no matching overload for '-_' applied to '(bool)'"
+        },
+        {
+          "id": "abs_of_boolean",
+          "outcome": "static",
+          "detail": "INVALID_ARGUMENT: ERROR: <input>:1:9: found no matching overload for 'math.abs' applied to '(bool)'"
+        },
+        {
+          "id": "undeclared_field",
+          "outcome": "static",
+          "detail": "INVALID_ARGUMENT: ERROR: <input>:1:2: undeclared reference to 'closee' (in container '')"
+        },
+        {
+          "id": "control_compare",
+          "outcome": "evaluated",
+          "detail": ""
+        },
+        {
+          "id": "control_if",
+          "outcome": "evaluated",
+          "detail": ""
+        },
+        {
+          "id": "control_and",
+          "outcome": "evaluated",
+          "detail": ""
+        },
+        {
+          "id": "control_arith",
+          "outcome": "evaluated",
+          "detail": ""
+        },
+        {
+          "id": "control_not",
+          "outcome": "evaluated",
+          "detail": ""
+        }
+      ]
+    },
+    "polars": {
+      "ill_typed_rejected_statically": 2,
+      "ill_typed_rejected_at_runtime": 5,
+      "ill_typed_silently_evaluated": [
+        "arithmetic_on_boolean",
+        "branches_disagree",
+        "compare_boolean_to_number"
+      ],
+      "controls_falsely_rejected": [],
+      "rows": [
+        {
+          "id": "bool_op_on_number",
+          "outcome": "runtime",
+          "detail": "InvalidOperationError: `bitand` operation not supported for dtype `f64`",
+          "warnings": [
+            "& on Float64 and Boolean is deprecated and will raise a ComputeError in Polars 2.0"
+          ]
+        },
+        {
+          "id": "number_as_condition",
+          "outcome": "runtime",
+          "detail": "SchemaError: invalid series dtype: expected `Boolean`, got `f64` for series with name `close`",
+          "warnings": []
+        },
+        {
+          "id": "not_on_number",
+          "outcome": "static",
+          "detail": "schema: InvalidOperationError: dtype Float64 not supported in 'not' operation"
+        },
+        {
+          "id": "compare_boolean_to_number",
+          "outcome": "evaluated",
+          "detail": "",
+          "warnings": []
+        },
+        {
+          "id": "arithmetic_on_boolean",
+          "outcome": "evaluated",
+          "detail": "",
+          "warnings": []
+        },
+        {
+          "id": "branches_disagree",
+          "outcome": "evaluated",
+          "detail": "",
+          "warnings": []
+        },
+        {
+          "id": "or_on_numbers",
+          "outcome": "runtime",
+          "detail": "InvalidOperationError: `bitor` operation not supported for dtype `f64`",
+          "warnings": []
+        },
+        {
+          "id": "negate_boolean",
+          "outcome": "runtime",
+          "detail": "InvalidOperationError: `neg` operation not supported for dtype `bool`",
+          "warnings": []
+        },
+        {
+          "id": "abs_of_boolean",
+          "outcome": "runtime",
+          "detail": "InvalidOperationError: `abs` operation not supported for dtype `bool`",
+          "warnings": []
+        },
+        {
+          "id": "undeclared_field",
+          "outcome": "static",
+          "detail": "schema: ColumnNotFoundError: unable to find column \"closee\"; valid columns: [\"close\", \"volume\", \"high\", \"low\", \"return_1\"]"
+        },
+        {
+          "id": "control_compare",
+          "outcome": "evaluated",
+          "detail": "",
+          "warnings": []
+        },
+        {
+          "id": "control_if",
+          "outcome": "evaluated",
+          "detail": "",
+          "warnings": []
+        },
+        {
+          "id": "control_and",
+          "outcome": "evaluated",
+          "detail": "",
+          "warnings": []
+        },
+        {
+          "id": "control_arith",
+          "outcome": "evaluated",
+          "detail": "",
+          "warnings": []
+        },
+        {
+          "id": "control_not",
+          "outcome": "evaluated",
+          "detail": "",
+          "warnings": []
+        }
+      ]
+    },
+    "ill_typed_total": 10,
+    "controls_total": 5
+  },
+  "dedup": {
+    "argus_canonical": {
+      "equivalent_merged": 4,
+      "equivalent_inexpressible": [],
+      "equivalent_missed": [
+        "associativity",
+        "double_negation",
+        "relational_flip",
+        "subtract_negation"
+      ],
+      "distinct_falsely_merged": [],
+      "convention_pairs_merged": [
+        "float_near_4e-7",
+        "float_noise_1e-11"
+      ]
+    },
+    "argus_normal_form": {
+      "equivalent_merged": 8,
+      "equivalent_inexpressible": [],
+      "equivalent_missed": [],
+      "distinct_falsely_merged": [],
+      "convention_pairs_merged": [
+        "float_near_4e-7",
+        "float_noise_1e-11"
+      ]
+    },
+    "cel": {
+      "equivalent_merged": 0,
+      "equivalent_inexpressible": [
+        "symmetric_corr"
+      ],
+      "equivalent_missed": [
+        "associativity",
+        "commutative_add",
+        "commutative_and",
+        "commutative_mul_const",
+        "double_negation",
+        "relational_flip",
+        "subtract_negation"
+      ],
+      "distinct_falsely_merged": [],
+      "convention_pairs_merged": []
+    },
+    "polars": {
+      "equivalent_merged": 0,
+      "equivalent_inexpressible": [],
+      "equivalent_missed": [
+        "associativity",
+        "commutative_add",
+        "commutative_and",
+        "commutative_mul_const",
+        "double_negation",
+        "relational_flip",
+        "subtract_negation",
+        "symmetric_corr"
+      ],
+      "distinct_falsely_merged": [],
+      "convention_pairs_merged": []
+    },
+    "sympy": {
+      "equivalent_merged": 7,
+      "equivalent_inexpressible": [],
+      "equivalent_missed": [
+        "symmetric_corr"
+      ],
+      "distinct_falsely_merged": [],
+      "convention_pairs_merged": []
+    },
+    "equivalent_total": 8
+  },
+  "numeric": {
+    "rows": [
+      {
+        "id": "mean_6",
+        "full_window_bars": 1434,
+        "full_window_max_abs_diff": 8.526512829121202e-14,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 5,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "sum_6",
+        "full_window_bars": 1434,
+        "full_window_max_abs_diff": 4.547473508864641e-13,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 5,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "max_6",
+        "full_window_bars": 1434,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 5,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "min_6",
+        "full_window_bars": 1434,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 5,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "std_6",
+        "full_window_bars": 1434,
+        "full_window_max_abs_diff": 2.1760371282653068e-14,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 5,
+        "warmup_undefined_in_polars": 1,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "median_6",
+        "full_window_bars": 1434,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 5,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "zscore_6",
+        "full_window_bars": 1434,
+        "full_window_max_abs_diff": 2.522315689645893e-12,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 5,
+        "warmup_undefined_in_polars": 1,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "rank_6",
+        "full_window_bars": 1434,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 5,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "slope_6",
+        "full_window_bars": 1434,
+        "full_window_max_abs_diff": 3.964584910365332e-11,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 5,
+        "warmup_undefined_in_polars": 1,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "argmax_6",
+        "polars": "inexpressible natively"
+      },
+      {
+        "id": "argmin_6",
+        "polars": "inexpressible natively"
+      },
+      {
+        "id": "corr_6",
+        "full_window_bars": 1434,
+        "full_window_max_abs_diff": 8.235878645734829e-11,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 5,
+        "warmup_undefined_in_polars": 1,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "delay_6",
+        "full_window_bars": 1434,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 5,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "mean_24",
+        "full_window_bars": 1416,
+        "full_window_max_abs_diff": 1.1368683772161603e-13,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 23,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "sum_24",
+        "full_window_bars": 1416,
+        "full_window_max_abs_diff": 2.7284841053187847e-12,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 23,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "max_24",
+        "full_window_bars": 1416,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 23,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "min_24",
+        "full_window_bars": 1416,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 23,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "std_24",
+        "full_window_bars": 1416,
+        "full_window_max_abs_diff": 3.064215547965432e-14,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 23,
+        "warmup_undefined_in_polars": 1,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "median_24",
+        "full_window_bars": 1416,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 23,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "zscore_24",
+        "full_window_bars": 1416,
+        "full_window_max_abs_diff": 1.0994261057106769e-12,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 23,
+        "warmup_undefined_in_polars": 1,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "rank_24",
+        "full_window_bars": 1416,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 23,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "slope_24",
+        "full_window_bars": 1416,
+        "full_window_max_abs_diff": 2.0733553762752877e-12,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 23,
+        "warmup_undefined_in_polars": 1,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "argmax_24",
+        "polars": "inexpressible natively"
+      },
+      {
+        "id": "argmin_24",
+        "polars": "inexpressible natively"
+      },
+      {
+        "id": "corr_24",
+        "full_window_bars": 1416,
+        "full_window_max_abs_diff": 6.473710456589288e-12,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 23,
+        "warmup_undefined_in_polars": 1,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "delay_24",
+        "full_window_bars": 1416,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 23,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "mean_96",
+        "full_window_bars": 1344,
+        "full_window_max_abs_diff": 1.9895196601282805e-13,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 95,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "sum_96",
+        "full_window_bars": 1344,
+        "full_window_max_abs_diff": 1.8189894035458565e-11,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 95,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "max_96",
+        "full_window_bars": 1344,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 95,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "min_96",
+        "full_window_bars": 1344,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 95,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "std_96",
+        "full_window_bars": 1344,
+        "full_window_max_abs_diff": 4.618527782440651e-14,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 95,
+        "warmup_undefined_in_polars": 1,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "median_96",
+        "full_window_bars": 1344,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 95,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "zscore_96",
+        "full_window_bars": 1344,
+        "full_window_max_abs_diff": 4.18554080283684e-13,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 95,
+        "warmup_undefined_in_polars": 1,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "rank_96",
+        "full_window_bars": 1344,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 95,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "slope_96",
+        "full_window_bars": 1344,
+        "full_window_max_abs_diff": 1.172187347187048e-13,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 95,
+        "warmup_undefined_in_polars": 1,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "argmax_96",
+        "polars": "inexpressible natively"
+      },
+      {
+        "id": "argmin_96",
+        "polars": "inexpressible natively"
+      },
+      {
+        "id": "corr_96",
+        "full_window_bars": 1344,
+        "full_window_max_abs_diff": 2.4147350785597155e-14,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 95,
+        "warmup_undefined_in_polars": 1,
+        "warmup_numeric_disagreements": 0
+      },
+      {
+        "id": "delay_96",
+        "full_window_bars": 1344,
+        "full_window_max_abs_diff": 0.0,
+        "full_window_agrees": true,
+        "full_window_undefined_in_polars": 0,
+        "argus_values_where_polars_undefined": [],
+        "warmup_bars": 95,
+        "warmup_undefined_in_polars": 0,
+        "warmup_numeric_disagreements": 0
+      }
+    ],
+    "ops_checked": 39,
+    "polars_inexpressible": [
+      "argmax_24",
+      "argmax_6",
+      "argmax_96",
+      "argmin_24",
+      "argmin_6",
+      "argmin_96"
+    ],
+    "full_window_agree": 33,
+    "full_window_expressible": 33,
+    "full_window_bars_undefined_in_polars": 0
+  },
+  "timing": {
+    "rows": [
+      {
+        "factor": "slow_trend",
+        "argus_per_bar_seconds": 0.002292599994689226,
+        "argus_series_seconds": 0.0034362999722361565,
+        "series_identical_to_per_bar": true,
+        "polars_seconds": 0.00023619993589818478,
+        "polars_speedup_over_argus_series": 14.548268013575548,
+        "signal_agreement": 1.0
+      },
+      {
+        "factor": "slow_fade",
+        "argus_per_bar_seconds": 0.0023303000489249825,
+        "argus_series_seconds": 0.0035783000057563186,
+        "series_identical_to_per_bar": true,
+        "polars_seconds": 0.00018319999799132347,
+        "polars_speedup_over_argus_series": 19.532205485754375,
+        "signal_agreement": 1.0
+      },
+      {
+        "factor": "vol_adjusted_momentum",
+        "argus_per_bar_seconds": 0.052876500063575804,
+        "argus_series_seconds": 0.04043120006099343,
+        "series_identical_to_per_bar": true,
+        "polars_seconds": 0.00027900002896785736,
+        "polars_speedup_over_argus_series": 144.91468051299512,
+        "signal_agreement": 1.0
+      },
+      {
+        "factor": "vol_adjusted_reversion",
+        "argus_per_bar_seconds": 0.07484050001949072,
+        "argus_series_seconds": 0.0255161999957636,
+        "series_identical_to_per_bar": true,
+        "polars_seconds": 0.00027840002439916134,
+        "polars_speedup_over_argus_series": 91.65300919363162,
+        "signal_agreement": 1.0
+      },
+      {
+        "factor": "range_breakout",
+        "argus_per_bar_seconds": 0.08004909998271614,
+        "argus_series_seconds": 0.029638899955898523,
+        "series_identical_to_per_bar": true,
+        "polars_seconds": 0.000984500045888126,
+        "polars_speedup_over_argus_series": 30.105534356944613,
+        "signal_agreement": 1.0
+      },
+      {
+        "factor": "stale_high_fade",
+        "argus_per_bar_seconds": 0.07293010002467781,
+        "argus_series_seconds": 0.0362054998986423,
+        "series_identical_to_per_bar": true,
+        "polars": "inexpressible natively (argmax)"
+      },
+      {
+        "factor": "fitted_trend",
+        "argus_per_bar_seconds": 0.07446380006149411,
+        "argus_series_seconds": 0.05058769998140633,
+        "series_identical_to_per_bar": true,
+        "polars_seconds": 0.0002698000753298402,
+        "polars_speedup_over_argus_series": 187.50068886956785,
+        "signal_agreement": 1.0
+      },
+      {
+        "factor": "delta_momentum",
+        "argus_per_bar_seconds": 0.00366969988681376,
+        "argus_series_seconds": 0.004264799994416535,
+        "series_identical_to_per_bar": true,
+        "polars_seconds": 0.00015730003360658884,
+        "polars_speedup_over_argus_series": 27.11251801180731,
+        "signal_agreement": 1.0
+      }
+    ]
+  },
+  "budget": {
+    "argus": {
+      "us_per_node": 0.48600259354601877,
+      "max_cost": 100000,
+      "rows": [
+        {
+          "depth": 1,
+          "cost_per_bar": 514,
+          "validate": "accepted",
+          "validate_without_cost_bound": "accepted",
+          "per_bar_path_estimated_seconds_per_bar": 0.00024980533308265366,
+          "series_cost_per_bar": 514,
+          "series_seconds_full_series": 0.07387610001023859,
+          "series_last": 222.90771484374994,
+          "abs_diff_vs_polars_last": 5.684341886080802e-14
+        },
+        {
+          "depth": 2,
+          "cost_per_bar": 262658,
+          "validate": "refused",
+          "validate_without_cost_bound": "accepted",
+          "per_bar_path_estimated_seconds_per_bar": 0.1276524692156102,
+          "series_cost_per_bar": 1026,
+          "series_seconds_full_series": 1.1314383000135422,
+          "series_last": 221.54080387115494,
+          "abs_diff_vs_polars_last": 1.4210854715202004e-13
+        },
+        {
+          "depth": 3,
+          "cost_per_bar": 134480386,
+          "validate": "refused",
+          "validate_without_cost_bound": "accepted",
+          "per_bar_path_estimated_seconds_per_bar": 65.35781637706971,
+          "series_cost_per_bar": 1538,
+          "series_seconds_full_series": 0.782825900008902,
+          "series_last": 220.00615521738192,
+          "abs_diff_vs_polars_last": 1.4210854715202004e-13
+        },
+        {
+          "depth": 4,
+          "cost_per_bar": 68853957122,
+          "validate": "refused",
+          "validate_without_cost_bound": "accepted",
+          "per_bar_path_estimated_seconds_per_bar": 33463.201737198375,
+          "series_cost_per_bar": 2050,
+          "series_seconds_full_series": 0.39977539994288236,
+          "series_last": 215.50144383955973,
+          "abs_diff_vs_polars_last": 2.842170943040401e-14
+        }
+      ]
+    },
+    "cel": [
+      {
+        "depth": 1,
+        "iterations_requested": 512,
+        "verdict": "evaluated",
+        "detail": "",
+        "seconds": 0.013214300037361681
+      },
+      {
+        "depth": 2,
+        "iterations_requested": 262144,
+        "verdict": "refused",
+        "detail": "INTERNAL: Iteration budget exceeded [INTERNAL]",
+        "seconds": 1.2567442000145093
+      },
+      {
+        "depth": 3,
+        "iterations_requested": 134217728,
+        "verdict": "refused",
+        "detail": "INTERNAL: Iteration budget exceeded [INTERNAL]",
+        "seconds": 1.4696744000539184
+      },
+      {
+        "depth": 4,
+        "iterations_requested": 68719476736,
+        "verdict": "refused",
+        "detail": "INTERNAL: Iteration budget exceeded [INTERNAL]",
+        "seconds": 0.7462988001061603
+      }
+    ],
+    "polars": [
+      {
+        "depth": 1,
+        "seconds": 0.00023389991838485003,
+        "last": 222.90771484375
+      },
+      {
+        "depth": 2,
+        "seconds": 0.00018220010679215193,
+        "last": 221.5408038711548
+      },
+      {
+        "depth": 3,
+        "seconds": 0.00017389992717653513,
+        "last": 220.00615521738177
+      },
+      {
+        "depth": 4,
+        "seconds": 0.00019809999503195286,
+        "last": 215.50144383955976
+      }
+    ]
+  },
+  "scope_statement": "CLAIMED, measured on the same neutral trees and the same 1,439 real hourly NVDAUSDT closes, every rival running its real installed code: (1) type checking \u2014 ARGUS's text path and CEL both reject every ill-typed case before touching data and accept every well-typed control; Polars resolves some of the same cases only at execution and evaluates others silently (counts in 'typecheck'). (2) Cost \u2014 before this comparison grammar.validate accepted a six-node tree costing ~6.9e10 node evaluations per bar; CEL refuses the analogous nested comprehension at its 10,000-iteration runtime budget. validate now refuses it statically at the same nesting depth CEL does; the ablation re-runs the old validate and shows it accepting. (3) Duplicate identity \u2014 on the equivalent-pair corpus ARGUS's canonical() missed the algebraic identities SymPy merges; normal_form() merges them and also merges the symmetric rolling correlation SymPy cannot see inside an uninterpreted function. CEL's serialised AST and Polars' meta.eq merge only identical spellings. (4) Numerics \u2014 Polars' rolling kernels agree with ARGUS's operators on full windows to within 1e-9 where Polars has a native kernel; warm-up conventions differ and are counted, and argmax/argmin have no native Polars rolling kernel. NOT CLAIMED: that ARGUS is faster than Polars \u2014 it is not, by the factor in 'timing', and the columnar evaluator adopted here narrows the nested-window gap from multiplicative to additive without touching Polars' constant factor, because incremental rolling kernels would break the bit-identity between the per-bar and series paths that trial accounting depends on. NOT CLAIMED: that CEL is weaker as a language \u2014 it is a general policy language with a formal spec and a conformance suite, and it cannot express a rolling window natively only because it deliberately has no fold. NOT CLAIMED: that normal_form is bit-exact \u2014 re-association is exact only up to rounding, stated in grammar_text's docstring. NOT RUN: a hostile-input corpus against the rivals; the execution-surface axis here is the AST scan of ARGUS's three grammar modules plus CEL's observed refusal of undeclared references. NOT WIRED: grammar_series and normal_form are available to callers but the search (research/searchoff.py) still uses the per-bar path and canonical()."
+}

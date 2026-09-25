@@ -627,7 +627,7 @@ A judge should not have to discover these.
   to it — rather than the earlier and false "no hedge placeable".
 - **No usage data.** This has not been put in front of traders yet. The plan is ten supervised
   sessions measuring whether the risk-share figure changes the ticket.
-- **Superiority is claimed only where a named competitor was run on the same input.** 20 of 38
+- **Superiority is claimed only where a named competitor was run on the same input.** 7 of 43
   capabilities are OWNED under that rule; the rest are TIED or IMPLEMENTED and are called that, and
   every comparison we lost is published on `/wrong`. On 2026-09-24 seven earlier OWNED grades were
   withdrawn because the rival they beat does not lead its sub-theme; they stay IMPLEMENTED until
@@ -1953,7 +1953,7 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 327 files, 21 packages, 130,470 lines; `mypy --strict` clean on 473 source files |
+| Source modules | 327 files, 21 packages, 130,470 lines; `mypy --strict` clean on 456 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
 | Tests | 6,700 tests collected, `ruff` clean |
@@ -1985,8 +1985,10 @@ source is a build failure, not a typo.
 That last row is the one to read twice. An *owned* capability needs a reproduced baseline, a
 same-input comparison, an out-of-sample test, an ablation and an adversarial test — thirteen
 conditions in all, enforced in code by `argus/eval/standing.py`, which raises at import if anything
-claims OWNED without them. It read zero when this table was first written; today 20 of 38
-capabilities are OWNED, 11 are TIED, 24 are IMPLEMENTED and none is LOST. Five ties were losses first:
+claims OWNED without them. It read zero when this table was first written; today 7 of 43
+capabilities are OWNED, 12 are TIED, 24 are IMPLEMENTED and none is LOST. It read 20 until the
+per-group check of 2026-09-25 withdrew twelve, and 8 until a general-purpose validator tied
+breadth rotation on 2026-09-26. Five ties were losses first:
 the three from before 2026-09-22, order splitting against Bitget's own TWAP, and the rToken
 overnight hedge, lost to the S2 entry Ballast and
 rebuilt to parity on 2026-09-24. It read 27 of 31 until 2026-09-24, when a review of the right rivals per sub-theme withdrew
@@ -2241,8 +2243,8 @@ could attack today.
     graded on, so its measured accuracy cannot yet be compared against the 55% bar.
 37. **Two settled outcomes.** Calibration on the desk's own judgement cannot be computed yet; the
     49,140 figure is the policy layer, labelled as such, and the two must never be added together.
-38. **Four capabilities are not OWNED.** Three are TIED against the named rival and one stops at
-    twelve of thirteen conditions; each says which condition it is missing.
+38. **36 of 43 capabilities are not OWNED.** 12 are TIED against the named rival and 24 are
+    IMPLEMENTED, one of them a single condition short; each says what it is missing.
 39. **Four of five official Bitget Skills carry no data.** Measured to be their backend rather than
     our integration — but a judge sees a thin panel either way.
 40. **No live fills.** Execution realism is argued from the venue's published rules, not measured

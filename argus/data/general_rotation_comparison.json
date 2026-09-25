@@ -1,0 +1,4664 @@
+{
+  "capability": "Data-honest cross-asset breadth rotation vs. a silently-dropping reference",
+  "general_function": "data-contract validation of a time-series panel feeding a computation: completeness, validity, ordering, timeliness and sufficiency of the inputs, the call's parameters, and an output invariant \u2014 refuse rather than emit a silently wrong result",
+  "corpus": {
+    "path": "data/general_rotation_corpus.json",
+    "sha256": "9d89f5a2daca60d63775aac4224754361d610e6a8b7f0c70d372fddec85a0931",
+    "fetched_at": "2026-09-25T16:29:38.278488+00:00",
+    "bars_per_symbol": {
+      "NVDAUSDT": 403,
+      "AAPLUSDT": 396,
+      "QQQUSDT": 333,
+      "BTCUSDT": 799,
+      "ETHUSDT": 799,
+      "PAXGUSDT": 799,
+      "XAUTUSDT": 541,
+      "XAUUSDT": 287,
+      "XAGUSDT": 262
+    }
+  },
+  "same_input": {
+    "cases": 36,
+    "mismatched": [],
+    "identical": true
+  },
+  "rival_environment": {
+    "python": "3.11.9",
+    "pandas": "3.0.6",
+    "numpy": "2.4.6",
+    "pandera": "0.33.1",
+    "great_expectations": "1.23.1",
+    "pydantic": "2.13.5"
+  },
+  "rival_notes": [
+    "great_expectations has no native 'finite' expectation: a [-1e6, 1e6] range on the momentum score stands in for it (catches inf; a real score is O(1))",
+    "great_expectations has no native 'within N days of the column's own maximum': the freshness floor is computed in pandas and passed as min_value",
+    "great_expectations validates data batches, not call arguments: no parameter clause",
+    "pandera validates frames, not call arguments: parameter clause only in pandera_pydantic, via a pydantic model",
+    "ExpectColumnValuesToBeIncreasing(strictly=True) on a datetime64 column of sorted, unique real bars: success=False; exception raised inside GX=True"
+  ],
+  "cases": [
+    {
+      "case_id": "clean",
+      "stage": "bars",
+      "kind": "control",
+      "clause": "none",
+      "description": "the real clean panel: four risk assets, two gold tokens, all >= 13 months",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "6983d58107a815b478b5dea40f66c5240c76ef56f81c67a400ba0a358212f7c5"
+    },
+    {
+      "case_id": "gap_between_anchors",
+      "stage": "bars",
+      "kind": "tolerable",
+      "clause": "sufficiency",
+      "description": "ETHUSDT loses every bar of the month five back \u2014 a month the formula never reads (anchors are 0/1/3/6/12 back)",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [],
+      "reference": "clean",
+      "digest": "64df521b20cf8ec26637dad2bd9583b03f4833761031dbbece13e9d9950ca319"
+    },
+    {
+      "case_id": "gap_outside_lookback",
+      "stage": "bars",
+      "kind": "tolerable",
+      "clause": "sufficiency",
+      "description": "BTCUSDT loses a month eighteen back, older than the 12-month lookback",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [],
+      "reference": "clean",
+      "digest": "da10590fd7a198d7aee43208e2b26c58892a9de78b819283b48a203fa7de878c"
+    },
+    {
+      "case_id": "gap_on_anchor",
+      "stage": "bars",
+      "kind": "must_refuse",
+      "clause": "sufficiency",
+      "description": "ETHUSDT loses every bar of the 3-month anchor month",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "ETHUSDT"
+      ],
+      "reference": null,
+      "digest": "8f79ee763bdbdca34db0f429b8f37c72d06f795b6facf85934e995e654cc2f3f"
+    },
+    {
+      "case_id": "stale_across_month",
+      "stage": "bars",
+      "kind": "must_refuse",
+      "clause": "timeliness",
+      "description": "NVDAUSDT stopped updating 45 days before the rest (a halted listing)",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "NVDAUSDT"
+      ],
+      "reference": null,
+      "digest": "541145055bc4420ec2e844b8c4f914a62418f821f11058eed22a24a6aeb6bcef"
+    },
+    {
+      "case_id": "stale_within_month",
+      "stage": "bars",
+      "kind": "must_refuse",
+      "clause": "timeliness",
+      "description": "NVDAUSDT stopped updating 12 days before the rest, inside the same month",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "NVDAUSDT"
+      ],
+      "reference": null,
+      "digest": "04032bcad569c057dc40d7e66770afa98bcc702c6846ddc53f7f500c3ae219cd"
+    },
+    {
+      "case_id": "missing_series",
+      "stage": "bars",
+      "kind": "must_refuse",
+      "clause": "completeness",
+      "description": "ETHUSDT's series is absent altogether (a failed fetch)",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "ETHUSDT"
+      ],
+      "reference": null,
+      "digest": "7c5146a77bc00b65c5b8d5425360c871ebe7d88709190d3eb03401171e4ea3c1"
+    },
+    {
+      "case_id": "nan_close_on_anchor",
+      "stage": "bars",
+      "kind": "must_refuse",
+      "clause": "validity",
+      "description": "BTCUSDT's 3-month anchor close is NaN",
+      "arises_in_live_path": false,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "BTCUSDT"
+      ],
+      "reference": null,
+      "digest": "b08430844bd9cb0d7618a3bb99907da7c66bfcd7453b2bf7264f4101adf3775c"
+    },
+    {
+      "case_id": "negative_close_on_anchor",
+      "stage": "bars",
+      "kind": "must_refuse",
+      "clause": "validity",
+      "description": "BTCUSDT's 3-month anchor close is negated",
+      "arises_in_live_path": false,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "BTCUSDT"
+      ],
+      "reference": null,
+      "digest": "b5740fb8e6c995a02dfec6c3c45d7dc221e4b94a4ec80804186fa93c49959d0f"
+    },
+    {
+      "case_id": "inf_close_on_anchor",
+      "stage": "bars",
+      "kind": "must_refuse",
+      "clause": "validity",
+      "description": "BTCUSDT's 3-month anchor close is +inf",
+      "arises_in_live_path": false,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "BTCUSDT"
+      ],
+      "reference": null,
+      "digest": "347577b8460a2c421c03ec85f407e2589ad4cfa5c10d3b6a94d925e5c9b501f4"
+    },
+    {
+      "case_id": "zero_close_on_anchor",
+      "stage": "bars",
+      "kind": "must_refuse",
+      "clause": "validity",
+      "description": "BTCUSDT's 3-month anchor close is zero",
+      "arises_in_live_path": false,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "BTCUSDT"
+      ],
+      "reference": null,
+      "digest": "161f1da1e95c881d8b63587b90371a9d57f54795655b9221f02f098c8f26ba67"
+    },
+    {
+      "case_id": "unsorted_bars",
+      "stage": "bars",
+      "kind": "tolerable",
+      "clause": "ordering",
+      "description": "ETHUSDT's bars arrive newest-first",
+      "arises_in_live_path": false,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [],
+      "reference": "clean",
+      "digest": "c8f58f6b642ce5939ca58e9d519439c4d714c6153133063639f97825bbccf54a"
+    },
+    {
+      "case_id": "conflicting_duplicate_bar",
+      "stage": "bars",
+      "kind": "must_refuse",
+      "clause": "ordering",
+      "description": "ETHUSDT's 3-month anchor bar appears twice with closes 10% apart",
+      "arises_in_live_path": false,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "ETHUSDT"
+      ],
+      "reference": null,
+      "digest": "a8b121ae182f3b966b332f55631159fc8e581c7272d68a56845576ffe8db355f"
+    },
+    {
+      "case_id": "real_short_history_cli_default",
+      "stage": "bars",
+      "kind": "must_refuse",
+      "clause": "sufficiency",
+      "description": "the CLI's own default universe on today's real data: QQQUSDT has 12 monthly closes and XAUUSDT 10",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "QQQUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "XAUUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "QQQUSDT",
+        "XAUUSDT"
+      ],
+      "reference": null,
+      "digest": "d8ab5cb7d13dfa35db7a2cee52f70a0cf1525a0fbeeb2c6d53a576ad9d498b1e"
+    },
+    {
+      "case_id": "real_short_history_three",
+      "stage": "bars",
+      "kind": "must_refuse",
+      "clause": "sufficiency",
+      "description": "the default universe plus silver: three real short-history symbols",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "QQQUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "XAUUSDT",
+        "XAGUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "QQQUSDT",
+        "XAUUSDT",
+        "XAGUSDT"
+      ],
+      "reference": null,
+      "digest": "9a2fe429949460353682e12bf5f260a6cf42fff68bfff031b28dd7199b28b11f"
+    },
+    {
+      "case_id": "three_faults_at_once",
+      "stage": "bars",
+      "kind": "must_refuse",
+      "clause": "several",
+      "description": "ETHUSDT anchor gap + NVDAUSDT stale 45 days + XAUTUSDT cut to 11 months, in one call",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "ETHUSDT",
+        "NVDAUSDT",
+        "XAUTUSDT"
+      ],
+      "reference": null,
+      "digest": "a50fbc6f022ea8c644810f59d26d6392b2e27a0012dacf6de7f9a0e492b1578e"
+    },
+    {
+      "case_id": "scores_clean",
+      "stage": "scores",
+      "kind": "control",
+      "clause": "none",
+      "description": "the real clean scores, default parameters",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "3fdcf63a3d52b656f4e13b26f12f50c6827e795d7c90a2e9981d99943cfa80f3"
+    },
+    {
+      "case_id": "nan_one_of_two_safe",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "completeness",
+      "description": "PAXGUSDT's score is NaN; XAUTUSDT is valid",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "PAXGUSDT"
+      ],
+      "reference": null,
+      "digest": "96006149ad303b8fbcfd6fd3aa7878f49d0364505afc9051768d502eb98b9b09"
+    },
+    {
+      "case_id": "nan_only_safe",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "completeness",
+      "description": "the only safe asset's score is NaN (the reference's measured 75%-vanish class)",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "PAXGUSDT"
+      ],
+      "reference": null,
+      "digest": "cc79a463581dacf7e1fee3d852e9720c58f1f918b4e220ea60891de4ef421bf5"
+    },
+    {
+      "case_id": "all_nan",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "completeness",
+      "description": "every score is NaN",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT",
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "reference": null,
+      "digest": "d9f17bc668ae534ac87419ef6a1ae26f5e45a087f43fc44a508ee8228cebd1dc"
+    },
+    {
+      "case_id": "inf_score",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "validity",
+      "description": "BTCUSDT's score is +inf",
+      "arises_in_live_path": false,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "BTCUSDT"
+      ],
+      "reference": null,
+      "digest": "5375eb8c8e11c53b59a6d6c98724dbf6667a2958b9de488cb0218f882bdc8388"
+    },
+    {
+      "case_id": "empty_safe",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "parameters",
+      "description": "no safe asset named",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "1a525ed18c31e27ee8b47e4a4c045bb024c33738689502cb84f45e0081e90b84"
+    },
+    {
+      "case_id": "empty_risk",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "parameters",
+      "description": "no risk asset named",
+      "arises_in_live_path": true,
+      "risk": [],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "f2f921c0f4aa7df46db1cdf032d5a4ea96e1992791e93c5a64407c4d96e1294d"
+    },
+    {
+      "case_id": "top_k_exceeds_risk",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "parameters",
+      "description": "top_k=5 with four risk assets (a --top-k typo on the CLI)",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 5,
+      "step": "0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "6a1b7ada0897024de4029322958d1119d0f9bb87aa1092b107eda1c1c64df11b"
+    },
+    {
+      "case_id": "top_k_zero",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "parameters",
+      "description": "top_k=0",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 0,
+      "step": "0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "f62b55ad29a0f20c10c82e0bf41601a786beb5f16f0d90c4338a9d59acb525fe"
+    },
+    {
+      "case_id": "top_k_negative",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "parameters",
+      "description": "top_k=-1",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": -1,
+      "step": "0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "5e6846a579548769d8afc485fed72fcbd203ca52a7009ad4f07e2d6d77593004"
+    },
+    {
+      "case_id": "step_negative",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "parameters",
+      "description": "step=-0.25",
+      "arises_in_live_path": false,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "-0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "abd87ee62bd729895046eb9dac37ed2913476b2dae90ff88d9c9d1389d947172"
+    },
+    {
+      "case_id": "step_nan",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "parameters",
+      "description": "step=NaN",
+      "arises_in_live_path": false,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "nan",
+      "offending": [],
+      "reference": null,
+      "digest": "58250ea70ad90ac84a93bfbded6cb4cd034e9598289d6f0d915fb8d553bd4c6b"
+    },
+    {
+      "case_id": "asset_in_both_sets",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "parameters",
+      "description": "PAXGUSDT named as both risk and safe (the CLI accepts it)",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT",
+        "PAXGUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "PAXGUSDT"
+      ],
+      "reference": null,
+      "digest": "f8c476554a1c762d4af0fe37a081542f751cac6725f27c06699b0b913daf1d13"
+    },
+    {
+      "case_id": "duplicate_risk_asset",
+      "stage": "scores",
+      "kind": "must_refuse",
+      "clause": "parameters",
+      "description": "BTCUSDT named twice among the risk assets (the CLI accepts it)",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT",
+        "BTCUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [
+        "BTCUSDT"
+      ],
+      "reference": null,
+      "digest": "28de627cca4b9fe189d42b6ac34a512a9879242ee341249ca61dc7f8d2815765"
+    },
+    {
+      "case_id": "step_one_control",
+      "stage": "scores",
+      "kind": "control",
+      "clause": "none",
+      "description": "step=1.0: any negative score sends the whole book to safety \u2014 a valid published variant",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "1.0",
+      "offending": [],
+      "reference": null,
+      "digest": "9d4a4a2fc5d079dafe45e19a5dd1d11ec825f9734bfaac11ddda03d3328cc26d"
+    },
+    {
+      "case_id": "top_k_all_risk_control",
+      "stage": "scores",
+      "kind": "control",
+      "clause": "none",
+      "description": "top_k equal to the risk count",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 4,
+      "step": "0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "c894e07bf0910ba415c5e618e97f870aafac46e4fea88948350d3de0b16d3d63"
+    },
+    {
+      "case_id": "breadth_1_negative_control",
+      "stage": "scores",
+      "kind": "control",
+      "clause": "none",
+      "description": "1 of 4 risk scores negative (real magnitudes, sign flipped)",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "d2d55dd86df55a1b3e099e219c51f7acc5252ef5cb986620f14e84293dfc238e"
+    },
+    {
+      "case_id": "breadth_2_negative_control",
+      "stage": "scores",
+      "kind": "control",
+      "clause": "none",
+      "description": "2 of 4 risk scores negative (real magnitudes, sign flipped)",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "56d2fecc89cd84f6590f5819999f771d543927d206aa17c8fd3f5dbf620e1234"
+    },
+    {
+      "case_id": "breadth_3_negative_control",
+      "stage": "scores",
+      "kind": "control",
+      "clause": "none",
+      "description": "3 of 4 risk scores negative (real magnitudes, sign flipped)",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "c425969e38fdd3ff0bbf5866fa6458a4812a7347ffece2e9d93c37e694014144"
+    },
+    {
+      "case_id": "breadth_4_negative_control",
+      "stage": "scores",
+      "kind": "control",
+      "clause": "none",
+      "description": "4 of 4 risk scores negative (real magnitudes, sign flipped)",
+      "arises_in_live_path": true,
+      "risk": [
+        "NVDAUSDT",
+        "AAPLUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "safe": [
+        "PAXGUSDT",
+        "XAUTUSDT"
+      ],
+      "top_k": 2,
+      "step": "0.25",
+      "offending": [],
+      "reference": null,
+      "digest": "f54944ac11da35be7a6aa79f331b483b649b8f7d908de8c69c6932d2ba73b959"
+    }
+  ],
+  "results": {
+    "argus_after": {
+      "clean": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.012520599993877113
+      },
+      "gap_between_anchors": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.004565899958834052
+      },
+      "gap_outside_lookback": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.03805949992965907
+      },
+      "gap_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [sufficiency] ETHUSDT: no bar in 2026-06 (3-month anchor)",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "sufficiency",
+            "symbol": "ETHUSDT",
+            "detail": "no bar in 2026-06 (3-month anchor)"
+          }
+        ],
+        "seconds": 0.0030406999867409468
+      },
+      "stale_across_month": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 2 contract violations \u2014 [timeliness] NVDAUSDT: last bar closes 2026-08-11T16:00:00+00:00, 45.0 days behind the freshest series (2026-09-25T16:00:00+00:00); limit 3 days; [sufficiency] NVDAUSDT: no bar in 2026-09 (evaluation month)",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "timeliness",
+            "symbol": "NVDAUSDT",
+            "detail": "last bar closes 2026-08-11T16:00:00+00:00, 45.0 days behind the freshest series (2026-09-25T16:00:00+00:00); limit 3 days"
+          },
+          {
+            "clause": "sufficiency",
+            "symbol": "NVDAUSDT",
+            "detail": "no bar in 2026-09 (evaluation month)"
+          }
+        ],
+        "seconds": 0.004819600027985871
+      },
+      "stale_within_month": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [timeliness] NVDAUSDT: last bar closes 2026-09-13T16:00:00+00:00, 12.0 days behind the freshest series (2026-09-25T16:00:00+00:00); limit 3 days",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "timeliness",
+            "symbol": "NVDAUSDT",
+            "detail": "last bar closes 2026-09-13T16:00:00+00:00, 12.0 days behind the freshest series (2026-09-25T16:00:00+00:00); limit 3 days"
+          }
+        ],
+        "seconds": 0.002510800026357174
+      },
+      "missing_series": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [completeness] ETHUSDT: no bar series supplied",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "completeness",
+            "symbol": "ETHUSDT",
+            "detail": "no bar series supplied"
+          }
+        ],
+        "seconds": 0.0021910000359639525
+      },
+      "nan_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [validity] BTCUSDT: 1 close(s) are not finite positive prices (first: nan at 2026-06-30T16:00:00+00:00)",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "validity",
+            "symbol": "BTCUSDT",
+            "detail": "1 close(s) are not finite positive prices (first: nan at 2026-06-30T16:00:00+00:00)"
+          }
+        ],
+        "seconds": 0.002531800069846213
+      },
+      "negative_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [validity] BTCUSDT: 1 close(s) are not finite positive prices (first: -58365.8 at 2026-06-30T16:00:00+00:00)",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "validity",
+            "symbol": "BTCUSDT",
+            "detail": "1 close(s) are not finite positive prices (first: -58365.8 at 2026-06-30T16:00:00+00:00)"
+          }
+        ],
+        "seconds": 0.0038256000261753798
+      },
+      "inf_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [validity] BTCUSDT: 1 close(s) are not finite positive prices (first: inf at 2026-06-30T16:00:00+00:00)",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "validity",
+            "symbol": "BTCUSDT",
+            "detail": "1 close(s) are not finite positive prices (first: inf at 2026-06-30T16:00:00+00:00)"
+          }
+        ],
+        "seconds": 0.002341299899853766
+      },
+      "zero_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [validity] BTCUSDT: 1 close(s) are not finite positive prices (first: 0.0 at 2026-06-30T16:00:00+00:00)",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "validity",
+            "symbol": "BTCUSDT",
+            "detail": "1 close(s) are not finite positive prices (first: 0.0 at 2026-06-30T16:00:00+00:00)"
+          }
+        ],
+        "seconds": 0.0023225999902933836
+      },
+      "unsorted_bars": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.009345800033770502
+      },
+      "conflicting_duplicate_bar": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [ordering] ETHUSDT: 1 timestamp(s) carry more than one bar (first: 2026-06-30T16:00:00+00:00) \u2014 which close is real cannot be decided",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "ordering",
+            "symbol": "ETHUSDT",
+            "detail": "1 timestamp(s) carry more than one bar (first: 2026-06-30T16:00:00+00:00) \u2014 which close is real cannot be decided"
+          }
+        ],
+        "seconds": 0.0022951000137254596
+      },
+      "real_short_history_cli_default": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 2 contract violations \u2014 [sufficiency] QQQUSDT: 12 month(s) of history to 2026-09, below the 13 a 12-month lookback needs; [sufficiency] XAUUSDT: 10 month(s) of history to 2026-09, below the 13 a 12-month lookback needs",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "sufficiency",
+            "symbol": "QQQUSDT",
+            "detail": "12 month(s) of history to 2026-09, below the 13 a 12-month lookback needs"
+          },
+          {
+            "clause": "sufficiency",
+            "symbol": "XAUUSDT",
+            "detail": "10 month(s) of history to 2026-09, below the 13 a 12-month lookback needs"
+          }
+        ],
+        "seconds": 0.002276299986988306
+      },
+      "real_short_history_three": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 3 contract violations \u2014 [sufficiency] QQQUSDT: 12 month(s) of history to 2026-09, below the 13 a 12-month lookback needs; [sufficiency] XAUUSDT: 10 month(s) of history to 2026-09, below the 13 a 12-month lookback needs; [sufficiency] XAGUSDT: 9 month(s) of history to 2026-09, below the 13 a 12-month lookback needs",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "sufficiency",
+            "symbol": "QQQUSDT",
+            "detail": "12 month(s) of history to 2026-09, below the 13 a 12-month lookback needs"
+          },
+          {
+            "clause": "sufficiency",
+            "symbol": "XAUUSDT",
+            "detail": "10 month(s) of history to 2026-09, below the 13 a 12-month lookback needs"
+          },
+          {
+            "clause": "sufficiency",
+            "symbol": "XAGUSDT",
+            "detail": "9 month(s) of history to 2026-09, below the 13 a 12-month lookback needs"
+          }
+        ],
+        "seconds": 0.041426800074987113
+      },
+      "three_faults_at_once": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 4 contract violations \u2014 [timeliness] NVDAUSDT: last bar closes 2026-08-11T16:00:00+00:00, 45.0 days behind the freshest series (2026-09-25T16:00:00+00:00); limit 3 days; [sufficiency] NVDAUSDT: no bar in 2026-09 (evaluation month); [sufficiency] ETHUSDT: no bar in 2026-06 (3-month anchor); [sufficiency] XAUTUSDT: 11 month(s) of history to 2026-09, below the 13 a 12-month lookback needs",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "timeliness",
+            "symbol": "NVDAUSDT",
+            "detail": "last bar closes 2026-08-11T16:00:00+00:00, 45.0 days behind the freshest series (2026-09-25T16:00:00+00:00); limit 3 days"
+          },
+          {
+            "clause": "sufficiency",
+            "symbol": "NVDAUSDT",
+            "detail": "no bar in 2026-09 (evaluation month)"
+          },
+          {
+            "clause": "sufficiency",
+            "symbol": "ETHUSDT",
+            "detail": "no bar in 2026-06 (3-month anchor)"
+          },
+          {
+            "clause": "sufficiency",
+            "symbol": "XAUTUSDT",
+            "detail": "11 month(s) of history to 2026-09, below the 13 a 12-month lookback needs"
+          }
+        ],
+        "seconds": 0.004683800041675568
+      },
+      "scores_clean": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 3.0499999411404133e-05
+      },
+      "nan_one_of_two_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [completeness] PAXGUSDT: cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS)",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "completeness",
+            "symbol": "PAXGUSDT",
+            "detail": "cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS)"
+          }
+        ],
+        "seconds": 1.810002140700817e-05
+      },
+      "nan_only_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [completeness] PAXGUSDT: cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS)",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "completeness",
+            "symbol": "PAXGUSDT",
+            "detail": "cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS)"
+          }
+        ],
+        "seconds": 1.3699987903237343e-05
+      },
+      "all_nan": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 6 contract violations \u2014 [completeness] NVDAUSDT: cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS); [completeness] AAPLUSDT: cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS); [completeness] BTCUSDT: cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS); [completeness] ETHUSDT: cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS); [completeness] PAXGUSDT: cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS); [completeness] XAUTUSDT: cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS)",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "completeness",
+            "symbol": "NVDAUSDT",
+            "detail": "cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS)"
+          },
+          {
+            "clause": "completeness",
+            "symbol": "AAPLUSDT",
+            "detail": "cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS)"
+          },
+          {
+            "clause": "completeness",
+            "symbol": "BTCUSDT",
+            "detail": "cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS)"
+          },
+          {
+            "clause": "completeness",
+            "symbol": "ETHUSDT",
+            "detail": "cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS)"
+          },
+          {
+            "clause": "completeness",
+            "symbol": "PAXGUSDT",
+            "detail": "cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS)"
+          },
+          {
+            "clause": "completeness",
+            "symbol": "XAUTUSDT",
+            "detail": "cannot allocate: no usable momentum score (NaN \u2014 insufficient history, see MIN_MONTHLY_OBSERVATIONS)"
+          }
+        ],
+        "seconds": 2.0400038920342922e-05
+      },
+      "inf_score": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [validity] BTCUSDT: momentum score inf is not finite",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "validity",
+            "symbol": "BTCUSDT",
+            "detail": "momentum score inf is not finite"
+          }
+        ],
+        "seconds": 1.5400000847876072e-05
+      },
+      "empty_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [parameters] breadth allocation needs at least one safe asset",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "parameters",
+            "symbol": null,
+            "detail": "breadth allocation needs at least one safe asset"
+          }
+        ],
+        "seconds": 1.2299977242946625e-05
+      },
+      "empty_risk": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [parameters] breadth allocation needs at least one risk asset",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "parameters",
+            "symbol": null,
+            "detail": "breadth allocation needs at least one risk asset"
+          }
+        ],
+        "seconds": 9.599956683814526e-06
+      },
+      "top_k_exceeds_risk": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [parameters] top_k=5 exceeds the 4 risk asset(s) supplied \u2014 the unfilled slots would leave part of the book unallocated",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "parameters",
+            "symbol": null,
+            "detail": "top_k=5 exceeds the 4 risk asset(s) supplied \u2014 the unfilled slots would leave part of the book unallocated"
+          }
+        ],
+        "seconds": 2.0400038920342922e-05
+      },
+      "top_k_zero": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [parameters] top_k=0 holds no risk asset; it must be at least 1",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "parameters",
+            "symbol": null,
+            "detail": "top_k=0 holds no risk asset; it must be at least 1"
+          }
+        ],
+        "seconds": 1.3299984857439995e-05
+      },
+      "top_k_negative": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [parameters] top_k=-1 holds no risk asset; it must be at least 1",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "parameters",
+            "symbol": null,
+            "detail": "top_k=-1 holds no risk asset; it must be at least 1"
+          }
+        ],
+        "seconds": 1.1899974197149277e-05
+      },
+      "step_negative": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [parameters] step=-0.25 must be a finite number above zero",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "parameters",
+            "symbol": null,
+            "detail": "step=-0.25 must be a finite number above zero"
+          }
+        ],
+        "seconds": 1.479999627918005e-05
+      },
+      "step_nan": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [parameters] step=nan must be a finite number above zero",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "parameters",
+            "symbol": null,
+            "detail": "step=nan must be a finite number above zero"
+          }
+        ],
+        "seconds": 1.279998105019331e-05
+      },
+      "asset_in_both_sets": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [parameters] PAXGUSDT: listed as both a risk asset and a safe asset",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "parameters",
+            "symbol": "PAXGUSDT",
+            "detail": "listed as both a risk asset and a safe asset"
+          }
+        ],
+        "seconds": 1.5900004655122757e-05
+      },
+      "duplicate_risk_asset": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "refused: 1 contract violation \u2014 [parameters] BTCUSDT: listed more than once among the risk assets",
+        "exception": "RotationError",
+        "violations": [
+          {
+            "clause": "parameters",
+            "symbol": "BTCUSDT",
+            "detail": "listed more than once among the risk assets"
+          }
+        ],
+        "seconds": 1.4099990949034691e-05
+      },
+      "step_one_control": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 1.9299914129078388e-05
+      },
+      "top_k_all_risk_control": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.125,
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.125,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 1.7400016076862812e-05
+      },
+      "breadth_1_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.75
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 1.71000137925148e-05
+      },
+      "breadth_2_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 1.5300000086426735e-05
+      },
+      "breadth_3_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 1.2900098226964474e-05
+      },
+      "breadth_4_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 1.3100099749863148e-05
+      }
+    },
+    "argus_before": {
+      "clean": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0006845000898465514
+      },
+      "gap_between_anchors": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.364689349594684,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0006588000105693936
+      },
+      "gap_outside_lookback": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0006713999900966883
+      },
+      "gap_on_anchor": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 2.842609000144943,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0006576000014320016
+      },
+      "stale_across_month": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 2.1078254282591473,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0011653000256046653
+      },
+      "stale_within_month": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 0.8080217687761184,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0006300000241026282
+      },
+      "missing_series": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "no monthly close series supplied for ETHUSDT",
+        "exception": "RotationError",
+        "violations": null,
+        "seconds": 0.0004638000391423702
+      },
+      "nan_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "cannot allocate: no usable momentum score for BTCUSDT (insufficient history \u2014 see MIN_MONTHLY_OBSERVATIONS)",
+        "exception": "RotationError",
+        "violations": null,
+        "seconds": 0.000610699993558228
+      },
+      "negative_close_on_anchor": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.125,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.75
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": -8.689356950151275,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0006700999801978469
+      },
+      "inf_close_on_anchor": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.125,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.75
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": -2.947981007390272,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0006835999665781856
+      },
+      "zero_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "a zero monthly close cannot anchor a momentum ratio",
+        "exception": "RotationError",
+        "violations": null,
+        "seconds": 0.0006562999915331602
+      },
+      "unsorted_bars": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.711556950287022,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0006847999757155776
+      },
+      "conflicting_duplicate_bar": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 3.5783068292743216,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0006828999612480402
+      },
+      "real_short_history_cli_default": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "12 monthly close(s) is below the 13 a 12-month lookback needs",
+        "exception": "RotationError",
+        "violations": null,
+        "seconds": 0.0005480999825522304
+      },
+      "real_short_history_three": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "12 monthly close(s) is below the 13 a 12-month lookback needs",
+        "exception": "RotationError",
+        "violations": null,
+        "seconds": 0.000587299931794405
+      },
+      "three_faults_at_once": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "11 monthly close(s) is below the 13 a 12-month lookback needs",
+        "exception": "RotationError",
+        "violations": null,
+        "seconds": 0.0006068999646231532
+      },
+      "scores_clean": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 9.400071576237679e-06
+      },
+      "nan_one_of_two_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "cannot allocate: no usable momentum score for PAXGUSDT (insufficient history \u2014 see MIN_MONTHLY_OBSERVATIONS)",
+        "exception": "RotationError",
+        "violations": null,
+        "seconds": 3.400025889277458e-06
+      },
+      "nan_only_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "cannot allocate: no usable momentum score for PAXGUSDT (insufficient history \u2014 see MIN_MONTHLY_OBSERVATIONS)",
+        "exception": "RotationError",
+        "violations": null,
+        "seconds": 3.100023604929447e-06
+      },
+      "all_nan": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "cannot allocate: no usable momentum score for NVDAUSDT, AAPLUSDT, BTCUSDT, ETHUSDT, PAXGUSDT, XAUTUSDT (insufficient history \u2014 see MIN_MONTHLY_OBSERVATIONS)",
+        "exception": "RotationError",
+        "violations": null,
+        "seconds": 2.800021320581436e-06
+      },
+      "inf_score": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 5.899928510189056e-06
+      },
+      "empty_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "breadth allocation needs at least one safe asset",
+        "exception": "RotationError",
+        "violations": null,
+        "seconds": 2.100015990436077e-06
+      },
+      "empty_risk": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "breadth allocation needs at least one risk asset",
+        "exception": "RotationError",
+        "violations": null,
+        "seconds": 1.700012944638729e-06
+      },
+      "top_k_exceeds_risk": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.1,
+          "AAPLUSDT": 0.1,
+          "BTCUSDT": 0.1,
+          "ETHUSDT": 0.1,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 5.399924702942371e-06
+      },
+      "top_k_zero": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 5.100038833916187e-06
+      },
+      "top_k_negative": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 5.799927748739719e-06
+      },
+      "step_negative": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.75,
+          "ETHUSDT": 0.75,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": -0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 5.400041118264198e-06
+      },
+      "step_nan": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 5.499925464391708e-06
+      },
+      "asset_in_both_sets": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.125,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.75
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 6.200047209858894e-06
+      },
+      "duplicate_risk_asset": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 4.800036549568176e-06
+      },
+      "step_one_control": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 5.200039595365524e-06
+      },
+      "top_k_all_risk_control": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.125,
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.125,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 4.800036549568176e-06
+      },
+      "breadth_1_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.75
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 4.599918611347675e-06
+      },
+      "breadth_2_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 5.100038833916187e-06
+      },
+      "breadth_3_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 5.09992241859436e-06
+      },
+      "breadth_4_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "NVDAUSDT": 0.0,
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 4.800036549568176e-06
+      }
+    },
+    "pytaa_raw": {
+      "clean": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0938941000495106
+      },
+      "gap_between_anchors": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.07056350004859269
+      },
+      "gap_outside_lookback": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.12261640001088381
+      },
+      "gap_on_anchor": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.25,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 2.680543393520818,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.09084530000109226
+      },
+      "stale_across_month": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": null,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.02640530001372099
+      },
+      "stale_within_month": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 0.8080217687761184,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.13481479999609292
+      },
+      "missing_series": {
+        "outcome": "crashed",
+        "weights": null,
+        "scores": null,
+        "message": "KeyError: \"['ETHUSDT'] not in index\"",
+        "exception": "KeyError",
+        "violations": null,
+        "seconds": 0.15853619994595647
+      },
+      "nan_close_on_anchor": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.25,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.655641698736421,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.024367600097320974
+      },
+      "negative_close_on_anchor": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.125,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.75
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": -8.689356950151275,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0994654999813065
+      },
+      "inf_close_on_anchor": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.125,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.75
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": -2.947981007390272,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.153009400004521
+      },
+      "zero_close_on_anchor": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": null,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.12260550004430115
+      },
+      "unsorted_bars": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.013855500030331314
+      },
+      "conflicting_duplicate_bar": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 3.5783068292743216,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.2018347999546677
+      },
+      "real_short_history_cli_default": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.5,
+          "ETHUSDT": 0.5,
+          "NVDAUSDT": 0.0,
+          "QQQUSDT": 0.0,
+          "XAUUSDT": 0.0
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "QQQUSDT": null,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "XAUUSDT": null
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.20652350003365427
+      },
+      "real_short_history_three": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.5,
+          "ETHUSDT": 0.5,
+          "NVDAUSDT": 0.0,
+          "QQQUSDT": 0.0,
+          "XAGUSDT": 0.0,
+          "XAUUSDT": 0.0
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "QQQUSDT": null,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "XAUUSDT": null,
+          "XAGUSDT": null
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.23544429999310523
+      },
+      "three_faults_at_once": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.375,
+          "BTCUSDT": 0.375,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.25,
+          "XAUTUSDT": 0.0
+        },
+        "scores": {
+          "NVDAUSDT": null,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 2.680543393520818,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": null
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.02176190004684031
+      },
+      "scores_clean": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.10754160000942647
+      },
+      "nan_one_of_two_safe": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.375,
+          "ETHUSDT": 0.375,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.25
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0028228999581187963
+      },
+      "nan_only_safe": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.5,
+          "ETHUSDT": 0.5,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.005084399948827922
+      },
+      "all_nan": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.002572900033555925
+      },
+      "inf_score": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.00296889990568161
+      },
+      "empty_safe": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.5,
+          "ETHUSDT": 0.5,
+          "NVDAUSDT": 0.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.002580000087618828
+      },
+      "empty_risk": {
+        "outcome": "accepted",
+        "weights": {
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.14443670003674924
+      },
+      "top_k_exceeds_risk": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.1,
+          "BTCUSDT": 0.1,
+          "ETHUSDT": 0.1,
+          "NVDAUSDT": 0.1,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.006633899989537895
+      },
+      "top_k_zero": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.00372919999063015
+      },
+      "top_k_negative": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0028642999241128564
+      },
+      "step_negative": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.75,
+          "ETHUSDT": 0.75,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": -0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.002718200092203915
+      },
+      "step_nan": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.13593119999859482
+      },
+      "asset_in_both_sets": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0068867000518366694
+      },
+      "duplicate_risk_asset": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0030891000060364604
+      },
+      "step_one_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.004759800038300455
+      },
+      "top_k_all_risk_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.125,
+          "NVDAUSDT": 0.125,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.004869699943810701
+      },
+      "breadth_1_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.75
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.1510792999761179
+      },
+      "breadth_2_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.003168600029312074
+      },
+      "breadth_3_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.004208399914205074
+      },
+      "breadth_4_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.00253070006147027
+      }
+    },
+    "pandera": {
+      "clean": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 2.617789800046012
+      },
+      "gap_between_anchors": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.7546610999852419
+      },
+      "gap_outside_lookback": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.5065845999633893
+      },
+      "gap_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"sufficiency\",\n                \"column\": \"bars_in_month\",\n                \"check\": \"at least one bar in every calendar month the score reads\",\n                \"error\": \"Column 'bars_in_month' failed element-wise validator number 0: at least one bar in every calendar month the score reads failure cases: 0\"\n            }\n        ]\n    }\n}\n  schema_context         column                                                     check  failure_case            index\n0         Column  bars_in_month  at least one bar in every calendar month the score reads             0  ETHUSDT@2026-06",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.4495051000267267
+      },
+      "stale_across_month": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"freshness\",\n                \"column\": \"last_close_time\",\n                \"check\": \"last bar within 3 days of the freshest series\",\n                \"error\": \"Column 'last_close_time' failed element-wise validator number 0: <Check <lambda>: last bar within 3 days of the freshest series> failure cases: 2026-08-11 16:00:00\"\n            }\n        ]\n    }\n}\n  schema_context           column                                          check        failure_case     index\n0         Column  last_close_time  last bar within 3 days of the freshest series 2026-08-11 16:00:00  NVDAUSDT\n{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"sufficiency\",\n                \"column\": \"bars_in_month\",\n                \"check\": \"at least one bar in every calendar month the score reads\",\n                \"error\": \"Column 'bars_in_month' failed element-wise validator number 0: at least one bar in every calendar month the score reads failure cases: 0\"\n            }\n        ]\n    }\n}\n  schema_context         column                                                     check  failure_case             index\n0         Column  bars_in_month  at least one bar in every calendar month the score reads             0  NVDAUSDT@2026-09\n{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"NVDAUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'NVDAUSDT' contains null values:2026-09-30   NaNName: NVDAUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context    column         check  failure_case      index\n0         Column  NVDAUSDT  not_nullable           NaN 2026-09-30",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.5498328999383375
+      },
+      "stale_within_month": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"freshness\",\n                \"column\": \"last_close_time\",\n                \"check\": \"last bar within 3 days of the freshest series\",\n                \"error\": \"Column 'last_close_time' failed element-wise validator number 0: <Check <lambda>: last bar within 3 days of the freshest series> failure cases: 2026-09-13 16:00:00\"\n            }\n        ]\n    }\n}\n  schema_context           column                                          check        failure_case     index\n0         Column  last_close_time  last bar within 3 days of the freshest series 2026-09-13 16:00:00  NVDAUSDT",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.6764719999628142
+      },
+      "missing_series": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"panel\",\n                \"column\": \"ETHUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'ETHUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'BTCUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context column                check failure_case index\n0  DataFrameSchema  panel  column_in_dataframe      ETHUSDT  None\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"ETHUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'ETHUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'BTCUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context           column                check failure_case index\n0  DataFrameSchema  momentum_scores  column_in_dataframe      ETHUSDT  None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.48508170002605766
+      },
+      "nan_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"bars[BTCUSDT]\",\n                \"column\": \"close\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'close' contains null values:2026-06-30 16:00:00   NaNName: close, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context column         check  failure_case               index\n0         Column  close  not_nullable           NaN 2026-06-30 16:00:00\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"panel\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context column                check failure_case index\n0  DataFrameSchema  panel  column_in_dataframe      BTCUSDT  None\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context           column                check failure_case index\n0  DataFrameSchema  momentum_scores  column_in_dataframe      BTCUSDT  None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.805314900004305
+      },
+      "negative_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"bars[BTCUSDT]\",\n                \"column\": \"close\",\n                \"check\": \"greater_than(0)\",\n                \"error\": \"Column 'close' failed element-wise validator number 0: greater_than(0) failure cases: -58365.8\"\n            }\n        ]\n    }\n}\n  schema_context column            check  failure_case               index\n0         Column  close  greater_than(0)      -58365.8 2026-06-30 16:00:00\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"panel\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context column                check failure_case index\n0  DataFrameSchema  panel  column_in_dataframe      BTCUSDT  None\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context           column                check failure_case index\n0  DataFrameSchema  momentum_scores  column_in_dataframe      BTCUSDT  None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.6368377999169752
+      },
+      "inf_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"bars[BTCUSDT]\",\n                \"column\": \"close\",\n                \"check\": \"finite\",\n                \"error\": \"Column 'close' failed element-wise validator number 1: <Check <lambda>: finite> failure cases: inf\"\n            }\n        ]\n    }\n}\n  schema_context column   check  failure_case               index\n0         Column  close  finite           inf 2026-06-30 16:00:00\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"panel\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context column                check failure_case index\n0  DataFrameSchema  panel  column_in_dataframe      BTCUSDT  None\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context           column                check failure_case index\n0  DataFrameSchema  momentum_scores  column_in_dataframe      BTCUSDT  None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.43769869999960065
+      },
+      "zero_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"bars[BTCUSDT]\",\n                \"column\": \"close\",\n                \"check\": \"greater_than(0)\",\n                \"error\": \"Column 'close' failed element-wise validator number 0: greater_than(0) failure cases: 0.0\"\n            }\n        ]\n    }\n}\n  schema_context column            check  failure_case               index\n0         Column  close  greater_than(0)           0.0 2026-06-30 16:00:00\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"panel\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context column                check failure_case index\n0  DataFrameSchema  panel  column_in_dataframe      BTCUSDT  None\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context           column                check failure_case index\n0  DataFrameSchema  momentum_scores  column_in_dataframe      BTCUSDT  None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.5164687000215054
+      },
+      "unsorted_bars": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.9504224000265822
+      },
+      "conflicting_duplicate_bar": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"SERIES_CONTAINS_DUPLICATES\": [\n            {\n                \"schema\": \"bars[ETHUSDT]\",\n                \"column\": null,\n                \"check\": \"field_uniqueness\",\n                \"error\": \"series 'None' contains duplicate values:2026-06-30 16:00:00   2026-06-30 16:00:002026-06-30 16:00:00   2026-06-30 16:00:00dtype: datetime64[us]\"\n            }\n        ]\n    }\n}\n  schema_context column             check        failure_case               index\n0          Index   None  field_uniqueness 2026-06-30 16:00:00 2026-06-30 16:00:00\n1          Index   None  field_uniqueness 2026-06-30 16:00:00 2026-06-30 16:00:00\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"panel\",\n                \"column\": \"ETHUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'ETHUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'BTCUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context column                check failure_case index\n0  DataFrameSchema  panel  column_in_dataframe      ETHUSDT  None\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"ETHUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'ETHUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'BTCUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context           column                check failure_case index\n0  DataFrameSchema  momentum_scores  column_in_dataframe      ETHUSDT  None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.6972306999377906
+      },
+      "real_short_history_cli_default": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"sufficiency\",\n                \"column\": \"bars_in_month\",\n                \"check\": \"at least one bar in every calendar month the score reads\",\n                \"error\": \"Column 'bars_in_month' failed element-wise validator number 0: at least one bar in every calendar month the score reads failure cases: 0, 0\"\n            }\n        ]\n    }\n}\n  schema_context         column                                                     check  failure_case            index\n0         Column  bars_in_month  at least one bar in every calendar month the score reads             0  QQQUSDT@2025-09\n1         Column  bars_in_month  at least one bar in every calendar month the score reads             0  XAUUSDT@2025-09\n{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"QQQUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'QQQUSDT' contains null values:2026-09-30   NaNName: QQQUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"XAUUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'XAUUSDT' contains null values:2026-09-30   NaNName: XAUUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context   column         check  failure_case      index\n0         Column  QQQUSDT  not_nullable           NaN 2026-09-30\n1         Column  XAUUSDT  not_nullable           NaN 2026-09-30",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.8545019000303
+      },
+      "real_short_history_three": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"sufficiency\",\n                \"column\": \"bars_in_month\",\n                \"check\": \"at least one bar in every calendar month the score reads\",\n                \"error\": \"Column 'bars_in_month' failed element-wise validator number 0: at least one bar in every calendar month the score reads failure cases: 0, 0, 0\"\n            }\n        ]\n    }\n}\n  schema_context         column                                                     check  failure_case            index\n0         Column  bars_in_month  at least one bar in every calendar month the score reads             0  QQQUSDT@2025-09\n1         Column  bars_in_month  at least one bar in every calendar month the score reads             0  XAUUSDT@2025-09\n2         Column  bars_in_month  at least one bar in every calendar month the score reads             0  XAGUSDT@2025-09\n{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"QQQUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'QQQUSDT' contains null values:2026-09-30   NaNName: QQQUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"XAUUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'XAUUSDT' contains null values:2026-09-30   NaNName: XAUUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"XAGUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'XAGUSDT' contains null values:2026-09-30   NaNName: XAGUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context   column         check  failure_case      index\n0         Column  QQQUSDT  not_nullable           NaN 2026-09-30\n1         Column  XAUUSDT  not_nullable           NaN 2026-09-30\n2         Column  XAGUSDT  not_nullable           NaN 2026-09-30",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.769969500019215
+      },
+      "three_faults_at_once": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"freshness\",\n                \"column\": \"last_close_time\",\n                \"check\": \"last bar within 3 days of the freshest series\",\n                \"error\": \"Column 'last_close_time' failed element-wise validator number 0: <Check <lambda>: last bar within 3 days of the freshest series> failure cases: 2026-08-11 16:00:00\"\n            }\n        ]\n    }\n}\n  schema_context           column                                          check        failure_case     index\n0         Column  last_close_time  last bar within 3 days of the freshest series 2026-08-11 16:00:00  NVDAUSDT\n{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"sufficiency\",\n                \"column\": \"bars_in_month\",\n                \"check\": \"at least one bar in every calendar month the score reads\",\n                \"error\": \"Column 'bars_in_month' failed element-wise validator number 0: at least one bar in every calendar month the score reads failure cases: 0, 0, 0\"\n            }\n        ]\n    }\n}\n  schema_context         column                                                     check  failure_case             index\n0         Column  bars_in_month  at least one bar in every calendar month the score reads             0  NVDAUSDT@2026-09\n1         Column  bars_in_month  at least one bar in every calendar month the score reads             0   ETHUSDT@2026-06\n2         Column  bars_in_month  at least one bar in every calendar month the score reads             0  XAUTUSDT@2025-09\n{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"NVDAUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'NVDAUSDT' contains null values:2026-09-30   NaNName: NVDAUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"XAUTUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'XAUTUSDT' contains null values:2026-09-30   NaNName: XAUTUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context    column         check  failure_case      index\n0         Column  NVDAUSDT  not_nullable           NaN 2026-09-30\n1         Column  XAUTUSDT  not_nullable           NaN 2026-09-30",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.5928109999513254
+      },
+      "scores_clean": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.274491099989973
+      },
+      "nan_one_of_two_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"PAXGUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'PAXGUSDT' contains null values:0   NaNName: PAXGUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context    column         check  failure_case  index\n0         Column  PAXGUSDT  not_nullable           NaN      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.20645249995868653
+      },
+      "nan_only_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"PAXGUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'PAXGUSDT' contains null values:0   NaNName: PAXGUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context    column         check  failure_case  index\n0         Column  PAXGUSDT  not_nullable           NaN      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.12171130010392517
+      },
+      "all_nan": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"NVDAUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'NVDAUSDT' contains null values:0   NaNName: NVDAUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"AAPLUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'AAPLUSDT' contains null values:0   NaNName: AAPLUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'BTCUSDT' contains null values:0   NaNName: BTCUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"ETHUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'ETHUSDT' contains null values:0   NaNName: ETHUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"PAXGUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'PAXGUSDT' contains null values:0   NaNName: PAXGUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"XAUTUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'XAUTUSDT' contains null values:0   NaNName: XAUTUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context    column         check  failure_case  index\n0         Column  NVDAUSDT  not_nullable           NaN      0\n1         Column  AAPLUSDT  not_nullable           NaN      0\n2         Column   BTCUSDT  not_nullable           NaN      0\n3         Column   ETHUSDT  not_nullable           NaN      0\n4         Column  PAXGUSDT  not_nullable           NaN      0\n5         Column  XAUTUSDT  not_nullable           NaN      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.4202281000325456
+      },
+      "inf_score": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"finite\",\n                \"error\": \"Column 'BTCUSDT' failed element-wise validator number 0: <Check <lambda>: finite> failure cases: inf\"\n            }\n        ]\n    }\n}\n  schema_context   column   check  failure_case  index\n0         Column  BTCUSDT  finite           inf      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.07768500002566725
+      },
+      "empty_safe": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.5,
+          "ETHUSDT": 0.5,
+          "NVDAUSDT": 0.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0863237000303343
+      },
+      "empty_risk": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"allocation\",\n                \"column\": \"allocation\",\n                \"check\": \"weights sum to one\",\n                \"error\": \"DataFrameSchema 'allocation' failed element-wise validator number 0: <Check <lambda>: weights sum to one> failure cases: 0.0, 0.5\"\n            }\n        ]\n    }\n}\n    schema_context    column               check  failure_case  index\n0  DataFrameSchema  PAXGUSDT  weights sum to one           0.0      0\n1  DataFrameSchema  XAUTUSDT  weights sum to one           0.5      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.09308560006320477
+      },
+      "top_k_exceeds_risk": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"allocation\",\n                \"column\": \"allocation\",\n                \"check\": \"weights sum to one\",\n                \"error\": \"DataFrameSchema 'allocation' failed element-wise validator number 0: <Check <lambda>: weights sum to one> failure cases: 0.1, 0.1, 0.1, 0.1, 0.0, 0.5\"\n            }\n        ]\n    }\n}\n    schema_context    column               check  failure_case  index\n0  DataFrameSchema  AAPLUSDT  weights sum to one           0.1      0\n1  DataFrameSchema   BTCUSDT  weights sum to one           0.1      0\n2  DataFrameSchema   ETHUSDT  weights sum to one           0.1      0\n3  DataFrameSchema  NVDAUSDT  weights sum to one           0.1      0\n4  DataFrameSchema  PAXGUSDT  weights sum to one           0.0      0\n5  DataFrameSchema  XAUTUSDT  weights sum to one           0.5      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.2261036999989301
+      },
+      "top_k_zero": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"allocation\",\n                \"column\": \"allocation\",\n                \"check\": \"weights sum to one\",\n                \"error\": \"DataFrameSchema 'allocation' failed element-wise validator number 0: <Check <lambda>: weights sum to one> failure cases: 0.0, 0.0, 0.0, 0.0, 0.0, 0.5\"\n            }\n        ]\n    }\n}\n    schema_context    column               check  failure_case  index\n0  DataFrameSchema  AAPLUSDT  weights sum to one           0.0      0\n1  DataFrameSchema   BTCUSDT  weights sum to one           0.0      0\n2  DataFrameSchema   ETHUSDT  weights sum to one           0.0      0\n3  DataFrameSchema  NVDAUSDT  weights sum to one           0.0      0\n4  DataFrameSchema  PAXGUSDT  weights sum to one           0.0      0\n5  DataFrameSchema  XAUTUSDT  weights sum to one           0.5      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.20466529997065663
+      },
+      "top_k_negative": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"allocation\",\n                \"column\": \"allocation\",\n                \"check\": \"weights sum to one\",\n                \"error\": \"DataFrameSchema 'allocation' failed element-wise validator number 0: <Check <lambda>: weights sum to one> failure cases: 0.0, 0.0, 0.0, 0.0, 0.0, 0.5\"\n            }\n        ]\n    }\n}\n    schema_context    column               check  failure_case  index\n0  DataFrameSchema  AAPLUSDT  weights sum to one           0.0      0\n1  DataFrameSchema   BTCUSDT  weights sum to one           0.0      0\n2  DataFrameSchema   ETHUSDT  weights sum to one           0.0      0\n3  DataFrameSchema  NVDAUSDT  weights sum to one           0.0      0\n4  DataFrameSchema  PAXGUSDT  weights sum to one           0.0      0\n5  DataFrameSchema  XAUTUSDT  weights sum to one           0.5      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.15387640008702874
+      },
+      "step_negative": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"allocation\",\n                \"column\": \"XAUTUSDT\",\n                \"check\": \"in_range(0, 1)\",\n                \"error\": \"Column 'XAUTUSDT' failed element-wise validator number 0: in_range(0, 1) failure cases: -0.5\"\n            }\n        ]\n    }\n}\n  schema_context    column           check  failure_case  index\n0         Column  XAUTUSDT  in_range(0, 1)          -0.5      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.20757790002971888
+      },
+      "step_nan": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.1567632999503985
+      },
+      "asset_in_both_sets": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.15805600001476705
+      },
+      "duplicate_risk_asset": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"allocation\",\n                \"column\": \"allocation\",\n                \"check\": \"weights sum to one\",\n                \"error\": \"DataFrameSchema 'allocation' failed element-wise validator number 0: <Check <lambda>: weights sum to one> failure cases: 0.0, 0.0, 0.25, 0.0, 0.0, 0.5\"\n            }\n        ]\n    }\n}\n    schema_context    column               check  failure_case  index\n0  DataFrameSchema  AAPLUSDT  weights sum to one          0.00      0\n1  DataFrameSchema   BTCUSDT  weights sum to one          0.00      0\n2  DataFrameSchema   ETHUSDT  weights sum to one          0.25      0\n3  DataFrameSchema  NVDAUSDT  weights sum to one          0.00      0\n4  DataFrameSchema  PAXGUSDT  weights sum to one          0.00      0\n5  DataFrameSchema  XAUTUSDT  weights sum to one          0.50      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.1919901999644935
+      },
+      "step_one_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.061958500067703426
+      },
+      "top_k_all_risk_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.125,
+          "NVDAUSDT": 0.125,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.2912680999143049
+      },
+      "breadth_1_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.75
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.08599779999349266
+      },
+      "breadth_2_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.09787349996622652
+      },
+      "breadth_3_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.14532829995732754
+      },
+      "breadth_4_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.08258510008454323
+      }
+    },
+    "pandera_pydantic": {
+      "clean": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.5834596999920905
+      },
+      "gap_between_anchors": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.44791410001926124
+      },
+      "gap_outside_lookback": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.6106578999897465
+      },
+      "gap_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"sufficiency\",\n                \"column\": \"bars_in_month\",\n                \"check\": \"at least one bar in every calendar month the score reads\",\n                \"error\": \"Column 'bars_in_month' failed element-wise validator number 0: at least one bar in every calendar month the score reads failure cases: 0\"\n            }\n        ]\n    }\n}\n  schema_context         column                                                     check  failure_case            index\n0         Column  bars_in_month  at least one bar in every calendar month the score reads             0  ETHUSDT@2026-06",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.444547799997963
+      },
+      "stale_across_month": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"freshness\",\n                \"column\": \"last_close_time\",\n                \"check\": \"last bar within 3 days of the freshest series\",\n                \"error\": \"Column 'last_close_time' failed element-wise validator number 0: <Check <lambda>: last bar within 3 days of the freshest series> failure cases: 2026-08-11 16:00:00\"\n            }\n        ]\n    }\n}\n  schema_context           column                                          check        failure_case     index\n0         Column  last_close_time  last bar within 3 days of the freshest series 2026-08-11 16:00:00  NVDAUSDT\n{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"sufficiency\",\n                \"column\": \"bars_in_month\",\n                \"check\": \"at least one bar in every calendar month the score reads\",\n                \"error\": \"Column 'bars_in_month' failed element-wise validator number 0: at least one bar in every calendar month the score reads failure cases: 0\"\n            }\n        ]\n    }\n}\n  schema_context         column                                                     check  failure_case             index\n0         Column  bars_in_month  at least one bar in every calendar month the score reads             0  NVDAUSDT@2026-09\n{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"NVDAUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'NVDAUSDT' contains null values:2026-09-30   NaNName: NVDAUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context    column         check  failure_case      index\n0         Column  NVDAUSDT  not_nullable           NaN 2026-09-30",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.5718254999956116
+      },
+      "stale_within_month": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"freshness\",\n                \"column\": \"last_close_time\",\n                \"check\": \"last bar within 3 days of the freshest series\",\n                \"error\": \"Column 'last_close_time' failed element-wise validator number 0: <Check <lambda>: last bar within 3 days of the freshest series> failure cases: 2026-09-13 16:00:00\"\n            }\n        ]\n    }\n}\n  schema_context           column                                          check        failure_case     index\n0         Column  last_close_time  last bar within 3 days of the freshest series 2026-09-13 16:00:00  NVDAUSDT",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.6477563000516966
+      },
+      "missing_series": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"panel\",\n                \"column\": \"ETHUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'ETHUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'BTCUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context column                check failure_case index\n0  DataFrameSchema  panel  column_in_dataframe      ETHUSDT  None\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"ETHUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'ETHUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'BTCUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context           column                check failure_case index\n0  DataFrameSchema  momentum_scores  column_in_dataframe      ETHUSDT  None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.36403110006358474
+      },
+      "nan_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"bars[BTCUSDT]\",\n                \"column\": \"close\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'close' contains null values:2026-06-30 16:00:00   NaNName: close, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context column         check  failure_case               index\n0         Column  close  not_nullable           NaN 2026-06-30 16:00:00\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"panel\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context column                check failure_case index\n0  DataFrameSchema  panel  column_in_dataframe      BTCUSDT  None\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context           column                check failure_case index\n0  DataFrameSchema  momentum_scores  column_in_dataframe      BTCUSDT  None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.9492897000163794
+      },
+      "negative_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"bars[BTCUSDT]\",\n                \"column\": \"close\",\n                \"check\": \"greater_than(0)\",\n                \"error\": \"Column 'close' failed element-wise validator number 0: greater_than(0) failure cases: -58365.8\"\n            }\n        ]\n    }\n}\n  schema_context column            check  failure_case               index\n0         Column  close  greater_than(0)      -58365.8 2026-06-30 16:00:00\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"panel\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context column                check failure_case index\n0  DataFrameSchema  panel  column_in_dataframe      BTCUSDT  None\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context           column                check failure_case index\n0  DataFrameSchema  momentum_scores  column_in_dataframe      BTCUSDT  None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.573440800071694
+      },
+      "inf_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"bars[BTCUSDT]\",\n                \"column\": \"close\",\n                \"check\": \"finite\",\n                \"error\": \"Column 'close' failed element-wise validator number 1: <Check <lambda>: finite> failure cases: inf\"\n            }\n        ]\n    }\n}\n  schema_context column   check  failure_case               index\n0         Column  close  finite           inf 2026-06-30 16:00:00\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"panel\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context column                check failure_case index\n0  DataFrameSchema  panel  column_in_dataframe      BTCUSDT  None\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context           column                check failure_case index\n0  DataFrameSchema  momentum_scores  column_in_dataframe      BTCUSDT  None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.41280209994874895
+      },
+      "zero_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"bars[BTCUSDT]\",\n                \"column\": \"close\",\n                \"check\": \"greater_than(0)\",\n                \"error\": \"Column 'close' failed element-wise validator number 0: greater_than(0) failure cases: 0.0\"\n            }\n        ]\n    }\n}\n  schema_context column            check  failure_case               index\n0         Column  close  greater_than(0)           0.0 2026-06-30 16:00:00\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"panel\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context column                check failure_case index\n0  DataFrameSchema  panel  column_in_dataframe      BTCUSDT  None\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'BTCUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'ETHUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context           column                check failure_case index\n0  DataFrameSchema  momentum_scores  column_in_dataframe      BTCUSDT  None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.8492800999665633
+      },
+      "unsorted_bars": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.5701614000136033
+      },
+      "conflicting_duplicate_bar": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"SERIES_CONTAINS_DUPLICATES\": [\n            {\n                \"schema\": \"bars[ETHUSDT]\",\n                \"column\": null,\n                \"check\": \"field_uniqueness\",\n                \"error\": \"series 'None' contains duplicate values:2026-06-30 16:00:00   2026-06-30 16:00:002026-06-30 16:00:00   2026-06-30 16:00:00dtype: datetime64[us]\"\n            }\n        ]\n    }\n}\n  schema_context column             check        failure_case               index\n0          Index   None  field_uniqueness 2026-06-30 16:00:00 2026-06-30 16:00:00\n1          Index   None  field_uniqueness 2026-06-30 16:00:00 2026-06-30 16:00:00\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"panel\",\n                \"column\": \"ETHUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'ETHUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'BTCUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context column                check failure_case index\n0  DataFrameSchema  panel  column_in_dataframe      ETHUSDT  None\n{\n    \"SCHEMA\": {\n        \"COLUMN_NOT_IN_DATAFRAME\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"ETHUSDT\",\n                \"check\": \"column_in_dataframe\",\n                \"error\": \"column 'ETHUSDT' not in dataframe. Columns in dataframe: ['NVDAUSDT', 'AAPLUSDT', 'BTCUSDT', 'PAXGUSDT', 'XAUTUSDT']\"\n            }\n        ]\n    }\n}\n    schema_context           column                check failure_case index\n0  DataFrameSchema  momentum_scores  column_in_dataframe      ETHUSDT  None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.9988930999534205
+      },
+      "real_short_history_cli_default": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"sufficiency\",\n                \"column\": \"bars_in_month\",\n                \"check\": \"at least one bar in every calendar month the score reads\",\n                \"error\": \"Column 'bars_in_month' failed element-wise validator number 0: at least one bar in every calendar month the score reads failure cases: 0, 0\"\n            }\n        ]\n    }\n}\n  schema_context         column                                                     check  failure_case            index\n0         Column  bars_in_month  at least one bar in every calendar month the score reads             0  QQQUSDT@2025-09\n1         Column  bars_in_month  at least one bar in every calendar month the score reads             0  XAUUSDT@2025-09\n{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"QQQUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'QQQUSDT' contains null values:2026-09-30   NaNName: QQQUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"XAUUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'XAUUSDT' contains null values:2026-09-30   NaNName: XAUUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context   column         check  failure_case      index\n0         Column  QQQUSDT  not_nullable           NaN 2026-09-30\n1         Column  XAUUSDT  not_nullable           NaN 2026-09-30",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.8097772999899462
+      },
+      "real_short_history_three": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"sufficiency\",\n                \"column\": \"bars_in_month\",\n                \"check\": \"at least one bar in every calendar month the score reads\",\n                \"error\": \"Column 'bars_in_month' failed element-wise validator number 0: at least one bar in every calendar month the score reads failure cases: 0, 0, 0\"\n            }\n        ]\n    }\n}\n  schema_context         column                                                     check  failure_case            index\n0         Column  bars_in_month  at least one bar in every calendar month the score reads             0  QQQUSDT@2025-09\n1         Column  bars_in_month  at least one bar in every calendar month the score reads             0  XAUUSDT@2025-09\n2         Column  bars_in_month  at least one bar in every calendar month the score reads             0  XAGUSDT@2025-09\n{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"QQQUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'QQQUSDT' contains null values:2026-09-30   NaNName: QQQUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"XAUUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'XAUUSDT' contains null values:2026-09-30   NaNName: XAUUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"XAGUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'XAGUSDT' contains null values:2026-09-30   NaNName: XAGUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context   column         check  failure_case      index\n0         Column  QQQUSDT  not_nullable           NaN 2026-09-30\n1         Column  XAUUSDT  not_nullable           NaN 2026-09-30\n2         Column  XAGUSDT  not_nullable           NaN 2026-09-30",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.9214580999687314
+      },
+      "three_faults_at_once": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"freshness\",\n                \"column\": \"last_close_time\",\n                \"check\": \"last bar within 3 days of the freshest series\",\n                \"error\": \"Column 'last_close_time' failed element-wise validator number 0: <Check <lambda>: last bar within 3 days of the freshest series> failure cases: 2026-08-11 16:00:00\"\n            }\n        ]\n    }\n}\n  schema_context           column                                          check        failure_case     index\n0         Column  last_close_time  last bar within 3 days of the freshest series 2026-08-11 16:00:00  NVDAUSDT\n{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"sufficiency\",\n                \"column\": \"bars_in_month\",\n                \"check\": \"at least one bar in every calendar month the score reads\",\n                \"error\": \"Column 'bars_in_month' failed element-wise validator number 0: at least one bar in every calendar month the score reads failure cases: 0, 0, 0\"\n            }\n        ]\n    }\n}\n  schema_context         column                                                     check  failure_case             index\n0         Column  bars_in_month  at least one bar in every calendar month the score reads             0  NVDAUSDT@2026-09\n1         Column  bars_in_month  at least one bar in every calendar month the score reads             0   ETHUSDT@2026-06\n2         Column  bars_in_month  at least one bar in every calendar month the score reads             0  XAUTUSDT@2025-09\n{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"NVDAUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'NVDAUSDT' contains null values:2026-09-30   NaNName: NVDAUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"XAUTUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'XAUTUSDT' contains null values:2026-09-30   NaNName: XAUTUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context    column         check  failure_case      index\n0         Column  NVDAUSDT  not_nullable           NaN 2026-09-30\n1         Column  XAUTUSDT  not_nullable           NaN 2026-09-30",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.8298894000472501
+      },
+      "scores_clean": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.13456560007762164
+      },
+      "nan_one_of_two_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"PAXGUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'PAXGUSDT' contains null values:0   NaNName: PAXGUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context    column         check  failure_case  index\n0         Column  PAXGUSDT  not_nullable           NaN      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.18432060000486672
+      },
+      "nan_only_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"PAXGUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'PAXGUSDT' contains null values:0   NaNName: PAXGUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context    column         check  failure_case  index\n0         Column  PAXGUSDT  not_nullable           NaN      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.16661770001519471
+      },
+      "all_nan": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"SCHEMA\": {\n        \"SERIES_CONTAINS_NULLS\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"NVDAUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'NVDAUSDT' contains null values:0   NaNName: NVDAUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"AAPLUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'AAPLUSDT' contains null values:0   NaNName: AAPLUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'BTCUSDT' contains null values:0   NaNName: BTCUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"ETHUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'ETHUSDT' contains null values:0   NaNName: ETHUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"PAXGUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'PAXGUSDT' contains null values:0   NaNName: PAXGUSDT, dtype: float64\"\n            },\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"XAUTUSDT\",\n                \"check\": \"not_nullable\",\n                \"error\": \"non-nullable series 'XAUTUSDT' contains null values:0   NaNName: XAUTUSDT, dtype: float64\"\n            }\n        ]\n    }\n}\n  schema_context    column         check  failure_case  index\n0         Column  NVDAUSDT  not_nullable           NaN      0\n1         Column  AAPLUSDT  not_nullable           NaN      0\n2         Column   BTCUSDT  not_nullable           NaN      0\n3         Column   ETHUSDT  not_nullable           NaN      0\n4         Column  PAXGUSDT  not_nullable           NaN      0\n5         Column  XAUTUSDT  not_nullable           NaN      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.23373680002987385
+      },
+      "inf_score": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "{\n    \"DATA\": {\n        \"DATAFRAME_CHECK\": [\n            {\n                \"schema\": \"momentum_scores\",\n                \"column\": \"BTCUSDT\",\n                \"check\": \"finite\",\n                \"error\": \"Column 'BTCUSDT' failed element-wise validator number 0: <Check <lambda>: finite> failure cases: inf\"\n            }\n        ]\n    }\n}\n  schema_context   column   check  failure_case  index\n0         Column  BTCUSDT  finite           inf      0",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.07275150006171316
+      },
+      "empty_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "parameters: 1 validation error for RotationParams\nsafe\n  List should have at least 1 item after validation, not 0 [type=too_short, input_value=[], input_type=list]\n    For further information visit https://errors.pydantic.dev/2.13/v/too_short",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.0580464000813663
+      },
+      "empty_risk": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "parameters: 1 validation error for RotationParams\nrisk\n  List should have at least 1 item after validation, not 0 [type=too_short, input_value=[], input_type=list]\n    For further information visit https://errors.pydantic.dev/2.13/v/too_short",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.05605070001911372
+      },
+      "top_k_exceeds_risk": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "parameters: 1 validation error for RotationParams\n  Value error, top_k=5 exceeds the 4 risk assets [type=value_error, input_value={'risk': ['NVDAUSDT', 'AA...top_k': 5, 'step': 0.25}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.009976900066249073
+      },
+      "top_k_zero": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "parameters: 1 validation error for RotationParams\ntop_k\n  Input should be greater than or equal to 1 [type=greater_than_equal, input_value=0, input_type=int]\n    For further information visit https://errors.pydantic.dev/2.13/v/greater_than_equal",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.09017029998358339
+      },
+      "top_k_negative": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "parameters: 1 validation error for RotationParams\ntop_k\n  Input should be greater than or equal to 1 [type=greater_than_equal, input_value=-1, input_type=int]\n    For further information visit https://errors.pydantic.dev/2.13/v/greater_than_equal",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.07254080008715391
+      },
+      "step_negative": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "parameters: 1 validation error for RotationParams\nstep\n  Input should be greater than 0 [type=greater_than, input_value=-0.25, input_type=float]\n    For further information visit https://errors.pydantic.dev/2.13/v/greater_than",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.009444399969652295
+      },
+      "step_nan": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "parameters: 1 validation error for RotationParams\nstep\n  Input should be a finite number [type=finite_number, input_value=nan, input_type=float]\n    For further information visit https://errors.pydantic.dev/2.13/v/finite_number",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.011186199961230159
+      },
+      "asset_in_both_sets": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "parameters: 1 validation error for RotationParams\n  Value error, named as both risk and safe: PAXGUSDT [type=value_error, input_value={'risk': ['NVDAUSDT', 'AA...top_k': 2, 'step': 0.25}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.009567100089043379
+      },
+      "duplicate_risk_asset": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "parameters: 1 validation error for RotationParams\n  Value error, repeated among risk assets: BTCUSDT [type=value_error, input_value={'risk': ['NVDAUSDT', 'AA...top_k': 2, 'step': 0.25}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.10610159998759627
+      },
+      "step_one_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.12579220009502023
+      },
+      "top_k_all_risk_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.125,
+          "NVDAUSDT": 0.125,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.23598530003800988
+      },
+      "breadth_1_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.75
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.24094459996558726
+      },
+      "breadth_2_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.09999909996986389
+      },
+      "breadth_3_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.30055030004587024
+      },
+      "breadth_4_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.1678402000106871
+      }
+    },
+    "great_expectations": {
+      "clean": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 1.9028071999782696
+      },
+      "gap_between_anchors": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.7468019999796525
+      },
+      "gap_outside_lookback": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.31121279997751117
+      },
+      "gap_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "sufficiency: expect_column_values_to_be_between failed; unexpected=[{'bars_in_month': np.int64(0), 'symbol_month': 'ETHUSDT@2026-06'}]; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.3613966000266373
+      },
+      "stale_across_month": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "freshness: expect_column_values_to_be_between failed; unexpected=[{'last_close_time_ns': np.int64(1786464000000000000), 'symbol': 'NVDAUSDT'}]; observed=None\nsufficiency: expect_column_values_to_be_between failed; unexpected=[{'bars_in_month': np.int64(0), 'symbol_month': 'NVDAUSDT@2026-09'}]; observed=None\nmomentum_scores: expect_column_values_to_not_be_null failed; unexpected=[{'score': np.float64(nan), 'symbol': 'NVDAUSDT'}]; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 1.073374499916099
+      },
+      "stale_within_month": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "freshness: expect_column_values_to_be_between failed; unexpected=[{'last_close_time_ns': np.int64(1789315200000000000), 'symbol': 'NVDAUSDT'}]; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.3519013000186533
+      },
+      "missing_series": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "panel: expect_column_to_exist failed; unexpected=None; observed=None\nmomentum_scores: expect_column_distinct_values_to_contain_set failed; unexpected=None; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.6971123999683186
+      },
+      "nan_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "bars[BTCUSDT]: expect_column_values_to_not_be_null failed; unexpected=[711]; observed=None\npanel: expect_column_to_exist failed; unexpected=None; observed=None\nmomentum_scores: expect_column_distinct_values_to_contain_set failed; unexpected=None; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.47932739998213947
+      },
+      "negative_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "bars[BTCUSDT]: expect_column_values_to_be_between failed; unexpected=[711]; observed=None\npanel: expect_column_to_exist failed; unexpected=None; observed=None\nmomentum_scores: expect_column_distinct_values_to_contain_set failed; unexpected=None; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.3114549999590963
+      },
+      "inf_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "bars[BTCUSDT]: expect_column_values_to_be_between failed; unexpected=[711]; observed=None\npanel: expect_column_to_exist failed; unexpected=None; observed=None\nmomentum_scores: expect_column_distinct_values_to_contain_set failed; unexpected=None; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.341153800021857
+      },
+      "zero_close_on_anchor": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "bars[BTCUSDT]: expect_column_values_to_be_between failed; unexpected=[711]; observed=None\npanel: expect_column_to_exist failed; unexpected=None; observed=None\nmomentum_scores: expect_column_distinct_values_to_contain_set failed; unexpected=None; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 1.1028789000120014
+      },
+      "unsorted_bars": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": {
+          "NVDAUSDT": 1.7086788157487263,
+          "AAPLUSDT": 2.700376381304526,
+          "BTCUSDT": 2.7933949353707277,
+          "ETHUSDT": 4.202623742970559,
+          "PAXGUSDT": -0.1498170440534068,
+          "XAUTUSDT": -0.10698651751071253
+        },
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 3.6967865000478923
+      },
+      "conflicting_duplicate_bar": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "bars[ETHUSDT]: expect_column_values_to_be_unique failed; unexpected=[711, 712]; observed=None\npanel: expect_column_to_exist failed; unexpected=None; observed=None\nmomentum_scores: expect_column_distinct_values_to_contain_set failed; unexpected=None; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 2.1724693999858573
+      },
+      "real_short_history_cli_default": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "sufficiency: expect_column_values_to_be_between failed; unexpected=[{'bars_in_month': np.int64(0), 'symbol_month': 'QQQUSDT@2025-09'}, {'bars_in_month': np.int64(0), 'symbol_month': 'XAUUSDT@2025-09'}]; observed=None\nmomentum_scores: expect_column_values_to_not_be_null failed; unexpected=[{'score': np.float64(nan), 'symbol': 'QQQUSDT'}, {'score': np.float64(nan), 'symbol': 'XAUUSDT'}]; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.5809865000192076
+      },
+      "real_short_history_three": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "sufficiency: expect_column_values_to_be_between failed; unexpected=[{'bars_in_month': np.int64(0), 'symbol_month': 'QQQUSDT@2025-09'}, {'bars_in_month': np.int64(0), 'symbol_month': 'XAUUSDT@2025-09'}, {'bars_in_month': np.int64(0), 'symbol_month': 'XAGUSDT@2025-09'}]; observed=None\nmomentum_scores: expect_column_values_to_not_be_null failed; unexpected=[{'score': np.float64(nan), 'symbol': 'QQQUSDT'}, {'score': np.float64(nan), 'symbol': 'XAUUSDT'}, {'score': np.float64(nan), 'symbol': 'XAGUSDT'}]; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 2.7934021999826655
+      },
+      "three_faults_at_once": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "freshness: expect_column_values_to_be_between failed; unexpected=[{'last_close_time_ns': np.int64(1786464000000000000), 'symbol': 'NVDAUSDT'}]; observed=None\nsufficiency: expect_column_values_to_be_between failed; unexpected=[{'bars_in_month': np.int64(0), 'symbol_month': 'NVDAUSDT@2026-09'}, {'bars_in_month': np.int64(0), 'symbol_month': 'ETHUSDT@2026-06'}, {'bars_in_month': np.int64(0), 'symbol_month': 'XAUTUSDT@2025-09'}]; observed=None\nmomentum_scores: expect_column_values_to_not_be_null failed; unexpected=[{'score': np.float64(nan), 'symbol': 'NVDAUSDT'}, {'score': np.float64(nan), 'symbol': 'XAUTUSDT'}]; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 2.1071818999480456
+      },
+      "scores_clean": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.054812700022011995
+      },
+      "nan_one_of_two_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "momentum_scores: expect_column_values_to_not_be_null failed; unexpected=[{'score': np.float64(nan), 'symbol': 'PAXGUSDT'}]; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.05238620005548
+      },
+      "nan_only_safe": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "momentum_scores: expect_column_values_to_not_be_null failed; unexpected=[{'score': np.float64(nan), 'symbol': 'PAXGUSDT'}]; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.029797299997881055
+      },
+      "all_nan": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "momentum_scores: expect_column_values_to_not_be_null failed; unexpected=[{'score': np.float64(nan), 'symbol': 'AAPLUSDT'}, {'score': np.float64(nan), 'symbol': 'BTCUSDT'}, {'score': np.float64(nan), 'symbol': 'ETHUSDT'}, {'score': np.float64(nan), 'symbol': 'NVDAUSDT'}, {'score': np.float64(nan), 'symbol': 'PAXGUSDT'}, {'score': np.float64(nan), 'symbol': 'XAUTUSDT'}]; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.02630780008621514
+      },
+      "inf_score": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "momentum_scores: expect_column_values_to_be_between failed; unexpected=[{'score': np.float64(inf), 'symbol': 'BTCUSDT'}]; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.026672199950553477
+      },
+      "empty_safe": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.5,
+          "ETHUSDT": 0.5,
+          "NVDAUSDT": 0.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.053161899908445776
+      },
+      "empty_risk": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "allocation: expect_column_sum_to_be_between failed; unexpected=None; observed=0.5",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.05374780006241053
+      },
+      "top_k_exceeds_risk": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "allocation: expect_column_sum_to_be_between failed; unexpected=None; observed=0.9",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.06675210001412779
+      },
+      "top_k_zero": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "allocation: expect_column_sum_to_be_between failed; unexpected=None; observed=0.5",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.07781940000131726
+      },
+      "top_k_negative": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "allocation: expect_column_sum_to_be_between failed; unexpected=None; observed=0.5",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.05873029993381351
+      },
+      "step_negative": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "allocation: expect_column_values_to_be_between failed; unexpected=[{'weight': np.float64(-0.5), 'symbol': 'XAUTUSDT'}]; observed=None",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.0746758000459522
+      },
+      "step_nan": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.1065533000510186
+      },
+      "asset_in_both_sets": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.25,
+          "ETHUSDT": 0.25,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.12136289989575744
+      },
+      "duplicate_risk_asset": {
+        "outcome": "refused",
+        "weights": null,
+        "scores": null,
+        "message": "allocation: expect_column_sum_to_be_between failed; unexpected=None; observed=0.75",
+        "exception": "Refused",
+        "violations": null,
+        "seconds": 0.07412730006035417
+      },
+      "step_one_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.06993260001763701
+      },
+      "top_k_all_risk_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.125,
+          "NVDAUSDT": 0.125,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.5
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.06343150010798126
+      },
+      "breadth_1_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.125,
+          "BTCUSDT": 0.125,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 0.75
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.059608499985188246
+      },
+      "breadth_2_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.0615500999847427
+      },
+      "breadth_3_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.08529700001236051
+      },
+      "breadth_4_negative_control": {
+        "outcome": "accepted",
+        "weights": {
+          "AAPLUSDT": 0.0,
+          "BTCUSDT": 0.0,
+          "ETHUSDT": 0.0,
+          "NVDAUSDT": 0.0,
+          "PAXGUSDT": 0.0,
+          "XAUTUSDT": 1.0
+        },
+        "scores": null,
+        "message": null,
+        "exception": null,
+        "violations": null,
+        "seconds": 0.05235679994802922
+      }
+    }
+  },
+  "scoreboard": {
+    "argus_after": {
+      "must_refuse_cases": 25,
+      "refused": 25,
+      "silent_accepts": [],
+      "crashed_instead_of_refusing": [],
+      "live_path_must_refuse": 17,
+      "live_path_refused": 17,
+      "tolerable_cases": 3,
+      "tolerable_correct": 3,
+      "over_refusals": [],
+      "silent_corruptions": [],
+      "control_cases": 8,
+      "controls_correct": 8,
+      "false_positives": [],
+      "controls_wrong": [],
+      "offending_symbols_named": 28,
+      "offending_symbols_total": 28,
+      "multi_symbol_refusals_fully_named": 4,
+      "multi_symbol_refusals": 4,
+      "cases_handled_correctly": 36,
+      "cases_total": 36
+    },
+    "argus_before": {
+      "must_refuse_cases": 25,
+      "refused": 11,
+      "silent_accepts": [
+        "gap_on_anchor",
+        "stale_across_month",
+        "stale_within_month",
+        "negative_close_on_anchor",
+        "inf_close_on_anchor",
+        "conflicting_duplicate_bar",
+        "inf_score",
+        "top_k_exceeds_risk",
+        "top_k_zero",
+        "top_k_negative",
+        "step_negative",
+        "step_nan",
+        "asset_in_both_sets",
+        "duplicate_risk_asset"
+      ],
+      "crashed_instead_of_refusing": [],
+      "live_path_must_refuse": 17,
+      "live_path_refused": 9,
+      "tolerable_cases": 3,
+      "tolerable_correct": 1,
+      "over_refusals": [],
+      "silent_corruptions": [
+        "gap_between_anchors",
+        "unsorted_bars"
+      ],
+      "control_cases": 8,
+      "controls_correct": 8,
+      "false_positives": [],
+      "controls_wrong": [],
+      "offending_symbols_named": 10,
+      "offending_symbols_total": 19,
+      "multi_symbol_refusals_fully_named": 1,
+      "multi_symbol_refusals": 4,
+      "cases_handled_correctly": 20,
+      "cases_total": 36
+    },
+    "pytaa_raw": {
+      "must_refuse_cases": 25,
+      "refused": 0,
+      "silent_accepts": [
+        "gap_on_anchor",
+        "stale_across_month",
+        "stale_within_month",
+        "nan_close_on_anchor",
+        "negative_close_on_anchor",
+        "inf_close_on_anchor",
+        "zero_close_on_anchor",
+        "conflicting_duplicate_bar",
+        "real_short_history_cli_default",
+        "real_short_history_three",
+        "three_faults_at_once",
+        "nan_one_of_two_safe",
+        "nan_only_safe",
+        "all_nan",
+        "inf_score",
+        "empty_safe",
+        "empty_risk",
+        "top_k_exceeds_risk",
+        "top_k_zero",
+        "top_k_negative",
+        "step_negative",
+        "step_nan",
+        "asset_in_both_sets",
+        "duplicate_risk_asset"
+      ],
+      "crashed_instead_of_refusing": [
+        "missing_series"
+      ],
+      "live_path_must_refuse": 17,
+      "live_path_refused": 0,
+      "tolerable_cases": 3,
+      "tolerable_correct": 3,
+      "over_refusals": [],
+      "silent_corruptions": [],
+      "control_cases": 8,
+      "controls_correct": 8,
+      "false_positives": [],
+      "controls_wrong": [],
+      "offending_symbols_named": 0,
+      "offending_symbols_total": 0,
+      "multi_symbol_refusals_fully_named": 0,
+      "multi_symbol_refusals": 0,
+      "cases_handled_correctly": 11,
+      "cases_total": 36
+    },
+    "pandera": {
+      "must_refuse_cases": 25,
+      "refused": 22,
+      "silent_accepts": [
+        "empty_safe",
+        "step_nan",
+        "asset_in_both_sets"
+      ],
+      "crashed_instead_of_refusing": [],
+      "live_path_must_refuse": 17,
+      "live_path_refused": 15,
+      "tolerable_cases": 3,
+      "tolerable_correct": 3,
+      "over_refusals": [],
+      "silent_corruptions": [],
+      "control_cases": 8,
+      "controls_correct": 8,
+      "false_positives": [],
+      "controls_wrong": [],
+      "offending_symbols_named": 27,
+      "offending_symbols_total": 27,
+      "multi_symbol_refusals_fully_named": 4,
+      "multi_symbol_refusals": 4,
+      "cases_handled_correctly": 33,
+      "cases_total": 36
+    },
+    "pandera_pydantic": {
+      "must_refuse_cases": 25,
+      "refused": 25,
+      "silent_accepts": [],
+      "crashed_instead_of_refusing": [],
+      "live_path_must_refuse": 17,
+      "live_path_refused": 17,
+      "tolerable_cases": 3,
+      "tolerable_correct": 3,
+      "over_refusals": [],
+      "silent_corruptions": [],
+      "control_cases": 8,
+      "controls_correct": 8,
+      "false_positives": [],
+      "controls_wrong": [],
+      "offending_symbols_named": 28,
+      "offending_symbols_total": 28,
+      "multi_symbol_refusals_fully_named": 4,
+      "multi_symbol_refusals": 4,
+      "cases_handled_correctly": 36,
+      "cases_total": 36
+    },
+    "great_expectations": {
+      "must_refuse_cases": 25,
+      "refused": 22,
+      "silent_accepts": [
+        "empty_safe",
+        "step_nan",
+        "asset_in_both_sets"
+      ],
+      "crashed_instead_of_refusing": [],
+      "live_path_must_refuse": 17,
+      "live_path_refused": 15,
+      "tolerable_cases": 3,
+      "tolerable_correct": 3,
+      "over_refusals": [],
+      "silent_corruptions": [],
+      "control_cases": 8,
+      "controls_correct": 8,
+      "false_positives": [],
+      "controls_wrong": [],
+      "offending_symbols_named": 25,
+      "offending_symbols_total": 27,
+      "multi_symbol_refusals_fully_named": 4,
+      "multi_symbol_refusals": 4,
+      "cases_handled_correctly": 33,
+      "cases_total": 36
+    }
+  },
+  "grid": {
+    "argus_after": {
+      "clean": "correct",
+      "gap_between_anchors": "correct",
+      "gap_outside_lookback": "correct",
+      "gap_on_anchor": "refused",
+      "stale_across_month": "refused",
+      "stale_within_month": "refused",
+      "missing_series": "refused",
+      "nan_close_on_anchor": "refused",
+      "negative_close_on_anchor": "refused",
+      "inf_close_on_anchor": "refused",
+      "zero_close_on_anchor": "refused",
+      "unsorted_bars": "correct",
+      "conflicting_duplicate_bar": "refused",
+      "real_short_history_cli_default": "refused",
+      "real_short_history_three": "refused",
+      "three_faults_at_once": "refused",
+      "scores_clean": "correct",
+      "nan_one_of_two_safe": "refused",
+      "nan_only_safe": "refused",
+      "all_nan": "refused",
+      "inf_score": "refused",
+      "empty_safe": "refused",
+      "empty_risk": "refused",
+      "top_k_exceeds_risk": "refused",
+      "top_k_zero": "refused",
+      "top_k_negative": "refused",
+      "step_negative": "refused",
+      "step_nan": "refused",
+      "asset_in_both_sets": "refused",
+      "duplicate_risk_asset": "refused",
+      "step_one_control": "correct",
+      "top_k_all_risk_control": "correct",
+      "breadth_1_negative_control": "correct",
+      "breadth_2_negative_control": "correct",
+      "breadth_3_negative_control": "correct",
+      "breadth_4_negative_control": "correct"
+    },
+    "argus_before": {
+      "clean": "correct",
+      "gap_between_anchors": "silent_corruption",
+      "gap_outside_lookback": "correct",
+      "gap_on_anchor": "silent_accept",
+      "stale_across_month": "silent_accept",
+      "stale_within_month": "silent_accept",
+      "missing_series": "refused",
+      "nan_close_on_anchor": "refused",
+      "negative_close_on_anchor": "silent_accept",
+      "inf_close_on_anchor": "silent_accept",
+      "zero_close_on_anchor": "refused",
+      "unsorted_bars": "silent_corruption",
+      "conflicting_duplicate_bar": "silent_accept",
+      "real_short_history_cli_default": "refused",
+      "real_short_history_three": "refused",
+      "three_faults_at_once": "refused",
+      "scores_clean": "correct",
+      "nan_one_of_two_safe": "refused",
+      "nan_only_safe": "refused",
+      "all_nan": "refused",
+      "inf_score": "silent_accept",
+      "empty_safe": "refused",
+      "empty_risk": "refused",
+      "top_k_exceeds_risk": "silent_accept",
+      "top_k_zero": "silent_accept",
+      "top_k_negative": "silent_accept",
+      "step_negative": "silent_accept",
+      "step_nan": "silent_accept",
+      "asset_in_both_sets": "silent_accept",
+      "duplicate_risk_asset": "silent_accept",
+      "step_one_control": "correct",
+      "top_k_all_risk_control": "correct",
+      "breadth_1_negative_control": "correct",
+      "breadth_2_negative_control": "correct",
+      "breadth_3_negative_control": "correct",
+      "breadth_4_negative_control": "correct"
+    },
+    "pytaa_raw": {
+      "clean": "correct",
+      "gap_between_anchors": "correct",
+      "gap_outside_lookback": "correct",
+      "gap_on_anchor": "silent_accept",
+      "stale_across_month": "silent_accept",
+      "stale_within_month": "silent_accept",
+      "missing_series": "crashed",
+      "nan_close_on_anchor": "silent_accept",
+      "negative_close_on_anchor": "silent_accept",
+      "inf_close_on_anchor": "silent_accept",
+      "zero_close_on_anchor": "silent_accept",
+      "unsorted_bars": "correct",
+      "conflicting_duplicate_bar": "silent_accept",
+      "real_short_history_cli_default": "silent_accept",
+      "real_short_history_three": "silent_accept",
+      "three_faults_at_once": "silent_accept",
+      "scores_clean": "correct",
+      "nan_one_of_two_safe": "silent_accept",
+      "nan_only_safe": "silent_accept",
+      "all_nan": "silent_accept",
+      "inf_score": "silent_accept",
+      "empty_safe": "silent_accept",
+      "empty_risk": "silent_accept",
+      "top_k_exceeds_risk": "silent_accept",
+      "top_k_zero": "silent_accept",
+      "top_k_negative": "silent_accept",
+      "step_negative": "silent_accept",
+      "step_nan": "silent_accept",
+      "asset_in_both_sets": "silent_accept",
+      "duplicate_risk_asset": "silent_accept",
+      "step_one_control": "correct",
+      "top_k_all_risk_control": "correct",
+      "breadth_1_negative_control": "correct",
+      "breadth_2_negative_control": "correct",
+      "breadth_3_negative_control": "correct",
+      "breadth_4_negative_control": "correct"
+    },
+    "pandera": {
+      "clean": "correct",
+      "gap_between_anchors": "correct",
+      "gap_outside_lookback": "correct",
+      "gap_on_anchor": "refused",
+      "stale_across_month": "refused",
+      "stale_within_month": "refused",
+      "missing_series": "refused",
+      "nan_close_on_anchor": "refused",
+      "negative_close_on_anchor": "refused",
+      "inf_close_on_anchor": "refused",
+      "zero_close_on_anchor": "refused",
+      "unsorted_bars": "correct",
+      "conflicting_duplicate_bar": "refused",
+      "real_short_history_cli_default": "refused",
+      "real_short_history_three": "refused",
+      "three_faults_at_once": "refused",
+      "scores_clean": "correct",
+      "nan_one_of_two_safe": "refused",
+      "nan_only_safe": "refused",
+      "all_nan": "refused",
+      "inf_score": "refused",
+      "empty_safe": "silent_accept",
+      "empty_risk": "refused",
+      "top_k_exceeds_risk": "refused",
+      "top_k_zero": "refused",
+      "top_k_negative": "refused",
+      "step_negative": "refused",
+      "step_nan": "silent_accept",
+      "asset_in_both_sets": "silent_accept",
+      "duplicate_risk_asset": "refused",
+      "step_one_control": "correct",
+      "top_k_all_risk_control": "correct",
+      "breadth_1_negative_control": "correct",
+      "breadth_2_negative_control": "correct",
+      "breadth_3_negative_control": "correct",
+      "breadth_4_negative_control": "correct"
+    },
+    "pandera_pydantic": {
+      "clean": "correct",
+      "gap_between_anchors": "correct",
+      "gap_outside_lookback": "correct",
+      "gap_on_anchor": "refused",
+      "stale_across_month": "refused",
+      "stale_within_month": "refused",
+      "missing_series": "refused",
+      "nan_close_on_anchor": "refused",
+      "negative_close_on_anchor": "refused",
+      "inf_close_on_anchor": "refused",
+      "zero_close_on_anchor": "refused",
+      "unsorted_bars": "correct",
+      "conflicting_duplicate_bar": "refused",
+      "real_short_history_cli_default": "refused",
+      "real_short_history_three": "refused",
+      "three_faults_at_once": "refused",
+      "scores_clean": "correct",
+      "nan_one_of_two_safe": "refused",
+      "nan_only_safe": "refused",
+      "all_nan": "refused",
+      "inf_score": "refused",
+      "empty_safe": "refused",
+      "empty_risk": "refused",
+      "top_k_exceeds_risk": "refused",
+      "top_k_zero": "refused",
+      "top_k_negative": "refused",
+      "step_negative": "refused",
+      "step_nan": "refused",
+      "asset_in_both_sets": "refused",
+      "duplicate_risk_asset": "refused",
+      "step_one_control": "correct",
+      "top_k_all_risk_control": "correct",
+      "breadth_1_negative_control": "correct",
+      "breadth_2_negative_control": "correct",
+      "breadth_3_negative_control": "correct",
+      "breadth_4_negative_control": "correct"
+    },
+    "great_expectations": {
+      "clean": "correct",
+      "gap_between_anchors": "correct",
+      "gap_outside_lookback": "correct",
+      "gap_on_anchor": "refused",
+      "stale_across_month": "refused",
+      "stale_within_month": "refused",
+      "missing_series": "refused",
+      "nan_close_on_anchor": "refused",
+      "negative_close_on_anchor": "refused",
+      "inf_close_on_anchor": "refused",
+      "zero_close_on_anchor": "refused",
+      "unsorted_bars": "correct",
+      "conflicting_duplicate_bar": "refused",
+      "real_short_history_cli_default": "refused",
+      "real_short_history_three": "refused",
+      "three_faults_at_once": "refused",
+      "scores_clean": "correct",
+      "nan_one_of_two_safe": "refused",
+      "nan_only_safe": "refused",
+      "all_nan": "refused",
+      "inf_score": "refused",
+      "empty_safe": "silent_accept",
+      "empty_risk": "refused",
+      "top_k_exceeds_risk": "refused",
+      "top_k_zero": "refused",
+      "top_k_negative": "refused",
+      "step_negative": "refused",
+      "step_nan": "silent_accept",
+      "asset_in_both_sets": "silent_accept",
+      "duplicate_risk_asset": "refused",
+      "step_one_control": "correct",
+      "top_k_all_risk_control": "correct",
+      "breadth_1_negative_control": "correct",
+      "breadth_2_negative_control": "correct",
+      "breadth_3_negative_control": "correct",
+      "breadth_4_negative_control": "correct"
+    }
+  },
+  "costs": {
+    "argus_after": {
+      "repeats": 200,
+      "median_seconds": 0.004698550037574023,
+      "min_seconds": 0.003790699993260205
+    },
+    "argus_before": {
+      "repeats": 200,
+      "median_seconds": 0.0006694999756291509,
+      "min_seconds": 0.0005255000432953238
+    },
+    "pytaa_raw": {
+      "repeats": 30,
+      "median_seconds": 0.010867249977309257,
+      "min_seconds": 0.009600499994121492
+    },
+    "pandera": {
+      "repeats": 30,
+      "median_seconds": 0.5100462500122376,
+      "min_seconds": 0.2027881999965757
+    },
+    "pandera_pydantic": {
+      "repeats": 30,
+      "median_seconds": 0.48404680006206036,
+      "min_seconds": 0.06584070005919784
+    },
+    "great_expectations": {
+      "repeats": 3,
+      "median_seconds": 2.9110912000760436,
+      "min_seconds": 0.40582220000214875,
+      "import_seconds": 100.58808659994975,
+      "context_seconds": 0.09142800001427531
+    }
+  },
+  "verdict": {
+    "best_general_rival": "pandera_pydantic",
+    "pre_contract_argus_vs_best_general_rival": "rival_wins",
+    "argus_after_vs_best_general_rival": "tie",
+    "cases_correct": {
+      "argus_after": 36,
+      "argus_before": 20,
+      "pytaa_raw": 11,
+      "pandera": 33,
+      "pandera_pydantic": 36,
+      "great_expectations": 33
+    },
+    "cases_total": 36,
+    "median_seconds_per_clean_call": {
+      "argus_after": 0.004698550037574023,
+      "argus_before": 0.0006694999756291509,
+      "pytaa_raw": 0.010867249977309257,
+      "pandera": 0.5100462500122376,
+      "pandera_pydantic": 0.48404680006206036,
+      "great_expectations": 2.9110912000760436
+    }
+  },
+  "business_month_divergence": {
+    "symbol": "BTCUSDT",
+    "points": [
+      {
+        "cutoff": "2025-10-10",
+        "pytaa_business_month": 1.8694378828892155,
+        "argus_calendar_month": 1.8694378828892155,
+        "difference": 0.0,
+        "identical": true,
+        "anchor_months_ending_on_a_weekend": []
+      },
+      {
+        "cutoff": "2025-12-15",
+        "pytaa_business_month": -2.07807427203052,
+        "argus_calendar_month": -1.9666917162923419,
+        "difference": 0.11138255573817801,
+        "identical": false,
+        "anchor_months_ending_on_a_weekend": [
+          "2025-11"
+        ]
+      },
+      {
+        "cutoff": "2026-02-10",
+        "pytaa_business_month": -3.8664557852890855,
+        "argus_calendar_month": -3.646613656097559,
+        "difference": 0.21984212919152668,
+        "identical": false,
+        "anchor_months_ending_on_a_weekend": [
+          "2026-01",
+          "2025-11",
+          "2025-08"
+        ]
+      },
+      {
+        "cutoff": "2026-03-10",
+        "pytaa_business_month": -0.6892392031329848,
+        "argus_calendar_month": -0.43553117051065726,
+        "difference": 0.25370803262232755,
+        "identical": false,
+        "anchor_months_ending_on_a_weekend": [
+          "2026-02"
+        ]
+      },
+      {
+        "cutoff": "2026-06-10",
+        "pytaa_business_month": -3.0568896637211793,
+        "argus_calendar_month": -3.038275573311445,
+        "difference": 0.018614090409734274,
+        "identical": false,
+        "anchor_months_ending_on_a_weekend": [
+          "2026-05"
+        ]
+      },
+      {
+        "cutoff": "2026-09-23",
+        "pytaa_business_month": 2.839882308393115,
+        "argus_calendar_month": 2.839882308393115,
+        "difference": 0.0,
+        "identical": true,
+        "anchor_months_ending_on_a_weekend": []
+      }
+    ],
+    "identical_exactly_when_no_anchor_month_ends_on_a_weekend": true
+  },
+  "scope_statement": "Measured: how each system handles a fixed corpus of real Bitget history with single, named contract violations injected, real short-history conditions present in the data as fetched, and valid controls \u2014 refusal, silent acceptance, over-refusal, false positives, which offending symbols a refusal names, and wall-clock cost. The general-purpose rivals are configured by us (their schemas and expectation suites are in scripts/general_rotation_rival.py); each clause is written in the tool's own idiom and against the same contract ARGUS enforces, and where a tool cannot express a clause natively that is recorded, not worked around. NOT claimed: that ARGUS is a better general-purpose validator than pandera or Great Expectations \u2014 they validate any frame, profile data and render reports, none of which ARGUS does; only that on this contract and this corpus the measured outcomes are as reported. NOT claimed: any forecasting value for the rotation rule. The corpus is one real snapshot (fetched once and frozen); a different day's panel could change which real symbols are short."
+}

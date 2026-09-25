@@ -339,7 +339,7 @@ def average_cross_correlation(windows: Sequence[EventWindow]) -> float:
 
     **Computed in O(N·L), not O(N²·L).** Each series is centred and scaled to unit length, so a
     pairwise correlation is a dot product ``z_i · z_j``, and the sum over every pair is
-    ``(‖Σ z_i‖² − m) / 2`` for the ``m`` series that have any variance. That is the same number
+    ``(‖Σ z_i‖² - m) / 2`` for the ``m`` series that have any variance. That is the same number
     the pairwise loop produced (a constant series has no correlation with anything, and was
     skipped there exactly as it is excluded from ``m`` here); what changed is the cost. The loop
     took about 1.7s for 108 events on 480-bar windows and grew with the square of the event count,

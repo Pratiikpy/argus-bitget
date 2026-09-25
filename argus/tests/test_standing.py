@@ -486,10 +486,12 @@ class TestTheLiveRegisterIsHonest:
         # were not kept, so no breakdown by symbol, date or regime could run on it
         # (data/groupwise_audit.json). Each carries the reason and the route back as its first
         # blocker; `TestDemotionsCarryTheirRouteBack` pins that.
+        # 2026-09-26: breadth rotation to TIED. A general validator (pandera with pydantic)
+        # configured to the same contract handles the same 36 cases it does
+        # (data/general_rotation_comparison.json); beating pytaa was beating a weaker rival.
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
             "Cross-sectional factor evaluation",
-            "Data-honest cross-asset breadth rotation vs. a silently-dropping reference",
             "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
             "Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal",
             "Per-profile mandate that changes the verdict",

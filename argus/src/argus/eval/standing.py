@@ -474,7 +474,9 @@ REGISTER: tuple[Capability, ...] = (
         subtheme="t2-agentic",
         module=(
             "argus/agents/meta_pm.py,argus/execution/latency.py,"
-            "argus/eval/deliberation_comparison.py,argus/eval/baselines/latencybench_reimpl.py"
+            "argus/eval/deliberation_comparison.py,argus/eval/baselines/latencybench_reimpl.py,"
+            "argus/agents/delay_cost.py,"
+            "argus/eval/general_delib_comparison.py"
         ),
         # Restored to OWNED 2026-09-22. Was demoted on 2026-09-20 when `verify()` began opening
         # artefacts instead of checking that files existed: reproducibility_proven was claimed and
@@ -629,6 +631,20 @@ REGISTER: tuple[Capability, ...] = (
             "decisions perform better) has not itself been measured — this OWNED finding is "
             "about the model's mathematical soundness relative to the one real named "
             "specialist, not about realised trading impact",
+            "LOSS, measured 2026-09-26 and NOT VERIFIED here: eval/general_delib_comparison.py "
+            "rescored the production charge on 23,003 decision instants (the forward tape of "
+            "2026-09-24 and Tardis Bitget-futures quotes for 2026-09-01 and 2026-08-01) against "
+            "the realised mid move at 3, 8 and 40 seconds. Mean squared error: production 10.85 / "
+            "28.16 / 135.56 against a trailing empirical estimator 0.96 / 2.30 / 10.08 and "
+            "trailing realised volatility 1.00 / 2.34 / 9.99, significant under a paired block "
+            "bootstrap at every horizon; production's rank correlation with the realised move is "
+            "negative (-0.43 to -0.48). Its depth multiplier points the wrong way: off-hours "
+            "moves are 0.48x (extended), 0.32x (overnight) and 0.22x (weekend) of regular hours, "
+            "where it charges 2x, 3x and 3x. The report (data/general_delib_comparison.json) was "
+            "not written, because the Chronos-2 arm stopped at 512 of 23,003 instants, and the "
+            "Tardis quotes it read are no longer on this machine (Tardis answers 403 from this "
+            "network), so the figures stand on the run's log only. agents/delay_cost.py, the "
+            "estimator that replaces the charge, is not yet wired into meta_pm.",
         ),
     ),
     Capability(
@@ -636,7 +652,10 @@ REGISTER: tuple[Capability, ...] = (
         subtheme="t2-riskcontrol",
         module=(
             "argus/paper/ledger.py,argus/eval/observatory.py,"
-            "argus/eval/abstention_comparison.py,argus/eval/baselines/ghostledger_reimpl.py"
+            "argus/eval/abstention_comparison.py,argus/eval/baselines/ghostledger_reimpl.py,"
+            "argus/eval/abstention_coverage.py,"
+            "argus/eval/general_abstention_comparison.py,"
+            "argus/eval/baselines/selective_rivals_runner.py"
         ),
         # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
         # proof now needs a groupwise check on the capability's own artefact, and this
@@ -782,6 +801,19 @@ REGISTER: tuple[Capability, ...] = (
             "headline against ARGUS's net on the real ledger's abstentions, per symbol and week.",
             "the abstention record is large and the traded record is small, so abstention quality "
             "is measured far better than trade quality",
+            "General-purpose rivals run 2026-09-26 on the real record "
+            "(data/general_abstention_comparison.json): 470 settled leans scored with fd-shifts "
+            "c4467aec and torch-uncertainty 3f82fe5d, run unmodified through "
+            "eval/baselines/selective_rivals_runner.py and reproduced exactly on an independent "
+            "rerun. LOSS for the earlier abstention_quality: it returns the same output for a "
+            "perfect, a random and an inverted gate, which fd-shifts orders (AURC 0.177 / 0.489 / "
+            "0.868). eval/abstention_coverage.py adopts fd-shifts' method and ties it on every "
+            "shared quantity (largest difference 3.4e-15), adding the loss priced in bps "
+            "(fd-shifts' 50%-risk working point loses 3,344bps), None instead of a ValueError, "
+            "and a day-clustered interval (ICC 0.121, design effect 5.6). The run also found the "
+            "scorecard grading by side instead of lean (-2,824bps became +2,381bps once fixed). "
+            "The desk shows no detectable ranking skill, and the sign of the abstention value is "
+            "not established (day interval about -30,800 to +28,600bps).",
         ),
     ),
     Capability(
@@ -789,7 +821,8 @@ REGISTER: tuple[Capability, ...] = (
         subtheme="t1-validation",
         module=(
             "argus/backtest/metrics.py,argus/eval/dsr_comparison.py,"
-            "argus/eval/baselines/vectorbt_loader.py,argus/eval/baselines/vectorbt_dsr_metrics.py"
+            "argus/eval/baselines/vectorbt_loader.py,argus/eval/baselines/vectorbt_dsr_metrics.py,"
+            "argus/eval/general_overfitgates_comparison.py"
         ),
         # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts instead
         # of checking that files existed: failure_cases_documented was claimed here and the
@@ -960,6 +993,19 @@ REGISTER: tuple[Capability, ...] = (
             "against and shown to hit - and that refusal itself needed a real fix mid-comparison "
             "(deflated_sharpe's own guard did not originally catch NaN either), so 'ours refuses "
             "by design' was true in intent and false in the actual code until this same session.",
+            "General-purpose rivals run 2026-09-26 on the same 1,332 inputs "
+            "(data/general_overfitgates_comparison.json): pydantic v2 validate_call with "
+            "FiniteFloat around vectorbt's real DSR, numpy/scipy IEEE trapping, "
+            "scipy.stats.false_discovery_control, statsmodels multipletests, and a derandomized "
+            "Hypothesis search. Hypothesis found 23 failure classes in the gates as they were "
+            "(every gate had a silent one) and finds 0 now. On the 1,332 DSR inputs ARGUS now "
+            "returns 0 silent-wrong outputs, against 5 for pydantic-wrapped vectorbt, 57 for the "
+            "numpy/scipy trap and 95 for bare vectorbt; before the 14 guards adapted from "
+            "pydantic's contract and scipy's range check, ARGUS returned 28 and lost to the "
+            "pydantic contract. Each guard trips on the pre-adaptation code and is load-bearing. "
+            "Not better than the general tools at keeping an overflowing input's real answer: "
+            "ARGUS refuses 3 of 6 overflow cases that have one, and wrapped around the whole "
+            "pipeline the numpy/scipy trap ties ARGUS on the 24 real-producer cases.",
         ),
     ),
     Capability(
@@ -969,7 +1015,11 @@ REGISTER: tuple[Capability, ...] = (
             "argus/research/grammar.py,argus/eval/grammar_comparison.py,"
             "argus/eval/baselines/qlib_expression_base.py,argus/eval/baselines/qlib_expression_ops.py,"
             "argus/eval/baselines/qlib_expression_loader.py,argus/eval/baselines/qlib_eval_surface.py,"
-            "argus/eval/baselines/qlib_eval_surface_loader.py"
+            "argus/eval/baselines/qlib_eval_surface_loader.py,"
+            "argus/research/grammar_text.py,"
+            "argus/research/grammar_series.py,"
+            "argus/eval/general_grammar_comparison.py,"
+            "argus/eval/baselines/general_grammar_rivals.py"
         ),
         # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
         # proof now needs a groupwise check on the capability's own artefact, and this
@@ -1120,6 +1170,14 @@ REGISTER: tuple[Capability, ...] = (
             "The nine expanded factors are measured but not proven: six of twelve symbols are now "
             "won by one of them and two clear the candidates-only DSR gate, while the all-trials "
             "gate — the honest one — still reports 0 of 12",
+            "General-purpose rivals run 2026-09-26 (data/general_grammar_comparison.json). LOST "
+            "on speed to Polars: 14.5x to 187x faster than the columnar grammar_series path on "
+            "the 7 shipped factors it can express. TIED with Google CEL on static type checking "
+            "(10 of 10 each; Polars catches 2 statically and is silent on 3). Duplicate identity: "
+            "normal_form 8 of 8 against SymPy's 7 of 8, the extra pair a symmetric rolling "
+            "correlation SymPy sees only as an uninterpreted function. The cost bound refuses at "
+            "the same nesting depth as CEL's 10,000-iteration budget; the CEL half of that "
+            "recording is NOT VERIFIED by a rerun.",
         ),
     ),
     Capability(
@@ -1641,7 +1699,9 @@ REGISTER: tuple[Capability, ...] = (
             "argus/research/arbitrage_study.py,argus/cost/model.py,"
             "argus/eval/arbitrage_comparison.py,"
             "argus/eval/baselines/maxme_arbitrer.py,"
-            "argus/eval/baselines/maxme_arbitrer_loader.py"
+            "argus/eval/baselines/maxme_arbitrer_loader.py,"
+            "argus/research/executable_arb.py,"
+            "argus/eval/general_arb_comparison.py"
         ),
         # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
         # proof now needs a groupwise check on the capability's own artefact, and this
@@ -1788,6 +1848,17 @@ REGISTER: tuple[Capability, ...] = (
             "real historical series bar-for-bar — research/arbitrage_study.py's own real "
             "study() already runs the full decomposition against the live index series; this "
             "comparison adds the maxme side, not a new live measurement",
+            "General-purpose rival run 2026-09-26 on real books "
+            "(data/general_arb_comparison.json): 400 two-sided Bitget spot-rToken/perpetual "
+            "snapshots (240 + 160 from a second capture ten minutes later, 80 tickers, taker fees "
+            "10bps spot and 6bps perpetual) scored against the HiGHS linear-programming optimum, "
+            "one verdict per snapshot. LOSS for the deployed decompose(): 49 of its 52 accepts "
+            "lose money on the first capture (precision 0.058, ticker-bootstrap interval 0 to "
+            "0.156) and 24 of 25 on the second. The cause is the flat 0.6bps spread constant: the "
+            "measured touch alone takes 49 false accepts to 1. research/executable_arb.py ties "
+            "HiGHS on every snapshot (largest difference 3.4e-14 USDT) in about 16us against "
+            "4-6ms. That is a tie with the general tool, not a win, and the deployed path still "
+            "uses decompose().",
         ),
     ),
     Capability(
@@ -1798,9 +1869,11 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/pytaa_vigilant_allocation.py,"
             "argus/eval/baselines/pytaa_vigilant_allocation_loader.py,"
             "argus/eval/baselines/pytaa_signal.py,"
-            "argus/eval/baselines/pytaa_signal_loader.py"
+            "argus/eval/baselines/pytaa_signal_loader.py,"
+            "argus/eval/general_rotation_comparison.py,"
+            "argus/eval/baselines/argus_rotation_pre_contract.py"
         ),
-        state=State.OWNED,
+        state=State.TIED,
         baseline="pytaa real VAA breadth rule (vigilant_allocation) + Signal.momentum_score",
         proofs=(
             Proof(
@@ -1948,6 +2021,20 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-26 from OWNED to TIED: the rival it beat, pytaa, is the reference "
+            "that silently drops weight, and the best general-purpose tool for the same job does "
+            "not. On 36 byte-identical cases from a frozen real Bitget corpus "
+            "(data/general_rotation_comparison.json), pandera with pydantic, configured to the "
+            "same contract, handles 36 of 36, as ARGUS does; pandera alone and Great Expectations "
+            "33 (silent on an empty safe set, a NaN step and an asset in both sets); raw pytaa "
+            "11. ARGUS is faster (4.7ms a call against 484ms and 2.9s), which is not material at "
+            "a monthly rebalance. The ablation holds: the rotation.py that predates the "
+            "2026-09-25 contract, byte-pinned, handles 20 of 36 with 14 silent accepts. Also "
+            "found: pytaa bins by business month-end and ARGUS by calendar month, so on real "
+            "BTCUSDT the two scores agree exactly only when no anchor month ends on a weekend and "
+            "otherwise differ by up to 0.25; the 2026-09-15 floating-point agreement holds only "
+            "on weekday-ending anchors. OWNED returns only with a margin over the configured "
+            "general validator that matters to a trader.",
             "Every real instrument in this comparison's universe has at most ~13-14 months of "
             "real Bitget listing history today, so the agreement measured here cannot yet be "
             "re-checked across a genuinely disjoint historical time window on the same "
@@ -1963,7 +2050,12 @@ REGISTER: tuple[Capability, ...] = (
         module=(
             "argus/research/eventstudy.py,argus/eval/eventdriven_comparison.py,"
             "argus/eval/baselines/whale_signals_event_study.py,"
-            "argus/eval/baselines/whale_signals_event_study_loader.py"
+            "argus/eval/baselines/whale_signals_event_study_loader.py,"
+            "argus/eval/eventdriven_agents.py,"
+            "argus/eval/eventdriven_rivals.py,"
+            "argus/eval/baselines/eventdriven_agents_loader.py,"
+            "argus/eval/baselines/vibe_trading_eventstudy.py,"
+            "argus/eval/baselines/vibe_trading_eventstudy_loader.py"
         ),
         state=State.IMPLEMENTED,
         baseline=(
@@ -2129,11 +2221,14 @@ REGISTER: tuple[Capability, ...] = (
             "method; the Event-Driven Agent sub-theme asks for event -> decision -> trade, and "
             "the rivals that do that (JohnboscoE/slimon and Ritapossible/Ballast, both S2 entries "
             "with executed demo orders; HKUDS/Vibe-Trading's event skill; "
-            "TauricResearch/TradingAgents; Nicholas-03/trading-bot) have not been run on the same "
-            "input. Two defects found in the same review: the EventAnalyst prompt never asked for "
+            "TauricResearch/TradingAgents; Nicholas-03/trading-bot) had not been run on the same "
+            "input; all but TradingAgents were on 2026-09-26 (the last blocker). Two defects "
+            "found in the same review: the EventAnalyst prompt never asked for "
             "`chain_falsifiers`, so 0 of 138 recorded chains carried one and every link graded "
             "UNSUPPORTED, and the chain's event field held the price line in 138 of 138 "
-            "(rival review of 2026-09-24). OWNED returns only when they are.",
+            "(rival review of 2026-09-24). Both are fixed in code (agents/analysts.py asks for "
+            "the falsifiers and takes the event from news, a filing or a print, never the price "
+            "line); re-measuring them on newly recorded chains is still to do.",
             "The placebo events are constructed (real timestamps, zero true edge by "
             "construction), not whale-signals' own real 646,442-transaction Dune dataset, which "
             "needs a paid API key this project does not have — their own already-published "
@@ -2141,6 +2236,18 @@ REGISTER: tuple[Capability, ...] = (
             "show the same qualitative pattern (tiny, sign-flipping year-over-year edges) but "
             "were not re-run here. The false-positive rate measured is specific to this real "
             "90-day ETHUSDT window's own drift and will vary with the window and period tested",
+            "Run 2026-09-26 (eval/eventdriven_agents.py, data/eventdriven_agents.json): slimon's "
+            "own perception replayed unmodified reproduces 1,690 of the 1,739 events its agent "
+            "logged (recall 0.972). On its 95-day, 12-name event stream, gated on one half and "
+            "traded on the other at a 12bps hurdle, ARGUS, Vibe-Trading's BMP and whale-signals "
+            "all abstain (0 trades). Ballast's pooled t trades 795 times for -14,483bps "
+            "(day-clustered t -1.87); follow-all and fade-all lose 30,174 and 40,002bps. ARGUS "
+            "beats Ballast and the no-gate baselines and TIES Vibe-Trading and whale-signals. "
+            "slimon's own LLM opens average -6.24bps (14 scored). Nicholas-03's hard-catalyst "
+            "gate passes 33 of 1,448 headlines with no measurable separation in move size (1.72x "
+            "+/- 0.29 against 1.58x +/- 0.06). Under clustered placebo events "
+            "(eval/eventdriven_rivals.py, data/eventdriven_rivals.json) ARGUS's four-test verdict "
+            "rejects 0.5-3%, Vibe BMP 10.5-15% and Ballast 14.5-33.5%. TradingAgents was not run.",
         ),
     ),
     Capability(
@@ -2315,7 +2422,8 @@ REGISTER: tuple[Capability, ...] = (
             "argus/research/sue.py,argus/eval/earnings_comparison.py,"
             "argus/eval/baselines/quantconnect_sue.py,"
             "argus/eval/baselines/quantconnect_sue_loader.py,"
-            "argus/market/fundamentals.py"
+            "argus/market/fundamentals.py,"
+            "argus/eval/general_sue_comparison.py"
         ),
         state=State.OWNED,
         baseline="QuantConnect/Tutorials real SUE factor (FineSelectionAndSueSorting)",
@@ -2368,7 +2476,12 @@ REGISTER: tuple[Capability, ...] = (
                     "both real systems scored on the same real, live SEC EDGAR quarterly EPS "
                     "(market/fundamentals.py's real, point-in-time, restatement-resolved XBRL "
                     "fetch) for all nine real rToken anchor companies, agreeing to floating-"
-                    "point identity"
+                    "point identity. CORRECTION 2026-09-25 (eval/general_sue_comparison.py): "
+                    "that agreement was between two positional quarters[i+4] computations, and "
+                    "SEC XBRL has no standalone fiscal Q4, so 0 of the 72 anchor pairs were "
+                    "really year-over-year (7.45% of 31,488 pairs across 3,997 filers). "
+                    "research.sue.read_dated now pairs by date, 100% year-over-year, and agrees "
+                    "with pandas PeriodIndex diff(4) to 1e-9 on 3,687 of 3,687 filers"
                 ),
                 test="test_earnings_comparison.py::TestBaselineReproduced",
             ),
@@ -2410,9 +2523,11 @@ REGISTER: tuple[Capability, ...] = (
                     "was tried first and found, by running it, to miss a real float-noise case "
                     "(order 1e-17 from binary rounding on a mathematically-exact-zero input), "
                     "letting SUE explode to an absurd finite ~6.4e15 instead of refusing — "
-                    "ZERO_VARIANCE_TOLERANCE was added and re-verified to catch exactly that "
-                    "case without ever triggering on any real anchor's real, meaningfully-"
-                    "varying EPS history"
+                    "a tolerance was added to catch exactly that case. Since 2026-09-25 the "
+                    "absolute 1e-9 tolerance is replaced by research.sue.noise_floor (16 ulps of "
+                    "the largest operand): in a unit sweep of the nine anchors at ten units, "
+                    "the absolute rule falsely refused 13 genuine readings and the relative "
+                    "rule none"
                 ),
                 test="test_sue.py::TestSueFromQuarters::"
                 "test_refuses_float_noise_near_zero_variance",
@@ -2471,6 +2586,13 @@ REGISTER: tuple[Capability, ...] = (
             "expects rather than fed directly. The nine-anchor universe is ARGUS's own tradable "
             "set, not a broad-market cross-sectional universe of the kind SUE was originally "
             "published against",
+            "General-purpose rivals run 2026-09-26 (data/general_sue_comparison.json): pandas "
+            "beat the ARGUS of before 2026-09-25 on quarter pairing, since fixed and matched. On "
+            "degenerate scale ARGUS refuses 15 of 15 constant-step windows at real EPS levels, "
+            "against SciPy 7, sklearn's VarianceThreshold 6 and StandardScaler 0, which return "
+            "finite SUEs of 3.2e7 to 9.0e15. On the 68 real degenerate SEC filers "
+            "VarianceThreshold, SciPy and ARGUS all refuse every one, so the margin over general "
+            "tools rests on constructed windows.",
         ),
     ),
     Capability(
@@ -4356,7 +4478,8 @@ REGISTER: tuple[Capability, ...] = (
         subtheme="t3-execution",
         module=(
             "argus/execution/schedule.py,argus/execution/guard.py,"
-            "argus/eval/schedule_comparison.py"
+            "argus/eval/schedule_comparison.py,"
+            "argus/desk/session_schedule.py"
         ),
         # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts instead
         # of checking that files existed: ablation and same_input_comparison were claimed here
@@ -4521,12 +4644,21 @@ REGISTER: tuple[Capability, ...] = (
             "validate().allowed on every one and never consumed a rate-limit slot, where a check "
             "that records as it checks would have spent the window's last slot. A constructed "
             "sweep, not live orders",
+            "desk/session_schedule.py, a time-varying Almgren-Chriss solver that refuses segments "
+            "it has not measured, with its calendar checked against LEAN for 2025-2027, is "
+            "complete and tested (tests/test_session_schedule.py). eval/session_arena.py, the "
+            "same-fills comparison against PACE, Egress, zz-0816 and Bitget TWAP, has never run: "
+            "Tardis answered 403 on 2026-09-26 and the PACE arm needs Qwen. The rivals are still "
+            "not run on the same fills.",
         ),
     ),
     Capability(
         name="Queue-position modelling ported from hftbacktest and measured against it",
         subtheme="t2-execution",
-        module="argus/execution/queue.py",
+        module=(
+            "argus/execution/queue.py,argus/eval/l3queue.py,argus/eval/l3feeds.py,"
+            "argus/eval/realqueue.py"
+        ),
         state=State.IMPLEMENTED,
         baseline="nkaz001/hftbacktest, backtest/models/queue.rs",
         proofs=(
@@ -4667,6 +4799,14 @@ REGISTER: tuple[Capability, ...] = (
             "it: a real vendor purchase of a deliberately-chosen, ordinary (non-holiday) trading "
             "day — still the owner's account-creation step, not a code gap; DataBento's "
             "`metadata.get_cost` can quote the exact price the moment a key exists.",
+            "2026-09-26: the corrected real-MBO replay (eval/l3queue.py, pinned by "
+            "tests/test_l3queue.py) on ESH4 2023-12-25 gives 1,454 synthetic orders and 0 "
+            "inconsistent levels. hftbacktest's shipped default LogProbQueueFunc2 has a queue "
+            "error of 0.0772; PowerProbQueueFunc3 with n=3 beats it by 0.0046 (5-minute cluster "
+            "bootstrap interval -0.0084 to -0.0007). These supersede data/mbo_queue_proof.json, "
+            "made before the double-count fix, but have no committed artefact yet. hftbacktest's "
+            "own engine has not been run against the replay (eval/hftbacktest_run.py; hftbacktest "
+            "is not installed).",
         ),
         note="Twelve of thirteen. The book recorder is running so the simulator's parameters stop "
              "being ours — and as of 2026-09-15 that calibration is read per elapsed-time horizon "

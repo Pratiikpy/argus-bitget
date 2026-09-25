@@ -1,0 +1,1068 @@
+{
+  "capability": "Overfitting gates that raise instead of returning NaN",
+  "general_function": "fail-loud statistical decision gates: runtime contract enforcement on numeric functions (argument and return validation), IEEE-754 exception trapping, multiple-testing control, and property-based adversarial search for inputs that break the contract",
+  "rivals_run": {
+    "pydantic_contract_around_vectorbt": "pydantic v2 validate_call + FiniteFloat + validate_return (MIT), around vectorbt's real vendored DSR",
+    "numpy_scipy_trap_around_vectorbt": "np.errstate(all='raise') + scipy.special.errstate(all='raise') + warnings-as-errors (BSD)",
+    "scipy_false_discovery_control": "scipy.stats.false_discovery_control (BSD)",
+    "statsmodels_multipletests": "statsmodels.stats.multitest.multipletests (BSD)",
+    "hypothesis": "property-based search, derandomized (MPL-2.0, used, not vendored)"
+  },
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "statsmodels": "0.15.0",
+    "pydantic": "2.13.5",
+    "hypothesis": "6.168.0",
+    "mpmath": "1.3.0"
+  },
+  "real_input": {
+    "file": "data/regime_candles_fixture.json",
+    "symbols": 12,
+    "bars_per_symbol": [
+      1439
+    ],
+    "family": [
+      "momentum_1h",
+      "momentum_6h",
+      "momentum_24h",
+      "reversion_1h",
+      "reversion_6h",
+      "reversion_24h",
+      "shock_follow_5pct"
+    ],
+    "fee_round_trip": 0.0012
+  },
+  "dsr_gate": {
+    "cases": 1332,
+    "tiers": {
+      "standing_input": 1220,
+      "poisoned": 72,
+      "edge_valid": 10,
+      "overflow": 6,
+      "real_producer": 24
+    },
+    "expectations": {
+      "standing_input": {
+        "value": 1219,
+        "refuse": 1
+      },
+      "poisoned": {
+        "refuse": 72
+      },
+      "edge_valid": {
+        "value": 10
+      },
+      "overflow": {
+        "value_or_refuse": 6
+      },
+      "real_producer": {
+        "refuse": 17,
+        "value": 7
+      }
+    },
+    "gate_threshold": 0.95,
+    "arms": {
+      "argus_current": {
+        "grades": {
+          "correct_value": 1239,
+          "correct_refusal": 93,
+          "over_refusal": 0,
+          "untyped_refusal": 0,
+          "silent_wrong": 0
+        },
+        "silent_wrong": 0,
+        "by_tier": {
+          "standing_input": {
+            "correct_value": 1219,
+            "correct_refusal": 1,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 0
+          },
+          "poisoned": {
+            "correct_value": 0,
+            "correct_refusal": 72,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 0
+          },
+          "edge_valid": {
+            "correct_value": 10,
+            "correct_refusal": 0,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 0
+          },
+          "overflow": {
+            "correct_value": 3,
+            "correct_refusal": 3,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 0
+          },
+          "real_producer": {
+            "correct_value": 7,
+            "correct_refusal": 17,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 0
+          }
+        },
+        "false_admissions_negated_gate": 0,
+        "false_admissions_positive_gate": 0,
+        "silent_examples": [],
+        "untyped_examples": []
+      },
+      "argus_pre_adaptation": {
+        "grades": {
+          "correct_value": 1239,
+          "correct_refusal": 54,
+          "over_refusal": 0,
+          "untyped_refusal": 11,
+          "silent_wrong": 28
+        },
+        "silent_wrong": 28,
+        "by_tier": {
+          "standing_input": {
+            "correct_value": 1219,
+            "correct_refusal": 1,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 0
+          },
+          "poisoned": {
+            "correct_value": 0,
+            "correct_refusal": 36,
+            "over_refusal": 0,
+            "untyped_refusal": 8,
+            "silent_wrong": 28
+          },
+          "edge_valid": {
+            "correct_value": 10,
+            "correct_refusal": 0,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 0
+          },
+          "overflow": {
+            "correct_value": 3,
+            "correct_refusal": 0,
+            "over_refusal": 0,
+            "untyped_refusal": 3,
+            "silent_wrong": 0
+          },
+          "real_producer": {
+            "correct_value": 7,
+            "correct_refusal": 17,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 0
+          }
+        },
+        "false_admissions_negated_gate": 16,
+        "false_admissions_positive_gate": 0,
+        "silent_examples": [
+          "clean_many_trials:observed=inf -> nan (reference None)",
+          "clean_many_trials:observed=-inf -> nan (reference None)",
+          "clean_many_trials:variance_of_trials=inf -> 0.0 (reference None)",
+          "clean_many_trials:skew=nan -> nan (reference None)",
+          "clean_many_trials:skew=-inf -> 0.5 (reference None)",
+          "clean_many_trials:kurtosis=nan -> nan (reference None)"
+        ],
+        "untyped_examples": [
+          "clean_many_trials:skew=inf -> ValueError: math domain error",
+          "clean_many_trials:kurtosis=-inf -> ValueError: math domain error",
+          "clean_skewed:skew=inf -> ValueError: math domain error",
+          "clean_skewed:kurtosis=-inf -> ValueError: math domain error"
+        ]
+      },
+      "vectorbt_bare": {
+        "grades": {
+          "correct_value": 1233,
+          "correct_refusal": 0,
+          "over_refusal": 0,
+          "untyped_refusal": 4,
+          "silent_wrong": 95
+        },
+        "silent_wrong": 95,
+        "by_tier": {
+          "standing_input": {
+            "correct_value": 1219,
+            "correct_refusal": 0,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 1
+          },
+          "poisoned": {
+            "correct_value": 0,
+            "correct_refusal": 0,
+            "over_refusal": 0,
+            "untyped_refusal": 4,
+            "silent_wrong": 68
+          },
+          "edge_valid": {
+            "correct_value": 3,
+            "correct_refusal": 0,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 7
+          },
+          "overflow": {
+            "correct_value": 4,
+            "correct_refusal": 0,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 2
+          },
+          "real_producer": {
+            "correct_value": 7,
+            "correct_refusal": 0,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 17
+          }
+        },
+        "false_admissions_negated_gate": 76,
+        "false_admissions_positive_gate": 3,
+        "silent_examples": [
+          "single_trial_var_computed_the_way_vectorbt_does -> nan (reference None)",
+          "clean_many_trials:observed=nan -> nan (reference None)",
+          "clean_many_trials:observed=inf -> nan (reference None)",
+          "clean_many_trials:observed=-inf -> nan (reference None)",
+          "clean_many_trials:variance_of_trials=nan -> nan (reference None)",
+          "clean_many_trials:variance_of_trials=inf -> 0.0 (reference None)"
+        ],
+        "untyped_examples": [
+          "clean_many_trials:trials=0 -> ZeroDivisionError: division by zero",
+          "clean_skewed:trials=0 -> ZeroDivisionError: division by zero",
+          "high_trial_count:trials=0 -> ZeroDivisionError: division by zero",
+          "low_observed:trials=0 -> ZeroDivisionError: division by zero"
+        ]
+      },
+      "numpy_scipy_trap_around_vectorbt": {
+        "grades": {
+          "correct_value": 1233,
+          "correct_refusal": 34,
+          "over_refusal": 4,
+          "untyped_refusal": 4,
+          "silent_wrong": 57
+        },
+        "silent_wrong": 57,
+        "by_tier": {
+          "standing_input": {
+            "correct_value": 1219,
+            "correct_refusal": 0,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 1
+          },
+          "poisoned": {
+            "correct_value": 0,
+            "correct_refusal": 32,
+            "over_refusal": 0,
+            "untyped_refusal": 4,
+            "silent_wrong": 36
+          },
+          "edge_valid": {
+            "correct_value": 3,
+            "correct_refusal": 0,
+            "over_refusal": 4,
+            "untyped_refusal": 0,
+            "silent_wrong": 3
+          },
+          "overflow": {
+            "correct_value": 4,
+            "correct_refusal": 2,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 0
+          },
+          "real_producer": {
+            "correct_value": 7,
+            "correct_refusal": 0,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 17
+          }
+        },
+        "false_admissions_negated_gate": 41,
+        "false_admissions_positive_gate": 3,
+        "silent_examples": [
+          "single_trial_var_computed_the_way_vectorbt_does -> nan (reference None)",
+          "clean_many_trials:observed=nan -> nan (reference None)",
+          "clean_many_trials:variance_of_trials=nan -> nan (reference None)",
+          "clean_many_trials:variance_of_trials=inf -> 0.0 (reference None)",
+          "clean_many_trials:skew=nan -> nan (reference None)",
+          "clean_many_trials:skew=-inf -> 0.5 (reference None)"
+        ],
+        "untyped_examples": [
+          "clean_many_trials:trials=0 -> ZeroDivisionError: division by zero",
+          "clean_skewed:trials=0 -> ZeroDivisionError: division by zero",
+          "high_trial_count:trials=0 -> ZeroDivisionError: division by zero",
+          "low_observed:trials=0 -> ZeroDivisionError: division by zero"
+        ]
+      },
+      "pydantic_contract_around_vectorbt": {
+        "grades": {
+          "correct_value": 1233,
+          "correct_refusal": 90,
+          "over_refusal": 4,
+          "untyped_refusal": 0,
+          "silent_wrong": 5
+        },
+        "silent_wrong": 5,
+        "by_tier": {
+          "standing_input": {
+            "correct_value": 1219,
+            "correct_refusal": 1,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 0
+          },
+          "poisoned": {
+            "correct_value": 0,
+            "correct_refusal": 72,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 0
+          },
+          "edge_valid": {
+            "correct_value": 3,
+            "correct_refusal": 0,
+            "over_refusal": 4,
+            "untyped_refusal": 0,
+            "silent_wrong": 3
+          },
+          "overflow": {
+            "correct_value": 4,
+            "correct_refusal": 0,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 2
+          },
+          "real_producer": {
+            "correct_value": 7,
+            "correct_refusal": 17,
+            "over_refusal": 0,
+            "untyped_refusal": 0,
+            "silent_wrong": 0
+          }
+        },
+        "false_admissions_negated_gate": 3,
+        "false_admissions_positive_gate": 3,
+        "silent_examples": [
+          "one_trial:observed=-2.0:variance=0.3 -> 1.0 (reference 5.169427701073876e-147)",
+          "one_trial:observed=0.0:variance=0.3 -> 1.0 (reference 0.5)",
+          "one_trial:observed=0.05:variance=0.3 -> 1.0 (reference 0.8678355793218054)",
+          "observed=1e200 -> 0.5 (reference 1.0)",
+          "observed=-1e200 -> 0.5 (reference 2.4432293981175574e-219)"
+        ],
+        "untyped_examples": []
+      }
+    },
+    "numpy_scipy_trap_whole_pipeline_real_producer_only": {
+      "grades": {
+        "correct_value": 7,
+        "correct_refusal": 17,
+        "over_refusal": 0,
+        "untyped_refusal": 0,
+        "silent_wrong": 0
+      },
+      "silent_wrong": 0,
+      "by_tier": {
+        "real_producer": {
+          "correct_value": 7,
+          "correct_refusal": 17,
+          "over_refusal": 0,
+          "untyped_refusal": 0,
+          "silent_wrong": 0
+        }
+      },
+      "false_admissions_negated_gate": 0,
+      "false_admissions_positive_gate": 0,
+      "silent_examples": [],
+      "untyped_examples": []
+    },
+    "real_producer_cases": [
+      {
+        "case": "AAPLUSDT:family_of_7:best=momentum_24h",
+        "observed": -0.03349285778160179,
+        "variance_of_trials": "nan",
+        "skew": 2.6678726171762954,
+        "kurtosis": 50.73790243671992,
+        "n": 1414,
+        "trials": 7,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "AAPLUSDT:single_trial:momentum_24h",
+        "observed": -0.03349285778160179,
+        "variance_of_trials": "nan",
+        "skew": 2.6678726171762954,
+        "kurtosis": 50.73790243671992,
+        "n": 1414,
+        "trials": 1,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "AMZNUSDT:family_of_7:best=shock_follow_5pct",
+        "observed": 0.02462582658827347,
+        "variance_of_trials": 0.006266195076858335,
+        "skew": 37.262432922310104,
+        "kurtosis": 1397.6835630125254,
+        "n": 1414,
+        "trials": 7,
+        "expect": "value",
+        "reference": 1.7973400887419146e-09
+      },
+      {
+        "case": "AMZNUSDT:single_trial:shock_follow_5pct",
+        "observed": 0.02462582658827347,
+        "variance_of_trials": "nan",
+        "skew": 37.262432922310104,
+        "kurtosis": 1397.6835630125254,
+        "n": 1414,
+        "trials": 1,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "COINUSDT:family_of_7:best=shock_follow_5pct",
+        "observed": 0.036131818819279425,
+        "variance_of_trials": 0.002397586459376709,
+        "skew": 30.534610740051267,
+        "kurtosis": 987.1733866995424,
+        "n": 1414,
+        "trials": 7,
+        "expect": "value",
+        "reference": 0.005318044230749005
+      },
+      {
+        "case": "COINUSDT:single_trial:shock_follow_5pct",
+        "observed": 0.036131818819279425,
+        "variance_of_trials": "nan",
+        "skew": 30.534610740051267,
+        "kurtosis": 987.1733866995424,
+        "n": 1414,
+        "trials": 1,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "GOOGLUSDT:family_of_7:best=momentum_24h",
+        "observed": -0.015895421375432702,
+        "variance_of_trials": "nan",
+        "skew": 0.24017288173173035,
+        "kurtosis": 19.53831761285583,
+        "n": 1414,
+        "trials": 7,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "GOOGLUSDT:single_trial:momentum_24h",
+        "observed": -0.015895421375432702,
+        "variance_of_trials": "nan",
+        "skew": 0.24017288173173035,
+        "kurtosis": 19.53831761285583,
+        "n": 1414,
+        "trials": 1,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "METAUSDT:family_of_7:best=shock_follow_5pct",
+        "observed": 0.02561418802563789,
+        "variance_of_trials": 0.0030245636127685257,
+        "skew": 37.48781987095515,
+        "kurtosis": 1408.3161263794113,
+        "n": 1414,
+        "trials": 7,
+        "expect": "value",
+        "reference": 0.0001260154450702045
+      },
+      {
+        "case": "METAUSDT:single_trial:shock_follow_5pct",
+        "observed": 0.02561418802563789,
+        "variance_of_trials": "nan",
+        "skew": 37.48781987095515,
+        "kurtosis": 1408.3161263794113,
+        "n": 1414,
+        "trials": 1,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "MSFTUSDT:family_of_7:best=momentum_24h",
+        "observed": 0.01292742884991702,
+        "variance_of_trials": 0.00692096695889502,
+        "skew": 4.257636578604106,
+        "kurtosis": 66.3292548270587,
+        "n": 1414,
+        "trials": 7,
+        "expect": "value",
+        "reference": 3.816834998179212e-05
+      },
+      {
+        "case": "MSFTUSDT:single_trial:momentum_24h",
+        "observed": 0.01292742884991702,
+        "variance_of_trials": "nan",
+        "skew": 4.257636578604106,
+        "kurtosis": 66.3292548270587,
+        "n": 1414,
+        "trials": 1,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "MSTRUSDT:family_of_7:best=shock_follow_5pct",
+        "observed": 0.01287626577967322,
+        "variance_of_trials": 0.0017810946535858172,
+        "skew": 1.6786042757626922,
+        "kurtosis": 475.2864775024047,
+        "n": 1414,
+        "trials": 7,
+        "expect": "value",
+        "reference": 0.04293013922467597
+      },
+      {
+        "case": "MSTRUSDT:single_trial:shock_follow_5pct",
+        "observed": 0.01287626577967322,
+        "variance_of_trials": "nan",
+        "skew": 1.6786042757626922,
+        "kurtosis": 475.2864775024047,
+        "n": 1414,
+        "trials": 1,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "NVDAUSDT:family_of_7:best=momentum_24h",
+        "observed": -0.017712958754535404,
+        "variance_of_trials": "nan",
+        "skew": -0.37926468165451516,
+        "kurtosis": 23.358288966273964,
+        "n": 1414,
+        "trials": 7,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "NVDAUSDT:single_trial:momentum_24h",
+        "observed": -0.017712958754535404,
+        "variance_of_trials": "nan",
+        "skew": -0.37926468165451516,
+        "kurtosis": 23.358288966273964,
+        "n": 1414,
+        "trials": 1,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "QQQUSDT:family_of_7:best=reversion_24h",
+        "observed": -0.02650120471320458,
+        "variance_of_trials": "nan",
+        "skew": 1.545950190335598,
+        "kurtosis": 21.606743736634357,
+        "n": 1414,
+        "trials": 7,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "QQQUSDT:single_trial:reversion_24h",
+        "observed": -0.02650120471320458,
+        "variance_of_trials": "nan",
+        "skew": 1.545950190335598,
+        "kurtosis": 21.606743736634357,
+        "n": 1414,
+        "trials": 1,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "SQQQUSDT:family_of_7:best=shock_follow_5pct",
+        "observed": 0.024319001667605672,
+        "variance_of_trials": 0.0025908921530555557,
+        "skew": 37.16287522035269,
+        "kurtosis": 1393.0988924892015,
+        "n": 1414,
+        "trials": 7,
+        "expect": "value",
+        "reference": 0.0007766117936211554
+      },
+      {
+        "case": "SQQQUSDT:single_trial:shock_follow_5pct",
+        "observed": 0.024319001667605672,
+        "variance_of_trials": "nan",
+        "skew": 37.16287522035269,
+        "kurtosis": 1393.0988924892015,
+        "n": 1414,
+        "trials": 1,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "TQQQUSDT:family_of_7:best=shock_follow_5pct",
+        "observed": 0.024340294564085506,
+        "variance_of_trials": 0.002312227198613568,
+        "skew": 37.17022923248939,
+        "kurtosis": 1393.435620511388,
+        "n": 1414,
+        "trials": 7,
+        "expect": "value",
+        "reference": 0.0018731617593206568
+      },
+      {
+        "case": "TQQQUSDT:single_trial:shock_follow_5pct",
+        "observed": 0.024340294564085506,
+        "variance_of_trials": "nan",
+        "skew": 37.17022923248939,
+        "kurtosis": 1393.435620511388,
+        "n": 1414,
+        "trials": 1,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "TSLAUSDT:family_of_7:best=reversion_24h",
+        "observed": 0.0020734025114582683,
+        "variance_of_trials": "nan",
+        "skew": 0.8480058900425503,
+        "kurtosis": 18.770870530118458,
+        "n": 1414,
+        "trials": 7,
+        "expect": "refuse",
+        "reference": null
+      },
+      {
+        "case": "TSLAUSDT:single_trial:reversion_24h",
+        "observed": 0.0020734025114582683,
+        "variance_of_trials": "nan",
+        "skew": 0.8480058900425503,
+        "kurtosis": 18.770870530118458,
+        "n": 1414,
+        "trials": 1,
+        "expect": "refuse",
+        "reference": null
+      }
+    ]
+  },
+  "vectorbt_accessor_kurtosis_convention": {
+    "family_cases_measured": 7,
+    "max_abs_dsr_gap": 8.704511321973134e-05,
+    "finding": "vectorbt's accessor feeds excess kurtosis (scipy's fisher=True default) into a Pearson-kurtosis formula. On per-period hourly Sharpes the SR**2 term it scales is tiny, so the measured DSR gap on these real cases is small; it grows with the square of the per-period Sharpe. Recorded as a vectorbt defect, not an ARGUS advantage: ARGUS's gate takes kurtosis from its caller and cannot tell which convention it got."
+  },
+  "multiple_testing": {
+    "cases": 466,
+    "tiers": {
+      "real_producer": 12,
+      "real_producer_nan_dropped": 12,
+      "grid": 432,
+      "poisoned_p": 5,
+      "poisoned_q": 5
+    },
+    "arms": {
+      "argus_bh_current": {
+        "correct_decisions": 451,
+        "wrong_decisions": 0,
+        "correct_refusals": 15,
+        "over_refusals": 0,
+        "untyped_refusals": 0,
+        "silent_on_invalid_input": 0,
+        "permissive_on_invalid_input": 0,
+        "wrong_examples": [],
+        "silent_examples": []
+      },
+      "argus_bh_pre_adaptation": {
+        "correct_decisions": 451,
+        "wrong_decisions": 0,
+        "correct_refusals": 10,
+        "over_refusals": 0,
+        "untyped_refusals": 0,
+        "silent_on_invalid_input": 5,
+        "permissive_on_invalid_input": 2,
+        "wrong_examples": [],
+        "silent_examples": [
+          "q=nan -> [False, False, False]",
+          "q=inf -> [True, True, True]",
+          "q=-inf -> [False, False, False]",
+          "q=-0.1 -> [False, False, False]"
+        ]
+      },
+      "argus_desk_bh_current": {
+        "correct_decisions": 451,
+        "wrong_decisions": 0,
+        "correct_refusals": 10,
+        "over_refusals": 0,
+        "untyped_refusals": 0,
+        "silent_on_invalid_input": 0,
+        "permissive_on_invalid_input": 0,
+        "wrong_examples": [],
+        "silent_examples": []
+      },
+      "argus_desk_bh_pre_adaptation": {
+        "correct_decisions": 451,
+        "wrong_decisions": 0,
+        "correct_refusals": 0,
+        "over_refusals": 0,
+        "untyped_refusals": 0,
+        "silent_on_invalid_input": 10,
+        "permissive_on_invalid_input": 3,
+        "wrong_examples": [],
+        "silent_examples": [
+          "AAPLUSDT:ttest_p_values -> [False, False, False, False, False, False, False]",
+          "GOOGLUSDT:ttest_p_values -> [False, False, False, False, False, False, False]",
+          "NVDAUSDT:ttest_p_values -> [False, False, False, False, False, False, False]",
+          "QQQUSDT:ttest_p_values -> [False, False, False, False, False, False, False]"
+        ]
+      },
+      "scipy_false_discovery_control": {
+        "correct_decisions": 451,
+        "wrong_decisions": 0,
+        "correct_refusals": 10,
+        "over_refusals": 0,
+        "untyped_refusals": 0,
+        "silent_on_invalid_input": 5,
+        "permissive_on_invalid_input": 2,
+        "wrong_examples": [],
+        "silent_examples": [
+          "q=nan -> [False, False, False]",
+          "q=inf -> [True, True, True]",
+          "q=-inf -> [False, False, False]",
+          "q=-0.1 -> [False, False, False]"
+        ]
+      },
+      "statsmodels_fdr_bh": {
+        "correct_decisions": 451,
+        "wrong_decisions": 0,
+        "correct_refusals": 0,
+        "over_refusals": 0,
+        "untyped_refusals": 0,
+        "silent_on_invalid_input": 15,
+        "permissive_on_invalid_input": 4,
+        "wrong_examples": [],
+        "silent_examples": [
+          "AAPLUSDT:ttest_p_values -> [False, False, False, False, False, False, False]",
+          "GOOGLUSDT:ttest_p_values -> [False, False, False, False, False, False, False]",
+          "NVDAUSDT:ttest_p_values -> [False, False, False, False, False, False, False]",
+          "QQQUSDT:ttest_p_values -> [False, False, False, False, False, False, False]"
+        ]
+      },
+      "argus_bonferroni_current": {
+        "correct_decisions": 451,
+        "wrong_decisions": 0,
+        "correct_refusals": 15,
+        "over_refusals": 0,
+        "untyped_refusals": 0,
+        "silent_on_invalid_input": 0,
+        "permissive_on_invalid_input": 0,
+        "wrong_examples": [],
+        "silent_examples": []
+      },
+      "argus_bonferroni_pre_adaptation": {
+        "correct_decisions": 451,
+        "wrong_decisions": 0,
+        "correct_refusals": 10,
+        "over_refusals": 0,
+        "untyped_refusals": 0,
+        "silent_on_invalid_input": 5,
+        "permissive_on_invalid_input": 2,
+        "wrong_examples": [],
+        "silent_examples": [
+          "q=nan -> [False, False, False]",
+          "q=inf -> [True, True, True]",
+          "q=-inf -> [False, False, False]",
+          "q=-0.1 -> [False, False, False]"
+        ]
+      },
+      "statsmodels_bonferroni": {
+        "correct_decisions": 451,
+        "wrong_decisions": 0,
+        "correct_refusals": 0,
+        "over_refusals": 0,
+        "untyped_refusals": 0,
+        "silent_on_invalid_input": 15,
+        "permissive_on_invalid_input": 4,
+        "wrong_examples": [],
+        "silent_examples": [
+          "AAPLUSDT:ttest_p_values -> [False, False, False, False, False, False, False]",
+          "GOOGLUSDT:ttest_p_values -> [False, False, False, False, False, False, False]",
+          "NVDAUSDT:ttest_p_values -> [False, False, False, False, False, False, False]",
+          "QQQUSDT:ttest_p_values -> [False, False, False, False, False, False, False]"
+        ]
+      }
+    }
+  },
+  "hypothesis_search": {
+    "hypothesis_version": "6.168.0",
+    "max_examples_per_function": 300,
+    "versions": {
+      "pre_adaptation": {
+        "functions_searched": 11,
+        "functions_with_failures": [
+          "benjamini_hochberg",
+          "bonferroni",
+          "deflated_sharpe",
+          "desk_benjamini_hochberg",
+          "min_track_record_length",
+          "moments",
+          "out_of_sample_decay",
+          "probabilistic_sharpe",
+          "probability_of_overfitting",
+          "sharpe",
+          "sortino"
+        ],
+        "failure_classes": 23,
+        "classes": {
+          "deflated_sharpe": {
+            "raised_untyped:ValueError": "(3.683139651094227e+16, 5617, 148, 1.7810160803581392e+16, -3.5230943063113236e+16, -3.5230943063113236e+16)",
+            "silent_nonfinite_output": "(-2.72935895868082e+16, 160, 2934, 6362711020798942.0, nan, 5.570661649014179e+16)",
+            "raised_untyped:OverflowError": "(1.7976931348623157e+308, 761, 761, 1.7976931348623157e+308, -2.7822252272762264e-175, 2.697487684213883e+16)"
+          },
+          "probabilistic_sharpe": {
+            "silent_accepted_invalid_input": "(-2.00001, -inf, 763, 6.31315857562237e-306, 5.852193534424791e+16)",
+            "raised_untyped:ValueError": "(2.223446377549209e+16, -1.541519353681671e-208, 2958, -5.34695528749998e-21, -8.120459337503719e+78)",
+            "raised_untyped:OverflowError": "(-5.701504662716658e+199, -5.701504662716658e+199, 4696, -0.4, -5.701504662716658e+199)",
+            "silent_nonfinite_output": "(3.402823466e+38, -inf, 464, -inf, 0.5)"
+          },
+          "sharpe": {
+            "raised_untyped:OverflowError": "[-2.7868430911106904e-151, 1.1862044813070636e+16, -1.0766905635893069e-275, -2.00001, -0.004, 4333621496843019.0, 1.9714382895561156e+16, -2.837188308857934e+16, 1.8135458098165827e+218, 1.9532942351103383e-149, 5.279223066815298e+16, -4.2",
+            "silent_nonfinite_output": "[-3.154168474809928e-37, -0.004, -3.891304679595448e+16, 9.684535574362653e+39, nan, 1.1754943508222875e-38, inf, -4.996954935664471e+16, -4.547906051885547e+16, -9582602689616714.0, 2.6540333643953077e+270, 6.787207012387878e+16]"
+          },
+          "sortino": {
+            "silent_nonfinite_output": "[-3.154168474809928e-37, -0.004, -3.891304679595448e+16, 9.684535574362653e+39, nan, 1.1754943508222875e-38, inf, -4.996954935664471e+16, -4.547906051885547e+16, -9582602689616714.0, 2.6540333643953077e+270, 6.787207012387878e+16]"
+          },
+          "out_of_sample_decay": {
+            "silent_nonfinite_output": "(-4.7786143803428226e-129, nan)",
+            "silent_accepted_invalid_input": "(-inf, -4.17052588563576e+16)"
+          },
+          "moments": {
+            "raised_untyped:OverflowError": "[-2.7868430911106904e-151, 1.1862044813070636e+16, -1.0766905635893069e-275, -2.00001, -0.004, 4333621496843019.0, 1.9714382895561156e+16, -2.837188308857934e+16, 1.8135458098165827e+218, 1.9532942351103383e-149, 5.279223066815298e+16, -4.2",
+            "silent_nonfinite_output": "[-3.154168474809928e-37, -0.004, -3.891304679595448e+16, 9.684535574362653e+39, nan, 1.1754943508222875e-38, inf, -4.996954935664471e+16, -4.547906051885547e+16, -9582602689616714.0, 2.6540333643953077e+270, 6.787207012387878e+16]"
+          },
+          "min_track_record_length": {
+            "raised_untyped:OverflowError": "([-2.7868430911106904e-151, 1.1862044813070636e+16, -1.0766905635893069e-275, -2.00001, -0.004, 4333621496843019.0, 1.9714382895561156e+16, -2.837188308857934e+16, 1.8135458098165827e+218, 1.9532942351103383e-149, 5.279223066815298e+16, -4.",
+            "raised_untyped:StatisticsError": "([-3.891304679595448e+16, 9.684535574362653e+39, nan, 1.1754943508222875e-38, inf, -4.996954935664471e+16, -4.547906051885547e+16, -9582602689616714.0, 8.32506925085427e+91, -5.92633123278544e-61, -7.651537863551604e-202, 4.7702244417644945",
+            "silent_nonfinite_output": "([3.925052978325412e+16, 6.082938475978983e+16, -4.22333723138013e+16, 0.9, nan, 3.717099309540142e+16, 1.3831708011009628e+247, -9.792362768075303e+23, 6.703038327125829e+16, -2.8746624961667814e-71, 6.571698679515342e+16, 1.11253692925360"
+          },
+          "probability_of_overfitting": {
+            "raised_untyped:OverflowError": "[[-2.7868430911106904e-151, 1.1862044813070636e+16, -1.0766905635893069e-275], [-2.00001, -0.004, 4333621496843019.0], [1.9714382895561156e+16, -2.837188308857934e+16, 1.8135458098165827e+218], [1.9532942351103383e-149, -5.317285969184304e-",
+            "silent_accepted_invalid_input": "[[3.877936119389992e+16, -3.71363052626499e+16, nan], [0.002, -4.1395527030299467e-13, -3.109472086658749e+16], [-5.3351183076837464e+16, 6.478671106862094e-245, -3.4853019042748004e+16], [-3.4711589609974576e+16, -3.076404626823001e+89, 1."
+          },
+          "benjamini_hochberg": {
+            "silent_accepted_invalid_input": "([0.0], 0.0)"
+          },
+          "bonferroni": {
+            "silent_accepted_invalid_input": "([0.0], 0.0)"
+          },
+          "desk_benjamini_hochberg": {
+            "silent_nonfinite_output": "[-2.7868430911106904e-151]",
+            "silent_accepted_invalid_input": "[1.2610335796713904e+16]"
+          }
+        }
+      },
+      "current": {
+        "functions_searched": 11,
+        "functions_with_failures": [],
+        "failure_classes": 0,
+        "classes": {
+          "deflated_sharpe": {},
+          "probabilistic_sharpe": {},
+          "sharpe": {},
+          "sortino": {},
+          "out_of_sample_decay": {},
+          "moments": {},
+          "min_track_record_length": {},
+          "probability_of_overfitting": {},
+          "benjamini_hochberg": {},
+          "bonferroni": {},
+          "desk_benjamini_hochberg": {}
+        }
+      }
+    }
+  },
+  "hand_designed_adversarial_baseline": [
+    "deflated_sharpe(variance_of_trials=NaN) \u2014 the single-trial np.var(ddof=1) case",
+    "probabilistic_sharpe(observed=NaN) \u2014 the ablation's tripped case"
+  ],
+  "ablation": [
+    {
+      "guard": "finite-argument guard (pydantic allow_inf_nan=False)",
+      "case": "deflated_sharpe(skew=NaN)",
+      "pre_adaptation": "silent_nonfinite",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "finite-argument guard",
+      "case": "deflated_sharpe(kurtosis=+inf) \u2014 pre returned a finite 0.5",
+      "pre_adaptation": "returned:0.5",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "finite-argument guard",
+      "case": "probabilistic_sharpe(observed=+inf)",
+      "pre_adaptation": "silent_nonfinite",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "arithmetic failures normalised to MetricError",
+      "case": "deflated_sharpe(observed=1e200) \u2014 SR**2 overflows",
+      "pre_adaptation": "raised_untyped:OverflowError",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "arithmetic failures normalised to MetricError",
+      "case": "deflated_sharpe(kurtosis=-5, observed=3) \u2014 negative radicand",
+      "pre_adaptation": "raised_untyped:ValueError",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "arithmetic failures normalised to MetricError",
+      "case": "deflated_sharpe(trials=10**17) \u2014 1 - 1/trials rounds to 1.0",
+      "pre_adaptation": "raised_untyped:StatisticsError",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "finite-series guard",
+      "case": "sharpe(returns with one NaN)",
+      "pre_adaptation": "silent_nonfinite",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "finite-series guard",
+      "case": "moments(returns with one NaN)",
+      "pre_adaptation": "silent_nonfinite",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "finite-series guard",
+      "case": "min_track_record_length(returns with one NaN)",
+      "pre_adaptation": "silent_nonfinite",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "finite-matrix guard",
+      "case": "probability_of_overfitting(one NaN return)",
+      "pre_adaptation": "returned:1.0",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "threshold guard (scipy's positive-form range check)",
+      "case": "benjamini_hochberg(fdr=+inf)",
+      "pre_adaptation": "returned:[True, True]",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "threshold guard",
+      "case": "bonferroni(alpha=2.0)",
+      "pre_adaptation": "returned:[True, True]",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "p-value contract on the desk's BH (scipy false_discovery_control's own check)",
+      "case": "desk benjamini_hochberg([NaN, 0.001])",
+      "pre_adaptation": "returned:[0.001, 0.001]",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "finite-argument guard",
+      "case": "out_of_sample_decay(in_sample=NaN)",
+      "pre_adaptation": "returned:{'in_sample_sharpe': nan, 'out_of_sample_sharpe': 0.5, 'retention_ratio",
+      "current": "refused",
+      "load_bearing": true
+    },
+    {
+      "guard": "return post-condition (pydantic validate_return=True)",
+      "case": "no input found that reaches it: with every argument finite and the radicand checked, NormalDist().cdf of a finite or infinite z is already in [0, 1]",
+      "pre_adaptation": "absent",
+      "current": "present, defence in depth",
+      "load_bearing": false
+    }
+  ],
+  "verdict": {
+    "dsr_outcome_now": "argus_wins",
+    "best_general_purpose_arm": "pydantic_contract_around_vectorbt",
+    "silent_wrong_by_arm": {
+      "argus_current": 0,
+      "argus_pre_adaptation": 28,
+      "vectorbt_bare": 95,
+      "numpy_scipy_trap_around_vectorbt": 57,
+      "pydantic_contract_around_vectorbt": 5
+    },
+    "untyped_refusals_by_arm": {
+      "argus_current": 0,
+      "argus_pre_adaptation": 11,
+      "vectorbt_bare": 4,
+      "numpy_scipy_trap_around_vectorbt": 4,
+      "pydantic_contract_around_vectorbt": 0
+    },
+    "over_refusals_by_arm": {
+      "argus_current": 0,
+      "argus_pre_adaptation": 0,
+      "vectorbt_bare": 0,
+      "numpy_scipy_trap_around_vectorbt": 4,
+      "pydantic_contract_around_vectorbt": 4
+    },
+    "real_producer_tier": {
+      "argus_current": {
+        "correct_value": 7,
+        "correct_refusal": 17,
+        "over_refusal": 0,
+        "untyped_refusal": 0,
+        "silent_wrong": 0
+      },
+      "numpy_scipy_trap_whole_pipeline": {
+        "correct_value": 7,
+        "correct_refusal": 17,
+        "over_refusal": 0,
+        "untyped_refusal": 0,
+        "silent_wrong": 0
+      }
+    },
+    "argus_lost_before_adaptation": true,
+    "hypothesis_failure_classes_pre": 23,
+    "hypothesis_failure_classes_current": 0,
+    "hand_designed_adversarial_inputs": 2,
+    "multiple_testing_silent_on_invalid": {
+      "argus_bh_current": 0,
+      "argus_bh_pre_adaptation": 5,
+      "argus_desk_bh_current": 0,
+      "argus_desk_bh_pre_adaptation": 10,
+      "scipy_false_discovery_control": 5,
+      "statsmodels_fdr_bh": 15,
+      "argus_bonferroni_current": 0,
+      "argus_bonferroni_pre_adaptation": 5,
+      "statsmodels_bonferroni": 15
+    },
+    "multiple_testing_wrong_decisions": {
+      "argus_bh_current": 0,
+      "argus_bh_pre_adaptation": 0,
+      "argus_desk_bh_current": 0,
+      "argus_desk_bh_pre_adaptation": 0,
+      "scipy_false_discovery_control": 0,
+      "statsmodels_fdr_bh": 0,
+      "argus_bonferroni_current": 0,
+      "argus_bonferroni_pre_adaptation": 0,
+      "statsmodels_bonferroni": 0
+    },
+    "summary": "DSR gate, 1,332 identical inputs: silent-wrong outputs \u2014 ARGUS now 0, ARGUS before adaptation 28, pydantic contract 5, numpy/scipy trap 57, vectorbt bare 95. Before adaptation ARGUS lost to the best general-purpose arm (pydantic_contract_around_vectorbt). Hypothesis found 23 failure classes in the pre-adaptation gates against the 2 inputs the hand-picked adversarial set had tried, and 0 in the current gates."
+  },
+  "scope_statement": "Claimed: on 1,332 identical inputs \u2014 the 1,220 the standing row is already measured on, plus poisoned, overflow, edge-valid and real-producer tiers (real Bitget hourly candles, a seven-variant strategy family net of 12 bps) \u2014 ARGUS's current deflated_sharpe returns 0 silent-wrong outputs, against 5 for vectorbt behind a pydantic contract and 57 behind numpy/scipy trapping; and the same derandomized Hypothesis search that found 23 failure classes across ARGUS's gates before adaptation finds 0 now. Where the general-purpose arms still fail \u2014 pydantic's contract passes vectorbt's 0.5 on an overflowing Sharpe and its 1.0 on a single trial; the numpy trap cannot see a NaN that arrives as an argument \u2014 the counts are in the artefact, run, not argued.\n\nNOT claimed: that ARGUS was ahead before this comparison. It was behind the general-purpose contract on the property the capability is named for, and the fix was taken from that contract. Not claimed: that Hypothesis finding nothing proves there is nothing; it is a bounded search. Not claimed: that refusing an overflowing input beats computing it \u2014 a refusal is the acceptable answer the grading allows, not the ideal one. Not claimed: that the numpy trap loses on real data \u2014 wrapped around the whole pipeline rather than the gate alone, it refuses at the source every real case ARGUS refuses at the gate, and ties there. Not claimed: that a gate can detect a caller passing excess kurtosis where Pearson is expected; vectorbt's own accessor does exactly that, and no argument check can tell the two apart.\n"
+}

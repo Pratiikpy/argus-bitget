@@ -1348,6 +1348,156 @@ _CASH_PCT = re.compile(
     rf"(\d+(?:\.\d+)?)\s*%\s*(?:in\s+|as\s+)?{_CASH_WORD}\b|\b{_CASH_WORD}\s*(?:at|=|:|-)?\s*"
     rf"(\d+(?:\.\d+)?)\s*%", re.I)
 
+_BOOK_CASH_USD = re.compile(
+    rf"(?<![\w.%])(?:\$\s?(\d[\d,]*(?:\.\d+)?)\s*(k|m)?|(\d[\d,]*(?:\.\d+)?)\s*(k|m)?)\s*"
+    rf"(?:in\s+|as\s+)?{_CASH_WORD}\b", re.I)
+""""$10k cash", "10,000 USDT": cash held as an amount in a saved book."""
+_BOOK_USD = re.compile(
+    r"(?<![\w.%])(?:\$\s?(\d[\d,]*(?:\.\d+)?)\s*(k|m)?|(\d[\d,]*(?:\.\d+)?)\s*(k|m)\b)\s*"
+    r"(?:(?:in|of|worth\s+of|into)\s+)?([A-Za-z][A-Za-z0-9.]{1,15})\b", re.I)
+""""$20k NVDA", "20k in TSLA", "$5,000 of BTC": a holding stated as its dollar value."""
+_BOOK_COUNT = re.compile(
+    r"(?<![\w.%$])(\d[\d,]*(?:\.\d+)?)\s*(?:x\s+)?"
+    r"(?:(?:contracts?|units?|lots?|shares?|coins?|tokens?)\s+(?:of\s+)?)?"
+    r"([A-Za-z][A-Za-z0-9.]{1,15})\b", re.I)
+""""long 2 NVDAUSDT", "2 contracts of TSLAUSDT", "0.5 BTC": a count of the contract's own unit,
+the way an order ticket and Bitget's position page state a position."""
+_BOOK_SHORT = re.compile(r"(?:\bshort(?:ing)?\s+|-\s*)$", re.I)
+
+PRICED_BOOK_TTL = 60.0
+"""Seconds a priced reading of one book text is reused: one answer reads the saved book from
+several engines, and each would otherwise fetch every Bitget ticker again."""
+_PRICED: dict[str, tuple[float, PricedBook | None]] = {}
+_PRICED_LOCK = threading.Lock()
+
+
+@dataclass(frozen=True)
+class PricedBook:
+    """A saved book written as amounts, turned into the weights every engine reads.
+
+    ``weights`` are signed (a short is negative) and their absolute values sum to one; ``cash`` is
+    the share of the account held as cash, so a caller scales the holdings to ``1 - cash``;
+    ``lines`` are the conversions, one per holding, for the reader to check."""
+
+    weights: dict[str, float]
+    cash: float
+    lines: tuple[str, ...]
+
+
+def priced_book(text: str) -> PricedBook | None:
+    """A book stated as contract counts, share counts, coin amounts or dollar values, priced at
+    Bitget's live last price. None when the text states no amounts.
+
+    Found on the live console (2026-09-26): My book "long 2 NVDAUSDT, long 1 TSLAUSDT" was read
+    as 50% NVDA and 50% TSLA — the counts were dropped and the names taken as an equal-weight
+    list — so every risk figure rested on a book the trader does not hold. `_amount_pairs` already
+    priced amounts inside a question, but only behind a holding cue ("I hold"), which a saved book
+    never carries: the field is the holdings by definition.
+    """
+    key = text.strip()
+    if not key:
+        return None
+    now = time.monotonic()
+    with _PRICED_LOCK:
+        hit = _PRICED.get(key)
+        if hit is not None and now - hit[0] < PRICED_BOOK_TTL:
+            return hit[1]
+    priced = _price_book(key)
+    with _PRICED_LOCK:
+        _PRICED[key] = (now, priced)
+    return priced
+
+
+def _price_book(text: str) -> PricedBook | None:
+    taken: list[tuple[int, int]] = []
+
+    def free(span: tuple[int, int]) -> bool:
+        return all(span[1] <= a or span[0] >= b for a, b in taken)
+
+    def scaled(number: str, unit: str | None) -> float:
+        scale = {"k": 1_000.0, "m": 1_000_000.0}.get((unit or "").lower(), 1.0)
+        return _number(number) * scale
+
+    def sign(start: int) -> float:
+        return -1.0 if _BOOK_SHORT.search(text[max(0, start - 14): start]) else 1.0
+
+    def holding(name: str) -> str | None:
+        if name.upper() in _NOT_A_HOLDING:
+            return None
+        return _resolve_any(name)
+
+    cash_usd = 0.0
+    for match in _BOOK_CASH_USD.finditer(text):
+        cash_usd += scaled(match.group(1) or match.group(3), match.group(2) or match.group(4))
+        taken.append(match.span())
+    usd: dict[str, float] = {}
+    for match in _BOOK_USD.finditer(text):
+        symbol = holding(match.group(5))
+        if symbol is None or not free(match.span()):
+            continue
+        value = scaled(match.group(1) or match.group(3), match.group(2) or match.group(4))
+        if value > 0:
+            usd[symbol] = usd.get(symbol, 0.0) + sign(match.start()) * value
+            taken.append(match.span())
+    units: dict[str, float] = {}
+    for match in _BOOK_COUNT.finditer(text):
+        symbol = holding(match.group(2))
+        if symbol is None or not free(match.span()):
+            continue
+        count = _number(match.group(1))
+        if count > 0:
+            units[symbol] = units.get(symbol, 0.0) + sign(match.start()) * count
+            taken.append(match.span())
+    if not usd and not units and not cash_usd:
+        return None
+
+    lines: list[str] = []
+    prices = _last_prices() if units else {}
+    for symbol, count in units.items():
+        price = prices.get(symbol)
+        if price is None:
+            lines.append(f"no live price for {_t(symbol)}, so its {abs(count):g} units were left "
+                         f"out")
+            continue
+        value = count * price
+        lines.append(f"{'short ' if count < 0 else ''}{abs(count):g} {_t(symbol)} = "
+                     f"${abs(value):,.0f} ({price:,.2f})")
+        usd[symbol] = usd.get(symbol, 0.0) + value
+    for symbol, value in usd.items():
+        if symbol not in units:
+            lines.append(f"{'short ' if value < 0 else ''}{_t(symbol)} ${abs(value):,.0f} "
+                         f"as stated")
+    gross = sum(abs(v) for v in usd.values())
+    account = gross + cash_usd
+    if cash_usd:
+        lines.append(f"${cash_usd:,.0f} cash")
+    if account <= 0:
+        return PricedBook(weights={}, cash=0.0, lines=tuple(lines))
+    weights = {s: v / gross for s, v in usd.items() if v} if gross > 0 else {}
+    return PricedBook(weights=weights, cash=cash_usd / account, lines=tuple(lines))
+
+
+def _last_prices() -> dict[str, float]:
+    """Every Bitget futures last price, in one request."""
+    from argus.market.bitget import fetch_tickers
+
+    try:
+        return {s: float(t.last) for s, t in fetch_tickers().items()}
+    except Exception:
+        return {}
+
+
+def book_pricing_note(text: str) -> str:
+    """How a saved book written as amounts was turned into weights, or "" when it was not: added
+    to every "used your saved book" note so the weights shown can be checked against the prices
+    they rest on."""
+    if not text.strip() or _pairs(text):
+        return ""
+    priced = priced_book(text)
+    if priced is None or not priced.lines:
+        return ""
+    return "; priced at Bitget's last price: " + ", ".join(priced.lines)
+
 
 _LEVEL = re.compile(
     r"(\d+(?:\.\d+)?)\s*%\s*(?:confidence|conf\b|level|var\b|cvar\b|es\b|expected\s+shortfall|"
@@ -1380,6 +1530,11 @@ def split_cash(text: str, book: dict[str, float]) -> tuple[dict[str, float], flo
     elif _CASH_REST.search(text):
         held = sum(book.values())
         cash = 1.0 - held if 0.0 < held < 1.0 else None
+    elif not _pairs(text):
+        # "$20k NVDA, $10k cash": the cash is a stated amount, a share of the priced account
+        priced = priced_book(text)
+        if priced is not None and priced.cash > 0:
+            cash = priced.cash
     if cash is not None and cash >= 0.999:
         return {}, 1.0
     if cash is None or not 0.0 < cash < 1.0 or not book:
@@ -2601,10 +2756,17 @@ def _detect(text: str) -> ResearchRequest | None:
 
 
 def parse_book(text: str) -> dict[str, float]:
-    """A saved book like "40% NVDA, 30% MSFT, 30% AAPL" (or bare names, read as equal weight)."""
+    """A saved book like "40% NVDA, 30% MSFT, 30% AAPL"; amounts ("long 2 NVDAUSDT", "$20k NVDA")
+    priced at Bitget's last price (:func:`priced_book`); or bare names, read as equal weight."""
     book: dict[str, float] = {}
     for _, symbol, weight in _pairs(text):
         book[symbol] = book.get(symbol, 0.0) + weight
+    if not book:
+        # A book of amounts ("long 2 NVDAUSDT", "$20k NVDA, $10k cash"), priced at Bitget's last
+        # price. Stated amounts that could not be priced leave the book empty, not equal-weight.
+        priced = priced_book(text)
+        if priced is not None:
+            return dict(priced.weights)
     if not book:
         named, _ = research_symbols(text)
         book = {s: 1.0 / len(named) for s in named} if named else {}
@@ -2692,6 +2854,9 @@ def saved_book_lines(book_text: str) -> list[str]:
                 if budget is not None else
                 f"; no risk budget is saved, so the default of {RISK_BUDGET:.0%} of book risk "
                 f"per name applies.")]
+    pricing = book_pricing_note(body)
+    if pricing:
+        lines.append("Priced at Bitget's last price: " + pricing.split(": ", 1)[1] + ".")
     if not book and not cash:
         lines.append("None of the names in it is a contract Bitget lists, so no risk figure can "
                      "use it — write it as weights of listed names.")
@@ -2736,7 +2901,7 @@ def with_book(request: ResearchRequest | None, book_text: str,
     if not book:
         return request
     shown = [f"{w:.0%} {_t(s)}" for s, w in book.items()] + ([f"{cash:.0%} cash"] if cash else [])
-    note = f"used your saved book ({', '.join(shown)})"
+    note = f"used your saved book ({', '.join(shown)}{book_pricing_note(book_text)})"
     missing = unread_holdings(book_text)
     if missing:
         # "20% DOGSHIT, 80% BTC" was scaled to all BTC with no word about DOGSHIT (answer audit,
