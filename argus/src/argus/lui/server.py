@@ -355,6 +355,24 @@ def repair_mojibake(text: str) -> str:
     return repaired if any(ord(c) > 0xFF for c in repaired) else text
 
 
+_PRONOUN = re.compile(r"\b(?:that|it|this|those|them|its)\b", re.I)
+
+
+def _carry_prior_name(text: str, prior: list[str]) -> str | None:
+    """The question with the previous turn's contract appended, when it names none itself, refers
+    back by pronoun, and is not about the desk's record ("why did you do that" is a ledger
+    question, and its "that" is a decision, not a contract)."""
+    if not prior or research_symbols(text)[0] or not _PRONOUN.search(text):
+        return None
+    if about_the_record(text):
+        return None
+    for earlier in reversed(prior[-4:]):
+        named = research_symbols(earlier)[0]
+        if named:
+            return f"{text} ({named[0].removesuffix('USDT')})"
+    return None
+
+
 def handle_ask(
     text: str, prior: list[str], *, now: datetime | None = None, visitor: str = "local",
     book: str = "",
@@ -399,6 +417,11 @@ def handle_ask(
         # market is open right now") it gets the premise verdict first.
         q = classify(text, now=clock, conversation=conversation)
         lines, sources = session_status(clock)
+        from argus.lui.research import holiday_line
+
+        holiday = holiday_line(text, clock)
+        if holiday is not None:
+            lines = [holiday, *(line.replace("Actionable: ", "", 1) for line in lines)]
         claimed = _SESSION_CLAIM.search(text) if not text.rstrip().endswith("?") else None
         if claimed is not None:
             lines = [_session_claim_line(claimed), *lines]
@@ -410,8 +433,34 @@ def handle_ask(
                        budget_ms=BUDGET_MS[q.speed], routing=audit, classified_by="session-clock",
                        matched=SESSION_QUESTION.pattern, turns=[*prior, text][-12:])
         return payload
-    from argus.lui.research import IMPLIED_OPEN_QUESTION, _is_an_order
+    from argus.lui.research import (
+        HURDLE_QUESTION,
+        IMPLIED_OPEN_QUESTION,
+        MY_BOOK_QUESTION,
+        _is_an_order,
+        hurdle_lines,
+        saved_book_lines,
+    )
 
+    if HURDLE_QUESTION.search(text) and not research_symbols(text)[0]:
+        q = classify(text, now=clock, conversation=conversation)
+        hurdle, hurdle_sources = hurdle_lines()
+        payload = Answer(question=q, lines=hurdle, sources=hurdle_sources).as_dict()
+        payload.update(elapsed_ms=(time.perf_counter() - started) * 1000,
+                       budget_ms=BUDGET_MS[q.speed], routing=audit, classified_by="hurdle",
+                       matched=HURDLE_QUESTION.pattern, turns=[*prior, text][-12:])
+        return payload
+
+    if MY_BOOK_QUESTION.search(text) and not research_symbols(text)[0]:
+        # "what's my stated risk budget right now" and "how much cash do I have in the book" were
+        # answered with the desk's own open positions (2026-09-25 audit). They ask about the
+        # trader's saved book, which the console holds and can state.
+        q = classify(text, now=clock, conversation=conversation)
+        payload = Answer(question=q, lines=saved_book_lines(book), sources=[]).as_dict()
+        payload.update(elapsed_ms=(time.perf_counter() - started) * 1000,
+                       budget_ms=BUDGET_MS[q.speed], routing=audit, classified_by="saved-book",
+                       matched=MY_BOOK_QUESTION.pattern, turns=[*prior, text][-12:])
+        return payload
     opening = research_symbols(text)[0]
     if opening and IMPLIED_OPEN_QUESTION.search(text) and not _is_an_order(text):
         # "Where will NVDA open?" and "what is TSLA worth right now?" have one measured answer,
@@ -421,6 +470,18 @@ def handle_ask(
         implied = ResearchRequest(kind=ResearchKind.QUOTE, symbols=tuple(opening[:4]))
         return _research_payload(text, prior, implied, ledger, started, "implied-open",
                                  {**audit, "detail": "an implied-open question"})
+    carried = _carry_prior_name(text, prior)
+    if carried is not None:
+        # "and how does that compare to last week" after "whats bitcoin doing rn" was told no
+        # contract was named (2026-09-25 audit): the pronoun is the previous turn's name.
+        request = detect_research(carried)
+        if request is not None:
+            carried_name = research_symbols(carried)[0][0].removesuffix("USDT")
+            request = replace(request, notes=(
+                *request.notes, f"read as a follow-up about {carried_name}"))
+            return _research_payload(text, prior, with_book(request, book, text), ledger,
+                                     started, "research-follow-up",
+                                     {**audit, "detail": "the previous turn's name carried"})
     followed = follow_up(text, prior, book)
     if followed is not None:
         return _research_payload(text, prior, followed, ledger, started, "research-follow-up",
@@ -438,6 +499,10 @@ def handle_ask(
         model = LocalPlanner(local) if local is not None else None
     if model is not None:
         planned, audit = plan_with_model(text, model)
+        if planned is not None and _PRICE_FORECAST.search(text):
+            # A price asked for a future time is refused whatever engine the model picked; it
+            # read "比特币明年这个时候准确价格是多少" as a portfolio question (held-out corpus).
+            planned, audit = None, {**audit, "detail": "a price forecast; refused below"}
         if (planned is None and not isinstance(model, LocalPlanner)
                 and str(audit.get("detail", "")).startswith("planner unavailable")):
             # **A failed language-model call falls back to the kind model, not to the patterns.**

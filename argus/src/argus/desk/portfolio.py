@@ -541,7 +541,11 @@ def assess(
     before = decompose(weights_before, columns) if weights_before else None
     after = decompose(weights_after, columns)
 
-    if after is None:
+    if after is None and not any(w > 0 for w in weights_after.values()):
+        # Everything sold into cash: nothing is left at risk, which is a known zero, not an
+        # unknown ("cut my BTC by 200%" on a BTC-and-cash book, 2026-09-25 audit).
+        notes.append("nothing is left at market risk after the trade: the book is all cash")
+    elif after is None:
         notes.append(
             "risk could not be decomposed: too few aligned observations, or the book has no "
             "variance. Reported as unknown rather than as zero risk"
@@ -1030,6 +1034,10 @@ def resize(before: Mapping[str, float], name: str, target: float) -> dict[str, f
     held = before.get(name, 0.0)
     rest = sum(w for s, w in before.items() if s != name)
     if rest <= 0:
+        if 0.0 < held < 0.999:
+            # One risky name beside cash ("50% BTC, 50% cash"): the resized weight moves to or
+            # from the cash, which is not a column here and so is not rescaled.
+            return {name: target}
         raise PortfolioError(f"a book of {name} alone cannot be resized against itself")
     scale = (1.0 - target) / rest
     after = {s: w * scale for s, w in before.items() if s != name}

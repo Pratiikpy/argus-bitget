@@ -507,6 +507,9 @@ class TestEveryBitgetContract:
             def quote(self, ticker: str) -> dict[str, Any]:
                 return {"last_price": 80.0}
         monkeypatch.setattr(bitget_mcp, "BitgetDataService", Colgate)
+        # While the market is shut the regular close comes from Yahoo's daily bar; the same
+        # collision reaches it, so it is stubbed with the same wrong company's price.
+        monkeypatch.setattr(research, "_shut_close", lambda symbol: 80.0)
         from decimal import Decimal
         assert research._premium_line("CLUSDT", Decimal("91.08"), False) is None
         assert research._premium_line("PLTRUSDT", Decimal("186.9"), False) is None

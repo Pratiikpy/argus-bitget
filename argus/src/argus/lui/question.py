@@ -211,9 +211,23 @@ _SPEED: dict[Intent, Speed] = {
 # interrogative: "sell half of that" commands, "why did you sell" asks.
 _ORDER_VERB = re.compile(
     r"^\s*(?:please\s+)?(?:go\s+)?(?:buy|sell|short|long|close|open|cancel|reduce|add|trim|"
-    r"rebalance|hedge|exit|flatten|undo|place|submit)\b",
+    r"rebalance|hedge|exit|flatten|undo|place|submit)\b"
+    # "open interest on ETH", "long short ratio for DOGE", "short interest" and "short squeeze"
+    # name a market measure, not an instruction; they were refused as orders (2026-09-25 audit).
+    r"(?!\s*(?:interest|[/-]?\s*short\s+ratio|[/-]\s*short\b|short\s+(?:ratio|interest)|"
+    r"squeeze|ratio|positioning))",
     re.I,
 )
+_ORDER_REQUEST = re.compile(
+    r"^\s*(?:can|could|would|will)\s+you\s+(?:please\s+)?(?:buy|sell|short|long|place|submit|"
+    r"execute|open|close|put\s+in|enter)\b"
+    r"|\b(?:place|put\s+in|submit|execute)\s+(?:a|an|the|my)?\s*(?:limit|market|stop|stop[\s-]loss|"
+    r"take[\s-]profit)?\s*orders?\s+for\s+me\b",
+    re.I,
+)
+"""An order asked as a question: "can you place a limit order for me" is an instruction, and
+fell to "I did not recognise that question" because the interrogative guard let it past
+(2026-09-25 audit)."""
 _ORDER_CJK = re.compile(
     r"(?:帮我|给我|替我|直接)[^?\uff1f]{0,12}(?:下单|买入|卖出|平仓|开仓)|实盘下单")
 """An instruction to trade in Chinese: "PLTR现在能买吗,帮我实盘下单买入" (buy it for me, live)
@@ -221,6 +235,12 @@ was answered as research on the 2026-09-25 blind corpus. The console places no o
 language."""
 _INTERROGATIVE = re.compile(r"^\s*(?:why|what|when|which|who|how|did|do|does|is|are|was|were|can|"
                             r"could|should|show|list|tell|explain|walk)\b", re.I)
+
+
+def is_order_instruction(raw: str) -> bool:
+    """An instruction to trade, in any of the forms the console refuses."""
+    return bool((_ORDER_VERB.match(raw) and not _INTERROGATIVE.match(raw))
+                or _ORDER_CJK.search(raw) or _ORDER_REQUEST.search(raw))
 
 
 class Tense(StrEnum):
@@ -454,7 +474,14 @@ def _listed_on_bitget(token: str) -> bool:
 # Order matters: the first pattern to match wins, so the more specific question comes first.
 # "why did you do nothing on NVDA" must reach ABSTENTION_WHY, not DECISION_WHY.
 TRACK_RECORD = r"\btrack\s+record\b"
-DECISIVE_PATTERNS: frozenset[str] = frozenset({TRACK_RECORD})
+SCORED_METRIC = (r"\b(?:your|the\s+desk'?s|its|our)\s+(?:\w+\s+){0,2}(?:sharpe|sortino|calmar|"
+                 r"(?:max(?:imum)?\s+)?drawdown|win\s*rate|hit\s*rate|pnl|p&l|"
+                 r"(?:biggest|largest|worst)\s+(?:loss|losses|losing\s+trade|trade|day))\b"
+                 r"|\bwhat(?:'?s|\s+is|\s+was)\s+(?:the\s+)?(?:your\s+)?(?:sharpe|win\s*rate|"
+                 r"hit\s*rate|max(?:imum)?\s+drawdown|(?:biggest|largest|worst)\s+loss)\b")
+"""A scored number asked of the desk by name. "What's your win rate" was relabelled calibration by
+the n-gram model at 0.15 and "what's your biggest loss" a decision at 0.19 (2026-09-25 audit)."""
+DECISIVE_PATTERNS: frozenset[str] = frozenset({TRACK_RECORD, SCORED_METRIC})
 """Patterns that name exactly what is asked, so the n-gram model may not relabel a question they
 matched (`lui/ngram.reclassify`). "What is your track record? How many trades have you made?" was
 relabelled a decision list by the model, which weighs the second sentence's words."""
@@ -464,6 +491,7 @@ _PATTERNS: tuple[tuple[str, Intent], ...] = (
     # track record? How many trades have you made?" was claimed by the decision-list pattern on
     # "how many trades" and answered with a count (a judge's probe, 2026-09-24).
     (TRACK_RECORD, Intent.PERFORMANCE),
+    (SCORED_METRIC, Intent.PERFORMANCE),
     # Review first: its questions carry "decision", "why" and "mistake" words that the ledger
     # patterns below would otherwise claim for a single row.
     (r"\b(?:review\w*|post[\s-]?mortem\w*|retrospective\w*|self[\s-]?evolution|"
@@ -882,8 +910,7 @@ def classify(
                         reason="empty question")
 
     symbols, off_venue = extract_symbols(raw)
-    if off_venue and ((_ORDER_VERB.match(raw) and not _INTERROGATIVE.match(raw))
-                      or _ORDER_CJK.search(raw)):
+    if off_venue and is_order_instruction(raw):
         # An instruction is refused as an instruction whatever it names. "buy 10 PLTR for me" was
         # refused as "PLTR is not one of the twelve stock perpetuals", which answers a question
         # nobody asked and implies the order would have been placed for NVDA.
@@ -901,7 +928,7 @@ def classify(
     # An imperative is checked before anything else. Left to the intent patterns, "sell half of
     # that" matches the decision-explanation rule on the word "sell" and comes back as a report on
     # a past decision — an instruction answered as though it were a question.
-    if (_ORDER_VERB.match(raw) and not _INTERROGATIVE.match(raw)) or _ORDER_CJK.search(raw):
+    if is_order_instruction(raw):
         return Question(
             raw=raw, intent=Intent.ORDER, speed=Speed.FAST, tense=Tense.FUTURE,
             symbols=symbols, window=window,

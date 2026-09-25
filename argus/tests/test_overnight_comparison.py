@@ -93,7 +93,7 @@ def test_the_console_states_the_implied_open_with_its_record(
     monkeypatch.setattr(answer, "_notes_path", lambda: tmp_path / "notes.json")
     close = datetime(2026, 9, 24, 20, tzinfo=UTC)
     monkeypatch.setattr(research, "_last_regular_close", lambda now: close)
-    monkeypatch.setattr(research, "_stock_last", lambda symbol, service: 200.0)
+    monkeypatch.setattr(research, "_yahoo_close", lambda symbol, at: 200.0)
     monkeypatch.setattr(history, "fetch", lambda *a, **k: [history.Candle(
         ts=close - timedelta(hours=1), open=Decimal(1), high=Decimal(1), low=Decimal(1),
         close=Decimal("100"), volume=Decimal(0))])
@@ -115,7 +115,7 @@ def test_no_close_bar_means_no_line(monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr(research, "_last_regular_close",
                         lambda now: datetime(2026, 9, 24, 20, tzinfo=UTC))
-    monkeypatch.setattr(research, "_stock_last", lambda symbol, service: 200.0)
+    monkeypatch.setattr(research, "_yahoo_close", lambda symbol, at: 200.0)
     monkeypatch.setattr(history, "fetch", lambda *a, **k: [])
     assert research._implied_open_line("NVDAUSDT", Decimal("101")) is None
 
@@ -183,3 +183,14 @@ def test_the_vendored_gloaming_model_is_its_clone_but_for_the_one_import() -> No
     body = original.replace("from fairvalue.config import FAIRVALUE_WEIGHTS\n", "")
     for line in body.splitlines():
         assert line in vendored.splitlines()
+
+
+def test_while_shut_only_the_regular_close_is_used(monkeypatch: pytest.MonkeyPatch) -> None:
+    """An extended-hours quote is not a close: without the daily bar there is no line."""
+    from argus.lui import research
+
+    monkeypatch.setattr(research, "_last_regular_close",
+                        lambda now: datetime(2026, 9, 24, 20, tzinfo=UTC))
+    monkeypatch.setattr(research, "_yahoo_close", lambda symbol, at: None)
+    monkeypatch.setattr(research, "_stock_last", lambda symbol, service: 226.36)
+    assert research._implied_open_line("NVDAUSDT", Decimal("226.5")) is None

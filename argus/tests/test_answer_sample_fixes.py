@@ -97,6 +97,7 @@ def test_while_shut_the_premium_is_the_gap_at_the_close_not_the_overnight_move(
     monkeypatch.setattr(research, "_stock_last", lambda symbol, service: 224.58)
     monkeypatch.setattr(research, "_last_regular_close", lambda now: close)
     monkeypatch.setattr(research, "_perp_at_close", lambda symbol, at: 224.72)
+    monkeypatch.setattr(research, "_yahoo_close", lambda symbol, at: 224.58)
     line, _source = research._premium_line("NVDAUSDT", research.Decimal("225.89"), False)
     assert "a 6.2bps premium at that close" in line
     assert "moved +0.52% since, which is the overnight move, not a premium" in line

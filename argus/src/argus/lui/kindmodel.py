@@ -127,8 +127,7 @@ class LocalPlanner:
         # The shock is a percentage that is not a holding weight: "I hold 50% BTC, 30% ETH, how
         # risky is my book" was stressed with a +50% Nasdaq move read from "50% BTC".
         weights = {pos for pos, _, _ in pairs}
-        shock = next((m for m in research._SHOCK_NUMBER.finditer(text)
-                      if not any(abs(pos - m.start()) < 16 for pos in weights)), None)
+        shock = next(iter(research.shock_numbers(text, sorted(weights), near=16)), None)
         if label == "stress" and shock is not None:
             value = abs(float(shock.group(1)))
             down = research._DOWN_WORDS.search(text) or shock.group(1).startswith("-")
