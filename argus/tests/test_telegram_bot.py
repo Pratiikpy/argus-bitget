@@ -30,7 +30,7 @@ def test_a_question_is_answered_through_the_console_with_its_sources_and_a_link(
     [(chat, text)] = tg.handle_update(_msg("is NVDA overbought?"), states, ask=desk)
     assert chat == 42 and desk.calls[0]["visitor"] == "tg-42"
     assert text.startswith("<b>Actionable:</b> NVDA &lt;is&gt; fine &amp; well.")
-    assert "<i>Sources: bitget tickers, SEC EDGAR.</i>" in text
+    assert "<i>Sources: <code>bitget tickers</code>, <code>SEC EDGAR</code>.</i>" in text
     assert "?q=is+NVDA+overbought%3F" in text
 
 
@@ -99,3 +99,26 @@ def test_the_webhook_needs_configuration_and_the_secret(monkeypatch: pytest.Monk
     monkeypatch.setattr(tg, "send", lambda token, chat, text: sent.append((chat, text)))
     status, body = tg.handle_webhook(json.dumps(_msg("/help")).encode(), "right")
     assert status == 200 and json.loads(body)["send_failures"] == 0 and sent[0][0] == 42
+
+
+def test_a_saved_book_survives_a_fresh_process_through_the_pinned_message(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """Behind the webhook each instance has its own memory; the chat's pin is the shared store."""
+    calls: list[tuple[str, dict[str, Any]]] = []
+
+    def fake_call(token: str, method: str, params: dict[str, Any], **_: Any) -> Any:
+        calls.append((method, params))
+        if method == "getChat":
+            return {"pinned_message": {"text": "Saved your book: 40% NVDA, 60% AAPL. Portfolio "
+                                                "questions in this chat now use it."}}
+        return {"message_id": 7}
+
+    monkeypatch.setattr(tg, "_call", fake_call)
+    states: dict[int, tg.ChatState] = {}
+    tg.recall_book("t", 42, states)
+    assert states[42].book == "40% NVDA, 60% AAPL"
+    tg.remember_book("t", 42, 7, "Saved your book: 10% BTC. Portfolio questions in this chat…")
+    assert ("pinChatMessage", {"chat_id": 42, "message_id": 7, "disable_notification": True}) \
+        in calls
+    tg.remember_book("t", 42, 8, "Forgotten: this chat's earlier questions and its saved book.")
+    assert calls[-1][0] == "unpinAllChatMessages"

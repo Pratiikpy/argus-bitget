@@ -138,7 +138,9 @@ def format_answer(payload: dict[str, Any], question: str, book: str) -> str:
         if ref and ref not in refs:
             refs.append(ref)
     if refs:
-        shown = ", ".join(html.escape(r, quote=False) for r in refs[:6])
+        # In code tags: Telegram otherwise links "technical_analysis.support" as a web address
+        # and "/api/v3/market/candles" as a bot command (seen in the chat, 2026-09-25).
+        shown = ", ".join(f"<code>{html.escape(r, quote=False)}</code>" for r in refs[:6])
         more = f" and {len(refs) - 6} more" if len(refs) > 6 else ""
         body.append(f"<i>Sources: {shown}{more}.</i>")
     query = {"q": question[:500], **({"book": book[:300]} if book else {})}
@@ -169,7 +171,7 @@ def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
     if command == "/book":
         if rest.strip():
             state.book = rest.strip()[:300]
-            return [(chat_id, f"Saved your book: {html.escape(state.book)}. Portfolio questions "
+            return [(chat_id, f"{SAVED_PREFIX}{html.escape(state.book)}. Portfolio questions "
                               f"in this chat now use it.")]
         return [(chat_id, f"Your saved book: {html.escape(state.book)}." if state.book else
                  "No book saved. Send, for example: /book 40% NVDA, 30% MSFT, 30% AAPL")]
@@ -240,6 +242,38 @@ def send(token: str, chat_id: int, text: str) -> int | None:
 
 _WEBHOOK_STATES: dict[int, ChatState] = {}
 
+SAVED_PREFIX = "Saved your book: "
+
+
+def recall_book(token: str, chat_id: int, states: dict[int, ChatState]) -> None:
+    """Fill a chat's book from its pinned "Saved your book" message when this process does not
+    hold it. Behind the webhook each serverless instance keeps its own memory, so a book saved in
+    one request was unknown to the next; the chat itself is the one store every instance can read
+    (`getChat` returns the pinned message)."""
+    state = states.setdefault(chat_id, ChatState())
+    if state.book:
+        return
+    try:
+        chat = _call(token, "getChat", {"chat_id": chat_id}, timeout=10.0)
+    except Exception:
+        return
+    pinned = str(((chat or {}).get("pinned_message") or {}).get("text") or "")
+    if pinned.startswith(SAVED_PREFIX):
+        state.book = pinned[len(SAVED_PREFIX):].split(". Portfolio questions", 1)[0].strip()
+
+
+def remember_book(token: str, chat_id: int, message_id: int | None, text: str) -> None:
+    """Pin the confirmation of a saved book, silently, so any later request can recall it; a
+    cleared book unpins everything the bot pinned."""
+    try:
+        if text.startswith(SAVED_PREFIX) and message_id is not None:
+            _call(token, "pinChatMessage", {"chat_id": chat_id, "message_id": message_id,
+                                            "disable_notification": True}, timeout=10.0)
+        elif text.startswith("Forgotten:"):
+            _call(token, "unpinAllChatMessages", {"chat_id": chat_id}, timeout=10.0)
+    except Exception:
+        return
+
 
 def handle_webhook(body: bytes, secret_header: str | None, *,
                    ask: Ask = _default_ask) -> tuple[int, bytes]:
@@ -258,9 +292,13 @@ def handle_webhook(body: bytes, secret_header: str | None, *,
         return 400, b'{"error": "not JSON"}'
     failures = 0
     last: dict[int, int | None] = {}
+    chat = ((update.get("message") or {}).get("chat") or {}).get("id")
+    if isinstance(chat, int):
+        recall_book(token, chat, _WEBHOOK_STATES)
     for chat_id, text in handle_update(update, _WEBHOOK_STATES, ask=ask):
         try:
             last[chat_id] = send(token, chat_id, text)
+            remember_book(token, chat_id, last[chat_id], text)
         except Exception:
             failures += 1
     for chat_id, message_id in last.items():
@@ -288,9 +326,13 @@ def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - 
         for update in updates:
             offset = max(offset, int(update["update_id"]) + 1)
             last: dict[int, int | None] = {}
+            chat = ((update.get("message") or {}).get("chat") or {}).get("id")
+            if isinstance(chat, int):
+                recall_book(token, chat, states)
             for chat_id, text in handle_update(update, states, ask=ask):
                 try:
                     last[chat_id] = send(token, chat_id, text)
+                    remember_book(token, chat_id, last[chat_id], text)
                 except Exception as exc:
                     print(f"sendMessage failed ({type(exc).__name__})", flush=True)
             for chat_id, message_id in last.items():

@@ -2712,7 +2712,12 @@ def max_size_within_budget(
 
     for step in range(1, 100 if as_target else 101):
         size = step / 100.0
-        after = resize(before, add, size) if as_target else rebalance(before, add, size)
+        try:
+            after = resize(before, add, size) if as_target else rebalance(before, add, size)
+        except PortfolioError:
+            # A book of the name alone has nothing to trim against: no weight answers the
+            # question, which is said as "no size fits" rather than raised to the reader.
+            return None
         risk = decompose(after, columns)
         if risk is None:
             return None

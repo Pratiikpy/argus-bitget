@@ -448,7 +448,9 @@ def handle_ask(
                      or (patterned.spot is not None and planned.spot != patterned.spot)
                      or planned.horizon_hours != patterned.horizon_hours
                      or planned.target != patterned.target
-                     or planned.resize_by != patterned.resize_by)):
+                     or planned.resize_by != patterned.resize_by
+                     or (planned.kind is ResearchKind.IMPACT
+                         and planned.symbols[:1] != patterned.symbols[:1]))):
             # The model read "order book depth on NVDA" as a quote and "who is selling NVDA" as
             # a news question (2026-09-24). Where the patterns name the one engine that answers
             # the question, their reading stands.

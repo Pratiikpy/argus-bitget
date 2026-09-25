@@ -109,7 +109,13 @@ class LocalPlanner:
         # to the plan once, and taking them here too applied a 3x multiple twice (90% for 10%).
         patterned = research._detect(text)
         if (patterned is not None and patterned.size_stated and patterned.symbols
-                and patterned.symbols[0] == candidate):
+                and patterned.kind is research.ResearchKind.IMPACT
+                and (patterned.symbols[0] == candidate or patterned.symbols[0] in holdings)):
+            # "40% NVDA, 30% MSFT, 30% AAPL — what does adding 15% TSLA do" paired "15% TSLA" as a
+            # fourth holding and made NVDA the add (Telegram, 2026-09-25). The add verb is the
+            # patterns' reading and names the candidate exactly.
+            candidate = patterned.symbols[0]
+            plan["candidate"] = candidate
             # "what does adding 15% TSLA do to my risk?" was answered for 20%: the 15% was read as
             # a holding, and the plan carried no size, so the default applied (found through the
             # Telegram bot's own help examples, 2026-09-25). The patterns' size reading is exact.

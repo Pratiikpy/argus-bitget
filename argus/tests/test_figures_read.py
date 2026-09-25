@@ -169,3 +169,18 @@ def test_a_volatility_scenario_scales_the_books_history(monkeypatch: pytest.Monk
     lines, _ = research._var_lines({}, {"NVDAUSDT": 1.0}, "a 2x vol spike", scale=2.0)
     assert "value at risk goes from 5.00% to 10.00%" in lines[0]
     assert "worst day in 199 would have been -10.00% instead of -5.00%" in lines[0]
+
+
+def test_a_book_and_an_add_in_one_sentence_through_the_kind_model() -> None:
+    model = kind_model()
+    if model is None:
+        pytest.skip("kind model export not present")
+    text = "40% NVDA, 30% MSFT, 30% AAPL what does adding 15% TSLA do to my risk?"
+    planned, _ = research.plan_with_model(text, LocalPlanner(model))
+    assert planned is not None and planned.symbols[0] == "TSLAUSDT"
+    assert planned.size == pytest.approx(0.15) and "TSLAUSDT" not in planned.book
+
+
+def test_no_trim_weight_is_an_answer_not_an_error() -> None:
+    assert research.max_size_within_budget(add="TSLAUSDT", before={"TSLAUSDT": 1.0},
+                                           columns={}, as_target=True) is None
