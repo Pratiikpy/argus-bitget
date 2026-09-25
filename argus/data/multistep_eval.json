@@ -1,0 +1,306 @@
+{
+  "generated_at": "2026-09-25T20:21:27.953102+00:00",
+  "multi": {
+    "questions": 25,
+    "split_correctly": 25,
+    "rows": [
+      {
+        "question": "Is NVDA overbought, and what would adding 20% of it do to my book? Then how do I split a $50k buy?",
+        "expected": [
+          "technicals",
+          "impact",
+          "execution"
+        ],
+        "got": [
+          "technicals",
+          "impact",
+          "execution"
+        ],
+        "ok": true
+      },
+      {
+        "question": "BTC funding rate and ETH open interest",
+        "expected": [
+          "quote",
+          "sentiment"
+        ],
+        "got": [
+          "quote",
+          "sentiment"
+        ],
+        "ok": true
+      },
+      {
+        "question": "compare NVDA and AMD risk; hedge my book; when does NVDA report earnings",
+        "expected": [
+          "compare",
+          "hedge",
+          "fundamentals"
+        ],
+        "got": [
+          "compare",
+          "hedge",
+          "fundamentals"
+        ],
+        "ok": true
+      },
+      {
+        "question": "where is NVDA trading? and when does it report earnings?",
+        "expected": [
+          "quote",
+          "fundamentals"
+        ],
+        "got": [
+          "quote",
+          "fundamentals"
+        ],
+        "ok": true
+      },
+      {
+        "question": "I hold 40% NVDA 60% AAPL. what if the nasdaq drops 10%? and how do I hedge it?",
+        "expected": [
+          "stress",
+          "hedge"
+        ],
+        "got": [
+          "stress",
+          "hedge"
+        ],
+        "ok": true
+      },
+      {
+        "question": "what is the TSLA funding rate? is TSLA overbought?",
+        "expected": [
+          "quote",
+          "technicals"
+        ],
+        "got": [
+          "quote",
+          "technicals"
+        ],
+        "ok": true
+      },
+      {
+        "question": "how has BTC done over the last week, and what are the odds it's up this week?",
+        "expected": [
+          "quote",
+          "analogue"
+        ],
+        "got": [
+          "quote",
+          "analogue"
+        ],
+        "ok": true
+      },
+      {
+        "question": "when does AAPL report earnings? what are analysts' targets? is it overbought?",
+        "expected": [
+          "fundamentals",
+          "technicals"
+        ],
+        "got": [
+          "fundamentals",
+          "technicals"
+        ],
+        "ok": true
+      },
+      {
+        "question": "what's the long/short ratio on SOL; how liquid is SOL on weekends",
+        "expected": [
+          "sentiment",
+          "quote"
+        ],
+        "got": [
+          "sentiment",
+          "quote"
+        ],
+        "ok": true
+      },
+      {
+        "question": "ETH price, then how should I split a $100k ETH buy",
+        "expected": [
+          "quote",
+          "execution"
+        ],
+        "got": [
+          "quote",
+          "execution"
+        ],
+        "ok": true
+      },
+      {
+        "question": "is MSTR riskier than COIN? and what is MSTR's liquidation price at 5x long?",
+        "expected": [
+          "compare",
+          "leverage"
+        ],
+        "got": [
+          "compare",
+          "leverage"
+        ],
+        "ok": true
+      },
+      {
+        "question": "what's the CPI print? and how does QQQ usually react on CPI days?",
+        "expected": [
+          "macro",
+          "event"
+        ],
+        "got": [
+          "macro",
+          "event"
+        ],
+        "ok": true
+      },
+      {
+        "question": "where will NVDA open? then what's its 200-day moving average?",
+        "expected": [
+          "quote",
+          "technicals"
+        ],
+        "got": [
+          "quote",
+          "technicals"
+        ],
+        "ok": true
+      },
+      {
+        "question": "what's the gold price; what does a 10% drop in gold do to 50% XAU 50% NVDA",
+        "expected": [
+          "quote",
+          "stress"
+        ],
+        "got": [
+          "quote",
+          "stress"
+        ],
+        "ok": true
+      },
+      {
+        "question": "is the hype on NVDA real? and what's the news on it?",
+        "expected": [
+          "sentiment",
+          "news"
+        ],
+        "got": [
+          "sentiment",
+          "news"
+        ],
+        "ok": true
+      },
+      {
+        "question": "what are rTokens? and what is the price of RNVDAUSDT?",
+        "expected": [
+          "venue",
+          "quote"
+        ],
+        "got": [
+          "venue",
+          "quote"
+        ],
+        "ok": true
+      },
+      {
+        "question": "take profit for a TSLA long? and where should my stop go?",
+        "expected": [
+          "analogue"
+        ],
+        "got": [],
+        "ok": true
+      },
+      {
+        "question": "TQQQ decay if QQQ goes sideways for a month; and what is QQQ's 52 week high and low",
+        "expected": [
+          "quote",
+          "quote"
+        ],
+        "got": [
+          "quote",
+          "quote"
+        ],
+        "ok": true
+      },
+      {
+        "question": "NVDA spread and depth; then split a $250k NVDA sell",
+        "expected": [
+          "execution"
+        ],
+        "got": [],
+        "ok": true
+      },
+      {
+        "question": "how risky is 60% NVDA 40% MSFT? also what is its beta to the S&P?",
+        "expected": [
+          "book"
+        ],
+        "got": [],
+        "ok": true
+      },
+      {
+        "question": "BTC sentiment and ETH sentiment",
+        "expected": [
+          "sentiment",
+          "sentiment"
+        ],
+        "got": [
+          "sentiment",
+          "sentiment"
+        ],
+        "ok": true
+      },
+      {
+        "question": "what does adding 10% COIN do to 50% NVDA 50% AAPL? and is COIN overbought?",
+        "expected": [
+          "impact",
+          "technicals"
+        ],
+        "got": [
+          "impact",
+          "technicals"
+        ],
+        "ok": true
+      },
+      {
+        "question": "should I hold NVDA for a week? and what's the weekend gap risk on it?",
+        "expected": [
+          "analogue",
+          "analogue"
+        ],
+        "got": [
+          "analogue",
+          "analogue"
+        ],
+        "ok": true
+      },
+      {
+        "question": "what's the fed doing with rates; how does BTC react to that",
+        "expected": [
+          "macro",
+          "macro"
+        ],
+        "got": [
+          "macro",
+          "macro"
+        ],
+        "ok": true
+      },
+      {
+        "question": "gold vs bitcoin risk; then how do I hedge 50% BTC 50% ETH",
+        "expected": [
+          "compare",
+          "hedge"
+        ],
+        "got": [
+          "compare",
+          "hedge"
+        ],
+        "ok": true
+      }
+    ]
+  },
+  "single": {
+    "single_questions": 680,
+    "split": 0,
+    "rows": []
+  }
+}

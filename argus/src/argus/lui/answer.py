@@ -15,6 +15,15 @@ fill in unsupervised.
 outcome and is rendered as one. The judge questions this is built against include several that are
 *supposed* to be refused — an instrument the venue does not carry, a reference with nothing to bind
 to, a statistic the sample cannot support. Answering those anyway is the failure being tested for.
+
+**Each answerer says what its lines are, where it is defined** (`truth/trace.py`, 2026-09-25).
+`lui/provenance.py` reads a label off a finished line's wording, and a quoted thesis that happens
+to open "RSI(14)" reads there as a live quote. The answerers below are declared with
+:func:`~argus.truth.trace.traced`: a decision's own row, quoted, is ``desk``; the graded refusal
+leans are a ``record``; the one line of each that explains a method rather than stating what the
+record holds (why an abstention is a decision, why two clocks matter, how the evidence gate works)
+declares nothing and keeps its wording-based label. A refused answer is never covered by its
+answerer's declaration. Outside a recording the decorator only reads one context variable.
 """
 
 from __future__ import annotations
@@ -30,6 +39,7 @@ from argus.eval.performance import evaluate_ledger
 from argus.lui.phrasebook import t
 from argus.lui.question import TRADED_SYMBOLS, Intent, Question
 from argus.paper.ledger import Entry, PaperLedger
+from argus.truth.trace import all_but, emit, only, traced
 
 
 @dataclass(frozen=True)
@@ -121,6 +131,7 @@ def _data_path(name: str) -> Path:
     return LEDGER_PATH.with_name(name)
 
 
+@traced("record")
 def _lean_grading() -> str | None:
     """How the desk's refusals' stated directions graded against what happened, from
     `eval/refusal.py`'s artefact — the one track record a desk that never traded has."""
@@ -171,9 +182,11 @@ def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
     # on exactly the same condition as win_rate (no settled trades), and stating that here means the
     # console can never render a 0.0% drawdown for an account that never took a position — the
     # best-looking risk number on the page, earned by not participating.
+    undefined: list[str] = []
     if perf.sharpe is None or perf.win_rate is None or perf.max_drawdown is None:
-        for stat, why in perf.undefined.items():
-            lines.append(t("perf.undefined_stat", lang, stat=stat, why=why))
+        undefined = [t("perf.undefined_stat", lang, stat=stat, why=why)
+                     for stat, why in perf.undefined.items()]
+        lines.extend(undefined)
         lines.append(
             t("perf.no_trades", lang, abstentions=perf.abstentions, trades=perf.trades,
               days=perf.window_days)
@@ -190,21 +203,39 @@ def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
                   share=perf.as_dict()["largest_symbol_share_pct"], trades=top.trades)
             )
     lines.append(t("perf.net_pnl", lang, net=perf.net_pnl, capital=perf.capital))
-    if perf.trades == 0 and lang == "en":
+    no_trades_en = perf.trades == 0 and lang == "en"
+    if no_trades_en:
         # A track-record question deserves its answer first, not a list of undefined ratios:
         # zero trades, every decision a refusal, and how the refusals' leans have graded.
         lines.insert(0, f"Track record: {len(ledger.entries)} decisions on the ledger and no "
                         f"trade settled — every decision so far is a refusal, so there is no "
                         f"Sharpe, drawdown or win rate to report.")
+    # Labelled where they are made (`truth/trace.emit`): a figure the record cannot support is
+    # ``missing``; what the ledger's own rows add up to is ``desk``, the label the reviewed wording
+    # rules give "Net PnL" and "Track record" lines. The graded leans below carry their own.
+    emit(undefined, "missing")
+    emit([line for line in lines if line not in undefined], "desk")
+    if no_trades_en:
         grading = _lean_grading()
         if grading:
             lines.insert(1, grading)
             sources.append(Source("artefact", "refusal_alpha.json", "graded refusal leans"))
+        # The reasons the desk wrote for standing aside, checked against its own record
+        # (`eval/refusal.py:reason_line`): a refusal is only explained if its stated reason is
+        # true of the moment it was made.
+        from argus.eval.refusal import reason_line
+
+        reasons = reason_line(_data_path("refusal_reasons.json"))
+        if reasons:
+            lines.insert(2 if grading else 1, reasons)
+            sources.append(Source("artefact", "refusal_reasons.json",
+                                  "refusal reasons checked against the record"))
     for entry in [e for e in ledger.entries if e.is_settled and not e.is_abstention][:3]:
         sources.append(_src(entry))
     return Answer(question=question, lines=lines, sources=sources, data=perf.as_dict())
 
 
+@traced("desk")
 def answer_decision_why(ledger: PaperLedger, question: Question) -> Answer:
     """Reconstruct one decision from the row that recorded it."""
     rows = _matching(ledger, question)
@@ -273,6 +304,7 @@ of the capabilities `/proof` lists: provenance-discounted agreement, graded memo
 deliberation, numeric grounding, the committed protocol."""
 
 
+@traced("desk")
 def _how_it_was_reached(seq: int) -> list[str]:
     """The checks the desk wrote down at decision ``seq`` — who ran, what was discounted, what the
     memory showed, whether every figure in the thesis resolves to evidence — from `desk_notes`.
@@ -324,6 +356,7 @@ def _how_it_was_reached(seq: int) -> list[str]:
     return out
 
 
+@traced(declaration=all_but("desk", (1,)))  # line 1 explains what an abstention is
 def answer_abstention_why(ledger: PaperLedger, question: Question) -> Answer:
     """Why the desk stood aside — the most common correct answer on this venue."""
     rows = [e for e in _matching(ledger, question) if e.is_abstention]
@@ -358,6 +391,7 @@ def answer_abstention_why(ledger: PaperLedger, question: Question) -> Answer:
                   data={"abstentions": len(rows), "symbols": symbols})
 
 
+@traced("desk")
 def answer_decision_list(ledger: PaperLedger, question: Question) -> Answer:
     rows = _matching(ledger, question)
     if not rows:
@@ -427,6 +461,7 @@ def answer_integrity(ledger: PaperLedger, question: Question) -> Answer:
                   data={k: str(v) for k, v in report.items()})
 
 
+@traced("desk")
 def answer_position(ledger: PaperLedger, question: Question) -> Answer:
     open_rows = [e for e in ledger.entries if not e.is_settled and not e.is_abstention]
     if not open_rows:
@@ -498,6 +533,7 @@ def answer_calibration(ledger: PaperLedger, question: Question) -> Answer:
     )
 
 
+@traced(declaration=only({0: "desk"}))  # line 1 explains the two clocks
 def answer_session(ledger: PaperLedger, question: Question) -> Answer:
     """Session state, read from the most recent decision rather than recomputed."""
     if not ledger.entries:
@@ -514,6 +550,7 @@ def answer_session(ledger: PaperLedger, question: Question) -> Answer:
                         "hours_to_discovery": latest.hours_to_discovery})
 
 
+@traced(declaration=all_but("desk", (3,)))  # line 3 describes the evidence gate
 def answer_evidence(ledger: PaperLedger, question: Question) -> Answer:
     """What the desk could see. Reads the decision's own record, never re-fetches.
 
@@ -641,6 +678,33 @@ def answer_review(ledger: PaperLedger, question: Question) -> Answer:
         )
     for p in report.rejected[:3]:
         lines.append(f"{p.rule}: {str(p.status).lower()} — {p.note}.")
+    learned_path = notes_path.parent / "rule_proposals.json"
+    learned: list[dict[str, Any]] = []
+    if learned_path.exists():
+        # Rules the desk wrote itself from pairs of a flawed and a sound decision, admitted only
+        # if they broke no decision the checkers had passed, then graded on the later half of the
+        # record they never saw (`eval/regression_gate.py`).
+        from argus.eval.regression_gate import admitted_checklist
+
+        seen: set[str] = set()
+        for row in admitted_checklist(json.loads(learned_path.read_text(encoding="utf-8"))):
+            if row.get("status") in ("active", "earning") and row["rule"] not in seen:
+                seen.add(str(row["rule"]))
+                learned.append(row)
+        if learned:
+            lines.append(
+                f"Learned from the desk's own mistakes: {len(learned)} rule(s) written from "
+                f"flawed-versus-sound decision pairs passed the regression gate and still hold on "
+                f"the later half of the record they never saw.")
+            for row in learned[:2]:
+                lines.append(
+                    f"{row['prompt']} Held out: right {row['precision']:.0%} of the times it "
+                    f"fires, catches {row['recall']:.0%} of those defects ({row['lift']:.2f}x "
+                    f"the base rate).")
+            lines.append(
+                "Measured honestly: these came from rule induction over the record; rules Qwen "
+                "wrote from the same pairs all failed the gate, and none of the proposers beat "
+                "the base rate on grounding or lean flags.")
     for item in report.unassessable:
         lines.append(f"Cannot assess yet: {item}.")
     if wrong:
@@ -655,6 +719,8 @@ def answer_review(ledger: PaperLedger, question: Question) -> Answer:
             Source("computation", "argus.desk.review:review"),
             Source("artefact", notes_path.name, f"{report.decisions} decision note(s)"),
             Source("artefact", risk_path.name, "risk records"),
+            *([Source("artefact", "rule_proposals.json",
+                      f"{len(learned)} learned rule(s) holding out of sample")] if learned else []),
         ],
         data=report.as_dict(),
     )

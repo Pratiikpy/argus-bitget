@@ -60,6 +60,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from argus.lui.normalise import fold
+
 MODEL_PATH = Path(__file__).resolve().parents[3] / "data" / "lui_ngram_model.json"
 
 OUT_OF_SCOPE = "out_of_scope"
@@ -177,7 +179,10 @@ class NgramClassifier:
         dense array would be almost entirely zeros and would need numpy to be worth building.
         """
         counts: dict[int, int] = {}
-        for gram in char_wb_ngrams(text.lower(), self.min_n, self.max_n):
+        # `fold` first: full-width letters and Traditional characters onto the forms the model was
+        # fitted on (`lui/normalise.py`). It is the identity on every training row, so the stdlib
+        # scorer still agrees with the fitted scikit-learn model on all of them.
+        for gram in char_wb_ngrams(fold(text).lower(), self.min_n, self.max_n):
             index = self._vocab.get(gram)
             if index is not None:
                 counts[index] = counts.get(index, 0) + 1
@@ -208,7 +213,7 @@ class NgramClassifier:
         """
         return any(
             gram.strip() and gram in self._vocab
-            for gram in char_wb_ngrams(text.lower(), self.min_n, self.max_n)
+            for gram in char_wb_ngrams(fold(text).lower(), self.min_n, self.max_n)
         )
 
     def probabilities(self, text: str) -> list[tuple[float, str]]:

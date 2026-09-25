@@ -10,7 +10,9 @@ signature error:
 3. **signature accepted** — a private read (``/api/v2/mix/account/accounts``); this is the step
    that proves base64 digest + query-string-inclusive signing are both right
 4. **demo routing** — confirms the client is pointed at the demo ``productType``
-5. **order round trip** — place the smallest possible order, read it back, cancel it
+5. **order round trip** — place the smallest possible order and poll its status until it is final
+   (`execution/confirm.py`). It is not cancelled: a demo market order fills or is refused, and
+   this line used to promise a cancel the code never made
 
 Step 5 places a real order **on the demo environment**. It is gated behind an explicit flag and
 never runs by default, because "it defaulted to live" is not a mistake worth being one command away
@@ -41,10 +43,15 @@ from argus.execution.bitget_client import (
     DEMO_PRODUCT_TYPE,
     BitgetAuthError,
     BitgetOrderError,
+    BitgetStatusSource,
     BitgetTradingClient,
     credentials_present,
 )
-from argus.execution.orders import Order, OrderBook, OrderState
+from argus.execution.confirm import confirm_in_book
+from argus.execution.orders import Order, OrderBook
+
+ROUND_TRIP_DEADLINE_S = 15.0
+"""How long the probe polls a demo market order's status before reporting what it last saw."""
 
 # Bitget's own names, from agent-sdk/src/config.ts:192-194 and both official READMEs.
 REQUIRED = ("BITGET_API_KEY", "BITGET_SECRET_KEY", "BITGET_PASSPHRASE")
@@ -155,18 +162,21 @@ def _order_round_trip(client: BitgetTradingClient, *, symbol: str, size: Decimal
         return Step("order_round_trip", False, f"place failed: {exc}")
 
     book.submit(authorised, at=datetime.now(UTC))
-    try:
-        state, filled = client.reconcile(order, symbol=symbol)
-    except BitgetOrderError as exc:
-        return Step(
-            "order_round_trip", False,
-            f"placed as {placed.venue_order_id} but reconcile failed: {exc}",
-        )
-
+    # **Polled to a deadline, not read once.** This used to call `client.reconcile` on the line
+    # after placement, so a venue that had not yet indexed the order returned an empty detail and
+    # the probe failed on timing rather than on the signed path it exists to prove. The status is
+    # now polled until it is final (`execution/confirm.py`, after OSWorld's settle-by-polling).
+    # There is no verified Bitget position read, so the most this can establish is a status the
+    # position has not corroborated — and the detail says exactly that rather than "filled".
+    confirmation = confirm_in_book(
+        book, client_order_id=order.client_order_id, status=BitgetStatusSource(client),
+        position=None, position_before=None, at=datetime.now(UTC),
+        deadline_s=ROUND_TRIP_DEADLINE_S,
+    )
     return Step(
         "order_round_trip",
-        state is not OrderState.UNKNOWN,
-        f"venue id {placed.venue_order_id}, state {state}, filled {filled}",
+        confirmation.status_state is not None,
+        f"venue id {placed.venue_order_id}; {confirmation.render()}",
     )
 
 

@@ -26,6 +26,15 @@ may have filled it, may never have seen it. Treating a timeout as a rejection an
 duplicate exposure is created, and it is the failure that stranded fourteen jobs on another
 platform of ours: the code assumed a step had happened, nothing errored, and the state sat wrong
 forever.
+
+**DISAGREED is a second ARGUS addition (2026-09-25), labelled the same way.** UNKNOWN means we asked
+and got no answer. DISAGREED means we asked twice, of two independent venue records (the order's
+status and the account's position), and the answers contradict each other: the status says filled
+and the position never moved, or the status says rejected and the position did. That is a
+different fact from silence, and folding it into UNKNOWN would erase the one thing the book knows —
+that the venue's own records are inconsistent. It is live for the same reason UNKNOWN is, and it is
+left only by reconciliation. `execution/confirm.py` is the only producer; its docstring names the
+SWE-bench (MIT) cross-check it is adapted from.
 """
 
 from __future__ import annotations
@@ -95,6 +104,14 @@ class OrderState(StrEnum):
     the venue — never by assumption, and never by resubmitting.
     """
 
+    DISAGREED = "disagreed"
+    """**ARGUS addition — not in Nautilus.** Two independent venue records contradict each other.
+
+    Set only through `execution/confirm.py` when the order's status and the position delta still
+    disagree at the settle deadline. Live, because whichever record is right, exposure may exist.
+    Resolvable only by reconciliation, exactly like UNKNOWN.
+    """
+
     # --- predicates, mirroring Nautilus's is_open / is_closed / is_inflight / is_cancellable ---
 
     @property
@@ -141,11 +158,27 @@ class OrderState(StrEnum):
     def is_live(self) -> bool:
         """Does this state imply exposure the risk layer must account for?
 
-        Open **or** in-flight **or** unknown. UNKNOWN counts as live: assuming otherwise leaves a
-        position nobody is watching. This is the predicate reconciliation sweeps must use.
+        Open **or** in-flight **or** unknown **or** disagreed. UNKNOWN and DISAGREED count as live:
+        assuming otherwise leaves a position nobody is watching. This is the predicate
+        reconciliation sweeps must use.
         """
-        return self.is_open or self.is_inflight or self is OrderState.UNKNOWN
+        return (
+            self.is_open or self.is_inflight
+            or self in (OrderState.UNKNOWN, OrderState.DISAGREED)
+        )
 
+
+_RECONCILED: frozenset[OrderState] = frozenset({
+    OrderState.ACCEPTED,
+    OrderState.TRIGGERED,
+    OrderState.PARTIALLY_FILLED,
+    OrderState.FILLED,
+    OrderState.CANCELLED,
+    OrderState.REJECTED,
+    OrderState.EXPIRED,
+    OrderState.VOIDED,
+})
+"""Wherever the venue says an order is. The exits from UNKNOWN and from DISAGREED."""
 
 _LEGAL: dict[OrderState, frozenset[OrderState]] = {
     OrderState.INITIALISED: frozenset({OrderState.DENIED, OrderState.SUBMITTED}),
@@ -156,6 +189,7 @@ _LEGAL: dict[OrderState, frozenset[OrderState]] = {
         OrderState.PARTIALLY_FILLED,
         OrderState.CANCELLED,
         OrderState.UNKNOWN,
+        OrderState.DISAGREED,
     }),
     OrderState.ACCEPTED: frozenset({
         OrderState.TRIGGERED,
@@ -167,6 +201,7 @@ _LEGAL: dict[OrderState, frozenset[OrderState]] = {
         OrderState.EXPIRED,
         OrderState.VOIDED,
         OrderState.UNKNOWN,
+        OrderState.DISAGREED,
     }),
     OrderState.TRIGGERED: frozenset({
         OrderState.PENDING_UPDATE,
@@ -176,6 +211,7 @@ _LEGAL: dict[OrderState, frozenset[OrderState]] = {
         OrderState.CANCELLED,
         OrderState.EXPIRED,
         OrderState.UNKNOWN,
+        OrderState.DISAGREED,
     }),
     OrderState.PENDING_UPDATE: frozenset({
         OrderState.ACCEPTED,
@@ -186,6 +222,7 @@ _LEGAL: dict[OrderState, frozenset[OrderState]] = {
         OrderState.EXPIRED,
         OrderState.REJECTED,          # the modify itself can be refused
         OrderState.UNKNOWN,
+        OrderState.DISAGREED,
     }),
     OrderState.PENDING_CANCEL: frozenset({
         OrderState.ACCEPTED,          # cancel refused, order still working
@@ -195,6 +232,7 @@ _LEGAL: dict[OrderState, frozenset[OrderState]] = {
         OrderState.EXPIRED,
         OrderState.REJECTED,
         OrderState.UNKNOWN,
+        OrderState.DISAGREED,
     }),
     OrderState.PARTIALLY_FILLED: frozenset({
         OrderState.PENDING_UPDATE,
@@ -204,20 +242,17 @@ _LEGAL: dict[OrderState, frozenset[OrderState]] = {
         OrderState.EXPIRED,
         OrderState.VOIDED,
         OrderState.UNKNOWN,
+        OrderState.DISAGREED,
     }),
-    # Reconciliation is the ONLY exit from UNKNOWN, and it can land wherever the venue says.
-    OrderState.UNKNOWN: frozenset({
-        OrderState.ACCEPTED,
-        OrderState.TRIGGERED,
-        OrderState.PARTIALLY_FILLED,
-        OrderState.FILLED,
-        OrderState.CANCELLED,
-        OrderState.REJECTED,
-        OrderState.EXPIRED,
-        OrderState.VOIDED,
-    }),
-    # Terminal. VOIDED is reachable from FILLED because a venue can bust a fill after the fact.
-    OrderState.FILLED: frozenset({OrderState.VOIDED}),
+    # Reconciliation is the ONLY exit from UNKNOWN, and it can land wherever the venue says. A
+    # reconciliation that finds the venue's two records contradicting each other lands in
+    # DISAGREED, which is a finding, not a failure to find.
+    OrderState.UNKNOWN: _RECONCILED | {OrderState.DISAGREED},
+    # The same exits, for the same reason: only the venue, read again, can settle a contradiction.
+    OrderState.DISAGREED: _RECONCILED,
+    # Terminal. VOIDED is reachable from FILLED because a venue can bust a fill after the fact, and
+    # DISAGREED because a later sweep can find the position never moved for a fill booked earlier.
+    OrderState.FILLED: frozenset({OrderState.VOIDED, OrderState.DISAGREED}),
     OrderState.DENIED: frozenset(),
     OrderState.CANCELLED: frozenset(),
     OrderState.REJECTED: frozenset(),
@@ -427,7 +462,57 @@ class OrderBook:
         return [o for o in self._orders.values() if o.state.is_live]
 
     def needs_reconciliation(self) -> list[Order]:
-        return [o for o in self._orders.values() if o.state is OrderState.UNKNOWN]
+        """Orders only the venue, read again, can settle: no answer, or two answers that clash."""
+        return [
+            o for o in self._orders.values()
+            if o.state in (OrderState.UNKNOWN, OrderState.DISAGREED)
+        ]
+
+    def apply_confirmation(
+        self,
+        client_order_id: str,
+        *,
+        target: OrderState,
+        filled: Decimal | None,
+        at: datetime,
+        reason: str,
+    ) -> Order:
+        """Record what `execution/confirm.py` established. The only writer of DISAGREED.
+
+        ``filled`` is adopted only when both venue records agreed on it; a caller passes ``None``
+        for a disagreement, because adopting either side's number would pick a winner the evidence
+        does not name.
+
+        **An inferred ACCEPTED, stated in the history rather than hidden.** A confirmation sees the
+        venue's end state, not its path. An order observed as SUBMITTED and next seen EXPIRED must
+        have been accepted in between — a venue cannot expire an order it never took — so when the
+        direct edge is not in the protocol but the route through ACCEPTED is, that route is taken
+        and the inferred step is written as such. Anything else is a protocol violation and raises,
+        exactly as :meth:`Order.transition` does.
+        """
+        order = self._orders[client_order_id]
+        if filled is not None:
+            if filled > order.quantity:
+                raise ValueError(
+                    f"{client_order_id}: a confirmed fill of {filled} exceeds the order's "
+                    f"{order.quantity}; an overfill is never adopted"
+                )
+            order.filled_quantity = filled
+        if target is order.state:
+            return order
+        if (
+            target not in _LEGAL[order.state]
+            and OrderState.ACCEPTED in _LEGAL[order.state]
+            and target in _LEGAL[OrderState.ACCEPTED]
+        ):
+            order.transition(
+                OrderState.ACCEPTED, at=at,
+                reason=(
+                    f"inferred: the venue reports {target.value}, so it accepted the order first"
+                ),
+            )
+        order.transition(target, at=at, reason=reason)
+        return order
 
     def get(self, client_order_id: str) -> Order:
         return self._orders[client_order_id]

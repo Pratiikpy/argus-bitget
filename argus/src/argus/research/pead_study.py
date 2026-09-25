@@ -69,7 +69,7 @@ from argus.cost.model import FUNDING_INTERVAL_HOURS, CostModel
 from argus.market.bitget import ANCHOR_OF, fetch_rtokens
 from argus.market.fundamentals import FundamentalsSource
 from argus.market.history import Candle, fetch_range
-from argus.research.sue import MIN_QUARTERS, SueError, read
+from argus.research.sue import MIN_QUARTERS, SueError, read_dated, yoy_window
 
 STUDY_PATH = Path(__file__).resolve().parents[3] / "data" / "pead_study.json"
 
@@ -177,14 +177,21 @@ def _fetch_sue_events(
             continue
         made = 0
         for i in range(len(facts) - MIN_QUARTERS + 1):
-            window = facts[i:i + MIN_QUARTERS]
+            # Paired by date, not by position (corrected 2026-09-25): SEC XBRL has no
+            # standalone fiscal Q4, so `facts[i + 4]` is not the same quarter a year earlier —
+            # see `research.sue`'s module docstring and `eval/general_sue_comparison.py`. Only
+            # quarters ending on or before `facts[i]` are visible to the reading.
+            history = [(f.end, f.value) for f in facts[i:]]
             try:
-                sue = read(ticker, [f.value for f in window])
+                window = yoy_window(history)
+                sue = read_dated(ticker, history)
             except SueError:
                 continue
+            used = {d.end for d in window} | {d.prior_end for d in window}
             events.append(PeadEvent(
                 rtoken=rtoken, anchor=ticker,
-                filed=window[0].filed, period_end=window[0].end, sue=sue.sue,
+                filed=max(f.filed for f in facts[i:] if f.end in used),
+                period_end=facts[i].end, sue=sue.sue,
             ))
             made += 1
         if made == 0:

@@ -24,6 +24,29 @@ broad-and-suggestive in a record a judge will read.
 Each rule pairs a phrase the desk actually writes with a field on the evidence that settles it. A
 claim with no such field is not checked and is not reported as passing — :class:`ClaimReport`
 counts what it examined, so coverage is visible rather than implied.
+
+**Partially supported, as a state of its own (added 2026-09-25, item S23).** A claim used to pass
+the moment one relevant record agreed, which is right about the question "is the thesis
+contradicted" and silent about a second one: a thesis that says "the insider sales are
+pre-arranged" over two filings, one planned and one not, is true of half of what it describes. That
+is Self-RAG's ``[Partially supported]`` exactly — "supported by the evidence to some extent, but
+there is major information in the output that is not discussed in the evidence"
+(``AkariAsai/self-rag``, MIT, ``data_creation/critic/gpt4_reward/chatgpt_groundness.py:48``;
+vocabulary at ``retrieval_lm/utils.py:48-49``). Such a claim is now a :class:`PartialClaim`:
+reported, serialised, counted in :attr:`ClaimReport.support`, and deliberately **not** a
+contradiction — :attr:`ClaimReport.sound` keeps its meaning, because a thesis may be about a subset
+of its evidence and the desk's flags, escalation and review all key on contradictions. Adapted, not
+copied: Self-RAG reads the label from a fine-tuned model's token probabilities; here it is counted
+from the records, and nothing is asked of a model.
+
+**The conviction rule no longer fires on the word alone (fixed 2026-09-25).** It matched
+``high-conviction`` anywhere, and the desk writes that about its own hurdle: "the 20.80bps total
+hurdle requires a high-conviction directional call". Replayed over the record, six of the seven
+contradictions the desk ever logged (seqs 175, 237, 461, 485, 520, 575) were this rule reading a
+sentence about the hurdle as a claim about an insider trade, and every one of the eight theses on
+the ledger that used the phrase used it that way. A contradiction that is not one is the most
+expensive kind of false alarm in a record a judge reads. The rule now needs the claim to be about an
+insider or a purchase, which is the claim its field can actually settle.
 """
 
 from __future__ import annotations
@@ -32,6 +55,8 @@ import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol
+
+from argus.agents.grounding import Support, combine
 
 NEGATION_WINDOW = 40
 """Characters before a phrase searched for a negation. "not pre-arranged" is the opposite claim."""
@@ -113,7 +138,13 @@ RULES: tuple[Rule, ...] = (
     ),
     Rule(
         name="conviction",
-        pattern=r"(?:high[- ]conviction|conviction\s+(?:buy|purchase)|strong\s+insider\s+signal)",
+        # About an insider or a purchase, within one clause — never "high-conviction" on its own,
+        # which the desk writes about its hurdle (see the module docstring, and the regression
+        # fixtures in tests/test_claims.py taken verbatim from the ledger).
+        pattern=(
+            r"(?:\binsider\b[^.;:]{0,40}?\bconviction\b|\bconviction\b[^.;:]{0,40}?\binsider\b"
+            r"|\bconviction\s+(?:buy|buying|purchase)\b|\bstrong\s+insider\s+signal\b)"
+        ),
         field="conviction",
         asserts=True,
         explain=(
@@ -155,21 +186,85 @@ class Contradiction:
 
 
 @dataclass(frozen=True)
+class PartialClaim:
+    """A claim some of its relevant records support and others refute.
+
+    Not a contradiction — the thesis is true of part of what it describes — and not full support
+    either: it generalises past its evidence. Both sides are named so a reader can see which.
+    """
+
+    rule: str
+    claim_text: str
+    field: str
+    asserted: bool
+    agreeing: tuple[str, ...]
+    disagreeing: tuple[str, ...]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "rule": self.rule,
+            "claim": self.claim_text,
+            "field": self.field,
+            "asserted": self.asserted,
+            "agreeing": list(self.agreeing),
+            "disagreeing": list(self.disagreeing),
+        }
+
+    def render(self) -> str:
+        """Worded to contain none of the finding phrases `paper/runner.py` flags on: this is a
+        qualification of a claim that passed, not a contradiction."""
+        shown = ", ".join(self.disagreeing[:3]) + (
+            f" and {len(self.disagreeing) - 3} more" if len(self.disagreeing) > 3 else ""
+        )
+        return (
+            f"[claim] {self.rule}: partially supported — \"{self.claim_text}\" holds for "
+            f"{len(self.agreeing)} of {len(self.agreeing) + len(self.disagreeing)} record(s) "
+            f"carrying {self.field}, not for {shown}; the thesis generalises past its evidence"
+        )
+
+
+@dataclass(frozen=True)
 class ClaimReport:
     contradictions: tuple[Contradiction, ...]
     claims_examined: int
     records_checked: int
+    partial: tuple[PartialClaim, ...] = ()
+    """Examined claims that some relevant records support and others refute."""
 
     @property
     def sound(self) -> bool:
         return not self.contradictions
 
+    @property
+    def fully_supported(self) -> int:
+        """Examined claims every relevant record agrees with."""
+        return self.claims_examined - len(self.contradictions) - len(self.partial)
+
+    @property
+    def support(self) -> Support | None:
+        """Self-RAG's three levels over the examined claims; ``None`` when none was examined.
+
+        ``None`` rather than full support on purpose: this module's founding rule is that a claim
+        it could not settle is never reported as passing, and a thesis-level "fully supported" over
+        zero examined claims would be exactly that.
+        """
+        if not self.claims_examined:
+            return None
+        return combine(
+            [Support.FULL] * self.fully_supported
+            + [Support.PARTIAL] * len(self.partial)
+            + [Support.NONE] * len(self.contradictions)
+        )
+
     def as_dict(self) -> dict[str, Any]:
+        support = self.support
         return {
             "sound": self.sound,
             "claims_examined": self.claims_examined,
             "records_checked": self.records_checked,
+            "support": None if support is None else str(support),
             "contradictions": [c.as_dict() for c in self.contradictions],
+            "partial": [p.as_dict() for p in self.partial],
         }
 
     def render(self) -> list[str]:
@@ -180,12 +275,18 @@ class ClaimReport:
                 f"[claim] no checkable claim found in the thesis "
                 f"({self.records_checked} structured record(s) available)"
             ]
-        if self.sound:
+        if self.sound and not self.partial:
             return [
                 f"[claim] {self.claims_examined} checkable claim(s) agree with the "
                 f"{self.records_checked} structured record(s) behind them"
             ]
-        return [c.render() for c in self.contradictions] + [
+        if self.sound:
+            return [
+                f"[claim] {self.claims_examined} checkable claim(s) examined against the "
+                f"{self.records_checked} structured record(s) behind them: "
+                f"{self.fully_supported} fully supported, {len(self.partial)} partially"
+            ] + [p.render() for p in self.partial]
+        return [c.render() for c in self.contradictions] + [p.render() for p in self.partial] + [
             "[claim] a thesis that contradicts its own evidence is a defect in the reasoning, "
             "not a difference of opinion"
         ]
@@ -209,9 +310,11 @@ def check(
     :meth:`argus.market.insider.InsiderDecision.as_dict`. A claim is a contradiction when the
     thesis asserts a property and **every** record carrying that field disagrees: one matching
     record is enough to make the claim true of something, and a thesis is allowed to be about a
-    subset of its evidence.
+    subset of its evidence. When some records agree and some do not, the claim is a
+    :class:`PartialClaim` — passing, and reported as reaching past its evidence.
     """
     contradictions: list[Contradiction] = []
+    partial: list[PartialClaim] = []
     examined = 0
 
     for rule in rules:
@@ -228,11 +331,24 @@ def check(
         examined += 1
 
         agreeing = [rid for rid, attrs in relevant if bool(attrs[rule.field]) is rule.asserts]
+        start = max(0, match.start() - 30)
         if agreeing:
+            disagreeing = [rid for rid, attrs in relevant
+                           if bool(attrs[rule.field]) is not rule.asserts]
+            if disagreeing:
+                partial.append(
+                    PartialClaim(
+                        rule=rule.name,
+                        claim_text=thesis[start: match.end() + 30].strip(),
+                        field=rule.field,
+                        asserted=rule.asserts,
+                        agreeing=tuple(agreeing),
+                        disagreeing=tuple(disagreeing),
+                    )
+                )
             continue
 
         rid, attrs = relevant[0]
-        start = max(0, match.start() - 30)
         contradictions.append(
             Contradiction(
                 rule=rule.name,
@@ -249,6 +365,7 @@ def check(
         contradictions=tuple(contradictions),
         claims_examined=examined,
         records_checked=len(records),
+        partial=tuple(partial),
     )
 
 
@@ -257,6 +374,7 @@ __all__ = [
     "RULES",
     "ClaimReport",
     "Contradiction",
+    "PartialClaim",
     "Rule",
     "check",
 ]

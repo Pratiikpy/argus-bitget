@@ -441,7 +441,8 @@ _SINGLE_NAME = re.compile(
 """One holding falling on its own, as distinct from the market falling."""
 _STOP_QUESTION = re.compile(
     r"\bstop[\s-]?loss\b|\bwhere\s+(?:should|do|would|to)\s+(?:i\s+)?(?:put|place|set)\s+"
-    r"(?:my\s+|a\s+|the\s+)?stop\b|\bstop\s+(?:level|placement|distance)\b", re.I)
+    r"(?:my\s+|a\s+|the\s+)?stop\b|\bstop\s+(?:level|placement|distance)\b|"
+    r"\bwhere\s+(?:should|would|do|does)\s+(?:my|the|a)\s+stop\s+(?:go|be|sit)\b", re.I)
 _TAKE_PROFIT_Q = re.compile(r"\btake[\s-]?profits?\b|\bprofit\s+(?:target|taking)\b|"
                             r"\btp\s+(?:level|target|at)\b|\bwhere\s+(?:should|do|to)\s+(?:i\s+)?"
                             r"(?:sell|exit|take\s+(?:gains|profits?))\b", re.I)
@@ -890,6 +891,7 @@ _MARKET_WIDE = re.compile(r"\b(?:the\s+market|markets|stocks|equities|nasdaq|s&p
                           r"tech\s+stocks|crypto\s+market)\b", re.I)
 _BOOK_RISK = re.compile(
     r"\b(?:how\s+risky\s+is\s+my|how\s+risky\s+(?:is\s+(?:it|this|that)\s+)?now|"
+    r"how\s+risky\s+is\s+(?=\d{1,3}(?:\.\d+)?\s*%)|"
     r"risk\s+(?:of|in|on)\s+my|my\s+(?:portfolio|book|holdings)\s+"
     r"(?:risk|look|safe)|rebalanc\w*|diversif\w*|concentrat\w*|review\s+my\s+(?:portfolio|"
     r"book|holdings|positions)|is\s+my\s+(?:portfolio|book)\s+(?:safe|ok|okay|too)|"
@@ -2706,7 +2708,12 @@ def with_book(request: ResearchRequest | None, book_text: str,
     wins over the saved one — the question is the more specific statement of intent — and whenever
     the saved book is used, the answer says so.
     """
-    if request is None or not book_text.strip():
+    if request is None:
+        return request
+    if question:
+        # a trade idea's size read as a market shock is the idea, added to this book
+        request = _idea_request(question, request)
+    if not book_text.strip():
         return request
     if question:
         request = without_hedges(request, question)
@@ -5662,8 +5669,26 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
     candidates = [*named, *(c for c in candidates if c not in named)]
     if not candidates:
         return [], [], {}
-    data = load([*book, *candidates])
-    series = data.raw
+    try:
+        data = load([*book, *candidates])
+        series = data.raw
+    except PortfolioError:
+        # One hedge instrument whose history cannot be read must not sink the answer: offline,
+        # SMH and BTC are not in the frozen history, and 33 hedge questions raised out of the
+        # console instead of answering with the legs that could be measured (trace audit,
+        # 2026-09-26). The book is loaded alone (its failure is the real refusal) and each
+        # candidate is added only if its own history loads.
+        data = load(list(book))
+        series = dict(data.raw)
+        for leg in list(candidates):
+            try:
+                series.update(load([leg]).raw)
+            except PortfolioError:
+                candidates.remove(leg)
+        if not candidates:
+            return ([f"No hedge instrument's price history could be read just now "
+                     f"({', '.join(_t(c) for c in HEDGE_CANDIDATES_EQUITY)} tried), so no hedge "
+                     f"ratio is given rather than one measured on nothing."], [], {})
     held = set.intersection(*(set(series.get(s, {})) for s in book))
     tickers = fetch_tickers()
     rows: list[dict[str, Any]] = []
@@ -6400,6 +6425,7 @@ _LIQUIDITY_TIME_Q = re.compile(
     r"\bbest\s+(?:time|hours?)\s+(?:of\s+(?:the\s+)?day\s+)?to\s+(?:trade|buy|sell|execute|enter)|"
     r"\bwhen\s+is\s+\S+\s+(?:most\s+)?liquid|\bliquidity\s+(?:dry|dries|dried|thin\w*)|"
     r"\bweekend\s+liquidity|\bliquid\w*\s+(?:on|over|at|during)\s+(?:the\s+)?weekends?|"
+    r"\bhow\s+liquid\s+is\s+\S+\s+(?:on|over|at|during)\s+(?:the\s+)?weekends?|"
     r"\bwhat\s+hours?\s+(?:is|are|does)\s+\S+\s+(?:most\s+)?(?:liquid|active|traded)|"
     r"\bmost\s+liquid\s+(?:hours?|time)", re.I)
 """"whats the best time of day to trade nvda perps" and "does liquidity dry up on weekends for
@@ -8090,7 +8116,7 @@ def _analogue(symbol: str, data: MarketData) -> tuple[list[str], list[Source], d
     if query is None or not corpus:
         return ([f"Not enough {_t(symbol)} history to describe the current state."], [], {})
     as_of = closes[-1][0] if closes[-1][0].tzinfo else closes[-1][0].replace(tzinfo=UTC)
-    report = find(query=query, corpus=corpus, as_of=as_of)
+    report = find(query=query, corpus=corpus, as_of=as_of, explain=True)
     lines = [
         f"Now: {_t(symbol)} is {query['trailing_return']:+.0f}bps over the last 24h with hourly "
         f"volatility of {query['volatility_bps']:.0f}bps."
@@ -8114,6 +8140,22 @@ def _analogue(symbol: str, data: MarketData) -> tuple[list[str], list[Source], d
         ))
         lines.append(f"Spread of outcomes: 25th percentile {dist.quantile(25):+.0f}bps, 75th "
                      f"{dist.quantile(75):+.0f}bps — the range, not the median, is the risk.")
+        # Why the closest past states were chosen: each one's distance and the feature that
+        # dominated it (`desk/analogue.py:explain_lines`). Retrieval is unchanged — diversity
+        # re-ranking tied here and lost for path shapes (`eval/retrieval_diversity.py`).
+        closest = [m for m in report.matches[:3] if m.details is not None]
+        first = closest[0].details if closest else None
+        if first is not None:
+            words = {"trailing_return": "the size of the 24h move",
+                     "volatility_bps": "hourly volatility"}
+            from collections import Counter
+
+            lead = Counter(m.dominant_feature for m in closest).most_common(1)[0][0]
+            lines.append(
+                "Closest past states: " + ", ".join(
+                    f"{m.observation.as_of:%d %b %H:%M} UTC" for m in closest)
+                + f" — matched mostly on {words.get(lead, lead.replace('_', ' '))} (distance "
+                  f"{first.distance:.2f}, where 2 is the cut-off for 'comparable').")
     sources = [Source(kind="computation", ref="argus.desk.analogue.find",
                       detail="state = trailing 24h return + realised vol; outcome = next 24h; "
                              "overlapping episodes collapsed")]
@@ -8596,9 +8638,24 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
     2026-09-25) reported the funding rate beside it. The premise is now measured against the
     contract's own settlement history and the verdict stated: holds, does not hold, or unclear.
     """
+    request = _idea_request(raw_text, request)
     with coverage.recording() as reached:
         answer = _run(raw_text, request, ledger=ledger)
         symbol = request.symbols[0] if request.symbols else ""
+        if (not answer.refused and symbol and _is_equity(symbol) and _INTO_EARNINGS.search(raw_text)
+                and request.kind in (ResearchKind.IMPACT, ResearchKind.STRESS,
+                                     ResearchKind.ANALOGUE, ResearchKind.LEVERAGE)):
+            # "…into earnings": the release this position would sit through, measured on the
+            # name's own history rather than left to the trader to look up.
+            night = _earnings_night_lines(symbol, request.size if request.kind is
+                                          ResearchKind.IMPACT else None)
+            lead = next((i for i, line in enumerate(answer.lines)
+                         if line.startswith("Actionable")), -1)
+            answer.lines[lead + 1:lead + 1] = night
+            if night:
+                answer.sources.append(Source(kind="evidence", ref="SEC EDGAR 8-K item 2.02",
+                                             detail=f"{_t(symbol)} results releases; Yahoo "
+                                                    f"daily prices"))
         if not answer.refused and (symbol or _SESSION_CLAIM.search(raw_text)):
             checked = _claim_check(raw_text, symbol)
             if checked:
@@ -8613,7 +8670,10 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                 answer.lines[:] = [*scoped, *(re.sub(r"^Actionable(?: \(\w+\))?:\s*(\w)",
                                                      lambda m: m.group(1).upper(), line)
                                               for line in answer.lines)]
-            if symbol and (request.kind in _PREDICTION_KINDS or (
+            as_of = _as_of(raw_text)
+            if as_of is not None and as_of < datetime.now(UTC) - timedelta(days=1):
+                _point_in_time(answer, as_of)
+            elif symbol and (request.kind in _PREDICTION_KINDS or (
                     request.kind is ResearchKind.ANALOGUE and request.horizon_hours is not None)):
                 _add_prediction_markets(answer, symbol)
     # A sentence said twice is noise: "Funding means longs pay shorts every 8h" appeared three
@@ -8652,7 +8712,165 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                   len(answer.lines))
         answer.lines.insert(at, closing)  # the "Data:" line stays last, as every answer ends
         answer.data["coverage"] = reached.as_dict()
+        _honest_data_line(answer, reached)
     return answer
+
+
+_INTO_EARNINGS = re.compile(r"\b(?:into|over|through|across|before|ahead\s+of)\s+(?:its\s+|the\s+|"
+                            r"their\s+|next\s+)?(?:earnings|results|report)\b|财报前|财报期间",
+                            re.I)
+_IDEA_SIZE = re.compile(
+    r"\b(?:long|short|buy|add|go\s+long|go\s+short)\s+(?P<n1>[A-Za-z]{1,6})\s+"
+    r"(?P<p1>\d{1,2}(?:\.\d+)?)\s*%(?:\s+of\s+(?:my\s+|the\s+)?(?:book|portfolio))?|"
+    r"(?P<p2>\d{1,2}(?:\.\d+)?)\s*%\s+of\s+(?:my\s+|the\s+)?(?:book|portfolio)\s+"
+    r"(?:in|into|of|on)\s+(?P<n2>[A-Za-z]{1,6})\b", re.I)
+"""A trade idea stated with its size: "long NVDA 20% of book", "20% of my book in NVDA". The size
+is a share of the book — never an index shock. "stress test my idea: long NVDA 20% of book into
+earnings" was answered "if QQQ moves +20%" on the hosted console (readiness audit, finding 35)."""
+
+
+def _idea_request(raw_text: str, request: ResearchRequest) -> ResearchRequest:
+    """A stress request whose "shock" is really the size of the trader's own idea, turned into the
+    portfolio-impact question it is: the idea added to the book (or held alone, the rest cash)."""
+    idea = _IDEA_SIZE.search(raw_text)
+    if request.kind is not ResearchKind.STRESS or idea is None:
+        return request
+    pct = float(idea.group("p1") or idea.group("p2"))
+    if request.shock_pct is not None and abs(abs(request.shock_pct) - pct) > 1e-9:
+        return request  # a real market shock was stated beside the idea: keep the stress
+    named = research_symbols(idea.group("n1") or idea.group("n2") or "")[0]
+    if not named:
+        return request
+    add = named[0]
+    book = {s: w for s, w in request.book.items() if s != add}
+    if len(book) == 0:
+        book = {}
+    return replace(request, kind=ResearchKind.IMPACT, symbols=(add, *book), book=book,
+                   size=pct / 100, size_stated=True, shock_pct=None, shock_on=None,
+                   notes=tuple(n for n in request.notes if "scaled to 100%" not in n))
+
+
+def _earnings_night_lines(symbol: str, weight: float | None) -> list[str]:
+    """How this name's own results have moved the stock, release by release: every 8-K item 2.02
+    on EDGAR (acceptance time) against the stock's split-adjusted daily prices (Yahoo). A release
+    accepted before the 09:30 New York open moves that session; one after, the next. The perp keeps
+    trading through the night, so a position held into the release carries the same gap."""
+    from datetime import date
+    from zoneinfo import ZoneInfo
+
+    from argus.market import equity_history
+    from argus.market.evidence import EdgarSource
+
+    ticker = _t(symbol)
+    try:
+        days = equity_history.daily(ticker)
+        filings = EdgarSource().filings(ticker, since=datetime.now(UTC) - timedelta(days=5 * 366),
+                                        limit=400)
+    except Exception:
+        return []
+    releases = sorted({f.accepted for f in filings if f.form == "8-K" and "2.02" in f.items})
+    index = {d.day: i for i, d in enumerate(days)}
+    new_york = ZoneInfo("America/New_York")
+    moves: list[tuple[date, float, float]] = []
+    for accepted in releases:
+        local = accepted.astimezone(new_york)
+        day = local.date() if local.hour * 60 + local.minute < 9 * 60 + 30 else (
+            local.date() + timedelta(days=1))
+        while days and day not in index and day <= days[-1].day:
+            day += timedelta(days=1)  # a release before a weekend or holiday prices after it
+        at = index.get(day)
+        if at is None or at == 0:
+            continue
+        before = days[at - 1].close
+        if before <= 0:
+            continue
+        moves.append((day, days[at].open / before - 1, days[at].close / before - 1))
+    if len(moves) < 4:
+        return []
+    sessions = sorted(abs(m[2]) for m in moves)
+    median = sessions[len(sessions) // 2] if len(sessions) % 2 else (
+        sessions[len(sessions) // 2 - 1] + sessions[len(sessions) // 2]) / 2
+    up = max(m[2] for m in moves)
+    down = min(m[2] for m in moves)
+    big = sum(1 for m in moves if abs(m[2]) > 0.05)
+    lead = (f"Into earnings: {ticker}'s own results moved the stock a median ±{median:.1%} on the "
+            f"session that priced them, over its last {len(moves)} releases (largest "
+            f"{up:+.1%} and {down:+.1%}; more than 5% in {big} of {len(moves)})")
+    if weight:
+        lead += (f" — at {weight:.0%} of the book that is about ±{median * weight:.1%} of the "
+                 f"whole book on the night, and as much as {abs(down) * weight:.1%} on the worst "
+                 f"one seen")
+    last = moves[-1]
+    return [lead + ".",
+            f"The most recent one, {last[0]:%d %b %Y}: opened {last[1]:+.1%} and closed "
+            f"{last[2]:+.1%} against the prior close. Held into the release, the perpetual "
+            f"carries this gap too — it trades through the night the stock is shut "
+            f"(SEC EDGAR 8-K item 2.02 acceptance times; Yahoo split-adjusted daily prices)."]
+
+
+def _honest_data_line(answer: Answer, reached: Any) -> None:
+    """Rewrite a "Data:" line that credits a server which did not answer this time.
+
+    Each kind names its sources up front ("Data: Bitget's bitget-mcp-server (US equity data) and
+    the company's SEC filings, live"), which is true when the server answers. On 2026-09-25 it
+    answered 503 on every tool for hours, the figures came from SEC filings and Yahoo Finance,
+    and the line still credited it — false provenance in a product whose point is that every
+    number names its source (readiness audit, finding 32). The rewritten line names what did
+    answer and says plainly which named source did not."""
+    servers: dict[str, bool] = {}
+    for name, ok in reached.answered.items():
+        server = name.partition(" ")[0] if name.startswith(("bitget-mcp-server ",
+                                                              "bitget-signal ")) else name
+        servers[server] = servers.get(server, False) or ok
+    at = next((i for i, line in enumerate(answer.lines) if line.startswith("Data:")), None)
+    if at is None:
+        return
+    data_line = answer.lines[at]
+    dead = [s for s, ok in servers.items() if not ok and s in data_line]
+    if not dead:
+        return
+    body = " ".join(answer.lines[:at])
+    used = [s for s, ok in servers.items() if ok]
+    for name, marker in (("Yahoo Finance", "Yahoo"), ("Polymarket", "Polymarket"),
+                         ("FRED", "FRED")):
+        if marker in body and name not in used:
+            used.append(name)
+    tail = (" This is analysis, not advice — you make the call."
+            if "This is analysis" in data_line else "")
+    answer.lines[at] = (
+        "Data: " + (", ".join(used) + ", live" if used else "no source answered") + "; "
+        + " and ".join(dead) + " did not answer this time, so nothing above comes from "
+        + ("it" if len(dead) == 1 else "them") + "." + tail)
+
+
+_TODAYS = re.compile(r"^(?:\w+ reports in \d+ day|Next report:|Analyst price targets|"
+                     r"Analyst consensus|Prediction market|Polymarket)", re.I)
+
+
+def _point_in_time(answer: Answer, as_of: datetime) -> None:
+    """Drop every line an answer "as of" a past date could not have known.
+
+    "What was NVDA's net income as of 1 March 2026" withheld the later filings correctly and then
+    appended today's earnings calendar, today's analyst targets and an earnings surprise filed in
+    August — a look-ahead leak in the one capability this console claims point-in-time
+    correctness for (readiness audit, finding 42). Lines that describe today are removed; a line
+    that names a filing date after the as-of date is removed; the answer says what was left out."""
+    kept, dropped = [], 0
+    for line in answer.lines:
+        filed = [datetime.strptime(d, "%Y-%m-%d").replace(tzinfo=UTC)
+                 for d in re.findall(r"\bfiled (\d{4}-\d{2}-\d{2})\b", line)]
+        bare = re.sub(r"^Actionable(?: \(\w+\))?:\s*", "", line)
+        if _TODAYS.search(bare) or any(f > as_of for f in filed):
+            dropped += 1
+            continue
+        kept.append(line)
+    if dropped:
+        at = next((i for i, line in enumerate(kept) if line.startswith("Data:")), len(kept))
+        kept.insert(at, f"Point in time: {dropped} line(s) about today — the next report date, "
+                        f"current analyst targets and consensus, and anything filed after "
+                        f"{as_of:%d %b %Y} — were left out, because the question asks what was "
+                        f"known on that date.")
+    answer.lines[:] = kept
 
 
 _PREDICTION_KINDS = frozenset({ResearchKind.FUNDAMENTALS, ResearchKind.NEWS,
@@ -9481,14 +9699,33 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                         + (f"; shorting {shocked_name} worth about {abs(book_beta):.0%} of the "
                            f"book offsets that part" if abs(book_beta) >= 0.2 else "")
                         + "."))
-            add = next(iter(request.book))
-            report = copilot(add=add, before={s: w for s, w in request.book.items() if s != add}
-                             or {}, size=request.book[add] if len(request.book) > 1 else 1.0,
-                             raw=data.raw, benchmark=BENCHMARK, is_open=is_open)
-            lines.append(report.worst.render().replace(
-                "[stress] ", "What actually happened, not a model — "))
+            # The book as stated, replayed over its own history. This used copilot(add=<first>,
+            # before=<rest>, size=<its weight>), and rebalancing scales the rest by 1 - size: a
+            # 50/50 QQQ/TSLA book was replayed as 50/25 and shown losing -2.01% where it had lost
+            # -4.01% — 28 of 28 multi-name figures wrong in `eval/research_depth.py`'s
+            # recomputation (2026-09-25).
+            from argus.desk import stress_tree
+
+            realised = stress_tree.book_worst_window(data.raw, request.book)
             payload["stress"] = [o.as_dict() for o in outcomes]
-            payload["worst_window"] = report.worst.as_dict()
+            payload["worst_window"] = realised.as_dict()
+            # The scenario tree (`desk/stress_tree.py`): the stated shock grown into what it
+            # implies — the hedged tail, each name alone, whether the shock ever happened in this
+            # history, the tail share and the trim that fixes it, the shut-session case. Measured
+            # on 61 live stress questions: 10 scenario angles against 3, 0 errors in 1,300
+            # recomputed figures, +187ms. It carries the realised worst window itself, so the
+            # one-pass line is used only when the tree could not be grown.
+            tree_lines, tree_sources, tree_payload = stress_tree.research_lines(
+                raw=data.raw, is_open=is_open, book=request.book, shocked=shocked,
+                shock_pct=request.shock_pct, cash=request.cash, shocked_label=shocked_name,
+                provenance=data.provenance)
+            if tree_lines:
+                lines.extend(tree_lines)
+                sources.extend(tree_sources)
+                payload["stress_tree"] = tree_payload
+            else:
+                lines.append(realised.render().replace(
+                    "[stress] ", "What actually happened, not a model — "))
             sources.append(Source(kind="computation", ref="argus.desk.portfolio.stress_by_beta",
                                   detail="beta-propagated shock + realised worst window"))
 

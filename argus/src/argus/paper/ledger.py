@@ -20,6 +20,15 @@ The ledger does not place real orders. Bitget's own SDK routes paper trading thr
 ``paptrading: 1`` header on private endpoints (``agent-sdk/src/client/rest-client.ts:274-280``);
 wiring that requires API credentials the user supplies. The full path is built here and the
 exchange call is the single remaining step.
+
+**Settlements are written as one batch per cycle (2026-09-25).** :meth:`PaperLedger.settle_batch`
+applies every due settlement in one locked rewrite, through
+:func:`argus.execution.batch.write_batch` (after mem0's try-batch-then-per-item fallback,
+Apache-2.0): a row that cannot be settled is refused and named, and the rest settle. Before it, one
+such row raised out of `paper/runner.py` and stopped every cycle that followed. The arithmetic is
+shared with :meth:`PaperLedger.settle` and :meth:`PaperLedger.settle_abstention` rather than
+copied, and a batch leaves the file byte-for-byte as the same settlements made one at a time would
+(`tests/test_execution_truth.py`).
 """
 
 from __future__ import annotations
@@ -28,7 +37,7 @@ import hashlib
 import json
 import os
 import time
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Sequence
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
@@ -37,6 +46,7 @@ from pathlib import Path
 from typing import Any
 
 from argus.cost.model import CostModel, Fill, Liquidity
+from argus.execution.batch import BatchReport, BatchResponse, write_batch
 
 GENESIS = "0" * 16
 
@@ -72,6 +82,29 @@ class LedgerError(RuntimeError):
 
 class LedgerLockTimeout(LedgerError):
     """Another writer held the ledger for too long. Better than writing beside it."""
+
+
+@dataclass(frozen=True, slots=True)
+class SettleRequest:
+    """One settlement to make: the row, the price it settles at, and when."""
+
+    seq: int
+    price: Decimal
+    """The exit price for a position, or the price now for an abstention's counterfactual."""
+
+    settled_at: datetime
+    exit_spread_bps: Decimal | None = None
+    """What crossing the book costs for this size now. Positions only; see
+    :meth:`PaperLedger.settle`."""
+
+
+@dataclass(frozen=True, slots=True)
+class SettlementBatch:
+    """What one :meth:`PaperLedger.settle_batch` call did, row by row."""
+
+    report: BatchReport
+    settled: tuple[Entry, ...]
+    """Rows this call settled, in request order. A row someone else settled is not among them."""
 
 
 @contextmanager
@@ -300,6 +333,118 @@ class Entry:
         return self.is_void or Decimal(self.quantity) == 0
 
 
+def _index_in(rows: Sequence[Entry], seq: int) -> int:
+    """Find a row by sequence number. See :meth:`PaperLedger._index_of` for why it searches."""
+    found = [i for i, e in enumerate(rows) if e.seq == seq]
+    if not found:
+        raise LedgerError(f"no entry {seq}")
+    if len(found) > 1:
+        raise LedgerError(
+            f"entry {seq} appears {len(found)} times; the log is malformed and settling "
+            f"against it would attach an outcome to an ambiguous decision"
+        )
+    return found[0]
+
+
+def _settled_abstention(entry: Entry, *, price_now: Decimal, settled_at: datetime) -> Entry:
+    """The abstention with its counterfactual attached. Shared by the single and batch paths."""
+    if not entry.is_abstention:
+        raise LedgerError(
+            f"entry {entry.seq} has verdict {entry.verdict!r}, which carries a position; settle it "
+            f"with settle(), not settle_abstention()"
+        )
+    if entry.is_settled:
+        raise LedgerError(
+            f"entry {entry.seq} is already settled at {entry.settled_at}; outcomes are written once"
+        )
+    entry_price = Decimal(entry.entry_price)
+    if entry_price <= 0:
+        raise LedgerError(
+            f"entry {entry.seq} has a non-positive entry price; cannot measure a move"
+        )
+    move_bps = (price_now - entry_price) / entry_price * Decimal("10000")
+    return Entry(
+        **{
+            **asdict(entry),
+            "invalidation": tuple(entry.invalidation),
+            "settled_at": settled_at.isoformat(),
+            "exit_price": str(price_now),
+            "counterfactual_move_bps": str(round(move_bps, 4)),
+        }
+    )
+
+
+def _settled_position(
+    entry: Entry,
+    *,
+    exit_price: Decimal,
+    settled_at: datetime,
+    exit_spread_bps: Decimal | None,
+    cost: CostModel,
+) -> Entry:
+    """The position with its outcome attached. Shared by the single and batch paths."""
+    if entry.is_settled:
+        raise LedgerError(
+            f"entry {entry.seq} is already settled at {entry.settled_at}; outcomes are written once"
+        )
+
+    qty = Decimal(entry.quantity)
+    entry_px = Decimal(entry.entry_price)
+
+    # An unrecognised side used to fall through to short, because the test was
+    # ``== "BUY"`` with an implicit else. That failure is silent and total: every long
+    # settles with an inverted sign, every winner is recorded as a loser, and the log looks
+    # entirely normal while the scored numbers are backwards. The canonical values come from
+    # :class:`argus.decision.verdicts.Side`, upper-cased by the runner; anything else is a
+    # defect upstream and is refused here rather than guessed at.
+    side = entry.side.upper()
+    if side not in {"BUY", "SELL"}:
+        raise LedgerError(
+            f"entry {entry.seq} has side {entry.side!r}; expected BUY or SELL. Refusing to settle: "
+            f"an unrecognised side would silently invert the P&L sign."
+        )
+    direction = Decimal("1") if side == "BUY" else Decimal("-1")
+
+    gross = (exit_price - entry_px) * qty * direction
+    exit_charge = cost.charge(
+        Fill(
+            notional=qty * exit_price,
+            liquidity=Liquidity.TAKER,
+            spread_bps=Decimal("0.6") if exit_spread_bps is None else exit_spread_bps,
+        )
+    )
+    entry_charge_bps = Decimal(entry.entry_cost_bps)
+    entry_charge = qty * entry_px * entry_charge_bps / Decimal("10000")
+    net = gross - exit_charge.total - entry_charge
+
+    return Entry(
+        **{
+            **asdict(entry),
+            "invalidation": tuple(entry.invalidation),
+            "settled_at": settled_at.isoformat(),
+            "exit_price": str(exit_price),
+            "gross_pnl": str(round(gross, 4)),
+            "net_pnl": str(round(net, 4)),
+            "direction_correct": bool(gross > 0),
+        }
+    )
+
+
+def _seal_for(settled: Entry, *, seq: int, prev_hash: str) -> Entry:
+    """The `"settlement_seal"` row committing to ``settled``'s outcome fields."""
+    return Entry(
+        seq=seq,
+        decided_at=settled.settled_at or "",
+        symbol="", verdict="settlement_seal", side="", quantity="0", entry_price="0",
+        stated_confidence=0.0, thesis="", invalidation=(),
+        market_state_hash="", approved_intent_hash="", session_phase="",
+        hours_to_discovery=0.0, entry_cost_bps="0",
+        prev_hash=prev_hash,
+        kind="settlement_seal", target_seq=settled.seq,
+        settlement_seal_hash=settled.settlement_content_hash,
+    )
+
+
 @dataclass
 class PaperLedger:
     """Append-only, hash-chained paper-trading record.
@@ -416,15 +561,7 @@ class PaperLedger:
         not: two entries shared seq 41 after a concurrent write. A lookup that silently returns the
         wrong row is worse than one that says the log is malformed.
         """
-        found = [i for i, e in enumerate(self._raw_entries) if e.seq == seq]
-        if not found:
-            raise LedgerError(f"no entry {seq}")
-        if len(found) > 1:
-            raise LedgerError(
-                f"entry {seq} appears {len(found)} times; the log is malformed and settling "
-                f"against it would attach an outcome to an ambiguous decision"
-            )
-        return found[0]
+        return _index_in(self._raw_entries, seq)
 
     @property
     def head_hash(self) -> str:
@@ -510,30 +647,9 @@ class PaperLedger:
         "how much we saved". Whether abstaining was correct is the Observatory's arithmetic to do,
         against the round trip, and pre-judging it here would bake the answer into the data.
         """
-        idx = self._index_of(seq)
-        entry = self._raw_entries[idx]
-        if not entry.is_abstention:
-            raise LedgerError(
-                f"entry {seq} has verdict {entry.verdict!r}, which carries a position; settle it "
-                f"with settle(), not settle_abstention()"
-            )
-        if entry.is_settled:
-            raise LedgerError(
-                f"entry {seq} is already settled at {entry.settled_at}; outcomes are written once"
-            )
-        entry_price = Decimal(entry.entry_price)
-        if entry_price <= 0:
-            raise LedgerError(f"entry {seq} has a non-positive entry price; cannot measure a move")
-
-        move_bps = (price_now - entry_price) / entry_price * Decimal("10000")
-        settled = Entry(
-            **{
-                **asdict(entry),
-                "invalidation": tuple(entry.invalidation),
-                "settled_at": (settled_at or datetime.now(UTC)).isoformat(),
-                "exit_price": str(price_now),
-                "counterfactual_move_bps": str(round(move_bps, 4)),
-            }
+        entry = self._raw_entries[self._index_of(seq)]
+        settled = _settled_abstention(
+            entry, price_now=price_now, settled_at=settled_at or datetime.now(UTC),
         )
         persisted = self._persist_settlement(settled)
         self._seal_settlement(persisted)
@@ -555,52 +671,10 @@ class PaperLedger:
         0.82 and 19.43bps depending on the name, against that single 0.6. Left as ``None`` the old
         default applies, so a caller with no book is charged the documented stand-in, not blocked.
         """
-        idx = self._index_of(seq)
-        entry = self._raw_entries[idx]
-        if entry.is_settled:
-            raise LedgerError(
-                f"entry {seq} is already settled at {entry.settled_at}; outcomes are written once"
-            )
-
-        qty = Decimal(entry.quantity)
-        entry_px = Decimal(entry.entry_price)
-
-        # An unrecognised side used to fall through to short, because the test was
-        # ``== "BUY"`` with an implicit else. That failure is silent and total: every long
-        # settles with an inverted sign, every winner is recorded as a loser, and the log looks
-        # entirely normal while the scored numbers are backwards. The canonical values come from
-        # :class:`argus.decision.verdicts.Side`, upper-cased by the runner; anything else is a
-        # defect upstream and is refused here rather than guessed at.
-        side = entry.side.upper()
-        if side not in {"BUY", "SELL"}:
-            raise LedgerError(
-                f"entry {seq} has side {entry.side!r}; expected BUY or SELL. Refusing to settle: "
-                f"an unrecognised side would silently invert the P&L sign."
-            )
-        direction = Decimal("1") if side == "BUY" else Decimal("-1")
-
-        gross = (exit_price - entry_px) * qty * direction
-        exit_charge = self.cost.charge(
-            Fill(
-                notional=qty * exit_price,
-                liquidity=Liquidity.TAKER,
-                spread_bps=Decimal("0.6") if exit_spread_bps is None else exit_spread_bps,
-            )
-        )
-        entry_charge_bps = Decimal(entry.entry_cost_bps)
-        entry_charge = qty * entry_px * entry_charge_bps / Decimal("10000")
-        net = gross - exit_charge.total - entry_charge
-
-        settled = Entry(
-            **{
-                **asdict(entry),
-                "invalidation": tuple(entry.invalidation),
-                "settled_at": (settled_at or datetime.now(UTC)).isoformat(),
-                "exit_price": str(exit_price),
-                "gross_pnl": str(round(gross, 4)),
-                "net_pnl": str(round(net, 4)),
-                "direction_correct": bool(gross > 0),
-            }
+        entry = self._raw_entries[self._index_of(seq)]
+        settled = _settled_position(
+            entry, exit_price=exit_price, settled_at=settled_at or datetime.now(UTC),
+            exit_spread_bps=exit_spread_bps, cost=self.cost,
         )
         persisted = self._persist_settlement(settled)
         self._seal_settlement(persisted)
@@ -627,22 +701,116 @@ class PaperLedger:
         two spaces can never collide, and a seal existing never shifts what number the next real
         decision gets.
         """
-        target_seq = settled.seq
-        seal_hash = settled.settlement_content_hash
-
         def build(seq: int, prev_hash: str) -> Entry:
-            return Entry(
-                seq=seq,
-                decided_at=settled.settled_at or "",
-                symbol="", verdict="settlement_seal", side="", quantity="0", entry_price="0",
-                stated_confidence=0.0, thesis="", invalidation=(),
-                market_state_hash="", approved_intent_hash="", session_phase="",
-                hours_to_discovery=0.0, entry_cost_bps="0",
-                prev_hash=prev_hash,
-                kind="settlement_seal", target_seq=target_seq, settlement_seal_hash=seal_hash,
-            )
+            return _seal_for(settled, seq=seq, prev_hash=prev_hash)
 
         return self._append_built(build, next_seq=lambda: -(len(self.seals) + 1))
+
+    def _settled_form(self, request: SettleRequest, rows: Sequence[Entry]) -> Entry:
+        """The settled version of ``request``'s row in ``rows``, or :class:`LedgerError`."""
+        entry = rows[_index_in(rows, request.seq)]
+        if entry.is_abstention:
+            return _settled_abstention(
+                entry, price_now=request.price, settled_at=request.settled_at,
+            )
+        return _settled_position(
+            entry, exit_price=request.price, settled_at=request.settled_at,
+            exit_spread_bps=request.exit_spread_bps, cost=self.cost,
+        )
+
+    def settle_batch(self, requests: Sequence[SettleRequest]) -> SettlementBatch:
+        """Settle many rows in one locked rewrite; fall back to one at a time; name every failure.
+
+        The batch path takes the lock once, applies each settlement and its seal to a staged copy
+        of the rows re-read from disk, and writes the file once. It produces exactly the rows and
+        seals, in exactly the order, that :meth:`settle` / :meth:`settle_abstention` would produce
+        called one after another — same arithmetic (shared helpers), same seal numbering, same
+        chain — which the tests pin byte for byte.
+
+        A row that cannot be settled (already settled, a side that is neither BUY nor SELL, a
+        non-positive entry price, a duplicated sequence number) is refused before anything is
+        written and named in the report; the others settle. If the batch write itself raises — the
+        lock times out, the disk refuses — each request is retried alone, after checking whether
+        the batch had already landed it, so a settlement is never written twice.
+        """
+        settled: dict[int, Entry] = {}
+
+        def validate(request: SettleRequest) -> str | None:
+            try:
+                self._settled_form(request, self._raw_entries)
+            except (LedgerError, ArithmeticError, ValueError) as exc:
+                return str(exc)
+            return None
+
+        def batch(valid: Sequence[SettleRequest]) -> BatchResponse:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            with _exclusive(self.path):
+                if self.path.exists():
+                    self._load()  # another writer may have appended or settled since
+                staged = list(self._raw_entries)
+                done: dict[int, Entry] = {}
+                failed: dict[str, str] = {}
+                for request in valid:
+                    try:
+                        new = self._settled_form(request, staged)
+                    except (LedgerError, ArithmeticError, ValueError) as exc:
+                        failed[str(request.seq)] = str(exc)
+                        continue
+                    staged[_index_in(staged, request.seq)] = new
+                    seals = sum(1 for e in staged if e.kind == "settlement_seal")
+                    staged.append(
+                        _seal_for(new, seq=-(seals + 1), prev_hash=staged[-1].content_hash)
+                    )
+                    done[request.seq] = new
+                if done:
+                    with self.path.open("w", encoding="utf-8") as fh:
+                        for e in staged:
+                            fh.write(json.dumps(asdict(e), default=str) + "\n")
+                    self._raw_entries = staged
+                    self._write_anchor()
+            settled.update(done)
+            return BatchResponse(
+                succeeded=frozenset(str(seq) for seq in done), failed=failed,
+            )
+
+        def single(request: SettleRequest) -> None:
+            if self.path.exists():
+                self._load()
+            entry = self._raw_entries[self._index_of(request.seq)]
+            if entry.is_abstention:
+                settled[request.seq] = self.settle_abstention(
+                    request.seq, price_now=request.price, settled_at=request.settled_at,
+                )
+            else:
+                settled[request.seq] = self.settle(
+                    request.seq, exit_price=request.price, settled_at=request.settled_at,
+                    exit_spread_bps=request.exit_spread_bps,
+                )
+
+        def applied(request: SettleRequest) -> bool | None:
+            try:
+                if self.path.exists():
+                    self._load()
+                entry = self._raw_entries[self._index_of(request.seq)]
+            except (OSError, ValueError, TypeError, LedgerError):
+                return None
+            if not entry.is_settled:
+                return False
+            if entry.settled_at == request.settled_at.isoformat():
+                settled[request.seq] = entry  # the failed batch had landed it before raising
+            return True
+
+        report = write_batch(
+            requests, key=lambda r: str(r.seq), batch=batch, single=single, applied=applied,
+            validate=validate,
+        )
+        written = set(report.written_keys)
+        return SettlementBatch(
+            report=report,
+            settled=tuple(
+                settled[r.seq] for r in requests if str(r.seq) in written and r.seq in settled
+            ),
+        )
 
     # --- verification ------------------------------------------------------------------------
 

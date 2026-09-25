@@ -1,0 +1,656 @@
+"""Pre-trade validation — the checks a venue will enforce anyway, done before we ask.
+
+Three independent sources named the same gap. Nautilus runs a `RiskEngine` that denies an order
+before it leaves the process, with a named reason, on price precision, quantity precision, notional
+bounds and submission rate. Hummingbot's `BudgetChecker` locks collateral for a hypothetical order
+and refuses when the balance cannot cover it. The author's own Nomos hit three separate 10x sizing
+bugs that were only fixed by reading tick size, contract multiplier and minimum notional *live from
+the venue* rather than assuming them (`research/architecture/kairos-nomos.md`).
+
+ARGUS had none of it. `execution/preflight.py` checks that the venue is reachable and the signature
+is accepted — a session-level check, run once. Nothing validated an individual order, so an order
+that violated a venue rule would be discovered by the venue, as a rejection, after the decision had
+been recorded as taken.
+
+**The specifications are fetched, never assumed.** Every field below came from
+`GET /api/v3/market/instruments` for the real instrument, and reading it settled a question our own
+cost model had only asserted: Bitget publishes `takerFeeRate: 0.0006`, so a round trip is exactly
+the 12bps `CostModel.bitget_perp` charges. The same response carries `minOrderAmount: 5`,
+`minOrderQty: 0.01`, `maxOrderQty: 52000`, `priceMultiplier: 0.01` and a ±2% price band — none of
+which anything in this system enforced.
+
+**Quantities round DOWN, never to nearest.** This is the Nomos lesson stated as code: rounding a
+size to the nearest multiple can round *up*, and a size that rounds up can cross the very ceiling
+that was just checked. Rounding down can only ever make a position smaller, which is the same
+asymmetry the Constitution obeys — a guard may shrink an order or refuse it, never enlarge it.
+
+**Self-check (2026-09-25).** :func:`would_pass`, :meth:`Guard.self_check` and
+:func:`self_check_request` answer "would this order pass?" with the same function that enforces
+(:func:`_rule`) and return pass/fail only, after mle-bench's ``/validate`` endpoint. The identity
+``would_pass(x) == validate(x).allowed`` is tested over a swept order space.
+
+    python -m argus.execution.guard --symbol NVDAUSDT
+    python -m argus.execution.guard --symbol NVDAUSDT --quantity 0.5 --self-check
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from collections import deque
+from dataclasses import dataclass, field
+from decimal import ROUND_DOWN, Decimal
+from enum import StrEnum
+from typing import Any
+
+INSTRUMENTS_URL = "https://api.bitget.com/api/v3/market/instruments"
+PRODUCT_TYPE = "USDT-FUTURES"
+_TIMEOUT = 20
+
+_ZERO = Decimal("0")
+
+
+class GuardError(RuntimeError):
+    """The guard could not do its job. Raised rather than waved through.
+
+    A validation layer that fails open is worse than none: it produces the confidence of a check
+    without the check.
+    """
+
+
+class Denial(StrEnum):
+    """Why an order was refused. Named states, after Nautilus's own denial vocabulary.
+
+    A generic rejection tells an operator that something is wrong. A named one tells them what.
+    """
+
+    NONE = "none"
+    INSTRUMENT_UNKNOWN = "instrument_unknown"
+    INSTRUMENT_OFFLINE = "instrument_offline"
+    QUANTITY_BELOW_MINIMUM = "quantity_below_minimum"
+    QUANTITY_ABOVE_MAXIMUM = "quantity_above_maximum"
+    NOTIONAL_BELOW_MINIMUM = "notional_below_minimum"
+    PRICE_OUTSIDE_BAND = "price_outside_band"
+    PRICE_NOT_POSITIVE = "price_not_positive"
+    RATE_LIMIT = "rate_limit"
+    INSUFFICIENT_BALANCE = "insufficient_balance"
+    NOT_A_NUMBER = "not_a_number"
+    """A quantity, price, reference or balance that is NaN or infinite.
+
+    Added 2026-09-25, found by the self-check sweep (`eval/guard_selfcheck.py`): 13,800 of
+    190,944 swept orders made the enforcing path *raise* ``decimal.InvalidOperation`` — a NaN
+    compared with ``<=`` — instead of returning a ruling. Failing by exception is closed only if
+    every caller catches that exception; a named denial is closed for all of them.
+
+    The same sweep found the worse half: an **infinite quantity was allowed**. ``Infinity``
+    stepped down is still ``Infinity``, which exceeds the ceiling, which the guard then shrinks to
+    the venue maximum — so "buy infinity" became a 52,000-contract order ruled *allowed*. 1,935
+    swept orders passed that way before this denial; 0 after."""
+
+    @property
+    def allows(self) -> bool:
+        return self is Denial.NONE
+
+
+@dataclass(frozen=True, slots=True)
+class Instrument:
+    """One instrument's trading rules, as the venue publishes them.
+
+    Every field is read from the venue. Nothing here has a default that would let a missing value
+    pass as a permissive one — :meth:`from_payload` raises instead, because a silently-defaulted
+    minimum is how an order gets through a check that never happened.
+    """
+
+    symbol: str
+    status: str
+    price_precision: int
+    quantity_precision: int
+    price_multiplier: Decimal
+    quantity_multiplier: Decimal
+    min_order_qty: Decimal
+    max_order_qty: Decimal
+    min_order_amount: Decimal
+    """Minimum notional in quote currency. 5 USDT on the rTokens."""
+
+    buy_limit_ratio: Decimal
+    sell_limit_ratio: Decimal
+    """How far from the reference price an order may sit, as a fraction. 0.02 is ±2%."""
+
+    maker_fee_rate: Decimal
+    taker_fee_rate: Decimal
+    is_rwa: bool
+    """Bitget's own flag for a tokenised real-world asset. The rTokens carry ``isRwa: YES``."""
+
+    @property
+    def is_online(self) -> bool:
+        return self.status.lower() == "online"
+
+    @property
+    def round_trip_taker_bps(self) -> Decimal:
+        """What the venue says a round trip costs, in bps.
+
+        Worth computing here rather than trusting the cost model: the two agreeing is a check, and
+        the two disagreeing is a finding.
+        """
+        return self.taker_fee_rate * 2 * Decimal("10000")
+
+    @classmethod
+    def from_payload(cls, row: dict[str, Any]) -> Instrument:
+        def need(key: str) -> str:
+            value = row.get(key)
+            if value in (None, ""):
+                raise GuardError(
+                    f"instrument {row.get('symbol', '?')} has no {key}; refusing to substitute a "
+                    f"default for a venue rule"
+                )
+            return str(value)
+
+        return cls(
+            symbol=need("symbol"),
+            status=need("status"),
+            price_precision=int(need("pricePrecision")),
+            quantity_precision=int(need("quantityPrecision")),
+            price_multiplier=Decimal(need("priceMultiplier")),
+            quantity_multiplier=Decimal(need("quantityMultiplier")),
+            min_order_qty=Decimal(need("minOrderQty")),
+            max_order_qty=Decimal(need("maxOrderQty")),
+            min_order_amount=Decimal(need("minOrderAmount")),
+            buy_limit_ratio=Decimal(need("buyLimitPriceRatio")),
+            sell_limit_ratio=Decimal(need("sellLimitPriceRatio")),
+            maker_fee_rate=Decimal(need("makerFeeRate")),
+            taker_fee_rate=Decimal(need("takerFeeRate")),
+            is_rwa=str(row.get("isRwa", "")).upper() == "YES",
+        )
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "symbol": self.symbol, "status": self.status, "is_rwa": self.is_rwa,
+            "price_precision": self.price_precision,
+            "quantity_precision": self.quantity_precision,
+            "price_multiplier": str(self.price_multiplier),
+            "quantity_multiplier": str(self.quantity_multiplier),
+            "min_order_qty": str(self.min_order_qty),
+            "max_order_qty": str(self.max_order_qty),
+            "min_order_amount": str(self.min_order_amount),
+            "price_band_pct": str(self.buy_limit_ratio * 100),
+            "taker_fee_rate": str(self.taker_fee_rate),
+            "round_trip_taker_bps": str(self.round_trip_taker_bps),
+        }
+
+
+def quantise_down(value: Decimal, step: Decimal) -> Decimal:
+    """Round to a multiple of ``step``, always downward.
+
+    Downward, never to nearest. Rounding to nearest can round *up*, and a size that rounds up can
+    cross the ceiling that was checked a moment earlier — which is how a validated order becomes an
+    oversized one between the check and the wire.
+    """
+    if step <= 0:
+        raise GuardError(f"step must be positive, got {step}")
+    return (value / step).to_integral_value(rounding=ROUND_DOWN) * step
+
+
+@dataclass
+class RateLimiter:
+    """A sliding window over submission times.
+
+    Nautilus enforces a maximum order rate because a bug that submits in a loop is the failure that
+    exhausts a quota or a balance before anyone notices. The window is checked, never merely
+    counted: a fixed-bucket counter lets twice the limit through at a bucket boundary.
+    """
+
+    max_orders: int = 10
+    window_seconds: float = 60.0
+    _stamps: deque[float] = field(default_factory=deque)
+
+    def would_exceed(self, *, now: float, prune: bool = True) -> bool:
+        """Whether one more submission at ``now`` would cross the cap.
+
+        ``prune=False`` answers the same question without touching the window, for
+        :func:`would_pass`: a self-check that pruned would still be a *read*, but one whose
+        answer to a later call at an earlier ``now`` could differ from the enforcing path's.
+        Counting instead of pruning keeps the question a pure function of the stamps.
+        """
+        if prune:
+            self._prune(now)
+            return len(self._stamps) >= self.max_orders
+        cutoff = now - self.window_seconds
+        return sum(1 for stamp in self._stamps if stamp > cutoff) >= self.max_orders
+
+    def record(self, *, now: float) -> None:
+        self._prune(now)
+        self._stamps.append(now)
+
+    def _prune(self, now: float) -> None:
+        cutoff = now - self.window_seconds
+        while self._stamps and self._stamps[0] <= cutoff:
+            self._stamps.popleft()
+
+    @property
+    def in_window(self) -> int:
+        return len(self._stamps)
+
+
+@dataclass(frozen=True, slots=True)
+class Ruling:
+    """What the guard decided about one order."""
+
+    denial: Denial
+    reason: str
+    quantity: Decimal
+    price: Decimal | None
+    adjusted: bool
+    """Whether the guard changed the order rather than only judging it."""
+
+    @property
+    def allowed(self) -> bool:
+        return self.denial.allows
+
+    def render(self) -> str:
+        if self.allowed:
+            return (
+                f"[guard] allowed: {self.quantity}"
+                + (f" @ {self.price}" if self.price is not None else "")
+                + (f" — {self.reason}" if self.adjusted else "")
+            )
+        return f"[guard] DENIED {self.denial}: {self.reason}"
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "denial": str(self.denial), "allowed": self.allowed, "reason": self.reason,
+            "quantity": str(self.quantity),
+            "price": None if self.price is None else str(self.price),
+            "adjusted": self.adjusted,
+        }
+
+
+def validate(
+    instrument: Instrument,
+    *,
+    quantity: Decimal,
+    price: Decimal | None = None,
+    reference_price: Decimal | None = None,
+    side: str = "buy",
+    available_balance: Decimal | None = None,
+    limiter: RateLimiter | None = None,
+    now: float | None = None,
+) -> Ruling:
+    """Enforce: rule on one order and, if it is allowed, spend a slot in the rate window.
+
+    The ruling itself is :func:`_rule`, shared word for word with :func:`would_pass`. See there.
+    """
+    return _rule(
+        instrument, quantity=quantity, price=price, reference_price=reference_price, side=side,
+        available_balance=available_balance, limiter=limiter, now=now, record=True,
+    )
+
+
+def would_pass(
+    instrument: Instrument,
+    *,
+    quantity: Decimal,
+    price: Decimal | None = None,
+    reference_price: Decimal | None = None,
+    side: str = "buy",
+    available_balance: Decimal | None = None,
+    limiter: RateLimiter | None = None,
+    now: float | None = None,
+) -> bool:
+    """Self-check: would :func:`validate` allow this order right now? Pass or fail, nothing more.
+
+    **Taken from mle-bench** (MIT; ``environment/grading_server.py:15-19`` and
+    ``mlebench/grade.py:98-124``). Its ``/validate`` endpoint answers "is this submission valid?"
+    by running the competition's *real* grader, ``competition.grader.grade_fn``, and returning
+    only whether it raised — never the score. Two properties made that design worth copying:
+
+    * **The check cannot drift from the enforcement, because it is the enforcement.** A separate
+      "pre-check" re-implementation of the venue rules would be a second copy of eight rules that
+      nobody keeps in step with the first; the day one gains a rule the other lacks, the check
+      starts approving orders the guard refuses. Here both paths call :func:`_rule`, and the
+      property ``would_pass(x) == validate(x).allowed`` is tested over a swept order space
+      (``eval/guard_selfcheck.py``, ``tests/test_guard_selfcheck.py``).
+    * **It answers only pass/fail.** mle-bench withholds the score so an agent cannot fit to the
+      grader. The analogue here is the adjusted size: :func:`validate` may shrink an order to the
+      venue step and ceiling, and a self-check that returned that size would turn a yes/no probe
+      into a sizing oracle the caller could lean on instead of deciding its own size.
+
+    **What differs from mle-bench, deliberately.** Its check is side-effect free because grading
+    is. Ours has one side effect to suppress: enforcement records a submission in the rate window.
+    A self-check that recorded would consume the budget it is asking about, so ``record=False``
+    reaches the limiter as a non-mutating count (:meth:`RateLimiter.would_exceed` with
+    ``prune=False``). Everything else — order of checks, rounding, bands, minima — is shared.
+
+    Rejected: mle-bench's HTTP-500 path for a grader that raises. Here a check that cannot be
+    evaluated is a ``False``, never an error the caller might read as "no objection".
+    """
+    try:
+        return _rule(
+            instrument, quantity=quantity, price=price, reference_price=reference_price,
+            side=side, available_balance=available_balance, limiter=limiter, now=now,
+            record=False,
+        ).allowed
+    except (GuardError, ArithmeticError):
+        # The enforcing path raises on the same input, so it would not have allowed it either.
+        return False
+
+
+def _rule(
+    instrument: Instrument,
+    *,
+    quantity: Decimal,
+    price: Decimal | None,
+    reference_price: Decimal | None,
+    side: str,
+    available_balance: Decimal | None,
+    limiter: RateLimiter | None,
+    now: float | None,
+    record: bool,
+) -> Ruling:
+    """Check one order against the venue's own rules, shrinking it or refusing it.
+
+    Ordered so the cheapest and most fundamental checks come first, and so a denial names the
+    reason a person would want: an offline instrument is reported as offline rather than as a
+    precision failure further down.
+
+    The guard may **reduce** a quantity to the venue's step and ceiling. It never raises one — not
+    even to reach ``min_order_qty``, because increasing an order to satisfy a minimum would be the
+    guard authoring size, and a validation layer that can enlarge a position is a strategy.
+    """
+    moment = time.monotonic() if now is None else now
+
+    for label, value in (("quantity", quantity), ("price", price),
+                         ("reference price", reference_price),
+                         ("available balance", available_balance)):
+        if value is not None and not value.is_finite():
+            return Ruling(Denial.NOT_A_NUMBER, f"{label} {value} is not a finite number",
+                          _ZERO, None, False)
+
+    if not instrument.is_online:
+        return Ruling(
+            Denial.INSTRUMENT_OFFLINE,
+            f"{instrument.symbol} is {instrument.status}, not online", _ZERO, price, False,
+        )
+
+    if limiter is not None and limiter.would_exceed(now=moment, prune=record):
+        return Ruling(
+            Denial.RATE_LIMIT,
+            f"{limiter.in_window} order(s) already submitted in the last "
+            f"{limiter.window_seconds:.0f}s, at the cap of {limiter.max_orders}",
+            _ZERO, price, False,
+        )
+
+    if price is not None and price <= 0:
+        return Ruling(Denial.PRICE_NOT_POSITIVE, f"price {price} is not positive",
+                      _ZERO, price, False)
+
+    adjusted = False
+    final_price = price
+    if price is not None:
+        stepped = quantise_down(price, instrument.price_multiplier)
+        if stepped != price:
+            adjusted = True
+            final_price = stepped
+        if reference_price is not None and reference_price > 0:
+            ratio = (
+                instrument.buy_limit_ratio if side.lower() == "buy"
+                else instrument.sell_limit_ratio
+            )
+            upper = reference_price * (Decimal("1") + ratio)
+            lower = reference_price * (Decimal("1") - ratio)
+            if not lower <= (final_price or _ZERO) <= upper:
+                return Ruling(
+                    Denial.PRICE_OUTSIDE_BAND,
+                    f"{final_price} is outside the venue's ±{ratio * 100}% band around "
+                    f"{reference_price} ({lower} to {upper})",
+                    _ZERO, final_price, False,
+                )
+
+    stepped_qty = quantise_down(quantity, instrument.quantity_multiplier)
+    if stepped_qty != quantity:
+        adjusted = True
+
+    if stepped_qty > instrument.max_order_qty:
+        stepped_qty = quantise_down(instrument.max_order_qty, instrument.quantity_multiplier)
+        adjusted = True
+        if stepped_qty <= 0:
+            return Ruling(
+                Denial.QUANTITY_ABOVE_MAXIMUM,
+                f"{quantity} exceeds the venue maximum {instrument.max_order_qty} and cannot be "
+                f"reduced to a valid step", _ZERO, final_price, True,
+            )
+
+    if stepped_qty < instrument.min_order_qty:
+        return Ruling(
+            Denial.QUANTITY_BELOW_MINIMUM,
+            f"{quantity} rounds down to {stepped_qty}, below the venue minimum "
+            f"{instrument.min_order_qty}; the guard may not round a size up to reach it",
+            _ZERO, final_price, adjusted,
+        )
+
+    mark = final_price if final_price is not None else reference_price
+    if mark is not None and mark > 0:
+        notional = stepped_qty * mark
+        if notional < instrument.min_order_amount:
+            return Ruling(
+                Denial.NOTIONAL_BELOW_MINIMUM,
+                f"notional {notional} is below the venue minimum "
+                f"{instrument.min_order_amount}", _ZERO, final_price, adjusted,
+            )
+        if available_balance is not None and notional > available_balance:
+            return Ruling(
+                Denial.INSUFFICIENT_BALANCE,
+                f"notional {notional} exceeds the available balance {available_balance}",
+                _ZERO, final_price, adjusted,
+            )
+
+    reason = (
+        "adjusted to the venue's step and limits" if adjusted
+        else "within every published venue rule"
+    )
+    if limiter is not None and record:
+        limiter.record(now=moment)
+    return Ruling(Denial.NONE, reason, stepped_qty, final_price, adjusted)
+
+
+def fetch_instruments(
+    *, symbol: str | None = None, product_type: str = PRODUCT_TYPE, timeout: int = _TIMEOUT
+) -> dict[str, Instrument]:
+    """Read the venue's published specifications.
+
+    Public and keyless. A failure raises: a guard that silently fell back to assumed limits would
+    be exactly the thing this module exists to replace.
+    """
+    params = {"category": product_type}
+    if symbol:
+        params["symbol"] = symbol
+    url = f"{INSTRUMENTS_URL}?{urllib.parse.urlencode(params)}"
+    request = urllib.request.Request(url, headers={"User-Agent": "argus/0.1"})
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            payload = json.loads(response.read().decode())
+    except (urllib.error.URLError, TimeoutError, OSError, json.JSONDecodeError) as exc:
+        raise GuardError(f"could not read instrument specifications: {exc}") from exc
+
+    if str(payload.get("code")) != "00000":
+        raise GuardError(f"venue refused the instrument query: {payload.get('msg', payload)}")
+
+    rows = payload.get("data") or []
+    out: dict[str, Instrument] = {}
+    for row in rows:
+        try:
+            instrument = Instrument.from_payload(row)
+        except (GuardError, ValueError, ArithmeticError):
+            # One malformed row must not deny the whole venue. It is simply absent, and an absent
+            # instrument is denied by name at validation rather than waved through.
+            continue
+        out[instrument.symbol] = instrument
+    if not out:
+        raise GuardError("the venue returned no usable instrument specifications")
+    return out
+
+
+@dataclass
+class Guard:
+    """Instrument rules plus a rate limiter, for one trading session."""
+
+    instruments: dict[str, Instrument]
+    limiter: RateLimiter = field(default_factory=RateLimiter)
+
+    def check(
+        self, symbol: str, *, quantity: Decimal, price: Decimal | None = None,
+        reference_price: Decimal | None = None, side: str = "buy",
+        available_balance: Decimal | None = None, now: float | None = None,
+    ) -> Ruling:
+        """Enforce. Spends a rate-window slot when the order is allowed."""
+        return self._judge(
+            symbol, quantity=quantity, price=price, reference_price=reference_price, side=side,
+            available_balance=available_balance, now=now, record=True,
+        )
+
+    def self_check(
+        self, symbol: str, *, quantity: Decimal, price: Decimal | None = None,
+        reference_price: Decimal | None = None, side: str = "buy",
+        available_balance: Decimal | None = None, now: float | None = None,
+    ) -> bool:
+        """Would :meth:`check` allow this order right now? Pass or fail only; nothing recorded.
+
+        The session-level twin of :func:`would_pass`, and it goes through the same
+        :meth:`_judge` as :meth:`check`, so the unknown-instrument denial is shared as well.
+        """
+        try:
+            return self._judge(
+                symbol, quantity=quantity, price=price, reference_price=reference_price,
+                side=side, available_balance=available_balance, now=now, record=False,
+            ).allowed
+        except (GuardError, ArithmeticError):
+            return False
+
+    def _judge(
+        self, symbol: str, *, quantity: Decimal, price: Decimal | None,
+        reference_price: Decimal | None, side: str, available_balance: Decimal | None,
+        now: float | None, record: bool,
+    ) -> Ruling:
+        instrument = self.instruments.get(symbol)
+        if instrument is None:
+            return Ruling(
+                Denial.INSTRUMENT_UNKNOWN,
+                f"{symbol} is not among the {len(self.instruments)} instruments the venue "
+                f"published; no rules are known for it",
+                _ZERO, price, False,
+            )
+        return _rule(
+            instrument, quantity=quantity, price=price, reference_price=reference_price,
+            side=side, available_balance=available_balance, limiter=self.limiter, now=now,
+            record=record,
+        )
+
+
+_ORDER_FIELDS = frozenset(
+    {"symbol", "quantity", "price", "reference_price", "side", "available_balance"}
+)
+
+
+def self_check_request(guard: Guard, body: Any) -> dict[str, bool]:
+    """The durable self-check endpoint's whole contract: an order as JSON in, ``{"pass": bool}``
+    out.
+
+    mle-bench exposes its self-check as ``POST /validate`` inside the agent's container
+    (``environment/grading_server.py:22-35``) so the agent can ask as often as it likes without
+    touching the grader's private answers. This is the same shape for an agent that wants to know
+    whether an order would clear the guard before it commits to one, and it is written as a plain
+    function so any transport (the console's HTTP handler, the MCP server, a CLI) can carry it.
+
+    Parsing is strict and every failure is a ``False``, never an exception and never a default:
+    a quantity sent as a float, a missing symbol, an unknown field or a non-object body cannot be
+    ruled on, and an order that cannot be ruled on does not pass. Floats are refused rather than
+    converted because ``Decimal(0.1)`` is ``0.1000000000000000055511151231257827...`` — a binary
+    approximation ruling on a size the caller never asked about. Numbers must arrive as strings or
+    integers.
+    """
+    if not isinstance(body, dict) or not set(body) <= _ORDER_FIELDS:
+        return {"pass": False}
+    symbol = body.get("symbol")
+    side = body.get("side", "buy")
+    if not isinstance(symbol, str) or not symbol or not isinstance(side, str):
+        return {"pass": False}
+
+    def number(key: str) -> Decimal | None:
+        raw = body.get(key)
+        if raw is None:
+            return None
+        if isinstance(raw, bool) or not isinstance(raw, (str, int)):
+            raise GuardError(f"{key} must be a decimal string or an integer")
+        value = Decimal(str(raw).strip())
+        if not value.is_finite():
+            raise GuardError(f"{key} must be finite")
+        return value
+
+    try:
+        quantity = number("quantity")
+        price = number("price")
+        reference_price = number("reference_price")
+        available_balance = number("available_balance")
+    except (GuardError, ArithmeticError, ValueError):
+        return {"pass": False}
+    if quantity is None:
+        return {"pass": False}
+    return {"pass": guard.self_check(
+        symbol, quantity=quantity, price=price, reference_price=reference_price, side=side,
+        available_balance=available_balance,
+    )}
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="ARGUS pre-trade guard")
+    parser.add_argument("--symbol", default="NVDAUSDT")
+    parser.add_argument("--quantity", type=Decimal, default=Decimal("1"))
+    parser.add_argument("--price", type=Decimal, default=None)
+    parser.add_argument("--self-check", action="store_true",
+                        help="answer PASS or FAIL only, recording nothing")
+    args = parser.parse_args(argv)
+
+    try:
+        instruments = fetch_instruments(symbol=args.symbol)
+    except GuardError as exc:
+        print(f"guard unavailable: {exc}")
+        return 1
+
+    guard = Guard(instruments=instruments)
+    if args.self_check:
+        passed = guard.self_check(args.symbol, quantity=args.quantity, price=args.price,
+                                  reference_price=args.price)
+        print("PASS" if passed else "FAIL")
+        return 0 if passed else 1
+    instrument = instruments[args.symbol]
+    print(json.dumps(instrument.as_dict(), indent=2))
+    ruling = guard.check(
+        args.symbol, quantity=args.quantity, price=args.price,
+        reference_price=args.price,
+    )
+    print(ruling.render())
+    return 0 if ruling.allowed else 1
+
+
+__all__ = [
+    "INSTRUMENTS_URL",
+    "Denial",
+    "Guard",
+    "GuardError",
+    "Instrument",
+    "RateLimiter",
+    "Ruling",
+    "fetch_instruments",
+    "main",
+    "quantise_down",
+    "self_check_request",
+    "validate",
+    "would_pass",
+]
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

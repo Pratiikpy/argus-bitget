@@ -17,6 +17,11 @@ import pytest
 
 _LOCAL_HOSTS = {"127.0.0.1", "::1", "localhost", "0.0.0.0"}
 
+# The web console instruments its engines on the first question (`lui/server._traced`). In the
+# suite that wrap would outlive the HTTP test that installed it and sit under every later
+# monkeypatch, so it is off here; the trace is tested on its own in tests/test_trace.py.
+os.environ.setdefault("ARGUS_TRACE", "0")
+
 
 class NetworkBlocked(ConnectionError):
     """An outbound connection was attempted while ARGUS_BLOCK_NETWORK=1."""

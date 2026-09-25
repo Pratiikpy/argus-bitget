@@ -5,7 +5,7 @@ computed from live data and names its source.**
 
 **Live console: https://deploy-topaz-seven-64.vercel.app** · [one research task, run
 live](https://deploy-topaz-seven-64.vercel.app/research) · [what we beat](https://deploy-topaz-seven-64.vercel.app/proof)
-· [what we got wrong](https://deploy-topaz-seven-64.vercel.app/wrong) · [the Track 2 agent, live](https://deploy-topaz-seven-64.vercel.app/agent)
+· [what we got wrong](https://deploy-topaz-seven-64.vercel.app/wrong)
 · [status](https://deploy-topaz-seven-64.vercel.app/status)
 
 <picture>
@@ -18,15 +18,16 @@ or a key to try.
 
 ---
 
-## Two entries, one system
+## What this entry is
 
-| | What it is | Track |
-|---|---|---|
-| **ARGUS** (this repository) | A natural-language research workbench: a trader asks, seven engines answer from Bitget's market data, SEC filings, FRED and the news, and the answer ends in a receipt. | **Track 3 — AI Trading Desk** |
-| **t2-sentiment-agent** ([live record](https://t2-sentiment-agent-live.vercel.app)) | A market-sentiment trading agent. Qwen decides, a risk kernel that can only reduce stands between it and the venue, and Bitget's Agent Hub places every order on Bitget Demo. Paper run live since 2026-09-24, its log hash-chained from a timestamped genesis. | **Track 2 — Agentic Trading** |
+ARGUS is this team's **Track 3 — AI Trading Desk** entry: a natural-language research workbench.
+A trader asks; the engines answer from Bitget's market data, SEC filings, FRED and the news; every
+answer ends in a receipt naming its sources, and the trader makes the call.
 
-They share one discipline: the model reads and decides, it never writes a number; every figure is
-computed and sourced; every loss is published.
+The same team entered Track 2 with a **separate project**,
+[t2-sentiment-agent](https://github.com/Pratiikpy/t2-sentiment-agent): its own repository, code,
+paper-trading ledger and demo, submitted through its own form, as the handbook requires of a second
+entry (Basic Competition Rules, rule 2). Nothing in this repository is part of that entry.
 
 ---
 
@@ -81,10 +82,17 @@ deflation gate, and the console says so.
 
 Every capability is held against the specialist that leads its sub-theme, run on the same input,
 and graded by a register that opens the evidence rather than trusting a filename
-(`python -m argus.eval.standing`). **20 of 43 capabilities are OWNED, 11 are TIED, 12 are
+(`python -m argus.eval.standing`). **8 of 43 capabilities are OWNED, 11 are TIED, 24 are
 IMPLEMENTED, and 0 are LOST.** OWNED needs all thirteen conditions: the rival's best
 implementation read and reproduced, a same-input comparison with costs, out-of-sample, ablation,
 an adversarial test, documented failure cases and reproducibility.
+
+The register got stricter on 2026-09-26 and the count fell from 20 to 8. A proof that rests on a
+population figure must now survive a per-group check — by symbol and by half of the sample — and 12
+capabilities went back to IMPLEMENTED: five because their headline was carried by one symbol or
+flipped between halves, seven because their proof is a designed case set the new check cannot
+grade, which needs its own construction test before it can count again. Each row names its route
+back (`data/standing.json`).
 
 Losses are published the moment they are found. Two were found and closed on 2026-09-24: Bitget's
 own 60-second TWAP beat the schedule the console printed (6.9 against 12.2bps on a $100k order),
@@ -121,7 +129,6 @@ The full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.v
 | Order-book websocket (`books5`, trades) | Execution replay and the order-splitting comparison | Recorded locally, RFC 6455 client |
 | `bitget-mcp-server` | US fundamentals, 13F holders, analyst estimates, earnings calendar, the stock behind each rToken | 37 of 67 catalog entries answered |
 | `bitget-signal` Skills | Technicals (MACD corrected against Bitget's own candles), sentiment, macro, news, market intel | Bitget's server answered 6 of 19; ARGUS read the other 13 from the sources those Skills name — 19 of 19, all 5 Skills |
-| Agent Hub (`bgc`) | The Track 2 agent's every order, `--paper-trading`, previewed with `--dry-run` | Demo run live |
 
 When a Skill's hosted server fails, ARGUS reads the source that Skill names (alternative.me,
 Binance futures data, FRED, Yahoo, DeFiLlama, CoinGecko, the RSS feeds). Every such answer says
@@ -170,7 +177,7 @@ a test that reaches the network shows itself.
 | | |
 |---|---|
 | Tests | **6,700 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 355 source files** |
+| Types | **`mypy --strict` clean on 472 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes**, resolved by import at runtime, not claimed in prose |
@@ -192,10 +199,11 @@ a test that reaches the network shows itself.
 
 - **ARGUS's own paper desk has no settled trades.** Every decision on its ledger is a refusal, so
   its Sharpe, drawdown and win rate are undefined and printed as such. Each refusal carried a
-  direction, hashed before the outcome existed: at about two hours, **194 of 325 directional calls
+  direction, hashed before the outcome existed: at about two hours, **206 of 347 directional calls
   were right**, which barely clears a coin flip and does not beat calling "up" every time. The
   median refusal **forgave -4.5bps of net edge** after the 12bps round trip — the trades it passed
-  on were mostly unprofitable. The Track 2 agent is the entry that trades.
+  on were mostly unprofitable. This workbench does not trade; trading is the separate Track 2
+  project's job.
 - **No certified alpha.** 0 of 8 factors and 0 of 12 strategies cleared the deflation gate.
 - **Price discovery attenuates about 7x while the anchor market is shut — it does not stop.** The
   weekend effect failed its own out-of-sample split, and the 3–5x off-hours spread widening first
@@ -207,9 +215,9 @@ a test that reaches the network shows itself.
 
 ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · AI Trading Desk）。用自然语言提问，
 七个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
-从不编写数字。38 项能力逐一与各子赛道领先的专业系统在相同输入上对比：20 项领先（OWNED）、8 项
-持平、10 项已实现、0 项落后，所有落败记录公开在 `/wrong`。配套的 Track 2 情绪交易 Agent 由 Qwen
-决策、只能减仓的风控内核把关，经 Bitget Agent Hub 在 Demo 环境下单，纸面交易日志自带时间戳哈希链。
+从不编写数字。43 项能力逐一与各子赛道领先的专业系统在相同输入上对比：8 项领先（OWNED）、11 项
+持平、24 项已实现、0 项落后，所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
+（t2-sentiment-agent，独立的代码库、交易日志与演示），不属于本仓库。
 
 ---
 

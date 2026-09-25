@@ -1,0 +1,427 @@
+{
+  "generated_at": "2026-09-25T14:27:03.706892+00:00",
+  "protocol": {
+    "grid": "AnalogDesk validation grid, horizon 5 sessions, 80% nominal",
+    "test_queries": 2698,
+    "calibration_queries": 1823,
+    "lambdas": [
+      0.9,
+      0.7,
+      0.5,
+      0.3
+    ],
+    "k": 50,
+    "window": 20,
+    "selection": "calibration era only: multipliers 2019-2020, Winkler 2021-2022",
+    "near_duplicate": {
+      "analogue": "share of analogues sharing an episode (OVERLAP_WINDOW)",
+      "shape": "share of windows correlated >= 0.9 with an earlier pick"
+    },
+    "recall_cap": "realised return inside the range of the first k retrieved outcomes (Mind2Web metric.py:99-105, transposed)"
+  },
+  "existing_comparison_rerun": {
+    "verdict": "NO SIGNIFICANT DIFFERENCE: argusAnalogue Winkler 15.52% against the best rival predictor uncondNamePIT at 15.14% (+0.38 points, Diebold-Mariano p=0.2932, clustered by date)",
+    "reproduced_rival": true,
+    "published_available": true,
+    "published_verdict": "NO SIGNIFICANT DIFFERENCE: argusAnalogue Winkler 15.52% against the best rival predictor uncondNamePIT at 15.14% (+0.38 points, Diebold-Mariano p=0.2932, clustered by date)",
+    "verdict_unchanged": true,
+    "max_abs_winkler_pct_difference": 0.0,
+    "argus_rows": {
+      "argusAnalogue": {
+        "predictor": "argusAnalogue",
+        "frozen_scale": 1.3928,
+        "n": 2690,
+        "coverage_pct": 84.8,
+        "coverage_se_pct": 1.51,
+        "width_pct": 11.69,
+        "matched_width_pct": 10.28,
+        "winkler_pct": 15.522
+      },
+      "argusShape": {
+        "predictor": "argusShape",
+        "frozen_scale": 1.4621,
+        "n": 2698,
+        "coverage_pct": 88.0,
+        "coverage_se_pct": 1.55,
+        "width_pct": 13.06,
+        "matched_width_pct": 10.03,
+        "winkler_pct": 16.396
+      }
+    }
+  },
+  "best_rival": {
+    "predictor": "uncondNamePIT",
+    "frozen_scale": 1.0,
+    "n": 2698,
+    "coverage_pct": 82.4,
+    "coverage_se_pct": 2.21,
+    "width_pct": 10.12,
+    "matched_width_pct": 9.48,
+    "winkler_pct": 15.141
+  },
+  "families": {
+    "analogue": {
+      "incumbent": "argusAnalogue",
+      "selection": {
+        "chosen": "argusAnalogueMMR30",
+        "calibration_split_winkler_pct": {
+          "argusAnalogue": 18.113,
+          "argusAnalogueMMR90": 18.103,
+          "argusAnalogueMMR70": 18.112,
+          "argusAnalogueMMR50": 18.118,
+          "argusAnalogueMMR30": 18.074
+        }
+      },
+      "chosen": "argusAnalogueMMR30",
+      "verdict": "NO SIGNIFICANT DIFFERENCE: argusAnalogueMMR30 Winkler 15.491% against argusAnalogue 15.522% (-0.030 points, DM p=0.5135)",
+      "diebold_mariano_vs_incumbent": {
+        "mean_diff_pct": -0.031,
+        "t": -0.653,
+        "p": 0.5135,
+        "dates": 38,
+        "paired_queries": 2690
+      },
+      "diebold_mariano_vs_best_rival_uncondNamePIT": {
+        "mean_diff_pct": 0.368,
+        "t": 0.973,
+        "p": 0.3305,
+        "dates": 38,
+        "paired_queries": 2690
+      },
+      "arms": {
+        "argusAnalogue": {
+          "selected": false,
+          "predictor": "argusAnalogue",
+          "frozen_scale": 1.3928,
+          "n": 2690,
+          "coverage_pct": 84.8,
+          "coverage_se_pct": 1.51,
+          "width_pct": 11.69,
+          "matched_width_pct": 10.28,
+          "winkler_pct": 15.522,
+          "queries": 2690,
+          "retriever": {
+            "recall_cap": {
+              "@5": 0.6015,
+              "@10": 0.7784,
+              "@20": 0.8848,
+              "@50": 0.9472
+            },
+            "near_duplicate_share": 0.5625,
+            "mean_outcome_stdev_pct": 4.196
+          },
+          "answer": {
+            "coverage_pct": 84.76,
+            "winkler_pct": 15.522,
+            "direction_accuracy": 0.5373,
+            "coverage_given_recall_hit": 0.8932,
+            "coverage_given_recall_miss": 0.0282,
+            "recall_misses": 142
+          }
+        },
+        "argusAnalogueMMR90": {
+          "selected": false,
+          "predictor": "argusAnalogueMMR90",
+          "frozen_scale": 1.3856,
+          "n": 2690,
+          "coverage_pct": 84.6,
+          "coverage_se_pct": 1.54,
+          "width_pct": 11.63,
+          "matched_width_pct": 10.27,
+          "winkler_pct": 15.504,
+          "queries": 2690,
+          "retriever": {
+            "recall_cap": {
+              "@5": 0.6026,
+              "@10": 0.7784,
+              "@20": 0.8859,
+              "@50": 0.9472
+            },
+            "near_duplicate_share": 0.5621,
+            "mean_outcome_stdev_pct": 4.197
+          },
+          "answer": {
+            "coverage_pct": 84.65,
+            "winkler_pct": 15.504,
+            "direction_accuracy": 0.5384,
+            "coverage_given_recall_hit": 0.8921,
+            "coverage_given_recall_miss": 0.0282,
+            "recall_misses": 142
+          }
+        },
+        "argusAnalogueMMR70": {
+          "selected": false,
+          "predictor": "argusAnalogueMMR70",
+          "frozen_scale": 1.3984,
+          "n": 2690,
+          "coverage_pct": 84.9,
+          "coverage_se_pct": 1.51,
+          "width_pct": 11.75,
+          "matched_width_pct": 10.27,
+          "winkler_pct": 15.529,
+          "queries": 2690,
+          "retriever": {
+            "recall_cap": {
+              "@5": 0.61,
+              "@10": 0.7796,
+              "@20": 0.8859,
+              "@50": 0.9483
+            },
+            "near_duplicate_share": 0.5612,
+            "mean_outcome_stdev_pct": 4.2
+          },
+          "answer": {
+            "coverage_pct": 84.87,
+            "winkler_pct": 15.529,
+            "direction_accuracy": 0.5401,
+            "coverage_given_recall_hit": 0.8942,
+            "coverage_given_recall_miss": 0.0144,
+            "recall_misses": 139
+          }
+        },
+        "argusAnalogueMMR50": {
+          "selected": false,
+          "predictor": "argusAnalogueMMR50",
+          "frozen_scale": 1.3844,
+          "n": 2690,
+          "coverage_pct": 84.9,
+          "coverage_se_pct": 1.47,
+          "width_pct": 11.67,
+          "matched_width_pct": 10.33,
+          "winkler_pct": 15.507,
+          "queries": 2690,
+          "retriever": {
+            "recall_cap": {
+              "@5": 0.6528,
+              "@10": 0.8026,
+              "@20": 0.8922,
+              "@50": 0.9483
+            },
+            "near_duplicate_share": 0.5525,
+            "mean_outcome_stdev_pct": 4.215
+          },
+          "answer": {
+            "coverage_pct": 84.94,
+            "winkler_pct": 15.507,
+            "direction_accuracy": 0.5384,
+            "coverage_given_recall_hit": 0.8938,
+            "coverage_given_recall_miss": 0.036,
+            "recall_misses": 139
+          }
+        },
+        "argusAnalogueMMR30": {
+          "selected": true,
+          "predictor": "argusAnalogueMMR30",
+          "frozen_scale": 1.3719,
+          "n": 2690,
+          "coverage_pct": 84.6,
+          "coverage_se_pct": 1.46,
+          "width_pct": 11.62,
+          "matched_width_pct": 10.28,
+          "winkler_pct": 15.491,
+          "queries": 2690,
+          "retriever": {
+            "recall_cap": {
+              "@5": 0.6584,
+              "@10": 0.826,
+              "@20": 0.8989,
+              "@50": 0.9524
+            },
+            "near_duplicate_share": 0.519,
+            "mean_outcome_stdev_pct": 4.234
+          },
+          "answer": {
+            "coverage_pct": 84.65,
+            "winkler_pct": 15.491,
+            "direction_accuracy": 0.536,
+            "coverage_given_recall_hit": 0.8864,
+            "coverage_given_recall_miss": 0.0469,
+            "recall_misses": 128
+          }
+        }
+      }
+    },
+    "shape": {
+      "incumbent": "argusShape",
+      "selection": {
+        "chosen": "argusShapeMMR90",
+        "calibration_split_winkler_pct": {
+          "argusShape": 19.169,
+          "argusShapeMMR90": 19.152,
+          "argusShapeMMR70": 19.16,
+          "argusShapeMMR50": 19.153,
+          "argusShapeMMR30": 19.155
+        }
+      },
+      "chosen": "argusShapeMMR90",
+      "verdict": "DIVERSITY LOSES: argusShapeMMR90 Winkler 16.417% against argusShape 16.396% (+0.021 points, DM p=0.0284)",
+      "diebold_mariano_vs_incumbent": {
+        "mean_diff_pct": 0.021,
+        "t": 2.192,
+        "p": 0.0284,
+        "dates": 38,
+        "paired_queries": 2698
+      },
+      "diebold_mariano_vs_best_rival_uncondNamePIT": {
+        "mean_diff_pct": 1.275,
+        "t": 3.303,
+        "p": 0.001,
+        "dates": 38,
+        "paired_queries": 2698
+      },
+      "arms": {
+        "argusShape": {
+          "selected": false,
+          "predictor": "argusShape",
+          "frozen_scale": 1.4621,
+          "n": 2698,
+          "coverage_pct": 88.0,
+          "coverage_se_pct": 1.55,
+          "width_pct": 13.06,
+          "matched_width_pct": 10.03,
+          "winkler_pct": 16.396,
+          "queries": 2698,
+          "retriever": {
+            "recall_cap": {
+              "@5": 0.6757,
+              "@10": 0.8213,
+              "@20": 0.914,
+              "@50": 0.9655
+            },
+            "near_duplicate_share": 0.4007,
+            "mean_outcome_stdev_pct": 4.466
+          },
+          "answer": {
+            "coverage_pct": 87.95,
+            "winkler_pct": 16.396,
+            "direction_accuracy": 0.5496,
+            "coverage_given_recall_hit": 0.9094,
+            "coverage_given_recall_miss": 0.043,
+            "recall_misses": 93
+          }
+        },
+        "argusShapeMMR90": {
+          "selected": true,
+          "predictor": "argusShapeMMR90",
+          "frozen_scale": 1.4649,
+          "n": 2698,
+          "coverage_pct": 88.0,
+          "coverage_se_pct": 1.56,
+          "width_pct": 13.09,
+          "matched_width_pct": 10.09,
+          "winkler_pct": 16.417,
+          "queries": 2698,
+          "retriever": {
+            "recall_cap": {
+              "@5": 0.6779,
+              "@10": 0.8254,
+              "@20": 0.914,
+              "@50": 0.9652
+            },
+            "near_duplicate_share": 0.3948,
+            "mean_outcome_stdev_pct": 4.469
+          },
+          "answer": {
+            "coverage_pct": 87.95,
+            "winkler_pct": 16.417,
+            "direction_accuracy": 0.552,
+            "coverage_given_recall_hit": 0.9098,
+            "coverage_given_recall_miss": 0.0426,
+            "recall_misses": 94
+          }
+        },
+        "argusShapeMMR70": {
+          "selected": false,
+          "predictor": "argusShapeMMR70",
+          "frozen_scale": 1.4649,
+          "n": 2698,
+          "coverage_pct": 88.0,
+          "coverage_se_pct": 1.58,
+          "width_pct": 13.09,
+          "matched_width_pct": 10.16,
+          "winkler_pct": 16.392,
+          "queries": 2698,
+          "retriever": {
+            "recall_cap": {
+              "@5": 0.6757,
+              "@10": 0.8265,
+              "@20": 0.9099,
+              "@50": 0.9648
+            },
+            "near_duplicate_share": 0.3747,
+            "mean_outcome_stdev_pct": 4.469
+          },
+          "answer": {
+            "coverage_pct": 87.99,
+            "winkler_pct": 16.392,
+            "direction_accuracy": 0.5509,
+            "coverage_given_recall_hit": 0.9105,
+            "coverage_given_recall_miss": 0.0421,
+            "recall_misses": 95
+          }
+        },
+        "argusShapeMMR50": {
+          "selected": false,
+          "predictor": "argusShapeMMR50",
+          "frozen_scale": 1.4681,
+          "n": 2698,
+          "coverage_pct": 88.3,
+          "coverage_se_pct": 1.52,
+          "width_pct": 13.16,
+          "matched_width_pct": 10.21,
+          "winkler_pct": 16.388,
+          "queries": 2698,
+          "retriever": {
+            "recall_cap": {
+              "@5": 0.6679,
+              "@10": 0.8184,
+              "@20": 0.9177,
+              "@50": 0.9648
+            },
+            "near_duplicate_share": 0.3122,
+            "mean_outcome_stdev_pct": 4.481
+          },
+          "answer": {
+            "coverage_pct": 88.32,
+            "winkler_pct": 16.388,
+            "direction_accuracy": 0.547,
+            "coverage_given_recall_hit": 0.9143,
+            "coverage_given_recall_miss": 0.0316,
+            "recall_misses": 95
+          }
+        },
+        "argusShapeMMR30": {
+          "selected": false,
+          "predictor": "argusShapeMMR30",
+          "frozen_scale": 1.4681,
+          "n": 2698,
+          "coverage_pct": 87.8,
+          "coverage_se_pct": 1.58,
+          "width_pct": 13.31,
+          "matched_width_pct": 10.45,
+          "winkler_pct": 16.61,
+          "queries": 2698,
+          "retriever": {
+            "recall_cap": {
+              "@5": 0.6764,
+              "@10": 0.8132,
+              "@20": 0.8955,
+              "@50": 0.9666
+            },
+            "near_duplicate_share": 0.1418,
+            "mean_outcome_stdev_pct": 4.534
+          },
+          "answer": {
+            "coverage_pct": 87.81,
+            "winkler_pct": 16.61,
+            "direction_accuracy": 0.544,
+            "coverage_given_recall_hit": 0.9072,
+            "coverage_given_recall_miss": 0.0333,
+            "recall_misses": 90
+          }
+        }
+      }
+    }
+  },
+  "qwen_calls": 0
+}

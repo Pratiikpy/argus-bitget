@@ -39,10 +39,30 @@ allowed to, and costs real money in reasoning time while producing the appearanc
 
 The transcript is the artefact: it is what makes a decision explainable to someone who was not
 there, which is the other judged criterion this serves.
+
+**A stall detector, added 2026-09-25 (item S7 of ``research/mypr-teardowns/_SYNTHESIS.md``).**
+:func:`converged` catches two sides that have *agreed*. It cannot catch two sides that have stopped
+*arguing* — each restating its case in new words, neither moving, neither citing anything the other
+has not already seen — and until now the round cap silently paid for that. Microsoft Agent
+Framework's Magentic manager asks the same question of a team every round, as two booleans with
+reasons, ``is_in_loop`` and ``is_progress_being_made`` (``microsoft/agent-framework``
+``python/packages/orchestrations/agent_framework_orchestrations/_magentic.py:292-395``, MIT;
+``stall_count`` incremented on a stalled round and decremented otherwise at ``:1119-1122``, a reset
+and replan once it exceeds ``max_stall_count`` at ``:1124-1127``, and ``MagenticContext.reset`` at
+``:389-396``). What is taken: the per-round progress question, the counter with its decrement, and
+one bounded reset. What is not: MAF answers the question with an LLM call per round, which here
+would cost as much as the round it is trying to save. :func:`progress` answers it from the
+transcript with no call — did the side change direction, did its magnitude move by more than
+:data:`CONVERGENCE_BPS`, did it cite a figure or an evidence id nobody had cited before — and a
+round is stalled only when *both* sides fail all three. The proxy is deliberately conservative: a
+seat that states no magnitude cannot be shown to have stood still, so it is never counted as
+stalled. Measured against the full-length debates and an LLM judge in
+``data/thesis_quality.json`` (``s7``).
 """
 
 from __future__ import annotations
 
+import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 from decimal import Decimal
@@ -99,6 +119,11 @@ class Ending(StrEnum):
 
     UNAVAILABLE = "unavailable"
     """A seat could not answer. The decision proceeds undebated and says so."""
+
+    STALLED = "stalled"
+    """Both sides stopped making progress: neither moved, neither changed direction, neither cited
+    anything new (:func:`progress`). The disagreement is live and is handed to the PM as one; what
+    ended is only the paying for restatements of it."""
 
 
 class Seat(Protocol):
@@ -199,6 +224,123 @@ def converged(bull: Position, bear: Position, *, within: float = CONVERGENCE_BPS
     return abs(left - right) <= within
 
 
+_EVIDENCE_ID = re.compile(r"\b[a-z][a-z0-9]*(?:[-_][a-z0-9]+)*[-_]\d{3,}\b", re.I)
+"""An evidence id as the desk renders them — ``yahoo-tsla-441620102``, ``form4-0001-24``."""
+
+_FIGURE = re.compile(r"(?<![\w.])[+-]?\d+(?:,\d{3})*(?:\.\d+)?")
+
+
+def _evidence_tokens(text: str) -> set[str]:
+    """The citable things a piece of argument names: evidence ids and figures, normalised.
+
+    Figures are normalised through ``float`` so ``2.30`` and ``2.3`` are one citation; ids are
+    lower-cased. Prose is deliberately not counted — a restatement in new words is exactly the case
+    the detector exists to catch, and lexical novelty would score it as progress.
+    """
+    ids = {m.group(0).lower() for m in _EVIDENCE_ID.finditer(text)}
+    scrubbed = _EVIDENCE_ID.sub(" ", text)
+    figures: set[str] = set()
+    for match in _FIGURE.finditer(scrubbed):
+        try:
+            figures.add(f"#{float(match.group(0).replace(',', '')):g}")
+        except ValueError:  # pragma: no cover - the pattern cannot produce this
+            continue
+    return ids | figures
+
+
+@dataclass(frozen=True, slots=True)
+class Progress:
+    """Did one side make progress between its previous round and this one? No model call.
+
+    The three questions MAF's progress ledger asks an LLM, answered from the transcript instead.
+    """
+
+    side: Side
+    round_index: int
+    direction_changed: bool
+    moved_bps: float | None
+    """How far the side's signed position moved, or ``None`` when either round named no magnitude
+    — in which case standing still cannot be shown, and the side is not counted as stalled."""
+
+    new_evidence: tuple[str, ...]
+    """Figures and evidence ids this round cites that no earlier round, on either side, did."""
+
+    @property
+    def stalled(self) -> bool:
+        if self.direction_changed or self.moved_bps is None:
+            return False
+        return self.moved_bps <= CONVERGENCE_BPS and not self.new_evidence
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "side": self.side.value,
+            "round": self.round_index,
+            "direction_changed": self.direction_changed,
+            "moved_bps": None if self.moved_bps is None else round(self.moved_bps, 3),
+            "new_evidence": list(self.new_evidence),
+            "stalled": self.stalled,
+        }
+
+
+def progress(prior: Sequence[Position], current: Position) -> Progress | None:
+    """Compare ``current`` with the same side's previous round, against everything said before.
+
+    ``prior`` is the transcript before ``current`` — both sides. ``None`` when this side has no
+    previous round, which is the opening round: nothing to have stalled from.
+    """
+    previous = next(
+        (p for p in reversed(prior) if p.side is current.side), None
+    )
+    if previous is None:
+        return None
+    before, after = signed(previous), signed(current)
+    moved = None if before is None or after is None else abs(after - before)
+    seen: set[str] = set()
+    for p in prior:
+        seen |= _evidence_tokens(p.case) | _evidence_tokens(p.strongest_opposing_point)
+    new = sorted(_evidence_tokens(current.case) - seen)
+    return Progress(
+        side=current.side,
+        round_index=current.round_index,
+        direction_changed=current.direction != previous.direction,
+        moved_bps=moved,
+        new_evidence=tuple(new),
+    )
+
+
+def round_progress(positions: Sequence[Position], round_index: int) -> tuple[Progress, ...]:
+    """Both sides' progress readings for one round, in speaking order. Empty for round 0."""
+    out: list[Progress] = []
+    for i, position in enumerate(positions):
+        if position.round_index != round_index:
+            continue
+        reading = progress(positions[:i], position)
+        if reading is not None:
+            out.append(reading)
+    return tuple(out)
+
+
+def round_stalled(positions: Sequence[Position], round_index: int) -> bool:
+    """True when both sides spoke in ``round_index`` and neither made progress."""
+    readings = round_progress(positions, round_index)
+    return len(readings) == 2 and all(r.stalled for r in readings)
+
+
+MAX_STALL_COUNT = 0
+"""Stalled rounds tolerated before the debate stops. MAF's default is 3 (``_magentic.py:477``), but
+MAF runs open-ended conversations and this debate is capped at :data:`MAX_ROUNDS`: a tolerance of
+three could never trigger. Zero means the first stalled round ends it — or triggers the one reset,
+when a reset is enabled."""
+
+STALL_NOTICE = """PROGRESS NOTICE
+  The last round moved neither side and cited nothing new: both positions were restated. This round
+  is paid for only if it changes something. Either cite evidence from the list above that has not
+  been cited yet and say what it changes, or move your magnitude, or say plainly that you have
+  nothing to add."""
+"""The bounded reset, MAF's ``replan`` reduced to what a two-seat debate can use: the transcript is
+kept (it *is* the evidence of what was argued), and both seats are told the round was a repeat."""
+
+
 @dataclass(frozen=True)
 class DebateBudget:
     """What a debate is allowed to cost, in basis points of the position argued about."""
@@ -225,6 +367,11 @@ class Debate:
 
     cost_bps: Decimal = Decimal("0")
     note: str = ""
+    progress: tuple[Progress, ...] = ()
+    """Every progress reading taken while the debate ran, for rounds after the first."""
+
+    resets: int = 0
+    """How many progress notices were issued. At most one; see :data:`STALL_NOTICE`."""
 
     @property
     def rounds(self) -> int:
@@ -287,7 +434,9 @@ class Debate:
             # No measurable gap: the debate did not produce two stated positions. That is not
             # "resolved" — it is a debate that never gave an answer either way.
             return False
-        return self.ending is Ending.EXHAUSTED_ROUNDS and gap > CONVERGENCE_BPS
+        # A stalled debate ended because the sides stopped moving, not because they met: the gap
+        # it finished on is as live as one left open by the round cap.
+        return self.ending in (Ending.EXHAUSTED_ROUNDS, Ending.STALLED) and gap > CONVERGENCE_BPS
 
     def render(self) -> str:
         if not self.positions:
@@ -314,6 +463,12 @@ class Debate:
         )
         if self.note:
             lines.append(f"  {self.note}")
+        if self.ending is Ending.STALLED:
+            lines.append(
+                "  STALLED: in the last round neither side moved, changed direction or cited "
+                "anything new, so further rounds were not bought. The disagreement stands as "
+                "argued and is handed to the PM unresolved."
+            )
         if self.unresolved:
             lines.append(
                 "  UNRESOLVED: the sides finished apart. That is a live disagreement and it is "
@@ -340,6 +495,8 @@ class Debate:
             "engagement": self.engaged,
             "positions": [p.as_dict() for p in self.positions],
             "note": self.note,
+            "progress": [r.as_dict() for r in self.progress],
+            "resets": self.resets,
         }
 
 
@@ -419,7 +576,8 @@ def _ask(
 
 
 def _body(
-    symbol: str, horizon_hours: float, evidence: Sequence[str], prior: Sequence[Position]
+    symbol: str, horizon_hours: float, evidence: Sequence[str], prior: Sequence[Position],
+    *, notice: str = "",
 ) -> str:
     rendered = "\n".join(f"  - {e}" for e in evidence) or "  (none)"
     if not prior:
@@ -436,7 +594,7 @@ EVIDENCE
 {rendered}
 
 THE ARGUMENT SO FAR
-{transcript}"""
+{transcript}""" + ("\n\n" + notice if notice else "")
 
 
 def hold(
@@ -449,11 +607,20 @@ def hold(
     budget: DebateBudget,
     max_rounds: int = MAX_ROUNDS,
     shared_model: bool = True,
+    stall_detection: bool = False,
+    reset_on_stall: bool = False,
 ) -> Debate:
-    """Run the debate, bounded by rounds, by budget, and by measured convergence.
+    """Run the debate, bounded by rounds, by budget, by measured convergence, and by progress.
 
     Returns a :class:`Debate` in every case, including the cases where no debate happened. A caller
     never has to handle ``None``, and the record always says what occurred.
+
+    ``stall_detection`` ends the debate as :attr:`Ending.STALLED` once a round passes in which
+    neither side made progress (:func:`round_stalled`), counted MAF-style: a stalled round adds one
+    to the stall count, a progressing round takes one off, and the debate stops when the count
+    exceeds :data:`MAX_STALL_COUNT`. ``reset_on_stall`` spends the first such stop on one more
+    round carrying :data:`STALL_NOTICE` instead — MAF's reset, bounded at one — and stops only if
+    that round stalls too. Readings are recorded either way.
     """
     if bull_seat is None or bear_seat is None:
         return Debate(
@@ -479,12 +646,16 @@ def hold(
         )
 
     positions: list[Position] = []
+    readings: list[Progress] = []
     ending = Ending.EXHAUSTED_ROUNDS
+    stall_count = 0
+    resets = 0
+    notice = ""
     for index in range(max_rounds):
         if not budget.affords(index):
             ending = Ending.EXHAUSTED_BUDGET
             break
-        body = _body(symbol, horizon_hours, evidence, positions)
+        body = _body(symbol, horizon_hours, evidence, positions, notice=notice)
         bull, why = _ask(
             bull_seat, system=BULL_PROMPT, body=body, side=Side.BULL, round_index=index
         )
@@ -497,7 +668,7 @@ def hold(
         positions.append(bull)
         bear, why = _ask(
             bear_seat, system=BEAR_PROMPT,
-            body=_body(symbol, horizon_hours, evidence, positions),
+            body=_body(symbol, horizon_hours, evidence, positions, notice=notice),
             side=Side.BEAR, round_index=index,
         )
         if bear is None:
@@ -510,6 +681,23 @@ def hold(
         if converged(bull, bear):
             ending = Ending.CONVERGED
             break
+        notice = ""
+        this_round = round_progress(positions, index)
+        readings.extend(this_round)
+        if not stall_detection or not this_round:
+            continue
+        if round_stalled(positions, index):
+            stall_count += 1
+        else:
+            stall_count = max(0, stall_count - 1)
+        if stall_count > MAX_STALL_COUNT:
+            if reset_on_stall and resets == 0 and index + 1 < max_rounds:
+                resets += 1
+                stall_count = 0
+                notice = STALL_NOTICE
+                continue
+            ending = Ending.STALLED
+            break
 
     return Debate(
         symbol=symbol,
@@ -517,20 +705,28 @@ def hold(
         ending=ending,
         shared_model=shared_model,
         cost_bps=budget.spent(max(1, (len(positions) + 1) // 2)),
+        progress=tuple(readings),
+        resets=resets,
     )
 
 
 __all__ = [
     "CONVERGENCE_BPS",
     "MAX_ROUNDS",
+    "MAX_STALL_COUNT",
     "ROUND_COST_BPS",
+    "STALL_NOTICE",
     "Debate",
     "DebateBudget",
     "Ending",
     "Position",
+    "Progress",
     "Seat",
     "Side",
     "converged",
     "hold",
+    "progress",
+    "round_progress",
+    "round_stalled",
     "signed",
 ]

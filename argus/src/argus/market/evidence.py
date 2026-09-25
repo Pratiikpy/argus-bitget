@@ -59,6 +59,7 @@ from email.utils import parsedate_to_datetime
 from enum import StrEnum
 from typing import Any
 
+from argus.market.rpc import LABELS, ErrorKind, JsonRpcClient, RpcError, ToolResult, payload_failure
 from argus.truth.evidence import Evidence
 
 # The SEC requires a User-Agent that identifies the requester and rejects anonymous clients (403).
@@ -533,84 +534,58 @@ class BitgetSkillSource:
 
     def __init__(self, *, user_agent: str = "claude-code/2.0") -> None:
         self._ua = user_agent
-        self._sid: str | None = None
-        self._next_id = 1
-
-    def _id(self) -> int:
-        """A fresh JSON-RPC id per request. The whole point is that it is never reused."""
-        self._next_id += 1
-        return self._next_id
-
-    def _rpc(self, body: dict[str, Any], *, timeout: int = _TIMEOUT) -> dict[str, Any]:
-        """One JSON-RPC round trip, with the reply matched to the request by id.
-
-        The body may arrive as an SSE stream carrying several ``data:`` frames. Taking the last one
-        is what produced cross-tool answers; the frame whose ``id`` equals the one sent is the only
-        acceptable reply, and its absence is an error rather than a silent substitution.
-        """
-        h = {"User-Agent": self._ua, "Content-Type": "application/json",
-             "Accept": "application/json, text/event-stream"}
-        if self._sid:
-            h["Mcp-Session-Id"] = self._sid
-        req = urllib.request.Request(self.URL, data=json.dumps(body).encode(), headers=h)
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            raw = r.read().decode(errors="replace")
-            sid = r.headers.get("Mcp-Session-Id") or r.headers.get("mcp-session-id")
-            self._sid = self._sid or sid
-
-        lines = [ln[5:].strip() for ln in raw.splitlines() if ln.startswith("data:")]
-        frames: list[dict[str, Any]] = []
-        for line in lines or [raw]:
-            try:
-                parsed = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if isinstance(parsed, dict):
-                frames.append(parsed)
-
-        wanted = body.get("id")
-        for frame in frames:
-            if frame.get("id") == wanted:
-                return frame
-        raise EvidenceError(
-            f"no JSON-RPC frame with id {wanted!r} in the reply "
-            f"(ids seen: {[f.get('id') for f in frames]}); refusing to return another "
-            f"request's response"
+        # The shared client (`market/rpc.py`, 2026-09-25): ids are monotonic per instance and the
+        # reply frame is chosen by id, which is the fix described above, now in one place for both
+        # Bitget servers. Timeouts are not retried here: `market/skills.py` measured the slow tools
+        # at 15-31 s every time, so a tool that missed a 10 s deadline once misses it twice, and a
+        # live answer would pay for both. A rate limit, a 5xx or a dropped connection is retried.
+        self.client = JsonRpcClient(
+            self.URL, headers={"User-Agent": user_agent}, timeout=_TIMEOUT,
+            retry_timeouts=False, client_info={"name": "argus", "version": "0.1"},
         )
 
-    def _ensure_session(self) -> None:
-        if self._sid:
-            return
-        self._rpc({"jsonrpc": "2.0", "id": self._id(), "method": "initialize", "params": {
-            "protocolVersion": "2025-06-18", "capabilities": {},
-            "clientInfo": {"name": "argus", "version": "0.1"}}})
+    def call_tool(self, tool: str, args: dict[str, Any], *,
+                  timeout: int = _TIMEOUT) -> ToolResult:
+        """One tool call, typed: a protocol or transport failure raises :class:`RpcError` with its
+        :class:`~argus.market.rpc.ErrorKind`; a failure inside the tool comes back in the result
+        (:meth:`ToolResult.failure`). What ``eval/skill_matrix.py`` counts."""
+        return self.client.call_tool(tool, args, timeout=timeout)
 
     def call(self, tool: str, args: dict[str, Any], *, timeout: int = _TIMEOUT) -> tuple[Any, str]:
-        """Invoke one tool. Returns ``(payload, status)``; never raises on an empty payload."""
+        """Invoke one tool. Returns ``(payload, status)``; never raises on an empty payload.
+
+        The status wording is a contract `market/skills.py:_classify` reads, so every typed failure
+        is rendered into the phrase that already means the same thing there — and the kind is named
+        inside the parentheses, so a reader of the status sees which failure it was. One behaviour
+        changed on purpose: a JSON-RPC ``error`` frame (an unknown tool, a missing session) used to
+        fall through as an empty payload and read "reachable, returned no data". It is a protocol
+        error and now says so.
+        """
         try:
-            self._ensure_session()
-            r = self._rpc({"jsonrpc": "2.0", "id": self._id(), "method": "tools/call",
-                           "params": {"name": tool, "arguments": args}}, timeout=timeout)
-            result = r.get("result", {})
-            content = result.get("content", [{}])
-            text = content[0].get("text", "") if content else ""
-            # Bitget's own MCP server sets `isError` on a failed call and keeps the payload in the
-            # text channel (`agent-mcp/src/server.ts:119-124`). Reading the text without checking
-            # the flag turns "Error executing tool cross_asset" into a piece of evidence.
-            if result.get("isError"):
-                return None, f"bitget:{tool}: tool reported an error ({text[:120]})"
-            try:
-                payload = json.loads(text)
-            except json.JSONDecodeError:
-                payload = text
-            if _is_empty(payload):
-                return payload, f"bitget:{tool}: reachable, returned no data"
-            return payload, f"bitget:{tool}: ok"
-        except EvidenceError as exc:
-            # A mismatched reply is a correctness failure, not a network one, and is named as such.
-            return None, f"bitget:{tool}: response correlation failed ({exc})"
-        except (urllib.error.URLError, TimeoutError, OSError, json.JSONDecodeError) as exc:
-            return None, f"bitget:{tool}: unavailable ({type(exc).__name__})"
+            result = self.call_tool(tool, args, timeout=timeout)
+        except RpcError as exc:
+            if exc.kind is ErrorKind.CORRELATION:
+                # A mismatched reply is a correctness failure, not a network one, and is named so.
+                return None, f"bitget:{tool}: response correlation failed ({exc})"
+            if exc.kind is ErrorKind.TIMEOUT:
+                return None, f"bitget:{tool}: unavailable (TimeoutError)"
+            return None, f"bitget:{tool}: unavailable ({exc.label}: {str(exc)[:120]})"
+        # The first content block, as before the migration: both servers put the payload there.
+        text = str(result.content[0].get("text", "")) if result.content else ""
+        # Bitget's own MCP server sets `isError` on a failed call and keeps the payload in the
+        # text channel (`agent-mcp/src/server.ts:119-124`). Reading the text without checking
+        # the flag turns "Error executing tool cross_asset" into a piece of evidence.
+        if result.is_error:
+            return None, f"bitget:{tool}: tool reported an error ({text[:120]})"
+        try:
+            payload: Any = json.loads(text)
+        except json.JSONDecodeError:
+            payload = text
+        if _is_empty(payload):
+            failed = payload_failure(payload)
+            why = f" ({LABELS[failed[0]]}: {failed[1][:100]})" if failed else ""
+            return payload, f"bitget:{tool}: reachable, returned no data{why}"
+        return payload, f"bitget:{tool}: ok"
 
     def evidence(self, symbol: str, *, as_of: datetime) -> tuple[list[Evidence], list[str]]:
         """Fear & Greed as a dated social fact, when the server has it."""

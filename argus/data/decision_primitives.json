@@ -1,0 +1,601 @@
+{
+  "generated_at": "2026-09-25T20:16:33.858214+00:00",
+  "qwen_calls_made": 0,
+  "inputs": {
+    "desk_notes_rows": 641,
+    "ledger_decisions": 703,
+    "causal_chains": 163
+  },
+  "partially_supported": {
+    "grounding_on_record": {
+      "decisions_with_a_grounding_note": 640,
+      "binary_pass": 379,
+      "binary_fail": 261,
+      "binary_fail_that_is_partial_exactly": 261,
+      "binary_fail_with_no_figure_traced": 0,
+      "figures_checked": 3840,
+      "figures_unresolved": 387,
+      "support_score_mean_lower_bound": 0.8992,
+      "near_miss": {
+        "band": 0.1,
+        "resolution_tolerance": 0.02,
+        "named_unresolved_figures_examined": 368,
+        "written_in_a_near_miss_unit": 234,
+        "excluded_as_reconstruction_conflicts": 0,
+        "unit_strict": {
+          "near_misses_found": 0,
+          "near_miss_rate": 0.0,
+          "chance_rate_shuffled_pairing": {
+            "seeds": 50,
+            "mean": 0.0,
+            "max": 0.0
+          },
+          "no_support_theses_lifted_to_partial": 0,
+          "examples": []
+        },
+        "quantity_blind_rejected": {
+          "near_misses_found": 66,
+          "near_miss_rate": 0.1793,
+          "chance_rate_shuffled_pairing": {
+            "seeds": 50,
+            "mean": 0.112,
+            "max": 0.1359
+          },
+          "no_support_theses_lifted_to_partial": 0,
+          "examples": [
+            {
+              "seq": 143,
+              "figure": "20.80bps",
+              "near": "hours_to_discovery",
+              "known_value": 22.0,
+              "distance": 0.0545
+            },
+            {
+              "seq": 145,
+              "figure": "20.80 bps",
+              "near": "distinct_sources",
+              "known_value": 20.0,
+              "distance": 0.0385
+            },
+            {
+              "seq": 151,
+              "figure": "20.80 bps",
+              "near": "hours_to_discovery",
+              "known_value": 20.0,
+              "distance": 0.0385
+            },
+            {
+              "seq": 155,
+              "figure": "20.80 bps",
+              "near": "hours_to_discovery",
+              "known_value": 20.0,
+              "distance": 0.0385
+            },
+            {
+              "seq": 157,
+              "figure": "20.80bps",
+              "near": "hours_to_discovery",
+              "known_value": 20.0,
+              "distance": 0.0385
+            },
+            {
+              "seq": 162,
+              "figure": "20.80bps",
+              "near": "distinct_sources",
+              "known_value": 19.0,
+              "distance": 0.0865
+            },
+            {
+              "seq": 167,
+              "figure": "20.8bps",
+              "near": "distinct_sources",
+              "known_value": 19.0,
+              "distance": 0.0865
+            },
+            {
+              "seq": 175,
+              "figure": "120bps",
+              "near": "token_price",
+              "known_value": 130.16,
+              "distance": 0.0781
+            },
+            {
+              "seq": 191,
+              "figure": "8",
+              "near": "chain_event",
+              "known_value": 0.07338,
+              "distance": 0.0828
+            },
+            {
+              "seq": 207,
+              "figure": "37.7bps",
+              "near": "token_price",
+              "known_value": 39.6,
+              "distance": 0.048
+            },
+            {
+              "seq": 212,
+              "figure": "320bps",
+              "near": "analysts",
+              "known_value": 3.0,
+              "distance": 0.0625
+            },
+            {
+              "seq": 214,
+              "figure": "16.27bps",
+              "near": "distinct_sources",
+              "known_value": 17.0,
+              "distance": 0.0429
+            }
+          ]
+        },
+        "known_values_reconstructed_per_decision": {
+          "min": 5,
+          "max": 9,
+          "declared_in_a_near_miss_unit": 327
+        },
+        "reading": "a lower bound: only values the record proves the desk held are used, and the hurdle \u2014 the figure theses misquote most \u2014 is not among them"
+      },
+      "outcome": {
+        "by_level": {
+          "fully_supported": {
+            "decisions": 379,
+            "settled": 351,
+            "lean_graded": 271,
+            "lean_hits": 136,
+            "lean_hit_rate": 0.5018,
+            "lean_hit_rate_95ci": [
+              0.4427,
+              0.5609
+            ],
+            "mean_abs_move_bps": 186.667,
+            "verdicts": {
+              "no_trade": 379
+            }
+          },
+          "partially_supported": {
+            "decisions": 261,
+            "settled": 249,
+            "lean_graded": 209,
+            "lean_hits": 110,
+            "lean_hit_rate": 0.5263,
+            "lean_hit_rate_95ci": [
+              0.4588,
+              0.5929
+            ],
+            "mean_abs_move_bps": 210.633,
+            "verdicts": {
+              "no_trade": 259,
+              "trade": 2
+            }
+          },
+          "no_support": {
+            "decisions": 0,
+            "settled": 0,
+            "lean_graded": 0,
+            "lean_hits": 0,
+            "lean_hit_rate": null,
+            "lean_hit_rate_95ci": null,
+            "mean_abs_move_bps": null,
+            "verdicts": {}
+          }
+        },
+        "partial_vs_none": {
+          "p_value": null,
+          "why": "one side has no graded lean"
+        },
+        "partial_vs_full": {
+          "p_value": 0.6453,
+          "difference": 0.0245
+        },
+        "grading": "lean against the settled move (eval/shadow.move_of), moves within 5.0bps not graded; two-sided Fisher exact on hits"
+      }
+    },
+    "grounding_recorded_frames": {
+      "frames_replayed": 5,
+      "answers_checked": 10,
+      "by_level": {
+        "partially_supported": 2,
+        "fully_supported": 8
+      },
+      "near_misses": 0,
+      "unresolved_figures": 3,
+      "rank_pairs": 5,
+      "rank_changes_if_scored_by_support_instead_of_coverage": 0,
+      "answers": [
+        {
+          "symbol": "NVDAUSDT",
+          "at": "2026-09-24T08:00:00+00:00",
+          "candidate": 0,
+          "support": "partially_supported",
+          "figures": 9,
+          "unresolved": 2,
+          "near_misses": [],
+          "coverage": 0.7778,
+          "support_score": 0.7778,
+          "realised_bps": 168.252,
+          "lean_hit": true
+        },
+        {
+          "symbol": "NVDAUSDT",
+          "at": "2026-09-24T08:00:00+00:00",
+          "candidate": 1,
+          "support": "partially_supported",
+          "figures": 10,
+          "unresolved": 1,
+          "near_misses": [],
+          "coverage": 0.9,
+          "support_score": 0.9,
+          "realised_bps": 168.252,
+          "lean_hit": true
+        },
+        {
+          "symbol": "NVDAUSDT",
+          "at": "2026-09-17T08:00:00+00:00",
+          "candidate": 0,
+          "support": "fully_supported",
+          "figures": 8,
+          "unresolved": 0,
+          "near_misses": [],
+          "coverage": 1.0,
+          "support_score": 1.0,
+          "realised_bps": 199.1354,
+          "lean_hit": true
+        },
+        {
+          "symbol": "NVDAUSDT",
+          "at": "2026-09-17T08:00:00+00:00",
+          "candidate": 1,
+          "support": "fully_supported",
+          "figures": 7,
+          "unresolved": 0,
+          "near_misses": [],
+          "coverage": 1.0,
+          "support_score": 1.0,
+          "realised_bps": 199.1354,
+          "lean_hit": true
+        },
+        {
+          "symbol": "TSLAUSDT",
+          "at": "2026-09-23T08:00:00+00:00",
+          "candidate": 0,
+          "support": "fully_supported",
+          "figures": 7,
+          "unresolved": 0,
+          "near_misses": [],
+          "coverage": 1.0,
+          "support_score": 1.0,
+          "realised_bps": -94.0166,
+          "lean_hit": false
+        },
+        {
+          "symbol": "TSLAUSDT",
+          "at": "2026-09-23T08:00:00+00:00",
+          "candidate": 1,
+          "support": "fully_supported",
+          "figures": 7,
+          "unresolved": 0,
+          "near_misses": [],
+          "coverage": 1.0,
+          "support_score": 1.0,
+          "realised_bps": -94.0166,
+          "lean_hit": false
+        },
+        {
+          "symbol": "TSLAUSDT",
+          "at": "2026-09-16T08:00:00+00:00",
+          "candidate": 0,
+          "support": "fully_supported",
+          "figures": 12,
+          "unresolved": 0,
+          "near_misses": [],
+          "coverage": 1.0,
+          "support_score": 1.0,
+          "realised_bps": 158.0829,
+          "lean_hit": null
+        },
+        {
+          "symbol": "TSLAUSDT",
+          "at": "2026-09-16T08:00:00+00:00",
+          "candidate": 1,
+          "support": "fully_supported",
+          "figures": 11,
+          "unresolved": 0,
+          "near_misses": [],
+          "coverage": 1.0,
+          "support_score": 1.0,
+          "realised_bps": 158.0829,
+          "lean_hit": null
+        },
+        {
+          "symbol": "AAPLUSDT",
+          "at": "2026-09-22T08:00:00+00:00",
+          "candidate": 0,
+          "support": "fully_supported",
+          "figures": 9,
+          "unresolved": 0,
+          "near_misses": [],
+          "coverage": 1.0,
+          "support_score": 1.0,
+          "realised_bps": 9.7045,
+          "lean_hit": true
+        },
+        {
+          "symbol": "AAPLUSDT",
+          "at": "2026-09-22T08:00:00+00:00",
+          "candidate": 1,
+          "support": "fully_supported",
+          "figures": 9,
+          "unresolved": 0,
+          "near_misses": [],
+          "coverage": 1.0,
+          "support_score": 1.0,
+          "realised_bps": 9.7045,
+          "lean_hit": true
+        }
+      ],
+      "stopped": "AAPLUSDT 2026-09-15T08:00:00+00:00: offline replay: this request is not in the recording",
+      "reading": "complete known values, tiny sample: the recording holds the five frames the original thesis-quality run reached before its network failed"
+    },
+    "claims_on_record": {
+      "sound_with_a_claim_examined": 52,
+      "contradictions_recorded": 7,
+      "contradictions_by_rule": {
+        "conviction": 6,
+        "pre_arranged": 1
+      },
+      "conviction_rule_replay": {
+        "recorded_conviction_contradictions": 6,
+        "still_fire_under_the_fixed_rule": 0,
+        "ledger_theses_matching_old_pattern": 8,
+        "ledger_theses_matching_new_pattern": 0,
+        "ledger_theses": 703,
+        "rows": [
+          {
+            "seq": 175,
+            "rule": "conviction",
+            "old_conviction_pattern_fires": true,
+            "new_conviction_pattern_fires": false
+          },
+          {
+            "seq": 237,
+            "rule": "conviction",
+            "old_conviction_pattern_fires": true,
+            "new_conviction_pattern_fires": false
+          },
+          {
+            "seq": 461,
+            "rule": "conviction",
+            "old_conviction_pattern_fires": true,
+            "new_conviction_pattern_fires": false
+          },
+          {
+            "seq": 485,
+            "rule": "conviction",
+            "old_conviction_pattern_fires": true,
+            "new_conviction_pattern_fires": false
+          },
+          {
+            "seq": 520,
+            "rule": "conviction",
+            "old_conviction_pattern_fires": true,
+            "new_conviction_pattern_fires": false
+          },
+          {
+            "seq": 575,
+            "rule": "conviction",
+            "old_conviction_pattern_fires": true,
+            "new_conviction_pattern_fires": false
+          },
+          {
+            "seq": 652,
+            "rule": "pre_arranged",
+            "old_conviction_pattern_fires": false,
+            "new_conviction_pattern_fires": false
+          }
+        ]
+      },
+      "partial_claims_recomputable": false,
+      "why_not": "a claim is partial when some of its relevant records agree and others do not, and the desk never persisted the records' attributes \u2014 only the verdict line \u2014 so the 52 examined claims that passed cannot be re-split; the state applies to every decision from the one that first carries it"
+    },
+    "live_three_state_lines": {
+      "first_seq_with_a_support_line": 690,
+      "failing_decisions_since": 6,
+      "failing_decisions_missing_the_support_line": 0,
+      "support_lines_by_level": {
+        "partial": 6
+      },
+      "near_miss_figures_printed": 1,
+      "near_miss_examples": [
+        {
+          "seq": 696,
+          "line": "[grounding] support: partial (0.93) \u2014 6 of 7 figure(s) trace to a given value; 1 more misquote one by under 10%: 19bps is 5% off earnings_magnitude_bps = 18"
+        }
+      ],
+      "partial_claims_printed": 1,
+      "partial_claims_by_rule": {
+        "fundamental_decline": 1
+      }
+    }
+  },
+  "m_of_k": {
+    "panels_on_record": 641,
+    "panels_reconstructed": 641,
+    "panels_skipped": {},
+    "assignments_per_panel": {
+      "min": 1,
+      "max": 55,
+      "exactly_one": 24
+    },
+    "thresholds": {
+      "1-of-K": {
+        "panels_with_K_at_least_m": 641,
+        "determined": 443,
+        "decisive": 234,
+        "decisiveness": 0.5282,
+        "graded": 208,
+        "hits": 99,
+        "hit_rate": 0.476,
+        "hit_rate_95ci": [
+          0.4091,
+          0.5437
+        ],
+        "stated_threshold": false
+      },
+      "2-of-K": {
+        "panels_with_K_at_least_m": 641,
+        "determined": 520,
+        "decisive": 219,
+        "decisiveness": 0.4212,
+        "graded": 195,
+        "hits": 88,
+        "hit_rate": 0.4513,
+        "hit_rate_95ci": [
+          0.383,
+          0.5214
+        ],
+        "stated_threshold": true
+      },
+      "3-of-K": {
+        "panels_with_K_at_least_m": 510,
+        "determined": 354,
+        "decisive": 21,
+        "decisiveness": 0.0593,
+        "graded": 19,
+        "hits": 8,
+        "hit_rate": 0.4211,
+        "hit_rate_95ci": [
+          0.2314,
+          0.6372
+        ],
+        "stated_threshold": false
+      },
+      "4-of-K": {
+        "panels_with_K_at_least_m": 221,
+        "determined": 158,
+        "decisive": 0,
+        "decisiveness": 0.0,
+        "graded": 0,
+        "hits": 0,
+        "hit_rate": null,
+        "hit_rate_95ci": null,
+        "stated_threshold": false
+      }
+    },
+    "desk_plurality": {
+      "calls": 396,
+      "graded": 357,
+      "hits": 175,
+      "hit_rate": 0.4902,
+      "hit_rate_95ci": [
+        0.4387,
+        0.5419
+      ]
+    },
+    "base_rate_always_up": {
+      "graded": 584,
+      "hits": 309,
+      "hit_rate": 0.5291
+    },
+    "grading": "call against the settled move's sign (eval/shadow.move_of), moves within 5.0bps not graded; a panel counts at a threshold only when every signal assignment consistent with its notes gives the same call"
+  },
+  "rubric": {
+    "self_score_used": "the ledger's stated_confidence \u2014 the one number the rubric sits beside",
+    "axes": {
+      "groundedness": {
+        "n": 640,
+        "meets_bar": 379,
+        "misses_bar": 261,
+        "auc": 0.5022,
+        "auc_p_value": 0.9257,
+        "spearman": -0.0656
+      },
+      "evidence_breadth": {
+        "n": 641,
+        "meets_bar": 530,
+        "misses_bar": 111,
+        "auc": 0.3125,
+        "auc_p_value": 0.0,
+        "spearman": -0.2226
+      },
+      "independence": {
+        "n": 641,
+        "meets_bar": 545,
+        "misses_bar": 96,
+        "auc": 0.326,
+        "auc_p_value": 0.0,
+        "spearman": -0.3309
+      }
+    },
+    "edge_over_hurdle": "not measured: the hurdle a decision faced is not persisted in the ledger or the notes",
+    "rubric_pairs": {
+      "pair_notes": 0,
+      "axes": {}
+    },
+    "rubric_measured": false,
+    "why_not": "the rubric flag is off and this item was built with no paid model calls, so no decision has a self-rubric yet; the numbers above are the baseline it must beat, and rubric_pairs is computed from the desk's pair lines once the first is written"
+  },
+  "prompt_cache": {
+    "first_run_within_process": {
+      "s5_rows": 5,
+      "s6_rows": 1,
+      "s4_rows": 10,
+      "s7_rows": 2,
+      "recording_lookups": 35,
+      "stopped": {
+        "s5": "stopped at AAPLUSDT 2026-09-15T08:00:00+00:00: offline replay: this request is not in the recording",
+        "s7": "TSLAUSDT: the bull seat did not answer (QwenError: offline replay: this request is not in the recording); the decision proceeds undebated"
+      },
+      "lookups": 38,
+      "hits": 1,
+      "misses": 37,
+      "bypassed": 0,
+      "revalidation_misses": 0,
+      "hit_rate": 0.0263,
+      "tokens_saved": 3817,
+      "unmeasured_hits": 0
+    },
+    "second_run_from_persisted_cache": {
+      "s5_rows": 5,
+      "s6_rows": 1,
+      "s4_rows": 10,
+      "s7_rows": 2,
+      "recording_lookups": 0,
+      "stopped": {
+        "s5": "stopped at AAPLUSDT 2026-09-15T08:00:00+00:00: offline replay: this request is not in the recording",
+        "s7": "TSLAUSDT: the bull seat did not answer (QwenError: offline replay: this request is not in the recording); the decision proceeds undebated"
+      },
+      "lookups": 38,
+      "hits": 36,
+      "misses": 2,
+      "bypassed": 0,
+      "revalidation_misses": 0,
+      "hit_rate": 0.9474,
+      "tokens_saved": 126428,
+      "unmeasured_hits": 0
+    },
+    "answers_persisted": 35,
+    "live_cost_ledger": {
+      "requests": 377,
+      "cache_hits": 2,
+      "hit_rate": 0.0053,
+      "first": "2026-09-25T13:57:20.990+00:00",
+      "last": "2026-09-25T20:16:28.744+00:00"
+    },
+    "default_prompt_unchanged": true
+  },
+  "id_remap": {
+    "evidence_ids_shown_in_recorded_frames": 133,
+    "distinct": 95,
+    "mean_length_chars": 24.32,
+    "carrying_a_run_of_10_or_more_digits": 37,
+    "characters_if_shown_as_handles": 376,
+    "characters_as_shown": 3234,
+    "mangling_rate_on_record": null,
+    "why_not": "the analysts' raw source_ids are not persisted \u2014 only the panel's distinct-source count \u2014 so how often an echoed id was not one shown cannot be read back; the remap makes it impossible from the first decision that uses it"
+  },
+  "forced_reflection": {
+    "measured": false,
+    "why_not": "needs the model's answers under the reflection flag, and no paid call was permitted; its mechanics \u2014 required fields, the seq check against the memory block, the byte-identical default prompt \u2014 are covered by tests/test_decision_primitives.py"
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "generated_at": "2026-09-25T20:29:16.370546+00:00",
+  "item": "S17 trajectory circuit-breaker (agents/circuit.py), replayed",
+  "ledger": "paper_ledger.jsonl",
+  "thresholds": {
+    "max_steps_per_symbol_per_window": 48,
+    "invalid_outputs": 3,
+    "equivalent_orders": 3,
+    "nudge_at": 2,
+    "size_tolerance": "0.10",
+    "window_hours": 24.0
+  },
+  "clean_replay": {
+    "decisions": 707,
+    "first": "2026-09-12T09:30:47.854319+00:00",
+    "last": "2026-09-25T19:40:53.188701+00:00",
+    "trips": 0,
+    "trips_per_100_decisions": 0.0,
+    "trip_rows": [],
+    "recorded": {
+      "max_decisions_per_symbol_in_window": 30,
+      "where": "NVDAUSDT at 2026-09-13T09:22:02.700871+00:00",
+      "exposure_opening_decisions": 2,
+      "invalid_outputs": 0,
+      "verdicts": {
+        "no_trade": 705,
+        "trade": 2
+      }
+    }
+  },
+  "step_budget_sensitivity": {
+    "24": 10,
+    "32": 0,
+    "48": 0
+  },
+  "injected": [
+    {
+      "fault": "repeated_equivalent_order",
+      "expected": "equivalent_orders",
+      "got": "equivalent_orders",
+      "earlier_steps_tripped": [
+        null,
+        null
+      ],
+      "caught_with_right_reason": true
+    },
+    {
+      "fault": "control_size_outside_tolerance",
+      "expected": null,
+      "got": null,
+      "caught_with_right_reason": true
+    },
+    {
+      "fault": "control_outside_window",
+      "expected": null,
+      "got": null,
+      "caught_with_right_reason": true
+    },
+    {
+      "fault": "control_alternating_side",
+      "expected": null,
+      "got": null,
+      "caught_with_right_reason": true
+    },
+    {
+      "fault": "malformed_output_x3",
+      "expected": "invalid_outputs",
+      "got": "invalid_outputs",
+      "earlier_steps_tripped": [
+        null,
+        null
+      ],
+      "caught_with_right_reason": true
+    },
+    {
+      "fault": "control_deliberate_human_review",
+      "expected": null,
+      "got": null,
+      "caught_with_right_reason": true
+    },
+    {
+      "fault": "runaway_caller",
+      "expected": "step_budget",
+      "got": "step_budget",
+      "step_before_budget_tripped": "step_budget",
+      "caught_with_right_reason": true
+    },
+    {
+      "fault": "venue_timeout_every_attempt",
+      "expected": "gave_up:timeout",
+      "got": "gave_up:timeout",
+      "attempts": 3,
+      "backoff_waits": [
+        0.1,
+        0.2
+      ],
+      "give_up": "gave up on venue.place_order after 3 attempt(s) (attempts exhausted): timeout \u2014 TimeoutError: no answer in 0.02s",
+      "caught_with_right_reason": true
+    },
+    {
+      "fault": "control_transient_then_success",
+      "expected": null,
+      "got": null,
+      "attempts": 3,
+      "caught_with_right_reason": true
+    },
+    {
+      "fault": "venue_rejection_not_resent",
+      "expected": "gave_up:permanent",
+      "got": "gave_up:permanent",
+      "times_sent": 1,
+      "caught_with_right_reason": true
+    }
+  ],
+  "injected_caught_with_right_reason": 10,
+  "injected_total": 10,
+  "not_measured": "the replay reads the ledger's recorded (post-Constitution) verdicts; the live desk assesses the intent before the Constitution, so a repeated proposal the Constitution blocked is invisible to this replay. The Meta-PM give-up path is exercised end to end in tests/test_circuit_breaker.py with a scripted model, not here.",
+  "qwen_requests": 0
+}

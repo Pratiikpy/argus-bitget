@@ -1,0 +1,1435 @@
+{
+  "generated_at": "2026-09-25T19:56:15.596897+00:00",
+  "command": "python -m argus.eval.execution_truth",
+  "qwen_calls": 0,
+  "fault_injection": {
+    "fill_confirmation": {
+      "scenarios": 12,
+      "deadline_s": 30.0,
+      "by_method": {
+        "argus_confirm_fill": {
+          "correct": 12,
+          "unsafe": 0
+        },
+        "single_immediate_status_read": {
+          "correct": 4,
+          "unsafe": 1
+        },
+        "fixed_2s_sleep_then_status_read": {
+          "correct": 7,
+          "unsafe": 4
+        },
+        "position_only_at_deadline": {
+          "correct": 7,
+          "unsafe": 5
+        }
+      },
+      "rows": [
+        {
+          "scenario": "instant_fill",
+          "story": "status and position both show the fill on the first read",
+          "truth": "filled",
+          "argus_verdict": "confirmed",
+          "argus_reads": 2,
+          "argus_simulated_seconds": 1.0,
+          "answers": {
+            "argus_confirm_fill": {
+              "answer": "filled",
+              "correct": true,
+              "unsafe": false
+            },
+            "single_immediate_status_read": {
+              "answer": "filled",
+              "correct": true,
+              "unsafe": false
+            },
+            "fixed_2s_sleep_then_status_read": {
+              "answer": "filled",
+              "correct": true,
+              "unsafe": false
+            },
+            "position_only_at_deadline": {
+              "answer": "filled",
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "late_settle",
+          "story": "accepted, filled at 1.5s; the position books it only at 3.0s",
+          "truth": "filled",
+          "argus_verdict": "confirmed",
+          "argus_reads": 6,
+          "argus_simulated_seconds": 4.75,
+          "answers": {
+            "argus_confirm_fill": {
+              "answer": "filled",
+              "correct": true,
+              "unsafe": false
+            },
+            "single_immediate_status_read": {
+              "answer": "not_final",
+              "correct": false,
+              "unsafe": false
+            },
+            "fixed_2s_sleep_then_status_read": {
+              "answer": "filled",
+              "correct": true,
+              "unsafe": false
+            },
+            "position_only_at_deadline": {
+              "answer": "filled",
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "late_index",
+          "story": "no order record for 6s (still being indexed), then filled",
+          "truth": "filled",
+          "argus_verdict": "confirmed",
+          "argus_reads": 7,
+          "argus_simulated_seconds": 8.75,
+          "answers": {
+            "argus_confirm_fill": {
+              "answer": "filled",
+              "correct": true,
+              "unsafe": false
+            },
+            "single_immediate_status_read": {
+              "answer": "not_final",
+              "correct": false,
+              "unsafe": false
+            },
+            "fixed_2s_sleep_then_status_read": {
+              "answer": "not_final",
+              "correct": false,
+              "unsafe": false
+            },
+            "position_only_at_deadline": {
+              "answer": "filled",
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "still_working",
+          "story": "a resting order that never fills inside the deadline",
+          "truth": "not_final",
+          "argus_verdict": "unsettled",
+          "argus_reads": 12,
+          "argus_simulated_seconds": 30.0,
+          "answers": {
+            "argus_confirm_fill": {
+              "answer": "not_final",
+              "correct": true,
+              "unsafe": false
+            },
+            "single_immediate_status_read": {
+              "answer": "not_final",
+              "correct": true,
+              "unsafe": false
+            },
+            "fixed_2s_sleep_then_status_read": {
+              "answer": "not_final",
+              "correct": true,
+              "unsafe": false
+            },
+            "position_only_at_deadline": {
+              "answer": "unfilled",
+              "correct": false,
+              "unsafe": true
+            }
+          }
+        },
+        {
+          "scenario": "phantom_fill",
+          "story": "the status says filled at 0.3s; the position never moves",
+          "truth": "disputed",
+          "argus_verdict": "disagreed",
+          "argus_reads": 12,
+          "argus_simulated_seconds": 30.0,
+          "answers": {
+            "argus_confirm_fill": {
+              "answer": "disputed",
+              "correct": true,
+              "unsafe": false
+            },
+            "single_immediate_status_read": {
+              "answer": "not_final",
+              "correct": false,
+              "unsafe": false
+            },
+            "fixed_2s_sleep_then_status_read": {
+              "answer": "filled",
+              "correct": false,
+              "unsafe": true
+            },
+            "position_only_at_deadline": {
+              "answer": "unfilled",
+              "correct": false,
+              "unsafe": true
+            }
+          }
+        },
+        {
+          "scenario": "rejected_but_exposed",
+          "story": "the status says rejected; the position moved by the full size",
+          "truth": "disputed",
+          "argus_verdict": "disagreed",
+          "argus_reads": 13,
+          "argus_simulated_seconds": 30.0,
+          "answers": {
+            "argus_confirm_fill": {
+              "answer": "disputed",
+              "correct": true,
+              "unsafe": false
+            },
+            "single_immediate_status_read": {
+              "answer": "not_final",
+              "correct": false,
+              "unsafe": false
+            },
+            "fixed_2s_sleep_then_status_read": {
+              "answer": "unfilled",
+              "correct": false,
+              "unsafe": true
+            },
+            "position_only_at_deadline": {
+              "answer": "filled",
+              "correct": false,
+              "unsafe": true
+            }
+          }
+        },
+        {
+          "scenario": "status_position_mismatch",
+          "story": "the status says 2 filled; the position shows 1",
+          "truth": "disputed",
+          "argus_verdict": "disagreed",
+          "argus_reads": 12,
+          "argus_simulated_seconds": 30.0,
+          "answers": {
+            "argus_confirm_fill": {
+              "answer": "disputed",
+              "correct": true,
+              "unsafe": false
+            },
+            "single_immediate_status_read": {
+              "answer": "not_final",
+              "correct": false,
+              "unsafe": false
+            },
+            "fixed_2s_sleep_then_status_read": {
+              "answer": "filled",
+              "correct": false,
+              "unsafe": true
+            },
+            "position_only_at_deadline": {
+              "answer": "partial",
+              "correct": false,
+              "unsafe": true
+            }
+          }
+        },
+        {
+          "scenario": "empty_record",
+          "story": "the venue never returns a record and the position never moves",
+          "truth": "not_final",
+          "argus_verdict": "no_evidence",
+          "argus_reads": 12,
+          "argus_simulated_seconds": 30.0,
+          "answers": {
+            "argus_confirm_fill": {
+              "answer": "not_final",
+              "correct": true,
+              "unsafe": false
+            },
+            "single_immediate_status_read": {
+              "answer": "not_final",
+              "correct": true,
+              "unsafe": false
+            },
+            "fixed_2s_sleep_then_status_read": {
+              "answer": "not_final",
+              "correct": true,
+              "unsafe": false
+            },
+            "position_only_at_deadline": {
+              "answer": "unfilled",
+              "correct": false,
+              "unsafe": true
+            }
+          }
+        },
+        {
+          "scenario": "genuine_rejection",
+          "story": "rejected, and the position agrees nothing happened",
+          "truth": "unfilled",
+          "argus_verdict": "confirmed_unfilled",
+          "argus_reads": 2,
+          "argus_simulated_seconds": 1.0,
+          "answers": {
+            "argus_confirm_fill": {
+              "answer": "unfilled",
+              "correct": true,
+              "unsafe": false
+            },
+            "single_immediate_status_read": {
+              "answer": "unfilled",
+              "correct": true,
+              "unsafe": false
+            },
+            "fixed_2s_sleep_then_status_read": {
+              "answer": "unfilled",
+              "correct": true,
+              "unsafe": false
+            },
+            "position_only_at_deadline": {
+              "answer": "unfilled",
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "partial_then_cancel",
+          "story": "half fills, the rest is cancelled; the position shows the half",
+          "truth": "partial",
+          "argus_verdict": "confirmed_partial",
+          "argus_reads": 5,
+          "argus_simulated_seconds": 2.75,
+          "answers": {
+            "argus_confirm_fill": {
+              "answer": "partial",
+              "correct": true,
+              "unsafe": false
+            },
+            "single_immediate_status_read": {
+              "answer": "not_final",
+              "correct": false,
+              "unsafe": false
+            },
+            "fixed_2s_sleep_then_status_read": {
+              "answer": "partial",
+              "correct": true,
+              "unsafe": false
+            },
+            "position_only_at_deadline": {
+              "answer": "partial",
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "flaky_status_reads",
+          "story": "status reads fail for 1.2s, then show the fill",
+          "truth": "filled",
+          "argus_verdict": "confirmed",
+          "argus_reads": 5,
+          "argus_simulated_seconds": 2.75,
+          "answers": {
+            "argus_confirm_fill": {
+              "answer": "filled",
+              "correct": true,
+              "unsafe": false
+            },
+            "single_immediate_status_read": {
+              "answer": "not_final",
+              "correct": false,
+              "unsafe": false
+            },
+            "fixed_2s_sleep_then_status_read": {
+              "answer": "filled",
+              "correct": true,
+              "unsafe": false
+            },
+            "position_only_at_deadline": {
+              "answer": "filled",
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "overfill",
+          "story": "both records agree on 4 filled against an order of 2",
+          "truth": "disputed",
+          "argus_verdict": "overfilled",
+          "argus_reads": 2,
+          "argus_simulated_seconds": 1.0,
+          "answers": {
+            "argus_confirm_fill": {
+              "answer": "disputed",
+              "correct": true,
+              "unsafe": false
+            },
+            "single_immediate_status_read": {
+              "answer": "filled",
+              "correct": false,
+              "unsafe": true
+            },
+            "fixed_2s_sleep_then_status_read": {
+              "answer": "filled",
+              "correct": false,
+              "unsafe": true
+            },
+            "position_only_at_deadline": {
+              "answer": "disputed",
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        }
+      ]
+    },
+    "batch_writes": {
+      "scenarios": 6,
+      "by_method": {
+        "argus_write_batch": {
+          "duplicates": 0,
+          "misreported": 0,
+          "unknown": 4
+        },
+        "retry_whole_batch": {
+          "duplicates": 6,
+          "misreported": 3,
+          "unknown": 0
+        },
+        "trust_the_response": {
+          "duplicates": 1,
+          "misreported": 8,
+          "unknown": 0
+        },
+        "mem0_literal_fallback": {
+          "duplicates": 6,
+          "misreported": 3,
+          "unknown": 0
+        }
+      },
+      "rows": [
+        {
+          "scenario": "clean",
+          "story": "every order lands and the response names each",
+          "methods": {
+            "argus_write_batch": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1,
+                "o3": 1,
+                "o4": 1,
+                "o5": 1
+              },
+              "duplicates": 0,
+              "misreported": 0,
+              "unknown": 0
+            },
+            "retry_whole_batch": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1,
+                "o3": 1,
+                "o4": 1,
+                "o5": 1
+              },
+              "duplicates": 0,
+              "misreported": 0,
+              "unknown": 0
+            },
+            "trust_the_response": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1,
+                "o3": 1,
+                "o4": 1,
+                "o5": 1
+              },
+              "duplicates": 0,
+              "misreported": 0,
+              "unknown": 0
+            },
+            "mem0_literal_fallback": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1,
+                "o3": 1,
+                "o4": 1,
+                "o5": 1
+              },
+              "duplicates": 0,
+              "misreported": 0,
+              "unknown": 0
+            }
+          }
+        },
+        {
+          "scenario": "failure_list",
+          "story": "the call succeeds but lists o2 and o4 as refused for margin",
+          "methods": {
+            "argus_write_batch": {
+              "reported": {
+                "o1": "written",
+                "o2": "failed",
+                "o3": "written",
+                "o4": "failed",
+                "o5": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o3": 1,
+                "o5": 1
+              },
+              "duplicates": 0,
+              "misreported": 0,
+              "unknown": 0
+            },
+            "retry_whole_batch": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o3": 1,
+                "o5": 1
+              },
+              "duplicates": 0,
+              "misreported": 2,
+              "unknown": 0
+            },
+            "trust_the_response": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o3": 1,
+                "o5": 1
+              },
+              "duplicates": 0,
+              "misreported": 2,
+              "unknown": 0
+            },
+            "mem0_literal_fallback": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o3": 1,
+                "o5": 1
+              },
+              "duplicates": 0,
+              "misreported": 2,
+              "unknown": 0
+            }
+          }
+        },
+        {
+          "scenario": "silent_items",
+          "story": "o4 lands but is not named; o5 is dropped and not named",
+          "methods": {
+            "argus_write_batch": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1,
+                "o3": 1,
+                "o4": 1,
+                "o5": 1
+              },
+              "duplicates": 0,
+              "misreported": 0,
+              "unknown": 0
+            },
+            "retry_whole_batch": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1,
+                "o3": 1,
+                "o4": 1
+              },
+              "duplicates": 0,
+              "misreported": 1,
+              "unknown": 0
+            },
+            "trust_the_response": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1,
+                "o3": 1,
+                "o4": 1
+              },
+              "duplicates": 0,
+              "misreported": 1,
+              "unknown": 0
+            },
+            "mem0_literal_fallback": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1,
+                "o3": 1,
+                "o4": 1
+              },
+              "duplicates": 0,
+              "misreported": 1,
+              "unknown": 0
+            }
+          }
+        },
+        {
+          "scenario": "raises_after_partial",
+          "story": "the call lands three orders then times out; o5 is refused singly",
+          "methods": {
+            "argus_write_batch": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "failed",
+                "o6": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1,
+                "o3": 1,
+                "o4": 1,
+                "o6": 1
+              },
+              "duplicates": 0,
+              "misreported": 0,
+              "unknown": 0
+            },
+            "retry_whole_batch": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "written",
+                "o6": "written"
+              },
+              "venue_holds": {
+                "o1": 2,
+                "o2": 2,
+                "o3": 2,
+                "o4": 1,
+                "o5": 1,
+                "o6": 1
+              },
+              "duplicates": 3,
+              "misreported": 0,
+              "unknown": 0
+            },
+            "trust_the_response": {
+              "reported": {
+                "o1": "failed",
+                "o2": "failed",
+                "o3": "failed",
+                "o4": "failed",
+                "o5": "failed",
+                "o6": "failed"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1,
+                "o3": 1
+              },
+              "duplicates": 0,
+              "misreported": 3,
+              "unknown": 0
+            },
+            "mem0_literal_fallback": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written",
+                "o5": "failed",
+                "o6": "written"
+              },
+              "venue_holds": {
+                "o1": 2,
+                "o2": 2,
+                "o3": 2,
+                "o4": 1,
+                "o6": 1
+              },
+              "duplicates": 3,
+              "misreported": 0,
+              "unknown": 0
+            }
+          }
+        },
+        {
+          "scenario": "raises_no_probe",
+          "story": "the call lands two orders then times out; the venue cannot be asked",
+          "methods": {
+            "argus_write_batch": {
+              "reported": {
+                "o1": "unknown",
+                "o2": "unknown",
+                "o3": "unknown",
+                "o4": "unknown"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1
+              },
+              "duplicates": 0,
+              "misreported": 0,
+              "unknown": 4
+            },
+            "retry_whole_batch": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written"
+              },
+              "venue_holds": {
+                "o1": 2,
+                "o2": 2,
+                "o3": 1,
+                "o4": 1
+              },
+              "duplicates": 2,
+              "misreported": 0,
+              "unknown": 0
+            },
+            "trust_the_response": {
+              "reported": {
+                "o1": "failed",
+                "o2": "failed",
+                "o3": "failed",
+                "o4": "failed"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1
+              },
+              "duplicates": 0,
+              "misreported": 2,
+              "unknown": 0
+            },
+            "mem0_literal_fallback": {
+              "reported": {
+                "o1": "written",
+                "o2": "written",
+                "o3": "written",
+                "o4": "written"
+              },
+              "venue_holds": {
+                "o1": 2,
+                "o2": 2,
+                "o3": 1,
+                "o4": 1
+              },
+              "duplicates": 2,
+              "misreported": 0,
+              "unknown": 0
+            }
+          }
+        },
+        {
+          "scenario": "duplicate_input",
+          "story": "the same order is named twice in one batch",
+          "methods": {
+            "argus_write_batch": {
+              "reported": {
+                "o1": "written",
+                "o2": "written"
+              },
+              "venue_holds": {
+                "o1": 1,
+                "o2": 1
+              },
+              "duplicates": 0,
+              "misreported": 0,
+              "unknown": 0
+            },
+            "retry_whole_batch": {
+              "reported": {
+                "o1": "written",
+                "o2": "written"
+              },
+              "venue_holds": {
+                "o1": 2,
+                "o2": 1
+              },
+              "duplicates": 1,
+              "misreported": 0,
+              "unknown": 0
+            },
+            "trust_the_response": {
+              "reported": {
+                "o1": "written",
+                "o2": "written"
+              },
+              "venue_holds": {
+                "o1": 2,
+                "o2": 1
+              },
+              "duplicates": 1,
+              "misreported": 0,
+              "unknown": 0
+            },
+            "mem0_literal_fallback": {
+              "reported": {
+                "o1": "written",
+                "o2": "written"
+              },
+              "venue_holds": {
+                "o1": 2,
+                "o2": 1
+              },
+              "duplicates": 1,
+              "misreported": 0,
+              "unknown": 0
+            }
+          }
+        }
+      ]
+    },
+    "shown_ids": {
+      "scenarios": 10,
+      "shown": {
+        "kind": "orders",
+        "digest": "edd34deef3fca4d3",
+        "rows": [
+          {
+            "id": "1",
+            "line": "BUY 2 NVDAUSDT, filled 0, submitted"
+          },
+          {
+            "id": "2",
+            "line": "SELL 1 TSLAUSDT, filled 0, submitted"
+          },
+          {
+            "id": "3",
+            "line": "SELL 3 NVDAUSDT, filled 0, submitted"
+          }
+        ]
+      },
+      "by_method": {
+        "argus_resolve_all": {
+          "correct": 10,
+          "unsafe": 0
+        },
+        "real_ids_any_in_book": {
+          "correct": 7,
+          "unsafe": 3
+        },
+        "webarena_literal_lookup": {
+          "correct": 7,
+          "unsafe": 2
+        }
+      },
+      "rows": [
+        {
+          "scenario": "picks_two_shown_orders",
+          "truth": "act",
+          "short_tokens": [
+            "'1'",
+            "'[3]'"
+          ],
+          "real_tokens": [
+            "'argus-7f3a01d2c4e5f6a7b8c9d0e1'",
+            "'argus-9e8d7c6b5a4f3e2d1c0b9a88'"
+          ],
+          "methods": {
+            "argus_resolve_all": {
+              "acted_on": 2,
+              "refused": false,
+              "correct": true,
+              "unsafe": false
+            },
+            "real_ids_any_in_book": {
+              "acted_on": 2,
+              "refused": false,
+              "correct": true,
+              "unsafe": false
+            },
+            "webarena_literal_lookup": {
+              "acted_on": 1,
+              "refused": true,
+              "correct": false,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "invents_an_id",
+          "truth": "refuse",
+          "short_tokens": [
+            "'7'"
+          ],
+          "real_tokens": [
+            "'argus-000000000000000000000000'"
+          ],
+          "methods": {
+            "argus_resolve_all": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "real_ids_any_in_book": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "webarena_literal_lookup": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "names_an_existing_order_it_was_not_shown",
+          "truth": "refuse",
+          "short_tokens": [
+            "'argus-0a1b2c3d4e5f6a7b8c9d0e1f'"
+          ],
+          "real_tokens": [
+            "'argus-0a1b2c3d4e5f6a7b8c9d0e1f'"
+          ],
+          "methods": {
+            "argus_resolve_all": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "real_ids_any_in_book": {
+              "acted_on": 1,
+              "refused": false,
+              "correct": false,
+              "unsafe": true
+            },
+            "webarena_literal_lookup": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "one_real_one_invented",
+          "truth": "refuse",
+          "short_tokens": [
+            "'1'",
+            "'9'"
+          ],
+          "real_tokens": [
+            "'argus-7f3a01d2c4e5f6a7b8c9d0e1'",
+            "'argus-000000000000000000000000'"
+          ],
+          "methods": {
+            "argus_resolve_all": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "real_ids_any_in_book": {
+              "acted_on": 1,
+              "refused": true,
+              "correct": false,
+              "unsafe": true
+            },
+            "webarena_literal_lookup": {
+              "acted_on": 1,
+              "refused": true,
+              "correct": false,
+              "unsafe": true
+            }
+          }
+        },
+        {
+          "scenario": "same_order_twice",
+          "truth": "refuse",
+          "short_tokens": [
+            "'2'",
+            "'[2]'"
+          ],
+          "real_tokens": [
+            "'argus-1b2c3d4e5f60718293a4b5c6'",
+            "'argus-1b2c3d4e5f60718293a4b5c6'"
+          ],
+          "methods": {
+            "argus_resolve_all": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "real_ids_any_in_book": {
+              "acted_on": 2,
+              "refused": false,
+              "correct": false,
+              "unsafe": true
+            },
+            "webarena_literal_lookup": {
+              "acted_on": 1,
+              "refused": true,
+              "correct": false,
+              "unsafe": true
+            }
+          }
+        },
+        {
+          "scenario": "boolean_token",
+          "truth": "refuse",
+          "short_tokens": [
+            "True"
+          ],
+          "real_tokens": [
+            "True"
+          ],
+          "methods": {
+            "argus_resolve_all": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "real_ids_any_in_book": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "webarena_literal_lookup": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "malformed_token",
+          "truth": "refuse",
+          "short_tokens": [
+            "'1a'"
+          ],
+          "real_tokens": [
+            "'1a'"
+          ],
+          "methods": {
+            "argus_resolve_all": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "real_ids_any_in_book": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "webarena_literal_lookup": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "empty_token",
+          "truth": "refuse",
+          "short_tokens": [
+            "''"
+          ],
+          "real_tokens": [
+            "''"
+          ],
+          "methods": {
+            "argus_resolve_all": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "real_ids_any_in_book": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "webarena_literal_lookup": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "float_token",
+          "truth": "refuse",
+          "short_tokens": [
+            "1.5"
+          ],
+          "real_tokens": [
+            "1.5"
+          ],
+          "methods": {
+            "argus_resolve_all": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "real_ids_any_in_book": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "webarena_literal_lookup": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        },
+        {
+          "scenario": "hash_prefixed_token",
+          "truth": "refuse",
+          "short_tokens": [
+            "'#2'"
+          ],
+          "real_tokens": [
+            "'#2'"
+          ],
+          "methods": {
+            "argus_resolve_all": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "real_ids_any_in_book": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            },
+            "webarena_literal_lookup": {
+              "acted_on": 0,
+              "refused": true,
+              "correct": true,
+              "unsafe": false
+            }
+          }
+        }
+      ]
+    },
+    "consent_gate": {
+      "scenarios": 8,
+      "correct": 8,
+      "real_money_orders_sent_without_valid_consent": 0,
+      "rows": [
+        {
+          "scenario": "paper_needs_no_consent",
+          "expected_sent": true,
+          "sent": true,
+          "correct": true,
+          "venue_requests": 2,
+          "detail": "sent"
+        },
+        {
+          "scenario": "live_without_consent",
+          "expected_sent": false,
+          "sent": false,
+          "correct": true,
+          "venue_requests": 0,
+          "detail": "argus-consent-2: refusing a real-money order: this client holds no consent. Paper and demo orders need none; a live order needs grant_live_consent() for this ru"
+        },
+        {
+          "scenario": "token_for_another_run",
+          "expected_sent": false,
+          "sent": false,
+          "correct": true,
+          "venue_requests": 0,
+          "detail": "the consent supplied does not name run run-B; a token consents to one run only. The phrase for this run is: I-ACCEPT-REAL-MONEY-ORDERS-FOR-RUN:run-B"
+        },
+        {
+          "scenario": "expired_consent",
+          "expected_sent": false,
+          "sent": false,
+          "correct": true,
+          "venue_requests": 0,
+          "detail": "argus-consent-3: the consent for run run-stale expired at 2026-09-25T19:11:15.415251+00:00; a run still sending real orders after that is not the run that was a"
+        },
+        {
+          "scenario": "token_reused",
+          "expected_sent": false,
+          "sent": false,
+          "correct": true,
+          "venue_requests": 0,
+          "detail": "the consent for run run-once was already used; a token is spent on its first grant, so start a new run and consent to that one"
+        },
+        {
+          "scenario": "forged_consent_object",
+          "expected_sent": false,
+          "sent": false,
+          "correct": true,
+          "venue_requests": 0,
+          "detail": "a LiveOrderConsent cannot be constructed directly; it is minted only by grant_live_consent(), which is the whole point of the type"
+        },
+        {
+          "scenario": "valid_consent",
+          "expected_sent": true,
+          "sent": true,
+          "correct": true,
+          "venue_requests": 2,
+          "detail": "sent"
+        },
+        {
+          "scenario": "paper_flag_on_live_product",
+          "expected_sent": false,
+          "sent": false,
+          "correct": true,
+          "venue_requests": 0,
+          "detail": "paper_trading=True with product_type='USDT-FUTURES' and no demo header would send real-money orders; use 'SUSDT-FUTURES', or legacy_paptrading on an account tha"
+        }
+      ],
+      "baseline": "not re-executed: before 2026-09-25 `BitgetTradingClient.place_order` had no consent check (read in source before the change), so every live-client scenario above would have been sent, and paper_trading=True with a live productType was constructible and reported trades_real_money=False"
+    }
+  },
+  "replay": {
+    "ledger_rows": 1361,
+    "decisions_on_ledger": 698,
+    "cycle_logs_parsed": 50,
+    "cycle_logs_unparsed": [
+      "cycle_2026-09-12_2252.log",
+      "cycle_2026-09-12_2304.log",
+      "cycle_2026-09-13_0852.log",
+      "cycle_2026-09-13_1052.log",
+      "cycle_2026-09-13_1252.log",
+      "cycle_2026-09-13_1452.log",
+      "cycle_2026-09-15_1900.log",
+      "cycle_2026-09-22_2300.log",
+      "cycle_2026-09-26_0100.log"
+    ],
+    "logged_decisions": {
+      "decisions_checked": 575,
+      "verdicts": {
+        "confirmed_unfilled": 573,
+        "confirmed": 2
+      },
+      "no_risk_record_to_check_against": 24,
+      "alarms": [
+        {
+          "log": "cycle_2026-09-16_0100.log",
+          "seq": 264,
+          "verdict": "confirmed",
+          "status_filled": "1",
+          "position_delta": "-1",
+          "authorised_quantity": "0",
+          "within_authorisation": false,
+          "alarm": true,
+          "note": "[fill] seq 264: the recorded position exceeds its authorisation \u2014 the ledger row and the book agree on 1 SELL, the Constitution authorised 0"
+        },
+        {
+          "log": "cycle_2026-09-16_0100.log",
+          "seq": 265,
+          "verdict": "confirmed",
+          "status_filled": "1",
+          "position_delta": "-1",
+          "authorised_quantity": "0",
+          "within_authorisation": false,
+          "alarm": true,
+          "note": "[fill] seq 265: the recorded position exceeds its authorisation \u2014 the ledger row and the book agree on 1 SELL, the Constitution authorised 0"
+        }
+      ],
+      "alarm_seqs": [
+        264,
+        265
+      ]
+    },
+    "false_alarms": [],
+    "true_alarms_on_known_voided_rows": [
+      264,
+      265
+    ],
+    "logged_settlements": {
+      "settlements_compared": 609,
+      "mismatches": []
+    },
+    "settlement_batches": {
+      "settlements_replayed": 663,
+      "batches": 48,
+      "failed_items": [],
+      "field_mismatches": [
+        {
+          "seq": 264,
+          "field": "gross_pnl",
+          "recorded": "9.9200",
+          "replayed": null
+        },
+        {
+          "seq": 264,
+          "field": "net_pnl",
+          "recorded": "9.6521",
+          "replayed": null
+        },
+        {
+          "seq": 264,
+          "field": "direction_correct",
+          "recorded": true,
+          "replayed": null
+        },
+        {
+          "seq": 264,
+          "field": "counterfactual_move_bps",
+          "recorded": null,
+          "replayed": "-570.6725"
+        },
+        {
+          "seq": 265,
+          "field": "gross_pnl",
+          "recorded": "5.5200",
+          "replayed": null
+        },
+        {
+          "seq": 265,
+          "field": "net_pnl",
+          "recorded": "5.3339",
+          "replayed": null
+        },
+        {
+          "seq": 265,
+          "field": "direction_correct",
+          "recorded": true,
+          "replayed": null
+        },
+        {
+          "seq": 265,
+          "field": "counterfactual_move_bps",
+          "recorded": null,
+          "replayed": "-422.9237"
+        }
+      ],
+      "not_reproducible_from_the_record": [],
+      "batch_file_identical_to_one_at_a_time": true,
+      "replayed_chain": {
+        "chain_intact": true,
+        "tampered_settlements": 0,
+        "unsealed_settlements": 0
+      },
+      "seconds": {
+        "batch": 6.66,
+        "one_at_a_time": 203.66
+      },
+      "file_rewrites": {
+        "batch": 48,
+        "one_at_a_time": 663
+      }
+    },
+    "incident_positive_control": {
+      "available": true,
+      "rows": 62,
+      "duplicated_seqs": [
+        41,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52
+      ],
+      "flagged_seqs": [
+        41,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52
+      ],
+      "exactly_the_duplicates": true
+    }
+  }
+}

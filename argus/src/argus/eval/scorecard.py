@@ -54,6 +54,9 @@ class LedgerScore:
     predictions: list[Prediction]
     abstention_outcomes: list[AbstentionOutcome]
     chain_intact: bool
+    no_lean: int = 0
+    """Settled abstentions whose lean was ``none``: counted in ``ungradeable``, and named here so a
+    reader can tell "no view was stated" from "no outcome is known yet"."""
 
     @property
     def has_enough_to_judge(self) -> bool:
@@ -78,13 +81,39 @@ def _prediction_from(entry: Entry) -> Prediction | None:
     return Prediction(confidence=entry.stated_confidence, correct=bool(entry.direction_correct))
 
 
+def lean_side(entry: Entry) -> str | None:
+    """The trade an abstention withheld: its lean, as a side. ``None`` when it stated no lean.
+
+    **An abstention is graded against its lean, never its ``side`` (fixed 2026-09-25).** This
+    function used to pass ``entry.side``. `eval/shadow.py` had already measured that field as
+    carrying no information on a refusal — the decision contract requires a side, so the model fills
+    the schema in, BUY on every one of the first 53 — and `paper/runner.py:_graded_predictions`
+    already grades refusals by their lean for exactly that reason. The scorecard never caught up.
+    On the frozen record of `eval/general_abstention_comparison.py` (637 settled refusals, ledger
+    seq <= 684) that meant 84 of the 470 refusals that stated a lean were graded against the
+    opposite direction and the 167 that stated none were graded as whatever side the schema was
+    filled with (164 BUY, 3 SELL) — and the headline flipped
+    sign: ``total_value_bps`` read -2,824bps ("standing aside cost money") where the trades the
+    desk would actually have taken say +2,381bps ("standing aside avoided a loss"). Neither is
+    distinguishable from zero on twelve days of record — see that comparison's day-clustered
+    interval — but a grade computed against the wrong trade is wrong whatever its interval.
+    """
+    lean = str(getattr(entry, "lean", "none") or "none").lower()
+    if lean == "up":
+        return "BUY"
+    if lean == "down":
+        return "SELL"
+    return None
+
+
 def _abstention_from(
     entry: Entry, *, realised_move_bps: Decimal | None
 ) -> AbstentionOutcome | None:
-    """An abstention scores only when we know what the move would have been.
+    """An abstention scores only when we know what the move would have been, and what it withheld.
 
     Without a counterfactual it is ungradeable, and counting it as correct is the exact flattery
-    this metric exists to prevent.
+    this metric exists to prevent. Without a lean there was no trade to have taken, so there is no
+    loss it avoided or gain it missed — see :func:`lean_side`.
     """
     if not entry.is_abstention:
         return None
@@ -94,10 +123,13 @@ def _abstention_from(
         realised_move_bps = Decimal(entry.counterfactual_move_bps)
     if realised_move_bps is None:
         return None
+    side = lean_side(entry)
+    if side is None:
+        return None
     return AbstentionOutcome(
         decision_id=str(entry.seq),
         counterfactual_move_bps=realised_move_bps,
-        intended_side=entry.side,
+        intended_side=side,
         round_trip_bps=ROUND_TRIP_BPS,
     )
 
@@ -111,12 +143,13 @@ def score_ledger(
     over its horizon, and **overrides** whatever the ledger recorded — for replaying a scorecard
     against a corrected price history. Omitted, each abstention uses the counterfactual the runner
     wrote at settlement. An abstention with neither is counted but ungraded, which remains the
-    honest default.
+    honest default; so is one whose move is known but which stated no lean (``no_lean``).
     """
     cf = counterfactuals or {}
     predictions: list[Prediction] = []
     abstentions: list[AbstentionOutcome] = []
     ungradeable = 0
+    no_lean = 0
 
     for entry in ledger.entries:
         if entry.is_abstention:
@@ -125,6 +158,9 @@ def score_ledger(
                 abstentions.append(outcome)
             else:
                 ungradeable += 1
+                move_known = entry.seq in cf or entry.counterfactual_move_bps is not None
+                if move_known and lean_side(entry) is None:
+                    no_lean += 1
             continue
 
         prediction = _prediction_from(entry)
@@ -141,7 +177,36 @@ def score_ledger(
         predictions=predictions,
         abstention_outcomes=abstentions,
         chain_intact=bool(ledger.verify()["chain_intact"]),
+        no_lean=no_lean,
     )
+
+
+def _abstention_block(
+    score: LedgerScore, ledger: PaperLedger, *, coverage: bool,
+    counterfactuals: dict[int, Decimal] | None = None,
+) -> dict[str, Any]:
+    """Abstention value, and — when asked — whether the confidence behind the abstentions ranks.
+
+    ``abstention_quality`` sums what the refusals were worth and never reads a confidence, so a
+    gate that refused at random scores the same as one that refused exactly the losers. The
+    risk-coverage block (`eval/abstention_coverage.py`) is the part that tells them apart. It is
+    opt-in because its day-clustered bootstrap takes seconds, and `lui/answer.py` calls this
+    function on a live question.
+    """
+    block = abstention_quality(score.abstention_outcomes)
+    block["without_a_lean"] = score.no_lean
+    if coverage:
+        from argus.eval.abstention_coverage import CoverageError, calls_from_entries
+        from argus.eval.abstention_coverage import score as coverage_score
+
+        try:
+            report = coverage_score(
+                calls_from_entries(ledger.entries, counterfactuals=counterfactuals)
+            )
+            block["risk_coverage"] = {k: v for k, v in report.items() if k != "curve"}
+        except CoverageError as exc:
+            block["risk_coverage"] = {"undefined": str(exc)}
+    return block
 
 
 def scorecard(
@@ -150,8 +215,12 @@ def scorecard(
     model: str = "argus/qwen3.8-max",
     counterfactuals: dict[int, Decimal] | None = None,
     capital: Decimal = Decimal("10000"),
+    coverage: bool = False,
 ) -> dict[str, Any]:
-    """The Observatory scorecard, computed from real recorded decisions."""
+    """The Observatory scorecard, computed from real recorded decisions.
+
+    ``coverage`` adds the risk-coverage scoring of the abstentions — see :func:`_abstention_block`.
+    """
     score = score_ledger(ledger, counterfactuals=counterfactuals)
 
     base: dict[str, Any] = {
@@ -162,6 +231,7 @@ def scorecard(
             "settled": score.settled,
             "abstentions": score.abstentions,
             "ungradeable": score.ungradeable,
+            "abstentions_without_a_lean": score.no_lean,
             "chain_intact": score.chain_intact,
         },
         "graded_predictions": len(score.predictions),
@@ -189,8 +259,10 @@ def scorecard(
             f"{len(score.predictions)} graded outcomes — below the floor of 5. Calibration on "
             f"fewer is noise, so none is reported."
         )
-        if score.abstention_outcomes:
-            base["abstention"] = abstention_quality(score.abstention_outcomes)
+        if score.abstention_outcomes or coverage:
+            base["abstention"] = _abstention_block(
+                score, ledger, coverage=coverage, counterfactuals=counterfactuals
+            )
         return base
 
     card = ModelScorecard(
@@ -203,6 +275,10 @@ def scorecard(
     base["brier"] = round(brier_score(score.predictions), 4)
     base["ece"] = round(expected_calibration_error(score.predictions), 4)
     base["reliability"] = reliability_curve(score.predictions)
+    if score.abstention_outcomes or coverage:
+        base["abstention"] = _abstention_block(
+            score, ledger, coverage=coverage, counterfactuals=counterfactuals
+        )
     base["note"] = (
         "every figure is deterministic arithmetic over recorded decisions; no model grades "
         "another, and only settled non-abstention rows contribute to calibration"
@@ -214,7 +290,7 @@ def main() -> int:
     from argus.paper.runner import LEDGER_PATH
 
     ledger = PaperLedger(path=LEDGER_PATH)
-    result = scorecard(ledger)
+    result = scorecard(ledger, coverage=True)
 
     out = Path(__file__).resolve().parents[3] / "data" / "scorecard.json"
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -252,6 +328,15 @@ def main() -> int:
               f"accuracy {result.get('accuracy_pct')}%")
     else:
         print(result.get("note") or result.get("error"))
+    abstention = result.get("abstention") or {}
+    rc = abstention.get("risk_coverage") or {}
+    if "aurc" in rc:
+        print(f"abstention value {abstention.get('total_value_bps')}bps over "
+              f"{abstention.get('abstentions')} lean(s), {abstention.get('without_a_lean')} "
+              f"without one | AURC {rc['aurc']:.4f} vs random {rc['aurc_random']:.4f}: "
+              f"{rc['gate_skill_verdict']}")
+    elif "undefined" in rc:
+        print(f"abstention risk-coverage: {rc['undefined']}")
     print(f"\nfull report -> {out}")
     return 0
 
@@ -260,4 +345,4 @@ if __name__ == "__main__":
     raise SystemExit(main())
 
 
-__all__ = ["LedgerScore", "score_ledger", "scorecard"]
+__all__ = ["LedgerScore", "lean_side", "score_ledger", "scorecard"]

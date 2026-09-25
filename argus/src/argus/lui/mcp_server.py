@@ -17,16 +17,57 @@ routing, the same refusals, the same receipts. The typed tools build the researc
 engine. No tool writes, trades or changes anything: the desk places no orders, and neither does
 this.
 
+**Hardened, and deliberately not replaced by the official SDK (2026-09-25).** The synthesis
+(`research/mypr-teardowns/_SYNTHESIS.md`, S15) proposed swapping this hand-rolled layer for the
+official MCP Python SDK (modelcontextprotocol/python-sdk, MIT). That was run, not argued
+(`eval/mcp_sdk_comparison.py` → `data/mcp_sdk_comparison.json`), on one fuzz corpus of 145 hostile
+bodies (`eval/mcp_fuzz.py`) with one oracle:
+
+* **Before hardening, this server failed it**: 3 bodies raised out of :func:`handle_body` — a
+  string or number ``params`` (``AttributeError``) and JSON nested past the recursion limit — which
+  `lui/server.py` turns into an HTTP 500 with no JSON-RPC body; 3 megabyte inputs were echoed back
+  a megabyte long; ``id`` values of the wrong type were echoed; ``1e999`` came back as the
+  non-JSON token ``Infinity``; an empty batch got silence instead of an error; and 46 of 145
+  cases were clean, with 98 engine calls, most of them carrying schema-invalid arguments.
+* **The SDK (2.2.0, low-level ``Server`` over its Streamable HTTP app)** fixed the envelope class —
+  zero unstructured exceptions, types enforced by pydantic — but still passed schema-invalid
+  arguments to the engine in 86 cases, because its low-level server does not validate
+  ``arguments`` against ``inputSchema``; its high-level ``MCPServer`` does validate, but only by
+  generating schemas from Python signatures (``mcpserver/tools/base.py:63-117``), which would
+  change every schema agents see today. It also echoed a megabyte ``id`` and method name (57 of
+  145 clean in all), took a median 1.2-1.7 ms per ``tools/list`` against 0.03-0.06 ms here over
+  two runs, needs 17 distributions the project does not have (the SDK's own two and 15
+  dependencies: Starlette, uvicorn, OpenTelemetry, PyJWT and pywin32 among them), and is an ASGI
+  app — so `lui/server.py`'s synchronous ``ThreadingHTTPServer`` handler could only reach it
+  through an event-loop bridge or a second server.
+
+So this layer stays, and takes from the SDK what made it better, with citations:
+
+* **One exception-to-wire boundary** (``shared/jsonrpc_dispatcher.py:701-770``): nothing raised
+  below :func:`handle_body` escapes it; anything unexpected becomes JSON-RPC ``-32603``.
+* **Tool-name validation per SEP-986** (``shared/tool_name_validation.py:21``): a name outside
+  ``^[A-Za-z0-9._-]{1,128}$`` is refused before lookup, and no name is echoed past 64 characters.
+* **Envelope typing the SDK gets from pydantic**, written out: ``params`` must be an object, an
+  ``id`` must be a string, an integer or null, ``arguments`` must be an object.
+
+and adds what neither had: **arguments are validated against each tool's own published
+``inputSchema``** before any engine runs, and a violation is returned as a tool execution error
+(``isError: true``) naming the field — the 2025-11-25 specification's rule (SEP-1303), so an agent
+can correct itself. The schemas themselves are unchanged. After hardening the same corpus is 145
+of 145 clean (`data/mcp_fuzz.json`).
+
     POST /mcp   {"jsonrpc": "2.0", "id": 1, "method": "tools/list"}
 """
 
 from __future__ import annotations
 
 import json
+import math
+import re
 from collections.abc import Callable, Mapping
 from typing import Any
 
-PROTOCOL_VERSIONS = ("2025-06-18", "2025-03-26", "2024-11-05")
+PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")
 """Versions of the MCP specification this server speaks, newest first. A client asking for one of
 these gets it back; anything else gets the newest, as the spec's version negotiation says."""
 SERVER_INFO = {"name": "argus-research-desk", "version": "1.0.0"}
@@ -101,6 +142,67 @@ TOOLS: tuple[dict[str, Any], ...] = (
 
 class ToolError(ValueError):
     """A tool call that cannot run as asked. Returned to the agent as ``isError``, never raised."""
+
+
+TOOL_NAME = re.compile(r"^[A-Za-z0-9._-]{1,128}$")
+"""SEP-986, as the SDK enforces it (``shared/tool_name_validation.py:21``, MIT)."""
+
+MAX_BATCH = 64
+"""Messages per batch. JSON-RPC sets no limit; a server has to, or one POST of ten thousand
+``tools/call`` requests is ten thousand engine runs."""
+
+MAX_ID_LENGTH = 256
+"""A string ``id`` must be echoed back verbatim, so an unbounded one is an amplifier."""
+
+_ECHO = 64
+"""Characters of a client-supplied name ever repeated in an error message."""
+
+
+def _echo(value: Any) -> str:
+    text = repr(value) if isinstance(value, str) else type(value).__name__
+    return text if len(text) <= _ECHO else text[:_ECHO] + "..."
+
+
+def schema_errors(schema: Mapping[str, Any], value: Any, path: str = "") -> list[str]:
+    """Violations of one tool's published ``inputSchema``, in words an agent can act on.
+
+    Covers exactly the JSON Schema this server publishes — ``type`` (object, string, number,
+    array), ``properties``, ``required``, ``items`` and schema-valued ``additionalProperties`` —
+    plus one rule the JSON grammar implies: a number must be finite. Booleans are not numbers
+    (JSON Schema's own rule; Python's ``bool`` is an ``int``). Properties not declared are
+    allowed, as the schemas do not forbid them.
+    """
+    where = path or "arguments"
+    kind = schema.get("type")
+    if kind == "object":
+        if not isinstance(value, dict):
+            return [f"{where} must be an object, not {type(value).__name__}"]
+        props: Mapping[str, Any] = schema.get("properties", {})
+        errors = [f"{path + '.' if path else ''}{name} is required"
+                  for name in schema.get("required", []) if name not in value]
+        extra = schema.get("additionalProperties")
+        for key, item in value.items():
+            child = f"{path}.{key}" if path else str(key)
+            if key in props:
+                errors += schema_errors(props[key], item, child)
+            elif isinstance(extra, Mapping):
+                errors += schema_errors(extra, item, f"{where}[{_echo(key)}]")
+        return errors
+    if kind == "string" and not isinstance(value, str):
+        return [f"{where} must be a string, not {type(value).__name__}"]
+    if kind == "number":
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return [f"{where} must be a number, not {type(value).__name__}"]
+        if not math.isfinite(value):
+            return [f"{where} must be a finite number"]
+    if kind == "array":
+        if not isinstance(value, list):
+            return [f"{where} must be an array, not {type(value).__name__}"]
+        items = schema.get("items")
+        if isinstance(items, Mapping):
+            return [error for i, item in enumerate(value)
+                    for error in schema_errors(items, item, f"{where}[{i}]")]
+    return []
 
 
 def _symbol(name: str) -> str:
@@ -182,9 +284,13 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         add = _symbol(str(args.get("add") or ""))
         book = _book(args.get("book"))
         size = args.get("size_percent")
+        if size is not None and not 0 < float(size) <= 100:
+            # `if size` used to read 0 as "not stated" and silently size the position at 20%.
+            raise ToolError("size_percent must be above 0 and at most 100")
         request = ResearchRequest(
             kind=ResearchKind.IMPACT, symbols=(add, *[s for s in book if s != add]), book=book,
-            size=float(size) / 100.0 if size else 0.2, size_stated=size is not None)
+            size=float(size) / 100.0 if size is not None else 0.2,
+            size_stated=size is not None)
         result = _run(request, f"add {size or 20}% {add}")
         return _answer_text(result), result["refused"]
     if name == "argus_stress":
@@ -240,9 +346,20 @@ def handle(message: Any, *, tool: Callable[[str, Mapping[str, Any]], tuple[str, 
         return _error(None, -32600, "not a JSON-RPC 2.0 request")
     method = message.get("method")
     message_id = message.get("id")
-    params = message.get("params") or {}
-    if message_id is None:
+    if "id" not in message:
         return None  # a notification (e.g. notifications/initialized) takes no response
+    if (isinstance(message_id, bool) or not isinstance(message_id, (str, int, type(None)))
+            or (isinstance(message_id, str) and len(message_id) > MAX_ID_LENGTH)):
+        # JSON-RPC 2.0 §4: an id is a string, a number or null (and SHOULD NOT be fractional).
+        # One that cannot be echoed safely is answered as an invalid request with a null id.
+        return _error(None, -32600, f"id must be a string of at most {MAX_ID_LENGTH} "
+                                    f"characters or an integer")
+    if not isinstance(method, str):
+        return _error(message_id, -32600, f"method must be a string, not {_echo(method)}")
+    raw_params = message.get("params")
+    if raw_params is not None and not isinstance(raw_params, dict):
+        return _error(message_id, -32602, "params must be an object")
+    params: dict[str, Any] = raw_params or {}
     if method == "initialize":
         asked = str(params.get("protocolVersion") or "")
         version = asked if asked in PROTOCOL_VERSIONS else PROTOCOL_VERSIONS[0]
@@ -260,32 +377,97 @@ def handle(message: Any, *, tool: Callable[[str, Mapping[str, Any]], tuple[str, 
     if method == "tools/list":
         return _result(message_id, {"tools": list(TOOLS)})
     if method == "tools/call":
-        name = str(params.get("name") or "")
-        arguments = params.get("arguments") or {}
-        if name not in {t["name"] for t in TOOLS}:
-            return _error(message_id, -32602, f"unknown tool {name!r}")
+        name = params.get("name")
+        arguments = params.get("arguments")
+        if not isinstance(name, str) or not TOOL_NAME.match(name):
+            return _error(message_id, -32602, f"tool name {_echo(name)} is not a valid tool "
+                                              f"name (SEP-986: [A-Za-z0-9._-], 1 to 128)")
+        spec = next((t for t in TOOLS if t["name"] == name), None)
+        if spec is None:
+            return _error(message_id, -32602, f"unknown tool {_echo(name)}")
+        if arguments is None:
+            arguments = {}
+        if not isinstance(arguments, dict):
+            return _error(message_id, -32602,
+                          f"arguments must be an object, not {type(arguments).__name__}")
+        invalid = schema_errors(spec["inputSchema"], arguments)
+        if invalid:
+            # A tool execution error, not a protocol error: the 2025-11-25 specification
+            # (SEP-1303) asks for input validation to come back where the model will read it.
+            text = f"invalid arguments for {name}: " + "; ".join(invalid[:5])
+            return _result(message_id, {"content": [{"type": "text", "text": text}],
+                                        "isError": True})
         try:
-            text, is_error = tool(name, arguments if isinstance(arguments, Mapping) else {})
+            text, is_error = tool(name, arguments)
         except ToolError as exc:
             text, is_error = str(exc), True
         except Exception as exc:  # an engine failure is the tool's error, not the transport's
             text, is_error = f"the desk could not answer: {type(exc).__name__}", True
         return _result(message_id, {"content": [{"type": "text", "text": text}],
                                     "isError": is_error})
-    return _error(message_id, -32601, f"method {method!r} not found")
+    return _error(message_id, -32601, f"method {_echo(method)} not found")
 
 
-def handle_body(body: bytes) -> tuple[int, bytes]:
-    """HTTP status and body for a POST to /mcp. Batches are answered as a batch."""
+def _finite(text: str) -> float:
+    value = float(text)
+    if not math.isfinite(value):
+        raise ValueError(f"number {text[:_ECHO]} overflows")
+    return value
+
+
+def _reject_constant(token: str) -> Any:
+    raise ValueError(f"{token} is not JSON")
+
+
+def _encode(payload: Any) -> bytes:
+    return json.dumps(payload, ensure_ascii=False, allow_nan=False).encode("utf-8")
+
+
+def handle_body(body: bytes, *,
+                tool: Callable[[str, Mapping[str, Any]], tuple[str, bool]] = call_tool
+                ) -> tuple[int, bytes]:
+    """HTTP status and body for a POST to /mcp. Batches are answered as a batch.
+
+    The single exception-to-wire boundary, after the SDK's ``JSONRPCDispatcher._handle_request``
+    (``shared/jsonrpc_dispatcher.py:701-770``): whatever goes wrong below, the caller receives a
+    JSON-RPC error body, never a raised exception.
+    """
     try:
-        message = json.loads(body.decode("utf-8") or "null")
-    except (UnicodeDecodeError, ValueError):
-        return 400, json.dumps(_error(None, -32700, "parse error")).encode()
+        return _handle_body(body, tool)
+    except Exception as exc:  # the boundary itself: nothing below may reach the transport raw
+        return 500, _encode(_error(None, -32603, f"internal error: {type(exc).__name__}"))
+
+
+def _handle_body(body: bytes, tool: Callable[[str, Mapping[str, Any]], tuple[str, bool]]
+                 ) -> tuple[int, bytes]:
+    try:
+        # Strict JSON: Python's parser accepts NaN, Infinity and 1e999 (as inf); JSON does not,
+        # and a non-finite number that got in would come back out as a non-JSON reply.
+        message = json.loads(body.decode("utf-8") or "null", parse_constant=_reject_constant,
+                             parse_float=_finite)
+    except (UnicodeDecodeError, ValueError, RecursionError):
+        return 400, _encode(_error(None, -32700, "parse error"))
     if isinstance(message, list):
-        replies = [r for r in (handle(m) for m in message) if r is not None]
-        return (200, json.dumps(replies).encode()) if replies else (202, b"")
-    reply = handle(message)
-    return (202, b"") if reply is None else (200, json.dumps(reply, ensure_ascii=False).encode())
+        if not message:
+            # JSON-RPC 2.0 §6: an empty batch is one Invalid Request, not silence.
+            return 400, _encode(_error(None, -32600, "empty batch"))
+        if len(message) > MAX_BATCH:
+            return 400, _encode(_error(None, -32600, f"batch of {len(message)} exceeds the "
+                                                     f"limit of {MAX_BATCH} messages"))
+        replies = [r for r in (handle(m, tool=tool) for m in message) if r is not None]
+        return (200, _encode(replies)) if replies else (202, b"")
+    reply = handle(message, tool=tool)
+    return (202, b"") if reply is None else (200, _encode(reply))
 
 
-__all__ = ["PROTOCOL_VERSIONS", "TOOLS", "ToolError", "call_tool", "handle", "handle_body"]
+__all__ = [
+    "MAX_BATCH",
+    "PROTOCOL_VERSIONS",
+    "TOOLS",
+    "TOOL_NAME",
+    "ToolError",
+    "call_tool",
+    "handle",
+    "handle_body",
+    "schema_errors",
+]

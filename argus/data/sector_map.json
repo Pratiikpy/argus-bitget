@@ -1,0 +1,4933 @@
+{
+ "generated_at": "2026-09-25T20:07:55.468315+00:00",
+ "source": "Yahoo Finance quoteSummary (assetProfile, price, quoteType, fundProfile, topHoldings) per contract; Bitget USDT-futures contracts (isRwa) and tickers",
+ "universe": "320 stock and ETF perpetuals, registry live",
+ "sector_names": "Yahoo's (Morningstar's) sectors under their GICS names; not GICS itself",
+ "counts": {
+  "stock/price": 215,
+  "etf/price": 60,
+  "stock/name": 32,
+  "unclassified/none": 10,
+  "etf/name": 2,
+  "unclassified/name": 1
+ },
+ "rows": {
+  "AALUSDT": {
+   "ticker": "AAL",
+   "name": "American Airlines Group Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 13.87,
+   "bitget_last": 13.887,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Airlines",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "AAOIUSDT": {
+   "ticker": "AAOI",
+   "name": "Applied Optoelectronics, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 101.4,
+   "bitget_last": 101.5,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Communication Equipment",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "AAPLUSDT": {
+   "ticker": "AAPL",
+   "name": "Apple Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 341.07,
+   "bitget_last": 341.34,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Consumer Electronics",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "AAPUUSDT": {
+   "ticker": "AAPU",
+   "name": "Direxion Daily AAPL Bull 2X Shares",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 46.42,
+   "bitget_last": 46.629,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "ABNBUSDT": {
+   "ticker": "ABNB",
+   "name": "Airbnb, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 157.47,
+   "bitget_last": 157.0,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Travel Services",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "ACHRUSDT": {
+   "ticker": "ACHR",
+   "name": "Archer Aviation Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 5.62,
+   "bitget_last": 5.614,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "ADBEUSDT": {
+   "ticker": "ADBE",
+   "name": "Adobe Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 235.47,
+   "bitget_last": 235.86,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "ADIUSDT": {
+   "ticker": "ADI",
+   "name": "Analog Devices, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 393.6,
+   "bitget_last": 391.63,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "ADVANTESTUSDT": {
+   "ticker": "6857.T",
+   "name": "Advantest Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "JPY",
+   "yahoo_last": 34000.0,
+   "bitget_last": 216.12,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Semiconductor Equipment & Materials",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "AEHRUSDT": {
+   "ticker": "AEHR",
+   "name": "Aehr Test Systems, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 104.39,
+   "bitget_last": 104.24,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductor Equipment & Materials",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "AGPUUSDT": {
+   "ticker": "AGPU",
+   "name": "Axe Compute Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 12.09,
+   "bitget_last": 12.112,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "ALABUSDT": {
+   "ticker": "ALAB",
+   "name": "Astera Labs, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 364.62,
+   "bitget_last": 363.92,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "AMATUSDT": {
+   "ticker": "AMAT",
+   "name": "Applied Materials, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 485.0,
+   "bitget_last": 485.67,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductor Equipment & Materials",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "AMCUSDT": {
+   "ticker": "AMC",
+   "name": "AMC Entertainment Holdings, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 2.9323,
+   "bitget_last": 2.943,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Entertainment",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "AMDUSDT": {
+   "ticker": "AMD",
+   "name": "Advanced Micro Devices, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 630.63,
+   "bitget_last": 631.22,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "AMGNUSDT": {
+   "ticker": "AMGN",
+   "name": "Amgen Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 414.61,
+   "bitget_last": 414.79,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Drug Manufacturers - General",
+   "yahoo_sector": "Healthcare",
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "AMKRUSDT": {
+   "ticker": "AMKR",
+   "name": "Amkor Technology, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 53.61,
+   "bitget_last": 53.32,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductor Equipment & Materials",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "AMZNUSDT": {
+   "ticker": "AMZN",
+   "name": "Amazon.com, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 249.67,
+   "bitget_last": 250.03,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Internet Retail",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "AMZUUSDT": {
+   "ticker": "AMZU",
+   "name": "Direxion Daily AMZN Bull 2X Shares",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 34.23,
+   "bitget_last": 34.254,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "ANETUSDT": {
+   "ticker": "ANET",
+   "name": "Arista Networks, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 206.54,
+   "bitget_last": 207.0,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "ANTHROPICUSDT": {
+   "ticker": "ANTHROPIC",
+   "kind": "unclassified",
+   "check": "none",
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo has no ANTHROPIC: EstimatesError"
+  },
+  "APDUSDT": {
+   "ticker": "APD",
+   "name": "Air Products and Chemicals, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 281.805,
+   "bitget_last": 283.15,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Specialty Chemicals",
+   "yahoo_sector": "Basic Materials",
+   "weights": {
+    "Materials": 1.0
+   }
+  },
+  "APLDUSDT": {
+   "ticker": "APLD",
+   "name": "Applied Digital Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 26.25,
+   "bitget_last": 26.28,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Information Technology Services",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "APPUSDT": {
+   "ticker": "APP",
+   "name": "AppLovin Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 310.75,
+   "bitget_last": 311.16,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Advertising Agencies",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "ARMUSDT": {
+   "ticker": "ARM",
+   "name": "Arm Holdings plc",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 310.32,
+   "bitget_last": 311.17,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "ARQQUSDT": {
+   "ticker": "ARQQ",
+   "name": "Arqit Quantum Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 24.6,
+   "bitget_last": 24.553,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "ASMLUSDT": {
+   "ticker": "ASML",
+   "name": "ASML Holding N.V.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 1743.94,
+   "bitget_last": 1741.51,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductor Equipment & Materials",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "ASTSUSDT": {
+   "ticker": "ASTS",
+   "name": "AST SpaceMobile, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 61.81,
+   "bitget_last": 61.84,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Communication Equipment",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "ASXUSDT": {
+   "ticker": "ASX",
+   "name": "ASE Technology Holding Co., Ltd.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 44.315,
+   "bitget_last": 44.41,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "AVAVUSDT": {
+   "ticker": "AVAV",
+   "name": "AeroVironment, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 152.05,
+   "bitget_last": 152.96,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "AVGOUSDT": {
+   "ticker": "AVGO",
+   "name": "Broadcom Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 352.81,
+   "bitget_last": 353.46,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "AXONUSDT": {
+   "ticker": "AXON",
+   "name": "Axon Enterprise, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 430.11,
+   "bitget_last": 432.43,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "AXTIUSDT": {
+   "ticker": "AXTI",
+   "name": "AXT, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 78.94,
+   "bitget_last": 78.66,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductor Equipment & Materials",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "B200USDT": {
+   "ticker": "B200",
+   "kind": "unclassified",
+   "check": "none",
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo has no B200: EstimatesError"
+  },
+  "BABAUSDT": {
+   "ticker": "BABA",
+   "name": "Alibaba Group Holding Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 109.76,
+   "bitget_last": 109.92,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Internet Retail",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "BACUSDT": {
+   "ticker": "BAC",
+   "name": "Bank of America Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 56.67,
+   "bitget_last": 56.82,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Banks - Diversified",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "BAUSDT": {
+   "ticker": "BA",
+   "name": "The Boeing Company",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 197.98,
+   "bitget_last": 198.5,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "BBSTOCKUSDT": {
+   "ticker": "BB",
+   "name": "BlackBerry Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 8.2,
+   "bitget_last": 8.196,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "BEUSDT": {
+   "ticker": "BE",
+   "name": "Bloom Energy Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 288.65,
+   "bitget_last": 288.93,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Electrical Equipment & Parts",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "BHPUSDT": {
+   "ticker": "BHP",
+   "name": "BHP Group Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 84.99,
+   "bitget_last": 84.9,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Other Industrial Metals & Mining",
+   "yahoo_sector": "Basic Materials",
+   "weights": {
+    "Materials": 1.0
+   }
+  },
+  "BITOUSDT": {
+   "ticker": "BITO",
+   "name": "ProShares Bitcoin ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 11.265,
+   "bitget_last": 11.238,
+   "check": "price",
+   "kind": "etf",
+   "category": "Digital Assets",
+   "leveraged": false,
+   "weights": {
+    "Crypto": 1.0
+   }
+  },
+  "BKNGUSDT": {
+   "ticker": "BKNG",
+   "name": "Booking Holdings Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 163.95,
+   "bitget_last": 164.02,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Travel Services",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "BLSHUSDT": {
+   "ticker": "BLSH",
+   "name": "Bullish",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 37.58,
+   "bitget_last": 37.668,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "BMNRUSDT": {
+   "ticker": "BMNR",
+   "name": "Bitmine Immersion Technologies, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 27.54,
+   "bitget_last": 27.451,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Capital Markets",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "BNCUSDT": {
+   "ticker": "BNC",
+   "name": "CEA Industries Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 6.11,
+   "bitget_last": 6.0994,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Farm & Heavy Construction Machinery",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "BOTUSDT": {
+   "ticker": "BOT",
+   "name": "Robostrategy, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 28.62,
+   "bitget_last": 28.96,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Asset Management",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "BOTZUSDT": {
+   "ticker": "BOTZ",
+   "name": "Global X Robotics & Artificial Intelligence ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 35.4,
+   "bitget_last": 35.297,
+   "check": "price",
+   "kind": "etf",
+   "category": "Technology",
+   "leveraged": false,
+   "weights": {
+    "Consumer Discretionary": 0.055600000111200004,
+    "Consumer Staples": 0.0002000000004,
+    "Information Technology": 0.3453000006906,
+    "Communication Services": 0.03910000207820001,
+    "Industrials": 0.47950000095900003,
+    "Health Care": 0.08029999616059999
+   }
+  },
+  "BRKBUSDT": {
+   "ticker": "BRK-B",
+   "name": "Berkshire Hathaway Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 505.43,
+   "bitget_last": 507.03,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Insurance - Diversified",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "BSPUSDT": {
+   "ticker": "BSP",
+   "name": "Bending Spoons S.p.A.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 33.25,
+   "bitget_last": 33.256,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "BUDUSDT": {
+   "ticker": "BUD",
+   "name": "Anheuser-Busch InBev SA/NV",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 77.985,
+   "bitget_last": 77.34,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Beverages - Brewers",
+   "yahoo_sector": "Consumer Defensive",
+   "weights": {
+    "Consumer Staples": 1.0
+   }
+  },
+  "BXUSDT": {
+   "ticker": "BX",
+   "name": "Blackstone Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 118.41,
+   "bitget_last": 118.74,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Asset Management",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "BYDUSDT": {
+   "ticker": "1211.HK",
+   "name": "BYD Company Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 78.1,
+   "bitget_last": 10.038,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Auto Manufacturers",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "CATUSDT": {
+   "ticker": "CAT",
+   "name": "Caterpillar Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 821.14,
+   "bitget_last": 821.39,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Farm & Heavy Construction Machinery",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "CBRSUSDT": {
+   "ticker": "CBRS",
+   "name": "Cerebras Systems Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 206.75,
+   "bitget_last": 205.14,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "CCLUSDT": {
+   "ticker": "CCL",
+   "name": "Carnival Corporation Ltd.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 22.265,
+   "bitget_last": 22.327,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Travel Services",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "CGNXUSDT": {
+   "ticker": "CGNX",
+   "name": "Cognex Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 58.66,
+   "bitget_last": 58.81,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Scientific & Technical Instruments",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "CIENUSDT": {
+   "ticker": "CIEN",
+   "name": "Ciena Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 356.9,
+   "bitget_last": 357.35,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Communication Equipment",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "CLSKUSDT": {
+   "ticker": "CLSK",
+   "name": "CleanSpark, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 13.95,
+   "bitget_last": 13.983,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Capital Markets",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "CMCSAUSDT": {
+   "ticker": "CMCSA",
+   "name": "Comcast Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 21.91,
+   "bitget_last": 21.901,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Telecom Services",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "COHRUSDT": {
+   "ticker": "COHR",
+   "name": "Coherent Corp.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 295.78,
+   "bitget_last": 296.43,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Scientific & Technical Instruments",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "COINUSDT": {
+   "ticker": "COIN",
+   "name": "Coinbase Global, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 195.11,
+   "bitget_last": 194.96,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Financial Data & Stock Exchanges",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "CONLUSDT": {
+   "ticker": "CONL",
+   "name": "GraniteShares 2x Long COIN Daily ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 6.31,
+   "bitget_last": 6.315,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "COPUSDT": {
+   "ticker": "COP",
+   "name": "ConocoPhillips",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 127.29,
+   "bitget_last": 127.51,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Oil & Gas E&P",
+   "yahoo_sector": "Energy",
+   "weights": {
+    "Energy": 1.0
+   }
+  },
+  "CORZUSDT": {
+   "ticker": "CORZ",
+   "name": "Core Scientific, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 17.34,
+   "bitget_last": 17.401,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "COSTUSDT": {
+   "ticker": "COST",
+   "name": "Costco Wholesale Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 922.765,
+   "bitget_last": 922.98,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Discount Stores",
+   "yahoo_sector": "Consumer Defensive",
+   "weights": {
+    "Consumer Staples": 1.0
+   }
+  },
+  "CPNGUSDT": {
+   "ticker": "CPNG",
+   "name": "Coupang, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 13.88,
+   "bitget_last": 13.961,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Internet Retail",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "CRCLUSDT": {
+   "ticker": "CRCL",
+   "name": "Circle Internet Group",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 88.96,
+   "bitget_last": 87.16,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Capital Markets",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "CRDOUSDT": {
+   "ticker": "CRDO",
+   "name": "Credo Technology Group Holding Ltd",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 210.97,
+   "bitget_last": 210.51,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "CRMUSDT": {
+   "ticker": "CRM",
+   "name": "Salesforce, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 234.055,
+   "bitget_last": 234.28,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "CRWDUSDT": {
+   "ticker": "CRWD",
+   "name": "CrowdStrike Holdings, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 252.13,
+   "bitget_last": 252.07,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "CRWVUSDT": {
+   "ticker": "CRWV",
+   "name": "CoreWeave, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 87.59,
+   "bitget_last": 87.61,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "CSCOUSDT": {
+   "ticker": "CSCO",
+   "name": "Cisco Systems, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 106.7,
+   "bitget_last": 106.82,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Communication Equipment",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "CSOPSK2LHKDUSDT": {
+   "ticker": "7709.HK",
+   "name": "Csop Leveraged And Inverse Series - CSOP SK Hynix Daily Max (2x) Leveraged Product",
+   "yahoo_type": "ETF",
+   "currency": "HKD",
+   "yahoo_last": 42.64,
+   "bitget_last": 42.557,
+   "check": "name",
+   "kind": "etf",
+   "category": null,
+   "leveraged": true,
+   "weights": {
+    "ETF: no category": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "CSOPSS2LHKDUSDT": {
+   "ticker": "7747.HK",
+   "name": "CSOP Leveraged and Inverse Series - CSOP Samsung Electronics Daily Max (2x) Leveraged Product",
+   "yahoo_type": "ETF",
+   "currency": "HKD",
+   "yahoo_last": 83.0,
+   "bitget_last": 82.56,
+   "check": "name",
+   "kind": "etf",
+   "category": null,
+   "leveraged": true,
+   "weights": {
+    "ETF: no category": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "CVXSTOCKUSDT": {
+   "ticker": "CVX",
+   "name": "Chevron Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 204.42,
+   "bitget_last": 204.62,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Oil & Gas Integrated",
+   "yahoo_sector": "Energy",
+   "weights": {
+    "Energy": 1.0
+   }
+  },
+  "CXMTUSDT": {
+   "ticker": "CXMT",
+   "kind": "unclassified",
+   "check": "none",
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo has no CXMT: EstimatesError"
+  },
+  "CYPHUSDT": {
+   "ticker": "CYPH",
+   "name": "Cypherpunk Technologies Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 4.12,
+   "bitget_last": 4.133,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Asset Management",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "DDOGUSDT": {
+   "ticker": "DDOG",
+   "name": "Datadog, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 268.13,
+   "bitget_last": 267.85,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "DELLUSDT": {
+   "ticker": "DELL",
+   "name": "Dell Technologies Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 562.8701,
+   "bitget_last": 563.66,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "DEUSDT": {
+   "ticker": "DE",
+   "name": "Deere & Company",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 690.045,
+   "bitget_last": 687.71,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Farm & Heavy Construction Machinery",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "DFENUSDT": {
+   "ticker": "DFEN",
+   "name": "Direxion Daily Aerospace & Defense Bull 3X Shares",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 52.0,
+   "bitget_last": 51.81,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "DIASTOCKUSDT": {
+   "ticker": "DIA",
+   "name": "State Street SPDR Dow Jones Industrial Average ETF Trust",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 517.43,
+   "bitget_last": 518.05,
+   "check": "price",
+   "kind": "etf",
+   "category": "Large Value",
+   "leveraged": false,
+   "weights": {
+    "Consumer Discretionary": 0.09950995099509949,
+    "Materials": 0.0379037903790379,
+    "Consumer Staples": 0.0378037803780378,
+    "Information Technology": 0.184018401840184,
+    "Communication Services": 0.049904990499049895,
+    "Financials": 0.2746274627462746,
+    "Industrials": 0.1554155415541554,
+    "Energy": 0.023002300230023,
+    "Health Care": 0.1378137813781378
+   }
+  },
+  "DISKUSDT": {
+   "ticker": "DISK",
+   "name": "Tema Memory ETF",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 39.78,
+   "bitget_last": 39.48,
+   "check": "price",
+   "kind": "stock",
+   "industry": null,
+   "yahoo_sector": null,
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo gives no sector for it"
+  },
+  "DJTUSDT": {
+   "ticker": "DJT",
+   "name": "Trump Media & Technology Group Corp.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 9.14,
+   "bitget_last": 9.139,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Internet Content & Information",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "DKNGUSDT": {
+   "ticker": "DKNG",
+   "name": "DraftKings Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 22.02,
+   "bitget_last": 21.995,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Gambling",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "DOOSBOTUSDT": {
+   "ticker": "454910.KS",
+   "name": "Doosan Robotics Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "KRW",
+   "yahoo_last": 70800.0,
+   "bitget_last": 52.23,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Specialty Industrial Machinery",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "DOOSENERUSDT": {
+   "ticker": "034020.KS",
+   "name": "Doosan Enerbility Co., Ltd.",
+   "yahoo_type": "EQUITY",
+   "currency": "KRW",
+   "yahoo_last": 81700.0,
+   "bitget_last": 60.25,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Specialty Industrial Machinery",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "DRAMUSDT": {
+   "ticker": "DRAM",
+   "name": "Roundhill Memory ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 61.865,
+   "bitget_last": 61.97,
+   "check": "price",
+   "kind": "etf",
+   "category": "Technology",
+   "leveraged": false,
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "DXYZUSDT": {
+   "ticker": "DXYZ",
+   "name": "Destiny Tech100 Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 30.58,
+   "bitget_last": 30.787,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Asset Management",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "ECHOUSDT": {
+   "ticker": "ECHO",
+   "name": "EchoStar Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 90.11,
+   "bitget_last": 90.29,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Telecom Services",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "ETNUSDT": {
+   "ticker": "ETN",
+   "name": "Eaton Corporation plc",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 439.88,
+   "bitget_last": 440.63,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Specialty Industrial Machinery",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "EUVUSDT": {
+   "ticker": "EUV",
+   "name": "Corgi Lithography & Semiconductor Photonics ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 24.94,
+   "bitget_last": 24.92,
+   "check": "price",
+   "kind": "etf",
+   "category": "Technology",
+   "leveraged": false,
+   "weights": {
+    "Consumer Discretionary": 0.013499999999999998,
+    "Materials": 0.0031,
+    "Information Technology": 0.9834
+   }
+  },
+  "EVEXUSDT": {
+   "ticker": "EVEX",
+   "name": "Eve Holding, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 2.185,
+   "bitget_last": 2.193,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "EWHUSDT": {
+   "ticker": "EWH",
+   "name": "iShares MSCI Hong Kong ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 22.25,
+   "bitget_last": 22.239,
+   "check": "price",
+   "kind": "etf",
+   "category": "Greater China Region",
+   "leveraged": false,
+   "weights": {
+    "Real Estate": 0.17358263652886802,
+    "Consumer Discretionary": 0.038696129226193504,
+    "Consumer Staples": 0.020997899580105006,
+    "Communication Services": 0.016598339668083002,
+    "Financials": 0.45465454090627316,
+    "Utilities": 0.11368862772656851,
+    "Industrials": 0.18178182636390883
+   }
+  },
+  "EWJUSDT": {
+   "ticker": "EWJ",
+   "name": "iShares MSCI Japan ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 97.92,
+   "bitget_last": 97.89,
+   "check": "price",
+   "kind": "etf",
+   "category": "Japan Stock",
+   "leveraged": false,
+   "weights": {
+    "Real Estate": 0.0180018001620144,
+    "Consumer Discretionary": 0.11591159104319275,
+    "Materials": 0.029002901261123214,
+    "Consumer Staples": 0.035303530317728246,
+    "Information Technology": 0.21512151193607215,
+    "Communication Services": 0.09330933083977465,
+    "Financials": 0.19101910171915285,
+    "Utilities": 0.009800980088207841,
+    "Industrials": 0.22912291206208332,
+    "Energy": 0.009400940084607522,
+    "Health Care": 0.05400540048604321
+   }
+  },
+  "EWTUSDT": {
+   "ticker": "EWT",
+   "name": "iShares MSCI Taiwan ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 114.78,
+   "bitget_last": 114.8,
+   "check": "price",
+   "kind": "etf",
+   "category": "Greater China Region",
+   "leveraged": false,
+   "weights": {
+    "Consumer Discretionary": 0.02410241026512892,
+    "Materials": 0.038003800418045595,
+    "Consumer Staples": 0.00970097010671164,
+    "Information Technology": 0.7385738581243863,
+    "Communication Services": 0.011601160127613919,
+    "Financials": 0.1401140115412681,
+    "Industrials": 0.02800279930793359,
+    "Health Care": 0.00990099010891188
+   }
+  },
+  "EWYUSDT": {
+   "ticker": "EWY",
+   "name": "iShares MSCI South Korea ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 187.17,
+   "bitget_last": 187.29,
+   "check": "price",
+   "kind": "etf",
+   "category": "Focused Region",
+   "leveraged": false,
+   "weights": {
+    "Consumer Discretionary": 0.051120448128130797,
+    "Materials": 0.015506202465479986,
+    "Consumer Staples": 0.024609844913355494,
+    "Information Technology": 0.5461184468326146,
+    "Communication Services": 0.032012805090023196,
+    "Financials": 0.11064425759239269,
+    "Utilities": 0.0031012404930959975,
+    "Industrials": 0.1703681470884672,
+    "Energy": 0.013705482179166183,
+    "Health Care": 0.03281312521727378
+   }
+  },
+  "EWZUSDT": {
+   "ticker": "EWZ",
+   "name": "iShares MSCI Brazil ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 36.825,
+   "bitget_last": 36.795,
+   "check": "price",
+   "kind": "etf",
+   "category": "Focused Region",
+   "leveraged": false,
+   "weights": {
+    "Consumer Discretionary": 0.01599999992,
+    "Materials": 0.14459999927699999,
+    "Consumer Staples": 0.044399999778,
+    "Communication Services": 0.0174999999125,
+    "Financials": 0.3404999982975,
+    "Utilities": 0.12439999937799999,
+    "Industrials": 0.11520000442399997,
+    "Energy": 0.17429999912850003,
+    "Health Care": 0.023099999884499997
+   }
+  },
+  "FCXUSDT": {
+   "ticker": "FCX",
+   "name": "Freeport-McMoRan Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 72.295,
+   "bitget_last": 72.13,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Copper",
+   "yahoo_sector": "Basic Materials",
+   "weights": {
+    "Materials": 1.0
+   }
+  },
+  "FLEXUSDT": {
+   "ticker": "FLEX",
+   "name": "Flex Ltd.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 114.68,
+   "bitget_last": 114.81,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Electronic Components",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "FLNCUSDT": {
+   "ticker": "FLNC",
+   "name": "Fluence Energy, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 7.85,
+   "bitget_last": 7.86,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Utilities - Renewable",
+   "yahoo_sector": "Utilities",
+   "weights": {
+    "Utilities": 1.0
+   }
+  },
+  "FLYUSDT": {
+   "ticker": "FLY",
+   "name": "Firefly Aerospace Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 24.36,
+   "bitget_last": 24.26,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "FOXAUSDT": {
+   "ticker": "FOXA",
+   "name": "Fox Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 63.07,
+   "bitget_last": 62.95,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Entertainment",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "FUTUUSDT": {
+   "ticker": "FUTU",
+   "name": "Futu Holdings Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 111.87,
+   "bitget_last": 112.02,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Capital Markets",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "FWDIUSDT": {
+   "ticker": "FWDI",
+   "name": "Forward Industries, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 8.42,
+   "bitget_last": 8.42,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Footwear & Accessories",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "GDXUSDT": {
+   "ticker": "GDX",
+   "name": "VanEck Gold Miners ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 92.87,
+   "bitget_last": 92.99,
+   "check": "price",
+   "kind": "etf",
+   "category": "Equity Precious Metals",
+   "leveraged": false,
+   "weights": {
+    "Materials": 1.0
+   }
+  },
+  "GEUSDT": {
+   "ticker": "GE",
+   "name": "GE Aerospace",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 327.18,
+   "bitget_last": 327.08,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "GEVUSDT": {
+   "ticker": "GEV",
+   "name": "GE Vernova Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 957.18,
+   "bitget_last": 958.8,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Specialty Industrial Machinery",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "GFSUSDT": {
+   "ticker": "GFS",
+   "name": "GLOBALFOUNDRIES Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 49.0,
+   "bitget_last": 48.933,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "GGLLUSDT": {
+   "ticker": "GGLL",
+   "name": "Direxion Daily GOOGL Bull 2X Shares",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 99.53,
+   "bitget_last": 99.76,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "GIGADEVICEUSDT": {
+   "ticker": "603986.SS",
+   "name": "GigaDevice Semiconductor Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "CNY",
+   "yahoo_last": 383.77,
+   "bitget_last": 61.98,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "GILDUSDT": {
+   "ticker": "GILD",
+   "name": "Gilead Sciences, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 150.93,
+   "bitget_last": 150.46,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Drug Manufacturers - General",
+   "yahoo_sector": "Healthcare",
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "GLWUSDT": {
+   "ticker": "GLW",
+   "name": "Corning Incorporated",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 156.7,
+   "bitget_last": 157.08,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Electronic Components",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "GMEUSDT": {
+   "ticker": "GME",
+   "name": "GameStop Corp.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 23.405,
+   "bitget_last": 23.41,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Specialty Retail",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "GNRCUSDT": {
+   "ticker": "GNRC",
+   "name": "Generac Holdings Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 208.1401,
+   "bitget_last": 208.25,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Specialty Industrial Machinery",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "GOOGLUSDT": {
+   "ticker": "GOOGL",
+   "name": "Alphabet Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 343.92,
+   "bitget_last": 344.13,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Internet Content & Information",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "GPROUSDT": {
+   "ticker": "GPRO",
+   "name": "GoPro, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 1.29,
+   "bitget_last": 1.2913,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Consumer Electronics",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "GSUSDT": {
+   "ticker": "GS",
+   "name": "The Goldman Sachs Group, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 935.406,
+   "bitget_last": 936.11,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Capital Markets",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "GTLBUSDT": {
+   "ticker": "GTLB",
+   "name": "GitLab Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 46.845,
+   "bitget_last": 46.95,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "H100USDT": {
+   "ticker": "H100",
+   "kind": "unclassified",
+   "check": "none",
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo has no H100: EstimatesError"
+  },
+  "HANMIUSDT": {
+   "ticker": "042700.KS",
+   "name": "HANMI Semiconductor Co., Ltd.",
+   "yahoo_type": "EQUITY",
+   "currency": "KRW",
+   "yahoo_last": 243500.0,
+   "bitget_last": 176.98,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Semiconductor Equipment & Materials",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "HOODUSDT": {
+   "ticker": "HOOD",
+   "name": "Robinhood Markets, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 119.4,
+   "bitget_last": 119.04,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Capital Markets",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "HPEUSDT": {
+   "ticker": "HPE",
+   "name": "Hewlett Packard Enterprise Company",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 62.94,
+   "bitget_last": 62.96,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Communication Equipment",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "HPQUSDT": {
+   "ticker": "HPQ",
+   "name": "HP Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 31.3,
+   "bitget_last": 31.255,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "HUTUSDT": {
+   "ticker": "HUT",
+   "name": "Hut 8 Corp.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 96.82,
+   "bitget_last": 96.95,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Capital Markets",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "HYUNDAIUSDT": {
+   "ticker": "005380.KS",
+   "name": "Hyundai Motor Company",
+   "yahoo_type": "EQUITY",
+   "currency": "KRW",
+   "yahoo_last": 353500.0,
+   "bitget_last": 261.57,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Auto Manufacturers",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "IBBUSDT": {
+   "ticker": "IBB",
+   "name": "iShares Biotechnology ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 209.77,
+   "bitget_last": 209.81,
+   "check": "price",
+   "kind": "etf",
+   "category": "Health",
+   "leveraged": false,
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "IBITUSDT": {
+   "ticker": "IBIT",
+   "name": "iShares Bitcoin Trust ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 47.57,
+   "bitget_last": 47.602,
+   "check": "price",
+   "kind": "etf",
+   "category": "Digital Assets",
+   "leveraged": false,
+   "weights": {
+    "Crypto": 1.0
+   }
+  },
+  "IBMUSDT": {
+   "ticker": "IBM",
+   "name": "International Business Machines Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 225.52,
+   "bitget_last": 225.91,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Information Technology Services",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "INDAUSDT": {
+   "ticker": "INDA",
+   "name": "iShares MSCI India ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 47.87,
+   "bitget_last": 47.92,
+   "check": "price",
+   "kind": "etf",
+   "category": "India Equity",
+   "leveraged": false,
+   "weights": {
+    "Real Estate": 0.014199999184599988,
+    "Consumer Discretionary": 0.1276000016588,
+    "Materials": 0.0837000010881,
+    "Consumer Staples": 0.054600000709800006,
+    "Information Technology": 0.0789000010257,
+    "Communication Services": 0.05159999867079998,
+    "Financials": 0.3009000039117,
+    "Utilities": 0.040200000522600005,
+    "Industrials": 0.09729999126489988,
+    "Energy": 0.0862000011206,
+    "Health Care": 0.0648000008424
+   }
+  },
+  "INFQUSDT": {
+   "ticker": "INFQ",
+   "name": "Infleqtion, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 14.51,
+   "bitget_last": 14.521,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "INTCUSDT": {
+   "ticker": "INTC",
+   "name": "Intel Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 123.0,
+   "bitget_last": 123.24,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "INTWUSDT": {
+   "ticker": "INTW",
+   "name": "GraniteShares 2x Long INTC Daily ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 33.01,
+   "bitget_last": 32.968,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "IONQUSDT": {
+   "ticker": "IONQ",
+   "name": "IonQ, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 45.495,
+   "bitget_last": 45.46,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "IRENUSDT": {
+   "ticker": "IREN",
+   "name": "IREN Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 44.125,
+   "bitget_last": 44.157,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Capital Markets",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "ISRGUSDT": {
+   "ticker": "ISRG",
+   "name": "Intuitive Surgical, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 405.18,
+   "bitget_last": 407.67,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Medical Instruments & Supplies",
+   "yahoo_sector": "Healthcare",
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "IWMUSDT": {
+   "ticker": "IWM",
+   "name": "iShares Russell 2000 ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 281.96,
+   "bitget_last": 282.55,
+   "check": "price",
+   "kind": "etf",
+   "category": "Small Blend",
+   "leveraged": false,
+   "weights": {
+    "Real Estate": 0.06499350246957111,
+    "Consumer Discretionary": 0.08869113337001473,
+    "Materials": 0.04459554169450572,
+    "Consumer Staples": 0.02629737299902654,
+    "Information Technology": 0.1378862152392901,
+    "Communication Services": 0.02269773086245022,
+    "Financials": 0.18058193686260796,
+    "Utilities": 0.027197281033420524,
+    "Industrials": 0.13228676502752668,
+    "Energy": 0.06499350246957111,
+    "Health Care": 0.2097790179720153
+   }
+  },
+  "JDUSDT": {
+   "ticker": "JD",
+   "name": "JD.com, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 26.51,
+   "bitget_last": 26.55,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Internet Retail",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "JEPQUSDT": {
+   "ticker": "JEPQ",
+   "name": "JPMorgan Nasdaq Equity Premium Income ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 61.24,
+   "bitget_last": 61.09,
+   "check": "price",
+   "kind": "etf",
+   "category": "Derivative Income",
+   "leveraged": false,
+   "weights": {
+    "Real Estate": 0.001999800025596881,
+    "Consumer Discretionary": 0.11538846147694001,
+    "Materials": 0.008399160107506898,
+    "Consumer Staples": 0.05789421074102969,
+    "Information Technology": 0.5922407775805162,
+    "Communication Services": 0.126287371616443,
+    "Financials": 0.004199580053753449,
+    "Utilities": 0.010098990129264246,
+    "Industrials": 0.035596440455624476,
+    "Energy": 0.0035996402460543872,
+    "Health Care": 0.04429556756727087
+   }
+  },
+  "JMKEUSDT": {
+   "ticker": "JMKE",
+   "name": "Jersey Mike's Subs Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 16.98,
+   "bitget_last": 16.963,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Restaurants",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "JOBYUSDT": {
+   "ticker": "JOBY",
+   "name": "Joby Aviation, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 6.31,
+   "bitget_last": 6.388,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Airports & Air Services",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "JPMUSDT": {
+   "ticker": "JPM",
+   "name": "JPMorgan Chase & Co.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 342.9,
+   "bitget_last": 342.95,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Banks - Diversified",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "KIOXIAUSDT": {
+   "ticker": "285A.T",
+   "name": "Kioxia Holdings Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "JPY",
+   "yahoo_last": 55780.0,
+   "bitget_last": 358.08,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "KLACUSDT": {
+   "ticker": "KLAC",
+   "name": "KLA Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 187.92,
+   "bitget_last": 187.99,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductor Equipment & Materials",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "KOPNUSDT": {
+   "ticker": "KOPN",
+   "name": "Kopin Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 4.99,
+   "bitget_last": 4.988,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Electronic Components",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "KORUUSDT": {
+   "ticker": "KORU",
+   "name": "Direxion Daily South Korea Bull 3X Shares",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 21.6,
+   "bitget_last": 21.576,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "KOUSDT": {
+   "ticker": "KO",
+   "name": "The Coca-Cola Company",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 87.8039,
+   "bitget_last": 88.03,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Beverages - Non-Alcoholic",
+   "yahoo_sector": "Consumer Defensive",
+   "weights": {
+    "Consumer Staples": 1.0
+   }
+  },
+  "KSTRUSDT": {
+   "ticker": "KSTR",
+   "name": "KraneShares China Technology & Semiconductor STAR 50 Index ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 23.53,
+   "bitget_last": 23.543,
+   "check": "price",
+   "kind": "etf",
+   "category": "Greater China Region",
+   "leveraged": false,
+   "weights": {
+    "Consumer Discretionary": 0.009099090095539991,
+    "Materials": 0.009599039600839436,
+    "Information Technology": 0.8803119692432316,
+    "Industrials": 0.054994500577439515,
+    "Health Care": 0.04599540048294941
+   }
+  },
+  "KTOSUSDT": {
+   "ticker": "KTOS",
+   "name": "Kratos Defense & Security Solutions, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 45.62,
+   "bitget_last": 46.0,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "KUAISHOUUSDT": {
+   "ticker": "1024.HK",
+   "name": "Kuaishou Technology",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 30.02,
+   "bitget_last": 3.835,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Internet Content & Information",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "KWEBUSDT": {
+   "ticker": "KWEB",
+   "name": "KraneShares CSI China Internet ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 24.57,
+   "bitget_last": 24.58,
+   "check": "price",
+   "kind": "etf",
+   "category": "Greater China Region",
+   "leveraged": false,
+   "weights": {
+    "Real Estate": 0.04359999917160002,
+    "Consumer Discretionary": 0.3433999934754001,
+    "Consumer Staples": 0.027999998468000033,
+    "Information Technology": 0.16989999677190007,
+    "Communication Services": 0.3663000130402998,
+    "Financials": 0.010799999794800006,
+    "Health Care": 0.03799999927800002
+   }
+  },
+  "LASERTECUSDT": {
+   "ticker": "6920.T",
+   "name": "Lasertec Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "JPY",
+   "yahoo_last": 40910.0,
+   "bitget_last": 261.35,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Semiconductor Equipment & Materials",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "LENOVOHKDUSDT": {
+   "ticker": "0992.HK",
+   "name": "Lenovo Group Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 37.16,
+   "bitget_last": 36.825,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "LGELECTRONICSUSDT": {
+   "ticker": "066570.KS",
+   "name": "LG Electronics Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "KRW",
+   "yahoo_last": 209000.0,
+   "bitget_last": 154.72,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Consumer Electronics",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "LINUSDT": {
+   "ticker": "LIN",
+   "name": "Linde plc",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 469.89,
+   "bitget_last": 469.54,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Specialty Chemicals",
+   "yahoo_sector": "Basic Materials",
+   "weights": {
+    "Materials": 1.0
+   }
+  },
+  "LITEUSDT": {
+   "ticker": "LITE",
+   "name": "Lumentum Holdings Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 941.65,
+   "bitget_last": 941.66,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Communication Equipment",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "LLYUSDT": {
+   "ticker": "LLY",
+   "name": "Eli Lilly and Company",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 1184.33,
+   "bitget_last": 1185.12,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Drug Manufacturers - General",
+   "yahoo_sector": "Healthcare",
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "LMTUSDT": {
+   "ticker": "LMT",
+   "name": "Lockheed Martin Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 519.57,
+   "bitget_last": 519.58,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "LRCXUSDT": {
+   "ticker": "LRCX",
+   "name": "Lam Research Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 315.21,
+   "bitget_last": 316.32,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductor Equipment & Materials",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "LWLGUSDT": {
+   "ticker": "LWLG",
+   "name": "Lightwave Logic, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 5.31,
+   "bitget_last": 5.323,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Specialty Chemicals",
+   "yahoo_sector": "Basic Materials",
+   "weights": {
+    "Materials": 1.0
+   }
+  },
+  "LYTEUSDT": {
+   "ticker": "LYTE",
+   "name": "Roundhill Photonics & Optics ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 25.365,
+   "bitget_last": 25.476,
+   "check": "price",
+   "kind": "etf",
+   "category": "Technology",
+   "leveraged": false,
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "MARAUSDT": {
+   "ticker": "MARA",
+   "name": "MARA Holdings, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 12.55,
+   "bitget_last": 12.566,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Capital Markets",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "MARUSDT": {
+   "ticker": "MAR",
+   "name": "Marriott International, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 352.03,
+   "bitget_last": 352.4,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Lodging",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "MCDUSDT": {
+   "ticker": "MCD",
+   "name": "McDonald's Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 236.51,
+   "bitget_last": 237.51,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Restaurants",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "MDBUSDT": {
+   "ticker": "MDB",
+   "name": "MongoDB, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 410.44,
+   "bitget_last": 409.73,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "MEITUANUSDT": {
+   "ticker": "3690.HK",
+   "name": "Meituan",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 71.65,
+   "bitget_last": 9.14,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Internet Retail",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "MELIUSDT": {
+   "ticker": "MELI",
+   "name": "MercadoLibre, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 1752.61,
+   "bitget_last": 1757.4,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Internet Retail",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "METAUSDT": {
+   "ticker": "META",
+   "name": "Meta Platforms, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 751.66,
+   "bitget_last": 751.59,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Internet Content & Information",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "METUUSDT": {
+   "ticker": "METU",
+   "name": "Direxion Daily META Bull 2X ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 33.03,
+   "bitget_last": 32.927,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "MINIMAXHKDUSDT": {
+   "ticker": "0100.HK",
+   "name": "MiniMax Group Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 275.2,
+   "bitget_last": 275.14,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "MINIMAXUSDT": {
+   "ticker": "0100.HK",
+   "name": "MiniMax Group Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 275.2,
+   "bitget_last": 35.064,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "MOONSHOTUSDT": {
+   "ticker": "MOONSHOT",
+   "kind": "unclassified",
+   "check": "none",
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo has no MOONSHOT: EstimatesError"
+  },
+  "MPUSDT": {
+   "ticker": "MP",
+   "name": "MP Materials Corp.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 48.83,
+   "bitget_last": 48.82,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Other Industrial Metals & Mining",
+   "yahoo_sector": "Basic Materials",
+   "weights": {
+    "Materials": 1.0
+   }
+  },
+  "MRKUSDT": {
+   "ticker": "MRK",
+   "name": "Merck & Co., Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 148.815,
+   "bitget_last": 148.62,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Drug Manufacturers - General",
+   "yahoo_sector": "Healthcare",
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "MRNAUSDT": {
+   "ticker": "MRNA",
+   "name": "Moderna, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 198.88,
+   "bitget_last": 198.41,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Biotechnology",
+   "yahoo_sector": "Healthcare",
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "MRVLUSDT": {
+   "ticker": "MRVL",
+   "name": "Marvell Technology, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 261.935,
+   "bitget_last": 262.29,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "MSFTUSDT": {
+   "ticker": "MSFT",
+   "name": "Microsoft Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 516.17,
+   "bitget_last": 516.13,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "MSFUUSDT": {
+   "ticker": "MSFU",
+   "name": "Direxion Daily MSFT Bull 2X Shares",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 39.82,
+   "bitget_last": 39.748,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "MSTRUSDT": {
+   "ticker": "MSTR",
+   "name": "Strategy Inc",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 158.61,
+   "bitget_last": 158.38,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "MSTUUSDT": {
+   "ticker": "MSTU",
+   "name": "T-Rex 2X Long MSTR Daily Target ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 42.71,
+   "bitget_last": 42.563,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "Information Technology": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "MUFGUSDT": {
+   "ticker": "MUFG",
+   "name": "Mitsubishi UFJ Financial Group, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 23.485,
+   "bitget_last": 23.477,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Banks - Diversified",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "MUUSDT": {
+   "ticker": "MU",
+   "name": "Micron Technology, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 1082.28,
+   "bitget_last": 1082.74,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "MUUUSDT": {
+   "ticker": "MUU",
+   "name": "Direxion Daily MU Bull 2X Shares",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 37.85,
+   "bitget_last": 37.888,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "MVLLUSDT": {
+   "ticker": "MVLL",
+   "name": "GraniteShares 2x Long MRVL Daily ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 35.44,
+   "bitget_last": 35.39,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "NAVERUSDT": {
+   "ticker": "035420.KS",
+   "name": "NAVER Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "KRW",
+   "yahoo_last": 194700.0,
+   "bitget_last": 142.53,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Internet Content & Information",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "NBISUSDT": {
+   "ticker": "NBIS",
+   "name": "Nebius Group N.V.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 237.33,
+   "bitget_last": 237.44,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Internet Content & Information",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "NETEASEUSDT": {
+   "ticker": "9999.HK",
+   "name": "NetEase, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 180.9,
+   "bitget_last": 23.174,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Electronic Gaming & Multimedia",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "NETUSDT": {
+   "ticker": "NET",
+   "name": "Cloudflare, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 348.895,
+   "bitget_last": 350.19,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "NFLXUSDT": {
+   "ticker": "NFLX",
+   "name": "Netflix, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 71.145,
+   "bitget_last": 71.25,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Entertainment",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "NIOUSDT": {
+   "ticker": "NIO",
+   "name": "NIO Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 3.57,
+   "bitget_last": 3.588,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Auto Manufacturers",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "NKEUSDT": {
+   "ticker": "NKE",
+   "name": "NIKE, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 35.75,
+   "bitget_last": 35.884,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Footwear & Accessories",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "NOCUSDT": {
+   "ticker": "NOC",
+   "name": "Northrop Grumman Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 510.49,
+   "bitget_last": 509.87,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "NOKSTOCKUSDT": {
+   "ticker": "NOK",
+   "name": "Nokia Oyj",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 10.38,
+   "bitget_last": 10.402,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Communication Equipment",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "NOWUSDT": {
+   "ticker": "NOW",
+   "name": "ServiceNow, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 135.63,
+   "bitget_last": 135.57,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "NTAPUSDT": {
+   "ticker": "NTAP",
+   "name": "NetApp, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 201.145,
+   "bitget_last": 201.08,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "NVDAUSDT": {
+   "ticker": "NVDA",
+   "name": "NVIDIA Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 225.07,
+   "bitget_last": 225.22,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "NVDLUSDT": {
+   "ticker": "NVDL",
+   "name": "GraniteShares 2x Long NVDA Daily ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 35.72,
+   "bitget_last": 35.611,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "Financials": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "NVSUSDT": {
+   "ticker": "NVS",
+   "name": "Novartis AG",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 145.455,
+   "bitget_last": 145.3,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Drug Manufacturers - General",
+   "yahoo_sector": "Healthcare",
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "OKLOUSDT": {
+   "ticker": "OKLO",
+   "name": "Oklo Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 38.05,
+   "bitget_last": 38.13,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Utilities - Independent Power Producers",
+   "yahoo_sector": "Utilities",
+   "weights": {
+    "Utilities": 1.0
+   }
+  },
+  "OKTAUSDT": {
+   "ticker": "OKTA",
+   "name": "Okta, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 195.19,
+   "bitget_last": 195.17,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "ONDSUSDT": {
+   "ticker": "ONDS",
+   "name": "Ondas Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 7.64,
+   "bitget_last": 7.66,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Communication Equipment",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "OPENAIUSDT": {
+   "ticker": "OPENAI",
+   "kind": "unclassified",
+   "check": "none",
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo has no OPENAI: EstimatesError"
+  },
+  "ORCLUSDT": {
+   "ticker": "ORCL",
+   "name": "Oracle Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 137.08,
+   "bitget_last": 137.36,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "OSSUSDT": {
+   "ticker": "OSS",
+   "name": "One Stop Systems, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 9.28,
+   "bitget_last": 9.278,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "OURAUSDT": {
+   "ticker": "OURA",
+   "name": null,
+   "yahoo_type": "NONE",
+   "currency": "",
+   "yahoo_last": null,
+   "bitget_last": 50.451,
+   "check": "name",
+   "kind": "unclassified",
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo types OURA as NONE"
+  },
+  "OUSTUSDT": {
+   "ticker": "OUST",
+   "name": "Ouster, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 43.72,
+   "bitget_last": 43.69,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Electronic Components",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "OXYUSDT": {
+   "ticker": "OXY",
+   "name": "Occidental Petroleum Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 56.86,
+   "bitget_last": 56.87,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Oil & Gas E&P",
+   "yahoo_sector": "Energy",
+   "weights": {
+    "Energy": 1.0
+   }
+  },
+  "PANWUSDT": {
+   "ticker": "PANW",
+   "name": "Palo Alto Networks, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 374.74,
+   "bitget_last": 374.58,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "PATHUSDT": {
+   "ticker": "PATH",
+   "name": "UiPath, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 12.465,
+   "bitget_last": 12.494,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "PDDUSDT": {
+   "ticker": "PDD",
+   "name": "PDD Holdings Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 77.57,
+   "bitget_last": 77.79,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Internet Retail",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "PENGUSDT": {
+   "ticker": "PENG",
+   "name": "Penguin Solutions, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 56.22,
+   "bitget_last": 56.27,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Information Technology Services",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "PEPUSDT": {
+   "ticker": "PEP",
+   "name": "PepsiCo, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 128.63,
+   "bitget_last": 128.48,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Beverages - Non-Alcoholic",
+   "yahoo_sector": "Consumer Defensive",
+   "weights": {
+    "Consumer Staples": 1.0
+   }
+  },
+  "PLTRUSDT": {
+   "ticker": "PLTR",
+   "name": "Palantir Technologies Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 189.67,
+   "bitget_last": 189.83,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "PLUSDT": {
+   "ticker": "PL",
+   "name": "Planet Labs PBC",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 17.42,
+   "bitget_last": 17.46,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "POETUSDT": {
+   "ticker": "POET",
+   "name": "POET Technologies Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 7.77,
+   "bitget_last": 7.774,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "POLYMARKETUSDT": {
+   "ticker": "POLYMARKET",
+   "kind": "unclassified",
+   "check": "none",
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo has no POLYMARKET: EstimatesError"
+  },
+  "POPMARTUSDT": {
+   "ticker": "9992.HK",
+   "name": "Pop Mart International Group Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 152.1,
+   "bitget_last": 19.386,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Leisure",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "PURRUSDT": {
+   "ticker": "PURR",
+   "name": "Hyperliquid Strategies Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 12.85,
+   "bitget_last": 12.843,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Capital Markets",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "PYPLUSDT": {
+   "ticker": "PYPL",
+   "name": "PayPal Holdings, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 55.04,
+   "bitget_last": 55.11,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Credit Services",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "QBTSUSDT": {
+   "ticker": "QBTS",
+   "name": "D-Wave Quantum Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 17.41,
+   "bitget_last": 17.404,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "QCOMUSDT": {
+   "ticker": "QCOM",
+   "name": "QUALCOMM Incorporated",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 201.97,
+   "bitget_last": 201.87,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "QLDUSDT": {
+   "ticker": "QLD",
+   "name": "ProShares Ultra QQQ",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 96.91,
+   "bitget_last": 97.1,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "Consumer Discretionary": 0.11018051589758221,
+    "Materials": 0.00991723851165415,
+    "Consumer Staples": 0.06188356831272189,
+    "Information Technology": 0.5867038303494595,
+    "Communication Services": 0.1259489290980077,
+    "Financials": 0.0020826200874473713,
+    "Utilities": 0.01130565190328573,
+    "Industrials": 0.03877640456401543,
+    "Energy": 0.005256136411176699,
+    "Health Care": 0.03986729881684968,
+    "Bonds": 0.008077806047799573
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "QNTSTOCKUSDT": {
+   "ticker": "QNT",
+   "name": "Quantinuum Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 49.53,
+   "bitget_last": 49.662,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "QQQUSDT": {
+   "ticker": "QQQ",
+   "name": "Invesco QQQ Trust",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 744.5,
+   "bitget_last": 745.44,
+   "check": "price",
+   "kind": "etf",
+   "category": "Large Growth",
+   "leveraged": false,
+   "weights": {
+    "Consumer Discretionary": 0.11108888289033342,
+    "Materials": 0.009998999720066003,
+    "Consumer Staples": 0.06239375825321186,
+    "Information Technology": 0.591440873437903,
+    "Communication Services": 0.12698729644483825,
+    "Financials": 0.0020997899412138607,
+    "Utilities": 0.011398859680875244,
+    "Industrials": 0.03909609090525802,
+    "Energy": 0.0052994698516349815,
+    "Health Care": 0.04019597887466534
+   }
+  },
+  "QUBTUSDT": {
+   "ticker": "QUBT",
+   "name": "Quantum Computing Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 8.96,
+   "bitget_last": 8.979,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "RAMUSDT": {
+   "ticker": "RAM",
+   "name": "Roundhill T-REX 2x Long DRAM Daily Target ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 14.47,
+   "bitget_last": 14.451,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "RDDTUSDT": {
+   "ticker": "RDDT",
+   "name": "Reddit, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 149.9,
+   "bitget_last": 150.39,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Internet Content & Information",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "RDWUSDT": {
+   "ticker": "RDW",
+   "name": "Redwire Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 11.615,
+   "bitget_last": 11.646,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "RGTIUSDT": {
+   "ticker": "RGTI",
+   "name": "Rigetti Computing, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 16.66,
+   "bitget_last": 16.665,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "RIOUSDT": {
+   "ticker": "RIO",
+   "name": "Rio Tinto Group",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 94.48,
+   "bitget_last": 94.6,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Other Industrial Metals & Mining",
+   "yahoo_sector": "Basic Materials",
+   "weights": {
+    "Materials": 1.0
+   }
+  },
+  "RKLBUSDT": {
+   "ticker": "RKLB",
+   "name": "Rocket Lab Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 73.95,
+   "bitget_last": 74.04,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "ROKUSDT": {
+   "ticker": "ROK",
+   "name": "Rockwell Automation, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 434.21,
+   "bitget_last": 436.57,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Specialty Industrial Machinery",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "RTXSTOCKUSDT": {
+   "ticker": "RTX",
+   "name": "RTX Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 189.4,
+   "bitget_last": 189.09,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "SAMSUNGEMUSDT": {
+   "ticker": "009150.KS",
+   "name": "Samsung Electro-Mechanics Co., Ltd.",
+   "yahoo_type": "EQUITY",
+   "currency": "KRW",
+   "yahoo_last": 1507000.0,
+   "bitget_last": 1078.7,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Electronic Components",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SAMSUNGUSDT": {
+   "ticker": "005930.KS",
+   "name": "Samsung Electronics Co., Ltd.",
+   "yahoo_type": "EQUITY",
+   "currency": "KRW",
+   "yahoo_last": 285500.0,
+   "bitget_last": 205.35,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Consumer Electronics",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SATLUSDT": {
+   "ticker": "SATL",
+   "name": "Satellogic Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 6.17,
+   "bitget_last": 6.151,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "SDGRUSDT": {
+   "ticker": "SDGR",
+   "name": "Schrödinger, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 28.85,
+   "bitget_last": 28.854,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Health Information Services",
+   "yahoo_sector": "Healthcare",
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "SECZUSDT": {
+   "ticker": "SECZ",
+   "name": "Securitize Corp.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 15.95,
+   "bitget_last": 16.084,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SGOVUSDT": {
+   "ticker": "SGOV",
+   "name": "iShares 0-3 Month Treasury Bond ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 100.655,
+   "bitget_last": 100.83,
+   "check": "price",
+   "kind": "etf",
+   "category": "Ultrashort Bond",
+   "leveraged": false,
+   "weights": {
+    "ETF: Ultrashort Bond": 1.0
+   }
+  },
+  "SHAZUSDT": {
+   "ticker": "SHAZ",
+   "name": "SharonAI Holdings Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 54.68,
+   "bitget_last": 54.47,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Information Technology Services",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SHEINHKDUSDT": {
+   "ticker": "0625.HK",
+   "name": "SHEIN Global Holdings Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 35.1,
+   "bitget_last": 35.73,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Internet Retail",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "SHEINUSDT": {
+   "ticker": "0625.HK",
+   "name": "SHEIN Global Holdings Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 35.1,
+   "bitget_last": 4.566,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Internet Retail",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "SHOPUSDT": {
+   "ticker": "SHOP",
+   "name": "Shopify Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 142.25,
+   "bitget_last": 142.17,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SIMOUSDT": {
+   "ticker": "SIMO",
+   "name": "Silicon Motion Technology Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 276.23,
+   "bitget_last": 276.99,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SITMUSDT": {
+   "ticker": "SITM",
+   "name": "SiTime Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 662.27,
+   "bitget_last": 664.33,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SKDDUSDT": {
+   "ticker": "SKDD",
+   "name": "GraniteShares 2x Short SK Hynix Daily ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 6.63,
+   "bitget_last": 6.643,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Inverse Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Inverse Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "SKHYNIXUSDT": {
+   "ticker": "000660.KS",
+   "name": "SK hynix Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "KRW",
+   "yahoo_last": 1862000.0,
+   "bitget_last": 1360.08,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SKHYUSDT": {
+   "ticker": "SKHY",
+   "name": "SK hynix Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 191.56,
+   "bitget_last": 191.33,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SKUUUSDT": {
+   "ticker": "SKUU",
+   "name": "Graniteshares 2x Long SK Hynix Daily ETF",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 30.6,
+   "bitget_last": 30.668,
+   "check": "price",
+   "kind": "stock",
+   "industry": null,
+   "yahoo_sector": null,
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo gives no sector for it"
+  },
+  "SMCIUSDT": {
+   "ticker": "SMCI",
+   "name": "Super Micro Computer, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 43.26,
+   "bitget_last": 43.19,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SMHUSDT": {
+   "ticker": "SMH",
+   "name": "VanEck Semiconductor ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 606.56,
+   "bitget_last": 608.17,
+   "check": "price",
+   "kind": "etf",
+   "category": "Technology",
+   "leveraged": false,
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SMICUSDT": {
+   "ticker": "0981.HK",
+   "name": "Semiconductor Manufacturing International Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 63.35,
+   "bitget_last": 8.096,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SMRUSDT": {
+   "ticker": "SMR",
+   "name": "NuScale Power Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 8.415,
+   "bitget_last": 8.437,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Specialty Industrial Machinery",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "SNDKUSDT": {
+   "ticker": "SNDK",
+   "name": "Sandisk Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 1777.8,
+   "bitget_last": 1776.31,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SNOWUSDT": {
+   "ticker": "SNOW",
+   "name": "Snowflake Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 336.05,
+   "bitget_last": 337.81,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SNXXUSDT": {
+   "ticker": "SNXX",
+   "name": "Tradr 2X Long Sndk Daily ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 17.525,
+   "bitget_last": 17.518,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "SOFIUSDT": {
+   "ticker": "SOFI",
+   "name": "SoFi Technologies, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 16.58,
+   "bitget_last": 16.58,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Credit Services",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "SOFTBANKUSDT": {
+   "ticker": "9984.T",
+   "name": "SoftBank Group Corp.",
+   "yahoo_type": "EQUITY",
+   "currency": "JPY",
+   "yahoo_last": 6150.0,
+   "bitget_last": 39.305,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Telecom Services",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "SONYUSDT": {
+   "ticker": "SONY",
+   "name": "Sony Group Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 23.545,
+   "bitget_last": 23.527,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Consumer Electronics",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SOXLUSDT": {
+   "ticker": "SOXL",
+   "name": "Direxion Daily Semiconductor Bull 3X Shares",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 151.47,
+   "bitget_last": 151.24,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "SOXSUSDT": {
+   "ticker": "SOXS",
+   "name": "Direxion Daily Semiconductor Bear 3X Shares",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 32.4662,
+   "bitget_last": 32.534,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Inverse Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Inverse Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "SOXXUSDT": {
+   "ticker": "SOXX",
+   "name": "iShares Semiconductor ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 572.68,
+   "bitget_last": 572.73,
+   "check": "price",
+   "kind": "etf",
+   "category": "Technology",
+   "leveraged": false,
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SPCHUSDT": {
+   "ticker": "SPCH",
+   "name": "Leverage Shares 2X Long SPCX Daily ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 9.785,
+   "bitget_last": 9.716,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "SPCXUSDT": {
+   "ticker": "SPCX",
+   "name": "Space Exploration Technologies Corp.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 148.68,
+   "bitget_last": 148.82,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Aerospace & Defense",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "SPIRUSDT": {
+   "ticker": "SPIR",
+   "name": "Spire Global, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 12.09,
+   "bitget_last": 12.162,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Specialty Business Services",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "SPYUSDT": {
+   "ticker": "SPY",
+   "name": "State Street SPDR S&P 500 ETF Trust",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 771.36,
+   "bitget_last": 772.29,
+   "check": "price",
+   "kind": "etf",
+   "category": "Large Blend",
+   "leveraged": false,
+   "weights": {
+    "Real Estate": 0.018001800288039604,
+    "Consumer Discretionary": 0.0931093154902049,
+    "Materials": 0.016801680268836966,
+    "Consumer Staples": 0.044604460713698134,
+    "Information Technology": 0.38693867618925093,
+    "Communication Services": 0.09500950152020902,
+    "Financials": 0.12061207193086551,
+    "Utilities": 0.019801980316843566,
+    "Industrials": 0.07750775124017052,
+    "Energy": 0.03480348055687656,
+    "Health Care": 0.09280928148500417
+   }
+  },
+  "SQQQUSDT": {
+   "ticker": "SQQQ",
+   "name": "ProShares UltraPro Short QQQ",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 33.75,
+   "bitget_last": 33.77,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Inverse Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Inverse Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "SSPCUSDT": {
+   "ticker": "SSPC",
+   "name": "Leverage Shares 2X Short SPCX Daily ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 9.125,
+   "bitget_last": 9.119,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Inverse Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Inverse Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "STRCUSDT": {
+   "ticker": "STRC",
+   "name": "Strategy Inc",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 98.54,
+   "bitget_last": 98.46,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "STXSTOCKUSDT": {
+   "ticker": "STX",
+   "name": "Seagate Technology Holdings plc",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 916.83,
+   "bitget_last": 918.24,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "SUMIELECUSDT": {
+   "ticker": "5802.T",
+   "name": "Sumitomo Electric Industries, Ltd.",
+   "yahoo_type": "EQUITY",
+   "currency": "JPY",
+   "yahoo_last": 2211.0,
+   "bitget_last": 14.044,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Auto Parts",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "TBTUSDT": {
+   "ticker": "TBT",
+   "name": "ProShares UltraShort 20+ Year Treasury",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 40.9,
+   "bitget_last": 40.9,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Inverse Debt",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Inverse Debt": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "TEAMUSDT": {
+   "ticker": "TEAM",
+   "name": "Atlassian Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 187.74,
+   "bitget_last": 188.2,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "TEMUSDT": {
+   "ticker": "TEM",
+   "name": "Tempus AI, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 85.01,
+   "bitget_last": 84.55,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Health Information Services",
+   "yahoo_sector": "Healthcare",
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "TENCENTHKDUSDT": {
+   "ticker": "0700.HK",
+   "name": "Tencent Holdings Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 436.6,
+   "bitget_last": 437.74,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Internet Content & Information",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "TENCENTUSDT": {
+   "ticker": "0700.HK",
+   "name": "Tencent Holdings Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 436.6,
+   "bitget_last": 55.82,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Internet Content & Information",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "TERUSDT": {
+   "ticker": "TER",
+   "name": "Teradyne, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 398.38,
+   "bitget_last": 399.0,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductor Equipment & Materials",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "TLTUSDT": {
+   "ticker": "TLT",
+   "name": "iShares 20+ Year Treasury Bond ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 79.32,
+   "bitget_last": 79.62,
+   "check": "price",
+   "kind": "etf",
+   "category": "Long Government",
+   "leveraged": false,
+   "weights": {
+    "Bonds": 1.0
+   }
+  },
+  "TMFUSDT": {
+   "ticker": "TMF",
+   "name": "Direxion Daily 20+ Year Treasury Bull 3X Shares",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 27.2,
+   "bitget_last": 27.231,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Debt",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Debt": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "TMUSDT": {
+   "ticker": "TM",
+   "name": "Toyota Motor Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 190.37,
+   "bitget_last": 190.2,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Auto Manufacturers",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "TOKYOELUSDT": {
+   "ticker": "8035.T",
+   "name": "Tokyo Electron Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "JPY",
+   "yahoo_last": 56520.0,
+   "bitget_last": 361.88,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Semiconductor Equipment & Materials",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "TQQQUSDT": {
+   "ticker": "TQQQ",
+   "name": "ProShares UltraPro QQQ",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 79.6,
+   "bitget_last": 79.7,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "Consumer Discretionary": 0.10483237401747952,
+    "Materials": 0.009435857587022731,
+    "Consumer Staples": 0.058879751343021834,
+    "Information Technology": 0.5581310140158249,
+    "Communication Services": 0.11983539135518868,
+    "Financials": 0.0019815300932747733,
+    "Utilities": 0.010756877649205914,
+    "Industrials": 0.0368942050524304,
+    "Energy": 0.005001004521122047,
+    "Health Care": 0.037932147499831384,
+    "Bonds": 0.05631984686559784
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "TSEMUSDT": {
+   "ticker": "TSEM",
+   "name": "Tower Semiconductor Ltd.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 230.47,
+   "bitget_last": 230.6,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "TSLAUSDT": {
+   "ticker": "TSLA",
+   "name": "Tesla, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 372.11,
+   "bitget_last": 372.87,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Auto Manufacturers",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "TSLLUSDT": {
+   "ticker": "TSLL",
+   "name": "Direxion Daily TSLA Bull 2X Shares",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 9.94,
+   "bitget_last": 9.947,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Leveraged Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Leveraged Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "TSMUSDT": {
+   "ticker": "TSM",
+   "name": "Taiwan Semiconductor Manufacturing Company Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 450.37,
+   "bitget_last": 451.03,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "TTWOUSDT": {
+   "ticker": "TTWO",
+   "name": "Take-Two Interactive Software, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 201.44,
+   "bitget_last": 202.07,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Electronic Gaming & Multimedia",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "TWLOUSDT": {
+   "ticker": "TWLO",
+   "name": "Twilio Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 275.86,
+   "bitget_last": 275.85,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "TXNUSDT": {
+   "ticker": "TXN",
+   "name": "Texas Instruments Incorporated",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 278.07,
+   "bitget_last": 278.11,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Semiconductors",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "TZAUSDT": {
+   "ticker": "TZA",
+   "name": "Direxion Daily Small Cap Bear 3X Shares",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 45.435,
+   "bitget_last": 45.368,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Inverse Equity",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Inverse Equity": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "UBERUSDT": {
+   "ticker": "UBER",
+   "name": "Uber Technologies, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 69.61,
+   "bitget_last": 69.62,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "UNHUSDT": {
+   "ticker": "UNH",
+   "name": "UnitedHealth Group Incorporated",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 376.69,
+   "bitget_last": 377.79,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Healthcare Plans",
+   "yahoo_sector": "Healthcare",
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "UNITREEUSDT": {
+   "ticker": "UNITREE",
+   "kind": "unclassified",
+   "check": "none",
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo has no UNITREE: EstimatesError"
+  },
+  "URNMUSDT": {
+   "ticker": "URNM",
+   "name": "Sprott Uranium Miners ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 49.11,
+   "bitget_last": 49.2,
+   "check": "price",
+   "kind": "etf",
+   "category": "Natural Resources",
+   "leveraged": false,
+   "weights": {
+    "Materials": 0.0178,
+    "Energy": 0.9822
+   }
+  },
+  "USARUSDT": {
+   "ticker": "USAR",
+   "name": "USA Rare Earth, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 15.18,
+   "bitget_last": 15.25,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Other Industrial Metals & Mining",
+   "yahoo_sector": "Basic Materials",
+   "weights": {
+    "Materials": 1.0
+   }
+  },
+  "UVXYUSDT": {
+   "ticker": "UVXY",
+   "name": "ProShares Ultra VIX Short-Term Futures ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 16.83,
+   "bitget_last": 16.816,
+   "check": "price",
+   "kind": "etf",
+   "category": "Trading--Miscellaneous",
+   "leveraged": true,
+   "weights": {
+    "ETF: Trading--Miscellaneous": 1.0
+   },
+   "note": "a leveraged or inverse fund: the split is its holdings', not scaled by its leverage"
+  },
+  "VALEUSDT": {
+   "ticker": "VALE",
+   "name": "Vale S.A.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 13.615,
+   "bitget_last": 13.6,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Other Industrial Metals & Mining",
+   "yahoo_sector": "Basic Materials",
+   "weights": {
+    "Materials": 1.0
+   }
+  },
+  "VEEVUSDT": {
+   "ticker": "VEEV",
+   "name": "Veeva Systems Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 280.71,
+   "bitget_last": 280.4,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Health Information Services",
+   "yahoo_sector": "Healthcare",
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "VOOUSDT": {
+   "ticker": "VOO",
+   "name": "Vanguard S&P 500 ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 710.834,
+   "bitget_last": 712.05,
+   "check": "price",
+   "kind": "etf",
+   "category": "Large Blend",
+   "leveraged": false,
+   "weights": {
+    "Real Estate": 0.017999999748,
+    "Consumer Discretionary": 0.09310000269659996,
+    "Materials": 0.016799999764800004,
+    "Consumer Staples": 0.04459999937560001,
+    "Information Technology": 0.38719999457920007,
+    "Communication Services": 0.09499999867000003,
+    "Financials": 0.12020000831719989,
+    "Utilities": 0.019899999721400004,
+    "Industrials": 0.07749999891500002,
+    "Energy": 0.0347999995128,
+    "Health Care": 0.09289999869940002
+   }
+  },
+  "VRTUSDT": {
+   "ticker": "VRT",
+   "name": "Vertiv Holdings Co",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 253.3,
+   "bitget_last": 253.8,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Electrical Equipment & Parts",
+   "yahoo_sector": "Industrials",
+   "weights": {
+    "Industrials": 1.0
+   }
+  },
+  "VSTUSDT": {
+   "ticker": "VST",
+   "name": "Vistra Corp.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 138.475,
+   "bitget_last": 138.78,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Utilities - Independent Power Producers",
+   "yahoo_sector": "Utilities",
+   "weights": {
+    "Utilities": 1.0
+   }
+  },
+  "VUSDT": {
+   "ticker": "V",
+   "name": "Visa Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 367.12,
+   "bitget_last": 367.9,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Credit Services",
+   "yahoo_sector": "Financial Services",
+   "weights": {
+    "Financials": 1.0
+   }
+  },
+  "WBDUSDT": {
+   "ticker": "WBD",
+   "name": "Warner Bros. Discovery, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 30.86,
+   "bitget_last": 30.858,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Entertainment",
+   "yahoo_sector": "Communication Services",
+   "weights": {
+    "Communication Services": 1.0
+   }
+  },
+  "WDCUSDT": {
+   "ticker": "WDC",
+   "name": "Western Digital Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 456.81,
+   "bitget_last": 456.79,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Computer Hardware",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "WENUSDT": {
+   "ticker": "WEN",
+   "name": "The Wendy's Company",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 6.55,
+   "bitget_last": 6.58,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Restaurants",
+   "yahoo_sector": "Consumer Cyclical",
+   "weights": {
+    "Consumer Discretionary": 1.0
+   }
+  },
+  "WMTUSDT": {
+   "ticker": "WMT",
+   "name": "Walmart Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 107.98,
+   "bitget_last": 107.84,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Discount Stores",
+   "yahoo_sector": "Consumer Defensive",
+   "weights": {
+    "Consumer Staples": 1.0
+   }
+  },
+  "XBIUSDT": {
+   "ticker": "XBI",
+   "name": "State Street SPDR S&P Biotech ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 155.03,
+   "bitget_last": 155.07,
+   "check": "price",
+   "kind": "etf",
+   "category": "Health",
+   "leveraged": false,
+   "weights": {
+    "Financials": 0.00720000029784,
+    "Health Care": 0.9927999997021599
+   }
+  },
+  "XIAOMIHKDUSDT": {
+   "ticker": "1810.HK",
+   "name": "Xiaomi Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 25.9,
+   "bitget_last": 25.954,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Consumer Electronics",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "XIAOMIUSDT": {
+   "ticker": "1810.HK",
+   "name": "Xiaomi Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "HKD",
+   "yahoo_last": 25.9,
+   "bitget_last": 3.3178,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Consumer Electronics",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "XLEUSDT": {
+   "ticker": "XLE",
+   "name": "State Street Energy Select Sector SPDR ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 62.06,
+   "bitget_last": 62.11,
+   "check": "price",
+   "kind": "etf",
+   "category": "Equity Energy",
+   "leveraged": false,
+   "weights": {
+    "Energy": 1.0
+   }
+  },
+  "XLKUSDT": {
+   "ticker": "XLK",
+   "name": "State Street Technology Select Sector SPDR ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 196.25,
+   "bitget_last": 196.43,
+   "check": "price",
+   "kind": "etf",
+   "category": "Technology",
+   "leveraged": false,
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "XLUUSDT": {
+   "ticker": "XLU",
+   "name": "State Street Utilities Select Sector SPDR ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 39.53,
+   "bitget_last": 39.532,
+   "check": "price",
+   "kind": "etf",
+   "category": "Utilities",
+   "leveraged": false,
+   "weights": {
+    "Utilities": 1.0
+   }
+  },
+  "XLVUSDT": {
+   "ticker": "XLV",
+   "name": "State Street Health Care Select Sector SPDR ETF",
+   "yahoo_type": "ETF",
+   "currency": "USD",
+   "yahoo_last": 170.715,
+   "bitget_last": 170.84,
+   "check": "price",
+   "kind": "etf",
+   "category": "Health",
+   "leveraged": false,
+   "weights": {
+    "Health Care": 1.0
+   }
+  },
+  "XNDUUSDT": {
+   "ticker": "XNDU",
+   "name": "Xanadu Quantum Technologies Limited",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 4.98,
+   "bitget_last": 4.983,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "XOMUSDT": {
+   "ticker": "XOM",
+   "name": "ExxonMobil Holdings Corporation",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 160.56,
+   "bitget_last": 160.65,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Oil & Gas Integrated",
+   "yahoo_sector": "Energy",
+   "weights": {
+    "Energy": 1.0
+   }
+  },
+  "ZHIPUHKDUSDT": {
+   "ticker": "ZHIPUHKD",
+   "kind": "unclassified",
+   "check": "none",
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo has no ZHIPUHKD: EstimatesError"
+  },
+  "ZHIPUUSDT": {
+   "ticker": "ZHIPU",
+   "kind": "unclassified",
+   "check": "none",
+   "weights": {
+    "Unclassified": 1.0
+   },
+   "note": "Yahoo has no ZHIPU: EstimatesError"
+  },
+  "ZHONGJIUSDT": {
+   "ticker": "300308.SZ",
+   "name": "Zhongji Innolight Co., Ltd.",
+   "yahoo_type": "EQUITY",
+   "currency": "CNY",
+   "yahoo_last": 895.86,
+   "bitget_last": 149.33,
+   "check": "name",
+   "kind": "stock",
+   "industry": "Communication Equipment",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "ZMUSDT": {
+   "ticker": "ZM",
+   "name": "Zoom Communications, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 89.71,
+   "bitget_last": 89.96,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Application",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  },
+  "ZSUSDT": {
+   "ticker": "ZS",
+   "name": "Zscaler, Inc.",
+   "yahoo_type": "EQUITY",
+   "currency": "USD",
+   "yahoo_last": 193.05,
+   "bitget_last": 193.89,
+   "check": "price",
+   "kind": "stock",
+   "industry": "Software - Infrastructure",
+   "yahoo_sector": "Technology",
+   "weights": {
+    "Information Technology": 1.0
+   }
+  }
+ }
+}

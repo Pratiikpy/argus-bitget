@@ -191,16 +191,26 @@ class TestTheSurfaceIsReadOnly:
         for verb in ("do_PUT", "do_PATCH", "do_DELETE"):
             assert not hasattr(Handler, verb), f"{verb} would be a write path"
 
-    def test_post_is_answered_only_at_mcp_and_the_telegram_webhook(self, base_url: str) -> None:
+    def test_post_is_answered_only_at_mcp_the_webhook_and_the_page_routes(
+            self, base_url: str) -> None:
+        """Since 2026-09-25 the page also POSTs ``/ask``, ``/translate`` and ``/feedback`` — the
+        same read-only answers, sent as a body so the host's access log never holds what a
+        visitor typed (`lui/usage.py`). Every other path still refuses POST."""
         import urllib.error
         import urllib.request
 
-        request = urllib.request.Request(base_url + "/ask", data=b"{}", method="POST")
+        request = urllib.request.Request(base_url + "/status", data=b"{}", method="POST")
         try:
             urllib.request.urlopen(request, timeout=10)
-            raise AssertionError("POST /ask was accepted")
+            raise AssertionError("POST /status was accepted")
         except urllib.error.HTTPError as exc:
             assert exc.code == 405
+        request = urllib.request.Request(base_url + "/ask", data=b"q=", method="POST")
+        try:
+            urllib.request.urlopen(request, timeout=10)
+            raise AssertionError("POST /ask with no question was answered")
+        except urllib.error.HTTPError as exc:
+            assert exc.code == 400
         # The webhook answers nothing without Telegram's secret header (503 when the bot is not
         # configured on this server at all, 403 when it is and the secret is wrong).
         request = urllib.request.Request(base_url + "/telegram", data=b"{}", method="POST")

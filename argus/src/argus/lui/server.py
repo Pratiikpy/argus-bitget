@@ -130,6 +130,11 @@ PAGE = """<!doctype html>
   .mem button { padding:0 0 0 6px; border:0; background:none; color:var(--dim); font-size:12.5px;
     cursor:pointer }
   .pv-missing, .pv-assumed { border-style:dashed }
+  .fb { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px;
+    font-size:12.5px; color:var(--dim) }
+  .fb button { padding:3px 11px; border:1px solid var(--line); background:var(--panel);
+    color:var(--ink); border-radius:999px; font-size:12.5px; cursor:pointer }
+  .fb button:hover, .fb button:focus-visible { border-color:var(--accent) }
   .stat { font:12px/1.6 var(--mono); color:var(--dim); margin:0 0 14px }
   .jump { display:flex; gap:10px 22px; flex-wrap:wrap; margin:0 0 30px; font-weight:500 }
   .jump a { text-decoration:none; color:var(--ink); border-bottom:1px solid var(--line);
@@ -178,7 +183,8 @@ const RESEARCH = ["I hold 50% NVDA, 50% AAPL — what does adding 20% TSLA do to
   "what if the Nasdaq drops 10%? I hold 40% MSFT, 30% META, 30% GOOGL",
   "is TSLA riskier than NVDA", "should I buy MSTR", "where is NVDA trading right now",
   "how should I split a $50k order in NVDA", "is TSLA overbought",
-  "when does NVDA report earnings", "has COIN been here before", "compare gold and bitcoin"];
+  "when does NVDA report earnings", "what did NVDA's latest 10-Q say drove data center revenue",
+  "has COIN been here before", "compare gold and bitcoin"];
 const SUGGEST = ["why did you do nothing all weekend","what is the sharpe","show me decision 25",
   "what did the risk layer block","what evidence backed that","is the log tamper-evident",
   "are you well calibrated","what bad decision patterns do you have","what is my position",
@@ -186,6 +192,19 @@ const SUGGEST = ["why did you do nothing all weekend","what is the sharpe","show
 const out = document.getElementById('out'), qEl = document.getElementById('q');
 const bookEl = document.getElementById('book'), savedEl = document.getElementById('saved');
 let turns = [], first = true;
+// Our own visits are marked so the usage count (`lui/usage.py`) is of other people: opening the
+// console once with ?internal=1 sets the flag in this browser.
+let internal = '';
+try {
+  if (new URLSearchParams(location.search).get('internal') === '1')
+    localStorage.setItem('argus.internal', '1');
+  internal = localStorage.getItem('argus.internal') === '1' ? '1' : '';
+} catch (e) {}
+// Questions, books and memory go in a POST body: a query string is written to the host's access
+// log, and what a visitor types is theirs.
+const post = (path, fields) => fetch(path, {method: 'POST',
+  headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+  body: new URLSearchParams({...fields, internal})});
 
 // The book is the visitor's own and stays in their browser; it is sent with each question and
 // never stored on the server.
@@ -265,9 +284,8 @@ document.getElementById('f').addEventListener('submit', async ev => {
   qEl.value = ''; document.getElementById('go').disabled = true;
   if (first) { out.innerHTML = ''; first = false; }
   try {
-    const r = await fetch('ask?' + new URLSearchParams(
-      {q: text, turns: JSON.stringify(turns), book: bookEl.value.trim(),
-       memory: JSON.stringify(memory)}));
+    const r = await post('ask', {q: text, turns: JSON.stringify(turns),
+      book: bookEl.value.trim(), memory: JSON.stringify(memory)});
     const a = await r.json();
     turns = a.turns || turns;
     if (a.memory) { try { memory = JSON.parse(a.memory); } catch (e) {} saveMemory(); }
@@ -288,14 +306,17 @@ document.getElementById('f').addEventListener('submit', async ev => {
           ` source${a.sources.length === 1 ? '' : 's'}</span>` +
           a.sources.map(s => `&nbsp;&nbsp;<b>${esc(s.kind)}</b>:${esc(s.ref)}` +
             (s.detail ? ' — ' + esc(s.detail) : '')).join('<br>') + `</div>` : ''}
+        ${a.answer_id ? `<div class="fb" data-id="${esc(a.answer_id)}">` +
+          `<span>Did this answer your question?</span><button type="button" data-u="1">Yes` +
+          `</button><button type="button" data-u="0">No</button></div>` : ''}
       </div>`);
     if (a.translate) {
       // English first, then the reader's language: every figure in the translation was checked
       // against the English by the server before it was sent (`lui/translate.py`).
       const card = out.firstElementChild;
       const body = a.lines.slice(a.translate.skip);
-      fetch('translate?' + new URLSearchParams({lang: a.translate.lang,
-        token: a.translate.token, lines: JSON.stringify(body)}))
+      post('translate', {lang: a.translate.lang, token: a.translate.token,
+        lines: JSON.stringify(body)})
         .then(r => r.ok ? r.json() : null).then(t => {
           if (!t || !t.lines) return;
           // Each translated line keeps the styling of the English line it came from.
@@ -313,6 +334,14 @@ document.getElementById('f').addEventListener('submit', async ev => {
   } finally {
     document.getElementById('go').disabled = false; qEl.focus();
   }
+});
+// "Did this answer your question?" — one click per answer, counted anonymously (`lui/usage.py`).
+out.addEventListener('click', e => {
+  const b = e.target.closest('.fb button'); if (!b) return;
+  const box = b.parentElement;
+  post('feedback', {id: box.dataset.id, useful: b.dataset.u}).catch(() => {});
+  box.textContent = b.dataset.u === '1' ? 'Thanks \u2014 noted as answered.'
+    : 'Thanks \u2014 noted as not answered. Rephrasing, or naming the ticker, often helps.';
 });
 // A link can carry a question (and a book) so it demonstrates an engine in one click: /proof
 // links every capability the console runs this way. The book fills the field for this visit
@@ -491,6 +520,13 @@ def handle_ask(
     token = _MEMORY.set(tuple(facts))
     try:
         payload = _answer(text, prior, now=now, visitor=visitor, book=book)
+        from argus.lui.honesty import order_prefix
+
+        prefix = order_prefix(text)
+        if prefix and payload.get("lines") and not str(payload["lines"][0]).startswith(prefix):
+            # An order instruction answered with analysis says first that nothing was sent: the
+            # console places, changes and cancels no orders (infeasibility bench, order rows).
+            payload["lines"] = [prefix, *payload["lines"]]
     finally:
         _MEMORY.reset(token)
     by = str(payload.get("classified_by") or "")
@@ -533,6 +569,35 @@ def _answer(
     # hourly allowance. Neither ever writes a figure: both only fill in the request.
     audit: dict[str, Any] = {"attempted": False, "applied": False,
                              "detail": "no model consulted"}
+
+    def engine_payload(lines: list[str], sources: list[Any], data: dict[str, Any],
+                       by: str) -> dict[str, Any]:
+        q = classify(text, now=clock, conversation=conversation)
+        note = _language_note(text)
+        built = Answer(question=q, lines=([note] if note else []) + lines, sources=sources,
+                       data=data).as_dict()
+        built.update(elapsed_ms=(time.perf_counter() - started) * 1000,
+                     budget_ms=BUDGET_MS[q.speed], routing=audit, classified_by=by, matched=by,
+                     turns=[*prior, text][-12:])
+        return built
+
+    # Three questions a trader asks of their own book that no engine owned until 2026-09-25 (the
+    # readiness audit found each refused or answered with the desk's statistics): a review of the
+    # trader's OWN pasted trades (`lui/journal.py`, first, because a pasted journal names
+    # instruments every research reader would claim), what to watch this week for the book
+    # (`lui/watchlist.py`), and its sector and factor exposures (`lui/exposures.py`).
+    from argus.lui import exposures as exposures_mod
+    from argus.lui.journal import review_trades
+    from argus.lui.watchlist import asks_for_watchlist, watchlist
+
+    reviewed = review_trades(text, now=clock)
+    if reviewed is not None:
+        return engine_payload(*reviewed, by="journal")
+    if asks_for_watchlist(text):
+        return engine_payload(*watchlist(text, book, now=clock), by="watchlist")
+    exposed = exposures_mod.answer(text, book)
+    if exposed is not None:
+        return engine_payload(exposed.lines, exposed.sources, exposed.data, by="exposures")
     from argus.lui.research import (
         _SESSION_CLAIM,
         SESSION_QUESTION,
@@ -642,6 +707,66 @@ def _answer(
             return _research_payload(text, prior, with_book(request, book, text), ledger,
                                      started, "research-follow-up",
                                      {**audit, "detail": "the previous turn's name carried"})
+    filed = _filing_answer(text, visitor, clock, conversation, started, prior, audit)
+    if filed is not None:
+        return filed
+    if _SKILLS_Q.search(text):
+        # Track 3 scores "Skill integration count and effectiveness": asked how well Bitget's
+        # Skills work, the console answers from its own sweeps of every tool, outages included.
+        from argus.eval.skill_matrix import console_lines
+        from argus.lui.answer import Source
+
+        q_skills = classify(text, now=clock, conversation=conversation)
+        payload = Answer(question=q_skills, lines=console_lines(), sources=[
+            Source("artefact", "skill_matrix_history.jsonl", "every sweep, keyless"),
+            Source("computation", "argus.eval.skill_matrix:run")]).as_dict()
+        payload.update(elapsed_ms=(time.perf_counter() - started) * 1000,
+                       budget_ms=BUDGET_MS[q_skills.speed], routing=audit,
+                       classified_by="research-skills", matched="skill_matrix",
+                       turns=[*prior, text][-12:])
+        return payload
+    from argus.lui import multistep
+
+    split = multistep.parts(text, book) if len(text) <= 600 else None
+    if split is not None:
+        # A question with several parts is answered part by part, each by its own engine
+        # (`lui/multistep.py`); one engine used to answer and the other parts were dropped.
+        q_multi = classify(text, now=clock, conversation=conversation)
+        from argus.lui import memory as mem
+
+        remembered = list(_MEMORY.get())
+
+        def run_part(part_text: str, request: Any) -> Any:
+            if remembered:
+                request, _used = mem.apply(request, remembered, part_text)
+            return run_research(part_text, request, ledger=ledger)
+
+        lines_multi, sources_multi, _unread = multistep.answer(text, split, run_part)
+        note = _language_note(text)
+        payload = Answer(question=q_multi, lines=([note] if note else []) + lines_multi,
+                         sources=sources_multi).as_dict()
+        payload.update(elapsed_ms=(time.perf_counter() - started) * 1000,
+                       budget_ms=BUDGET_MS[q_multi.speed], routing=audit,
+                       classified_by="research-multistep", matched="multistep",
+                       turns=[*prior, text][-12:])
+        return payload
+    # A question no console can answer as asked — the trader's own account, other traders'
+    # positions, an exact future price, a date before the data, an N-year figure longer than the
+    # instrument has existed, a company Bitget does not list, a name nobody gave — is answered
+    # with its true reason, and with the real figure where one exists (a past close, the longest
+    # span there is). Before this, 29 of 73 such questions were answered with figures from an
+    # unrelated engine (`eval/infeasibilitybench.py`, 2026-09-25); `eval/honesty_eval.py`
+    # measures 73 of 73 with the true reason and 0 false alarms on 605 answerable questions.
+    from argus.lui import honesty
+
+    honest = honesty.honest_answer(text, prior=prior, book=book)
+    if honest is not None:
+        answered_honestly = engine_payload(honest[1], [], {"cause": honest[0]}, by="honesty")
+        if honest[0] not in (honesty.PAST_PRICE, honesty.LONG_HORIZON):
+            # a decline with its true reason is a refusal, counted as one; a past close or the
+            # longest span that exists is an answer
+            answered_honestly.update(refused=True, reason=honest[0].replace("_", " "))
+        return answered_honestly
     followed = follow_up(text, prior, book)
     if followed is not None:
         # A name swap ("and ETH?", "actually i meant ethereum") re-asks the earlier question, so
@@ -1037,6 +1162,112 @@ def _model_for(visitor: str) -> Router | None:
     return _router()
 
 
+_FILING_Q = re.compile(
+    r"\b(?:10-[kq]\b|8-k\b|form\s+(?:10-?[kq]|8-?k)\b|10[kq]\s+(?:filing|report)|"
+    r"annual\s+report|quarterly\s+report|(?:sec\s+)?filings?|"
+    r"prospectus|risk\s+factors|md&a|management'?s\s+discussion|"
+    r"(?:disclose|disclosed|disclosure|disclosures)\b|according\s+to\s+(?:its|their|the)\s+"
+    r"(?:filing|report|10-?[kq]))", re.I)
+"""A question whose answer sits inside a company's own filing: read by `research/document_qa.py`.
+"10k" alone is not one: "dca into eth with 10k" is an amount (held-out blind corpus)."""
+
+_TRACE_READY = False
+
+
+def _traced() -> bool:
+    """Whether answers are recorded step by step, instrumenting the engines on first use.
+
+    Once per process, at the first question, because the hosted console has no start-up hook of
+    its own (Vercel imports the handler and calls it). ``ARGUS_TRACE=0`` turns it off: the test
+    suite does, so a module-wide wrap installed by one HTTP test cannot change what another test
+    monkeypatches; the trace has its own tests (`tests/test_trace.py`)."""
+    global _TRACE_READY
+    if os.environ.get("ARGUS_TRACE", "1") == "0":
+        return False
+    if not _TRACE_READY:
+        from argus.truth import trace
+
+        trace.instrument()
+        _TRACE_READY = True
+    return True
+
+
+_SKILLS_Q = re.compile(
+    r"\b(?:bitget[\s-]+)?skills?\b[^?]{0,40}\b(?:work|working|effective\w*|integrat\w*|reliab\w*|"
+    r"answer\w*|up|down|status|health)\b|\bskill\s+(?:integration|effectiveness|matrix|health)\b|"
+    r"\bbitget-(?:signal|mcp)\b|\bwhich\s+bitget\s+(?:tools|skills|data\s+sources)\b", re.I)
+"""A question about how well Bitget's own Skills and data server answer (`eval/skill_matrix.py`)."""
+
+_FILINGS: dict[str, tuple[float, list[Any]]] = {}
+"""Filings read this process, by ticker, with when they were read: one EDGAR read serves every
+question about that company for an hour (a read takes 5-20 s)."""
+
+_DOC_MODEL: Any = None
+_DOC_MODEL_BUILT = False
+
+
+def _filing_model() -> Any:
+    """A Qwen client of its own for filing questions, so they cannot spend the question router's
+    budget: one answer is about 5k prompt tokens, a quarter of the router's whole allowance."""
+    global _DOC_MODEL, _DOC_MODEL_BUILT
+    if not _DOC_MODEL_BUILT:
+        _DOC_MODEL_BUILT = True
+        try:
+            from argus.llm.qwen import QwenClient, TokenBudget
+
+            _DOC_MODEL = QwenClient(budget=TokenBudget(limit=120_000))
+        except Exception:
+            _DOC_MODEL = None
+    return _DOC_MODEL
+
+
+def _filing_answer(text: str, visitor: str, clock: datetime, conversation: Any, started: float,
+                   prior: list[str], audit: dict[str, Any]) -> dict[str, Any] | None:
+    """A question about what a filing says, answered from the filing with every sentence citing
+    the passage it rests on (`research/document_qa.py`). None — and the question takes the usual
+    route — when it is not such a question, names no company with SEC filings, or no model is
+    available to this visitor."""
+    import time
+
+    if not _FILING_Q.search(text):
+        return None
+    named = [s.removesuffix("USDT") for s in research_symbols(text)[0]]
+    if not named or _model_for(visitor) is None:
+        return None
+    model = _filing_model()
+    if model is None:
+        return None
+    from argus.research.document_qa import EdgarDocuments, research_answer
+
+    ticker = named[0]
+    cached = _FILINGS.get(ticker)
+    if cached is None or time.time() - cached[0] > 3600:
+        try:
+            cached = (time.time(), EdgarDocuments().latest(ticker))
+        except Exception:
+            return None
+        _FILINGS[ticker] = cached
+    if not cached[1]:
+        return None  # no SEC filer by that name (a coin, a commodity): the usual engines answer
+    try:
+        lines, sources, data = research_answer(text, ticker, model, documents=cached[1])
+    except Exception as exc:
+        lines, sources, data = ([f"The filings for {ticker} were read, but the model that answers "
+                                 f"from them is unavailable ({type(exc).__name__}); nothing is "
+                                 f"said rather than something unsupported."], [], {})
+    unused = len(data.get("retrieved_sources") or [])
+    lines = [*lines, f"Data: SEC EDGAR filings for {ticker}; {len(sources)} passage(s) cited, "
+                     f"{unused} read and not used. Every sentence cites the passage it rests on; "
+                     f"a sentence without one was removed before it reached you."]
+    q = classify(text, now=clock, conversation=conversation)
+    payload = Answer(question=q, lines=lines, sources=list(sources)).as_dict()
+    payload.update(elapsed_ms=(time.perf_counter() - started) * 1000,
+                   budget_ms=BUDGET_MS[q.speed], routing=audit, classified_by="research-filing",
+                   matched="document_qa", refused=bool(data.get("refused")),
+                   turns=[*prior, text][-12:])
+    return payload
+
+
 _ROUTER: Router | None = None
 _ROUTER_BUILT = False
 
@@ -1050,7 +1281,12 @@ def _router() -> Router | None:
     """
     global _ROUTER, _ROUTER_BUILT
     if not _ROUTER_BUILT:
-        _ROUTER = build_router()
+        # 200k tokens per server instance, about fifty planner calls (each is a ~4k-token prompt
+        # with thinking off). The router's own default, 20k, ran out after five questions: a
+        # readiness audit on 2026-09-25 hit BudgetExhausted twice in one sitting, and every question
+        # after that fell back to the pattern reader. The per-visitor hourly allowance above is what
+        # bounds spending; this only stops one instance from spending without end.
+        _ROUTER = build_router(budget_tokens=200_000)
         _ROUTER_BUILT = True
     return _ROUTER
 
@@ -1188,13 +1424,97 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _visitor(self) -> str:
+        return (self.headers.get("x-forwarded-for") or "").split(",")[0].strip() \
+            or self.client_address[0]
+
+    def _answer_route(self, path: str, params: dict[str, list[str]]) -> None:
+        """``/ask``, ``/translate`` and ``/feedback``, the same whether the parameters came as a
+        query string (links, tests, scripts) or a POST body (the page, so the hosting runtime's
+        access log never holds what a visitor typed — `lui/usage.py`)."""
+        from argus.lui import usage
+
+        def first(name: str, default: str = "") -> str:
+            return (params.get(name) or [default])[0]
+
+        visitor = self._visitor()
+        seen_as = usage.visitor_hash(visitor)
+        client = usage.client_class(self.headers.get("User-Agent") or "")
+        internal = first("internal") == "1"
+        if path == "/ask":
+            text = repair_mojibake(first("q"))
+            try:
+                prior = [str(t) for t in json.loads(first("turns", "[]"))][-12:]
+            except (ValueError, TypeError):
+                prior = []
+            if not text.strip():
+                self._send(json.dumps({"error": "empty question"}).encode(),
+                           "application/json", 400)
+                return
+            book = repair_mojibake(first("book"))[:300]
+            memory_text = first("memory")[:12000]
+            if _traced():
+                # Where each line comes from — live, computed, record, desk, assumed, missing —
+                # decided by the engine step that produced it (`truth/trace.py`); a line no step
+                # declares keeps the wording label (`lui/provenance.py`). Measured on the 680
+                # held-out questions: 83.6% of lines labelled against 75.8% by wording alone, and
+                # the two agree on all 601 lines both label.
+                from argus.truth import trace
+
+                payload = trace.answered(
+                    text, lambda: handle_ask(text, prior, visitor=visitor, book=book,
+                                             memory=memory_text),
+                    lambda p: offer_translation(p, text))
+            else:
+                payload = handle_ask(text, prior, visitor=visitor, book=book, memory=memory_text)
+                offer_translation(payload, text)
+                payload["line_labels"] = provenance_labels(payload.get("lines") or [])
+            payload["answer_id"] = usage.answer_id()
+            usage.ask_event(payload, answer=payload["answer_id"], visitor=seen_as, client=client,
+                            internal=internal)
+            self._send(json.dumps(payload, default=str).encode(), "application/json")
+            return
+        if path == "/feedback":
+            event = usage.feedback_event(first("id"), first("useful") == "1", visitor=seen_as,
+                                         client=client, internal=internal)
+            self._send(b'{"ok": true}' if event else b'{"error": "unknown answer id"}',
+                       "application/json", 200 if event else 400)
+            return
+        # /translate — the second half of a non-English answer: the page shows the English at
+        # once and asks here for the translation, signed by this server so only its own answers
+        # are translated (`lui/translate.py`).
+        from argus.lui import translate
+
+        lang, token = first("lang"), first("token")
+        try:
+            lines = json.loads(first("lines", "[]"))
+        except ValueError:
+            lines = None
+        if (not isinstance(lines, list) or not all(isinstance(x, str) for x in lines)
+                or not translate.verify(lang, lines, token)):
+            self._send(b'{"error": "not an answer this console wrote"}', "application/json", 403)
+            return
+        result = translate.translate(lines, lang, _model_for(visitor))
+        self._send(json.dumps(result, ensure_ascii=False).encode(), "application/json")
+
     def do_POST(self) -> None:
-        """Two endpoints only: ``/mcp``, the Model Context Protocol (`lui/mcp_server.py`), and
-        ``/telegram``, the bot's webhook (`lui/telegram_bot.py`, rejected without Telegram's secret
-        header). Both answer questions; neither writes anything. Every other path answers GET."""
+        """``/mcp``, the Model Context Protocol (`lui/mcp_server.py`); ``/telegram``, the bot's
+        webhook (`lui/telegram_bot.py`, rejected without Telegram's secret header); and the page's
+        own ``/ask``, ``/translate`` and ``/feedback``, sent as a form body so a visitor's words
+        stay out of the access log. None of them writes anything but a usage line."""
         from urllib.parse import urlparse
 
         path = urlparse(self.path).path.rstrip("/")
+        if path in ("/ask", "/translate", "/feedback"):
+            length = min(int(self.headers.get("Content-Length") or 0), 64_000)
+            try:
+                self._answer_route(path, parse_qs(self.rfile.read(length).decode("utf-8"),
+                                                  keep_blank_values=True))
+            except Exception as exc:  # the same honest 500 the GET routes give
+                self._send(json.dumps({"error": type(exc).__name__,
+                                       "detail": str(exc)[:200]}).encode(),
+                           "application/json", 500)
+            return
         if path == "/telegram":
             from argus.lui.telegram_bot import handle_webhook
 
@@ -1204,11 +1524,21 @@ class Handler(BaseHTTPRequestHandler):
             self._send(body, "application/json", status)
             return
         if path != "/mcp":
-            self._send(b'{"error": "POST is accepted only at /mcp and /telegram"}',
-                       "application/json", 405)
+            self._send(b'{"error": "POST is accepted only at /mcp, /telegram, /ask, /translate '
+                       b'and /feedback"}', "application/json", 405)
             return
         from argus.lui.mcp_server import handle_body
 
+        # MCP 2025-11-25 (basic/transports.mdx:78-80): a server MUST validate the
+        # Origin header and answer 403 to an invalid one, or a web page the visitor opens could
+        # drive the endpoint by DNS rebinding. A client that sends no Origin (every non-browser
+        # MCP client) is not a browser page and is served; a browser page is served only from
+        # this host.
+        origin = (self.headers.get("Origin") or "").strip()
+        if origin and urlparse(origin).netloc.lower() != (self.headers.get("Host") or "").lower():
+            self._send(b'{"jsonrpc": "2.0", "id": null, "error": {"code": -32600, '
+                       b'"message": "Origin not allowed"}}', "application/json", 403)
+            return
         length = min(int(self.headers.get("Content-Length") or 0), 64_000)
         status, body = handle_body(self.rfile.read(length))
         self._send(body, "application/json", status)
@@ -1339,51 +1669,8 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 self._send(render_task(task, FAVICON).encode(), "text/html; charset=utf-8")
                 return
-            if path == "/ask":
-                params = parse_qs(route.query)
-                text = repair_mojibake((params.get("q") or [""])[0])
-                raw_turns = (params.get("turns") or ["[]"])[0]
-                try:
-                    prior = [str(t) for t in json.loads(raw_turns)][-12:]
-                except (ValueError, TypeError):
-                    prior = []
-                if not text.strip():
-                    self._send(json.dumps({"error": "empty question"}).encode(),
-                               "application/json", 400)
-                    return
-                visitor = (self.headers.get("x-forwarded-for") or "").split(",")[0].strip() \
-                    or self.client_address[0]
-                book = repair_mojibake((params.get("book") or [""])[0])[:300]
-                remembered = (params.get("memory") or [""])[0][:12000]
-                payload = handle_ask(text, prior, visitor=visitor, book=book, memory=remembered)
-                offer_translation(payload, text)
-                # Where each line comes from — live, computed, record, desk, assumed, missing
-                # (`lui/provenance.py`); a line no rule recognises carries none.
-                payload["line_labels"] = provenance_labels(payload.get("lines") or [])
-                self._send(json.dumps(payload, default=str).encode(), "application/json")
-                return
-            if path == "/translate":
-                # The second half of a non-English answer: the page shows the English at once and
-                # asks here for the translation, signed by this server so only its own answers
-                # are translated (`lui/translate.py`).
-                from argus.lui import translate
-
-                params = parse_qs(route.query)
-                lang = (params.get("lang") or [""])[0]
-                token = (params.get("token") or [""])[0]
-                try:
-                    lines = json.loads((params.get("lines") or ["[]"])[0])
-                except ValueError:
-                    lines = None
-                if (not isinstance(lines, list) or not all(isinstance(x, str) for x in lines)
-                        or not translate.verify(lang, lines, token)):
-                    self._send(b'{"error": "not an answer this console wrote"}',
-                               "application/json", 403)
-                    return
-                visitor = (self.headers.get("x-forwarded-for") or "").split(",")[0].strip() \
-                    or self.client_address[0]
-                result = translate.translate(lines, lang, _model_for(visitor))
-                self._send(json.dumps(result, ensure_ascii=False).encode(), "application/json")
+            if path in ("/ask", "/translate", "/feedback"):
+                self._answer_route(path, parse_qs(route.query))
                 return
             self._send(b'{"error":"not found"}', "application/json", 404)
         except Exception as exc:  # a demo that 500s silently is worse than one that says why

@@ -1,0 +1,661 @@
+{
+  "generated_at": "2026-09-25T14:46:17.339125+00:00",
+  "item": "S2 vocabulary-obfuscation invariance",
+  "source": "PlanBench plan-bench/obfuscator.py:31-52 (random_mapping); MIT",
+  "layers": {
+    "entities": {
+      "requirement": "invariance",
+      "decisions": 6,
+      "unchanged": 6,
+      "unchanged_share": 1.0,
+      "score": {
+        "snapshots": 6,
+        "before": 1.0,
+        "resample_worst": 1.0,
+        "worst": 1.0,
+        "per_condition_worst": {
+          "obfuscate:entities": 1.0
+        },
+        "clean_pair_disagreement": {
+          "disagreeing": 0,
+          "pairs": 18,
+          "rate": 0.0
+        },
+        "cross_pair_disagreement": {
+          "disagreeing": 0,
+          "pairs": 18,
+          "rate": 0.0
+        },
+        "excess_disagreement": 0.0,
+        "flips_beyond_noise": [],
+        "flips_within_noise": []
+      },
+      "verdict": "6 snapshot(s), 6 renamed (entities) decision(s). Unperturbed agreement (before) 100%; resample worst case 100%; worst case with renamed (entities) 100%. Pairwise disagreement: 0/18 between unperturbed runs, 0/18 between a renamed (entities) run and an unperturbed one. No renamed (entities) run left its snapshot's reference action. With this few snapshots that is an absence of observed flips, not a bound on the flip rate",
+      "lean_score": {
+        "snapshots": 6,
+        "before": 0.9444,
+        "resample_worst": 0.8333,
+        "worst": 0.8333,
+        "per_condition_worst": {
+          "obfuscate:entities": 0.8333
+        },
+        "clean_pair_disagreement": {
+          "disagreeing": 2,
+          "pairs": 18,
+          "rate": 0.1111
+        },
+        "cross_pair_disagreement": {
+          "disagreeing": 2,
+          "pairs": 18,
+          "rate": 0.1111
+        },
+        "excess_disagreement": 0.0,
+        "flips_beyond_noise": [],
+        "flips_within_noise": [
+          "METAUSDT-20260925T135626Z/obfuscate:entities: up -> down"
+        ]
+      },
+      "lean_verdict": "Lean level. 6 snapshot(s), 6 renamed (entities) decision(s). Unperturbed agreement (before) 94%; resample worst case 83%; worst case with renamed (entities) 83%. Pairwise disagreement: 2/18 between unperturbed runs, 2/18 between a renamed (entities) run and an unperturbed one. Every flip landed on a snapshot whose unperturbed runs already disagreed, so none is attributable to renamed (entities) beyond sampling noise"
+    },
+    "entities+labels": {
+      "requirement": "dependence (reported only)",
+      "decisions": 6,
+      "unchanged": 6,
+      "unchanged_share": 1.0,
+      "score": {
+        "snapshots": 6,
+        "before": 1.0,
+        "resample_worst": 1.0,
+        "worst": 1.0,
+        "per_condition_worst": {
+          "obfuscate:entities+labels": 1.0
+        },
+        "clean_pair_disagreement": {
+          "disagreeing": 0,
+          "pairs": 18,
+          "rate": 0.0
+        },
+        "cross_pair_disagreement": {
+          "disagreeing": 0,
+          "pairs": 18,
+          "rate": 0.0
+        },
+        "excess_disagreement": 0.0,
+        "flips_beyond_noise": [],
+        "flips_within_noise": []
+      },
+      "verdict": "6 snapshot(s), 6 renamed (entities+labels) decision(s). Unperturbed agreement (before) 100%; resample worst case 100%; worst case with renamed (entities+labels) 100%. Pairwise disagreement: 0/18 between unperturbed runs, 0/18 between a renamed (entities+labels) run and an unperturbed one. No renamed (entities+labels) run left its snapshot's reference action. With this few snapshots that is an absence of observed flips, not a bound on the flip rate",
+      "lean_score": {
+        "snapshots": 6,
+        "before": 0.9444,
+        "resample_worst": 0.8333,
+        "worst": 0.8333,
+        "per_condition_worst": {
+          "obfuscate:entities+labels": 0.8333
+        },
+        "clean_pair_disagreement": {
+          "disagreeing": 2,
+          "pairs": 18,
+          "rate": 0.1111
+        },
+        "cross_pair_disagreement": {
+          "disagreeing": 2,
+          "pairs": 18,
+          "rate": 0.1111
+        },
+        "excess_disagreement": 0.0,
+        "flips_beyond_noise": [],
+        "flips_within_noise": [
+          "METAUSDT-20260925T135626Z/obfuscate:entities+labels: up -> down"
+        ]
+      },
+      "lean_verdict": "Lean level. 6 snapshot(s), 6 renamed (entities+labels) decision(s). Unperturbed agreement (before) 94%; resample worst case 83%; worst case with renamed (entities+labels) 83%. Pairwise disagreement: 2/18 between unperturbed runs, 2/18 between a renamed (entities+labels) run and an unperturbed one. Every flip landed on a snapshot whose unperturbed runs already disagreed, so none is attributable to renamed (entities+labels) beyond sampling noise"
+    }
+  },
+  "numbers_fixed": true,
+  "mappings": {
+    "entities:NVDAUSDT-20260925T135626Z": {
+      "renamed_symbol": "PRAXJUUSDT",
+      "replacements": 31,
+      "mapping": {
+        "NVDAUSDT": "PRAXJUUSDT",
+        "NVDA": "PRAXJU",
+        "NVIDIA Corporation": "Ostravel",
+        "NVIDIA CORPORATION": "OSTRAVEL",
+        "Nvidia Corporation": "Ostravel",
+        "NVIDIA": "Drumbrel",
+        "Nvidia": "Drumbrel"
+      }
+    },
+    "entities:TSLAUSDT-20260925T135626Z": {
+      "renamed_symbol": "SKOVREUSDT",
+      "replacements": 33,
+      "mapping": {
+        "TSLAUSDT": "SKOVREUSDT",
+        "TSLA": "SKOVRE",
+        "Tesla, Inc.": "Sulvenix",
+        "TESLA, INC.": "SULVENIX",
+        "Tesla": "Drumbrel",
+        "TESLA": "DRUMBREL"
+      }
+    },
+    "entities:METAUSDT-20260925T135626Z": {
+      "renamed_symbol": "ZORBLQUSDT",
+      "replacements": 32,
+      "mapping": {
+        "METAUSDT": "ZORBLQUSDT",
+        "META": "ZORBLQ",
+        "Meta Platforms, Inc.": "Ostravel",
+        "META PLATFORMS, INC.": "OSTRAVEL",
+        "Meta Platforms": "Ilmendo",
+        "META PLATFORMS": "ILMENDO",
+        "Meta": "Umbrisk",
+        "Facebook": "Zelkovi",
+        "FACEBOOK": "ZELKOVI"
+      }
+    },
+    "entities:COINUSDT-20260925T135626Z": {
+      "renamed_symbol": "BRUXQEUSDT",
+      "replacements": 34,
+      "mapping": {
+        "COINUSDT": "BRUXQEUSDT",
+        "COIN": "BRUXQE",
+        "Coinbase Global, Inc.": "Brathun",
+        "COINBASE GLOBAL, INC.": "BRATHUN",
+        "Coinbase": "Sulvenix",
+        "COINBASE": "SULVENIX"
+      }
+    },
+    "entities:MSTRUSDT-20260925T135626Z": {
+      "renamed_symbol": "PRAXJUUSDT",
+      "replacements": 33,
+      "mapping": {
+        "MSTRUSDT": "PRAXJUUSDT",
+        "MSTR": "PRAXJU",
+        "Strategy Inc. (formerly MicroStrategy)": "Ostravel",
+        "STRATEGY INC. (FORMERLY MICROSTRATEGY)": "OSTRAVEL",
+        "Strategy Inc. (Formerly Microstrategy)": "Ostravel",
+        "MicroStrategy": "Grovanth",
+        "MICROSTRATEGY": "GROVANTH",
+        "Microstrategy": "Grovanth",
+        "Strategy Inc": "Tessimar",
+        "STRATEGY INC": "TESSIMAR"
+      }
+    },
+    "entities:QQQUSDT-20260925T135626Z": {
+      "renamed_symbol": "YOVELZUSDT",
+      "replacements": 11,
+      "mapping": {
+        "QQQUSDT": "YOVELZUSDT",
+        "QQQ": "YOVELZ",
+        "Invesco QQQ Trust": "Veltrano",
+        "INVESCO QQQ TRUST": "VELTRANO",
+        "Invesco Qqq Trust": "Veltrano",
+        "Invesco": "Fazzoric",
+        "INVESCO": "FAZZORIC"
+      }
+    },
+    "entities+labels:NVDAUSDT-20260925T135626Z": {
+      "renamed_symbol": "PRAXJUUSDT",
+      "replacements": 41,
+      "mapping": {
+        "NVDAUSDT": "PRAXJUUSDT",
+        "NVDA": "PRAXJU",
+        "NVIDIA Corporation": "Ostravel",
+        "NVIDIA CORPORATION": "OSTRAVEL",
+        "Nvidia Corporation": "Ostravel",
+        "NVIDIA": "Drumbrel",
+        "Nvidia": "Drumbrel",
+        "Fear & Greed": "Snorvit",
+        "Fear and Greed": "Fromby",
+        "8-K/A": "Brumix",
+        "8-K": "Mubbin",
+        "10-Q/A": "Varrow",
+        "10-Q": "Kradle",
+        "10-K/A": "Tolvash",
+        "10-K": "Zindle",
+        "Form 4": "Hesk",
+        "13F": "Pellox",
+        "VIX": "Joskel",
+        "CBOE": "Plenth",
+        "FINRA": "Drovil",
+        "Treasury": "Crindle",
+        "Nasdaq": "Quenby",
+        "EDGAR": "Wuzzock",
+        "SEC": "Nerith"
+      }
+    },
+    "entities+labels:TSLAUSDT-20260925T135626Z": {
+      "renamed_symbol": "SKOVREUSDT",
+      "replacements": 43,
+      "mapping": {
+        "TSLAUSDT": "SKOVREUSDT",
+        "TSLA": "SKOVRE",
+        "Tesla, Inc.": "Sulvenix",
+        "TESLA, INC.": "SULVENIX",
+        "Tesla": "Drumbrel",
+        "TESLA": "DRUMBREL",
+        "Fear & Greed": "Glimmet",
+        "Fear and Greed": "Mubbin",
+        "8-K/A": "Quenby",
+        "8-K": "Snorvit",
+        "10-Q/A": "Joskel",
+        "10-Q": "Talvex",
+        "10-K/A": "Brumix",
+        "10-K": "Nerith",
+        "Form 4": "Tolvash",
+        "13F": "Varrow",
+        "VIX": "Kradle",
+        "CBOE": "Fromby",
+        "FINRA": "Pellox",
+        "Treasury": "Wuzzock",
+        "Nasdaq": "Drovil",
+        "EDGAR": "Crindle",
+        "SEC": "Plenth"
+      }
+    },
+    "entities+labels:METAUSDT-20260925T135626Z": {
+      "renamed_symbol": "ZORBLQUSDT",
+      "replacements": 42,
+      "mapping": {
+        "METAUSDT": "ZORBLQUSDT",
+        "META": "ZORBLQ",
+        "Meta Platforms, Inc.": "Ostravel",
+        "META PLATFORMS, INC.": "OSTRAVEL",
+        "Meta Platforms": "Ilmendo",
+        "META PLATFORMS": "ILMENDO",
+        "Meta": "Umbrisk",
+        "Facebook": "Zelkovi",
+        "FACEBOOK": "ZELKOVI",
+        "Fear & Greed": "Fromby",
+        "Fear and Greed": "Mubbin",
+        "8-K/A": "Plenth",
+        "8-K": "Frandle",
+        "10-Q/A": "Varrow",
+        "10-Q": "Wuzzock",
+        "10-K/A": "Pellox",
+        "10-K": "Tolvash",
+        "Form 4": "Hesk",
+        "13F": "Zindle",
+        "VIX": "Brumix",
+        "CBOE": "Glimmet",
+        "FINRA": "Talvex",
+        "Treasury": "Crindle",
+        "Nasdaq": "Kradle",
+        "EDGAR": "Quenby",
+        "SEC": "Drovil"
+      }
+    },
+    "entities+labels:COINUSDT-20260925T135626Z": {
+      "renamed_symbol": "BRUXQEUSDT",
+      "replacements": 44,
+      "mapping": {
+        "COINUSDT": "BRUXQEUSDT",
+        "COIN": "BRUXQE",
+        "Coinbase Global, Inc.": "Brathun",
+        "COINBASE GLOBAL, INC.": "BRATHUN",
+        "Coinbase": "Sulvenix",
+        "COINBASE": "SULVENIX",
+        "Fear & Greed": "Frandle",
+        "Fear and Greed": "Nerith",
+        "8-K/A": "Brumix",
+        "8-K": "Mubbin",
+        "10-Q/A": "Zindle",
+        "10-Q": "Varrow",
+        "10-K/A": "Tolvash",
+        "10-K": "Hesk",
+        "Form 4": "Wuzzock",
+        "13F": "Pellox",
+        "VIX": "Talvex",
+        "CBOE": "Plenth",
+        "FINRA": "Quenby",
+        "Treasury": "Drovil",
+        "Nasdaq": "Fromby",
+        "EDGAR": "Snorvit",
+        "SEC": "Kradle"
+      }
+    },
+    "entities+labels:MSTRUSDT-20260925T135626Z": {
+      "renamed_symbol": "PRAXJUUSDT",
+      "replacements": 46,
+      "mapping": {
+        "MSTRUSDT": "PRAXJUUSDT",
+        "MSTR": "PRAXJU",
+        "Strategy Inc. (formerly MicroStrategy)": "Ostravel",
+        "STRATEGY INC. (FORMERLY MICROSTRATEGY)": "OSTRAVEL",
+        "Strategy Inc. (Formerly Microstrategy)": "Ostravel",
+        "MicroStrategy": "Grovanth",
+        "MICROSTRATEGY": "GROVANTH",
+        "Microstrategy": "Grovanth",
+        "Strategy Inc": "Tessimar",
+        "STRATEGY INC": "TESSIMAR",
+        "Fear & Greed": "Quenby",
+        "Fear and Greed": "Zindle",
+        "8-K/A": "Wuzzock",
+        "8-K": "Joskel",
+        "10-Q/A": "Crindle",
+        "10-Q": "Fromby",
+        "10-K/A": "Glimmet",
+        "10-K": "Brumix",
+        "Form 4": "Plenth",
+        "13F": "Tolvash",
+        "VIX": "Kradle",
+        "CBOE": "Snorvit",
+        "FINRA": "Varrow",
+        "Treasury": "Mubbin",
+        "Nasdaq": "Nerith",
+        "EDGAR": "Frandle",
+        "SEC": "Hesk"
+      }
+    },
+    "entities+labels:QQQUSDT-20260925T135626Z": {
+      "renamed_symbol": "YOVELZUSDT",
+      "replacements": 21,
+      "mapping": {
+        "QQQUSDT": "YOVELZUSDT",
+        "QQQ": "YOVELZ",
+        "Invesco QQQ Trust": "Veltrano",
+        "INVESCO QQQ TRUST": "VELTRANO",
+        "Invesco Qqq Trust": "Veltrano",
+        "Invesco": "Fazzoric",
+        "INVESCO": "FAZZORIC",
+        "Fear & Greed": "Quenby",
+        "Fear and Greed": "Joskel",
+        "8-K/A": "Pellox",
+        "8-K": "Varrow",
+        "10-Q/A": "Glimmet",
+        "10-Q": "Crindle",
+        "10-K/A": "Plenth",
+        "10-K": "Wuzzock",
+        "Form 4": "Kradle",
+        "13F": "Talvex",
+        "VIX": "Frandle",
+        "CBOE": "Tolvash",
+        "FINRA": "Snorvit",
+        "Treasury": "Mubbin",
+        "Nasdaq": "Brumix",
+        "EDGAR": "Fromby",
+        "SEC": "Hesk"
+      }
+    }
+  },
+  "not_run": [],
+  "qwen_requests": 12,
+  "cells": [
+    {
+      "snapshot_id": "NVDAUSDT-20260925T135626Z",
+      "condition": "obfuscate:entities",
+      "edits": 31,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.55,
+        "thesis": "PRAXJU shows strong fundamentals (revenue +17.9% QoQ, SUE +2.84\u03c3, 35/36 analysts revising up) and the macro backdrop is supportive (VIX at 33rd percentile, positive US-China trade optics), but the token is up only 1.38% in 24h with no identifiable near-term catalyst that hasn't already been priced into the current level. The 14.27 bps hurdle requires a directional edge beyond what consensus already reflects, and the evidence here is confirmatory rather than predictive. Under a general mandate with no specific risk budget or holding-period constraint, the asymmetry between what's already known and what could move the price next is insufficient to justify entry.",
+        "reasoning": "PRAXJU shows strong fundamentals (revenue +17.9% QoQ, SUE +2.84\u03c3, 35/36 analysts revising up) and the macro backdrop is supportive (VIX at 33rd percentile, positive US-China trade optics), but the token is up only 1.38% in 24h with no identifiable near-term catalyst that hasn't already been priced into the current level. The 14.27 bps hurdle requires a directional edge beyond what consensus already reflects, and the evidence here is confirmatory rather than predictive. Under a general mandate with no specific risk budget or holding-period constraint, the asymmetry between what's already known and what could move the price next is insufficient to justify entry. Counter-case: The strongest argument against standing aside is that the SUE of +2.84\u03c3 combined with 35/36 upward revisions suggests the market is still underpricing earnings momentum; post-earnings drift literature would argue the move hasn't fully played out, and the US-China dinner headline could provide a fresh leg if chip-related trade restrictions ease. The token's 24h move of only 1.38% may represent an early-stage repricing rather than a completed one.",
+        "invalidation": [
+          "A sudden spike in short interest above 40% of daily volume would signal institutional distribution and invalidate the constructive setup",
+          "If the 10y-2y spread compresses below +15bps within the next week, the rate environment is shifting hawkish and growth multiples face pressure",
+          "If VIX breaks above 20 intraday, the low-vol regime assumption collapses and the risk/reward deteriorates"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "TSLAUSDT-20260925T135626Z",
+      "condition": "obfuscate:entities",
+      "edits": 33,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.45,
+        "thesis": "Under a general mandate, SKOVRE shows strong fundamental momentum (revenue +26% QoQ, net income +133% QoQ, EPS +146% QoQ, SUE +0.83) but the consensus revision picture is decisively negative (4 up / 15 down for current quarter, 3 up / 16 down for next quarter), suggesting the market has already priced in the beat and is now marking down future expectations. With only 5 days to the quarter end and no clear catalyst to bridge the gap between strong trailing results and deteriorating forward estimates, the edge does not clear the 14.27 bps hurdle.",
+        "reasoning": "Under a general mandate, SKOVRE shows strong fundamental momentum (revenue +26% QoQ, net income +133% QoQ, EPS +146% QoQ, SUE +0.83) but the consensus revision picture is decisively negative (4 up / 15 down for current quarter, 3 up / 16 down for next quarter), suggesting the market has already priced in the beat and is now marking down future expectations. With only 5 days to the quarter end and no clear catalyst to bridge the gap between strong trailing results and deteriorating forward estimates, the edge does not clear the 14.27 bps hurdle. Counter-case: The strongest argument against standing aside is that the trailing fundamental momentum is exceptional \u2014 revenue growing 26% QoQ with net income more than doubling \u2014 and the SUE of +0.83 suggests the market may still be underreacting to the earnings beat. If the downward revisions are merely analyst conservatism rather than genuine deterioration, the stock could re-rate higher as Q3 results approach. The 55.6% short volume could also fuel a squeeze if sentiment shifts.",
+        "invalidation": [
+          "Consensus EPS for Q3 2026 revises upward by more than 5% within the next 5 trading days, indicating the downward revision trend has reversed",
+          "Price breaks above 390 with above-average volume, suggesting the market is re-rating the stock despite negative revisions",
+          "A material positive catalyst (e.g., major contract win, guidance raise, or strategic announcement) emerges before quarter-end"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "METAUSDT-20260925T135626Z",
+      "condition": "obfuscate:entities",
+      "edits": 32,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "down",
+        "confidence": 0.35,
+        "thesis": "Under a general mandate with no specific client constraint, the evidence presents a mixed picture: a massive -40.8% QoQ earnings decline with heavily negative consensus revisions (7 up / 33 down for current quarter) argues against buying, while the token's 24h change is essentially flat (-0.009%) and the broader market context (VIX at 33rd percentile, tech stocks gaining on geopolitical optimism) is benign. The hurdle of 14.27 bps requires a clear directional edge, and none exists here \u2014 the earnings deterioration is already two months old and likely priced in, while the consensus revision momentum is too negative to support a fresh long.",
+        "reasoning": "Under a general mandate with no specific client constraint, the evidence presents a mixed picture: a massive -40.8% QoQ earnings decline with heavily negative consensus revisions (7 up / 33 down for current quarter) argues against buying, while the token's 24h change is essentially flat (-0.009%) and the broader market context (VIX at 33rd percentile, tech stocks gaining on geopolitical optimism) is benign. The hurdle of 14.27 bps requires a clear directional edge, and none exists here \u2014 the earnings deterioration is already two months old and likely priced in, while the consensus revision momentum is too negative to support a fresh long. Counter-case: The strongest argument for a trade is that the -40.8% QoQ earnings drop may have created a mean-reversion setup if the market has overreacted; the SUE of only -0.10 standard deviations suggests the miss was not extreme relative to the company's own history, and the stock/token is sitting flat rather than collapsing, which could indicate the bad news is fully absorbed and a bounce is imminent.",
+        "invalidation": [
+          "Consensus EPS revisions for the current quarter flip net positive within 5 trading days",
+          "Token price breaks below 720 (roughly -4.9%) on elevated volume, confirming the earnings miss is still being digested",
+          "VIX spikes above 20, shifting the regime from normal to stressed and invalidating any benign-market assumption"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "COINUSDT-20260925T135626Z",
+      "condition": "obfuscate:entities",
+      "edits": 34,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "down",
+        "confidence": 0.35,
+        "thesis": "Under a general mandate, BRUXQE (a tokenized equity) shows deteriorating fundamentals \u2014 revenue down 13.7% QoQ, still deeply unprofitable (EPS -$1.36), consensus estimates revised down 16/17 analysts, and 60.8% short volume \u2014 but the token is flat on the day (-0.215%) with no identifiable catalyst or mispricing that clears the 14.27 bps hurdle. The news flow is platform-level (Sulvenix/Coinbase ecosystem) rather than company-specific, and the VIX at 15.11 implies only ~95 bps of daily equity movement, making it difficult to justify a directional bet that clears costs.",
+        "reasoning": "Under a general mandate, BRUXQE (a tokenized equity) shows deteriorating fundamentals \u2014 revenue down 13.7% QoQ, still deeply unprofitable (EPS -$1.36), consensus estimates revised down 16/17 analysts, and 60.8% short volume \u2014 but the token is flat on the day (-0.215%) with no identifiable catalyst or mispricing that clears the 14.27 bps hurdle. The news flow is platform-level (Sulvenix/Coinbase ecosystem) rather than company-specific, and the VIX at 15.11 implies only ~95 bps of daily equity movement, making it difficult to justify a directional bet that clears costs. Counter-case: The 60.8% short interest and unanimous downward revisions could set up a short squeeze if any positive catalyst emerges, and the token's flat price action may be masking accumulation. However, without a specific trigger, this is speculation rather than a tradeable edge.",
+        "invalidation": [
+          "A material positive catalyst (e.g., guidance raise, strategic partnership, or short squeeze) that would drive price above the 14.27 bps hurdle within the holding period",
+          "Consensus estimates reversing to net upward revisions before the next earnings report"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "MSTRUSDT-20260925T135626Z",
+      "condition": "obfuscate:entities",
+      "edits": 33,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.35,
+        "thesis": "PRAXJU is a Strategy (MSTR) preferred stock token. The news flow (daily dividend proposal, 950 BTC purchase) is mildly positive but already reflected in the -0.94% 24h move, and the 8-K filed today is opaque \u2014 its contents are unknown and could be material in either direction. Under a general mandate with no specific client constraint, the combination of an unread 8-K, mixed consensus revisions (2 up / 2 down for current quarter), and a 14.27 bps hurdle against a token that has already moved down ~1% today does not present a clear edge. The mandate shapes this as: without a specific risk appetite or horizon preference from a client, I default to requiring higher conviction before committing capital to a single-name crypto-treasury preferred with opaque pending disclosure.",
+        "reasoning": "PRAXJU is a Strategy (MSTR) preferred stock token. The news flow (daily dividend proposal, 950 BTC purchase) is mildly positive but already reflected in the -0.94% 24h move, and the 8-K filed today is opaque \u2014 its contents are unknown and could be material in either direction. Under a general mandate with no specific client constraint, the combination of an unread 8-K, mixed consensus revisions (2 up / 2 down for current quarter), and a 14.27 bps hurdle against a token that has already moved down ~1% today does not present a clear edge. The mandate shapes this as: without a specific risk appetite or horizon preference from a client, I default to requiring higher conviction before committing capital to a single-name crypto-treasury preferred with opaque pending disclosure. Counter-case: The strongest argument against standing aside is that Strategy's daily dividend proposal and continued BTC accumulation are unambiguously positive catalysts for a preferred stock whose value is tied to Strategy's creditworthiness and dividend capacity, and the 50.9% short volume suggests crowded short positioning that could fuel a squeeze if the 8-K is benign or positive.",
+        "invalidation": [
+          "If the 8-K contents are revealed to be clearly positive (e.g., dividend rate increase, new capital raise at premium), the thesis to stand aside would be wrong",
+          "If BTC rallies sharply above $84,000 in the next session, PRAXJU likely re-rates higher and the stand-aside was costly"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "QQQUSDT-20260925T135626Z",
+      "condition": "obfuscate:entities",
+      "edits": 11,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.35,
+        "thesis": "Under a general mandate with no specific alpha signal, YOVELZUSDT presents no actionable edge. The 24h change of +1.28% is modest and already occurred; the quoted spread is tight (0.13bps) but the total hurdle of 14.27bps requires a forward-looking catalyst that simply does not exist in the evidence. No EDGAR filings, no CIK, no EPS history, no analyst estimates \u2014 the fundamental data infrastructure for this name is absent. The macro backdrop (rising yields, VIX at 33rd percentile, Fear & Greed at 71) is mildly constructive for risk but not specific to this name. The 53.8% short volume is notable but without a clear catalyst or mean-reversion setup, it is insufficient to clear the hurdle.",
+        "reasoning": "Under a general mandate with no specific alpha signal, YOVELZUSDT presents no actionable edge. The 24h change of +1.28% is modest and already occurred; the quoted spread is tight (0.13bps) but the total hurdle of 14.27bps requires a forward-looking catalyst that simply does not exist in the evidence. No EDGAR filings, no CIK, no EPS history, no analyst estimates \u2014 the fundamental data infrastructure for this name is absent. The macro backdrop (rising yields, VIX at 33rd percentile, Fear & Greed at 71) is mildly constructive for risk but not specific to this name. The 53.8% short volume is notable but without a clear catalyst or mean-reversion setup, it is insufficient to clear the hurdle. Counter-case: The 53.8% short interest combined with a positive 24h move and a broadly risk-on tape (Dow rising on peace hopes, futures up, VIX falling) could suggest a short-squeeze dynamic that might push the token higher intraday. However, without knowing the float, borrow cost, or any specific catalyst for this name, this remains speculative and unlikely to reliably exceed 14.27bps net of costs.",
+        "invalidation": []
+      }
+    },
+    {
+      "snapshot_id": "NVDAUSDT-20260925T135626Z",
+      "condition": "obfuscate:entities+labels",
+      "edits": 41,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.45,
+        "thesis": "PRAXJU shows strong fundamentals (revenue +17.9% QoQ, SUE +2.84\u03c3, consensus revisions 35:1 up for current quarter) and a supportive macro backdrop (VIX 15.11, positive US-China trade sentiment), but the token is up only 1.38% in 24h with no identifiable near-term catalyst that would generate an edge exceeding the 14.27 bps hurdle. The general mandate favors capital preservation when the edge is ambiguous rather than chasing a well-known, already-priced quality story.",
+        "reasoning": "PRAXJU shows strong fundamentals (revenue +17.9% QoQ, SUE +2.84\u03c3, consensus revisions 35:1 up for current quarter) and a supportive macro backdrop (VIX 15.11, positive US-China trade sentiment), but the token is up only 1.38% in 24h with no identifiable near-term catalyst that would generate an edge exceeding the 14.27 bps hurdle. The general mandate favors capital preservation when the edge is ambiguous rather than chasing a well-known, already-priced quality story. Counter-case: The strongest argument against NO_TRADE is that the SUE of +2.84\u03c3 combined with 35:1 upward revisions is a historically powerful post-earnings drift signal, and the token may still be underpricing the fundamental improvement. The US-China dinner headlines and easing oil prices provide a tailwind that could push the token higher before the next earnings report, and waiting means missing the drift.",
+        "invalidation": [
+          "A specific, checkable observation that would prove this wrong: if the token breaks above its intraday high on volume exceeding 80,000 units (33% above current 24h base volume), indicating a momentum breakout not yet priced in",
+          "If consensus EPS for the current quarter is revised upward by more than 5% within the next 48 hours, suggesting the market has not fully absorbed the earnings trajectory"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "TSLAUSDT-20260925T135626Z",
+      "condition": "obfuscate:entities+labels",
+      "edits": 43,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.45,
+        "thesis": "Under a general mandate, SKOVRE shows strong fundamental momentum (revenue +26% QoQ, net income +133% QoQ, EPS +146% QoQ) but consensus revisions are decisively negative (4 up / 15 down for current quarter, 3 up / 16 down for next quarter), creating a tension between backward-looking strength and forward-looking deterioration. The 24h price change is essentially flat (-0.65%), short interest is elevated at 55.6%, and no catalyst is identifiable that would move the stock more than the 14.27 bps hurdle in a specific direction today. The general mandate requires a clear edge over costs; the mixed signal does not provide one.",
+        "reasoning": "Under a general mandate, SKOVRE shows strong fundamental momentum (revenue +26% QoQ, net income +133% QoQ, EPS +146% QoQ) but consensus revisions are decisively negative (4 up / 15 down for current quarter, 3 up / 16 down for next quarter), creating a tension between backward-looking strength and forward-looking deterioration. The 24h price change is essentially flat (-0.65%), short interest is elevated at 55.6%, and no catalyst is identifiable that would move the stock more than the 14.27 bps hurdle in a specific direction today. The general mandate requires a clear edge over costs; the mixed signal does not provide one. Counter-case: The strongest argument against NO_TRADE is that the fundamental trajectory is exceptionally strong (revenue acceleration, EPS more than doubling QoQ, SUE +0.83), and the market may be underpricing the earnings momentum heading into the quarter-end on Sept 30. Consensus revisions can lag actual results, and the stock could surprise to the upside at the upcoming earnings report.",
+        "invalidation": [
+          "If consensus revisions reverse to net positive within 5 trading days, the forward-looking concern would be invalidated",
+          "If short interest drops below 45% on rising volume, the bearish positioning thesis weakens",
+          "If the stock breaks above 380 with volume > 100k, momentum may be resuming"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "METAUSDT-20260925T135626Z",
+      "condition": "obfuscate:entities+labels",
+      "edits": 42,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "down",
+        "confidence": 0.35,
+        "thesis": "Under a general mandate with no specific risk appetite or horizon constraint, the evidence presents a mixed picture: ZORBLQ's last quarter showed a sharp 40.8% QoQ earnings decline with negative SUE, and consensus revisions are heavily negative (7 up / 33 down for current quarter). However, the stock is flat today (-0.009%), VIX is in normal regime, and there is no clear directional catalyst that would generate an edge exceeding the 14.27 bps hurdle. The news flow is broadly positive for tech/AI but not specific enough to this name to overcome the deteriorating fundamentals. No edge clears the cost.",
+        "reasoning": "Under a general mandate with no specific risk appetite or horizon constraint, the evidence presents a mixed picture: ZORBLQ's last quarter showed a sharp 40.8% QoQ earnings decline with negative SUE, and consensus revisions are heavily negative (7 up / 33 down for current quarter). However, the stock is flat today (-0.009%), VIX is in normal regime, and there is no clear directional catalyst that would generate an edge exceeding the 14.27 bps hurdle. The news flow is broadly positive for tech/AI but not specific enough to this name to overcome the deteriorating fundamentals. No edge clears the cost. Counter-case: The 59.7% short volume is notably elevated and could signal either continued downside pressure or a setup for a violent squeeze if any positive catalyst emerges \u2014 either direction could produce a move exceeding the hurdle, but the direction is ambiguous and the timing unknowable from this data alone.",
+        "invalidation": [
+          "A specific catalyst (earnings beat, major contract, regulatory action) emerges that would move the stock more than 14.27 bps in a direction within the next session",
+          "Short interest at 59.7% triggers a squeeze if any positive catalyst appears, which would invalidate a short thesis"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "COINUSDT-20260925T135626Z",
+      "condition": "obfuscate:entities+labels",
+      "edits": 44,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "down",
+        "confidence": 0.35,
+        "thesis": "Under a general mandate, BRUXQE presents a mixed fundamental picture: revenue declining QoQ (-13.7%), still unprofitable (EPS -1.36), but improving sequentially (net income +8.8% QoQ, EPS +8.7% QoQ). Consensus is heavily negative (16 down / 0 up revisions), short interest is elevated at 60.8%, and the SUE is mildly negative (-0.64 SD). The 24h price change is essentially flat (-0.215%), and there is no identifiable catalyst or edge that clears the 14.27 bps hurdle. The token trades on a crypto venue with Greed sentiment, but that is a venue-level signal, not a stock-specific one. No trade clears the cost threshold.",
+        "reasoning": "Under a general mandate, BRUXQE presents a mixed fundamental picture: revenue declining QoQ (-13.7%), still unprofitable (EPS -1.36), but improving sequentially (net income +8.8% QoQ, EPS +8.7% QoQ). Consensus is heavily negative (16 down / 0 up revisions), short interest is elevated at 60.8%, and the SUE is mildly negative (-0.64 SD). The 24h price change is essentially flat (-0.215%), and there is no identifiable catalyst or edge that clears the 14.27 bps hurdle. The token trades on a crypto venue with Greed sentiment, but that is a venue-level signal, not a stock-specific one. No trade clears the cost threshold. Counter-case: The heavy short interest (60.8%) combined with improving sequential fundamentals could set up a short squeeze if any positive catalyst emerges, and the crypto venue's Greed regime might provide tailwind. However, no such catalyst is present today, and the consensus revision pattern (16 down, 0 up) argues against near-term upside surprise.",
+        "invalidation": []
+      }
+    },
+    {
+      "snapshot_id": "MSTRUSDT-20260925T135626Z",
+      "condition": "obfuscate:entities+labels",
+      "edits": 46,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.35,
+        "thesis": "PRAXJU is a Strategy (MSTR) preferred stock token. The company is deeply unprofitable (net income -8.22B last quarter, EPS -24.45), but the consensus for the current quarter has flipped to positive EPS of 16.39, suggesting a potential inflection (likely driven by Bitcoin mark-to-market gains given Strategy's BTC accumulation). However, the 24h move is -0.94%, short interest is elevated at 50.9%, and the two opaque 8-K filings (one today, one four days ago) are unreadable \u2014 they could contain anything from positive to negative material information. With a general mandate and no prior position, the combination of unreadable filings, high short interest, and a token that is essentially a leveraged Bitcoin proxy in a 'Greed' regime (71/100) does not present an edge that clears the 14.27 bps hurdle. The mandate shapes this as a pass: without a specific mandate to express a Bitcoin view or a preferred-stock carry trade, the risk/reward is not asymmetric enough.",
+        "reasoning": "PRAXJU is a Strategy (MSTR) preferred stock token. The company is deeply unprofitable (net income -8.22B last quarter, EPS -24.45), but the consensus for the current quarter has flipped to positive EPS of 16.39, suggesting a potential inflection (likely driven by Bitcoin mark-to-market gains given Strategy's BTC accumulation). However, the 24h move is -0.94%, short interest is elevated at 50.9%, and the two opaque 8-K filings (one today, one four days ago) are unreadable \u2014 they could contain anything from positive to negative material information. With a general mandate and no prior position, the combination of unreadable filings, high short interest, and a token that is essentially a leveraged Bitcoin proxy in a 'Greed' regime (71/100) does not present an edge that clears the 14.27 bps hurdle. The mandate shapes this as a pass: without a specific mandate to express a Bitcoin view or a preferred-stock carry trade, the risk/reward is not asymmetric enough. Counter-case: The strongest argument against standing aside is that consensus EPS has swung from deeply negative to +16.39 for the current quarter, and if Bitcoin continues rising (it was bought at $79,670 and is now ~$84,000), Strategy's mark-to-market gains could drive a significant beat. The stock is a leveraged Bitcoin proxy and the crypto Fear & Greed at 71 suggests momentum could persist. A buyer here would be positioning for an earnings surprise in 5 days.",
+        "invalidation": [
+          "If the opaque 8-K filings are read and contain clearly positive material information (e.g., a new capital raise, a dividend declaration, or a strategic event), the thesis for standing aside weakens",
+          "If Bitcoin breaks above $85,000 with momentum and PRAXJU trades up more than 2% intraday, the consensus EPS inflection may be underpriced",
+          "If short interest drops below 40% while price holds, the squeeze setup becomes more attractive"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "QQQUSDT-20260925T135626Z",
+      "condition": "obfuscate:entities+labels",
+      "edits": 21,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.35,
+        "thesis": "General mandate: no prior position, no symbol-specific catalyst, and no debate held. The token tracks YOVELZ with a 24h move of +1.28% and a quoted spread of only 0.13 bps, but there is no identifiable edge that clears the 14.27 bps total hurdle. The macro backdrop (VIX at 15.11, 33rd percentile \u2014 normal regime; crypto greed at 71; UST curve positively sloped) is mildly risk-on but provides no differentiated signal for this specific name. Short interest at 53.8% is elevated but not extreme enough to constitute a squeeze thesis without a catalyst. No EDGAR filings, no earnings data, no analyst estimates \u2014 the information set is too thin to construct a thesis with conviction.",
+        "reasoning": "General mandate: no prior position, no symbol-specific catalyst, and no debate held. The token tracks YOVELZ with a 24h move of +1.28% and a quoted spread of only 0.13 bps, but there is no identifiable edge that clears the 14.27 bps total hurdle. The macro backdrop (VIX at 15.11, 33rd percentile \u2014 normal regime; crypto greed at 71; UST curve positively sloped) is mildly risk-on but provides no differentiated signal for this specific name. Short interest at 53.8% is elevated but not extreme enough to constitute a squeeze thesis without a catalyst. No EDGAR filings, no earnings data, no analyst estimates \u2014 the information set is too thin to construct a thesis with conviction. Counter-case: The 53.8% short interest combined with a mildly risk-on macro environment and positive 24h momentum could argue for a small long position, but without a catalyst or fundamental data to anchor the thesis, this is momentum-chasing at a cost that likely exceeds the expected edge.",
+        "invalidation": [
+          "A specific, identifiable catalyst (e.g., earnings beat, contract win, regulatory approval) emerges that would justify a directional move exceeding 14.27 bps",
+          "Short interest rises above 60% with a concurrent positive news event, creating a credible squeeze setup"
+        ]
+      }
+    }
+  ]
+}

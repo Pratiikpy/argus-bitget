@@ -1,0 +1,186 @@
+{
+  "fetched": "2026-09-25",
+  "source": "SEC EDGAR",
+  "documents": [
+    {
+      "doc_id": "NVDA-8-K-0001045810-26-000078",
+      "ticker": "NVDA",
+      "form": "8-K",
+      "filed": "2026-09-03",
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000078/nvda-20260902.htm",
+      "title": "NVDA 8-K (items 8.01)",
+      "sha256": "1fce06f6a041ae821a948fe7dbc2de8283749820825949f133a58b9671504080",
+      "chars": 8021
+    },
+    {
+      "doc_id": "NVDA-10-Q-0001045810-26-000075",
+      "ticker": "NVDA",
+      "form": "10-Q",
+      "filed": "2026-08-26",
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm",
+      "title": "NVDA 10-Q",
+      "sha256": "c97b61e7a943584b06e715eeb3b8e0ad4c384e3a1bd822ff9f3508b5622214bf",
+      "chars": 151651
+    },
+    {
+      "doc_id": "NVDA-10-K-0001045810-26-000021",
+      "ticker": "NVDA",
+      "form": "10-K",
+      "filed": "2026-02-25",
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
+      "title": "NVDA 10-K",
+      "sha256": "da8f07b2019cbe464fcaa99c62798694e78dca23210e19eb4f8b02fd4c813bba",
+      "chars": 343766
+    },
+    {
+      "doc_id": "AAPL-10-Q-0000320193-26-000020",
+      "ticker": "AAPL",
+      "form": "10-Q",
+      "filed": "2026-07-31",
+      "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000020/aapl-20260627.htm",
+      "title": "AAPL 10-Q",
+      "sha256": "08337c0c19cccda065964f5f3f9ccac547b62156d46f7d747ff1a9008f4552af",
+      "chars": 85496
+    },
+    {
+      "doc_id": "AAPL-8-K-0000320193-26-000018",
+      "ticker": "AAPL",
+      "form": "8-K",
+      "filed": "2026-07-30",
+      "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000018/aapl-20260730.htm",
+      "title": "AAPL 8-K (items 2.02,9.01)",
+      "sha256": "d2ed052ab77de869b0a3da950160722acfe861ba58ee2b9709540d9ff923862a",
+      "chars": 3515
+    },
+    {
+      "doc_id": "AAPL-8-K-0000320193-26-000018-ex99",
+      "ticker": "AAPL",
+      "form": "EX-99.1",
+      "filed": "2026-07-30",
+      "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000018/a8-kex991q3202606272026.htm",
+      "title": "AAPL 8-K exhibit 99.1",
+      "sha256": "35137f75240447788563cab85f62b51e5148c8e15a0b60b472a82d2908456645",
+      "chars": 10925
+    },
+    {
+      "doc_id": "AAPL-10-K-0000320193-25-000079",
+      "ticker": "AAPL",
+      "form": "10-K",
+      "filed": "2025-10-31",
+      "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm",
+      "title": "AAPL 10-K",
+      "sha256": "ab70b922d4619adfe592092f5a3c66e86d5be3bcbf7a0f27a53d53e1ce4a5cd4",
+      "chars": 210011
+    },
+    {
+      "doc_id": "MSFT-8-K-0001193125-26-380280",
+      "ticker": "MSFT",
+      "form": "8-K",
+      "filed": "2026-09-02",
+      "url": "https://www.sec.gov/Archives/edgar/data/789019/000119312526380280/d291965d8k.htm",
+      "title": "MSFT 8-K (items 7.01,9.01)",
+      "sha256": "895b963e6a1703acbf93f5cbed9897279a1f771ffe58be63f3e3f37c09b7557d",
+      "chars": 3813
+    },
+    {
+      "doc_id": "MSFT-8-K-0001193125-26-380280-ex99",
+      "ticker": "MSFT",
+      "form": "EX-99.1",
+      "filed": "2026-09-02",
+      "url": "https://www.sec.gov/Archives/edgar/data/789019/000119312526380280/d291965dex991.htm",
+      "title": "MSFT 8-K exhibit 99.1",
+      "sha256": "547cf1f52578de693af042804b13a47ac9e7e8efcdbce903fa8ff4fcdee35bf6",
+      "chars": 24952
+    },
+    {
+      "doc_id": "MSFT-10-K-0001193125-26-323660",
+      "ticker": "MSFT",
+      "form": "10-K",
+      "filed": "2026-07-29",
+      "url": "https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm",
+      "title": "MSFT 10-K",
+      "sha256": "39f2e0f68a8c1ffb2ac37ca1584900e8d525d15f19373139a04ba08b0922b162",
+      "chars": 321636
+    },
+    {
+      "doc_id": "MSFT-10-Q-0001193125-26-191507",
+      "ticker": "MSFT",
+      "form": "10-Q",
+      "filed": "2026-04-29",
+      "url": "https://www.sec.gov/Archives/edgar/data/789019/000119312526191507/msft-20260331.htm",
+      "title": "MSFT 10-Q",
+      "sha256": "e1c3ce49c6c5c49733755a0ca432d244159ea4c7ab5fc966ee40627edaaefcd5",
+      "chars": 203734
+    },
+    {
+      "doc_id": "TSLA-10-Q-0001628280-26-049270",
+      "ticker": "TSLA",
+      "form": "10-Q",
+      "filed": "2026-07-23",
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026049270/tsla-20260630.htm",
+      "title": "TSLA 10-Q",
+      "sha256": "185098dc0aa1b5407b9601b1fc706f2ae4db6f65944e0c469cd3181974ff7167",
+      "chars": 128455
+    },
+    {
+      "doc_id": "TSLA-8-K-0001628280-26-049213",
+      "ticker": "TSLA",
+      "form": "8-K",
+      "filed": "2026-07-22",
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026049213/tsla-20260722.htm",
+      "title": "TSLA 8-K (items 2.02,9.01)",
+      "sha256": "2963dca2b44dbbdf2b6d593f71eaf27325b6ff44a4d1153071868531d051b8b8",
+      "chars": 3192
+    },
+    {
+      "doc_id": "TSLA-8-K-0001628280-26-049213-ex99",
+      "ticker": "TSLA",
+      "form": "EX-99.1",
+      "filed": "2026-07-22",
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026049213/exhibit991.htm",
+      "title": "TSLA 8-K exhibit 99.1",
+      "sha256": "d372467a2b7e34fadce8822b53db76ed37e9db234fb67867a74832b0c4595fce",
+      "chars": 41668
+    },
+    {
+      "doc_id": "TSLA-10-K-0001628280-26-003952",
+      "ticker": "TSLA",
+      "form": "10-K",
+      "filed": "2026-01-29",
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026003952/tsla-20251231.htm",
+      "title": "TSLA 10-K",
+      "sha256": "f47657d00eba996061e5a8f3341d0dd84b770a566ee7d8366098cd23a0e1fe2b",
+      "chars": 400335
+    },
+    {
+      "doc_id": "COIN-8-K-0001679788-26-000101",
+      "ticker": "COIN",
+      "form": "8-K",
+      "filed": "2026-09-02",
+      "url": "https://www.sec.gov/Archives/edgar/data/1679788/000167978826000101/coin-20260901.htm",
+      "title": "COIN 8-K (items 5.02)",
+      "sha256": "0ed1d1eab66b7e0ce8defd7ee917e8a91681e3c127327f58131ceb79353c129a",
+      "chars": 5270
+    },
+    {
+      "doc_id": "COIN-10-Q-0001679788-26-000088",
+      "ticker": "COIN",
+      "form": "10-Q",
+      "filed": "2026-07-30",
+      "url": "https://www.sec.gov/Archives/edgar/data/1679788/000167978826000088/coin-20260630.htm",
+      "title": "COIN 10-Q",
+      "sha256": "1c9d51397e410873f8127b518ea40e90ef264c6292e614446c17aa5f562b8838",
+      "chars": 141381
+    },
+    {
+      "doc_id": "COIN-10-K-0001679788-26-000015",
+      "ticker": "COIN",
+      "form": "10-K",
+      "filed": "2026-02-12",
+      "url": "https://www.sec.gov/Archives/edgar/data/1679788/000167978826000015/coin-20251231.htm",
+      "title": "COIN 10-K",
+      "sha256": "75ed504c0531ec8e479cae010eb826baabf9dce148bb49f0ab29949ad8c657f0",
+      "chars": 654984
+    }
+  ]
+}

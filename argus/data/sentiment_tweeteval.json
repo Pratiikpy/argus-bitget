@@ -1,0 +1,1030 @@
+{
+  "generated_at": "2026-09-25T20:37:25.625681+00:00",
+  "qwen_calls": 0,
+  "data": {
+    "source": "https://github.com/cardiffnlp/tweeteval at 4fbd22cd78421f05b1ecdb4fc5725bc7a7bd8f66, read in place from a local clone",
+    "licence": "none published upstream; data read in place, never copied, and no benchmark text appears in this file",
+    "files": {
+      "sentiment/mapping.txt": {
+        "git_blob_sha1": "e98272f57db16af409fee64d9efccf5116e1ec27",
+        "matches_upstream": true
+      },
+      "sentiment/test_text.txt": {
+        "git_blob_sha1": "95fe0b5fdfaba658fca9e4d85ab9e5224bc67bbe",
+        "matches_upstream": true
+      },
+      "sentiment/test_labels.txt": {
+        "git_blob_sha1": "e3cf7395a85ad38caf6b53cfdeeefd7fbf2dcc48",
+        "matches_upstream": true
+      },
+      "sentiment/val_text.txt": {
+        "git_blob_sha1": "b608664639361a9f8da99a882472af44f0330c89",
+        "matches_upstream": true
+      },
+      "sentiment/val_labels.txt": {
+        "git_blob_sha1": "fd86539deb0d094782a1efed6dd06416fac75566",
+        "matches_upstream": true
+      },
+      "hate/mapping.txt": {
+        "git_blob_sha1": "44b259c804f1e8dd9c5e25ddfe980356dc0ccffd",
+        "matches_upstream": true
+      },
+      "hate/test_text.txt": {
+        "git_blob_sha1": "a0055d380adc200e324f03da6435400245134c88",
+        "matches_upstream": true
+      },
+      "hate/test_labels.txt": {
+        "git_blob_sha1": "d9d3a798964e229839afae91d7e0f0fef17b5dad",
+        "matches_upstream": true
+      },
+      "hate/val_text.txt": {
+        "git_blob_sha1": "85d1032af60d3389604da2b6c40d0b3f3ffb22f3",
+        "matches_upstream": true
+      },
+      "hate/val_labels.txt": {
+        "git_blob_sha1": "421514e2a76742f1c45ee0a98ceeb417731e0aeb",
+        "matches_upstream": true
+      },
+      "offensive/mapping.txt": {
+        "git_blob_sha1": "1019138231fb5b942f8b360f8aa8c155f823d833",
+        "matches_upstream": true
+      },
+      "offensive/test_text.txt": {
+        "git_blob_sha1": "0c33e87ec0046f7268725382b4609cc4d308b666",
+        "matches_upstream": true
+      },
+      "offensive/test_labels.txt": {
+        "git_blob_sha1": "07a2b53e7cfa17a3c95e921e57c2dd81045a429d",
+        "matches_upstream": true
+      },
+      "offensive/val_text.txt": {
+        "git_blob_sha1": "47355787a1ef2ecc4c3bf275c12c004e0803b4c6",
+        "matches_upstream": true
+      },
+      "offensive/val_labels.txt": {
+        "git_blob_sha1": "619bc73701379cf4eaf3e526049aa5bb6a1a301a",
+        "matches_upstream": true
+      },
+      "predictions/sentiment.txt": {
+        "git_blob_sha1": "1027371e3a8386cfd176603e4279c201e5d026fa",
+        "matches_upstream": true
+      },
+      "predictions/hate.txt": {
+        "git_blob_sha1": "aa5f386c91c8bd1282bced9f2edc24b28d0f1e5d",
+        "matches_upstream": true
+      },
+      "predictions/offensive.txt": {
+        "git_blob_sha1": "e1c3330c660ce8d7291d6143031ae0420cf34bcd",
+        "matches_upstream": true
+      }
+    }
+  },
+  "sentiment": {
+    "metric": "macro-averaged recall (AvgRec), TweetEval \u00a72.2 / SemEval-2017 Task 4 \u00a74.1",
+    "why_not_accuracy": {
+      "majority_class_accuracy": 0.4833116248778899,
+      "majority_class_macro_recall": 0.3333333333333333,
+      "class_shares": {
+        "negative": 0.32334744382937153,
+        "neutral": 0.4833116248778899,
+        "positive": 0.19334093129273852
+      }
+    },
+    "test_tweets": 12284,
+    "class_counts": {
+      "negative": 3972,
+      "neutral": 5937,
+      "positive": 2375
+    },
+    "scorers": {
+      "argus_crowd_read": {
+        "macro_recall": 0.5436595017636242,
+        "macro_recall_ci95": [
+          0.5347129285887968,
+          0.5533210160138563
+        ],
+        "accuracy": 0.5082220774991859,
+        "macro_f1": 0.5064173663374562,
+        "recall_by_class": {
+          "negative": 0.47759315206445113,
+          "neutral": 0.45106956375273705,
+          "positive": 0.7023157894736842
+        },
+        "predicted_counts": {
+          "negative": 3286,
+          "neutral": 4398,
+          "positive": 4600
+        },
+        "confusion_true_by_predicted": {
+          "negative": {
+            "negative": 1897,
+            "neutral": 1158,
+            "positive": 917
+          },
+          "neutral": {
+            "negative": 1244,
+            "neutral": 2678,
+            "positive": 2015
+          },
+          "positive": {
+            "negative": 145,
+            "neutral": 562,
+            "positive": 1668
+          }
+        },
+        "withheld_by_the_abuse_screen": 656,
+        "withheld_share": 0.053402800390752195,
+        "withheld_share_by_sentiment_class": {
+          "negative": 0.12311178247734139,
+          "neutral": 0.021054404581438438,
+          "positive": 0.01768421052631579
+        },
+        "withheld_scored_as": "neutral \u2014 the pulse publishes no tone for a withheld post",
+        "tone_bias_from_the_abuse_screen": {
+          "gold_share_all_tweets": {
+            "positive": 0.19334093129273852,
+            "neutral": 0.4833116248778899,
+            "negative": 0.32334744382937153
+          },
+          "gold_share_tweets_the_screen_kept": {
+            "positive": 0.20063639490884072,
+            "neutral": 0.499828001375989,
+            "negative": 0.2995356037151703
+          },
+          "withheld_tweets_as_vader_would_have_read_them": {
+            "positive": 180,
+            "neutral": 101,
+            "negative": 375
+          },
+          "per_sweep_share_difference": {
+            "negative_screened_minus_gold": {
+              "mean": -0.04018748051370372,
+              "ci95": [
+                -0.0496477451238102,
+                -0.030416006713706725
+              ],
+              "sweeps": 205
+            },
+            "negative_screened_minus_unscreened": {
+              "mean": -0.015120834235955673,
+              "ci95": [
+                -0.01742020056476912,
+                -0.013026090124079556
+              ],
+              "sweeps": 205
+            },
+            "negative_unscreened_minus_gold": {
+              "mean": -0.025066646277748045,
+              "ci95": [
+                -0.03417590539541755,
+                -0.015487932308790168
+              ],
+              "sweeps": 205
+            },
+            "negative_weighted_minus_unweighted": {
+              "mean": 6.69372045349957e-05,
+              "ci95": [
+                0.0,
+                0.00020081161360498706
+              ],
+              "sweeps": 205
+            },
+            "positive_screened_minus_gold": {
+              "mean": 0.2019580019807825,
+              "ci95": [
+                0.19141290374282655,
+                0.21158154113028502
+              ],
+              "sweeps": 205
+            },
+            "positive_screened_minus_unscreened": {
+              "mean": 0.006083444802608895,
+              "ci95": [
+                0.004311774676556057,
+                0.007808261371831151
+              ],
+              "sweeps": 205
+            },
+            "positive_unscreened_minus_gold": {
+              "mean": 0.1958745571781737,
+              "ci95": [
+                0.18538675230012489,
+                0.20582409460458237
+              ],
+              "sweeps": 205
+            },
+            "positive_weighted_minus_unweighted": {
+              "mean": 6.024348408149596e-05,
+              "ci95": [
+                0.0,
+                0.00018073045224448788
+              ],
+              "sweeps": 205
+            }
+          },
+          "coordinated_stories_counted_once": 1
+        },
+        "unscreened_pulse_agrees_with_vader_alone": {
+          "tweets": 12284,
+          "agree": 12284
+        },
+        "what": "market/social_pulse.pulse \u2014 VADER tone per post the abuse screen keeps, the class read back from the pulse's own post_tone; a withheld post is scored neutral",
+        "before_2026_09_26": {
+          "macro_recall": 0.3333333333333333,
+          "what": "assigned no polarity"
+        },
+        "on_the_tweets_it_scored": {
+          "tweets": 11628,
+          "macro_recall": 0.5662894310262145,
+          "macro_recall_ci95": [
+            0.5564069393300496,
+            0.5754623771615961
+          ],
+          "vader_alone_on_the_same_tweets": 0.5662894310262145,
+          "class_counts": {
+            "negative": 3483,
+            "neutral": 5812,
+            "positive": 2333
+          }
+        },
+        "against_paper_baselines": {
+          "beats": [],
+          "beats_count": 0,
+          "of": 8,
+          "gap_to_best": 0.19334049823637578
+        }
+      },
+      "finbert": {
+        "macro_recall": 0.3957207681414557,
+        "macro_recall_ci95": [
+          0.38997716072095506,
+          0.4013839243637792
+        ],
+        "accuracy": 0.5214099641810486,
+        "macro_f1": 0.36170543662342536,
+        "recall_by_class": {
+          "negative": 0.2280966767371601,
+          "neutral": 0.9043287855819437,
+          "positive": 0.05473684210526316
+        },
+        "predicted_counts": {
+          "negative": 1371,
+          "neutral": 10627,
+          "positive": 286
+        },
+        "confusion_true_by_predicted": {
+          "negative": {
+            "negative": 906,
+            "neutral": 3038,
+            "positive": 28
+          },
+          "neutral": {
+            "negative": 440,
+            "neutral": 5369,
+            "positive": 128
+          },
+          "positive": {
+            "negative": 25,
+            "neutral": 2220,
+            "positive": 130
+          }
+        },
+        "model": "ProsusAI/finbert (local Hugging Face cache, offline)",
+        "model_commit": "4556d13015211d73dccd3fdd39d39232506f3e43",
+        "label_map": {
+          "negative": "negative",
+          "neutral": "neutral",
+          "positive": "positive"
+        },
+        "seconds": 601.3315029998776,
+        "ms_per_tweet": 48.95241802343516,
+        "tweets_resumed_from_an_interrupted_run": 12284,
+        "batching_label_agreement": {
+          "tweets": 100,
+          "agree": 100
+        },
+        "against_paper_baselines": {
+          "beats": [],
+          "beats_count": 0,
+          "of": 8,
+          "gap_to_best": 0.3412792318585443
+        }
+      },
+      "vader": {
+        "macro_recall": 0.5700070419266613,
+        "macro_recall_ci95": [
+          0.5611509906815614,
+          0.5795742298448032
+        ],
+        "accuracy": 0.5300390752197981,
+        "macro_f1": 0.5288245756648084,
+        "recall_by_class": {
+          "negative": 0.5594159113796576,
+          "neutral": 0.43692100387401045,
+          "positive": 0.7136842105263158
+        },
+        "predicted_counts": {
+          "negative": 3661,
+          "neutral": 3843,
+          "positive": 4780
+        },
+        "confusion_true_by_predicted": {
+          "negative": {
+            "negative": 2222,
+            "neutral": 725,
+            "positive": 1025
+          },
+          "neutral": {
+            "negative": 1283,
+            "neutral": 2594,
+            "positive": 2060
+          },
+          "positive": {
+            "negative": 156,
+            "neutral": 524,
+            "positive": 1695
+          }
+        },
+        "file": "research\\gpt_suggestions\\repos\\cjhutto~vaderSentiment\\vaderSentiment\\vaderSentiment.py",
+        "commit": "44fc044cd877310ee8278a0eadf34bcd50d41d06",
+        "read_at_commit": "44fc044cd877310ee8278a0eadf34bcd50d41d06",
+        "commit_matches_the_one_read": "true",
+        "licence": "MIT (Copyright (c) 2016 C.J. Hutto); run from the clone, not copied",
+        "thresholds": "compound >= 0.05 positive, <= -0.05 negative (README.rst:243-245)",
+        "seconds": 0.6491576000116765,
+        "ms_per_tweet": 0.05284578313348067,
+        "against_paper_baselines": {
+          "beats": [],
+          "beats_count": 0,
+          "of": 8,
+          "gap_to_best": 0.1669929580733387
+        }
+      },
+      "majority_class": {
+        "macro_recall": 0.3333333333333333,
+        "macro_recall_ci95": [
+          0.3333333333333333,
+          0.3333333333333333
+        ],
+        "accuracy": 0.4833116248778899,
+        "macro_f1": 0.217221886833873,
+        "recall_by_class": {
+          "negative": 0.0,
+          "neutral": 1.0,
+          "positive": 0.0
+        },
+        "predicted_counts": {
+          "negative": 0,
+          "neutral": 12284,
+          "positive": 0
+        },
+        "confusion_true_by_predicted": {
+          "negative": {
+            "negative": 0,
+            "neutral": 3972,
+            "positive": 0
+          },
+          "neutral": {
+            "negative": 0,
+            "neutral": 5937,
+            "positive": 0
+          },
+          "positive": {
+            "negative": 0,
+            "neutral": 2375,
+            "positive": 0
+          }
+        },
+        "against_paper_baselines": {
+          "beats": [],
+          "beats_count": 0,
+          "of": 8,
+          "gap_to_best": 0.4036666666666667
+        }
+      },
+      "tweeteval_reference": {
+        "macro_recall": 0.7285672376332831,
+        "macro_recall_ci95": [
+          0.719828544165488,
+          0.736375672430575
+        ],
+        "accuracy": 0.7232171930967112,
+        "macro_f1": 0.7231406390580212,
+        "recall_by_class": {
+          "negative": 0.7920443101711984,
+          "neutral": 0.6816574027286508,
+          "positive": 0.712
+        },
+        "predicted_counts": {
+          "negative": 4467,
+          "neutral": 5448,
+          "positive": 2369
+        },
+        "confusion_true_by_predicted": {
+          "negative": {
+            "negative": 3146,
+            "neutral": 773,
+            "positive": 53
+          },
+          "neutral": {
+            "negative": 1265,
+            "neutral": 4047,
+            "positive": 625
+          },
+          "positive": {
+            "negative": 56,
+            "neutral": 628,
+            "positive": 1691
+          }
+        },
+        "what": "RoBERTa-Retrained (RoB-RT), TweetEval's published test predictions",
+        "paper_table3": 0.726,
+        "readme": 0.728,
+        "against_paper_baselines": {
+          "beats": [
+            "BLSTM",
+            "FastText",
+            "RoBERTa-Base (RoB-Bs)",
+            "RoBERTa-Retrained (RoB-RT)",
+            "RoBERTa-Twitter (RoB-Tw)",
+            "SVM"
+          ],
+          "beats_count": 6,
+          "of": 8,
+          "gap_to_best": 0.008432762366716862
+        }
+      },
+      "argus_sentiment_analyst": {
+        "status": "not_run",
+        "reason": "agents/analysts.SentimentAnalyst answers through Qwen, and this item's Qwen budget is zero calls; no response was requested or recorded.",
+        "qwen_calls": 0,
+        "how_it_would_be_scored": "each tweet as one Evidence item; bullish -> positive, bearish -> negative, neutral and insufficient_evidence -> neutral",
+        "tweets_needed_for_a_95pct_interval_of_plus_minus": 0.03,
+        "tweets_needed": 444,
+        "derived_from": "finBERT's measured interval half-width 0.0057 on 12284 tweets, scaled by 1/sqrt(n); one Qwen call per tweet"
+      }
+    },
+    "paired_bootstrap_macro_recall": {
+      "finbert_minus_vader": {
+        "difference": -0.17428627378520561,
+        "ci95_low": -0.18525089780174125,
+        "ci95_high": -0.16429012469165372,
+        "share_of_resamples_first_not_ahead": 1.0
+      },
+      "finbert_minus_argus_crowd_read": {
+        "difference": -0.14793873362216853,
+        "ci95_low": -0.1588231322852292,
+        "ci95_high": -0.13794172012470812,
+        "share_of_resamples_first_not_ahead": 1.0
+      },
+      "rob_rt_minus_vader": {
+        "difference": 0.15856019570662183,
+        "ci95_low": 0.14783439765052853,
+        "ci95_high": 0.16911540498933642,
+        "share_of_resamples_first_not_ahead": 0.0
+      },
+      "rob_rt_minus_argus_crowd_read": {
+        "difference": 0.18490773586965892,
+        "ci95_low": 0.17435161868898585,
+        "ci95_high": 0.19554981120179127,
+        "share_of_resamples_first_not_ahead": 0.0
+      },
+      "argus_crowd_read_minus_vader": {
+        "difference": -0.026347540163037086,
+        "ci95_low": -0.02953775876522624,
+        "ci95_high": -0.023124961634163665,
+        "share_of_resamples_first_not_ahead": 1.0
+      },
+      "argus_crowd_read_minus_finbert": {
+        "difference": 0.14793873362216853,
+        "ci95_low": 0.13794172012470812,
+        "ci95_high": 0.1588231322852292,
+        "share_of_resamples_first_not_ahead": 0.0
+      }
+    },
+    "paper_baselines_macro_recall": {
+      "SVM": 0.629,
+      "FastText": 0.629,
+      "BLSTM": 0.583,
+      "RoBERTa-Base (RoB-Bs)": 0.713,
+      "RoBERTa-Retrained (RoB-RT)": 0.726,
+      "RoBERTa-Twitter (RoB-Tw)": 0.691,
+      "BERTweet (README leaderboard)": 0.7340000000000001,
+      "TimeLMs-2021 (README leaderboard)": 0.737
+    },
+    "paper": "Barbieri, Camacho-Collados, Espinosa-Anke, Neves. TweetEval: Unified Benchmark and Comparative Evaluation for Tweet Classification. Findings of EMNLP 2020. arXiv:2010.12421v2, Table 3 (test block; neural models are the mean of three runs).",
+    "readme_disagrees_with_paper": {
+      "RoBERTa-Retrained (RoB-RT) sentiment": {
+        "paper_table3": 72.6,
+        "readme": 72.8
+      },
+      "RoBERTa-Twitter (RoB-Tw) hate": {
+        "paper_table3": 46.9,
+        "readme": 49.9
+      }
+    },
+    "verdict": "ARGUS LOSES to every published baseline on sentiment classification. Its crowd read now scores tone with VADER on every post the abuse screen keeps: macro-recall 0.544 (95% CI 0.535-0.553), up from the 0.333 floor it scored with no polarity. VADER alone scores 0.570, finBERT (the capability's named baseline) 0.396, the paper's weakest baseline BLSTM 0.583 and the best reported model TimeLMs-2021 (README leaderboard) 0.737. Against VADER alone it is -0.026 (paired 95% CI -0.030 to -0.023): that is the abuse screen's cost, since a withheld post gets no tone. Against finBERT it is +0.148 (+0.138 to +0.159). RoB-RT, re-scored here at 0.729, is still 0.185 ahead: a tweet-domain transformer closes that at the cost of torch in the runtime. ARGUS's LLM analyst was not run (Qwen budget zero).",
+    "what_would_close_the_gap": [
+      {
+        "option": "a tweet-domain fine-tuned transformer (TweetEval's own RoBERTa checkpoints, BERTweet or TimeLMs) as the polarity reader",
+        "evidence": "RoB-RT's published test predictions re-scored here; the others cited",
+        "macro_recall": {
+          "lowest_of_them": 0.691,
+          "best_reported": 0.737,
+          "best_reported_model": "TimeLMs-2021 (README leaderboard)",
+          "rob_rt_rescored_here": 0.7285672376332831
+        },
+        "closes_of_the_gap_to_best": 1.0,
+        "cost": "puts torch and a 500 MB checkpoint into the desk's runtime, which pyproject.toml keeps dependency-light by standing rule; not run here because no checkpoint is cached on this machine and nothing may be downloaded"
+      },
+      {
+        "option": "a measured run of ARGUS's own Sentiment Integrity Analyst (Qwen)",
+        "evidence": "not run: this item's Qwen budget is zero",
+        "macro_recall": null,
+        "closes_of_the_gap_to_best": null,
+        "cost": "444 Qwen calls for a 95% interval of plus or minus 0.03; the literature it cites (BloombergGPT trailing an always-neutral predictor, FinMA at chance) is reason not to assume it wins"
+      },
+      {
+        "option": "finBERT, the capability's named baseline, as the polarity reader",
+        "evidence": "measured on every test tweet in this run",
+        "macro_recall": 0.3957207681414557,
+        "closes_of_the_gap_to_best": 0.1545518616221033,
+        "cost": "torch in the runtime, and it is a financial-news model: on tweets it trails the lexicon scorer below"
+      },
+      {
+        "option": "VADER (MIT, pure Python, no model) as the polarity reader",
+        "status": "adopted in market/social_pulse.py on 2026-09-26, weighted so a coordinated story counts once",
+        "evidence": "measured on every test tweet in this run",
+        "macro_recall": 0.5700070419266613,
+        "argus_crowd_read_with_it": 0.5436595017636242,
+        "closes_of_the_gap_to_best": 0.5863097653013906,
+        "crowd_read_closes_of_the_gap_to_best": 0.5210392281510097,
+        "cost": "no new heavy dependency; still below BERTweet (README leaderboard), BLSTM, FastText, RoBERTa-Base (RoB-Bs), RoBERTa-Retrained (RoB-RT), RoBERTa-Twitter (RoB-Tw), SVM, TimeLMs-2021 (README leaderboard) \u2014 and a polarity score is exactly the reading a coordinated campaign inflates, which is why the crowd read counts a coordinated story once"
+      }
+    ],
+    "tone_bias_from_the_abuse_screen": "The abuse screen lowers the negative share a reader is shown: per 60-post sweep, screened minus unscreened is -1.51% (95% CI -1.74% to -1.30%, 205 sweeps). Gold negative share is 32.3% of all tweets and 30.0% of the ones kept. Against the gold share of the whole sweep, VADER's negative share is -2.51% unscreened and -4.02% screened, so the screen adds to a bias VADER already has. The withheld tweets, had they been scored, would have read {'positive': 180, 'neutral': 101, 'negative': 375}. The coordination weighting moved the negative share by +0.01% on this organic benchmark (1 coordinated stories formed in all sweeps), as expected where nobody is brigading."
+  },
+  "abuse_screen": {
+    "production_screen": "obscenity+cuss2+threats",
+    "lexicon": {
+      "obscenity_phrases": 69,
+      "cuss_rated_2_entries": 1255,
+      "cuss_rated_2_sha256": "aa5b29a8161a2f23a5b92d50b33eba6d862ed6d615ba9efd19f1dcf1a5a982ab",
+      "cuss_rated_2_sha256_pinned": "aa5b29a8161a2f23a5b92d50b33eba6d862ed6d615ba9efd19f1dcf1a5a982ab",
+      "threat_patterns": 7,
+      "market_allowlist_phrases": 22
+    },
+    "selection": {
+      "criterion": "largest mean of hate-class and offensive-class recall (share of abusive posts withheld) on the validation splits, subject to withholding at most 6% of clean OffensEval posts and at most 6% of ordinary sentiment tweets; fixed after a first validation pass",
+      "validation": {
+        "obscenity": {
+          "hate": {
+            "macro_f1": 0.5033955857385399,
+            "abusive_withheld_share": 0.34192037470725994,
+            "clean_withheld_share": 0.3263525305410122,
+            "f1_by_class": {
+              "not-hate": 0.6225806451612903,
+              "hate": 0.38421052631578945
+            },
+            "abusive_posts": 427,
+            "clean_posts": 573
+          },
+          "offensive": {
+            "macro_f1": 0.6327323162274618,
+            "abusive_withheld_share": 0.29411764705882354,
+            "clean_withheld_share": 0.027745664739884393,
+            "f1_by_class": {
+              "not-offensive": 0.8285714285714285,
+              "offensive": 0.4368932038834952
+            },
+            "abusive_posts": 459,
+            "clean_posts": 865
+          },
+          "mean_abusive_withheld_share": 0.31801901088304174,
+          "sentiment_withheld_share": 0.0385
+        },
+        "cuss2": {
+          "hate": {
+            "macro_f1": 0.5831405948137465,
+            "abusive_withheld_share": 0.38875878220140514,
+            "clean_withheld_share": 0.21291448516579406,
+            "f1_by_class": {
+              "not-hate": 0.7019455252918287,
+              "hate": 0.4643356643356643
+            },
+            "abusive_posts": 427,
+            "clean_posts": 573
+          },
+          "offensive": {
+            "macro_f1": 0.640057924005512,
+            "abusive_withheld_share": 0.3159041394335512,
+            "clean_withheld_share": 0.04046242774566474,
+            "f1_by_class": {
+              "not-offensive": 0.8262817322050772,
+              "offensive": 0.4538341158059468
+            },
+            "abusive_posts": 459,
+            "clean_posts": 865
+          },
+          "mean_abusive_withheld_share": 0.3523314608174782,
+          "sentiment_withheld_share": 0.035
+        },
+        "obscenity+cuss2": {
+          "hate": {
+            "macro_f1": 0.5344136450869283,
+            "abusive_withheld_share": 0.43559718969555034,
+            "clean_withheld_share": 0.36649214659685864,
+            "f1_by_class": {
+              "not-hate": 0.6168224299065421,
+              "hate": 0.4520048602673147
+            },
+            "abusive_posts": 427,
+            "clean_posts": 573
+          },
+          "offensive": {
+            "macro_f1": 0.6716062521984614,
+            "abusive_withheld_share": 0.3747276688453159,
+            "clean_withheld_share": 0.04971098265895954,
+            "f1_by_class": {
+              "not-offensive": 0.8328267477203648,
+              "offensive": 0.510385756676558
+            },
+            "abusive_posts": 459,
+            "clean_posts": 865
+          },
+          "mean_abusive_withheld_share": 0.4051624292704331,
+          "sentiment_withheld_share": 0.0445
+        },
+        "obscenity+cuss2+threats": {
+          "hate": {
+            "macro_f1": 0.5404898357790857,
+            "abusive_withheld_share": 0.45433255269320844,
+            "clean_withheld_share": 0.37347294938917974,
+            "f1_by_class": {
+              "not-hate": 0.6163090128755365,
+              "hate": 0.4646706586826348
+            },
+            "abusive_posts": 427,
+            "clean_posts": 573
+          },
+          "offensive": {
+            "macro_f1": 0.6729207260986279,
+            "abusive_withheld_share": 0.3769063180827887,
+            "clean_withheld_share": 0.04971098265895954,
+            "f1_by_class": {
+              "not-offensive": 0.833248859604663,
+              "offensive": 0.5125925925925926
+            },
+            "abusive_posts": 459,
+            "clean_posts": 865
+          },
+          "mean_abusive_withheld_share": 0.41561943538799856,
+          "sentiment_withheld_share": 0.045
+        }
+      },
+      "selected": "obscenity+cuss2+threats",
+      "selected_is_production": true
+    },
+    "test": {
+      "obscenity": {
+        "hate": {
+          "macro_f1": 0.5246286372147646,
+          "abusive_withheld_share": 0.5934504792332268,
+          "clean_withheld_share": 0.5250291036088475,
+          "f1_by_class": {
+            "not-hate": 0.5363128491620112,
+            "hate": 0.5129444252675182
+          },
+          "abusive_posts": 1252,
+          "clean_posts": 1718
+        },
+        "offensive": {
+          "macro_f1": 0.6774226972900274,
+          "abusive_withheld_share": 0.35833333333333334,
+          "clean_withheld_share": 0.043548387096774194,
+          "f1_by_class": {
+            "not-offensive": 0.8675932699341624,
+            "offensive": 0.48725212464589235
+          },
+          "abusive_posts": 240,
+          "clean_posts": 620
+        },
+        "mean_abusive_withheld_share": 0.47589190628328004,
+        "sentiment_withheld_share": 0.0371214588082058
+      },
+      "cuss2": {
+        "hate": {
+          "macro_f1": 0.561462274064733,
+          "abusive_withheld_share": 0.39217252396166136,
+          "clean_withheld_share": 0.2636786961583236,
+          "f1_by_class": {
+            "not-hate": 0.6757478632478632,
+            "hate": 0.4471766848816029
+          },
+          "abusive_posts": 1252,
+          "clean_posts": 1718
+        },
+        "offensive": {
+          "macro_f1": 0.6678066733793966,
+          "abusive_withheld_share": 0.32083333333333336,
+          "clean_withheld_share": 0.024193548387096774,
+          "f1_by_class": {
+            "not-offensive": 0.8717579250720461,
+            "offensive": 0.46385542168674704
+          },
+          "abusive_posts": 240,
+          "clean_posts": 620
+        },
+        "mean_abusive_withheld_share": 0.35650292864749733,
+        "sentiment_withheld_share": 0.04086616737219147
+      },
+      "obscenity+cuss2": {
+        "hate": {
+          "macro_f1": 0.5232107023411372,
+          "abusive_withheld_share": 0.6126198083067093,
+          "clean_withheld_share": 0.5419091967403958,
+          "f1_by_class": {
+            "not-hate": 0.5264214046822743,
+            "hate": 0.52
+          },
+          "abusive_posts": 1252,
+          "clean_posts": 1718
+        },
+        "offensive": {
+          "macro_f1": 0.6958513743833408,
+          "abusive_withheld_share": 0.4041666666666667,
+          "clean_withheld_share": 0.054838709677419356,
+          "f1_by_class": {
+            "not-offensive": 0.8687916975537435,
+            "offensive": 0.522911051212938
+          },
+          "abusive_posts": 240,
+          "clean_posts": 620
+        },
+        "mean_abusive_withheld_share": 0.508393237486688,
+        "sentiment_withheld_share": 0.05307717355910127
+      },
+      "obscenity+cuss2+threats": {
+        "hate": {
+          "macro_f1": 0.5235534137034272,
+          "abusive_withheld_share": 0.6142172523961661,
+          "clean_withheld_share": 0.5424912689173458,
+          "f1_by_class": {
+            "not-hate": 0.5262805490458655,
+            "hate": 0.5208262783609888
+          },
+          "abusive_posts": 1252,
+          "clean_posts": 1718
+        },
+        "offensive": {
+          "macro_f1": 0.6947289492996395,
+          "abusive_withheld_share": 0.4041666666666667,
+          "clean_withheld_share": 0.056451612903225805,
+          "f1_by_class": {
+            "not-offensive": 0.8679525222551929,
+            "offensive": 0.521505376344086
+          },
+          "abusive_posts": 240,
+          "clean_posts": 620
+        },
+        "mean_abusive_withheld_share": 0.5091919595314164,
+        "sentiment_withheld_share": 0.053402800390752195
+      },
+      "obscenity+cuss2+threats (no allowlist)": {
+        "hate": {
+          "macro_f1": 0.5235534137034272,
+          "abusive_withheld_share": 0.6142172523961661,
+          "clean_withheld_share": 0.5424912689173458,
+          "f1_by_class": {
+            "not-hate": 0.5262805490458655,
+            "hate": 0.5208262783609888
+          },
+          "abusive_posts": 1252,
+          "clean_posts": 1718
+        },
+        "offensive": {
+          "macro_f1": 0.6947289492996395,
+          "abusive_withheld_share": 0.4041666666666667,
+          "clean_withheld_share": 0.056451612903225805,
+          "f1_by_class": {
+            "not-offensive": 0.8679525222551929,
+            "offensive": 0.521505376344086
+          },
+          "abusive_posts": 240,
+          "clean_posts": 620
+        },
+        "mean_abusive_withheld_share": 0.5091919595314164,
+        "sentiment_withheld_share": 0.053402800390752195
+      }
+    },
+    "production_macro_f1_ci95": {
+      "hate": [
+        0.5059261218944403,
+        0.5410499172880596
+      ],
+      "offensive": [
+        0.654913728432108,
+        0.7312041356749905
+      ]
+    },
+    "tweeteval_reference_rescored": {
+      "hate": {
+        "what": "RoBERTa-Retrained (RoB-RT), TweetEval's published test predictions",
+        "macro_f1": 0.5547114323640363,
+        "macro_f1_ci95": [
+          0.5363530400186226,
+          0.5716258428433194
+        ],
+        "paper_table3": 0.523,
+        "abusive_posts_it_flags": 1187,
+        "abusive_posts": 1252,
+        "rob_rt_minus_production_screen": {
+          "difference": 0.031158018660609077,
+          "ci95_low": 0.004826666210293373,
+          "ci95_high": 0.05881136270196585,
+          "share_of_resamples_first_not_ahead": 0.008
+        }
+      },
+      "offensive": {
+        "what": "RoBERTa-Retrained (RoB-RT), TweetEval's published test predictions",
+        "macro_f1": 0.8155092112424851,
+        "macro_f1_ci95": [
+          0.7851478034938034,
+          0.8449947730795575
+        ],
+        "paper_table3": 0.805,
+        "abusive_posts_it_flags": 160,
+        "abusive_posts": 240,
+        "rob_rt_minus_production_screen": {
+          "difference": 0.12078026194284563,
+          "ci95_low": 0.08640701073793045,
+          "ci95_high": 0.15743575218843553,
+          "share_of_resamples_first_not_ahead": 0.0
+        }
+      }
+    },
+    "hate_negative_class_is_not_clean": "HatEval's negative class is 'not-hate', not 'not-offensive': 54.2% of those posts carry a listed profanity, slur or threat and are withheld by design. The clean-post rate is the OffensEval 'not-offensive' row and the ordinary sentiment tweets, which is where the selection limit is applied.",
+    "paper_baselines_macro_f1": {
+      "hate": {
+        "SVM": 0.36700000000000005,
+        "FastText": 0.506,
+        "BLSTM": 0.526,
+        "RoBERTa-Base (RoB-Bs)": 0.466,
+        "RoBERTa-Retrained (RoB-RT)": 0.523,
+        "RoBERTa-Twitter (RoB-Tw)": 0.469,
+        "BERTweet (README leaderboard)": 0.564,
+        "TimeLMs-2021 (README leaderboard)": 0.551
+      },
+      "offensive": {
+        "SVM": 0.523,
+        "FastText": 0.7340000000000001,
+        "BLSTM": 0.7170000000000001,
+        "RoBERTa-Base (RoB-Bs)": 0.795,
+        "RoBERTa-Retrained (RoB-RT)": 0.805,
+        "RoBERTa-Twitter (RoB-Tw)": 0.7709999999999999,
+        "BERTweet (README leaderboard)": 0.795,
+        "TimeLMs-2021 (README leaderboard)": 0.8220000000000001
+      }
+    },
+    "against_paper_baselines": {
+      "hate": {
+        "beats": [
+          "FastText",
+          "RoBERTa-Base (RoB-Bs)",
+          "RoBERTa-Retrained (RoB-RT)",
+          "RoBERTa-Twitter (RoB-Tw)",
+          "SVM"
+        ],
+        "beats_count": 5,
+        "of": 8,
+        "gap_to_best": 0.04044658629657272
+      },
+      "offensive": {
+        "beats": [
+          "SVM"
+        ],
+        "beats_count": 1,
+        "of": 8,
+        "gap_to_best": 0.1272710507003606
+      }
+    },
+    "pipeline_regression": {
+      "hate": {
+        "organic": {
+          "unscreened_as_before_2026_09_25": {
+            "posts": 2970,
+            "abusive_posts": 1252,
+            "abusive_posts_counted": 1252,
+            "clean_posts": 1718,
+            "clean_posts_withheld": 0,
+            "abusive_texts_in_snapshot": 105,
+            "abusive_texts_quoted_to_reader": 0,
+            "coordinated_stories_counted": 0,
+            "coordinated_abusive_stories_in_snapshot": 0
+          },
+          "screened": {
+            "posts": 2970,
+            "abusive_posts": 1252,
+            "abusive_posts_counted": 483,
+            "clean_posts": 1718,
+            "clean_posts_withheld": 932,
+            "abusive_texts_in_snapshot": 92,
+            "abusive_texts_quoted_to_reader": 0,
+            "coordinated_stories_counted": 0,
+            "coordinated_abusive_stories_in_snapshot": 0
+          }
+        },
+        "brigade": {
+          "unscreened_as_before_2026_09_25": {
+            "posts": 3756,
+            "abusive_posts": 3756,
+            "abusive_posts_counted": 3756,
+            "clean_posts": 0,
+            "clean_posts_withheld": 0,
+            "abusive_texts_in_snapshot": 315,
+            "abusive_texts_quoted_to_reader": 63,
+            "coordinated_stories_counted": 1252,
+            "coordinated_abusive_stories_in_snapshot": 315
+          },
+          "screened": {
+            "posts": 3756,
+            "abusive_posts": 3756,
+            "abusive_posts_counted": 1449,
+            "clean_posts": 0,
+            "clean_posts_withheld": 0,
+            "abusive_texts_in_snapshot": 308,
+            "abusive_texts_quoted_to_reader": 0,
+            "coordinated_stories_counted": 483,
+            "coordinated_abusive_stories_in_snapshot": 308
+          }
+        }
+      },
+      "offensive": {
+        "organic": {
+          "unscreened_as_before_2026_09_25": {
+            "posts": 860,
+            "abusive_posts": 240,
+            "abusive_posts_counted": 240,
+            "clean_posts": 620,
+            "clean_posts_withheld": 0,
+            "abusive_texts_in_snapshot": 20,
+            "abusive_texts_quoted_to_reader": 1,
+            "coordinated_stories_counted": 0,
+            "coordinated_abusive_stories_in_snapshot": 0
+          },
+          "screened": {
+            "posts": 860,
+            "abusive_posts": 240,
+            "abusive_posts_counted": 143,
+            "clean_posts": 620,
+            "clean_posts_withheld": 35,
+            "abusive_texts_in_snapshot": 13,
+            "abusive_texts_quoted_to_reader": 1,
+            "coordinated_stories_counted": 0,
+            "coordinated_abusive_stories_in_snapshot": 0
+          }
+        },
+        "brigade": {
+          "unscreened_as_before_2026_09_25": {
+            "posts": 720,
+            "abusive_posts": 720,
+            "abusive_posts_counted": 720,
+            "clean_posts": 0,
+            "clean_posts_withheld": 0,
+            "abusive_texts_in_snapshot": 60,
+            "abusive_texts_quoted_to_reader": 12,
+            "coordinated_stories_counted": 239,
+            "coordinated_abusive_stories_in_snapshot": 60
+          },
+          "screened": {
+            "posts": 720,
+            "abusive_posts": 720,
+            "abusive_posts_counted": 429,
+            "clean_posts": 0,
+            "clean_posts_withheld": 0,
+            "abusive_texts_in_snapshot": 60,
+            "abusive_texts_quoted_to_reader": 0,
+            "coordinated_stories_counted": 143,
+            "coordinated_abusive_stories_in_snapshot": 60
+          }
+        }
+      }
+    },
+    "live_snapshot": {
+      "snapshot_generated_at": "2026-09-25T18:43:04.110822+00:00",
+      "story_texts": 60,
+      "would_be_withheld": 0,
+      "by_reason": {},
+      "would_be_withheld_without_the_market_allowlist": 1
+    },
+    "market_allowlist_excused": {
+      "sentiment/test": 0,
+      "hate/test": 0,
+      "offensive/test": 0,
+      "hate/val": 0,
+      "offensive/val": 1,
+      "sentiment/val": 0
+    },
+    "verdict": "Before the screen, social_pulse counted every abusive post and quoted 63 coordinated abusive HatEval lines back to the reader in the brigade scenario; with it, 0. The screen withholds 61.4% of hateful and 40.4% of offensive test posts, and 5.6% of clean ones. Macro-F1 0.524 on hate and 0.695 on offensive: a word screen, so hostility with no listed word in it passes and is still counted. Brigade quotes fall to zero because the console no longer quotes any coordinated story's text (the screen alone left every sweep quoting a missed line); in the organic scenario 1 missed abusive line(s) were still quoted as the most-shared story. TweetEval's RoB-RT, re-scored on the same items, reaches 0.555 and 0.816: the regression check still finds a defect \u2014 abusive posts the screen misses are counted as crowd volume \u2014 and what would close it is a trained classifier, which the runtime's no-torch rule currently excludes."
+  }
+}

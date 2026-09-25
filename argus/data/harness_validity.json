@@ -1,0 +1,3532 @@
+{
+  "generated": "2026-09-25T15:17:18+00:00",
+  "method": "AgentDojo-style canary per harness: reachability of the code standing.py credits (read from sabotage canaries firing in the entry point; a profiled run where they fire at import), a sabotage canary that must surface, and an oracle/anti-oracle desk where the harness is on the eval spine; network refused and writes contained in every run",
+  "harnesses": 37,
+  "run": 36,
+  "valid": 16,
+  "invalid": 20,
+  "not_run": [
+    "sentiment_comparison"
+  ],
+  "fleet_valid_share": {
+    "value": null,
+    "components": 37,
+    "missing": [
+      "sentiment_comparison"
+    ],
+    "partial_mean_of_present": 0.4444444444444444
+  },
+  "failures_by_check": {
+    "sabotage_canary_surfaces": 15,
+    "reproducible_without_network": 14,
+    "reaches_the_credited_code": 14,
+    "ran_offline": 13,
+    "credits_code_outside_the_harness": 6,
+    "cited_by_standing": 2
+  },
+  "rows": [
+    {
+      "harness": "abstention_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Abstention scored as a decision": [
+          "argus/paper/ledger.py",
+          "argus/eval/observatory.py",
+          "argus/eval/abstention_comparison.py",
+          "argus/eval/baselines/ghostledger_reimpl.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/eval/observatory.py",
+        "argus/paper/ledger.py"
+      ],
+      "reached": [
+        "argus/eval/observatory.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 0.14,
+        "network_attempts": 0,
+        "writes_redirected": [
+          "argus/data/abstention_comparison.json"
+        ],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.01,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/eval/observatory.py": 10,
+          "argus/paper/ledger.py": 14
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\abstention_comparison.py\", line 287, in main\n    cases = run_all_netting_cases()\n            ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\abstention_comparison.py\", line 155, in run_all_netting_cases\n    return [run_netting_case(c) for c in NETTING_CASES]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\abstention_comparison.py\", line 155, in <listcomp>\n    return [run_netting_case(c) for c in NETTING_CASES]\n            ^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\abstention_comparison.py\", line 140, in run_netting_case\n    scored = abstention_quality(outcomes)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.eval.observatory.abstention_quality---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/abstention_comparison.py', 'argus/eval/baselines/ghostledger_reimpl.py', 'argus/eval/observatory.py', 'argus/paper/ledger.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/eval/observatory.py'] of ['argus/eval/observatory.py', 'argus/paper/ledger.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "afterhours_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias": [
+          "argus/research/gap_study.py",
+          "argus/eval/afterhours_comparison.py",
+          "argus/eval/baselines/quantconnect_preholiday_decision.py",
+          "argus/eval/baselines/quantconnect_preholiday_loader.py",
+          "argus/eval/baselines/lean_market_holidays_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/research/gap_study.py"
+      ],
+      "reached": [],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 1.03,
+        "network_attempts": 24,
+        "writes_redirected": [
+          "argus/data/afterhours_comparison.json"
+        ],
+        "error": null
+      },
+      "canary": {
+        "status": "ok",
+        "elapsed_s": 0.95,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/research/gap_study.py": 5
+        },
+        "error": null,
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "reproducible_without_network",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "24 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/afterhours_comparison.py', 'argus/eval/baselines/lean_market_holidays_loader.py', 'argus/eval/baselines/quantconnect_preholiday_decision.py', 'argus/eval/baselines/quantconnect_preholiday_loader.py', 'argus/research/gap_study.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of ['argus/research/gap_study.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "allocation_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Portfolio allocation, measured against Riskfolio-Lib's NCO": [
+          "argus/desk/allocation.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/desk/allocation.py"
+      ],
+      "reached": [],
+      "baseline": {
+        "status": "timed out after 900s",
+        "elapsed_s": null,
+        "network_attempts": null,
+        "writes_redirected": null,
+        "error": null
+      },
+      "canary": {
+        "status": "timed out after 900s",
+        "elapsed_s": null,
+        "fired_at_import": null,
+        "sabotaged_functions": null,
+        "error": null,
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "timed out after 900s",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "None connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/desk/allocation.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of ['argus/desk/allocation.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "analogstress_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Analogue stress bands vs. AnalogDesk (S2) on its own pre-registered test": [
+          "argus/desk/analogue.py",
+          "argus/desk/shapematch.py",
+          "argus/eval/analogstress_comparison.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/desk/analogue.py",
+        "argus/desk/shapematch.py"
+      ],
+      "reached": [
+        "argus/desk/analogue.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 249.67,
+        "network_attempts": 0,
+        "writes_redirected": [
+          "argus/data/analogstress_comparison.json"
+        ],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 63.07,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/desk/analogue.py": 14,
+          "argus/desk/shapematch.py": 11
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\analogstress_comparison.py\", line 441, in main\n    run_argus(grid)\n  File \"~\\bitget\\argus\\src\\argus\\eval\\analogstress_comparison.py\", line 285, in run_argus\n    got = arm(closes, horizon, float(row[\"y\"]))\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\analogstress_comparison.py\", line 256, in argus_analogue\n    query = current_state(closes, window=WINDOW)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.desk.analogue.current_state---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/desk/analogue.py', 'argus/desk/shapematch.py', 'argus/eval/analogstress_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/desk/analogue.py'] of ['argus/desk/analogue.py', 'argus/desk/shapematch.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "arbitrage_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Net executable arbitrage vs. a fee-blind detector": [
+          "argus/research/arbitrage_study.py",
+          "argus/cost/model.py",
+          "argus/eval/arbitrage_comparison.py",
+          "argus/eval/baselines/maxme_arbitrer.py",
+          "argus/eval/baselines/maxme_arbitrer_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/cost/model.py",
+        "argus/research/arbitrage_study.py"
+      ],
+      "reached": [
+        "argus/research/arbitrage_study.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 0.05,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during import",
+        "elapsed_s": 0.02,
+        "fired_at_import": true,
+        "sabotaged_functions": {
+          "argus/cost/model.py": 10
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 266, in _child\n    sabotaged[target] = _sabotage(importlib.import_module(_dotted(target)), guards)\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\importlib\\__init__.py\", line 126, in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<frozen importlib._bootstrap>\", line 1204, in _gcd_import\n  File \"<frozen importlib._bootstrap>\", line 1176, in _find_and_load\n  File \"<frozen importlib._bootstrap>\", line 1147, in _find_and_load_unlocked\n  File \"<frozen importlib._bootstrap>\", line 690, in _load_unlocked\n  File \"<frozen importlib._bootstrap_external>\", line 940, in exec_module\n  File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed\n  File \"~\\bitget\\argus\\src\\argus\\research\\arbitrage_study.py\", line 51, in <module>\n    ROUND_TRIP_BPS = CostModel.bitget_perp().round_trip_bps()\n                     ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.cost.model.CostModel.bitget_perp---\n",
+        "fired": 1,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "sabotage_canary_surfaces",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/cost/model.py', 'argus/eval/arbitrage_comparison.py', 'argus/eval/baselines/maxme_arbitrer.py', 'argus/eval/baselines/maxme_arbitrer_loader.py', 'argus/research/arbitrage_study.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/research/arbitrage_study.py'] of ['argus/cost/model.py', 'argus/research/arbitrage_study.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary fired only at import; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "claimcheck_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "A trader's claims about the tape checked against it, measured against MirrorLine": [
+          "argus/eval/claimcheck_comparison.py"
+        ]
+      },
+      "code_under_test": [],
+      "reached": [],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 0.21,
+        "network_attempts": 0,
+        "writes_redirected": [
+          "argus/data/claimcheck_comparison.json",
+          "argus/data/h2h_mirrorline/argus_replay.json"
+        ],
+        "error": null
+      },
+      "canary": {
+        "status": "not run: nothing outside the harness is credited",
+        "elapsed_s": null,
+        "fired_at_import": null,
+        "sabotaged_functions": null,
+        "error": null,
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": {
+        "graded": 30,
+        "oracle_correct": 30,
+        "wrong_desk_correct": 0,
+        "oracle_perfect": true,
+        "anti_oracle_worse": true
+      },
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "credits_code_outside_the_harness",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "credited: ['argus/eval/claimcheck_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of []",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          },
+          {
+            "name": "oracle_scores_perfectly",
+            "tier": "statistic",
+            "passed": true,
+            "score": 1.0,
+            "detail": "{\"graded\": 30, \"oracle_correct\": 30, \"wrong_desk_correct\": 0, \"oracle_perfect\": true, \"anti_oracle_worse\": true}",
+            "skipped": false
+          },
+          {
+            "name": "wrong_desk_scores_worse",
+            "tier": "statistic",
+            "passed": true,
+            "score": 1.0,
+            "detail": "{\"graded\": 30, \"oracle_correct\": 30, \"wrong_desk_correct\": 0, \"oracle_perfect\": true, \"anti_oracle_worse\": true}",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "cointegration_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Cross-market cointegration with corrected multiple testing": [
+          "argus/research/cointegration.py",
+          "argus/backtest/validation.py",
+          "argus/eval/cointegration_comparison.py",
+          "argus/eval/baselines/lean_pairs_ranking.py",
+          "argus/eval/baselines/lean_pairs_ranking_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/backtest/validation.py",
+        "argus/research/cointegration.py"
+      ],
+      "reached": [
+        "argus/research/cointegration.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 11.85,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 2.02,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/backtest/validation.py": 9,
+          "argus/research/cointegration.py": 19
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\cointegration_comparison.py\", line 474, in main\n    adf_cases = run_adf_cases()\n                ^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\cointegration_comparison.py\", line 136, in run_adf_cases\n    argus_result = adf(series, regression=\"c\")\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.research.cointegration.adf---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/backtest/validation.py', 'argus/eval/baselines/lean_pairs_ranking.py', 'argus/eval/baselines/lean_pairs_ranking_loader.py', 'argus/eval/cointegration_comparison.py', 'argus/research/cointegration.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/research/cointegration.py'] of ['argus/backtest/validation.py', 'argus/research/cointegration.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "crosssection_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Cross-sectional factor evaluation": [
+          "argus/research/panel.py",
+          "argus/research/crosssection.py",
+          "argus/research/grammar.py",
+          "argus/eval/crosssection_comparison.py",
+          "argus/eval/baselines/qlib_loader.py",
+          "argus/eval/baselines/qlib_cs_processor.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/research/crosssection.py",
+        "argus/research/grammar.py",
+        "argus/research/panel.py"
+      ],
+      "reached": [
+        "argus/research/grammar.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 0.61,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.53,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/research/crosssection.py": 12,
+          "argus/research/grammar.py": 42,
+          "argus/research/panel.py": 6
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\crosssection_comparison.py\", line 317, in main\n    designed = [compare_ordering(list(p), baseline.cs_rank_norm) for p in designed_panels()]\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\crosssection_comparison.py\", line 317, in <listcomp>\n    designed = [compare_ordering(list(p), baseline.cs_rank_norm) for p in designed_panels()]\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\crosssection_comparison.py\", line 100, in compare_ordering\n    argus_out = run_argus(values)\n                ^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\crosssection_comparison.py\", line 47, in run_argus\n    return CrossRank.combine(values)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.research.grammar.CrossRank.combine---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/baselines/qlib_cs_processor.py', 'argus/eval/baselines/qlib_loader.py', 'argus/eval/crosssection_comparison.py', 'argus/research/crosssection.py', 'argus/research/grammar.py', 'argus/research/panel.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/research/grammar.py'] of ['argus/research/crosssection.py', 'argus/research/grammar.py', 'argus/research/panel.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "deliberation_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Deliberation priced as a trading cost": [
+          "argus/agents/meta_pm.py",
+          "argus/execution/latency.py",
+          "argus/eval/deliberation_comparison.py",
+          "argus/eval/baselines/latencybench_reimpl.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/agents/meta_pm.py",
+        "argus/execution/latency.py"
+      ],
+      "reached": [
+        "argus/execution/latency.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 0.08,
+        "network_attempts": 0,
+        "writes_redirected": [
+          "argus/data/deliberation_comparison.json"
+        ],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.05,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/agents/meta_pm.py": 18,
+          "argus/execution/latency.py": 13
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\deliberation_comparison.py\", line 304, in main\n    thinking_cases = run_thinking_budget_cases()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\deliberation_comparison.py\", line 116, in run_thinking_budget_cases\n    return [\n           ^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\deliberation_comparison.py\", line 120, in <listcomp>\n    argus_bps=argus_cost_bps(ms / 1000.0),\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\deliberation_comparison.py\", line 88, in argus_cost_bps\n    latency_slippage_bps(\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.execution.latency.latency_slippage_bps---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/agents/meta_pm.py', 'argus/eval/baselines/latencybench_reimpl.py', 'argus/eval/deliberation_comparison.py', 'argus/execution/latency.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/execution/latency.py'] of ['argus/agents/meta_pm.py', 'argus/execution/latency.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "dsr_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Overfitting gates that raise instead of returning NaN": [
+          "argus/backtest/metrics.py",
+          "argus/eval/dsr_comparison.py",
+          "argus/eval/baselines/vectorbt_loader.py",
+          "argus/eval/baselines/vectorbt_dsr_metrics.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/backtest/metrics.py"
+      ],
+      "reached": [
+        "argus/backtest/metrics.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 1.29,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.93,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/backtest/metrics.py": 15
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\dsr_comparison.py\", line 385, in main\n    designed = run_designed(symbols)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\dsr_comparison.py\", line 178, in run_designed\n    results = tuple(compare(c, symbols) for c in designed_cases())\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\dsr_comparison.py\", line 178, in <genexpr>\n    results = tuple(compare(c, symbols) for c in designed_cases())\n                    ^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\dsr_comparison.py\", line 123, in compare\n    argus_value, argus_raised = run_argus_dsr(case)\n                                ^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\dsr_comparison.py\", line 96, in run_argus_dsr\n    deflated_sharpe(\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.backtest.metrics.deflated_sharpe---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/backtest/metrics.py', 'argus/eval/baselines/vectorbt_dsr_metrics.py', 'argus/eval/baselines/vectorbt_loader.py', 'argus/eval/dsr_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/backtest/metrics.py'] of ['argus/backtest/metrics.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "earnings_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Refusal-first earnings surprise ranking vs. a silently-exploding factor": [
+          "argus/research/sue.py",
+          "argus/eval/earnings_comparison.py",
+          "argus/eval/baselines/quantconnect_sue.py",
+          "argus/eval/baselines/quantconnect_sue_loader.py",
+          "argus/market/fundamentals.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/market/fundamentals.py",
+        "argus/research/sue.py"
+      ],
+      "reached": [
+        "argus/market/fundamentals.py"
+      ],
+      "baseline": {
+        "status": "raised during entry",
+        "elapsed_s": 0.06,
+        "network_attempts": 1,
+        "writes_redirected": [],
+        "error": "Traceback (most recent call last):\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1348, in do_open\n    h.request(req.get_method(), req.selector, req.data, headers,\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1303, in request\n    self._send_request(method, url, body, headers, encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1349, in _send_request\n    self.endheaders(body, encode_chunked=encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1298, in endheaders\n    self._send_output(message_body, encode_chunked=encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1058, in _send_output\n    self.send(msg)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 996, in send\n    self.connect()\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1468, in connect\n    super().connect()\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 962, in connect\n    self.sock = self._create_connection(\n                ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 173, in refuse\n    raise NetworkBlockedError(\"network is blocked in a harness-validity run\")\nNetworkBlockedError: network is blocked in a harness-validity run\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\earnings_comparison.py\", line 345, in main\n    \"baseline_reproduced\": run_baseline_reproduced_cases(),\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\earnings_comparison.py\", line 153, in run_baseline_reproduced_cases\n    return _compute_baseline_reproduced_cases(_fetch_all_anchor_quarters())\n                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\earnings_comparison.py\", line 115, in _fetch_all_anchor_quarters\n    return {ticker: _fetch_quarters(ticker) for ticker in ANCHORS}\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\earnings_comparison.py\", line 115, in <dictcomp>\n    return {ticker: _fetch_quarters(ticker) for ticker in ANCHORS}\n                    ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\earnings_comparison.py\", line 94, in _fetch_quarters\n    facts, _status = source.facts(ticker, concept=\"eps_diluted\", as_of=datetime.now(UTC))\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\fundamentals.py\", line 313, in facts\n    cik = self._edgar.cik_for(ticker)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\evidence.py\", line 334, in cik_for\n    raw = self._get(self.TICKERS_URL)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\evidence.py\", line 329, in _get\n    with urllib.request.urlopen(req, timeout=_TIMEOUT) as r:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 216, in urlopen\n    return opener.open(url, data, timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 519, in open\n    response = self._open(req, data)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 536, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 496, in _call_chain\n    result = func(*args)\n             ^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1391, in https_open\n    return self.do_open(http.client.HTTPSConnection, req,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1351, in do_open\n    raise URLError(err)\nurllib.error.URLError: <urlopen error network is blocked in a harness-validity run>\n"
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.03,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/market/fundamentals.py": 9,
+          "argus/research/sue.py": 5
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\earnings_comparison.py\", line 345, in main\n    \"baseline_reproduced\": run_baseline_reproduced_cases(),\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\earnings_comparison.py\", line 153, in run_baseline_reproduced_cases\n    return _compute_baseline_reproduced_cases(_fetch_all_anchor_quarters())\n                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\earnings_comparison.py\", line 115, in _fetch_all_anchor_quarters\n    return {ticker: _fetch_quarters(ticker) for ticker in ANCHORS}\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\earnings_comparison.py\", line 115, in <dictcomp>\n    return {ticker: _fetch_quarters(ticker) for ticker in ANCHORS}\n                    ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\earnings_comparison.py\", line 94, in _fetch_quarters\n    facts, _status = source.facts(ticker, concept=\"eps_diluted\", as_of=datetime.now(UTC))\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.market.fundamentals.FundamentalsSource.facts---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "raised during entry",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "1 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/baselines/quantconnect_sue.py', 'argus/eval/baselines/quantconnect_sue_loader.py', 'argus/eval/earnings_comparison.py', 'argus/market/fundamentals.py', 'argus/research/sue.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/market/fundamentals.py'] of ['argus/market/fundamentals.py', 'argus/research/sue.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "eventdriven_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Clustering-corrected, base-rate-honest event significance vs. a fixed-null test": [
+          "argus/research/eventstudy.py",
+          "argus/eval/eventdriven_comparison.py",
+          "argus/eval/baselines/whale_signals_event_study.py",
+          "argus/eval/baselines/whale_signals_event_study_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/research/eventstudy.py"
+      ],
+      "reached": [],
+      "baseline": {
+        "status": "raised during entry",
+        "elapsed_s": 0.05,
+        "network_attempts": 1,
+        "writes_redirected": [],
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\eventdriven_comparison.py\", line 429, in main\n    \"base_rate_case\": run_base_rate_case(),\n                      ^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\eventdriven_comparison.py\", line 184, in run_base_rate_case\n    eth_closes, btc_closes, ts = _fetch_eth_btc()\n                                 ^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\eventdriven_comparison.py\", line 87, in _fetch_eth_btc\n    eth = fetch_range(\"ETHUSDT\", days=FETCH_DAYS, interval=\"1H\", candle_type=CandleType.MARKET)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 243, in fetch_range\n    return fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=days), interval=interval,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 268, in fetch_window\n    page = fetch(symbol, interval=interval, candle_type=candle_type, end=cursor)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 219, in fetch\n    for row in _get(params, path=RECENT_PATH if recent else HISTORY_PATH):\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 180, in _get\n    raise HistoryError(f\"transport failure: {exc}\") from None\nargus.market.history.HistoryError: transport failure: <urlopen error network is blocked in a harness-validity run>\n"
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.06,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/research/eventstudy.py": 18
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\eventdriven_comparison.py\", line 429, in main\n    \"base_rate_case\": run_base_rate_case(),\n                      ^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\eventdriven_comparison.py\", line 184, in run_base_rate_case\n    eth_closes, btc_closes, ts = _fetch_eth_btc()\n                                 ^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\eventdriven_comparison.py\", line 87, in _fetch_eth_btc\n    eth = fetch_range(\"ETHUSDT\", days=FETCH_DAYS, interval=\"1H\", candle_type=CandleType.MARKET)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 243, in fetch_range\n    return fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=days), interval=interval,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 268, in fetch_window\n    page = fetch(symbol, interval=interval, candle_type=candle_type, end=cursor)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 219, in fetch\n    for row in _get(params, path=RECENT_PATH if recent else HISTORY_PATH):\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 180, in _get\n    raise HistoryError(f\"transport failure: {exc}\") from None\nargus.market.history.HistoryError: transport failure: <urlopen error network is blocked in a harness-validity run>\n",
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "raised during entry",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "1 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/baselines/whale_signals_event_study.py', 'argus/eval/baselines/whale_signals_event_study_loader.py', 'argus/eval/eventdriven_comparison.py', 'argus/research/eventstudy.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of ['argus/research/eventstudy.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "execassist_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel": [
+          "argus/execution/latency.py",
+          "argus/eval/execassist_comparison.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/execution/latency.py"
+      ],
+      "reached": [],
+      "baseline": {
+        "status": "raised during entry",
+        "elapsed_s": 0.37,
+        "network_attempts": 1,
+        "writes_redirected": [],
+        "error": "Traceback (most recent call last):\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1348, in do_open\n    h.request(req.get_method(), req.selector, req.data, headers,\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1303, in request\n    self._send_request(method, url, body, headers, encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1349, in _send_request\n    self.endheaders(body, encode_chunked=encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1298, in endheaders\n    self._send_output(message_body, encode_chunked=encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1058, in _send_output\n    self.send(msg)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 996, in send\n    self.connect()\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1468, in connect\n    super().connect()\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 962, in connect\n    self.sock = self._create_connection(\n                ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 173, in refuse\n    raise NetworkBlockedError(\"network is blocked in a harness-validity run\")\nNetworkBlockedError: network is blocked in a harness-validity run\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\market\\volatility.py\", line 192, in _get\n    with urllib.request.urlopen(request, timeout=timeout) as response:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 216, in urlopen\n    return opener.open(url, data, timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 519, in open\n    response = self._open(req, data)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 536, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 496, in _call_chain\n    result = func(*args)\n             ^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1391, in https_open\n    return self.do_open(http.client.HTTPSConnection, req,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1351, in do_open\n    raise URLError(err)\nurllib.error.URLError: <urlopen error network is blocked in a harness-validity run>\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\execassist_comparison.py\", line 225, in main\n    \"same_input_comparison\": run_same_input_comparison(),\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\execassist_comparison.py\", line 107, in run_same_input_comparison\n    vix = fetch_vix()\n          ^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\volatility.py\", line 275, in fetch\n    payload = json.loads(_get(QUOTE_URL, timeout=timeout).decode(\"utf-8\", errors=\"replace\"))\n                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\volatility.py\", line 195, in _get\n    raise VolatilityError(f\"could not read {url}: {exc}\") from exc\nargus.market.volatility.VolatilityError: could not read https://cdn.cboe.com/api/global/delayed_quotes/quotes/_VIX.json: <urlopen error network is blocked in a harness-validity run>\n"
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.39,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/execution/latency.py": 13
+        },
+        "error": "Traceback (most recent call last):\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1348, in do_open\n    h.request(req.get_method(), req.selector, req.data, headers,\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1303, in request\n    self._send_request(method, url, body, headers, encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1349, in _send_request\n    self.endheaders(body, encode_chunked=encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1298, in endheaders\n    self._send_output(message_body, encode_chunked=encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1058, in _send_output\n    self.send(msg)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 996, in send\n    self.connect()\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1468, in connect\n    super().connect()\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 962, in connect\n    self.sock = self._create_connection(\n                ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 173, in refuse\n    raise NetworkBlockedError(\"network is blocked in a harness-validity run\")\nNetworkBlockedError: network is blocked in a harness-validity run\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\market\\volatility.py\", line 192, in _get\n    with urllib.request.urlopen(request, timeout=timeout) as response:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 216, in urlopen\n    return opener.open(url, data, timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 519, in open\n    response = self._open(req, data)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 536, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 496, in _call_chain\n    result = func(*args)\n             ^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1391, in https_open\n    return self.do_open(http.client.HTTPSConnection, req,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1351, in do_open\n    raise URLError(err)\nurllib.error.URLError: <urlopen error network is blocked in a harness-validity run>\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\execassist_comparison.py\", line 225, in main\n    \"same_input_comparison\": run_same_input_comparison(),\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\execassist_comparison.py\", line 107, in run_same_input_comparison\n    vix = fetch_vix()\n          ^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\volatility.py\", line 275, in fetch\n    payload = json.loads(_get(QUOTE_URL, timeout=timeout).decode(\"utf-8\", errors=\"replace\"))\n                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\volatility.py\", line 195, in _get\n    raise VolatilityError(f\"could not read {url}: {exc}\") from exc\nargus.market.volatility.VolatilityError: could not read https://cdn.cboe.com/api/global/delayed_quotes/quotes/_VIX.json: <urlopen error network is blocked in a harness-validity run>\n",
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "raised during entry",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "1 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/execassist_comparison.py', 'argus/execution/latency.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of ['argus/execution/latency.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "execution_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Funding-aware cross-asset hedge routing vs. a fee-blind composite router": [
+          "argus/desk/execution.py",
+          "argus/eval/execution_comparison.py",
+          "argus/eval/baselines/crypto_sor_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/desk/execution.py"
+      ],
+      "reached": [],
+      "baseline": {
+        "status": "raised during entry",
+        "elapsed_s": 0.05,
+        "network_attempts": 1,
+        "writes_redirected": [],
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\execution_comparison.py\", line 301, in main\n    \"base_case\": run_base_case(),\n                 ^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\execution_comparison.py\", line 103, in run_base_case\n    rtoken_leg, crypto_leg = legs if legs is not None else (_real_leg(rtoken), _real_leg(crypto))\n                                                            ^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\execution_comparison.py\", line 68, in _real_leg\n    tickers = fetch_tickers()\n              ^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\bitget.py\", line 202, in fetch_tickers\n    rows = _get(\"/api/v2/mix/market/tickers\", {\"productType\": product_type}) or []\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\bitget.py\", line 119, in _get\n    raise BitgetError(f\"transport failure for {path}: {exc}\") from None\nargus.market.bitget.BitgetError: transport failure for /api/v2/mix/market/tickers: <urlopen error network is blocked in a harness-validity run>\n"
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.07,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/desk/execution.py": 5
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\execution_comparison.py\", line 301, in main\n    \"base_case\": run_base_case(),\n                 ^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\execution_comparison.py\", line 103, in run_base_case\n    rtoken_leg, crypto_leg = legs if legs is not None else (_real_leg(rtoken), _real_leg(crypto))\n                                                            ^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\execution_comparison.py\", line 68, in _real_leg\n    tickers = fetch_tickers()\n              ^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\bitget.py\", line 202, in fetch_tickers\n    rows = _get(\"/api/v2/mix/market/tickers\", {\"productType\": product_type}) or []\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\bitget.py\", line 119, in _get\n    raise BitgetError(f\"transport failure for {path}: {exc}\") from None\nargus.market.bitget.BitgetError: transport failure for /api/v2/mix/market/tickers: <urlopen error network is blocked in a harness-validity run>\n",
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "raised during entry",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "1 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/desk/execution.py', 'argus/eval/baselines/crypto_sor_loader.py', 'argus/eval/execution_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of ['argus/desk/execution.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "explainability_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal": [
+          "argus/agents/grounding.py",
+          "argus/eval/explainability_comparison.py",
+          "argus/eval/baselines/tradingagents_trader.py",
+          "argus/eval/baselines/tradingagents_trader_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/agents/grounding.py"
+      ],
+      "reached": [],
+      "baseline": {
+        "status": "raised during entry",
+        "elapsed_s": 0.23,
+        "network_attempts": 1,
+        "writes_redirected": [],
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\explainability_comparison.py\", line 276, in main\n    \"same_input_comparison\": run_same_input_comparison(),\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\explainability_comparison.py\", line 95, in run_same_input_comparison\n    facts = _real_facts(symbol)\n            ^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\explainability_comparison.py\", line 61, in _real_facts\n    ticker = fetch_tickers()[symbol]\n             ^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\bitget.py\", line 202, in fetch_tickers\n    rows = _get(\"/api/v2/mix/market/tickers\", {\"productType\": product_type}) or []\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\bitget.py\", line 119, in _get\n    raise BitgetError(f\"transport failure for {path}: {exc}\") from None\nargus.market.bitget.BitgetError: transport failure for /api/v2/mix/market/tickers: <urlopen error network is blocked in a harness-validity run>\n"
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.22,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/agents/grounding.py": 9
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\explainability_comparison.py\", line 276, in main\n    \"same_input_comparison\": run_same_input_comparison(),\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\explainability_comparison.py\", line 95, in run_same_input_comparison\n    facts = _real_facts(symbol)\n            ^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\explainability_comparison.py\", line 61, in _real_facts\n    ticker = fetch_tickers()[symbol]\n             ^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\bitget.py\", line 202, in fetch_tickers\n    rows = _get(\"/api/v2/mix/market/tickers\", {\"productType\": product_type}) or []\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\bitget.py\", line 119, in _get\n    raise BitgetError(f\"transport failure for {path}: {exc}\") from None\nargus.market.bitget.BitgetError: transport failure for /api/v2/mix/market/tickers: <urlopen error network is blocked in a harness-validity run>\n",
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "raised during entry",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "1 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/agents/grounding.py', 'argus/eval/baselines/tradingagents_trader.py', 'argus/eval/baselines/tradingagents_trader_loader.py', 'argus/eval/explainability_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of ['argus/agents/grounding.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "factor_divergence_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "rToken factor divergence vs. Alphalens' real Information Coefficient": [
+          "argus/research/factor_divergence.py",
+          "argus/eval/factor_divergence_comparison.py",
+          "argus/eval/baselines/alphalens_ic.py",
+          "argus/eval/baselines/alphalens_ic_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/research/factor_divergence.py"
+      ],
+      "reached": [
+        "argus/research/factor_divergence.py"
+      ],
+      "baseline": {
+        "status": "raised during entry",
+        "elapsed_s": 4.76,
+        "network_attempts": 73,
+        "writes_redirected": [],
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\factor_divergence_comparison.py\", line 569, in main\n    \"costs\": measure_costs(),\n             ^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\factor_divergence_comparison.py\", line 484, in measure_costs\n    bars = fetch_bars(\"NVDAUSDT\", days=DAYS, candle_type=CandleType.MARKET)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\research\\factor_divergence.py\", line 73, in fetch_bars\n    candles = fetch_range(symbol, days=days, interval=\"1H\", candle_type=candle_type)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 243, in fetch_range\n    return fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=days), interval=interval,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 268, in fetch_window\n    page = fetch(symbol, interval=interval, candle_type=candle_type, end=cursor)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 219, in fetch\n    for row in _get(params, path=RECENT_PATH if recent else HISTORY_PATH):\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 180, in _get\n    raise HistoryError(f\"transport failure: {exc}\") from None\nargus.market.history.HistoryError: transport failure: <urlopen error network is blocked in a harness-validity run>\n"
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 1.43,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/research/factor_divergence.py": 5
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\factor_divergence_comparison.py\", line 569, in main\n    \"costs\": measure_costs(),\n             ^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\factor_divergence_comparison.py\", line 484, in measure_costs\n    bars = fetch_bars(\"NVDAUSDT\", days=DAYS, candle_type=CandleType.MARKET)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.research.factor_divergence.fetch_bars---\n",
+        "fired": 2,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "raised during entry",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "73 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/baselines/alphalens_ic.py', 'argus/eval/baselines/alphalens_ic_loader.py', 'argus/eval/factor_divergence_comparison.py', 'argus/research/factor_divergence.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/research/factor_divergence.py'] of ['argus/research/factor_divergence.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 2 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "feedlist_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Perception layer: what the desk can see": [
+          "argus/market/evidence.py",
+          "argus/market/volatility.py",
+          "argus/market/macro.py",
+          "argus/eval/feedlist_comparison.py",
+          "argus/eval/baselines/tradingagents_feedlist_loader.py",
+          "argus/eval/baselines/tradingagents_feedlist_interface.py",
+          "argus/eval/baselines/tradingagents_feedlist_errors.py",
+          "argus/eval/baselines/tradingagents_feedlist_config.py",
+          "argus/eval/baselines/tradingagents_feedlist_default_config.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/market/evidence.py",
+        "argus/market/macro.py",
+        "argus/market/volatility.py"
+      ],
+      "reached": [
+        "argus/market/evidence.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 0.08,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.03,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/market/evidence.py": 22,
+          "argus/market/macro.py": 16,
+          "argus/market/volatility.py": 14
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\feedlist_comparison.py\", line 435, in main\n    argus_core_case = run_argus_core_source_failure()\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\feedlist_comparison.py\", line 169, in run_argus_core_source_failure\n    result = gather(\n             ^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.market.evidence.gather---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/baselines/tradingagents_feedlist_config.py', 'argus/eval/baselines/tradingagents_feedlist_default_config.py', 'argus/eval/baselines/tradingagents_feedlist_errors.py', 'argus/eval/baselines/tradingagents_feedlist_interface.py', 'argus/eval/baselines/tradingagents_feedlist_loader.py', 'argus/eval/feedlist_comparison.py', 'argus/market/evidence.py', 'argus/market/macro.py', 'argus/market/volatility.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/market/evidence.py'] of ['argus/market/evidence.py', 'argus/market/macro.py', 'argus/market/volatility.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "grammar_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Typed factor grammar with no execution surface": [
+          "argus/research/grammar.py",
+          "argus/eval/grammar_comparison.py",
+          "argus/eval/baselines/qlib_expression_base.py",
+          "argus/eval/baselines/qlib_expression_ops.py",
+          "argus/eval/baselines/qlib_expression_loader.py",
+          "argus/eval/baselines/qlib_eval_surface.py",
+          "argus/eval/baselines/qlib_eval_surface_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/research/grammar.py"
+      ],
+      "reached": [
+        "argus/research/grammar.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 1.52,
+        "network_attempts": 0,
+        "writes_redirected": [
+          "argus/data/_grammar_comparison_tmp/_ablated_eval_dispatch.py"
+        ],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 1.39,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/research/grammar.py": 42
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\grammar_comparison.py\", line 587, in main\n    rank_cases = run_rank_cases(ops_module)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\grammar_comparison.py\", line 162, in run_rank_cases\n    argus_value = Window(\"rank\", n, Ref(Field.CLOSE)).evaluate(bars, n - 1)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.research.grammar.Window.evaluate---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/baselines/qlib_eval_surface.py', 'argus/eval/baselines/qlib_eval_surface_loader.py', 'argus/eval/baselines/qlib_expression_base.py', 'argus/eval/baselines/qlib_expression_loader.py', 'argus/eval/baselines/qlib_expression_ops.py', 'argus/eval/grammar_comparison.py', 'argus/research/grammar.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/research/grammar.py'] of ['argus/research/grammar.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "infoextract_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Structured filing extraction vs. FinanceBench's real, published LLM measurement": [
+          "argus/market/fundamentals.py",
+          "argus/eval/infoextract_comparison.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/market/fundamentals.py"
+      ],
+      "reached": [
+        "argus/market/fundamentals.py"
+      ],
+      "baseline": {
+        "status": "raised during entry",
+        "elapsed_s": 0.08,
+        "network_attempts": 1,
+        "writes_redirected": [],
+        "error": "Traceback (most recent call last):\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1348, in do_open\n    h.request(req.get_method(), req.selector, req.data, headers,\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1303, in request\n    self._send_request(method, url, body, headers, encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1349, in _send_request\n    self.endheaders(body, encode_chunked=encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1298, in endheaders\n    self._send_output(message_body, encode_chunked=encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1058, in _send_output\n    self.send(msg)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 996, in send\n    self.connect()\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1468, in connect\n    super().connect()\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 962, in connect\n    self.sock = self._create_connection(\n                ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 173, in refuse\n    raise NetworkBlockedError(\"network is blocked in a harness-validity run\")\nNetworkBlockedError: network is blocked in a harness-validity run\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\infoextract_comparison.py\", line 246, in main\n    \"designed_cases\": run_designed_cases(),\n                      ^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\infoextract_comparison.py\", line 114, in run_designed_cases\n    facts, status = source.facts(ticker, concept=concept, as_of=AT)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\fundamentals.py\", line 313, in facts\n    cik = self._edgar.cik_for(ticker)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\evidence.py\", line 334, in cik_for\n    raw = self._get(self.TICKERS_URL)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\evidence.py\", line 329, in _get\n    with urllib.request.urlopen(req, timeout=_TIMEOUT) as r:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 216, in urlopen\n    return opener.open(url, data, timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 519, in open\n    response = self._open(req, data)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 536, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 496, in _call_chain\n    result = func(*args)\n             ^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1391, in https_open\n    return self.do_open(http.client.HTTPSConnection, req,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1351, in do_open\n    raise URLError(err)\nurllib.error.URLError: <urlopen error network is blocked in a harness-validity run>\n"
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.03,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/market/fundamentals.py": 9
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\infoextract_comparison.py\", line 246, in main\n    \"designed_cases\": run_designed_cases(),\n                      ^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\infoextract_comparison.py\", line 114, in run_designed_cases\n    facts, status = source.facts(ticker, concept=concept, as_of=AT)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.market.fundamentals.FundamentalsSource.facts---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "raised during entry",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "1 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/infoextract_comparison.py', 'argus/market/fundamentals.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/market/fundamentals.py'] of ['argus/market/fundamentals.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "journal_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Pre-registered trading protocol, hash-committed": [
+          "argus/paper/protocol.py",
+          "argus/paper/ledger.py",
+          "argus/eval/journal_comparison.py",
+          "argus/eval/baselines/serenity_journal.py",
+          "argus/eval/baselines/serenity_guards.py",
+          "argus/eval/baselines/serenity_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/paper/ledger.py",
+        "argus/paper/protocol.py"
+      ],
+      "reached": [
+        "argus/paper/ledger.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 5.78,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.06,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/paper/ledger.py": 14,
+          "argus/paper/protocol.py": 22
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\journal_comparison.py\", line 453, in main\n    argus_crlf = run_argus_crlf_case()\n                 ^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\journal_comparison.py\", line 107, in run_argus_crlf_case\n    ledger.record(\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.paper.ledger.PaperLedger.record---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/baselines/serenity_guards.py', 'argus/eval/baselines/serenity_journal.py', 'argus/eval/baselines/serenity_loader.py', 'argus/eval/journal_comparison.py', 'argus/paper/ledger.py', 'argus/paper/protocol.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/paper/ledger.py'] of ['argus/paper/ledger.py', 'argus/paper/protocol.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "lui_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "LUI intent routing, measured against Rasa's real DIET classifier": [
+          "argus/lui/ngram.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/lui/ngram.py"
+      ],
+      "reached": [
+        "argus/lui/ngram.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 0.36,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.07,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/lui/ngram.py": 11
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\lui_comparison.py\", line 344, in main\n    sealed = run_sealed_comparison()\n             ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\lui_comparison.py\", line 156, in run_sealed_comparison\n    reached, source = classify_with_fallback(ask, now=AT)\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.lui.ngram.classify_with_fallback---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/lui/ngram.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/lui/ngram.py'] of ['argus/lui/ngram.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "mandate_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Per-profile mandate that changes the verdict": [
+          "argus/agents/mandate.py",
+          "argus/desk/workbench.py",
+          "argus/desk/personalisation.py",
+          "argus/agents/desk.py",
+          "argus/agents/meta_pm.py",
+          "argus/eval/mandate_comparison.py",
+          "argus/eval/baselines/loader.py",
+          "argus/eval/baselines/vibe_trading_enforcement.py",
+          "argus/eval/baselines/vibe_trading_mandate_model.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/agents/desk.py",
+        "argus/agents/mandate.py",
+        "argus/agents/meta_pm.py",
+        "argus/desk/personalisation.py",
+        "argus/desk/workbench.py"
+      ],
+      "reached": [
+        "argus/desk/workbench.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 1.14,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.69,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/agents/desk.py": 11,
+          "argus/agents/mandate.py": 7,
+          "argus/agents/meta_pm.py": 18,
+          "argus/desk/personalisation.py": 14,
+          "argus/desk/workbench.py": 14
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\mandate_comparison.py\", line 757, in main\n    designed = run_designed(baseline)\n               ^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\mandate_comparison.py\", line 372, in run_designed\n    results = tuple(compare(s, baseline) for s in designed_scenarios())\n                                                  ^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\mandate_comparison.py\", line 221, in designed_scenarios\n    conservative = _conservative()\n                   ^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\mandate_comparison.py\", line 207, in _conservative\n    return TraderProfile.conservative()\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.desk.workbench.TraderProfile.conservative---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/agents/desk.py', 'argus/agents/mandate.py', 'argus/agents/meta_pm.py', 'argus/desk/personalisation.py', 'argus/desk/workbench.py', 'argus/eval/baselines/loader.py', 'argus/eval/baselines/vibe_trading_enforcement.py', 'argus/eval/baselines/vibe_trading_mandate_model.py', 'argus/eval/mandate_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/desk/workbench.py'] of ['argus/agents/desk.py', 'argus/agents/mandate.py', 'argus/agents/meta_pm.py', 'argus/desk/personalisation.py', 'argus/desk/workbench.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "mcp_sdk_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {},
+      "code_under_test": [],
+      "reached": [],
+      "baseline": {
+        "status": "raised during entry",
+        "elapsed_s": 1.37,
+        "network_attempts": 1,
+        "writes_redirected": [],
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\mcp_sdk_comparison.py\", line 243, in main\n    report = run()\n             ^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\mcp_sdk_comparison.py\", line 233, in run\n    report[\"sdk\"] = mcp_fuzz.fuzz(sdk_transport(mcp_server.TOOLS), mcp_server.TOOLS)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\mcp_fuzz.py\", line 376, in fuzz\n    transport = transport_for(probe)\n                ^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\mcp_sdk_comparison.py\", line 101, in factory\n    client.__enter__()\n  File \"~\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\starlette\\testclient.py\", line 680, in __enter__\n    self.portal = portal = stack.enter_context(anyio.from_thread.start_blocking_portal(**self.async_backend))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\contextlib.py\", line 517, in enter_context\n    result = _enter(cm)\n             ^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\contextlib.py\", line 137, in __enter__\n    return next(self.gen)\n           ^^^^^^^^^^^^^^\n  File \"~\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\anyio\\from_thread.py\", line 548, in start_blocking_portal\n    portal = future.result()\n             ^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\concurrent\\futures\\_base.py\", line 456, in result\n    return self.__get_result()\n           ^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\concurrent\\futures\\_base.py\", line 401, in __get_result\n    raise self._exception\n  File \"~\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\anyio\\from_thread.py\", line 536, in run_blocking_portal\n    run_eventloop(\n  File \"~\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\anyio\\_core\\_eventloop.py\", line 83, in run\n    return async_backend.run(func, args, {}, backend_options)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\anyio\\_backends\\_asyncio.py\", line 2435, in run\n    with Runner(debug=debug, loop_factory=loop_factory) as runner:\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\asyncio\\runners.py\", line 59, in __enter__\n    self._lazy_init()\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\asyncio\\runners.py\", line 137, in _lazy_init\n    self._loop = events.new_event_loop()\n                 ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\asyncio\\events.py\", line 810, in new_event_loop\n    return get_event_loop_policy().new_event_loop()\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\asyncio\\events.py\", line 699, in new_event_loop\n    return self._loop_factory()\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\asyncio\\windows_events.py\", line 315, in __init__\n    super().__init__(proactor)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\asyncio\\proactor_events.py\", line 639, in __init__\n    self._make_self_pipe()\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\asyncio\\proactor_events.py\", line 784, in _make_self_pipe\n    self._ssock, self._csock = socket.socketpair()\n                               ^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\socket.py\", line 641, in socketpair\n    csock.connect((addr, port))\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 173, in refuse\n    raise NetworkBlockedError(\"network is blocked in a harness-validity run\")\nNetworkBlockedError: network is blocked in a harness-validity run\n"
+      },
+      "canary": {
+        "status": "not run: nothing outside the harness is credited",
+        "elapsed_s": null,
+        "fired_at_import": null,
+        "sabotaged_functions": null,
+        "error": null,
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "raised during entry",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "1 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "0 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "credited: []",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of []",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "overnight_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Where a shut stock should open: the perpetual-implied open, against gloaming and nocturne": [
+          "argus/eval/overnight_comparison.py",
+          "argus/eval/void_comparison.py"
+        ]
+      },
+      "code_under_test": [],
+      "reached": [],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 21.82,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "not run: nothing outside the harness is credited",
+        "elapsed_s": null,
+        "fired_at_import": null,
+        "sabotaged_functions": null,
+        "error": null,
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": {
+        "rows": 904,
+        "oracle_mae_bps": 0.0,
+        "wrong_desk_mae_bps": 180.64,
+        "oracle_vs_gloaming": "a better",
+        "oracle_perfect": true,
+        "anti_oracle_worse": true
+      },
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "credits_code_outside_the_harness",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "credited: ['argus/eval/overnight_comparison.py', 'argus/eval/void_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of []",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          },
+          {
+            "name": "oracle_scores_perfectly",
+            "tier": "statistic",
+            "passed": true,
+            "score": 1.0,
+            "detail": "{\"rows\": 904, \"oracle_mae_bps\": 0.0, \"wrong_desk_mae_bps\": 180.64, \"oracle_vs_gloaming\": \"a better\", \"oracle_perfect\": true, \"anti_oracle_worse\": true}",
+            "skipped": false
+          },
+          {
+            "name": "wrong_desk_scores_worse",
+            "tier": "statistic",
+            "passed": true,
+            "score": 1.0,
+            "detail": "{\"rows\": 904, \"oracle_mae_bps\": 0.0, \"wrong_desk_mae_bps\": 180.64, \"oracle_vs_gloaming\": \"a better\", \"oracle_perfect\": true, \"anti_oracle_worse\": true}",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "quarantine_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {},
+      "code_under_test": [],
+      "reached": [],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 28.98,
+        "network_attempts": 0,
+        "writes_redirected": [
+          "argus/data/quarantine_comparison.json"
+        ],
+        "error": null
+      },
+      "canary": {
+        "status": "not run: nothing outside the harness is credited",
+        "elapsed_s": null,
+        "fired_at_import": null,
+        "sabotaged_functions": null,
+        "error": null,
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "cited_by_standing",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "0 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "credited: []",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of []",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "rdagent_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Factor-discovery safety: no execution surface and trial-corrected selection, vs. RD-Agent": [
+          "argus/research/searchoff.py",
+          "argus/research/grammar.py",
+          "argus/eval/rdagent_comparison.py",
+          "argus/eval/baselines/rdagent_experiment.py",
+          "argus/eval/baselines/rdagent_factor.py",
+          "argus/eval/baselines/rdagent_costeer_task.py",
+          "argus/eval/baselines/rdagent_exception.py",
+          "argus/eval/baselines/rdagent_cache_utils.py",
+          "argus/eval/baselines/rdagent_factor_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/research/grammar.py",
+        "argus/research/searchoff.py"
+      ],
+      "reached": [],
+      "baseline": {
+        "status": "raised during entry",
+        "elapsed_s": 0.61,
+        "network_attempts": 1,
+        "writes_redirected": [],
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\rdagent_comparison.py\", line 506, in main\n    candles = fetch_range(\"NVDAUSDT\", days=62, interval=\"1H\", candle_type=CandleType.MARKET)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 243, in fetch_range\n    return fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=days), interval=interval,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 268, in fetch_window\n    page = fetch(symbol, interval=interval, candle_type=candle_type, end=cursor)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 219, in fetch\n    for row in _get(params, path=RECENT_PATH if recent else HISTORY_PATH):\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 180, in _get\n    raise HistoryError(f\"transport failure: {exc}\") from None\nargus.market.history.HistoryError: transport failure: <urlopen error network is blocked in a harness-validity run>\n"
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.57,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/research/grammar.py": 42,
+          "argus/research/searchoff.py": 22
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\rdagent_comparison.py\", line 506, in main\n    candles = fetch_range(\"NVDAUSDT\", days=62, interval=\"1H\", candle_type=CandleType.MARKET)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 243, in fetch_range\n    return fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=days), interval=interval,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 268, in fetch_window\n    page = fetch(symbol, interval=interval, candle_type=candle_type, end=cursor)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 219, in fetch\n    for row in _get(params, path=RECENT_PATH if recent else HISTORY_PATH):\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 180, in _get\n    raise HistoryError(f\"transport failure: {exc}\") from None\nargus.market.history.HistoryError: transport failure: <urlopen error network is blocked in a harness-validity run>\n",
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "raised during entry",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "1 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/baselines/rdagent_cache_utils.py', 'argus/eval/baselines/rdagent_costeer_task.py', 'argus/eval/baselines/rdagent_exception.py', 'argus/eval/baselines/rdagent_experiment.py', 'argus/eval/baselines/rdagent_factor.py', 'argus/eval/baselines/rdagent_factor_loader.py', 'argus/eval/rdagent_comparison.py', 'argus/research/grammar.py', 'argus/research/searchoff.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of ['argus/research/grammar.py', 'argus/research/searchoff.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "recall_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Episodic memory across decisions": [
+          "argus/agents/recall.py",
+          "argus/eval/recall_comparison.py",
+          "argus/eval/baselines/tradingagents_loader.py",
+          "argus/eval/baselines/tradingagents_memory.py",
+          "argus/eval/baselines/tradingagents_rating.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/agents/recall.py"
+      ],
+      "reached": [
+        "argus/agents/recall.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 0.06,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.01,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/agents/recall.py": 11
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\recall_comparison.py\", line 354, in main\n    boundary = run_boundary_cases(memory_log_class)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\recall_comparison.py\", line 141, in run_boundary_cases\n    argus_after_settle = run_argus_recall(\n                         ^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\recall_comparison.py\", line 83, in run_argus_recall\n    return recall(entries, symbol=symbol, now=now)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.agents.recall.recall---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/agents/recall.py', 'argus/eval/baselines/tradingagents_loader.py', 'argus/eval/baselines/tradingagents_memory.py', 'argus/eval/baselines/tradingagents_rating.py', 'argus/eval/recall_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/agents/recall.py'] of ['argus/agents/recall.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "regime_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Regime-boundary detection, measured against stumpy FLUSS and ruptures": [
+          "argus/desk/regime.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/desk/regime.py"
+      ],
+      "reached": [
+        "argus/desk/regime.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 571.63,
+        "network_attempts": 0,
+        "writes_redirected": [
+          "argus/data/regime_comparison.json"
+        ],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 2.51,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/desk/regime.py": 14
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\regime_comparison.py\", line 1733, in main\n    base = run_base_case(frozen=frozen)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\regime_comparison.py\", line 1240, in run_base_case\n    **_compute_base_case(series),\n      ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\regime_comparison.py\", line 1221, in _compute_base_case\n    runs = [run_symbol(symbol, rows) for symbol, rows in sorted(series.items())]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\regime_comparison.py\", line 1221, in <listcomp>\n    runs = [run_symbol(symbol, rows) for symbol, rows in sorted(series.items())]\n            ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\regime_comparison.py\", line 688, in run_symbol\n    argus_index, argus_seconds = argus_profile(values)\n                                 ^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\regime_comparison.py\", line 423, in argus_profile\n    index = matrix_profile_index(values, window)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.desk.regime.matrix_profile_index---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/desk/regime.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/desk/regime.py'] of ['argus/desk/regime.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "review_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Self-evolving review rules": [
+          "argus/desk/review.py",
+          "argus/eval/review_comparison.py",
+          "argus/eval/baselines/tradingagents_loader.py",
+          "argus/eval/baselines/tradingagents_memory.py",
+          "argus/eval/baselines/tradingagents_rating.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/desk/review.py"
+      ],
+      "reached": [
+        "argus/desk/review.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 0.04,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.03,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/desk/review.py": 51
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\review_comparison.py\", line 397, in main\n    lifecycle = run_lifecycle()\n                ^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\review_comparison.py\", line 228, in run_lifecycle\n    cases = run_lifecycle_cases()\n            ^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\review_comparison.py\", line 144, in run_lifecycle_cases\n    perf = evaluate(rule, few, [Defect(0, \"X\", DefectKind.GROUNDING, \"x\")])\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.desk.review.evaluate---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/desk/review.py', 'argus/eval/baselines/tradingagents_loader.py', 'argus/eval/baselines/tradingagents_memory.py', 'argus/eval/baselines/tradingagents_rating.py', 'argus/eval/review_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/desk/review.py'] of ['argus/desk/review.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "risk_layer_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Risk layer proved by domain sweep": [
+          "argus/eval/riskproof.py",
+          "argus/eval/freqtrade_baseline.py",
+          "argus/eval/risk_layer_comparison.py",
+          "argus/eval/gate_ablation.py",
+          "argus/agents/desk.py",
+          "argus/desk/book.py",
+          "argus/risk/circuit.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/agents/desk.py",
+        "argus/desk/book.py",
+        "argus/eval/freqtrade_baseline.py",
+        "argus/eval/gate_ablation.py",
+        "argus/eval/riskproof.py",
+        "argus/risk/circuit.py"
+      ],
+      "reached": [
+        "argus/risk/circuit.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 3.36,
+        "network_attempts": 0,
+        "writes_redirected": [
+          "argus/data/risk_layer_comparison.json"
+        ],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.28,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/agents/desk.py": 11,
+          "argus/desk/book.py": 34,
+          "argus/eval/freqtrade_baseline.py": 8,
+          "argus/eval/gate_ablation.py": 8,
+          "argus/eval/riskproof.py": 17,
+          "argus/risk/circuit.py": 11
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\risk_layer_comparison.py\", line 1149, in main\n    report = compare_real_symbols(days=args.days, frozen=frozen)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\risk_layer_comparison.py\", line 620, in compare_real_symbols\n    checkpoints = walk_trades(trades, symbol=symbol, oos_boundary_ts=boundary_ts)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\risk_layer_comparison.py\", line 291, in walk_trades\n    activation, trips = assess(book)\n                        ^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.risk.circuit.assess---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/agents/desk.py', 'argus/desk/book.py', 'argus/eval/freqtrade_baseline.py', 'argus/eval/gate_ablation.py', 'argus/eval/risk_layer_comparison.py', 'argus/eval/riskproof.py', 'argus/risk/circuit.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/risk/circuit.py'] of ['argus/agents/desk.py', 'argus/desk/book.py', 'argus/eval/freqtrade_baseline.py', 'argus/eval/gate_ablation.py', 'argus/eval/riskproof.py', 'argus/risk/circuit.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "rotation_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Data-honest cross-asset breadth rotation vs. a silently-dropping reference": [
+          "argus/desk/rotation.py",
+          "argus/eval/rotation_comparison.py",
+          "argus/eval/baselines/pytaa_vigilant_allocation.py",
+          "argus/eval/baselines/pytaa_vigilant_allocation_loader.py",
+          "argus/eval/baselines/pytaa_signal.py",
+          "argus/eval/baselines/pytaa_signal_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/desk/rotation.py"
+      ],
+      "reached": [],
+      "baseline": {
+        "status": "raised during entry",
+        "elapsed_s": 0.6,
+        "network_attempts": 4,
+        "writes_redirected": [],
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\rotation_comparison.py\", line 574, in main\n    \"baseline_reproduced\": run_baseline_reproduced_cases(),\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\rotation_comparison.py\", line 191, in run_baseline_reproduced_cases\n    scored = _score_symbols(df, pairs_by_symbol, DESIGN_SYMBOLS)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\rotation_comparison.py\", line 143, in _score_symbols\n    real_scores = signal_mod.Signal(df).momentum_score().iloc[-1]\n                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^\n  File \"~\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\pandas\\core\\indexing.py\", line 1207, in __getitem__\n    return self._getitem_axis(maybe_callable, axis=axis)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\pandas\\core\\indexing.py\", line 1773, in _getitem_axis\n    self._validate_integer(key, axis)\n  File \"~\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\pandas\\core\\indexing.py\", line 1706, in _validate_integer\n    raise IndexError(\"single positional indexer is out-of-bounds\")\nIndexError: single positional indexer is out-of-bounds\n"
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.6,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/desk/rotation.py": 6
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\rotation_comparison.py\", line 574, in main\n    \"baseline_reproduced\": run_baseline_reproduced_cases(),\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\rotation_comparison.py\", line 191, in run_baseline_reproduced_cases\n    scored = _score_symbols(df, pairs_by_symbol, DESIGN_SYMBOLS)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\rotation_comparison.py\", line 143, in _score_symbols\n    real_scores = signal_mod.Signal(df).momentum_score().iloc[-1]\n                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^\n  File \"~\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\pandas\\core\\indexing.py\", line 1207, in __getitem__\n    return self._getitem_axis(maybe_callable, axis=axis)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\pandas\\core\\indexing.py\", line 1773, in _getitem_axis\n    self._validate_integer(key, axis)\n  File \"~\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\pandas\\core\\indexing.py\", line 1706, in _validate_integer\n    raise IndexError(\"single positional indexer is out-of-bounds\")\nIndexError: single positional indexer is out-of-bounds\n",
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "raised during entry",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "4 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/desk/rotation.py', 'argus/eval/baselines/pytaa_signal.py', 'argus/eval/baselines/pytaa_signal_loader.py', 'argus/eval/baselines/pytaa_vigilant_allocation.py', 'argus/eval/baselines/pytaa_vigilant_allocation_loader.py', 'argus/eval/rotation_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of ['argus/desk/rotation.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "schedule_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Session-aware execution that refuses to solve through a boundary": [
+          "argus/execution/schedule.py",
+          "argus/execution/guard.py",
+          "argus/eval/schedule_comparison.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/execution/guard.py",
+        "argus/execution/schedule.py"
+      ],
+      "reached": [
+        "argus/execution/schedule.py"
+      ],
+      "baseline": {
+        "status": "raised during entry",
+        "elapsed_s": 0.08,
+        "network_attempts": 1,
+        "writes_redirected": [],
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\schedule_comparison.py\", line 534, in main\n    oos_rpt = out_of_sample_sweep()\n              ^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\schedule_comparison.py\", line 454, in out_of_sample_sweep\n    results[symbol] = out_of_sample_test(symbol=symbol).as_dict()\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\schedule_comparison.py\", line 403, in out_of_sample_test\n    candles = fetch_range(symbol, days=days, interval=\"1H\", candle_type=CandleType.MARKET)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 243, in fetch_range\n    return fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=days), interval=interval,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 268, in fetch_window\n    page = fetch(symbol, interval=interval, candle_type=candle_type, end=cursor)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 219, in fetch\n    for row in _get(params, path=RECENT_PATH if recent else HISTORY_PATH):\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\history.py\", line 180, in _get\n    raise HistoryError(f\"transport failure: {exc}\") from None\nargus.market.history.HistoryError: transport failure: <urlopen error network is blocked in a harness-validity run>\n"
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.01,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/execution/guard.py": 19,
+          "argus/execution/schedule.py": 9
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\schedule_comparison.py\", line 524, in main\n    comparisons = sweep()\n                  ^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\schedule_comparison.py\", line 189, in sweep\n    out.append(compare(\n               ^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\schedule_comparison.py\", line 128, in compare\n    ac = trajectory(\n         ^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.execution.schedule.trajectory---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "raised during entry",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "1 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/schedule_comparison.py', 'argus/execution/guard.py', 'argus/execution/schedule.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/execution/schedule.py'] of ['argus/execution/guard.py', 'argus/execution/schedule.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "sentiment_comparison",
+      "skipped": "main() builds a live QwenClient and scores the model's own answers; this task's Qwen cap is 0, so it is not run",
+      "capabilities_citing_it": {
+        "Sentiment integrity: resistance to coordinated posting, vs. finBERT": [
+          "argus/agents/analysts.py",
+          "argus/market/macro.py",
+          "argus/eval/sentiment_comparison.py",
+          "argus/eval/baselines/finbert_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/agents/analysts.py",
+        "argus/market/macro.py"
+      ],
+      "reached": [],
+      "baseline": {
+        "status": "not run: main() builds a live QwenClient and scores the model's own answers; this task's Qwen cap is 0, so it is not run",
+        "elapsed_s": null,
+        "network_attempts": null,
+        "writes_redirected": null,
+        "error": null
+      },
+      "canary": {
+        "status": "not run",
+        "elapsed_s": null,
+        "fired_at_import": null,
+        "sabotaged_functions": null,
+        "error": null,
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": null,
+      "valid": null
+    },
+    {
+      "harness": "shapematch_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Path-shape matching with a calibrated null": [
+          "argus/desk/shapematch.py",
+          "argus/eval/shapematch_comparison.py",
+          "argus/eval/baselines/stumpy_squared_distance.py",
+          "argus/eval/baselines/stumpy_squared_distance_loader.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/desk/shapematch.py"
+      ],
+      "reached": [
+        "argus/desk/shapematch.py"
+      ],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 35.95,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.43,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/desk/shapematch.py": 11
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\shapematch_comparison.py\", line 444, in main\n    distance_cases = run_distance_cases(surface)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\shapematch_comparison.py\", line 129, in run_distance_cases\n    argus_value = distance(left, right)\n                  ^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.desk.shapematch.distance---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/desk/shapematch.py', 'argus/eval/baselines/stumpy_squared_distance.py', 'argus/eval/baselines/stumpy_squared_distance_loader.py', 'argus/eval/shapematch_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/desk/shapematch.py'] of ['argus/desk/shapematch.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "harness": "stopquality_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Where a stop sits in the noise, measured against Rook's invalidation price": [
+          "argus/eval/stopquality_comparison.py"
+        ]
+      },
+      "code_under_test": [],
+      "reached": [],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 0.02,
+        "network_attempts": 0,
+        "writes_redirected": [
+          "argus/data/stopquality_comparison.json"
+        ],
+        "error": null
+      },
+      "canary": {
+        "status": "not run: nothing outside the harness is credited",
+        "elapsed_s": null,
+        "fired_at_import": null,
+        "sabotaged_functions": null,
+        "error": null,
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "credits_code_outside_the_harness",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "credited: ['argus/eval/stopquality_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of []",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "void_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Where a shut stock should open: the perpetual-implied open, against gloaming and nocturne": [
+          "argus/eval/overnight_comparison.py",
+          "argus/eval/void_comparison.py"
+        ]
+      },
+      "code_under_test": [],
+      "reached": [],
+      "baseline": {
+        "status": "ok",
+        "elapsed_s": 2.87,
+        "network_attempts": 0,
+        "writes_redirected": [],
+        "error": null
+      },
+      "canary": {
+        "status": "not run: nothing outside the harness is credited",
+        "elapsed_s": null,
+        "fired_at_import": null,
+        "sabotaged_functions": null,
+        "error": null,
+        "fired": 0,
+        "surfaced": null
+      },
+      "oracle": {
+        "rows": 61,
+        "oracle_mae_pct": 0.0,
+        "wrong_desk_mae_pct": 8.467,
+        "oracle_vs_full_fade": "a better",
+        "oracle_perfect": true,
+        "anti_oracle_worse": true
+      },
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "credits_code_outside_the_harness",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ok",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "0 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "credited: ['argus/eval/overnight_comparison.py', 'argus/eval/void_comparison.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "executed [] of []",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "canary never fired; 0 distinct canary(ies) fired",
+            "skipped": false
+          },
+          {
+            "name": "oracle_scores_perfectly",
+            "tier": "statistic",
+            "passed": true,
+            "score": 1.0,
+            "detail": "{\"rows\": 61, \"oracle_mae_pct\": 0.0, \"wrong_desk_mae_pct\": 8.467, \"oracle_vs_full_fade\": \"a better\", \"oracle_perfect\": true, \"anti_oracle_worse\": true}",
+            "skipped": false
+          },
+          {
+            "name": "wrong_desk_scores_worse",
+            "tier": "statistic",
+            "passed": true,
+            "score": 1.0,
+            "detail": "{\"rows\": 61, \"oracle_mae_pct\": 0.0, \"wrong_desk_mae_pct\": 8.467, \"oracle_vs_full_fade\": \"a better\", \"oracle_perfect\": true, \"anti_oracle_worse\": true}",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "harness": "workbench_comparison",
+      "skipped": null,
+      "capabilities_citing_it": {
+        "Point-in-time correctness vs. OpenBB's real, ungated live-API agent": [
+          "argus/market/evidence.py",
+          "argus/market/fundamentals.py",
+          "argus/eval/workbench_comparison.py"
+        ]
+      },
+      "code_under_test": [
+        "argus/market/evidence.py",
+        "argus/market/fundamentals.py"
+      ],
+      "reached": [
+        "argus/market/fundamentals.py"
+      ],
+      "baseline": {
+        "status": "raised during entry",
+        "elapsed_s": 0.19,
+        "network_attempts": 1,
+        "writes_redirected": [],
+        "error": "Traceback (most recent call last):\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1348, in do_open\n    h.request(req.get_method(), req.selector, req.data, headers,\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1303, in request\n    self._send_request(method, url, body, headers, encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1349, in _send_request\n    self.endheaders(body, encode_chunked=encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1298, in endheaders\n    self._send_output(message_body, encode_chunked=encode_chunked)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1058, in _send_output\n    self.send(msg)\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 996, in send\n    self.connect()\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 1468, in connect\n    super().connect()\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\http\\client.py\", line 962, in connect\n    self.sock = self._create_connection(\n                ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 173, in refuse\n    raise NetworkBlockedError(\"network is blocked in a harness-validity run\")\nNetworkBlockedError: network is blocked in a harness-validity run\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\workbench_comparison.py\", line 244, in main\n    \"point_in_time_comparison\": run_point_in_time_comparison(),\n                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\workbench_comparison.py\", line 133, in run_point_in_time_comparison\n    facts_far_past, status_far_past = fundamentals.facts(\n                                      ^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\fundamentals.py\", line 313, in facts\n    cik = self._edgar.cik_for(ticker)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\evidence.py\", line 334, in cik_for\n    raw = self._get(self.TICKERS_URL)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\market\\evidence.py\", line 329, in _get\n    with urllib.request.urlopen(req, timeout=_TIMEOUT) as r:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 216, in urlopen\n    return opener.open(url, data, timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 519, in open\n    response = self._open(req, data)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 536, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 496, in _call_chain\n    result = func(*args)\n             ^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1391, in https_open\n    return self.do_open(http.client.HTTPSConnection, req,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\urllib\\request.py\", line 1351, in do_open\n    raise URLError(err)\nurllib.error.URLError: <urlopen error network is blocked in a harness-validity run>\n"
+      },
+      "canary": {
+        "status": "raised during entry",
+        "elapsed_s": 0.16,
+        "fired_at_import": false,
+        "sabotaged_functions": {
+          "argus/market/evidence.py": 22,
+          "argus/market/fundamentals.py": 9
+        },
+        "error": "Traceback (most recent call last):\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 277, in _child\n    returned = entry(*_entry_args(entry))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\workbench_comparison.py\", line 244, in main\n    \"point_in_time_comparison\": run_point_in_time_comparison(),\n                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\workbench_comparison.py\", line 133, in run_point_in_time_comparison\n    facts_far_past, status_far_past = fundamentals.facts(\n                                      ^^^^^^^^^^^^^^^^^^^\n  File \"~\\bitget\\argus\\src\\argus\\eval\\harness_validity.py\", line 217, in fire\n    raise CanaryError(token)\nCanaryError: ---CANARY_argus.market.fundamentals.FundamentalsSource.facts---\n",
+        "fired": 1,
+        "surfaced": true
+      },
+      "oracle": null,
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "ran_offline",
+        "checks": [
+          {
+            "name": "ran_offline",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "raised during entry",
+            "skipped": false
+          },
+          {
+            "name": "reproducible_without_network",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "1 connection attempt(s) refused",
+            "skipped": false
+          },
+          {
+            "name": "cited_by_standing",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "1 capability(ies) cite its artefact",
+            "skipped": false
+          },
+          {
+            "name": "credits_code_outside_the_harness",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "credited: ['argus/eval/workbench_comparison.py', 'argus/market/evidence.py', 'argus/market/fundamentals.py']",
+            "skipped": false
+          },
+          {
+            "name": "reaches_the_credited_code",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "executed ['argus/market/fundamentals.py'] of ['argus/market/evidence.py', 'argus/market/fundamentals.py']",
+            "skipped": false
+          },
+          {
+            "name": "sabotage_canary_surfaces",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "canary surfaced; 1 distinct canary(ies) fired",
+            "skipped": false
+          }
+        ]
+      },
+      "valid": false
+    }
+  ],
+  "qwen_calls": 0,
+  "rows_remeasured": {
+    "harnesses": [
+      "stopquality_comparison",
+      "claimcheck_comparison",
+      "overnight_comparison",
+      "void_comparison"
+    ],
+    "at": "2026-09-25T20:44:11+00:00",
+    "why": "the four harnesses were changed to call the console code standing.py credits; the other rows are from 'generated'"
+  }
+}

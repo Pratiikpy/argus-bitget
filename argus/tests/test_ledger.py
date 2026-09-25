@@ -186,11 +186,13 @@ class TestAbstentionsAreGradeable:
 
     @staticmethod
     def _abstain(ledger, symbol: str = "rNVDA"):  # type: ignore[no-untyped-def]
+        # A lean is recorded because the scorecard grades a refusal against the trade it withheld
+        # — its lean — and a refusal that states none is counted, not graded (2026-09-25).
         return ledger.record(
             symbol=symbol, verdict="no_trade", side="BUY", quantity=Decimal("0"),
             entry_price=Decimal("100"), stated_confidence=0.9, thesis="edge below the hurdle",
             invalidation=("a catalyst appears",), market_state_hash="h", approved_intent_hash="i",
-            session_phase="weekend", hours_to_discovery=30.5,
+            session_phase="weekend", hours_to_discovery=30.5, lean="up", lean_confidence=0.6,
         )
 
     def test_an_abstention_records_what_the_market_did(self, tmp_path) -> None:  # type: ignore[no-untyped-def]

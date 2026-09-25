@@ -41,8 +41,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+import re
 import sys
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -655,6 +657,338 @@ def assess(
     return report
 
 
+# --- the evidence the thesis did not use -------------------------------------------------------
+#
+# Added 2026-09-25, item S4 of `research/mypr-teardowns/_SYNTHESIS.md`. Every stress above shocks
+# the *position*. This one stresses the *reasoning*: of the evidence the desk was handed, which item
+# did the thesis leave out that most deserved an answer?
+#
+# Taken from STORM's Co-STORM moderator (`stanford-oval/storm`
+# `knowledge_storm/collaborative_storm/modules/co_storm_agents.py:190-312`, MIT). The moderator
+# diffs the retrieved snippets against the cited ones (`:190-214`), embeds the remainder, and scores
+# each unused snippet by
+#
+#     (1 - max similarity to the queries) ** 0.5
+#       * (1 - max similarity to the cited snippets) ** 0.5
+#       * [similarity to the claim >= 0.25]                       (`:216-244`)
+#
+# — close to the topic, far from what was already asked and already used — then asks a question
+# grounded in the top one. The formula and its equal 0.5/0.5 exponents are taken as shipped.
+#
+# Departures, each deliberate:
+#
+# * **The gate is relative, not 0.25.** STORM's constant is calibrated to its own dense sentence
+#   encoder. The encoder here is the repository's static `potion-base-8M` table (`lui/semantic.py`),
+#   whose cosines between clearly related financial sentences measured 0.14-0.25 on 2026-09-25, so
+#   0.25 would gate out nearly everything. An unused item passes when it is at least as close to the
+#   claim as the least-close item the thesis *did* rely on — "as on-topic as something you used" —
+#   or, when nothing was cited, when it is in the closer half of the unused pool. Both are on the
+#   encoder's own scale, so no constant has to be re-fitted per encoder.
+# * **"Queries" are what the thesis already considered.** A desk thesis has no search queries. What
+#   it has is its invalidation conditions and its counter-case — the angles it already examined —
+#   and an item close to those has been answered, if implicitly.
+# * **"Cited" is established, not declared.** A desk thesis carries no citation markers, so an item
+#   counts as cited when the thesis names its evidence id or when a figure in the thesis resolves to
+#   a figure that item carried (`agents/grounding.py`, the same resolver the desk uses).
+# * **The question is templated, not generated.** STORM spends an LLM call to phrase it. The item is
+#   the finding; the phrasing adds a call and a chance to misstate the item.
+#
+# Whether the surfaced item is actually more relevant than an arbitrary unused one is measured, not
+# assumed: `eval/thesis_quality.py` (``s4``) against a random unused item under a blind judge.
+
+_EVIDENCE_LINE = re.compile(r"^\[(?P<id>[^\]]+)\]\s*(?:\([^)]*\)\s*)?(?P<claim>.*)$", re.S)
+_WORD = re.compile(r"[a-z][a-z0-9]{2,}")
+_STOPWORDS = frozenset({
+    "the", "and", "for", "with", "that", "this", "from", "are", "was", "were", "has",
+    "have", "had", "not", "but", "its", "into", "over", "than", "then", "they", "them",
+    "their", "there", "which", "while", "what", "when", "where", "who", "will", "would",
+    "could", "should", "may", "might", "can", "been", "being", "also", "more", "most",
+    "less", "least", "very", "such", "only", "just", "about", "after", "before", "between",
+    "under", "above", "below", "any", "all", "each", "other", "some", "same", "own", "both",
+    "few", "per", "via"
+})
+
+Encoder = Callable[[Sequence[str]], list[list[float]]]
+"""Texts in, one vector per text out. Cosine similarity is taken between the vectors."""
+
+
+def lexical_encoder(texts: Sequence[str]) -> list[list[float]]:
+    """TF-IDF over the batch's own vocabulary. The fallback when no embedding table is installed.
+
+    Weaker than an embedding — two paraphrases with no shared word score zero — and stated as such:
+    the default is :func:`default_encoder`, and this exists so the stress still runs, labelled,
+    where the table does not.
+    """
+    docs = [[w for w in _WORD.findall(t.lower()) if w not in _STOPWORDS] for t in texts]
+    vocab = sorted({w for d in docs for w in d})
+    index = {w: i for i, w in enumerate(vocab)}
+    df = [0] * len(vocab)
+    for d in docs:
+        for w in set(d):
+            df[index[w]] += 1
+    n = len(docs)
+    out: list[list[float]] = []
+    for d in docs:
+        vector = [0.0] * len(vocab)
+        for w in d:
+            vector[index[w]] += 1.0
+        for i in range(len(vocab)):
+            if vector[i]:
+                vector[i] *= math.log((1 + n) / (1 + df[i])) + 1.0
+        out.append(vector)
+    return out
+
+
+def default_encoder() -> tuple[Encoder, str]:
+    """The repository's static embedding table when installed, else :func:`lexical_encoder`.
+
+    Returns the encoder and its name, so a report can say which one produced its ranking.
+    """
+    try:
+        from argus.lui.semantic import MODEL_ID, _load, available
+
+        if available():
+            model = _load(MODEL_ID)
+
+            def encode(texts: Sequence[str]) -> list[list[float]]:
+                return [[float(x) for x in row] for row in model.encode(list(texts))]
+
+            return encode, MODEL_ID
+    except Exception:  # an absent or broken table degrades to the lexical encoder, labelled
+        pass
+    return lexical_encoder, "lexical-tfidf"
+
+
+def _cosine(a: Sequence[float], b: Sequence[float]) -> float:
+    na = math.sqrt(sum(x * x for x in a))
+    nb = math.sqrt(sum(x * x for x in b))
+    if na == 0 or nb == 0:
+        return 0.0
+    return sum(x * y for x, y in zip(a, b, strict=True)) / (na * nb)
+
+
+def split_evidence_line(line: str, *, index: int = 0) -> tuple[str, str]:
+    """``[id] (source, credibility, available) claim`` → ``(id, claim)``; a bare line keeps its
+    text and gets a positional id."""
+    match = _EVIDENCE_LINE.match(line.strip())
+    if match is None:
+        return f"evidence[{index}]", line.strip()
+    return match.group("id"), match.group("claim").strip()
+
+
+def cited_evidence(thesis: str, evidence: Sequence[tuple[str, str]]) -> set[str]:
+    """Ids of the evidence items a thesis relied on: named by id, or quoted by figure."""
+    from argus.agents.grounding import check, extract
+
+    named = {eid for eid, _ in evidence if eid and eid in thesis}
+    values = [(eid, f.value) for eid, text in evidence for f in extract(text)]
+    report = check(thesis, facts={}, evidence_values=values)
+    quoted = {r.source for r in report.resolutions if r.source is not None}
+    return named | quoted
+
+
+@dataclass(frozen=True, slots=True)
+class UnusedEvidence:
+    """One piece of evidence the thesis did not use, scored the way STORM's moderator scores it."""
+
+    evidence_id: str
+    text: str
+    query_similarity: float
+    cited_similarity: float
+    claim_similarity: float
+    gated_in: bool
+    score: float
+
+    def question(self) -> str:
+        """The stress question, stated so it can be answered with the evidence in hand."""
+        return (
+            f"The thesis did not use [{self.evidence_id}]: {self.text} — does this change the "
+            f"decision? If it cuts against the thesis, say why it was set aside; if it supports "
+            f"it, say why it was not needed."
+        )
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "evidence_id": self.evidence_id,
+            "text": self.text,
+            "query_similarity": round(self.query_similarity, 4),
+            "cited_similarity": round(self.cited_similarity, 4),
+            "claim_similarity": round(self.claim_similarity, 4),
+            "gated_in": self.gated_in,
+            "score": round(self.score, 4),
+        }
+
+
+def unused_evidence(
+    *,
+    claim: str,
+    queries: Sequence[str],
+    evidence: Sequence[tuple[str, str]],
+    cited: set[str] | frozenset[str],
+    encoder: Encoder | None = None,
+) -> list[UnusedEvidence]:
+    """Every unused evidence item, best stress candidate first. Gated-out items sort last at 0.
+
+    ``evidence`` is ``(id, text)`` pairs; ``cited`` the ids the thesis relied on
+    (:func:`cited_evidence`). Returns an empty list when nothing went unused.
+    """
+    unused = [(eid, text) for eid, text in evidence if eid not in cited]
+    if not unused:
+        return []
+    used = [text for eid, text in evidence if eid in cited]
+    encode = encoder if encoder is not None else default_encoder()[0]
+    batch = [claim, *queries, *used, *(text for _, text in unused)]
+    vectors = encode(batch)
+    claim_vec = vectors[0]
+    query_vecs = vectors[1:1 + len(queries)]
+    used_vecs = vectors[1 + len(queries):1 + len(queries) + len(used)]
+    unused_vecs = vectors[1 + len(queries) + len(used):]
+
+    claim_sims = [_cosine(v, claim_vec) for v in unused_vecs]
+    if used_vecs:
+        gate = min(_cosine(v, claim_vec) for v in used_vecs)
+    else:
+        ordered = sorted(claim_sims)
+        gate = ordered[(len(ordered) - 1) // 2]
+
+    out: list[UnusedEvidence] = []
+    for (eid, text), vec, claim_sim in zip(unused, unused_vecs, claim_sims, strict=True):
+        q = max((_cosine(vec, qv) for qv in query_vecs), default=0.0)
+        c = max((_cosine(vec, uv) for uv in used_vecs), default=0.0)
+        q, c = min(max(q, 0.0), 1.0), min(max(c, 0.0), 1.0)
+        gated_in = claim_sim >= gate
+        score = ((1 - q) ** 0.5) * ((1 - c) ** 0.5) * (1.0 if gated_in else 0.0)
+        out.append(UnusedEvidence(
+            evidence_id=eid, text=text, query_similarity=q, cited_similarity=c,
+            claim_similarity=claim_sim, gated_in=gated_in, score=score,
+        ))
+    out.sort(key=lambda u: (-u.score, -u.claim_similarity, u.evidence_id))
+    return out
+
+
+def unused_evidence_stress(
+    *,
+    thesis: str,
+    invalidation: Sequence[str] = (),
+    counter_case: str = "",
+    evidence_lines: Sequence[str],
+    encoder: Encoder | None = None,
+) -> UnusedEvidence | None:
+    """The one stress question worth asking about a thesis, or ``None`` when every item was used.
+
+    The entry point for a caller holding a rendered decision: the thesis, its invalidation list and
+    counter-case, and the evidence lines exactly as the model saw them. A top item that fails the
+    relevance gate is not returned — a question about an off-topic item is noise, and ``None`` says
+    "nothing unused deserved one" rather than inventing a question.
+    """
+    evidence = [split_evidence_line(line, index=i) for i, line in enumerate(evidence_lines)]
+    cited = cited_evidence(thesis, evidence)
+    queries = [q for q in [*invalidation, counter_case] if q.strip()]
+    ranked = unused_evidence(
+        claim=thesis, queries=queries, evidence=evidence, cited=cited, encoder=encoder
+    )
+    if not ranked or not ranked[0].gated_in:
+        return None
+    return ranked[0]
+
+
+# --- how often a stated shock has actually happened ---------------------------------------------
+#
+# Added 2026-09-25 for the scenario tree (`desk/stress_tree.py`, item S24). A trader states a shock
+# as a round number ("QQQ -10%"), and the console's stress answer propagates it through beta without
+# asking the question this module was written to answer: *has that ever happened?* The machinery was
+# already here — :func:`horizon_moves` turns closes into overlapping windowed moves and
+# :func:`quantile_move` refuses a tail it cannot support — but it only ran from a percentile to a
+# shock. These two helpers run the other way, from a stated shock to its frequency, so the tree can
+# say "beyond anything in the window" when that is the truth, and grow the next scenario from the
+# worst move that did happen.
+
+
+@dataclass(frozen=True, slots=True)
+class ShockFrequency:
+    """How often a stated move, or one more extreme in the same direction, actually happened."""
+
+    shock_pct: Decimal
+    horizon_bars: int
+    observations: int
+    occurrences: int
+    """Windows at least as extreme as :attr:`shock_pct`, in its direction."""
+
+    extreme_pct: Decimal
+    """The most extreme observed move in the shock's direction: the lowest for a fall, the highest
+    for a rise. Always a move that genuinely occurred, as :func:`quantile_move` guarantees for its
+    percentiles."""
+
+    last_seen: datetime | None
+
+    @property
+    def frequency_pct(self) -> Decimal:
+        return (Decimal(self.occurrences) / Decimal(self.observations) * Decimal("100")
+                if self.observations else _ZERO)
+
+    @property
+    def beyond_history(self) -> bool:
+        """True when nothing in the window was as extreme as the stated shock."""
+        return self.occurrences == 0
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "shock_pct": str(self.shock_pct), "horizon_bars": self.horizon_bars,
+            "observations": self.observations, "occurrences": self.occurrences,
+            "frequency_pct": str(self.frequency_pct), "extreme_pct": str(self.extreme_pct),
+            "last_seen": self.last_seen.isoformat() if self.last_seen else None,
+            "beyond_history": self.beyond_history,
+        }
+
+
+def shock_frequency(
+    moves: Sequence[Move], *, shock_pct: Decimal, horizon_bars: int,
+) -> ShockFrequency:
+    """Count the observed windows at least as extreme as ``shock_pct``, in its direction.
+
+    Held to the same floor as :func:`quantile_move`: below :data:`MIN_OBSERVATIONS` windows a
+    count of zero means "too little history", not "never happens", and saying the second when the
+    first is true is the error this module exists to prevent — so it raises instead. A zero shock
+    has no direction and is refused too.
+    """
+    if len(moves) < MIN_OBSERVATIONS:
+        raise StressError(
+            f"{len(moves)} observation(s) is below the {MIN_OBSERVATIONS} needed to say how often "
+            f"a move happens; a count from this few windows is not a frequency"
+        )
+    if shock_pct == 0:
+        raise StressError("a shock of zero has no direction to count in")
+    falling = shock_pct < 0
+    hits = [m for m in moves if (m.pct <= shock_pct if falling else m.pct >= shock_pct)]
+    pcts = [m.pct for m in moves]
+    return ShockFrequency(
+        shock_pct=shock_pct, horizon_bars=horizon_bars, observations=len(moves),
+        occurrences=len(hits), extreme_pct=min(pcts) if falling else max(pcts),
+        last_seen=max((m.at for m in hits), default=None),
+    )
+
+
+def closes_from_returns(
+    series: Sequence[tuple[datetime, float]], *, start: Decimal = Decimal("100"),
+) -> list[tuple[datetime, Decimal]]:
+    """A price path rebuilt from per-bar returns, so :func:`horizon_moves` can read it.
+
+    The console holds returns keyed by the bar they end on (`desk/portfolio.returns`), not prices.
+    Level *i* is ``start`` compounded through returns 0..i and stamped with return *i*'s own time,
+    so a window from level *i - k* to level *i* is exactly the compounded move of returns
+    *i - k + 1 .. i*. No level is invented for the instant before the first return: the first
+    return therefore opens no window of its own, which costs one window and dates nothing falsely.
+    Each return passes through ``str`` into :class:`~decimal.Decimal`, so the path is the same on
+    every run rather than depending on a float's binary expansion.
+    """
+    level = start
+    out: list[tuple[datetime, Decimal]] = []
+    for at, value in series:
+        level = level * (Decimal("1") + Decimal(str(value)))
+        out.append((at, level))
+    return out
+
+
 def phase_of_timestamp(at: datetime) -> str:
     """Session phase for a timestamp, using the same clock the desk decides on.
 
@@ -743,19 +1077,30 @@ __all__ = [
     "SEVERITIES",
     "STRUCTURAL",
     "EmpiricalScenario",
+    "Encoder",
     "Move",
     "ReverseStressResult",
+    "ShockFrequency",
     "StressError",
     "StressReport",
     "StructuralScenario",
+    "UnusedEvidence",
     "assess",
+    "cited_evidence",
+    "closes_from_returns",
+    "default_encoder",
     "empirical_scenarios",
     "horizon_moves",
+    "lexical_encoder",
     "main",
     "ordinal",
     "phase_of_timestamp",
     "quantile_move",
     "reverse_stress_liquidity",
+    "shock_frequency",
+    "split_evidence_line",
+    "unused_evidence",
+    "unused_evidence_stress",
 ]
 
 

@@ -1,0 +1,2079 @@
+{
+  "generated_at": "2026-09-25T19:53:55.476179+00:00",
+  "corpora": [
+    "lui_final_heldout_2026-09-25.jsonl",
+    "lui_heldout_corpus_2026-09-25.jsonl",
+    "lui_blind_corpus_2026-09-25.jsonl"
+  ],
+  "questions": 680,
+  "answered": 647,
+  "crashed": [
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 114,
+      "question": "best way to hedge a long AAPL book against a broad tech selloff",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 115,
+      "question": "I'm long 3k in NVDA, what's a cheap way to hedge the downside",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 116,
+      "question": "what perp combo hedges my spot BTC holding best right now",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 117,
+      "question": "i have 0.4 btc and im scared of a crash, how do i protect it",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 118,
+      "question": "how i can protect my tesla stock from going down too much",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 119,
+      "question": "\u6211\u6301\u6709\u5927\u91cfBTC\u73b0\u8d27,\u600e\u4e48\u5bf9\u51b2\u4e0b\u8dcc\u98ce\u9669",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 120,
+      "question": "\u5982\u679c\u6211\u505a\u591a\u82f9\u679c\u4ee3\u5e01\u5316\u80a1\u7968,\u7528\u4ec0\u4e48\u65b9\u5f0f\u5bf9\u51b2\u6700\u6709\u6548",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 121,
+      "question": "\u6211\u7684\u4ee5\u592a\u574a\u4ed3\u4f4d\u5f88\u62c5\u5fc3\u66b4\u8dcc,\u8981\u600e\u4e48\u4fdd\u62a4\u4e00\u4e0b",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 122,
+      "question": "tengo 0.5 BTC, \u00bfc\u00f3mo lo protejo si el mercado cae?",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 125,
+      "question": "wie kann ich meine SOL-Position gegen einen Crash absichern?",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 126,
+      "question": "como eu protejo minha posi\u00e7\u00e3o em bitcoin de uma queda grande?",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 97,
+      "question": "how would you hedge a 2m long NVDA book into earnings",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 98,
+      "question": "\u6211\u6301\u6709\u5927\u91cfAAPL\u591a\u5934\uff0c\u5e94\u8be5\u7528\u4ec0\u4e48\u5de5\u5177\u5bf9\u51b2\u4e0b\u884c\u98ce\u9669\uff1f",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 99,
+      "question": "i have a lot of tesla stock and im scared of a crash how do i protect it",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 100,
+      "question": "mera BTC ka position hai, market girne se bachne ke liye kya karu",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 101,
+      "question": "how I can hedge my gold holding against price going down",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 102,
+      "question": "\u5982\u679c\u8981\u5bf9\u51b2\u79d1\u6280\u80a1\u7ec4\u5408\u7684\u7cfb\u7edf\u6027\u98ce\u9669\uff0c\u7528QQQ\u7a7a\u5934\u8fd8\u662f\u671f\u6743\u66f4\u5408\u9002\uff1f",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 104,
+      "question": "Tengo acciones de Amazon y me preocupa una ca\u00edda, \u00bfc\u00f3mo puedo protegerlas?",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 105,
+      "question": "how do i hedge my solana bag without selling it",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 106,
+      "question": "\u6211\u6709\u4e00\u4e9b\u9ec4\u91d1\uff0c\u600e\u4e48\u5bf9\u51b2\u4ef7\u683c\u4e0b\u8dcc\u7684\u98ce\u9669",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 107,
+      "question": "cross-hedge a MSTR position using BTC perp shorts, what ratio",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 108,
+      "question": "ETH \ub871 \ud3ec\uc9c0\uc158\uc744 \ud5e4\uc9c0\ud558\ub824\uba74 \uc5b4\ub5a4 \ubc29\ubc95\uc774 \uac00\uc7a5 \ud6a8\uc728\uc801\uc774\uc57c?",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 121,
+      "question": "\u6211\u7684\u4ed3\u4f4d\u82f1\u4f1f\u8fbe\u5360\u6bd4\u5f88\u9ad8,\u5e94\u8be5\u600e\u4e48\u5bf9\u51b2",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 123,
+      "question": "best way to hedge a big tsla position going into earnings",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 124,
+      "question": "\u6211\u60f3\u5bf9\u51b2\u4e00\u4e0b\u6211\u7684\u6bd4\u7279\u5e01\u4ed3\u4f4d,\u600e\u4e48\u505a",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 126,
+      "question": "protect my mstr position from a btc drawdown",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 127,
+      "question": "how to hedge overnight risk holding qqq rtoken",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 128,
+      "question": "gold as a hedge for my tech-heavy book, does it work",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 129,
+      "question": "\u6301\u6709\u5927\u91cfAAPL,\u60f3\u627e\u4e2a\u5bf9\u51b2\u65b9\u6848",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 130,
+      "question": "hedge amzn earnings risk without selling the position",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 132,
+      "question": "what's the cheapest way to hedge my spy exposure this week",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 133,
+      "question": "\u6211\u6301\u6709eth\u7684rToken\u8fc7\u591c,\u60f3\u5bf9\u51b2\u4e00\u4e0b\u98ce\u9669",
+      "error": "PortfolioError: BTCUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 135,
+      "question": "protective hedge for meta going into cpi week",
+      "error": "PortfolioError: SMHUSDT is not in the frozen history either",
+      "last_steps": [
+        "argus.lui.research._candles",
+        "argus.lui.research._fetch_one",
+        "argus.lui.research._candles",
+        "argus.lui.research._from_fixture"
+      ],
+      "without_recorder": "also raises PortfolioError"
+    }
+  ],
+  "crashes_caused_by_the_recorder": 0,
+  "lines": {
+    "meta": 862,
+    "content": 1807
+  },
+  "trace_determined": {
+    "lines": 742,
+    "share": 0.4106,
+    "by_label": {
+      "missing": 262,
+      "computed": 179,
+      "desk": 143,
+      "live": 77,
+      "record": 48,
+      "assumed": 33
+    },
+    "by_engine": {
+      "argus.lui.research._run": 281,
+      "argus.lui.research._impact_lines": 100,
+      "emit": 88,
+      "argus.lui.research._event_lines": 66,
+      "argus.lui.answer._how_it_was_reached": 37,
+      "request.defaults": 33,
+      "argus.lui.answer.answer_abstention_why": 30,
+      "argus.lui.research._desk_view": 19,
+      "argus.lui.research._distribution_line": 18,
+      "argus.lui.research._coordination_test": 18,
+      "argus.lui.answer.answer_decision_why": 12,
+      "argus.lui.research._flow_lines": 11,
+      "argus.lui.answer._lean_grading": 10,
+      "argus.lui.research._hedge_line": 9,
+      "argus.lui.answer.answer_decision_list": 7,
+      "argus.lui.answer.answer_position": 2,
+      "argus.lui.research._beta_track_record": 1
+    }
+  },
+  "wording_labelled_today": {
+    "lines": 1369,
+    "share": 0.7576
+  },
+  "labelled_with_trace_first": {
+    "lines": 1510,
+    "share": 0.8356
+  },
+  "producer_found": {
+    "lines": 1789,
+    "share": 0.99
+  },
+  "where_both_label": {
+    "lines": 601,
+    "agree": 601,
+    "agreement": 1.0
+  },
+  "trace_labels_where_wording_has_none": 141,
+  "disagreements": [
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 7,
+      "question": "\u628a\u4ed3\u4f4d\u4ece10\u4e07\u7f8e\u91d1\u52a0\u523015\u4e07\u7f8e\u91d1,\u5bf9\u6574\u4f53\u6760\u6746\u548c\u98ce\u9669\u655e\u53e3\u5f71\u54cd\u591a\u5927",
+      "line": "\u5f53\u524d\u6ca1\u6709\u6301\u4ed3\u3002",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_position",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 7,
+      "question": "\u628a\u4ed3\u4f4d\u4ece10\u4e07\u7f8e\u91d1\u52a0\u523015\u4e07\u7f8e\u91d1,\u5bf9\u6574\u4f53\u6760\u6746\u548c\u98ce\u9669\u655e\u53e3\u5f71\u54cd\u591a\u5927",
+      "line": "\u8bb0\u5f55\u4e2d\u5171\u6709 696 \u6761\u51b3\u7b56\uff0c\u5176\u4e2d 696 \u6761\u4e3a\u653e\u5f03\u4ea4\u6613\u3002",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_position",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 57,
+      "question": "what's the funding rate on BTC perp right now",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 58,
+      "question": "current round trip cost on the TSLA perp including fees and spread",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 59,
+      "question": "quick, what's NVDA trading at and what's the current spread",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 60,
+      "question": "whats the price of apple stock token right this second",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 62,
+      "question": "how much is one bitcoin costing right now, and what is the spread",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 63,
+      "question": "\u73b0\u5728\u82f9\u679c\u80a1\u7968\u4ee3\u5e01\u7684\u4e70\u5356\u4ef7\u5dee\u662f\u591a\u5c11",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 64,
+      "question": "\u4ee5\u592a\u574a\u73b0\u5728\u7684\u8d44\u91d1\u8d39\u7387\u662f\u591a\u5c11,\u4e70\u4e00\u5356\u4e00\u4ef7\u5dee\u5462",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 65,
+      "question": "\u7279\u65af\u62c9\u4ee3\u5e01\u5316\u80a1\u7968\u73b0\u5728\u591a\u5c11\u94b1,\u6210\u4ea4\u91cf\u600e\u4e48\u6837",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 66,
+      "question": "dame el precio actual de ETH y el spread bid ask",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 67,
+      "question": "gi\u00e1 bitcoin b\u00e2y gi\u1edd l\u00e0 bao nhi\u00eau, v\u00e0 ch\u00eanh l\u1ec7ch mua b\u00e1n th\u1ebf n\u00e0o",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 68,
+      "question": "c'est quoi le funding rate actuel sur ETH perp ?",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 69,
+      "question": "was kostet eine BTC-Perp-Order gerade komplett, inklusive Spread und Geb\u00fchren?",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 70,
+      "question": "qual o pre\u00e7o agora do bitcoin, bid e ask, quero saber",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 71,
+      "question": "what's the RSI on BTC perp on the 4h chart right now",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 72,
+      "question": "is apple stock overbought right now, what do the indicators say",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 73,
+      "question": "golden cross forming on SOL daily chart or nah",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 74,
+      "question": "show me MSFT support and resistance levels on the daily",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 76,
+      "question": "tesla stock chart, is it showing bullish or bearish pattern now",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 77,
+      "question": "\u4ee5\u592a\u574a\u73b0\u5728\u662f\u4e0d\u662f\u8d85\u4e70\u4e86,MACD\u600e\u4e48\u6837",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 78,
+      "question": "\u6bd4\u7279\u5e01\u5468\u7ebf\u7ea7\u522b\u73b0\u5728\u662f\u8d85\u4e70\u8fd8\u662f\u8d85\u5356",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 79,
+      "question": "\u82f1\u4f1f\u8fbe\u65e5\u7ebf\u7684\u652f\u6491\u4f4d\u548c\u963b\u529b\u4f4d\u5927\u6982\u5728\u54ea\u91cc",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 80,
+      "question": "BTC ka RSI kitna hai abhi, overbought hai kya",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 81,
+      "question": "\ud14c\uc2ac\ub77c \uc8fc\uac00 \uc800\ud56d\uc120\uc774 \uc5b4\ub514\ucbe4\uc774\uc5d0\uc694, \uae30\uc220\uc801\uc73c\ub85c",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 82,
+      "question": "SOL\u306eMACD\u304c\u30c7\u30c3\u30c9\u30af\u30ed\u30b9\u3057\u305d\u3046\u3067\u3059\u304b\uff1f\u30c8\u30ec\u30f3\u30c9\u306f\u3069\u3046\u306a\u3063\u3066\u307e\u3059\u304b",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 83,
+      "question": "\u73fe\u5728\u6bd4\u7279\u5e63\u662f\u4e0d\u662f\u8655\u65bc\u8d85\u8ce3\u5340\u9593,\u6280\u8853\u6307\u6a19\u600e\u9ebc\u770b\uff1f",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 141,
+      "question": "what's the fear and greed index reading right now",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 142,
+      "question": "what's crowd positioning look like on BTC perps, mostly long or short",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 143,
+      "question": "gimme a quick read on crowd sentiment for tech stocks this week",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 144,
+      "question": "is there a lot of hype building around SOL right now or is it dying down",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 145,
+      "question": "is everyone panicking right now or is the mood okay",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 146,
+      "question": "what people feeling about bitcoin now, positive or negative",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 147,
+      "question": "\u73b0\u5728\u5e02\u573a\u60c5\u7eea\u662f\u8d2a\u5a6a\u8fd8\u662f\u6050\u614c,\u6563\u6237\u5728\u8ffd\u591a\u8fd8\u662f\u5728\u629b",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 148,
+      "question": "\u73b0\u5728\u5927\u5bb6\u5bf9\u4ee5\u592a\u574a\u7684\u4ed3\u4f4d\u662f\u504f\u591a\u8fd8\u662f\u504f\u7a7a",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 149,
+      "question": "\u73b0\u5728\u6574\u4f53\u5e02\u573a\u662f\u5bb3\u6015\u8fd8\u662f\u8d2a\u5a6a,\u6211\u6709\u70b9\u614c",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 150,
+      "question": "\u00bfcu\u00e1l es el sentimiento general del mercado hoy?",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 151,
+      "question": "t\u00e2m l\u00fd th\u1ecb tr\u01b0\u1eddng v\u1ec1 SOL \u0111ang hype hay \u0111ang ngu\u1ed9i \u0111i",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 152,
+      "question": "quel est le sentiment g\u00e9n\u00e9ral du march\u00e9 en ce moment ?",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 153,
+      "question": "wie ist die aktuelle Marktstimmung, eher \u00e4ngstlich oder gierig?",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 154,
+      "question": "o mercado est\u00e1 mais euf\u00f3rico ou com medo agora?",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 157,
+      "question": "why is sol pumping right now, what's going on",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 158,
+      "question": "what's the news on johnson and johnson today, why the move",
+      "line": "None has settled yet, so none is graded. The counterfactual is attached at settlement, not asserted now.",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_abstention_why",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 170,
+      "question": "show me the desk's past trades and how they performed",
+      "line": "697 decision(s): 695 no_trade",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_decision_list",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 170,
+      "question": "show me the desk's past trades and how they performed",
+      "line": "  2 row(s) excluded from these counts: they record positions the risk layer refused and the ledger booked anyway (see paper/corrections.py). They remain in the chain, listed but not counted.",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_decision_list",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 177,
+      "question": "\u4e3a\u4ec0\u4e48\u8fd9\u4e2a\u7cfb\u7edf\u4eca\u5929\u4e00\u7b14\u90fd\u6ca1\u6709\u4ea4\u6613",
+      "line": "697 \u6b21\u653e\u5f03\u4ea4\u6613\uff0c\u6d89\u53ca 12 \u4e2a\u6807\u7684\uff0c\u5168\u90e8\u53d1\u751f\u5728 extended/rth/weekend \u65f6\u6bb5\u3002",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_abstention_why",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 177,
+      "question": "\u4e3a\u4ec0\u4e48\u8fd9\u4e2a\u7cfb\u7edf\u4eca\u5929\u4e00\u7b14\u90fd\u6ca1\u6709\u4ea4\u6613",
+      "line": "  \u5e8f\u53f7 695 TQQQUSDT\uff1aGeneral mandate: TQQQ is up +1.47% intraday with VIX at 15 (low-vol regime) and no catalyst in the near-term earnings calendar, but the evidence base is thin \u2014 no analyst panel produced a directional edge above the 14.27bps hurdle, social feeds are engagement bait with zero signal, and the 57.3% short volume on the underlying suggests institutional hedging rather than directional conviction.",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_abstention_why",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 177,
+      "question": "\u4e3a\u4ec0\u4e48\u8fd9\u4e2a\u7cfb\u7edf\u4eca\u5929\u4e00\u7b14\u90fd\u6ca1\u6709\u4ea4\u6613",
+      "line": "  \u5e8f\u53f7 696 NVDAUSDT\uff1aGeneral mandate: the fundamental case (SUE +2.40, 97% positive revision rate) is genuinely bullish on a medium-term horizon, but the immediate horizon is 0.0 hours, the equity is down 19bps today with no fresh catalyst, technicals are mixed-to-negative (below MA7/MA25, negative MACD histogram), and the token trades ~7bps above the underlying equity suggesting slight overpricing.",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_abstention_why",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 177,
+      "question": "\u4e3a\u4ec0\u4e48\u8fd9\u4e2a\u7cfb\u7edf\u4eca\u5929\u4e00\u7b14\u90fd\u6ca1\u6709\u4ea4\u6613",
+      "line": "  \u5e8f\u53f7 697 TSLAUSDT\uff1aUnder a general mandate with no specific risk budget or directional bias, the evidence is mixed but leans bearish: technicals are weak (price below MA7/MA25, MACD histogram negative, RSI 41, below lower Bollinger band), consensus revisions are heavily negative (4 up / 15 down current quarter), and the 24h change is -2.08%.",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_abstention_why",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 177,
+      "question": "\u4e3a\u4ec0\u4e48\u8fd9\u4e2a\u7cfb\u7edf\u4eca\u5929\u4e00\u7b14\u90fd\u6ca1\u6709\u4ea4\u6613",
+      "line": "\u5176\u4e2d 661 \u6761\u5df2\u8bb0\u5f55\u53cd\u4e8b\u5b9e\u7ed3\u679c\uff0c\u4e5f\u5c31\u662f\u5f53\u65f6\u82e5\u5165\u573a\u4f1a\u53d1\u751f\u7684\u884c\u60c5\uff0c\u56e0\u6b64\u9009\u62e9\u89c2\u671b\u53ef\u4ee5\u88ab\u8bc4\u5206\uff0c\u800c\u4e0d\u662f\u88ab\u9ed8\u8ba4\u4e3a\u6b63\u786e\u3002",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_abstention_why",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_final_heldout_2026-09-25.jsonl",
+      "id": 211,
+      "question": "is NEWSHIBA token going to pump to a dollar by friday",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 31,
+      "question": "side by side drawdown and correlation for META, GOOGL, AMZN over the last year",
+      "line": "META carries the most market risk per dollar of the 3. Listed from most to least volatile.",
+      "wording": null,
+      "trace": "computed",
+      "engine": "argus.lui.research._run",
+      "why": "DECLARED: research.py:9514-9573, the COMPARE branch: per-name realised vol, session beta, beta stress and worst window, the pair's correlation and the lead ranking them, all computed from the candles for this answer. Other kinds mix computed, record and missing lines in the same branch and declare nothing."
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 49,
+      "question": "what's tesla trading at right now",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 50,
+      "question": "\u73b0\u5728btc\u591a\u5c11\u94b1\u4e86",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 51,
+      "question": "give me the bid-ask spread and current funding rate on BTC perp",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 52,
+      "question": "abhi gold ka price kya chal raha hai",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 53,
+      "question": "what is round trip cost if I buy and sell AAPL same day",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 54,
+      "question": "\u73b0\u5728NVDA\u7684\u4e70\u5356\u4ef7\u5dee\u591a\u5927\uff0c\u6d41\u52a8\u6027\u600e\u4e48\u6837",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 55,
+      "question": "Could you tell me the current price of silver, please?",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 56,
+      "question": "\u800c\u5bb6ETH\u5e7e\u9322\u4e00\u96bb\uff1f",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 57,
+      "question": "current funding rate and open interest on ETH perp",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 58,
+      "question": "\u4e9a\u9a6c\u900a\u73b0\u5728\u80a1\u4ef7\u662f\u591a\u5c11",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 59,
+      "question": "what's spy at rn and whats the spread looking like",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 60,
+      "question": "\uc9c0\uae08 \ucf54\uc778\ubca0\uc774\uc2a4 \uc8fc\uac00\uac00 \uc5bc\ub9c8\uc57c?",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 61,
+      "question": "what's RSI and MACD reading on NVDA daily right now",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 62,
+      "question": "TSLA\u7684\u5747\u7ebf\u7cfb\u7edf\u73b0\u5728\u662f\u4ec0\u4e48\u5f62\u6001\uff0c\u662f\u4e0d\u662f\u8d85\u4e70\u4e86\uff1f",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 63,
+      "question": "is apple overbought right now",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 64,
+      "question": "AMD ka RSI kitna hai abhi, overbought hai kya",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 65,
+      "question": "please tell me support and resistance level for META stock",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 66,
+      "question": "COIN\u7684MACD\u51fa\u73b0\u6b7b\u53c9\u4e86\u5417\uff1fRSI\u5904\u4e8e\u4ec0\u4e48\u533a\u95f4\uff1f",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 67,
+      "question": "SOL chart looking overbought or we still pumping",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 68,
+      "question": "\u00bfEl oro est\u00e1 en una zona de sobrecompra seg\u00fan los indicadores t\u00e9cnicos?",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 69,
+      "question": "where's the key support level on QQQ into next week",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 70,
+      "question": "\u82f1\u4f1f\u8fbe\u73b0\u5728\u6280\u672f\u6307\u6807\u663e\u793a\u662f\u8d85\u4e70\u8fd8\u662f\u8d85\u5356",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 71,
+      "question": "50 and 200 day moving average crossover status on AVGO",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles, Yahoo Finance headlines"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 72,
+      "question": "\ube44\ud2b8\ucf54\uc778 \uc9c0\uae08 \uacfc\ub9e4\uc218 \uad6c\uac04\uc774\uc57c?",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 121,
+      "question": "is crypto twitter still bullish on sol or did everyone capitulate",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 124,
+      "question": "abhi market ka mood kaisa hai crypto ke liye, bullish ya bearish",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 125,
+      "question": "what people feeling about bitcoin right now, positive or negative",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 126,
+      "question": "\u5f53\u524d\u671f\u6743\u5e02\u573a\u9690\u542b\u7684\u770b\u6da8\u770b\u8dcc\u60c5\u7eea\u6bd4\u7387\u662f\u591a\u5c11\uff1f",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 128,
+      "question": "\u00bfCu\u00e1l es el sentimiento general del mercado hacia el oro ahora?",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 130,
+      "question": "\u6563\u6237\u5bf9\u6bd4\u7279\u5e01\u73b0\u5728\u662f\u6050\u614c\u8fd8\u662f\u8d2a\u5a6a",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 132,
+      "question": "\uc9c0\uae08 \uc774\ub354\ub9ac\uc6c0\uc5d0 \ub300\ud55c \ucee4\ubba4\ub2c8\ud2f0 \ubd84\uc704\uae30\uac00 \uc5b4\ub54c?",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 139,
+      "question": "why is sol pumping right now what happened",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 154,
+      "question": "\u4e3a\u4ec0\u4e48\u8fd9\u5468\u6ca1\u6709\u4ea4\u6613\u4efb\u4f55\u4e1c\u897f",
+      "line": "697 \u6b21\u653e\u5f03\u4ea4\u6613\uff0c\u6d89\u53ca 12 \u4e2a\u6807\u7684\uff0c\u5168\u90e8\u53d1\u751f\u5728 extended/rth/weekend \u65f6\u6bb5\u3002",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_abstention_why",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 154,
+      "question": "\u4e3a\u4ec0\u4e48\u8fd9\u5468\u6ca1\u6709\u4ea4\u6613\u4efb\u4f55\u4e1c\u897f",
+      "line": "  \u5e8f\u53f7 695 TQQQUSDT\uff1aGeneral mandate: TQQQ is up +1.47% intraday with VIX at 15 (low-vol regime) and no catalyst in the near-term earnings calendar, but the evidence base is thin \u2014 no analyst panel produced a directional edge above the 14.27bps hurdle, social feeds are engagement bait with zero signal, and the 57.3% short volume on the underlying suggests institutional hedging rather than directional conviction.",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_abstention_why",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 154,
+      "question": "\u4e3a\u4ec0\u4e48\u8fd9\u5468\u6ca1\u6709\u4ea4\u6613\u4efb\u4f55\u4e1c\u897f",
+      "line": "  \u5e8f\u53f7 696 NVDAUSDT\uff1aGeneral mandate: the fundamental case (SUE +2.40, 97% positive revision rate) is genuinely bullish on a medium-term horizon, but the immediate horizon is 0.0 hours, the equity is down 19bps today with no fresh catalyst, technicals are mixed-to-negative (below MA7/MA25, negative MACD histogram), and the token trades ~7bps above the underlying equity suggesting slight overpricing.",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_abstention_why",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 154,
+      "question": "\u4e3a\u4ec0\u4e48\u8fd9\u5468\u6ca1\u6709\u4ea4\u6613\u4efb\u4f55\u4e1c\u897f",
+      "line": "  \u5e8f\u53f7 697 TSLAUSDT\uff1aUnder a general mandate with no specific risk budget or directional bias, the evidence is mixed but leans bearish: technicals are weak (price below MA7/MA25, MACD histogram negative, RSI 41, below lower Bollinger band), consensus revisions are heavily negative (4 up / 15 down current quarter), and the 24h change is -2.08%.",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_abstention_why",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+      "id": 154,
+      "question": "\u4e3a\u4ec0\u4e48\u8fd9\u5468\u6ca1\u6709\u4ea4\u6613\u4efb\u4f55\u4e1c\u897f",
+      "line": "\u5176\u4e2d 661 \u6761\u5df2\u8bb0\u5f55\u53cd\u4e8b\u5b9e\u7ed3\u679c\uff0c\u4e5f\u5c31\u662f\u5f53\u65f6\u82e5\u5165\u573a\u4f1a\u53d1\u751f\u7684\u884c\u60c5\uff0c\u56e0\u6b64\u9009\u62e9\u89c2\u671b\u53ef\u4ee5\u88ab\u8bc4\u5206\uff0c\u800c\u4e0d\u662f\u88ab\u9ed8\u8ba4\u4e3a\u6b63\u786e\u3002",
+      "wording": null,
+      "trace": "desk",
+      "engine": "argus.lui.answer.answer_abstention_why",
+      "why": "declared at the definition"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 61,
+      "question": "\u82f1\u4f1f\u8fbe\u73b0\u5728\u591a\u5c11\u94b1",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 62,
+      "question": "what's aapl trading at",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 63,
+      "question": "btc quote",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 64,
+      "question": "\u73b0\u5728eth\u591a\u5c11\u94b1",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 65,
+      "question": "where's gold trading",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 66,
+      "question": "spy live price",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 67,
+      "question": "coin quote plus round trip cost",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 68,
+      "question": "what's the round trip cost on mstr right now",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 69,
+      "question": "tsla price and spread?",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 70,
+      "question": "\u73b0\u5728\u539f\u6cb9\u591a\u5c11\u94b1\u4e00\u6876",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 71,
+      "question": "qqq bid ask",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 72,
+      "question": "give me meta's live quote",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 73,
+      "question": "amzn price check",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 74,
+      "question": "\u73b0\u5728googl\u62a5\u4ef7\u591a\u5c11",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 75,
+      "question": "eth round trip cost if I buy and sell right now",
+      "line": "Bitget did not return a quote just now, and a stale price presented as current is worse than none. Try again in a minute.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget tickers"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 76,
+      "question": "\u82f1\u4f1f\u8fbe\u7684RSI\u73b0\u5728\u662f\u591a\u5c11",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 77,
+      "question": "is tsla overbought",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 78,
+      "question": "macd on coin, bullish or bearish crossover",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 79,
+      "question": "\u82f9\u679c\u7684RSI\u73b0\u5728\u591a\u5c11",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 80,
+      "question": "what's support and resistance on spy",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 81,
+      "question": "is btc oversold on the daily",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 82,
+      "question": "qqq macd signal",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 83,
+      "question": "mstr technicals looking stretched?",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 84,
+      "question": "\u7279\u65af\u62c9\u73b0\u5728\u662f\u4e0d\u662f\u8d85\u4e70\u4e86",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 85,
+      "question": "eth support levels",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 86,
+      "question": "googl rsi + macd combined read",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 87,
+      "question": "gold technicals, is it overbought",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 88,
+      "question": "amzn resistance level above current price?",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 89,
+      "question": "\u9ec4\u91d1\u7684\u652f\u6491\u4f4d\u5728\u54ea",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 90,
+      "question": "oil rsi reading right now",
+      "line": "Neither Bitget's technical-analysis Skill nor Bitget's own candles answered just now, so there is nothing to read the tape from. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget candles"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 155,
+      "question": "mstr sentiment \u2014 is the btc treasury story still working",
+      "line": "Strategy last bought 950 BTC on 2026-09-21 ($76m), holding 846,000 BTC; its buys are filed with the SEC and move MSTR on the day (SoSoValue).",
+      "wording": null,
+      "trace": "live",
+      "engine": "argus.lui.research._flow_lines",
+      "why": "DECLARED: research.py:4847 and market/etf_flows.py:154-184. Dated ETF-flow and treasury-purchase readings from SoSoValue, read from the latest data/etf_flows.json snapshot and each stated with its date (the wording rules' convention for a dated reading); the step's source list shows no network read at answer time."
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 158,
+      "question": "btc sentiment index right now",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 160,
+      "question": "\u5927\u5bb6\u73b0\u5728\u5bf9\u6bd4\u7279\u5e01\u662f\u770b\u591a\u8fd8\u662f\u770b\u7a7a",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 163,
+      "question": "gold sentiment, is safe haven demand genuine right now",
+      "line": "Neither FRED nor the sentiment source answered just now, so there is nothing honest to report. Try again shortly.",
+      "wording": null,
+      "trace": "missing",
+      "engine": "argus.lui.research._run",
+      "why": "a refusal after a failed read: Bitget positioning, Bitget tickers, fear & greed"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 181,
+      "question": "\u8fd9\u4e2a\u7cfb\u7edf\u81ea\u5df1\u7684\u590f\u666e\u6bd4\u7387\u662f\u591a\u5c11",
+      "line": "sharpe\uff1a\u65e0\u6cd5\u7ed9\u51fa \u2014 the window is 14 day(s); a standard deviation needs at least 30",
+      "wording": null,
+      "trace": "missing",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 181,
+      "question": "\u8fd9\u4e2a\u7cfb\u7edf\u81ea\u5df1\u7684\u590f\u666e\u6bd4\u7387\u662f\u591a\u5c11",
+      "line": "sortino\uff1a\u65e0\u6cd5\u7ed9\u51fa \u2014 the window is 14 day(s); a standard deviation needs at least 30",
+      "wording": null,
+      "trace": "missing",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 181,
+      "question": "\u8fd9\u4e2a\u7cfb\u7edf\u81ea\u5df1\u7684\u590f\u666e\u6bd4\u7387\u662f\u591a\u5c11",
+      "line": "win_rate\uff1a\u65e0\u6cd5\u7ed9\u51fa \u2014 no settled trades; a win rate over zero trades is undefined, not zero per cent",
+      "wording": null,
+      "trace": "missing",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 181,
+      "question": "\u8fd9\u4e2a\u7cfb\u7edf\u81ea\u5df1\u7684\u590f\u666e\u6bd4\u7387\u662f\u591a\u5c11",
+      "line": "max_drawdown\uff1a\u65e0\u6cd5\u7ed9\u51fa \u2014 no settled trades; equity never moved, so the 0.0% this would otherwise report measures an account that never took a position rather than the desk's risk control, and is not comparable to a traded strategy's drawdown",
+      "wording": null,
+      "trace": "missing",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 181,
+      "question": "\u8fd9\u4e2a\u7cfb\u7edf\u81ea\u5df1\u7684\u590f\u666e\u6bd4\u7387\u662f\u591a\u5c11",
+      "line": "\u8bb0\u5f55\u4e2d\u6709 698 \u6b21\u653e\u5f03\u4ea4\u6613\u30010 \u7b14\u5df2\u7ed3\u7b97\u4ea4\u6613\uff0c\u8de8\u5ea6 14 \u5929\u3002\u590f\u666e\u6bd4\u7387\u3001\u80dc\u7387\u548c\u56de\u64a4\u90fd\u9700\u8981\u6210\u4ea4\u624d\u80fd\u8ba1\u7b97\uff1b\u653e\u5f03\u4ea4\u6613\u53e6\u884c\u8bc4\u5206\uff0c\u6309\u653e\u5f03\u4ef7\u503c\u8861\u91cf\u3002",
+      "wording": null,
+      "trace": "desk",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 181,
+      "question": "\u8fd9\u4e2a\u7cfb\u7edf\u81ea\u5df1\u7684\u590f\u666e\u6bd4\u7387\u662f\u591a\u5c11",
+      "line": "\u51c0\u76c8\u4e8f 0\uff0c\u58f0\u660e\u672c\u91d1 10000\u3002",
+      "wording": null,
+      "trace": "desk",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 184,
+      "question": "\u7cfb\u7edf\u81ea\u5df1\u7684\u4ea4\u6613\u8bb0\u5f55\u8868\u73b0\u600e\u4e48\u6837",
+      "line": "sharpe\uff1a\u65e0\u6cd5\u7ed9\u51fa \u2014 the window is 14 day(s); a standard deviation needs at least 30",
+      "wording": null,
+      "trace": "missing",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 184,
+      "question": "\u7cfb\u7edf\u81ea\u5df1\u7684\u4ea4\u6613\u8bb0\u5f55\u8868\u73b0\u600e\u4e48\u6837",
+      "line": "sortino\uff1a\u65e0\u6cd5\u7ed9\u51fa \u2014 the window is 14 day(s); a standard deviation needs at least 30",
+      "wording": null,
+      "trace": "missing",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 184,
+      "question": "\u7cfb\u7edf\u81ea\u5df1\u7684\u4ea4\u6613\u8bb0\u5f55\u8868\u73b0\u600e\u4e48\u6837",
+      "line": "win_rate\uff1a\u65e0\u6cd5\u7ed9\u51fa \u2014 no settled trades; a win rate over zero trades is undefined, not zero per cent",
+      "wording": null,
+      "trace": "missing",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 184,
+      "question": "\u7cfb\u7edf\u81ea\u5df1\u7684\u4ea4\u6613\u8bb0\u5f55\u8868\u73b0\u600e\u4e48\u6837",
+      "line": "max_drawdown\uff1a\u65e0\u6cd5\u7ed9\u51fa \u2014 no settled trades; equity never moved, so the 0.0% this would otherwise report measures an account that never took a position rather than the desk's risk control, and is not comparable to a traded strategy's drawdown",
+      "wording": null,
+      "trace": "missing",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 184,
+      "question": "\u7cfb\u7edf\u81ea\u5df1\u7684\u4ea4\u6613\u8bb0\u5f55\u8868\u73b0\u600e\u4e48\u6837",
+      "line": "\u8bb0\u5f55\u4e2d\u6709 698 \u6b21\u653e\u5f03\u4ea4\u6613\u30010 \u7b14\u5df2\u7ed3\u7b97\u4ea4\u6613\uff0c\u8de8\u5ea6 14 \u5929\u3002\u590f\u666e\u6bd4\u7387\u3001\u80dc\u7387\u548c\u56de\u64a4\u90fd\u9700\u8981\u6210\u4ea4\u624d\u80fd\u8ba1\u7b97\uff1b\u653e\u5f03\u4ea4\u6613\u53e6\u884c\u8bc4\u5206\uff0c\u6309\u653e\u5f03\u4ef7\u503c\u8861\u91cf\u3002",
+      "wording": null,
+      "trace": "desk",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 184,
+      "question": "\u7cfb\u7edf\u81ea\u5df1\u7684\u4ea4\u6613\u8bb0\u5f55\u8868\u73b0\u600e\u4e48\u6837",
+      "line": "\u51c0\u76c8\u4e8f 0\uff0c\u58f0\u660e\u672c\u91d1 10000\u3002",
+      "wording": null,
+      "trace": "desk",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 192,
+      "question": "\u8fd9\u4e2a\u7cfb\u7edf\u81ea\u5df1\u7684sharpe\u548c\u56de\u64a4\u662f\u591a\u5c11",
+      "line": "sharpe\uff1a\u65e0\u6cd5\u7ed9\u51fa \u2014 the window is 14 day(s); a standard deviation needs at least 30",
+      "wording": null,
+      "trace": "missing",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 192,
+      "question": "\u8fd9\u4e2a\u7cfb\u7edf\u81ea\u5df1\u7684sharpe\u548c\u56de\u64a4\u662f\u591a\u5c11",
+      "line": "sortino\uff1a\u65e0\u6cd5\u7ed9\u51fa \u2014 the window is 14 day(s); a standard deviation needs at least 30",
+      "wording": null,
+      "trace": "missing",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 192,
+      "question": "\u8fd9\u4e2a\u7cfb\u7edf\u81ea\u5df1\u7684sharpe\u548c\u56de\u64a4\u662f\u591a\u5c11",
+      "line": "win_rate\uff1a\u65e0\u6cd5\u7ed9\u51fa \u2014 no settled trades; a win rate over zero trades is undefined, not zero per cent",
+      "wording": null,
+      "trace": "missing",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 192,
+      "question": "\u8fd9\u4e2a\u7cfb\u7edf\u81ea\u5df1\u7684sharpe\u548c\u56de\u64a4\u662f\u591a\u5c11",
+      "line": "max_drawdown\uff1a\u65e0\u6cd5\u7ed9\u51fa \u2014 no settled trades; equity never moved, so the 0.0% this would otherwise report measures an account that never took a position rather than the desk's risk control, and is not comparable to a traded strategy's drawdown",
+      "wording": null,
+      "trace": "missing",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 192,
+      "question": "\u8fd9\u4e2a\u7cfb\u7edf\u81ea\u5df1\u7684sharpe\u548c\u56de\u64a4\u662f\u591a\u5c11",
+      "line": "\u8bb0\u5f55\u4e2d\u6709 698 \u6b21\u653e\u5f03\u4ea4\u6613\u30010 \u7b14\u5df2\u7ed3\u7b97\u4ea4\u6613\uff0c\u8de8\u5ea6 14 \u5929\u3002\u590f\u666e\u6bd4\u7387\u3001\u80dc\u7387\u548c\u56de\u64a4\u90fd\u9700\u8981\u6210\u4ea4\u624d\u80fd\u8ba1\u7b97\uff1b\u653e\u5f03\u4ea4\u6613\u53e6\u884c\u8bc4\u5206\uff0c\u6309\u653e\u5f03\u4ef7\u503c\u8861\u91cf\u3002",
+      "wording": null,
+      "trace": "desk",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    },
+    {
+      "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+      "id": 192,
+      "question": "\u8fd9\u4e2a\u7cfb\u7edf\u81ea\u5df1\u7684sharpe\u548c\u56de\u64a4\u662f\u591a\u5c11",
+      "line": "\u51c0\u76c8\u4e8f 0\uff0c\u58f0\u660e\u672c\u91d1 10000\u3002",
+      "wording": null,
+      "trace": "desk",
+      "engine": "emit",
+      "why": "emitted at the line site"
+    }
+  ],
+  "worklist_undeclared_producers": {
+    "argus.lui.research._macro": 405,
+    "argus.lui.answer.answer": 190,
+    "argus.lui.research._run": 86,
+    "argus.lui.research._event_reaction": 80,
+    "argus.lui.research._crowd_lines": 68,
+    "argus.lui.research._fundamentals": 52,
+    "argus.lui.server._language_note": 45,
+    "argus.lui.research._news": 35,
+    "argus.lui.research._sentiment": 35,
+    "argus.lui.answer.answer_integrity": 18,
+    "argus.lui.answer.answer_risk_control": 12,
+    "argus.lui.answer.answer_calibration": 9,
+    "argus.lui.answer.answer_abstention_why": 6,
+    "argus.lui.research._cpi_lines": 4,
+    "argus.lui.research._mandate_lines": 2
+  },
+  "offline": {
+    "outbound_connections_refused": 2957,
+    "seconds": 282.5,
+    "traced_seconds_per_answer": 0.419,
+    "data_files_this_run_wrote": [],
+    "data_files_changed_by_any_process": [
+      "decision_primitives.json",
+      "desk_notes.jsonl",
+      "groupwise_audit.json",
+      "infeasibility_bench.json",
+      "paper_ledger.jsonl",
+      "paper_ledger.jsonl.head",
+      "qwen_cost_ledger.jsonl",
+      "refusal_reasons.json",
+      "research_depth_fanout.json",
+      "research_depth_fanout_rows.jsonl",
+      "review_comparison.json",
+      "review_oos.json",
+      "review_report.json",
+      "risk_records.jsonl"
+    ]
+  },
+  "example": {
+    "question": "if I add 200 shares of TSLA tokenized stock to my book right now, how much does that move my overall delta?",
+    "lines": [
+      "Actionable: size TSLA so that its worst observed 24 hours (-8.0%) is a loss you would accept \u2014 on a $10,000 position that is about $799; tell me what you hold to see its share of your risk.",
+      "TSLA moves 1.29x the Nasdaq-100 (QQQ) while US markets are open and 1.00x while they are shut \u2014 the open-session figure is the one that prices it.",
+      "If QQQ falls 5%, this position moves about -6.4% through beta alone.",
+      "If QQQ falls 10%, this position moves about -12.9% through beta alone.",
+      "Realised worst case: the worst 24-bar window in the observed history would have moved this position -7.99% \u2014 driven by TSLA -7.99%",
+      "Return shape over 720 hourly bars: realised volatility 38% a year, skew +1.93, excess kurtosis 22.9 (fat-tailed \u2014 large hourly moves are far more common than a normal curve implies); QQQ explains 24% of its open-session moves (R\u00b2), so a QQQ hedge leaves most of its risk in place.",
+      "The desk's own last call on TSLA (decision 686, 2026-09-25T17:35Z): no_trade at stated confidence 0.58 \u2014 General mandate: the bear case (EU FSD delay, analyst revisions 4:1 down, price below short MAs, elevated short volume) is directionally correct but the move is already -130bps intraday, leaving insufficient residual edge to clear the 16.27bps total hurdle on a short.",
+      "Assumed: no size was given, so TSLA is assessed at 20%.",
+      "Sources reached: 0 of 1 answered. Did not answer: Bitget candles (unreachable) \u2014 everything above is built without it.",
+      "Data: Bitget hourly candles frozen on 2026-09-23 (the live fetch did not complete: HistoryError) \u2014 the figures are real, but not as of this minute. This is analysis, not advice \u2014 you make the call."
+    ],
+    "labels": [
+      {
+        "label": "computed",
+        "origin": "trace",
+        "step": 12,
+        "engine": "argus.lui.research._impact_lines",
+        "reason": "DECLARED: research.py:5814-5942. Every line is arithmetic on the copilot's report for this answer (beta, risk share, the risk budget, beta stress, the hedge line); the final line, always appended last (`lines.append(worst)`), is the realised worst window from history, which the reviewed convention files as a record."
+      },
+      {
+        "label": "computed",
+        "origin": "trace",
+        "step": 12,
+        "engine": "argus.lui.research._impact_lines",
+        "reason": "DECLARED: research.py:5814-5942. Every line is arithmetic on the copilot's report for this answer (beta, risk share, the risk budget, beta stress, the hedge line); the final line, always appended last (`lines.append(worst)`), is the realised worst window from history, which the reviewed convention files as a record."
+      },
+      {
+        "label": "computed",
+        "origin": "trace",
+        "step": 12,
+        "engine": "argus.lui.research._impact_lines",
+        "reason": "DECLARED: research.py:5814-5942. Every line is arithmetic on the copilot's report for this answer (beta, risk share, the risk budget, beta stress, the hedge line); the final line, always appended last (`lines.append(worst)`), is the realised worst window from history, which the reviewed convention files as a record."
+      },
+      {
+        "label": "computed",
+        "origin": "trace",
+        "step": 12,
+        "engine": "argus.lui.research._impact_lines",
+        "reason": "DECLARED: research.py:5814-5942. Every line is arithmetic on the copilot's report for this answer (beta, risk share, the risk budget, beta stress, the hedge line); the final line, always appended last (`lines.append(worst)`), is the realised worst window from history, which the reviewed convention files as a record."
+      },
+      {
+        "label": "record",
+        "origin": "trace",
+        "step": 12,
+        "engine": "argus.lui.research._impact_lines",
+        "reason": "DECLARED: research.py:5814-5942. Every line is arithmetic on the copilot's report for this answer (beta, risk share, the risk budget, beta stress, the hedge line); the final line, always appended last (`lines.append(worst)`), is the realised worst window from history, which the reviewed convention files as a record."
+      },
+      {
+        "label": "computed",
+        "origin": "trace",
+        "step": 13,
+        "engine": "argus.lui.research._distribution_line",
+        "reason": "DECLARED: research.py:3663. The return distribution's moments, computed from the candles now."
+      },
+      {
+        "label": "desk",
+        "origin": "trace",
+        "step": 14,
+        "engine": "argus.lui.research._desk_view",
+        "reason": "DECLARED: research.py:3857-3875. The desk's last ledger row on the name, quoted, or the statement that the desk's record holds none (the desk does not trade it, or has not decided it)."
+      },
+      {
+        "label": "assumed",
+        "origin": "trace",
+        "step": 1,
+        "engine": "request.defaults",
+        "reason": "the request reader's notes: defaults applied because the question did not say"
+      },
+      {
+        "label": null,
+        "origin": "meta",
+        "step": null,
+        "engine": null,
+        "reason": ""
+      },
+      {
+        "label": null,
+        "origin": "meta",
+        "step": null,
+        "engine": null,
+        "reason": ""
+      }
+    ],
+    "trace": [
+      "Action 1: request.defaults()",
+      "Observation 1: 1 line(s) made",
+      "Action 2: request.defaults()",
+      "Observation 2: 2 line(s) made",
+      "Thought 3: the question was read as kind 'impact' on TSLAUSDT by research-model",
+      "Action 3: argus.lui.server._research_payload(text='if I add 200 shares of TSLA tokenized stock to my book right now, how much does that move my overall delta?', prior=[0 items], request=impact on TSLAUSDT, classified_by='research-model', audit={3 keys})",
+      "Observation 3: 0 line(s) made",
+      "Action 4: argus.lui.research.run(raw_text='if I add 200 shares of TSLA tokenized stock to my book right now, how much does that move my overall delta?', request=impact on TSLAUSDT) [inside step 3]",
+      "Observation 4: 1 line(s) made",
+      "Action 5: argus.lui.research._run(raw_text='if I add 200 shares of TSLA tokenized stock to my book right now, how much does that move my overall delta?', request=impact on TSLAUSDT) [inside step 4]",
+      "Observation 5: 1 line(s) made",
+      "Action 6: argus.lui.research.load(symbols=[1 items]) [inside step 5]",
+      "Observation 6: 0 line(s) made",
+      "Action 7: argus.lui.research._fetch_live(symbols=[2 items], days=30) [inside step 6]",
+      "Observation 7: 0 line(s) made, raised HistoryError: transport failure: <urlopen error outbound connections are refused in an offline run>",
+      "Action 8: argus.lui.research._fetch_one(symbol='QQQUSDT', days=30, deadline=885225.703) [inside step 7]",
+      "Observation 8: 0 line(s) made, raised HistoryError: transport failure: <urlopen error outbound connections are refused in an offline run>",
+      "Action 9: argus.lui.research._candles(symbol='QQQUSDT', days=30) [inside step 8]",
+      "Observation 9: Bitget candles did not answer (unreachable) at 19:49:02.556; 0 line(s) made, raised HistoryError: transport failure: <urlopen error outbound connections are refused in an offline run>",
+      "Action 10: argus.lui.research._fetch_one(symbol='TSLAUSDT', days=30, deadline=885225.703) [inside step 7]",
+      "Observation 10: 0 line(s) made, raised HistoryError: transport failure: <urlopen error outbound connections are refused in an offline run>",
+      "Action 11: argus.lui.research._candles(symbol='TSLAUSDT', days=30) [inside step 10]",
+      "Observation 11: Bitget candles did not answer (unreachable) at 19:49:02.556; 0 line(s) made, raised HistoryError: transport failure: <urlopen error outbound connections are refused in an offline run>",
+      "Action 12: argus.lui.research._impact_lines(report=CopilotReport, request=impact on TSLAUSDT) [inside step 5]",
+      "Observation 12: 5 line(s) made",
+      "Action 13: argus.lui.research._distribution_line(symbol='TSLAUSDT') [inside step 5]",
+      "Observation 13: 1 line(s) made",
+      "Action 14: argus.lui.research._desk_view(symbol='TSLAUSDT') [inside step 5]",
+      "Observation 14: 1 line(s) made",
+      "Action 15: argus.lui.memory.dumps(facts=[0 items])",
+      "Observation 15: 1 line(s) made"
+    ]
+  },
+  "limitations": [
+    "offline: every live source fails, so live lines are barely exercised; a live-network run of this audit is not done",
+    "a declaration is written by reading the engine's code; the disagreements list is where it should be checked, and it is published in full",
+    "lines composed inline by lui/research.py's large functions have no producing step of their own and keep the wording label; the worklist counts them by engine"
+  ],
+  "overhead": {
+    "questions": 62,
+    "seconds_per_answer": {
+      "plain": 0.451,
+      "traced": 0.461
+    },
+    "ratio": 1.02
+  }
+}

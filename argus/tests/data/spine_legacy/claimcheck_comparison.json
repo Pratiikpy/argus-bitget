@@ -1,0 +1,532 @@
+{
+ "comparison": "claims about the tape: ARGUS premise check vs MirrorLine challenge engine",
+ "baseline": "PinnacleCryptNG/MirrorLine getInterpretationChallenge, run from its clone",
+ "run_started": "2026-09-25T04:36:11.636838+00:00",
+ "us_session_open_at_start": false,
+ "graded": 30,
+ "argus_correct": 30,
+ "mirrorline_correct": 30,
+ "both_correct": 30,
+ "argus_only": 0,
+ "mirrorline_only": 0,
+ "by_kind": {
+  "direction": {
+   "n": 14,
+   "argus": 14,
+   "mirrorline": 14
+  },
+  "causal": {
+   "n": 14,
+   "argus": 14,
+   "mirrorline": 14
+  },
+  "session": {
+   "n": 2,
+   "argus": 2,
+   "mirrorline": 2
+  }
+ },
+ "flat_not_graded": [
+  {
+   "claim": "NVDA is up today",
+   "argus": "challenged",
+   "mirrorline": "challenged"
+  },
+  {
+   "claim": "NVDA is down today",
+   "argus": "supported",
+   "mirrorline": "supported"
+  },
+  {
+   "claim": "NVDA rallied today because of strong earnings",
+   "argus": "challenged",
+   "mirrorline": "challenged"
+  },
+  {
+   "claim": "NVDA dropped today because of a downgrade",
+   "argus": "supported",
+   "mirrorline": "supported"
+  },
+  {
+   "claim": "TSLA is up today",
+   "argus": "supported",
+   "mirrorline": "supported"
+  },
+  {
+   "claim": "TSLA is down today",
+   "argus": "challenged",
+   "mirrorline": "challenged"
+  },
+  {
+   "claim": "TSLA rallied today because of strong earnings",
+   "argus": "supported",
+   "mirrorline": "supported"
+  },
+  {
+   "claim": "TSLA dropped today because of a downgrade",
+   "argus": "challenged",
+   "mirrorline": "challenged"
+  }
+ ],
+ "first_run_loss": "argus_raw_first_run.json: ARGUS 18 of the claims it could read, no verdict on any past-tense causal claim or session claim; MirrorLine judged them all. Fixed the same morning, then both run again.",
+ "failure_cases": [],
+ "not_covered": "claim types only one desk reads — funding and perp premium (ARGUS), 40-level depth, liquidity and trade-action advice (MirrorLine) — are not in this set; spot rToken and perpetual are different instruments, which is why near-zero days are not graded",
+ "rows": [
+  {
+   "claim": "META is up today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": false,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "META is down today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": false,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "META rallied today because of strong earnings",
+   "kind": "causal",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": true,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "META dropped today because of a downgrade",
+   "kind": "causal",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": true,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "MSTR is up today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": false,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "MSTR is down today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": false,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "MSTR rallied today because of strong earnings",
+   "kind": "causal",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": true,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "MSTR dropped today because of a downgrade",
+   "kind": "causal",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": true,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "AMZN is up today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": false,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "AMZN is down today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": false,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "AMZN rallied today because of strong earnings",
+   "kind": "causal",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": true,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "AMZN dropped today because of a downgrade",
+   "kind": "causal",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": true,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "GOOGL is up today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": false,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "GOOGL is down today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": false,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "GOOGL rallied today because of strong earnings",
+   "kind": "causal",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": true,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "GOOGL dropped today because of a downgrade",
+   "kind": "causal",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": true,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "COIN is up today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": false,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "COIN is down today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": false,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "COIN rallied today because of strong earnings",
+   "kind": "causal",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": true,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "COIN dropped today because of a downgrade",
+   "kind": "causal",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": true,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "AAPL is up today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": false,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "AAPL is down today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": false,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "AAPL rallied today because of strong earnings",
+   "kind": "causal",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": true,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "AAPL dropped today because of a downgrade",
+   "kind": "causal",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": true,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "MSFT is up today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": false,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "MSFT is down today",
+   "kind": "direction",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": false,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "MSFT rallied today because of strong earnings",
+   "kind": "causal",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": true,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "MSFT dropped today because of a downgrade",
+   "kind": "causal",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": true,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "NVDA is up today",
+   "kind": "direction",
+   "graded": false,
+   "truth": "flat",
+   "argus": "challenged",
+   "argus_cause_held_back": false,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": null,
+   "mirrorline_correct": null
+  },
+  {
+   "claim": "NVDA is down today",
+   "kind": "direction",
+   "graded": false,
+   "truth": "flat",
+   "argus": "supported",
+   "argus_cause_held_back": false,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": null,
+   "mirrorline_correct": null
+  },
+  {
+   "claim": "NVDA rallied today because of strong earnings",
+   "kind": "causal",
+   "graded": false,
+   "truth": "flat",
+   "argus": "challenged",
+   "argus_cause_held_back": true,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": null,
+   "mirrorline_correct": null
+  },
+  {
+   "claim": "NVDA dropped today because of a downgrade",
+   "kind": "causal",
+   "graded": false,
+   "truth": "flat",
+   "argus": "supported",
+   "argus_cause_held_back": true,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": null,
+   "mirrorline_correct": null
+  },
+  {
+   "claim": "The US stock market is closed right now, so NVDA is trading after hours",
+   "kind": "session",
+   "graded": true,
+   "truth": "supported",
+   "argus": "supported",
+   "argus_cause_held_back": false,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "The US stock market is open right now",
+   "kind": "session",
+   "graded": true,
+   "truth": "challenged",
+   "argus": "challenged",
+   "argus_cause_held_back": false,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": true,
+   "mirrorline_correct": true
+  },
+  {
+   "claim": "TSLA is up today",
+   "kind": "direction",
+   "graded": false,
+   "truth": "flat",
+   "argus": "supported",
+   "argus_cause_held_back": false,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": null,
+   "mirrorline_correct": null
+  },
+  {
+   "claim": "TSLA is down today",
+   "kind": "direction",
+   "graded": false,
+   "truth": "flat",
+   "argus": "challenged",
+   "argus_cause_held_back": false,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": false,
+   "argus_correct": null,
+   "mirrorline_correct": null
+  },
+  {
+   "claim": "TSLA rallied today because of strong earnings",
+   "kind": "causal",
+   "graded": false,
+   "truth": "flat",
+   "argus": "supported",
+   "argus_cause_held_back": true,
+   "mirrorline": "supported",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": null,
+   "mirrorline_correct": null
+  },
+  {
+   "claim": "TSLA dropped today because of a downgrade",
+   "kind": "causal",
+   "graded": false,
+   "truth": "flat",
+   "argus": "challenged",
+   "argus_cause_held_back": true,
+   "mirrorline": "challenged",
+   "mirrorline_cause_held_back": true,
+   "argus_correct": null,
+   "mirrorline_correct": null
+  }
+ ]
+}

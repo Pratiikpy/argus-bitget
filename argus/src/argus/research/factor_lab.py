@@ -38,11 +38,25 @@ This lab enforces the separation structurally rather than by convention:
    consumes. A search that does not record how many times it looked has not produced a result.
 4. A factor holds an explicit lifecycle state and cannot skip one. ``RETIRE`` exists and fires on
    measured decay, because a library that only ever grows is lying about decay.
+5. **A factor must reproduce itself (added 2026-09-25).** Certification also requires the
+   split-half reliability gate (:func:`split_half`): the factor's payoff on one half of every block
+   must predict its payoff on the other half, against an exact sign-flip null. It is GoEmotions'
+   split-half PPCA (google-research, Apache-2.0, `goemotions/ppca.py:87-99,136-217`) with one
+   stated departure — uncentred, because a factor's mean payoff is what is under test — and it asks
+   a question none of the other gates asks: not "is this better than shuffled" or "does it survive
+   costs", but "would an independent half of the same evidence have found the same thing". Planted
+   noise fails it and a planted real edge passes it (`tests/test_factor_split_half.py`); what it
+   does to today's primitives on real data is in ``data/factor_split_half.json``
+   (:mod:`argus.eval.factor_split_half`). :func:`reliable_components` applies the full
+   multi-dimensional PPCA to the library and counts how many independent payoff dimensions it
+   actually reproduces.
 """
 
 from __future__ import annotations
 
 import json
+import math
+import random
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -57,7 +71,7 @@ from argus.backtest.metrics import (
     deflated_sharpe,
 )
 from argus.cost.model import CostModel
-from argus.research.overfit import Observation, OverfitReport, run_all
+from argus.research.overfit import Observation, Outcome, OverfitReport, run_all
 from argus.truth.clocks import DualClock, SessionPhase
 
 
@@ -145,6 +159,9 @@ class FactorRecord:
     """The anti-overfit report, when one could be computed. ``None`` means the factor never
     reached the gate, which is different from reaching it and being found wanting."""
 
+    split_half: dict[str, Any] | None = None
+    """The split-half reliability verdict (:class:`SplitHalf`), with the same ``None`` meaning."""
+
     rejection_reason: str = ""
 
     def advance(self, to: Lifecycle, *, note: str = "") -> None:
@@ -179,6 +196,7 @@ class FactorRecord:
             "oos_sharpe": self.oos_sharpe,
             "dsr": self.dsr,
             "overfit": self.overfit,
+            "split_half": self.split_half,
             "rejection_reason": self.rejection_reason,
             "path": [f"{a}->{b}" for a, b in self.history],
         }
@@ -230,6 +248,263 @@ PRIMITIVES: dict[str, Any] = {
 }
 
 
+# --- split-half reliability ------------------------------------------------------------------
+# Adapted from GoEmotions' split-half Probabilistic PCA (google-research/goemotions, Apache-2.0,
+# `ppca.py:87-99` for PPCA and `ppca.py:136-217` for the held-out split). Copyright 2021 The
+# Google Research Authors; notice in `licenses/google-research-goemotions-APACHE-2.0.txt`.
+
+SPLIT_HALF_ALPHA = 0.05
+"""Largest sign-flip p-value at which a factor's payoff counts as reproduced across halves."""
+
+SPLIT_HALF_FLIPS = 2000
+"""Sign-flip draws per null. 2,000 puts the resolution of the p-value at 0.0005, twenty times finer
+than the threshold it is compared against."""
+
+SPLIT_HALF_MIN_BLOCKS = 12
+"""Fewer paired blocks than this and the gate returns INCONCLUSIVE rather than a verdict: a
+correlation over a handful of pairs is decided by one of them."""
+
+SPLIT_HALF_BLOCK_BARS = 120
+"""Bars per item: five days of hourly bars, so 90 days give 18 paired blocks. **Measured, not
+chosen for looks.** The statistic's z-score is roughly ``sqrt(n) * rho / sqrt(1 + 2 * rho)`` with
+``n`` blocks and ``rho = snr² * B / 2`` the squared signal-to-noise of one half-block's mean payoff,
+so short blocks bury a real edge in per-half noise. Written first with one block per day (the lab's
+``horizon_bars``), a planted factor calling the next hour's sign right 58% of the time — an enormous
+edge — passed only 14 times in 40 on fat-tailed synthetic returns. Swept on 2026-09-25 over
+2,160-bar planted series: at 24 bars the 58% factor passed 37% of 60; at 96, 120 and 144 bars the
+58% and 60% factors passed 60/93, 74/96 and 73/95 of 100; noise passed 5-8% throughout against a
+nominal 5%. 120 is the shortest block at which a 60%-accurate factor passes at least 95% of the
+time, and it keeps the block count above :data:`SPLIT_HALF_MIN_BLOCKS` on a 90-day history. The
+real-return version of this sweep is published in ``data/factor_split_half.json`` and is weaker:
+on the twelve rTokens' real hourly returns (fatter tails than the synthetic series) a 60%-accurate
+factor passed 65-69% of the time at 120 bars and a 62% one 80%, with noise passing 3.3-5.2%. The
+block was not re-tuned on those numbers, since they are the check on the choice. The ceiling is
+structural: requiring each half to reproduce the payoff costs about half the z-score of a plain
+mean test on the whole sample, which is the price of asking for replication rather than
+significance."""
+
+SPLIT_HALF_SEED = 20260925
+"""Fixed for the same reason as :data:`argus.research.overfit.PERMUTATION_SEED`: a null drawn
+afresh each run is a different test each run."""
+
+
+@dataclass(frozen=True, slots=True)
+class SplitHalf:
+    """Is a factor's payoff reproduced by an independent half of the same evidence?
+
+    The design is GoEmotions' (`ppca.py:136-217`): the same items rated by two disjoint halves of
+    the raters, and a dimension kept only when one half's scores predict the other's. Here an item
+    is a block of ``block`` bars (:data:`SPLIT_HALF_BLOCK_BARS` in the lab), the two "raters" are
+    its even- and odd-offset bars, and the rating is the factor's payoff — factor value times the
+    next bar's return — averaged over that half.
+    Two halves of one block share the block's regime and nothing else, because a one-bar forward
+    return on one bar does not overlap the next bar's.
+
+    **Uncentred, deliberately, and this is the departure from the source.** GoEmotions demeans each
+    half (`ppca.py:89-90`) because it looks for dimensions along which *examples differ*; the grand
+    mean of a rating is a scale artefact there. A factor's mean payoff is the very thing under test:
+    demeaned, a factor with a perfectly constant edge scores exactly zero reliability, and one whose
+    payoff merely swings with the market scores high. So the statistic is ``Σ x_b y_b`` — the
+    one-dimensional uncentred symmetrised cross-covariance, half of what `PPCA` would eigendecompose
+    — and its scale-free form, Tucker's congruence, is reported beside it.
+
+    **The null is exact, not asymptotic.** Under "no reproducible payoff" each block's product
+    ``x_b y_b`` is as likely to be negative as positive, so flipping their signs at random draws
+    from the statistic's own null distribution. It is one-sided: agreement is the claim.
+
+    **What passing does not mean.** A factor that is always long reproduces the market's drift in
+    both halves and passes. Reliability is not validity, as it is not in GoEmotions; the placebo and
+    the cost gate are the validity tests, and this gate runs beside them, not instead of them.
+    """
+
+    outcome: Outcome
+    blocks: int
+    statistic: float
+    congruence: float | None
+    p_value: float | None
+    reason: str
+
+    @property
+    def passed(self) -> bool:
+        return self.outcome is Outcome.PASS
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "outcome": str(self.outcome),
+            "blocks": self.blocks,
+            "statistic": self.statistic,
+            "congruence": None if self.congruence is None else round(self.congruence, 4),
+            "p_value": None if self.p_value is None else round(self.p_value, 4),
+            "reason": self.reason,
+        }
+
+
+def payoff_halves(
+    values: Sequence[float], returns: Sequence[float], *, block: int,
+) -> tuple[list[float], list[float]]:
+    """Per block of ``block`` bars, the mean payoff on even-offset bars and on odd-offset bars.
+
+    ``values[i]`` is the factor reading at bar ``i`` and ``returns[i]`` the return that followed it.
+    A trailing partial block is dropped rather than paired unevenly. Blocks where either half is
+    empty are skipped.
+    """
+    if block < 2:
+        raise ValueError("a block needs at least two bars to have two halves")
+    if len(values) != len(returns):
+        raise ValueError(f"{len(values)} readings against {len(returns)} returns")
+    xs: list[float] = []
+    ys: list[float] = []
+    for start in range(0, len(values) - block + 1, block):
+        even = [values[i] * returns[i] for i in range(start, start + block, 2)]
+        odd = [values[i] * returns[i] for i in range(start + 1, start + block, 2)]
+        if even and odd:
+            xs.append(sum(even) / len(even))
+            ys.append(sum(odd) / len(odd))
+    return xs, ys
+
+
+def split_half(
+    values: Sequence[float], returns: Sequence[float], *, block: int,
+    flips: int = SPLIT_HALF_FLIPS, alpha: float = SPLIT_HALF_ALPHA, seed: int = SPLIT_HALF_SEED,
+) -> SplitHalf:
+    """The split-half reliability gate for one factor. See :class:`SplitHalf`."""
+    xs, ys = payoff_halves(values, returns, block=block)
+    products = [x * y for x, y in zip(xs, ys, strict=True)]
+    statistic = sum(products)
+    if len(products) < SPLIT_HALF_MIN_BLOCKS:
+        return SplitHalf(Outcome.INCONCLUSIVE, len(products), statistic, None, None,
+                         f"{len(products)} paired block(s); {SPLIT_HALF_MIN_BLOCKS} are needed")
+    norm = math.sqrt(sum(x * x for x in xs) * sum(y * y for y in ys))
+    if norm == 0.0:
+        return SplitHalf(Outcome.FAIL, len(products), statistic, None, 1.0,
+                         "the factor never paid or lost anything: no payoff to reproduce")
+    congruence = statistic / norm
+    rng = random.Random(seed)
+    at_least = sum(
+        1 for _ in range(flips)
+        if sum(p if rng.random() < 0.5 else -p for p in products) >= statistic
+    )
+    p_value = (1 + at_least) / (1 + flips)
+    if statistic > 0 and p_value <= alpha:
+        return SplitHalf(Outcome.PASS, len(products), statistic, congruence, p_value,
+                         f"payoff reproduced across halves (congruence {congruence:.3f}, "
+                         f"p={p_value:.4f})")
+    return SplitHalf(Outcome.FAIL, len(products), statistic, congruence, p_value,
+                     f"payoff not reproduced across independent halves (congruence "
+                     f"{congruence:.3f}, p={p_value:.4f} > {alpha})")
+
+
+def symmetric_eigh(matrix: Sequence[Sequence[float]]) -> tuple[list[float], list[list[float]]]:
+    """Eigenvalues (descending) and eigenvectors (as columns) of a real symmetric matrix.
+
+    Cyclic Jacobi rotations, pure Python, because ARGUS's shipped code does not depend on numpy
+    (see `research/overfit.py`). GoEmotions calls ``numpy.linalg.eigh`` and flips the result into
+    descending order (`ppca.py:95-98`); this returns the same ordering, and the test suite pins it
+    against numpy. The matrices here are one row per factor, so O(n³) per sweep is nothing.
+    """
+    n = len(matrix)
+    a = [[float(matrix[i][j]) for j in range(n)] for i in range(n)]
+    for i in range(n):
+        for j in range(i + 1, n):
+            if abs(a[i][j] - a[j][i]) > 1e-9 * (1.0 + abs(a[i][j])):
+                raise ValueError("matrix is not symmetric")
+    v = [[1.0 if i == j else 0.0 for j in range(n)] for i in range(n)]
+    for _ in range(100):
+        off = math.sqrt(sum(a[i][j] ** 2 for i in range(n) for j in range(n) if i != j))
+        scale = math.sqrt(sum(a[i][i] ** 2 for i in range(n))) or 1.0
+        if off <= 1e-14 * scale:
+            break
+        for p in range(n - 1):
+            for q in range(p + 1, n):
+                if a[p][q] == 0.0:
+                    continue
+                theta = (a[q][q] - a[p][p]) / (2.0 * a[p][q])
+                t = math.copysign(1.0, theta) / (abs(theta) + math.sqrt(theta * theta + 1.0))
+                c = 1.0 / math.sqrt(t * t + 1.0)
+                s = t * c
+                for k in range(n):
+                    akp, akq = a[k][p], a[k][q]
+                    a[k][p], a[k][q] = c * akp - s * akq, s * akp + c * akq
+                for k in range(n):
+                    apk, aqk = a[p][k], a[q][k]
+                    a[p][k], a[q][k] = c * apk - s * aqk, s * apk + c * aqk
+                for k in range(n):
+                    vkp, vkq = v[k][p], v[k][q]
+                    v[k][p], v[k][q] = c * vkp - s * vkq, s * vkp + c * vkq
+    order = sorted(range(n), key=lambda i: a[i][i], reverse=True)
+    values = [a[i][i] for i in order]
+    vectors = [[v[r][i] for i in order] for r in range(n)]
+    return values, vectors
+
+
+def ppca(
+    x: Sequence[Sequence[float]], y: Sequence[Sequence[float]], *, demean: bool = True,
+) -> tuple[list[float], list[list[float]]]:
+    """GoEmotions' ``PPCA(x, y)`` (`ppca.py:87-99`): eigen-decompose ``xᵀy + yᵀx``.
+
+    Rows are items, columns are dimensions, and ``x`` and ``y`` are the two independent halves.
+    ``demean=True`` is the source exactly; ``demean=False`` keeps the mean, which is the form the
+    factor gate needs (:class:`SplitHalf` says why). Returns eigenvalues in descending order — the
+    component covariances — and the eigenvectors as columns, as the source does after its flips.
+    """
+    if not x or len(x) != len(y):
+        raise ValueError("the two halves must rate the same, non-empty set of items")
+    dims = len(x[0])
+
+    def centred(m: Sequence[Sequence[float]]) -> list[list[float]]:
+        rows = [[float(v) for v in row] for row in m]
+        if any(len(row) != dims for row in rows):
+            raise ValueError("every item must be rated on every dimension")
+        if not demean:
+            return rows
+        means = [sum(row[j] for row in rows) / len(rows) for j in range(dims)]
+        return [[row[j] - means[j] for j in range(dims)] for row in rows]
+
+    xc, yc = centred(x), centred(y)
+    cross = [[sum(xc[r][i] * yc[r][j] + yc[r][i] * xc[r][j] for r in range(len(xc)))
+              for j in range(dims)] for i in range(dims)]
+    return symmetric_eigh(cross)
+
+
+def reliable_components(
+    x: Sequence[Sequence[float]], y: Sequence[Sequence[float]], *,
+    flips: int = 500, alpha: float = SPLIT_HALF_ALPHA, seed: int = SPLIT_HALF_SEED,
+) -> dict[str, Any]:
+    """How many independent payoff dimensions a factor library reproduces across halves.
+
+    GoEmotions keeps the principal preserved components whose held-out correlation is significant
+    (`ppca.py:136-217`, via a leave-one-rater-out Spearman). Here the null flips the sign of whole
+    block rows of one half, which destroys agreement between halves while keeping each half's own
+    structure, and component ``i`` counts as reliable when its eigenvalue exceeds the
+    ``1 - alpha`` quantile of the null's ``i``-th eigenvalue. Uncentred, for the reason
+    :class:`SplitHalf` gives. The count, not the loadings, is what the lab reports: eight vetted
+    primitives that reproduce two dimensions are two ideas, not eight.
+    """
+    observed, _ = ppca(x, y, demean=False)
+    rng = random.Random(seed)
+    nulls: list[list[float]] = []
+    for _ in range(flips):
+        signs = [1.0 if rng.random() < 0.5 else -1.0 for _ in y]
+        flipped = [[s * v for v in row] for s, row in zip(signs, y, strict=True)]
+        nulls.append(ppca(x, flipped, demean=False)[0])
+    thresholds: list[float] = []
+    for i in range(len(observed)):
+        ranked = sorted(null[i] for null in nulls)
+        thresholds.append(ranked[min(len(ranked) - 1, math.ceil((1 - alpha) * len(ranked)) - 1)])
+    reliable = 0
+    for value, threshold in zip(observed, thresholds, strict=True):
+        if value <= threshold:
+            break
+        reliable += 1
+    return {
+        "dimensions": len(observed),
+        "reliable_components": reliable,
+        "eigenvalues": [round(v, 10) for v in observed],
+        "null_thresholds": [round(t, 10) for t in thresholds],
+        "flips": flips,
+    }
+
+
 class Evaluator:
     """Deterministic scoring. No model touches this.
 
@@ -274,6 +549,26 @@ class Evaluator:
         if not rows:
             return None
         return run_all(rows)
+
+    def payoff_series(self, factor: Factor) -> tuple[list[float], list[float]]:
+        """Factor readings and the next bar's return — exactly the pairs :meth:`observations`
+        scores, so the split-half gate and the anti-overfit gates see the same evidence."""
+        signal = PRIMITIVES[factor.expression]
+        values: list[float] = []
+        returns: list[float] = []
+        for i in range(len(self._bars) - 1):
+            try:
+                value = float(signal(self._bars, i))
+            except (ValueError, ZeroDivisionError, OverflowError, IndexError):
+                continue
+            values.append(value)
+            returns.append(_ret(self._bars, i + 1, 1))
+        return values, returns
+
+    def split_half(self, factor: Factor) -> SplitHalf:
+        """The split-half reliability gate, one item per :data:`SPLIT_HALF_BLOCK_BARS` bars."""
+        values, returns = self.payoff_series(factor)
+        return split_half(values, returns, block=SPLIT_HALF_BLOCK_BARS)
 
     def score(self, record: FactorRecord) -> FactorRecord:
         """Walk one factor through every gate, in order, stopping at the first failure."""
@@ -413,6 +708,14 @@ class FactorLab:
                     record.reject(f"anti-overfit: {overfit.verdict}")
                     continue
 
+            # Reliability, a third question: would an independent half of the same evidence have
+            # found this? INCONCLUSIVE does not certify, for the reason given above.
+            reliability = self.evaluator.split_half(record.factor)
+            record.split_half = reliability.as_dict()
+            if not reliability.passed:
+                record.reject(f"split-half: {reliability.reason}")
+                continue
+
             record.advance(Lifecycle.CERTIFIED)
             certified.append(record)
         if self.memory is not None:
@@ -537,6 +840,8 @@ if __name__ == "__main__":
 
 
 __all__ = [
-    "PRIMITIVES", "Evaluator", "Factor", "FactorLab", "FactorRecord",
-    "Lifecycle", "LifecycleViolation", "ProposerContext", "report",
+    "PRIMITIVES", "SPLIT_HALF_ALPHA", "SPLIT_HALF_BLOCK_BARS", "SPLIT_HALF_FLIPS",
+    "SPLIT_HALF_MIN_BLOCKS", "Evaluator", "Factor", "FactorLab", "FactorRecord", "Lifecycle",
+    "LifecycleViolation", "ProposerContext", "SplitHalf", "payoff_halves", "ppca",
+    "reliable_components", "report", "split_half", "symmetric_eigh",
 ]

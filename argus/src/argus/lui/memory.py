@@ -64,17 +64,24 @@ _MAX_LOSS = re.compile(
     r"(?:more\s+than\s+)?(\d{1,2}(?:\.\d+)?)\s*%|\bmax(?:imum)?\s+(?:loss|drawdown)\s+(?:is\s+|of\s+)?"
     r"(\d{1,2}(?:\.\d+)?)\s*%|\b(?:my\s+)?loss\s+limit\s+(?:is\s+)?(\d{1,2}(?:\.\d+)?)\s*%", re.I)
 _HORIZON = re.compile(
-    r"\bi(?:'?m|\s+am)\s+an?\s+(day|swing|position|long[\s-]term)\s+(?:trader|investor)|"
+    r"\bi(?:'?m|\s+am)\s+an?\s+(?:[\w-]+\s+){0,3}?(day|swing|position|long[\s-]term)\s+"
+    r"(?:trader|investor)|"
     r"\bi\s+(?:usually\s+|normally\s+|typically\s+)?hold\s+(?:for\s+)?(?:a\s+few\s+|several\s+)?"
     r"(hours?|days?|weeks?|months?|years?)\b", re.I)
 _STYLE = re.compile(
     r"\bi(?:'?m|\s+am)\s+(?:a\s+|an\s+|pretty\s+|quite\s+|very\s+)?(conservative|aggressive|"
     r"risk[\s-]averse|cautious)\b|\bi\s+(?:mostly\s+|only\s+|usually\s+)?trade\s+(earnings|momentum|"
-    r"mean[\s-]reversion|breakouts?|news|macro|crypto|stocks)\b", re.I)
+    r"mean[\s-]reversion|breakouts?|news|macro|crypto|stocks)\b|"
+    r"\b(event[\s-]driven|earnings[\s-]driven|momentum|news[\s-]driven|macro)\s+(?:swing\s+|day\s+|"
+    r"position\s+)?(?:trader|investor|trading)\b", re.I)
+"""Style, including the one said in passing: "I am a tech-stock event-driven swing trader" was not
+remembered at all on the hosted console (readiness audit, finding 40)."""
 _CAPITAL = re.compile(
     r"\bmy\s+(?:account|book|portfolio|capital)\s+is\s+(?:about\s+|around\s+)?\$?\s*"
     r"(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b|\bi\s+have\s+(?:about\s+|around\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)"
-    r"\s*(k|m)?\s+(?:to\s+(?:trade|invest)|in\s+my\s+account)", re.I)
+    r"\s*(k|m)?\s+(?:to\s+(?:trade|invest)|in\s+my\s+account)|"
+    r"\b(?:an?|my)\s+\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:account|book|portfolio)\b|"
+    r"\b(?:trading|investing)\s+(?:with\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b", re.I)
 _THESIS = re.compile(
     r"\bi\s+(?:think|believe|expect|reckon|bet)\s+(?:that\s+)?(.{2,40}?)\s+(?:will|is\s+going\s+to|"
     r"gonna|should|can|to)\s+(.{3,120})", re.I)
@@ -119,10 +126,12 @@ def extract(question: str, now: datetime | None = None,
             168 if word.startswith("week") else 720 if word.startswith("month") else 24 * 365)
         add("horizon", "", str(hours), m.group(0))
     if (m := _STYLE.search(text)) is not None:
-        add("style", "", (m.group(1) or m.group(2) or "").lower(), m.group(0))
+        add("style", "", re.sub(r"[\s-]+", "-", (m.group(1) or m.group(2) or m.group(3)
+                                                  or "").lower()), m.group(0))
     if (m := _CAPITAL.search(text)) is not None:
-        amount = float((m.group(1) or m.group(3) or "0").replace(",", ""))
-        unit = (m.group(2) or m.group(4) or "").lower()
+        amount = float((m.group(1) or m.group(3) or m.group(5) or m.group(7)
+                        or "0").replace(",", ""))
+        unit = (m.group(2) or m.group(4) or m.group(6) or m.group(8) or "").lower()
         amount *= 1_000 if unit == "k" else 1_000_000 if unit == "m" else 1
         if amount >= 100:
             add("capital", "", f"{amount:.0f}", m.group(0))

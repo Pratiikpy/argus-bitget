@@ -17,6 +17,15 @@ the kind that silently produce a 40009 signature error:
 **Paper trading is the default here and turning it off takes an explicit argument.** A client whose
 default is real money is one typo from a real loss.
 
+**And since 2026-09-25 the explicit argument is not enough on its own.** Any order this client would
+send to a real-money venue is refused unless the client holds a per-run
+:class:`~argus.execution.consent.LiveOrderConsent` (`execution/consent.py`, after MLE-bench's
+code-enforced consent gate, MIT). The check sits in :meth:`BitgetTradingClient.place_order`, the one
+function in ARGUS that sends an order to a venue, so no caller can route around it. The same change
+fixed :attr:`BitgetTradingClient.trades_real_money`, which read ``False`` for ``paper_trading=True``
+with an explicit live ``product_type`` — a combination that sent real orders — and made that
+combination unconstructable.
+
 Credentials come from the environment only, using **Bitget's own variable names** —
 ``BITGET_API_KEY``, ``BITGET_SECRET_KEY``, ``BITGET_PASSPHRASE``
 (``agent-sdk/src/config.ts:192-194`` and both official READMEs). An earlier draft of this module
@@ -42,6 +51,8 @@ from decimal import Decimal
 from typing import Any
 
 from argus.decision.verdicts import Authorised
+from argus.execution.confirm import StatusReading
+from argus.execution.consent import ConsentRefused, LiveOrderConsent, require_live_consent
 from argus.execution.orders import Order, OrderState
 
 BASE_URL = "https://api.bitget.com"
@@ -82,6 +93,35 @@ class BitgetOrderError(RuntimeError):
     """The venue refused an order. Carries the venue's own code so it can be acted on."""
 
 
+class LiveOrderRefused(BitgetOrderError):
+    """A real-money order was refused before it left: no valid consent for this run.
+
+    A :class:`BitgetOrderError` so every existing handler that already treats a refused order as a
+    refused order (`execution/preflight.py`, `demo/flow.py`) handles this one the same way.
+    """
+
+
+VENUE_STATES: dict[str, OrderState] = {
+    "live": OrderState.ACCEPTED,
+    "new": OrderState.ACCEPTED,
+    "partially_filled": OrderState.PARTIALLY_FILLED,
+    "filled": OrderState.FILLED,
+    "cancelled": OrderState.CANCELLED,
+    "canceled": OrderState.CANCELLED,
+    "rejected": OrderState.REJECTED,
+    "expired": OrderState.EXPIRED,
+}
+"""Bitget's order-detail ``state`` words, mapped onto ours. Anything else maps to UNKNOWN."""
+
+
+def map_order_detail(detail: dict[str, Any]) -> tuple[OrderState, Decimal, str]:
+    """The venue's order detail as ``(state, filled, raw word)``. Unrecognised is UNKNOWN, never a
+    guess — the same rule :meth:`BitgetTradingClient.reconcile` has always applied."""
+    raw = str(detail.get("state", "")).lower()
+    filled = Decimal(str(detail.get("baseVolume", "0") or "0"))
+    return VENUE_STATES.get(raw, OrderState.UNKNOWN), filled, raw
+
+
 @dataclass(frozen=True, slots=True)
 class PlacedOrder:
     """What the venue said it did."""
@@ -112,6 +152,7 @@ class BitgetTradingClient:
         timeout: float = 30.0,
         product_type: str | None = None,
         legacy_paptrading: bool = False,
+        live_consent: LiveOrderConsent | None = None,
     ) -> None:
         self._key = _from_env("BITGET_API_KEY")
         self._secret = _from_env("BITGET_SECRET_KEY", "BITGET_API_SECRET")
@@ -141,11 +182,24 @@ class BitgetTradingClient:
         self._product_type = product_type or (
             DEMO_PRODUCT_TYPE if paper_trading else LIVE_PRODUCT_TYPE
         )
+        if paper_trading and not self._simulated:
+            # The corner `trades_real_money` used to get wrong: paper mode pointed at a live
+            # productType with no demo header sends real orders to the real venue. A client that
+            # believes it is paper while spending money cannot be allowed to exist.
+            raise ValueError(
+                f"paper_trading=True with product_type={self._product_type!r} and no demo header "
+                f"would send real-money orders; use {DEMO_PRODUCT_TYPE!r}, or legacy_paptrading "
+                f"on an account that still uses the classic header"
+            )
+        self._live_consent = live_consent
         self._pos_mode: str | None = None
 
     def __repr__(self) -> str:
         mode = "PAPER" if self._paper else "LIVE"
-        return f"BitgetTradingClient(mode={mode}, product_type={self._product_type!r})"
+        consent = (
+            "" if self._live_consent is None else f", consent_run={self._live_consent.run_id!r}"
+        )
+        return f"BitgetTradingClient(mode={mode}, product_type={self._product_type!r}{consent})"
 
     @property
     def product_type(self) -> str:
@@ -161,13 +215,28 @@ class BitgetTradingClient:
         return MARGIN_COIN.get(self._product_type, "USDT")
 
     @property
+    def _simulated(self) -> bool:
+        """Would an order from this client land on a simulated venue? Decided by the request.
+
+        The demo productType is simulated whatever the flag says; so is the classic ``paptrading``
+        header, which this client sends only in paper mode with ``legacy_paptrading``. Nothing
+        else is.
+        """
+        return self._product_type == DEMO_PRODUCT_TYPE or (self._paper and self._legacy_paptrading)
+
+    @property
     def trades_real_money(self) -> bool:
         """The single question that matters before any order goes out.
 
-        True only when the client is live *and* pointed at a real productType. Kept as one
-        property so a caller never has to reason about two flags agreeing.
+        True unless the order would land on a simulated venue. Kept as one property so a caller
+        never has to reason about two flags agreeing.
+
+        **Corrected 2026-09-25.** This read ``not self._paper and product_type != DEMO``, which
+        answered ``False`` for ``paper_trading=True`` with an explicit live productType — a client
+        whose orders went to the real venue with no demo header. The answer now comes from what the
+        request actually is (:attr:`_simulated`), and that combination is refused at construction.
         """
-        return not self._paper and self._product_type != DEMO_PRODUCT_TYPE
+        return not self._simulated
 
     @property
     def is_paper(self) -> bool:
@@ -351,6 +420,13 @@ class BitgetTradingClient:
         order = authorised.order
         if not isinstance(order, Order):  # pragma: no cover - structural guard
             raise BitgetOrderError(f"an Authorised must carry an Order, not {type(order).__name__}")
+        if self.trades_real_money:
+            # The consent gate (`execution/consent.py`). Checked before the payload is even built,
+            # so a refused real-money order never reaches the signing path.
+            try:
+                require_live_consent(self._live_consent)
+            except ConsentRefused as exc:
+                raise LiveOrderRefused(f"{order.client_order_id}: {exc}") from None
         if not order.approved_intent_hash.strip():
             raise BitgetOrderError(
                 f"{order.client_order_id} carries no approved_intent_hash; refusing to send an "
@@ -407,20 +483,27 @@ class BitgetTradingClient:
         not recognise is exactly how a position stops being watched.
         """
         detail = self.order_status(symbol=symbol, client_order_id=book_order.client_order_id)
-        venue_state = str(detail.get("state", "")).lower()
-        filled = Decimal(str(detail.get("baseVolume", "0") or "0"))
+        state, filled, _ = map_order_detail(detail)
+        return state, filled
 
-        mapping = {
-            "live": OrderState.ACCEPTED,
-            "new": OrderState.ACCEPTED,
-            "partially_filled": OrderState.PARTIALLY_FILLED,
-            "filled": OrderState.FILLED,
-            "cancelled": OrderState.CANCELLED,
-            "canceled": OrderState.CANCELLED,
-            "rejected": OrderState.REJECTED,
-            "expired": OrderState.EXPIRED,
-        }
-        return mapping.get(venue_state, OrderState.UNKNOWN), filled
+
+class BitgetStatusSource:
+    """The venue's order record as a :class:`~argus.execution.confirm.StatusSource`.
+
+    One of the two signals `execution/confirm.py` needs. There is deliberately no Bitget
+    ``PositionSource`` beside it: see that module's docstring for why no position read is wired,
+    and what a confirmation against this venue can and cannot establish without one.
+    """
+
+    def __init__(self, client: BitgetTradingClient) -> None:
+        self._client = client
+
+    def order_status(self, client_order_id: str, *, symbol: str) -> StatusReading:
+        detail = self._client.order_status(symbol=symbol, client_order_id=client_order_id)
+        state, filled, raw = map_order_detail(detail)
+        if state is OrderState.UNKNOWN:
+            return StatusReading(state=None, filled=Decimal("0"), raw=raw or "empty detail")
+        return StatusReading(state=state, filled=filled, raw=raw)
 
 
 def _from_env(canonical: str, *fallbacks: str) -> str:

@@ -28,14 +28,14 @@ def _trade(led: PaperLedger, *, n: int, conf: float, qty: str = "10") -> None:
     )
 
 
-def _abstain(led: PaperLedger, *, n: int) -> None:
+def _abstain(led: PaperLedger, *, n: int, lean: str = "up", side: str = "BUY") -> None:
     led.record(
-        symbol="NVDAUSDT", verdict="no_trade", side="BUY",
+        symbol="NVDAUSDT", verdict="no_trade", side=side,
         quantity=Decimal("0"), entry_price=Decimal("220"),
         stated_confidence=0.9, thesis="edge does not clear 12bps",
         invalidation=(), market_state_hash="h", approved_intent_hash="a",
         session_phase="weekend", hours_to_discovery=30.0,
-        decided_at=T0 + timedelta(hours=n),
+        decided_at=T0 + timedelta(hours=n), lean=lean, lean_confidence=0.6,
     )
 
 
@@ -86,6 +86,69 @@ class TestAbstentions:
         for i in range(4):
             _abstain(led, n=i)
         assert score_ledger(led).predictions == []
+
+
+class TestAbstentionsAreGradedAgainstTheirLean:
+    """The regression behind 2026-09-25: a refusal was graded against ``side``, a field the model
+    fills in because the contract demands one (BUY on every refusal `eval/shadow.py` measured),
+    instead of against its lean — the trade it actually withheld."""
+
+    def test_a_down_lean_is_graded_as_the_short_it_withheld_not_as_the_side(
+        self, tmp_path: Path
+    ) -> None:
+        led = _ledger(tmp_path)
+        _abstain(led, n=0, lean="down", side="BUY")
+        got = score_ledger(led, counterfactuals={1: Decimal("-40")})
+        outcome = got.abstention_outcomes[0]
+        assert outcome.intended_side == "SELL"
+        # The market fell 40bps: the short it withheld would have made 40 - 12 = 28bps, so
+        # standing aside MISSED a gain. Graded against side=BUY it would read as a loss avoided.
+        assert outcome.value_bps == Decimal("-28")
+        assert outcome.was_right is False
+
+    def test_an_up_lean_is_graded_as_a_long(self, tmp_path: Path) -> None:
+        led = _ledger(tmp_path)
+        _abstain(led, n=0, lean="up", side="SELL")
+        got = score_ledger(led, counterfactuals={1: Decimal("-40")})
+        assert got.abstention_outcomes[0].intended_side == "BUY"
+        assert got.abstention_outcomes[0].value_bps == Decimal("52")   # avoided 40 + 12
+
+    def test_a_refusal_without_a_lean_is_counted_not_graded(self, tmp_path: Path) -> None:
+        """No lean, no trade withheld: there is no loss it avoided or gain it missed."""
+        led = _ledger(tmp_path)
+        _abstain(led, n=0, lean="none")
+        got = score_ledger(led, counterfactuals={1: Decimal("-40")})
+        assert got.abstention_outcomes == []
+        assert got.ungradeable == 1
+        assert got.no_lean == 1
+
+    def test_an_unsettled_refusal_without_a_lean_is_not_counted_as_no_lean(
+        self, tmp_path: Path
+    ) -> None:
+        """``no_lean`` names refusals whose outcome IS known; an unknown one is just ungraded."""
+        led = _ledger(tmp_path)
+        _abstain(led, n=0, lean="none")
+        got = score_ledger(led)
+        assert got.ungradeable == 1
+        assert got.no_lean == 0
+
+    def test_the_scorecard_reports_the_refusals_without_a_lean(self, tmp_path: Path) -> None:
+        led = _ledger(tmp_path)
+        _abstain(led, n=0, lean="none")
+        _abstain(led, n=1, lean="up")
+        got = scorecard(led, counterfactuals={1: Decimal("-40"), 2: Decimal("30")})
+        assert got["ledger"]["abstentions_without_a_lean"] == 1
+        assert got["abstention"]["abstentions"] == 1
+        assert got["abstention"]["without_a_lean"] == 1
+
+    def test_risk_coverage_is_opt_in_and_refuses_a_thin_record(self, tmp_path: Path) -> None:
+        """Below the floor the ranking is noise, and the block says so instead of a number."""
+        led = _ledger(tmp_path)
+        _abstain(led, n=0, lean="up")
+        got = scorecard(led, counterfactuals={1: Decimal("30")})
+        assert "risk_coverage" not in got["abstention"]
+        got = scorecard(led, counterfactuals={1: Decimal("30")}, coverage=True)
+        assert "below the floor" in got["abstention"]["risk_coverage"]["undefined"]
 
 
 class TestFloorAndIntegrity:

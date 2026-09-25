@@ -17,21 +17,28 @@ def _inputs(nights: int = 30) -> dict[str, Any]:
     it plus noise, so the scorer has a known answer."""
     hourly: dict[str, list[tuple[float, float]]] = {k: [] for k in
                                                     (*oc.PROXIES, *oc.CRYPTO, "NVDAUSDT")}
+    from argus.eval.baselines.lean_market_holidays_loader import load_usa_equity_holidays
+
+    # Session days only: the console's clock carries the NYSE calendar (Juneteenth and 3 July fall
+    # in this window), so a synthetic session on a holiday would be anchored on the day before.
+    shut = load_usa_equity_holidays()
     sessions = []
     price, day = 100.0, date(2026, 6, 1)
     for i in range(nights):
-        while day.weekday() >= 5:
+        while day.weekday() >= 5 or day in shut:
             day += timedelta(days=1)
         gap = (0.01 if i % 2 else -0.012) * (1 + i % 3)
         close_at = oc._ny(day, time(16))
         nxt = day + timedelta(days=1)
-        while nxt.weekday() >= 5:
+        while nxt.weekday() >= 5 or nxt in shut:
             nxt += timedelta(days=1)
         predict_at = oc._ny(nxt, time(9))
         for stamp, factor in ((predict_at - 24 * 3600, 1.0), (close_at, 1.0),
                               (predict_at - 3600, 1.0), (predict_at, 1.0 + gap)):
             hourly["NVDAUSDT"].append((stamp, price * factor))
-            hourly["NQ=F"].append((stamp, 1000 * (1 + gap / 2 * (factor != 1.0))))
+            # Half the gap plus noise the gap does not explain, so no fit recovers it exactly.
+            noise = 0.004 * ((i * 7) % 5 - 2)
+            hourly["NQ=F"].append((stamp, 1000 * (1 + (gap / 2 + noise) * (factor != 1.0))))
             hourly["ES=F"].append((stamp, 1000.0))
             hourly["DX-Y.NYB"].append((stamp, 100.0))
             for c in oc.CRYPTO:
@@ -135,10 +142,15 @@ def test_nocturnes_claim_is_scored_on_the_stock_at_its_own_moment() -> None:
     inputs = _inputs(60)
     assert oc.sunday_evening({**inputs, "sessions": {"NVDA": inputs["sessions"]["NVDA"][:4]}}) \
         is None
+    from argus.eval.baselines.lean_market_holidays_loader import load_usa_equity_holidays
+
     friday, monday = date(2026, 6, 5), date(2026, 6, 8)
-    hourly = {k: [] for k in inputs["hourly"]}
+    hourly: dict[str, list[tuple[float, float]]] = {k: [] for k in inputs["hourly"]}
     sessions = []
-    for week in range(24):
+    # Holiday Fridays (19 June, 3 July) are not sessions: the console anchors on Thursday then.
+    weeks = [w for w in range(24)
+             if friday + timedelta(weeks=w) not in load_usa_equity_holidays()]
+    for week in weeks:
         fri, mon = friday + timedelta(weeks=week), monday + timedelta(weeks=week)
         move = 0.01 * (1 if week % 2 else -1)
         hourly["NVDAUSDT"] += [(oc._ny(fri, time(16)), 100.0),
@@ -146,7 +158,7 @@ def test_nocturnes_claim_is_scored_on_the_stock_at_its_own_moment() -> None:
         sessions += [{"day": fri.isoformat(), "open": 100.0, "close": 100.0},
                      {"day": mon.isoformat(), "open": 100.0 * (1 + move), "close": 100.0}]
     report = oc.sunday_evening({"hourly": hourly, "sessions": {"NVDA": sessions}})
-    assert report is not None and report["weekends"] == 24
+    assert report is not None and report["weekends"] == len(weeks) == 22
     assert report["slope_gap_on_perp_weekend_move"] == 1.0
     assert report["paired"]["verdict"] == "a better"
 
@@ -194,3 +206,68 @@ def test_while_shut_only_the_regular_close_is_used(monkeypatch: pytest.MonkeyPat
     monkeypatch.setattr(research, "_yahoo_close", lambda symbol, at: None)
     monkeypatch.setattr(research, "_stock_last", lambda symbol, service: 226.36)
     assert research._implied_open_line("NVDAUSDT", Decimal("226.5")) is None
+
+
+def test_the_scored_argus_estimate_is_the_consoles_printed_implied_open(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """argus_perp is read back from `_implied_open_line`'s sentence: breaking the console breaks
+    the harness, and the former in-module formula agrees with it to the printed cent."""
+    from argus.lui import research
+
+    report = oc.score(_inputs())
+    replay = report["console_replay"]
+    assert replay["nights_the_console_declined"] == []
+    assert replay["max_abs_diff_vs_former_formula_bps"] < 1.0
+    assert "puts the stock near" in replay["sample_line"]
+
+    def broken(*_a: Any, **_k: Any) -> Any:
+        raise RuntimeError("console broken")
+
+    monkeypatch.setattr(research, "_implied_open_line", broken)
+    with pytest.raises(RuntimeError, match="console broken"):
+        oc.score(_inputs())
+
+
+def test_the_replay_feed_is_restored_and_refuses_what_it_does_not_hold() -> None:
+    from argus.market import equity_history, history, universe
+
+    real = (history.fetch, equity_history.daily, universe.contracts)
+    with oc.console_feed({"NVDAUSDT": [(7200.0, 101.0)]}, {"NVDA": [(date(2026, 1, 2), 99.0)]}):
+        bars = history.fetch("NVDAUSDT", interval="1H",
+                             start=datetime.fromtimestamp(0, UTC),
+                             end=datetime.fromtimestamp(3600, UTC))
+        assert [(b.ts, b.close) for b in bars] == [(datetime.fromtimestamp(3600, UTC),
+                                                    Decimal("101.0"))]
+        assert equity_history.daily("NVDA")[0].close == 99.0
+        with pytest.raises(history.HistoryError):
+            history.fetch("NVDAUSDT", interval="1D", start=None, end=None)
+    assert (history.fetch, equity_history.daily, universe.contracts) == real
+
+
+def test_claimcheck_grades_the_consoles_own_premise_check(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """The replay calls `_claim_check` on the saved sentences and tape; its verdicts are the ones
+    the console gave that morning, and a broken `_claim_check` breaks the harness."""
+    from argus.eval import claimcheck_comparison as cc
+    from argus.lui import research
+
+    claims = json.loads((cc.DATA / "claims.json").read_text("utf-8"))
+    tape = json.loads((cc.DATA / "tape.json").read_text("utf-8"))
+    recorded = json.loads((cc.DATA / "argus_raw.json").read_text("utf-8"))
+    replay = cc.console_answers(claims, tape)
+    assert cc._agreement(claims, replay, recorded)["differ"] == []
+    session = replay["NVDA"][-1]
+    assert session["symbol"] == "" and "at 04:36 UTC" in session["lines"][0]
+    # No claim in the set reads a price, so the zeroed price fields of the replayed tape are safe.
+    for sentences in claims.values():
+        for sentence in sentences:
+            assert not research._FUNDING_CLAIM.search(sentence)
+            assert not research._PREMIUM_CLAIM.search(sentence)
+            assert not research._LIQUIDITY_CLAIM.search(sentence)
+
+    def broken(*_a: Any, **_k: Any) -> Any:
+        raise RuntimeError("console broken")
+
+    monkeypatch.setattr(research, "_claim_check", broken)
+    with pytest.raises(RuntimeError, match="console broken"):
+        cc.console_answers(claims, tape)

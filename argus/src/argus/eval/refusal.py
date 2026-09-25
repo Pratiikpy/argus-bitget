@@ -44,23 +44,78 @@ fetched after the outcomes were known.
 taken in the last cycle before the overnight gap is next seen ~18h later rather than ~2h. Averaging
 those together would produce a number about the recording schedule rather than about the desk —
 the defect `eval/bookcalib.py` was found committing and which is not repeated here.
+
+**A fifth question, added 2026-09-25: was the stated reason true?** The four measurements above ask
+whether standing aside was *economically* right. None of them asks whether the reason the desk
+wrote down for standing aside was true — and a refusal that is right for a false reason is an
+explainability defect even when it saves money, because the reason is what a reader acts on.
+VisualWebArena grades exactly this for its unachievable tasks: ``llm_ua_match``
+(``evaluation_harness/helper_functions.py:610-642``, MIT) sets the *reported* reason for giving up
+beside the *actual* one and asks only "same or different". ARGUS does not need a model for most of
+it, because the record already holds the facts the theses cite:
+
+* **session** — a thesis that says the anchor is asleep, the market closed, or that it is the
+  weekend, against the ``session_phase`` the ledger recorded at decision time (and the reverse);
+* **hours to price discovery** — a number quoted in the thesis against ``hours_to_discovery``;
+* **the hedge menu** — "no hedge available" against the desk's own note (`agents/desk.py:531`
+  writes ``hedge menu empty`` exactly when the menu is empty);
+* **the risk layer** — a thesis that blames the risk layer for the abstention against
+  `data/risk_records.jsonl`, which says whether the Constitution actually intervened;
+* **size against direction** — the two forward claims a thesis makes about magnitude ("the binding
+  constraint was direction, not size" and "any move would be too small to clear the round trip"),
+  graded against the next ~2h mark and set beside the base rate of clearance over every mark, so a
+  claim that is borne out no more often than the base rate is visible as carrying no information.
+
+What was taken from VWA: the question (reported reason against actual reason) and its binary
+verdict. What was not: the model call — a claim the record can settle is settled by the record, so
+this grading is deterministic and reproducible to the digit. Claims the record cannot settle (the
+24h change a thesis quotes, a panel's edge in bps) are **not graded** rather than guessed at; the
+report says how many refusals carried no gradeable claim at all. Voided rows (seqs 264 and 265,
+`paper/corrections.py`) are not graded: their thesis argues for the trade the record voided. Results
+are in ``data/refusal_reasons.json`` (:func:`run_reasons`).
+
+**Finding, 2026-09-25.** 682 refusals; 325 state at least one reason the record can check. Of the
+691 decision-time reasons graded — session 275, hours to price discovery 266, hedge menu 150 —
+all 691 agree with the record and none contradicts it; no refusal blames the risk layer, and the
+risk records agree it never intervened. The one forward claim the desk makes about magnitude, "the
+binding constraint was direction, not size", was borne out by the next ~2h move 37 of 46 times:
+80%, against a base rate of 75% over every ~2h refusal mark (one-sided exact binomial p = 0.26).
+True, and no more informative than the tape. The first version of this grader reported two
+contradictions (seqs 139 and 460); both were its own misreading of "**no** anchor market open", and
+the negation guard in :func:`_asserted` exists because of them.
+
+**Re-run 2026-09-26** on the grown record: 696 refusals, 333 with a checkable reason. The
+decision-time tally is unchanged — 691 of 691 consistent — because none of the 14 newer theses
+(seqs 685-698, all RTH) states a session, hours-to-discovery or hedge-menu claim in words the
+patterns read, and six state "direction, not size" (five borne out, one not); that is a
+coverage limit of this grader, not evidence about those theses. "Direction, not size" was borne
+out 43 of 54 times (80%) against the same 75% base rate (p = 0.26): still true, still no more
+informative than the tape.
 """
 
 from __future__ import annotations
 
 import json
 import random
+import re
 from collections import defaultdict
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from enum import StrEnum
 from math import comb, sqrt
 from pathlib import Path
 from typing import Any
 
+from argus.eval import artefact
 from argus.paper.marks import Mark, read_marks
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 REPORT_PATH = DATA / "refusal_alpha.json"
+REASONS_PATH = DATA / "refusal_reasons.json"
+LEDGER_PATH = DATA / "paper_ledger.jsonl"
+NOTES_PATH = DATA / "desk_notes.jsonl"
+RISK_PATH = DATA / "risk_records.jsonl"
 
 HORIZONS: tuple[tuple[str, float, float], ...] = (
     ("about_2h", 1.5, 4.0),
@@ -144,6 +199,12 @@ def cluster_interval(cycles: list[tuple[int, int]], *, resamples: int = BOOTSTRA
         rates.append(sum(h for h, _ in draw) / sum(n for _, n in draw))
     rates.sort()
     return rates[int(0.025 * resamples)], rates[int(0.975 * resamples) - 1]
+
+
+def binomial_upper(k: int, n: int, p: float) -> float:
+    """P(X >= k) for X ~ Binomial(n, p), exact. The one-sided test a forward claim's hit rate is
+    held to against the base rate."""
+    return min(1.0, sum(comb(n, i) * p ** i * (1.0 - p) ** (n - i) for i in range(k, n + 1)))
 
 
 def sign_test(wins: int, losses: int) -> float | None:
@@ -468,6 +529,383 @@ def orphans(marks: list[Mark], *, ledger_path: Path | None = None) -> list[int]:
     return sorted({m.seq for m in marks if m.seq not in known})
 
 
+# --- the stated reason, against the record -------------------------------------------------------
+
+
+class Claim(StrEnum):
+    """A kind of reason a refusal thesis gives that the record can check."""
+
+    SESSION_CLOSED = "session_closed"
+    SESSION_OPEN = "session_open"
+    HOURS_TO_DISCOVERY = "hours_to_discovery"
+    NO_HEDGE = "no_hedge"
+    RISK_LAYER = "risk_layer"
+    MOVES_ENOUGH = "moves_enough"
+    MOVE_TOO_SMALL = "move_too_small"
+
+
+FORWARD_CLAIMS = frozenset({Claim.MOVES_ENOUGH, Claim.MOVE_TOO_SMALL})
+"""Claims about a move that had not happened yet. Graded against the next ~2h mark, and reported
+apart from the decision-time claims, because one later price is a noisy test of a claim about
+magnitude in a way that a recorded session phase is not a noisy test of "the market is closed"."""
+
+CONSISTENT = "consistent"
+CONTRADICTED = "contradicted"
+UNGRADEABLE = "ungradeable"
+
+HOURS_TOLERANCE = 1.5
+"""How far a quoted "N hours to price discovery" may sit from the recorded figure and still agree.
+
+Not tuned. A thesis is written minutes after the session clock is read and rounds freely ("52
+hours" for 51.99, "32+ hours" for 32.13); a cycle takes minutes, not hours. A gap wider than this
+cannot be rounding: it is a number from a different session, or no session at all."""
+
+_CLOSED_CLAIM = re.compile(
+    r"\bweekend\s+(?:session|phase|anchor|pricing|liquidity|tape|gap)\b|"
+    r"\b(?:it\s+is|it's|during\s+the|over\s+the|this)\s+weekend\b|"
+    r"\banchor(?:\s+market)?\s+(?:is\s+)?(?:asleep|closed|shut|dormant)\b|"
+    r"\b(?:us\s+|anchor\s+)?markets?\s+(?:is|are)\s+(?:now\s+)?(?:closed|shut)\b|"
+    r"\b(?:without|no)\s+(?:a\s+)?live\s+anchor\b|"
+    r"\b(?:after[- ]hours|overnight|extended[- ]hours)\s+session\b", re.I)
+"""A thesis saying there is no price discovery **now**. "The weekend memory", "prior weekend
+moves" and "8 prior weekend decisions" are references to the past and deliberately do not match:
+six RTH theses use the word that way (seqs 196-213) and none of them claims the market is shut."""
+
+_OPEN_CLAIM = re.compile(
+    r"\b(?:us\s+|anchor\s+)?markets?\s+(?:is|are)\s+(?:now\s+)?open\b|"
+    r"\bregular\s+(?:trading\s+)?(?:session|hours)\b|"
+    r"\bduring\s+(?:us\s+)?(?:market|regular|trading)\s+hours\b|"
+    r"\banchor(?:\s+market)?\s+(?:is\s+)?(?:open|awake)\b|\bRTH\b", re.I)
+
+_HOURS_CLAIM = re.compile(
+    r"(\d+(?:\.\d+)?)\s*\+?\s*[- ]?hours?\s+(?:to|until|before|from)\s+(?:the\s+)?(?:next\s+)?"
+    r"(?:genuine\s+)?price\s+discovery|"
+    r"\basleep\s+for\s+~?\s*(\d+(?:\.\d+)?)\s*\+?\s*hours?", re.I)
+
+_HEDGE_CLAIM = re.compile(
+    r"\bno\s+hedge(?:\s+(?:menu|available|instruments?))?\b|\bhedge\s+menu\s+(?:is\s+)?empty\b|"
+    r"\bempty\s+hedge\s+menu\b|\bnothing\s+(?:is\s+)?placeable\b", re.I)
+
+_RISK_LAYER_CLAIM = re.compile(
+    r"\b(?:the\s+|our\s+|desk'?s\s+)?(?:risk\s+layer|constitution|risk\s+kernel|risk\s+gate)\s+"
+    r"(?:blocks?|blocked|forbids?|forbade|caps?|capped|prevents?|prevented|vetoe?s?|vetoed|"
+    r"refuses?|refused|rejects?|rejected|narrows?|narrowed)\b|"
+    r"\bblocked\s+by\s+(?:the\s+)?(?:risk\s+(?:layer|kernel|gate|limit)|constitution)\b|"
+    r"\b(?:position|exposure|risk)\s+(?:limit|cap)\s+(?:is\s+|was\s+)?(?:reached|breached|hit|"
+    r"binding|blocks?|prevents?)\b", re.I)
+"""The desk's **own** risk layer named as the cause. News about a "kill switch proposal" (seq 262)
+is not a claim about the Constitution and must not match."""
+
+_MOVES_ENOUGH_CLAIM = re.compile(
+    r"\bdirection,?\s+not\s+(?:size|magnitude)\b|\btape\s+moves\s+enough\b|"
+    r"\bmoves?\s+(?:are\s+|is\s+)?(?:large|big)\s+enough\b", re.I)
+
+_TOO_SMALL_CLAIM = re.compile(
+    r"\bany\s+move\s+would\s+be\b[^.]{0,60}\bunlikely\s+to\s+clear\b|"
+    r"\b(?:realistic|expected|likely|projected|remaining)\s+(?:upside|downside|move|range)\b"
+    r"[^.]{0,60}\b(?:unlikely\s+to|will\s+not|won't|cannot)\s+(?:clear|cover|pay)\b|"
+    r"\bnot\s+(?:large|big)\s+enough\s+to\s+(?:pay|clear|cover)\b|"
+    r"\brange\s+(?:is\s+)?too\s+(?:narrow|small)\b", re.I)
+"""A claim about the size of the coming move. "The remaining *edge* is unlikely to clear the
+hurdle" does not match: an edge is a directional expectation, and grading it against an unsigned
+move would test a claim the thesis did not make."""
+
+
+@dataclass(frozen=True, slots=True)
+class ReasonCheck:
+    """One reason a refusal gave, set beside what the record says about it."""
+
+    seq: int
+    symbol: str
+    claim: Claim
+    stated: str
+    """The words in the thesis that make the claim, verbatim."""
+
+    recorded: str
+    """What the record holds for the same fact, with the file it came from."""
+
+    verdict: str
+    """``consistent``, ``contradicted`` or ``ungradeable`` — three states, because a claim the
+    record cannot reach is neither confirmed nor refuted and must not be counted as either."""
+
+    def as_dict(self) -> dict[str, Any]:
+        return {"seq": self.seq, "symbol": self.symbol, "claim": str(self.claim),
+                "stated": self.stated, "recorded": self.recorded, "verdict": self.verdict}
+
+
+_NEGATED = re.compile(r"\b(?:no|not|never|without|nor)\s+(?:\w+\s+)?$", re.I)
+
+
+def _asserted(pattern: re.Pattern[str], text: str) -> re.Match[str] | None:
+    """The first match that the thesis asserts rather than negates.
+
+    Found on the first run (2026-09-25): "a weekend token with **no** anchor market open" (seq 139)
+    and "the weekend session has **no** anchor market open" (seq 460) matched the open-market
+    pattern and were graded as contradicting a weekend record — two false contradictions out of
+    two. A reason grader that misreads a negation accuses the desk of the error it is looking for.
+    """
+    for found in pattern.finditer(text):
+        if not _NEGATED.search(text[max(0, found.start() - 24):found.start()]):
+            return found
+    return None
+
+
+def _excerpt(text: str, match: re.Match[str], *, pad: int = 60) -> str:
+    start, end = max(0, match.start() - pad), min(len(text), match.end() + pad)
+    return ("…" if start else "") + text[start:end].strip() + ("…" if end < len(text) else "")
+
+
+def check_reasons(
+    entry: Mapping[str, Any], *, notes: Sequence[str] | None = None,
+    risk: Mapping[str, Any] | None = None, mark: Mark | None = None,
+) -> list[ReasonCheck]:
+    """Every checkable reason one refusal's thesis gives, each graded against the record.
+
+    ``notes`` are the desk's own notes for this decision (`data/desk_notes.jsonl`), ``risk`` its
+    risk ruling (`data/risk_records.jsonl`), ``mark`` its later observation (`paper/marks.py`).
+    Any of them may be absent; a claim that needs an absent record is ``ungradeable``, never
+    assumed to hold.
+    """
+    thesis = str(entry.get("thesis") or "")
+    seq, symbol = int(entry["seq"]), str(entry.get("symbol", ""))
+    phase = str(entry.get("session_phase") or "").lower()
+    out: list[ReasonCheck] = []
+
+    def add(claim: Claim, match: re.Match[str], recorded: str, verdict: str) -> None:
+        out.append(ReasonCheck(seq, symbol, claim, _excerpt(thesis, match), recorded, verdict))
+
+    closed, opened = _asserted(_CLOSED_CLAIM, thesis), _asserted(_OPEN_CLAIM, thesis)
+    recorded_phase = f"session_phase={phase or 'unrecorded'} (paper_ledger.jsonl)"
+    if closed:
+        add(Claim.SESSION_CLOSED, closed, recorded_phase,
+            UNGRADEABLE if not phase else CONTRADICTED if phase == "rth" else CONSISTENT)
+    if opened:
+        add(Claim.SESSION_OPEN, opened, recorded_phase,
+            UNGRADEABLE if not phase else CONSISTENT if phase == "rth" else CONTRADICTED)
+
+    hours = _HOURS_CLAIM.search(thesis)
+    if hours:
+        quoted = float(hours.group(1) or hours.group(2))
+        raw = entry.get("hours_to_discovery")
+        if raw is None or raw == "":
+            add(Claim.HOURS_TO_DISCOVERY, hours, "hours_to_discovery unrecorded", UNGRADEABLE)
+        else:
+            actual = float(raw)
+            add(Claim.HOURS_TO_DISCOVERY, hours,
+                f"hours_to_discovery={actual:g} (paper_ledger.jsonl); quoted {quoted:g}",
+                CONSISTENT if abs(quoted - actual) <= HOURS_TOLERANCE else CONTRADICTED)
+
+    hedge = _HEDGE_CLAIM.search(thesis)
+    if hedge:
+        if notes is None:
+            add(Claim.NO_HEDGE, hedge, "no desk notes for this decision", UNGRADEABLE)
+        elif any(n.lower().startswith("hedge menu empty") for n in notes):
+            add(Claim.NO_HEDGE, hedge, "note 'hedge menu empty' (desk_notes.jsonl)", CONSISTENT)
+        else:
+            # `agents/desk.py:531` writes the line whenever the menu is empty, so notes that exist
+            # without it are the record of a menu that had something on it.
+            add(Claim.NO_HEDGE, hedge, "notes present, no 'hedge menu empty' line "
+                "(desk_notes.jsonl)", CONTRADICTED)
+
+    blamed = _RISK_LAYER_CLAIM.search(thesis)
+    if blamed:
+        if risk is None:
+            add(Claim.RISK_LAYER, blamed, "no risk record for this decision", UNGRADEABLE)
+        else:
+            intervened = bool(risk.get("intervened"))
+            add(Claim.RISK_LAYER, blamed,
+                f"intervened={intervened}, binding_constraint="
+                f"{risk.get('binding_constraint', '')} (risk_records.jsonl)",
+                CONSISTENT if intervened else CONTRADICTED)
+
+    for claim, pattern in ((Claim.MOVES_ENOUGH, _MOVES_ENOUGH_CLAIM),
+                           (Claim.MOVE_TOO_SMALL, _TOO_SMALL_CLAIM)):
+        found = pattern.search(thesis)
+        if not found:
+            continue
+        if mark is None or _horizon_of(mark.horizon_hours) != HORIZONS[0][0]:
+            add(claim, found, "no ~2h mark for this decision", UNGRADEABLE)
+            continue
+        cleared = abs(mark.move) > ROUND_TRIP_BPS
+        borne_out = cleared if claim is Claim.MOVES_ENOUGH else not cleared
+        add(claim, found,
+            f"next move {mark.move:+.1f}bps over {mark.horizon_hours:.2f}h against a "
+            f"{ROUND_TRIP_BPS:g}bps round trip (refusal_marks.jsonl)",
+            CONSISTENT if borne_out else CONTRADICTED)
+    return out
+
+
+@dataclass(frozen=True, slots=True)
+class ReasonReport:
+    """Every graded reason across the desk's refusals, and what could not be graded."""
+
+    checks: tuple[ReasonCheck, ...]
+    refusals: int
+    base_clearance: tuple[int, int]
+    """``(cleared, marks)`` over every ~2h refusal mark: how often *any* passed-on move cleared
+    the round trip. The yardstick a forward magnitude claim has to beat to mean anything."""
+
+    as_of: datetime
+
+    @property
+    def refusals_with_a_claim(self) -> int:
+        return len({c.seq for c in self.checks if c.verdict != UNGRADEABLE})
+
+    def tally(self, claim: Claim) -> dict[str, int]:
+        rows = [c for c in self.checks if c.claim is claim]
+        return {v: sum(1 for c in rows if c.verdict == v)
+                for v in (CONSISTENT, CONTRADICTED, UNGRADEABLE)}
+
+    @property
+    def contradicted(self) -> tuple[ReasonCheck, ...]:
+        return tuple(c for c in self.checks if c.verdict == CONTRADICTED)
+
+    def _share(self, claims: frozenset[Claim]) -> tuple[int, int]:
+        graded = [c for c in self.checks if c.claim in claims and c.verdict != UNGRADEABLE]
+        return sum(1 for c in graded if c.verdict == CONSISTENT), len(graded)
+
+    @property
+    def verdict(self) -> str:
+        if self.refusals == 0:
+            return "No refusal is on the record, so no stated reason can be graded — UNDEFINED."
+        now_claims = frozenset(Claim) - FORWARD_CLAIMS
+        held, graded = self._share(now_claims)
+        text = (f"{self.refusals} refusal(s) on record; {self.refusals_with_a_claim} carried at "
+                f"least one reason the record can check. Of {graded} decision-time reason(s) "
+                f"graded, {held} agreed with the record and {graded - held} contradicted it.")
+        if graded == 0:
+            text = (f"{self.refusals} refusal(s) on record and none stated a reason the record "
+                    f"can check; reason accuracy is UNDEFINED.")
+        for claim in sorted(FORWARD_CLAIMS):
+            test = self.against_base(claim)
+            if test is None:
+                continue
+            held, n, base, p = test
+            text += (f" `{claim}` claims were borne out by the next ~2h move {held} of {n} "
+                     f"time(s) ({held / n:.0%}), against {base:.0%} for every ~2h refusal mark")
+            text += (f" (one-sided exact binomial p = {p:.2f}); "
+                     + ("the stated reason carries information beyond the base rate."
+                        if p < 0.05 else
+                        "no evidence the stated reason says more than the base rate does."))
+        return text
+
+    def against_base(self, claim: Claim) -> tuple[int, int, float, float] | None:
+        """``(borne out, graded, base rate, p)`` for a forward claim, or ``None`` if none graded.
+
+        The base rate is how often the claim would have been borne out had it been made on every
+        ~2h refusal mark; ``p`` is the chance of doing at least this well at that rate. A claim
+        that is right four times in five is uninformative when the tape does the same unasked."""
+        tally = self.tally(claim)
+        n = tally[CONSISTENT] + tally[CONTRADICTED]
+        cleared, marks = self.base_clearance
+        if n == 0 or marks == 0:
+            return None
+        base = cleared / marks if claim is Claim.MOVES_ENOUGH else (marks - cleared) / marks
+        return tally[CONSISTENT], n, base, binomial_upper(tally[CONSISTENT], n, base)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "as_of": self.as_of.isoformat(),
+            "refusals": self.refusals,
+            "refusals_with_a_gradeable_claim": self.refusals_with_a_claim,
+            "hours_tolerance": HOURS_TOLERANCE,
+            "round_trip_bps": ROUND_TRIP_BPS,
+            "base_clearance_about_2h": {"cleared": self.base_clearance[0],
+                                        "marks": self.base_clearance[1]},
+            "by_claim": {str(claim): self.tally(claim) for claim in Claim},
+            "forward_against_base": {
+                str(claim): (None if (t := self.against_base(claim)) is None else {
+                    "borne_out": t[0], "graded": t[1], "base_rate": round(t[2], 4),
+                    "p_one_sided": round(t[3], 4)})
+                for claim in sorted(FORWARD_CLAIMS)},
+            "forward_claims": sorted(str(c) for c in FORWARD_CLAIMS),
+            "contradicted": [c.as_dict() for c in self.contradicted],
+            "verdict": self.verdict,
+            "method": (
+                "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set "
+                "beside the record: session_phase and hours_to_discovery from the ledger, the "
+                "desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims "
+                "about the size of the coming move. Question and binary verdict from "
+                "VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, "
+                "MIT); graded here by the record, not by a model."),
+        }
+
+
+def _jsonl(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()
+            if line.strip()]
+
+
+def grade_reasons(
+    *, ledger_path: Path = LEDGER_PATH, notes_path: Path = NOTES_PATH,
+    risk_path: Path = RISK_PATH, marks: Sequence[Mark] | None = None,
+    now: datetime | None = None,
+) -> ReasonReport:
+    """Grade the stated reason of every ``no_trade`` decision against the record."""
+    loaded = list(read_marks() if marks is None else marks)
+    by_seq = {m.seq: m for m in loaded}
+    notes = {int(r["seq"]): [str(n) for n in r.get("notes") or []] for r in _jsonl(notes_path)}
+    risk = {int(r["seq"]): r for r in _jsonl(risk_path)}
+    refusals = [r for r in _jsonl(ledger_path)
+                if r.get("kind", "decision") == "decision" and r.get("verdict") == "no_trade"]
+    checks: list[ReasonCheck] = []
+    for entry in refusals:
+        seq = int(entry["seq"])
+        checks.extend(check_reasons(entry, notes=notes.get(seq), risk=risk.get(seq),
+                                    mark=by_seq.get(seq)))
+    short = [m for m in loaded if _horizon_of(m.horizon_hours) == HORIZONS[0][0]]
+    return ReasonReport(
+        checks=tuple(checks), refusals=len(refusals),
+        base_clearance=(sum(1 for m in short if abs(m.move) > ROUND_TRIP_BPS), len(short)),
+        as_of=now or datetime.now(UTC),
+    )
+
+
+def reason_line(path: Path = REASONS_PATH) -> str | None:
+    """The reason grading as one sentence for the console's record answers, or ``None`` when
+    ``data/refusal_reasons.json`` is missing or graded nothing.
+
+    Written for the place the console already quotes this module's lean grading
+    (`lui/answer.py:_lean_grading`, inserted where a desk with no settled trade explains itself):
+    the decision-time reasons checked against the record, the contradictions named by count, and
+    the forward magnitude claim set beside its base rate — including when, as on every run so
+    far, that comparison says the reason carries no information the tape did not.
+    """
+    try:
+        report = json.loads(path.read_text(encoding="utf-8"))
+        by_claim: Mapping[str, Mapping[str, int]] = report["by_claim"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+    now = [c for c in Claim if c not in FORWARD_CLAIMS]
+    held = sum(int(by_claim.get(str(c), {}).get(CONSISTENT, 0)) for c in now)
+    wrong = sum(int(by_claim.get(str(c), {}).get(CONTRADICTED, 0)) for c in now)
+    if held + wrong == 0:
+        return None
+    line = (f"The reasons the desk wrote for standing aside were checked against its own record: "
+            f"of {held + wrong} that the record can settle (session, hours to price discovery, "
+            f"hedge menu, risk layer), {held} agreed and {wrong} contradicted it")
+    forward = (report.get("forward_against_base") or {}).get(str(Claim.MOVES_ENOUGH))
+    if forward and forward.get("graded"):
+        share = forward["borne_out"] / forward["graded"]
+        line += (f"; \"direction, not size\" was borne out {forward['borne_out']} of "
+                 f"{forward['graded']} times ({share:.0%}) against {forward['base_rate']:.0%} for "
+                 f"every refusal (p = {forward['p_one_sided']:.2f}), "
+                 + ("so it carries information beyond the tape"
+                    if forward["p_one_sided"] < 0.05 else
+                    "so it is true but says no more than the tape does"))
+    return (line + f" — graded {str(report.get('as_of', ''))[:10]}, "
+            f"`python -m argus.eval.refusal`.")
+
+
+def run_reasons(*, out: Path = REASONS_PATH, now: datetime | None = None) -> dict[str, Any]:
+    """Grade every refusal's stated reason and write ``data/refusal_reasons.json``."""
+    report = grade_reasons(now=now).as_dict()
+    artefact.write(out, report)
+    return report
+
+
 def run(*, out: Path = REPORT_PATH, now: datetime | None = None) -> dict[str, Any]:
     """Score every mark on disk and write the artefact.
 
@@ -493,6 +931,8 @@ def main() -> int:  # pragma: no cover - CLI
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2) + "\n", encoding="utf-8")
     print(f"\nwritten to {REPORT_PATH}")
+    reasons = run_reasons()
+    print(f"\nREASON AGAINST RECORD — {reasons['verdict']}\nwritten to {REASONS_PATH}")
     return 0
 
 

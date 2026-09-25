@@ -125,6 +125,9 @@ markers = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# Third-party source kept verbatim under its own licence (`src/argus/vendor/*/LICENSE.txt`): linting
+# it to this project's style would mean it is no longer the unmodified copy.
+extend-exclude = ["src/argus/vendor"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
@@ -136,6 +139,12 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 # broken to a Chinese speaker. Scoped to this one file so the check keeps working everywhere else,
 # where a full-width character really would be a mistake.
 "src/argus/lui/phrasebook.py" = ["RUF001"]
+# `lui/honesty.py` answers Chinese questions in Chinese typography for the same reason.
+"src/argus/lui/honesty.py" = ["RUF001"]
+# the characters under test are the full-width and Traditional forms the fold maps
+"tests/test_lui_normalise.py" = ["RUF001"]
+# the module's subject is these characters: its docstring names the forms it folds
+"src/argus/lui/normalise.py" = ["RUF001", "RUF002"]
 # Same false positive, same reason: `obliquebench.FRESH` carries Chinese cases written by a model
 # asked for natural Chinese, and `？`/`，` are the correct marks. Rewriting them ASCII would change
 # the corpus after it was frozen — and a test corpus edited to satisfy a linter is no longer the
@@ -199,6 +208,7 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 python_version = "3.11"
 strict = true
 warn_unreachable = true
+exclude = ["src/argus/vendor/"]
 
 # Vendored, verbatim third-party files (see `eval/baselines/__init__.py`) are exempt from our own
 # strict-typing standard by design: editing them to satisfy mypy would mean they are no longer the

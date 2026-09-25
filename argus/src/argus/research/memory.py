@@ -214,11 +214,14 @@ class MemorySignal:
 
 
 # Field names on `FactorRecord` that carry, or summarise, a measured outcome. `MemorySignal` may
-# never grow one of these, nor anything derived from one.
+# never grow one of these, nor anything derived from one. `split_half` joined 2026-09-25, when
+# `FactorRecord` gained the split-half reliability verdict (research/factor_lab.py:162): whether a
+# factor's payoff reproduced across independent halves is a measured outcome like any other, and a
+# memory that passed it to the proposer would tell the proposer which forms worked.
 PERFORMANCE_FIELDS = frozenset({
     "gross_sharpe", "net_sharpe", "oos_sharpe", "dsr", "overfit",
     "success_rate", "ic", "rank", "score", "grade", "admitted", "certified",
-    "recommended", "recent_admissions", "best", "top",
+    "recommended", "recent_admissions", "best", "top", "split_half",
 })
 
 

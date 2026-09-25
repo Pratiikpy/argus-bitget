@@ -1,0 +1,167 @@
+{
+ "generated_at": "2026-09-25T20:12:29.192882+00:00",
+ "method": "same daily returns, same four factors; ARGUS OLS keeps all four, Riskfolio-Lib loadings_matrix(feature_selection='stepwise', stepwise='Forward', criterion='pvalue', threshold=0.05) keeps those forward selection admits",
+ "riskfolio_source": "research/repos-t2/dcajasn~riskfolio-lib/riskfolio/src/ParamsEstimation.py:354,779 (BSD-3), executed unmodified",
+ "results": {
+  "MSFTUSDT": {
+   "n": 252,
+   "argus": {
+    "market": 1.2495,
+    "size": -0.6269,
+    "momentum": -0.5222,
+    "crypto": 0.1003
+   },
+   "argus_t": {
+    "market": 8.02,
+    "size": -3.75,
+    "momentum": -5.03,
+    "crypto": 2.37
+   },
+   "argus_r2": 0.297,
+   "riskfolio_stepwise": {
+    "market": 1.2495,
+    "size": -0.6269,
+    "momentum": -0.5222,
+    "crypto": 0.1003
+   },
+   "origin": "MSFT daily closes (Yahoo)"
+  },
+  "METAUSDT": {
+   "n": 252,
+   "argus": {
+    "market": 1.6227,
+    "size": -0.536,
+    "momentum": -0.3387,
+    "crypto": 0.0814
+   },
+   "argus_t": {
+    "market": 7.96,
+    "size": -2.45,
+    "momentum": -2.49,
+    "crypto": 1.47
+   },
+   "argus_r2": 0.252,
+   "riskfolio_stepwise": {
+    "market": 1.7185,
+    "size": -0.5327,
+    "momentum": -0.3349,
+    "crypto": 0.0
+   },
+   "origin": "META daily closes (Yahoo)"
+  },
+  "GOOGLUSDT": {
+   "n": 252,
+   "argus": {
+    "market": 1.666,
+    "size": -0.2719,
+    "momentum": -0.3936,
+    "crypto": -0.0331
+   },
+   "argus_t": {
+    "market": 11.69,
+    "size": -1.78,
+    "momentum": -4.14,
+    "crypto": -0.85
+   },
+   "argus_r2": 0.371,
+   "riskfolio_stepwise": {
+    "market": 1.5949,
+    "size": 0.0,
+    "momentum": -0.427,
+    "crypto": 0.0
+   },
+   "origin": "GOOGL daily closes (Yahoo)"
+  },
+  "NVDAUSDT": {
+   "n": 252,
+   "argus": {
+    "market": 1.8624,
+    "size": -0.7309,
+    "momentum": 0.3385,
+    "crypto": -0.0197
+   },
+   "argus_t": {
+    "market": 12.04,
+    "size": -4.4,
+    "momentum": 3.28,
+    "crypto": -0.47
+   },
+   "argus_r2": 0.479,
+   "riskfolio_stepwise": {
+    "market": 1.8392,
+    "size": -0.7317,
+    "momentum": 0.3376,
+    "crypto": 0.0
+   },
+   "origin": "NVDA daily closes (Yahoo)"
+  },
+  "BTCUSDT": {
+   "n": 252,
+   "argus": {
+    "market": 0.0,
+    "size": 0.0,
+    "momentum": -0.0,
+    "crypto": 1.0
+   },
+   "argus_t": {
+    "market": 13.47,
+    "size": 3.84,
+    "momentum": -4.4,
+    "crypto": 2.9995630105480388e+16
+   },
+   "argus_r2": 1.0,
+   "riskfolio_stepwise": {
+    "market": -0.0,
+    "size": 0.0,
+    "momentum": -0.0,
+    "crypto": 1.0
+   },
+   "origin": "BTCUSDT daily candles (Bitget, 16:00 UTC close)"
+  },
+  "XAUUSDT": {
+   "n": 195,
+   "argus": {
+    "market": 0.2993,
+    "size": 0.0355,
+    "momentum": 0.0536,
+    "crypto": 0.2209
+   },
+   "argus_t": {
+    "market": 1.73,
+    "size": 0.19,
+    "momentum": 0.51,
+    "crypto": 4.56
+   },
+   "argus_r2": 0.169,
+   "riskfolio_stepwise": {
+    "market": 0.3404,
+    "size": 0.0,
+    "momentum": 0.0,
+    "crypto": 0.2211
+   },
+   "origin": "XAUUSDT daily candles (Bitget, 16:00 UTC close)"
+  }
+ },
+ "riskfolio_zeroed": {
+  "MSFTUSDT": [],
+  "METAUSDT": [
+   "crypto"
+  ],
+  "GOOGLUSDT": [
+   "size",
+   "crypto"
+  ],
+  "NVDAUSDT": [
+   "crypto"
+  ],
+  "BTCUSDT": [
+   "market",
+   "size",
+   "momentum"
+  ],
+  "XAUUSDT": [
+   "size",
+   "momentum"
+  ]
+ }
+}

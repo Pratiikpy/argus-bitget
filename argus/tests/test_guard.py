@@ -10,11 +10,15 @@ import pytest
 
 from argus.cost.model import CostModel
 from argus.execution.guard import (
+    GUARD_GATES,
+    RULE_GATES,
     Denial,
+    GateVerdict,
     Guard,
     GuardError,
     Instrument,
     RateLimiter,
+    exact_precision,
     fetch_instruments,
     quantise_down,
     validate,
@@ -261,6 +265,105 @@ class TestTheGuardFacade:
     def test_every_denial_state_renders_its_name(self) -> None:
         for denial in Denial:
             assert str(denial)
+
+
+class TestThePermissionCheckTrace:
+    """Every ruling carries the whole gate stack, in order — letta-code's staged trace."""
+
+    def test_an_allowed_order_lists_every_gate_once_in_order(self) -> None:
+        got = validate(_instrument(), quantity=Decimal("1.009"), reference_price=Decimal("200"))
+        assert got.trace.gates == RULE_GATES
+        verdicts = {e.gate: e.verdict for e in got.trace.events}
+        assert verdicts["quantity_step"] is GateVerdict.ADJUST
+        assert verdicts["price_band"] is GateVerdict.SKIP
+        assert got.trace.deciding is None
+        assert GateVerdict.NOT_REACHED not in verdicts.values()
+
+    def test_a_refusal_names_one_deciding_gate_and_the_rest_are_not_reached(self) -> None:
+        got = validate(_instrument(), quantity=Decimal("0.004"), reference_price=Decimal("200"))
+        deciding = got.trace.deciding
+        assert deciding is not None and deciding.gate == "quantity_floor"
+        assert deciding.reason == got.reason
+        after = got.trace.events[RULE_GATES.index("quantity_floor") + 1:]
+        assert after and all(e.verdict is GateVerdict.NOT_REACHED for e in after)
+        assert sum(e.verdict is GateVerdict.DENY for e in got.trace.events) == 1
+
+    def test_the_session_guard_puts_the_instrument_lookup_first(self) -> None:
+        guard = Guard(instruments={"NVDAUSDT": _instrument()})
+        known = guard.check("NVDAUSDT", quantity=Decimal("1"), reference_price=Decimal("200"))
+        assert known.trace.gates == GUARD_GATES
+        assert known.trace.events[0].verdict is GateVerdict.PASS
+        unknown = guard.check("NOTLISTED", quantity=Decimal("1"))
+        assert unknown.trace.gates == GUARD_GATES
+        assert unknown.trace.deciding is not None
+        assert unknown.trace.deciding.gate == "instrument_known"
+
+    def test_the_trace_serialises_and_renders(self) -> None:
+        got = validate(_instrument(), quantity=Decimal("1"), reference_price=Decimal("200"))
+        blob = got.as_dict()["trace"]
+        assert [row["gate"] for row in blob] == list(RULE_GATES)
+        assert set(blob[0]) == {"gate", "input", "verdict", "reason"}
+        assert got.explain().splitlines()[1].strip().startswith("1. finite_inputs: pass")
+
+    def test_the_trace_records_and_never_decides(self) -> None:
+        """Rulings are unchanged by the trace: the one-line render the runner writes is the same
+        text it wrote before the trace existed, for an allowed and a refused order."""
+        allowed = validate(_instrument(), quantity=Decimal("1"), reference_price=Decimal("200"))
+        assert allowed.render() == "[guard] allowed: 1"
+        refused = validate(_instrument(status="offline"), quantity=Decimal("1"))
+        assert refused.render() == (
+            "[guard] DENIED instrument_offline: NVDAUSDT is offline, not online"
+        )
+
+
+class TestTheDefectsTheCertifierFound:
+    """Three orders the guard allowed against its own contract before 2026-09-25 (S20)."""
+
+    def test_a_31_digit_quantity_is_never_rounded_up(self) -> None:
+        tiny = Decimal("0.0099999999999999999999999999999")
+        assert quantise_down(tiny, Decimal("0.01")) == 0
+        got = validate(_instrument(), quantity=tiny, reference_price=Decimal("1000"))
+        assert got.denial is Denial.QUANTITY_BELOW_MINIMUM
+        near_max = Decimal("51999.999999999999999999999999999")
+        capped = validate(_instrument(), quantity=near_max, reference_price=Decimal("100"))
+        assert capped.allowed and capped.quantity == Decimal("51999.99") <= near_max
+
+    def test_products_are_exact_at_the_notional_and_balance_limits(self) -> None:
+        under = validate(_instrument(), quantity=Decimal("0.05"),
+                         reference_price=Decimal("99.99999999999999999999999999999"))
+        assert under.denial is Denial.NOTIONAL_BELOW_MINIMUM
+        over = validate(_instrument(), quantity=Decimal("1"),
+                        reference_price=Decimal("100.00000000000000000000000000001"),
+                        available_balance=Decimal("100"))
+        assert over.denial is Denial.INSUFFICIENT_BALANCE
+        band = validate(_instrument(), quantity=Decimal("1"), price=Decimal("102"),
+                        reference_price=Decimal("99.99999999999999999999999999999"))
+        assert band.denial is Denial.PRICE_OUTSIDE_BAND
+
+    def test_a_sub_tick_limit_price_is_refused_not_zeroed(self) -> None:
+        got = validate(_instrument(), quantity=Decimal("1"), price=Decimal("0.005"))
+        assert got.denial is Denial.PRICE_NOT_POSITIVE
+        assert got.trace.deciding is not None and got.trace.deciding.gate == "price_step"
+
+    def test_only_buy_and_sell_are_sides(self) -> None:
+        for side in ("hold", "", "long", "buy "):
+            got = validate(_instrument(), quantity=Decimal("1"), reference_price=Decimal("200"),
+                           side=side)
+            assert got.denial is Denial.SIDE_UNKNOWN, side
+        for side in ("buy", "sell", "SELL", "Buy"):
+            assert validate(_instrument(), quantity=Decimal("1"),
+                            reference_price=Decimal("200"), side=side).allowed, side
+
+    def test_ordinary_results_keep_their_representation(self) -> None:
+        """The runner writes ``quantity`` into the hashed ledger as a string; exact arithmetic
+        must not turn ``5`` into ``5.00``."""
+        assert str(quantise_down(Decimal("5"), Decimal("0.01"))) == "5"
+        assert str(quantise_down(Decimal("1.999"), Decimal("0.01"))) == "1.99"
+        assert str(quantise_down(Decimal("0.004"), Decimal("0.01"))) == "0.00"
+
+    def test_the_context_widens_with_the_operands(self) -> None:
+        assert exact_precision(Decimal("1"), Decimal("0.01")) == 28
+        assert exact_precision(Decimal("0.0099999999999999999999999999999")) > 31
 
 
 @live_only

@@ -17,19 +17,43 @@ ARGUS's distance is fitted on the first 60% of the history and scored on the las
 rate is out of sample; Rook's is fixed by its run and scored on the same last 40%. Neither says
 whether the thesis was right — that needs the next 24 hours, and the prospective check at the end
 records both stops for grading then.
+
+**ARGUS's distance is the console's own (changed 2026-09-26).** Until then this module computed it
+with a nearest-rank copy of the rule written here (``_p90_adverse``) while `eval/standing.py`
+credited `desk/odds.py`; the harness-validity canary (`data/harness_validity.json`) found
+``directional_odds`` never ran, and the harness also fetched its bars live, so it could not be
+re-run offline. Now the fit slice is handed to ``argus.desk.odds.directional_odds`` exactly as
+`lui/research._odds_lines` hands it the console's daily bars for a 24-hour long: closes stamped
+with their close time, each bar's (low, high) as ``extremes``, one bar per window, and the stop
+distance is its ``adverse_p90_bps`` (a linearly interpolated 10th percentile of the worst point on
+the lows). The hurdle passed is the 12bps round trip without funding, which does not enter the
+adverse measure. The bars are saved once by :func:`collect` (``data/h2h_rook/bars/``) and scored
+from the files; the copy of the old rule is kept only to publish how far it differed
+(``argus_distance_former_copy``). The prospective block records the stops as they stood when Rook
+ran; a re-score keeps it as recorded rather than re-stamping it, because `eval/stopquality_
+prospective.py` grades the 24 hours after that moment.
 """
 
 from __future__ import annotations
 
 import itertools
 import json
+import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from argus.eval import artefact
+
 DATA = Path(__file__).resolve().parents[3] / "data" / "h2h_rook"
+BARS = DATA / "bars"
 REPORT = Path(__file__).resolve().parents[3] / "data" / "stopquality_comparison.json"
 FIT_SHARE = 0.6
+DAYS = 500
+"""The console's own look-back for a daily-horizon odds answer (`lui/research._odds_lines`)."""
+
+Bar = tuple[datetime, float, float, float]
+"""(bar open, close, low, high), oldest first."""
 
 
 def _hit_rate(bars: list[tuple[float, float]], distance: float) -> float | None:
@@ -40,6 +64,8 @@ def _hit_rate(bars: list[tuple[float, float]], distance: float) -> float | None:
 
 
 def _p90_adverse(bars: list[tuple[float, float]]) -> float | None:
+    """The rule this harness scored before it called the console (nearest rank, 20-window floor).
+    Kept only to publish how far it differs from ``directional_odds``; nothing is scored on it."""
     drops = sorted(1 - low / prev_close for (prev_close, _), (_, low)
                    in itertools.pairwise(bars) if prev_close > 0)
     if len(drops) < 20:
@@ -47,12 +73,56 @@ def _p90_adverse(bars: list[tuple[float, float]]) -> float | None:
     return drops[int(0.9 * (len(drops) - 1))]
 
 
-def score(*, fetch: Any = None) -> dict[str, Any]:
+def console_stop_distance(bars: list[Bar]) -> float | None:
+    """The console's stop distance for a 24-hour long over ``bars``, as a fraction.
+
+    ``argus.desk.odds.directional_odds`` receives what `lui/research._odds_lines` builds from the
+    console's daily bars: each close stamped with its bar's close (open + 1 day), each bar's
+    (low, high) as ``extremes``, one bar per window, side long. Its ``adverse_p90_bps`` is the move
+    against a long that 90% of windows stayed inside; the distance is its magnitude. An exception
+    from the console propagates rather than becoming a missing row."""
+    from argus.cost.model import CostModel
+    from argus.desk.odds import directional_odds
+
+    closes = [(ts + timedelta(days=1), close) for ts, close, _, _ in bars]
+    extremes = [(low, high) for _, _, low, high in bars]
+    odds = directional_odds(closes, 1, cost_bps=float(CostModel.bitget_perp().round_trip_bps()),
+                            side="long", extremes=extremes)
+    if odds is None or odds.adverse_p90_bps is None:
+        return None
+    return abs(odds.adverse_p90_bps) / 10_000
+
+
+def collect(*, fetch: Any = None) -> dict[str, Any]:
+    """Save each name's daily bars once (``data/h2h_rook/bars/<symbol>.json``), the console's own
+    fetch: Bitget market candles, 1D, the last :data:`DAYS` days."""
     from argus.market.history import CandleType, fetch_window
 
-    loader = fetch or (lambda s: fetch_window(s, start=datetime.now(UTC) - timedelta(days=500),
+    loader = fetch or (lambda s: fetch_window(s, start=datetime.now(UTC) - timedelta(days=DAYS),
                                               interval="1D", candle_type=CandleType.MARKET,
                                               pause=0.05))
+    BARS.mkdir(parents=True, exist_ok=True)
+    saved: dict[str, int] = {}
+    for path in sorted(DATA.glob("*USDT.json")):
+        rows = [[b.ts.isoformat(), str(b.close), str(b.low), str(b.high)]
+                for b in loader(path.stem) if float(b.close) > 0]
+        artefact.write(BARS / path.name, {"symbol": path.stem, "interval": "1D",
+                                          "fetched": datetime.now(UTC).isoformat(
+                                              timespec="seconds"),
+                                          "bars": rows})
+        saved[path.stem] = len(rows)
+    return saved
+
+
+def _saved_bars(symbol: str) -> list[Bar]:
+    blob = json.loads((BARS / f"{symbol}.json").read_text("utf-8"))
+    return [(datetime.fromisoformat(ts), float(close), float(low), float(high))
+            for ts, close, low, high in blob["bars"]]
+
+
+def score(*, fetch: Any = None) -> dict[str, Any]:
+    """Score every saved Rook run against the saved bars (``fetch``, given, replaces the files:
+    it returns objects with ``ts``, ``close``, ``low`` and ``high``)."""
     rows: list[dict[str, Any]] = []
     for path in sorted(DATA.glob("*USDT.json")):
         # Rook logs its fetches to stdout ("[bitget] ticker v2 ok ...") before its result line;
@@ -61,10 +131,13 @@ def score(*, fetch: Any = None) -> dict[str, Any]:
         symbol = path.stem
         report, snapshot = run.get("report") or {}, run.get("snapshot") or {}
         last, stop = snapshot.get("last"), report.get("invalidation_price")
-        daily = [(float(b.close), float(b.low)) for b in loader(symbol) if float(b.close) > 0]
-        cut = int(len(daily) * FIT_SHARE)
-        fit, test = daily[:cut], daily[cut - 1:]
-        argus_d = _p90_adverse(fit)
+        bars: list[Bar] = ([(b.ts, float(b.close), float(b.low), float(b.high))
+                            for b in fetch(symbol) if float(b.close) > 0] if fetch
+                           else _saved_bars(symbol))
+        daily = [(close, low) for _, close, low, _ in bars]
+        cut = int(len(bars) * FIT_SHARE)
+        fit, test = bars[:cut], daily[cut - 1:]
+        argus_d = console_stop_distance(fit)
         rook_d = (1 - float(stop) / float(last)) if stop and last and float(stop) < float(last) \
             else None
         rows.append({
@@ -73,9 +146,21 @@ def score(*, fetch: Any = None) -> dict[str, Any]:
             "rook_noise_hit_rate_oos": _hit_rate(test, rook_d) if rook_d else None,
             "argus_distance_fit_on_first_60pct": argus_d,
             "argus_noise_hit_rate_oos": _hit_rate(test, argus_d) if argus_d else None,
+            "argus_distance_former_copy": _p90_adverse(daily[:cut]),
+            "bars": len(bars), "first_bar": bars[0][0].isoformat() if bars else None,
+            "last_bar": bars[-1][0].isoformat() if bars else None,
             "test_windows": len(test) - 1, "error": run.get("error")})
     scored = [r for r in rows if r["rook_noise_hit_rate_oos"] is not None
               and r["argus_noise_hit_rate_oos"] is not None]
+    try:
+        # Recorded when Rook ran and graded on the 24 hours after it: never re-stamped.
+        prospective = json.loads(REPORT.read_text("utf-8"))["prospective"]
+    except (OSError, ValueError, KeyError):
+        prospective = {"recorded_at": datetime.now(UTC).isoformat(),
+                       "stops": {r["symbol"]: {"rook": r["rook_invalidation"],
+                                               "argus_distance": r[
+                                                   "argus_distance_fit_on_first_60pct"],
+                                               "last": r["rook_last"]} for r in rows}}
     report_out = {
         "comparison": "stop placement: Rook's invalidation price vs ARGUS's measured stop distance",
         "baseline": "iamsuperfly/Rook runDebate (bull/bear + judge) on the hackathon Qwen, long "
@@ -83,6 +168,10 @@ def score(*, fetch: Any = None) -> dict[str, Any]:
         "metric": "share of held-out 24h windows in which ordinary movement alone reached the "
                   "stop (a long's stop: that day's low at or under prior close x (1 - distance))",
         "argus_stop_is_out_of_sample": True,
+        "argus_code": "argus.desk.odds.directional_odds(adverse_p90_bps) on the fit slice, the "
+                      "call lui/research._odds_lines makes for a 24-hour long",
+        "inputs": "data/h2h_rook/*.json (Rook's runs) and data/h2h_rook/bars/ (Bitget 1D market "
+                  "candles saved by collect())",
         "rows": rows,
         "argus_mean_noise_hit_rate": (sum(r["argus_noise_hit_rate_oos"] for r in scored)
                                       / len(scored)) if scored else None,
@@ -91,17 +180,15 @@ def score(*, fetch: Any = None) -> dict[str, Any]:
         "failure_cases": [r for r in rows if r["error"] or r["rook_distance"] is None],
         "not_covered": "whether either stop leaves the right trades on: the thesis outcome needs "
                        "the next 24 hours; six names only",
-        "prospective": {"recorded_at": datetime.now(UTC).isoformat(),
-                        "stops": {r["symbol"]: {"rook": r["rook_invalidation"],
-                                                "argus_distance": r[
-                                                    "argus_distance_fit_on_first_60pct"],
-                                                "last": r["rook_last"]} for r in rows}},
+        "prospective": prospective,
     }
-    REPORT.write_text(json.dumps(report_out, indent=1), encoding="utf-8")
+    artefact.write(REPORT, report_out, indent=1)
     return report_out
 
 
 def main() -> int:  # pragma: no cover - CLI
+    if "--collect" in sys.argv:
+        print(collect())
     out = score()
     for r in out["rows"]:
         print(r["symbol"], r["rook_bias"], r["rook_distance"], r["rook_noise_hit_rate_oos"],

@@ -157,6 +157,25 @@ class TestTheOtherRules:
         record = _record(acquired=True, conviction=True)
         assert check("Insider buying, a high-conviction signal.", records=[record]).sound
 
+    # Six of the seven contradictions the desk ever logged, verbatim from the claim lines of
+    # data/desk_notes.jsonl: each is the desk writing about its own hurdle, and the conviction
+    # rule, before 2026-09-25, read every one as a claim about an insider trade.
+    HURDLE_SENTENCES = (
+        "l hurdle of 20.80bps requires high conviction on both direction and magnitu",  # seq 175
+        "27bps total hurdle requires a high-conviction directional edge, and the con",  # seq 237
+        "urdle of 20.80 bps requires a high-conviction directional edge; the panel c",  # seq 461
+        "IX in calm regime) prevents a high-conviction short. The panels net to a mi",  # seq 485
+        "27bps total hurdle requires a high-conviction directional edge, and while t",  # seq 520
+        "27bps total hurdle requires a high-conviction directional edge that neither",  # seq 575
+    )
+
+    @pytest.mark.parametrize("sentence", HURDLE_SENTENCES)
+    def test_conviction_about_the_hurdle_is_not_a_claim_about_an_insider(
+        self, sentence: str
+    ) -> None:
+        report = check(sentence, records=[_record()])
+        assert report.sound and report.claims_examined == 0
+
     def test_every_rule_names_a_field_and_an_explanation(self) -> None:
         for rule in RULES:
             assert rule.field and rule.explain

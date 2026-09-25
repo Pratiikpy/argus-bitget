@@ -368,3 +368,43 @@ class TestSueEvidence:
         facts = _eps_quarters([12.0, 6.0, 10.0, 5.0, 9.0, 4.0, 9.0, 3.0, 8.0, 3.0, 7.0, 2.0])
         got, _ = _Stub(facts).evidence("NVDA", as_of=datetime(2027, 1, 1, tzinfo=UTC))
         assert any(e.attributes.get("concept") == "sue" for e in got)
+
+
+class TestSueEvidenceIsYearOverYearByDate:
+    """Added 2026-09-25 (`eval/general_sue_comparison.py`): SEC XBRL has no standalone fiscal Q4,
+    so the newest twelve quarterly facts are not twelve consecutive quarters and a positional
+    ``quarters[i + 4]`` is not a year earlier. The evidence must pair by date."""
+
+    @staticmethod
+    def _q4_missing(values: list[float]) -> list[Fact]:
+        """Newest-first facts three months apart with every December quarter absent — the shape
+        `FundamentalsSource.facts` returns for a calendar-year filer."""
+        facts = _eps_quarters(values + [0.0] * (len(values) // 3 + 2))
+        return [f for f in facts if f.end.month != 1][: len(values)]
+
+    def test_the_reading_uses_only_genuine_year_over_year_pairs(self) -> None:
+        from argus.research.sue import read, read_dated, yoy_window
+
+        values = [3.1, 2.2, 2.9, 2.0, 1.4, 2.5, 1.9, 1.0, 2.1, 1.6, 0.9, 1.7, 1.2, 0.8, 1.1]
+        facts = self._q4_missing(values)
+        points = [(f.end, f.value) for f in facts]
+        window = yoy_window(points)
+        assert all(350 <= (d.end - d.prior_end).days <= 380 for d in window)
+        evidence, _ = _sue_evidence("NVDA", facts)
+        assert evidence[0].attributes["sue"] == read_dated("NVDA", points).sue
+        assert evidence[0].attributes["sue"] != read("NVDA", values[:MIN_QUARTERS]).sue
+
+    def test_available_at_waits_for_a_later_restatement_of_a_quarter_it_used(self) -> None:
+        values = [3.1, 2.2, 2.9, 2.0, 1.4, 2.5, 1.9, 1.0, 2.1, 1.6, 0.9, 1.7, 1.2, 0.8, 1.1]
+        facts = self._q4_missing(values)
+        restated_on = facts[0].filed + timedelta(days=40)
+        old = facts[5]
+        facts[5] = Fact(
+            concept=old.concept, tag=old.tag, value=old.value, unit=old.unit, start=old.start,
+            end=old.end, filed=restated_on, form="10-Q/A", fiscal_year=old.fiscal_year,
+            fiscal_period=old.fiscal_period, frame=old.frame,
+        )
+        evidence, _ = _sue_evidence("NVDA", facts)
+        assert evidence[0].available_at == datetime.combine(
+            restated_on, datetime.min.time(), tzinfo=UTC
+        )

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-25T08:14:57+00:00",
+  "generated": "2026-09-25T20:43:19+00:00",
   "target": "rToken price Monday 10:00 ET, predicted from Sunday 19:00 ET (nocturne's own)",
   "baseline_reproduced": {
     "nocturne_published_large_caps": {
@@ -59,8 +59,8 @@
     "ARGUS": {
       "mae_pct": 2.07,
       "rmse_pct": 2.809,
-      "direction_hit_rate": 0.519,
-      "direction_scored": 54
+      "direction_hit_rate": 0.528,
+      "direction_scored": 53
     }
   },
   "paired": [
@@ -102,17 +102,17 @@
     "2026-07-24": {
       "M0": 4.048,
       "MF": 2.844,
-      "ARGUS": 4.497
+      "ARGUS": 4.498
     },
     "2026-07-31": {
       "M0": 3.303,
       "MF": 3.159,
-      "ARGUS": 3.167
+      "ARGUS": 3.168
     },
     "2026-08-07": {
       "M0": 2.259,
       "MF": 1.61,
-      "ARGUS": 1.83
+      "ARGUS": 1.829
     },
     "2026-08-14": {
       "M0": 1.623,
@@ -136,5 +136,188 @@
     }
   },
   "failures": {},
-  "limitations": "nocturne's data ends where its clone was taken; the perpetuals are fetched fresh over the same weekends. Symbols without a Bitget perpetual are scored by nocturne alone and left out of the paired rows."
+  "console_replay": {
+    "method": "lui/research._implied_open_line called at Sunday 20:00 ET per row, its perpetual reader on data/h2h_nocturne/ and its close reader on the rToken's 16:00 ET price (overnight_comparison.console_feed)",
+    "rows_offered": 61,
+    "rows_the_console_answered": 61,
+    "rows_the_former_formula_answered": 61,
+    "answered_by_one_only": [],
+    "anchor_differs_from_nocturnes_friday_price": [],
+    "max_abs_diff_vs_former_formula_bps": 0.486,
+    "mean_abs_diff_vs_former_formula_bps": 0.0748,
+    "sample_line": "Implied open: GOOGL's perpetual has moved +1.45% since the Fri 20:00 UTC close, which puts the stock near 324.34 at the next open (last close 319.715). Read this way on GOOGL on 113 nights, the open was missed by 31bps on average, with the direction right 94% of the time; gloaming, an S2 desk that estimates overnight fair value from index futures, crypto and the dollar, missed by 96bps, and assuming no gap by 88bps."
+  },
+  "limitations": "nocturne's data ends where its clone was taken; the perpetuals are fetched fresh over the same weekends. Symbols without a Bitget perpetual are scored by nocturne alone and left out of the paired rows.",
+  "comparison_reports": [
+    {
+      "comparison": "void",
+      "question": "the rToken's Monday 10:00 ET price from Sunday 19:00",
+      "argus": "ARGUS: the console's implied open (lui/research._implied_open_line), anchored on the rToken's Friday price",
+      "rival": "nocturne's full fade (its best model)",
+      "metric": "mean absolute error of the Sunday-to-Monday return, pct",
+      "lower_is_better": true,
+      "argus_score": 2.07,
+      "rival_score": 1.922,
+      "n": 7,
+      "unit": "weekend",
+      "outcome": "not_separable",
+      "basis": "paired bootstrap over weekends, 4000 draws, seed 11; ARGUS better if the whole 95% interval of (ARGUS - rival) absolute error is below zero",
+      "ci95": [
+        -0.115,
+        0.548
+      ],
+      "p_value": null,
+      "scored": 61,
+      "total": 61,
+      "groups": {},
+      "every_group": null,
+      "inputs_exist": true,
+      "valid": true,
+      "unvalidated_outcome": null,
+      "validity": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "inputs_exist",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "inputs were read",
+            "skipped": false
+          },
+          {
+            "name": "something_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "n=7 weekend, 61 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "coverage_declared",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "61 of 61 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "both_sides_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ARGUS 2.07, rival 1.922",
+            "skipped": false
+          },
+          {
+            "name": "outcome_agrees_with_its_evidence",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "interval [-0.115, 0.548] spans zero",
+            "skipped": false
+          },
+          {
+            "name": "baseline_reproduced",
+            "tier": "statistic",
+            "passed": true,
+            "score": 1.0,
+            "detail": "published {'M0': 2.117, 'MF': 1.922}, re-run {'M0': 2.117, 'MF': 1.922}",
+            "skipped": false
+          }
+        ]
+      },
+      "errors": [],
+      "artefact": "data/void_comparison.json",
+      "created_at": "2026-09-25T20:43:19+00:00"
+    },
+    {
+      "comparison": "void",
+      "question": "the rToken's Monday 10:00 ET price from Sunday 19:00",
+      "argus": "ARGUS: the console's implied open (lui/research._implied_open_line), anchored on the rToken's Friday price",
+      "rival": "the Sunday rToken price (no change)",
+      "metric": "mean absolute error of the Sunday-to-Monday return, pct",
+      "lower_is_better": true,
+      "argus_score": 2.07,
+      "rival_score": 2.117,
+      "n": 7,
+      "unit": "weekend",
+      "outcome": "not_separable",
+      "basis": "paired bootstrap over weekends, 4000 draws, seed 11; ARGUS better if the whole 95% interval of (ARGUS - rival) absolute error is below zero",
+      "ci95": [
+        -0.174,
+        0.091
+      ],
+      "p_value": null,
+      "scored": 61,
+      "total": 61,
+      "groups": {},
+      "every_group": null,
+      "inputs_exist": true,
+      "valid": true,
+      "unvalidated_outcome": null,
+      "validity": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "inputs_exist",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "inputs were read",
+            "skipped": false
+          },
+          {
+            "name": "something_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "n=7 weekend, 61 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "coverage_declared",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "61 of 61 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "both_sides_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ARGUS 2.07, rival 2.117",
+            "skipped": false
+          },
+          {
+            "name": "outcome_agrees_with_its_evidence",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "interval [-0.174, 0.091] spans zero",
+            "skipped": false
+          },
+          {
+            "name": "baseline_reproduced",
+            "tier": "statistic",
+            "passed": true,
+            "score": 1.0,
+            "detail": "published {'M0': 2.117, 'MF': 1.922}, re-run {'M0': 2.117, 'MF': 1.922}",
+            "skipped": false
+          }
+        ]
+      },
+      "errors": [],
+      "artefact": "data/void_comparison.json",
+      "created_at": "2026-09-25T20:43:19+00:00"
+    }
+  ]
 }

@@ -20,14 +20,47 @@ layer stays genuinely binding rather than advisory.
 
 That property is enforced here by :func:`apply_constraint`, and the enforcement is tested. It is
 the difference between "we have a risk layer" and "the risk layer cannot become the real trader".
+
+**m-of-K agreement, stated rather than implied (added 2026-09-25, item S23).** The analyst panel
+reaches the Meta-PM as a plurality — ``Panel.consensus`` picks the most common signal — and a
+plurality hides how much agreement produced it: one bullish analyst beside two neutral ones and
+three bullish analysts out of three both read "bullish". GoEmotions turns noisy multi-rater labels
+into trusted ones with a single stated knob, ``CheckAgreement(ex, min_agreement, ...)``: keep a
+label only if at least *m* raters chose it, and report the result at 1+, 2+ and 3+ side by side
+(``google-research/goemotions`` ``analyze_data.py:63-67`` and ``:222-243``, Apache-2.0; licence
+text and the "Used in" record at ``argus/licenses/google-research-goemotions-APACHE-2.0.txt``).
+:func:`m_of_k` and :func:`agreement_ladder` are that rule, adapted: changed so the labels are the
+two mutually exclusive directions rather than independent emotions, which means both directions
+reaching *m* is a *split* and yields no call — a multi-label keep-both would be a panel voting for
+a long and a short at once. Neutral and insufficient-evidence votes count in *K* and for neither
+side, because an analyst who looked and saw nothing is a real vote against acting.
+
+The vote is information, not authority. It never creates or reverses a decision — nothing here
+takes an :class:`Intent` and returns a different one — and :func:`backs` only says whether the
+panel's agreement reached the intent's side. Whether a threshold should *bind*, as a reduction, is
+a question for `eval/decision_primitives.py`'s measurement against realised moves, not for a
+constant chosen here.
+
+**Measured, and it loses (2026-09-26).** The panels' individual signals were never persisted, so the
+evaluation reconstructs them from each decision's conflict and panel lines — every assignment
+consistent with `agents/conflict.py`'s rules — and scores a panel only where all of them give the
+same call; graded against the settled move with `eval/shadow.py`'s dead zone. Over 641 recorded
+decisions: 1-of-K was right 47.6% of the time (99 of 208 graded calls), 2-of-K 45.1% (88 of 195),
+3-of-K 42.1% (8 of 19); the desk's own plurality 49.0% (175 of 357); calling "up" every time 52.9%
+(309 of 584). Decisiveness falls as the threshold rises — 53% of determinable panels call a
+direction at 1-of-K, 42% at 2-of-K, 6% at 3-of-K, none at 4-of-K — and accuracy does not rise to pay
+for it: on this record the panel's direction is not predictive at any threshold, and every
+threshold trails the plurality and the always-up base rate. So the vote stays what it is here, a
+transparent reading of how much the panel agreed, and nothing binds on it.
 """
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import StrEnum
-from typing import Final, Protocol
+from typing import Final, Literal, Protocol
 
 
 class Verdict(StrEnum):
@@ -321,6 +354,139 @@ def apply_constraint(
         return ConstitutionRuling(verdict, binding_constraint, reason, flat)
 
     raise ConstitutionViolation(f"unhandled constitution verdict: {verdict}")
+
+
+Direction = Literal["up", "down"]
+
+UP_SIGNALS: Final = frozenset({"bullish", "long", "buy", "positive"})
+DOWN_SIGNALS: Final = frozenset({"bearish", "short", "sell", "negative"})
+"""The two sides, spelled the ways `agents/conflict.py`'s ``_opposed`` already accepts them, so a
+vote and a directional conflict can never disagree about which signals oppose."""
+
+DEFAULT_AGREEMENT: Final = 2
+"""The stated threshold: a direction is called when at least two analysts chose it.
+
+Fixed on 2026-09-25, before `eval/decision_primitives.py` graded any threshold against a realised
+move, as the smallest number of analysts that is agreement rather than one opinion. Panels here
+hold two to four analysts, so 2-of-K is a majority on the small ones and a coalition on the large
+ones. Every threshold is reported beside it (:func:`agreement_ladder`) so a reader who prefers
+another can read that one instead of trusting this."""
+
+
+def direction_of(signal: str) -> Direction | None:
+    """The side a signal votes for, or ``None`` for neutral, insufficient evidence or unknown."""
+    low = signal.strip().lower()
+    if low in UP_SIGNALS:
+        return "up"
+    if low in DOWN_SIGNALS:
+        return "down"
+    return None
+
+
+@dataclass(frozen=True, slots=True)
+class AgreementVote:
+    """What *m*-of-*K* agreement says about one panel at one threshold."""
+
+    threshold: int
+    """*m*: votes a direction needs before it is called."""
+
+    voters: int
+    """*K*: every analyst that returned a view, directional or not."""
+
+    up: int
+    down: int
+
+    @property
+    def abstaining(self) -> int:
+        """Neutral and insufficient-evidence votes. They count in *K* and for neither side."""
+        return self.voters - self.up - self.down
+
+    @property
+    def split(self) -> bool:
+        """Both directions reached the threshold. Possible only when *m* is at most half of *K*."""
+        return self.up >= self.threshold and self.down >= self.threshold
+
+    @property
+    def call(self) -> Direction | None:
+        """The direction at least *m* analysts agree on, unless the other side also got there."""
+        if self.split:
+            return None
+        if self.up >= self.threshold:
+            return "up"
+        if self.down >= self.threshold:
+            return "down"
+        return None
+
+    @property
+    def decisive(self) -> bool:
+        return self.call is not None
+
+    def as_dict(self) -> dict[str, object]:
+        return {
+            "threshold": self.threshold, "voters": self.voters, "up": self.up, "down": self.down,
+            "abstaining": self.abstaining, "split": self.split, "call": self.call,
+        }
+
+    def render(self) -> str:
+        outcome = (
+            "split" if self.split else self.call if self.call is not None else "no call"
+        )
+        return f"{self.threshold}-of-{self.voters}: {outcome}"
+
+
+def m_of_k(signals: Sequence[str], threshold: int = DEFAULT_AGREEMENT) -> AgreementVote:
+    """GoEmotions' ``CheckAgreement`` over directions (see the module docstring for the change).
+
+    ``signals`` are the analysts' own labels, one per view. A threshold below one would call a
+    direction nobody chose, so it is refused rather than clamped.
+    """
+    if threshold < 1:
+        raise ValueError("an agreement threshold below 1 calls a direction nobody chose")
+    sides = [direction_of(s) for s in signals]
+    return AgreementVote(
+        threshold=threshold,
+        voters=len(sides),
+        up=sum(1 for s in sides if s == "up"),
+        down=sum(1 for s in sides if s == "down"),
+    )
+
+
+def agreement_ladder(signals: Sequence[str]) -> tuple[AgreementVote, ...]:
+    """The vote at every threshold from 1 to *K*, side by side — GoEmotions' 1+/2+/3+ report
+    (``analyze_data.py:222-243``), so decisiveness can be read against consensus strength."""
+    return tuple(m_of_k(signals, m) for m in range(1, len(signals) + 1))
+
+
+def backs(intent: Intent, vote: AgreementVote) -> bool | None:
+    """Whether the panel's *m*-of-*K* call is on the side the intent acts on.
+
+    ``None`` when the intent opens no exposure — an abstention has no side to back — and a
+    no-call or a split is ``False``: the intent acts where the panel did not agree to.
+    """
+    if not intent.verdict.opens_exposure:
+        return None
+    wanted: Direction = "up" if intent.side is Side.BUY else "down"
+    return vote.call == wanted
+
+
+def agreement_note(signals: Sequence[str], *, threshold: int = DEFAULT_AGREEMENT) -> str:
+    """One line for the decision record: the tally, and the call at every threshold.
+
+    The stated threshold is marked, so the line reads as a policy with its alternatives shown
+    rather than as one number. It contains none of the phrases `paper/runner.py` flags on.
+    """
+    ladder = agreement_ladder(signals)
+    if not ladder:
+        return "[agreement] no analyst returned a view; no direction can be called"
+    first = ladder[0]
+    rungs = "; ".join(
+        vote.render() + (" (stated threshold)" if vote.threshold == threshold else "")
+        for vote in ladder
+    )
+    return (
+        f"[agreement] {first.voters} analyst(s): {first.up} up, {first.down} down, "
+        f"{first.abstaining} neither — {rungs}"
+    )
 
 
 def _replace_quantity(

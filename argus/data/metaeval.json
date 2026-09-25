@@ -1,0 +1,189 @@
+{
+  "generated": "2026-09-25T14:10:05+00:00",
+  "method": "openai/evals modelgraded metaeval (classify.py:95-98, 123-125): mean of judge == reference, plus Cohen's kappa; MEASURED needs >= 50 human labels",
+  "judges": [
+    {
+      "judge": "adversary",
+      "module": "argus/agents/adversary.py",
+      "call_site": "argus/agents/adversary.py:229",
+      "judges": "whether the desk's own decision is already refuted, and how severely it is challenged",
+      "label_space": "outcome in {upheld, reduced, refused} with a severity in [0, 1]",
+      "recorded_outputs": "2 challenges in data/desk_notes.jsonl, counter-case truncated, no evidence pack",
+      "labelled_set": null,
+      "n": 0,
+      "metascore": null,
+      "kappa": null,
+      "labeller_kinds": {},
+      "confusion": {},
+      "status": "unmeasured",
+      "grade": null
+    },
+    {
+      "judge": "lui_router",
+      "module": "argus/lui/router.py",
+      "call_site": "argus/lui/router.py:278",
+      "judges": "which kind of question a trader asked, when the patterns cannot tell",
+      "label_space": "one console intent, or none",
+      "recorded_outputs": "24 routings in data/router_bench.json, each beside the corpus author's expected intent",
+      "labelled_set": "data/metaeval/lui_router.jsonl",
+      "n": 24,
+      "metascore": 1.0,
+      "kappa": 1.0,
+      "labeller_kinds": {
+        "author": 24
+      },
+      "confusion": {
+        "performance": {
+          "performance": 3
+        },
+        "decision_why": {
+          "decision_why": 2
+        },
+        "abstention_why": {
+          "abstention_why": 3
+        },
+        "decision_list": {
+          "decision_list": 1
+        },
+        "evidence": {
+          "evidence": 2
+        },
+        "calibration": {
+          "calibration": 2
+        },
+        "position": {
+          "position": 2
+        },
+        "session": {
+          "session": 2
+        },
+        "none": {
+          "none": 7
+        }
+      },
+      "status": "not_human",
+      "grade": {
+        "passed": false,
+        "score": 0.0,
+        "model_calls": 0,
+        "first_failure": "every_reference_label_is_human",
+        "checks": [
+          {
+            "name": "every_reference_label_is_human",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "labeller kinds {'author': 24}",
+            "skipped": false
+          },
+          {
+            "name": "at_least_50_labels",
+            "tier": "rule",
+            "passed": false,
+            "score": 0.0,
+            "detail": "24 labelled items",
+            "skipped": false
+          },
+          {
+            "name": "kappa_defined",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "kappa 1.0",
+            "skipped": false
+          }
+        ]
+      }
+    },
+    {
+      "judge": "research_planner",
+      "module": "argus/lui/research.py",
+      "call_site": "argus/lui/research.py:3108",
+      "judges": "which research engine a free-text question needs, and its inputs",
+      "label_space": "one ResearchKind, or none / record",
+      "recorded_outputs": "none per item: data/lui_final_heldout_report.json keeps only per-language totals",
+      "labelled_set": null,
+      "n": 0,
+      "metascore": null,
+      "kappa": null,
+      "labeller_kinds": {},
+      "confusion": {},
+      "status": "unmeasured",
+      "grade": null
+    },
+    {
+      "judge": "analysts",
+      "module": "argus/agents/analysts.py",
+      "call_site": "argus/agents/analysts.py:158",
+      "judges": "the direction and strength an evidence channel supports (event, sentiment, earnings, cross-asset, factor)",
+      "label_space": "signal in {bullish, bearish, neutral} with a confidence",
+      "recorded_outputs": "none per item: data/desk_notes.jsonl keeps the panel's net lean, not each analyst's view with its evidence",
+      "labelled_set": null,
+      "n": 0,
+      "metascore": null,
+      "kappa": null,
+      "labeller_kinds": {},
+      "confusion": {},
+      "status": "unmeasured",
+      "grade": null
+    },
+    {
+      "judge": "citation_audit",
+      "module": "argus/eval/document_qa_eval.py",
+      "call_site": "argus/eval/document_qa_eval.py:458",
+      "judges": "whether each answer sentence is supported by the filing passages it cites (FACT-style)",
+      "label_space": "verdict in {SUPPORTED, UNSUPPORTED} per sentence",
+      "recorded_outputs": "written by a concurrent builder on 2026-09-25; its deterministic checker is a second grader, not a human label",
+      "labelled_set": null,
+      "n": 0,
+      "metascore": null,
+      "kappa": null,
+      "labeller_kinds": {},
+      "confusion": {},
+      "status": "unmeasured",
+      "grade": null
+    },
+    {
+      "judge": "unused_evidence_rater",
+      "module": "argus/eval/thesis_quality.py",
+      "call_site": "argus/eval/thesis_quality.py:656",
+      "judges": "which piece of evidence the thesis did not use is most worth answering",
+      "label_space": "a rating per unused evidence item",
+      "recorded_outputs": "written by a concurrent builder on 2026-09-25; no labelled set",
+      "labelled_set": null,
+      "n": 0,
+      "metascore": null,
+      "kappa": null,
+      "labeller_kinds": {},
+      "confusion": {},
+      "status": "unmeasured",
+      "grade": null
+    },
+    {
+      "judge": "debate_progress",
+      "module": "argus/eval/thesis_quality.py",
+      "call_site": "argus/eval/thesis_quality.py:834",
+      "judges": "whether a debate is in a loop and whether progress is being made",
+      "label_space": "is_in_loop and is_progress_being_made, each yes/no",
+      "recorded_outputs": "written by a concurrent builder on 2026-09-25; scored against what happened after the stop, which is an outcome check, not a human label",
+      "labelled_set": null,
+      "n": 0,
+      "metascore": null,
+      "kappa": null,
+      "labeller_kinds": {},
+      "confusion": {},
+      "status": "unmeasured",
+      "grade": null
+    }
+  ],
+  "not_judges": {
+    "argus/agents/meta_pm.py:276,325": "the decision-maker itself; it is graded on outcomes (eval/shadow.py), not on agreement with a label",
+    "argus/agents/debate.py:389": "argues a side; convergence is computed arithmetically, no seat issues a verdict",
+    "argus/lui/translate.py:145": "translates text; generation, not judgement",
+    "argus/eval/leakage.py:753,770": "the model is the subject under test, not the grader",
+    "argus/desk/rule_proposer.py:604": "writes a candidate rule; whether it is kept is decided by a replayed regression gate, not by a model",
+    "argus/lui/kindmodel.py:74": "a local trained classifier behind the same interface, not an LLM; it is scored on held-out corpora by eval/kindtrain.py"
+  },
+  "measured": [],
+  "qwen_calls": 0
+}

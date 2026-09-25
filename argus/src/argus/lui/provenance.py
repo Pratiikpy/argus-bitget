@@ -30,12 +30,20 @@ label** rather than a guess, and the share left unlabelled is measured and publi
 
 Meta lines — "Data:", "Sources reached", "Quoted", "Caveat:" — describe provenance themselves and
 are left unlabelled on purpose.
+
+**These rules are the fallback, not the record** (2026-09-26). `truth/trace.py` records, while an
+answer is built, which step made each line, what it read and when; where that step declares what
+its lines are, or a refusal followed a failed read, the label comes from the step
+(``origin: "trace"``) and these rules are not consulted. A line no step speaks for keeps the label
+these rules give it, marked ``origin: "regex"``. `eval/trace_audit.py` publishes how many lines
+each decides on the held-out corpora and every line on which the two disagree.
 """
 
 from __future__ import annotations
 
 import re
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 LABELS = ("live", "computed", "record", "desk", "assumed", "missing", "memory")
 
@@ -52,6 +60,25 @@ the funding rate asked for — keeps its live label."""
 # Order matters: the first rule that matches decides. Missing and assumed come first because a
 # line that says it could not read something must never be labelled as if it had.
 _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
+    # A sentence from a filing answer (`research/document_qa.py`) ends with the number of the
+    # passage it cites, and a sentence without one never reaches the page: read from EDGAR now.
+    ("live", re.compile(r"\.\s*(?:\[\d{1,2}\])+\s*$")),
+    # the past states an analogue answer was matched to: worked out from the candles just read
+    ("computed", re.compile(r"^Closest past states: ")),
+    # the stress answer's scenario tree (`desk/stress_tree.py`) and its loss-share line: every
+    # figure worked out for this answer from the candles it just read
+    ("computed", re.compile(r"^Scenario tree: \d+ scenarios|^\d+(?:\.\d+){0,3}\. (?:Stated shock|"
+                            r"With the beta hedge|In the worst|\w+ on its own|Worst realised|"
+                            r"Halving|History check|At the most extreme|Tail:|Trimming|Session:|"
+                            r"If the )|\bis \d+% of the book but \d+% of its loss\b")),
+    # A measured record over past sweeps or past releases (`eval/skill_matrix.py`, the "into
+    # earnings" history): counted from what already happened, not read now.
+    ("record", re.compile(r"^(?:Actionable: )?across \d+ sweep|^bitget-mcp-server: every call|"
+                          r"^bitget-signal's news|^Answering with data in the latest sweep|"
+                          r"^Why the rest did not, by kind|^Into earnings: |"
+                          r"^The most recent one, ", re.I)),
+    # what an as-of answer left out, and why: the answer describing itself
+    ("assumed", re.compile(r"^Point in time: \d+ line\(s\) about today")),
     # A FRED series served from the snapshot shipped with the console is a past reading. Checked
     # before "missing": its line also says FRED did not answer, which is why it is a record and not
     # a gap (the CPI lead was tagged computed on the live page, 2026-09-25).
@@ -175,4 +202,18 @@ def labels(lines: Sequence[str]) -> list[str | None]:
     return [label(str(line)) for line in lines]
 
 
-__all__ = ["LABELS", "label", "labels"]
+def payload_labels(payload: Mapping[str, Any]) -> list[str | None]:
+    """The labels an answer carries, one per line: the ones attached with its trace
+    (`truth/trace.attach`) when there is one per line, else these wording rules.
+
+    The one call for a surface that shows an answer (the MCP server, the Telegram bot), so a line
+    labelled by the step that made it is not relabelled from its wording on the way out."""
+    lines = [str(line) for line in payload.get("lines") or []]
+    carried = payload.get("line_labels")
+    if (isinstance(carried, list) and len(carried) == len(lines)
+            and all(x is None or x in LABELS for x in carried)):
+        return list(carried)
+    return labels(lines)
+
+
+__all__ = ["LABELS", "label", "labels", "payload_labels"]

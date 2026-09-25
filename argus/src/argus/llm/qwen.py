@@ -21,7 +21,13 @@ This is a hackathon key with a limited balance, so that ratio is a budget constr
 
 * every call's reasoning tokens are counted separately and reported (:class:`Usage`),
 * a session-wide :class:`TokenBudget` can hard-stop before the key is exhausted,
-* identical requests are cached, because re-asking a deterministic question is pure waste.
+* identical requests are cached, because re-asking a deterministic question is pure waste — and
+  only deterministic ones (temperature 0 or a fixed seed), because re-serving a sample a caller
+  asked to be drawn afresh would be a silent error; `llm/cache.py` is the persistent,
+  model-agnostic form of the same store,
+* every request — answered, cached, failed or refused by the budget — is written to the per-step
+  cost ledger (`llm/ledger.py`, 2026-09-25), tagged with the ARGUS module that asked, so the spend
+  is attributable after the process exits and the form's "Role of the LLM" field is measured.
 
 Credentials are read from the environment only. The key never appears in code, a default argument,
 a log line, a repr, or an exception message.
@@ -34,11 +40,14 @@ import json
 import os
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
+
+from argus.llm.ledger import CallShape, CostLedger, Outcome, new_entry
 
 
 class Thinking(StrEnum):
@@ -228,6 +237,7 @@ class QwenClient:
         timeout: float = 600.0,
         max_retries: int = 3,
         cache: bool = True,
+        ledger: CostLedger | None = None,
     ) -> None:
         self._api_key = api_key or os.environ.get("BITGET_QWEN_API_KEY", "")
         if not self._api_key:
@@ -246,6 +256,9 @@ class QwenClient:
         self._cache: dict[str, Completion] | None = {} if cache else None
         self.calls = 0
         self.cache_hits = 0
+        self.ledger = ledger if ledger is not None else CostLedger.default()
+        """Per-call cost record (`llm/ledger.py`). Defaults to the shared on-disk ledger, or an
+        in-memory one under a test run so a fake model never writes the real record."""
 
     def __repr__(self) -> str:
         # Explicit: the default dataclass-ish repr would be fine today, but a future field holding
@@ -300,19 +313,49 @@ class QwenClient:
         if use_stream:
             payload["stream"] = True
 
+        shape = CallShape(
+            model=self._model, host=urllib.parse.urlsplit(self._base_url).netloc,
+            thinking=str(thinking), stream=use_stream, json_mode=json_mode, tools=bool(tools),
+        )
         key = self._cache_key(payload)
-        if self._cache is not None and key in self._cache:
+        # A request is reusable only when its answer is meant to be reproducible: greedy decoding,
+        # or a fixed seed. Caching a sampled request would hand a caller that asked twice for a
+        # fresh sample the first sample twice. No caller does that today (every call site decodes
+        # at temperature 0); the guard is here so none can start to by accident. Added 2026-09-25
+        # with `llm/cache.py`, which applies the same rule. The key itself is unchanged, so every
+        # recording keyed by it (`eval/thesis_quality.py`) still matches.
+        cacheable = self._cache is not None and (temperature == 0.0 or seed is not None)
+        if self._cache is not None and cacheable and key in self._cache:
             self.cache_hits += 1
+            self.ledger.record(new_entry(outcome=Outcome.CACHE_HIT, shape=shape))
             return self._cache[key]
 
         if self.budget is not None:
-            self.budget.check(max_tokens)
+            try:
+                self.budget.check(max_tokens)
+            except BudgetExhausted as exc:
+                self.ledger.record(new_entry(outcome=Outcome.BUDGET_REFUSED, error=str(exc),
+                                             shape=shape))
+                raise
 
-        result = self._post(payload)
+        started = time.monotonic()
+        try:
+            result = self._post(payload)
+        except QwenError as exc:
+            self.ledger.record(new_entry(outcome=Outcome.ERROR, started=started,
+                                         error=str(exc), shape=shape))
+            raise
+        usage = result.usage
+        self.ledger.record(new_entry(
+            outcome=Outcome.OK, started=started, prompt_tokens=usage.prompt_tokens,
+            completion_tokens=usage.completion_tokens, reasoning_tokens=usage.reasoning_tokens,
+            total_tokens=usage.total_tokens, cached_tokens=usage.cached_tokens,
+            usage_reported=usage.reported, finish_reason=result.finish_reason, shape=shape,
+        ))
 
         if self.budget is not None:
             self.budget.record(result.usage)
-        if self._cache is not None:
+        if self._cache is not None and cacheable:
             self._cache[key] = result
         return result
 

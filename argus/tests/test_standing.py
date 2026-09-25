@@ -2,19 +2,33 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+from typing import Any
+
 import pytest
 
+from argus.eval import standing
 from argus.eval.standing import (
+    GROUPWISE_CONDITIONS,
     ORDER,
     OWNED_CONDITIONS,
     REGISTER,
+    TRANSITIONS,
     Capability,
+    IllegalTransition,
     Proof,
     Report,
     StandingError,
     State,
     audit,
+    check_transition,
+    comparison_outcomes,
+    groupwise_verdict,
+    render_outcome,
     summary,
+    transitions_since,
+    write_report,
 )
 
 
@@ -467,30 +481,20 @@ class TestTheLiveRegisterIsHonest:
         # sub-theme (the rival review of 2026-09-24), and sentiment and factor
         # discovery narrowed to what was proven. Each withdrawn row stays in the register as
         # IMPLEMENTED with the reason as its first blocker.
+        # 2026-09-25 (S18): twelve more withdrawn by the groupwise gate. Their statistical or
+        # out-of-sample proof rests on designed cases, a parameter sweep or an aggregate whose rows
+        # were not kept, so no breakdown by symbol, date or regime could run on it
+        # (data/groupwise_audit.json). Each carries the reason and the route back as its first
+        # blocker; `TestDemotionsCarryTheirRouteBack` pins that.
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
-            "Abstention scored as a decision",
-            "Cross-market cointegration with corrected multiple testing",
             "Cross-sectional factor evaluation",
             "Data-honest cross-asset breadth rotation vs. a silently-dropping reference",
-            "Deliberation priced as a trading cost",
-            "Episodic memory across decisions",
-            (
-                "Factor-discovery safety: no execution surface and "
-                "trial-corrected selection, vs. RD-Agent"
-            ),
-            "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
             "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
-            "Net executable arbitrage vs. a fee-blind detector",
             "Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal",
-            "Overfitting gates that raise instead of returning NaN",
-            "Path-shape matching with a calibrated null",
             "Per-profile mandate that changes the verdict",
-            "Perception layer: what the desk can see",
-            "Pre-registered trading protocol, hash-committed",
             "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
             "Risk layer proved by domain sweep",
-            "Typed factor grammar with no execution surface",
             "rToken factor divergence vs. Alphalens' real Information Coefficient",
         }
         for cap in audit().owned:
@@ -656,3 +660,285 @@ def test_the_live_register_does_not_overstate() -> None:
     report = audit()
     overstated = sorted({c.name for c in report.owned} - {c.name for c in report.earned})
     assert not overstated, "declared OWNED without evidence: " + ", ".join(overstated)
+
+
+# --- S18: the legal-transition table ------------------------------------------------------------
+
+
+def _cap(name: str, state: State) -> Capability:
+    proofs = _all_thirteen() if state is State.OWNED else ()
+    baseline = "" if state in (State.LOST, State.IMPLEMENTED) else "a named rival"
+    return Capability(name=name, subtheme="t", module="argus/eval/standing.py", state=state,
+                      baseline=baseline, proofs=proofs)
+
+
+class TestStateChangesAreLegalMovesOrNothing:
+    """LOST -> TIED -> IMPLEMENTED -> OWNED one rung at a time; down any number; nothing else."""
+
+    def test_the_table_climbs_exactly_one_rung_from_every_state(self) -> None:
+        for rank, state in enumerate(ORDER):
+            up = {s for s in TRANSITIONS[state] if ORDER.index(s) > rank}
+            assert up == ({ORDER[rank + 1]} if rank + 1 < len(ORDER) else set()), state
+
+    @pytest.mark.parametrize(("before", "after"), [
+        (State.LOST, State.IMPLEMENTED), (State.LOST, State.OWNED), (State.TIED, State.OWNED),
+    ])
+    def test_a_skipped_rung_is_refused_with_the_legal_targets_named(
+            self, before: State, after: State) -> None:
+        with pytest.raises(IllegalTransition, match="may move only to") as err:
+            check_transition("x", before, after)
+        for legal in TRANSITIONS[before] - {before}:
+            assert legal.value in str(err.value)
+
+    @pytest.mark.parametrize("before", list(State))
+    def test_every_fall_and_every_stay_is_legal(self, before: State) -> None:
+        for after in ORDER[: ORDER.index(before) + 1]:
+            check_transition("x", before, after)
+
+    @pytest.mark.parametrize("after", list(State))
+    def test_a_new_capability_may_enter_at_any_state(self, after: State) -> None:
+        check_transition("x", None, after)
+
+    def test_a_table_that_lets_a_state_skip_a_rung_fails_its_own_check(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        widened = {**TRANSITIONS, State.LOST: TRANSITIONS[State.LOST] | {State.OWNED}}
+        monkeypatch.setattr(standing, "TRANSITIONS", widened)
+        with pytest.raises(IllegalTransition, match="climb exactly one rung"):
+            standing._check_transition_table()
+
+    def test_a_table_that_forbids_a_fall_fails_its_own_check(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        narrowed = {**TRANSITIONS, State.OWNED: frozenset({State.OWNED, State.IMPLEMENTED})}
+        monkeypatch.setattr(standing, "TRANSITIONS", narrowed)
+        with pytest.raises(IllegalTransition, match="fall to every lower rung"):
+            standing._check_transition_table()
+
+    def test_changes_and_disappearances_are_both_recorded(self) -> None:
+        previous = {"kept": "implemented", "fell": "owned", "renamed away": "tied"}
+        register = (_cap("kept", State.IMPLEMENTED), _cap("fell", State.TIED),
+                    _cap("new", State.IMPLEMENTED))
+        changes = transitions_since(previous, register)
+        assert {"capability": "fell", "from": "owned", "to": "tied"} in changes
+        assert {"capability": "new", "from": None, "to": "implemented"} in changes
+        assert {"capability": "renamed away", "from": "tied", "to": None} in changes
+        assert not any(c["capability"] == "kept" for c in changes)
+
+    def test_an_illegal_jump_raises_before_anything_is_written(self, tmp_path: Path) -> None:
+        path = tmp_path / "standing.json"
+        before = json.dumps({"capabilities": [{"name": "x", "state": "lost"}]})
+        path.write_text(before, encoding="utf-8")
+        with pytest.raises(IllegalTransition, match="lost -> implemented"):
+            write_report(path, report=Report(capabilities=(_cap("x", State.IMPLEMENTED),)))
+        assert path.read_text(encoding="utf-8") == before
+
+    def test_a_legal_move_is_appended_to_the_persisted_log(self, tmp_path: Path) -> None:
+        path = tmp_path / "standing.json"
+        path.write_text(json.dumps({
+            "capabilities": [{"name": "x", "state": "lost"}],
+            "transition_log": [{"capability": "x", "from": None, "to": "lost", "at": "t0"}],
+        }), encoding="utf-8")
+        write_report(path, report=Report(capabilities=(_cap("x", State.TIED),)))
+        blob = json.loads(path.read_text(encoding="utf-8"))
+        assert blob["transitions_this_write"] == [{"capability": "x", "from": "lost", "to": "tied"}]
+        assert [e["to"] for e in blob["transition_log"]] == ["lost", "tied"]
+        assert blob["transition_log"][-1]["at"]
+        # Written again with no change: nothing new is logged.
+        write_report(path, report=Report(capabilities=(_cap("x", State.TIED),)))
+        assert len(json.loads(path.read_text(encoding="utf-8"))["transition_log"]) == 2
+
+    def test_an_unreadable_previous_register_is_not_silently_replaced(
+            self, tmp_path: Path) -> None:
+        path = tmp_path / "standing.json"
+        path.write_text("{not json", encoding="utf-8")
+        with pytest.raises(StandingError, match="not readable JSON"):
+            write_report(path, report=Report(capabilities=(_cap("x", State.TIED),)))
+        assert path.read_text(encoding="utf-8") == "{not json"
+
+    def test_the_live_register_is_a_legal_successor_of_the_persisted_one(self) -> None:
+        """Whatever ``data/standing.json`` holds, the register as it stands now must be reachable
+        from it by legal moves — otherwise the next ``python -m argus.eval.standing`` raises."""
+        blob = json.loads(standing.REPORT_PATH.read_text(encoding="utf-8"))
+        previous = {str(c["name"]): str(c["state"]) for c in blob["capabilities"]}
+        transitions_since(previous, REGISTER)
+
+
+# --- S18: no statistical or out-of-sample condition without its breakdown -----------------------
+
+_ARTEFACT = "data/overnight_comparison.json"
+
+
+def _stat_cap() -> Capability:
+    return Capability(
+        name="gated", subtheme="t", module="argus/eval/standing.py", state=State.IMPLEMENTED,
+        baseline="", proofs=(Proof("statistically_valid_evaluation", "bootstrap",
+                                   artefact=_ARTEFACT),))
+
+
+def _groupwise(**headline: Any) -> dict[str, Any]:
+    head = {"name": "h", "role": "argus_vs_rival", "flags": [], "favours": "argus", **headline}
+    return {"artefacts": {_ARTEFACT: {
+        "status": "checked", "sha256": standing._sha256(standing.PACKAGE / _ARTEFACT),
+        "headlines": [head]}}}
+
+
+class TestTheGroupwiseGate:
+    @staticmethod
+    def _verdict(groupwise: dict[str, Any] | None) -> tuple[bool, str]:
+        cap = _stat_cap()
+        return groupwise_verdict(cap, cap.proofs[0], groupwise)
+
+    def test_a_clean_breakdown_on_the_current_artefact_passes(self) -> None:
+        ok, why = self._verdict(_groupwise())
+        assert ok and why.startswith(f"groupwise-checked on {_ARTEFACT}")
+
+    def test_no_audit_at_all_fails(self) -> None:
+        ok, why = self._verdict(None)
+        assert not ok and "no groupwise check has run" in why
+
+    def test_an_artefact_the_audit_never_reached_fails(self) -> None:
+        ok, why = self._verdict({"artefacts": {}})
+        assert not ok and "not in the audit" in why
+
+    def test_designed_cases_cannot_pass(self) -> None:
+        ok, why = self._verdict({"artefacts": {_ARTEFACT: {
+            "status": "designed_cases", "reason": "cases an author chose"}}})
+        assert not ok and "designed_cases" in why
+
+    def test_a_context_headline_alone_does_not_count(self) -> None:
+        ok, why = self._verdict(_groupwise(role="context"))
+        assert not ok and "only context headlines" in why
+
+    def test_a_headline_carried_by_one_group_fails_and_names_it(self) -> None:
+        ok, why = self._verdict(_groupwise(flags=["carried_by_one_group:symbol=NVDAUSDT"]))
+        assert not ok and "carried_by_one_group:symbol=NVDAUSDT" in why
+
+    def test_halves_that_flip_fail(self) -> None:
+        ok, why = self._verdict(_groupwise(flags=["flips_across_halves:chronological halves"]))
+        assert not ok and "flips_across_halves" in why
+
+    def test_a_headline_that_favours_the_rival_fails(self) -> None:
+        ok, why = self._verdict(_groupwise(favours="rival"))
+        assert not ok and "favours the rival" in why
+
+    def test_an_audit_of_an_older_artefact_is_stale(self) -> None:
+        blob = _groupwise()
+        blob["artefacts"][_ARTEFACT]["sha256"] = "0" * 64
+        ok, why = self._verdict(blob)
+        assert not ok and "predates" in why
+
+    def test_the_audit_demotes_an_owned_claim_whose_breakdown_is_missing(
+            self, tmp_path: Path) -> None:
+        proofs = tuple(
+            Proof(c, "bootstrap", artefact=_ARTEFACT) if c in GROUPWISE_CONDITIONS else _proof(c)
+            for c in OWNED_CONDITIONS)
+        cap = Capability(name="gated", subtheme="t", module="argus/eval/standing.py",
+                         state=State.OWNED, baseline="a rival", proofs=proofs)
+        empty = tmp_path / "groupwise.json"
+        empty.write_text(json.dumps({"artefacts": {}}), encoding="utf-8")
+        report = audit((cap,), groupwise_path=empty)
+        assert report.owned and not report.earned
+        gated = [v for v in report.verifications if v.condition in GROUPWISE_CONDITIONS]
+        assert len(gated) == 2 and all(v.status == "UNPROVEN" for v in gated)
+
+        passing = tmp_path / "groupwise_ok.json"
+        passing.write_text(json.dumps(_groupwise()), encoding="utf-8")
+        report = audit((cap,), groupwise_path=passing)
+        gated = [v for v in report.verifications if v.condition in GROUPWISE_CONDITIONS]
+        assert all("groupwise-checked on" in v.detail for v in gated)
+
+    def test_every_owned_row_was_broken_down_on_the_live_audit(self) -> None:
+        report = audit()
+        owned = {c.name for c in report.owned}
+        gated = [v for v in report.verifications
+                 if v.capability in owned and v.condition in GROUPWISE_CONDITIONS]
+        assert gated
+        for v in gated:
+            assert v.status != "UNPROVEN" and "groupwise-checked on" in v.detail, v.render()
+
+
+class TestDemotionsCarryTheirRouteBack:
+    def test_every_row_the_gate_demoted_says_so_first_and_names_the_route_back(self) -> None:
+        demoted = [c for c in REGISTER
+                   if c.blockers and "by the groupwise gate" in c.blockers[0]]
+        assert len(demoted) == 12
+        for cap in demoted:
+            assert cap.state is State.IMPLEMENTED, cap.name
+            assert cap.blockers[0].startswith(
+                "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate"), cap.name
+            assert "oute back" in cap.blockers[0], cap.name
+
+
+# --- verdicts read from the harness, not restated ------------------------------------------------
+
+
+class TestVerdictsAreRead:
+    def test_outcomes_are_the_artefacts_comparison_reports(self) -> None:
+        blob = json.loads((standing.PACKAGE / _ARTEFACT).read_text(encoding="utf-8"))
+        got = comparison_outcomes(_stat_cap())
+        assert [o["outcome"] for o in got] == [r["outcome"] for r in blob["comparison_reports"]]
+        assert all(o["artefact"] for o in got)
+
+    def test_an_invalid_report_is_marked_as_not_counted(self) -> None:
+        row = {"outcome": "argus_better", "valid": False, "question": "q", "rival": "r",
+               "metric": "m", "argus_score": 1, "rival_score": 2, "n": 3, "unit": "night",
+               "ci95": None, "p_value": 0.5, "artefact": _ARTEFACT}
+        assert "(INVALID: not counted)" in render_outcome(row)
+        assert "p = 0.5" in render_outcome(row)
+
+    def test_an_owned_row_contradicted_by_its_own_report_is_not_earned(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        against = ({"outcome": "rival_better", "valid": True, "question": "q", "rival": "r"},)
+        monkeypatch.setattr(standing, "comparison_outcomes", lambda cap: against)
+        cap = Capability(name="x", subtheme="t", module="argus/eval/standing.py",
+                         state=State.OWNED, baseline="r", proofs=_all_thirteen())
+        report = audit((cap,))
+        assert not report.earned
+        assert any(f.problem == "a comparison report records the rival ahead"
+                   for f in report.findings)
+
+    def test_the_live_report_shows_each_rows_measured_outcomes(self) -> None:
+        report = audit()
+        overnight = next(c for c in REGISTER if c.name.startswith("Where a shut stock"))
+        assert report.outcomes[overnight.name]
+        assert "measured: argus_better" in report.render()
+
+
+class TestTheEvaluatorSpineFindingsAreApplied:
+    @staticmethod
+    def _row(prefix: str) -> Capability:
+        return next(c for c in REGISTER if c.name.startswith(prefix))
+
+    def test_the_qqq_overnight_sentence_says_argus_leads(self) -> None:
+        text = " ".join(self._row("Where a shut stock").blockers)
+        assert "1.84bps ahead" in text
+        assert "ARGUS is ahead on all eight stocks" in text
+
+    def test_a_row_credits_console_code_only_when_its_harness_runs_it(self) -> None:
+        """The credits returned on 2026-09-26 because the harnesses now call the code they name;
+        a credit whose harness stops calling it fails here."""
+        harnesses = standing.PACKAGE / "src" / "argus" / "eval"
+        stop = (harnesses / "stopquality_comparison.py").read_text(encoding="utf-8")
+        claims = (harnesses / "claimcheck_comparison.py").read_text(encoding="utf-8")
+        if "desk/odds.py" in self._row("Where a stop sits").module:
+            assert "directional_odds" in stop
+        if "lui/research.py" in self._row("A trader's claims").module:
+            assert "_claim_check" in claims
+
+    @pytest.mark.parametrize("artefact", [
+        "rule_proposals", "retrieval_diversity", "factor_split_half", "perturbation_robustness",
+        "vocab_stress", "feedbugged", "document_qa_eval", "pause_drill", "skill_matrix",
+        "guard_selfcheck", "mcp_fuzz", "mcp_sdk_comparison",
+    ])
+    def test_todays_artefacts_are_cited_on_a_row(self, artefact: str) -> None:
+        ref = f"data/{artefact}.json"
+        assert (standing.PACKAGE / ref).exists(), ref
+        assert any(ref in " ".join((*c.blockers, c.note, *(p.artefact for p in c.proofs)))
+                   for c in REGISTER), ref
+
+    def test_the_corrupted_feed_result_is_recorded_as_a_loss(self) -> None:
+        text = " ".join(self._row("Perception layer").blockers)
+        assert "detection F1 0.0" in text and "LOSS" in text
+
+    def test_the_qwen_proposer_is_recorded_as_beating_neither_baseline(self) -> None:
+        text = " ".join(self._row("Self-evolving review rules").blockers)
+        assert "the model beat neither" in text

@@ -32,6 +32,8 @@ from datetime import UTC, date, datetime, timedelta
 from enum import StrEnum
 from typing import Any
 
+from argus.lui.normalise import fold
+
 # Instruments ARGUS actually decides on. A question about anything else is refused by name rather
 # than answered from the model's memory of what gold did.
 TRADED_SYMBOLS: tuple[str, ...] = (
@@ -474,6 +476,28 @@ def resolve_symbol(token: str) -> str | None:
     return _TICKER_TO_SYMBOL.get(upper) or (upper if upper in TRADED_SYMBOLS else None)
 
 
+_PROSE_WORDS = frozenset({
+    "THE", "WHY", "WHAT", "WHATS", "HOW", "WHEN", "WHERE", "WHICH", "WHO", "DID", "DO", "DOES",
+    "IS", "ARE", "WAS", "WERE", "WE", "YOU", "OUR", "YOUR", "MY", "IT", "THAT", "THIS", "OF",
+    "TO", "IN", "ON", "FOR", "AND", "OR", "WITH", "ANY", "ALL", "CAN", "SHOW", "ME", "LIST",
+    "GIVE", "TELL", "HAVE", "HAS", "BE", "BEEN", "SO", "FAR", "LAST", "EVERY",
+})
+"""Function words that mark a run of capitals as prose. A question built only of capitalised
+tokens with none of these ("GME AMC BB") is still read as tickers."""
+
+
+def shouted(text: str) -> bool:
+    """Is this question typed in capitals, so case says nothing about which words are tickers?
+
+    Three or more Latin words, no lower-case Latin letter anywhere, and at least one ordinary
+    function word among them. Chinese text around the Latin words does not count either way.
+    """
+    words = re.findall(r"[A-Za-z]+(?:'[A-Za-z]+)?", text)
+    if len(words) < 3 or any(ch.islower() for word in words for ch in word):
+        return False
+    return any(word.replace("'", "") in _PROSE_WORDS for word in words)
+
+
 def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
     """Find traded symbols, and report an off-venue instrument by name rather than as a miss.
 
@@ -501,6 +525,13 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
             found.append(symbol)
     if found:
         return tuple(found), ""
+    if shouted(text):
+        # Case is the only thing that makes an unknown word a ticker, and a question typed in
+        # capitals carries none: "WHY DID WE DECIDE TO SHORT THAT TECH STOCK" was refused as "DID
+        # is not among the twelve stock perpetuals", and 104 of 105 capitalised sealed questions
+        # were refused the same way (2026-09-25 rematch, `eval/lui_rematch.py`). Named tickers and
+        # company names still resolve above; only the unknown-capitals guess is withheld.
+        return (), ""
     for token in _TICKER_SHAPED.findall(text):
         if token in _NOT_A_TICKER or token in TRADED_SYMBOLS or token in _TICKER_TO_SYMBOL:
             continue
@@ -991,7 +1022,10 @@ def classify(
     routes an unrecognised question to its nearest-looking answerer produces a confident reply to a
     question nobody asked, which is worse than saying it did not understand.
     """
-    raw = text.strip()
+    # Full-width letters and Traditional characters folded first (`lui/normalise.py`): every
+    # pattern below is written for ASCII and Simplified Chinese, and "ＮＶＤＡ" or "爲什麼" matched
+    # none of them (2026-09-25 rematch, `eval/lui_rematch.py`). The identity on ordinary text.
+    raw = fold(text).strip()
     if not raw:
         return Question(raw=raw, intent=Intent.AMBIGUOUS, speed=Speed.FAST, tense=Tense.PRESENT,
                         reason="empty question")

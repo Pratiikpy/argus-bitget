@@ -100,3 +100,113 @@ def test_a_batch_is_answered_as_a_batch() -> None:
         {"jsonrpc": "2.0", "id": 2, "method": "tools/list"}]).encode())
     replies = json.loads(body)
     assert status == 200 and [r["id"] for r in replies] == [1, 2]
+
+
+# --- hardening, 2026-09-25: the fuzz corpus, schema invariance, and the engine path ----------
+
+
+def test_the_whole_fuzz_corpus_is_clean_with_zero_unstructured_exceptions() -> None:
+    from argus.eval import mcp_fuzz
+
+    result = mcp_fuzz.fuzz(mcp_fuzz.hand_rolled_transport, mcp.TOOLS)
+    assert result["cases"] >= 145
+    assert result["unstructured_exceptions"] == 0
+    assert result["failures"] == []
+
+
+def test_every_published_schema_is_unchanged() -> None:
+    """The hardening validates against the schemas; it must not have edited them."""
+    by_name = {t["name"]: t["inputSchema"] for t in mcp.TOOLS}
+    assert set(by_name["argus_ask"]["properties"]) == {"question", "book", "memory"}
+    assert by_name["argus_ask"]["required"] == ["question"]
+    assert by_name["argus_quote"]["properties"]["symbols"] == {
+        "type": "array", "items": {"type": "string"},
+        "description": "Tickers or contracts, e.g. ['NVDA', 'BTCUSDT']."}
+    assert by_name["argus_execution_plan"]["required"] == ["symbol", "usd"]
+    assert by_name["argus_scoreboard"] == {"type": "object", "properties": {}}
+    assert "additionalProperties" not in by_name["argus_stress"]
+
+
+def test_invalid_arguments_are_a_tool_error_the_agent_can_read() -> None:
+    reply = _rpc("tools/call", {"name": "argus_execution_plan",
+                                "arguments": {"symbol": "NVDA", "usd": "lots"}})
+    assert reply["result"]["isError"] is True
+    assert reply["result"]["content"][0]["text"] == (
+        "invalid arguments for argus_execution_plan: usd must be a number, not str")
+    missing = _rpc("tools/call", {"name": "argus_quote", "arguments": {}})
+    assert "symbols is required" in missing["result"]["content"][0]["text"]
+
+
+def test_a_size_of_zero_is_refused_rather_than_read_as_twenty_percent() -> None:
+    with pytest.raises(mcp.ToolError, match="size_percent must be above 0"):
+        mcp.call_tool("argus_portfolio_impact", {
+            "add": "TSLA", "size_percent": 0, "book": {"NVDA": 100}})
+    reply = _rpc("tools/call", {"name": "argus_portfolio_impact", "arguments": {
+        "add": "TSLA", "size_percent": 0, "book": {"NVDA": 100}}})
+    assert reply["result"]["isError"] is True
+
+
+def test_malformed_calls_through_the_real_engines_stay_structured() -> None:
+    arguments: dict[str, Any]
+    for arguments in ({"symbols": "NVDA"}, {"symbols": [1, 2]}, {"symbols": []},
+                      {"symbols": ["ZYXQWV"]}):
+        status, body = mcp.handle_body(json.dumps({
+            "jsonrpc": "2.0", "id": 3, "method": "tools/call",
+            "params": {"name": "argus_quote", "arguments": arguments}}).encode())
+        reply = json.loads(body)
+        assert status == 200 and reply["result"]["isError"] is True, arguments
+
+
+def test_names_are_validated_and_never_echoed_at_length() -> None:
+    reply = _rpc("tools/call", {"name": "x" * 5000})
+    assert reply["error"]["code"] == -32602 and len(reply["error"]["message"]) < 200
+    assert _rpc("tools/call", {"name": "argus quote"})["error"]["code"] == -32602
+    assert _rpc("tools/call", {"name": 7})["error"]["code"] == -32602
+
+
+def test_envelope_rules_from_json_rpc() -> None:
+    status, body = mcp.handle_body(b"[]")
+    assert status == 400 and json.loads(body)["error"]["code"] == -32600
+    status, body = mcp.handle_body(json.dumps(
+        [{"jsonrpc": "2.0", "id": i, "method": "ping"} for i in range(mcp.MAX_BATCH + 1)]
+    ).encode())
+    assert status == 400 and json.loads(body)["error"]["code"] == -32600
+    null_id = mcp.handle({"jsonrpc": "2.0", "id": None, "method": "ping"})
+    assert null_id == {"jsonrpc": "2.0", "id": None, "result": {}}
+    bad_id = mcp.handle({"jsonrpc": "2.0", "id": True, "method": "ping"})
+    assert bad_id is not None and bad_id["error"]["code"] == -32600
+    assert _rpc("ping", "x")["error"]["code"] == -32602  # type: ignore[arg-type]
+    status, body = mcp.handle_body(b'{"jsonrpc": "2.0", "id": 1e999, "method": "ping"}')
+    assert status == 400 and json.loads(body)["error"]["code"] == -32700
+
+
+def test_nothing_raised_below_the_boundary_reaches_the_transport(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def explode(message: Any, **kw: Any) -> Any:
+        raise MemoryError("simulated")
+
+    monkeypatch.setattr(mcp, "handle", explode)
+    status, body = mcp.handle_body(b'{"jsonrpc": "2.0", "id": 1, "method": "ping"}')
+    assert status == 500 and json.loads(body)["error"]["code"] == -32603
+
+
+def test_argus_ask_carries_memory_and_the_labelled_lines(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from argus.lui import server
+
+    seen: dict[str, Any] = {}
+
+    def fake_ask(question: str, history: Any, **kw: Any) -> dict[str, Any]:
+        seen.update(kw, question=question)
+        return {"refused": False, "lines": ["Assumed: 20%.", "Data: Bitget."],
+                "sources": [{"ref": "bitget tickers"}], "memory": '["loss limit 5%"]'}
+
+    monkeypatch.setattr(server, "handle_ask", fake_ask)
+    reply = _rpc("tools/call", {"name": "argus_ask", "arguments": {
+        "question": "should I add TSLA", "memory": '["loss limit 5%"]'}})
+    text = reply["result"]["content"][0]["text"]
+    assert text.startswith("[assumed] Assumed: 20%.\nData: Bitget.")
+    assert "Memory (pass back as `memory` next time): [\"loss limit 5%\"]" in text
+    assert seen["memory"] == '["loss limit 5%"]' and seen["visitor"] == "mcp"

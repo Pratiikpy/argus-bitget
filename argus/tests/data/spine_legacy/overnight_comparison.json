@@ -1,0 +1,351 @@
+{
+  "generated": "2026-09-25T08:17:35+00:00",
+  "inputs_fetched": "2026-09-25T08:00:07+00:00",
+  "target": "gap from the last regular close to the next regular open, per stock",
+  "predicted_at": "09:00 New York time on the opening day",
+  "scored_rows": 904,
+  "nights": 113,
+  "first_night": "2026-04-15",
+  "last_night": "2026-09-24",
+  "summary": {
+    "zero": {
+      "mae_bps": 90.32,
+      "median_abs_error_bps": 64.91,
+      "rmse_bps": 144.46,
+      "direction_hit_rate": null,
+      "direction_scored": 0
+    },
+    "gloaming_prior": {
+      "mae_bps": 96.18,
+      "median_abs_error_bps": 66.21,
+      "rmse_bps": 150.3,
+      "direction_hit_rate": 0.633,
+      "direction_scored": 795
+    },
+    "gloaming_shipped_24h": {
+      "mae_bps": 134.94,
+      "median_abs_error_bps": 100.06,
+      "rmse_bps": 187.13,
+      "direction_hit_rate": 0.581,
+      "direction_scored": 795
+    },
+    "gloaming_ols": {
+      "mae_bps": 81.28,
+      "median_abs_error_bps": 53.75,
+      "rmse_bps": 137.85,
+      "direction_hit_rate": 0.648,
+      "direction_scored": 795
+    },
+    "argus_perp": {
+      "mae_bps": 30.35,
+      "median_abs_error_bps": 22.11,
+      "rmse_bps": 41.67,
+      "direction_hit_rate": 0.932,
+      "direction_scored": 795
+    },
+    "argus_perp_vs_close": {
+      "mae_bps": 31.81,
+      "median_abs_error_bps": 24.39,
+      "rmse_bps": 42.71,
+      "direction_hit_rate": 0.922,
+      "direction_scored": 795
+    },
+    "argus_perp_fitted": {
+      "mae_bps": 30.61,
+      "median_abs_error_bps": 22.42,
+      "rmse_bps": 42.36,
+      "direction_hit_rate": 0.932,
+      "direction_scored": 795
+    },
+    "argus_perp_plus_futures": {
+      "mae_bps": 31.04,
+      "median_abs_error_bps": 22.35,
+      "rmse_bps": 42.94,
+      "direction_hit_rate": 0.935,
+      "direction_scored": 795
+    }
+  },
+  "best_gloaming": "gloaming_ols",
+  "paired": [
+    {
+      "a": "argus_perp",
+      "b": "gloaming_ols",
+      "mean_diff_bps": -50.93,
+      "ci95_bps": [
+        -60.72,
+        -42.77
+      ],
+      "nights": 113,
+      "verdict": "a better"
+    },
+    {
+      "a": "argus_perp",
+      "b": "zero",
+      "mean_diff_bps": -59.96,
+      "ci95_bps": [
+        -70.83,
+        -50.61
+      ],
+      "nights": 113,
+      "verdict": "a better"
+    },
+    {
+      "a": "gloaming_ols",
+      "b": "zero",
+      "mean_diff_bps": -9.04,
+      "ci95_bps": [
+        -14.31,
+        -4.19
+      ],
+      "nights": 113,
+      "verdict": "a better"
+    },
+    {
+      "a": "argus_perp",
+      "b": "argus_perp_vs_close",
+      "mean_diff_bps": -1.45,
+      "ci95_bps": [
+        -2.31,
+        -0.55
+      ],
+      "nights": 113,
+      "verdict": "a better"
+    },
+    {
+      "a": "argus_perp_fitted",
+      "b": "argus_perp",
+      "mean_diff_bps": 0.26,
+      "ci95_bps": [
+        -0.13,
+        0.64
+      ],
+      "nights": 113,
+      "verdict": "not separable"
+    }
+  ],
+  "per_stock": {
+    "AAPL": {
+      "nights": 113,
+      "zero": 58.25,
+      "gloaming_ols": 65.81,
+      "argus_perp": 25.68,
+      "argus_perp_vs_close": 26.26,
+      "argus_perp_direction_hit_rate": 0.902,
+      "argus_perp_vs_best_gloaming": {
+        "a": "argus_perp",
+        "b": "gloaming_ols",
+        "mean_diff_bps": -40.13,
+        "ci95_bps": [
+          -57.09,
+          -27.77
+        ],
+        "nights": 113,
+        "verdict": "a better"
+      }
+    },
+    "AMZN": {
+      "nights": 113,
+      "zero": 93.34,
+      "gloaming_ols": 92.94,
+      "argus_perp": 32.74,
+      "argus_perp_vs_close": 34.98,
+      "argus_perp_direction_hit_rate": 0.929,
+      "argus_perp_vs_best_gloaming": {
+        "a": "argus_perp",
+        "b": "gloaming_ols",
+        "mean_diff_bps": -60.2,
+        "ci95_bps": [
+          -85.88,
+          -41.36
+        ],
+        "nights": 113,
+        "verdict": "a better"
+      }
+    },
+    "META": {
+      "nights": 113,
+      "zero": 107.16,
+      "gloaming_ols": 119.38,
+      "argus_perp": 38.33,
+      "argus_perp_vs_close": 39.81,
+      "argus_perp_direction_hit_rate": 0.878,
+      "argus_perp_vs_best_gloaming": {
+        "a": "argus_perp",
+        "b": "gloaming_ols",
+        "mean_diff_bps": -81.05,
+        "ci95_bps": [
+          -113.41,
+          -55.8
+        ],
+        "nights": 113,
+        "verdict": "a better"
+      }
+    },
+    "TSLA": {
+      "nights": 113,
+      "zero": 101.62,
+      "gloaming_ols": 84.14,
+      "argus_perp": 35.02,
+      "argus_perp_vs_close": 36.15,
+      "argus_perp_direction_hit_rate": 0.95,
+      "argus_perp_vs_best_gloaming": {
+        "a": "argus_perp",
+        "b": "gloaming_ols",
+        "mean_diff_bps": -49.12,
+        "ci95_bps": [
+          -65.88,
+          -34.53
+        ],
+        "nights": 113,
+        "verdict": "a better"
+      }
+    },
+    "GOOGL": {
+      "nights": 113,
+      "zero": 87.52,
+      "gloaming_ols": 96.42,
+      "argus_perp": 30.51,
+      "argus_perp_vs_close": 32.02,
+      "argus_perp_direction_hit_rate": 0.939,
+      "argus_perp_vs_best_gloaming": {
+        "a": "argus_perp",
+        "b": "gloaming_ols",
+        "mean_diff_bps": -65.9,
+        "ci95_bps": [
+          -82.75,
+          -50.4
+        ],
+        "nights": 113,
+        "verdict": "a better"
+      }
+    },
+    "NVDA": {
+      "nights": 113,
+      "zero": 105.37,
+      "gloaming_ols": 68.76,
+      "argus_perp": 28.57,
+      "argus_perp_vs_close": 28.41,
+      "argus_perp_direction_hit_rate": 0.953,
+      "argus_perp_vs_best_gloaming": {
+        "a": "argus_perp",
+        "b": "gloaming_ols",
+        "mean_diff_bps": -40.19,
+        "ci95_bps": [
+          -53.17,
+          -29.2
+        ],
+        "nights": 113,
+        "verdict": "a better"
+      }
+    },
+    "MSFT": {
+      "nights": 113,
+      "zero": 99.39,
+      "gloaming_ols": 108.46,
+      "argus_perp": 39.48,
+      "argus_perp_vs_close": 41.52,
+      "argus_perp_direction_hit_rate": 0.913,
+      "argus_perp_vs_best_gloaming": {
+        "a": "argus_perp",
+        "b": "gloaming_ols",
+        "mean_diff_bps": -68.98,
+        "ci95_bps": [
+          -90.44,
+          -52.07
+        ],
+        "nights": 113,
+        "verdict": "a better"
+      }
+    },
+    "QQQ": {
+      "nights": 113,
+      "zero": 69.9,
+      "gloaming_ols": 14.34,
+      "argus_perp": 12.5,
+      "argus_perp_vs_close": 15.29,
+      "argus_perp_direction_hit_rate": 0.99,
+      "argus_perp_vs_best_gloaming": {
+        "a": "argus_perp",
+        "b": "gloaming_ols",
+        "mean_diff_bps": -1.84,
+        "ci95_bps": [
+          -3.59,
+          -0.29
+        ],
+        "nights": 113,
+        "verdict": "a better"
+      }
+    }
+  },
+  "sunday_evening_vs_nocturne_claim": {
+    "rows": 160,
+    "weekends": 20,
+    "summary": {
+      "last_close": {
+        "mae_bps": 86.18,
+        "median_abs_error_bps": 65.75,
+        "rmse_bps": 113.25,
+        "direction_hit_rate": null,
+        "direction_scored": 0
+      },
+      "perp_weekend": {
+        "mae_bps": 70.11,
+        "median_abs_error_bps": 58.25,
+        "rmse_bps": 90.96,
+        "direction_hit_rate": 0.718,
+        "direction_scored": 142
+      }
+    },
+    "slope_gap_on_perp_weekend_move": 0.826,
+    "paired": {
+      "a": "perp_weekend",
+      "b": "last_close",
+      "mean_diff_bps": -16.08,
+      "ci95_bps": [
+        -32.74,
+        -1.08
+      ],
+      "nights": 20,
+      "verdict": "a better"
+    }
+  },
+  "out_of_sample": {
+    "method": "walk-forward per stock: every fitted candidate is refit before each night on that stock's earlier nights only",
+    "warmup_nights_excluded_per_stock": 10,
+    "rows_excluded": 80,
+    "rows_scored": 904
+  },
+  "ablation": {
+    "shipped": "argus_perp",
+    "variants_mae_bps": {
+      "argus_perp": 30.35,
+      "argus_perp_vs_close": 31.81,
+      "argus_perp_fitted": 30.61,
+      "argus_perp_plus_futures": 31.04
+    },
+    "without_the_basis_correction": {
+      "a": "argus_perp",
+      "b": "argus_perp_vs_close",
+      "mean_diff_bps": -1.45,
+      "ci95_bps": [
+        -2.31,
+        -0.55
+      ],
+      "nights": 113,
+      "verdict": "a better"
+    },
+    "with_gloamings_futures_added": {
+      "a": "argus_perp_plus_futures",
+      "b": "argus_perp",
+      "mean_diff_bps": 0.69,
+      "ci95_bps": [
+        -0.38,
+        1.82
+      ],
+      "nights": 113,
+      "verdict": "not separable"
+    }
+  },
+  "failures": {},
+  "scope": "Rows before a stock's 11th night are excluded from every candidate so the walk-forward fits are out of sample on the same rows as the fixed ones. gloaming's crypto input is Bitget USDT perpetuals, not spot."
+}

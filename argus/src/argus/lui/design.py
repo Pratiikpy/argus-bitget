@@ -132,10 +132,13 @@ LINKS: tuple[tuple[str, str], ...] = (
     ("/research", "Research task"),
     ("/proof", "What we beat"),
     ("/wrong", "What we got wrong"),
-    ("/agent", "Live agent"),
     ("/status", "Status"),
     ("/brand", "Brand"),
 )
+"""The console's own pages. The Track 2 agent's record (/agent) is not among them: the handbook
+requires each entry to be an independent project (Basic Competition Rules, rule 2), and a tab for
+the other entry inside this one read as one system entered twice (readiness audit, 2026-09-25).
+The page still answers at its URL for anyone who follows a link to it."""
 
 
 def mark_svg(size: int = 22, colour: str = "currentColor") -> str:

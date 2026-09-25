@@ -1,0 +1,27 @@
+{
+  "what": "would_pass(x) == validate(x).allowed over the swept order space",
+  "source": "mle-bench environment/grading_server.py:15-19, mlebench/grade.py:98-124 (MIT)",
+  "sweep": {
+    "orders_swept": 190944,
+    "self_check_pass": 19260,
+    "self_check_fail": 171684,
+    "enforcement_raised": 0,
+    "disagreement_count": 0,
+    "disagreements_first_20": [],
+    "self_check_mutated_window_count": 0,
+    "self_check_mutated_window_first_20": [],
+    "identity_holds": true,
+    "self_check_is_read_only": true
+  },
+  "slot_consumption": {
+    "window": "one slot left of 10",
+    "self_check_then_enforce": [
+      true,
+      true
+    ],
+    "recording_check_then_enforce": [
+      true,
+      false
+    ]
+  }
+}

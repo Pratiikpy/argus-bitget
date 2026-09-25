@@ -51,6 +51,8 @@ from math import comb
 from pathlib import Path
 from typing import Any
 
+from argus.backtest.metrics import MetricError
+
 MIN_DECISIONS = 20
 """Fewest reviewed decisions before a rule may be called anything but PROPOSED.
 
@@ -155,6 +157,13 @@ class DefectKind(StrEnum):
     OUTCOME = "outcome"
     """The decision was graded against what happened and was wrong. Needs settlement."""
 
+    LEAN = "lean"
+    """The desk's lean — the direction it would take if forced — was contradicted by the move that
+    followed, by more than `eval.shadow`'s dead zone. Observable without a single trade settling,
+    which is why it exists: it is the only outcome-shaped defect this record carries. Added
+    2026-09-25 for `desk/rule_proposer.py`; :func:`review` does not read it, so the standing
+    report's figures are unchanged by its existence."""
+
 
 @dataclass(frozen=True, slots=True)
 class Defect:
@@ -242,6 +251,58 @@ def defects_from_outcomes(entries: Sequence[Any]) -> list[Defect]:
             detail=f"direction wrong; net {getattr(entry, 'net_pnl', 'unknown')}",
         ))
     return out
+
+
+def defects_from_leans(entries: Sequence[Any]) -> list[Defect]:
+    """Settled decisions whose lean the market then contradicted.
+
+    Reuses `eval/shadow.py`'s own grading rather than restating it: the move comes from
+    :func:`argus.eval.shadow.move_of` (counterfactual move for an abstention, exit against entry for
+    a fill) and a move inside :data:`argus.eval.shadow.DEAD_ZONE_BPS` is not a direction, so it is
+    neither a defect nor a clean call. A lean of ``none`` is an answer, not a wrong one, and an
+    unsettled decision has no outcome — both are skipped. Settlement seals are not decisions.
+    """
+    from argus.eval.shadow import DEAD_ZONE_BPS, move_of
+
+    out: list[Defect] = []
+    for entry in entries:
+        if str(getattr(entry, "kind", "decision")) != "decision":
+            continue
+        lean = str(getattr(entry, "lean", "none"))
+        if lean not in {"up", "down"}:
+            continue
+        moved = move_of(entry)
+        if moved is None or abs(moved[0]) <= DEAD_ZONE_BPS:
+            continue
+        if (moved[0] > 0) == (lean == "up"):
+            continue
+        out.append(Defect(
+            seq=int(getattr(entry, "seq", 0)), symbol=str(getattr(entry, "symbol", "")),
+            kind=DefectKind.LEAN,
+            detail=f"leaned {lean}; the market moved {moved[0]:+.1f}bps ({moved[1]})",
+        ))
+    return out
+
+
+def lean_settled(entries: Sequence[Any]) -> set[int]:
+    """Sequences whose lean was actually graded — the only decisions a LEAN rule can be judged on.
+
+    A decision that declined to lean, or met a flat tape, or has not settled, is neither right nor
+    wrong about direction; counting it as clean would dilute every LEAN rule's base rate with
+    decisions that could never have carried the defect.
+    """
+    from argus.eval.shadow import DEAD_ZONE_BPS, move_of
+
+    graded: set[int] = set()
+    for entry in entries:
+        if str(getattr(entry, "kind", "decision")) != "decision":
+            continue
+        if str(getattr(entry, "lean", "none")) not in {"up", "down"}:
+            continue
+        moved = move_of(entry)
+        if moved is not None and abs(moved[0]) > DEAD_ZONE_BPS:
+            graded.add(int(getattr(entry, "seq", 0)))
+    return graded
 
 
 @dataclass(frozen=True, slots=True)
@@ -393,7 +454,16 @@ def _lower_tail(total: int, marked: int, drawn: int, hit: int) -> float:
 
 
 def benjamini_hochberg(p_values: Sequence[float]) -> list[float]:
-    """Benjamini-Hochberg (1995) adjusted q-values, in the order given."""
+    """Benjamini-Hochberg (1995) adjusted q-values, in the order given.
+
+    Refuses a p-value outside [0, 1], NaN included, the way ``scipy.stats.false_discovery_control``
+    does (``scipy/stats/_morestats.py:4791-4794``) and with the same positive-form check. Without
+    it a NaN sorted to an arbitrary rank and ``min(running, nan)`` kept ``running``, so a NaN
+    p-value came back with the q-value of its neighbour — ``[nan, 0.001]`` returned
+    ``[0.001, 0.001]`` — measured in ``eval/general_overfitgates_comparison.py``.
+    """
+    if any(not 0.0 <= p <= 1.0 for p in p_values):
+        raise MetricError("every p-value must be a finite number in [0, 1]")
     m = len(p_values)
     if m == 0:
         return []
@@ -660,7 +730,13 @@ STANDING_RULES: tuple[Rule, ...] = (
             "question, so this rule cannot be validated until decisions settle."
         ),
         targets=frozenset({DefectKind.OUTCOME}),
-        predicate=lambda r: "contagion" in _notes_text(r),
+        # **Fixed 2026-09-25.** This read ``"contagion" in notes``, and the concurrent panel's own
+        # note says the opposite in the same word — "agreement is consensus rather than
+        # contagion" — so the rule fired on 599 of 611 recorded decisions (98%), almost all of
+        # them panels that ran concurrently and could not have been contagion. Found while
+        # building the feature vocabulary for `desk/rule_proposer.py`, which had to parse the
+        # panel note exactly. Only the sequential wording ("may be contagion") now fires it.
+        predicate=lambda r: "may be contagion" in _notes_text(r),
     ),
     Rule(
         name="unhedged-risk-is-stated-not-assumed",
@@ -673,6 +749,418 @@ STANDING_RULES: tuple[Rule, ...] = (
         predicate=lambda r: "hedge menu empty" in _notes_text(r),
     ),
 )
+
+
+# --- rules a machine can write --------------------------------------------------------------------
+#
+# The standing rules above are Python lambdas, which is fine for rules a person writes and
+# unacceptable for rules a model writes: a model's output is untrusted text, and executing it is
+# not an option. So a proposed rule is *data* — a conjunction of at most three comparisons over a
+# fixed vocabulary of decision features — and it becomes a :class:`Rule` only by being compiled
+# here, where every feature name, operator and value is checked against the vocabulary first.
+#
+# **The vocabulary is the leakage boundary.** Every feature below is read from a line the desk
+# writes *before* any checker runs — the panel, the quarantine, the skills probe, the memory, the
+# hedge menu — or from the ledger's decision-time fields. Nothing reads the grounding, conflict,
+# claim, debate, adversary or constitution lines, or the flags, because a rule that keys on the
+# checker's verdict "predicts" the defect by restating it; that is the same distinction
+# `narrow-evidence-base`'s rationale draws by hand. `tests/test_rule_proposer.py` enforces it on
+# every recorded decision: stripping every checker line from a record must leave its features
+# unchanged. Settlement fields (exit price, counterfactual move, P&L, direction_correct) are
+# likewise never read — they are the future.
+
+MAX_CONDITIONS = 3
+"""A rule is a conjunction of at most this many comparisons.
+
+A longer conjunction can describe any single decision exactly, which is how a rule written from
+one contrast pair memorises its target instead of naming a cause."""
+
+FeatureValue = float | bool | str
+"""What a feature reads: a number, a flag or a label. ``None`` means the record cannot say."""
+
+
+@dataclass(frozen=True, slots=True)
+class Feature:
+    """One thing about a decision that was known before any checker looked at it."""
+
+    name: str
+    kind: str
+    """``number``, ``flag`` or ``label`` — decides which comparisons are legal."""
+
+    description: str
+    read: Callable[[dict[str, Any]], FeatureValue | None]
+
+    def value(self, record: dict[str, Any]) -> FeatureValue | None:
+        try:
+            return self.read(record)
+        except (TypeError, ValueError, KeyError, AttributeError):
+            return None
+
+
+def _joined_notes(record: dict[str, Any]) -> str:
+    return "\n".join(str(n) for n in record.get("notes", []) or [])
+
+
+def _first(pattern: re.Pattern[str], record: dict[str, Any]) -> re.Match[str] | None:
+    return pattern.search(_joined_notes(record))
+
+
+def _number(pattern: re.Pattern[str], group: str) -> Callable[[dict[str, Any]], float | None]:
+    def read(record: dict[str, Any]) -> float | None:
+        match = _first(pattern, record)
+        return None if match is None else float(match.group(group))
+    return read
+
+
+_STANCE = re.compile(
+    r"panel:.*?->\s*(?P<stance>[a-z_]+)\s+at\s+(?P<confidence>[\d.]+)\s+after provenance", re.I
+)
+_RUN = re.compile(
+    r"^\[panel\]\s*(?P<run>\d+)\s+of\s+(?P<of>\d+)\s+analysts run:\s*(?P<which>[^\n]*)$",
+    re.I | re.M,
+)
+_CAUSAL = re.compile(r"^causal chain:\s*(?P<links>\d+)\s+links", re.I | re.M)
+_HEDGE = re.compile(r"^hedge menu empty: nothing placeable for (?P<hours>[\d.]+)h", re.I | re.M)
+_SCREENED = re.compile(
+    r"^\[quarantine\]\s*(?:(?P<withheld>\d+)\s+of\s+)?(?P<screened>\d+)\s+evidence item\(s\)"
+    r"\s+(?:screened|withheld)",
+    re.I | re.M,
+)
+_SKILLS = re.compile(
+    r"^\[skills\]\s*(?P<answered>\d+)\s+of\s+(?P<calls>\d+)\s+official-Skill calls answered"
+    r"[^\n]*?;\s*(?P<reached>\d+)\s+of\s+\d+\s+Skills reached",
+    re.I | re.M,
+)
+_MEMORY = re.compile(
+    r"^\[memory\]\s*(?P<prior>\d+)\s+prior decision\(s\)[^\n]*?,\s*(?P<graded>\d+)"
+    r"\s+of them graded",
+    re.I | re.M,
+)
+_UNSPENT = re.compile(r"^\[panel\]\s*(?P<bps>[\d.]+)bps of deliberation not spent", re.I | re.M)
+
+
+def _analysts_run(record: dict[str, Any]) -> float | None:
+    match = _first(_RUN, record)
+    return None if match is None else float(match.group("run"))
+
+
+def _ran(analyst: str) -> Callable[[dict[str, Any]], bool | None]:
+    def read(record: dict[str, Any]) -> bool | None:
+        match = _first(_RUN, record)
+        if match is None:
+            return None
+        return analyst in {w.strip().lower() for w in match.group("which").split(",")}
+    return read
+
+
+def _channel(name: str) -> Callable[[dict[str, Any]], bool | None]:
+    def read(record: dict[str, Any]) -> bool | None:
+        if "sources" not in record:
+            return None
+        return name in {str(s) for s in record.get("sources") or []}
+    return read
+
+
+def _withheld(record: dict[str, Any]) -> float | None:
+    match = _first(_SCREENED, record)
+    if match is None:
+        return None
+    return float(match.group("withheld") or 0)
+
+
+def _decision(field_name: str) -> Callable[[dict[str, Any]], FeatureValue | None]:
+    """A decision-time ledger field attached by :func:`attach_decisions`; never a settlement one."""
+    def read(record: dict[str, Any]) -> FeatureValue | None:
+        raw = (record.get("decision") or {}).get(field_name)
+        if raw is None:
+            return None
+        if isinstance(raw, bool | str):
+            return raw
+        return float(raw)
+    return read
+
+
+def _hour(record: dict[str, Any]) -> float | None:
+    raw = record.get("at")
+    return None if not raw else float(datetime.fromisoformat(str(raw)).hour)
+
+
+def _stance(record: dict[str, Any]) -> str | None:
+    match = _first(_STANCE, record)
+    return None if match is None else match.group("stance").lower()
+
+
+def _stance_confidence(record: dict[str, Any]) -> float | None:
+    match = _first(_STANCE, record)
+    return None if match is None else float(match.group("confidence"))
+
+
+def _stat(name: str) -> Callable[[dict[str, Any]], float | None]:
+    def read(record: dict[str, Any]) -> float | None:
+        return panel_stats(record).get(name)
+    return read
+
+
+DECISION_FIELDS = (
+    "session_phase", "hours_to_discovery", "stated_confidence", "lean", "lean_confidence",
+    "verdict",
+)
+"""The ledger fields a rule may read: all fixed at decision time and hashed with the intent.
+
+Everything else on a ledger entry — ``exit_price``, ``counterfactual_move_bps``, ``net_pnl``,
+``direction_correct``, ``settled_at`` — is written at settlement and is the outcome itself."""
+
+
+DESK_FEATURES: dict[str, Feature] = {f.name: f for f in (
+    Feature("analysts", "number", "analysts on the panel (panel line)", _stat("analysts")),
+    Feature("sources", "number", "distinct evidence sources the panel read", _stat("sources")),
+    Feature("independence", "number", "panel independence score after provenance discount",
+            _stat("independence")),
+    Feature("panel_stance", "label",
+            "the panel's aggregate view: bullish, bearish, neutral or insufficient_evidence",
+            _stance),
+    Feature("panel_confidence", "number", "the panel's confidence after provenance discount",
+            _stance_confidence),
+    Feature("analysts_run", "number", "evidence analysts actually run, of three",
+            _analysts_run),
+    Feature("ran_event", "flag", "the event analyst ran", _ran("event")),
+    Feature("ran_sentiment", "flag", "the sentiment analyst ran", _ran("sentiment")),
+    Feature("ran_earnings", "flag", "the earnings analyst ran", _ran("earnings")),
+    Feature("concurrent_panel", "flag",
+            "analysts ran concurrently, so none could read another's answer",
+            lambda r: "ran concurrently" in _joined_notes(r).lower()),
+    Feature("deliberation_unspent_bps", "number",
+            "deliberation budget left unspent, in bps of the round trip",
+            _number(_UNSPENT, "bps")),
+    Feature("causal_links", "number", "links in the causal chain the thesis states",
+            _number(_CAUSAL, "links")),
+    Feature("hedge_gap_hours", "number", "hours with nothing placeable on the hedge menu",
+            _number(_HEDGE, "hours")),
+    Feature("evidence_screened", "number", "evidence items the quarantine screened",
+            _number(_SCREENED, "screened")),
+    Feature("evidence_withheld", "number", "evidence items the quarantine withheld", _withheld),
+    Feature("skill_calls_answered", "number", "official Bitget Skill calls that answered",
+            _number(_SKILLS, "answered")),
+    Feature("skills_reached", "number", "official Bitget Skills reached, of five",
+            _number(_SKILLS, "reached")),
+    Feature("memory_prior", "number", "prior decisions on this symbol shown to the PM",
+            _number(_MEMORY, "prior")),
+    Feature("memory_graded", "number", "of those prior decisions, how many had been graded",
+            _number(_MEMORY, "graded")),
+    Feature("sentiment_demoted", "flag", "the sentiment analyst ran at its demoted weight",
+            lambda r: "sentiment is demoted" in _joined_notes(r).lower()),
+    Feature("has_filing", "flag", "a filing channel carried evidence", _channel("filing")),
+    Feature("has_sec_edgar", "flag", "SEC EDGAR carried evidence", _channel("sec-edgar")),
+    Feature("has_social", "flag", "a social channel carried evidence", _channel("social")),
+    Feature("has_news", "flag", "a news channel carried evidence", _channel("news")),
+    Feature("has_macro", "flag", "a macro channel carried evidence", _channel("macro")),
+    Feature("symbol", "label", "the instrument", lambda r: str(r.get("symbol") or "") or None),
+    Feature("hour_utc", "number", "hour of the decision, UTC", _hour),
+    Feature("session_phase", "label", "rth, extended or weekend", _decision("session_phase")),
+    Feature("hours_to_discovery", "number", "hours until the anchor market next discovers price",
+            _decision("hours_to_discovery")),
+    Feature("stated_confidence", "number", "the PM's stated confidence in its verdict",
+            _decision("stated_confidence")),
+    Feature("lean", "label", "the direction the desk would take if forced: up, down or none",
+            _decision("lean")),
+    Feature("lean_confidence", "number", "the desk's confidence in its lean",
+            _decision("lean_confidence")),
+    Feature("verdict", "label", "the final verdict: no_trade, buy, sell", _decision("verdict")),
+)}
+"""The vocabulary a machine-written rule may use on ARGUS's own decisions."""
+
+
+def attach_decisions(
+    notes: Sequence[dict[str, Any]], entries: Sequence[Any]
+) -> list[dict[str, Any]]:
+    """Each desk-notes row with its ledger decision's decision-time fields under ``decision``.
+
+    Joined on ``seq``, which the two files share (verified on the record: 611 of 611 notes rows
+    match a ledger decision with the same symbol). Only :data:`DECISION_FIELDS` are copied, so a
+    settlement field cannot reach a rule even by accident.
+    """
+    by_seq: dict[int, Any] = {}
+    for entry in entries:
+        if str(getattr(entry, "kind", "decision")) == "decision":
+            by_seq[int(getattr(entry, "seq", 0))] = entry
+    out: list[dict[str, Any]] = []
+    for row in notes:
+        entry = by_seq.get(int(row.get("seq", 0)))
+        merged = dict(row)
+        if entry is not None:
+            merged["decision"] = {
+                name: getattr(entry, name, None) for name in DECISION_FIELDS
+            }
+        out.append(merged)
+    return out
+
+
+def features_of(
+    record: dict[str, Any], vocabulary: dict[str, Feature] | None = None
+) -> dict[str, FeatureValue]:
+    """Every feature the record can answer. A feature it cannot answer is absent, never zero."""
+    vocab = DESK_FEATURES if vocabulary is None else vocabulary
+    out: dict[str, FeatureValue] = {}
+    for name, feature in vocab.items():
+        value = feature.value(record)
+        if value is not None:
+            out[name] = value
+    return out
+
+
+class SpecError(ValueError):
+    """A proposed rule that cannot be compiled. The message is fed back to whoever wrote it."""
+
+
+_NUMBER_OPS = frozenset({"<", "<=", ">", ">=", "==", "!="})
+_LABEL_OPS = frozenset({"==", "!=", "in"})
+_FLAG_OPS = frozenset({"=="})
+
+
+@dataclass(frozen=True, slots=True)
+class Condition:
+    """One comparison. A record that cannot answer the feature does not satisfy it."""
+
+    feature: str
+    op: str
+    value: FeatureValue | tuple[str, ...]
+
+    def holds(self, features: dict[str, FeatureValue]) -> bool:
+        if self.feature not in features:
+            return False
+        got = features[self.feature]
+        want = self.value
+        if self.op == "in":
+            return isinstance(want, tuple) and str(got) in want
+        if self.op == "==":
+            return got == want
+        if self.op == "!=":
+            return got != want
+        if isinstance(got, bool) or not isinstance(got, float | int):
+            return False
+        if isinstance(want, bool) or not isinstance(want, float | int):
+            return False
+        return {
+            "<": got < want, "<=": got <= want, ">": got > want, ">=": got >= want,
+        }[self.op]
+
+    def render(self) -> str:
+        shown = list(self.value) if isinstance(self.value, tuple) else self.value
+        return f"{self.feature} {self.op} {shown!r}"
+
+    def as_dict(self) -> dict[str, Any]:
+        value = list(self.value) if isinstance(self.value, tuple) else self.value
+        return {"feature": self.feature, "op": self.op, "value": value}
+
+
+def condition_from(raw: Any, vocabulary: dict[str, Feature] | None = None) -> Condition:
+    """Validate one untrusted comparison against the vocabulary. Raises :class:`SpecError`."""
+    vocab = DESK_FEATURES if vocabulary is None else vocabulary
+    if not isinstance(raw, dict):
+        raise SpecError(f"a condition must be an object, got {type(raw).__name__}")
+    name, op, value = raw.get("feature"), raw.get("op"), raw.get("value")
+    if not isinstance(name, str) or name not in vocab:
+        raise SpecError(f"unknown feature {name!r}; use one of: {', '.join(sorted(vocab))}")
+    kind = vocab[name].kind
+    if kind == "number":
+        if op not in _NUMBER_OPS:
+            raise SpecError(f"{name} is a number; op must be one of {sorted(_NUMBER_OPS)}")
+        if isinstance(value, bool) or not isinstance(value, int | float):
+            raise SpecError(f"{name} is a number; value {value!r} is not")
+        return Condition(name, op, float(value))
+    if kind == "flag":
+        if op not in _FLAG_OPS or not isinstance(value, bool):
+            raise SpecError(f"{name} is a flag; write it as {{op: '==', value: true|false}}")
+        return Condition(name, op, value)
+    if op not in _LABEL_OPS:
+        raise SpecError(f"{name} is a label; op must be one of {sorted(_LABEL_OPS)}")
+    if op == "in":
+        if (not isinstance(value, list) or not value
+                or not all(isinstance(v, str) for v in value)):
+            raise SpecError(f"{name} 'in' takes a non-empty list of strings")
+        return Condition(name, op, tuple(v.lower() if name != "symbol" else v for v in value))
+    if not isinstance(value, str):
+        raise SpecError(f"{name} is a label; value {value!r} is not a string")
+    return Condition(name, op, value if name == "symbol" else value.lower())
+
+
+_SLUG = re.compile(r"^[a-z0-9][a-z0-9-]{2,60}$")
+
+
+@dataclass(frozen=True, slots=True)
+class RuleSpec:
+    """A rule as data: what to ask, why, what it claims to prevent, and exactly when it fires."""
+
+    name: str
+    prompt: str
+    rationale: str
+    targets: frozenset[DefectKind]
+    conditions: tuple[Condition, ...]
+
+    def fires(self, record: dict[str, Any], vocabulary: dict[str, Feature] | None = None) -> bool:
+        return self.matches(features_of(record, vocabulary))
+
+    def matches(self, features: dict[str, FeatureValue]) -> bool:
+        """The same test on features already read — a replay over hundreds of decisions reads each
+        record once, not once per candidate rule."""
+        return all(c.holds(features) for c in self.conditions)
+
+    def compile(self, vocabulary: dict[str, Feature] | None = None) -> Rule:
+        """The :class:`Rule` the replay grades. The predicate closes over validated data only."""
+        return Rule(
+            name=self.name, prompt=self.prompt, rationale=self.rationale, targets=self.targets,
+            predicate=lambda record: self.fires(record, vocabulary),
+        )
+
+    def render(self) -> str:
+        return " AND ".join(c.render() for c in self.conditions)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name, "prompt": self.prompt, "rationale": self.rationale,
+            "targets": sorted(str(t) for t in self.targets),
+            "conditions": [c.as_dict() for c in self.conditions],
+            "fires_when": self.render(),
+        }
+
+
+def spec_from(
+    raw: Any, *, allowed_targets: frozenset[DefectKind] | None = None,
+    vocabulary: dict[str, Feature] | None = None,
+) -> RuleSpec:
+    """Validate an untrusted rule object into a :class:`RuleSpec`. Raises :class:`SpecError`
+    with a message specific enough to be fed straight back to the model that wrote it."""
+    if not isinstance(raw, dict):
+        raise SpecError(f"a rule must be an object, got {type(raw).__name__}")
+    name = str(raw.get("name") or "").strip().lower()
+    if not _SLUG.match(name):
+        raise SpecError(f"name {name!r} must be a lowercase slug of 3-61 chars (a-z, 0-9, -)")
+    prompt = str(raw.get("prompt") or "").strip()
+    rationale = str(raw.get("rationale") or "").strip()
+    if len(prompt) < 12 or len(prompt) > 300:
+        raise SpecError("prompt must be one imperative sentence of 12-300 characters")
+    if len(rationale) < 12 or len(rationale) > 600:
+        raise SpecError("rationale must be 12-600 characters")
+    raw_targets = raw.get("targets")
+    if not isinstance(raw_targets, list) or not raw_targets:
+        raise SpecError("targets must be a non-empty list of defect kinds")
+    try:
+        targets = frozenset(DefectKind(str(t).lower()) for t in raw_targets)
+    except ValueError:
+        raise SpecError(
+            f"targets {raw_targets!r} must be from {[str(k) for k in DefectKind]}"
+        ) from None
+    if allowed_targets is not None and not targets <= allowed_targets:
+        raise SpecError(f"targets must be within {sorted(str(t) for t in allowed_targets)}")
+    raw_conditions = raw.get("conditions")
+    if not isinstance(raw_conditions, list) or not 1 <= len(raw_conditions) <= MAX_CONDITIONS:
+        raise SpecError(f"conditions must be a list of 1 to {MAX_CONDITIONS} comparisons")
+    conditions = tuple(condition_from(c, vocabulary) for c in raw_conditions)
+    if len({c.feature for c in conditions}) != len(conditions):
+        raise SpecError("each feature may appear in at most one condition")
+    return RuleSpec(
+        name=name, prompt=prompt, rationale=rationale, targets=targets, conditions=conditions,
+    )
 
 
 def review(
@@ -717,8 +1205,12 @@ def review(
 
 def _corrected(performance: list[RulePerformance]) -> list[RulePerformance]:
     """Benjamini-Hochberg across every rule that was graded, and ACTIVE only where it survives."""
-    graded = [i for i, perf in enumerate(performance) if perf.p_value is not None]
-    q_values = benjamini_hochberg([performance[i].p_value or 1.0 for i in graded])
+    graded_p = [(i, perf.p_value) for i, perf in enumerate(performance)
+                if perf.p_value is not None]
+    graded = [i for i, _ in graded_p]
+    # Not `p_value or 1.0`: that turned an exact p of 0.0 — the most significant result a rule can
+    # have — into 1.0, because 0.0 is falsy. The None case it was written for is already excluded.
+    q_values = benjamini_hochberg([p for _, p in graded_p])
     out = list(performance)
     for i, q in zip(graded, q_values, strict=True):
         perf = out[i]
@@ -769,25 +1261,40 @@ def main(argv: list[str] | None = None) -> int:
 
 __all__ = [
     "ALWAYS_FIRES",
+    "DECISION_FIELDS",
+    "DESK_FEATURES",
     "LOW_INDEPENDENCE",
+    "MAX_CONDITIONS",
     "MIN_DECISIONS",
     "MIN_PRECISION",
     "NARROW_SOURCES",
     "NEVER_FIRES",
     "STANDING_RULES",
+    "Condition",
     "Defect",
     "DefectKind",
+    "Feature",
+    "FeatureValue",
     "ReviewReport",
     "Rule",
     "RulePerformance",
+    "RuleSpec",
+    "SpecError",
     "Status",
+    "attach_decisions",
+    "benjamini_hochberg",
+    "condition_from",
+    "defects_from_leans",
     "defects_from_notes",
     "defects_from_outcomes",
     "defects_from_risk",
     "evaluate",
+    "features_of",
+    "lean_settled",
     "main",
     "panel_stats",
     "review",
+    "spec_from",
 ]
 
 

@@ -1,0 +1,1314 @@
+{
+  "generated_at": "2026-09-25T20:01:39.645512+00:00",
+  "market": {
+    "source": "risk_layer_candles_fixture.json",
+    "decided_at": "2026-09-17T15:00:00+00:00",
+    "marked_at": "2026-09-17T18:00:00+00:00",
+    "settled_at": "2026-09-18T16:00:00+00:00",
+    "closes": {
+      "AAPLUSDT": [
+        "335.09",
+        "336.58",
+        "334.91"
+      ],
+      "AMZNUSDT": [
+        "252.73",
+        "251.99",
+        "253.76"
+      ],
+      "COINUSDT": [
+        "170.13",
+        "172.46",
+        "194.64"
+      ],
+      "GOOGLUSDT": [
+        "345.99",
+        "346.46",
+        "350.18"
+      ],
+      "METAUSDT": [
+        "679.71",
+        "676.76",
+        "670.27"
+      ],
+      "MSFTUSDT": [
+        "497.3",
+        "495.75",
+        "493.83"
+      ],
+      "MSTRUSDT": [
+        "131.03",
+        "132.25",
+        "150.25"
+      ],
+      "NVDAUSDT": [
+        "219.14",
+        "219.67",
+        "220.01"
+      ],
+      "QQQUSDT": [
+        "717.66",
+        "717.3",
+        "717.52"
+      ],
+      "SQQQUSDT": [
+        "38.63",
+        "38.68",
+        "38.6"
+      ],
+      "TQQQUSDT": [
+        "71.4",
+        "71.3",
+        "71.34"
+      ],
+      "TSLAUSDT": [
+        "369.54",
+        "367.26",
+        "363.35"
+      ]
+    },
+    "stated_constants": {
+      "quoted_spread_bps": "2",
+      "base_volume": "1000000",
+      "funding_rate": "0",
+      "taker_bps": "6"
+    },
+    "instruments": "replay_instruments_2026-09-25.json"
+  },
+  "teacher_forcing": {
+    "name": "teacher",
+    "passed": true,
+    "checks": [
+      {
+        "check": "every scripted decision reached the ledger once",
+        "passed": true,
+        "detail": "12 rows for 12 scripted decisions"
+      },
+      {
+        "check": "a scripted abstention is recorded as an abstention",
+        "passed": true,
+        "detail": "3 abstentions; wrong: none"
+      },
+      {
+        "check": "the risk layer and venue gate only reduced",
+        "passed": true,
+        "detail": "widened past the script: none; side flipped: none; risk records enlarging: none"
+      },
+      {
+        "check": "a scripted trade the ledger records as no trade names the gate that stopped it",
+        "passed": true,
+        "detail": "no scripted trade was stopped"
+      },
+      {
+        "check": "no row records a trade without a size, or a size without a trade",
+        "passed": true,
+        "detail": "rows where verdict and size disagree: none (the seq 264 defect recorded a trade the risk layer had refused)"
+      },
+      {
+        "check": "an oversized order is reduced by the risk layer and recorded at the reduced size",
+        "passed": true,
+        "detail": "NVDAUSDT: scripted 2281.64, risk layer unhedgeable_gap -> 91.26585744273067445468650178, ledger 91.26"
+      },
+      {
+        "check": "each entry is charged the taker fee plus the quoted spread",
+        "passed": true,
+        "detail": "9 trades; wrong entry cost: none"
+      },
+      {
+        "check": "each trade settles at the gold gross and net P&L, 25 hours later",
+        "passed": true,
+        "detail": "9 trades match to 0.0001"
+      },
+      {
+        "check": "each abstention settles at the gold counterfactual move",
+        "passed": true,
+        "detail": "all abstentions match to 0.0001bps"
+      },
+      {
+        "check": "each abstention is marked once at the three-hour price",
+        "passed": true,
+        "detail": "3 marks for 3 abstentions"
+      },
+      {
+        "check": "the scorer reports the gold trade count, win rate and net P&L",
+        "passed": true,
+        "detail": "scorer: 9 trades, win rate 0.8888888888888888, net 711.2375; gold: 9 trades, win rate 0.8888888888888888, net 711.2376"
+      },
+      {
+        "check": "a two-day record reports no Sharpe rather than a number",
+        "passed": true,
+        "detail": "sharpe None; stated reason: the window is 2 day(s); a standard deviation needs at least 30"
+      },
+      {
+        "check": "the hash chain verifies, and a one-cent forgery does not",
+        "passed": true,
+        "detail": "chain intact: True; forgery caught: True"
+      },
+      {
+        "check": "the replay wrote nothing under data/",
+        "passed": true,
+        "detail": "files this process opened for writing there: none"
+      },
+      {
+        "check": "the seat answered every call; nothing reached a model or the network",
+        "passed": true,
+        "detail": "seat calls {'analyst': 12, 'decision': 12, 'adversary': 9, 'revision': 1}; outbound connections refused: 18"
+      },
+      {
+        "check": "every oracle trade is scored the right way",
+        "passed": true,
+        "detail": "scored wrong-way: none"
+      }
+    ],
+    "decisions": {
+      "AAPLUSDT": {
+        "verdict": "trade",
+        "side": "sell",
+        "quantity": "5.96"
+      },
+      "AMZNUSDT": {
+        "verdict": "trade",
+        "side": "buy",
+        "quantity": "7.91"
+      },
+      "COINUSDT": {
+        "verdict": "trade",
+        "side": "buy",
+        "quantity": "11.75"
+      },
+      "GOOGLUSDT": {
+        "verdict": "trade",
+        "side": "buy",
+        "quantity": "5.78"
+      },
+      "METAUSDT": {
+        "verdict": "trade",
+        "side": "sell",
+        "quantity": "2.94"
+      },
+      "MSFTUSDT": {
+        "verdict": "trade",
+        "side": "sell",
+        "quantity": "4.02"
+      },
+      "MSTRUSDT": {
+        "verdict": "trade",
+        "side": "buy",
+        "quantity": "15.26"
+      },
+      "NVDAUSDT": {
+        "verdict": "trade",
+        "side": "buy",
+        "quantity": "2281.64"
+      },
+      "QQQUSDT": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0"
+      },
+      "SQQQUSDT": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0"
+      },
+      "TQQQUSDT": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0"
+      },
+      "TSLAUSDT": {
+        "verdict": "trade",
+        "side": "sell",
+        "quantity": "5.41"
+      }
+    },
+    "recorded": [
+      {
+        "seq": 1,
+        "symbol": "AAPLUSDT",
+        "verdict": "trade",
+        "side": "SELL",
+        "quantity": "5.96",
+        "entry_price": "335.09",
+        "exit_price": "334.91",
+        "net_pnl": "-2.1218",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 2,
+        "symbol": "AMZNUSDT",
+        "verdict": "trade",
+        "side": "BUY",
+        "quantity": "7.91",
+        "entry_price": "252.73",
+        "exit_price": "253.76",
+        "net_pnl": "4.9422",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 3,
+        "symbol": "COINUSDT",
+        "verdict": "trade",
+        "side": "BUY",
+        "quantity": "11.75",
+        "entry_price": "170.13",
+        "exit_price": "194.64",
+        "net_pnl": "284.5637",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 4,
+        "symbol": "GOOGLUSDT",
+        "verdict": "trade",
+        "side": "BUY",
+        "quantity": "5.78",
+        "entry_price": "345.99",
+        "exit_price": "350.18",
+        "net_pnl": "20.9991",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 5,
+        "symbol": "METAUSDT",
+        "verdict": "trade",
+        "side": "SELL",
+        "quantity": "2.94",
+        "entry_price": "679.71",
+        "exit_price": "670.27",
+        "net_pnl": "24.5784",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 6,
+        "symbol": "MSFTUSDT",
+        "verdict": "trade",
+        "side": "SELL",
+        "quantity": "4.02",
+        "entry_price": "497.3",
+        "exit_price": "493.83",
+        "net_pnl": "10.7619",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 7,
+        "symbol": "MSTRUSDT",
+        "verdict": "trade",
+        "side": "BUY",
+        "quantity": "15.26",
+        "entry_price": "131.03",
+        "exit_price": "150.25",
+        "net_pnl": "289.8633",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 8,
+        "symbol": "NVDAUSDT",
+        "verdict": "trade",
+        "side": "BUY",
+        "quantity": "91.26",
+        "entry_price": "219.14",
+        "exit_price": "220.01",
+        "net_pnl": "47.3347",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 9,
+        "symbol": "QQQUSDT",
+        "verdict": "no_trade",
+        "side": "BUY",
+        "quantity": "0",
+        "entry_price": "717.66",
+        "exit_price": "717.52",
+        "net_pnl": null,
+        "counterfactual_move_bps": "-1.9508"
+      },
+      {
+        "seq": 10,
+        "symbol": "SQQQUSDT",
+        "verdict": "no_trade",
+        "side": "BUY",
+        "quantity": "0",
+        "entry_price": "38.63",
+        "exit_price": "38.6",
+        "net_pnl": null,
+        "counterfactual_move_bps": "-7.7660"
+      },
+      {
+        "seq": 11,
+        "symbol": "TQQQUSDT",
+        "verdict": "no_trade",
+        "side": "BUY",
+        "quantity": "0",
+        "entry_price": "71.4",
+        "exit_price": "71.34",
+        "net_pnl": null,
+        "counterfactual_move_bps": "-8.4034"
+      },
+      {
+        "seq": 12,
+        "symbol": "TSLAUSDT",
+        "verdict": "trade",
+        "side": "SELL",
+        "quantity": "5.41",
+        "entry_price": "369.54",
+        "exit_price": "363.35",
+        "net_pnl": "30.3160",
+        "counterfactual_move_bps": null
+      }
+    ],
+    "risk_bindings": {
+      "none": 8,
+      "unhedgeable_gap": 1,
+      "no_exposure": 3
+    },
+    "stopped_by_a_gate": {},
+    "performance": {
+      "trades": 9,
+      "win_rate_pct": 88.89,
+      "net_pnl": "711.2375",
+      "sharpe": null,
+      "max_drawdown_pct": 0.0,
+      "abstentions": 3
+    },
+    "seat_calls": {
+      "analyst": 12,
+      "decision": 12,
+      "adversary": 9,
+      "revision": 1
+    },
+    "validator_complaints": [],
+    "outbound_connections_refused": 18,
+    "data_files_this_replay_wrote": [],
+    "seconds": 2.26
+  },
+  "sabotage_control": {
+    "defect": "settlement handed the decision cycle's prices",
+    "caught": true,
+    "failed_checks": [
+      "each trade settles at the gold gross and net P&L, 25 hours later",
+      "each abstention settles at the gold counterfactual move",
+      "the scorer reports the gold trade count, win rate and net P&L",
+      "every oracle trade is scored the right way"
+    ],
+    "name": "teacher-sabotaged",
+    "passed": false,
+    "checks": [
+      {
+        "check": "every scripted decision reached the ledger once",
+        "passed": true,
+        "detail": "12 rows for 12 scripted decisions"
+      },
+      {
+        "check": "a scripted abstention is recorded as an abstention",
+        "passed": true,
+        "detail": "3 abstentions; wrong: none"
+      },
+      {
+        "check": "the risk layer and venue gate only reduced",
+        "passed": true,
+        "detail": "widened past the script: none; side flipped: none; risk records enlarging: none"
+      },
+      {
+        "check": "a scripted trade the ledger records as no trade names the gate that stopped it",
+        "passed": true,
+        "detail": "no scripted trade was stopped"
+      },
+      {
+        "check": "no row records a trade without a size, or a size without a trade",
+        "passed": true,
+        "detail": "rows where verdict and size disagree: none (the seq 264 defect recorded a trade the risk layer had refused)"
+      },
+      {
+        "check": "an oversized order is reduced by the risk layer and recorded at the reduced size",
+        "passed": true,
+        "detail": "NVDAUSDT: scripted 2281.64, risk layer unhedgeable_gap -> 91.26585744273067445468650178, ledger 91.26"
+      },
+      {
+        "check": "each entry is charged the taker fee plus the quoted spread",
+        "passed": true,
+        "detail": "9 trades; wrong entry cost: none"
+      },
+      {
+        "check": "each trade settles at the gold gross and net P&L, 25 hours later",
+        "passed": false,
+        "detail": "AAPLUSDT: ledger gross -0.0000 net -3.1954, gold gross 1.0728 net -2.1218; AMZNUSDT: ledger gross 0.0000 net -3.1986, gold gross 8.1473 net 4.9422; COINUSDT: ledger gross 0.0000 net -3.1984, gold gross 287.9925 net 284.5637; GOOGLUSDT: ledger gross 0.0000 net -3.1997, gold gross 24.2182 net 20.9991; METAUSDT: ledger gross -0.0000 net -3.1974, gold gross 27.7536 net 24.5784; MSFTUSDT: ledger gross -0.0000 net -3.1986, gold gross 13.9494 net 10.7619; MSTRUSDT: ledger gross 0.0000 net -3.1992, gold gross 293.2972 net 289.8633; NVDAUSDT: ledger gross 0.0000 net -31.9979, gold gross 79.3962 net 47.3347; TSLAUSDT: ledger gross -0.0000 net -3.1987, gold gross 33.4879 net 30.3160"
+      },
+      {
+        "check": "each abstention settles at the gold counterfactual move",
+        "passed": false,
+        "detail": "QQQUSDT: ledger 0.0000, gold -1.9508; SQQQUSDT: ledger 0.0000, gold -7.7660; TQQQUSDT: ledger 0.0000, gold -8.4034"
+      },
+      {
+        "check": "each abstention is marked once at the three-hour price",
+        "passed": true,
+        "detail": "3 marks for 3 abstentions"
+      },
+      {
+        "check": "the scorer reports the gold trade count, win rate and net P&L",
+        "passed": false,
+        "detail": "scorer: 9 trades, win rate 0.0, net -57.5839; gold: 9 trades, win rate 0.8888888888888888, net 711.2376"
+      },
+      {
+        "check": "a two-day record reports no Sharpe rather than a number",
+        "passed": true,
+        "detail": "sharpe None; stated reason: the window is 2 day(s); a standard deviation needs at least 30"
+      },
+      {
+        "check": "the hash chain verifies, and a one-cent forgery does not",
+        "passed": true,
+        "detail": "chain intact: True; forgery caught: True"
+      },
+      {
+        "check": "the replay wrote nothing under data/",
+        "passed": true,
+        "detail": "files this process opened for writing there: none"
+      },
+      {
+        "check": "the seat answered every call; nothing reached a model or the network",
+        "passed": true,
+        "detail": "seat calls {'analyst': 12, 'decision': 12, 'adversary': 9, 'revision': 1}; outbound connections refused: 18"
+      },
+      {
+        "check": "every oracle trade is scored the right way",
+        "passed": false,
+        "detail": "scored wrong-way: ['AAPLUSDT', 'AMZNUSDT', 'COINUSDT', 'GOOGLUSDT', 'METAUSDT', 'MSFTUSDT', 'MSTRUSDT', 'NVDAUSDT', 'TSLAUSDT']"
+      }
+    ],
+    "decisions": {
+      "AAPLUSDT": {
+        "verdict": "trade",
+        "side": "sell",
+        "quantity": "5.96"
+      },
+      "AMZNUSDT": {
+        "verdict": "trade",
+        "side": "buy",
+        "quantity": "7.91"
+      },
+      "COINUSDT": {
+        "verdict": "trade",
+        "side": "buy",
+        "quantity": "11.75"
+      },
+      "GOOGLUSDT": {
+        "verdict": "trade",
+        "side": "buy",
+        "quantity": "5.78"
+      },
+      "METAUSDT": {
+        "verdict": "trade",
+        "side": "sell",
+        "quantity": "2.94"
+      },
+      "MSFTUSDT": {
+        "verdict": "trade",
+        "side": "sell",
+        "quantity": "4.02"
+      },
+      "MSTRUSDT": {
+        "verdict": "trade",
+        "side": "buy",
+        "quantity": "15.26"
+      },
+      "NVDAUSDT": {
+        "verdict": "trade",
+        "side": "buy",
+        "quantity": "2281.64"
+      },
+      "QQQUSDT": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0"
+      },
+      "SQQQUSDT": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0"
+      },
+      "TQQQUSDT": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0"
+      },
+      "TSLAUSDT": {
+        "verdict": "trade",
+        "side": "sell",
+        "quantity": "5.41"
+      }
+    },
+    "recorded": [
+      {
+        "seq": 1,
+        "symbol": "AAPLUSDT",
+        "verdict": "trade",
+        "side": "SELL",
+        "quantity": "5.96",
+        "entry_price": "335.09",
+        "exit_price": "335.09",
+        "net_pnl": "-3.1954",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 2,
+        "symbol": "AMZNUSDT",
+        "verdict": "trade",
+        "side": "BUY",
+        "quantity": "7.91",
+        "entry_price": "252.73",
+        "exit_price": "252.73",
+        "net_pnl": "-3.1986",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 3,
+        "symbol": "COINUSDT",
+        "verdict": "trade",
+        "side": "BUY",
+        "quantity": "11.75",
+        "entry_price": "170.13",
+        "exit_price": "170.13",
+        "net_pnl": "-3.1984",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 4,
+        "symbol": "GOOGLUSDT",
+        "verdict": "trade",
+        "side": "BUY",
+        "quantity": "5.78",
+        "entry_price": "345.99",
+        "exit_price": "345.99",
+        "net_pnl": "-3.1997",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 5,
+        "symbol": "METAUSDT",
+        "verdict": "trade",
+        "side": "SELL",
+        "quantity": "2.94",
+        "entry_price": "679.71",
+        "exit_price": "679.71",
+        "net_pnl": "-3.1974",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 6,
+        "symbol": "MSFTUSDT",
+        "verdict": "trade",
+        "side": "SELL",
+        "quantity": "4.02",
+        "entry_price": "497.3",
+        "exit_price": "497.3",
+        "net_pnl": "-3.1986",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 7,
+        "symbol": "MSTRUSDT",
+        "verdict": "trade",
+        "side": "BUY",
+        "quantity": "15.26",
+        "entry_price": "131.03",
+        "exit_price": "131.03",
+        "net_pnl": "-3.1992",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 8,
+        "symbol": "NVDAUSDT",
+        "verdict": "trade",
+        "side": "BUY",
+        "quantity": "91.26",
+        "entry_price": "219.14",
+        "exit_price": "219.14",
+        "net_pnl": "-31.9979",
+        "counterfactual_move_bps": null
+      },
+      {
+        "seq": 9,
+        "symbol": "QQQUSDT",
+        "verdict": "no_trade",
+        "side": "BUY",
+        "quantity": "0",
+        "entry_price": "717.66",
+        "exit_price": "717.66",
+        "net_pnl": null,
+        "counterfactual_move_bps": "0.0000"
+      },
+      {
+        "seq": 10,
+        "symbol": "SQQQUSDT",
+        "verdict": "no_trade",
+        "side": "BUY",
+        "quantity": "0",
+        "entry_price": "38.63",
+        "exit_price": "38.63",
+        "net_pnl": null,
+        "counterfactual_move_bps": "0.0000"
+      },
+      {
+        "seq": 11,
+        "symbol": "TQQQUSDT",
+        "verdict": "no_trade",
+        "side": "BUY",
+        "quantity": "0",
+        "entry_price": "71.4",
+        "exit_price": "71.4",
+        "net_pnl": null,
+        "counterfactual_move_bps": "0.0000"
+      },
+      {
+        "seq": 12,
+        "symbol": "TSLAUSDT",
+        "verdict": "trade",
+        "side": "SELL",
+        "quantity": "5.41",
+        "entry_price": "369.54",
+        "exit_price": "369.54",
+        "net_pnl": "-3.1987",
+        "counterfactual_move_bps": null
+      }
+    ],
+    "risk_bindings": {
+      "none": 8,
+      "unhedgeable_gap": 1,
+      "no_exposure": 3
+    },
+    "stopped_by_a_gate": {},
+    "performance": {
+      "trades": 9,
+      "win_rate_pct": 0.0,
+      "net_pnl": "-57.5839",
+      "sharpe": null,
+      "max_drawdown_pct": 0.5758,
+      "abstentions": 3
+    },
+    "seat_calls": {
+      "analyst": 12,
+      "decision": 12,
+      "adversary": 9,
+      "revision": 1
+    },
+    "validator_complaints": [],
+    "outbound_connections_refused": 18,
+    "data_files_this_replay_wrote": [],
+    "seconds": 1.84
+  },
+  "human_baselines": [
+    {
+      "label": "human-rule: always abstain",
+      "name": "human-rule-always-abstain",
+      "passed": true,
+      "checks": [
+        {
+          "check": "every scripted decision reached the ledger once",
+          "passed": true,
+          "detail": "12 rows for 12 scripted decisions"
+        },
+        {
+          "check": "a scripted abstention is recorded as an abstention",
+          "passed": true,
+          "detail": "12 abstentions; wrong: none"
+        },
+        {
+          "check": "the risk layer and venue gate only reduced",
+          "passed": true,
+          "detail": "widened past the script: none; side flipped: none; risk records enlarging: none"
+        },
+        {
+          "check": "a scripted trade the ledger records as no trade names the gate that stopped it",
+          "passed": true,
+          "detail": "no scripted trade was stopped"
+        },
+        {
+          "check": "no row records a trade without a size, or a size without a trade",
+          "passed": true,
+          "detail": "rows where verdict and size disagree: none (the seq 264 defect recorded a trade the risk layer had refused)"
+        },
+        {
+          "check": "an oversized order is reduced by the risk layer and recorded at the reduced size",
+          "passed": true,
+          "detail": "no oversized order in this script"
+        },
+        {
+          "check": "each entry is charged the taker fee plus the quoted spread",
+          "passed": true,
+          "detail": "0 trades; wrong entry cost: none"
+        },
+        {
+          "check": "each trade settles at the gold gross and net P&L, 25 hours later",
+          "passed": true,
+          "detail": "0 trades match to 0.0001"
+        },
+        {
+          "check": "each abstention settles at the gold counterfactual move",
+          "passed": true,
+          "detail": "all abstentions match to 0.0001bps"
+        },
+        {
+          "check": "each abstention is marked once at the three-hour price",
+          "passed": true,
+          "detail": "12 marks for 12 abstentions"
+        },
+        {
+          "check": "the scorer reports the gold trade count, win rate and net P&L",
+          "passed": true,
+          "detail": "scorer: 0 trades, win rate None, net 0; gold: 0 trades, win rate None, net 0.0000"
+        },
+        {
+          "check": "a two-day record reports no Sharpe rather than a number",
+          "passed": true,
+          "detail": "sharpe None; stated reason: the window is 1 day(s); a standard deviation needs at least 30"
+        },
+        {
+          "check": "the hash chain verifies, and a one-cent forgery does not",
+          "passed": true,
+          "detail": "chain intact: True; forgery caught: True"
+        },
+        {
+          "check": "the replay wrote nothing under data/",
+          "passed": true,
+          "detail": "files this process opened for writing there: none"
+        },
+        {
+          "check": "the seat answered every call; nothing reached a model or the network",
+          "passed": true,
+          "detail": "seat calls {'analyst': 12, 'decision': 12}; outbound connections refused: 0"
+        }
+      ],
+      "decisions": {
+        "AAPLUSDT": {
+          "verdict": "no_trade",
+          "side": "buy",
+          "quantity": "0"
+        },
+        "AMZNUSDT": {
+          "verdict": "no_trade",
+          "side": "buy",
+          "quantity": "0"
+        },
+        "COINUSDT": {
+          "verdict": "no_trade",
+          "side": "buy",
+          "quantity": "0"
+        },
+        "GOOGLUSDT": {
+          "verdict": "no_trade",
+          "side": "buy",
+          "quantity": "0"
+        },
+        "METAUSDT": {
+          "verdict": "no_trade",
+          "side": "buy",
+          "quantity": "0"
+        },
+        "MSFTUSDT": {
+          "verdict": "no_trade",
+          "side": "buy",
+          "quantity": "0"
+        },
+        "MSTRUSDT": {
+          "verdict": "no_trade",
+          "side": "buy",
+          "quantity": "0"
+        },
+        "NVDAUSDT": {
+          "verdict": "no_trade",
+          "side": "buy",
+          "quantity": "0"
+        },
+        "QQQUSDT": {
+          "verdict": "no_trade",
+          "side": "buy",
+          "quantity": "0"
+        },
+        "SQQQUSDT": {
+          "verdict": "no_trade",
+          "side": "buy",
+          "quantity": "0"
+        },
+        "TQQQUSDT": {
+          "verdict": "no_trade",
+          "side": "buy",
+          "quantity": "0"
+        },
+        "TSLAUSDT": {
+          "verdict": "no_trade",
+          "side": "buy",
+          "quantity": "0"
+        }
+      },
+      "recorded": [
+        {
+          "seq": 1,
+          "symbol": "AAPLUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "335.09",
+          "exit_price": "334.91",
+          "net_pnl": null,
+          "counterfactual_move_bps": "-5.3717"
+        },
+        {
+          "seq": 2,
+          "symbol": "AMZNUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "252.73",
+          "exit_price": "253.76",
+          "net_pnl": null,
+          "counterfactual_move_bps": "40.7550"
+        },
+        {
+          "seq": 3,
+          "symbol": "COINUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "170.13",
+          "exit_price": "194.64",
+          "net_pnl": null,
+          "counterfactual_move_bps": "1440.6630"
+        },
+        {
+          "seq": 4,
+          "symbol": "GOOGLUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "345.99",
+          "exit_price": "350.18",
+          "net_pnl": null,
+          "counterfactual_move_bps": "121.1018"
+        },
+        {
+          "seq": 5,
+          "symbol": "METAUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "679.71",
+          "exit_price": "670.27",
+          "net_pnl": null,
+          "counterfactual_move_bps": "-138.8828"
+        },
+        {
+          "seq": 6,
+          "symbol": "MSFTUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "497.3",
+          "exit_price": "493.83",
+          "net_pnl": null,
+          "counterfactual_move_bps": "-69.7768"
+        },
+        {
+          "seq": 7,
+          "symbol": "MSTRUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "131.03",
+          "exit_price": "150.25",
+          "net_pnl": null,
+          "counterfactual_move_bps": "1466.8397"
+        },
+        {
+          "seq": 8,
+          "symbol": "NVDAUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "219.14",
+          "exit_price": "220.01",
+          "net_pnl": null,
+          "counterfactual_move_bps": "39.7006"
+        },
+        {
+          "seq": 9,
+          "symbol": "QQQUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "717.66",
+          "exit_price": "717.52",
+          "net_pnl": null,
+          "counterfactual_move_bps": "-1.9508"
+        },
+        {
+          "seq": 10,
+          "symbol": "SQQQUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "38.63",
+          "exit_price": "38.6",
+          "net_pnl": null,
+          "counterfactual_move_bps": "-7.7660"
+        },
+        {
+          "seq": 11,
+          "symbol": "TQQQUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "71.4",
+          "exit_price": "71.34",
+          "net_pnl": null,
+          "counterfactual_move_bps": "-8.4034"
+        },
+        {
+          "seq": 12,
+          "symbol": "TSLAUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "369.54",
+          "exit_price": "363.35",
+          "net_pnl": null,
+          "counterfactual_move_bps": "-167.5055"
+        }
+      ],
+      "risk_bindings": {
+        "no_exposure": 12
+      },
+      "stopped_by_a_gate": {},
+      "performance": {
+        "trades": 0,
+        "win_rate_pct": null,
+        "net_pnl": "0",
+        "sharpe": null,
+        "max_drawdown_pct": null,
+        "abstentions": 12
+      },
+      "seat_calls": {
+        "analyst": 12,
+        "decision": 12
+      },
+      "validator_complaints": [],
+      "outbound_connections_refused": 0,
+      "data_files_this_replay_wrote": [],
+      "seconds": 0.75
+    },
+    {
+      "label": "human-rule: buy every name",
+      "name": "human-rule-buy-every-name",
+      "passed": true,
+      "checks": [
+        {
+          "check": "every scripted decision reached the ledger once",
+          "passed": true,
+          "detail": "12 rows for 12 scripted decisions"
+        },
+        {
+          "check": "a scripted abstention is recorded as an abstention",
+          "passed": true,
+          "detail": "0 abstentions; wrong: none"
+        },
+        {
+          "check": "the risk layer and venue gate only reduced",
+          "passed": true,
+          "detail": "widened past the script: none; side flipped: none; risk records enlarging: none"
+        },
+        {
+          "check": "a scripted trade the ledger records as no trade names the gate that stopped it",
+          "passed": true,
+          "detail": "TQQQUSDT: [guard] DENIED rate_limit: 10 order(s) already submitted in the last 60s, at the cap of 10; TSLAUSDT: [guard] DENIED rate_limit: 10 order(s) already submitted in the last 60s, at the cap of 10"
+        },
+        {
+          "check": "no row records a trade without a size, or a size without a trade",
+          "passed": true,
+          "detail": "rows where verdict and size disagree: none (the seq 264 defect recorded a trade the risk layer had refused)"
+        },
+        {
+          "check": "an oversized order is reduced by the risk layer and recorded at the reduced size",
+          "passed": true,
+          "detail": "no oversized order in this script"
+        },
+        {
+          "check": "each entry is charged the taker fee plus the quoted spread",
+          "passed": true,
+          "detail": "10 trades; wrong entry cost: none"
+        },
+        {
+          "check": "each trade settles at the gold gross and net P&L, 25 hours later",
+          "passed": true,
+          "detail": "10 trades match to 0.0001"
+        },
+        {
+          "check": "each abstention settles at the gold counterfactual move",
+          "passed": true,
+          "detail": "all abstentions match to 0.0001bps"
+        },
+        {
+          "check": "each abstention is marked once at the three-hour price",
+          "passed": true,
+          "detail": "2 marks for 2 abstentions"
+        },
+        {
+          "check": "the scorer reports the gold trade count, win rate and net P&L",
+          "passed": true,
+          "detail": "scorer: 10 trades, win rate 0.5, net 544.4329; gold: 10 trades, win rate 0.5, net 544.4330"
+        },
+        {
+          "check": "a two-day record reports no Sharpe rather than a number",
+          "passed": true,
+          "detail": "sharpe None; stated reason: the window is 2 day(s); a standard deviation needs at least 30"
+        },
+        {
+          "check": "the hash chain verifies, and a one-cent forgery does not",
+          "passed": true,
+          "detail": "chain intact: True; forgery caught: True"
+        },
+        {
+          "check": "the replay wrote nothing under data/",
+          "passed": true,
+          "detail": "files this process opened for writing there: none"
+        },
+        {
+          "check": "the seat answered every call; nothing reached a model or the network",
+          "passed": true,
+          "detail": "seat calls {'analyst': 12, 'decision': 12, 'adversary': 12}; outbound connections refused: 20"
+        }
+      ],
+      "decisions": {
+        "AAPLUSDT": {
+          "verdict": "trade",
+          "side": "buy",
+          "quantity": "5.96"
+        },
+        "AMZNUSDT": {
+          "verdict": "trade",
+          "side": "buy",
+          "quantity": "7.91"
+        },
+        "COINUSDT": {
+          "verdict": "trade",
+          "side": "buy",
+          "quantity": "11.75"
+        },
+        "GOOGLUSDT": {
+          "verdict": "trade",
+          "side": "buy",
+          "quantity": "5.78"
+        },
+        "METAUSDT": {
+          "verdict": "trade",
+          "side": "buy",
+          "quantity": "2.94"
+        },
+        "MSFTUSDT": {
+          "verdict": "trade",
+          "side": "buy",
+          "quantity": "4.02"
+        },
+        "MSTRUSDT": {
+          "verdict": "trade",
+          "side": "buy",
+          "quantity": "15.26"
+        },
+        "NVDAUSDT": {
+          "verdict": "trade",
+          "side": "buy",
+          "quantity": "9.12"
+        },
+        "QQQUSDT": {
+          "verdict": "trade",
+          "side": "buy",
+          "quantity": "2.78"
+        },
+        "SQQQUSDT": {
+          "verdict": "trade",
+          "side": "buy",
+          "quantity": "51.77"
+        },
+        "TQQQUSDT": {
+          "verdict": "trade",
+          "side": "buy",
+          "quantity": "28.01"
+        },
+        "TSLAUSDT": {
+          "verdict": "trade",
+          "side": "buy",
+          "quantity": "5.41"
+        }
+      },
+      "recorded": [
+        {
+          "seq": 1,
+          "symbol": "AAPLUSDT",
+          "verdict": "trade",
+          "side": "BUY",
+          "quantity": "5.96",
+          "entry_price": "335.09",
+          "exit_price": "334.91",
+          "net_pnl": "-4.2674",
+          "counterfactual_move_bps": null
+        },
+        {
+          "seq": 2,
+          "symbol": "AMZNUSDT",
+          "verdict": "trade",
+          "side": "BUY",
+          "quantity": "7.91",
+          "entry_price": "252.73",
+          "exit_price": "253.76",
+          "net_pnl": "4.9422",
+          "counterfactual_move_bps": null
+        },
+        {
+          "seq": 3,
+          "symbol": "COINUSDT",
+          "verdict": "trade",
+          "side": "BUY",
+          "quantity": "11.75",
+          "entry_price": "170.13",
+          "exit_price": "194.64",
+          "net_pnl": "284.5637",
+          "counterfactual_move_bps": null
+        },
+        {
+          "seq": 4,
+          "symbol": "GOOGLUSDT",
+          "verdict": "trade",
+          "side": "BUY",
+          "quantity": "5.78",
+          "entry_price": "345.99",
+          "exit_price": "350.18",
+          "net_pnl": "20.9991",
+          "counterfactual_move_bps": null
+        },
+        {
+          "seq": 5,
+          "symbol": "METAUSDT",
+          "verdict": "trade",
+          "side": "BUY",
+          "quantity": "2.94",
+          "entry_price": "679.71",
+          "exit_price": "670.27",
+          "net_pnl": "-30.9288",
+          "counterfactual_move_bps": null
+        },
+        {
+          "seq": 6,
+          "symbol": "MSFTUSDT",
+          "verdict": "trade",
+          "side": "BUY",
+          "quantity": "4.02",
+          "entry_price": "497.3",
+          "exit_price": "493.83",
+          "net_pnl": "-17.1369",
+          "counterfactual_move_bps": null
+        },
+        {
+          "seq": 7,
+          "symbol": "MSTRUSDT",
+          "verdict": "trade",
+          "side": "BUY",
+          "quantity": "15.26",
+          "entry_price": "131.03",
+          "exit_price": "150.25",
+          "net_pnl": "289.8633",
+          "counterfactual_move_bps": null
+        },
+        {
+          "seq": 8,
+          "symbol": "NVDAUSDT",
+          "verdict": "trade",
+          "side": "BUY",
+          "quantity": "9.12",
+          "entry_price": "219.14",
+          "exit_price": "220.01",
+          "net_pnl": "4.7304",
+          "counterfactual_move_bps": null
+        },
+        {
+          "seq": 9,
+          "symbol": "QQQUSDT",
+          "verdict": "trade",
+          "side": "BUY",
+          "quantity": "2.78",
+          "entry_price": "717.66",
+          "exit_price": "717.52",
+          "net_pnl": "-3.5810",
+          "counterfactual_move_bps": null
+        },
+        {
+          "seq": 10,
+          "symbol": "SQQQUSDT",
+          "verdict": "trade",
+          "side": "BUY",
+          "quantity": "51.77",
+          "entry_price": "38.63",
+          "exit_price": "38.6",
+          "net_pnl": "-4.7517",
+          "counterfactual_move_bps": null
+        },
+        {
+          "seq": 11,
+          "symbol": "TQQQUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "71.4",
+          "exit_price": "71.34",
+          "net_pnl": null,
+          "counterfactual_move_bps": "-8.4034"
+        },
+        {
+          "seq": 12,
+          "symbol": "TSLAUSDT",
+          "verdict": "no_trade",
+          "side": "BUY",
+          "quantity": "0",
+          "entry_price": "369.54",
+          "exit_price": "363.35",
+          "net_pnl": null,
+          "counterfactual_move_bps": "-167.5055"
+        }
+      ],
+      "risk_bindings": {
+        "none": 12
+      },
+      "stopped_by_a_gate": {
+        "TQQQUSDT": [
+          "[guard] DENIED rate_limit: 10 order(s) already submitted in the last 60s, at the cap of 10"
+        ],
+        "TSLAUSDT": [
+          "[guard] DENIED rate_limit: 10 order(s) already submitted in the last 60s, at the cap of 10"
+        ]
+      },
+      "performance": {
+        "trades": 10,
+        "win_rate_pct": 50.0,
+        "net_pnl": "544.4329",
+        "sharpe": null,
+        "max_drawdown_pct": 0.0,
+        "abstentions": 2
+      },
+      "seat_calls": {
+        "analyst": 12,
+        "decision": 12,
+        "adversary": 12
+      },
+      "validator_complaints": [],
+      "outbound_connections_refused": 20,
+      "data_files_this_replay_wrote": [],
+      "seconds": 2.26
+    }
+  ],
+  "harness_verdict": "sound on this replay",
+  "findings": [
+    "human-rule: buy every name: 2 scripted trade(s) were booked as no_trade by a gate (TQQQUSDT: [guard] DENIED rate_limit: 10 order(s) already submitted in the last 60s, at the cap of 10; TSLAUSDT: [guard] DENIED rate_limit: 10 order(s) already submitted in the last 60s, at the cap of 10). The ledger records them as abstentions: 2 were marked at three hours and 2 graded with a counterfactual move, so they count in abstention scoring although the decision-maker chose to trade."
+  ],
+  "files_under_data_changed_by_any_process": [],
+  "limitations": [
+    "one replayed market instant; the selection rule is fixed but a second instant would test more of the Constitution's session-dependent gates",
+    "every non-price feed is reported unavailable, so the analysts' evidence paths are not exercised; the replay tests the decision-to-score path, not evidence gathering",
+    "the committed protocol is read as it is; it governs the live record from its own sequence number, so it does not govern a replay ledger that starts at 1"
+  ]
+}

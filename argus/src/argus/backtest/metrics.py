@@ -41,8 +41,9 @@ distribution. :func:`deflated_sharpe` takes the trial count and is the gate that
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from math import exp, sqrt
+from math import exp, isfinite, sqrt
 from statistics import NormalDist
 
 # Sampling frequencies, stated explicitly so a caller never has to guess one.
@@ -57,6 +58,61 @@ class MetricError(ValueError):
     Raised rather than returning NaN or a sentinel. A gate comparing against NaN passes
     everything, which is how a broken statistic becomes a green light.
     """
+
+
+# ---------------------------------------------------------------------------------------------
+# Contract enforcement, adapted from general-purpose validation rather than written ad hoc.
+#
+# Until 2026-09-25 each function here guarded the one argument someone had once seen go NaN —
+# `deflated_sharpe` checked its variance, `probabilistic_sharpe` its observed Sharpe — and nothing
+# else. Run against general-purpose tools on the same 1,332 inputs
+# (`eval/general_overfitgates_comparison.py`), that lost: vectorbt's DSR behind a pydantic v2
+# contract returned 5 silent-wrong values where these functions returned 28, and a derandomized
+# Hypothesis search found 22 failure classes across every gate here. The two rules below are
+# pydantic's, reimplemented with `math.isfinite` so this module keeps its stdlib-only imports:
+#
+# * every float argument must be finite at the boundary — pydantic's `FiniteFloat`
+#   (`pydantic/types.py:643`, `AllowInfNan` at `types.py:386-407`, MIT);
+# * the result is validated before it leaves — `validate_call(validate_return=True)`
+#   (`pydantic/validate_call_decorator.py:74,99`).
+#
+# Range checks are written in the positive form scipy uses for its p-values
+# (`scipy/stats/_morestats.py:4791-4794`: `ps == clip(ps, 0, 1)`), `not (lo <= x <= hi)`, which
+# NaN cannot pass because every comparison with NaN is False. And every arithmetic failure — an
+# overflow, a math-domain error, a probability that rounds to 1.0 — is re-raised as MetricError,
+# so a caller's `except MetricError` records a refusal instead of crashing on a ValueError.
+# ---------------------------------------------------------------------------------------------
+
+
+def _require_finite(**values: float) -> None:
+    """Refuse a non-finite argument, by name, before it reaches any arithmetic."""
+    for name, value in values.items():
+        if not isfinite(value):
+            raise MetricError(
+                f"{name} is {value!r}; a statistic built on a non-finite input has no honest value"
+            )
+
+
+def _require_finite_series(name: str, values: Iterable[float]) -> None:
+    """Refuse a series containing NaN or an infinity, naming the first offending position."""
+    for i, value in enumerate(values):
+        if not isfinite(value):
+            raise MetricError(
+                f"{name}[{i}] is {value!r}; one non-finite observation leaves the whole statistic "
+                f"without an honest value"
+            )
+
+
+def _finite_result(value: float, what: str) -> float:
+    """The return-side check: nothing non-finite leaves this module as a number."""
+    if not isfinite(value):
+        raise MetricError(f"{what} is {value!r}: the inputs exceed double precision")
+    return value
+
+
+def _require_periods(periods_per_year: int) -> None:
+    if periods_per_year < 1:
+        raise MetricError(f"periods_per_year must be at least 1, got {periods_per_year}")
 
 
 def _is_negligible(sd: float, reference: float) -> bool:
@@ -81,7 +137,14 @@ def _stdev(xs: list[float], *, sample: bool = True) -> float:
         raise MetricError("standard deviation needs at least two observations")
     mu = _mean(xs)
     denom = n - 1 if sample else n
-    return sqrt(sum((x - mu) ** 2 for x in xs) / denom)
+    try:
+        sd = sqrt(sum((x - mu) ** 2 for x in xs) / denom)
+    except OverflowError as exc:
+        raise MetricError("standard deviation overflows double precision") from exc
+    if not isfinite(mu) or not isfinite(sd):
+        # Finite inputs whose sum overflowed to inf: `mu` is inf and every deviation is NaN.
+        raise MetricError("mean or standard deviation overflows double precision")
+    return sd
 
 
 def sharpe(returns: list[float], *, periods_per_year: int, risk_free: float = 0.0) -> float:
@@ -99,6 +162,9 @@ def sharpe(returns: list[float], *, periods_per_year: int, risk_free: float = 0.
     """
     if len(returns) < 2:
         raise MetricError("Sharpe needs at least two returns")
+    _require_periods(periods_per_year)
+    _require_finite(risk_free=risk_free)
+    _require_finite_series("returns", returns)
     excess = [r - risk_free / periods_per_year for r in returns]
     sd = _stdev(excess)
     mu = _mean(excess)
@@ -107,7 +173,7 @@ def sharpe(returns: list[float], *, periods_per_year: int, risk_free: float = 0.
             "Sharpe is undefined for a zero-variance series "
             f"(sd={sd:.3e} is floating-point noise around mean {mu:.3e})"
         )
-    return _mean(excess) / sd * sqrt(periods_per_year)
+    return _finite_result(mu / sd * sqrt(periods_per_year), "Sharpe")
 
 
 def sortino(returns: list[float], *, periods_per_year: int, target: float = 0.0) -> float:
@@ -119,11 +185,19 @@ def sortino(returns: list[float], *, periods_per_year: int, target: float = 0.0)
     """
     if len(returns) < 2:
         raise MetricError("Sortino needs at least two returns")
+    _require_periods(periods_per_year)
+    _require_finite(target=target)
+    _require_finite_series("returns", returns)
     downside = [min(0.0, r - target) for r in returns]
     dd = sqrt(sum(d * d for d in downside) / len(returns))
-    if _is_negligible(dd, _mean(returns) - target):
+    excess_mean = _mean(returns) - target
+    if not isfinite(dd) or not isfinite(excess_mean):
+        # `d * d` overflows to inf silently (only `**` raises), and inf downside deviation would
+        # otherwise turn into a Sortino of exactly 0.0.
+        raise MetricError("Sortino overflows double precision on these returns")
+    if _is_negligible(dd, excess_mean):
         raise MetricError("Sortino is undefined when there is no downside deviation")
-    return (_mean(returns) - target) / dd * sqrt(periods_per_year)
+    return _finite_result(excess_mean / dd * sqrt(periods_per_year), "Sortino")
 
 
 def max_drawdown(equity: list[float]) -> float:
@@ -169,22 +243,41 @@ def probabilistic_sharpe(
     """
     if n < 2:
         raise MetricError("probabilistic Sharpe needs at least two observations")
-    # `x != x` is true only for NaN (IEEE 754) — checked on both inputs up front, at the same
-    # spot as every other input-validity check, rather than relying on it corrupting `denom` or
-    # `z` downstream and hoping a later comparison happens to catch it. It would not have: `skew
-    # * observed` is itself NaN whenever `observed` is NaN (0.0 * nan == nan, not 0.0), so a NaN
-    # `observed` reaches `denom <= 0` as NaN too, and `nan <= 0` is False — the same
-    # fails-every-comparison behaviour that makes NaN silent in vectorbt's own gate (this
-    # module's own docstring), now checked directly instead of assumed caught downstream.
+    # Every float argument, not only the two that were once seen to go NaN. The earlier guard
+    # (`observed != observed or benchmark != benchmark`) let a NaN skew or kurtosis through to a
+    # NaN result, an infinite observed Sharpe through to NaN (`0.0 * inf` is NaN), and an infinite
+    # kurtosis through to a confident-looking 0.5 — all found by the general-purpose comparison
+    # (`eval/general_overfitgates_comparison.py`), none by the hand-picked cases before it. The
+    # NaN-observed message is kept word for word; callers and tests already match on it.
     if observed != observed or benchmark != benchmark:
         raise MetricError(
             "probabilistic Sharpe cannot be computed from a NaN observed or benchmark"
         )
-    denom = sqrt(1 - skew * observed + (kurtosis - 1) / 4 * observed ** 2)
-    if denom <= 0:
-        raise MetricError("probabilistic Sharpe denominator is non-positive")
-    z = (observed - benchmark) * sqrt(n - 1) / denom
-    return NormalDist().cdf(z)
+    _require_finite(observed=observed, benchmark=benchmark, skew=skew, kurtosis=kurtosis)
+    try:
+        radicand = 1 - skew * observed + (kurtosis - 1) / 4 * observed ** 2
+    except OverflowError as exc:
+        raise MetricError(
+            "probabilistic Sharpe overflows double precision: the observed Sharpe is too large "
+            "to square"
+        ) from exc
+    # Positive form, so NaN and +inf fail it too. A non-positive radicand used to reach
+    # `math.sqrt` and escape as a bare ValueError("math domain error") that no caller catching
+    # MetricError would record.
+    if not 0 < radicand < float("inf"):
+        raise MetricError(
+            f"probabilistic Sharpe denominator is non-positive or not finite (radicand "
+            f"{radicand!r}): these skew and kurtosis values are not a possible moment pair for "
+            f"this Sharpe"
+        )
+    z = (observed - benchmark) * sqrt(n - 1) / sqrt(radicand)
+    p = NormalDist().cdf(z)
+    # The return contract. With every argument finite and the radicand checked, `cdf` of a finite
+    # or infinite z is already in [0, 1]; kept as defence in depth, and reported as such (not
+    # load-bearing on any input found) by the comparison's ablation.
+    if not 0.0 <= p <= 1.0:
+        raise MetricError(f"probabilistic Sharpe produced {p!r}, which is not a probability")
+    return p
 
 
 def deflated_sharpe(
@@ -210,18 +303,36 @@ def deflated_sharpe(
     # a genuinely NaN `variance_of_trials` (vectorbt's own `np.var(x, ddof=1)` on one trial) and
     # would otherwise have reached `sqrt(variance_of_trials)` below and returned NaN silently,
     # the exact defect this function's own docstring promises never to allow through.
-    if variance_of_trials < 0 or variance_of_trials != variance_of_trials:
-        raise MetricError("variance of trial Sharpes cannot be negative or NaN")
+    # Positive form, so NaN and +inf both fail it (the NaN half of this was the 2026-09-20 fix;
+    # +inf used to pass and deflate every Sharpe to exactly 0.0 without a word).
+    if not 0 <= variance_of_trials < float("inf"):
+        raise MetricError(
+            "variance of trial Sharpes cannot be negative or NaN, and must be finite "
+            f"(got {variance_of_trials!r})"
+        )
     if n < 2:
         raise MetricError("deflated Sharpe needs at least two observations")
+    _require_finite(observed=observed, skew=skew, kurtosis=kurtosis)
 
     if trials == 1:
+        # Exact, not approximated: the expected maximum of one draw is its mean, 0. The
+        # extreme-value formula below is -inf here (Phi^-1(0)), which is how vectorbt's own
+        # `deflated_sharpe_ratio` certifies any single strategy with DSR = 1.0 whenever it is
+        # handed a positive variance — measured in `eval/general_overfitgates_comparison.py`.
         expected_max = 0.0
     else:
         # Expected maximum of `trials` draws, via the standard extreme-value approximation.
         euler = 0.5772156649015329
         nd = NormalDist()
-        a = nd.inv_cdf(1 - 1 / trials)
+        p_a = 1 - 1 / trials
+        if not p_a < 1.0:
+            # Beyond ~9e15 trials `1 - 1/trials` rounds to exactly 1.0 and `inv_cdf` would raise
+            # a bare StatisticsError; the expected maximum is past what a double can resolve.
+            raise MetricError(
+                f"{trials} trials is beyond what double precision can deflate for; the expected "
+                f"maximum of that many draws cannot be resolved"
+            )
+        a = nd.inv_cdf(p_a)
         b = nd.inv_cdf(1 - 1 / (trials * exp(1)))
         expected_max = sqrt(variance_of_trials) * ((1 - euler) * a + euler * b)
 
@@ -393,8 +504,14 @@ def out_of_sample_decay(in_sample: float, out_of_sample: float) -> dict[str, flo
 
     Reported rather than hidden. A strategy that decays past this threshold is overfitted, and
     saying so is worth more than a number that quietly fails the judge's check instead of ours.
+
+    Raises on a non-finite Sharpe: a NaN in-sample value used to produce ``ratio = nan``, and
+    ``nan < 0.5`` is False, so the alert this function exists to raise stayed silent.
     """
-    ratio = out_of_sample / in_sample if in_sample != 0 else 0.0
+    _require_finite(in_sample=in_sample, out_of_sample=out_of_sample)
+    ratio = _finite_result(
+        out_of_sample / in_sample if in_sample != 0 else 0.0, "out-of-sample retention ratio"
+    )
     return {
         "in_sample_sharpe": round(in_sample, 3),
         "out_of_sample_sharpe": round(out_of_sample, 3),

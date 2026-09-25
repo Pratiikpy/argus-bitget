@@ -1,0 +1,588 @@
+{
+  "what": "Kill-and-resume drill for decision/pause.py: each scenario paused in a child process that was killed while waiting, then answered and resumed from disk by a fresh desk; compared with the same scenario paused and resumed in memory",
+  "measured_at_as_of": "2026-09-14T15:00:00+00:00",
+  "qwen_calls": 0,
+  "model": "scripted, deterministic, no network (argus.eval.pausedrill.ScriptedModel)",
+  "scenarios": 9,
+  "children_alive_when_killed": 9,
+  "state_hash_identical": 9,
+  "decision_identical_to_no_kill": 9,
+  "comparison_kind": "capability, not accuracy: before pauses, 0 of these escalated decisions could be resumed by a human answer; after, the count is decision_identical_to_no_kill",
+  "before": {
+    "resumable_by_a_human_answer": 0,
+    "orders_placed": 0
+  },
+  "after": {
+    "resumed": 9,
+    "orders_placed": 6,
+    "constitution_bound_on_resume": 3
+  },
+  "not_proven_here": [
+    "a live model's revision call on resume is a fresh call and may differ from the one a no-kill run would make; this drill uses a deterministic model",
+    "the drill's human is scripted; median answer time is therefore not a human's"
+  ],
+  "seconds": 4.23,
+  "rows": [
+    {
+      "scenario": "underlying_halted/approve",
+      "trigger": "underlying_halted",
+      "answer": "approve",
+      "before_pauses": {
+        "final_verdict": "human_review",
+        "order": false,
+        "a_human_answer_could_reach_it": false
+      },
+      "child": {
+        "alive_when_killed": true,
+        "returncode": 1
+      },
+      "state_hash": {
+        "printed_before_kill": "aab7fd005e93862b7becbabfe208f612f7ac87e2f022b762e668c5f0af88c52c",
+        "recorded_on_request": "aab7fd005e93862b7becbabfe208f612f7ac87e2f022b762e668c5f0af88c52c",
+        "recomputed_after_restore": "aab7fd005e93862b7becbabfe208f612f7ac87e2f022b762e668c5f0af88c52c",
+        "identical": true
+      },
+      "decision": {
+        "identical_to_no_kill": true,
+        "differing_fields": [],
+        "difference_detail": {},
+        "constitution": "resize",
+        "binding_constraint": "unhedgeable_gap",
+        "revised_by_model": true,
+        "approved_intent_hash": "d16ab2b8c798c468",
+        "order_quantity": "100",
+        "order_client_id": "argus-0083e7ab134e989d62d2fa33",
+        "proposed_quantity": "600"
+      },
+      "model_calls_on_resume": {
+        "no_kill": 1,
+        "killed": 1
+      },
+      "events_summary": {
+        "takeover": {
+          "escalations": 1,
+          "actionable_decisions": 1,
+          "total_decisions": 1,
+          "rate": 1.0,
+          "by_trigger": {
+            "underlying_halted": 1
+          },
+          "verdict": "100% of 1 actionable decision(s) were handed to a human. Above half, the desk is not operating unattended in any meaningful sense"
+        },
+        "model_requested_review": 0,
+        "paused": 1,
+        "answered": 1,
+        "approved": 1,
+        "modified": 0,
+        "rejected": 0,
+        "expired": 0,
+        "superseded": 0,
+        "pending": 0,
+        "resumed": 1,
+        "replayed": 0,
+        "median_answer_seconds": 240.0,
+        "override_rate": 0.0,
+        "unanswered_rate": 0.0
+      }
+    },
+    {
+      "scenario": "underlying_halted/modify_size",
+      "trigger": "underlying_halted",
+      "answer": "modify_size",
+      "before_pauses": {
+        "final_verdict": "human_review",
+        "order": false,
+        "a_human_answer_could_reach_it": false
+      },
+      "child": {
+        "alive_when_killed": true,
+        "returncode": 1
+      },
+      "state_hash": {
+        "printed_before_kill": "2bca4f56b185c34cc0f0ba37e530d40b81cccb0d0965b0a400a0e2a086639267",
+        "recorded_on_request": "2bca4f56b185c34cc0f0ba37e530d40b81cccb0d0965b0a400a0e2a086639267",
+        "recomputed_after_restore": "2bca4f56b185c34cc0f0ba37e530d40b81cccb0d0965b0a400a0e2a086639267",
+        "identical": true
+      },
+      "decision": {
+        "identical_to_no_kill": true,
+        "differing_fields": [],
+        "difference_detail": {},
+        "constitution": "allow",
+        "binding_constraint": "none",
+        "revised_by_model": false,
+        "approved_intent_hash": "47136f2376509b27",
+        "order_quantity": "25",
+        "order_client_id": "argus-229380053dfd43d686733106",
+        "proposed_quantity": "60"
+      },
+      "model_calls_on_resume": {
+        "no_kill": 0,
+        "killed": 0
+      },
+      "events_summary": {
+        "takeover": {
+          "escalations": 1,
+          "actionable_decisions": 1,
+          "total_decisions": 1,
+          "rate": 1.0,
+          "by_trigger": {
+            "underlying_halted": 1
+          },
+          "verdict": "100% of 1 actionable decision(s) were handed to a human. Above half, the desk is not operating unattended in any meaningful sense"
+        },
+        "model_requested_review": 0,
+        "paused": 1,
+        "answered": 1,
+        "approved": 0,
+        "modified": 1,
+        "rejected": 0,
+        "expired": 0,
+        "superseded": 0,
+        "pending": 0,
+        "resumed": 1,
+        "replayed": 0,
+        "median_answer_seconds": 240.0,
+        "override_rate": 1.0,
+        "unanswered_rate": 0.0
+      }
+    },
+    {
+      "scenario": "underlying_halted/reject",
+      "trigger": "underlying_halted",
+      "answer": "reject",
+      "before_pauses": {
+        "final_verdict": "human_review",
+        "order": false,
+        "a_human_answer_could_reach_it": false
+      },
+      "child": {
+        "alive_when_killed": true,
+        "returncode": 1
+      },
+      "state_hash": {
+        "printed_before_kill": "d43469fd05a880f0e246eb2c3cff948ce1d39c969a6f7098b473a6e6263073b4",
+        "recorded_on_request": "d43469fd05a880f0e246eb2c3cff948ce1d39c969a6f7098b473a6e6263073b4",
+        "recomputed_after_restore": "d43469fd05a880f0e246eb2c3cff948ce1d39c969a6f7098b473a6e6263073b4",
+        "identical": true
+      },
+      "decision": {
+        "identical_to_no_kill": true,
+        "differing_fields": [],
+        "difference_detail": {},
+        "constitution": "allow",
+        "binding_constraint": "no_exposure",
+        "revised_by_model": false,
+        "approved_intent_hash": "5fd91fbf938f5c4d",
+        "order_quantity": null,
+        "order_client_id": null,
+        "proposed_quantity": "60"
+      },
+      "model_calls_on_resume": {
+        "no_kill": 0,
+        "killed": 0
+      },
+      "events_summary": {
+        "takeover": {
+          "escalations": 1,
+          "actionable_decisions": 1,
+          "total_decisions": 1,
+          "rate": 1.0,
+          "by_trigger": {
+            "underlying_halted": 1
+          },
+          "verdict": "100% of 1 actionable decision(s) were handed to a human. Above half, the desk is not operating unattended in any meaningful sense"
+        },
+        "model_requested_review": 0,
+        "paused": 1,
+        "answered": 1,
+        "approved": 0,
+        "modified": 0,
+        "rejected": 1,
+        "expired": 0,
+        "superseded": 0,
+        "pending": 0,
+        "resumed": 1,
+        "replayed": 0,
+        "median_answer_seconds": 240.0,
+        "override_rate": 1.0,
+        "unanswered_rate": 0.0
+      }
+    },
+    {
+      "scenario": "ungrounded_figure/approve",
+      "trigger": "ungrounded_figure",
+      "answer": "approve",
+      "before_pauses": {
+        "final_verdict": "human_review",
+        "order": false,
+        "a_human_answer_could_reach_it": false
+      },
+      "child": {
+        "alive_when_killed": true,
+        "returncode": 1
+      },
+      "state_hash": {
+        "printed_before_kill": "a7f3c920630bc135cd8072194b95498dfe77a95374598de8c064ea133ac4ad75",
+        "recorded_on_request": "a7f3c920630bc135cd8072194b95498dfe77a95374598de8c064ea133ac4ad75",
+        "recomputed_after_restore": "a7f3c920630bc135cd8072194b95498dfe77a95374598de8c064ea133ac4ad75",
+        "identical": true
+      },
+      "decision": {
+        "identical_to_no_kill": true,
+        "differing_fields": [],
+        "difference_detail": {},
+        "constitution": "resize",
+        "binding_constraint": "unhedgeable_gap",
+        "revised_by_model": true,
+        "approved_intent_hash": "19fd06ee6b047635",
+        "order_quantity": "100",
+        "order_client_id": "argus-16a4a18a73c88c1bc7f10426",
+        "proposed_quantity": "600"
+      },
+      "model_calls_on_resume": {
+        "no_kill": 1,
+        "killed": 1
+      },
+      "events_summary": {
+        "takeover": {
+          "escalations": 1,
+          "actionable_decisions": 1,
+          "total_decisions": 1,
+          "rate": 1.0,
+          "by_trigger": {
+            "ungrounded_figure": 1
+          },
+          "verdict": "100% of 1 actionable decision(s) were handed to a human. Above half, the desk is not operating unattended in any meaningful sense"
+        },
+        "model_requested_review": 0,
+        "paused": 1,
+        "answered": 1,
+        "approved": 1,
+        "modified": 0,
+        "rejected": 0,
+        "expired": 0,
+        "superseded": 0,
+        "pending": 0,
+        "resumed": 1,
+        "replayed": 0,
+        "median_answer_seconds": 240.0,
+        "override_rate": 0.0,
+        "unanswered_rate": 0.0
+      }
+    },
+    {
+      "scenario": "ungrounded_figure/modify_size",
+      "trigger": "ungrounded_figure",
+      "answer": "modify_size",
+      "before_pauses": {
+        "final_verdict": "human_review",
+        "order": false,
+        "a_human_answer_could_reach_it": false
+      },
+      "child": {
+        "alive_when_killed": true,
+        "returncode": 1
+      },
+      "state_hash": {
+        "printed_before_kill": "61c1b51fbb52b9741ebf806efa70e3aac03c7c7fee2a526c00b42ab1d8aa3c46",
+        "recorded_on_request": "61c1b51fbb52b9741ebf806efa70e3aac03c7c7fee2a526c00b42ab1d8aa3c46",
+        "recomputed_after_restore": "61c1b51fbb52b9741ebf806efa70e3aac03c7c7fee2a526c00b42ab1d8aa3c46",
+        "identical": true
+      },
+      "decision": {
+        "identical_to_no_kill": true,
+        "differing_fields": [],
+        "difference_detail": {},
+        "constitution": "allow",
+        "binding_constraint": "none",
+        "revised_by_model": false,
+        "approved_intent_hash": "a8b01a0ef48832d3",
+        "order_quantity": "25",
+        "order_client_id": "argus-b8e1dd8b853d45d767f233c1",
+        "proposed_quantity": "60"
+      },
+      "model_calls_on_resume": {
+        "no_kill": 0,
+        "killed": 0
+      },
+      "events_summary": {
+        "takeover": {
+          "escalations": 1,
+          "actionable_decisions": 1,
+          "total_decisions": 1,
+          "rate": 1.0,
+          "by_trigger": {
+            "ungrounded_figure": 1
+          },
+          "verdict": "100% of 1 actionable decision(s) were handed to a human. Above half, the desk is not operating unattended in any meaningful sense"
+        },
+        "model_requested_review": 0,
+        "paused": 1,
+        "answered": 1,
+        "approved": 0,
+        "modified": 1,
+        "rejected": 0,
+        "expired": 0,
+        "superseded": 0,
+        "pending": 0,
+        "resumed": 1,
+        "replayed": 0,
+        "median_answer_seconds": 240.0,
+        "override_rate": 1.0,
+        "unanswered_rate": 0.0
+      }
+    },
+    {
+      "scenario": "ungrounded_figure/reject",
+      "trigger": "ungrounded_figure",
+      "answer": "reject",
+      "before_pauses": {
+        "final_verdict": "human_review",
+        "order": false,
+        "a_human_answer_could_reach_it": false
+      },
+      "child": {
+        "alive_when_killed": true,
+        "returncode": 1
+      },
+      "state_hash": {
+        "printed_before_kill": "064cd6ec9fb460a62d8a3540e4264b5f6905f075c6e355964d68b3a5f8f8e496",
+        "recorded_on_request": "064cd6ec9fb460a62d8a3540e4264b5f6905f075c6e355964d68b3a5f8f8e496",
+        "recomputed_after_restore": "064cd6ec9fb460a62d8a3540e4264b5f6905f075c6e355964d68b3a5f8f8e496",
+        "identical": true
+      },
+      "decision": {
+        "identical_to_no_kill": true,
+        "differing_fields": [],
+        "difference_detail": {},
+        "constitution": "allow",
+        "binding_constraint": "no_exposure",
+        "revised_by_model": false,
+        "approved_intent_hash": "25650d5bda7a70cc",
+        "order_quantity": null,
+        "order_client_id": null,
+        "proposed_quantity": "60"
+      },
+      "model_calls_on_resume": {
+        "no_kill": 0,
+        "killed": 0
+      },
+      "events_summary": {
+        "takeover": {
+          "escalations": 1,
+          "actionable_decisions": 1,
+          "total_decisions": 1,
+          "rate": 1.0,
+          "by_trigger": {
+            "ungrounded_figure": 1
+          },
+          "verdict": "100% of 1 actionable decision(s) were handed to a human. Above half, the desk is not operating unattended in any meaningful sense"
+        },
+        "model_requested_review": 0,
+        "paused": 1,
+        "answered": 1,
+        "approved": 0,
+        "modified": 0,
+        "rejected": 1,
+        "expired": 0,
+        "superseded": 0,
+        "pending": 0,
+        "resumed": 1,
+        "replayed": 0,
+        "median_answer_seconds": 240.0,
+        "override_rate": 1.0,
+        "unanswered_rate": 0.0
+      }
+    },
+    {
+      "scenario": "halted_and_ungrounded/approve",
+      "trigger": "halted_and_ungrounded",
+      "answer": "approve",
+      "before_pauses": {
+        "final_verdict": "human_review",
+        "order": false,
+        "a_human_answer_could_reach_it": false
+      },
+      "child": {
+        "alive_when_killed": true,
+        "returncode": 1
+      },
+      "state_hash": {
+        "printed_before_kill": "64857d8c13205c69570853ac41a52f24bd8c435ed81d3f51da37c94cdb451e75",
+        "recorded_on_request": "64857d8c13205c69570853ac41a52f24bd8c435ed81d3f51da37c94cdb451e75",
+        "recomputed_after_restore": "64857d8c13205c69570853ac41a52f24bd8c435ed81d3f51da37c94cdb451e75",
+        "identical": true
+      },
+      "decision": {
+        "identical_to_no_kill": true,
+        "differing_fields": [],
+        "difference_detail": {},
+        "constitution": "resize",
+        "binding_constraint": "unhedgeable_gap",
+        "revised_by_model": true,
+        "approved_intent_hash": "19fd06ee6b047635",
+        "order_quantity": "100",
+        "order_client_id": "argus-16a4a18a73c88c1bc7f10426",
+        "proposed_quantity": "600"
+      },
+      "model_calls_on_resume": {
+        "no_kill": 1,
+        "killed": 1
+      },
+      "events_summary": {
+        "takeover": {
+          "escalations": 1,
+          "actionable_decisions": 1,
+          "total_decisions": 1,
+          "rate": 1.0,
+          "by_trigger": {
+            "underlying_halted": 1,
+            "ungrounded_figure": 1
+          },
+          "verdict": "100% of 1 actionable decision(s) were handed to a human. Above half, the desk is not operating unattended in any meaningful sense"
+        },
+        "model_requested_review": 0,
+        "paused": 1,
+        "answered": 1,
+        "approved": 1,
+        "modified": 0,
+        "rejected": 0,
+        "expired": 0,
+        "superseded": 0,
+        "pending": 0,
+        "resumed": 1,
+        "replayed": 0,
+        "median_answer_seconds": 240.0,
+        "override_rate": 0.0,
+        "unanswered_rate": 0.0
+      }
+    },
+    {
+      "scenario": "halted_and_ungrounded/modify_size",
+      "trigger": "halted_and_ungrounded",
+      "answer": "modify_size",
+      "before_pauses": {
+        "final_verdict": "human_review",
+        "order": false,
+        "a_human_answer_could_reach_it": false
+      },
+      "child": {
+        "alive_when_killed": true,
+        "returncode": 1
+      },
+      "state_hash": {
+        "printed_before_kill": "95ab5315f0c9e5632034aecfaf26cc3d9d29ab9fe7d98a53d6db7deacc0ee92a",
+        "recorded_on_request": "95ab5315f0c9e5632034aecfaf26cc3d9d29ab9fe7d98a53d6db7deacc0ee92a",
+        "recomputed_after_restore": "95ab5315f0c9e5632034aecfaf26cc3d9d29ab9fe7d98a53d6db7deacc0ee92a",
+        "identical": true
+      },
+      "decision": {
+        "identical_to_no_kill": true,
+        "differing_fields": [],
+        "difference_detail": {},
+        "constitution": "allow",
+        "binding_constraint": "none",
+        "revised_by_model": false,
+        "approved_intent_hash": "a8b01a0ef48832d3",
+        "order_quantity": "25",
+        "order_client_id": "argus-b8e1dd8b853d45d767f233c1",
+        "proposed_quantity": "60"
+      },
+      "model_calls_on_resume": {
+        "no_kill": 0,
+        "killed": 0
+      },
+      "events_summary": {
+        "takeover": {
+          "escalations": 1,
+          "actionable_decisions": 1,
+          "total_decisions": 1,
+          "rate": 1.0,
+          "by_trigger": {
+            "underlying_halted": 1,
+            "ungrounded_figure": 1
+          },
+          "verdict": "100% of 1 actionable decision(s) were handed to a human. Above half, the desk is not operating unattended in any meaningful sense"
+        },
+        "model_requested_review": 0,
+        "paused": 1,
+        "answered": 1,
+        "approved": 0,
+        "modified": 1,
+        "rejected": 0,
+        "expired": 0,
+        "superseded": 0,
+        "pending": 0,
+        "resumed": 1,
+        "replayed": 0,
+        "median_answer_seconds": 240.0,
+        "override_rate": 1.0,
+        "unanswered_rate": 0.0
+      }
+    },
+    {
+      "scenario": "halted_and_ungrounded/reject",
+      "trigger": "halted_and_ungrounded",
+      "answer": "reject",
+      "before_pauses": {
+        "final_verdict": "human_review",
+        "order": false,
+        "a_human_answer_could_reach_it": false
+      },
+      "child": {
+        "alive_when_killed": true,
+        "returncode": 1
+      },
+      "state_hash": {
+        "printed_before_kill": "a29e2241af812b8fbd00940874f3f5b059bb0bea7e5be9359de877c6e57a5517",
+        "recorded_on_request": "a29e2241af812b8fbd00940874f3f5b059bb0bea7e5be9359de877c6e57a5517",
+        "recomputed_after_restore": "a29e2241af812b8fbd00940874f3f5b059bb0bea7e5be9359de877c6e57a5517",
+        "identical": true
+      },
+      "decision": {
+        "identical_to_no_kill": true,
+        "differing_fields": [],
+        "difference_detail": {},
+        "constitution": "allow",
+        "binding_constraint": "no_exposure",
+        "revised_by_model": false,
+        "approved_intent_hash": "25650d5bda7a70cc",
+        "order_quantity": null,
+        "order_client_id": null,
+        "proposed_quantity": "60"
+      },
+      "model_calls_on_resume": {
+        "no_kill": 0,
+        "killed": 0
+      },
+      "events_summary": {
+        "takeover": {
+          "escalations": 1,
+          "actionable_decisions": 1,
+          "total_decisions": 1,
+          "rate": 1.0,
+          "by_trigger": {
+            "underlying_halted": 1,
+            "ungrounded_figure": 1
+          },
+          "verdict": "100% of 1 actionable decision(s) were handed to a human. Above half, the desk is not operating unattended in any meaningful sense"
+        },
+        "model_requested_review": 0,
+        "paused": 1,
+        "answered": 1,
+        "approved": 0,
+        "modified": 0,
+        "rejected": 1,
+        "expired": 0,
+        "superseded": 0,
+        "pending": 0,
+        "resumed": 1,
+        "replayed": 0,
+        "median_answer_seconds": 240.0,
+        "override_rate": 1.0,
+        "unanswered_rate": 0.0
+      }
+    }
+  ]
+}

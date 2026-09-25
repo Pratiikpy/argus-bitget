@@ -1,0 +1,153 @@
+{
+  "as_of": "2026-09-25T20:27:36.832541+00:00",
+  "refusals": 705,
+  "refusals_with_a_gradeable_claim": 333,
+  "hours_tolerance": 1.5,
+  "round_trip_bps": 12.0,
+  "base_clearance_about_2h": {
+    "cleared": 261,
+    "marks": 349
+  },
+  "by_claim": {
+    "session_closed": {
+      "consistent": 272,
+      "contradicted": 0,
+      "ungradeable": 0
+    },
+    "session_open": {
+      "consistent": 3,
+      "contradicted": 0,
+      "ungradeable": 0
+    },
+    "hours_to_discovery": {
+      "consistent": 266,
+      "contradicted": 0,
+      "ungradeable": 0
+    },
+    "no_hedge": {
+      "consistent": 150,
+      "contradicted": 0,
+      "ungradeable": 52
+    },
+    "risk_layer": {
+      "consistent": 0,
+      "contradicted": 0,
+      "ungradeable": 0
+    },
+    "moves_enough": {
+      "consistent": 43,
+      "contradicted": 11,
+      "ungradeable": 27
+    },
+    "move_too_small": {
+      "consistent": 0,
+      "contradicted": 0,
+      "ungradeable": 3
+    }
+  },
+  "forward_against_base": {
+    "move_too_small": null,
+    "moves_enough": {
+      "borne_out": 43,
+      "graded": 54,
+      "base_rate": 0.7479,
+      "p_one_sided": 0.2586
+    }
+  },
+  "forward_claims": [
+    "move_too_small",
+    "moves_enough"
+  ],
+  "contradicted": [
+    {
+      "seq": 245,
+      "symbol": "NVDAUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026xceeding the 12bps hurdle \u2014 the binding constraint has been direction, not size. The bull case (RSI 29.41 at support with panic headlines)\u2026",
+      "recorded": "next move +9.4bps over 2.00h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 377,
+      "symbol": "NVDAUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026oves averaging 169bps shows the binding constraint has been direction, not size \u2014 and while direction looks mildly positive here, the edge\u2026",
+      "recorded": "next move -2.7bps over 1.98h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 380,
+      "symbol": "MSFTUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026assed on moves averaging 84bps \u2014 the binding constraint was direction, not size, and nothing today changes that calculus. The hurdle of",
+      "recorded": "next move -3.4bps over 1.98h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 544,
+      "symbol": "NVDAUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026followed by upward moves \u2014 the binding constraint has been direction, not size, yet the overbought condition and mean-reversion risk at th\u2026",
+      "recorded": "next move -7.9bps over 1.99h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 553,
+      "symbol": "QQQUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026ceeding the hurdle, meaning the binding constraint has been direction, not size \u2014 and direction remains ambiguous here.",
+      "recorded": "next move -9.0bps over 1.99h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 563,
+      "symbol": "COINUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026ket moved 502.5bps median \u2014 the binding constraint has been direction, not size, and direction remains ambiguous here between the fundament\u2026",
+      "recorded": "next move -2.0bps over 1.97h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 610,
+      "symbol": "MSFTUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026e desk's history here shows the binding constraint has been direction, not size \u2014 and direction remains genuinely ambiguous at this moment.",
+      "recorded": "next move +4.2bps over 1.99h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 633,
+      "symbol": "GOOGLUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026the market moved a median 187bps \u2014 the constraint has been direction, not size, and direction remains unclear.",
+      "recorded": "next move +0.6bps over 2.00h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 654,
+      "symbol": "AAPLUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026ket moved a median 127bps \u2014 the binding constraint has been direction, not size, and nothing here resolves that ambiguity.",
+      "recorded": "next move -0.6bps over 1.99h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 684,
+      "symbol": "TQQQUSDT",
+      "claim": "moves_enough",
+      "stated": "\u20268 consecutive abstentions where the binding constraint was direction, not size \u2014 the tape moves enough but we cannot call which way. That\u2026",
+      "recorded": "next move +11.3bps over 3.81h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 694,
+      "symbol": "QQQUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026he median move was 67.7bps; the binding constraint has been direction, not size, and today's directional signal is mild bullish without a c\u2026",
+      "recorded": "next move -5.8bps over 2.08h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    }
+  ],
+  "verdict": "705 refusal(s) on record; 333 carried at least one reason the record can check. Of 691 decision-time reason(s) graded, 691 agreed with the record and 0 contradicted it. `moves_enough` claims were borne out by the next ~2h move 43 of 54 time(s) (80%), against 75% for every ~2h refusal mark (one-sided exact binomial p = 0.26); no evidence the stated reason says more than the base rate does.",
+  "method": "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set beside the record: session_phase and hours_to_discovery from the ledger, the desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims about the size of the coming move. Question and binary verdict from VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, MIT); graded here by the record, not by a model."
+}

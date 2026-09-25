@@ -1,0 +1,596 @@
+{
+  "generated_at": "2026-09-25T20:29:15.154306+00:00",
+  "item": "S17 feed-sanity gate (desk/feed_sanity.py) on the S3 corrupted-feed cases",
+  "method": "deterministic; corrupted inputs rebuilt from data/feedbugged.json's recorded kind, feature and seed and checked against its recorded wrong value; negatives are every clean snapshot in data/robustness_snapshots.json plus the six correct-reasoning lines",
+  "acceptance": {
+    "cases": [
+      {
+        "snapshot_id": "NVDAUSDT-20260925T135626Z",
+        "condition": "bugged",
+        "corruption": "price explicit_error: 225.63 -> NaN",
+        "corrupted": true,
+        "caught": true,
+        "rules": [
+          "non_numeric"
+        ],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "TSLAUSDT-20260925T135626Z",
+        "condition": "bugged",
+        "corruption": "change_24h large_offset: -0.00654 -> 9.99346",
+        "corrupted": true,
+        "caught": true,
+        "rules": [
+          "implausible_change"
+        ],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "METAUSDT-20260925T135626Z",
+        "condition": "bugged",
+        "corruption": "vix small_offset: 15.11 -> 14.11",
+        "corrupted": true,
+        "caught": true,
+        "rules": [
+          "vix_inconsistent"
+        ],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "COINUSDT-20260925T135626Z",
+        "condition": "bugged",
+        "corruption": "sue sign_flip: -0.64 -> 0.64",
+        "corrupted": true,
+        "caught": true,
+        "rules": [
+          "sue_direction"
+        ],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "MSTRUSDT-20260925T135626Z",
+        "condition": "bugged",
+        "corruption": "fear_greed incorrect_type: 71 -> grape",
+        "corrupted": true,
+        "caught": true,
+        "rules": [
+          "non_numeric"
+        ],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "QQQUSDT-20260925T135626Z",
+        "condition": "bugged",
+        "corruption": "spread_bps random_output: 0.13 -> -5",
+        "corrupted": true,
+        "caught": true,
+        "rules": [
+          "negative_spread"
+        ],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "NVDAUSDT-20260925T135626Z",
+        "condition": "correct_reasoning",
+        "corruption": "correct_reasoning",
+        "corrupted": false,
+        "caught": false,
+        "rules": [],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "TSLAUSDT-20260925T135626Z",
+        "condition": "correct_reasoning",
+        "corruption": "correct_reasoning",
+        "corrupted": false,
+        "caught": false,
+        "rules": [],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "METAUSDT-20260925T135626Z",
+        "condition": "correct_reasoning",
+        "corruption": "correct_reasoning",
+        "corrupted": false,
+        "caught": false,
+        "rules": [],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "COINUSDT-20260925T135626Z",
+        "condition": "correct_reasoning",
+        "corruption": "correct_reasoning",
+        "corrupted": false,
+        "caught": false,
+        "rules": [],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "MSTRUSDT-20260925T135626Z",
+        "condition": "correct_reasoning",
+        "corruption": "correct_reasoning",
+        "corrupted": false,
+        "caught": false,
+        "rules": [],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "QQQUSDT-20260925T135626Z",
+        "condition": "correct_reasoning",
+        "corruption": "correct_reasoning",
+        "corrupted": false,
+        "caught": false,
+        "rules": [],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "NVDAUSDT-20260925T135626Z",
+        "condition": "incorrect_reasoning",
+        "corruption": "incorrect_reasoning",
+        "corrupted": true,
+        "caught": true,
+        "rules": [
+          "absurd_edge",
+          "unit_error"
+        ],
+        "model_decision_recorded": [
+          "trade",
+          "buy",
+          "50"
+        ]
+      },
+      {
+        "snapshot_id": "TSLAUSDT-20260925T135626Z",
+        "condition": "incorrect_reasoning",
+        "corruption": "incorrect_reasoning",
+        "corrupted": true,
+        "caught": true,
+        "rules": [
+          "absurd_edge",
+          "unit_error"
+        ],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "METAUSDT-20260925T135626Z",
+        "condition": "incorrect_reasoning",
+        "corruption": "incorrect_reasoning",
+        "corrupted": true,
+        "caught": true,
+        "rules": [
+          "unit_error"
+        ],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "COINUSDT-20260925T135626Z",
+        "condition": "incorrect_reasoning",
+        "corruption": "incorrect_reasoning",
+        "corrupted": true,
+        "caught": true,
+        "rules": [
+          "absurd_edge",
+          "unit_error"
+        ],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "MSTRUSDT-20260925T135626Z",
+        "condition": "incorrect_reasoning",
+        "corruption": "incorrect_reasoning",
+        "corrupted": true,
+        "caught": true,
+        "rules": [
+          "absurd_edge",
+          "unit_error"
+        ],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      },
+      {
+        "snapshot_id": "QQQUSDT-20260925T135626Z",
+        "condition": "incorrect_reasoning",
+        "corruption": "incorrect_reasoning",
+        "corrupted": true,
+        "caught": true,
+        "rules": [
+          "absurd_edge",
+          "unit_error"
+        ],
+        "model_decision_recorded": [
+          "no_trade",
+          "-",
+          "0"
+        ]
+      }
+    ],
+    "detection": {
+      "tp": 12,
+      "fp": 0,
+      "tn": 6,
+      "fn": 0,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "model_detection_f1_on_the_same_cases": 0.0
+  },
+  "clean": {
+    "snapshots": 12,
+    "items_checked": 255,
+    "false_flags": 0,
+    "rows": [
+      {
+        "snapshot_id": "NVDAUSDT-20260925T135626Z",
+        "items_checked": 25,
+        "false_flags": 0,
+        "rules": []
+      },
+      {
+        "snapshot_id": "TSLAUSDT-20260925T135626Z",
+        "items_checked": 25,
+        "false_flags": 0,
+        "rules": []
+      },
+      {
+        "snapshot_id": "AAPLUSDT-20260925T135626Z",
+        "items_checked": 25,
+        "false_flags": 0,
+        "rules": []
+      },
+      {
+        "snapshot_id": "MSFTUSDT-20260925T135626Z",
+        "items_checked": 25,
+        "false_flags": 0,
+        "rules": []
+      },
+      {
+        "snapshot_id": "METAUSDT-20260925T135626Z",
+        "items_checked": 25,
+        "false_flags": 0,
+        "rules": []
+      },
+      {
+        "snapshot_id": "GOOGLUSDT-20260925T135626Z",
+        "items_checked": 25,
+        "false_flags": 0,
+        "rules": []
+      },
+      {
+        "snapshot_id": "AMZNUSDT-20260925T135626Z",
+        "items_checked": 25,
+        "false_flags": 0,
+        "rules": []
+      },
+      {
+        "snapshot_id": "COINUSDT-20260925T135626Z",
+        "items_checked": 25,
+        "false_flags": 0,
+        "rules": []
+      },
+      {
+        "snapshot_id": "MSTRUSDT-20260925T135626Z",
+        "items_checked": 27,
+        "false_flags": 0,
+        "rules": []
+      },
+      {
+        "snapshot_id": "QQQUSDT-20260925T135626Z",
+        "items_checked": 13,
+        "false_flags": 0,
+        "rules": []
+      },
+      {
+        "snapshot_id": "TQQQUSDT-20260925T135626Z",
+        "items_checked": 8,
+        "false_flags": 0,
+        "rules": []
+      },
+      {
+        "snapshot_id": "SQQQUSDT-20260925T135626Z",
+        "items_checked": 7,
+        "false_flags": 0,
+        "rules": []
+      }
+    ]
+  },
+  "coverage_matrix": {
+    "planted": 612,
+    "caught": 490,
+    "recall": 0.8007,
+    "cells": {
+      "change_24h/explicit_error": {
+        "planted": 12,
+        "caught": 12
+      },
+      "change_24h/incorrect_type": {
+        "planted": 12,
+        "caught": 12
+      },
+      "change_24h/large_offset": {
+        "planted": 12,
+        "caught": 12
+      },
+      "change_24h/random_output": {
+        "planted": 12,
+        "caught": 12
+      },
+      "change_24h/sign_flip": {
+        "planted": 12,
+        "caught": 0
+      },
+      "change_24h/small_offset": {
+        "planted": 12,
+        "caught": 12
+      },
+      "fear_greed/explicit_error": {
+        "planted": 12,
+        "caught": 12
+      },
+      "fear_greed/incorrect_type": {
+        "planted": 12,
+        "caught": 12
+      },
+      "fear_greed/large_offset": {
+        "planted": 12,
+        "caught": 0
+      },
+      "fear_greed/random_output": {
+        "planted": 12,
+        "caught": 7
+      },
+      "fear_greed/sign_flip": {
+        "planted": 12,
+        "caught": 12
+      },
+      "fear_greed/small_offset": {
+        "planted": 12,
+        "caught": 0
+      },
+      "price/explicit_error": {
+        "planted": 12,
+        "caught": 12
+      },
+      "price/incorrect_type": {
+        "planted": 12,
+        "caught": 12
+      },
+      "price/large_offset": {
+        "planted": 12,
+        "caught": 12
+      },
+      "price/random_output": {
+        "planted": 12,
+        "caught": 12
+      },
+      "price/sign_flip": {
+        "planted": 12,
+        "caught": 12
+      },
+      "price/small_offset": {
+        "planted": 12,
+        "caught": 4
+      },
+      "revenue_qoq/explicit_error": {
+        "planted": 9,
+        "caught": 9
+      },
+      "revenue_qoq/incorrect_type": {
+        "planted": 9,
+        "caught": 9
+      },
+      "revenue_qoq/large_offset": {
+        "planted": 9,
+        "caught": 0
+      },
+      "revenue_qoq/random_output": {
+        "planted": 9,
+        "caught": 0
+      },
+      "revenue_qoq/sign_flip": {
+        "planted": 9,
+        "caught": 0
+      },
+      "revenue_qoq/small_offset": {
+        "planted": 9,
+        "caught": 0
+      },
+      "short_share/explicit_error": {
+        "planted": 12,
+        "caught": 12
+      },
+      "short_share/incorrect_type": {
+        "planted": 12,
+        "caught": 12
+      },
+      "short_share/large_offset": {
+        "planted": 12,
+        "caught": 12
+      },
+      "short_share/random_output": {
+        "planted": 12,
+        "caught": 12
+      },
+      "short_share/sign_flip": {
+        "planted": 12,
+        "caught": 12
+      },
+      "short_share/small_offset": {
+        "planted": 12,
+        "caught": 12
+      },
+      "spread_bps/explicit_error": {
+        "planted": 12,
+        "caught": 12
+      },
+      "spread_bps/incorrect_type": {
+        "planted": 12,
+        "caught": 12
+      },
+      "spread_bps/large_offset": {
+        "planted": 12,
+        "caught": 5
+      },
+      "spread_bps/random_output": {
+        "planted": 12,
+        "caught": 8
+      },
+      "spread_bps/sign_flip": {
+        "planted": 12,
+        "caught": 12
+      },
+      "spread_bps/small_offset": {
+        "planted": 12,
+        "caught": 2
+      },
+      "sue/explicit_error": {
+        "planted": 9,
+        "caught": 9
+      },
+      "sue/incorrect_type": {
+        "planted": 9,
+        "caught": 9
+      },
+      "sue/large_offset": {
+        "planted": 9,
+        "caught": 4
+      },
+      "sue/random_output": {
+        "planted": 9,
+        "caught": 5
+      },
+      "sue/sign_flip": {
+        "planted": 9,
+        "caught": 9
+      },
+      "sue/small_offset": {
+        "planted": 9,
+        "caught": 2
+      },
+      "vix/explicit_error": {
+        "planted": 12,
+        "caught": 12
+      },
+      "vix/incorrect_type": {
+        "planted": 12,
+        "caught": 12
+      },
+      "vix/large_offset": {
+        "planted": 12,
+        "caught": 12
+      },
+      "vix/random_output": {
+        "planted": 12,
+        "caught": 12
+      },
+      "vix/sign_flip": {
+        "planted": 12,
+        "caught": 12
+      },
+      "vix/small_offset": {
+        "planted": 12,
+        "caught": 12
+      },
+      "yield/explicit_error": {
+        "planted": 12,
+        "caught": 12
+      },
+      "yield/incorrect_type": {
+        "planted": 12,
+        "caught": 12
+      },
+      "yield/large_offset": {
+        "planted": 12,
+        "caught": 12
+      },
+      "yield/random_output": {
+        "planted": 12,
+        "caught": 12
+      },
+      "yield/sign_flip": {
+        "planted": 12,
+        "caught": 12
+      },
+      "yield/small_offset": {
+        "planted": 12,
+        "caught": 12
+      }
+    },
+    "never_caught": [
+      "change_24h/sign_flip",
+      "fear_greed/large_offset",
+      "fear_greed/small_offset",
+      "revenue_qoq/large_offset",
+      "revenue_qoq/random_output",
+      "revenue_qoq/sign_flip",
+      "revenue_qoq/small_offset"
+    ],
+    "note": "cells that are never caught are corruptions that contradict nothing in the frame (a plausible value with no second statement of it); catching them needs a second source for the same figure, which the desk does not have"
+  },
+  "qwen_requests": 0
+}

@@ -1,0 +1,631 @@
+{
+  "generated_at": "2026-09-25T14:37:09.146522+00:00",
+  "item": "S1 worst-case decision consistency under seeded evidence perturbation",
+  "source": "HELM metric.py:253-315 (compute_worst_case_metrics), perturbation.py:23-32 (get_rng); Apache-2.0, notice at argus/licenses/helm-APACHE-2.0.txt",
+  "seat": "MetaPM.decide, production prompt, thinking low, max_tokens 900, cache off",
+  "perturbations": [
+    "reorder",
+    "unit_restate",
+    "restyle",
+    "reorder+restate"
+  ],
+  "score": {
+    "snapshots": 6,
+    "before": 1.0,
+    "resample_worst": 1.0,
+    "worst": 1.0,
+    "per_condition_worst": {
+      "reorder": 1.0,
+      "reorder+restate": 1.0,
+      "restyle": 1.0,
+      "unit_restate": 1.0
+    },
+    "clean_pair_disagreement": {
+      "disagreeing": 0,
+      "pairs": 18,
+      "rate": 0.0
+    },
+    "cross_pair_disagreement": {
+      "disagreeing": 0,
+      "pairs": 72,
+      "rate": 0.0
+    },
+    "excess_disagreement": 0.0,
+    "flips_beyond_noise": [],
+    "flips_within_noise": []
+  },
+  "verdict": "6 snapshot(s), 24 perturbed decision(s). Unperturbed agreement (before) 100%; resample worst case 100%; worst case with perturbed 100%. Pairwise disagreement: 0/18 between unperturbed runs, 0/72 between a perturbed run and an unperturbed one. No perturbed run left its snapshot's reference action. With this few snapshots that is an absence of observed flips, not a bound on the flip rate",
+  "lean_score": {
+    "snapshots": 6,
+    "before": 0.9444,
+    "resample_worst": 0.8333,
+    "worst": 0.8333,
+    "per_condition_worst": {
+      "reorder": 0.8333,
+      "reorder+restate": 0.8333,
+      "restyle": 0.8333,
+      "unit_restate": 0.8333
+    },
+    "clean_pair_disagreement": {
+      "disagreeing": 2,
+      "pairs": 18,
+      "rate": 0.1111
+    },
+    "cross_pair_disagreement": {
+      "disagreeing": 6,
+      "pairs": 72,
+      "rate": 0.0833
+    },
+    "excess_disagreement": -0.0278,
+    "flips_beyond_noise": [],
+    "flips_within_noise": [
+      "METAUSDT-20260925T135626Z/restyle: up -> down",
+      "METAUSDT-20260925T135626Z/reorder+restate: up -> down"
+    ]
+  },
+  "lean_verdict": "Lean level. 6 snapshot(s), 24 perturbed decision(s). Unperturbed agreement (before) 94%; resample worst case 83%; worst case with perturbed 83%. Pairwise disagreement: 2/18 between unperturbed runs, 6/72 between a perturbed run and an unperturbed one. Every flip landed on a snapshot whose unperturbed runs already disagreed, so none is attributable to perturbed beyond sampling noise",
+  "no_op_cells": [],
+  "not_run": [],
+  "qwen_requests": 24,
+  "cells": [
+    {
+      "snapshot_id": "NVDAUSDT-20260925T135626Z",
+      "condition": "reorder",
+      "edits": 1,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.45,
+        "thesis": "Under a general mandate, NVDA shows strong fundamentals (revenue +17.9% QoQ, SUE +2.84\u03c3, consensus revisions 35 up/1 down for current quarter) and a mildly positive catalyst (US-China state dinner with tech CEOs), but the token has already moved +1.38% in 24h, likely pricing in the dinner headline. The remaining edge is ambiguous \u2014 the news is soft (credibility 0.70, no concrete policy outcome), VIX is low-normal, and the 14.27 bps hurdle requires a directional move that the evidence does not clearly support beyond what has already been captured. The mandate shapes this toward patience: a general book should not chase a headline that has already moved the price without a quantifiable residual edge.",
+        "reasoning": "Under a general mandate, NVDA shows strong fundamentals (revenue +17.9% QoQ, SUE +2.84\u03c3, consensus revisions 35 up/1 down for current quarter) and a mildly positive catalyst (US-China state dinner with tech CEOs), but the token has already moved +1.38% in 24h, likely pricing in the dinner headline. The remaining edge is ambiguous \u2014 the news is soft (credibility 0.70, no concrete policy outcome), VIX is low-normal, and the 14.27 bps hurdle requires a directional move that the evidence does not clearly support beyond what has already been captured. The mandate shapes this toward patience: a general book should not chase a headline that has already moved the price without a quantifiable residual edge. Counter-case: The strongest argument for a trade is that the US-China dinner could produce a material easing of chip export restrictions \u2014 the single biggest overhang on NVDA \u2014 and consensus revisions (35 up / 1 down) suggest the Street is still underestimating near-term earnings. If a headline drops confirming relaxed export controls, the stock could gap significantly and the current price would look cheap. Additionally, the 24h move of only 1.38% may understate the potential if the dinner yields a concrete outcome.",
+        "invalidation": [
+          "A concrete US-China chip export agreement or tariff reduction announced within 24 hours that re-rates NVDA materially higher",
+          "NVDA token price pulls back below 222 (roughly -1.6%) on no negative news, suggesting the move was noise and a better entry exists"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "TSLAUSDT-20260925T135626Z",
+      "condition": "reorder",
+      "edits": 1,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.45,
+        "thesis": "Under a general mandate with no specific risk budget or holding-period constraint, the evidence presents a mixed picture: strong Q2 fundamentals (EPS +146% QoQ, revenue +26% QoQ, SUE +0.83) are offset by aggressive consensus downward revisions (15 of 19 analysts cutting estimates for both current and next quarter), elevated short interest at 55.6%, and a modest negative 24h price action (-0.65%). The positive US-China dinner headline is vague and not TSLA-specific enough to constitute a tradeable catalyst. The edge, if any, does not clearly exceed the 14.27 bps hurdle given the conflicting signals and lack of a concrete near-term catalyst.",
+        "reasoning": "Under a general mandate with no specific risk budget or holding-period constraint, the evidence presents a mixed picture: strong Q2 fundamentals (EPS +146% QoQ, revenue +26% QoQ, SUE +0.83) are offset by aggressive consensus downward revisions (15 of 19 analysts cutting estimates for both current and next quarter), elevated short interest at 55.6%, and a modest negative 24h price action (-0.65%). The positive US-China dinner headline is vague and not TSLA-specific enough to constitute a tradeable catalyst. The edge, if any, does not clearly exceed the 14.27 bps hurdle given the conflicting signals and lack of a concrete near-term catalyst. Counter-case: The strongest argument for a trade is that Q2 results were genuinely strong (SUE +0.83, net income +133% QoQ), the VIX is low (15.11, 33rd percentile) suggesting a benign risk environment, and the US-China dinner could be a meaningful catalyst for Tesla given its China exposure. A momentum buyer could argue the stock is being held down by excessive short interest that will eventually cover, creating a squeeze opportunity.",
+        "invalidation": [
+          "TSLA breaks above $385 with volume confirmation, indicating the market is pricing in the US-China dinner as a material positive for Tesla specifically",
+          "Consensus EPS revisions reverse to net positive within 5 days, signaling analyst re-rating",
+          "Short interest drops below 50% on rising price, indicating short covering"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "METAUSDT-20260925T135626Z",
+      "condition": "reorder",
+      "edits": 1,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.55,
+        "thesis": "Under a general mandate, META presents a mixed picture: Q2 2026 EPS collapsed 40.8% QoQ ($10.44\u2192$6.18) with consensus for the current quarter being revised down (7 up / 33 down in 30d), yet three analysts just raised targets toward $920 and the stock is dipping intraday on a day tech is broadly gaining. The 14.27 bps hurdle is not cleared by any directional edge I can identify \u2014 the bearish earnings momentum is already partially priced at $756.78 (which implies ~30x forward annualized EPS of ~$25.60, a reasonable multiple for a company with AI optionality), and the bullish analyst targets lack a specific near-term catalyst to bridge the gap. The 59.7% short volume is notable but ambiguous \u2014 it can reflect hedging, not directional conviction. No trade clears the hurdle.",
+        "reasoning": "Under a general mandate, META presents a mixed picture: Q2 2026 EPS collapsed 40.8% QoQ ($10.44\u2192$6.18) with consensus for the current quarter being revised down (7 up / 33 down in 30d), yet three analysts just raised targets toward $920 and the stock is dipping intraday on a day tech is broadly gaining. The 14.27 bps hurdle is not cleared by any directional edge I can identify \u2014 the bearish earnings momentum is already partially priced at $756.78 (which implies ~30x forward annualized EPS of ~$25.60, a reasonable multiple for a company with AI optionality), and the bullish analyst targets lack a specific near-term catalyst to bridge the gap. The 59.7% short volume is notable but ambiguous \u2014 it can reflect hedging, not directional conviction. No trade clears the hurdle. Counter-case: The strongest argument against standing aside is that the stock is dipping while tech rallies, three analysts just raised targets to ~$920 (21% upside), and the Q2 EPS miss may be a one-time AI capex spike rather than structural deterioration \u2014 meaning the dip is a gift. However, without knowing *why* EPS fell 40.8% (one-time charge vs. margin compression), I cannot distinguish between a value opportunity and a falling knife, and the 14.27 bps hurdle demands more conviction than 'it might bounce.'",
+        "invalidation": [
+          "If META breaks above $770 on volume exceeding 2x the 24h average without a broad market rally, the dip was a buying opportunity I missed",
+          "If Q3 consensus revisions turn net positive (more ups than downs) before the October earnings date, the downward momentum thesis is dead"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "COINUSDT-20260925T135626Z",
+      "condition": "reorder",
+      "edits": 1,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "down",
+        "confidence": 0.45,
+        "thesis": "Under a general mandate with no specific risk appetite or time horizon, COIN presents a mixed picture: two consecutive quarters of losses (-$0.39B, -$0.36B) with declining revenue (-13.7% QoQ), unanimous downward revisions (16/16 analysts cutting both current and next quarter), and 60.8% short volume, but the stock is only down 0.2% today in a low-vol regime (VIX 15.11, 33rd percentile). The fundamental deterioration is real but already reflected in the price; the 14.27 bps hurdle is not cleared by any identifiable near-term catalyst or mispricing. The Clarity Act collapse is a regulatory headwind but its magnitude is unclear.",
+        "reasoning": "Under a general mandate with no specific risk appetite or time horizon, COIN presents a mixed picture: two consecutive quarters of losses (-$0.39B, -$0.36B) with declining revenue (-13.7% QoQ), unanimous downward revisions (16/16 analysts cutting both current and next quarter), and 60.8% short volume, but the stock is only down 0.2% today in a low-vol regime (VIX 15.11, 33rd percentile). The fundamental deterioration is real but already reflected in the price; the 14.27 bps hurdle is not cleared by any identifiable near-term catalyst or mispricing. The Clarity Act collapse is a regulatory headwind but its magnitude is unclear. Counter-case: The strongest argument against standing aside is that 16/16 downward revisions with consensus EPS still negative for both current and next quarter, combined with 60.8% short volume and revenue declining 13.7% QoQ, suggests the stock is in a sustained downtrend that a short could exploit. The Fear & Greed at 71 (Greed) in crypto suggests complacency that could unwind. However, the 24h move is only -0.2%, VIX is low, and there is no specific catalyst to time entry \u2014 the edge is directional but not sufficient to clear 14.27 bps with conviction.",
+        "invalidation": [
+          "If COIN were to break below $190 on elevated volume, the consolidation thesis fails and a short becomes viable",
+          "If a positive regulatory catalyst (e.g., new crypto legislation passing) emerged, the bearish fundamental setup would be overridden",
+          "If short interest compressed sharply (below 50% of daily volume), the crowding signal would weaken"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "MSTRUSDT-20260925T135626Z",
+      "condition": "reorder",
+      "edits": 1,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.45,
+        "thesis": "General mandate: MSTR is a leveraged Bitcoin proxy trading at $159.91 with mixed signals \u2014 improving (but still deeply negative) net income QoQ, consensus EPS revisions leaning positive for next quarter, and continued BTC accumulation \u2014 but the 14.27 bps hurdle is not cleared by any identifiable near-term catalyst. The 50.9% short volume is ambiguous (could be hedging by convertible arb desks), the SUE is negative, and the opaque 8-K filings provide no actionable edge. No trade clears the cost threshold.",
+        "reasoning": "General mandate: MSTR is a leveraged Bitcoin proxy trading at $159.91 with mixed signals \u2014 improving (but still deeply negative) net income QoQ, consensus EPS revisions leaning positive for next quarter, and continued BTC accumulation \u2014 but the 14.27 bps hurdle is not cleared by any identifiable near-term catalyst. The 50.9% short volume is ambiguous (could be hedging by convertible arb desks), the SUE is negative, and the opaque 8-K filings provide no actionable edge. No trade clears the cost threshold. Counter-case: The strongest argument for a trade is that consensus EPS revisions are net positive for next quarter (3 up / 1 down), BTC accumulation continues at ~$80k, and Fear & Greed at 71 suggests momentum persistence \u2014 a momentum buyer could argue the token is coiling for a breakout. However, this is a narrative, not a quantified edge exceeding 14.27 bps with identifiable timing.",
+        "invalidation": [
+          "Bitcoin breaks below $75,000 within 48 hours, invalidating the accumulation thesis",
+          "The opaque 8-K filed today reveals dilutive equity issuance or adverse regulatory action",
+          "MSTR token spread widens materially above 1.25 bps indicating liquidity withdrawal"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "QQQUSDT-20260925T135626Z",
+      "condition": "reorder",
+      "edits": 1,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.55,
+        "thesis": "General mandate, first look at QQQUSDT. The session is mildly constructive (futures up pre-bell, Dow rising on geopolitical de-escalation, VIX at 33rd percentile, Arm/semis bouncing) but the macro backdrop is ambiguous: the 10y at 5.18% with yields 'continuing to spike' per headlines creates a genuine headwind for duration-sensitive growth/tech, and the Fidelity AI-skepticism piece adds narrative risk to the largest QQQ constituents. The 24h move is only +1.28%, well within the 95bps implied daily range, and no single catalyst is strong enough to clear the 14.27bps hurdle with conviction. Under a general mandate with no stated risk tolerance or time horizon, the correct action is to stand aside rather than take a low-conviction directional bet.",
+        "reasoning": "General mandate, first look at QQQUSDT. The session is mildly constructive (futures up pre-bell, Dow rising on geopolitical de-escalation, VIX at 33rd percentile, Arm/semis bouncing) but the macro backdrop is ambiguous: the 10y at 5.18% with yields 'continuing to spike' per headlines creates a genuine headwind for duration-sensitive growth/tech, and the Fidelity AI-skepticism piece adds narrative risk to the largest QQQ constituents. The 24h move is only +1.28%, well within the 95bps implied daily range, and no single catalyst is strong enough to clear the 14.27bps hurdle with conviction. Under a general mandate with no stated risk tolerance or time horizon, the correct action is to stand aside rather than take a low-conviction directional bet. Counter-case: The strongest argument against standing aside is that the tape is already moving up (futures up, Dow rising, semis bouncing) and waiting for confirmation may mean missing the first leg of a move; if the U.S.-Iran peace narrative strengthens and yields stabilize, QQQ could grind higher and the 14bps hurdle would have been easily cleared by simply being long from here.",
+        "invalidation": [
+          "A decisive break above the prior session high with volume expansion and VIX compression below 14 would suggest momentum is real and the yield headwind is being absorbed",
+          "A sharp reversal in Treasury yields (10y dropping below 5.05%) would remove the primary headwind and could trigger a tech rally"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "NVDAUSDT-20260925T135626Z",
+      "condition": "unit_restate",
+      "edits": 8,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.55,
+        "thesis": "Under a general mandate (no specific risk budget or concentration constraint stated), NVDA's fundamentals are strong \u2014 revenue +17.9% QoQ, SUE +2.84\u03c3, 35/36 analysts revising up for the current quarter \u2014 and the geopolitical backdrop (Trump-Xi dinner with tech titans) is mildly supportive. However, the token is already up 1.38% in 24h, the VIX is at the 33rd percentile (low-vol, low-dispersion regime), and there is no identifiable catalyst that has not already been priced into today's move. The 14.27 bps hurdle requires a near-term edge beyond what the market has already reflected; the news flow is confirmatory, not incremental.",
+        "reasoning": "Under a general mandate (no specific risk budget or concentration constraint stated), NVDA's fundamentals are strong \u2014 revenue +17.9% QoQ, SUE +2.84\u03c3, 35/36 analysts revising up for the current quarter \u2014 and the geopolitical backdrop (Trump-Xi dinner with tech titans) is mildly supportive. However, the token is already up 1.38% in 24h, the VIX is at the 33rd percentile (low-vol, low-dispersion regime), and there is no identifiable catalyst that has not already been priced into today's move. The 14.27 bps hurdle requires a near-term edge beyond what the market has already reflected; the news flow is confirmatory, not incremental. Counter-case: The Trump-Xi dinner with 30+ CEOs and NVDA's presence at the head table could produce a surprise easing of chip export controls, which would be a genuine upside catalyst not yet priced. If that materializes, standing aside means missing a multi-percent move. The 35:1 revision ratio is unusually lopsided and suggests the Street sees continued upside that the token hasn't fully captured.",
+        "invalidation": [
+          "A concrete US-China chip export agreement or tariff reduction announced within the next 24 hours that materially expands NVDA's addressable market",
+          "NVDA token price pulling back below 223.00 (roughly -1.2%) on no negative news, indicating the current level is unsupported"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "TSLAUSDT-20260925T135626Z",
+      "condition": "unit_restate",
+      "edits": 8,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.45,
+        "thesis": "Under a general mandate, the evidence is mixed: Q2 fundamentals improved sharply (revenue +26% QoQ, net income +134% QoQ, SUE +0.83), and the US-China dinner headline is mildly positive for Tesla's China exposure, but consensus revisions are heavily negative (4 up / 15 down for current quarter, 3 up / 16 down for next quarter), short interest is elevated at 55.6%, and the Optimus robot production challenges headline adds execution risk. The 24h price change is -0.65% with no clear directional catalyst strong enough to clear the 14.27 bps hurdle.",
+        "reasoning": "Under a general mandate, the evidence is mixed: Q2 fundamentals improved sharply (revenue +26% QoQ, net income +134% QoQ, SUE +0.83), and the US-China dinner headline is mildly positive for Tesla's China exposure, but consensus revisions are heavily negative (4 up / 15 down for current quarter, 3 up / 16 down for next quarter), short interest is elevated at 55.6%, and the Optimus robot production challenges headline adds execution risk. The 24h price change is -0.65% with no clear directional catalyst strong enough to clear the 14.27 bps hurdle. Counter-case: The strongest argument against this decision is that the Q2 earnings surprise (SUE +0.83) combined with the US-China dinner optics could be underpriced if the market is overly focused on the negative revision trend, and a momentum trade could capture a short squeeze given 55.6% short volume.",
+        "invalidation": [
+          "If consensus revisions reverse to net positive within the next week, the bearish revision trend would be invalidated",
+          "If short interest drops below 50% in the next FINRA report, the crowding argument weakens",
+          "If a concrete positive catalyst emerges (e.g., China delivery numbers, FSD regulatory approval), the no-trade decision would be wrong"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "METAUSDT-20260925T135626Z",
+      "condition": "unit_restate",
+      "edits": 9,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.55,
+        "thesis": "General mandate: no prior position, first look at META. The evidence is mixed and does not clear the 14.27 bps hurdle. Q2 earnings declined sharply QoQ (-4080 bps net income and EPS), SUE is slightly negative (-0.10 SD), and consensus revisions are heavily negative (7 up / 33 down for current quarter). However, analyst price targets approaching $920 (vs. current $756.78) and a broadly risk-on environment (VIX 15.11, Fear & Greed 71, positive 10y-2y spread) suggest the market is not pricing in a collapse. The intraday headline says 'Meta Shares Dip' while broader tech gains on geopolitical optimism. The net effect is ambiguous: fundamental deterioration is real but the stock is already well below analyst targets, and the negative revision skew may already be embedded. No single catalyst or dislocation is identifiable that would generate an edge exceeding 14.27 bps in the near term.",
+        "reasoning": "General mandate: no prior position, first look at META. The evidence is mixed and does not clear the 14.27 bps hurdle. Q2 earnings declined sharply QoQ (-4080 bps net income and EPS), SUE is slightly negative (-0.10 SD), and consensus revisions are heavily negative (7 up / 33 down for current quarter). However, analyst price targets approaching $920 (vs. current $756.78) and a broadly risk-on environment (VIX 15.11, Fear & Greed 71, positive 10y-2y spread) suggest the market is not pricing in a collapse. The intraday headline says 'Meta Shares Dip' while broader tech gains on geopolitical optimism. The net effect is ambiguous: fundamental deterioration is real but the stock is already well below analyst targets, and the negative revision skew may already be embedded. No single catalyst or dislocation is identifiable that would generate an edge exceeding 14.27 bps in the near term. Counter-case: The strongest argument against standing aside is that analyst targets at $920 imply ~21% upside from $756.78, and the negative revisions may have already pushed the stock to a level where the risk/reward is asymmetrically favorable. If the market is overreacting to the QoQ earnings decline (which could be seasonal or one-time), a long entry here could capture mean reversion. However, without a specific catalyst or identifiable mispricing that clears the cost hurdle, this remains speculative rather than actionable.",
+        "invalidation": [
+          "If META breaks below $740 intraday on elevated volume, the dip is not being bought and the support thesis fails",
+          "If consensus EPS for Q3 2026 drops below $6.00 before the earnings report, the fundamental deterioration is accelerating beyond what is priced",
+          "If VIX spikes above 20 within 24 hours, the risk-on backdrop that supports holding risk is gone"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "COINUSDT-20260925T135626Z",
+      "condition": "unit_restate",
+      "edits": 8,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "down",
+        "confidence": 0.55,
+        "thesis": "Under a general mandate with no specific risk tolerance or time horizon, the evidence is mixed: fundamentals are deteriorating (revenue -13.7% QoQ, net loss of $360M, EPS -$1.36, consensus revised down 16/0 in 30 days), but the token price at $195.13 with only -0.215% 24h change and a VIX at 15.11 (normal regime) suggests the market has already priced in the bad news. The 14.27 bps hurdle cannot be cleared with conviction in either direction given the absence of a near-term catalyst and the conflicting signals between improving net income trajectory (QoQ +880bps) and universally downward estimate revisions.",
+        "reasoning": "Under a general mandate with no specific risk tolerance or time horizon, the evidence is mixed: fundamentals are deteriorating (revenue -13.7% QoQ, net loss of $360M, EPS -$1.36, consensus revised down 16/0 in 30 days), but the token price at $195.13 with only -0.215% 24h change and a VIX at 15.11 (normal regime) suggests the market has already priced in the bad news. The 14.27 bps hurdle cannot be cleared with conviction in either direction given the absence of a near-term catalyst and the conflicting signals between improving net income trajectory (QoQ +880bps) and universally downward estimate revisions. Counter-case: The strongest argument against standing aside is that 16/16 downward revisions with consensus EPS at -$0.22 for the current quarter (ending in 5 days) creates a setup where any miss could trigger a sharp move lower, and the 60.8% short volume suggests smart money is already positioned short \u2014 a momentum trade that could clear the 14.27 bps hurdle if the earnings print disappoints.",
+        "invalidation": [
+          "If COIN reports Q3 revenue above $1.3B or EPS above -$0.15, the bearish fundamental thesis is wrong",
+          "If short interest drops below 50% of volume within 5 sessions, the positioning argument for continued downside weakens materially",
+          "If crypto Fear & Greed drops below 40, the macro risk appetite supporting the token venue deteriorates"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "MSTRUSDT-20260925T135626Z",
+      "condition": "unit_restate",
+      "edits": 8,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.55,
+        "thesis": "General mandate: MSTR is a leveraged Bitcoin proxy. The company continues accumulating BTC (950 BTC at ~$79,670 last week), proposed daily preferred dividends (a capital-structure signal of confidence), and consensus EPS for the current quarter is positive at $16.39 with mixed-to-positive revisions. However, the 24h price change is -0.94%, short interest is elevated at 50.9%, the token is down on the day, and there is no identifiable catalyst with enough immediacy to clear the 14.27 bps hurdle. The 8-K filed this morning is opaque and unreadable, which adds uncertainty rather than reducing it. No edge over costs.",
+        "reasoning": "General mandate: MSTR is a leveraged Bitcoin proxy. The company continues accumulating BTC (950 BTC at ~$79,670 last week), proposed daily preferred dividends (a capital-structure signal of confidence), and consensus EPS for the current quarter is positive at $16.39 with mixed-to-positive revisions. However, the 24h price change is -0.94%, short interest is elevated at 50.9%, the token is down on the day, and there is no identifiable catalyst with enough immediacy to clear the 14.27 bps hurdle. The 8-K filed this morning is opaque and unreadable, which adds uncertainty rather than reducing it. No edge over costs. Counter-case: The strongest argument against standing aside is that MSTR is a high-beta Bitcoin proxy in a Greed regime (71/100), the company is actively buying BTC, consensus is turning positive, and the proposed daily dividend structure signals management confidence. A momentum buyer could argue the dip today is an entry. However, without a specific catalyst and with 50.9% short volume suggesting institutional disagreement, the edge is not demonstrably above the hurdle.",
+        "invalidation": [
+          "If the 8-K filed today contains materially positive information (e.g., a large BTC purchase or capital raise), the no-trade decision would be wrong",
+          "If Bitcoin breaks decisively above $84,000 with MSTR token following, the momentum thesis would have been actionable"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "QQQUSDT-20260925T135626Z",
+      "condition": "unit_restate",
+      "edits": 7,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.35,
+        "thesis": "General mandate, first look at QQQUSDT. The session is mildly constructive (Dow rising on geopolitical de-escalation, semis rallying, VIX suppressed at 15.11, futures up pre-bell Friday), but the 24h move is only +1.28% and the total hurdle is 14.27 bps. The news flow is mixed-to-positive but lacks a single high-conviction catalyst that would justify expecting a continuation move exceeding the hurdle within a reasonable holding period. Treasury yields are rising (10y at 5.18%, 2y at 4.87%), which is a headwind for duration-sensitive tech. The Fidelity 'AI trade is dead money' call adds a narrative overhang. Without a clear asymmetric edge over 14.27 bps, standing aside is correct.",
+        "reasoning": "General mandate, first look at QQQUSDT. The session is mildly constructive (Dow rising on geopolitical de-escalation, semis rallying, VIX suppressed at 15.11, futures up pre-bell Friday), but the 24h move is only +1.28% and the total hurdle is 14.27 bps. The news flow is mixed-to-positive but lacks a single high-conviction catalyst that would justify expecting a continuation move exceeding the hurdle within a reasonable holding period. Treasury yields are rising (10y at 5.18%, 2y at 4.87%), which is a headwind for duration-sensitive tech. The Fidelity 'AI trade is dead money' call adds a narrative overhang. Without a clear asymmetric edge over 14.27 bps, standing aside is correct. Counter-case: The strongest argument for a trade is that VIX at 15.11 implies ~0.95% daily move, the market is in a low-vol uptrend with semis leading, and geopolitical de-escalation (US-Iran) is a genuine positive catalyst. A momentum continuation trade could clear the hurdle if the rally extends through Friday. However, rising yields and the AI-capex skepticism narrative create enough ambiguity that the expected edge does not reliably exceed 14.27 bps.",
+        "invalidation": [
+          "A breakout above 750 with volume expansion and VIX remaining below 15 would suggest momentum continuation I am missing",
+          "A sharp drop in 10y yields below 5.0% would remove the rate headwind and likely catalyze a tech rally"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "NVDAUSDT-20260925T135626Z",
+      "condition": "restyle",
+      "edits": 25,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.62,
+        "thesis": "Under a general mandate (no specific risk budget or mandate constraint stated), NVDA presents a fundamentally strong but already-priced setup: revenue +17.9% QoQ, SUE of +2.84\u03c3, 35/36 analysts revising current-quarter EPS upward, and a positive US-China diplomatic catalyst (tech titan dinner). However, the 24h move is only +1.38%, VIX is at the 33rd percentile (normal regime, no urgency), and the hurdle of 14.27bps requires a near-term edge that the evidence does not clearly establish beyond what is already reflected in the token price. The diplomatic catalyst is sentiment-positive but lacks specificity on chip export policy outcomes, which is the actual variable that matters for NVDA's revenue trajectory.",
+        "reasoning": "Under a general mandate (no specific risk budget or mandate constraint stated), NVDA presents a fundamentally strong but already-priced setup: revenue +17.9% QoQ, SUE of +2.84\u03c3, 35/36 analysts revising current-quarter EPS upward, and a positive US-China diplomatic catalyst (tech titan dinner). However, the 24h move is only +1.38%, VIX is at the 33rd percentile (normal regime, no urgency), and the hurdle of 14.27bps requires a near-term edge that the evidence does not clearly establish beyond what is already reflected in the token price. The diplomatic catalyst is sentiment-positive but lacks specificity on chip export policy outcomes, which is the actual variable that matters for NVDA's revenue trajectory. Counter-case: The strongest argument against standing aside is that the combination of a +2.84\u03c3 SUE, near-unanimous upward EPS revisions (35 up / 1 down), and a fresh geopolitical de-escalation catalyst is exactly the kind of multi-factor alignment that produces sustained drift over the next several days. By waiting, I may miss the continuation move that these conditions historically generate, especially with VIX low and risk appetite elevated (Fear & Greed at 71).",
+        "invalidation": [
+          "If the US-China summit produces concrete chip export restrictions or tariffs that specifically target NVIDIA's data center GPU exports to China, the bullish thesis is invalidated",
+          "If NVDA's next earnings (quarter ending 2026-10-31) shows revenue growth decelerating below 10% QoQ, the momentum thesis breaks",
+          "If the token price gaps down more than 2% on the next session open without a corresponding broad market decline, the diplomatic catalyst has been fully consumed or reversed"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "TSLAUSDT-20260925T135626Z",
+      "condition": "restyle",
+      "edits": 25,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.42,
+        "thesis": "General mandate: no prior position, no debate, first look. The macro backdrop is mildly supportive (VIX 15.11 at 33rd percentile, S&P edging higher, tech dinner headline positive), and fundamentals show strong Q2 acceleration (revenue +26% QoQ, net income +133% QoQ, SUE +0.83). However, the 24h price change is -0.65% despite the positive headline flow, suggesting the market is not rewarding the narrative in real time. Analyst revisions are heavily negative (15 down vs 4 up for current quarter; 16 down vs 3 up for next quarter), short volume at 55.6% is elevated, and the Optimus robot production challenge headline adds a near-term drag. The 14.27 bps total hurdle requires a clear directional edge; the conflicting signals (positive fundamentals and macro vs. negative revisions, elevated short interest, and price not responding to good news) do not provide one.",
+        "reasoning": "General mandate: no prior position, no debate, first look. The macro backdrop is mildly supportive (VIX 15.11 at 33rd percentile, S&P edging higher, tech dinner headline positive), and fundamentals show strong Q2 acceleration (revenue +26% QoQ, net income +133% QoQ, SUE +0.83). However, the 24h price change is -0.65% despite the positive headline flow, suggesting the market is not rewarding the narrative in real time. Analyst revisions are heavily negative (15 down vs 4 up for current quarter; 16 down vs 3 up for next quarter), short volume at 55.6% is elevated, and the Optimus robot production challenge headline adds a near-term drag. The 14.27 bps total hurdle requires a clear directional edge; the conflicting signals (positive fundamentals and macro vs. negative revisions, elevated short interest, and price not responding to good news) do not provide one. Counter-case: The strongest argument against standing aside is that the US-China dinner headline with tech titans is a genuine geopolitical de-escalation catalyst for TSLA specifically (China is a major market), and the market may simply be slow to price it during RTH. The Q2 earnings momentum is real and accelerating. If the stock gaps up on this narrative, the opportunity cost of standing aside is the missed move minus 14 bps.",
+        "invalidation": [
+          "If TSLAUSDT breaks above 380 with volume expansion within the next 2 hours, the negative revision signal may be wrong and the positive catalysts are being priced in with a lag",
+          "If short volume drops below 50% on the next FINRA print, the bearish positioning thesis weakens"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "METAUSDT-20260925T135626Z",
+      "condition": "restyle",
+      "edits": 25,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "down",
+        "confidence": 0.45,
+        "thesis": "Under a general mandate (no specific risk budget or directional bias imposed), the evidence presents a conflicted picture: fundamentals show a sharp QoQ earnings decline (-40.8% EPS QoQ) with consensus revisions heavily skewed downward (7 up / 33 down for current quarter), yet analyst price targets near $920 and a tech-friendly geopolitical backdrop (Trump-Xi dinner) offer a bullish counter-narrative. The 14.27 bps hurdle is not cleared by any identifiable short-term edge \u2014 the 24h change is essentially flat (-0.009%), VIX is in a normal regime (33rd percentile), and no catalyst is imminent enough to generate a move that exceeds transaction costs with sufficient probability.",
+        "reasoning": "Under a general mandate (no specific risk budget or directional bias imposed), the evidence presents a conflicted picture: fundamentals show a sharp QoQ earnings decline (-40.8% EPS QoQ) with consensus revisions heavily skewed downward (7 up / 33 down for current quarter), yet analyst price targets near $920 and a tech-friendly geopolitical backdrop (Trump-Xi dinner) offer a bullish counter-narrative. The 14.27 bps hurdle is not cleared by any identifiable short-term edge \u2014 the 24h change is essentially flat (-0.009%), VIX is in a normal regime (33rd percentile), and no catalyst is imminent enough to generate a move that exceeds transaction costs with sufficient probability. Counter-case: The strongest argument against standing aside is that three major analysts have price targets approaching $920 (21% upside from current), the Trump-Xi dinner is a positive sentiment catalyst for big tech, and the 59.7% short volume could set up a squeeze if any positive headline emerges. However, the heavy downward revision skew (33 down vs 7 up) and the -40.8% QoQ EPS decline suggest those targets may be stale or aspirational rather than actionable in the near term.",
+        "invalidation": [
+          "A sudden spike in short interest beyond 65% combined with a breakdown below $740 would suggest the bearish case is accelerating faster than the market is pricing",
+          "If consensus EPS for Q3 2026 is revised up by more than 5% within the next week, the downward revision trend may be reversing"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "COINUSDT-20260925T135626Z",
+      "condition": "restyle",
+      "edits": 25,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "down",
+        "confidence": 0.35,
+        "thesis": "Under a general mandate with no specific risk appetite or horizon stated, the evidence on COIN is mixed and does not clear the 14.27 bps hurdle. Fundamentals are deteriorating (revenue -13.7% QoQ, negative EPS, 16/16 analysts cutting estimates for both current and next quarter), yet the token is flat on the day and crypto sentiment is in 'Greed' territory. The 60.8% short volume is notable but not actionable without a clear catalyst or mean-reversion signal that exceeds transaction costs.",
+        "reasoning": "Under a general mandate with no specific risk appetite or horizon stated, the evidence on COIN is mixed and does not clear the 14.27 bps hurdle. Fundamentals are deteriorating (revenue -13.7% QoQ, negative EPS, 16/16 analysts cutting estimates for both current and next quarter), yet the token is flat on the day and crypto sentiment is in 'Greed' territory. The 60.8% short volume is notable but not actionable without a clear catalyst or mean-reversion signal that exceeds transaction costs. Counter-case: The strongest argument against standing aside is that the 60.8% short interest combined with crypto Fear & Greed at 71 and a $400K BTC target from the Coinbase CEO could set up a short squeeze that moves COIN sharply higher, and waiting means missing the initial leg. However, without a specific trigger or momentum signal, this remains speculative.",
+        "invalidation": [
+          "If COIN announces a material positive catalyst (e.g., new product launch, regulatory approval, or earnings beat) that would drive a move exceeding 14.27 bps intraday",
+          "If short volume spikes above 70% while price holds support, suggesting a potential short squeeze setup with defined risk"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "MSTRUSDT-20260925T135626Z",
+      "condition": "restyle",
+      "edits": 27,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.35,
+        "thesis": "Under a general mandate with no specific risk tolerance or horizon stated, the evidence presents a mixed picture: MSTR bought 950 BTC at ~$79,670 (now implied ~$84K, a mark-to-market gain), proposed daily preferred dividends (mildly positive for capital structure credibility), and consensus EPS revisions skew positive for next quarter. However, the 24h price change is essentially flat (-0.94%), short interest is elevated at 50.9%, the 8-K filed this morning is opaque, and the token trades at $159.91 with no clear catalyst to drive a move exceeding the 14.27 bps hurdle in the near term. The edge does not clear the cost.",
+        "reasoning": "Under a general mandate with no specific risk tolerance or horizon stated, the evidence presents a mixed picture: MSTR bought 950 BTC at ~$79,670 (now implied ~$84K, a mark-to-market gain), proposed daily preferred dividends (mildly positive for capital structure credibility), and consensus EPS revisions skew positive for next quarter. However, the 24h price change is essentially flat (-0.94%), short interest is elevated at 50.9%, the 8-K filed this morning is opaque, and the token trades at $159.91 with no clear catalyst to drive a move exceeding the 14.27 bps hurdle in the near term. The edge does not clear the cost. Counter-case: The strongest argument against standing aside is that the 950 BTC purchase at $79,670 with BTC now around $84K represents a ~5.4% unrealized gain on that tranche alone, and the daily-dividend preferred structure could attract a new class of buyer, creating a slow but persistent bid that makes the token grind higher over the next several sessions.",
+        "invalidation": [
+          "If the opaque 8-K filed at 08:03 UTC today contains a material positive disclosure (e.g., large BTC purchase, new financing facility, or index inclusion), the thesis of no edge would be wrong",
+          "If BTC price breaks above $85,000 intraday with MSTR token volume expanding >2x the 24h average, momentum could carry the token past the hurdle"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "QQQUSDT-20260925T135626Z",
+      "condition": "restyle",
+      "edits": 13,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.35,
+        "thesis": "General mandate: mixed intraday signals \u2014 Dow rising on geopolitical de-escalation and semiconductor strength (Arm +5%, Micron rally) are offset by rising Treasury yields (10y at 5.18%, curve steepening), Meta weakness, and a Fidelity strategist calling AI capex 'dead money.' The 24h move of +1.28% already prices in the positive headlines; the remaining edge is unclear and unlikely to clear the 14.27 bps hurdle in the near term.",
+        "reasoning": "General mandate: mixed intraday signals \u2014 Dow rising on geopolitical de-escalation and semiconductor strength (Arm +5%, Micron rally) are offset by rising Treasury yields (10y at 5.18%, curve steepening), Meta weakness, and a Fidelity strategist calling AI capex 'dead money.' The 24h move of +1.28% already prices in the positive headlines; the remaining edge is unclear and unlikely to clear the 14.27 bps hurdle in the near term. Counter-case: The strongest argument against standing aside is that the VIX at 15.11 (33rd percentile) signals a low-volatility regime where momentum tends to persist, the 24h gain of 1.28% shows buyers are in control, and geopolitical de-escalation (US-Iran peace hopes) is a durable positive catalyst that could drive further upside before the session ends.",
+        "invalidation": [
+          "A decisive break above the 24h high on expanding volume with yields stabilizing or falling would indicate momentum continuation beyond what is priced",
+          "A sharp reversal in Treasury yields (10y falling below 5.0%) would remove the primary headwind and could catalyze a leg higher"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "NVDAUSDT-20260925T135626Z",
+      "condition": "reorder+restate",
+      "edits": 25,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.62,
+        "thesis": "Under a general mandate, NVDA's fundamentals are strong (revenue +17.9% QoQ, SUE +2.84, consensus revisions 35-up/1-down for current quarter) and the US-China dinner headline is mildly positive for chip stocks, but the token has already moved +1.38% in 24h, VIX is low and stable, and the short interest at 34.8% is elevated without a clear catalyst to force covering. The edge from the news is likely already priced into the move; I cannot identify a specific, time-bound catalyst that would push the token beyond the 14.27 bps hurdle in the near term beyond what is already reflected.",
+        "reasoning": "Under a general mandate, NVDA's fundamentals are strong (revenue +17.9% QoQ, SUE +2.84, consensus revisions 35-up/1-down for current quarter) and the US-China dinner headline is mildly positive for chip stocks, but the token has already moved +1.38% in 24h, VIX is low and stable, and the short interest at 34.8% is elevated without a clear catalyst to force covering. The edge from the news is likely already priced into the move; I cannot identify a specific, time-bound catalyst that would push the token beyond the 14.27 bps hurdle in the near term beyond what is already reflected. Counter-case: The strongest argument against standing aside is that the US-China dinner with NVDA's CEO at the head table is a genuine de-escalation signal for chip export controls, and the 35-up/1-down revision skew suggests analysts are still catching up to the upside \u2014 meaning the 1.38% move is only the beginning of a multi-day re-rating that would easily clear the hurdle.",
+        "invalidation": [
+          "If NVDAUSDT breaks below 224.00 within the next session, the positive momentum thesis is broken",
+          "If a concrete US-China chip export restriction is announced within 48 hours, the dinner narrative is invalidated",
+          "If VIX spikes above 20 within 24 hours, the low-volatility regime assumption fails"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "TSLAUSDT-20260925T135626Z",
+      "condition": "reorder+restate",
+      "edits": 25,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.35,
+        "thesis": "General mandate: no specific client constraint applies, so the decision is governed purely by edge vs. hurdle. TSLA shows improving fundamentals (Q2 EPS beat, revenue +26% QoQ, net income +133% QoQ) and a mildly supportive macro backdrop (VIX low, yield curve normal, S&P edging up on US-China dinner optics). However, consensus revisions are heavily negative (15 down vs. 4 up for current quarter; 16 down vs. 3 up for next), short interest is elevated at 55.6%, the Optimus robot production challenge headline introduces execution risk, and the token is already down 0.65% on the day. The positive fundamental momentum is real but already reflected in the price; the negative revision skew and elevated short interest suggest the market is pricing in deceleration ahead. No single catalyst is strong enough to clear the 14.27 bps hurdle with confidence.",
+        "reasoning": "General mandate: no specific client constraint applies, so the decision is governed purely by edge vs. hurdle. TSLA shows improving fundamentals (Q2 EPS beat, revenue +26% QoQ, net income +133% QoQ) and a mildly supportive macro backdrop (VIX low, yield curve normal, S&P edging up on US-China dinner optics). However, consensus revisions are heavily negative (15 down vs. 4 up for current quarter; 16 down vs. 3 up for next), short interest is elevated at 55.6%, the Optimus robot production challenge headline introduces execution risk, and the token is already down 0.65% on the day. The positive fundamental momentum is real but already reflected in the price; the negative revision skew and elevated short interest suggest the market is pricing in deceleration ahead. No single catalyst is strong enough to clear the 14.27 bps hurdle with confidence. Counter-case: The strongest argument against standing aside is that the Q2 earnings surprise (+0.83 SUE) combined with the US-China dinner optics and low VIX could produce a short squeeze given 55.6% short volume \u2014 a momentum move that would clear the hurdle easily. If the dinner produces concrete trade concessions affecting Tesla's China operations, the stock could gap up meaningfully.",
+        "invalidation": [
+          "Consensus EPS revisions for Q3 2026 flip to net positive within 7 days",
+          "Short volume drops below 45% of total prints for two consecutive sessions",
+          "A concrete, positive catalyst (e.g., delivery beat, new product announcement with confirmed timeline) emerges before next earnings"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "METAUSDT-20260925T135626Z",
+      "condition": "reorder+restate",
+      "edits": 25,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "down",
+        "confidence": 0.45,
+        "thesis": "General mandate: no specific client constraint, so the bar is purely risk-adjusted edge over the 14.27 bps hurdle. Q2 EPS fell 41% QoQ ($10.44\u2192$6.18), consensus for the current quarter (ending 2026-09-30) is $6.40 with 33 of 40 analysts revising downward, and SUE was slightly negative. The bullish analyst price-target headline ($920) is contradicted by the revision skew and the earnings deceleration. The short volume at 59.7% is elevated but not extreme enough to signal a squeeze. The token is flat on the day (-0.009%) with no clear catalyst in the next few hours. The mixed-to-negative fundamental trajectory does not clear the hurdle in either direction with sufficient confidence.",
+        "reasoning": "General mandate: no specific client constraint, so the bar is purely risk-adjusted edge over the 14.27 bps hurdle. Q2 EPS fell 41% QoQ ($10.44\u2192$6.18), consensus for the current quarter (ending 2026-09-30) is $6.40 with 33 of 40 analysts revising downward, and SUE was slightly negative. The bullish analyst price-target headline ($920) is contradicted by the revision skew and the earnings deceleration. The short volume at 59.7% is elevated but not extreme enough to signal a squeeze. The token is flat on the day (-0.009%) with no clear catalyst in the next few hours. The mixed-to-negative fundamental trajectory does not clear the hurdle in either direction with sufficient confidence. Counter-case: The strongest argument against standing aside is that three major analysts just raised targets to ~$920 (22% upside from 756.78), the yield curve is positively sloped (risk-on macro), VIX is low, and the Fear & Greed index at 71 suggests continued appetite. A momentum buyer could argue the earnings miss is already priced in and the AI narrative is the forward driver. However, the 33/40 downward revision ratio on current-quarter estimates is a more direct, quantitative signal than headline price targets, which tend to lag.",
+        "invalidation": [
+          "If META reports Q3 revenue growth re-accelerating above 20% YoY and EPS beats consensus by more than 10%, the bearish lean is wrong",
+          "If short interest collapses below 40% of daily volume within 3 sessions while price rises, a squeeze thesis would invalidate the stand-aside"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "COINUSDT-20260925T135626Z",
+      "condition": "reorder+restate",
+      "edits": 23,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "sell",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "down",
+        "confidence": 0.45,
+        "thesis": "Under a general mandate (no specific risk budget or conviction threshold stated), the evidence is directionally bearish but insufficient to clear the 14.27 bps hurdle with confidence. COIN has posted two consecutive quarters of net losses (-$0.39B Q1, -$0.36B Q2), revenue is declining QoQ (-13.7%), consensus EPS for the current quarter is negative (-$0.22) with 16/17 analysts revising down, and short volume is elevated at 60.8% of prints. However, the 24h price change is only -0.215%, the VIX is benign, and the crypto Fear & Greed at 71 suggests the venue itself is not pricing distress. The gap between deteriorating fundamentals and a market that is not yet repricing them creates ambiguity about timing \u2014 the edge may exist but I cannot confirm it exceeds the hurdle today.",
+        "reasoning": "Under a general mandate (no specific risk budget or conviction threshold stated), the evidence is directionally bearish but insufficient to clear the 14.27 bps hurdle with confidence. COIN has posted two consecutive quarters of net losses (-$0.39B Q1, -$0.36B Q2), revenue is declining QoQ (-13.7%), consensus EPS for the current quarter is negative (-$0.22) with 16/17 analysts revising down, and short volume is elevated at 60.8% of prints. However, the 24h price change is only -0.215%, the VIX is benign, and the crypto Fear & Greed at 71 suggests the venue itself is not pricing distress. The gap between deteriorating fundamentals and a market that is not yet repricing them creates ambiguity about timing \u2014 the edge may exist but I cannot confirm it exceeds the hurdle today. Counter-case: The strongest argument against a short is that the market is already aware of the losses and the stock/token is at $195 \u2014 potentially already discounted. The Clarity Act collapse headline could be a contrarian catalyst if regulatory clarity eventually emerges. Additionally, the $1B tokenized stock volume milestone on Base suggests a new revenue stream that analysts may not yet be modeling, and the Fear & Greed at 71 means the broader crypto ecosystem is still risk-on, which historically supports COIN's transaction revenue.",
+        "invalidation": [
+          "If COIN reports positive net income for Q3 2026 (ending Sep 30), the bearish fundamental thesis is broken",
+          "If consensus EPS revisions turn positive (more up than down in 30d), the estimate deterioration thesis is invalidated",
+          "If short volume drops below 45% of prints for three consecutive sessions, the crowding signal weakens"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "MSTRUSDT-20260925T135626Z",
+      "condition": "reorder+restate",
+      "edits": 27,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.55,
+        "thesis": "General mandate: no prior position, first look at MSTRUSDT. The token is down ~0.94% in 24h while short interest remains elevated (50.9% of prints), net income is improving QoQ (+3450bps from deeply negative), consensus EPS revisions lean positive for next quarter, and Bitcoin purchases continue. However, the edge is insufficient to clear the 14.27 bps hurdle \u2014 the improvement is from a deeply negative base, the 8-K filings are opaque, the token is already reflecting the BTC accumulation narrative, and no catalyst is identifiable that would move price beyond transaction costs in the near term.",
+        "reasoning": "General mandate: no prior position, first look at MSTRUSDT. The token is down ~0.94% in 24h while short interest remains elevated (50.9% of prints), net income is improving QoQ (+3450bps from deeply negative), consensus EPS revisions lean positive for next quarter, and Bitcoin purchases continue. However, the edge is insufficient to clear the 14.27 bps hurdle \u2014 the improvement is from a deeply negative base, the 8-K filings are opaque, the token is already reflecting the BTC accumulation narrative, and no catalyst is identifiable that would move price beyond transaction costs in the near term. Counter-case: The strongest argument against standing aside is that MSTR is a leveraged Bitcoin proxy in a Greed regime (F&G 71), with continued BTC accumulation (950 BTC bought last week at $79,670), improving earnings trajectory, and positive consensus revisions for next quarter. If Bitcoin rallies on macro tailwinds (VIX at 15, curve normalizing), MSTR could gap higher and the missed opportunity would be real. The daily dividend proposal for preferred stock could also signal management confidence.",
+        "invalidation": []
+      }
+    },
+    {
+      "snapshot_id": "QQQUSDT-20260925T135626Z",
+      "condition": "reorder+restate",
+      "edits": 13,
+      "decision": {
+        "verdict": "no_trade",
+        "side": "buy",
+        "quantity": "0",
+        "action": [
+          "no_trade",
+          "-",
+          "0"
+        ],
+        "lean": "up",
+        "confidence": 0.35,
+        "thesis": "General mandate: no specific edge identified. The session is mildly constructive (Dow rising on US-Iran peace hopes, Arm/semis bouncing, VIX declining, futures up pre-bell) but offset by rising Treasury yields (10y at 5.18%, curve steepening) and a Fidelity strategist calling the AI trade 'dead money' with unknown returns. The 24h move is only +1.28% and the total hurdle is 14.27 bps; no catalyst here is specific or urgent enough to clear that with conviction. No prior position, no debate, no hedge available \u2014 the evidence is adequate to conclude there is no tradeable edge right now.",
+        "reasoning": "General mandate: no specific edge identified. The session is mildly constructive (Dow rising on US-Iran peace hopes, Arm/semis bouncing, VIX declining, futures up pre-bell) but offset by rising Treasury yields (10y at 5.18%, curve steepening) and a Fidelity strategist calling the AI trade 'dead money' with unknown returns. The 24h move is only +1.28% and the total hurdle is 14.27 bps; no catalyst here is specific or urgent enough to clear that with conviction. No prior position, no debate, no hedge available \u2014 the evidence is adequate to conclude there is no tradeable edge right now. Counter-case: The strongest argument against standing aside is that the market is in a low-vol, risk-on regime (VIX 15, Fear & Greed 71, futures green, semis bouncing) and momentum tends to persist in such environments; by waiting for a clearer signal I may be missing the continuation of a trend that is already underway and would have cleared the hurdle easily.",
+        "invalidation": [
+          "A sudden break above 750 with volume surge would suggest momentum continuation I missed",
+          "Treasury yields reversing sharply lower intraday would remove the headwind and open a long thesis"
+        ]
+      }
+    }
+  ]
+}

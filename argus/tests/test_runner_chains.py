@@ -196,8 +196,12 @@ class TestTheWiringItself:
         assert "_grade_chains(outcomes)" in inspect.getsource(runner._settle_due)
 
     def test_the_decision_path_calls_the_writer(self) -> None:
+        """Every booked run goes through `_record_run` since 2026-09-25 — the fresh decision and
+        the one a human resumed alike — so the writer is pinned there, and `run_once` is pinned to
+        route both kinds of run through it."""
         import inspect
 
         from argus.paper import runner
 
-        assert "_write_chain(" in inspect.getsource(runner.run_once)
+        assert "_write_chain(" in inspect.getsource(runner._record_run)
+        assert inspect.getsource(runner.run_once).count("_record_run(") == 2

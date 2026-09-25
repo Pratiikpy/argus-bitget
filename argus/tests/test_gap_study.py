@@ -62,9 +62,13 @@ def _recent_weekday(days_back: int) -> date:
     """A real date guaranteed to fall inside a short trailing fetch window, walked back off a
     weekend if `days_back` lands on one — so the constructed "holiday" below is unambiguous
     (`DualClock.phase` checks `d in holidays` before the weekday check, so a weekend date would
-    already read HOLIDAY without ever exercising that first branch)."""
+    already read HOLIDAY without ever exercising that first branch).
+
+    Tuesday to Thursday only (2026-09-26): a Monday or Friday holiday joins the weekend it touches
+    and is correctly read as one long WEEKEND closure, so a Monday landing here (as 26 Sep minus 5
+    did) failed the test on the calendar, not on the code."""
     d = date.today() - timedelta(days=days_back)
-    while d.weekday() >= 5:
+    while d.weekday() not in (1, 2, 3):
         d -= timedelta(days=1)
     return d
 

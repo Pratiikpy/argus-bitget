@@ -13,15 +13,28 @@ lie are all ways of turning an absence into a verdict:
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 import pytest
 
+from argus.eval import artefact
 from argus.eval.refusal import (
+    CONSISTENT,
+    CONTRADICTED,
     MIN_FOR_A_RATE,
     ROUND_TRIP_BPS,
+    UNGRADEABLE,
+    Claim,
     HorizonResult,
+    ReasonCheck,
+    ReasonReport,
+    binomial_upper,
+    check_reasons,
+    grade_reasons,
     orphans,
+    reason_line,
     score,
     wilson,
 )
@@ -271,7 +284,7 @@ class TestAMarkNeedsADecisionBehindIt:
     this project is built against, so it is now refused rather than scored.
     """
 
-    def test_a_mark_with_no_decision_behind_it_is_named(self, tmp_path) -> None:
+    def test_a_mark_with_no_decision_behind_it_is_named(self, tmp_path: Path) -> None:
         ledger = tmp_path / "ledger.jsonl"
         ledger.write_text('{"seq": 1}\n{"seq": 2}\n', encoding="utf-8")
         stray = orphans(
@@ -281,12 +294,12 @@ class TestAMarkNeedsADecisionBehindIt:
         )
         assert stray == [999]
 
-    def test_marks_that_all_match_the_ledger_leave_no_orphans(self, tmp_path) -> None:
+    def test_marks_that_all_match_the_ledger_leave_no_orphans(self, tmp_path: Path) -> None:
         ledger = tmp_path / "ledger.jsonl"
         ledger.write_text('{"seq": 1}\n{"seq": 2}\n', encoding="utf-8")
         assert orphans([_mark(horizon=2.0, move=10.0, lean="up", seq=2)], ledger_path=ledger) == []
 
-    def test_a_missing_ledger_makes_every_mark_unverifiable_not_valid(self, tmp_path) -> None:
+    def test_a_missing_ledger_makes_every_mark_unverifiable_not_valid(self, tmp_path: Path) -> None:
         """Nothing to check against is not the same as everything checking out."""
         stray = orphans(
             [_mark(horizon=2.0, move=10.0, lean="up", seq=5)],
@@ -294,5 +307,168 @@ class TestAMarkNeedsADecisionBehindIt:
         )
         assert stray == [5]
 
-    def test_no_marks_and_no_ledger_yields_no_orphans(self, tmp_path) -> None:
+    def test_no_marks_and_no_ledger_yields_no_orphans(self, tmp_path: Path) -> None:
         assert orphans([], ledger_path=tmp_path / "absent.jsonl") == []
+
+
+class TestTheStatedReasonIsCheckedAgainstTheRecord:
+    """The fifth question: was the reason a refusal gave true? Each claim is graded only against a
+    record that can settle it, and a claim the record cannot reach is ``ungradeable`` — never
+    counted as confirmed, which would flatter the desk, nor as contradicted, which would slander
+    it."""
+
+    def _entry(self, thesis: str, *, phase: str = "weekend", hours: float = 50.0,
+               seq: int = 7) -> dict[str, object]:
+        return {"seq": seq, "symbol": "NVDAUSDT", "thesis": thesis, "session_phase": phase,
+                "hours_to_discovery": hours, "verdict": "no_trade", "kind": "decision"}
+
+    def _one(self, checks: list[ReasonCheck], claim: Claim) -> ReasonCheck:
+        found = [c for c in checks if c.claim is claim]
+        assert len(found) == 1, [c.claim for c in checks]
+        return found[0]
+
+    def test_a_closed_market_claim_on_a_weekend_is_consistent(self) -> None:
+        checks = check_reasons(self._entry("Weekend session with anchor asleep."))
+        assert self._one(checks, Claim.SESSION_CLOSED).verdict == CONSISTENT
+
+    def test_a_closed_market_claim_during_regular_hours_is_contradicted(self) -> None:
+        checks = check_reasons(self._entry("The anchor market is closed, so stand aside.",
+                                           phase="rth", hours=0.0))
+        assert self._one(checks, Claim.SESSION_CLOSED).verdict == CONTRADICTED
+
+    def test_a_negated_open_claim_is_not_read_as_an_open_claim(self) -> None:
+        """Seqs 139 and 460: "no anchor market open" on a weekend. The first run of this grader
+        read both as open-market claims and accused the desk of the error it was looking for."""
+        checks = check_reasons(self._entry("a weekend token with no anchor market open"))
+        assert not [c for c in checks if c.claim is Claim.SESSION_OPEN]
+
+    def test_a_past_reference_to_the_weekend_is_not_a_claim_about_now(self) -> None:
+        checks = check_reasons(self._entry("the weekend memory shows 8 prior passes", phase="rth",
+                                           hours=0.0))
+        assert not [c for c in checks if c.claim is Claim.SESSION_CLOSED]
+
+    def test_quoted_hours_within_rounding_agree_and_far_off_do_not(self) -> None:
+        near = check_reasons(self._entry("52 hours to genuine price discovery", hours=51.99))
+        far = check_reasons(self._entry("52 hours to genuine price discovery", hours=20.0))
+        assert self._one(near, Claim.HOURS_TO_DISCOVERY).verdict == CONSISTENT
+        assert self._one(far, Claim.HOURS_TO_DISCOVERY).verdict == CONTRADICTED
+
+    def test_no_hedge_is_graded_only_where_the_desk_wrote_notes(self) -> None:
+        thesis = self._entry("no hedge menu available")
+        assert self._one(check_reasons(thesis), Claim.NO_HEDGE).verdict == UNGRADEABLE
+        empty = check_reasons(thesis, notes=["hedge menu empty: nothing placeable for 50.0h"])
+        assert self._one(empty, Claim.NO_HEDGE).verdict == CONSISTENT
+        full = check_reasons(thesis, notes=["panel: 2 analysts"])
+        assert self._one(full, Claim.NO_HEDGE).verdict == CONTRADICTED
+
+    def test_blaming_the_risk_layer_when_it_did_not_intervene_is_contradicted(self) -> None:
+        thesis = self._entry("The risk layer blocked the position.")
+        idle = check_reasons(thesis, risk={"intervened": False,
+                                           "binding_constraint": "no_exposure"})
+        acted = check_reasons(thesis, risk={"intervened": True,
+                                            "binding_constraint": "max_notional"})
+        assert self._one(idle, Claim.RISK_LAYER).verdict == CONTRADICTED
+        assert self._one(acted, Claim.RISK_LAYER).verdict == CONSISTENT
+
+    def test_news_about_a_kill_switch_is_not_blaming_the_risk_layer(self) -> None:
+        checks = check_reasons(self._entry("a Senate AI kill switch proposal weighs on sentiment"))
+        assert not [c for c in checks if c.claim is Claim.RISK_LAYER]
+
+    def test_a_forward_size_claim_is_graded_by_the_next_two_hour_mark(self) -> None:
+        thesis = self._entry("the binding constraint was direction, not size")
+        big = _mark(horizon=2.0, move=40.0, lean="none", seq=7)
+        small = _mark(horizon=2.0, move=3.0, lean="none", seq=7)
+        late = _mark(horizon=18.0, move=40.0, lean="none", seq=7)
+        assert self._one(check_reasons(thesis, mark=big), Claim.MOVES_ENOUGH).verdict == \
+            CONSISTENT
+        assert self._one(check_reasons(thesis, mark=small), Claim.MOVES_ENOUGH).verdict == \
+            CONTRADICTED
+        assert self._one(check_reasons(thesis, mark=late), Claim.MOVES_ENOUGH).verdict == \
+            UNGRADEABLE
+
+    def test_an_edge_claim_is_not_mistaken_for_a_size_claim(self) -> None:
+        checks = check_reasons(self._entry("the remaining edge is unlikely to clear the hurdle"))
+        assert not [c for c in checks if c.claim is Claim.MOVE_TOO_SMALL]
+
+    def test_the_report_from_files_and_its_artefact(self, tmp_path: Path) -> None:
+        ledger = tmp_path / "ledger.jsonl"
+        rows = [self._entry("Weekend session with 50 hours to genuine price discovery.", seq=1),
+                self._entry("The market is closed.", phase="rth", hours=0.0, seq=2),
+                self._entry("No view.", seq=3),
+                {"seq": 4, "verdict": "settlement_seal", "kind": "settlement_seal",
+                 "thesis": "The market is closed."}]
+        ledger.write_text("\n".join(json.dumps(r) for r in rows), encoding="utf-8")
+        report = grade_reasons(ledger_path=ledger, notes_path=tmp_path / "none.jsonl",
+                               risk_path=tmp_path / "none.jsonl", marks=[], now=AT)
+        assert report.refusals == 3
+        assert report.refusals_with_a_claim == 2
+        assert [c.seq for c in report.contradicted] == [2]
+        assert "1 contradicted it" in report.verdict
+        out = tmp_path / "reasons.json"
+        artefact.write(out, report.as_dict())
+        assert artefact.is_strict(out)
+
+    def test_no_refusals_is_undefined(self, tmp_path: Path) -> None:
+        empty = tmp_path / "ledger.jsonl"
+        empty.write_text("", encoding="utf-8")
+        report = grade_reasons(ledger_path=empty, notes_path=empty, risk_path=empty, marks=[],
+                               now=AT)
+        assert "UNDEFINED" in report.verdict
+
+
+class TestAForwardClaimMustBeatTheBaseRate:
+    def test_the_exact_upper_tail(self) -> None:
+        assert binomial_upper(5, 5, 0.5) == pytest.approx(1 / 32)
+        assert binomial_upper(0, 7, 0.3) == pytest.approx(1.0)
+
+    def test_a_claim_right_as_often_as_the_tape_carries_no_information(self) -> None:
+        """Four in five right sounds like skill; it is not when four in five moves clear anyway."""
+        entries = [{"seq": i, "symbol": "NVDAUSDT", "thesis": "direction, not size",
+                    "session_phase": "rth", "hours_to_discovery": 0.0} for i in range(10)]
+        marks = [_mark(horizon=2.0, move=40.0 if i < 8 else 2.0, lean="none", seq=i)
+                 for i in range(10)]
+        checks = [c for e, m in zip(entries, marks, strict=True)
+                  for c in check_reasons(e, mark=m)]
+        report = ReasonReport(checks=tuple(checks), refusals=10, base_clearance=(8, 10), as_of=AT)
+        held, n, base, p = report.against_base(Claim.MOVES_ENOUGH) or (0, 0, 0.0, 0.0)
+        assert (held, n, base) == (8, 10, 0.8)
+        assert p > 0.05
+        assert "no evidence the stated reason says more than the base rate" in report.verdict
+        assert report.against_base(Claim.MOVE_TOO_SMALL) is None
+
+
+class TestTheConsoleLineSaysWhatTheGradingSays:
+    def _written(self, tmp_path: Path, *, contradicted: int, p: float) -> Path:
+        entries = [{"seq": i, "symbol": "NVDAUSDT",
+                    "thesis": "the anchor is asleep; direction, not size",
+                    "session_phase": "rth" if i < contradicted else "weekend",
+                    "hours_to_discovery": 0.0} for i in range(10)]
+        marks = [_mark(horizon=2.0, move=40.0, lean="none", seq=i) for i in range(10)]
+        checks = [c for e, m in zip(entries, marks, strict=True)
+                  for c in check_reasons(e, mark=m)]
+        report = ReasonReport(checks=tuple(checks), refusals=10, base_clearance=(8, 10),
+                              as_of=AT).as_dict()
+        report["forward_against_base"]["moves_enough"]["p_one_sided"] = p
+        out = tmp_path / "reasons.json"
+        artefact.write(out, report)
+        return out
+
+    def test_contradictions_and_an_uninformative_forward_claim_are_both_said(
+            self, tmp_path: Path) -> None:
+        line = reason_line(self._written(tmp_path, contradicted=2, p=0.26)) or ""
+        assert "of 10 that the record can settle" in line
+        assert "8 agreed and 2 contradicted it" in line
+        assert "borne out 10 of 10 times (100%) against 80%" in line
+        assert "says no more than the tape does" in line
+        assert line.endswith("`python -m argus.eval.refusal`.")
+
+    def test_an_informative_claim_is_called_informative(self, tmp_path: Path) -> None:
+        line = reason_line(self._written(tmp_path, contradicted=0, p=0.01)) or ""
+        assert "10 agreed and 0 contradicted" in line
+        assert "carries information beyond the tape" in line
+
+    def test_no_artefact_or_nothing_graded_is_no_line(self, tmp_path: Path) -> None:
+        assert reason_line(tmp_path / "missing.json") is None
+        empty = tmp_path / "empty.json"
+        empty.write_text(json.dumps({"by_claim": {}}), encoding="utf-8")
+        assert reason_line(empty) is None

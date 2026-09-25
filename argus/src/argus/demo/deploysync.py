@@ -220,8 +220,14 @@ def _copy_tree(source: Path, target: Path, *, dry_run: bool) -> tuple[int, int]:
     return seen, changed
 
 
-def sync(*, dry_run: bool = False) -> SyncResult:
-    """Refresh the bundle from the working tree, and report what was behind."""
+def sync(*, dry_run: bool = False, data_only: bool = False) -> SyncResult:
+    """Refresh the bundle from the working tree, and report what was behind.
+
+    ``data_only`` refreshes the artefacts and leaves the deployed code as it is. It exists for the
+    scheduled refresh after each desk cycle (`run_deploy_data.ps1`): the hosted console told
+    judges its record was 24 hours stale while the desk was deciding on schedule, because the
+    bundle only moved when the code was deployed (readiness audit, 2026-09-25). Code is deployed
+    when it is ready; the record should not wait for it."""
     if not DEPLOY.exists():
         raise SyncError(f"no deployment directory at {DEPLOY}")
     if not SOURCE_PACKAGE.exists():
@@ -241,7 +247,7 @@ def sync(*, dry_run: bool = False) -> SyncResult:
     result.ledger_before = _count_lines(DEPLOY_DATA / "paper_ledger.jsonl")
     result.ledger_after = _count_lines(SOURCE_DATA / "paper_ledger.jsonl")
 
-    result.package_files, result.package_updated = _copy_tree(
+    result.package_files, result.package_updated = (0, 0) if data_only else _copy_tree(
         SOURCE_PACKAGE, DEPLOY_PACKAGE, dry_run=dry_run
     )
 
@@ -295,9 +301,11 @@ def main() -> int:  # pragma: no cover - CLI
 
     parser = argparse.ArgumentParser(description="refresh the deployed console bundle")
     parser.add_argument("--dry-run", action="store_true", help="report the gap, change nothing")
+    parser.add_argument("--data-only", action="store_true",
+                        help="refresh the artefacts, leave the deployed code unchanged")
     args = parser.parse_args()
 
-    result = sync(dry_run=args.dry_run)
+    result = sync(dry_run=args.dry_run, data_only=args.data_only)
     print(result.render())
     if not args.dry_run:
         print(f"\n  manifest -> {MANIFEST_PATH}")

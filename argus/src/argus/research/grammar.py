@@ -16,9 +16,20 @@ control that matters would have been ours to build anyway.
 
 A grammar gets the same benefit with **no execution surface at all**. The proposer emits a *tree*;
 the evaluator validates it against a type system and then *interprets* it. There is no path from a
-model's output to the Python interpreter, so the entire class of injection, exfiltration and
-resource-exhaustion attacks does not arise. The search space goes from 8 to combinatorially large,
-which is the thing we actually wanted.
+model's output to the Python interpreter, so injection and exfiltration do not arise. The search
+space goes from 8 to combinatorially large, which is the thing we actually wanted.
+
+**Resource exhaustion is a separate property, and it was not true here until it was measured.**
+This docstring used to say it "does not arise". It did: ``Window`` re-evaluates its operand once
+per bar of its lookback, so windows nest *multiplicatively*, and :func:`validate` bounded only
+depth and size. ``signal(mean(512,mean(512,mean(512,mean(512,close)))))`` is depth 6 and size 6,
+passed ``validate``, and costs 512**4 ~ 6.9e10 node evaluations per bar — measured at 0.39 to
+0.61 us per node on the development machine, seven to twelve hours for one bar. Found by running
+Google CEL (``eval/general_grammar_comparison.py``), a general-purpose safe-expression language
+that bounds the same thing at runtime: ``comprehension_max_iterations = 10000`` per evaluation,
+``google/cel-cpp runtime/runtime_options.h:83``. The fix here is static rather than a runtime
+counter, because the tree is fully known before evaluation: :func:`cost` is an upper bound on node
+evaluations per call, and :func:`validate` refuses anything above :data:`MAX_COST`.
 
 **What the grammar deliberately cannot express.** No unbounded recursion, no data access beyond the
 bar series it is handed, no I/O, no imports, no user-defined functions. A factor is a pure function
@@ -778,13 +789,60 @@ class Signal(Expr):
 MAX_DEPTH = 12
 MAX_SIZE = 96
 
+MAX_COST = 100_000
+"""Upper bound on node evaluations one ``evaluate(bars, i)`` call may perform.
 
-def validate(expr: Expr, *, max_depth: int = MAX_DEPTH, max_size: int = MAX_SIZE) -> Signal:
+At the measured 0.39 to 0.61 us per node evaluation that is 40 to 60 ms per bar, so a factor swept
+over the 1,439 hourly bars of a 60-day series is bounded at one to one and a half minutes. Every
+tree this repository ships (`ORIGINAL_EIGHT`, `EXPANDED`, the cross-sectional and divergence
+factors) costs under 300. The bound exists for the tree nobody meant to write — see the module
+docstring for the one that passed `validate` before this existed. CEL's analogue is a runtime
+iteration budget (``comprehension_max_iterations = 10000``, ``google/cel-cpp
+runtime/runtime_options.h:83``); a static bound is possible here because every lookback is a
+literal in the tree.
+"""
+
+
+def cost(expr: Expr) -> int:
+    """An upper bound on node evaluations for one ``expr.evaluate(bars, i)`` call.
+
+    Read off the real ``evaluate`` methods above, not assumed:
+
+    * ``Window`` evaluates its operand once per bar of its lookback: ``1 + lookback * cost(x)``.
+    * ``Corr`` does that for both legs: ``1 + lookback * (cost(a) + cost(b))``.
+    * ``Delay`` evaluates its operand **once**, at a shifted index: ``1 + cost(x)``. (The search's
+      own ``searchoff.node_cost`` multiplies by the lookback here, which over-estimates; that is a
+      research budget and is left as it is.)
+    * ``IfElse`` evaluates the condition and one branch: ``1 + cost(c) + max(cost(t), cost(o))``.
+    * A cross-sectional node is a lookup at evaluation time, but the panel evaluates its operand
+      for every symbol at every bar to build the context, so the operand's cost is charged here.
+
+    A node type this function does not know is charged ``1 + sum(children)``, the cost of a node
+    that evaluates each child once — the shape of every other node in the grammar.
+    """
+    if isinstance(expr, Window):
+        return 1 + expr.lookback * cost(expr.operand)
+    if isinstance(expr, Corr):
+        return 1 + expr.lookback * (cost(expr.left) + cost(expr.right))
+    if isinstance(expr, IfElse):
+        return 1 + cost(expr.condition) + max(cost(expr.then), cost(expr.otherwise))
+    return 1 + sum(cost(c) for c in expr.children)
+
+
+def validate(
+    expr: Expr,
+    *,
+    max_depth: int = MAX_DEPTH,
+    max_size: int = MAX_SIZE,
+    max_cost: int = MAX_COST,
+) -> Signal:
     """Check a proposed factor before it is ever evaluated.
 
-    Complexity limits are a research control rather than a safety one: an arbitrarily deep tree is
-    a way to overfit by construction, and capping depth keeps the hypothesis legible enough for a
-    human to argue with. Safety comes from the grammar having no execution surface at all.
+    Depth and size limits are a research control rather than a safety one: an arbitrarily deep
+    tree is a way to overfit by construction, and capping depth keeps the hypothesis legible enough
+    for a human to argue with. The cost limit is a safety control: without it a six-node tree can
+    occupy the evaluator for hours per bar (see :data:`MAX_COST`). Injection safety comes from the
+    grammar having no execution surface at all.
     """
     if not isinstance(expr, Signal):
         raise GrammarError(
@@ -795,6 +853,12 @@ def validate(expr: Expr, *, max_depth: int = MAX_DEPTH, max_size: int = MAX_SIZE
         raise GrammarError(f"depth {expr.depth} exceeds {max_depth}")
     if expr.size > max_size:
         raise GrammarError(f"size {expr.size} exceeds {max_size}")
+    estimated = cost(expr)
+    if estimated > max_cost:
+        raise GrammarError(
+            f"cost {estimated} node evaluations per bar exceeds {max_cost}; nested windows "
+            f"multiply, so this tree would occupy the evaluator far longer than any factor needs"
+        )
     return expr
 
 
@@ -956,6 +1020,7 @@ EXPANDED: dict[str, Signal] = {
 
 __all__ = [
     "EXPANDED",
+    "MAX_COST",
     "MAX_DEPTH",
     "MAX_SIZE",
     "ORIGINAL_EIGHT",
@@ -979,5 +1044,6 @@ __all__ = [
     "UnOp",
     "Window",
     "as_signal_fn",
+    "cost",
     "validate",
 ]

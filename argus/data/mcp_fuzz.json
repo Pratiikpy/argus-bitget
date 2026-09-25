@@ -1,0 +1,35 @@
+{
+  "what": "MCP wire fuzz: zero unstructured exceptions, conformant replies, no reflection, no schema-invalid argument reaching an engine",
+  "server": "argus.lui.mcp_server (hand-rolled, hardened 2026-09-25)",
+  "result": {
+    "cases": 145,
+    "clean": 145,
+    "unstructured_exceptions": 0,
+    "cases_with_violations": 0,
+    "engine_calls": 10,
+    "reference_validator": true,
+    "by_family": {
+      "parse": {
+        "cases": 8,
+        "clean": 8
+      },
+      "envelope": {
+        "cases": 22,
+        "clean": 22
+      },
+      "batch": {
+        "cases": 6,
+        "clean": 6
+      },
+      "call": {
+        "cases": 15,
+        "clean": 15
+      },
+      "args": {
+        "cases": 94,
+        "clean": 94
+      }
+    },
+    "failures": []
+  }
+}

@@ -1,0 +1,908 @@
+{
+  "what": "official MCP SDK (low-level Server, Streamable HTTP, stateless JSON) vs the hand-rolled lui/mcp_server.py, same fuzz corpus and oracle",
+  "sdk_version": "2.2.0",
+  "hand_rolled_before_hardening": {
+    "measured": "2026-09-25, same corpus and oracle, against lui/mcp_server.py as it stood before the hardening in this change (that source is not kept, so this row is a record, not a re-run)",
+    "cases": 145,
+    "clean": 46,
+    "unstructured_exceptions": 3,
+    "cases_with_violations": 96,
+    "engine_calls": 98
+  },
+  "hand_rolled": {
+    "cases": 145,
+    "clean": 145,
+    "unstructured_exceptions": 0,
+    "cases_with_violations": 0,
+    "engine_calls": 10,
+    "reference_validator": true,
+    "by_family": {
+      "parse": {
+        "cases": 8,
+        "clean": 8
+      },
+      "envelope": {
+        "cases": 22,
+        "clean": 22
+      },
+      "batch": {
+        "cases": 6,
+        "clean": 6
+      },
+      "call": {
+        "cases": 15,
+        "clean": 15
+      },
+      "args": {
+        "cases": 94,
+        "clean": 94
+      }
+    },
+    "failures": []
+  },
+  "hand_rolled_tools_list_ms": 0.058,
+  "sdk": {
+    "cases": 145,
+    "clean": 57,
+    "unstructured_exceptions": 0,
+    "cases_with_violations": 88,
+    "engine_calls": 96,
+    "reference_validator": true,
+    "by_family": {
+      "parse": {
+        "cases": 8,
+        "clean": 8
+      },
+      "envelope": {
+        "cases": 22,
+        "clean": 20
+      },
+      "batch": {
+        "cases": 6,
+        "clean": 6
+      },
+      "call": {
+        "cases": 15,
+        "clean": 15
+      },
+      "args": {
+        "cases": 94,
+        "clean": 8
+      }
+    },
+    "failures": [
+      {
+        "label": "id is a megabyte string",
+        "family": "envelope",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "reflected an oversize input (1,048,613 bytes)"
+        ]
+      },
+      {
+        "label": "megabyte method name",
+        "family": "envelope",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "reflected an oversize input (1,048,663 bytes)"
+        ]
+      },
+      {
+        "label": "NaN shock",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shock_percent: non-finite number"
+        ]
+      },
+      {
+        "label": "infinite usd",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.usd: non-finite number"
+        ]
+      },
+      {
+        "label": "argus_ask: missing question",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.question: required"
+        ]
+      },
+      {
+        "label": "argus_ask.question as null",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.question: expected string, got NoneType"
+        ]
+      },
+      {
+        "label": "argus_ask.question as true",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.question: expected string, got bool"
+        ]
+      },
+      {
+        "label": "argus_ask.question as int",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.question: expected string, got int"
+        ]
+      },
+      {
+        "label": "argus_ask.question as float",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.question: expected string, got float"
+        ]
+      },
+      {
+        "label": "argus_ask.question as list",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.question: expected string, got list"
+        ]
+      },
+      {
+        "label": "argus_ask.question as object",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.question: expected string, got dict"
+        ]
+      },
+      {
+        "label": "argus_ask.book as null",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.book: expected string, got NoneType"
+        ]
+      },
+      {
+        "label": "argus_ask.book as true",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.book: expected string, got bool"
+        ]
+      },
+      {
+        "label": "argus_ask.book as int",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.book: expected string, got int"
+        ]
+      },
+      {
+        "label": "argus_ask.book as float",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.book: expected string, got float"
+        ]
+      },
+      {
+        "label": "argus_ask.book as list",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.book: expected string, got list"
+        ]
+      },
+      {
+        "label": "argus_ask.book as object",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.book: expected string, got dict"
+        ]
+      },
+      {
+        "label": "argus_ask.memory as null",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.memory: expected string, got NoneType"
+        ]
+      },
+      {
+        "label": "argus_ask.memory as true",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.memory: expected string, got bool"
+        ]
+      },
+      {
+        "label": "argus_ask.memory as int",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.memory: expected string, got int"
+        ]
+      },
+      {
+        "label": "argus_ask.memory as float",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.memory: expected string, got float"
+        ]
+      },
+      {
+        "label": "argus_ask.memory as list",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.memory: expected string, got list"
+        ]
+      },
+      {
+        "label": "argus_ask.memory as object",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_ask received invalid arguments: $.memory: expected string, got dict"
+        ]
+      },
+      {
+        "label": "argus_quote: missing symbols",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_quote received invalid arguments: $.symbols: required"
+        ]
+      },
+      {
+        "label": "argus_quote.symbols as null",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_quote received invalid arguments: $.symbols: expected array, got NoneType"
+        ]
+      },
+      {
+        "label": "argus_quote.symbols as true",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_quote received invalid arguments: $.symbols: expected array, got bool"
+        ]
+      },
+      {
+        "label": "argus_quote.symbols as int",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_quote received invalid arguments: $.symbols: expected array, got int"
+        ]
+      },
+      {
+        "label": "argus_quote.symbols as float",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_quote received invalid arguments: $.symbols: expected array, got float"
+        ]
+      },
+      {
+        "label": "argus_quote.symbols as string",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_quote received invalid arguments: $.symbols: expected array, got str"
+        ]
+      },
+      {
+        "label": "argus_quote.symbols as empty-string",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_quote received invalid arguments: $.symbols: expected array, got str"
+        ]
+      },
+      {
+        "label": "argus_quote.symbols as object",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_quote received invalid arguments: $.symbols: expected array, got dict"
+        ]
+      },
+      {
+        "label": "argus_quote.symbols items as numbers",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_quote received invalid arguments: $.symbols[0]: expected string, got int"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact: missing add",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.add: required"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.add as null",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.add: expected string, got NoneType"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.add as true",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.add: expected string, got bool"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.add as int",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.add: expected string, got int"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.add as float",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.add: expected string, got float"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.add as list",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.add: expected string, got list"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.add as object",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.add: expected string, got dict"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.size_percent as null",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.size_percent: expected number, got NoneType"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.size_percent as true",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.size_percent: expected number, got bool"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.size_percent as string",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.size_percent: expected number, got str"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.size_percent as empty-string",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.size_percent: expected number, got str"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.size_percent as list",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.size_percent: expected number, got list"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.size_percent as object",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.size_percent: expected number, got dict"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.book as null",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.book: expected object, got NoneType"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.book as true",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.book: expected object, got bool"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.book as int",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.book: expected object, got int"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.book as float",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.book: expected object, got float"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.book as string",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.book: expected object, got str"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.book as empty-string",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.book: expected object, got str"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.book as list",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.book: expected object, got list"
+        ]
+      },
+      {
+        "label": "argus_portfolio_impact.book values as strings",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_portfolio_impact received invalid arguments: $.book.NVDA: expected number, got str"
+        ]
+      },
+      {
+        "label": "argus_stress: missing book",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.book: required"
+        ]
+      },
+      {
+        "label": "argus_stress.book as null",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.book: expected object, got NoneType"
+        ]
+      },
+      {
+        "label": "argus_stress.book as true",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.book: expected object, got bool"
+        ]
+      },
+      {
+        "label": "argus_stress.book as int",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.book: expected object, got int"
+        ]
+      },
+      {
+        "label": "argus_stress.book as float",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.book: expected object, got float"
+        ]
+      },
+      {
+        "label": "argus_stress.book as string",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.book: expected object, got str"
+        ]
+      },
+      {
+        "label": "argus_stress.book as empty-string",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.book: expected object, got str"
+        ]
+      },
+      {
+        "label": "argus_stress.book as list",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.book: expected object, got list"
+        ]
+      },
+      {
+        "label": "argus_stress.book values as strings",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.book.NVDA: expected number, got str"
+        ]
+      },
+      {
+        "label": "argus_stress.shock_percent as null",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shock_percent: expected number, got NoneType"
+        ]
+      },
+      {
+        "label": "argus_stress.shock_percent as true",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shock_percent: expected number, got bool"
+        ]
+      },
+      {
+        "label": "argus_stress.shock_percent as string",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shock_percent: expected number, got str"
+        ]
+      },
+      {
+        "label": "argus_stress.shock_percent as empty-string",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shock_percent: expected number, got str"
+        ]
+      },
+      {
+        "label": "argus_stress.shock_percent as list",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shock_percent: expected number, got list"
+        ]
+      },
+      {
+        "label": "argus_stress.shock_percent as object",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shock_percent: expected number, got dict"
+        ]
+      },
+      {
+        "label": "argus_stress.shocked as null",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shocked: expected string, got NoneType"
+        ]
+      },
+      {
+        "label": "argus_stress.shocked as true",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shocked: expected string, got bool"
+        ]
+      },
+      {
+        "label": "argus_stress.shocked as int",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shocked: expected string, got int"
+        ]
+      },
+      {
+        "label": "argus_stress.shocked as float",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shocked: expected string, got float"
+        ]
+      },
+      {
+        "label": "argus_stress.shocked as list",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shocked: expected string, got list"
+        ]
+      },
+      {
+        "label": "argus_stress.shocked as object",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_stress received invalid arguments: $.shocked: expected string, got dict"
+        ]
+      },
+      {
+        "label": "argus_execution_plan: missing symbol",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.symbol: required"
+        ]
+      },
+      {
+        "label": "argus_execution_plan: missing usd",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.usd: required"
+        ]
+      },
+      {
+        "label": "argus_execution_plan.symbol as null",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.symbol: expected string, got NoneType"
+        ]
+      },
+      {
+        "label": "argus_execution_plan.symbol as true",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.symbol: expected string, got bool"
+        ]
+      },
+      {
+        "label": "argus_execution_plan.symbol as int",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.symbol: expected string, got int"
+        ]
+      },
+      {
+        "label": "argus_execution_plan.symbol as float",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.symbol: expected string, got float"
+        ]
+      },
+      {
+        "label": "argus_execution_plan.symbol as list",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.symbol: expected string, got list"
+        ]
+      },
+      {
+        "label": "argus_execution_plan.symbol as object",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.symbol: expected string, got dict"
+        ]
+      },
+      {
+        "label": "argus_execution_plan.usd as null",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.usd: expected number, got NoneType"
+        ]
+      },
+      {
+        "label": "argus_execution_plan.usd as true",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.usd: expected number, got bool"
+        ]
+      },
+      {
+        "label": "argus_execution_plan.usd as string",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.usd: expected number, got str"
+        ]
+      },
+      {
+        "label": "argus_execution_plan.usd as empty-string",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.usd: expected number, got str"
+        ]
+      },
+      {
+        "label": "argus_execution_plan.usd as list",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.usd: expected number, got list"
+        ]
+      },
+      {
+        "label": "argus_execution_plan.usd as object",
+        "family": "args",
+        "status": 200,
+        "raised": "",
+        "violations": [
+          "engine argus_execution_plan received invalid arguments: $.usd: expected number, got dict"
+        ]
+      }
+    ]
+  },
+  "sdk_schema_round_trip": {
+    "status": 200,
+    "tools_listed": 6,
+    "schemas_mismatched": []
+  },
+  "sdk_tools_list_ms": 1.719,
+  "sdk_distributions_missing_from_argus_venv": [
+    "attrs",
+    "httpcore2",
+    "httpx2",
+    "jsonschema",
+    "jsonschema-specifications",
+    "mcp",
+    "mcp-types",
+    "opentelemetry-api",
+    "pyjwt",
+    "python-multipart",
+    "pywin32",
+    "referencing",
+    "rpds-py",
+    "sse-starlette",
+    "starlette",
+    "truststore",
+    "uvicorn"
+  ],
+  "sdk_client_against_argus_server": {
+    "negotiated_version": "2025-11-25",
+    "tools_listed": [
+      "argus_ask",
+      "argus_execution_plan",
+      "argus_portfolio_impact",
+      "argus_quote",
+      "argus_scoreboard",
+      "argus_stress"
+    ],
+    "schemas_identical": true,
+    "good_call_is_error": false,
+    "bad_call_is_error": true,
+    "bad_call_text": "invalid arguments for argus_execution_plan: usd must be a number, not str"
+  }
+}

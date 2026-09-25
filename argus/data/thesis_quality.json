@@ -1,0 +1,876 @@
+{
+  "generated_at": "2026-09-25T14:24:40.603552+00:00",
+  "frames": 16,
+  "frames_sha256_16": "7c35a2a97d3d3682",
+  "frame_span": {
+    "first": "2026-09-11T08:00:00+00:00",
+    "last": "2026-09-24T08:00:00+00:00"
+  },
+  "qwen_calls_made_this_run": 36,
+  "qwen_calls_by_stage": {
+    "s5": 11,
+    "s6": 2,
+    "s4": 6,
+    "s7": 17
+  },
+  "responses_replayed_from_recording": 0,
+  "qwen_cap": 100,
+  "s5": {
+    "question": "Does drawing a second, independently derived answer and committing the one the code-side checker ranks higher beat committing the first answer?",
+    "arms": {
+      "single_shot": {
+        "decisions": 5,
+        "defect_free": 4,
+        "grounding_pass": 4,
+        "mean_score": 2.4556,
+        "opened": 0,
+        "net_bps_total": 0.0,
+        "lean_calls": 4,
+        "lean_hits": 3,
+        "verdicts": [
+          "NO_TRADE"
+        ]
+      },
+      "rank_before_commit": {
+        "decisions": 5,
+        "defect_free": 4,
+        "grounding_pass": 4,
+        "mean_score": 2.48,
+        "opened": 0,
+        "net_bps_total": 0.0,
+        "lean_calls": 4,
+        "lean_hits": 3,
+        "verdicts": [
+          "NO_TRADE"
+        ]
+      }
+    },
+    "ranking_changed_the_committed_answer": 1,
+    "candidates_disagreed_on_verdict": 0,
+    "extra_deliberation_bps_per_decision": 4.5314,
+    "rows": [
+      {
+        "symbol": "NVDAUSDT",
+        "at": "2026-09-24T08:00:00+00:00",
+        "realised_bps": 168.252,
+        "evidence_items": 10,
+        "single_verdict": "NO_TRADE",
+        "ranked_verdict": "NO_TRADE",
+        "ranked_chose": 1,
+        "second_available": true,
+        "candidates_disagree_on_verdict": false,
+        "single_check": {
+          "defects": [
+            "ungrounded_figure"
+          ],
+          "unresolved_figures": [
+            "26",
+            "3"
+          ],
+          "figures": 9,
+          "grounding_coverage": 0.7778,
+          "engages_evidence": true,
+          "score": 2.2778
+        },
+        "ranked_check": {
+          "defects": [
+            "ungrounded_figure"
+          ],
+          "unresolved_figures": [
+            "3"
+          ],
+          "figures": 10,
+          "grounding_coverage": 0.9,
+          "engages_evidence": true,
+          "score": 2.4
+        },
+        "single_net_bps": 0.0,
+        "ranked_net_bps": 0.0,
+        "extra_deliberation_bps": 4.5314,
+        "single_lean_hit": true,
+        "ranked_lean_hit": true,
+        "calls": 2
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "at": "2026-09-17T08:00:00+00:00",
+        "realised_bps": 199.1354,
+        "evidence_items": 10,
+        "single_verdict": "NO_TRADE",
+        "ranked_verdict": "NO_TRADE",
+        "ranked_chose": 0,
+        "second_available": true,
+        "candidates_disagree_on_verdict": false,
+        "single_check": {
+          "defects": [],
+          "unresolved_figures": [],
+          "figures": 8,
+          "grounding_coverage": 1.0,
+          "engages_evidence": true,
+          "score": 2.5
+        },
+        "ranked_check": {
+          "defects": [],
+          "unresolved_figures": [],
+          "figures": 8,
+          "grounding_coverage": 1.0,
+          "engages_evidence": true,
+          "score": 2.5
+        },
+        "single_net_bps": 0.0,
+        "ranked_net_bps": 0.0,
+        "extra_deliberation_bps": 4.5314,
+        "single_lean_hit": true,
+        "ranked_lean_hit": true,
+        "calls": 2
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "at": "2026-09-23T08:00:00+00:00",
+        "realised_bps": -94.0166,
+        "evidence_items": 6,
+        "single_verdict": "NO_TRADE",
+        "ranked_verdict": "NO_TRADE",
+        "ranked_chose": 0,
+        "second_available": true,
+        "candidates_disagree_on_verdict": false,
+        "single_check": {
+          "defects": [],
+          "unresolved_figures": [],
+          "figures": 7,
+          "grounding_coverage": 1.0,
+          "engages_evidence": true,
+          "score": 2.5
+        },
+        "ranked_check": {
+          "defects": [],
+          "unresolved_figures": [],
+          "figures": 7,
+          "grounding_coverage": 1.0,
+          "engages_evidence": true,
+          "score": 2.5
+        },
+        "single_net_bps": 0.0,
+        "ranked_net_bps": 0.0,
+        "extra_deliberation_bps": 4.5314,
+        "single_lean_hit": false,
+        "ranked_lean_hit": false,
+        "calls": 2
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "at": "2026-09-16T08:00:00+00:00",
+        "realised_bps": 158.0829,
+        "evidence_items": 6,
+        "single_verdict": "NO_TRADE",
+        "ranked_verdict": "NO_TRADE",
+        "ranked_chose": 0,
+        "second_available": true,
+        "candidates_disagree_on_verdict": false,
+        "single_check": {
+          "defects": [],
+          "unresolved_figures": [],
+          "figures": 12,
+          "grounding_coverage": 1.0,
+          "engages_evidence": true,
+          "score": 2.5
+        },
+        "ranked_check": {
+          "defects": [],
+          "unresolved_figures": [],
+          "figures": 12,
+          "grounding_coverage": 1.0,
+          "engages_evidence": true,
+          "score": 2.5
+        },
+        "single_net_bps": 0.0,
+        "ranked_net_bps": 0.0,
+        "extra_deliberation_bps": 4.5314,
+        "single_lean_hit": null,
+        "ranked_lean_hit": null,
+        "calls": 2
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "at": "2026-09-22T08:00:00+00:00",
+        "realised_bps": 9.7045,
+        "evidence_items": 7,
+        "single_verdict": "NO_TRADE",
+        "ranked_verdict": "NO_TRADE",
+        "ranked_chose": 0,
+        "second_available": true,
+        "candidates_disagree_on_verdict": false,
+        "single_check": {
+          "defects": [],
+          "unresolved_figures": [],
+          "figures": 9,
+          "grounding_coverage": 1.0,
+          "engages_evidence": true,
+          "score": 2.5
+        },
+        "ranked_check": {
+          "defects": [],
+          "unresolved_figures": [],
+          "figures": 9,
+          "grounding_coverage": 1.0,
+          "engages_evidence": true,
+          "score": 2.5
+        },
+        "single_net_bps": 0.0,
+        "ranked_net_bps": 0.0,
+        "extra_deliberation_bps": 4.5314,
+        "single_lean_hit": true,
+        "ranked_lean_hit": true,
+        "calls": 2
+      }
+    ],
+    "stopped": "stopped at AAPLUSDT 2026-09-15T08:00:00+00:00: failed after 1 attempts \u2014 transport: <urlopen error [WinError 10060] A connection attempt failed because the connected p"
+  },
+  "s6": {
+    "question": "Of single-shot answers carrying a named defect, how many does one (or two) checker-triggered repair calls fix without introducing a defect they did not have? No revision leaves every one of them defective.",
+    "defective_single_shot": 1,
+    "attempted": 1,
+    "after_one_round": {
+      "n": 1,
+      "repaired_without_new_defects": 0,
+      "acquired_a_new_defect": 0
+    },
+    "after_two_rounds": {
+      "n": 1,
+      "repaired_without_new_defects": 0,
+      "acquired_a_new_defect": 0
+    },
+    "no_revision": {
+      "n": 1,
+      "repaired_without_new_defects": 0
+    },
+    "verdict_changed_by_repair": 0,
+    "repair_calls": 2,
+    "rows": [
+      {
+        "symbol": "NVDAUSDT",
+        "at": "2026-09-24T08:00:00+00:00",
+        "defects_before": [
+          "ungrounded_figure"
+        ],
+        "unresolved_before": [
+          "26",
+          "3"
+        ],
+        "round_1": {
+          "available": true,
+          "defects": [
+            "ungrounded_figure"
+          ],
+          "new_defects": [],
+          "repaired_clean": false
+        },
+        "round_2": {
+          "available": true,
+          "defects": [
+            "ungrounded_figure"
+          ],
+          "new_defects": [],
+          "repaired_clean": false
+        },
+        "committed_after_1": {
+          "available": true,
+          "defects": [
+            "ungrounded_figure"
+          ],
+          "new_defects": [],
+          "repaired_clean": false
+        },
+        "committed_after_2": {
+          "available": true,
+          "defects": [
+            "ungrounded_figure"
+          ],
+          "new_defects": [],
+          "repaired_clean": false
+        },
+        "repair_calls": 2,
+        "verdict_before": "NO_TRADE",
+        "verdict_committed": "NO_TRADE"
+      }
+    ],
+    "stopped": ""
+  },
+  "s4": {
+    "question": "Is the unused item STORM's moderator score surfaces judged more relevant to the decision than a uniformly random unused item?",
+    "encoder": "minishlab/potion-base-8M",
+    "theses": 10,
+    "judged": 5,
+    "skipped": 4,
+    "surfaced": {
+      "n": 5,
+      "judged_relevant": 3,
+      "judged_directly_relevant": 2,
+      "mean_rating": 1.0
+    },
+    "lexical_surfaced": {
+      "n": 3,
+      "judged_relevant": 3,
+      "judged_directly_relevant": 1,
+      "mean_rating": 1.333
+    },
+    "random": {
+      "n": 5,
+      "judged_relevant": 4,
+      "judged_directly_relevant": 1,
+      "mean_rating": 1.0
+    },
+    "paired": {
+      "surfaced_rated_higher": 1,
+      "random_rated_higher": 1,
+      "tied": 3,
+      "same_item": 0
+    },
+    "judge": "qwen3.8-max via the hackathon endpoint, blind to which item is which, items in seeded random order. NOT metaeval-checked: no human-labelled agreement set exists for this judge.",
+    "rows": [
+      {
+        "symbol": "NVDAUSDT",
+        "at": "2026-09-24T08:00:00+00:00",
+        "verdict": "NO_TRADE",
+        "cited": [
+          "edgar-0001045810-26-000078",
+          "ta-NVDAUSDT-1790236800",
+          "ust-curve-2026-09-24"
+        ],
+        "unused": 7,
+        "surfaced": {
+          "evidence_id": "vix-2026-09-18",
+          "text": "VIX 14.81 (-0.63 on the day), the 31% percentile of 9,276 daily closes \u2014 normal regime. Implies a one-day move of about 93bps on US equities, which is what these tokens track.",
+          "query_similarity": 0.5094,
+          "cited_similarity": 0.5697,
+          "claim_similarity": 0.46,
+          "gated_in": true,
+          "score": 0.4595,
+          "rating": 2
+        },
+        "lexical": {
+          "evidence_id": "edgar-0001045810-26-000073",
+          "text": "NVDA filed 8-K [MATERIAL] \u2014 2.02 results of operations, 9.01 financial statements and exhibits",
+          "query_similarity": 0.0497,
+          "cited_similarity": 0.0859,
+          "claim_similarity": 0.0211,
+          "gated_in": true,
+          "score": 0.932,
+          "rating": 2
+        },
+        "random": {
+          "evidence_id": "mkt-NVDAUSDT-2026-09-24T08:00:00+00:00",
+          "text": "NVDAUSDT last 222.88; 474 hourly bars of history to this instant",
+          "rating": 2
+        },
+        "labels": {
+          "mkt-NVDAUSDT-2026-09-24T08:00:00+00:00": "A",
+          "vix-2026-09-18": "B",
+          "edgar-0001045810-26-000073": "C"
+        }
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "at": "2026-09-24T08:00:00+00:00",
+        "verdict": "NO_TRADE",
+        "cited": [
+          "edgar-0001045810-26-000078",
+          "finra-short-NVDA-2026-09-23",
+          "ta-NVDAUSDT-1790236800",
+          "ust-curve-2026-09-24",
+          "vix-2026-09-18"
+        ],
+        "unused": 5,
+        "surfaced": {
+          "evidence_id": "ust-spread-2026-09-24",
+          "text": "US 10y-2y spread +31.00bps on 2026-09-24",
+          "query_similarity": 0.3443,
+          "cited_similarity": 0.71,
+          "claim_similarity": 0.3262,
+          "gated_in": true,
+          "score": 0.436,
+          "rating": 1
+        },
+        "lexical": {
+          "evidence_id": "ust-spread-2026-09-24",
+          "text": "US 10y-2y spread +31.00bps on 2026-09-24",
+          "query_similarity": 0.0991,
+          "cited_similarity": 0.1653,
+          "claim_similarity": 0.0907,
+          "gated_in": true,
+          "score": 0.8672,
+          "rating": 1
+        },
+        "random": {
+          "evidence_id": "edgar-0001045810-26-000075",
+          "text": "NVDA filed 10-Q \u2014 10-Q",
+          "rating": 1
+        },
+        "labels": {
+          "ust-spread-2026-09-24": "A",
+          "edgar-0001045810-26-000075": "B"
+        }
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "at": "2026-09-17T08:00:00+00:00",
+        "verdict": "NO_TRADE",
+        "cited": [
+          "edgar-0001045810-26-000075",
+          "edgar-0001045810-26-000078",
+          "mkt-NVDAUSDT-2026-09-17T08:00:00+00:00",
+          "ta-NVDAUSDT-1789632000"
+        ],
+        "unused": 6,
+        "surfaced": {
+          "evidence_id": "edgar-0001045810-26-000073",
+          "text": "NVDA filed 8-K [MATERIAL] \u2014 2.02 results of operations, 9.01 financial statements and exhibits",
+          "query_similarity": 0.2192,
+          "cited_similarity": 0.4009,
+          "claim_similarity": 0.1268,
+          "gated_in": true,
+          "score": 0.6839,
+          "rating": 2
+        },
+        "lexical": {
+          "evidence_id": "ust-spread-2026-09-17",
+          "text": "US 10y-2y spread +27.00bps on 2026-09-17",
+          "query_similarity": 0.0,
+          "cited_similarity": 0.0,
+          "claim_similarity": 0.0616,
+          "gated_in": true,
+          "score": 1.0,
+          "rating": 1
+        },
+        "random": {
+          "evidence_id": "finra-short-NVDA-2026-09-16",
+          "text": "NVDA short volume 17,019,969 of 40,065,786 total on 2026-09-16 \u2014 42.5% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+          "rating": 1
+        },
+        "labels": {
+          "ust-spread-2026-09-17": "A",
+          "edgar-0001045810-26-000073": "B",
+          "finra-short-NVDA-2026-09-16": "C"
+        }
+      },
+      {
+        "symbol": "NVDAUSDT",
+        "at": "2026-09-17T08:00:00+00:00",
+        "verdict": "NO_TRADE",
+        "cited": [
+          "ta-NVDAUSDT-1789632000",
+          "ust-curve-2026-09-17"
+        ],
+        "unused": 8,
+        "surfaced": {
+          "evidence_id": "vix-2026-09-17",
+          "text": "VIX 15.44 (-2.27 on the day), the 35% percentile of 9,275 daily closes \u2014 normal regime. Implies a one-day move of about 97bps on US equities, which is what these tokens track.",
+          "query_similarity": 0.544,
+          "cited_similarity": 0.6257,
+          "claim_similarity": 0.5168,
+          "gated_in": true,
+          "score": 0.4131,
+          "rating": null
+        },
+        "lexical": {
+          "evidence_id": "vix-2026-09-17",
+          "text": "VIX 15.44 (-2.27 on the day), the 35% percentile of 9,275 daily closes \u2014 normal regime. Implies a one-day move of about 97bps on US equities, which is what these tokens track.",
+          "query_similarity": 0.1262,
+          "cited_similarity": 0.1038,
+          "claim_similarity": 0.0744,
+          "gated_in": true,
+          "score": 0.8849,
+          "rating": null
+        },
+        "random": {
+          "evidence_id": "edgar-0001045810-26-000069",
+          "text": "NVDA filed 8-K [MATERIAL] \u2014 1.01 material agreement, 2.03 new direct financial obligation, 7.01 Regulation FD disclosure",
+          "rating": 2
+        },
+        "labels": {
+          "edgar-0001045810-26-000069": "A",
+          "vix-2026-09-17": "B"
+        }
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "at": "2026-09-23T08:00:00+00:00",
+        "skipped": "fewer than two unused items, or none passed the relevance gate",
+        "unused": 2,
+        "cited": [
+          "finra-short-TSLA-2026-09-22",
+          "ta-TSLAUSDT-1790150400",
+          "ust-curve-2026-09-23",
+          "vix-2026-09-18"
+        ]
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "at": "2026-09-23T08:00:00+00:00",
+        "skipped": "fewer than two unused items, or none passed the relevance gate",
+        "unused": 2,
+        "cited": [
+          "finra-short-TSLA-2026-09-22",
+          "ta-TSLAUSDT-1790150400",
+          "ust-curve-2026-09-23",
+          "vix-2026-09-18"
+        ]
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "at": "2026-09-16T08:00:00+00:00",
+        "skipped": "fewer than two unused items, or none passed the relevance gate",
+        "unused": 2,
+        "cited": [
+          "finra-short-TSLA-2026-09-15",
+          "ta-TSLAUSDT-1789545600",
+          "ust-curve-2026-09-16",
+          "vix-2026-09-16"
+        ]
+      },
+      {
+        "symbol": "TSLAUSDT",
+        "at": "2026-09-16T08:00:00+00:00",
+        "skipped": "fewer than two unused items, or none passed the relevance gate",
+        "unused": 2,
+        "cited": [
+          "finra-short-TSLA-2026-09-15",
+          "ta-TSLAUSDT-1789545600",
+          "ust-curve-2026-09-16",
+          "vix-2026-09-16"
+        ]
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "at": "2026-09-22T08:00:00+00:00",
+        "verdict": "NO_TRADE",
+        "cited": [
+          "edgar-0001140361-26-035325",
+          "finra-short-AAPL-2026-09-21",
+          "ta-AAPLUSDT-1790064000",
+          "vix-2026-09-18"
+        ],
+        "unused": 3,
+        "surfaced": {
+          "evidence_id": "ust-spread-2026-09-22",
+          "text": "US 10y-2y spread +25.00bps on 2026-09-22",
+          "query_similarity": 0.352,
+          "cited_similarity": 0.4905,
+          "claim_similarity": 0.432,
+          "gated_in": true,
+          "score": 0.5746,
+          "rating": 0
+        },
+        "lexical": null,
+        "random": {
+          "evidence_id": "ust-curve-2026-09-22",
+          "text": "US Treasury par curve 2026-09-22: 1m 3.97%, 2m 4.09%, 3m 4.16%, 6m 4.26%, 1y 4.43%, 2y 4.71%, 3y 4.81%, 5y 4.83%, 7y 4.89%, 10y 4.96%, 20y 5.33%, 30y 5.29%; 10y-2y +25.00bps",
+          "rating": 0
+        },
+        "labels": {
+          "ust-curve-2026-09-22": "A",
+          "ust-spread-2026-09-22": "B"
+        }
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "at": "2026-09-22T08:00:00+00:00",
+        "verdict": "NO_TRADE",
+        "cited": [
+          "edgar-0001140361-26-035325",
+          "ta-AAPLUSDT-1790064000",
+          "vix-2026-09-18"
+        ],
+        "unused": 4,
+        "surfaced": {
+          "evidence_id": "ust-spread-2026-09-22",
+          "text": "US 10y-2y spread +25.00bps on 2026-09-22",
+          "query_similarity": 0.2634,
+          "cited_similarity": 0.4905,
+          "claim_similarity": 0.359,
+          "gated_in": true,
+          "score": 0.6126,
+          "rating": 0
+        },
+        "lexical": null,
+        "random": {
+          "evidence_id": "mkt-AAPLUSDT-2026-09-22T08:00:00+00:00",
+          "text": "AAPLUSDT last 340.05; 426 hourly bars of history to this instant",
+          "rating": 1
+        },
+        "labels": {
+          "mkt-AAPLUSDT-2026-09-22T08:00:00+00:00": "A",
+          "ust-spread-2026-09-22": "B"
+        }
+      }
+    ],
+    "stopped": ""
+  },
+  "s7": {
+    "question": "How many paid rounds does the non-LLM stall proxy save on full-length debates, how many of its stops were wrong, and how often does it agree with an LLM asked MAF's two progress questions?",
+    "recorded_log": {
+      "available": true,
+      "debates_held": 174,
+      "with_two_or_more_rounds": 0,
+      "rounds_the_detector_could_have_saved": 0,
+      "why": "the desk's default debate budget is 2.0bps = one round (agents/desk.py), so no live debate has ever reached a round the detector reads"
+    },
+    "debates": 2,
+    "rounds_held": 6,
+    "detections": 0,
+    "rounds_saved": 0,
+    "wrong_detections": 0,
+    "proxy_vs_llm": {
+      "labelled_rounds": 4,
+      "agree": 1,
+      "proxy_stalled": 0,
+      "llm_stalled": 3
+    },
+    "rows": [
+      {
+        "symbol": "NVDAUSDT",
+        "at": "2026-09-17T08:00:00+00:00",
+        "rounds_held": 3,
+        "ending": "exhausted_rounds",
+        "final_gap_bps": 70.0,
+        "detector_stop_after_round": null,
+        "rounds_saved": 0,
+        "detection_wrong": null,
+        "why": "",
+        "progress_labels": [
+          {
+            "round": 1,
+            "proxy_stalled": false,
+            "llm_stalled": true,
+            "readings": [
+              {
+                "side": "bull",
+                "round": 1,
+                "direction_changed": false,
+                "moved_bps": 15.0,
+                "new_evidence": [],
+                "stalled": false
+              },
+              {
+                "side": "bear",
+                "round": 1,
+                "direction_changed": false,
+                "moved_bps": 5.0,
+                "new_evidence": [],
+                "stalled": true
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "proxy_stalled": false,
+            "llm_stalled": true,
+            "readings": [
+              {
+                "side": "bull",
+                "round": 2,
+                "direction_changed": false,
+                "moved_bps": 5.0,
+                "new_evidence": [
+                  "#25"
+                ],
+                "stalled": false
+              },
+              {
+                "side": "bear",
+                "round": 2,
+                "direction_changed": false,
+                "moved_bps": 5.0,
+                "new_evidence": [],
+                "stalled": true
+              }
+            ]
+          }
+        ],
+        "transcript": [
+          {
+            "side": "bull",
+            "round": 0,
+            "direction": "up",
+            "magnitude_bps": 45.0,
+            "case": "NVDAUSDT at 217.44 shows positive short-term momentum: the 24-hour change is +1.63%, price is +0.80% above the 20-hour mean and +1.57% above the 50-hour mean, indicating a sustained upward drift rather than a single spike. The VIX at 15.44 (35th percentile, down 2.27 on the day) signals a low-fear, risk-on environment that historically favors high-beta growth names like NVDA. The 10y-2y spread is positive at +27bps, indicating a normalized (non-inverted) curve, which removes recession-signal overhang. NVDA's recent 8-K filing on 2026-08-26 covering results of operations and financial statements (Item 2.02, 9.01) combined with the 10-Q filed the same day suggests the market has digested earnings and is in a post-report drift phase. Short volume at 42.5% is moderate and not extreme enough to signal heavy bearish positioning that would cap upside; rather it provides fuel for a short squeeze if momentum continues. Realised volatility at 20.5% annualised is relatively subdued, suggesting orderly price action rather than distribution. The RSI at 85.8 on the hourly timeframe is elevated but in a trending, low-volatility regime this often reflects strength rather than imminent reversal over a 24-hour window.",
+            "strongest_opposing_point": "RSI(14) at 85.8 on the hourly chart is deeply overbought, and the 5-day change is negative (-0.87%), suggesting the recent 24-hour rally may be a mean-reversion bounce within a broader short-term downtrend rather than the start of a new leg up. An overbought reading at this level historically precedes at least a pause or pullback within 24 hours."
+          },
+          {
+            "side": "bear",
+            "round": 0,
+            "direction": "down",
+            "magnitude_bps": 55.0,
+            "case": "The strongest bear case rests on mean-reversion signals from the technicals and the broader short-term trend context. RSI(14, hourly) at 85.8 is deeply overbought \u2014 this is not merely elevated, it is in the extreme territory where hourly reversals are statistically common within 24 hours. The bull concedes this point. Critically, the 5-day change is -0.87%, meaning the recent +1.63% 24-hour rally is a bounce within a short-term downtrend, not a new impulse. Price is +1.57% above the 50-hour mean, which represents a stretched deviation that tends to snap back. The VIX at 15.44 (35th percentile) implies roughly 97bps of expected daily equity movement \u2014 the bull's +45bps target is within that range, but so is a -55bps reversion. Short volume at 42.5% is not low; it is above the typical ~40% threshold and indicates meaningful bearish flow that has not yet capitulated, meaning there is no short-squeeze fuel beyond what has already been squeezed in the last 24 hours. The 8-K filed 2026-09-03 under Item 8.01 (Other Events) is opaque and unresolved \u2014 it could contain adverse disclosure that the market has not fully priced. The macro backdrop (10y at 4.94%, 30y at 5.29%) shows long rates still elevated, which pressures high-multiple growth names on any risk-off impulse. The combination of extreme overbought RSI, negative 5-day trend, stretched deviation from the 50-hour mean, and elevated short interest creates a high-probability setup for a pullback over the next 24 hours.",
+            "strongest_opposing_point": "The VIX is falling (-2.27 on the day) and sits at the 35th percentile, indicating a genuinely risk-on regime where overbought readings can persist longer than expected. In low-volatility trending environments, RSI above 80 on hourly charts often precedes continued upside rather than reversal, and the positive 10y-2y spread removes recession fear. If momentum is regime-driven rather than noise-driven, the mean-reversion thesis fails and the stock drifts higher."
+          },
+          {
+            "side": "bull",
+            "round": 1,
+            "direction": "up",
+            "magnitude_bps": 30.0,
+            "case": "The bull case in round 2 refines the argument around regime persistence and the specific mechanics of low-volatility momentum. The VIX at 15.44 (35th percentile, down 2.27 on the day) is the anchor: in regimes where VIX is below the 40th percentile and falling, hourly RSI readings above 80 have historically persisted or continued higher rather than reversed within 24 hours, because the absence of fear removes the catalyst for sharp mean-reversion. The bear's own concession acknowledges this. The 24-hour change of +1.63% with price +1.57% above the 50-hour mean shows the move is broad-based across timeframes, not a single-bar spike. Realised volatility at 20.5% annualised is subdued, consistent with orderly accumulation rather than blow-off distribution. The 10y-2y spread at +27bps confirms no recession signal, and the 10-Q plus results 8-K filed 2026-08-26 have been fully digested \u2014 we are three weeks post-earnings with no adverse repricing. The opaque 8-K of 2026-09-03 (Item 8.01) has been in the market for two weeks without triggering a selloff; if it contained material adverse information, the price would have reacted by now \u2014 the absence of negative price action is itself informative. Short volume at 42.5% is moderate and, in a rising tape with falling VIX, represents potential squeeze fuel rather than a ceiling. I reduce magnitude from 45 to 30bps to account for the genuine overbought risk the bear correctly identifies, but the weight of evidence \u2014 falling VIX, positive curve, post-earnings drift, subdued realised vol, and no adverse reaction to the opaque filing \u2014 favours continued upside.",
+            "strongest_opposing_point": "RSI at 85.8 on the hourly chart is in extreme overbought territory, and the 5-day change is negative (-0.87%), meaning the current rally is a bounce within a short-term downtrend. In such configurations, even in low-VIX regimes, the probability of at least a partial retracement within 24 hours is elevated, and the +1.57% deviation above the 50-hour mean represents a stretched condition that historically snaps back. The bear's 55bps downside target is well within the VIX-implied 97bps daily move envelope."
+          },
+          {
+            "side": "bear",
+            "round": 1,
+            "direction": "down",
+            "magnitude_bps": 50.0,
+            "case": "The bear case strengthens in round 2 by focusing on the convergence of extreme overbought conditions with negative short-term trend structure. RSI(14, hourly) at 85.8 is not merely overbought \u2014 it is in the top decile of readings where hourly mean-reversion within 24 hours is statistically dominant even in low-VIX regimes. The bull's regime argument (VIX below 40th percentile sustains overbought readings) is valid but has a critical flaw: it applies to sustained trends, not to bounces within downtrends. The 5-day change is -0.87%, confirming this rally is a counter-trend bounce, not a new impulse. In such configurations, overbought readings mark exhaustion points rather than continuation signals. Price at +1.57% above the 50-hour mean represents a stretched deviation; combined with the negative 5-day trend, this is a classic rubber-band setup. The bull's argument that the opaque 8-K (2026-09-03) has been 'digested' because price hasn't fallen is circular \u2014 the stock has been falling over 5 days (-0.87%), which is consistent with slow digestion of adverse information. Short volume at 42.5% is above the neutral ~40% threshold and represents persistent bearish flow that has NOT capitulated \u2014 meaning the recent bounce has not yet triggered the short-covering cascade the bull needs for continued upside. The VIX-implied daily move of 97bps provides ample room for a 50bps downside. Realised volatility at 20.5% annualised is low, but low realised vol in the context of an overbought bounce within a downtrend often precedes a vol expansion event (the snap-back). The 10y at 4.94% and 30y at 5.29% remain elevated, providing a persistent headwind for high-multiple names on any risk-off impulse, and the positive curve slope does not protect individual stocks from mean-reversion.",
+            "strongest_opposing_point": "The bull's strongest counter is that in genuinely low-VIX, falling-VIX regimes (35th percentile, down 2.27 on the day), overbought hourly RSI readings frequently persist or extend rather than reverse, because the absence of a fear catalyst removes the trigger for sharp mean-reversion. If the current move is regime-driven momentum rather than noise, the RSI reading is a signal of strength, and the stock drifts higher by 30bps or more. The positive 10y-2y spread and three weeks of post-earnings stability support this interpretation."
+          },
+          {
+            "side": "bull",
+            "round": 2,
+            "direction": "up",
+            "magnitude_bps": 25.0,
+            "case": "The bull case in round 3 narrows to the single most decisive factor: regime classification. The VIX at 15.44 (35th percentile, falling -2.27 on the day) defines a low-fear environment where the bear's mean-reversion thesis faces its highest hurdle. The bear's round 2 concession explicitly acknowledges this: 'in genuinely low-VIX, falling-VIX regimes, overbought hourly RSI readings frequently persist or extend rather than reverse.' The bear attempts to carve out an exception by arguing this is a 'counter-trend bounce within a downtrend' rather than a sustained trend, but the evidence does not cleanly support that distinction. The 5-day change is only -0.87% \u2014 a marginal decline that is well within noise for a name with 20.5% annualised realised volatility. Meanwhile, the 24-hour change of +1.63% is nearly double the magnitude of the 5-day decline, suggesting the bounce has already overwhelmed the prior weakness. Price at +0.80% above the 20-hour mean and +1.57% above the 50-hour mean shows the move is gaining traction across multiple lookback windows, not stalling. The opaque 8-K from 2026-09-03 has been public for two weeks with no adverse price reaction \u2014 the bear's claim that the 5-day decline represents 'slow digestion' is speculative and contradicted by the fact that the most recent 24 hours show the strongest momentum in the dataset. Short volume at 42.5% is moderate, not extreme; in a falling-VIX tape with positive momentum, this level provides squeeze potential rather than a ceiling. The 10y-2y spread at +27bps and the absence of any recession signal remove the macro catalyst that would trigger a regime shift. I reduce magnitude to 25bps from 30bps to acknowledge the genuine statistical weight of RSI 85.8 on the hourly timeframe, but the preponderance of evidence \u2014 falling VIX, positive curve, post-earnings stability, moderate short interest, and momentum accelerating across timeframes \u2014 favours continued upside.",
+            "strongest_opposing_point": "RSI(14, hourly) at 85.8 is in extreme overbought territory, and the 5-day change is negative (-0.87%), meaning the current rally is technically a bounce within a short-term downtrend. In such configurations, even in low-VIX regimes, the probability of at least a partial retracement within 24 hours is elevated. The bear correctly notes that the VIX-implied daily move of 97bps provides ample room for a 50bps downside, and that low realised volatility in the context of an overbought bounce within a downtrend can precede a vol expansion event. The bull's regime argument depends on the assumption that this is a sustained trend, but the negative 5-day change is direct evidence against that assumption."
+          },
+          {
+            "side": "bear",
+            "round": 2,
+            "direction": "down",
+            "magnitude_bps": 45.0,
+            "case": "The bear case in round 3 consolidates around the single most statistically robust signal in the evidence: RSI(14, hourly) at 85.8 is in extreme overbought territory, and the bull has now conceded this point three consecutive rounds while attempting to argue it away with regime classification. The bull's regime argument (low VIX sustains overbought readings) has a fatal structural flaw that the bear identified in round 2 and the bull has never adequately addressed: this is a counter-trend bounce within a 5-day downtrend (-0.87%), not a sustained trend. The bull's round 3 attempt to dismiss the 5-day decline as 'within noise' is contradicted by the bull's own framework \u2014 if -0.87% over 5 days is noise, then +1.63% over 24 hours is equally noise, and neither side has a momentum argument. The +1.57% deviation above the 50-hour mean is a stretched condition that historically snaps back within 24 hours, particularly when the broader 5-day trend is negative. Short volume at 42.5% is above the neutral ~40% threshold, indicating persistent bearish flow that has not capitulated \u2014 the bounce has not triggered a short-covering cascade, meaning the fuel for continued upside is limited. The VIX-implied daily move of 97bps provides ample room for a 45bps downside. The opaque 8-K (2026-09-03, Item 8.01) remains unresolved and the bull's argument that 'no adverse reaction means it's benign' is weakened by the fact that the 5-day trend IS negative, consistent with gradual repricing. Long rates at 4.94% (10y) and 5.29% (30y) remain elevated, providing a persistent valuation headwind for high-multiple names. I reduce from 50bps to 45bps to acknowledge that the falling VIX (-2.27 on the day) does provide some support for momentum persistence, but the weight of evidence \u2014 extreme overbought RSI, negative 5-day trend, stretched deviation from 50-hour mean, above-neutral short interest, and elevated long rates \u2014 favours a pullback.",
+            "strongest_opposing_point": "The VIX at 15.44 (35th percentile, falling -2.27 on the day) defines a genuinely low-fear regime where overbought hourly RSI readings historically persist or extend rather than reverse, because the absence of a fear catalyst removes the trigger for sharp mean-reversion. The bull has correctly noted that the 24-hour change (+1.63%) is nearly double the magnitude of the 5-day decline (-0.87%), suggesting the bounce is overwhelming the prior weakness. If this is regime-driven momentum rather than a counter-trend bounce, the RSI reading signals strength and the stock drifts higher by 25bps or more."
+          }
+        ]
+      },
+      {
+        "symbol": "AAPLUSDT",
+        "at": "2026-09-22T08:00:00+00:00",
+        "rounds_held": 3,
+        "ending": "exhausted_rounds",
+        "final_gap_bps": 55.0,
+        "detector_stop_after_round": null,
+        "rounds_saved": 0,
+        "detection_wrong": null,
+        "why": "",
+        "progress_labels": [
+          {
+            "round": 1,
+            "proxy_stalled": false,
+            "llm_stalled": false,
+            "readings": [
+              {
+                "side": "bull",
+                "round": 1,
+                "direction_changed": false,
+                "moved_bps": 15.0,
+                "new_evidence": [
+                  "#-9",
+                  "#18",
+                  "#21",
+                  "#22",
+                  "#40",
+                  "#70",
+                  "edgar-0001140361-26-035325",
+                  "finra-short-aapl-2026",
+                  "ust-spread-2026",
+                  "vix-2026"
+                ],
+                "stalled": false
+              },
+              {
+                "side": "bear",
+                "round": 1,
+                "direction_changed": false,
+                "moved_bps": 5.0,
+                "new_evidence": [
+                  "#0.31",
+                  "#1.5",
+                  "#4",
+                  "ta-aaplusdt-1790064000",
+                  "ust-curve-2026"
+                ],
+                "stalled": false
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "proxy_stalled": false,
+            "llm_stalled": true,
+            "readings": [
+              {
+                "side": "bull",
+                "round": 2,
+                "direction_changed": false,
+                "moved_bps": 10.0,
+                "new_evidence": [
+                  "#3",
+                  "#30"
+                ],
+                "stalled": false
+              },
+              {
+                "side": "bear",
+                "round": 2,
+                "direction_changed": false,
+                "moved_bps": 0.0,
+                "new_evidence": [
+                  "#0.67",
+                  "#82"
+                ],
+                "stalled": false
+              }
+            ]
+          }
+        ],
+        "transcript": [
+          {
+            "side": "bull",
+            "round": 0,
+            "direction": "up",
+            "magnitude_bps": 55.0,
+            "case": "The bull case rests on three converging signals. First, momentum is positive and broad-based: the 24h change is +1.37%, the 5-day change is +1.68%, and price sits above both the 20-hour (+0.35%) and 50-hour (+1.09%) means, indicating sustained buying rather than a single spike. RSI at 66.2 is elevated but not overbought, leaving room for continuation within a 24-hour window. Second, the volatility regime is supportive: VIX at 14.81 (31st percentile) signals a calm, risk-on environment where large-cap names like AAPL tend to drift higher with low probability of a sharp reversal. Realised volatility of 10.7% annualised is very low, consistent with orderly trend continuation rather than mean-reversion pressure. Third, short interest at 44.7% of volume is moderate\u2014not extreme enough to signal a coordinated bearish thesis, but high enough that any upward momentum can trigger short-covering that amplifies gains. The macro backdrop is neutral-to-supportive: the 10y-2y spread at +25bps indicates a normally sloped curve with no recession signal, and the 8-K/A filing regarding an officer/director change is routine and unlikely to be a negative catalyst. With VIX-implied daily move of ~93bps, a 55bps upside target represents roughly 60% of the expected range, consistent with a mild momentum continuation in a low-vol regime.",
+            "strongest_opposing_point": "RSI at 66.2 on the hourly timeframe combined with price already +1.09% above the 50-hour mean suggests the move may be stretched in the short term; mean-reversion pressure could cap upside or produce a pullback, especially if the low-vol regime compresses returns toward zero rather than allowing trend continuation."
+          },
+          {
+            "side": "bear",
+            "round": 0,
+            "direction": "down",
+            "magnitude_bps": 30.0,
+            "case": "The bear case rests on mean-reversion pressure after an extended move in a low-volatility regime. Price is +1.37% over 24h and +1.68% over 5 days, sitting +1.09% above the 50-hour mean and +0.35% above the 20-hour mean. RSI(14, hourly) at 66.2 is approaching the overbought threshold on the hourly timeframe, which historically precedes short-term pullbacks. Critically, realised volatility is only 10.7% annualised \u2014 this is extremely low. In such regimes, the expected daily move is compressed; VIX implies only ~93bps of daily movement. A +1.37% move in 24 hours already exceeds the typical daily range implied by this volatility environment, suggesting the move is statistically stretched and prone to partial retracement. The 44.7% short volume (FINRA data) is notable: while the bull frames this as fuel for a squeeze, it equally indicates persistent selling interest at these levels \u2014 nearly half of all prints are short sales, meaning there is substantial supply overhead. The 8-K/A filing (officer/director change, filed 2026-09-01) is a minor governance event that adds no positive catalyst to justify further extension. With the bull's own concession that 'mean-reversion pressure could cap upside or produce a pullback,' the most probable outcome over 24 hours is a modest drift lower as the stretched hourly RSI normalises and low-vol gravity pulls price back toward the 50-hour mean.",
+            "strongest_opposing_point": "The bull's strongest argument is that low VIX (31st percentile) and a normally-sloped yield curve create a risk-on drift environment where momentum tends to persist rather than reverse, and that 44.7% short volume could trigger a covering squeeze that amplifies any upside, making a bearish call fighting the regime."
+          },
+          {
+            "side": "bull",
+            "round": 1,
+            "direction": "up",
+            "magnitude_bps": 40.0,
+            "case": "The bull case in round 2 refines rather than retreats. The bear's core argument\u2014that the 24h move of +1.37% already exceeds the VIX-implied daily range of ~93bps and is therefore 'statistically stretched'\u2014misapplies the metric. The VIX-implied move is a one-standard-deviation envelope, not a hard cap; in low-VIX regimes (31st percentile per vix-2026-09-18), realised moves frequently cluster in one direction for multiple sessions because the low-vol environment reflects suppressed hedging demand and steady institutional accumulation, not exhaustion. The 5-day change of +1.68% versus a 24h change of +1.37% shows the move is accelerating, not decelerating\u2014momentum is building, not fading. RSI at 66.2 on the hourly is elevated but well below the 70+ threshold where mean-reversion signals become reliable; the bear conflates 'approaching overbought' with 'overbought.' The 44.7% short volume (finra-short-AAPL-2026-09-21) is the critical asymmetry: the bear frames it as supply overhead, but in a rising tape with low realised volatility (10.7% annualised), persistent short volume that fails to push price down is evidence of strong bid-side absorption. Shorts are being absorbed, not winning. This sets up a covering dynamic where any further upside forces capitulation. The 8-K/A officer/director change (edgar-0001140361-26-035325) is routine governance and not a negative catalyst. The yield curve at +25bps (ust-spread-2026-09-22) confirms no recession signal, supporting risk appetite. I reduce magnitude from 55 to 40bps to acknowledge the bear's valid point about low-vol compression limiting the absolute upside, but direction remains up.",
+            "strongest_opposing_point": "The bear's best argument is that realised volatility of 10.7% annualised is so low that the expected daily move is compressed toward zero, meaning even a modest +1.37% move is statistically unusual for this regime and the path of least resistance over the next 24 hours is drift toward the mean rather than continuation\u2014low-vol regimes reward mean-reversion strategies, not momentum chasing, and the 44.7% short volume represents genuine supply that has not yet been exhausted."
+          },
+          {
+            "side": "bear",
+            "round": 1,
+            "direction": "down",
+            "magnitude_bps": 25.0,
+            "case": "The bear case sharpens in round 2 by directly addressing the bull's acceleration claim. The bull argues the 5-day change (+1.68%) versus 24h change (+1.37%) shows acceleration, but this arithmetic is misleading: if 24h accounts for 1.37% of a 5-day 1.68% total, then the prior 4 days contributed only +0.31%, meaning the move is actually front-loaded and decelerating when viewed as a cumulative process\u2014the bulk of the gain arrived in the last session, not building over time. This is a classic exhaustion signature, not acceleration. The bull's own round-2 concession is damning: they acknowledge 'low-vol regimes reward mean-reversion strategies, not momentum chasing.' With realised volatility at 10.7% annualised (ta-AAPLUSDT-1790064000), the expected hourly drift is minuscule; a +1.37% move in 24 hours is already ~1.5x the VIX-implied daily range of 93bps (vix-2026-09-18). In low-vol environments, such overshoots revert because the underlying process has insufficient energy to sustain directional moves beyond one standard deviation. RSI at 66.2 on the hourly (ta-AAPLUSDT-1790064000) is not 'well below 70' as the bull claims\u2014it is within 4 points of the threshold on a fast timeframe where signals fire quickly. The 44.7% short volume (finra-short-AAPL-2026-09-21) represents persistent supply that the bull reinterprets as 'absorption,' but absorption without a catalyst to exhaust that supply simply means the bid is working harder to hold price, not that a breakout is imminent. No positive catalyst exists in the evidence: the 8-K/A (edgar-0001140361-26-035325) is routine governance. The yield curve (ust-curve-2026-09-22) is neutral. With no new buying catalyst and a statistically stretched move in a mean-reversion-favouring regime, the highest-probability 24h outcome is a modest pullback toward the 50-hour mean, implying roughly 25bps of downside.",
+            "strongest_opposing_point": "The bull's strongest counter is that in a VIX-at-31st-percentile environment with a normally sloped curve, institutional flows tend to be unidirectional and persistent\u2014low hedging demand means dips get bought systematically, and the 44.7% short volume that fails to push price down is evidence of bid-side strength that could trigger a covering squeeze on any positive headline, making a bearish call structurally fighting the regime's drift characteristics."
+          },
+          {
+            "side": "bull",
+            "round": 2,
+            "direction": "up",
+            "magnitude_bps": 30.0,
+            "case": "The bull case in round 3 narrows to the single strongest structural argument: the regime itself. VIX at 14.81 (31st percentile, vix-2026-09-18) with a normally sloped 10y-2y spread of +25bps (ust-spread-2026-09-22) defines an environment where the base rate for large-cap equities is positive drift. The bear's exhaustion argument\u2014that 1.37% of the 1.68% five-day gain arrived in the last 24 hours\u2014actually supports the bull case when interpreted correctly: the move is fresh, not stale. A front-loaded move in a low-vol regime with RSI at 66.2 (below 70) means the market has just begun repricing, not that it has exhausted itself. The bear's own concession in round 2 is the key admission: 'low hedging demand means dips get bought systematically.' This is precisely the mechanism that sustains upward drift over 24 hours. The 44.7% short volume (finra-short-AAPL-2026-09-21) failing to depress price over a full session where price rose +1.37% is direct evidence that supply is being absorbed at higher levels\u2014each short sale that doesn't push price down is a future covering obligation. Realised volatility of 10.7% annualised (ta-AAPLUSDT-1790064000) means the market is calm and orderly, not chaotic; in such conditions, momentum persists because there is no volatility shock to trigger reversals. I reduce magnitude to 30bps to respect the bear's valid point about low-vol compression and the statistical stretch of the recent move, but direction remains up because the regime's drift characteristics and the absorption of short volume create a structural bid.",
+            "strongest_opposing_point": "The bear's strongest argument is that in a 10.7% annualised realised volatility regime, a +1.37% daily move is already ~1.5x the VIX-implied range, making it statistically unusual and prone to mean-reversion; the 44.7% short volume represents genuine persistent supply that has not been exhausted, and without any positive catalyst in the evidence, the highest-probability path is a modest pullback toward the 50-hour mean rather than continued extension."
+          },
+          {
+            "side": "bear",
+            "round": 2,
+            "direction": "down",
+            "magnitude_bps": 25.0,
+            "case": "The bear case in round 3 consolidates around the single most statistically robust argument: the move is overstretched relative to the volatility regime, and no catalyst exists to sustain it. Realised volatility is 10.7% annualised (ta-AAPLUSDT-1790064000), which translates to roughly 0.67% daily standard deviation. The 24h move of +1.37% is approximately 2x that daily sigma \u2014 a statistically rare event in a low-vol process that is prone to revert. The bull's 'fresh move' reinterpretation of the front-loaded gain (1.37% of 1.68% arriving in the last 24h) actually strengthens the bear case: a single-session spike that accounts for 82% of the 5-day move is the definition of a mean-reversion candidate, not a trend initiation. RSI at 66.2 on the hourly (ta-AAPLUSDT-1790064000) is within 4 points of overbought on a fast timeframe where signals resolve within hours, not days. The 44.7% short volume (finra-short-AAPL-2026-09-21) is the critical supply metric the bull keeps reinterpreting: nearly half of all prints are short sales, and this supply has not been exhausted \u2014 it has merely been temporarily absorbed. Absorption without a new catalyst (and none exists in the evidence: the 8-K/A is routine governance per edgar-0001140361-26-035325) means the bid is working harder, not that supply is disappearing. The bull's regime argument (VIX 31st percentile, +25bps curve) describes the environment but does not identify a mechanism for continued upside beyond what has already occurred. In low-vol regimes, the base rate is small positive drift \u2014 not +1.37% daily moves that then continue. The most probable 24h path is partial retracement toward the 50-hour mean, which sits 1.09% below current price, implying roughly 25bps of downside as the overshoot partially corrects.",
+            "strongest_opposing_point": "The bull's strongest argument is that in a VIX-at-31st-percentile regime with a normally sloped curve, institutional flows are systematically unidirectional \u2014 dips get bought by systematic strategies (risk parity, vol-targeting funds), and the 44.7% short volume that failed to push price down represents trapped shorts who will cover on any positive tick, creating an asymmetric payoff to the upside. The bear is structurally fighting a regime where the base rate for large-cap equities is positive drift, and the absence of a negative catalyst means there is no identified trigger for the pullback the bear predicts."
+          }
+        ]
+      }
+    ],
+    "stopped": "stopped before TSLAUSDT: stage cap cannot fund a full debate"
+  }
+}

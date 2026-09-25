@@ -28,9 +28,13 @@ and the *anchor* is exactly what a tokenized-equity desk cannot see from the ven
   ``id``, so the obvious call is wrong, and the server answers with a pydantic validation error
   rather than a hint. Named here so the next reader does not rediscover it.
 
-Transport is JSON-RPC over HTTP with Server-Sent Events framing: a reply arrives as ``data: {...}``
-lines rather than a bare body, which is why :func:`_post` parses for the prefix instead of calling
-``json.loads`` on the response.
+Transport is JSON-RPC over HTTP with Server-Sent Events framing (a reply arrives as ``data: {...}``
+lines rather than a bare body). Since 2026-09-25 that transport is :mod:`argus.market.rpc`, the one
+client both Bitget MCP servers now share, and :class:`BitgetMcpError` carries a typed ``kind``:
+a refused argument (``tool_execution``), the service's own upstream answering 503
+(``upstream_5xx``), a missing session (``protocol``) and a dropped connection (``transport``) used
+to be one undifferentiated string and are now four facts. The negotiated protocol version is
+2025-11-25 — the server's newest, found by asking it — where this module used to pin 2024-11-05.
 
 **This module fetches; it does not decide.** Everything returned is evidence for the desk to weigh,
 and it is deliberately *not* wired into the Constitution — the risk layer computes, and a rule that
@@ -41,14 +45,18 @@ reaches for the network is a rule that can fail open.
 
 from __future__ import annotations
 
-import contextlib
 import json
-import urllib.error
-import urllib.request
-import uuid
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
+
+from argus.market.rpc import (
+    LATEST_SUPPORTED,
+    ErrorKind,
+    JsonRpcClient,
+    RpcError,
+    payload_failure,
+)
 
 ENDPOINT = "https://agent.bitget.com/mcp"
 """The HTTP transport the handbook publishes. Keyless, and confirmed keyless by calling it."""
@@ -61,15 +69,19 @@ _HEADERS = {
     "User-Agent": "curl/8.0",
 }
 
-PROTOCOL_VERSION = "2024-11-05"
+PROTOCOL_VERSION = LATEST_SUPPORTED
+"""The version asked for first. The server's answer is what is used — see
+:attr:`BitgetDataService.negotiation`."""
 TIMEOUT = 45.0
 
 
-class BitgetMcpError(RuntimeError):
+class BitgetMcpError(RpcError):
     """The service could not be reached or refused a call. Raised rather than returning empty.
 
     An empty result and an unreachable service are different facts, and `market/skills.py` already
     learned that lesson: a probe that reports a transport failure as "no data" measures the probe.
+    ``kind`` (an :class:`~argus.market.rpc.ErrorKind`) says which failure it was; the message text
+    is unchanged from before the taxonomy, so ``eval/datacoverage.py``'s reading of it still holds.
     """
 
 
@@ -89,60 +101,33 @@ class Entry:
         }
 
 
-def _post(payload: dict[str, Any], session: str | None = None) -> tuple[dict[str, Any], str | None]:
-    """One JSON-RPC call, unwrapping the SSE framing the server replies with."""
-    headers = dict(_HEADERS)
-    if session:
-        headers["Mcp-Session-Id"] = session
-    request = urllib.request.Request(
-        ENDPOINT, data=json.dumps(payload).encode(), headers=headers,
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
-            raw = response.read().decode("utf-8", "replace")
-            returned = response.headers.get("Mcp-Session-Id")
-    except urllib.error.HTTPError as exc:
-        raise BitgetMcpError(f"{exc.code} from {ENDPOINT}: {exc.reason}") from exc
-    except OSError as exc:
-        raise BitgetMcpError(f"transport failure reaching {ENDPOINT}: {exc}") from exc
-
-    for line in raw.splitlines():
-        if line.startswith("data: "):
-            return json.loads(line[6:]), returned
-    try:
-        return json.loads(raw), returned
-    except json.JSONDecodeError as exc:
-        raise BitgetMcpError(f"unparseable reply from {ENDPOINT}: {raw[:200]}") from exc
-
-
 class BitgetDataService:
     """A session against the MCP server. One handshake, then any number of queries."""
 
-    def __init__(self) -> None:
-        handshake, session = _post({
-            "jsonrpc": "2.0", "id": str(uuid.uuid4()), "method": "initialize",
-            "params": {
-                "protocolVersion": PROTOCOL_VERSION, "capabilities": {},
-                "clientInfo": {"name": "argus", "version": "1.0"},
-            },
-        })
-        info = handshake.get("result", {}).get("serverInfo", {})
-        self.server = f"{info.get('name', '?')} {info.get('version', '?')}"
-        self._session = session
-        # Required by the protocol before the server will serve tool calls. A failure here is not
-        # fatal on this implementation, so it is attempted and not asserted.
-        with contextlib.suppress(BitgetMcpError):
-            _post({"jsonrpc": "2.0", "id": str(uuid.uuid4()),
-                   "method": "notifications/initialized", "params": {}}, self._session)
+    def __init__(self, *, client: JsonRpcClient | None = None) -> None:
+        self.client = client or JsonRpcClient(
+            ENDPOINT, headers=_HEADERS, timeout=TIMEOUT, error_type=BitgetMcpError,
+            client_info={"name": "argus", "version": "1.0"},
+        )
+        try:
+            self.negotiation = self.client.initialize()
+        except RpcError as exc:  # an injected client may raise the base type
+            raise BitgetMcpError(exc.kind, str(exc), http_status=exc.http_status) from exc
+        self.server = self.negotiation.server
 
     def _call(self, tool: str, arguments: Mapping[str, Any]) -> dict[str, Any]:
-        reply, _ = _post({
-            "jsonrpc": "2.0", "id": str(uuid.uuid4()), "method": "tools/call",
-            "params": {"name": tool, "arguments": dict(arguments)},
-        }, self._session)
-        if "error" in reply:
-            raise BitgetMcpError(f"{tool}: {reply['error']}")
-        return dict(reply.get("result", {}))
+        """One ``tools/call``, returning the raw result. A protocol failure raises typed; a tool
+        failure is left in the result for :meth:`query` to read, as SEP-1303 places it there."""
+        try:
+            tool_result = self.client.call_tool(tool, arguments)
+        except RpcError as exc:
+            raise BitgetMcpError(exc.kind, f"{tool}: {exc}", http_status=exc.http_status,
+                                 code=exc.code, data=exc.data, attempts=exc.attempts) from exc
+        result: dict[str, Any] = {"content": list(tool_result.content),
+                                  "isError": tool_result.is_error}
+        if tool_result.structured is not None:
+            result["structuredContent"] = tool_result.structured
+        return result
 
     def categories(self) -> list[dict[str, Any]]:
         """The five top-level groups and how many entries each holds."""
@@ -173,10 +158,16 @@ class BitgetDataService:
         result = self._call("do_query", {"entry_id": entry_id, "params": dict(params)})
         if result.get("isError"):
             text = json.dumps(result.get("content", ""))[:300]
-            raise BitgetMcpError(f"{entry_id}: {text}")
+            raise BitgetMcpError(ErrorKind.TOOL_EXECUTION, f"{entry_id}: {text}")
         payload = result.get("structuredContent", {})
+        if not isinstance(payload, dict):
+            payload = {}
         if not payload.get("success", True):
-            raise BitgetMcpError(f"{entry_id}: service reported failure: {payload}")
+            # success=false with the upstream's own status: a 503 is the service behind this one
+            # being down, a 4xx is our request being refused. Different owners, different kinds.
+            failed = payload_failure(payload)
+            kind = failed[0] if failed else ErrorKind.DOMAIN
+            raise BitgetMcpError(kind, f"{entry_id}: service reported failure: {payload}")
         return dict(payload.get("data", {}))
 
     def results(self, entry_id: str, **params: Any) -> list[dict[str, Any]]:

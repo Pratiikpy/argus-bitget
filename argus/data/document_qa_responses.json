@@ -1,0 +1,380 @@
+{
+  "69e12c95aadb6d5fe296880f566ac0ac768438defac7f4de2c357bbb0cbc8c74": {
+    "content": "NVIDIA's Data Center revenue was $89.0 billion in the second quarter of fiscal year 2027. (dqa-5908b085) This represented an increase of 117% from a year ago. (dqa-5908b085) The growth was driven by the ramp of Blackwell Ultra infrastructure. (dqa-5908b085) The comparable prior-year figure for the second quarter of fiscal year 2026 was $41,096 million. (dqa-d0a4f7d4)",
+    "finish": "stop",
+    "prompt_tokens": 4793,
+    "completion_tokens": 298,
+    "reasoning_tokens": 163
+  },
+  "54681bc9ddfafdc537dfd3792043139da74d0d7804766982d248e1436c95f5ba": {
+    "content": "NVIDIA's gross margin was 75.0% for the second quarter of fiscal year 2027, compared to 72.4% for the second quarter of fiscal year 2026 (dqa-919787f5). The increase was driven by improved mix from Blackwell Ultra (dqa-919787f5, dqa-5908b085).",
+    "finish": "stop",
+    "prompt_tokens": 5059,
+    "completion_tokens": 251,
+    "reasoning_tokens": 154
+  },
+  "1fab06f08f1a97899923285c9e3562c18ba362a2e1eee25b8afee37ed8553899": {
+    "content": "In the second quarter of fiscal year 2027, NVIDIA repurchased 94 million shares of its common stock for $19.7 billion. (dqa-24a485ee, dqa-7e1db1dc, dqa-51253199) As of July 26, 2026, the company was authorized, subject to certain specifications, to repurchase up to $99.3 billion of its common stock. (dqa-24a485ee, dqa-7e1db1dc, dqa-51253199) This remaining authorization followed the Board of Directors' approval on May 18, 2026 of an additional $80.0 billion in share repurchase authorization without expiration. (dqa-24a485ee, dqa-7e1db1dc, dqa-51253199)",
+    "finish": "stop",
+    "prompt_tokens": 5055,
+    "completion_tokens": 624,
+    "reasoning_tokens": 409
+  },
+  "70956c408eff3785980a512ddd358716b5c54e1a00a5b435957a0e757359027a": {
+    "content": "In August 2026, NVIDIA entered into guarantees capped at a total of $105 billion to provide credit support on a land, power, and shell buildout with affiliates of SB Energy Corp. on behalf of a customer, an affiliate of OpenAI Group PBC. (dqa-188c1cbc, dqa-be1a8457) The guarantees relate to leases for approximately 4.25 gigawatts of IT load in the aggregate at SB Energy's PORTS Technology Campus in Pike County, Ohio. (dqa-188c1cbc, dqa-be1a8457) Each guarantee generally becomes effective upon commencement of the applicable lease, with corresponding guarantee amounts increasing as each of the nine phases of data center construction is completed, the first of which is expected in fiscal year 2029. (dqa-188c1cbc, dqa-be1a8457) The guarantees are limited to defined portions of lease and power payments and not the full cost of the site or all of the tenant's obligations. (dqa-188c1cbc, dqa-be1a8457) They terminate upon certain events, including OpenAI achieving a satisfactory credit rating or after each respective lease term has completed. (dqa-188c1cbc, dqa-be1a8457) In exchange for the guarantees, the site will exclusively host NVIDIA AI infrastructure, subject to limited exceptions. (dqa-188c1cbc, dqa-be1a8457)",
+    "finish": "stop",
+    "prompt_tokens": 4306,
+    "completion_tokens": 835,
+    "reasoning_tokens": 497
+  },
+  "9d2efeebf0492145c616ca495c5f91f7fceff71d54528ca961bee701c851c080": {
+    "content": "NVIDIA entered into a definitive agreement to acquire Hugging Face on September 2, 2026. (dqa-fd1ba545) The transaction includes an approximately $11.9 billion purchase price payable to Hugging Face stockholders, subject to certain adjustments. (dqa-fd1ba545) In addition, the deal includes an equity-based retention program of up to approximately $1.0 billion for Hugging Face employees joining NVIDIA. (dqa-fd1ba545) The transaction is expected to close in the first half of 2027, subject to the satisfaction or waiver of customary closing conditions, including receipt of required regulatory approvals. (dqa-fd1ba545, dqa-ef716fcf)",
+    "finish": "stop",
+    "prompt_tokens": 3672,
+    "completion_tokens": 365,
+    "reasoning_tokens": 196
+  },
+  "c6c69e6052ab6521125eeb24ef9268d675eddaa73904f8a0a57c5648eacaeed2": {
+    "content": "As of the end of fiscal year 2026, NVIDIA had approximately 42,000 employees in 38 countries. (dqa-48e5592a) Of those, 31,000 were engaged in research and development and 11,000 were engaged in sales, marketing, operations, and administrative positions. (dqa-48e5592a)",
+    "finish": "stop",
+    "prompt_tokens": 5149,
+    "completion_tokens": 228,
+    "reasoning_tokens": 132
+  },
+  "95039ba59fb942b9d80e641f5ffeea4799af35c8bd430499ea768d8e3fd8699e": {
+    "content": "NVIDIA's supply commitments were $279 billion as of July 26, 2026. (dqa-f4c6abd3) The previous quarter, those commitments were $119 billion. (dqa-f4c6abd3) The company described this as an increase in supply commitments to meet future demand. (dqa-a5b25b89)",
+    "finish": "stop",
+    "prompt_tokens": 4702,
+    "completion_tokens": 237,
+    "reasoning_tokens": 150
+  },
+  "d6e744ffa2f5f1de6c2f207c710a6c20154924946d2a52aebf7cb5504ae0aa02": {
+    "content": "Apple reported quarterly revenue of $109.4 billion for its fiscal 2026 third quarter ended June 27, 2026 (dqa-dca27fd2). This represented growth of 16 percent year over year (dqa-dca27fd2). The 10-Q confirms total net sales of $109,417 million for the three months ended June 27, 2026, compared to $94,036 million for the three months ended June 28, 2025 (dqa-4ab74d7b).",
+    "finish": "stop",
+    "prompt_tokens": 5307,
+    "completion_tokens": 340,
+    "reasoning_tokens": 201
+  },
+  "6fd6f7ac2e106f25af2d8f8f3d35a820bb5dd15bebd91afb21d0679490de8bb7": {
+    "content": "Apple's total gross margin for the three months ended June 27, 2026 was $54,770 million. (dqa-d7d65405) The total gross margin percentage for that quarter was 50.1%. (dqa-d7d65405) The company gross margin of 50.1 percent included a favorable impact of approximately 2 percentage points from tariff refunds. (dqa-dca27fd2) The Company recognized tariff refunds received as a reduction of products cost of sales. (dqa-0c190bc7)",
+    "finish": "stop",
+    "prompt_tokens": 5521,
+    "completion_tokens": 350,
+    "reasoning_tokens": 216
+  },
+  "98abfd7493a4dc19538acf934d3004bb71cd788aa6ef01a013967b4d4fa48dfa": {
+    "content": "Apple's board of directors declared a cash dividend of $0.27 per share of the Company's common stock. (dqa-294958e5) The dividend is payable on August 13, 2026, to shareholders of record as of the close of business on August 10, 2026. (dqa-294958e5) This is consistent with the Company's quarterly cash dividend of $0.27 per share as of June 27, 2026. (dqa-a2d0545d)",
+    "finish": "stop",
+    "prompt_tokens": 5091,
+    "completion_tokens": 317,
+    "reasoning_tokens": 183
+  },
+  "44b0c9b4a9e7e84d34049d859d95f1fdb7ad78c53742187ef8dc47183c347f96": {
+    "content": "Greater China net sales were $18,816 million in the third quarter of fiscal 2026, up 22% from $15,369 million in the same period of 2025 (dqa-ffab422f). The increase was primarily due to higher net sales of iPhone (dqa-607abf80). The strength in the renminbi relative to the U.S. dollar also had a favorable year-over-year impact on Greater China net sales during the third quarter of 2026 (dqa-607abf80).",
+    "finish": "stop",
+    "prompt_tokens": 7162,
+    "completion_tokens": 357,
+    "reasoning_tokens": 222
+  },
+  "0c7309df346f5e000f82ff9975a3b15aa27274f13ca2f408e26cf14112f62602": {
+    "content": "During the third quarter of 2026, Apple repurchased $25.8 billion of its common stock. (dqa-a2d0545d)",
+    "finish": "stop",
+    "prompt_tokens": 5634,
+    "completion_tokens": 250,
+    "reasoning_tokens": 210
+  },
+  "d4eacb4fd239090dd64c4c6c019efcc20da7293c21064f55efcb5c78e32f95b7": {
+    "content": "As of September 27, 2025, Apple had approximately 166,000 full-time equivalent employees (dqa-e547c9a8).",
+    "finish": "stop",
+    "prompt_tokens": 4815,
+    "completion_tokens": 160,
+    "reasoning_tokens": 117
+  },
+  "b2348a8d3d01487bc98f5ee6bde83bb593cb7871fec41f641a66e7c962e4dc6a": {
+    "content": "Beginning in fiscal year 2027, Microsoft will report its financial performance based on two reportable segments: Agents and Infra and Devices and Consumer (dqa-8325492a). This represents a transition from the prior three segments of Productivity and Business Processes, Intelligent Cloud, and More Personal Computing (dqa-80751c5b). Agents and Infra will include the Microsoft Cloud, productivity and server licensing, and consulting and support businesses (dqa-25c7208a). Devices and Consumer will include the Windows, XBOX, and advertising businesses (dqa-25c7208a).",
+    "finish": "stop",
+    "prompt_tokens": 4623,
+    "completion_tokens": 359,
+    "reasoning_tokens": 218
+  },
+  "f9ccfe5c70eafb15655a78ccd5d67b382de298da6e1ad5d95de9d4b5e9fe99b9": {
+    "content": "Microsoft reported Microsoft Cloud revenue of $214.4 billion for fiscal year 2026. (dqa-c616e619) This represented a 27% increase compared with fiscal year 2025. (dqa-c616e619)",
+    "finish": "stop",
+    "prompt_tokens": 6512,
+    "completion_tokens": 215,
+    "reasoning_tokens": 148
+  },
+  "6f0f9c053d0f1ea22aa81be0482f8fe83d952f101abfdc430426d3afb1dab2db": {
+    "content": "As of June 30, 2026, Microsoft employed approximately 223,000 people on a full-time basis. (dqa-479093e3)",
+    "finish": "stop",
+    "prompt_tokens": 4548,
+    "completion_tokens": 172,
+    "reasoning_tokens": 125
+  },
+  "0f6acc0f52aff84c8b2882b4217903ebf71e7838fcefcaa2e91d3a245d44f357": {
+    "content": "Microsoft Cloud revenue was $54.5 billion in the quarter ended March 31, 2026. (dqa-031699af) It increased 29% compared with the same quarter of the prior year. (dqa-031699af)",
+    "finish": "stop",
+    "prompt_tokens": 5908,
+    "completion_tokens": 263,
+    "reasoning_tokens": 195
+  },
+  "0d3fab406ee31c3584ab9505bf0455db4b1c29152266b671eac087d5f1e20b84": {
+    "content": "Tesla's total revenues for the three months ended June 30, 2026 were $28.24 billion. (dqa-92c73a8b) This represented an increase of $5.74 billion compared to the same period in the prior year. (dqa-92c73a8b) The revenue table confirms total revenues of $28,236 million for the three months ended June 30, 2026, compared to $22,496 million for the three months ended June 30, 2025. (dqa-9a40b32a)",
+    "finish": "stop",
+    "prompt_tokens": 4950,
+    "completion_tokens": 388,
+    "reasoning_tokens": 240
+  },
+  "e44a624f5f119c506ba3ca3901a7867f1ce319f9b9e32d18df80132cbee783a2": {
+    "content": "Tesla delivered 467,762 Model 3/Y vehicles in the second quarter of 2026 (dqa-41818530).",
+    "finish": "stop",
+    "prompt_tokens": 4367,
+    "completion_tokens": 141,
+    "reasoning_tokens": 100
+  },
+  "1af3def94d8e121388f34bc39261f0236aab6e5e306b28c9f22c16e485275d1a": {
+    "content": "I cannot answer.",
+    "finish": "stop",
+    "prompt_tokens": 3530,
+    "completion_tokens": 462,
+    "reasoning_tokens": 455
+  },
+  "821877e978b8b18d33b91396b8fa2dde6bd60d5ff6d40a0f73816e4e9474e9fc": {
+    "content": "Energy generation and storage segment revenue was $3,139 million in the three months ended June 30, 2026, compared to $2,789 million in the three months ended June 30, 2025, representing an increase of $350 million, or 13% (dqa-de0bcbee). The increase was primarily due to an increase in Megapack deployments (dqa-0bc6b54f). This growth was partially offset by a lower average selling price per Megapack unit (dqa-0bc6b54f). It was also partially offset by a decrease in Powerwall deployments (dqa-0bc6b54f).",
+    "finish": "stop",
+    "prompt_tokens": 4811,
+    "completion_tokens": 373,
+    "reasoning_tokens": 215
+  },
+  "de997c4df8330d34e6f51c45e3984d43919e4290f54654ed105c6f4aa57718bc": {
+    "content": "As of December 31, 2025, Tesla's employee headcount worldwide was 134,785 (dqa-870e3f1d, dqa-2808a8f1).",
+    "finish": "stop",
+    "prompt_tokens": 4133,
+    "completion_tokens": 196,
+    "reasoning_tokens": 140
+  },
+  "86475795caf7242a87bc512af4cfdb12e15aaea3af03ffcf49b1484a1cb14218": {
+    "content": "Coinbase's total revenue for the three months ended June 30, 2026 was $1,220,068 thousand. (dqa-be9dfc33) For the three months ended June 30, 2025, total revenue was $1,497,208 thousand. (dqa-be9dfc33) This represents a decrease of $277,140 thousand from the second quarter of 2025 to the second quarter of 2026. (dqa-be9dfc33)",
+    "finish": "stop",
+    "prompt_tokens": 6254,
+    "completion_tokens": 392,
+    "reasoning_tokens": 260
+  },
+  "eb8ad75ce2203633a41de3406421c26a8272c811414a19faa53639c8e3da5cc8": {
+    "content": "On September 1, 2026, Coinbase's Board of Directors appointed Anthony Armstrong to serve as a director of the Company, effective immediately (dqa-16c738cf). The Board increased its size from nine to ten directors to accommodate the appointment (dqa-16c738cf). Mr. Armstrong was appointed following a recommendation by the Nominating and Corporate Governance Committee (dqa-16c738cf). He will serve on the Board's Audit and Compliance Committee (dqa-16c738cf).",
+    "finish": "stop",
+    "prompt_tokens": 3852,
+    "completion_tokens": 232,
+    "reasoning_tokens": 109
+  },
+  "64ae1ebff3e40901cb745884478a4feabd40d9cb5e340e332abf502d14232cbd": {
+    "content": "Coinbase reported a net loss of $(359,468) thousand for the three months ended June 30, 2026 (dqa-2b790fa0). This figure is also described as a net loss of $359.5 million for the same period (dqa-ae7128ea). The same net loss amount appears in the reconciliation of net loss to Adjusted EBITDA (dqa-218913dd).",
+    "finish": "stop",
+    "prompt_tokens": 6319,
+    "completion_tokens": 414,
+    "reasoning_tokens": 305
+  },
+  "e63bd874b8fb4065bcdf74f0abdaa6ac29db980edc5dcae62b2af0d01f6687b7": {
+    "content": "During the three months ended June 30, 2026, one counterparty accounted for 26% of Coinbase's total revenue. (dqa-be9dfc33) This represented an increase from 22% during the same period in 2025. (dqa-be9dfc33) For the six months ended June 30, 2026, that same concentration measure was 24%, up from 18% in the prior year period. (dqa-be9dfc33)",
+    "finish": "stop",
+    "prompt_tokens": 5634,
+    "completion_tokens": 273,
+    "reasoning_tokens": 152
+  },
+  "08cee3700c622f5574f2ee5319c5b5eb8ec7d7b9df51628ac9f14ff3eb605a03": {
+    "content": "As of December 31, 2025, Coinbase had 4,951 employees. (dqa-0e032c76)",
+    "finish": "stop",
+    "prompt_tokens": 4373,
+    "completion_tokens": 119,
+    "reasoning_tokens": 80
+  },
+  "35ca2804d4542912661684a48a7c1c3cb03c1fa3bfa0bb3a3325a5e4f7a12658": {
+    "content": "I cannot answer.",
+    "finish": "stop",
+    "prompt_tokens": 5039,
+    "completion_tokens": 386,
+    "reasoning_tokens": 379
+  },
+  "a10a3b1e575db2f0fc1beba1f922be0bac5022ec8e5bea8fd693e59486cee43a": {
+    "content": "I cannot answer.",
+    "finish": "stop",
+    "prompt_tokens": 3896,
+    "completion_tokens": 424,
+    "reasoning_tokens": 417
+  },
+  "8f78c831ea5656fea0f09ee96ea73bc30cf057ff563283823094814c0d787c46": {
+    "content": "I cannot answer.",
+    "finish": "stop",
+    "prompt_tokens": 5549,
+    "completion_tokens": 395,
+    "reasoning_tokens": 388
+  },
+  "d20a51552d475ab36752cbf912047ffcbdd02c1e03af89927b059d68b38b5698": {
+    "content": "{\"verdicts\": [{\"id\": \"nvda-dc-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-dc-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-dc-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-dc-s4\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-gm-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-gm-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-buyback-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-buyback-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-buyback-s3\", \"verdict\": \"SUPPORTED\"}]}",
+    "finish": "stop",
+    "prompt_tokens": 6167,
+    "completion_tokens": 1110,
+    "reasoning_tokens": 930
+  },
+  "075430402d5010e705202ca488ff70ea8b001fe6f51db1a882056d613a313c12": {
+    "content": "{\"verdicts\": [{\"id\": \"nvda-sbenergy-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-sbenergy-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-sbenergy-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-sbenergy-s4\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-sbenergy-s5\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-sbenergy-s6\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-hf-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-hf-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-hf-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-hf-s4\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-staff-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"nvda-staff-s2\", \"verdict\": \"SUPPORTED\"}]}",
+    "finish": "stop",
+    "prompt_tokens": 6367,
+    "completion_tokens": 1330,
+    "reasoning_tokens": 1087
+  },
+  "04491ba93df55e048de58193479a85f48fbfeeff6c00b9f7282dcba3c74320f7": {
+    "content": "{\"verdicts\":[{\"id\":\"nvda-supply-s1\",\"verdict\":\"SUPPORTED\"},{\"id\":\"nvda-supply-s2\",\"verdict\":\"SUPPORTED\"},{\"id\":\"nvda-supply-s3\",\"verdict\":\"SUPPORTED\"},{\"id\":\"aapl-rev-s1\",\"verdict\":\"SUPPORTED\"},{\"id\":\"aapl-rev-s2\",\"verdict\":\"SUPPORTED\"},{\"id\":\"aapl-rev-s3\",\"verdict\":\"SUPPORTED\"},{\"id\":\"aapl-gm-s1\",\"verdict\":\"SUPPORTED\"},{\"id\":\"aapl-gm-s2\",\"verdict\":\"SUPPORTED\"},{\"id\":\"aapl-gm-s3\",\"verdict\":\"SUPPORTED\"},{\"id\":\"aapl-gm-s4\",\"verdict\":\"SUPPORTED\"}]}",
+    "finish": "stop",
+    "prompt_tokens": 4404,
+    "completion_tokens": 953,
+    "reasoning_tokens": 794
+  },
+  "8e98c9f1823f2f733929c7f347f8d36241d2fb7f8db1ab05f04f92d6d0139290": {
+    "content": "{\"verdicts\": [{\"id\": \"aapl-div-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"aapl-div-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"aapl-div-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"aapl-china-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"aapl-china-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"aapl-china-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"aapl-buyback-s1\", \"verdict\": \"SUPPORTED\"}]}",
+    "finish": "stop",
+    "prompt_tokens": 2619,
+    "completion_tokens": 932,
+    "reasoning_tokens": 793
+  },
+  "c380af94132d75dc1900b6a9a24f63d47b6eb20790702dce57b2597e8021c007": {
+    "content": "{\"verdicts\": [{\"id\": \"aapl-staff-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"msft-segments-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"msft-segments-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"msft-segments-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"msft-segments-s4\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"msft-cloud-fy-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"msft-cloud-fy-s2\", \"verdict\": \"SUPPORTED\"}]}",
+    "finish": "stop",
+    "prompt_tokens": 2360,
+    "completion_tokens": 749,
+    "reasoning_tokens": 605
+  },
+  "f8d6b65b088e1e1926ec104d6a2ffd6f11b52134abacb036ad6bfc681dd8890a": {
+    "content": "{\"verdicts\": [{\"id\": \"msft-staff-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"msft-cloud-q-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"msft-cloud-q-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"tsla-rev-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"tsla-rev-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"tsla-rev-s3\", \"verdict\": \"SUPPORTED\"}]}",
+    "finish": "stop",
+    "prompt_tokens": 2215,
+    "completion_tokens": 1293,
+    "reasoning_tokens": 1170
+  },
+  "1928a97c9b1aa81d3f888621f19fbff4dd4f49fac6b04d94db46d5110975c629": {
+    "content": "{\"verdicts\": [{\"id\": \"tsla-deliv-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"tsla-energy-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"tsla-energy-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"tsla-energy-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"tsla-energy-s4\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"tsla-staff-s1\", \"verdict\": \"SUPPORTED\"}]}",
+    "finish": "stop",
+    "prompt_tokens": 3845,
+    "completion_tokens": 566,
+    "reasoning_tokens": 447
+  },
+  "2acd62ac33d1db221811d2b2dad7ebb985653311ed97bd923a44162cc5bb146b": {
+    "content": "{\"verdicts\": [{\"id\": \"coin-rev-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"coin-rev-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"coin-rev-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"coin-board-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"coin-board-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"coin-board-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"coin-board-s4\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"coin-netloss-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"coin-netloss-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"coin-netloss-s3\", \"verdict\": \"SUPPORTED\"}]}",
+    "finish": "stop",
+    "prompt_tokens": 4296,
+    "completion_tokens": 1908,
+    "reasoning_tokens": 1723
+  },
+  "539ee71e4fea89825f04a7ab0475e376deb183f7ced7df1d3dfa26d7c04b2dc5": {
+    "content": "{\"verdicts\": [{\"id\": \"coin-concentration-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"coin-concentration-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"coin-concentration-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"coin-staff-s1\", \"verdict\": \"SUPPORTED\"}]}",
+    "finish": "stop",
+    "prompt_tokens": 2114,
+    "completion_tokens": 653,
+    "reasoning_tokens": 572
+  },
+  "2684099d9616334cdf455b19855c891699a3e233d37ab5a0cdd495e73432f39a": {
+    "content": "NVIDIA's Data Center revenue in the second quarter of fiscal year 2027 was $89,023 million. (dqa-d0a4f7d4, dqa-e1957f35) This represented a year-over-year increase of 117% compared to $41,096 million in the second quarter of fiscal year 2026. (dqa-e1957f35)",
+    "finish": "stop",
+    "prompt_tokens": 5113,
+    "completion_tokens": 339,
+    "reasoning_tokens": 237
+  },
+  "6f94fb34d5bc7fd82bd130fe0aac815212f63577a00ce25b568d13acb5c6b745": {
+    "content": "The passages do not state a specific gross margin percentage for the second quarter of fiscal year 2027. (dqa-5908b085) They do state that gross margin increased from a year ago on improved mix from Blackwell Ultra. (dqa-5908b085) Gross margin was approximately flat sequentially as the Blackwell architecture remains the vast majority of revenue. (dqa-5908b085) The net effect of inventory provisions on gross margin was an unfavorable impact of 0.8% in the second quarter of fiscal year 2027. (dqa-759d7604)",
+    "finish": "stop",
+    "prompt_tokens": 5018,
+    "completion_tokens": 1000,
+    "reasoning_tokens": 853
+  },
+  "964e0ea30bf12a3188b40c33c7cfa087b6cfb444d35218d49142e90c1ca20280": {
+    "content": "In the second quarter of fiscal year 2027, NVIDIA repurchased 94 million shares of its common stock for $19.7 billion (dqa-24a485ee, dqa-51253199). As of July 26, 2026, the company was authorized to repurchase up to $99.3 billion of its common stock (dqa-24a485ee, dqa-51253199). This remaining authorization followed the Board of Directors' approval on May 18, 2026, of an additional $80.0 billion in share repurchase authorization without expiration (dqa-24a485ee, dqa-51253199).",
+    "finish": "stop",
+    "prompt_tokens": 5150,
+    "completion_tokens": 542,
+    "reasoning_tokens": 365
+  },
+  "8b115d11c090c24c35270c51d5c03fd2119baeb272297d8213160d819d287ccc": {
+    "content": "In August 2026, NVIDIA entered into guarantees with SB Energy Corp. to provide credit support on the land, power, and shell buildout at SB Energy's PORTS Technology Campus in Pike County, Ohio, covering leases for approximately 4.25 gigawatts of IT load. (dqa-be1a8457) The campus will exclusively host NVIDIA's compute under 20-year leases to OpenAI, with NVIDIA's obligation capped at $105 billion in the aggregate. (dqa-be1a8457) Each guarantee generally becomes effective upon commencement of the applicable lease, with amounts increasing as each of nine data centers is placed in service, expected to begin in fiscal year 2029. (dqa-be1a8457) NVIDIA's exposure declines as OpenAI fulfills its lease payments, and the guarantees are limited to defined portions of lease and power payments rather than the full cost of the site. (dqa-be1a8457) The guarantees terminate upon certain events, including OpenAI achieving a satisfactory credit rating or after each respective lease term has completed. (dqa-be1a8457) NVIDIA also holds an option, exercisable in its sole discretion, to provide additional credit support in phases for approximately 3.8 additional gigawatts as the site scales. (dqa-be1a8457)",
+    "finish": "stop",
+    "prompt_tokens": 4146,
+    "completion_tokens": 613,
+    "reasoning_tokens": 318
+  },
+  "eaa9394b0772b37dfa080111ed78043e56fc95d77c76a4281e2306db2c77c3e7": {
+    "content": "I cannot answer.",
+    "finish": "stop",
+    "prompt_tokens": 3543,
+    "completion_tokens": 289,
+    "reasoning_tokens": 282
+  },
+  "1973fee5a5e8969a9bd0e4803299f52a53667153219f3fae9559b41c43498336": {
+    "content": "I cannot answer.",
+    "finish": "stop",
+    "prompt_tokens": 5362,
+    "completion_tokens": 421,
+    "reasoning_tokens": 414
+  },
+  "97834ad296be2dee22d3e9d0047bb2a1c101a029e95ee8db298164eb89620935": {
+    "content": "NVIDIA's supply and capacity commitments were $279 billion as of July 26, 2026 (dqa-a5b25b89). The previous quarter, those commitments were $119 billion (dqa-a5b25b89).",
+    "finish": "stop",
+    "prompt_tokens": 4523,
+    "completion_tokens": 197,
+    "reasoning_tokens": 133
+  },
+  "57764b870215752e3c6f1a24e92352f7f6e958ca4134f0ae99c642e468fc9d5e": {
+    "content": "Apple reported total net sales of $109,417 million for the three months ended June 27, 2026, which corresponds to its fiscal 2026 third quarter (dqa-a3fe76c5, dqa-4ab74d7b). This represented a 16% increase compared to total net sales of $94,036 million for the three months ended June 28, 2025 (dqa-a3fe76c5).",
+    "finish": "stop",
+    "prompt_tokens": 5529,
+    "completion_tokens": 311,
+    "reasoning_tokens": 195
+  },
+  "d52f73b691151ba59b1451ed0cd75c980695a2393433e80a1e114d9572c1d626": {
+    "content": "Apple's total gross margin for the three months ended June 27, 2026 was $54,770 million. (dqa-d7d65405) Products gross margin increased during the third quarter of 2026 compared to the same period in 2025 primarily due to a different mix of products and tariff refunds, partially offset by higher costs, including memory. (dqa-d7d65405) The tariff refunds relate to tariffs previously imposed under the International Emergency Economic Powers Act of 1977 that were struck down by the U.S. Supreme Court on February 20, 2026. (dqa-0c190bc7) The Company applied for a refund of tariffs paid and has recognized any refunds received as a reduction of products cost of sales. (dqa-0c190bc7)",
+    "finish": "stop",
+    "prompt_tokens": 5546,
+    "completion_tokens": 412,
+    "reasoning_tokens": 217
+  },
+  "ba4cb22d7f363b4290f8a33fcf88f090f28f17755af690b7592248f0260cce3b": {
+    "content": "I cannot answer.",
+    "finish": "stop",
+    "prompt_tokens": 5097,
+    "completion_tokens": 369,
+    "reasoning_tokens": 362
+  },
+  "d55a0a8f231489982569c6113f04489317bce866bd5b74214af5b7932ad1373f": {
+    "content": "Greater China net sales increased during the third quarter of 2026 compared to the same period in 2025, primarily due to higher net sales of iPhone (dqa-607abf80). For the three months ended June 27, 2026, Greater China net sales were $18,816 million, compared to $15,369 million for the three months ended June 28, 2025 (dqa-fcaa099a). The strength in the renminbi relative to the U.S. dollar had a favorable year-over-year impact on Greater China net sales during the third quarter of 2026 (dqa-607abf80). Additionally, in Greater China, iPhone revenue represented a moderately higher proportion of net sales compared to other segments during this period (dqa-8ae54f51).",
+    "finish": "stop",
+    "prompt_tokens": 7165,
+    "completion_tokens": 564,
+    "reasoning_tokens": 366
+  },
+  "07b88eb12d59632e3e7f449d455dcd36bd53d66e337d48edc8ecc94353c6e859": {
+    "content": "I cannot answer.",
+    "finish": "stop",
+    "prompt_tokens": 5642,
+    "completion_tokens": 340,
+    "reasoning_tokens": 333
+  },
+  "a22a2cfbb88f427218d9e85bad062412ff50cab5bce22ea20dd478bd4e30bd14": {
+    "content": "{\"verdicts\": [{\"id\": \"starved-nvda-dc-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-dc-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-gm-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-gm-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-gm-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-gm-s4\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-buyback-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-buyback-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-buyback-s3\", \"verdict\": \"SUPPORTED\"}]}",
+    "finish": "stop",
+    "prompt_tokens": 5973,
+    "completion_tokens": 1493,
+    "reasoning_tokens": 1286
+  },
+  "037eae8f13f1f2e22dac5f25b7cda62b07eebc8dda3e8e68d9678644c2cea588": {
+    "content": "{\"verdicts\": [{\"id\": \"starved-nvda-sbenergy-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-sbenergy-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-sbenergy-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-sbenergy-s4\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-sbenergy-s5\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-sbenergy-s6\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-supply-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-nvda-supply-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-aapl-rev-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-aapl-rev-s2\", \"verdict\": \"SUPPORTED\"}]}",
+    "finish": "stop",
+    "prompt_tokens": 4342,
+    "completion_tokens": 1781,
+    "reasoning_tokens": 1548
+  },
+  "3a519ad200ce832dbbb4808956e9a8c25661a91479594504dc6dc2330cabd9c8": {
+    "content": "{\"verdicts\": [{\"id\": \"starved-aapl-gm-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-aapl-gm-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-aapl-gm-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-aapl-gm-s4\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-aapl-china-s1\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-aapl-china-s2\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-aapl-china-s3\", \"verdict\": \"SUPPORTED\"}, {\"id\": \"starved-aapl-china-s4\", \"verdict\": \"NOT_SUPPORTED\"}]}",
+    "finish": "stop",
+    "prompt_tokens": 4355,
+    "completion_tokens": 1367,
+    "reasoning_tokens": 1190
+  }
+}

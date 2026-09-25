@@ -19,10 +19,13 @@ inalpha keeps the model off the order path by design, FinRobot has no broker at 
 
 from __future__ import annotations
 
+import copy
+import hashlib
+import json
 import time
 from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field, replace
+from dataclasses import asdict, dataclass, field, fields, replace
 from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any
@@ -38,6 +41,17 @@ from argus.agents.analysts import (
     SourceIndependenceGraph,
 )
 from argus.agents.causality import CausalChain
+from argus.agents.circuit import (
+    DEFAULT_THRESHOLDS,
+    PM_POLICY,
+    CircuitRecord,
+    RetryPolicy,
+    Step,
+    Thresholds,
+    call_with_retry,
+    nudge_for,
+)
+from argus.agents.circuit import assess as assess_trajectory
 from argus.agents.claims import check as check_claims
 from argus.agents.conflict import report as conflict_report
 from argus.agents.debate import Debate, DebateBudget, Ending
@@ -51,9 +65,21 @@ from argus.agents.meta_pm import MarketFrame, MetaPM, deliberation_cost_bps
 from argus.agents.recall import recall
 from argus.agents.selection import select
 from argus.cost.model import CostModel
+from argus.decision.escalation import Escalation
 from argus.decision.escalation import Signals as EscalationSignals
 from argus.decision.escalation import apply as apply_escalation
 from argus.decision.escalation import assess as assess_escalation
+from argus.decision.pause import (
+    DEFAULT_ANSWER_WINDOW,
+    AlreadyResolved,
+    HumanResponse,
+    PauseError,
+    PauseExpired,
+    PauseRequest,
+    PauseStore,
+    check_response,
+    resolve_intent,
+)
 from argus.decision.verdicts import (
     ConstitutionRuling,
     ConstitutionVerdict,
@@ -63,11 +89,13 @@ from argus.decision.verdicts import (
     apply_constraint,
 )
 from argus.desk.book import PositionSide
+from argus.desk.feed_sanity import market_move, screen_views
+from argus.desk.feed_sanity import screen_evidence as sanity_screen
 from argus.desk.workbench import TraderProfile
 from argus.execution.orders import Order, OrderBook, deterministic_client_order_id
 from argus.llm.base import ChatModel
-from argus.llm.qwen import Thinking
-from argus.proof.autonomy import AutonomyProof
+from argus.llm.qwen import BudgetExhausted, Thinking
+from argus.proof.autonomy import AutonomyProof, hash_intent
 from argus.risk.hedgeability import HedgeabilitySurface
 from argus.truth.clocks import SessionState
 from argus.truth.evidence import Evidence
@@ -138,12 +166,49 @@ class DeskRun:
     debate: Debate | None = None
     """The bull/bear exchange, its cost, and whether it resolved."""
 
+    pause: PauseRequest | None = None
+    """Set when this decision was held for a human and its continuation written to disk.
+
+    A held run is still a complete record — the Constitution ruled on the held intent and no order
+    was placed — so a paused decision and a finished one read the same way to everything
+    downstream. What the pause adds is the way back: `decision/pause.py`."""
+
+    human: HumanResponse | None = None
+    """Set on the run a human's answer resumed. The owner of the takeover, and what they said."""
+
+    continuation: DeskContinuation | None = field(default=None, repr=False)
+    """The paused-point state, kept in memory beside the one on disk.
+
+    Lets a caller in the same process — the console answering while the desk is still up — resume
+    with :meth:`TradingDesk.resume_with` without a disk round trip. Not serialised: the durable copy
+    is the one in the pause store, and a record that carried both would carry the state twice."""
+
+    deliberation: dict[str, Any] | None = None
+    """`MetaPM.last_deliberation.as_dict()` for this decision — every attempt, which one was
+    committed and how many model calls it took — persisted beside the proof it produced.
+
+    Set by :meth:`TradingDesk.run` rather than carried on :class:`DeskContinuation` on purpose:
+    adding a field there changes :func:`resume_signature` and would refuse every continuation
+    already paused on disk. A decision resumed from disk therefore has ``None`` here; its notes
+    still carry the rendered deliberation, which is written before the pause point."""
+
+    feed_sanity: dict[str, Any] | None = None
+    """What the deterministic feed-sanity gate (`desk/feed_sanity.py`) checked and withheld, for the
+    evidence and for the analyst panel, before the Meta-PM read either. Same lifetime as above."""
+
+    circuit: dict[str, Any] | None = None
+    """The trajectory breaker's record (`agents/circuit.py` :class:`CircuitRecord`): trips that
+    changed this decision, nudges the model was shown, and every failed call attempt."""
+
     def as_dict(self) -> dict[str, Any]:
         return {
             "symbol": self.symbol,
             "as_of": self.as_of.isoformat(),
             "panel": self.panel.as_dict(),
             "decision": self.proof.to_record(),
+            "deliberation": self.deliberation,
+            "feed_sanity": self.feed_sanity,
+            "circuit": self.circuit,
             "order": None if self.order is None else {
                 "client_order_id": self.order.client_order_id,
                 "state": str(self.order.state),
@@ -165,7 +230,141 @@ class DeskRun:
             "causal_chain": None if self.causal_chain is None else self.causal_chain.as_dict(),
             "earnings": None if self.earnings_read is None else self.earnings_read.as_dict(),
             "debate": None if self.debate is None else self.debate.as_dict(),
+            "human_loop": self._human_loop(),
         }
+
+    def _human_loop(self) -> dict[str, Any] | None:
+        if self.pause is None:
+            return None
+        return {
+            "state": "paused" if self.human is None else "resumed",
+            "request_id": self.pause.request_id,
+            "state_hash": self.pause.state_hash,
+            "triggers": [t.value for t in self.pause.escalation.triggers],
+            "expires_at": self.pause.expires_at.isoformat(),
+            "response": None if self.human is None else self.human.as_dict(),
+        }
+
+
+RESUME_PIPELINE: tuple[str, ...] = (
+    "constitution", "ablated_rulings", "revise_if_bound", "approve", "mandate", "order",
+)
+"""The stages :meth:`TradingDesk._conclude` runs, in order — what a resume executes.
+
+Part of :func:`resume_signature`. A change to this tuple, or to the fields of
+:class:`DeskContinuation`, changes the signature, and every continuation written before the change
+is refused on resume rather than replayed through a pipeline it never saw (MAF
+`_workflows/_runner.py:316-320`)."""
+
+
+def resume_signature() -> str:
+    """The fingerprint of the resumable half of the desk. MAF `_workflow.py:372-375,1296-1361`."""
+    shape = {
+        "stages": list(RESUME_PIPELINE),
+        "continuation": [f.name for f in fields(DeskContinuation)],
+    }
+    return hashlib.sha256(
+        json.dumps(shape, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+
+@dataclass
+class DeskContinuation:
+    """Everything the desk holds at the escalation point that the rest of the decision needs.
+
+    Written to disk when the desk pauses (`decision/pause.py`) and restored on resume. The split is
+    at stage 2c because that is where the question changes: before it, the desk works out *what* it
+    would do (analysts, debate, the model's decision, the adversary); after it, the Constitution,
+    the model's revision, the mandate and the order decide *how much of it* reaches the venue. A
+    human answers the first question's result, so a resume runs only the second half — the model's
+    first half is not re-run, which is what makes "continues from the paused point" true rather
+    than "starts again and hopes the model says the same thing".
+
+    The model client is deliberately absent. It is the resuming desk's, not the paused one's: a
+    continuation carries state, never a live connection or a key.
+    """
+
+    decision_id: str
+    symbol: str
+    session: SessionState
+    token_price: Decimal
+    hedges: HedgeabilitySurface
+    constitution: ConstitutionPolicy | None
+    ablated_constitutions: dict[str, ConstitutionPolicy]
+    profile: TraderProfile | None
+    proof: AutonomyProof
+    frame: MarketFrame
+    panel: SourceIndependenceGraph
+    notes: list[str]
+    evidence_sources: tuple[str, ...]
+    causal_chain: CausalChain | None
+    earnings_read: EarningsRead | None
+    debate: Debate
+    proposed: Intent
+    """The intent after the adversary and before escalation — what a human is asked about."""
+
+    escalation: Escalation
+
+    def signature_state(self) -> dict[str, Any]:
+        """The canonical view the state hash is taken over. Every field, no reprs.
+
+        ``proof`` goes through :func:`dataclasses.asdict` rather than `AutonomyProof.to_record`,
+        because `to_record` asserts the Constitution has ruled and at the pause point it has not.
+        """
+        return {
+            "decision_id": self.decision_id,
+            "symbol": self.symbol,
+            "session": asdict(self.session),
+            "token_price": self.token_price,
+            "hedges": asdict(self.hedges),
+            "constitution": None if self.constitution is None else asdict(self.constitution),
+            "ablated_constitutions": {
+                k: asdict(v) for k, v in sorted(self.ablated_constitutions.items())
+            },
+            "profile": None if self.profile is None else asdict(self.profile),
+            "proof": asdict(self.proof),
+            "frame": asdict(self.frame),
+            "panel": self.panel.as_dict(),
+            "notes": list(self.notes),
+            "evidence_sources": list(self.evidence_sources),
+            "causal_chain": None if self.causal_chain is None else self.causal_chain.as_dict(),
+            "earnings_read": (
+                None if self.earnings_read is None else self.earnings_read.as_dict()
+            ),
+            "debate": self.debate.as_dict(),
+            "proposed": asdict(self.proposed),
+            "proposed_hash": hash_intent(self.proposed),
+            "escalation": self.escalation.as_dict(),
+        }
+
+
+def _no_decision(frame: MarketFrame, *, decision_id: str, reason: str) -> AutonomyProof:
+    """The safe no-op the desk records when the Meta-PM call gave up (`agents/circuit.py`).
+
+    The intent is NO_TRADE with zero size, and its thesis says in its first words that no model
+    decided — ``[circuit] no model decision`` is one of :data:`circuit.INVALID_MARKERS`, so the
+    breaker counts it as a not-a-decision on the next pass and a reader of the ledger can never
+    mistake it for an abstention the model chose.
+    """
+    return AutonomyProof(
+        decision_id=decision_id,
+        as_of=frame.as_of,
+        market_state_hash=frame.state_hash(),
+        llm_original_intent=Intent(
+            symbol=frame.symbol, side=Side.BUY, quantity=_ZERO, verdict=Verdict.NO_TRADE,
+            stated_confidence=0.0,
+            thesis=f"[circuit] no model decision — {reason}; degraded to a safe no-op",
+        ),
+        llm_original_reasoning=reason,
+    )
+
+
+def _stopped(intent: Intent) -> Intent:
+    """An exposure-opening intent reduced to a no-op by a breaker trip. Only ever reduces."""
+    stopped = replace(intent, verdict=Verdict.NO_TRADE, quantity=_ZERO)
+    if stopped.quantity != _ZERO or stopped.verdict.opens_exposure:  # the asymmetry, checked
+        raise AssertionError("a circuit-breaker trip produced exposure")
+    return stopped
 
 
 class TradingDesk:
@@ -180,8 +379,15 @@ class TradingDesk:
         pm_thinking: Thinking = Thinking.FULL,
         annualised_vol: Decimal = Decimal("0.45"),
         critic: Critic | None = None,
+        pm_policy: RetryPolicy = PM_POLICY,
+        circuit_thresholds: Thresholds = DEFAULT_THRESHOLDS,
     ) -> None:
         self._client = client
+        # The trajectory breaker (`agents/circuit.py`): how the Meta-PM call is guarded, and when a
+        # run of bad answers or repeated orders stops a decision. Both default to the measured
+        # settings; a caller passes its own only to test the breaker, never to disarm it.
+        self.pm_policy = pm_policy
+        self.circuit_thresholds = circuit_thresholds
         # The adversary shares the desk's model by default. A separate seat would be better —
         # a critic that is the same model as the author shares its blind spots — and that is a
         # stated limitation rather than a hidden one: `eval/bakeoff.py` already seats two models,
@@ -220,7 +426,16 @@ class TradingDesk:
         debate_affordable: bool = True,
         underlying_halted: bool = False,
         halt_reason: str = "",
+        pause_store: PauseStore | None = None,
+        answer_window: timedelta = DEFAULT_ANSWER_WINDOW,
     ) -> DeskRun:
+        """One decision, end to end. With ``pause_store``, an escalation holds it for a human.
+
+        Without a store the behaviour is exactly what it was before pauses existed: an escalated
+        decision concludes as ``HUMAN_REVIEW`` and nothing more happens to it. With one, the same
+        held record is returned *and* the continuation is written so a human's answer can resume
+        it — see :meth:`resume` and `decision/pause.py`.
+        """
         panel = SourceIndependenceGraph()
         notes: list[str] = []
 
@@ -245,6 +460,15 @@ class TradingDesk:
 
         evidence, screening = screen_evidence(evidence)
         notes.append(screening.note)
+
+        # The feed-sanity gate (`desk/feed_sanity.py`), deterministic and before anything reasons.
+        # Measured on 2026-09-25 (`data/feedbugged.json`): the Meta-PM's detection F1 on planted
+        # wrong values was 0.0 — it read a +999% 24h change as an ordinary move and a NaN price
+        # without comment. Quarantine screens for hostile *text*; this screens for impossible or
+        # self-contradicting *figures*. A failing figure is withheld with its item's identity kept,
+        # so it never reaches an analyst or the model as a fact, and every count downstream holds.
+        evidence, sanity = sanity_screen(evidence, token_price=token_price)
+        notes.extend(sanity.render())
 
         selection = select(evidence, as_of=session.as_of, deliberation_bps=deliberation)
         notes.extend(selection.render())
@@ -382,6 +606,17 @@ class TradingDesk:
             f"list, so no fact about the evidence could make it irrelevant"
         )
 
+        # The same gate, on the panel. An analyst is an upstream reasoner, and the injected-step
+        # eval showed one wrong step is enough: a quant line claiming a 6895bps edge turned the NVDA
+        # abstention into TRADE BUY 50. A view claiming an absurd edge, or quoting the 24h move at
+        # 100x the feed's own figure, is dropped before consensus is taken and before the frame is
+        # built — and the decision records which view and why.
+        kept_views, panel_sanity = screen_views(
+            panel.views, move_24h=market_move([e.claim for e in evidence])
+        )
+        panel.views[:] = kept_views
+        notes.extend(panel_sanity.render())
+
         if hedges.is_empty:
             notes.append(
                 f"hedge menu empty: nothing placeable for {session.hours_to_next_discovery:.1f}h; "
@@ -410,6 +645,12 @@ class TradingDesk:
         # independence on every decision in the ledger.
         conflicts = conflict_report(panel.views, sequential=False)
         notes.extend(conflicts.render())
+        # The panel's agreement at every threshold, the stated one marked (`decision/verdicts.py`).
+        # Recorded for transparency only: m-of-K voting lost to the desk's plurality on the settled
+        # record (45.1% against 49.0%), so it never binds a decision.
+        from argus.decision.verdicts import agreement_note
+
+        notes.append(agreement_note([v.signal for v in panel.views]))
 
         # The facts the desk computed for this decision, so the thesis can be checked against them
         # while they still exist. Measured on the live ledger: theses quote the hurdle and the 24h
@@ -531,6 +772,21 @@ class TradingDesk:
             notes.append(debate.render())
         deliberation += debate.cost_bps
 
+        # The trajectory the breaker reads (`agents/circuit.py`): every prior decision in the
+        # ledger history, reduced to instrument, side, size and whether it was a decision at all.
+        # Read from the same history the memory block uses, so a replay of the ledger through
+        # `circuit.assess` is the computation the desk ran live, not an approximation of it.
+        circuit = CircuitRecord()
+        trajectory = [s for s in (Step.from_record(row) for row in history) if s is not None]
+        # browser_use's escalating nudge, told to the model before it decides: one equivalent
+        # order short of the trip, the model is warned rather than silently overruled next time.
+        nudge = nudge_for(
+            trajectory, symbol=symbol, now=session.as_of, thresholds=self.circuit_thresholds
+        )
+        if nudge is not None:
+            circuit.nudges.append(nudge)
+            notes.append(nudge)
+
         frame = MarketFrame(
             debate_block=debate.render() if debate.positions else "",
             memory_block=memory_block,
@@ -561,9 +817,61 @@ class TradingDesk:
                     f"discounted for {len(panel.distinct_sources)} distinct sources across "
                     f"{len(panel.views)} analysts"
                 ]
+                + ([nudge] if nudge is not None else [])
             ),
         )
-        proof = self.pm.decide(frame, decision_id=decision_id)
+        # The one call that decides, guarded: a deadline, a named give-up, and a safe no-op in
+        # place of an exception. Until now a hung or failing Meta-PM call raised straight out of
+        # `run`, and the cycle lost every symbol still to be decided after it. The deliberation is
+        # returned *with* the proof from inside the guarded call rather than read off `self.pm`
+        # afterwards: a call abandoned at the deadline may still finish on its daemon thread and
+        # would otherwise overwrite `last_deliberation` under a later decision.
+        pm = self.pm
+        outcome = call_with_retry(
+            lambda: (pm.decide(frame, decision_id=decision_id), pm.last_deliberation),
+            name="meta_pm.decide", policy=self.pm_policy,
+            # A spent budget is the runner ending the cycle (it is raised before any request),
+            # not a fault of this decision: it propagates exactly as it always has.
+            propagate=(BudgetExhausted,),
+        )
+        circuit.faults.extend(a.as_dict() for a in outcome.attempts if a.fault is not None)
+        notes.extend(outcome.render())
+        deliberation_record: dict[str, Any] | None = None
+        if outcome.value is not None:
+            proof, last = outcome.value
+            if last is not None:
+                # How the committed answer was reached, in the notes and beside the proof — and
+                # priced. `Deliberation.calls` counts every model call `decide` made; the first is
+                # the single-shot baseline already in the hurdle the model was quoted, and every
+                # call past it is extra thinking time charged at the same per-call rate.
+                notes.extend(last.render())
+                per_call = deliberation_cost_bps(
+                    session, thinking=self.pm_thinking, annualised_vol=self.annualised_vol
+                )
+                extra_bps = round((last.calls - 1) * per_call, 2)
+                deliberation_record = {
+                    **last.as_dict(),
+                    "extra_calls": last.calls - 1,
+                    "extra_cost_bps": str(extra_bps),
+                    "total_deliberation_bps": str(round(deliberation + extra_bps, 2)),
+                }
+                if extra_bps > 0:
+                    notes.append(
+                        f"[deliberation] {last.calls - 1} call(s) beyond the first cost "
+                        f"{extra_bps}bps more; this decision's deliberation is "
+                        f"{round(deliberation + extra_bps, 2)}bps, not the {deliberation}bps "
+                        f"quoted before it ran"
+                    )
+                deliberation += extra_bps
+        else:
+            reason = outcome.gave_up or "the Meta-PM call gave up"
+            proof = _no_decision(frame, decision_id=decision_id, reason=reason)
+            circuit.trips.append({"trip": "call_gave_up", "reason": reason})
+            notes.append(
+                "[circuit] TRIP call_gave_up — no model decision was obtained, so the desk "
+                "degraded to a safe no-op: no order, nothing reaches the venue, and the cycle "
+                "continues with the next symbol"
+            )
 
         # The numbers the evidence itself carried, paired with the id that carried them. Without
         # these, `check_grounding` sees only the desk's *computed* facts, and a thesis quoting a
@@ -572,13 +880,15 @@ class TradingDesk:
         # evidence had stated as 0.0024 — the checker's own unit handling would have matched it,
         # had it been given the value. `evidence_values` is a parameter `grounding.check` has
         # always had and nothing was passing.
-        evidence_values: list[tuple[str, float]] = [
-            (e.id, figure.value) for e in evidence for figure in extract_figures(e.claim)
-        ]
+        figures = [(e.id, figure) for e in evidence for figure in extract_figures(e.claim)]
+        evidence_values: list[tuple[str, float]] = [(i, f.value) for i, f in figures]
+        # the unit each evidence value was written in, so a same-unit near miss is found and
+        # reported as partial support rather than as an unattributable figure
         grounding = check_grounding(
             proof.llm_original_intent.thesis,
             facts=grounding_facts,
             evidence_values=evidence_values,
+            evidence_units=[f.unit for _, f in figures],
         )
         notes.extend(grounding.render())
 
@@ -639,11 +949,19 @@ class TradingDesk:
         #
         # It may only reduce, like everything else downstream, and `escalation.apply` raises rather
         # than logs if it is ever asked to do more.
+        #
+        # With a pause store (2026-09-25) this is also where the desk *stops*: the state up to this
+        # line is written to disk as a `DeskContinuation`, and a human's answer resumes the
+        # decision from here rather than re-running the analysts — see `decision/pause.py`.
         escalation = assess_escalation(
             attacked,
             EscalationSignals(
                 directional_split=conflicts.has_directional_split,
-                debate_converged=debate.ending is not Ending.EXHAUSTED_ROUNDS,
+                # A STALLED debate (`agents/debate.py`, added 2026-09-25) ended because neither side
+                # was making progress, with the sides still apart: its own docstring calls the
+                # disagreement live. Reading it as converged would tell escalation a split had
+                # been settled when it had only stopped being paid for.
+                debate_converged=debate.ending not in (Ending.EXHAUSTED_ROUNDS, Ending.STALLED),
                 thesis_refuted_by_own_falsifier=challenged.already_refuted,
                 refuted_condition=challenged.refuted_condition,
                 unresolved_figures=len(grounding.unresolved),
@@ -653,7 +971,222 @@ class TradingDesk:
         )
         if escalation.required:
             notes.append(escalation.render())
+        proposed = attacked
         attacked = apply_escalation(attacked, escalation)
+
+        # --- 2d. the trajectory breaker. It may only reduce. ---
+        #
+        # WebArena's `early_stop` checks, over the desk's own decision history: a step budget, a
+        # run of answers that were not decisions, and the k-th functionally-equivalent order —
+        # same instrument, same side, size within tolerance, inside the window. Placed after
+        # escalation because it asks a different question: not whether this decision is one the
+        # desk may take alone, but whether the desk is repeating itself. A trip turns an
+        # exposure-opening intent into a no-op and says why; it never adds size or flips a side.
+        current = Step(
+            symbol=symbol, at=session.as_of, verdict=str(attacked.verdict),
+            side=str(attacked.side), quantity=attacked.quantity,
+            valid=outcome.ok and not proof.llm_original_intent.thesis.startswith(
+                "[unparseable verdict"
+            ),
+        )
+        reading = assess_trajectory(trajectory, current, thresholds=self.circuit_thresholds)
+        if reading.tripped and not any(t.get("trip") == "call_gave_up" for t in circuit.trips):
+            circuit.trips.append(reading.as_dict())
+            if attacked.verdict.opens_exposure:
+                attacked = _stopped(attacked)
+                notes.append(
+                    f"[circuit] TRIP {reading.trip} — {reading.reason}. The intent was reduced to "
+                    f"a no-op before the Constitution; the model's own proposal stays on the proof"
+                )
+            else:
+                notes.append(
+                    f"[circuit] TRIP {reading.trip} — {reading.reason}. Nothing opened exposure, "
+                    f"so nothing was reduced; the stop is recorded for the takeover count"
+                )
+
+        continuation = DeskContinuation(
+            decision_id=decision_id, symbol=symbol, session=session, token_price=token_price,
+            hedges=hedges, constitution=constitution,
+            ablated_constitutions=dict(ablated_constitutions or {}), profile=profile,
+            proof=proof, frame=frame, panel=panel, notes=notes,
+            # Sorted so the record is stable between runs on identical evidence; a set's iteration
+            # order would make two identical decisions serialise differently.
+            evidence_sources=tuple(sorted({e.source for e in evidence})),
+            causal_chain=causal_chain, earnings_read=earnings_read, debate=debate,
+            proposed=proposed, escalation=escalation,
+        )
+        if pause_store is None:
+            run = self._conclude(continuation, attacked)
+        else:
+            run = self._hold_or_replay(
+                continuation, attacked, store=pause_store, answer_window=answer_window
+            )
+        run.deliberation = deliberation_record
+        run.feed_sanity = {"evidence": sanity.as_dict(), "analysts": panel_sanity.as_dict()}
+        run.circuit = circuit.as_dict()
+        return run
+
+    # --- the human loop ---------------------------------------------------------------------------
+
+    def _hold_or_replay(
+        self,
+        continuation: DeskContinuation,
+        held: Intent,
+        *,
+        store: PauseStore,
+        answer_window: timedelta,
+    ) -> DeskRun:
+        """Record the decision; pause it if it escalated; replay an answer it already has.
+
+        The replay is LangGraph's (`types.py:1004-1011`) keyed by proposal, per `decision/pause.py`:
+        the same decision re-run with the same proposal consumes the human's recorded answer rather
+        than asking again, and one already acted on is never acted on twice.
+        """
+        c = continuation
+        store.record_decision(
+            decision_id=c.decision_id, symbol=c.symbol, at=c.session.as_of,
+            reachable=c.proposed.verdict.opens_exposure, escalation=c.escalation,
+            model_requested_review=c.proof.llm_original_intent.verdict is Verdict.HUMAN_REVIEW,
+        )
+        if not c.escalation.required:
+            return self._conclude(c, held)
+
+        # Snapshot BEFORE the held run concludes: `_conclude` records a ruling on the proof and
+        # appends to the notes, and the continuation must be the state at the paused point, not
+        # the state after the held intent was ruled on.
+        snapshot = copy.deepcopy(c)
+        prior = store.prior(c.decision_id, hash_intent(c.proposed))
+        request: PauseRequest | None = None
+        if prior is not None and prior.same_proposal:
+            if prior.status == "answered" and prior.response is not None:
+                if c.session.as_of > prior.request.expires_at:
+                    store.expire(prior.request, now=c.session.as_of, stage="replay")
+                else:
+                    return self.resume_with(
+                        snapshot, prior.request, prior.response, store=store,
+                        now=c.session.as_of, replayed=True,
+                    )
+            elif prior.status == "resumed":
+                c.notes.append(
+                    f"[pause] {prior.request.request_id} was already answered and acted on for "
+                    f"this proposal; the re-run is held rather than executed a second time"
+                )
+                run = self._conclude(c, held)
+                run.pause = prior.request
+                return run
+            elif prior.status == "paused":
+                request = prior.request
+        elif prior is not None and prior.status in ("paused", "answered"):
+            # An answer to a proposal this run no longer makes is withdrawn, not left live: left
+            # "answered", a later `resume` would act on the old proposal after the new one was
+            # asked about — the same decision acted on twice.
+            store.supersede(prior.request, at=c.session.as_of, by_proposal=hash_intent(c.proposed))
+
+        created = request is None
+        if request is None:
+            request = store.pause(
+                snapshot, decision_id=c.decision_id, symbol=c.symbol, as_of=c.session.as_of,
+                proposal=c.proposed, escalation=c.escalation,
+                pipeline_signature=resume_signature(), answer_window=answer_window,
+            )
+        c.notes.append(
+            f"[pause] held for a human as {request.request_id} until "
+            f"{request.expires_at.isoformat()}; the state at this point is written to disk "
+            f"(state {request.state_hash[:16]}) and an answer resumes the decision from here — "
+            f"python -m argus.decision.pause answer {request.request_id} approve|reject|modify"
+        )
+        run = self._conclude(c, held)
+        run.pause = request
+        # Only when this run wrote the request: a re-run that found the same proposal still pending
+        # holds a snapshot of *its* state, and the request's durable continuation is the earlier
+        # one. Handing out the newer snapshot would pair a request with a state it does not hash to.
+        run.continuation = snapshot if created else None
+        return run
+
+    def resume(self, store: PauseStore, request_id: str, *, now: datetime) -> DeskRun:
+        """Continue a paused decision from its persisted state, on the human's recorded answer.
+
+        This is the durable path: nothing from the process that paused is needed. The continuation
+        is refused unless its bytes, its state hash and the pipeline signature all match (see
+        `PauseStore.load_continuation`), and the answer is refused unless it fits the request.
+        """
+        request = store.load_request(request_id)
+        status = store.status(request_id)
+        if status == "paused":
+            raise PauseError(f"{request_id} has not been answered yet")
+        if status != "answered":
+            raise AlreadyResolved(f"{request_id} is {status or 'unknown'}; nothing to resume")
+        response = store.load_response(request_id)
+        if response is None:
+            raise PauseError(f"{request_id} is marked answered but its response file is missing")
+        if now > request.expires_at:
+            store.expire(request, now=now, stage="resume")
+            raise PauseExpired(
+                f"{request_id} closed at {request.expires_at.isoformat()}; an approval of a "
+                f"proposal priced at {request.as_of.isoformat()} is not acted on after that"
+            )
+        continuation = store.load_continuation(request_id, pipeline_signature=resume_signature())
+        if not isinstance(continuation, DeskContinuation):
+            raise PauseError(f"{request_id} did not restore to a desk continuation")
+        return self.resume_with(continuation, request, response, store=store, now=now)
+
+    def resume_with(
+        self,
+        continuation: DeskContinuation,
+        request: PauseRequest,
+        response: HumanResponse,
+        *,
+        store: PauseStore | None = None,
+        now: datetime,
+        replayed: bool = False,
+    ) -> DeskRun:
+        """Run the second half of the decision on the intent a human released.
+
+        The in-memory form of :meth:`resume`, and the one it delegates to. The released intent goes
+        through the same Constitution, revision, mandate and order stages as any other: a human can
+        release a hold, not the risk layer.
+        """
+        check_response(request, response)
+        if hash_intent(continuation.proposed) != request.proposal_hash:
+            raise PauseError(
+                f"{request.request_id}: the continuation's proposal is not the one the human saw"
+            )
+        c = copy.deepcopy(continuation)
+        released = resolve_intent(c.proposed, response)
+        quantity = "" if response.quantity is None else f" to {response.quantity}"
+        c.notes.append(
+            f"[human] {response.reviewer} answered {response.action.value}{quantity} on "
+            f"{request.request_id} (proposed {c.proposed.side.value} {c.proposed.quantity}); "
+            f"resumed from the paused point"
+            + (" by replaying the recorded answer" if replayed else "")
+            + (f" — {response.note}" if response.note else "")
+        )
+        run = self._conclude(c, released)
+        run.pause = request
+        run.human = response
+        if store is not None:
+            store.mark_resumed(
+                request, at=now, replayed=replayed,
+                outcome={
+                    "released_verdict": released.verdict.value,
+                    "released_quantity": str(released.quantity),
+                    "constitution": None if run.ruling is None else run.ruling.verdict.value,
+                    "approved_intent_hash": run.proof.approved_intent_hash,
+                    "order": None if run.order is None else run.order.client_order_id,
+                    "order_quantity": None if run.order is None else str(run.order.quantity),
+                },
+            )
+        return run
+
+    # --- the second half: from the Constitution to the order -------------------------------------
+
+    def _conclude(self, continuation: DeskContinuation, attacked: Intent) -> DeskRun:
+        """Stages 3 onward, on ``attacked`` — the escalated intent, or one a human released."""
+        c = continuation
+        symbol, session, token_price = c.symbol, c.session, c.token_price
+        hedges, constitution, profile = c.hedges, c.constitution, c.profile
+        ablated_constitutions = c.ablated_constitutions
+        proof, frame, notes = c.proof, c.frame, c.notes
 
         # --- 3. the Constitution. It may only reduce. ---
         # **`token_price` was already a parameter of this method and was never given to the
@@ -808,13 +1341,11 @@ class TradingDesk:
             notes.append(f"no order: final verdict {final.verdict} with quantity {final.quantity}")
 
         return DeskRun(
-            symbol=symbol, as_of=session.as_of, panel=panel,
+            symbol=symbol, as_of=session.as_of, panel=c.panel,
             proof=proof, ruling=ruling, ruled_intent=attacked,
             ablated_rulings=ablated_rulings, order=order, notes=notes,
-            # Sorted so the record is stable between runs on identical evidence; a set's iteration
-            # order would make two identical decisions serialise differently.
-            evidence_sources=tuple(sorted({e.source for e in evidence})),
-            causal_chain=causal_chain, earnings_read=earnings_read, debate=debate,
+            evidence_sources=c.evidence_sources,
+            causal_chain=c.causal_chain, earnings_read=c.earnings_read, debate=c.debate,
         )
 
 

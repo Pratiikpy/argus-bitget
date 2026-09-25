@@ -1,0 +1,347 @@
+{
+  "generated_at": "2026-09-25T14:02:53.713003+00:00",
+  "note": "Recorded before any model call; every stage of eval/thesis_quality.py reads this.",
+  "frames": [
+    {
+      "symbol": "NVDAUSDT",
+      "at": "2026-09-24T08:00:00+00:00",
+      "price": "222.88",
+      "evidence_lines": [
+        "[mkt-NVDAUSDT-2026-09-24T08:00:00+00:00] (news, credibility 1.00, available 2026-09-24T08:00:00+00:00) NVDAUSDT last 222.88; 474 hourly bars of history to this instant",
+        "[edgar-0001045810-26-000078] (sec-edgar, credibility 1.00, available 2026-09-03T12:03:56+00:00) NVDA filed 8-K [OPAQUE] \u2014 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001045810-26-000075] (filing, credibility 1.00, available 2026-08-26T20:36:00+00:00) NVDA filed 10-Q \u2014 10-Q",
+        "[edgar-0001045810-26-000073] (sec-edgar, credibility 1.00, available 2026-08-26T20:21:19+00:00) NVDA filed 8-K [MATERIAL] \u2014 2.02 results of operations, 9.01 financial statements and exhibits",
+        "[edgar-0001045810-26-000069] (sec-edgar, credibility 1.00, available 2026-08-17T12:41:33+00:00) NVDA filed 8-K [MATERIAL] \u2014 1.01 material agreement, 2.03 new direct financial obligation, 7.01 Regulation FD disclosure",
+        "[ust-curve-2026-09-24] (macro, credibility 1.00, available 2026-09-24T00:00:00+00:00) US Treasury par curve 2026-09-24: 1m 4.01%, 2m 4.18%, 3m 4.24%, 6m 4.34%, 1y 4.51%, 2y 4.87%, 3y 4.99%, 5y 5.03%, 7y 5.10%, 10y 5.18%, 20y 5.53%, 30y 5.47%; 10y-2y +31.00bps",
+        "[ust-spread-2026-09-24] (macro, credibility 1.00, available 2026-09-24T00:00:00+00:00) US 10y-2y spread +31.00bps on 2026-09-24",
+        "[vix-2026-09-18] (macro, credibility 0.90, available 2026-09-18T00:00:00+00:00) VIX 14.81 (-0.63 on the day), the 31% percentile of 9,276 daily closes \u2014 normal regime. Implies a one-day move of about 93bps on US equities, which is what these tokens track.",
+        "[finra-short-NVDA-2026-09-23] (macro, credibility 0.95, available 2026-09-23T00:00:00+00:00) NVDA short volume 12,791,057 of 33,881,445 total on 2026-09-23 \u2014 37.8% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-NVDAUSDT-1790236800] (technical, credibility 1.00, available 2026-09-24T08:00:00+00:00) NVDAUSDT technicals computed from hourly closes to this instant: 24h change -2.74%; 5-day change +0.24%; price -1.06% vs 20-hour mean; -1.88% vs 50-hour mean; RSI(14, hourly) 17.5; realised volatility (48 hourly returns, annualised) 23.5%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": 168.252
+    },
+    {
+      "symbol": "NVDAUSDT",
+      "at": "2026-09-17T08:00:00+00:00",
+      "price": "217.44",
+      "evidence_lines": [
+        "[mkt-NVDAUSDT-2026-09-17T08:00:00+00:00] (news, credibility 1.00, available 2026-09-17T08:00:00+00:00) NVDAUSDT last 217.44; 306 hourly bars of history to this instant",
+        "[edgar-0001045810-26-000078] (sec-edgar, credibility 1.00, available 2026-09-03T12:03:56+00:00) NVDA filed 8-K [OPAQUE] \u2014 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001045810-26-000075] (filing, credibility 1.00, available 2026-08-26T20:36:00+00:00) NVDA filed 10-Q \u2014 10-Q",
+        "[edgar-0001045810-26-000073] (sec-edgar, credibility 1.00, available 2026-08-26T20:21:19+00:00) NVDA filed 8-K [MATERIAL] \u2014 2.02 results of operations, 9.01 financial statements and exhibits",
+        "[edgar-0001045810-26-000069] (sec-edgar, credibility 1.00, available 2026-08-17T12:41:33+00:00) NVDA filed 8-K [MATERIAL] \u2014 1.01 material agreement, 2.03 new direct financial obligation, 7.01 Regulation FD disclosure",
+        "[ust-curve-2026-09-17] (macro, credibility 1.00, available 2026-09-17T00:00:00+00:00) US Treasury par curve 2026-09-17: 1m 3.97%, 2m 4.09%, 3m 4.12%, 6m 4.20%, 1y 4.40%, 2y 4.67%, 3y 4.75%, 5y 4.78%, 7y 4.86%, 10y 4.94%, 20y 5.32%, 30y 5.29%; 10y-2y +27.00bps",
+        "[ust-spread-2026-09-17] (macro, credibility 1.00, available 2026-09-17T00:00:00+00:00) US 10y-2y spread +27.00bps on 2026-09-17",
+        "[vix-2026-09-17] (macro, credibility 0.90, available 2026-09-17T00:00:00+00:00) VIX 15.44 (-2.27 on the day), the 35% percentile of 9,275 daily closes \u2014 normal regime. Implies a one-day move of about 97bps on US equities, which is what these tokens track.",
+        "[finra-short-NVDA-2026-09-16] (macro, credibility 0.95, available 2026-09-16T00:00:00+00:00) NVDA short volume 17,019,969 of 40,065,786 total on 2026-09-16 \u2014 42.5% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-NVDAUSDT-1789632000] (technical, credibility 1.00, available 2026-09-17T08:00:00+00:00) NVDAUSDT technicals computed from hourly closes to this instant: 24h change +1.63%; 5-day change -0.87%; price +0.80% vs 20-hour mean; +1.57% vs 50-hour mean; RSI(14, hourly) 85.8; realised volatility (48 hourly returns, annualised) 20.5%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": 199.1354
+    },
+    {
+      "symbol": "TSLAUSDT",
+      "at": "2026-09-23T08:00:00+00:00",
+      "price": "379.72",
+      "evidence_lines": [
+        "[mkt-TSLAUSDT-2026-09-23T08:00:00+00:00] (news, credibility 1.00, available 2026-09-23T08:00:00+00:00) TSLAUSDT last 379.72; 450 hourly bars of history to this instant",
+        "[ust-curve-2026-09-23] (macro, credibility 1.00, available 2026-09-23T00:00:00+00:00) US Treasury par curve 2026-09-23: 1m 3.99%, 2m 4.10%, 3m 4.19%, 6m 4.31%, 1y 4.49%, 2y 4.85%, 3y 4.97%, 5y 4.99%, 7y 5.05%, 10y 5.11%, 20y 5.45%, 30y 5.40%; 10y-2y +26.00bps",
+        "[ust-spread-2026-09-23] (macro, credibility 1.00, available 2026-09-23T00:00:00+00:00) US 10y-2y spread +26.00bps on 2026-09-23",
+        "[vix-2026-09-18] (macro, credibility 0.90, available 2026-09-18T00:00:00+00:00) VIX 14.81 (-0.63 on the day), the 31% percentile of 9,276 daily closes \u2014 normal regime. Implies a one-day move of about 93bps on US equities, which is what these tokens track.",
+        "[finra-short-TSLA-2026-09-22] (macro, credibility 0.95, available 2026-09-22T00:00:00+00:00) TSLA short volume 9,155,592 of 14,688,489 total on 2026-09-22 \u2014 62.3% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-TSLAUSDT-1790150400] (technical, credibility 1.00, available 2026-09-23T08:00:00+00:00) TSLAUSDT technicals computed from hourly closes to this instant: 24h change +0.74%; 5-day change +2.79%; price +0.24% vs 20-hour mean; +0.86% vs 50-hour mean; RSI(14, hourly) 48.4; realised volatility (48 hourly returns, annualised) 30.2%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": -94.0166
+    },
+    {
+      "symbol": "TSLAUSDT",
+      "at": "2026-09-16T08:00:00+00:00",
+      "price": "358.04",
+      "evidence_lines": [
+        "[mkt-TSLAUSDT-2026-09-16T08:00:00+00:00] (news, credibility 1.00, available 2026-09-16T08:00:00+00:00) TSLAUSDT last 358.04; 282 hourly bars of history to this instant",
+        "[ust-curve-2026-09-16] (macro, credibility 1.00, available 2026-09-16T00:00:00+00:00) US Treasury par curve 2026-09-16: 1m 3.96%, 2m 4.07%, 3m 4.14%, 6m 4.22%, 1y 4.45%, 2y 4.74%, 3y 4.82%, 5y 4.86%, 7y 4.94%, 10y 5.01%, 20y 5.39%, 30y 5.35%; 10y-2y +27.00bps",
+        "[ust-spread-2026-09-16] (macro, credibility 1.00, available 2026-09-16T00:00:00+00:00) US 10y-2y spread +27.00bps on 2026-09-16",
+        "[vix-2026-09-16] (macro, credibility 0.90, available 2026-09-16T00:00:00+00:00) VIX 17.71 (+0.51 on the day), the 51% percentile of 9,274 daily closes \u2014 normal regime. Implies a one-day move of about 112bps on US equities, which is what these tokens track.",
+        "[finra-short-TSLA-2026-09-15] (macro, credibility 0.95, available 2026-09-15T00:00:00+00:00) TSLA short volume 8,555,226 of 16,300,134 total on 2026-09-15 \u2014 52.5% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-TSLAUSDT-1789545600] (technical, credibility 1.00, available 2026-09-16T08:00:00+00:00) TSLAUSDT technicals computed from hourly closes to this instant: 24h change +0.15%; 5-day change -2.03%; price +0.07% vs 20-hour mean; -0.27% vs 50-hour mean; RSI(14, hourly) 53.5; realised volatility (48 hourly returns, annualised) 29.7%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": 158.0829
+    },
+    {
+      "symbol": "AAPLUSDT",
+      "at": "2026-09-22T08:00:00+00:00",
+      "price": "340.05",
+      "evidence_lines": [
+        "[mkt-AAPLUSDT-2026-09-22T08:00:00+00:00] (news, credibility 1.00, available 2026-09-22T08:00:00+00:00) AAPLUSDT last 340.05; 426 hourly bars of history to this instant",
+        "[edgar-0001140361-26-035325] (sec-edgar, credibility 1.00, available 2026-09-01T20:30:35+00:00) AAPL filed 8-K/A [MATERIAL] \u2014 5.02 officer or director change",
+        "[ust-curve-2026-09-22] (macro, credibility 1.00, available 2026-09-22T00:00:00+00:00) US Treasury par curve 2026-09-22: 1m 3.97%, 2m 4.09%, 3m 4.16%, 6m 4.26%, 1y 4.43%, 2y 4.71%, 3y 4.81%, 5y 4.83%, 7y 4.89%, 10y 4.96%, 20y 5.33%, 30y 5.29%; 10y-2y +25.00bps",
+        "[ust-spread-2026-09-22] (macro, credibility 1.00, available 2026-09-22T00:00:00+00:00) US 10y-2y spread +25.00bps on 2026-09-22",
+        "[vix-2026-09-18] (macro, credibility 0.90, available 2026-09-18T00:00:00+00:00) VIX 14.81 (-0.63 on the day), the 31% percentile of 9,276 daily closes \u2014 normal regime. Implies a one-day move of about 93bps on US equities, which is what these tokens track.",
+        "[finra-short-AAPL-2026-09-21] (macro, credibility 0.95, available 2026-09-21T00:00:00+00:00) AAPL short volume 5,442,428 of 12,178,461 total on 2026-09-21 \u2014 44.7% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-AAPLUSDT-1790064000] (technical, credibility 1.00, available 2026-09-22T08:00:00+00:00) AAPLUSDT technicals computed from hourly closes to this instant: 24h change +1.37%; 5-day change +1.68%; price +0.35% vs 20-hour mean; +1.09% vs 50-hour mean; RSI(14, hourly) 66.2; realised volatility (48 hourly returns, annualised) 10.7%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": 9.7045
+    },
+    {
+      "symbol": "AAPLUSDT",
+      "at": "2026-09-15T08:00:00+00:00",
+      "price": "331.05",
+      "evidence_lines": [
+        "[mkt-AAPLUSDT-2026-09-15T08:00:00+00:00] (news, credibility 1.00, available 2026-09-15T08:00:00+00:00) AAPLUSDT last 331.05; 258 hourly bars of history to this instant",
+        "[edgar-0001140361-26-035325] (sec-edgar, credibility 1.00, available 2026-09-01T20:30:35+00:00) AAPL filed 8-K/A [MATERIAL] \u2014 5.02 officer or director change",
+        "[ust-curve-2026-09-15] (macro, credibility 1.00, available 2026-09-15T00:00:00+00:00) US Treasury par curve 2026-09-15: 1m 3.93%, 2m 4.06%, 3m 4.11%, 6m 4.17%, 1y 4.39%, 2y 4.67%, 3y 4.76%, 5y 4.83%, 7y 4.91%, 10y 5.00%, 20y 5.40%, 30y 5.36%; 10y-2y +33.00bps",
+        "[ust-spread-2026-09-15] (macro, credibility 1.00, available 2026-09-15T00:00:00+00:00) US 10y-2y spread +33.00bps on 2026-09-15",
+        "[vix-2026-09-15] (macro, credibility 0.90, available 2026-09-15T00:00:00+00:00) VIX 17.20 (+0.10 on the day), the 48% percentile of 9,273 daily closes \u2014 normal regime. Implies a one-day move of about 108bps on US equities, which is what these tokens track.",
+        "[finra-short-AAPL-2026-09-14] (macro, credibility 0.95, available 2026-09-14T00:00:00+00:00) AAPL short volume 6,475,246 of 13,998,279 total on 2026-09-14 \u2014 46.3% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-AAPLUSDT-1789459200] (technical, credibility 1.00, available 2026-09-15T08:00:00+00:00) AAPLUSDT technicals computed from hourly closes to this instant: 24h change -0.05%; 5-day change +3.53%; price -0.45% vs 20-hour mean; -0.22% vs 50-hour mean; RSI(14, hourly) 14.9; realised volatility (48 hourly returns, annualised) 18.1%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": 21.1448
+    },
+    {
+      "symbol": "METAUSDT",
+      "at": "2026-09-21T08:00:00+00:00",
+      "price": "682.56",
+      "evidence_lines": [
+        "[mkt-METAUSDT-2026-09-21T08:00:00+00:00] (news, credibility 1.00, available 2026-09-21T08:00:00+00:00) METAUSDT last 682.56; 402 hourly bars of history to this instant",
+        "[ust-curve-2026-09-21] (macro, credibility 1.00, available 2026-09-21T00:00:00+00:00) US Treasury par curve 2026-09-21: 1m 3.96%, 2m 4.10%, 3m 4.17%, 6m 4.27%, 1y 4.45%, 2y 4.76%, 3y 4.82%, 5y 4.83%, 7y 4.89%, 10y 4.96%, 20y 5.33%, 30y 5.29%; 10y-2y +20.00bps",
+        "[ust-spread-2026-09-21] (macro, credibility 1.00, available 2026-09-21T00:00:00+00:00) US 10y-2y spread +20.00bps on 2026-09-21",
+        "[vix-2026-09-18] (macro, credibility 0.90, available 2026-09-18T00:00:00+00:00) VIX 14.81 (-0.63 on the day), the 31% percentile of 9,276 daily closes \u2014 normal regime. Implies a one-day move of about 93bps on US equities, which is what these tokens track.",
+        "[finra-short-META-2026-09-18] (macro, credibility 0.95, available 2026-09-18T00:00:00+00:00) META short volume 5,825,936 of 9,295,715 total on 2026-09-18 \u2014 62.7% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-METAUSDT-1789977600] (technical, credibility 1.00, available 2026-09-21T08:00:00+00:00) METAUSDT technicals computed from hourly closes to this instant: 24h change +2.10%; 5-day change +1.64%; price +1.17% vs 20-hour mean; +1.56% vs 50-hour mean; RSI(14, hourly) 91.0; realised volatility (48 hourly returns, annualised) 11.8%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": 924.4609
+    },
+    {
+      "symbol": "METAUSDT",
+      "at": "2026-09-14T08:00:00+00:00",
+      "price": "639.87",
+      "evidence_lines": [
+        "[mkt-METAUSDT-2026-09-14T08:00:00+00:00] (news, credibility 1.00, available 2026-09-14T08:00:00+00:00) METAUSDT last 639.87; 234 hourly bars of history to this instant",
+        "[ust-curve-2026-09-14] (macro, credibility 1.00, available 2026-09-14T00:00:00+00:00) US Treasury par curve 2026-09-14: 1m 3.94%, 2m 4.06%, 3m 4.11%, 6m 4.18%, 1y 4.37%, 2y 4.65%, 3y 4.73%, 5y 4.80%, 7y 4.88%, 10y 4.97%, 20y 5.37%, 30y 5.34%; 10y-2y +32.00bps",
+        "[ust-spread-2026-09-14] (macro, credibility 1.00, available 2026-09-14T00:00:00+00:00) US 10y-2y spread +32.00bps on 2026-09-14",
+        "[vix-2026-09-14] (macro, credibility 0.90, available 2026-09-14T00:00:00+00:00) VIX 17.10 (+1.26 on the day), the 47% percentile of 9,272 daily closes \u2014 normal regime. Implies a one-day move of about 108bps on US equities, which is what these tokens track.",
+        "[finra-short-META-2026-09-11] (macro, credibility 0.95, available 2026-09-11T00:00:00+00:00) META short volume 2,082,466 of 5,788,009 total on 2026-09-11 \u2014 36.0% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-METAUSDT-1789372800] (technical, credibility 1.00, available 2026-09-14T08:00:00+00:00) METAUSDT technicals computed from hourly closes to this instant: 24h change -1.01%; 5-day change +2.56%; price -0.37% vs 20-hour mean; -0.92% vs 50-hour mean; RSI(14, hourly) 39.0; realised volatility (48 hourly returns, annualised) 14.1%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": 310.2193
+    },
+    {
+      "symbol": "COINUSDT",
+      "at": "2026-09-18T08:00:00+00:00",
+      "price": "180.34",
+      "evidence_lines": [
+        "[mkt-COINUSDT-2026-09-18T08:00:00+00:00] (news, credibility 1.00, available 2026-09-18T08:00:00+00:00) COINUSDT last 180.34; 330 hourly bars of history to this instant",
+        "[edgar-0001679788-26-000101] (sec-edgar, credibility 1.00, available 2026-09-02T20:10:28+00:00) COIN filed 8-K [MATERIAL] \u2014 5.02 officer or director change",
+        "[ust-curve-2026-09-18] (macro, credibility 1.00, available 2026-09-18T00:00:00+00:00) US Treasury par curve 2026-09-18: 1m 3.97%, 2m 4.10%, 3m 4.14%, 6m 4.24%, 1y 4.44%, 2y 4.76%, 3y 4.83%, 5y 4.86%, 7y 4.93%, 10y 5.01%, 20y 5.38%, 30y 5.34%; 10y-2y +25.00bps",
+        "[ust-spread-2026-09-18] (macro, credibility 1.00, available 2026-09-18T00:00:00+00:00) US 10y-2y spread +25.00bps on 2026-09-18",
+        "[vix-2026-09-18] (macro, credibility 0.90, available 2026-09-18T00:00:00+00:00) VIX 14.81 (-0.63 on the day), the 31% percentile of 9,276 daily closes \u2014 normal regime. Implies a one-day move of about 93bps on US equities, which is what these tokens track.",
+        "[finra-short-COIN-2026-09-17] (macro, credibility 0.95, available 2026-09-17T00:00:00+00:00) COIN short volume 2,698,018 of 4,387,616 total on 2026-09-17 \u2014 61.5% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-COINUSDT-1789718400] (technical, credibility 1.00, available 2026-09-18T08:00:00+00:00) COINUSDT technicals computed from hourly closes to this instant: 24h change +6.40%; 5-day change +3.60%; price +3.64% vs 20-hour mean; +5.73% vs 50-hour mean; RSI(14, hourly) 86.7; realised volatility (48 hourly returns, annualised) 72.7%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": 821.7811
+    },
+    {
+      "symbol": "COINUSDT",
+      "at": "2026-09-11T08:00:00+00:00",
+      "price": "173.45",
+      "evidence_lines": [
+        "[mkt-COINUSDT-2026-09-11T08:00:00+00:00] (news, credibility 1.00, available 2026-09-11T08:00:00+00:00) COINUSDT last 173.45; 162 hourly bars of history to this instant",
+        "[edgar-0001679788-26-000101] (sec-edgar, credibility 1.00, available 2026-09-02T20:10:28+00:00) COIN filed 8-K [MATERIAL] \u2014 5.02 officer or director change",
+        "[edgar-0001679788-26-000088] (filing, credibility 1.00, available 2026-07-30T20:15:28+00:00) COIN filed 10-Q \u2014 10-Q",
+        "[edgar-0001679788-26-000087] (sec-edgar, credibility 1.00, available 2026-07-30T20:06:18+00:00) COIN filed 8-K [MATERIAL] \u2014 2.02 results of operations, 9.01 financial statements and exhibits",
+        "[ust-curve-2026-09-11] (macro, credibility 1.00, available 2026-09-11T00:00:00+00:00) US Treasury par curve 2026-09-11: 1m 3.93%, 2m 4.05%, 3m 4.07%, 6m 4.12%, 1y 4.35%, 2y 4.63%, 3y 4.69%, 5y 4.78%, 7y 4.87%, 10y 4.96%, 20y 5.38%, 30y 5.35%; 10y-2y +33.00bps",
+        "[ust-spread-2026-09-11] (macro, credibility 1.00, available 2026-09-11T00:00:00+00:00) US 10y-2y spread +33.00bps on 2026-09-11",
+        "[vix-2026-09-11] (macro, credibility 0.90, available 2026-09-11T00:00:00+00:00) VIX 15.84 (-2.00 on the day), the 38% percentile of 9,271 daily closes \u2014 normal regime. Implies a one-day move of about 100bps on US equities, which is what these tokens track.",
+        "[finra-short-COIN-2026-09-10] (macro, credibility 0.95, available 2026-09-10T00:00:00+00:00) COIN short volume 1,157,582 of 2,236,176 total on 2026-09-10 \u2014 51.8% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-COINUSDT-1789113600] (technical, credibility 1.00, available 2026-09-11T08:00:00+00:00) COINUSDT technicals computed from hourly closes to this instant: 24h change -0.44%; 5-day change -6.79%; price +0.59% vs 20-hour mean; -0.95% vs 50-hour mean; RSI(14, hourly) 49.2; realised volatility (48 hourly returns, annualised) 53.2%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": 161.4298
+    },
+    {
+      "symbol": "MSTRUSDT",
+      "at": "2026-09-24T08:00:00+00:00",
+      "price": "158.84",
+      "evidence_lines": [
+        "[mkt-MSTRUSDT-2026-09-24T08:00:00+00:00] (news, credibility 1.00, available 2026-09-24T08:00:00+00:00) MSTRUSDT last 158.84; 474 hourly bars of history to this instant",
+        "[edgar-0001193125-26-396093] (sec-edgar, credibility 1.00, available 2026-09-21T12:00:13+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-389858] (sec-edgar, credibility 1.00, available 2026-09-14T12:00:16+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-384402] (sec-edgar, credibility 1.00, available 2026-09-08T12:00:15+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-377583] (sec-edgar, credibility 1.00, available 2026-09-01T12:07:22+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-375463] (sec-edgar, credibility 1.00, available 2026-08-31T12:00:15+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-361845] (sec-edgar, credibility 1.00, available 2026-08-24T12:00:15+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-353240] (sec-edgar, credibility 1.00, available 2026-08-17T12:00:16+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-341297] (sec-edgar, credibility 1.00, available 2026-08-10T12:00:15+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[ust-curve-2026-09-24] (macro, credibility 1.00, available 2026-09-24T00:00:00+00:00) US Treasury par curve 2026-09-24: 1m 4.01%, 2m 4.18%, 3m 4.24%, 6m 4.34%, 1y 4.51%, 2y 4.87%, 3y 4.99%, 5y 5.03%, 7y 5.10%, 10y 5.18%, 20y 5.53%, 30y 5.47%; 10y-2y +31.00bps",
+        "[ust-spread-2026-09-24] (macro, credibility 1.00, available 2026-09-24T00:00:00+00:00) US 10y-2y spread +31.00bps on 2026-09-24",
+        "[vix-2026-09-18] (macro, credibility 0.90, available 2026-09-18T00:00:00+00:00) VIX 14.81 (-0.63 on the day), the 31% percentile of 9,276 daily closes \u2014 normal regime. Implies a one-day move of about 93bps on US equities, which is what these tokens track.",
+        "[finra-short-MSTR-2026-09-23] (macro, credibility 0.95, available 2026-09-23T00:00:00+00:00) MSTR short volume 4,437,745 of 8,835,875 total on 2026-09-23 \u2014 50.2% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-MSTRUSDT-1790236800] (technical, credibility 1.00, available 2026-09-24T08:00:00+00:00) MSTRUSDT technicals computed from hourly closes to this instant: 24h change -5.64%; 5-day change +1.02%; price -2.07% vs 20-hour mean; -4.25% vs 50-hour mean; RSI(14, hourly) 33.3; realised volatility (48 hourly returns, annualised) 71.0%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": 238.6049
+    },
+    {
+      "symbol": "MSTRUSDT",
+      "at": "2026-09-17T08:00:00+00:00",
+      "price": "129.89",
+      "evidence_lines": [
+        "[mkt-MSTRUSDT-2026-09-17T08:00:00+00:00] (news, credibility 1.00, available 2026-09-17T08:00:00+00:00) MSTRUSDT last 129.89; 306 hourly bars of history to this instant",
+        "[edgar-0001193125-26-389858] (sec-edgar, credibility 1.00, available 2026-09-14T12:00:16+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-384402] (sec-edgar, credibility 1.00, available 2026-09-08T12:00:15+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-377583] (sec-edgar, credibility 1.00, available 2026-09-01T12:07:22+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-375463] (sec-edgar, credibility 1.00, available 2026-08-31T12:00:15+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-361845] (sec-edgar, credibility 1.00, available 2026-08-24T12:00:15+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-353240] (sec-edgar, credibility 1.00, available 2026-08-17T12:00:16+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001193125-26-341297] (sec-edgar, credibility 1.00, available 2026-08-10T12:00:15+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001050446-26-000044] (filing, credibility 1.00, available 2026-08-03T20:49:56+00:00) MSTR filed 10-Q \u2014 10-Q",
+        "[edgar-0001193125-26-329565] (sec-edgar, credibility 1.00, available 2026-08-03T12:00:16+00:00) MSTR filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 8.01 other events. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[ust-curve-2026-09-17] (macro, credibility 1.00, available 2026-09-17T00:00:00+00:00) US Treasury par curve 2026-09-17: 1m 3.97%, 2m 4.09%, 3m 4.12%, 6m 4.20%, 1y 4.40%, 2y 4.67%, 3y 4.75%, 5y 4.78%, 7y 4.86%, 10y 4.94%, 20y 5.32%, 30y 5.29%; 10y-2y +27.00bps",
+        "[ust-spread-2026-09-17] (macro, credibility 1.00, available 2026-09-17T00:00:00+00:00) US 10y-2y spread +27.00bps on 2026-09-17",
+        "[vix-2026-09-17] (macro, credibility 0.90, available 2026-09-17T00:00:00+00:00) VIX 15.44 (-2.27 on the day), the 35% percentile of 9,275 daily closes \u2014 normal regime. Implies a one-day move of about 97bps on US equities, which is what these tokens track.",
+        "[finra-short-MSTR-2026-09-16] (macro, credibility 0.95, available 2026-09-16T00:00:00+00:00) MSTR short volume 3,803,859 of 9,141,357 total on 2026-09-16 \u2014 41.6% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-MSTRUSDT-1789632000] (technical, credibility 1.00, available 2026-09-17T08:00:00+00:00) MSTRUSDT technicals computed from hourly closes to this instant: 24h change +0.78%; 5-day change -1.04%; price +1.70% vs 20-hour mean; +0.55% vs 50-hour mean; RSI(14, hourly) 82.6; realised volatility (48 hourly returns, annualised) 77.7%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": 613.5961
+    },
+    {
+      "symbol": "AMZNUSDT",
+      "at": "2026-09-23T08:00:00+00:00",
+      "price": "256.21",
+      "evidence_lines": [
+        "[mkt-AMZNUSDT-2026-09-23T08:00:00+00:00] (news, credibility 1.00, available 2026-09-23T08:00:00+00:00) AMZNUSDT last 256.21; 450 hourly bars of history to this instant",
+        "[edgar-0001104659-26-107526] (sec-edgar, credibility 1.00, available 2026-09-14T20:45:41+00:00) AMZN filed 8-K [OPAQUE] \u2014 8.01 other events, 9.01 financial statements and exhibits. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001018724-26-000036] (sec-edgar, credibility 1.00, available 2026-09-09T20:28:21+00:00) AMZN filed 8-K [MATERIAL] \u2014 5.02 officer or director change",
+        "[ust-curve-2026-09-23] (macro, credibility 1.00, available 2026-09-23T00:00:00+00:00) US Treasury par curve 2026-09-23: 1m 3.99%, 2m 4.10%, 3m 4.19%, 6m 4.31%, 1y 4.49%, 2y 4.85%, 3y 4.97%, 5y 4.99%, 7y 5.05%, 10y 5.11%, 20y 5.45%, 30y 5.40%; 10y-2y +26.00bps",
+        "[ust-spread-2026-09-23] (macro, credibility 1.00, available 2026-09-23T00:00:00+00:00) US 10y-2y spread +26.00bps on 2026-09-23",
+        "[vix-2026-09-18] (macro, credibility 0.90, available 2026-09-18T00:00:00+00:00) VIX 14.81 (-0.63 on the day), the 31% percentile of 9,276 daily closes \u2014 normal regime. Implies a one-day move of about 93bps on US equities, which is what these tokens track.",
+        "[finra-short-AMZN-2026-09-22] (macro, credibility 0.95, available 2026-09-22T00:00:00+00:00) AMZN short volume 5,311,020 of 16,538,065 total on 2026-09-22 \u2014 32.1% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-AMZNUSDT-1790150400] (technical, credibility 1.00, available 2026-09-23T08:00:00+00:00) AMZNUSDT technicals computed from hourly closes to this instant: 24h change -1.71%; 5-day change +1.44%; price +0.15% vs 20-hour mean; -0.43% vs 50-hour mean; RSI(14, hourly) 74.5; realised volatility (48 hourly returns, annualised) 26.0%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": -339.1749
+    },
+    {
+      "symbol": "AMZNUSDT",
+      "at": "2026-09-16T08:00:00+00:00",
+      "price": "249.07",
+      "evidence_lines": [
+        "[mkt-AMZNUSDT-2026-09-16T08:00:00+00:00] (news, credibility 1.00, available 2026-09-16T08:00:00+00:00) AMZNUSDT last 249.07; 282 hourly bars of history to this instant",
+        "[edgar-0001104659-26-107526] (sec-edgar, credibility 1.00, available 2026-09-14T20:45:41+00:00) AMZN filed 8-K [OPAQUE] \u2014 8.01 other events, 9.01 financial statements and exhibits. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[edgar-0001018724-26-000036] (sec-edgar, credibility 1.00, available 2026-09-09T20:28:21+00:00) AMZN filed 8-K [MATERIAL] \u2014 5.02 officer or director change",
+        "[ust-curve-2026-09-16] (macro, credibility 1.00, available 2026-09-16T00:00:00+00:00) US Treasury par curve 2026-09-16: 1m 3.96%, 2m 4.07%, 3m 4.14%, 6m 4.22%, 1y 4.45%, 2y 4.74%, 3y 4.82%, 5y 4.86%, 7y 4.94%, 10y 5.01%, 20y 5.39%, 30y 5.35%; 10y-2y +27.00bps",
+        "[ust-spread-2026-09-16] (macro, credibility 1.00, available 2026-09-16T00:00:00+00:00) US 10y-2y spread +27.00bps on 2026-09-16",
+        "[vix-2026-09-16] (macro, credibility 0.90, available 2026-09-16T00:00:00+00:00) VIX 17.71 (+0.51 on the day), the 51% percentile of 9,274 daily closes \u2014 normal regime. Implies a one-day move of about 112bps on US equities, which is what these tokens track.",
+        "[finra-short-AMZN-2026-09-15] (macro, credibility 0.95, available 2026-09-15T00:00:00+00:00) AMZN short volume 5,863,571 of 15,863,735 total on 2026-09-15 \u2014 37.0% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-AMZNUSDT-1789545600] (technical, credibility 1.00, available 2026-09-16T08:00:00+00:00) AMZNUSDT technicals computed from hourly closes to this instant: 24h change -1.20%; 5-day change -1.87%; price -0.04% vs 20-hour mean; -1.10% vs 50-hour mean; RSI(14, hourly) 75.4; realised volatility (48 hourly returns, annualised) 31.0%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": 20.0747
+    },
+    {
+      "symbol": "MSFTUSDT",
+      "at": "2026-09-22T08:00:00+00:00",
+      "price": "504.83",
+      "evidence_lines": [
+        "[mkt-MSFTUSDT-2026-09-22T08:00:00+00:00] (news, credibility 1.00, available 2026-09-22T08:00:00+00:00) MSFTUSDT last 504.83; 426 hourly bars of history to this instant",
+        "[edgar-0001193125-26-380280] (sec-edgar, credibility 1.00, available 2026-09-02T20:30:24+00:00) MSFT filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 9.01 financial statements and exhibits. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[ust-curve-2026-09-22] (macro, credibility 1.00, available 2026-09-22T00:00:00+00:00) US Treasury par curve 2026-09-22: 1m 3.97%, 2m 4.09%, 3m 4.16%, 6m 4.26%, 1y 4.43%, 2y 4.71%, 3y 4.81%, 5y 4.83%, 7y 4.89%, 10y 4.96%, 20y 5.33%, 30y 5.29%; 10y-2y +25.00bps",
+        "[ust-spread-2026-09-22] (macro, credibility 1.00, available 2026-09-22T00:00:00+00:00) US 10y-2y spread +25.00bps on 2026-09-22",
+        "[vix-2026-09-18] (macro, credibility 0.90, available 2026-09-18T00:00:00+00:00) VIX 14.81 (-0.63 on the day), the 31% percentile of 9,276 daily closes \u2014 normal regime. Implies a one-day move of about 93bps on US equities, which is what these tokens track.",
+        "[finra-short-MSFT-2026-09-21] (macro, credibility 0.95, available 2026-09-21T00:00:00+00:00) MSFT short volume 3,064,820 of 8,759,298 total on 2026-09-21 \u2014 35.0% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-MSFTUSDT-1790064000] (technical, credibility 1.00, available 2026-09-22T08:00:00+00:00) MSFTUSDT technicals computed from hourly closes to this instant: 24h change +2.03%; 5-day change +1.94%; price +0.83% vs 20-hour mean; +1.53% vs 50-hour mean; RSI(14, hourly) 82.6; realised volatility (48 hourly returns, annualised) 18.8%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": -71.5092
+    },
+    {
+      "symbol": "MSFTUSDT",
+      "at": "2026-09-15T08:00:00+00:00",
+      "price": "499.2",
+      "evidence_lines": [
+        "[mkt-MSFTUSDT-2026-09-15T08:00:00+00:00] (news, credibility 1.00, available 2026-09-15T08:00:00+00:00) MSFTUSDT last 499.2; 258 hourly bars of history to this instant",
+        "[edgar-0001193125-26-380280] (sec-edgar, credibility 1.00, available 2026-09-02T20:30:24+00:00) MSFT filed 8-K [OPAQUE] \u2014 7.01 Regulation FD disclosure, 9.01 financial statements and exhibits. This is a catch-all item: the code constrains nothing about the contents, so it is neither news nor the absence of news until read.",
+        "[ust-curve-2026-09-15] (macro, credibility 1.00, available 2026-09-15T00:00:00+00:00) US Treasury par curve 2026-09-15: 1m 3.93%, 2m 4.06%, 3m 4.11%, 6m 4.17%, 1y 4.39%, 2y 4.67%, 3y 4.76%, 5y 4.83%, 7y 4.91%, 10y 5.00%, 20y 5.40%, 30y 5.36%; 10y-2y +33.00bps",
+        "[ust-spread-2026-09-15] (macro, credibility 1.00, available 2026-09-15T00:00:00+00:00) US 10y-2y spread +33.00bps on 2026-09-15",
+        "[vix-2026-09-15] (macro, credibility 0.90, available 2026-09-15T00:00:00+00:00) VIX 17.20 (+0.10 on the day), the 48% percentile of 9,273 daily closes \u2014 normal regime. Implies a one-day move of about 108bps on US equities, which is what these tokens track.",
+        "[finra-short-MSFT-2026-09-14] (macro, credibility 0.95, available 2026-09-14T00:00:00+00:00) MSFT short volume 3,050,221 of 8,754,339 total on 2026-09-14 \u2014 34.8% of the session's prints were short sales, reported by FINRA for the underlying equity rather than the token",
+        "[ta-MSFTUSDT-1789459200] (technical, credibility 1.00, available 2026-09-15T08:00:00+00:00) MSFTUSDT technicals computed from hourly closes to this instant: 24h change +1.62%; 5-day change +1.31%; price -0.90% vs 20-hour mean; +0.34% vs 50-hour mean; RSI(14, hourly) 1.5; realised volatility (48 hourly returns, annualised) 24.5%"
+      ],
+      "absent": [
+        "Bitget official Skills (answer only for now)",
+        "consensus estimates and insider Form 4 (not reconstructed in this run)",
+        "live RSS headlines (feeds carry only recent items)"
+      ],
+      "realised_bps": -59.6955
+    }
+  ]
+}

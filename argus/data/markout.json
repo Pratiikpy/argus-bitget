@@ -1,41 +1,41 @@
 {
   "symbol": "MSTRUSDT",
   "phase": "rth",
-  "started_at": "2026-09-25T13:30:04.106666+00:00",
+  "started_at": "2026-09-25T19:30:11.504671+00:00",
   "window_seconds": 90,
-  "samples": 68,
-  "prints_seen": 0,
+  "samples": 69,
+  "prints_seen": 93,
   "rpi_share": 0.0,
   "maker_bps": 2.0,
   "markouts": [
     {
       "horizon_seconds": 5,
-      "prints": 0,
+      "prints": 92,
       "median_bps": 0.0,
-      "mean_bps": 0.0,
-      "worst_bps": 0.0
+      "mean_bps": 0.1326,
+      "worst_bps": -6.8692
     },
     {
       "horizon_seconds": 15,
-      "prints": 0,
-      "median_bps": 0.0,
-      "mean_bps": 0.0,
-      "worst_bps": 0.0
+      "prints": 84,
+      "median_bps": 0.3124,
+      "mean_bps": -0.3343,
+      "worst_bps": -7.4927
     },
     {
       "horizon_seconds": 30,
-      "prints": 0,
-      "median_bps": 0.0,
-      "mean_bps": 0.0,
-      "worst_bps": 0.0
+      "prints": 44,
+      "median_bps": -2.3424,
+      "mean_bps": -0.4896,
+      "worst_bps": -4.3708
     },
     {
       "horizon_seconds": 60,
-      "prints": 0,
-      "median_bps": 0.0,
-      "mean_bps": 0.0,
-      "worst_bps": 0.0
+      "prints": 28,
+      "median_bps": -1.5623,
+      "mean_bps": -1.4166,
+      "worst_bps": -9.3659
     }
   ],
-  "verdict": "0 joined print(s) at the 5s horizon over 90s of MSTRUSDT (rth) \u2014 below the 20 this module will draw a conclusion from. The sample says the book was quiet, not that resting here is safe"
+  "verdict": "Resting on MSTRUSDT (rth) cost a median 1.56bps of adverse selection over 60s across 28 print(s), worst 9.37bps. That is inside the 2bps maker fee it would save, so the blanket refusal to credit maker treatment is now costing measurable edge and deserves a number rather than a rule"
 }

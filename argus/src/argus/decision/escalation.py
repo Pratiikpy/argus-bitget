@@ -158,6 +158,26 @@ class Escalation:
             "detail": list(self.detail),
         }
 
+    @classmethod
+    def from_dict(cls, blob: dict[str, Any]) -> Escalation:
+        """The inverse of :meth:`as_dict`, for a record read back off disk.
+
+        Added 2026-09-25 for `decision/pause.py`, whose event log is the only place a takeover rate
+        can honestly be computed from: the log is what survives a process restart, and a rate
+        recomputed from live objects would count only the decisions the current process happened
+        to see. ``reasons`` is not read back — it is derived from the trigger, so storing it is a
+        convenience for a human reader and trusting it on the way in would let an edited file
+        attach one trigger's explanation to another.
+        """
+        triggers = tuple(Trigger(value) for value in blob.get("triggers", ()))
+        detail = tuple(str(d) for d in blob.get("detail", ()))
+        if len(detail) != len(triggers):
+            raise EscalationError(
+                f"an escalation record carries {len(triggers)} trigger(s) and {len(detail)} "
+                f"detail line(s); they are paired one to one, so the record is malformed"
+            )
+        return cls(triggers=triggers, detail=detail)
+
 
 def assess(intent: Intent, signals: Signals) -> Escalation:
     """Which escalation conditions this decision meets. All of them, not the first.

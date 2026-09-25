@@ -336,24 +336,38 @@ def average_cross_correlation(windows: Sequence[EventWindow]) -> float:
     residuals rather than the event window is deliberate: the event window is where the effect is
     supposed to be, so correlation measured there confounds the thing being corrected for with the
     thing being tested.
+
+    **Computed in O(N·L), not O(N²·L).** Each series is centred and scaled to unit length, so a
+    pairwise correlation is a dot product ``z_i · z_j``, and the sum over every pair is
+    ``(‖Σ z_i‖² − m) / 2`` for the ``m`` series that have any variance. That is the same number
+    the pairwise loop produced (a constant series has no correlation with anything, and was
+    skipped there exactly as it is excluded from ``m`` here); what changed is the cost. The loop
+    took about 1.7s for 108 events on 480-bar windows and grew with the square of the event count,
+    which made a study of a few thousand real events — one event class over a quarter of 5-minute
+    perception, `eval/eventdriven_rivals.py` — impractical. The equivalence is pinned against the
+    original loop in `tests/test_eventdriven_rivals.py`.
     """
     if len(windows) < 2:
         return 0.0
     length = min(len(w.estimation_abnormal) for w in windows)
     if length < 2:
         return 0.0
-    series = [list(w.estimation_abnormal[-length:]) for w in windows]
-    correlations: list[float] = []
-    for i in range(len(series)):
-        for j in range(i + 1, len(series)):
-            a, b = series[i], series[j]
-            mean_a, mean_b = sum(a) / length, sum(b) / length
-            da = [x - mean_a for x in a]
-            db = [x - mean_b for x in b]
-            denominator = sqrt(sum(x * x for x in da) * sum(x * x for x in db))
-            if denominator > 0:
-                correlations.append(sum(x * y for x, y in zip(da, db, strict=True)) / denominator)
-    return sum(correlations) / len(correlations) if correlations else 0.0
+    total = [0.0] * length
+    usable = 0
+    for w in windows:
+        tail = w.estimation_abnormal[-length:]
+        mean = sum(tail) / length
+        centred = [x - mean for x in tail]
+        norm = sqrt(sum(x * x for x in centred))
+        if norm <= 0:
+            continue
+        usable += 1
+        for k, x in enumerate(centred):
+            total[k] += x / norm
+    if usable < 2:
+        return 0.0
+    pair_sum = (sum(x * x for x in total) - usable) / 2.0
+    return pair_sum / (usable * (usable - 1) / 2.0)
 
 
 def kolari_pynnonen(statistic: float, *, events: int, correlation: float) -> float:

@@ -46,7 +46,13 @@ from math import comb, isfinite, sqrt
 from statistics import NormalDist
 from typing import Any
 
-from argus.backtest.metrics import MetricError, _is_negligible
+from argus.backtest.metrics import (
+    MetricError,
+    _finite_result,
+    _is_negligible,
+    _require_finite,
+    _require_finite_series,
+)
 
 MIN_OBSERVATIONS = 10
 """Fewest return observations before any of this is meaningful."""
@@ -67,8 +73,18 @@ def moments(returns: Sequence[float]) -> tuple[float, float, float, float]:
             f"{n} observation(s) is below the {MIN_OBSERVATIONS} these statistics need; "
             f"reporting one anyway would be a number with no sample behind it"
         )
+    # A NaN return used to flow through every line below — `nan <= 0` is False and
+    # `_is_negligible(nan, nan)` is False — and come back as four NaN moments, which
+    # `min_track_record_length` then turned into a NaN track record. Found by the derandomized
+    # Hypothesis search in `eval/general_overfitgates_comparison.py`.
+    _require_finite_series("returns", returns)
     mean = sum(returns) / n
-    variance = sum((r - mean) ** 2 for r in returns) / (n - 1)
+    try:
+        variance = sum((r - mean) ** 2 for r in returns) / (n - 1)
+    except OverflowError as exc:
+        raise MetricError("the return variance overflows double precision") from exc
+    if not isfinite(mean) or not isfinite(variance):
+        raise MetricError("the return mean or variance overflows double precision")
     sd = sqrt(variance)
     # Not `variance <= 0`. A constant series of 0.01 returns has sd 1.8e-18 rather than 0.0, so an
     # exact test never fires and the Sharpe comes back near 1e15 — which then produces a
@@ -77,9 +93,12 @@ def moments(returns: Sequence[float]) -> tuple[float, float, float, float]:
     # restated so the two tolerances cannot drift apart.
     if variance <= 0 or _is_negligible(sd, mean):
         raise MetricError("a zero-variance series has no Sharpe and therefore no track record")
-    skew = sum(((r - mean) / sd) ** 3 for r in returns) / n
-    kurtosis = sum(((r - mean) / sd) ** 4 for r in returns) / n
-    return mean, sd, skew, kurtosis
+    try:
+        skew = sum(((r - mean) / sd) ** 3 for r in returns) / n
+        kurtosis = sum(((r - mean) / sd) ** 4 for r in returns) / n
+    except OverflowError as exc:
+        raise MetricError("a higher moment overflows double precision") from exc
+    return mean, sd, _finite_result(skew, "skew"), _finite_result(kurtosis, "kurtosis")
 
 
 def min_track_record_length(
@@ -99,6 +118,9 @@ def min_track_record_length(
     record that makes a losing strategy significant, and returning a large number would imply
     there is.
     """
+    _require_finite(benchmark_sharpe=benchmark_sharpe, confidence=confidence)
+    if not 0.0 < confidence < 1.0:
+        raise MetricError(f"confidence must lie strictly between 0 and 1, got {confidence!r}")
     mean, sd, skew, kurtosis = moments(returns)
     sharpe = mean / sd
     if sharpe <= benchmark_sharpe:
@@ -107,13 +129,17 @@ def min_track_record_length(
             f"no length of track record makes it significant"
         )
     z = NormalDist().inv_cdf(confidence)
-    adjustment = 1.0 - skew * sharpe + (kurtosis - 1.0) / 4.0 * sharpe**2
-    if adjustment <= 0:
-        raise MetricError(
-            "the higher-moment adjustment is non-positive, so the track record length is "
-            "undefined for this return distribution"
-        )
-    return 1.0 + adjustment * (z / (sharpe - benchmark_sharpe)) ** 2
+    try:
+        adjustment = 1.0 - skew * sharpe + (kurtosis - 1.0) / 4.0 * sharpe**2
+        if not 0 < adjustment < float("inf"):
+            raise MetricError(
+                "the higher-moment adjustment is non-positive or not finite, so the track record "
+                "length is undefined for this return distribution"
+            )
+        length = 1.0 + adjustment * (z / (sharpe - benchmark_sharpe)) ** 2
+    except OverflowError as exc:
+        raise MetricError("the track record length overflows double precision") from exc
+    return _finite_result(length, "minimum track record length")
 
 
 def annualised_track_record_years(
@@ -278,6 +304,10 @@ def probability_of_overfitting(
             f"{len(rows)} observation(s) cannot be split into {groups} blocks of at least "
             f"{MIN_OBSERVATIONS}; a block too small to compute a Sharpe makes the split a coin toss"
         )
+    # A NaN return used to reach `sharpe_of`, where `variance > 0` is False for NaN, so the
+    # strategy was silently scored a Sharpe of exactly 0.0 and ranked on that.
+    for t, row in enumerate(rows):
+        _require_finite_series(f"matrix[{t}]", row)
 
     size = len(rows) // groups
     blocks = [rows[i * size:(i + 1) * size] for i in range(groups)]
@@ -286,7 +316,12 @@ def probability_of_overfitting(
         series = [row[index] for block in block_set for row in block]
         n = len(series)
         mean = sum(series) / n
-        variance = sum((v - mean) ** 2 for v in series) / (n - 1) if n > 1 else 0.0
+        try:
+            variance = sum((v - mean) ** 2 for v in series) / (n - 1) if n > 1 else 0.0
+        except OverflowError as exc:
+            raise MetricError("a block's return variance overflows double precision") from exc
+        if not isfinite(mean) or not isfinite(variance):
+            raise MetricError("a block's return mean or variance overflows double precision")
         return mean / sqrt(variance) if variance > 0 else 0.0
 
     ranks: list[float] = []
@@ -348,6 +383,18 @@ def purged_splits(
     return out
 
 
+def _require_level(name: str, level: float) -> None:
+    """A significance or false-discovery level must lie strictly inside (0, 1).
+
+    Positive form, the way scipy validates its p-values (``ps == clip(ps, 0, 1)``,
+    ``scipy/stats/_morestats.py:4791-4794``), so NaN fails it. Before 2026-09-25 neither procedure
+    checked its level: ``fdr=inf`` or ``alpha=2.0`` admitted every hypothesis, exactly as
+    statsmodels' ``multipletests`` still does, and ``fdr=nan`` quietly admitted none.
+    """
+    if not 0.0 < level < 1.0:
+        raise MetricError(f"{name} must lie strictly between 0 and 1, got {level!r}")
+
+
 def benjamini_hochberg(p_values: Sequence[float], *, fdr: float = 0.05) -> list[bool]:
     """Which p-values survive at a controlled false-discovery rate. Order is preserved.
 
@@ -355,6 +402,7 @@ def benjamini_hochberg(p_values: Sequence[float], *, fdr: float = 0.05) -> list[
     variants; Benjamini-Hochberg controls the expected *share* of false positives among the
     rejections, which is the right question for a sweep whose purpose is to shortlist.
     """
+    _require_level("fdr", fdr)
     if not p_values:
         return []
     if any(not isfinite(p) or p < 0 or p > 1 for p in p_values):
@@ -371,6 +419,7 @@ def benjamini_hochberg(p_values: Sequence[float], *, fdr: float = 0.05) -> list[
 
 def bonferroni(p_values: Sequence[float], *, alpha: float = 0.05) -> list[bool]:
     """The conservative bound, reported beside the false-discovery result rather than instead."""
+    _require_level("alpha", alpha)
     if any(not isfinite(p) or p < 0 or p > 1 for p in p_values):
         raise MetricError("every p-value must be a finite number in [0, 1]")
     threshold = alpha / len(p_values) if p_values else alpha

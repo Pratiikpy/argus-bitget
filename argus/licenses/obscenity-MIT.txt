@@ -1,0 +1,31 @@
+Upstream: https://github.com/jo3-l/obscenity (licence read through the GitHub licence API on 2026-09-25: MIT; read at commit 121bc42a817dbe171139926349adb606f8bdffa5).
+Used in: argus/src/argus/market/abuse.py
+What was used: src/preset/english.ts lines 106-379 (the 69 English phrases: their patterns and whitelisted terms, copied as data into OBSCENITY), lines 13-42 (the recommended blacklist and whitelist transformer chains), src/transformer/resolve-leetspeak/dictionary.ts lines 1-12 (the leetspeak map), src/transformer/collapse-duplicates/transformer.ts lines 18-27 (the collapse rule), src/pattern/Util.ts lines 8-37 (pattern-to-regex compilation), src/matcher/regexp/RegExpMatcher.ts lines 120-169 and src/matcher/IntervalCollection.ts lines 13-33 (whitelist containment).
+Modified: yes. The TypeScript matcher is re-expressed in Python; the confusables table is replaced by Unicode NFKD folding; the two duplicated entries in the upstream 'anal' phrase are listed once; the whitelist chain also maps U+2019 to an ASCII apostrophe. The english.ts dataset notes that its words are taken from words/cuss (MIT, Copyright (c) 2016 Titus Wormer); that notice is reproduced in licenses/cuss-MIT.txt.
+
+----- Upstream licence text, verbatim -----
+
+# The MIT License (MIT)
+
+Copyright © 2025 Joseph Liu.
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the “Software”), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

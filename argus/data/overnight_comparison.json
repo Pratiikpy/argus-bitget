@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-25T08:17:35+00:00",
+  "generated": "2026-09-25T20:43:28+00:00",
   "inputs_fetched": "2026-09-25T08:00:07+00:00",
   "target": "gap from the last regular close to the next regular open, per stock",
   "predicted_at": "09:00 New York time on the opening day",
@@ -37,9 +37,9 @@
       "direction_scored": 795
     },
     "argus_perp": {
-      "mae_bps": 30.35,
-      "median_abs_error_bps": 22.11,
-      "rmse_bps": 41.67,
+      "mae_bps": 30.36,
+      "median_abs_error_bps": 22.13,
+      "rmse_bps": 41.68,
       "direction_hit_rate": 0.932,
       "direction_scored": 795
     },
@@ -51,17 +51,24 @@
       "direction_scored": 795
     },
     "argus_perp_fitted": {
-      "mae_bps": 30.61,
+      "mae_bps": 30.62,
       "median_abs_error_bps": 22.42,
-      "rmse_bps": 42.36,
+      "rmse_bps": 42.37,
       "direction_hit_rate": 0.932,
       "direction_scored": 795
     },
     "argus_perp_plus_futures": {
-      "mae_bps": 31.04,
-      "median_abs_error_bps": 22.35,
+      "mae_bps": 31.05,
+      "median_abs_error_bps": 22.34,
       "rmse_bps": 42.94,
       "direction_hit_rate": 0.935,
+      "direction_scored": 795
+    },
+    "argus_perp_formula": {
+      "mae_bps": 30.35,
+      "median_abs_error_bps": 22.11,
+      "rmse_bps": 41.67,
+      "direction_hit_rate": 0.932,
       "direction_scored": 795
     }
   },
@@ -70,7 +77,7 @@
     {
       "a": "argus_perp",
       "b": "gloaming_ols",
-      "mean_diff_bps": -50.93,
+      "mean_diff_bps": -50.92,
       "ci95_bps": [
         -60.72,
         -42.77
@@ -83,7 +90,7 @@
       "b": "zero",
       "mean_diff_bps": -59.96,
       "ci95_bps": [
-        -70.83,
+        -70.82,
         -50.61
       ],
       "nights": 113,
@@ -166,7 +173,7 @@
       "nights": 113,
       "zero": 107.16,
       "gloaming_ols": 119.38,
-      "argus_perp": 38.33,
+      "argus_perp": 38.34,
       "argus_perp_vs_close": 39.81,
       "argus_perp_direction_hit_rate": 0.878,
       "argus_perp_vs_best_gloaming": {
@@ -174,7 +181,7 @@
         "b": "gloaming_ols",
         "mean_diff_bps": -81.05,
         "ci95_bps": [
-          -113.41,
+          -113.4,
           -55.8
         ],
         "nights": 113,
@@ -185,16 +192,16 @@
       "nights": 113,
       "zero": 101.62,
       "gloaming_ols": 84.14,
-      "argus_perp": 35.02,
+      "argus_perp": 35.03,
       "argus_perp_vs_close": 36.15,
       "argus_perp_direction_hit_rate": 0.95,
       "argus_perp_vs_best_gloaming": {
         "a": "argus_perp",
         "b": "gloaming_ols",
-        "mean_diff_bps": -49.12,
+        "mean_diff_bps": -49.11,
         "ci95_bps": [
-          -65.88,
-          -34.53
+          -65.86,
+          -34.51
         ],
         "nights": 113,
         "verdict": "a better"
@@ -204,7 +211,7 @@
       "nights": 113,
       "zero": 87.52,
       "gloaming_ols": 96.42,
-      "argus_perp": 30.51,
+      "argus_perp": 30.52,
       "argus_perp_vs_close": 32.02,
       "argus_perp_direction_hit_rate": 0.939,
       "argus_perp_vs_best_gloaming": {
@@ -213,7 +220,7 @@
         "mean_diff_bps": -65.9,
         "ci95_bps": [
           -82.75,
-          -50.4
+          -50.39
         ],
         "nights": 113,
         "verdict": "a better"
@@ -231,8 +238,8 @@
         "b": "gloaming_ols",
         "mean_diff_bps": -40.19,
         "ci95_bps": [
-          -53.17,
-          -29.2
+          -53.18,
+          -29.19
         ],
         "nights": 113,
         "verdict": "a better"
@@ -242,16 +249,16 @@
       "nights": 113,
       "zero": 99.39,
       "gloaming_ols": 108.46,
-      "argus_perp": 39.48,
+      "argus_perp": 39.47,
       "argus_perp_vs_close": 41.52,
       "argus_perp_direction_hit_rate": 0.913,
       "argus_perp_vs_best_gloaming": {
         "a": "argus_perp",
         "b": "gloaming_ols",
-        "mean_diff_bps": -68.98,
+        "mean_diff_bps": -68.99,
         "ci95_bps": [
           -90.44,
-          -52.07
+          -52.08
         ],
         "nights": 113,
         "verdict": "a better"
@@ -289,9 +296,9 @@
         "direction_scored": 0
       },
       "perp_weekend": {
-        "mae_bps": 70.11,
-        "median_abs_error_bps": 58.25,
-        "rmse_bps": 90.96,
+        "mae_bps": 70.12,
+        "median_abs_error_bps": 58.29,
+        "rmse_bps": 90.97,
         "direction_hit_rate": 0.718,
         "direction_scored": 142
       }
@@ -300,10 +307,10 @@
     "paired": {
       "a": "perp_weekend",
       "b": "last_close",
-      "mean_diff_bps": -16.08,
+      "mean_diff_bps": -16.07,
       "ci95_bps": [
         -32.74,
-        -1.08
+        -1.07
       ],
       "nights": 20,
       "verdict": "a better"
@@ -318,10 +325,10 @@
   "ablation": {
     "shipped": "argus_perp",
     "variants_mae_bps": {
-      "argus_perp": 30.35,
+      "argus_perp": 30.36,
       "argus_perp_vs_close": 31.81,
-      "argus_perp_fitted": 30.61,
-      "argus_perp_plus_futures": 31.04
+      "argus_perp_fitted": 30.62,
+      "argus_perp_plus_futures": 31.05
     },
     "without_the_basis_correction": {
       "a": "argus_perp",
@@ -339,7 +346,7 @@
       "b": "argus_perp",
       "mean_diff_bps": 0.69,
       "ci95_bps": [
-        -0.38,
+        -0.37,
         1.82
       ],
       "nights": 113,
@@ -347,5 +354,257 @@
     }
   },
   "failures": {},
-  "scope": "Rows before a stock's 11th night are excluded from every candidate so the walk-forward fits are out of sample on the same rows as the fixed ones. gloaming's crypto input is Bitget USDT perpetuals, not spot."
+  "console_replay": {
+    "method": "lui/research._implied_open_line called per night at 09:00 New York, its market readers pointed at data/h2h_gloaming/inputs.json (console_feed); the gap is the printed implied price over the session's regular close",
+    "nights_offered": 984,
+    "nights_the_console_answered": 984,
+    "nights_the_console_declined": [],
+    "anchor_differs_from_the_session_close": [],
+    "max_abs_diff_vs_former_formula_bps": 0.253,
+    "mean_abs_diff_vs_former_formula_bps": 0.0486,
+    "sample_line": "Implied open: AAPL's perpetual has moved +0.70% since the Mon 20:00 UTC close, which puts the stock near 248.35 at the next open (last close 246.63). Read this way on AAPL on 113 nights, the open was missed by 26bps on average, with the direction right 90% of the time; gloaming, an S2 desk that estimates overnight fair value from index futures, crypto and the dollar, missed by 66bps, and assuming no gap by 58bps."
+  },
+  "scope": "Rows before a stock's 11th night are excluded from every candidate so the walk-forward fits are out of sample on the same rows as the fixed ones. gloaming's crypto input is Bitget USDT perpetuals, not spot.",
+  "comparison_reports": [
+    {
+      "comparison": "overnight",
+      "question": "the stock's overnight gap",
+      "argus": "argus_perp",
+      "rival": "gloaming (gloaming_ols), its best variant",
+      "metric": "mean absolute error of the predicted close-to-open gap, bps",
+      "lower_is_better": true,
+      "argus_score": 30.36,
+      "rival_score": 81.28,
+      "n": 113,
+      "unit": "night",
+      "outcome": "argus_better",
+      "basis": "paired bootstrap over nights, 4000 draws, seed 7; ARGUS is the console's _implied_open_line replayed on the saved inputs; ARGUS better if the whole 95% interval of (ARGUS - rival) absolute error is below zero",
+      "ci95": [
+        -60.72,
+        -42.77
+      ],
+      "p_value": null,
+      "scored": 904,
+      "total": 984,
+      "groups": {
+        "AAPL": "argus_better",
+        "AMZN": "argus_better",
+        "META": "argus_better",
+        "TSLA": "argus_better",
+        "GOOGL": "argus_better",
+        "NVDA": "argus_better",
+        "MSFT": "argus_better",
+        "QQQ": "argus_better"
+      },
+      "every_group": "argus_better_on_every_group",
+      "inputs_exist": true,
+      "valid": true,
+      "unvalidated_outcome": null,
+      "validity": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "inputs_exist",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "inputs were read",
+            "skipped": false
+          },
+          {
+            "name": "something_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "n=113 night, 904 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "coverage_declared",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "904 of 984 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "both_sides_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ARGUS 30.36, rival 81.28",
+            "skipped": false
+          },
+          {
+            "name": "outcome_agrees_with_its_evidence",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "interval [-60.72, -42.77] gives argus_better",
+            "skipped": false
+          }
+        ]
+      },
+      "errors": [],
+      "artefact": "data/overnight_comparison.json",
+      "created_at": "2026-09-25T20:43:28+00:00"
+    },
+    {
+      "comparison": "overnight",
+      "question": "the stock's overnight gap: the floor",
+      "argus": "argus_perp",
+      "rival": "no gap (the last close)",
+      "metric": "mean absolute error of the predicted close-to-open gap, bps",
+      "lower_is_better": true,
+      "argus_score": 30.36,
+      "rival_score": 90.32,
+      "n": 113,
+      "unit": "night",
+      "outcome": "argus_better",
+      "basis": "paired bootstrap over nights, 4000 draws, seed 7; ARGUS is the console's _implied_open_line replayed on the saved inputs; ARGUS better if the whole 95% interval of (ARGUS - rival) absolute error is below zero",
+      "ci95": [
+        -70.82,
+        -50.61
+      ],
+      "p_value": null,
+      "scored": 904,
+      "total": 984,
+      "groups": {},
+      "every_group": null,
+      "inputs_exist": true,
+      "valid": true,
+      "unvalidated_outcome": null,
+      "validity": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "inputs_exist",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "inputs were read",
+            "skipped": false
+          },
+          {
+            "name": "something_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "n=113 night, 904 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "coverage_declared",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "904 of 984 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "both_sides_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ARGUS 30.36, rival 90.32",
+            "skipped": false
+          },
+          {
+            "name": "outcome_agrees_with_its_evidence",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "interval [-70.82, -50.61] gives argus_better",
+            "skipped": false
+          }
+        ]
+      },
+      "errors": [],
+      "artefact": "data/overnight_comparison.json",
+      "created_at": "2026-09-25T20:43:28+00:00"
+    },
+    {
+      "comparison": "overnight",
+      "question": "the Monday open from Sunday 20:00 New York",
+      "argus": "perp_weekend",
+      "rival": "nocturne's claim: the last regular close",
+      "metric": "mean absolute error of the predicted Friday-close-to-Monday-open gap, bps",
+      "lower_is_better": true,
+      "argus_score": 70.12,
+      "rival_score": 86.18,
+      "n": 20,
+      "unit": "weekend",
+      "outcome": "argus_better",
+      "basis": "paired bootstrap over weekends, 4000 draws, seed 7",
+      "ci95": [
+        -32.74,
+        -1.07
+      ],
+      "p_value": null,
+      "scored": 160,
+      "total": 160,
+      "groups": {},
+      "every_group": null,
+      "inputs_exist": true,
+      "valid": true,
+      "unvalidated_outcome": null,
+      "validity": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "inputs_exist",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "inputs were read",
+            "skipped": false
+          },
+          {
+            "name": "something_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "n=20 weekend, 160 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "coverage_declared",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "160 of 160 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "both_sides_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ARGUS 70.12, rival 86.18",
+            "skipped": false
+          },
+          {
+            "name": "outcome_agrees_with_its_evidence",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "interval [-32.74, -1.07] gives argus_better",
+            "skipped": false
+          }
+        ]
+      },
+      "errors": [],
+      "artefact": "data/overnight_comparison.json",
+      "created_at": "2026-09-25T20:43:28+00:00"
+    }
+  ]
 }

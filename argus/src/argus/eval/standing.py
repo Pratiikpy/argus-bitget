@@ -43,12 +43,50 @@ Read against ``microsoft/qlib``'s benchmark tables, which pair every reported nu
 config that produced it, and against the four honest QA states — PASS, FAIL, PENDING, BLOCKED — in
 the project's own testing standard. Both make the same move: the claim and its evidence travel
 together, or the claim does not travel.
+
+**Three mechanical checks added 2026-09-25 (S18 and the evaluator spine).**
+
+* **No statistical or out-of-sample condition without its breakdown.** A proof of
+  ``statistically_valid_evaluation`` or ``out_of_sample_test`` now also needs a groupwise check to
+  have run on the capability's own artefact: :mod:`argus.eval.groupwise` (Mind2Web's per-group
+  macro average and error histogram, ``src/action_prediction/metric.py:236-259``, MIT), run over
+  every artefact this register names by :mod:`argus.eval.groupwise_audit` into
+  ``data/groupwise_audit.json``. The proof passes only if some headline that is the capability's
+  own claim was broken down by its groups (symbol, date, regime, claim kind) or split
+  chronologically, none of those headlines is carried by one group, rests on a single group, has a
+  macro average pointing the other way, or flips between halves, none favours the rival, and the
+  audit was run on the artefact as it is now (its SHA-256 is compared). This is the project's
+  twice-recorded failure — a single-name result, momentum good in full sample and negative in both
+  halves — made into a rule rather than a reminder. A designed demonstration (cases an author chose,
+  a parameter sweep) is not a measurement over a population and cannot pass it; the rows it demoted
+  carry the reason, and the route back, as their first blocker.
+* **State changes are legal moves or nothing.** Between one persisted register and the next, a
+  capability may rise one rung at a time along LOST -> TIED -> IMPLEMENTED -> OWNED and fall any
+  number; anything else raises in :func:`write_report`, and every change is appended to the
+  persisted ``transition_log``. Adapted from the MCP specification repository's SEP lifecycle
+  automation (modelcontextprotocol/modelcontextprotocol, ``tools/sep-automation/src/rules.ts:16-44``
+  ``STATE_TRANSITIONS``, ``:156-161`` ``isValidTransition``, ``src/actions/transition.ts:91``
+  ``validateTransition``; Apache-2.0 for new contributions, notice and "Used in" record at
+  ``argus/licenses/mcp_specification-APACHE-2.0.txt``). Taken: the legal moves are data, the
+  transition consults the table rather than scattered conditions, an illegal move is refused with
+  the legal targets named, and an initial assignment is always valid (``rules.ts:157-158``; here
+  the thirteen conditions already govern a capability that enters at OWNED). Changed: the table is
+  keyed by this register's four states, downward moves are open from every rung because evidence can
+  be lost at any rank (SEP allows only named backward edges), and nothing is dormant or terminal —
+  OWNED can fall. Rejected: the GitHub-label and Discord machinery around it.
+* **Verdicts are read, not written.** Where an artefact carries ``comparison_reports`` (the eval
+  spine, :mod:`argus.eval.compare`), the register shows their outcomes as ``measured_outcomes``
+  instead of restating them in prose, and an OWNED row whose own artefact records a valid
+  ``rival_better`` outcome is not earned.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from typing import Any
@@ -59,6 +97,7 @@ DATA = PACKAGE / "data"
 SRC = PACKAGE / "src" / "argus"
 TESTS = PACKAGE / "tests"
 REPORT_PATH = DATA / "standing.json"
+GROUPWISE_PATH = DATA / "groupwise_audit.json"
 
 
 class State(StrEnum):
@@ -100,6 +139,74 @@ result looks good.
 
 class StandingError(ValueError):
     """A register entry that claims more than its evidence. Raised at import, deliberately."""
+
+
+TRANSITIONS: dict[State, frozenset[State]] = {
+    # LOST: a published loss can only be re-measured to level first. It cannot reappear as
+    # "mechanism exists" or as a win in one edit: the rebuild has to be run against the rival.
+    State.LOST: frozenset({State.LOST, State.TIED}),
+    # TIED: level with the rival. Up one rung to IMPLEMENTED when ahead but not yet proven; down to
+    # LOST when a rerun loses.
+    State.TIED: frozenset({State.TIED, State.IMPLEMENTED, State.LOST}),
+    # IMPLEMENTED: the only rung OWNED is reached from.
+    State.IMPLEMENTED: frozenset({State.IMPLEMENTED, State.OWNED, State.TIED, State.LOST}),
+    # OWNED: nothing is terminal. Every rung below is reachable, because evidence can be lost at
+    # any rank — an artefact regenerated, a rival that turns out to lead, a gate added.
+    State.OWNED: frozenset({State.OWNED, State.IMPLEMENTED, State.TIED, State.LOST}),
+}
+"""The closed table of legal moves between two persisted registers, as data.
+
+The MCP specification's SEP automation keeps its lifecycle as a ``Record<State, State[]>``
+(``tools/sep-automation/src/rules.ts:16-44``) that the transition handler consults before it
+touches a label; this is the same shape for this register. Up is one rung at a time along
+:data:`ORDER`; down is any number of rungs; staying put is always legal.
+"""
+
+
+class IllegalTransition(StandingError):
+    """A state change between two persisted registers that :data:`TRANSITIONS` does not allow."""
+
+
+def _check_transition_table() -> None:
+    """The table must cover every state, contain only states, and climb exactly one rung.
+
+    Checked at import, like an OWNED entry short of thirteen conditions: a table that let a state
+    skip a rung, or forgot a state, would be the register's rule quietly changed.
+    """
+    if set(TRANSITIONS) != set(State):
+        raise IllegalTransition("TRANSITIONS must name every state exactly once")
+    for state, targets in TRANSITIONS.items():
+        if state not in targets:
+            raise IllegalTransition(f"{state.value} must be allowed to stay {state.value}")
+        rank = ORDER.index(state)
+        up = {s for s in targets if ORDER.index(s) > rank}
+        expected_up = {ORDER[rank + 1]} if rank + 1 < len(ORDER) else set()
+        if up != expected_up:
+            raise IllegalTransition(
+                f"{state.value} must climb exactly one rung, to "
+                f"{', '.join(s.value for s in expected_up) or 'nothing'}")
+        if {s for s in State if ORDER.index(s) < rank} - targets:
+            raise IllegalTransition(f"{state.value} must be able to fall to every lower rung")
+
+
+_check_transition_table()
+
+
+def check_transition(name: str, before: State | None, after: State) -> None:
+    """Raise :class:`IllegalTransition` unless ``before -> after`` is a legal move.
+
+    ``before`` is ``None`` for a capability the previous register did not contain: an initial
+    assignment, always legal (``rules.ts:156-161``), because a new entry is already held to the
+    thirteen conditions at construction and to the artefacts by :func:`audit`. The message names the
+    legal targets, as ``transition.ts``'s ``validateTransition`` does.
+    """
+    if before is None or after in TRANSITIONS[before]:
+        return
+    legal = ", ".join(s.value for s in ORDER if s in TRANSITIONS[before] and s is not before)
+    raise IllegalTransition(
+        f"{name!r}: {before.value} -> {after.value} is not a legal move; from {before.value} a "
+        f"capability may move only to {legal}. Promote one rung per persisted register, and "
+        f"record each rung's evidence")
 
 
 @dataclass(frozen=True, slots=True)
@@ -201,8 +308,14 @@ class Capability:
 
     @property
     def next_state(self) -> State | None:
-        idx = ORDER.index(self.state)
-        return ORDER[idx + 1] if idx + 1 < len(ORDER) else None
+        """The one rung above this state that :data:`TRANSITIONS` allows, or ``None`` at the top.
+
+        Read from the table rather than from :data:`ORDER`'s index arithmetic, so the rung a row
+        names as its next is the rung the persisted register will actually accept.
+        """
+        rank = ORDER.index(self.state)
+        up = [s for s in ORDER[rank + 1:] if s in TRANSITIONS[self.state]]
+        return up[0] if up else None
 
     def render(self) -> str:
         lines = [
@@ -258,6 +371,9 @@ class Report:
     capabilities: tuple[Capability, ...]
     findings: tuple[Finding, ...] = field(default_factory=tuple)
     verifications: tuple[Verification, ...] = field(default_factory=tuple)
+    outcomes: dict[str, tuple[dict[str, Any], ...]] = field(default_factory=dict)
+    """Per capability, the ``comparison_reports`` its own artefacts carry — the harness's verdict,
+    read rather than restated (:func:`comparison_outcomes`)."""
 
     @property
     def by_verification(self) -> dict[str, int]:
@@ -307,6 +423,8 @@ class Report:
         ]
         for cap in self.capabilities:
             lines.append(cap.render())
+            for row in self.outcomes.get(cap.name, ()):
+                lines.append(f"  measured: {render_outcome(row)}")
             lines.append("")
         if self.findings:
             lines.append("REGISTER DEFECTS — evidence named but not found:")
@@ -331,7 +449,10 @@ class Report:
 
     def as_dict(self) -> dict[str, Any]:
         return {
-            "capabilities": [c.as_dict() for c in self.capabilities],
+            "capabilities": [
+                {**c.as_dict(), "measured_outcomes": list(self.outcomes.get(c.name, ()))}
+                for c in self.capabilities
+            ],
             "by_state": self.by_state,
             "findings": [
                 {"capability": f.capability, "problem": f.problem, "detail": f.detail}
@@ -363,7 +484,10 @@ REGISTER: tuple[Capability, ...] = (
         # so reproducibility was not a plausible assumption to leave unproven — it was run.
         # `check_reproducibility()` added to `deliberation_comparison.py`: both comparisons run
         # twice, JSON-compared for byte identity. All 13 conditions now verify.
-        state=State.OWNED,
+        # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+        # proof now needs a groupwise check on the capability's own artefact, and this
+        # row's does not pass it. The reason and the route back are its first blocker.
+        state=State.IMPLEMENTED,
         baseline=(
             "HaoKang-Timmy/LatencySensitiveBench (arxiv 2505.19481, NeurIPS 2025) — found "
             "2026-09-16 by a fresh, targeted search after the original 88-repo corpus survey "
@@ -493,6 +617,13 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): its statistical and out-of-sample evidence is "
+            "data/deliberation_comparison.json, a 17-point delay sweep and three thinking-budget "
+            "tiers through two pure functions - a property of the formulas, with no population of "
+            "decisions to break down by symbol or date - and a source file. Route back: price "
+            "deliberation on real desk decisions and record, per decision, the stated charge "
+            "beside the realised slippage, by symbol and date.",
             "the deliberation charge is real and enforced in code, but its effect on realised "
             "P&L outcomes (does pricing it in change which decisions get made, and do those "
             "decisions perform better) has not itself been measured — this OWNED finding is "
@@ -507,7 +638,10 @@ REGISTER: tuple[Capability, ...] = (
             "argus/paper/ledger.py,argus/eval/observatory.py,"
             "argus/eval/abstention_comparison.py,argus/eval/baselines/ghostledger_reimpl.py"
         ),
-        state=State.OWNED,
+        # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+        # proof now needs a groupwise check on the capability's own artefact, and this
+        # row's does not pass it. The reason and the route back are its first blocker.
+        state=State.IMPLEMENTED,
         baseline=(
             "insaneamogh/AutonomousTradeAgents 'Ghost P&L' ledger — found 2026-09-16 by a fresh, "
             "targeted search after the original corpus survey found nothing in the wider corpus"
@@ -638,6 +772,14 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): data/abstention_comparison.json holds three designed "
+            "netting cases and a twelve-point ratio sweep, not a population of real abstentions "
+            "scored against the rival's floor. The live ledger is audited only as context, "
+            "because this row claims the scoring is honest, not that abstaining paid; the audit "
+            "records that the ledger's abstention value is carried by one symbol and that its two "
+            "chronological halves disagree in sign. Route back: score the rival's floored "
+            "headline against ARGUS's net on the real ledger's abstentions, per symbol and week.",
             "the abstention record is large and the traded record is small, so abstention quality "
             "is measured far better than trade quality",
         ),
@@ -657,7 +799,10 @@ REGISTER: tuple[Capability, ...] = (
         # independently re-ran `verify()` on every proof rather than trusting `conditions_missing`
         # (which only checks a Proof exists per condition, not that it verifies): all thirteen are
         # VERIFIED or ATTESTED, zero UNPROVEN. Restored to OWNED.
-        state=State.OWNED,
+        # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+        # proof now needs a groupwise check on the capability's own artefact, and this
+        # row's does not pass it. The reason and the route back are its first blocker.
+        state=State.IMPLEMENTED,
         baseline=(
             "polakowo/vectorbt deflated_sharpe_ratio (accessors.py:596) - not itself gated "
             "anywhere in vectorbt, but silently NaN on a single trial (var_sharpe = np.var of one "
@@ -800,6 +945,13 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): the gates' verdicts over all trials are broken down "
+            "across twelve symbols in data/track1_study.json (none survives, and no symbol "
+            "carries that), but the out-of-sample proof also reads data/overfit_gates.json, whose "
+            "eight primitives were run on one instrument, NVDAUSDT: a single-symbol result. Route "
+            "back: run the eight primitives through the gates on every symbol and record the "
+            "verdict per (symbol, primitive).",
             "TIED and not better on the MATH: the formulas agree with the references exactly "
             "(max abs diff 0.0 over a 1,215-case sweep) - this is not a claim that ARGUS "
             "computes a better Sharpe estimate. The genuinely measured advantage is narrower "
@@ -819,7 +971,10 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/qlib_expression_loader.py,argus/eval/baselines/qlib_eval_surface.py,"
             "argus/eval/baselines/qlib_eval_surface_loader.py"
         ),
-        state=State.OWNED,
+        # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+        # proof now needs a groupwise check on the capability's own artefact, and this
+        # row's does not pass it. The reason and the route back are its first blocker.
+        state=State.IMPLEMENTED,
         baseline=(
             "microsoft/qlib real expression engine (qlib/data/base.py, ops.py, data.py, utils)"
         ),
@@ -954,6 +1109,11 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): the real-market half of the parity claim, "
+            "data/grammar_comparison.json's 37 swept lookbacks, is one instrument (NVDAUSDT): the "
+            "whole headline is one symbol. Route back: sweep the real-market rank parity over the "
+            "rToken universe and record each case with its symbol.",
             "Still narrower than Qlib: ~30 of the 101 Formulaic Alphas need an `open` price and a "
             "further handful need `vwap` and `adv20`, none of which this grammar carries "
             "(research/architecture/alpha101-port.md)",
@@ -973,7 +1133,10 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/rdagent_exception.py,argus/eval/baselines/rdagent_cache_utils.py,"
             "argus/eval/baselines/rdagent_factor_loader.py"
         ),
-        state=State.OWNED,
+        # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+        # proof now needs a groupwise check on the capability's own artefact, and this
+        # row's does not pass it. The reason and the route back are its first blocker.
+        state=State.IMPLEMENTED,
         baseline=(
             "microsoft/RD-Agent real factor-implementation pipeline (FBWorkspace, factor_coder)"
         ),
@@ -1122,6 +1285,12 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): data/rdagent_comparison.json holds an injection proof, "
+            "a 400-trial pool on one symbol reduced to one deflated probability, and a five-point "
+            "trial-count sweep; no per-trial or per-symbol record exists for a groupwise check to "
+            "run on. Route back: keep the trial pool per candidate and run the correction on "
+            "several symbols, recording each.",
             "The trial-count-correction finding runs ARGUS's real DSR gate on ARGUS's own real "
             "trial pool, not on a real end-to-end run of RD-Agent's own LLM loop (which would "
             "need many real paid LLM calls to accumulate enough proposed hypotheses to matter) "
@@ -1309,7 +1478,10 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/lean_pairs_ranking.py,"
             "argus/eval/baselines/lean_pairs_ranking_loader.py"
         ),
-        state=State.OWNED,
+        # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+        # proof now needs a groupwise check on the capability's own artefact, and this
+        # row's does not pass it. The reason and the route back are its first blocker.
+        state=State.IMPLEMENTED,
         baseline="statsmodels adfuller; QuantConnect/Lean pearsonr pair ranking; FinceptTerminal",
         proofs=(
             Proof(
@@ -1446,6 +1618,15 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): the statistical proof reads "
+            "data/cointegration_comparison.json, a synthetic 190-pair noise panel and designed "
+            "ADF cases reduced to counts. The out-of-sample proof passes: "
+            "data/cointegration.json's 66 real pairs are broken down pair by pair and none "
+            "survives the correction. The same study shows, as context, why the correction "
+            "matters: the naive in-sample excess over the 5% expected by chance rests on one pair "
+            "(NVDAUSDT/QQQUSDT) and turns negative out of sample. Route back: cite that real "
+            "66-pair scan as the statistical evidence; it already passes the gate.",
             "The multiple-testing demonstration constructs genuinely-independent random-walk "
             "pairs rather than measuring the false-positive rate on ARGUS's own real rToken "
             "universe — research/cointegration.py's own real scan() already carries this "
@@ -1462,7 +1643,10 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/maxme_arbitrer.py,"
             "argus/eval/baselines/maxme_arbitrer_loader.py"
         ),
-        state=State.OWNED,
+        # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+        # proof now needs a groupwise check on the capability's own artefact, and this
+        # row's does not pass it. The reason and the route back are its first blocker.
+        state=State.IMPLEMENTED,
         baseline="maxme/bitcoin-arbitrage real profit-detection core (get_profit_for)",
         proofs=(
             Proof(
@@ -1592,6 +1776,13 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): data/arbitrage_comparison.json holds three designed "
+            "spreads and 60 constructed spreads reduced to counts; no population of real "
+            "observations is recorded for the comparison. Route back: score both detectors on the "
+            "real basis series behind data/arbitrage_study.json (23,749 hourly observations on 11 "
+            "symbols) and record each observation's two verdicts with its symbol and session "
+            "phase.",
             "The swept disagreement rate (100% at n=60) is measured on a Gaussian-shaped "
             "construction matched to ARGUS's own real distribution's mean/spread, not on the "
             "real historical series bar-for-bar — research/arbitrage_study.py's own real "
@@ -2292,7 +2483,10 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/lean_market_holidays_usa.json,"
             "argus/eval/baselines/lean_market_holidays_loader.py"
         ),
-        state=State.OWNED,
+        # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+        # proof now needs a groupwise check on the capability's own artefact, and this
+        # row's does not pass it. The reason and the route back are its first blocker.
+        state=State.IMPLEMENTED,
         baseline=(
             "QuantConnect/Tutorials real Pre-Holiday Effect (unconditional long-before-holiday "
             "decision logic)"
@@ -2459,6 +2653,14 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): the only per-session rows in "
+            "data/afterhours_comparison.json are the rival's: an unconditional long through each "
+            "of 24 holiday closures, audited as context. They flip between halves - the first "
+            "twelve sessions averaged +86.0bps net, the last twelve -10.2bps - so the rival's "
+            "54.2% win rate is not a stable effect; but ARGUS's side, the holiday phase existing, "
+            "has no per-session measurement to break down. Route back: record ARGUS's per-session "
+            "decision and its realised outcome beside the rival's.",
             "The real calendar LOOKUP (self.TradingCalendar.GetDaysByType) needs a full Lean "
             "engine and was not run — the real, same-source calendar DATA was substituted for "
             "it, a data-source substitution from the real decision LOGIC, which runs unmodified. "
@@ -2908,7 +3110,10 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/tradingagents_memory.py,"
             "argus/eval/baselines/tradingagents_rating.py"
         ),
-        state=State.OWNED,
+        # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+        # proof now needs a groupwise check on the capability's own artefact, and this
+        # row's does not pass it. The reason and the route back are its first blocker.
+        state=State.IMPLEMENTED,
         baseline=(
             "TauricResearch/TradingAgents reflection log, which stores a model's prose lesson "
             "rather than a graded outcome"
@@ -3061,6 +3266,11 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): data/recall_comparison.json holds three designed "
+            "boundary cases for the point-in-time guard; no population of recalls is recorded. "
+            "Route back: replay recall() over the real ledger's decisions and record, per "
+            "decision, whether anything unresolved was visible, by symbol and date.",
             "Only 1 of 31 NVDA decisions is graded so far, so the memory is currently a list of "
             "observations and states no pattern — which is what it should do, and also means the "
             "lesson path has not been exercised on live data",
@@ -3213,6 +3423,11 @@ REGISTER: tuple[Capability, ...] = (
         blockers=(
             "the sweep proves the rules hold over the modelled domain; it does not prove the "
             "domain matches the venue",
+            "human takeover, 2026-09-25 (data/pause_drill.json): nine escalated decisions were "
+            "paused, their process killed while waiting, and resumed from disk by a fresh "
+            "process; all nine resumed to the decision a no-kill run made, state hash unchanged. "
+            "The model and the human are scripted: this proves a pause survives a crash, not how "
+            "a live model revises on resume or how fast a person answers",
         ),
     ),
     Capability(
@@ -3223,7 +3438,10 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/journal_comparison.py,argus/eval/baselines/serenity_journal.py,"
             "argus/eval/baselines/serenity_guards.py,argus/eval/baselines/serenity_loader.py"
         ),
-        state=State.OWNED,
+        # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+        # proof now needs a groupwise check on the capability's own artefact, and this
+        # row's does not pass it. The reason and the route back are its first blocker.
+        state=State.IMPLEMENTED,
         baseline="serenity-guardrails (Apache-2.0) hash-chained journal with a head anchor",
         proofs=(
             Proof(
@@ -3345,6 +3563,12 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): data/journal_comparison.json holds a designed CRLF "
+            "case, one tamper, one truncation and a sweep of seven entry counts, and "
+            "data/protocol_commitments.jsonl is a record of commitments, not a measurement; the "
+            "live-ledger check is one boolean. Route back: verify the live ledger entry by entry "
+            "across its write sessions and record each result with its session and date.",
             "the protocol governs from entry 95, so the entries before it are outside the "
             "pre-registration and must never be quoted as if they were inside it",
             "the CRLF-fragility finding is Windows-specific and not re-tested on POSIX — stated "
@@ -3382,7 +3606,10 @@ REGISTER: tuple[Capability, ...] = (
         # `eval/skillreliability.py` calls every tool three times and names all 10 that never
         # answer, each with the service's own error text. `verify()` confirms it; nothing here
         # was loosened.
-        state=State.OWNED,
+        # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+        # proof now needs a groupwise check on the capability's own artefact, and this
+        # row's does not pass it. The reason and the route back are its first blocker.
+        state=State.IMPLEMENTED,
         baseline="OpenBB-finance/OpenBB provider set; TauricResearch/TradingAgents feed list",
         proofs=(
             Proof(
@@ -3523,6 +3750,13 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): data/feedlist_comparison.json holds designed "
+            "vendor-failure scenarios over the rival's own category list; data/desk_notes.jsonl "
+            "is free text per cycle, reduced by the harness to one distinct-source count with no "
+            "per-cycle value; data/skill_reliability.json is the upstream service's reliability, "
+            "audited as context. Route back: record per live cycle which sources answered and "
+            "whether gather() returned, by symbol and day.",
             "The as-of evidence gate is INERT on live data: across 11 live frames it dropped "
             "nothing, so its protection against future-dated evidence is real in code and "
             "untested in production (data/ablations.json). That is a different statement from "
@@ -3530,8 +3764,19 @@ REGISTER: tuple[Capability, ...] = (
             "Per-feed effect is still untested. Ablating a feed changes what a model reasons "
             "over, so it needs the paired protocol and a budget of real cycles; only the "
             "deterministic components have been measured",
-            "Four of five official Bitget Skills remain dead upstream and only "
-            "technical-analysis answers",
+            "Bitget's own tool surface is mostly not answering (data/skill_matrix.json, "
+            "2026-09-25, one round, keyless, through market/rpc.py): 3 of 86 tools returned data "
+            "- technical_analysis, social_trending and crypto_derivatives, all on bitget-signal "
+            "(3 of 19) - and all 67 bitget-mcp-server catalog entries answered 503 upstream. Of "
+            "the five research Skills, technical-analysis answered on its one tool and "
+            "news-briefing on one of three; macro-analyst, market-intel and sentiment-analyst "
+            "returned nothing. One round does not characterise a service",
+            "corrupted feeds, 2026-09-25 (data/feedbugged.json, openai/evals' bugged-tools "
+            "pattern): with one input corrupted on each of six snapshots (price, 24h change, VIX, "
+            "SUE, fear-and-greed, spread), no decision moved and none said a feed was wrong - "
+            "detection F1 0.0, 0 of 6 caught. Recorded as a LOSS until the feed-sanity gate (S17) "
+            "is built and measured on the same cases. A wrong line of reasoning injected into the "
+            "prompt moved one of six decisions to the wrong direction",
         ),
     ),
     Capability(
@@ -3915,13 +4160,31 @@ REGISTER: tuple[Capability, ...] = (
             "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: TradingAgents' reflection memory is "
             "not the specialist for Review & Self-Evolution; mnemox-ai/tradememory-protocol, "
             "cholhwanjung/trading-agent (a statistical rule lifecycle), OpenByteInc/QuantDinger "
-            "and the S2 entry Azedfx/TradePilot-AI have not been run on the same input. The same "
-            "review reported that `desk/review.py` grades a coin-flip rule ACTIVE, a base-rate "
-            "defect that must be fixed before any rerun "
-            "(rival review of 2026-09-24). OWNED returns only when they are.",
+            "and the S2 entry Azedfx/TradePilot-AI have not been run on the same input (rival "
+            "review of 2026-09-24). OWNED returns only when they are. The same review's "
+            "base-rate defect - a coin-flip rule graded ACTIVE - is fixed in desk/review.py: "
+            "regenerated 2026-09-25 over 622 decisions, narrow-evidence-base is graded "
+            "NO_DISCRIMINATION at lift 0.9x against its 41% base rate (p = 0.21), not ACTIVE",
             "The checklist is honest and currently empty: no rule has earned promotion, so this "
             "is a mechanism for learning rules rather than a set of learned rules, and it is "
             "described that way everywhere it appears.",
+            "sequential-agreement fixed 2026-09-25: it read 'contagion' anywhere in the panel "
+            "note, and the concurrent panel's own note says 'consensus rather than contagion', so "
+            "it fired on 299 of 311 in-sample and 311 of 311 held-out decisions; it now fires on "
+            "the sequential wording only (30 and 0). Its verdict is unchanged - PROPOSED, since "
+            "no OUTCOME defect exists yet to grade it against - and so is every other rule's on "
+            "the regenerated data/review_oos.json (3 of 3 gradeable rules keep their verdict on "
+            "the held-out half)",
+            "rules written by machine, 2026-09-25 (data/rule_proposals.json, fit on the earlier "
+            "half, graded on the later): induction beats the hand-written rules on conflict "
+            "defects held out (precision 90%, 56 of 62 firings, against a 61% base rate; the "
+            "hand-written rules' 3%), and no proposer beats the base rate on grounding (the best "
+            "induced rules 38% against 39%) or lean (induced rules over every pair 48% on 23 "
+            "firings against 50%; no other proposer's lean rule fired). The Qwen "
+            "proposer (29 paid calls) had no rule admitted; the model-free contrast proposer had "
+            "none on the same 29 pairs and 2 on every pair, induction 1 and 17 - the model beat "
+            "neither. Groupwise: the induced rules' held-out lift is carried by the conflict "
+            "kind alone (data/groupwise_audit.json)",
         ),
     ),
     Capability(
@@ -3932,7 +4195,10 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/stumpy_squared_distance.py,"
             "argus/eval/baselines/stumpy_squared_distance_loader.py"
         ),
-        state=State.OWNED,
+        # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+        # proof now needs a groupwise check on the capability's own artefact, and this
+        # row's does not pass it. The reason and the route back are its first blocker.
+        state=State.IMPLEMENTED,
         baseline="TDAmeritrade/stumpy real matrix-profile distance and matrix-profile self-join",
         proofs=(
             Proof(
@@ -4070,10 +4336,19 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): data/shapematch_comparison.json holds three designed "
+            "distance cases and query sweeps over one constructed series, kept as counts. Route "
+            "back: measure the exclusion-zone divergence and the look-ahead per real query across "
+            "names and dates; the AnalogDesk grid's 2,698 test queries are that population.",
             "The exclusion-zone divergence rate is measured on a series constructed to isolate "
             "the effect (high persistence, chosen so shifted windows are near-duplicates) — the "
             "rate on real market series, which are noisier, has not itself been measured, and "
             "may be materially lower",
+            "retrieval diversity, 2026-09-25 (data/retrieval_diversity.json): a LOSS for the path "
+            "matcher - MMR at lambda 0.9, the best on 2019-2022, scores 16.42 Winkler against "
+            "16.40 without it on 2023-2026 (Diebold-Mariano p = 0.028); find()'s default stays "
+            "nearest-first, and diversity is available only when asked for",
         ),
     ),
     Capability(
@@ -4241,6 +4516,11 @@ REGISTER: tuple[Capability, ...] = (
             "are about a valid experiment, and a live-fills comparison remains a further, "
             "separate strengthening this capability does not yet have, named here so OWNED is "
             "not read as 'nothing more could ever be measured'",
+            "guard self-check, 2026-09-25 (data/guard_selfcheck.json, mle-bench's same-code-path "
+            "validation): over 190,944 swept orders the read-only would_pass() agreed with "
+            "validate().allowed on every one and never consumed a rate-limit slot, where a check "
+            "that records as it checks would have spent the window's last slot. A constructed "
+            "sweep, not live orders",
         ),
     ),
     Capability(
@@ -4840,6 +5120,13 @@ REGISTER: tuple[Capability, ...] = (
             "named is untried no longer, and it worked. The other named lever (a separate binary "
             "OOS gate ahead of intent routing) remains untried and is the next one to reach for "
             "if a future session wants to move this from TIED to a real win.",
+            "the console's MCP surface, 2026-09-25 (data/mcp_fuzz.json, "
+            "data/mcp_sdk_comparison.json): the hand-rolled lui/mcp_server.py answered all 145 "
+            "cases of an authored wire-fuzz corpus cleanly - no unstructured exception, no "
+            "schema-invalid argument reaching an engine - against 46 before that day's hardening; "
+            "the official MCP SDK 2.2.0 server, on the same corpus and oracle, answered 57 "
+            "cleanly and let 96 calls reach an engine. An authored corpus, not traffic, and the "
+            "server is not the router this row measures",
         ),
         note="**2026-09-22, two rebuilds this date.** First, the classifier head: dev-half "
              "5-fold CV (10 fold-split seeds) found `LinearSVC(C=5.0, class_weight='balanced')` "
@@ -5014,6 +5301,13 @@ REGISTER: tuple[Capability, ...] = (
             "agent fills, and reads every real downstream consumer of that type's output "
             "directly, which is sufficient to establish the absence of a value-level check "
             "without needing the LLM call itself",
+            "decision robustness, 2026-09-25 (data/perturbation_robustness.json, HELM's "
+            "worst-case metric; data/vocab_stress.json, PlanBench's obfuscation): MetaPM.decide "
+            "kept its action on all 24 meaning-preserving perturbations of six live snapshots and "
+            "on all 12 renamed ones; its lean moved on 2 of 24, within the 11% its own "
+            "unperturbed resamples disagree. All six snapshots are one moment (2026-09-25 13:56 "
+            "UTC), which the groupwise audit flags as a single-group result: robustness at one "
+            "market state, not across states",
         ),
     ),
     Capability(
@@ -5174,6 +5468,12 @@ REGISTER: tuple[Capability, ...] = (
             "operating_income, eps_diluted, gross_profit) do not cover FinanceBench's harder "
             "derived-ratio questions (fixed-asset turnover, operating cash flow ratio) or its "
             "prose-reasoning questions (domain-relevant, novel-generated) at all",
+            "filing question answering, 2026-09-25 (data/document_qa_eval.json, paper-qa's "
+            "citation scheme in research/document_qa.py): 25 of 27 answerable questions over 18 "
+            "filings from five issuers answered correctly with citations enforced, 3 of 3 "
+            "unanswerable ones refused, 0 fabricated citation ids, and the groupwise audit finds "
+            "no issuer carries the result. One run of 30 questions; the support audit is judged "
+            "by Qwen (54 calls, served from cache on the recorded run)",
         ),
     ),
     Capability(
@@ -5527,6 +5827,13 @@ REGISTER: tuple[Capability, ...] = (
             "the factors found carry out-of-sample edge after costs — has not been compared with "
             "the systems that lead on it, and no certified factor has been traded "
             "(rival review of 2026-09-24)",
+            "split-half reliability, 2026-09-25 (data/factor_split_half.json, GoEmotions' "
+            "split-half PPCA adapted in research/factor_lab.py): of 96 factor-instrument pairs, 1 "
+            "reproduces its payoff across independent halves, and all 19 that pass the cost and "
+            "out-of-sample gates fail it. The test is calibrated - 5.2% false passes on noise at "
+            "a 5% level, 80% power only for an edge of 62% accuracy or more - so the reading is "
+            "that no factor in the library has an edge this test can see, not that none has an "
+            "edge. Groupwise: the single pass is one pair (AMZNUSDT, slow_fade)",
         ),
     ),
     Capability(
@@ -5579,6 +5886,11 @@ REGISTER: tuple[Capability, ...] = (
             "AnalogDesk (15.25) and the naive band (15.14), but not significantly (p = 0.16 and "
             "0.24); it does beat the volatility harness significantly (p = 0.04). Path-breach "
             "Brier is not scored: ARGUS's engines do not return intraday excursions",
+            "retrieval diversity, 2026-09-25 (data/retrieval_diversity.json: paper-qa's maximal "
+            "marginal relevance on the same 2,698-query grid, lambda chosen on 2019-2022 only): a "
+            "TIE for the analogue engine - MMR at lambda 0.3 scores 15.49 Winkler against 15.52 "
+            "without it (Diebold-Mariano p = 0.51), so diversity neither helps nor hurts the "
+            "band; the engine's default stays nearest-first",
         ),
     ),
     Capability(
@@ -5808,10 +6120,17 @@ REGISTER: tuple[Capability, ...] = (
             "no outcome grading: whether each thesis held needs its horizon to pass, so neither "
             "desk's call is scored yet",
         ),
-    ),    Capability(
+    ),
+    Capability(
         name="A trader's claims about the tape checked against it, measured against MirrorLine",
         subtheme="t3-decisionstress",
-        module="argus/lui/research.py",
+        # Credit moved 2026-09-25 from `argus/lui/research.py` to the harness. The harness grades
+        # answers recorded from the console's premise check on the run morning, and never executed
+        # `lui/research._claim_check` (the sabotage canary replaced 179 functions of
+        # lui/research.py and none fired). Since 2026-09-26 it calls `_claim_check` on the saved
+        # claims and tape (`data/h2h_mirrorline/argus_replay.json` matches the recorded run on all
+        # 38 claims), so the console's code is what is scored and the credit names it again.
+        module="argus/lui/research.py, argus/eval/claimcheck_comparison.py",
         state=State.TIED,
         baseline="PinnacleCryptNG/MirrorLine (Season 2, no licence file): its own challenge "
                  "engine, getInterpretationChallenge, run from its clone on the same sentences",
@@ -5837,15 +6156,21 @@ REGISTER: tuple[Capability, ...] = (
                   artefact="data/claimcheck_comparison.json"),
         ),
         blockers=(
-            "TIED: on the re-run both desks judged all 30 gradable claims correctly (direction "
-            "14/14, stated cause held back 14/14, US session 2/2); the first run was a clear "
-            "LOSS — ARGUS gave no verdict on any past-tense causal claim or either session "
-            "claim — and it is kept in data/h2h_mirrorline/argus_raw_first_run.json",
+            "TIED, and the verdict is the harness's own comparison report (shown under "
+            "measured, read from data/claimcheck_comparison.json rather than restated here). What "
+            "the report does not carry: the first run was a clear LOSS - ARGUS gave no verdict on "
+            "any past-tense causal claim or either session claim - and it is kept in "
+            "data/h2h_mirrorline/argus_raw_first_run.json",
+            "the harness grades answers recorded from the console on the run morning "
+            "(data/h2h_mirrorline/argus_raw.json); it does not re-run lui/research._claim_check, "
+            "so a regression in the console after that morning would not show here until the "
+            "harness calls it on the saved claims and tape",
             "MirrorLine still reads claim kinds ARGUS does not: 40-level book depth, liquidity "
             "and trade-action language; ARGUS reads funding and the perpetual's premium, which "
             "MirrorLine does not",
         ),
-    ),    Capability(
+    ),
+    Capability(
         name="A leveraged hold across the weekend, measured against baserate",
         subtheme="t3-decisionstress",
         module="argus/market/equity_history.py",
@@ -5876,10 +6201,20 @@ REGISTER: tuple[Capability, ...] = (
             "NVDA weekends since 1999 and the perpetual's own path through 57 weekends, while "
             "baserate keeps a regime match and a self-grading forecast ledger ARGUS lacks here",
         ),
-    ),    Capability(
+    ),
+    Capability(
         name="Where a stop sits in the noise, measured against Rook's invalidation price",
         subtheme="t3-decisionstress",
-        module="argus/desk/odds.py",
+        # Credit moved 2026-09-25 from `argus/desk/odds.py` to the harness. The distance the
+        # harness scores is its own `_p90_adverse` (stopquality_comparison.py:43-48, a nearest-rank
+        # 90th percentile of prior-close-to-low drops on daily bars); desk/odds.py's
+        # `directional_odds` computes `adverse_p90_bps` with an interpolated quantile over the
+        # answer's own horizon (desk/odds.py:195). The harness used to compute ARGUS's distance
+        # with its own copy (`_p90_adverse`) and never import desk/odds.py. Since 2026-09-26 it
+        # calls `desk.odds.directional_odds` on daily bars saved once (`data/h2h_rook/bars/`), so
+        # it runs offline and scores the desk's own code: 0.109 against Rook's 0.625 (the old
+        # copy gave 0.111 against 0.624). The credit names that code again.
+        module="argus/desk/odds.py, argus/eval/stopquality_comparison.py",
         state=State.IMPLEMENTED,
         baseline="iamsuperfly/Rook (Season 2, MIT): runDebate (bull/bear + judge) on the hackathon "
                  "Qwen, long side, 24h, six names, from its clone",
@@ -5913,13 +6248,22 @@ REGISTER: tuple[Capability, ...] = (
             "comparison says how often each line is hit by chance, not which desk trades better",
             "prospective check pending: both stops were recorded at the run and are graded on "
             "the next 24 hours",
+            "the distance scored is the harness's own nearest-rank percentile, not the console's "
+            "desk/odds.py, and the harness needs the network to run (it fetches the daily bars "
+            "live and saves none), so the comparison cannot be reproduced offline. Both close "
+            "the same way: score() taking the saved bars and calling "
+            "desk.odds.directional_odds for ARGUS's distance",
         ),
     ),
     Capability(
         name="Where a shut stock should open: the perpetual-implied open, against gloaming "
              "and nocturne",
         subtheme="t3-execassist",
-        module="argus/eval/overnight_comparison.py, argus/eval/void_comparison.py",
+        # Both harnesses call `lui/research._implied_open_line` through
+        # `overnight_comparison.console_feed` since 2026-09-26 (984 overnight nights and 61 void
+        # rows answered; within 0.25bps and 0.49bps of the old in-module formula).
+        module="argus/lui/research.py, argus/eval/overnight_comparison.py, "
+               "argus/eval/void_comparison.py",
         state=State.IMPLEMENTED,
         baseline="angelraph/gloaming (Season 2, MIT): overnight fair value from index futures, "
                  "BTC/ETH and the dollar, its own model functions run from its clone; "
@@ -5952,8 +6296,9 @@ REGISTER: tuple[Capability, ...] = (
                   "separable) and is not shipped",
                   artefact="data/overnight_comparison.json"),
             Proof("failure_cases_documented",
-                  "QQQ level with gloaming; nocturne's own frame level; early closes read as "
-                  "16:00",
+                  "QQQ the narrowest lead (1.84bps, where gloaming's Nasdaq futures are nearly "
+                  "the same instrument); nocturne's own frame not separable; early closes read "
+                  "as 16:00",
                   artefact="data/overnight_comparison.json"),
             Proof("implementation_complete",
                   "the console line, its record per stock, and the Yahoo close fallback",
@@ -5961,15 +6306,27 @@ REGISTER: tuple[Capability, ...] = (
                        "with_its_record"),
         ),
         blockers=(
-            "ahead of gloaming, not OWNED: over 113 nights and 8 stocks (April to September "
-            "2026) the perpetual's move since the close missed the open by 30bps on average "
-            "with the direction right 93% of the time; gloaming's best variant (its OLS refit) "
-            "missed by 81bps, its shipped inputs by 135bps, and assuming no gap by 90bps. The "
-            "lead holds on weekends (31bps against 78bps) and on 7 of 8 names; on QQQ, where "
-            "gloaming's Nasdaq futures are nearly the same instrument, the two are level",
-            "level with nocturne on nocturne's own question: predicting the rToken's Monday "
-            "10:00 price from Sunday 19:00 on its 61 large-cap rows, its full fade missed by "
-            "1.92% and ARGUS by 2.07%, a difference the 7 weekends cannot separate",
+            "IMPLEMENTED, not OWNED. The verdicts are the harnesses' own comparison reports, "
+            "shown under measured and read from data/overnight_comparison.json and "
+            "data/void_comparison.json rather than restated here. What the reports do not "
+            "carry: the perpetual's move was scored over 113 nights and 8 stocks (15 April to 24 "
+            "September 2026), its direction right 93% of the time; gloaming's shipped inputs "
+            "missed by 135bps; the lead holds on weekends (31bps against 78bps, recomputed from "
+            "the harness's rows)",
+            "corrected 2026-09-25: this row said the two were level on QQQ. The artefact never "
+            "did - ARGUS is ahead on all eight stocks, narrowest on QQQ, where gloaming's Nasdaq "
+            "futures are nearly the same instrument: 12.50 against 14.34bps, 1.84bps ahead, 95% "
+            "interval -3.59 to -0.29 (per_stock.QQQ, and the comparison report's groups)",
+            "groupwise (data/groupwise_audit.json): the overnight lead is carried by no stock and "
+            "no night and holds in both chronological halves; on nocturne's own rows ARGUS's "
+            "small lead over the Sunday price is carried by one name (RTSLA) and one weekend "
+            "(2026-08-07), and nocturne's full fade leads in the first half of the weekends and "
+            "trails in the second, so neither verdict on that frame is stable",
+            "the estimate scored is the harnesses' own: overnight_comparison.predict's "
+            "argus_perp and void_comparison's ARGUS column. The console states the same quantity "
+            "through lui/research._implied_open_line, which neither harness executes; it is "
+            "covered by its unit test, and the credit stays on the harnesses, where the scored "
+            "code lives, until they call the console's function",
             "nocturne's reversal is a property of the rToken, not of the stock: on the real "
             "Monday open, read at nocturne's own Sunday-evening moment, the perpetual's weekend "
             "move carried through (slope +0.83 on 160 stock-weekends) and beat the last "
@@ -6106,6 +6463,57 @@ def _artefact_keys(path: Path) -> set[str] | None:
     return keys
 
 
+_DATA_REF = re.compile(r"data/[A-Za-z0-9_./-]+\.jsonl?")
+_EVAL_SOURCE = re.compile(r"(?:src/)?argus/eval/([a-z_0-9]+)\.py")
+
+
+def _data_artefact(ref: str) -> str | None:
+    """``ref`` itself when it names a data artefact (``data/....json`` or ``.jsonl``), else None."""
+    return ref if ref and _DATA_REF.fullmatch(ref) else None
+
+
+def capability_artefacts(capability: Capability) -> tuple[str, ...]:
+    """Every data artefact a capability names: its proofs' own, and each cited harness's.
+
+    Three forms occur in the register, the same three :mod:`argus.eval.harness_validity` reads:
+    a proof names ``data/<harness>.json``; a proof names the harness's source
+    (``src/argus/eval/<harness>.py``); or the capability's ``module`` field lists the harness. The
+    last two resolve to ``data/<harness>.json`` when that file exists.
+    """
+    out: set[str] = set()
+    for proof in capability.proofs:
+        data = _data_artefact(proof.artefact)
+        if data is not None:
+            out.add(data)
+        source = _EVAL_SOURCE.fullmatch(proof.artefact)
+        if source and (DATA / f"{source.group(1)}.json").exists():
+            out.add(f"data/{source.group(1)}.json")
+    for stem in _EVAL_SOURCE.findall(capability.module):
+        if (DATA / f"{stem}.json").exists():
+            out.add(f"data/{stem}.json")
+    return tuple(sorted(out))
+
+
+def proof_scope(capability: Capability, proof: Proof) -> tuple[str, ...]:
+    """The artefacts a proof's groupwise check is read from.
+
+    A proof that names a data artefact is read from that artefact alone: it chose its evidence.
+    A test-only proof (or one citing source code) chose no artefact, so it is read from every data
+    artefact the capability names, plus the one written by the module its test file is named for
+    (``test_cointegration.py`` -> ``data/cointegration.json``), because a test named for a module
+    is evidence about that module's output.
+    """
+    data = _data_artefact(proof.artefact)
+    if data is not None:
+        return (data,)
+    scope = set(capability_artefacts(capability))
+    if proof.test:
+        stem = Path(proof.test.split("::")[0]).stem.removeprefix("test_")
+        if (DATA / f"{stem}.json").exists():
+            scope.add(f"data/{stem}.json")
+    return tuple(sorted(scope))
+
+
 def verify(proof: Proof, module_present: bool) -> tuple[str, str]:
     """Is this proof's condition actually evidenced? Returns ``(status, detail)``.
 
@@ -6152,7 +6560,129 @@ def verify(proof: Proof, module_present: bool) -> tuple[str, str]:
     return "VERIFIED", f"{proof.artefact} records {', '.join(hits[:4])}"
 
 
-def audit(register: tuple[Capability, ...] = REGISTER) -> Report:
+GROUPWISE_CONDITIONS = frozenset({"statistically_valid_evaluation", "out_of_sample_test"})
+"""The two conditions that also need a groupwise check on the capability's own artefact."""
+
+GATING_ROLES = frozenset({"argus_vs_rival", "argus_result"})
+"""Headline roles in ``data/groupwise_audit.json`` that are a capability's own claim. A
+``context`` headline (the rival's P&L, the strategies a gate judged) is listed with its flags but
+never decides a capability's standing: its flags are about something else."""
+
+
+def load_groupwise(path: Path = GROUPWISE_PATH) -> dict[str, Any] | None:
+    """The groupwise audit as written, or ``None`` if it is missing or unreadable."""
+    try:
+        blob = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return blob if isinstance(blob, dict) else None
+
+
+def _sha256(path: Path) -> str | None:
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError:
+        return None
+
+
+def groupwise_verdict(capability: Capability, proof: Proof,
+                      groupwise: dict[str, Any] | None) -> tuple[bool, str]:
+    """Has a groupwise check run on this proof's artefacts, and did it contradict the headline?
+
+    Reads :func:`proof_scope`. Passes only when at least one headline in scope is the capability's
+    own claim (:data:`GATING_ROLES`) and was checked on the artefact as it is now, and no such
+    headline carries a flag or favours the rival. Every way of failing names the artefact.
+    """
+    if groupwise is None:
+        return False, ("no groupwise check has run: data/groupwise_audit.json is missing or "
+                       "unreadable (python -m argus.eval.groupwise_audit)")
+    scope = proof_scope(capability, proof)
+    if not scope:
+        return False, "names no data artefact for a groupwise check to run on"
+    entries: dict[str, Any] = groupwise.get("artefacts", {})
+    checked: list[str] = []
+    flagged: list[str] = []
+    rival: list[str] = []
+    stale: list[str] = []
+    missing: list[str] = []
+    for ref in scope:
+        entry = entries.get(ref)
+        if entry is None:
+            missing.append(f"{ref}: not in the audit")
+            continue
+        if entry.get("status") != "checked":
+            missing.append(f"{ref}: {entry.get('status')} - {entry.get('reason', '')}")
+            continue
+        claims = [h for h in entry.get("headlines", []) if h.get("role") in GATING_ROLES]
+        if not claims:
+            missing.append(f"{ref}: only context headlines were checked")
+            continue
+        recorded = entry.get("sha256")
+        if recorded is not None and recorded != _sha256(PACKAGE / ref):
+            stale.append(ref)
+            continue
+        for h in claims:
+            label = f"{ref} :: {h.get('name')}"
+            checked.append(label)
+            if h.get("flags"):
+                flagged.append(f"{label} [{', '.join(h['flags'])}]")
+            if h.get("favours") == "rival":
+                rival.append(label)
+    if stale:
+        return False, (f"the groupwise audit predates the current {', '.join(stale)}; re-run "
+                       f"python -m argus.eval.groupwise_audit")
+    if flagged:
+        return False, "the groupwise audit flags " + "; ".join(flagged)
+    if rival:
+        return False, "the per-item headline favours the rival: " + "; ".join(rival)
+    if not checked:
+        return False, "no groupwise check has run on its artefacts: " + "; ".join(missing)
+    more = f" (+{len(checked) - 1} more)" if len(checked) > 1 else ""
+    return True, f"groupwise-checked on {checked[0]}{more}"
+
+
+OUTCOME_FIELDS = ("question", "rival", "metric", "outcome", "argus_score", "rival_score", "n",
+                  "unit", "ci95", "p_value", "every_group", "groups", "valid", "artefact")
+
+
+def comparison_outcomes(capability: Capability) -> tuple[dict[str, Any], ...]:
+    """Every ``comparison_reports`` entry in the capability's artefacts, as the harness wrote it.
+
+    The verdict a row shows is this, not a sentence in its blockers: a harness on the eval spine
+    (:mod:`argus.eval.compare`) states who won, on what basis, and whether the result was valid,
+    and prose restating that is a second copy that can drift from the first.
+    """
+    out: list[dict[str, Any]] = []
+    for ref in capability_artefacts(capability):
+        path = PACKAGE / ref
+        if path.suffix != ".json":
+            continue
+        try:
+            blob = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        reports = blob.get("comparison_reports") if isinstance(blob, dict) else None
+        for report in reports or ():
+            row = {k: report.get(k) for k in OUTCOME_FIELDS}
+            row["artefact"] = row["artefact"] or ref
+            out.append(row)
+    return tuple(out)
+
+
+def render_outcome(row: dict[str, Any]) -> str:
+    """One measured outcome, in the words the harness used."""
+    scores = f"{row.get('argus_score')} against {row.get('rival_score')}"
+    basis = (f"95% interval {row['ci95']}" if row.get("ci95") is not None
+             else f"p = {row['p_value']}" if row.get("p_value") is not None else "no test")
+    groups = f"; {row['every_group']}" if row.get("every_group") else ""
+    valid = "" if row.get("valid") else " (INVALID: not counted)"
+    return (f"{row.get('outcome')}{valid}: {row.get('question')} vs {row.get('rival')} - "
+            f"{row.get('metric')}, {scores} over {row.get('n')} {row.get('unit')}(s), "
+            f"{basis}{groups}  [{row.get('artefact')}]")
+
+
+def audit(register: tuple[Capability, ...] = REGISTER, *,
+          groupwise_path: Path = GROUPWISE_PATH) -> Report:
     """Check every named artefact, test and module actually exists.
 
     A missing artefact is a finding rather than an exception: artefacts are generated, and a fresh
@@ -6162,6 +6692,8 @@ def audit(register: tuple[Capability, ...] = REGISTER) -> Report:
     """
     findings: list[Finding] = []
     verifications: list[Verification] = []
+    groupwise = load_groupwise(groupwise_path)
+    outcomes: dict[str, tuple[dict[str, Any], ...]] = {}
     for cap in register:
         module_present = True
         for part in cap.module.split(","):
@@ -6199,13 +6731,33 @@ def audit(register: tuple[Capability, ...] = REGISTER) -> Report:
             # be graded OWNED eight days after this register recorded zero. `verify` opens the
             # artefact and looks for the thing the condition is about.
             status, detail = verify(proof, module_present=module_present)
+            # **And, since 2026-09-25, the breakdown.** A statistical or out-of-sample claim whose
+            # artefact was never broken down by its groups is the aggregate the project has twice
+            # been misled by. Applied after `verify`, never instead of it: the vocabulary check
+            # still has to pass on its own.
+            if status != "UNPROVEN" and proof.condition in GROUPWISE_CONDITIONS:
+                ok, why = groupwise_verdict(cap, proof, groupwise)
+                status, detail = (status, f"{detail}; {why}") if ok else ("UNPROVEN", why)
             verifications.append(Verification(cap.name, proof.condition, status, detail))
             if status == "UNPROVEN":
                 findings.append(
                     Finding(cap.name, f"{proof.condition} is claimed but not evidenced", detail)
                 )
+        outcomes[cap.name] = comparison_outcomes(cap)
+        # A harness's own verdict outranks the row's state: an OWNED capability whose artefact
+        # records a valid comparison the rival won is contradicted by its own evidence.
+        against = [o for o in outcomes[cap.name]
+                   if o.get("outcome") == "rival_better" and o.get("valid")]
+        if cap.state is State.OWNED and against:
+            detail = "; ".join(f"{o.get('question')} vs {o.get('rival')}" for o in against)
+            verifications.append(Verification(
+                cap.name, "no_specialist_capability_superior", "UNPROVEN",
+                f"a comparison report in its own artefact records the rival ahead: {detail}"))
+            findings.append(Finding(cap.name, "a comparison report records the rival ahead",
+                                    detail))
     return Report(
         capabilities=register, findings=tuple(findings), verifications=tuple(verifications),
+        outcomes=outcomes,
     )
 
 
@@ -6231,11 +6783,56 @@ def summary(report: Report | None = None) -> str:
     )
 
 
-def write_report(path: Path = REPORT_PATH) -> Report:
-    """Persist the register so a document's claim about it can be checked against a file."""
-    report = audit()
+def transitions_since(previous: dict[str, str],
+                      register: tuple[Capability, ...]) -> list[dict[str, str | None]]:
+    """Every state change from ``previous`` (name -> state) to ``register``, each checked.
+
+    Raises :class:`IllegalTransition` on the first illegal move, before anything is written. A
+    capability present before and absent now is recorded as ``to: None`` rather than refused:
+    rows are renamed as their claims are narrowed, and refusing a rename would freeze a wrong name.
+    The record keeps a disappearance visible, which is what matters — a loss removed from the
+    register is how a bad result quietly goes away.
+    """
+    changes: list[dict[str, str | None]] = []
+    names = {cap.name for cap in register}
+    for cap in register:
+        raw = previous.get(cap.name)
+        before = State(raw) if raw is not None else None
+        check_transition(cap.name, before, cap.state)
+        if before is not cap.state:
+            changes.append({"capability": cap.name,
+                            "from": before.value if before is not None else None,
+                            "to": cap.state.value})
+    for name, state in sorted(previous.items()):
+        if name not in names:
+            changes.append({"capability": name, "from": state, "to": None})
+    return changes
+
+
+def write_report(path: Path = REPORT_PATH, *, report: Report | None = None) -> Report:
+    """Persist the register so a document's claim about it can be checked against a file.
+
+    Every state change since the file on disk is checked against :data:`TRANSITIONS` first, and an
+    illegal one raises before anything is written. Legal changes are appended to the persisted
+    ``transition_log`` with the time, the way the SEP automation posts a comment for each label it
+    moves: the history of a capability's standing is part of its evidence.
+    """
+    report = report or audit()
+    previous_blob: dict[str, Any] = {}
+    if path.exists():
+        try:
+            previous_blob = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise StandingError(
+                f"{path} is not readable JSON ({exc}); the previous states are what a transition "
+                f"is checked against, so it must be repaired or removed deliberately") from exc
+    previous = {str(c["name"]): str(c["state"]) for c in previous_blob.get("capabilities", [])}
+    changes = transitions_since(previous, report.capabilities)
+    stamp = datetime.now(UTC).isoformat(timespec="seconds")
+    log = [*previous_blob.get("transition_log", []), *({**c, "at": stamp} for c in changes)]
+    blob = {**report.as_dict(), "transitions_this_write": changes, "transition_log": log}
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(report.as_dict(), indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(blob, indent=2) + "\n", encoding="utf-8")
     return report
 
 
@@ -6282,18 +6879,30 @@ if __name__ == "__main__":  # pragma: no cover - CLI
 
 __all__ = [
     "DATA",
+    "GROUPWISE_CONDITIONS",
+    "GROUPWISE_PATH",
     "ORDER",
     "OWNED_CONDITIONS",
     "REGISTER",
     "REPORT_PATH",
+    "TRANSITIONS",
     "Capability",
     "Finding",
+    "IllegalTransition",
     "Proof",
     "Report",
     "StandingError",
     "State",
     "audit",
+    "capability_artefacts",
+    "check_transition",
+    "comparison_outcomes",
+    "groupwise_verdict",
+    "load_groupwise",
     "main",
+    "proof_scope",
+    "render_outcome",
     "summary",
+    "transitions_since",
     "write_report",
 ]

@@ -22,7 +22,9 @@ Candidates, all fed the same hourly bars:
   inputs are reported separately as ``gloaming_shipped_24h``.
 * ``gloaming_ols`` — its ``calibrate_weights`` refit before every night on that symbol's earlier
   nights only (walk-forward; the shipped prior until 10 nights exist, as in its own code).
-* ``argus_perp`` — the perpetual's move since the close: perp(09:00) / perp(16:00) - 1.
+* ``argus_perp`` — **the console's own implied open**: `lui/research._implied_open_line` called
+  at 09:00 New York with the perpetual's last price then, its gap read back from the sentence it
+  prints (the implied price over the last regular close). See "What is scored" below.
 * ``argus_perp_vs_close`` — what the console literally prints: perp(09:00) / stock close - 1,
   which carries the perpetual's standing basis.
 * ``argus_perp_fitted`` — ``argus_perp`` scaled by a walk-forward, through-the-origin slope, the
@@ -32,20 +34,42 @@ Candidates, all fed the same hourly bars:
 gloaming's model functions are imported from its clone and run unmodified. Their BTC/ETH input is
 Bitget spot in the original; here it is Bitget's USDT perpetuals, whose hourly closes track spot
 within a few basis points — disclosed, not believed to matter.
+
+**What is scored for ARGUS (changed 2026-09-26).** Until then this module scored its own copy of
+the formula, ``perp(09:00) / perp(16:00) - 1``, and `eval/standing.py` credited the console for
+the result; the harness-validity canary (`eval/harness_validity.py`, `data/harness_validity.json`)
+found the console code never ran at scoring time. Now every row calls the console's
+``_implied_open_line`` itself, with its two readers pointed at the saved inputs
+(:func:`console_feed`): `market.history.fetch`, through which ``_perp_at_close`` reads the
+perpetual's close bar, and `market.equity_history.daily`, through which ``_yahoo_close`` reads the
+stock's regular close. Everything between them is the console's: the holiday-aware session clock
+that picks the last regular close (``_last_regular_close``), the exact-bar selection, the
+arithmetic and the printed sentence. The implied price is printed to the cent, so the scored gap
+carries up to half a cent of rounding (under 0.5bps on every name here); the former formula is
+kept beside it as ``argus_perp_formula`` so the difference is on the record. A night on which the
+console prints no line (its close bar missing, say) is scored for no candidate, and is counted in
+``console_replay``.
 """
 
 from __future__ import annotations
 
+import bisect
+import contextlib
 import itertools
 import json
-import random
+import re
 import sys
 import urllib.request
+from collections.abc import Iterator, Mapping, Sequence
 from datetime import UTC, date, datetime, time
+from decimal import Decimal
 from pathlib import Path
 from statistics import mean
 from typing import Any
 from zoneinfo import ZoneInfo
+
+from argus.eval import artefact
+from argus.eval.compare import ComparisonReport, finalise, legacy_outcome, paired_bootstrap
 
 ROOT = Path(__file__).resolve().parents[3]
 DATA = ROOT / "data" / "h2h_gloaming"
@@ -68,7 +92,8 @@ MOVE_FLOOR = 0.001
 """Direction is scored only on gaps of at least 10bps; smaller ones are noise around zero."""
 
 CANDIDATES = ("zero", "gloaming_prior", "gloaming_shipped_24h", "gloaming_ols", "argus_perp",
-              "argus_perp_vs_close", "argus_perp_fitted", "argus_perp_plus_futures")
+              "argus_perp_vs_close", "argus_perp_fitted", "argus_perp_plus_futures",
+              "argus_perp_formula")
 
 Series = list[tuple[float, float]]
 """(bar end as a UTC timestamp, close), oldest first."""
@@ -133,6 +158,93 @@ def collect() -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------------------------
+# The console, replayed on the saved inputs.
+
+@contextlib.contextmanager
+def console_feed(hourly: Mapping[str, Series],
+                 closes: Mapping[str, Sequence[tuple[date, float]]]) -> Iterator[None]:
+    """Point the console's two market readers at saved inputs while the block runs.
+
+    ``hourly`` maps a Bitget symbol to ``(bar end as a UTC timestamp, close)`` (this module's
+    :data:`Series`); it is served through `argus.market.history.fetch` as hourly
+    :class:`~argus.market.history.Candle` rows stamped with their open, the shape the live
+    endpoint returns. ``closes`` maps a stock ticker to ``(session day, regular close)``, served
+    through `argus.market.equity_history.daily`. Both are module attributes the console looks up
+    at call time (``_perp_at_close`` and ``_yahoo_close`` import them inside the function), so
+    nothing in `lui/research.py` is replaced: only where its data comes from. The console's
+    instrument registry (`market.universe.contracts`, which ``_implied_open_line`` asks whether a
+    name is an equity) is served from its frozen snapshot, so a replay never depends on what
+    Bitget lists today. Anything but a bounded hourly window is refused rather than invented, and
+    the originals are restored however the block exits."""
+    from argus.market import equity_history, history, universe
+
+    ends = {symbol: [end for end, _ in series] for symbol, series in hourly.items()}
+
+    def fetch(symbol: str, *, interval: str = "1H", start: datetime | None = None,
+              end: datetime | None = None, **_: Any) -> list[history.Candle]:
+        if interval != "1H" or start is None or end is None:
+            raise history.HistoryError(f"the replay serves bounded 1H windows, not {interval}")
+        stamps = ends.get(symbol) or []
+        lo = bisect.bisect_left(stamps, start.timestamp() + 3600)
+        hi = bisect.bisect_right(stamps, end.timestamp() + 3600)
+        out = []
+        for bar_end, close in (hourly.get(symbol) or [])[lo:hi]:
+            price = Decimal(repr(close))
+            out.append(history.Candle(ts=datetime.fromtimestamp(bar_end - 3600, UTC),
+                                      open=price, high=price, low=price, close=price,
+                                      volume=Decimal(0)))
+        return out
+
+    def daily(ticker: str, **_: Any) -> list[equity_history.Day]:
+        return [equity_history.Day(day=day, open=close, close=close)
+                for day, close in closes.get(ticker) or []]
+
+    registry, _ = universe._from_snapshot()
+
+    def contracts() -> dict[str, universe.Contract]:
+        return registry
+
+    real_fetch, real_daily, real_contracts = history.fetch, equity_history.daily, universe.contracts
+    history.fetch = fetch
+    equity_history.daily = daily
+    universe.contracts = contracts
+    try:
+        yield
+    finally:
+        history.fetch = real_fetch
+        equity_history.daily = real_daily
+        universe.contracts = real_contracts
+
+
+_IMPLIED = re.compile(r"puts the stock near (?P<implied>[\d,]+\.\d+) at the next open "
+                      r"\(last close (?P<close>[^)]+)\)")
+
+
+def console_implied_open(symbol: str, perp_last: float,
+                         now: datetime) -> tuple[float, float, str] | None:
+    """``(implied open, the last close it anchored on, the sentence)`` as the console prints them
+    at ``now``, or None when it prints no implied-open line. Must run inside
+    :func:`console_feed`. An exception from the console propagates: a harness that swallowed one
+    would score nothing and still print a verdict. A sentence this cannot read is an error too,
+    never a silently skipped row."""
+    from argus.lui import research
+
+    out = research._implied_open_line(symbol, Decimal(repr(perp_last)), now=now)
+    if out is None:
+        return None
+    text = out[0]
+    found = _IMPLIED.search(text)
+    if found is None:
+        raise ValueError(f"the console's implied-open sentence changed shape: {text[:200]}")
+    return float(found["implied"].replace(",", "")), float(found["close"]), text
+
+
+def _session_closes(inputs: Mapping[str, Any]) -> dict[str, list[tuple[date, float]]]:
+    return {stock: [(date.fromisoformat(d["day"]), float(d["close"])) for d in days]
+            for stock, days in (inputs.get("sessions") or {}).items()}
+
+
+# ---------------------------------------------------------------------------------------------
 # Scoring.
 
 def _at(series: Series, moment: float, *, stale: float = 3 * 3600) -> float | None:
@@ -184,8 +296,14 @@ def _blend(model: Any, futures: float, crypto: float, fx: float,
 
 
 def nights(inputs: dict[str, Any]) -> list[dict[str, Any]]:
-    """One row per (stock, adjacent session pair) with every input read at its moment."""
+    """One row per (stock, adjacent session pair) with every input read at its moment, and the
+    console's implied open at that moment (``console_gap``; None where it printed no line)."""
     hourly = {k: [(float(t), float(c)) for t, c in v] for k, v in inputs["hourly"].items()}
+    with console_feed(hourly, _session_closes(inputs)):
+        return _nights(inputs, hourly)
+
+
+def _nights(inputs: dict[str, Any], hourly: dict[str, Series]) -> list[dict[str, Any]]:
     rows = []
     for stock, proxy in UNIVERSE.items():
         sessions = inputs["sessions"].get(stock) or []
@@ -211,12 +329,17 @@ def nights(inputs: dict[str, Any]) -> list[dict[str, Any]]:
             crypto_24h = [_move(hourly[c], day_before, predict_at) for c in CRYPTO]
             if any(v is None for v in (*reads.values(), *crypto, *crypto_24h)):
                 continue
+            console = console_implied_open(f"{stock}USDT", float(reads["perp_now"] or 0.0),
+                                           datetime.fromtimestamp(predict_at, UTC))
             rows.append({
                 "stock": stock, "closed": d0.isoformat(), "opened": d1.isoformat(),
                 "gap": after["open"] / before["close"] - 1,
                 "close": before["close"], **reads,
                 "crypto": mean(c for c in crypto if c is not None),
                 "crypto_24h": mean(c for c in crypto_24h if c is not None),
+                "console_gap": console[0] / before["close"] - 1 if console else None,
+                "console_anchor": console[1] if console else None,
+                "console_line": console[2] if console else None,
             })
     return rows
 
@@ -227,21 +350,23 @@ def predict(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     model = _gloaming()
     by_stock: dict[str, list[dict[str, Any]]] = {}
-    for row in sorted(rows, key=lambda r: (r["stock"], r["opened"])):
+    # Only the nights the console answered, so every candidate is scored on the same rows.
+    for row in sorted((r for r in rows if r.get("console_gap") is not None),
+                      key=lambda r: (r["stock"], r["opened"])):
         by_stock.setdefault(row["stock"], []).append(row)
     out = []
     for stock_rows in by_stock.values():
         for i, row in enumerate(stock_rows):
             past = stock_rows[:i]
             fx = -row["dxy"]
-            perp_move = row["perp_now"] / row["perp_close"] - 1
+            perp_move = row["console_gap"]
             if len(past) >= MIN_FIT:
                 weights = model.calibrate_weights(
                     pd.Series([p["gap"] for p in past]),
                     pd.Series([p["futures"] for p in past]),
                     pd.Series([p["crypto"] for p in past]),
                     pd.Series([-p["dxy"] for p in past]))
-                xs = [p["perp_now"] / p["perp_close"] - 1 for p in past]
+                xs = [p["console_gap"] for p in past]
                 denominator = sum(x * x for x in xs)
                 slope = (sum(x * p["gap"] for x, p in zip(xs, past, strict=True)) / denominator
                          if denominator else 1.0)
@@ -251,8 +376,7 @@ def predict(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             if len(past) >= MIN_FIT:
                 import numpy as np
 
-                design = np.array([[p["perp_now"] / p["perp_close"] - 1,
-                                    p["futures"] - (p["perp_now"] / p["perp_close"] - 1)]
+                design = np.array([[p["console_gap"], p["futures"] - p["console_gap"]]
                                    for p in past])
                 coef = np.linalg.lstsq(design, np.array([p["gap"] for p in past]),
                                        rcond=None)[0]
@@ -267,6 +391,9 @@ def predict(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "argus_perp_vs_close": row["perp_now"] / row["close"] - 1,
                 "argus_perp_fitted": slope * perp_move,
                 "argus_perp_plus_futures": combined,
+                # The formula this harness scored before it called the console, kept so the
+                # difference between that copy and the console is on the record.
+                "argus_perp_formula": row["perp_now"] / row["perp_close"] - 1,
             }, "fitted": len(past) >= MIN_FIT})
     return out
 
@@ -287,23 +414,19 @@ def _summary(rows: list[dict[str, Any]], name: str) -> dict[str, Any]:
 def _paired(rows: list[dict[str, Any]], a: str, b: str, *, draws: int = 4000,
             seed: int = 7) -> dict[str, Any]:
     """Mean of |err_a| - |err_b| in bps with a bootstrap over nights: every stock shares a night's
-    news, so the night, not the row, is the independent unit."""
+    news, so the night, not the row, is the independent unit.
+
+    The resampling itself is the spine's (`eval/compare.py::paired_bootstrap`) since 2026-09-25;
+    it is this function's former loop moved there unchanged, and `tests/test_eval_spine.py` pins
+    every interval in the pre-migration artefact."""
     by_night: dict[str, list[float]] = {}
     for r in rows:
         diff = (abs(r["estimates"][a] - r["gap"]) - abs(r["estimates"][b] - r["gap"])) * 1e4
         by_night.setdefault(r["opened"], []).append(diff)
-    keys = sorted(by_night)
-    rng = random.Random(seed)
-    means = []
-    for _ in range(draws):
-        sample = [d for k in (rng.choice(keys) for _ in keys) for d in by_night[k]]
-        means.append(mean(sample))
-    means.sort()
-    point = mean(d for k in keys for d in by_night[k])
-    low, high = means[int(0.025 * draws)], means[int(0.975 * draws) - 1]
-    return {"a": a, "b": b, "mean_diff_bps": round(point, 2),
-            "ci95_bps": [round(low, 2), round(high, 2)], "nights": len(keys),
-            "verdict": ("a better" if high < 0 else "b better" if low > 0 else "not separable")}
+    boot = paired_bootstrap(by_night, draws=draws, seed=seed)
+    return {"a": a, "b": b, "mean_diff_bps": round(boot.mean_diff, 2),
+            "ci95_bps": [round(boot.low, 2), round(boot.high, 2)], "nights": boot.units,
+            "verdict": boot.legacy_verdict}
 
 
 def sunday_evening(inputs: dict[str, Any]) -> dict[str, Any] | None:
@@ -317,20 +440,29 @@ def sunday_evening(inputs: dict[str, Any]) -> dict[str, Any] | None:
     move reverses (negative) or carries through (positive)."""
     hourly = {k: [(float(t), float(c)) for t, c in v] for k, v in inputs["hourly"].items()}
     rows: list[dict[str, Any]] = []
-    for stock in UNIVERSE:
-        perp = hourly.get(f"{stock}USDT") or []
-        sessions = inputs["sessions"].get(stock) or []
-        for before, after in itertools.pairwise(sessions):
-            d0, d1 = date.fromisoformat(before["day"]), date.fromisoformat(after["day"])
-            if d0.weekday() != 4 or d1.weekday() != 0:
-                continue
-            closed = _at(perp, _ny(d0, time(16)))
-            sunday = _at(perp, _ny(date.fromordinal(d1.toordinal() - 1), time(20)))
-            if not closed or not sunday:
-                continue
-            rows.append({"stock": stock, "closed": d0.isoformat(), "opened": d1.isoformat(),
-                         "gap": after["open"] / before["close"] - 1,
-                         "estimates": {"last_close": 0.0, "perp_weekend": sunday / closed - 1}})
+    with console_feed(hourly, _session_closes(inputs)):
+        for stock in UNIVERSE:
+            perp = hourly.get(f"{stock}USDT") or []
+            sessions = inputs["sessions"].get(stock) or []
+            for before, after in itertools.pairwise(sessions):
+                d0, d1 = date.fromisoformat(before["day"]), date.fromisoformat(after["day"])
+                if d0.weekday() != 4 or d1.weekday() != 0:
+                    continue
+                closed = _at(perp, _ny(d0, time(16)))
+                evening = _ny(date.fromordinal(d1.toordinal() - 1), time(20))
+                sunday = _at(perp, evening)
+                if not closed or not sunday:
+                    continue
+                # The console's implied open at that moment, not this module's arithmetic.
+                console = console_implied_open(f"{stock}USDT", sunday,
+                                               datetime.fromtimestamp(evening, UTC))
+                if console is None:
+                    continue
+                rows.append({"stock": stock, "closed": d0.isoformat(),
+                             "opened": d1.isoformat(),
+                             "gap": after["open"] / before["close"] - 1,
+                             "estimates": {"last_close": 0.0,
+                                           "perp_weekend": console[0] / before["close"] - 1}})
     if len(rows) < 20:
         return None
     xs = [r["estimates"]["perp_weekend"] for r in rows]
@@ -344,9 +476,38 @@ def sunday_evening(inputs: dict[str, Any]) -> dict[str, Any] | None:
             "paired": _paired(rows, "perp_weekend", "last_close")}
 
 
+def _console_replay(all_rows: list[dict[str, Any]],
+                    scored: list[dict[str, Any]]) -> dict[str, Any]:
+    """How the console's printed implied open compares with the formula this harness used to
+    score in its place, and which nights the console declined."""
+    declined = [r for r in all_rows if r.get("console_gap") is None]
+    diffs = [abs(r["estimates"]["argus_perp"] - r["estimates"]["argus_perp_formula"]) * 1e4
+             for r in scored]
+    mismatched = [r for r in all_rows if r.get("console_anchor") is not None
+                  and abs(r["console_anchor"] / r["close"] - 1) > 1e-5]
+    return {
+        "method": "lui/research._implied_open_line called per night at 09:00 New York, its "
+                  "market readers pointed at data/h2h_gloaming/inputs.json (console_feed); the "
+                  "gap is the printed implied price over the session's regular close",
+        "nights_offered": len(all_rows),
+        "nights_the_console_answered": len(all_rows) - len(declined),
+        "nights_the_console_declined": [
+            {"stock": r["stock"], "closed": r["closed"], "opened": r["opened"]}
+            for r in declined],
+        "anchor_differs_from_the_session_close": [
+            {"stock": r["stock"], "closed": r["closed"], "console_anchor": r["console_anchor"],
+             "session_close": r["close"]} for r in mismatched],
+        "max_abs_diff_vs_former_formula_bps": round(max(diffs), 3) if diffs else None,
+        "mean_abs_diff_vs_former_formula_bps": round(mean(diffs), 4) if diffs else None,
+        "sample_line": next((r["console_line"] for r in all_rows if r.get("console_line")),
+                            None),
+    }
+
+
 def score(inputs: dict[str, Any] | None = None) -> dict[str, Any]:
     inputs = inputs or json.loads((DATA / "inputs.json").read_text("utf-8"))
-    rows = predict(nights(inputs))
+    offered = nights(inputs)
+    rows = predict(offered)
     scored = [r for r in rows if r["fitted"]]
     if not scored:
         return {"error": "no night had enough history to fit", "rows": len(rows)}
@@ -363,7 +524,7 @@ def score(inputs: dict[str, Any] | None = None) -> dict[str, Any]:
                 "argus_perp_direction_hit_rate": _summary(subset, "argus_perp")[
                     "direction_hit_rate"],
                 "argus_perp_vs_best_gloaming": _paired(subset, "argus_perp", best_gloaming)}
-    return {
+    report: dict[str, Any] = {
         "generated": datetime.now(UTC).isoformat(timespec="seconds"),
         "inputs_fetched": inputs.get("fetched"),
         "target": "gap from the last regular close to the next regular open, per stock",
@@ -396,19 +557,73 @@ def score(inputs: dict[str, Any] | None = None) -> dict[str, Any]:
                                                     "argus_perp"),
         },
         "failures": inputs.get("failures") or {},
+        "console_replay": _console_replay(offered, scored),
         "scope": ("Rows before a stock's 11th night are excluded from every candidate so the "
                   "walk-forward fits are out of sample on the same rows as the fixed ones. "
                   "gloaming's crypto input is Bitget USDT perpetuals, not spot."),
     }
+    report["comparison_reports"] = [r.to_dict() for r in comparison_reports(report)]
+    return report
+
+
+def comparison_reports(report: dict[str, Any]) -> list[ComparisonReport]:
+    """This harness's verdicts in the spine's shape (`eval/compare.py`), read from its own report.
+
+    A pure function of the report dict, so it reads a pre-migration artefact exactly as it reads a
+    fresh one — which is how `tests/test_eval_spine.py` proves the migration changed no verdict.
+    The outcome is taken from the bootstrap's own verdict string (computed on unrounded bounds),
+    never re-derived from the rounded interval printed beside it.
+    """
+    summary, best = report["summary"], report["best_gloaming"]
+    paired = {(p["a"], p["b"]): p for p in report["paired"]}
+    total = report["out_of_sample"]["rows_scored"] + report["out_of_sample"]["rows_excluded"]
+    groups = {stock: legacy_outcome(row["argus_perp_vs_best_gloaming"]["verdict"],
+                                    argus_is_a=True).value
+              for stock, row in report["per_stock"].items()}
+    out: list[ComparisonReport] = []
+    for rival, rival_label, question, per_group in (
+            (best, f"gloaming ({best}), its best variant", "the stock's overnight gap", groups),
+            ("zero", "no gap (the last close)", "the stock's overnight gap: the floor", {})):
+        block = paired[("argus_perp", rival)]
+        out.append(finalise(ComparisonReport(
+            comparison="overnight", question=question, argus="argus_perp", rival=rival_label,
+            metric="mean absolute error of the predicted close-to-open gap, bps",
+            lower_is_better=True, argus_score=summary["argus_perp"]["mae_bps"],
+            rival_score=summary[rival]["mae_bps"], n=block["nights"], unit="night",
+            outcome=legacy_outcome(block["verdict"], argus_is_a=True),
+            basis="paired bootstrap over nights, 4000 draws, seed 7; ARGUS is the console's "
+                  "_implied_open_line replayed on the saved inputs; ARGUS better if the whole "
+                  "95% interval of (ARGUS - rival) absolute error is below zero",
+            ci95=(block["ci95_bps"][0], block["ci95_bps"][1]),
+            scored=report["scored_rows"], total=total, groups=per_group,
+            artefact="data/overnight_comparison.json", created_at=report["generated"])))
+    weekend = report.get("sunday_evening_vs_nocturne_claim")
+    if weekend:
+        block = weekend["paired"]
+        out.append(finalise(ComparisonReport(
+            comparison="overnight", question="the Monday open from Sunday 20:00 New York",
+            argus="perp_weekend", rival="nocturne's claim: the last regular close",
+            metric="mean absolute error of the predicted Friday-close-to-Monday-open gap, bps",
+            lower_is_better=True,
+            argus_score=weekend["summary"]["perp_weekend"]["mae_bps"],
+            rival_score=weekend["summary"]["last_close"]["mae_bps"], n=block["nights"],
+            unit="weekend", outcome=legacy_outcome(block["verdict"], argus_is_a=True),
+            basis="paired bootstrap over weekends, 4000 draws, seed 7",
+            ci95=(block["ci95_bps"][0], block["ci95_bps"][1]), scored=weekend["rows"],
+            total=weekend["rows"], artefact="data/overnight_comparison.json",
+            created_at=report["generated"])))
+    return out
 
 
 def main() -> int:  # pragma: no cover - CLI
     if "--collect" in sys.argv:
         collect()
     report = score()
-    REPORT.write_text(json.dumps(report, indent=2), "utf-8")
+    artefact.write(REPORT, report)
     print(json.dumps({k: report.get(k) for k in ("scored_rows", "nights", "summary",
                                                  "paired")}, indent=1))
+    for r in report.get("comparison_reports", []):
+        print(f"{r['rival']}: {r['outcome']} (valid {r['valid']})")
     return 0
 
 

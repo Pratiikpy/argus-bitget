@@ -1,0 +1,290 @@
+{
+  "reading": "tape_before",
+  "at": "2026-09-25T04:36:11.636838+00:00",
+  "answers": {
+    "META": [
+      {
+        "claim": "META is up today",
+        "symbol": "METAUSDT",
+        "lines": [
+          "Your premise that META is up: holds \u2014 META is +5.78% over 24 hours."
+        ]
+      },
+      {
+        "claim": "META is down today",
+        "symbol": "METAUSDT",
+        "lines": [
+          "Your premise that META is down: does not hold \u2014 META is +5.78% over 24 hours, up, not down."
+        ]
+      },
+      {
+        "claim": "META rallied today because of strong earnings",
+        "symbol": "METAUSDT",
+        "lines": [
+          "Your premise that META is up: holds \u2014 META is +5.78% over 24 hours; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      },
+      {
+        "claim": "META dropped today because of a downgrade",
+        "symbol": "METAUSDT",
+        "lines": [
+          "Your premise that META is down: does not hold \u2014 META is +5.78% over 24 hours, up, not down; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      }
+    ],
+    "MSTR": [
+      {
+        "claim": "MSTR is up today",
+        "symbol": "MSTRUSDT",
+        "lines": [
+          "Your premise that MSTR is up: holds \u2014 MSTR is +1.66% over 24 hours."
+        ]
+      },
+      {
+        "claim": "MSTR is down today",
+        "symbol": "MSTRUSDT",
+        "lines": [
+          "Your premise that MSTR is down: does not hold \u2014 MSTR is +1.66% over 24 hours, up, not down."
+        ]
+      },
+      {
+        "claim": "MSTR rallied today because of strong earnings",
+        "symbol": "MSTRUSDT",
+        "lines": [
+          "Your premise that MSTR is up: holds \u2014 MSTR is +1.66% over 24 hours; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      },
+      {
+        "claim": "MSTR dropped today because of a downgrade",
+        "symbol": "MSTRUSDT",
+        "lines": [
+          "Your premise that MSTR is down: does not hold \u2014 MSTR is +1.66% over 24 hours, up, not down; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      }
+    ],
+    "AMZN": [
+      {
+        "claim": "AMZN is up today",
+        "symbol": "AMZNUSDT",
+        "lines": [
+          "Your premise that AMZN is up: holds \u2014 AMZN is +0.67% over 24 hours."
+        ]
+      },
+      {
+        "claim": "AMZN is down today",
+        "symbol": "AMZNUSDT",
+        "lines": [
+          "Your premise that AMZN is down: does not hold \u2014 AMZN is +0.67% over 24 hours, up, not down."
+        ]
+      },
+      {
+        "claim": "AMZN rallied today because of strong earnings",
+        "symbol": "AMZNUSDT",
+        "lines": [
+          "Your premise that AMZN is up: holds \u2014 AMZN is +0.67% over 24 hours; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      },
+      {
+        "claim": "AMZN dropped today because of a downgrade",
+        "symbol": "AMZNUSDT",
+        "lines": [
+          "Your premise that AMZN is down: does not hold \u2014 AMZN is +0.67% over 24 hours, up, not down; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      }
+    ],
+    "GOOGL": [
+      {
+        "claim": "GOOGL is up today",
+        "symbol": "GOOGLUSDT",
+        "lines": [
+          "Your premise that GOOGL is up: holds \u2014 GOOGL is +0.62% over 24 hours."
+        ]
+      },
+      {
+        "claim": "GOOGL is down today",
+        "symbol": "GOOGLUSDT",
+        "lines": [
+          "Your premise that GOOGL is down: does not hold \u2014 GOOGL is +0.62% over 24 hours, up, not down."
+        ]
+      },
+      {
+        "claim": "GOOGL rallied today because of strong earnings",
+        "symbol": "GOOGLUSDT",
+        "lines": [
+          "Your premise that GOOGL is up: holds \u2014 GOOGL is +0.62% over 24 hours; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      },
+      {
+        "claim": "GOOGL dropped today because of a downgrade",
+        "symbol": "GOOGLUSDT",
+        "lines": [
+          "Your premise that GOOGL is down: does not hold \u2014 GOOGL is +0.62% over 24 hours, up, not down; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      }
+    ],
+    "COIN": [
+      {
+        "claim": "COIN is up today",
+        "symbol": "COINUSDT",
+        "lines": [
+          "Your premise that COIN is up: holds \u2014 COIN is +0.84% over 24 hours."
+        ]
+      },
+      {
+        "claim": "COIN is down today",
+        "symbol": "COINUSDT",
+        "lines": [
+          "Your premise that COIN is down: does not hold \u2014 COIN is +0.84% over 24 hours, up, not down."
+        ]
+      },
+      {
+        "claim": "COIN rallied today because of strong earnings",
+        "symbol": "COINUSDT",
+        "lines": [
+          "Your premise that COIN is up: holds \u2014 COIN is +0.84% over 24 hours; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      },
+      {
+        "claim": "COIN dropped today because of a downgrade",
+        "symbol": "COINUSDT",
+        "lines": [
+          "Your premise that COIN is down: does not hold \u2014 COIN is +0.84% over 24 hours, up, not down; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      }
+    ],
+    "AAPL": [
+      {
+        "claim": "AAPL is up today",
+        "symbol": "AAPLUSDT",
+        "lines": [
+          "Your premise that AAPL is up: does not hold \u2014 AAPL is -0.36% over 24 hours, down, not up."
+        ]
+      },
+      {
+        "claim": "AAPL is down today",
+        "symbol": "AAPLUSDT",
+        "lines": [
+          "Your premise that AAPL is down: holds \u2014 AAPL is -0.36% over 24 hours."
+        ]
+      },
+      {
+        "claim": "AAPL rallied today because of strong earnings",
+        "symbol": "AAPLUSDT",
+        "lines": [
+          "Your premise that AAPL is up: does not hold \u2014 AAPL is -0.36% over 24 hours, down, not up; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      },
+      {
+        "claim": "AAPL dropped today because of a downgrade",
+        "symbol": "AAPLUSDT",
+        "lines": [
+          "Your premise that AAPL is down: holds \u2014 AAPL is -0.36% over 24 hours; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      }
+    ],
+    "MSFT": [
+      {
+        "claim": "MSFT is up today",
+        "symbol": "MSFTUSDT",
+        "lines": [
+          "Your premise that MSFT is up: does not hold \u2014 MSFT is -0.36% over 24 hours, down, not up."
+        ]
+      },
+      {
+        "claim": "MSFT is down today",
+        "symbol": "MSFTUSDT",
+        "lines": [
+          "Your premise that MSFT is down: holds \u2014 MSFT is -0.36% over 24 hours."
+        ]
+      },
+      {
+        "claim": "MSFT rallied today because of strong earnings",
+        "symbol": "MSFTUSDT",
+        "lines": [
+          "Your premise that MSFT is up: does not hold \u2014 MSFT is -0.36% over 24 hours, down, not up; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      },
+      {
+        "claim": "MSFT dropped today because of a downgrade",
+        "symbol": "MSFTUSDT",
+        "lines": [
+          "Your premise that MSFT is down: holds \u2014 MSFT is -0.36% over 24 hours; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      }
+    ],
+    "NVDA": [
+      {
+        "claim": "NVDA is up today",
+        "symbol": "NVDAUSDT",
+        "lines": [
+          "Your premise that NVDA is up: does not hold \u2014 NVDA is -0.19% over 24 hours, essentially flat and if anything down."
+        ]
+      },
+      {
+        "claim": "NVDA is down today",
+        "symbol": "NVDAUSDT",
+        "lines": [
+          "Your premise that NVDA is down: barely \u2014 NVDA is -0.19% over 24 hours, essentially flat."
+        ]
+      },
+      {
+        "claim": "NVDA rallied today because of strong earnings",
+        "symbol": "NVDAUSDT",
+        "lines": [
+          "Your premise that NVDA is up: does not hold \u2014 NVDA is -0.19% over 24 hours, essentially flat and if anything down; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      },
+      {
+        "claim": "NVDA dropped today because of a downgrade",
+        "symbol": "NVDAUSDT",
+        "lines": [
+          "Your premise that NVDA is down: barely \u2014 NVDA is -0.19% over 24 hours, essentially flat; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      },
+      {
+        "claim": "The US stock market is closed right now, so NVDA is trading after hours",
+        "symbol": "NVDAUSDT",
+        "lines": [
+          "Your premise that the US market is closed: holds \u2014 at 04:36 UTC the NYSE regular session is closed, so the stock's last price is its last close and the perpetual is the only thing trading."
+        ]
+      },
+      {
+        "claim": "The US stock market is open right now",
+        "symbol": "",
+        "lines": [
+          "Your premise that the US market is open: does not hold \u2014 at 04:36 UTC the NYSE regular session is closed, so the stock's last price is its last close and the perpetual is the only thing trading."
+        ]
+      }
+    ],
+    "TSLA": [
+      {
+        "claim": "TSLA is up today",
+        "symbol": "TSLAUSDT",
+        "lines": [
+          "Your premise that TSLA is up: holds \u2014 TSLA is +0.30% over 24 hours."
+        ]
+      },
+      {
+        "claim": "TSLA is down today",
+        "symbol": "TSLAUSDT",
+        "lines": [
+          "Your premise that TSLA is down: does not hold \u2014 TSLA is +0.30% over 24 hours, up, not down."
+        ]
+      },
+      {
+        "claim": "TSLA rallied today because of strong earnings",
+        "symbol": "TSLAUSDT",
+        "lines": [
+          "Your premise that TSLA is up: holds \u2014 TSLA is +0.30% over 24 hours; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      },
+      {
+        "claim": "TSLA dropped today because of a downgrade",
+        "symbol": "TSLAUSDT",
+        "lines": [
+          "Your premise that TSLA is down: does not hold \u2014 TSLA is +0.30% over 24 hours, up, not down; the reason you give is not something a price can confirm \u2014 the lines below say whether a filing or headline backs it."
+        ]
+      }
+    ]
+  }
+}

@@ -47,6 +47,27 @@ best distance worse than :data:`WEAK_MATCH_DISTANCE`, and the report says the pr
 precedent in the window examined instead of returning the least-bad row. "Nothing like this has
 happened before" is a finding; the fifth-nearest of five poor matches presented as a precedent is a
 fabrication.
+
+**Diversity among the analogues, opt-in (added 2026-09-25).** The exclusion zone guarantees no two
+analogues share a bar; it does not stop five of them being the same *shape*, one sharp V repeated
+across five months, which is one precedent counted five times in a different way.
+``find(diversity=λ)`` re-ranks the non-overlapping candidates with Maximal Marginal Relevance
+through :func:`argus.desk.analogue.mmr_order`, a transcription of paper-qa's loop (Apache-2.0,
+`src/paperqa/llms.py:151-166`). Relevance is the Pearson correlation ``rho = 1 - d² / 2`` of a
+candidate with the query — the same quantity :func:`_distances` already computes — and similarity
+between two candidates is their own correlation, so the penalty is paid in the metric the match was
+made in and ``λ = 1`` is exactly the old order. The pool is the ``2 * top`` nearest
+non-overlapping windows (paper-qa's ``fetch_k = 2 * k``, `docs.py:483`), so the exclusion zone is
+applied first and never traded away. The null calibration is untouched: it scans for the single
+best match, and MMR's first pick is always the nearest. ``explain=True`` records each pick's
+relevance, penalty and score in the shape of mem0's ``score_details`` (Apache-2.0,
+`mem0/utils/scoring.py:127-137`). **Off by default, because on the test it lost.** On AnalogDesk's
+pre-registered grid (:mod:`argus.eval.retrieval_diversity`, ``data/retrieval_diversity.json``,
+2026-09-25) the calibration era chose λ = 0.9, and on 2,698 test queries it was worse: Winkler
+16.396% → 16.417%, +0.021 points, Diebold-Mariano p = 0.028 over 38 clustered dates — small but
+significant. Lower lambdas cut shape near-duplicates sharply (40.1% of analogues correlated ≥ 0.9
+with an earlier pick → 14.2% at λ = 0.3) without improving the band either (16.610% at λ = 0.3).
+The exclusion zone already removes the redundancy that matters to the outcome distribution.
 """
 
 from __future__ import annotations
@@ -54,12 +75,14 @@ from __future__ import annotations
 import json
 import math
 import random
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from statistics import fmean, median, pstdev
 from typing import Any
+
+from argus.desk.analogue import mmr_order
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 REPORT_PATH = DATA / "shape_matches.json"
@@ -167,12 +190,19 @@ class Analogue:
 
     start_index: int
 
+    why: Mapping[str, float] | None = None
+    """Relevance, diversity penalty, MMR score and pick order, when :func:`find` was asked to
+    ``explain``. Absent otherwise, so an unexplained report serialises exactly as it always has."""
+
     def as_dict(self) -> dict[str, Any]:
-        return {
+        out: dict[str, Any] = {
             "ends_at": self.ends_at.isoformat(),
             "distance": round(self.distance, 4),
             "forward_pct": None if self.forward_pct is None else round(self.forward_pct, 4),
         }
+        if self.why is not None:
+            out["why"] = {k: round(v, 4) for k, v in self.why.items()}
+        return out
 
 
 @dataclass(frozen=True, slots=True)
@@ -332,6 +362,8 @@ def _scan(
     window: int,
     horizon: int,
     top: int,
+    diversity: float | None = None,
+    explain: bool = False,
 ) -> tuple[list[Analogue], int]:
     """One brute-force pass: every candidate window scored against the final one.
 
@@ -367,13 +399,54 @@ def _scan(
     # Exclusion zone: a full window either side, so no two reported analogues share a bar. Without
     # this the top-5 is one event reported five times, and the outcome distribution is one outcome
     # counted five times.
+    lam = 1.0 if diversity is None else diversity
+    wanted = top if lam >= 1.0 else 2 * top
     chosen: list[Analogue] = []
     for dist, start in ranked:
         if all(abs(start - kept.start_index) >= window for kept in chosen):
             chosen.append(analogue(start, dist))
-        if len(chosen) == top:
+        if len(chosen) == wanted:
             break
-    return chosen, len(ranked)
+    if lam >= 1.0 and not explain:
+        return chosen, len(ranked)
+
+    # MMR over the non-overlapping pool. rho = 1 - d^2 / 2 is the correlation with the query, and
+    # the pairwise similarity is the correlation between two candidate windows.
+    rels = [1.0 - 0.5 * a.distance * a.distance for a in chosen]
+    pool = [closes[a.start_index:a.start_index + window] for a in chosen]
+    cache: dict[tuple[int, int], float] = {}
+
+    def similarity(i: int, j: int) -> float:
+        key = (min(i, j), max(i, j))
+        if key not in cache:
+            cache[key] = _correlation(pool[i], pool[j])
+        return cache[key]
+
+    picks = mmr_order(rels, similarity, k=top, mmr_lambda=lam)
+    out: list[Analogue] = []
+    for rank, (index, penalty, score) in enumerate(picks, start=1):
+        base = chosen[index]
+        why = None
+        if explain:
+            why = {"relevance_rho": rels[index], "diversity_penalty": penalty,
+                   "mmr_lambda": lam, "final_score": score, "selection_rank": float(rank),
+                   "pool": float(len(chosen))}
+        out.append(Analogue(ends_at=base.ends_at, distance=base.distance,
+                            forward_pct=base.forward_pct, start_index=base.start_index, why=why))
+    return out, len(ranked)
+
+
+def _correlation(left: Sequence[float], right: Sequence[float]) -> float:
+    """Pearson correlation of two equal-length windows, with :func:`znormalise`'s flat-window rule:
+    a flat window has correlation 0 with anything shaped, and 1 with another flat window."""
+    n = len(left)
+    lm, rm = math.fsum(left) / n, math.fsum(right) / n
+    ld = [v - lm for v in left]
+    rd = [v - rm for v in right]
+    lss, rss = math.fsum(d * d for d in ld), math.fsum(d * d for d in rd)
+    if lss <= 0.0 or rss <= 0.0:
+        return 1.0 if lss <= 0.0 and rss <= 0.0 else 0.0
+    return math.fsum(a * b for a, b in zip(ld, rd, strict=True)) / math.sqrt(lss * rss)
 
 
 def _distances(closes: Sequence[float], window: int, starts: Sequence[int]) -> list[float]:
@@ -433,6 +506,8 @@ def find(
     top: int = 5,
     trials: int = NULL_TRIALS,
     seed: int = 20260914,
+    diversity: float | None = None,
+    explain: bool = False,
 ) -> AnalogueReport:
     """The ``top`` past windows most resembling the final ``window`` bars, and what followed each.
 
@@ -444,7 +519,12 @@ def find(
     series; ``trials=0`` skips that and the report says so rather than claiming a precedent. The
     seed is fixed and stated so the p-value is reproducible — a calibration that moves between runs
     is a number a reader cannot check.
+
+    ``diversity`` is an MMR lambda in [0, 1] (``None``, the default, keeps nearest-first);
+    ``explain`` records why each analogue was picked. Neither touches the null calibration.
     """
+    if diversity is not None and not 0.0 <= diversity <= 1.0:
+        raise AnalogueError(f"diversity is an MMR lambda in [0, 1], got {diversity}")
     if window < 3:
         raise AnalogueError(f"a {window}-bar window has no shape to match")
     if horizon < 1:
@@ -457,7 +537,8 @@ def find(
 
     closes = [c for _, c in series]
     stamps = [t for t, _ in series]
-    chosen, searched = _scan(closes, stamps, window=window, horizon=horizon, top=top)
+    chosen, searched = _scan(closes, stamps, window=window, horizon=horizon, top=top,
+                             diversity=diversity, explain=explain)
 
     null_better = 0
     null_median: float | None = None

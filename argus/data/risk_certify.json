@@ -1,0 +1,2322 @@
+{
+  "what": "the risk layer certified gate by gate against a written specification, and every gate broken on purpose to test the certifier",
+  "sources": {
+    "certifier": "PlanBench (MIT): llm_planning_analysis/full_validator/__init__.py:6-63 step replay; utils/task_utils.py:549-561, 589-706 localised unmet-precondition messages; back_prompting.py:355-359 sound versus unsound correction signals",
+    "trace_and_modes": "letta-code (Apache-2.0): src/permissions/types.ts:32-52, checker.ts:88-105, 202-229; src/permissions/mode.ts:3-18; src/reminders/engine.ts:337-377"
+  },
+  "generated_at": "2026-09-25T20:32:43.880400+00:00",
+  "qwen_calls": 0,
+  "specification": {
+    "venue": [
+      {
+        "gate": "instrument_known",
+        "denials": [
+          "instrument_unknown"
+        ],
+        "precondition": "the symbol is one the venue published rules for (checked by the session guard only)",
+        "effect": "none"
+      },
+      {
+        "gate": "finite_inputs",
+        "denials": [
+          "not_a_number"
+        ],
+        "precondition": "the quantity, and the limit price, reference price and balance when given, are finite numbers",
+        "effect": "none"
+      },
+      {
+        "gate": "side_known",
+        "denials": [
+          "side_unknown"
+        ],
+        "precondition": "the side is buy or sell, ignoring case \u2014 the venue's own enum",
+        "effect": "none"
+      },
+      {
+        "gate": "instrument_online",
+        "denials": [
+          "instrument_offline"
+        ],
+        "precondition": "the instrument's published status is online, ignoring case",
+        "effect": "none"
+      },
+      {
+        "gate": "rate_window",
+        "denials": [
+          "rate_limit"
+        ],
+        "precondition": "fewer submissions than the cap sit strictly inside the window ending now; a stamp exactly one window old has left it. Skipped when no window is supplied",
+        "effect": "none here; one slot is spent, at now, only if the whole order is allowed and the call enforces rather than self-checks"
+      },
+      {
+        "gate": "price_positive",
+        "denials": [
+          "price_not_positive"
+        ],
+        "precondition": "a limit price, when given, is above zero. Skipped for a market order",
+        "effect": "none"
+      },
+      {
+        "gate": "price_step",
+        "denials": [
+          "price_not_positive"
+        ],
+        "precondition": "the limit price stepped down to the tick is still above zero",
+        "effect": "the limit price becomes the largest tick multiple not above it"
+      },
+      {
+        "gate": "price_band",
+        "denials": [
+          "price_outside_band"
+        ],
+        "precondition": "with a reference price above zero, the stepped limit price lies in reference x (1 - ratio) to reference x (1 + ratio) inclusive, with the buy ratio for a buy and the sell ratio for a sell. Skipped without a limit price or a positive reference",
+        "effect": "none"
+      },
+      {
+        "gate": "quantity_step",
+        "denials": [],
+        "precondition": "none",
+        "effect": "the quantity becomes the step multiple nearest zero on its own side"
+      },
+      {
+        "gate": "quantity_ceiling",
+        "denials": [
+          "quantity_above_maximum"
+        ],
+        "precondition": "when the quantity exceeds the venue maximum, the maximum stepped down is above zero",
+        "effect": "a quantity above the maximum becomes the maximum stepped down"
+      },
+      {
+        "gate": "quantity_floor",
+        "denials": [
+          "quantity_below_minimum"
+        ],
+        "precondition": "the stepped quantity is at least the venue minimum; the guard may not raise it",
+        "effect": "none"
+      },
+      {
+        "gate": "notional_floor",
+        "denials": [
+          "notional_below_minimum"
+        ],
+        "precondition": "valued at the stepped limit price, or at the reference price for a market order, the notional is at least the venue minimum. Skipped when no positive value exists",
+        "effect": "none"
+      },
+      {
+        "gate": "balance",
+        "denials": [
+          "insufficient_balance"
+        ],
+        "precondition": "the same notional does not exceed the available balance. Skipped without a balance or without a value",
+        "effect": "none"
+      }
+    ],
+    "venue_goals": [
+      "an allowed order is never larger than the order asked for",
+      "an allowed quantity is a multiple of the step, within the venue minimum and maximum",
+      "an allowed limit price is above zero, a multiple of the tick and not above the price asked",
+      "an allowed limit price sits inside the band whenever a positive reference was given",
+      "an allowed, valued order meets the minimum notional and fits the balance when one was given",
+      "a refused order carries quantity zero and spends no rate-window slot"
+    ],
+    "circuit": [
+      {
+        "gate": "total_drawdown",
+        "denials": [
+          "halted"
+        ],
+        "precondition": "peak-to-trough drawdown is below 0.1",
+        "effect": "demands halted"
+      },
+      {
+        "gate": "session_drawdown",
+        "denials": [
+          "halted"
+        ],
+        "precondition": "drawdown since the session opened is below 0.04",
+        "effect": "demands halted"
+      },
+      {
+        "gate": "losing_streak",
+        "denials": [
+          "halted"
+        ],
+        "precondition": "fewer than 4 consecutive losses",
+        "effect": "demands halted"
+      },
+      {
+        "gate": "shock",
+        "denials": [
+          "halted"
+        ],
+        "precondition": "the signed move is above -3 sigma",
+        "effect": "demands halted"
+      },
+      {
+        "gate": "stale_evidence",
+        "denials": [
+          "reduce_only"
+        ],
+        "precondition": "the evidence is no older than 6:00:00",
+        "effect": "demands reduce_only"
+      },
+      {
+        "gate": "drawdown_ladder",
+        "denials": [
+          "reduce_only"
+        ],
+        "precondition": "drawdown is below 0.02 or already at the halt",
+        "effect": "demands reduce_only; appetite scales 1 / 0.75 / 0.5 / 0 at 0, 2%, 6%, 10%"
+      }
+    ],
+    "sizing": [
+      {
+        "gate": "calibration_sample",
+        "denials": [],
+        "precondition": "at least 20 graded outcomes",
+        "effect": "otherwise size at the fixed fraction"
+      },
+      {
+        "gate": "calibration_error",
+        "denials": [],
+        "precondition": "expected calibration error at most 0.15",
+        "effect": "otherwise size at the fixed fraction"
+      },
+      {
+        "gate": "kelly_floor",
+        "denials": [],
+        "precondition": "none",
+        "effect": "a negative Kelly stake is zero, never a reversal"
+      },
+      {
+        "gate": "kelly_share",
+        "denials": [],
+        "precondition": "none",
+        "effect": "the Kelly stake is scaled by 0.5"
+      },
+      {
+        "gate": "position_cap",
+        "denials": [],
+        "precondition": "none",
+        "effect": "no fraction above 0.25"
+      },
+      {
+        "gate": "reduce_only_multipliers",
+        "denials": [],
+        "precondition": "both multipliers are non-negative and the session throttle is at most one",
+        "effect": "otherwise refuse to size"
+      }
+    ],
+    "modes": [
+      {
+        "gate": "resolution",
+        "denials": [],
+        "precondition": "every layer is present once, in the order operator, venue, circuit, posture, and the posture layer demands a mode",
+        "effect": "the effective mode is the most restrictive demanded (normal < paper < reduce_only < halted); the binding layer is the first, in that order, to demand it"
+      },
+      {
+        "gate": "risk_mode",
+        "denials": [
+          "risk_mode"
+        ],
+        "precondition": "the verdict carries a quantity (trade, hedge, reduce); a reduction is admitted in every mode and on either venue; otherwise the venue is paper unless the mode is normal; reduce_only refuses trade; halted refuses trade and hedge",
+        "effect": "a refused trade or hedge is narrowed to reduce if positions are open, else no_trade"
+      }
+    ],
+    "chain": [
+      {
+        "gate": "constitution",
+        "denials": [],
+        "precondition": "a risk record exists for the decision",
+        "effect": "the approved quantity is no larger than the proposed one"
+      },
+      {
+        "gate": "protocol",
+        "denials": [],
+        "precondition": "the protocol receives the Constitution's approved intent",
+        "effect": "the protocol may shrink or refuse; it never enlarges"
+      },
+      {
+        "gate": "venue_gate",
+        "denials": [],
+        "precondition": "an order reaches the venue gate only if a positive quantity was approved, and never more than was approved",
+        "effect": "the venue gate may shrink or refuse; it never enlarges"
+      },
+      {
+        "gate": "ledger",
+        "denials": [],
+        "precondition": "the ledger records exactly what the last gate let through, and a trade only with a positive quantity the venue gate allowed",
+        "effect": "none"
+      }
+    ]
+  },
+  "streams": {
+    "recorded": {
+      "decisions_read": 707,
+      "reached_venue_gate": 2,
+      "replayable": 2,
+      "not_replayable": [],
+      "window": "replayed against an empty rate window; the live window was not recorded"
+    },
+    "counterfactual": {
+      "decision_points": 707,
+      "intents": 6363,
+      "sizes": "notionals ['4.99', '5', '5.01', '100', '1000', '10000', '1000000'] USDT at the recorded price, plus each instrument's minimum and twice its maximum",
+      "what": "synthetic sizes on real symbols, real sides and real recorded prices"
+    },
+    "swept": {
+      "orders": 190944,
+      "source": "eval/guard_selfcheck.py order_space()"
+    },
+    "probe": {
+      "orders": 29,
+      "labels": [
+        "quantity not a number",
+        "offline instrument",
+        "rate window at the cap",
+        "rate window at the cap, every stamp exactly one window old",
+        "limit price zero",
+        "sell inside the buy band but outside the sell band",
+        "quantity exactly the venue minimum",
+        "venue maximum below one step",
+        "balance just covers the order",
+        "side neither buy nor sell",
+        "empty side",
+        "side with trailing space",
+        "side long",
+        "sub-tick limit price, no reference",
+        "sub-tick limit price, reference",
+        "sub-tick limit price on a whole-unit tick",
+        "sub-tick price, whole-unit tick, reference",
+        "31-digit quantity just under one step",
+        "31-digit quantity just under two steps",
+        "31-digit quantity just under the maximum",
+        "notional a hair under the floor",
+        "notional a hair over the balance",
+        "limit a hair above the band, stepped back onto the tick",
+        "limit on the tick, band edge from a 31-digit reference",
+        "limit exactly on the band edge",
+        "non-terminating step quotient",
+        "non-terminating price quotient",
+        "exact odd step",
+        "unknown symbol through the session guard"
+      ]
+    },
+    "instrument_specs": {
+      "fetched_at": "2026-09-25T16:09:16.719407+00:00",
+      "source": "https://api.bitget.com/api/v3/market/instruments?category=USDT-FUTURES",
+      "note": "today's rows; the rows in force at each decision were never recorded",
+      "missing": [],
+      "symbols": [
+        "AAPLUSDT",
+        "AMZNUSDT",
+        "COINUSDT",
+        "GOOGLUSDT",
+        "METAUSDT",
+        "MSFTUSDT",
+        "MSTRUSDT",
+        "NVDAUSDT",
+        "QQQUSDT",
+        "SQQQUSDT",
+        "TQQQUSDT",
+        "TSLAUSDT"
+      ]
+    }
+  },
+  "guard_agreement": {
+    "current": {
+      "engine": {
+        "label": "guard current",
+        "path": "src/argus/execution/guard.py",
+        "sha256": "0f0e402284bcde6c55e9f9325dd5783714a2162ab970a41b25e85a6b7eca8c45"
+      },
+      "streams": {
+        "recorded": {
+          "orders": 2,
+          "certified": 2,
+          "violated": 0,
+          "violations_by_gate": {},
+          "examples_violated": [],
+          "examples_refused": [],
+          "agreement": 1.0
+        },
+        "counterfactual": {
+          "orders": 6363,
+          "certified": 6363,
+          "violated": 0,
+          "violations_by_gate": {},
+          "examples_violated": [],
+          "examples_refused": [
+            {
+              "intent": {
+                "stream": "counterfactual",
+                "id": "seq 1 size 0",
+                "instrument": "NVDAUSDT",
+                "symbol": "NVDAUSDT",
+                "quantity": "0.022746957",
+                "price": null,
+                "reference": "219.37",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": true
+              },
+              "first_unmet": "notional_floor (step 12 of 13): unmet precondition \u2014 notional 4.3874 (0.02 x 219.37) is below the venue minimum 5"
+            },
+            {
+              "intent": {
+                "stream": "counterfactual",
+                "id": "seq 1 size 1",
+                "instrument": "NVDAUSDT",
+                "symbol": "NVDAUSDT",
+                "quantity": "0.022792542",
+                "price": null,
+                "reference": "219.37",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": true
+              },
+              "first_unmet": "notional_floor (step 12 of 13): unmet precondition \u2014 notional 4.3874 (0.02 x 219.37) is below the venue minimum 5"
+            },
+            {
+              "intent": {
+                "stream": "counterfactual",
+                "id": "seq 1 size 2",
+                "instrument": "NVDAUSDT",
+                "symbol": "NVDAUSDT",
+                "quantity": "0.022838127",
+                "price": null,
+                "reference": "219.37",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": true
+              },
+              "first_unmet": "notional_floor (step 12 of 13): unmet precondition \u2014 notional 4.3874 (0.02 x 219.37) is below the venue minimum 5"
+            }
+          ],
+          "agreement": 1.0
+        },
+        "probe": {
+          "orders": 29,
+          "certified": 29,
+          "violated": 0,
+          "violations_by_gate": {},
+          "examples_violated": [],
+          "examples_refused": [
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "quantity not a number",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "NaN",
+                "price": null,
+                "reference": "100",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "first_unmet": "finite_inputs (step 1 of 12): unmet precondition \u2014 quantity NaN is not a finite number"
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "offline instrument",
+                "instrument": "offline",
+                "symbol": "offline",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "first_unmet": "instrument_online (step 3 of 12): unmet precondition \u2014 NVDAUSDT is limit_open, not online"
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "rate window at the cap",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "buy",
+                "balance": null,
+                "window": "at_cap",
+                "lookup": false
+              },
+              "first_unmet": "rate_window (step 4 of 12): unmet precondition \u2014 10 submission(s) inside the 60s window ending at 1000, at the cap of 10"
+            }
+          ],
+          "agreement": 1.0
+        },
+        "swept": {
+          "orders": 190944,
+          "certified": 190944,
+          "violated": 0,
+          "violations_by_gate": {},
+          "examples_violated": [],
+          "examples_refused": [
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": null,
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "none",
+                "lookup": false
+              },
+              "first_unmet": "quantity_floor (step 10 of 12): unmet precondition \u2014 quantity -1 steps down to -1, below the venue minimum 0.01"
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": null,
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "first_unmet": "quantity_floor (step 10 of 12): unmet precondition \u2014 quantity -1 steps down to -1, below the venue minimum 0.01"
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": null,
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "one_below_cap",
+                "lookup": false
+              },
+              "first_unmet": "quantity_floor (step 10 of 12): unmet precondition \u2014 quantity -1 steps down to -1, below the venue minimum 0.01"
+            }
+          ],
+          "agreement": 1.0
+        }
+      }
+    },
+    "before S20 (2026-09-25 morning)": {
+      "engine": {
+        "label": "before S20 (2026-09-25 morning)",
+        "path": "data/risk_baselines/guard_2026-09-25_pre_s20.py.txt",
+        "sha256": "dfae508225fa9a2ad7a72f3848febe6a99cf872c0b428bfadd7e36282f905e83"
+      },
+      "streams": {
+        "recorded": {
+          "orders": 2,
+          "certified": 2,
+          "violated": 0,
+          "violations_by_gate": {},
+          "examples_violated": [],
+          "examples_refused": [],
+          "agreement": 1.0
+        },
+        "counterfactual": {
+          "orders": 6363,
+          "certified": 6363,
+          "violated": 0,
+          "violations_by_gate": {},
+          "examples_violated": [],
+          "examples_refused": [
+            {
+              "intent": {
+                "stream": "counterfactual",
+                "id": "seq 1 size 0",
+                "instrument": "NVDAUSDT",
+                "symbol": "NVDAUSDT",
+                "quantity": "0.022746957",
+                "price": null,
+                "reference": "219.37",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": true
+              },
+              "first_unmet": "notional_floor (step 12 of 13): unmet precondition \u2014 notional 4.3874 (0.02 x 219.37) is below the venue minimum 5"
+            },
+            {
+              "intent": {
+                "stream": "counterfactual",
+                "id": "seq 1 size 1",
+                "instrument": "NVDAUSDT",
+                "symbol": "NVDAUSDT",
+                "quantity": "0.022792542",
+                "price": null,
+                "reference": "219.37",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": true
+              },
+              "first_unmet": "notional_floor (step 12 of 13): unmet precondition \u2014 notional 4.3874 (0.02 x 219.37) is below the venue minimum 5"
+            },
+            {
+              "intent": {
+                "stream": "counterfactual",
+                "id": "seq 1 size 2",
+                "instrument": "NVDAUSDT",
+                "symbol": "NVDAUSDT",
+                "quantity": "0.022838127",
+                "price": null,
+                "reference": "219.37",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": true
+              },
+              "first_unmet": "notional_floor (step 12 of 13): unmet precondition \u2014 notional 4.3874 (0.02 x 219.37) is below the venue minimum 5"
+            }
+          ],
+          "agreement": 1.0
+        },
+        "probe": {
+          "orders": 29,
+          "certified": 15,
+          "violated": 14,
+          "violations_by_gate": {
+            "side_known": 4,
+            "price_step": 4,
+            "goal": 2,
+            "quantity_floor": 1,
+            "notional_floor": 1,
+            "balance": 1,
+            "price_band": 1
+          },
+          "examples_violated": [
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "side neither buy nor sell",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "hold",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied side_unknown",
+                "observed": "allowed 1",
+                "first_unmet": "side_known (step 2 of 12): unmet precondition \u2014 side 'hold' is not one of the venue's sides, buy or sell",
+                "violations": [
+                  "ruled none, but the specification requires side_unknown because side_known (step 2 of 12): unmet precondition \u2014 side 'hold' is not one of the venue's sides, buy or sell"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "empty side",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied side_unknown",
+                "observed": "allowed 1",
+                "first_unmet": "side_known (step 2 of 12): unmet precondition \u2014 side '' is not one of the venue's sides, buy or sell",
+                "violations": [
+                  "ruled none, but the specification requires side_unknown because side_known (step 2 of 12): unmet precondition \u2014 side '' is not one of the venue's sides, buy or sell"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "side with trailing space",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "buy ",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied side_unknown",
+                "observed": "allowed 1",
+                "first_unmet": "side_known (step 2 of 12): unmet precondition \u2014 side 'buy ' is not one of the venue's sides, buy or sell",
+                "violations": [
+                  "ruled none, but the specification requires side_unknown because side_known (step 2 of 12): unmet precondition \u2014 side 'buy ' is not one of the venue's sides, buy or sell"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "side long",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "long",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied side_unknown",
+                "observed": "allowed 1",
+                "first_unmet": "side_known (step 2 of 12): unmet precondition \u2014 side 'long' is not one of the venue's sides, buy or sell",
+                "violations": [
+                  "ruled none, but the specification requires side_unknown because side_known (step 2 of 12): unmet precondition \u2014 side 'long' is not one of the venue's sides, buy or sell"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "sub-tick limit price, no reference",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": "0.005",
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied price_not_positive",
+                "observed": "allowed 1 @ 0",
+                "first_unmet": "price_step (step 6 of 12): unmet precondition \u2014 limit price 0.005 steps down to 0 on the 0.01 tick",
+                "violations": [
+                  "ruled none, but the specification requires price_not_positive because price_step (step 6 of 12): unmet precondition \u2014 limit price 0.005 steps down to 0 on the 0.01 tick",
+                  "goal unmet: allowed limit price 0 is not above zero"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "sub-tick limit price, reference",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": "0.005",
+                "reference": "0.005",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied price_not_positive",
+                "observed": "denied price_outside_band",
+                "first_unmet": "price_step (step 6 of 12): unmet precondition \u2014 limit price 0.005 steps down to 0 on the 0.01 tick",
+                "violations": [
+                  "ruled price_outside_band, but the specification requires price_not_positive because price_step (step 6 of 12): unmet precondition \u2014 limit price 0.005 steps down to 0 on the 0.01 tick"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "sub-tick limit price on a whole-unit tick",
+                "instrument": "coarse_tick",
+                "symbol": "coarse_tick",
+                "quantity": "1",
+                "price": "0.5",
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied price_not_positive",
+                "observed": "allowed 1 @ 0",
+                "first_unmet": "price_step (step 6 of 12): unmet precondition \u2014 limit price 0.5 steps down to 0 on the 1 tick",
+                "violations": [
+                  "ruled none, but the specification requires price_not_positive because price_step (step 6 of 12): unmet precondition \u2014 limit price 0.5 steps down to 0 on the 1 tick",
+                  "goal unmet: allowed limit price 0 is not above zero"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "sub-tick price, whole-unit tick, reference",
+                "instrument": "coarse_tick",
+                "symbol": "coarse_tick",
+                "quantity": "1",
+                "price": "0.5",
+                "reference": "0.5",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied price_not_positive",
+                "observed": "denied price_outside_band",
+                "first_unmet": "price_step (step 6 of 12): unmet precondition \u2014 limit price 0.5 steps down to 0 on the 1 tick",
+                "violations": [
+                  "ruled price_outside_band, but the specification requires price_not_positive because price_step (step 6 of 12): unmet precondition \u2014 limit price 0.5 steps down to 0 on the 1 tick"
+                ],
+                "steps": []
+              }
+            }
+          ],
+          "examples_refused": [
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "quantity not a number",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "NaN",
+                "price": null,
+                "reference": "100",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "first_unmet": "finite_inputs (step 1 of 12): unmet precondition \u2014 quantity NaN is not a finite number"
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "offline instrument",
+                "instrument": "offline",
+                "symbol": "offline",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "first_unmet": "instrument_online (step 3 of 12): unmet precondition \u2014 NVDAUSDT is limit_open, not online"
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "rate window at the cap",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "buy",
+                "balance": null,
+                "window": "at_cap",
+                "lookup": false
+              },
+              "first_unmet": "rate_window (step 4 of 12): unmet precondition \u2014 10 submission(s) inside the 60s window ending at 1000, at the cap of 10"
+            }
+          ],
+          "agreement": 0.517241
+        },
+        "swept": {
+          "orders": 190944,
+          "certified": 190944,
+          "violated": 0,
+          "violations_by_gate": {},
+          "examples_violated": [],
+          "examples_refused": [
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": null,
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "none",
+                "lookup": false
+              },
+              "first_unmet": "quantity_floor (step 10 of 12): unmet precondition \u2014 quantity -1 steps down to -1, below the venue minimum 0.01"
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": null,
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "first_unmet": "quantity_floor (step 10 of 12): unmet precondition \u2014 quantity -1 steps down to -1, below the venue minimum 0.01"
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": null,
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "one_below_cap",
+                "lookup": false
+              },
+              "first_unmet": "quantity_floor (step 10 of 12): unmet precondition \u2014 quantity -1 steps down to -1, below the venue minimum 0.01"
+            }
+          ],
+          "agreement": 1.0
+        }
+      }
+    },
+    "deploy/api copy (2026-09-24)": {
+      "engine": {
+        "label": "deploy/api copy (2026-09-24)",
+        "path": "data/risk_baselines/guard_2026-09-24_deployed.py.txt",
+        "sha256": "37ce7492d830fdc1b902229ccabd12766cc190c4db5bfa4a6fe17230054e0e73"
+      },
+      "streams": {
+        "recorded": {
+          "orders": 2,
+          "certified": 2,
+          "violated": 0,
+          "violations_by_gate": {},
+          "examples_violated": [],
+          "examples_refused": [],
+          "agreement": 1.0
+        },
+        "counterfactual": {
+          "orders": 6363,
+          "certified": 6363,
+          "violated": 0,
+          "violations_by_gate": {},
+          "examples_violated": [],
+          "examples_refused": [
+            {
+              "intent": {
+                "stream": "counterfactual",
+                "id": "seq 1 size 0",
+                "instrument": "NVDAUSDT",
+                "symbol": "NVDAUSDT",
+                "quantity": "0.022746957",
+                "price": null,
+                "reference": "219.37",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": true
+              },
+              "first_unmet": "notional_floor (step 12 of 13): unmet precondition \u2014 notional 4.3874 (0.02 x 219.37) is below the venue minimum 5"
+            },
+            {
+              "intent": {
+                "stream": "counterfactual",
+                "id": "seq 1 size 1",
+                "instrument": "NVDAUSDT",
+                "symbol": "NVDAUSDT",
+                "quantity": "0.022792542",
+                "price": null,
+                "reference": "219.37",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": true
+              },
+              "first_unmet": "notional_floor (step 12 of 13): unmet precondition \u2014 notional 4.3874 (0.02 x 219.37) is below the venue minimum 5"
+            },
+            {
+              "intent": {
+                "stream": "counterfactual",
+                "id": "seq 1 size 2",
+                "instrument": "NVDAUSDT",
+                "symbol": "NVDAUSDT",
+                "quantity": "0.022838127",
+                "price": null,
+                "reference": "219.37",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": true
+              },
+              "first_unmet": "notional_floor (step 12 of 13): unmet precondition \u2014 notional 4.3874 (0.02 x 219.37) is below the venue minimum 5"
+            }
+          ],
+          "agreement": 1.0
+        },
+        "probe": {
+          "orders": 29,
+          "certified": 14,
+          "violated": 15,
+          "violations_by_gate": {
+            "side_known": 4,
+            "price_step": 4,
+            "goal": 2,
+            "outcome": 1,
+            "quantity_floor": 1,
+            "notional_floor": 1,
+            "balance": 1,
+            "price_band": 1
+          },
+          "examples_violated": [
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "quantity not a number",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "NaN",
+                "price": null,
+                "reference": "100",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied not_a_number",
+                "observed": "raised InvalidOperation",
+                "first_unmet": "finite_inputs (step 1 of 12): unmet precondition \u2014 quantity NaN is not a finite number",
+                "violations": [
+                  "the implementation raised InvalidOperation instead of ruling; the specification requires a ruling for every order"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "side neither buy nor sell",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "hold",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied side_unknown",
+                "observed": "allowed 1",
+                "first_unmet": "side_known (step 2 of 12): unmet precondition \u2014 side 'hold' is not one of the venue's sides, buy or sell",
+                "violations": [
+                  "ruled none, but the specification requires side_unknown because side_known (step 2 of 12): unmet precondition \u2014 side 'hold' is not one of the venue's sides, buy or sell"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "empty side",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied side_unknown",
+                "observed": "allowed 1",
+                "first_unmet": "side_known (step 2 of 12): unmet precondition \u2014 side '' is not one of the venue's sides, buy or sell",
+                "violations": [
+                  "ruled none, but the specification requires side_unknown because side_known (step 2 of 12): unmet precondition \u2014 side '' is not one of the venue's sides, buy or sell"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "side with trailing space",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "buy ",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied side_unknown",
+                "observed": "allowed 1",
+                "first_unmet": "side_known (step 2 of 12): unmet precondition \u2014 side 'buy ' is not one of the venue's sides, buy or sell",
+                "violations": [
+                  "ruled none, but the specification requires side_unknown because side_known (step 2 of 12): unmet precondition \u2014 side 'buy ' is not one of the venue's sides, buy or sell"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "side long",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "long",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied side_unknown",
+                "observed": "allowed 1",
+                "first_unmet": "side_known (step 2 of 12): unmet precondition \u2014 side 'long' is not one of the venue's sides, buy or sell",
+                "violations": [
+                  "ruled none, but the specification requires side_unknown because side_known (step 2 of 12): unmet precondition \u2014 side 'long' is not one of the venue's sides, buy or sell"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "sub-tick limit price, no reference",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": "0.005",
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied price_not_positive",
+                "observed": "allowed 1 @ 0",
+                "first_unmet": "price_step (step 6 of 12): unmet precondition \u2014 limit price 0.005 steps down to 0 on the 0.01 tick",
+                "violations": [
+                  "ruled none, but the specification requires price_not_positive because price_step (step 6 of 12): unmet precondition \u2014 limit price 0.005 steps down to 0 on the 0.01 tick",
+                  "goal unmet: allowed limit price 0 is not above zero"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "sub-tick limit price, reference",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": "0.005",
+                "reference": "0.005",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied price_not_positive",
+                "observed": "denied price_outside_band",
+                "first_unmet": "price_step (step 6 of 12): unmet precondition \u2014 limit price 0.005 steps down to 0 on the 0.01 tick",
+                "violations": [
+                  "ruled price_outside_band, but the specification requires price_not_positive because price_step (step 6 of 12): unmet precondition \u2014 limit price 0.005 steps down to 0 on the 0.01 tick"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "sub-tick limit price on a whole-unit tick",
+                "instrument": "coarse_tick",
+                "symbol": "coarse_tick",
+                "quantity": "1",
+                "price": "0.5",
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied price_not_positive",
+                "observed": "allowed 1 @ 0",
+                "first_unmet": "price_step (step 6 of 12): unmet precondition \u2014 limit price 0.5 steps down to 0 on the 1 tick",
+                "violations": [
+                  "ruled none, but the specification requires price_not_positive because price_step (step 6 of 12): unmet precondition \u2014 limit price 0.5 steps down to 0 on the 1 tick",
+                  "goal unmet: allowed limit price 0 is not above zero"
+                ],
+                "steps": []
+              }
+            }
+          ],
+          "examples_refused": [
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "offline instrument",
+                "instrument": "offline",
+                "symbol": "offline",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "first_unmet": "instrument_online (step 3 of 12): unmet precondition \u2014 NVDAUSDT is limit_open, not online"
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "rate window at the cap",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": null,
+                "reference": "100",
+                "side": "buy",
+                "balance": null,
+                "window": "at_cap",
+                "lookup": false
+              },
+              "first_unmet": "rate_window (step 4 of 12): unmet precondition \u2014 10 submission(s) inside the 60s window ending at 1000, at the cap of 10"
+            },
+            {
+              "intent": {
+                "stream": "probe",
+                "id": "limit price zero",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "1",
+                "price": "0",
+                "reference": "100",
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "first_unmet": "price_positive (step 5 of 12): unmet precondition \u2014 limit price 0 is not above zero"
+            }
+          ],
+          "agreement": 0.482759
+        },
+        "swept": {
+          "orders": 190944,
+          "certified": 155520,
+          "violated": 35424,
+          "violations_by_gate": {
+            "finite_inputs": 21624,
+            "outcome": 13800
+          },
+          "examples_violated": [
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": "sNaN",
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "none",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied not_a_number",
+                "observed": "raised InvalidOperation",
+                "first_unmet": "finite_inputs (step 1 of 12): unmet precondition \u2014 price sNaN is not a finite number",
+                "violations": [
+                  "the implementation raised InvalidOperation instead of ruling; the specification requires a ruling for every order"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": "sNaN",
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied not_a_number",
+                "observed": "raised InvalidOperation",
+                "first_unmet": "finite_inputs (step 1 of 12): unmet precondition \u2014 price sNaN is not a finite number",
+                "violations": [
+                  "the implementation raised InvalidOperation instead of ruling; the specification requires a ruling for every order"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": "sNaN",
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "one_below_cap",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied not_a_number",
+                "observed": "raised InvalidOperation",
+                "first_unmet": "finite_inputs (step 1 of 12): unmet precondition \u2014 price sNaN is not a finite number",
+                "violations": [
+                  "the implementation raised InvalidOperation instead of ruling; the specification requires a ruling for every order"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": "sNaN",
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "at_cap",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied not_a_number",
+                "observed": "denied rate_limit",
+                "first_unmet": "finite_inputs (step 1 of 12): unmet precondition \u2014 price sNaN is not a finite number",
+                "violations": [
+                  "ruled rate_limit, but the specification requires not_a_number because finite_inputs (step 1 of 12): unmet precondition \u2014 price sNaN is not a finite number"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": "sNaN",
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "at_cap_but_half_expired",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied not_a_number",
+                "observed": "raised InvalidOperation",
+                "first_unmet": "finite_inputs (step 1 of 12): unmet precondition \u2014 price sNaN is not a finite number",
+                "violations": [
+                  "the implementation raised InvalidOperation instead of ruling; the specification requires a ruling for every order"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": "sNaN",
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "at_cap_on_the_boundary",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied not_a_number",
+                "observed": "raised InvalidOperation",
+                "first_unmet": "finite_inputs (step 1 of 12): unmet precondition \u2014 price sNaN is not a finite number",
+                "violations": [
+                  "the implementation raised InvalidOperation instead of ruling; the specification requires a ruling for every order"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": "sNaN",
+                "reference": null,
+                "side": "buy",
+                "balance": "1",
+                "window": "none",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied not_a_number",
+                "observed": "raised InvalidOperation",
+                "first_unmet": "finite_inputs (step 1 of 12): unmet precondition \u2014 price sNaN is not a finite number",
+                "violations": [
+                  "the implementation raised InvalidOperation instead of ruling; the specification requires a ruling for every order"
+                ],
+                "steps": []
+              }
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": "sNaN",
+                "reference": null,
+                "side": "buy",
+                "balance": "1",
+                "window": "empty",
+                "lookup": false
+              },
+              "certificate": {
+                "subject": "venue guard",
+                "status": "violated",
+                "expected": "denied not_a_number",
+                "observed": "raised InvalidOperation",
+                "first_unmet": "finite_inputs (step 1 of 12): unmet precondition \u2014 price sNaN is not a finite number",
+                "violations": [
+                  "the implementation raised InvalidOperation instead of ruling; the specification requires a ruling for every order"
+                ],
+                "steps": []
+              }
+            }
+          ],
+          "examples_refused": [
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": null,
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "none",
+                "lookup": false
+              },
+              "first_unmet": "quantity_floor (step 10 of 12): unmet precondition \u2014 quantity -1 steps down to -1, below the venue minimum 0.01"
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": null,
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "empty",
+                "lookup": false
+              },
+              "first_unmet": "quantity_floor (step 10 of 12): unmet precondition \u2014 quantity -1 steps down to -1, below the venue minimum 0.01"
+            },
+            {
+              "intent": {
+                "stream": "swept",
+                "id": "",
+                "instrument": "nvda",
+                "symbol": "nvda",
+                "quantity": "-1",
+                "price": null,
+                "reference": null,
+                "side": "buy",
+                "balance": null,
+                "window": "one_below_cap",
+                "lookup": false
+              },
+              "first_unmet": "quantity_floor (step 10 of 12): unmet precondition \u2014 quantity -1 steps down to -1, below the venue minimum 0.01"
+            }
+          ],
+          "agreement": 0.81448
+        }
+      }
+    }
+  },
+  "recorded_chain": {
+    "decisions": 707,
+    "certified": 623,
+    "violated": 2,
+    "uncertifiable": 82,
+    "flagged_seqs": [
+      264,
+      265
+    ],
+    "voided_by_human_audit": [
+      264,
+      265
+    ],
+    "caught_every_voided_row": true,
+    "flagged_outside_the_audit": [],
+    "violated_certificates": [
+      {
+        "subject": "decision seq 264 (COINUSDT)",
+        "status": "violated",
+        "expected": "ledger at most 0 (human_review)",
+        "observed": "ledger trade 1",
+        "first_unmet": "venue_gate (step 3 of 4): unmet precondition \u2014 an order reached the venue gate although the Constitution approved 0 (human_review)",
+        "violations": [
+          "venue_gate (step 3 of 4): unmet precondition \u2014 an order reached the venue gate although the Constitution approved 0 (human_review)",
+          "ledger (step 4 of 4): unmet precondition \u2014 the ledger records trade but the Constitution ruled human_review"
+        ],
+        "steps": []
+      },
+      {
+        "subject": "decision seq 265 (MSTRUSDT)",
+        "status": "violated",
+        "expected": "ledger at most 0 (human_review)",
+        "observed": "ledger trade 1",
+        "first_unmet": "venue_gate (step 3 of 4): unmet precondition \u2014 an order reached the venue gate although the Constitution approved 0 (human_review)",
+        "violations": [
+          "venue_gate (step 3 of 4): unmet precondition \u2014 an order reached the venue gate although the Constitution approved 0 (human_review)",
+          "ledger (step 4 of 4): unmet precondition \u2014 the ledger records trade but the Constitution ruled human_review"
+        ],
+        "steps": []
+      }
+    ],
+    "uncertifiable_reason": "no risk record: risk_records.jsonl begins at seq 83"
+  },
+  "circuit": {
+    "cases": 3200,
+    "certified": 3200,
+    "violated": 0,
+    "uncertifiable": 0,
+    "agreement": 1.0,
+    "examples_violated": []
+  },
+  "sizing": {
+    "cases": 8400,
+    "certified": 8400,
+    "violated": 0,
+    "uncertifiable": 0,
+    "agreement": 1.0,
+    "examples_violated": []
+  },
+  "session_throttle": {
+    "cases": 240,
+    "certified": 240,
+    "violated": 0,
+    "uncertifiable": 0,
+    "agreement": 1.0,
+    "examples_violated": []
+  },
+  "modes": {
+    "cases": 5264,
+    "certified": 5264,
+    "violated": 0,
+    "uncertifiable": 0,
+    "agreement": 1.0,
+    "examples_violated": []
+  },
+  "mutation": {
+    "mutants": 55,
+    "caught": 55,
+    "survived": 0,
+    "kill_rate": 1.0,
+    "equivalent_mutants": 1,
+    "equivalent_mutants_survived_as_expected": true,
+    "by_target": {
+      "guard": {
+        "mutants": 25,
+        "caught": 25
+      },
+      "circuit": {
+        "mutants": 12,
+        "caught": 12
+      },
+      "sizing": {
+        "mutants": 7,
+        "caught": 7
+      },
+      "session_risk": {
+        "mutants": 3,
+        "caught": 3
+      },
+      "modes": {
+        "mutants": 8,
+        "caught": 8
+      }
+    },
+    "gates_mutated": [
+      "balance",
+      "calibration_error",
+      "calibration_sample",
+      "circuit",
+      "drawdown_ladder",
+      "finite_inputs",
+      "instrument_known",
+      "instrument_online",
+      "kelly_floor",
+      "kelly_share",
+      "losing_streak",
+      "multiplier",
+      "narrowing",
+      "notional_floor",
+      "operator",
+      "position_cap",
+      "price_band",
+      "price_positive",
+      "price_step",
+      "quantity_ceiling",
+      "quantity_floor",
+      "quantity_step",
+      "rate_window",
+      "reduce_only_multipliers",
+      "resolution",
+      "risk_mode",
+      "session_drawdown",
+      "shock",
+      "side_known",
+      "stale_evidence",
+      "throttle_floor",
+      "throttle_ratio",
+      "throttle_unmeasured",
+      "total_drawdown",
+      "trace",
+      "transition",
+      "venue"
+    ],
+    "hunts": [
+      {
+        "id": "G01",
+        "target": "guard",
+        "gate": "finite_inputs",
+        "change": "the finiteness check is removed",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6366,
+        "exposed_by": "probe quantity not a number {'stream': 'probe', 'id': 'quantity not a number', 'instrument': 'nvda', 'symbol': 'nvda', 'quantity': 'NaN', 'price': None, 'reference': '100', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': False}",
+        "certifier_said": "the implementation raised InvalidOperation instead of ruling; the specification requires a ruling for every order"
+      },
+      {
+        "id": "G02",
+        "target": "guard",
+        "gate": "side_known",
+        "change": "any side is accepted",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6375,
+        "exposed_by": "probe side neither buy nor sell {'stream': 'probe', 'id': 'side neither buy nor sell', 'instrument': 'nvda', 'symbol': 'nvda', 'quantity': '1', 'price': None, 'reference': '100', 'side': 'hold', 'balance': None, 'window': 'empty', 'lookup': False}",
+        "certifier_said": "ruled none, but the specification requires side_unknown because side_known (step 2 of 12): unmet precondition \u2014 side 'hold' is not one of the venue's sides, buy or sell"
+      },
+      {
+        "id": "G03",
+        "target": "guard",
+        "gate": "instrument_online",
+        "change": "offline instruments are accepted",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6367,
+        "exposed_by": "probe offline instrument {'stream': 'probe', 'id': 'offline instrument', 'instrument': 'offline', 'symbol': 'offline', 'quantity': '1', 'price': None, 'reference': '100', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': False}",
+        "certifier_said": "ruled none, but the specification requires instrument_offline because instrument_online (step 3 of 12): unmet precondition \u2014 NVDAUSDT is limit_open, not online"
+      },
+      {
+        "id": "G04",
+        "target": "guard",
+        "gate": "rate_window",
+        "change": "the rate cap is never enforced",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6368,
+        "exposed_by": "probe rate window at the cap {'stream': 'probe', 'id': 'rate window at the cap', 'instrument': 'nvda', 'symbol': 'nvda', 'quantity': '1', 'price': None, 'reference': '100', 'side': 'buy', 'balance': None, 'window': 'at_cap', 'lookup': False}",
+        "certifier_said": "ruled none, but the specification requires rate_limit because rate_window (step 4 of 12): unmet precondition \u2014 10 submission(s) inside the 60s window ending at 1000, at the cap of 10"
+      },
+      {
+        "id": "G05",
+        "target": "guard",
+        "gate": "rate_window",
+        "change": "a stamp exactly one window old still counts",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6369,
+        "exposed_by": "probe rate window at the cap, every stamp exactly one window old {'stream': 'probe', 'id': 'rate window at the cap, every stamp exactly one window old', 'instrument': 'nvda', 'symbol': 'nvda', 'quantity': '1', 'price': None, 'reference': '100', 'side': 'buy', 'balance': None, 'window': 'at_cap_on_the_boundary', 'lookup': False}",
+        "certifier_said": "ruled rate_limit, but the specification requires none"
+      },
+      {
+        "id": "G06",
+        "target": "guard",
+        "gate": "price_positive",
+        "change": "a zero limit price passes this gate",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6370,
+        "exposed_by": "probe limit price zero {'stream': 'probe', 'id': 'limit price zero', 'instrument': 'nvda', 'symbol': 'nvda', 'quantity': '1', 'price': '0', 'reference': '100', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': False}",
+        "certifier_said": "price_positive (step 5): the trace records pass but the specification requires deny \u2014 limit price 0 is not above zero"
+      },
+      {
+        "id": "G07",
+        "target": "guard",
+        "gate": "price_step",
+        "change": "a limit price stepped to zero is allowed",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6379,
+        "exposed_by": "probe sub-tick limit price, no reference {'stream': 'probe', 'id': 'sub-tick limit price, no reference', 'instrument': 'nvda', 'symbol': 'nvda', 'quantity': '1', 'price': '0.005', 'reference': None, 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': False}",
+        "certifier_said": "ruled none, but the specification requires price_not_positive because price_step (step 6 of 12): unmet precondition \u2014 limit price 0.005 steps down to 0 on the 0.01 tick"
+      },
+      {
+        "id": "G08",
+        "target": "guard",
+        "gate": "price_step",
+        "change": "the limit price is not stepped to the tick",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6379,
+        "exposed_by": "probe sub-tick limit price, no reference {'stream': 'probe', 'id': 'sub-tick limit price, no reference', 'instrument': 'nvda', 'symbol': 'nvda', 'quantity': '1', 'price': '0.005', 'reference': None, 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': False}",
+        "certifier_said": "ruled notional_below_minimum, but the specification requires price_not_positive because price_step (step 6 of 12): unmet precondition \u2014 limit price 0.005 steps down to 0 on the 0.01 tick"
+      },
+      {
+        "id": "G09",
+        "target": "guard",
+        "gate": "price_band",
+        "change": "the band's upper edge is doubled",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6371,
+        "exposed_by": "probe sell inside the buy band but outside the sell band {'stream': 'probe', 'id': 'sell inside the buy band but outside the sell band', 'instrument': 'coarse', 'symbol': 'coarse', 'quantity': '1', 'price': '104', 'reference': '100', 'side': 'sell', 'balance': None, 'window': 'empty', 'lookup': False}",
+        "certifier_said": "ruled none, but the specification requires price_outside_band because price_band (step 7 of 12): unmet precondition \u2014 limit price 104 lies outside the sell band 99 to 101 around 100"
+      },
+      {
+        "id": "G10",
+        "target": "guard",
+        "gate": "price_band",
+        "change": "sells are held to the buy band",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6371,
+        "exposed_by": "probe sell inside the buy band but outside the sell band {'stream': 'probe', 'id': 'sell inside the buy band but outside the sell band', 'instrument': 'coarse', 'symbol': 'coarse', 'quantity': '1', 'price': '104', 'reference': '100', 'side': 'sell', 'balance': None, 'window': 'empty', 'lookup': False}",
+        "certifier_said": "ruled none, but the specification requires price_outside_band because price_band (step 7 of 12): unmet precondition \u2014 limit price 104 lies outside the sell band 99 to 101 around 100"
+      },
+      {
+        "id": "G11",
+        "target": "guard",
+        "gate": "quantity_step",
+        "change": "the quantity is not stepped",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 3,
+        "exposed_by": "counterfactual seq 1 size 0 {'stream': 'counterfactual', 'id': 'seq 1 size 0', 'instrument': 'NVDAUSDT', 'symbol': 'NVDAUSDT', 'quantity': '0.022746957', 'price': None, 'reference': '219.37', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': True}",
+        "certifier_said": "quantity_step (step 9): the trace records pass but the specification requires adjust \u2014 stepped down to 0.02"
+      },
+      {
+        "id": "G12",
+        "target": "guard",
+        "gate": "quantity_step",
+        "change": "stepping rounds half-up instead of down",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6,
+        "exposed_by": "counterfactual seq 1 size 3 {'stream': 'counterfactual', 'id': 'seq 1 size 3', 'instrument': 'NVDAUSDT', 'symbol': 'NVDAUSDT', 'quantity': '0.455850846', 'price': None, 'reference': '219.37', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': True}",
+        "certifier_said": "the implementation raised GuardError instead of ruling; the specification requires a ruling for every order"
+      },
+      {
+        "id": "G13",
+        "target": "guard",
+        "gate": "quantity_ceiling",
+        "change": "the venue maximum is not enforced",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 11,
+        "exposed_by": "counterfactual seq 1 size 8 {'stream': 'counterfactual', 'id': 'seq 1 size 8', 'instrument': 'NVDAUSDT', 'symbol': 'NVDAUSDT', 'quantity': '104000', 'price': None, 'reference': '219.37', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': True}",
+        "certifier_said": "quantity_ceiling (step 10): the trace records pass but the specification requires adjust \u2014 cut to 52000"
+      },
+      {
+        "id": "G14",
+        "target": "guard",
+        "gate": "quantity_ceiling",
+        "change": "a maximum below one step is not refused",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6373,
+        "exposed_by": "probe venue maximum below one step {'stream': 'probe', 'id': 'venue maximum below one step', 'instrument': 'sub_step_max', 'symbol': 'sub_step_max', 'quantity': '1', 'price': None, 'reference': '100', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': False}",
+        "certifier_said": "ruled quantity_below_minimum, but the specification requires quantity_above_maximum because quantity_ceiling (step 9 of 12): unmet precondition \u2014 quantity 1 exceeds the maximum 0.005, which steps down to 0, so no valid size exists"
+      },
+      {
+        "id": "G15",
+        "target": "guard",
+        "gate": "quantity_floor",
+        "change": "an order exactly at the minimum is refused",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 10,
+        "exposed_by": "counterfactual seq 1 size 7 {'stream': 'counterfactual', 'id': 'seq 1 size 7', 'instrument': 'NVDAUSDT', 'symbol': 'NVDAUSDT', 'quantity': '0.01', 'price': None, 'reference': '219.37', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': True}",
+        "certifier_said": "ruled quantity_below_minimum, but the specification requires notional_below_minimum because notional_floor (step 12 of 13): unmet precondition \u2014 notional 2.1937 (0.01 x 219.37) is below the venue minimum 5"
+      },
+      {
+        "id": "G16",
+        "target": "guard",
+        "gate": "notional_floor",
+        "change": "the minimum notional is halved",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 3,
+        "exposed_by": "counterfactual seq 1 size 0 {'stream': 'counterfactual', 'id': 'seq 1 size 0', 'instrument': 'NVDAUSDT', 'symbol': 'NVDAUSDT', 'quantity': '0.022746957', 'price': None, 'reference': '219.37', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': True}",
+        "certifier_said": "ruled none, but the specification requires notional_below_minimum because notional_floor (step 12 of 13): unmet precondition \u2014 notional 4.3874 (0.02 x 219.37) is below the venue minimum 5"
+      },
+      {
+        "id": "G17",
+        "target": "guard",
+        "gate": "balance",
+        "change": "the balance is doubled",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6387,
+        "exposed_by": "probe notional a hair over the balance {'stream': 'probe', 'id': 'notional a hair over the balance', 'instrument': 'nvda', 'symbol': 'nvda', 'quantity': '1', 'price': None, 'reference': '100.00000000000000000000000000001', 'side': 'buy', 'balance': '100', 'window': 'empty', 'lookup': False}",
+        "certifier_said": "ruled none, but the specification requires insufficient_balance because balance (step 12 of 12): unmet precondition \u2014 notional 100 exceeds the available balance 100"
+      },
+      {
+        "id": "G18",
+        "target": "guard",
+        "gate": "rate_window",
+        "change": "an allowed order never spends its slot",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 1,
+        "exposed_by": "recorded seq 264 {'stream': 'recorded', 'id': 'seq 264', 'instrument': 'COINUSDT', 'symbol': 'COINUSDT', 'quantity': '1', 'price': None, 'reference': '173.83', 'side': 'sell', 'balance': None, 'window': 'empty', 'lookup': True}",
+        "certifier_said": "rate window holds 0 submission(s) after the call; the effect requires 1 (one slot spent at now)"
+      },
+      {
+        "id": "G19",
+        "target": "guard",
+        "gate": "rate_window",
+        "change": "every order past the rate gate spends a slot",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 1,
+        "exposed_by": "recorded seq 264 {'stream': 'recorded', 'id': 'seq 264', 'instrument': 'COINUSDT', 'symbol': 'COINUSDT', 'quantity': '1', 'price': None, 'reference': '173.83', 'side': 'sell', 'balance': None, 'window': 'empty', 'lookup': True}",
+        "certifier_said": "rate window holds 2 submission(s) after the call; the effect requires 1 (one slot spent at now)"
+      },
+      {
+        "id": "G20",
+        "target": "guard",
+        "gate": "instrument_known",
+        "change": "an unlisted symbol is ruled against another instrument's rules",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6394,
+        "exposed_by": "probe unknown symbol through the session guard {'stream': 'probe', 'id': 'unknown symbol through the session guard', 'instrument': 'unlisted', 'symbol': 'ZZZZUSDT', 'quantity': '1', 'price': None, 'reference': '100', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': True}",
+        "certifier_said": "ruled none, but the specification requires instrument_unknown because instrument_known (step 1 of 13): unmet precondition \u2014 ZZZZUSDT has no published venue rules"
+      },
+      {
+        "id": "G21",
+        "target": "guard",
+        "gate": "quantity_floor",
+        "change": "the trace calls a passed gate skipped",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 1,
+        "exposed_by": "recorded seq 264 {'stream': 'recorded', 'id': 'seq 264', 'instrument': 'COINUSDT', 'symbol': 'COINUSDT', 'quantity': '1', 'price': None, 'reference': '173.83', 'side': 'sell', 'balance': None, 'window': 'empty', 'lookup': True}",
+        "certifier_said": "quantity_floor (step 11): the trace records skip but the specification requires pass \u2014 at or above the minimum"
+      },
+      {
+        "id": "G22",
+        "target": "guard",
+        "gate": "quantity_step",
+        "change": "stepping runs at 28 digits again",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6383,
+        "exposed_by": "probe 31-digit quantity just under one step {'stream': 'probe', 'id': '31-digit quantity just under one step', 'instrument': 'nvda', 'symbol': 'nvda', 'quantity': '0.0099999999999999999999999999999', 'price': None, 'reference': '100', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': False}",
+        "certifier_said": "the implementation raised GuardError instead of ruling; the specification requires a ruling for every order"
+      },
+      {
+        "id": "G23",
+        "target": "guard",
+        "gate": "notional_floor",
+        "change": "the value arithmetic runs at 28 digits again",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6386,
+        "exposed_by": "probe notional a hair under the floor {'stream': 'probe', 'id': 'notional a hair under the floor', 'instrument': 'nvda', 'symbol': 'nvda', 'quantity': '0.05', 'price': None, 'reference': '99.99999999999999999999999999999', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': False}",
+        "certifier_said": "ruled none, but the specification requires notional_below_minimum because notional_floor (step 11 of 12): unmet precondition \u2014 notional 5 (0.05 x 100) is below the venue minimum 5"
+      },
+      {
+        "id": "G24",
+        "target": "guard",
+        "gate": "price_band",
+        "change": "the trace names the band gate as the step gate",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 6388,
+        "exposed_by": "probe limit a hair above the band, stepped back onto the tick {'stream': 'probe', 'id': 'limit a hair above the band, stepped back onto the tick', 'instrument': 'nvda', 'symbol': 'nvda', 'quantity': '1', 'price': '102.00000000000000000000000000001', 'reference': '100', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': False}",
+        "certifier_said": "trace lists gates ['finite_inputs', 'side_known', 'instrument_online', 'rate_window', 'price_positive', 'price_step', 'price_step', 'quantity_step', 'quantity_ceiling', 'quantity_floor', 'notional_floor', 'balance']; the specification's stack is ['finite_inputs', 'side_known', 'instrument_online', 'rate_window', 'price_positive', 'price_step', 'price_band', 'quantity_step', 'quantity_ceiling', 'quantity_floor', 'notional_floor', 'balance']"
+      },
+      {
+        "id": "G25",
+        "target": "guard",
+        "gate": "trace",
+        "change": "gates after a refusal are omitted from the trace",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 3,
+        "exposed_by": "counterfactual seq 1 size 0 {'stream': 'counterfactual', 'id': 'seq 1 size 0', 'instrument': 'NVDAUSDT', 'symbol': 'NVDAUSDT', 'quantity': '0.022746957', 'price': None, 'reference': '219.37', 'side': 'buy', 'balance': None, 'window': 'empty', 'lookup': True}",
+        "certifier_said": "trace lists gates ['instrument_known', 'finite_inputs', 'side_known', 'instrument_online', 'rate_window', 'price_positive', 'price_step', 'price_band', 'quantity_step', 'quantity_ceiling', 'quantity_floor', 'notional_floor']; the specification's stack is ['instrument_known', 'finite_inputs', 'side_known', 'instrument_online', 'rate_window', 'price_positive', 'price_step', 'price_band', 'quantity_step', 'quantity_ceiling', 'quantity_floor', 'notional_floor', 'balance']"
+      },
+      {
+        "id": "C01",
+        "target": "circuit",
+        "gate": "total_drawdown",
+        "change": "a drawdown exactly at 10% no longer halts",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 1345,
+        "exposed_by": "book {'equity': '90', 'peak_equity': '100', 'session_open_equity': '90', 'consecutive_losses': '3', 'open_positions': '0', 'evidence_age': '6:00:00', 'realised_move_sigma': '3'} verdict trade",
+        "certifier_said": "rule total_drawdown must fire and demand halted \u2014 drawdown 0.1 is at or past 0.1 \u2014 but the ruling does not report it"
+      },
+      {
+        "id": "C02",
+        "target": "circuit",
+        "gate": "session_drawdown",
+        "change": "the session drawdown rule is removed",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 2017,
+        "exposed_by": "book {'equity': '90', 'peak_equity': '100', 'session_open_equity': '93.75', 'consecutive_losses': '3', 'open_positions': '0', 'evidence_age': '6:00:00', 'realised_move_sigma': '3'} verdict trade",
+        "certifier_said": "rule session_drawdown must fire and demand halted \u2014 session drawdown 0.04 is at or past 0.04 \u2014 but the ruling does not report it"
+      },
+      {
+        "id": "C03",
+        "target": "circuit",
+        "gate": "losing_streak",
+        "change": "four losses in a row no longer halt",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 113,
+        "exposed_by": "book {'equity': '100', 'peak_equity': '100', 'session_open_equity': '100', 'consecutive_losses': '4', 'open_positions': '0', 'evidence_age': '6:00:00', 'realised_move_sigma': '3'} verdict trade",
+        "certifier_said": "rule losing_streak must fire and demand halted \u2014 4 consecutive losses \u2014 but the ruling does not report it"
+      },
+      {
+        "id": "C04",
+        "target": "circuit",
+        "gate": "shock",
+        "change": "the shock threshold moves from -3 to -4 sigma",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 57,
+        "exposed_by": "book {'equity': '100', 'peak_equity': '100', 'session_open_equity': '100', 'consecutive_losses': '3', 'open_positions': '0', 'evidence_age': '6:00:00', 'realised_move_sigma': '-3'} verdict trade",
+        "certifier_said": "rule shock must fire and demand halted \u2014 move -3 sigma \u2014 but the ruling does not report it"
+      },
+      {
+        "id": "C05",
+        "target": "circuit",
+        "gate": "stale_evidence",
+        "change": "evidence exactly six hours old is stale",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 1,
+        "exposed_by": "book {'equity': '100', 'peak_equity': '100', 'session_open_equity': '100', 'consecutive_losses': '3', 'open_positions': '0', 'evidence_age': '6:00:00', 'realised_move_sigma': '3'} verdict trade",
+        "certifier_said": "the ruling reports stale_evidence demanding reduce_only, but its precondition for firing does not hold on this book"
+      },
+      {
+        "id": "C06",
+        "target": "circuit",
+        "gate": "drawdown_ladder",
+        "change": "the reduce-only ladder is removed",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 449,
+        "exposed_by": "book {'equity': '98', 'peak_equity': '100', 'session_open_equity': '98', 'consecutive_losses': '3', 'open_positions': '0', 'evidence_age': '6:00:00', 'realised_move_sigma': '3'} verdict trade",
+        "certifier_said": "rule drawdown_ladder must fire and demand reduce_only \u2014 drawdown 0.02 on the ladder \u2014 but the ruling does not report it"
+      },
+      {
+        "id": "C07",
+        "target": "circuit",
+        "gate": "resolution",
+        "change": "one reduce-only rule outvotes a halting one",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 71,
+        "exposed_by": "book {'equity': '100', 'peak_equity': '100', 'session_open_equity': '100', 'consecutive_losses': '3', 'open_positions': '0', 'evidence_age': '6:00:01', 'realised_move_sigma': '-3'} verdict trade",
+        "certifier_said": "activation reduce_only; the specification resolves the fired rules to halted"
+      },
+      {
+        "id": "C08",
+        "target": "circuit",
+        "gate": "narrowing",
+        "change": "a halted book may still hedge",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 59,
+        "exposed_by": "book {'equity': '100', 'peak_equity': '100', 'session_open_equity': '100', 'consecutive_losses': '3', 'open_positions': '0', 'evidence_age': '6:00:00', 'realised_move_sigma': '-3'} verdict hedge",
+        "certifier_said": "left hedge standing; under halted the specification narrows hedge to no_trade"
+      },
+      {
+        "id": "C09",
+        "target": "circuit",
+        "gate": "narrowing",
+        "change": "reduce-only no longer narrows a trade",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 15,
+        "exposed_by": "book {'equity': '100', 'peak_equity': '100', 'session_open_equity': '100', 'consecutive_losses': '3', 'open_positions': '0', 'evidence_age': '6:00:01', 'realised_move_sigma': '3'} verdict trade",
+        "certifier_said": "left trade standing; under reduce_only the specification narrows trade to no_trade"
+      },
+      {
+        "id": "C10",
+        "target": "circuit",
+        "gate": "multiplier",
+        "change": "the 6% rung scales to 0.75 instead of 0.5",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 897,
+        "exposed_by": "book {'equity': '94', 'peak_equity': '100', 'session_open_equity': '94', 'consecutive_losses': '3', 'open_positions': '0', 'evidence_age': '6:00:00', 'realised_move_sigma': '3'} verdict trade",
+        "certifier_said": "risk multiplier 0.75; the ladder gives 0.5 at drawdown 0.06"
+      },
+      {
+        "id": "C11",
+        "target": "circuit",
+        "gate": "multiplier",
+        "change": "a halted book still sizes at half",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 1345,
+        "exposed_by": "book {'equity': '90', 'peak_equity': '100', 'session_open_equity': '90', 'consecutive_losses': '3', 'open_positions': '0', 'evidence_age': '6:00:00', 'realised_move_sigma': '3'} verdict trade",
+        "certifier_said": "risk multiplier 0.5; the ladder gives 0 at drawdown 0.1"
+      },
+      {
+        "id": "C12",
+        "target": "circuit",
+        "gate": "transition",
+        "change": "a halted breaker may jump straight to active",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 2243,
+        "exposed_by": "breaker from halted on book {'equity': '100', 'peak_equity': '100', 'session_open_equity': '100', 'consecutive_losses': '3', 'open_positions': '0', 'evidence_age': '6:00:00', 'realised_move_sigma': '3'}",
+        "certifier_said": "moved halted -> active on a demand for active; the specification lands on reduce_only"
+      },
+      {
+        "id": "S01",
+        "target": "sizing",
+        "gate": "calibration_sample",
+        "change": "nineteen graded outcomes are enough",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 2101,
+        "exposed_by": "graded 19 accuracy 0.6 p 0.3 payoff 0 multipliers 0x0.25",
+        "certifier_said": "calibration gate passed; the specification fails it (19 graded outcome(s), 20 needed)"
+      },
+      {
+        "id": "S02",
+        "target": "sizing",
+        "gate": "calibration_error",
+        "change": "the calibration ceiling is doubled",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 4901,
+        "exposed_by": "graded 20 accuracy 0.4 p 0.3 payoff 0 multipliers 0x0.25",
+        "certifier_said": "calibration gate passed; the specification fails it (calibration error 0.19999999999999984 against a ceiling of 0.15)"
+      },
+      {
+        "id": "S03",
+        "target": "sizing",
+        "gate": "kelly_floor",
+        "change": "a negative Kelly stake is not floored at zero",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 4226,
+        "exposed_by": "graded 20 accuracy 0.6 p 0.3 payoff 0.5 multipliers 0.5x0.25",
+        "certifier_said": "fraction -0.06875; the specification gives 0"
+      },
+      {
+        "id": "S04",
+        "target": "sizing",
+        "gate": "kelly_share",
+        "change": "full Kelly instead of half",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 4286,
+        "exposed_by": "graded 20 accuracy 0.6 p 0.3 payoff 3 multipliers 0.5x0.25",
+        "certifier_said": "fraction 0.008333333333333333333333333334; the specification gives 0.00416666666667"
+      },
+      {
+        "id": "S05",
+        "target": "sizing",
+        "gate": "position_cap",
+        "change": "the 25% cap is removed from Kelly sizing",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 4578,
+        "exposed_by": "graded 20 accuracy 0.6 p 0.7 payoff 2 multipliers 1x1",
+        "certifier_said": "fraction 0.275; the specification gives 0.25"
+      },
+      {
+        "id": "S06",
+        "target": "sizing",
+        "gate": "reduce_only_multipliers",
+        "change": "a session multiplier of 1.5 is accepted",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 4,
+        "exposed_by": "graded 0 accuracy 0.6 p 0.3 payoff 0 multipliers 0x1.5",
+        "certifier_said": "sized with multipliers 0 and 1.5; the specification requires a refusal, because a risk layer may not add exposure"
+      },
+      {
+        "id": "S07",
+        "target": "sizing",
+        "gate": "reduce_only_multipliers",
+        "change": "the fixed fraction ignores multipliers",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 1,
+        "exposed_by": "graded 0 accuracy 0.6 p 0.3 payoff 0 multipliers 0x0.25",
+        "certifier_said": "fraction 0.05; the specification gives 0"
+      },
+      {
+        "id": "T01",
+        "target": "session_risk",
+        "gate": "throttle_floor",
+        "change": "the throttle floor is removed",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 97,
+        "exposed_by": "violent reopen, Monday an hour before the open, 1 bar(s), floor 0.25",
+        "certifier_said": "multiplier 0.175; the specification gives 0.25 (scaled to 31.5/180)"
+      },
+      {
+        "id": "T02",
+        "target": "session_risk",
+        "gate": "throttle_unmeasured",
+        "change": "an unmeasured symbol is halved",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 1,
+        "exposed_by": "unmeasured, Monday an hour before the open, 1 bar(s), floor 0.25",
+        "certifier_said": "multiplier 0.5; the specification gives 1 (not measured)"
+      },
+      {
+        "id": "T03",
+        "target": "session_risk",
+        "gate": "throttle_ratio",
+        "change": "the ratio is inverted",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 49,
+        "exposed_by": "typical, Monday an hour before the open, 1 bar(s), floor 0.25",
+        "certifier_said": "multiplier 1; the specification gives 0.604606525912 (scaled to 31.5/52.1)"
+      },
+      {
+        "id": "T04",
+        "target": "session_risk",
+        "gate": "throttle_cap",
+        "change": "the cap at one is removed",
+        "equivalent": true,
+        "outcome": "survived (equivalent, as expected)",
+        "cases_run": 240,
+        "exposed_by": null,
+        "certifier_said": null
+      },
+      {
+        "id": "D01",
+        "target": "modes",
+        "gate": "resolution",
+        "change": "the least restrictive demand wins",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 96,
+        "exposed_by": "operator None, rules True, breaker reduce_only, live False; trade on paper, 0 open",
+        "certifier_said": "effective mode paper; the most restrictive demand is reduce_only"
+      },
+      {
+        "id": "D02",
+        "target": "modes",
+        "gate": "resolution",
+        "change": "the last layer, not the first, is named binding",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 566,
+        "exposed_by": "operator None, rules False, breaker halted, live False; trade on paper, 0 open",
+        "certifier_said": "binding layer circuit; the first layer demanding halted is venue"
+      },
+      {
+        "id": "D03",
+        "target": "modes",
+        "gate": "risk_mode",
+        "change": "a halted desk may still hedge",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 202,
+        "exposed_by": "operator None, rules True, breaker halted, live False; hedge on paper, 0 open",
+        "certifier_said": "admitted hedge on paper under halted; the specification refuses it \u2014 halted refuses hedge; it narrows to no_trade"
+      },
+      {
+        "id": "D04",
+        "target": "modes",
+        "gate": "risk_mode",
+        "change": "paper and reduce-only desks may open on the live venue",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 4,
+        "exposed_by": "operator None, rules True, breaker active, live False; trade on live, 0 open",
+        "certifier_said": "admitted trade on live under paper; the specification refuses it \u2014 paper admits orders that open exposure on the paper venue only"
+      },
+      {
+        "id": "D05",
+        "target": "modes",
+        "gate": "operator",
+        "change": "an unreadable operator switch is ignored",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 4513,
+        "exposed_by": "operator 'hlated', rules True, breaker active, live False",
+        "certifier_said": "layer operator demands None; reading operator='hlated', rules loaded=True, breaker 'active', live=False, it must demand halted"
+      },
+      {
+        "id": "D06",
+        "target": "modes",
+        "gate": "venue",
+        "change": "missing venue rules only reduce instead of halting",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 377,
+        "exposed_by": "operator None, rules False, breaker active, live False",
+        "certifier_said": "layer venue demands reduce_only; reading operator=None, rules loaded=False, breaker 'active', live=False, it must demand halted"
+      },
+      {
+        "id": "D07",
+        "target": "modes",
+        "gate": "circuit",
+        "change": "an unrecognised breaker state is ignored",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 283,
+        "exposed_by": "operator None, rules True, breaker bogus, live False",
+        "certifier_said": "layer circuit demands None; reading operator=None, rules loaded=True, breaker 'bogus', live=False, it must demand halted"
+      },
+      {
+        "id": "D08",
+        "target": "modes",
+        "gate": "risk_mode",
+        "change": "a mode refusal omits the venue gates from the trace",
+        "equivalent": false,
+        "outcome": "caught",
+        "cases_run": 47,
+        "exposed_by": "operator None, rules True, breaker active, live False; check_order no_trade",
+        "certifier_said": "a refusal by the mode must list every venue gate as not reached"
+      }
+    ]
+  },
+  "not_covered": [
+    "the Constitution's own rules (agents/desk.py) \u2014 swept by eval/riskproof.py; here only its recorded input and output are certified, as step 1 of the chain",
+    "the measured inputs sizing and the throttle report (calibration error, path volatility) are taken as given, not re-derived",
+    "Decimal exponents beyond the default context's Emax (|exponent| > 999999) are not probed"
+  ]
+}

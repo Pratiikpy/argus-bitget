@@ -1,0 +1,3682 @@
+{
+  "generated_at": "2026-09-25T19:08:56.263474+00:00",
+  "rounds": 1,
+  "servers": {
+    "bitget-signal": {
+      "endpoint": "https://datahub.noxiaohao.com/mcp",
+      "tools_listed": 19,
+      "http_requests": 23,
+      "requested": "2025-11-25",
+      "negotiated": "2025-11-25",
+      "server": "market-data-mcp 1.26.0",
+      "server_discover": "not implemented (protocol error: JSON-RPC error -32600: Bad Request: Missing session ID)"
+    },
+    "bitget-mcp-server": {
+      "endpoint": "https://agent.bitget.com/mcp",
+      "catalog_entries": 67,
+      "http_requests": 76,
+      "requested": "2025-11-25",
+      "negotiated": "2025-11-25",
+      "server": "bitget-mcp-server 4.0.5",
+      "server_discover": "not implemented (protocol error: JSON-RPC error -32600: Bad Request: Missing session ID)"
+    }
+  },
+  "columns": [
+    "answered",
+    "empty",
+    "domain_error",
+    "protocol_error",
+    "transport_error",
+    "upstream_5xx"
+  ],
+  "totals": {
+    "answered": 3,
+    "empty": 10,
+    "domain_error": 4,
+    "protocol_error": 0,
+    "transport_error": 2,
+    "upstream_5xx": 67,
+    "calls": 86,
+    "tools": 86,
+    "tools_answering": 3,
+    "answer_rate": 0.0349
+  },
+  "by_server": {
+    "bitget-signal": {
+      "answered": 3,
+      "empty": 10,
+      "domain_error": 4,
+      "protocol_error": 0,
+      "transport_error": 2,
+      "upstream_5xx": 0,
+      "calls": 19,
+      "tools": 19,
+      "tools_answering": 3,
+      "answer_rate": 0.1579
+    },
+    "bitget-mcp-server": {
+      "answered": 0,
+      "empty": 0,
+      "domain_error": 0,
+      "protocol_error": 0,
+      "transport_error": 0,
+      "upstream_5xx": 67,
+      "calls": 67,
+      "tools": 67,
+      "tools_answering": 0,
+      "answer_rate": 0.0
+    }
+  },
+  "by_skill": {
+    "bitget-mcp-server/crypto": {
+      "answered": 0,
+      "empty": 0,
+      "domain_error": 0,
+      "protocol_error": 0,
+      "transport_error": 0,
+      "upstream_5xx": 39,
+      "calls": 39,
+      "tools": 39,
+      "tools_answering": 0,
+      "answer_rate": 0.0
+    },
+    "bitget-mcp-server/equity": {
+      "answered": 0,
+      "empty": 0,
+      "domain_error": 0,
+      "protocol_error": 0,
+      "transport_error": 0,
+      "upstream_5xx": 22,
+      "calls": 22,
+      "tools": 22,
+      "tools_answering": 0,
+      "answer_rate": 0.0
+    },
+    "bitget-mcp-server/etf": {
+      "answered": 0,
+      "empty": 0,
+      "domain_error": 0,
+      "protocol_error": 0,
+      "transport_error": 0,
+      "upstream_5xx": 3,
+      "calls": 3,
+      "tools": 3,
+      "tools_answering": 0,
+      "answer_rate": 0.0
+    },
+    "bitget-mcp-server/news": {
+      "answered": 0,
+      "empty": 0,
+      "domain_error": 0,
+      "protocol_error": 0,
+      "transport_error": 0,
+      "upstream_5xx": 1,
+      "calls": 1,
+      "tools": 1,
+      "tools_answering": 0,
+      "answer_rate": 0.0
+    },
+    "bitget-mcp-server/sentiment": {
+      "answered": 0,
+      "empty": 0,
+      "domain_error": 0,
+      "protocol_error": 0,
+      "transport_error": 0,
+      "upstream_5xx": 2,
+      "calls": 2,
+      "tools": 2,
+      "tools_answering": 0,
+      "answer_rate": 0.0
+    },
+    "macro-analyst": {
+      "answered": 0,
+      "empty": 3,
+      "domain_error": 2,
+      "protocol_error": 0,
+      "transport_error": 1,
+      "upstream_5xx": 0,
+      "calls": 6,
+      "tools": 6,
+      "tools_answering": 0,
+      "answer_rate": 0.0
+    },
+    "market-intel": {
+      "answered": 0,
+      "empty": 3,
+      "domain_error": 1,
+      "protocol_error": 0,
+      "transport_error": 0,
+      "upstream_5xx": 0,
+      "calls": 4,
+      "tools": 4,
+      "tools_answering": 0,
+      "answer_rate": 0.0
+    },
+    "news-briefing": {
+      "answered": 1,
+      "empty": 2,
+      "domain_error": 0,
+      "protocol_error": 0,
+      "transport_error": 0,
+      "upstream_5xx": 0,
+      "calls": 3,
+      "tools": 3,
+      "tools_answering": 1,
+      "answer_rate": 0.3333
+    },
+    "sentiment-analyst": {
+      "answered": 0,
+      "empty": 2,
+      "domain_error": 0,
+      "protocol_error": 0,
+      "transport_error": 0,
+      "upstream_5xx": 0,
+      "calls": 2,
+      "tools": 2,
+      "tools_answering": 0,
+      "answer_rate": 0.0
+    },
+    "server-only (no SKILL.md names it)": {
+      "answered": 1,
+      "empty": 0,
+      "domain_error": 1,
+      "protocol_error": 0,
+      "transport_error": 1,
+      "upstream_5xx": 0,
+      "calls": 3,
+      "tools": 3,
+      "tools_answering": 1,
+      "answer_rate": 0.3333
+    },
+    "technical-analysis": {
+      "answered": 1,
+      "empty": 0,
+      "domain_error": 0,
+      "protocol_error": 0,
+      "transport_error": 0,
+      "upstream_5xx": 0,
+      "calls": 1,
+      "tools": 1,
+      "tools_answering": 1,
+      "answer_rate": 1.0
+    }
+  },
+  "failure_kinds": {
+    "upstream_5xx": 67,
+    "tool_execution": 3,
+    "timeout": 2,
+    "domain": 1
+  },
+  "taxonomy_vs_legacy": {
+    "failures_typed": 73,
+    "failures_legacy_left_as_one_word": 67,
+    "disagreements": [
+      {
+        "tool": "backtest",
+        "legacy": "empty",
+        "typed": "domain_error",
+        "kind": "domain"
+      }
+    ],
+    "note": "Each row's legacy reading is the pre-2026-09-25 classifier applied to the same reply. 'failures_legacy_left_as_one_word' counts failures the old probes could only call 'error' or 'unavailable'; a disagreement is a row the old classifier put in a different answered/empty/failed bucket."
+  },
+  "rows": [
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_coin_info",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_etf_flows",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_big_trades",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_big_trades_window",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_funding_rate",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_kline",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_liquidations",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_long_short_ratio",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_long_short_top_account_ratio",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_long_short_top_position_ratio",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_mark_price",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_open_interest",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.28,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.28,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_open_interest_history",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.28,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.28,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_order_book",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_taker_volume",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_ticker",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_futures_trades",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_hyperliquid_position_distribution_by_balance_tag",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_hyperliquid_position_distribution_by_pnl_tag",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_hyperliquid_position_distribution_by_position_tag",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {},
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {},
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_hyperliquid_whale_alert",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_indicators_hyperliquid_whale_sentiment",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_indicators_technical_indicators",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbols": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbols": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_institutional_company_flow",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.28,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.28,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_institutional_country_flow",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_institutional_mining_company_flow",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.28,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.28,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_market",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.69,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.69,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_onchain_exchange_flows",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_onchain_fund_flow",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_onchain_stablecoin_flow",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {},
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.28,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {},
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.28,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_onchain_token_unlock_event",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_onchain_trading_signal",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_spot_big_trades",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_spot_big_trades_window",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_spot_kline",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_spot_order_book",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_spot_taker_volume",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_spot_ticker",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/crypto",
+      "tool": "crypto_spot_trades",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "BTCUSDT"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "BTCUSDT"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_calendar",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_estimates_consensus",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.28,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.28,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_estimates_forward_ebitda",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.28,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.28,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_estimates_forward_eps",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_estimates_forward_pe",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_estimates_forward_sales",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_estimates_price_target",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_fundamental_balance",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_fundamental_cash",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_fundamental_dividends",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_fundamental_income",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_fundamental_management",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.28,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.28,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_fundamental_metrics",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_fundamental_ratios",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_ownership_form_13f",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_ownership_insider_trading",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_ownership_inst_position_detail",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_ownership_inst_position_summary",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.28,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.28,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_ownership_major_holders",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_price_historical",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_price_quote",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/equity",
+      "tool": "equity_profile",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "NVDA"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "NVDA"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/etf",
+      "tool": "etf_holdings",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "QQQ"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "QQQ"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/etf",
+      "tool": "etf_info",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "QQQ"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "QQQ"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/etf",
+      "tool": "etf_price_performance",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "symbol": "QQQ"
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "symbol": "QQQ"
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/news",
+      "tool": "news_label_search",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "label": 1
+        },
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.3,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "label": 1
+            },
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.3,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/sentiment",
+      "tool": "crypto_sentiment_crypto_fear_greed",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {},
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {},
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-mcp-server",
+      "skill": "bitget-mcp-server/sentiment",
+      "tool": "sentiment_market_fear_greed",
+      "args_source": "catalog params_summary",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 1
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {},
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {},
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "macro-analyst",
+      "tool": "cn_market",
+      "args_source": "inputSchema: 'index (sh000001)'",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 1,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "index",
+          "symbol": "sh000001"
+        },
+        "outcome": "transport_error",
+        "kind": "timeout",
+        "detail": "timed out: no complete reply within 45s (stream held open by 3 keep-alive ping(s))",
+        "seconds": 45.28,
+        "legacy": "timeout"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "index",
+              "symbol": "sh000001"
+            },
+            "outcome": "transport_error",
+            "kind": "timeout",
+            "detail": "timed out: no complete reply within 45s (stream held open by 3 keep-alive ping(s))",
+            "seconds": 45.28,
+            "legacy": "timeout"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "macro-analyst",
+      "tool": "cross_asset",
+      "args_source": "market/skills.py PROBES",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 1,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "correlation"
+        },
+        "outcome": "domain_error",
+        "kind": "tool_execution",
+        "detail": "Error executing tool cross_asset: ",
+        "seconds": 40.34,
+        "legacy": "tool_error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "correlation"
+            },
+            "outcome": "domain_error",
+            "kind": "tool_execution",
+            "detail": "Error executing tool cross_asset: ",
+            "seconds": 40.34,
+            "legacy": "tool_error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "macro-analyst",
+      "tool": "global_assets",
+      "args_source": "inputSchema: 'Yahoo Finance symbol: ... AAPL'",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 1,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "price",
+          "symbol": "NVDA"
+        },
+        "outcome": "domain_error",
+        "kind": "tool_execution",
+        "detail": "Error executing tool global_assets: ",
+        "seconds": 15.34,
+        "legacy": "tool_error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "price",
+              "symbol": "NVDA"
+            },
+            "outcome": "domain_error",
+            "kind": "tool_execution",
+            "detail": "Error executing tool global_assets: ",
+            "seconds": 15.34,
+            "legacy": "tool_error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "macro-analyst",
+      "tool": "global_data",
+      "args_source": "inputSchema: 'Base currency for forex (default: USD)'",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 1,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "forex",
+          "base": "USD",
+          "symbols": "EUR,JPY,CNY"
+        },
+        "outcome": "empty",
+        "kind": "",
+        "detail": "answered with no data",
+        "seconds": 20.38,
+        "legacy": "empty"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "forex",
+              "base": "USD",
+              "symbols": "EUR,JPY,CNY"
+            },
+            "outcome": "empty",
+            "kind": "",
+            "detail": "answered with no data",
+            "seconds": 20.38,
+            "legacy": "empty"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "macro-analyst",
+      "tool": "macro_indicators",
+      "args_source": "market/skills.py PROBES",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 1,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "latest_release"
+        },
+        "outcome": "empty",
+        "kind": "",
+        "detail": "answered with no data",
+        "seconds": 20.28,
+        "legacy": "empty"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "latest_release"
+            },
+            "outcome": "empty",
+            "kind": "",
+            "detail": "answered with no data",
+            "seconds": 20.28,
+            "legacy": "empty"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "macro-analyst",
+      "tool": "rates_yields",
+      "args_source": "market/skills.py PROBES",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 1,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "yield_curve"
+        },
+        "outcome": "empty",
+        "kind": "",
+        "detail": "answered with no data",
+        "seconds": 20.56,
+        "legacy": "empty"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "yield_curve"
+            },
+            "outcome": "empty",
+            "kind": "",
+            "detail": "answered with no data",
+            "seconds": 20.56,
+            "legacy": "empty"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "market-intel",
+      "tool": "crypto_market",
+      "args_source": "market/skills.py PROBES",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 1,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "trending"
+        },
+        "outcome": "domain_error",
+        "kind": "tool_execution",
+        "detail": "Error executing tool crypto_market: ConnectTimeout('')",
+        "seconds": 30.36,
+        "legacy": "tool_error"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "trending"
+            },
+            "outcome": "domain_error",
+            "kind": "tool_execution",
+            "detail": "Error executing tool crypto_market: ConnectTimeout('')",
+            "seconds": 30.36,
+            "legacy": "tool_error"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "market-intel",
+      "tool": "defi_analytics",
+      "args_source": "market/skills.py PROBES",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 1,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "tvl_rank",
+          "limit": 10
+        },
+        "outcome": "empty",
+        "kind": "",
+        "detail": "answered with no data",
+        "seconds": 20.31,
+        "legacy": "empty"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "tvl_rank",
+              "limit": 10
+            },
+            "outcome": "empty",
+            "kind": "",
+            "detail": "answered with no data",
+            "seconds": 20.31,
+            "legacy": "empty"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "market-intel",
+      "tool": "dex_market",
+      "args_source": "inputSchema action enum",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 1,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "trending"
+        },
+        "outcome": "empty",
+        "kind": "",
+        "detail": "answered with no data",
+        "seconds": 15.47,
+        "legacy": "empty"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "trending"
+            },
+            "outcome": "empty",
+            "kind": "",
+            "detail": "answered with no data",
+            "seconds": 15.47,
+            "legacy": "empty"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "market-intel",
+      "tool": "network_status",
+      "args_source": "market/skills.py PROBES",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 1,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "eth_gas"
+        },
+        "outcome": "empty",
+        "kind": "",
+        "detail": "answered with no data",
+        "seconds": 15.3,
+        "legacy": "empty"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "eth_gas"
+            },
+            "outcome": "empty",
+            "kind": "",
+            "detail": "answered with no data",
+            "seconds": 15.3,
+            "legacy": "empty"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "news-briefing",
+      "tool": "news_feed",
+      "args_source": "market/skills.py PROBES",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 1,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "latest"
+        },
+        "outcome": "empty",
+        "kind": "",
+        "detail": "answered with no data",
+        "seconds": 20.66,
+        "legacy": "empty"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "latest"
+            },
+            "outcome": "empty",
+            "kind": "",
+            "detail": "answered with no data",
+            "seconds": 20.66,
+            "legacy": "empty"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "news-briefing",
+      "tool": "social_trending",
+      "args_source": "inputSchema platform list (xueqiu is the finance board)",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 1,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 1.0,
+      "latest": {
+        "args": {
+          "action": "trending",
+          "platform": "xueqiu"
+        },
+        "outcome": "answered",
+        "kind": "",
+        "detail": "3 item(s)",
+        "seconds": 30.3,
+        "legacy": "ok"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "trending",
+              "platform": "xueqiu"
+            },
+            "outcome": "answered",
+            "kind": "",
+            "detail": "3 item(s)",
+            "seconds": 30.3,
+            "legacy": "ok"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "news-briefing",
+      "tool": "tradfi_news",
+      "args_source": "market/skills.py PROBES, with the anchor symbol the schema allows",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 1,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "earnings",
+          "symbol": "NVDA"
+        },
+        "outcome": "empty",
+        "kind": "",
+        "detail": "answered with no data",
+        "seconds": 15.3,
+        "legacy": "empty"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "earnings",
+              "symbol": "NVDA"
+            },
+            "outcome": "empty",
+            "kind": "",
+            "detail": "answered with no data",
+            "seconds": 15.3,
+            "legacy": "empty"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "sentiment-analyst",
+      "tool": "derivatives_sentiment",
+      "args_source": "market/skills.py PROBES",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 1,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "long_short",
+          "symbol": "BTCUSDT",
+          "period": "4h"
+        },
+        "outcome": "empty",
+        "kind": "",
+        "detail": "answered with no data",
+        "seconds": 15.28,
+        "legacy": "empty"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "long_short",
+              "symbol": "BTCUSDT",
+              "period": "4h"
+            },
+            "outcome": "empty",
+            "kind": "",
+            "detail": "answered with no data",
+            "seconds": 15.28,
+            "legacy": "empty"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "sentiment-analyst",
+      "tool": "sentiment_index",
+      "args_source": "market/skills.py PROBES",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 1,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "current"
+        },
+        "outcome": "empty",
+        "kind": "",
+        "detail": "answered with no data",
+        "seconds": 30.3,
+        "legacy": "empty"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "current"
+            },
+            "outcome": "empty",
+            "kind": "",
+            "detail": "answered with no data",
+            "seconds": 30.3,
+            "legacy": "empty"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "server-only (no SKILL.md names it)",
+      "tool": "backtest",
+      "args_source": "strategy_config keys from the tool's own description",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 1,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "run",
+          "strategy_config": "{\"name\": \"rsi_reversion\", \"symbols\": [\"BTC/USDT\"], \"timeframe\": \"1d\", \"indicators\": [{\"name\": \"RSI\", \"params\": {\"period\": 14}, \"key\": \"rsi\"}], \"entry_conditions\": [{\"indicator\": \"rsi\", \"field\": \"rsi\", \"operator\": \"<\", \"value\": 30}], \"exit_conditions\": [{\"indicator\": \"rsi\", \"field\": \"rsi\", \"operator\": \">\", \"value\": 70}], \"direction\": \"long\"}",
+          "period": "6m",
+          "exchange": "bitget"
+        },
+        "outcome": "domain_error",
+        "kind": "domain",
+        "detail": "the JSON object must be str, bytes or bytearray, not dict",
+        "seconds": 0.34,
+        "legacy": "empty"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "run",
+              "strategy_config": "{\"name\": \"rsi_reversion\", \"symbols\": [\"BTC/USDT\"], \"timeframe\": \"1d\", \"indicators\": [{\"name\": \"RSI\", \"params\": {\"period\": 14}, \"key\": \"rsi\"}], \"entry_conditions\": [{\"indicator\": \"rsi\", \"field\": \"rsi\", \"operator\": \"<\", \"value\": 30}], \"exit_conditions\": [{\"indicator\": \"rsi\", \"field\": \"rsi\", \"operator\": \">\", \"value\": 70}], \"direction\": \"long\"}",
+              "period": "6m",
+              "exchange": "bitget"
+            },
+            "outcome": "domain_error",
+            "kind": "domain",
+            "detail": "the JSON object must be str, bytes or bytearray, not dict",
+            "seconds": 0.34,
+            "legacy": "empty"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "server-only (no SKILL.md names it)",
+      "tool": "crypto_derivatives",
+      "args_source": "tool description: 'price, klines, ticker_24h, multi_price'; 'e.g. BTC/USDT'",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 1,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 1.0,
+      "latest": {
+        "args": {
+          "action": "ticker_24h",
+          "symbol": "BTC/USDT",
+          "exchange": "bitget"
+        },
+        "outcome": "answered",
+        "kind": "",
+        "detail": "8 item(s)",
+        "seconds": 0.45,
+        "legacy": "ok"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "ticker_24h",
+              "symbol": "BTC/USDT",
+              "exchange": "bitget"
+            },
+            "outcome": "answered",
+            "kind": "",
+            "detail": "8 item(s)",
+            "seconds": 0.45,
+            "legacy": "ok"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "server-only (no SKILL.md names it)",
+      "tool": "crypto_price",
+      "args_source": "inputSchema: \"e.g. 'BTC,ETH,SOL'\"",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 0,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 1,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 0.0,
+      "latest": {
+        "args": {
+          "action": "price",
+          "symbol": "BTC,ETH,SOL"
+        },
+        "outcome": "transport_error",
+        "kind": "timeout",
+        "detail": "timed out: no complete reply within 45s (stream held open by 3 keep-alive ping(s))",
+        "seconds": 45.31,
+        "legacy": "timeout"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "price",
+              "symbol": "BTC,ETH,SOL"
+            },
+            "outcome": "transport_error",
+            "kind": "timeout",
+            "detail": "timed out: no complete reply within 45s (stream held open by 3 keep-alive ping(s))",
+            "seconds": 45.31,
+            "legacy": "timeout"
+          }
+        ]
+      ]
+    },
+    {
+      "server": "bitget-signal",
+      "skill": "technical-analysis",
+      "tool": "technical_analysis",
+      "args_source": "market/skills.py PROBES (measured answering on rToken symbols)",
+      "rounds": 1,
+      "outcomes": {
+        "answered": 1,
+        "empty": 0,
+        "domain_error": 0,
+        "protocol_error": 0,
+        "transport_error": 0,
+        "upstream_5xx": 0
+      },
+      "answer_rate": 1.0,
+      "latest": {
+        "args": {
+          "action": "rsi",
+          "symbol": "NVDAUSDT"
+        },
+        "outcome": "answered",
+        "kind": "",
+        "detail": "5 item(s)",
+        "seconds": 0.64,
+        "legacy": "ok"
+      },
+      "attempts": [
+        [
+          {
+            "args": {
+              "action": "rsi",
+              "symbol": "NVDAUSDT"
+            },
+            "outcome": "answered",
+            "kind": "",
+            "detail": "5 item(s)",
+            "seconds": 0.64,
+            "legacy": "ok"
+          }
+        ]
+      ]
+    }
+  ],
+  "scope_statement": "Every bitget-signal tool (19) and every bitget-mcp-server catalog entry (67) called 1 time(s), keyless, through the same shared client the desk and the research console use (market/rpc.py). NOT CLAIMED: that 1 round(s) characterise a service \u2014 `eval/skillreliability.py` shows the same calls reading differently a day apart. NOT CLAIMED: that a domain error is Bitget's fault; for bitget-mcp-server it can be a symbol spelling the catalog does not document, and every attempted form is published so a reader can judge. An 'empty' is a tool answering with nothing, which is a fact about coverage, never read as a quiet market."
+}

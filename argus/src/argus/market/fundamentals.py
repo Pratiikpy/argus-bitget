@@ -42,8 +42,7 @@ from datetime import UTC, date, datetime
 from typing import Any
 
 from argus.market.evidence import _UA, EdgarSource
-from argus.research.sue import MIN_QUARTERS, SueError
-from argus.research.sue import read as sue_read
+from argus.research.sue import MIN_QUARTERS, SueError, read_dated, yoy_window
 from argus.truth.evidence import Evidence
 
 TIMEOUT = 15
@@ -228,37 +227,50 @@ def _sue_evidence(ticker: str, eps_facts: list[Fact]) -> tuple[list[Evidence], l
     Deliberately makes no return-predictiveness claim in the rendered text — see
     `research.pead_study` for whether one is warranted, and cite it explicitly here only once a
     result is verified, not assumed.
+
+    Corrected 2026-09-25: this used to hand the newest twelve facts to the positional
+    `research.sue.read`, whose ``quarters[i + 4]`` is the same quarter a year earlier only when no
+    quarter is missing. SEC XBRL carries no standalone fiscal Q4 (it lives in the 10-K's annual
+    figure), so for NVDA, AAPL, MSTR and COIN every one of the eight "year-over-year" deltas was
+    in fact a fifteen-to-eighteen-month change between different fiscal quarters, and the claim
+    below said "year-over-year" over it. `research.sue.read_dated` pairs by period end instead
+    (`eval/general_sue_comparison.py`). The reading is available once every fact it used was
+    filed, which is the newest quarter's own filing date unless an older one was restated later.
     """
     if len(eps_facts) < MIN_QUARTERS:
         return [], [
             f"xbrl:{ticker}: {len(eps_facts)} quarter(s) of EPS, below the {MIN_QUARTERS} SUE needs"
         ]
-    window = eps_facts[:MIN_QUARTERS]
+    points = [(f.end, f.value) for f in eps_facts]
     try:
-        sue = sue_read(ticker, [f.value for f in window])
+        window = yoy_window(points)
+        sue = read_dated(ticker, points)
     except SueError as exc:
         return [], [f"xbrl:{ticker}: SUE not computable ({exc})"]
+    used_ends = {d.end for d in window} | {d.prior_end for d in window}
+    newest = next(f for f in eps_facts if f.end == window[0].end)
+    known_on = max(f.filed for f in eps_facts if f.end in used_ends)
     direction = "above" if sue.sue > 0 else "below" if sue.sue < 0 else "in line with"
     magnitude = "many" if abs(sue.sue) >= 3 else "several" if abs(sue.sue) >= 1 else "under one"
     return [
         Evidence(
-            id=f"xbrl-{ticker}-sue-{window[0].end.isoformat()}",
+            id=f"xbrl-{ticker}-sue-{newest.end.isoformat()}",
             claim=(
                 f"Standardized Unexpected Earnings for the quarter ending "
-                f"{window[0].end.isoformat()}: {sue.sue:+.2f} standard deviations "
+                f"{newest.end.isoformat()}: {sue.sue:+.2f} standard deviations "
                 f"{direction} this company's own trailing year-over-year EPS-change volatility "
                 f"({magnitude} standard deviation(s) of surprise, EPS change "
                 f"{sue.eps_change:+.4f} vs a historical deviation of {sue.eps_std:.4f})"
             ),
             source="filing",
-            available_at=datetime.combine(window[0].filed, datetime.min.time(), tzinfo=UTC),
+            available_at=datetime.combine(known_on, datetime.min.time(), tzinfo=UTC),
             credibility=1.0,
             attributes={
                 "concept": "sue",
                 "sue": sue.sue,
                 "eps_change": sue.eps_change,
                 "eps_std": sue.eps_std,
-                "period_end": window[0].end.isoformat(),
+                "period_end": newest.end.isoformat(),
                 "quarters_used": sue.quarters_used,
             },
         )

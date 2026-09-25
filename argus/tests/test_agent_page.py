@@ -58,8 +58,10 @@ def test_no_decisions_yet_explains_the_heartbeats() -> None:
     assert "No decision yet" in html and "heartbeats" in html
 
 
-def test_the_nav_links_the_page() -> None:
+def test_the_track3_nav_does_not_carry_the_track2_entry() -> None:
+    """Each entry is an independent project (handbook, Basic Competition Rules 2): the page stays
+    at its URL, but the Track 3 console's own navigation does not link the Track 2 agent."""
     from argus.lui import design
 
-    assert ("/agent", "Live agent") in design.LINKS
-    assert 'href="/agent" class="on"' in design.nav("/agent")
+    assert all(path != "/agent" for path, _ in design.LINKS)
+    assert 'href="/agent"' not in design.nav("/")
