@@ -123,65 +123,65 @@
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "333"
+        "334"
       ],
       "live": [
-        333
+        334
       ],
       "status": "OK",
-      "excerpt": "strict clean on 333 source files"
+      "excerpt": "strict clean on 334 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 118,
       "quoted": [
-        "333"
+        "334"
       ],
       "live": [
-        333
+        334
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 333 source files"
+      "excerpt": "strict` clean on 334 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 419,
       "quoted": [
-        "333"
+        "334"
       ],
       "live": [
-        333
+        334
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 333 files"
+      "excerpt": "strict` clean on 334 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 620,
       "quoted": [
-        "333"
+        "334"
       ],
       "live": [
-        333
+        334
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 333 source files"
+      "excerpt": "strict` clean across 334 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 1956,
       "quoted": [
-        "333"
+        "334"
       ],
       "live": [
-        333
+        334
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 333 source files"
+      "excerpt": "strict` clean on 334 source files"
     },
     {
       "claim": "register_claims",

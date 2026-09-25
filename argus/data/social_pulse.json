@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-09-25T02:53:31.875573+00:00",
+  "generated_at": "2026-09-25T02:59:56.427076+00:00",
   "lookback_hours": 48.0,
   "coordination_rule": "3 or more distinct accounts inside 2h",
   "sources": "X via twitter-cli, Reddit via rdt-cli (the agent-reach router's backends)",
   "symbols": [
     {
       "symbol": "NVDAUSDT",
-      "posts": 46,
-      "accounts": 36,
+      "posts": 49,
+      "accounts": 37,
       "by_channel": {
-        "x": 16,
+        "x": 19,
         "reddit": 30
       },
-      "distinct_stories": 42,
+      "distinct_stories": 45,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "top_stories": [
@@ -47,6 +47,16 @@
           "first_seen": "2026-09-23T10:10:35+00:00"
         },
         {
+          "text": "$IONQ will deploy its Superion 256 as the first on-premise quantum system at $NVDA Accelerated Quantum Research Center.\n\nIt will connect directly to a GB200 NVL72 through NVQLink and CUDA-Q as Nvidia and IonQ push hybrid",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@StockSavvyShay"
+          ],
+          "first_seen": "2026-09-23T12:42:28+00:00"
+        },
+        {
           "text": "If $GOOGL TPUs, $NVDA &amp; $AMD GPUs keep scaling the way I expect then next major spend is everything required to power them from generation &amp; grid equipment to cooling &amp; power delivery inside rack.\n\nI just sha",
           "posts": 1,
           "accounts": 1,
@@ -55,33 +65,22 @@
             "@StockSavvyShay"
           ],
           "first_seen": "2026-09-23T14:21:31+00:00"
-        },
-        {
-          "text": "🚨 GOOD NEWS: $NVDA IS GEARING UP FOR A BRUTAL BREAKOUT AND IT JUST GOT CONFIRMED\n\nThe MACD flashed a Golden Cross as Nvidia is approaching the upper part of the range.\n\nThis Triangle could end up being the pattern $NVDA ",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@Coinforge_real"
-          ],
-          "first_seen": "2026-09-23T17:00:24+00:00"
         }
       ],
       "status": [
         "twitter: 30 tweets",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-25T02:53:31.875573+00:00"
+      "checked_at": "2026-09-25T02:59:56.427076+00:00"
     },
     {
       "symbol": "TSLAUSDT",
-      "posts": 46,
-      "accounts": 37,
+      "posts": 30,
+      "accounts": 23,
       "by_channel": {
-        "x": 16,
         "reddit": 30
       },
-      "distinct_stories": 40,
+      "distinct_stories": 24,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "top_stories": [
@@ -116,41 +115,40 @@
           "first_seen": "2026-09-24T16:36:19+00:00"
         },
         {
-          "text": "Haters will say this is AI. \n\nMe and Elon when $TSLA 400 Friday. https://t.co/JLN6LggwoN",
+          "text": "Premarket Briefing Sep 24: Upbeat News Goes Unrewarded as Buyers Choose Defensives. — Dear Trader,\n\nToday is a washed-out tape with just 20% of NYSE names above their 40-day average, yet the selling is concentrated, not ",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@The_RockTrading"
+            "u/breakoutsHappen"
           ],
-          "first_seen": "2026-09-23T18:50:37+00:00"
+          "first_seen": "2026-09-24T13:03:50+00:00"
         },
         {
-          "text": "When $TSLA hits 400 on Friday: \nNot AI generated. https://t.co/BUiwB1vkn6",
+          "text": "📊 TODAY'S $SPX HEATMAP: A CLEAR TECH-TO-DEFENSIVES ROTATION 📊 — The S&P 500 sector heatmap today tells a very specific story. Let's break it down. 👀\n\n🔴 **TECH & SEMIS TAKE THE HIT**\n\nThe pain is concentrated hard in Tech",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@The_RockTrading"
+            "u/robot2trade"
           ],
-          "first_seen": "2026-09-23T22:50:58+00:00"
+          "first_seen": "2026-09-24T13:35:07+00:00"
         }
       ],
       "status": [
-        "twitter: 30 tweets",
+        "twitter: unavailable (CalledProcessError)",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-25T02:53:31.875573+00:00"
+      "checked_at": "2026-09-25T02:59:56.427076+00:00"
     },
     {
       "symbol": "AAPLUSDT",
-      "posts": 47,
-      "accounts": 37,
+      "posts": 30,
+      "accounts": 25,
       "by_channel": {
-        "x": 17,
         "reddit": 30
       },
-      "distinct_stories": 43,
+      "distinct_stories": 26,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "top_stories": [
@@ -175,51 +173,50 @@
           "first_seen": "2026-09-24T16:36:19+00:00"
         },
         {
-          "text": "You have $10,000 to invest today. \n\nYou can only buy ONE stock.\n\n$META or $AAPL?\n\nWhich one are you picking?",
+          "text": "peachOS beta, a gnome/ubuntu based distro — Hello guys, If any of you remember the original peachOS posts, they got taken down for some reason. Yes, this is me from a different account, and I can confirm we had over 150 ",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@MsVeilMoney"
+            "u/No-Geologist1692"
           ],
-          "first_seen": "2026-09-23T11:00:26+00:00"
+          "first_seen": "2026-09-24T16:23:35+00:00"
         },
         {
-          "text": "JUST IN: Apple $AAPL unveils new Mac mini and Mac Studio models focused on on-device AI performance",
+          "text": "Bullish & bearish options flow: AAPL SOFI AVGO TLT KORU LLY GEN META METU APP VKTX PLTR NVDA ORCL COST HOOD GOOGL INTC",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@Kalshi_Finance"
+            "u/MyProof_Fly"
           ],
-          "first_seen": "2026-09-23T13:30:00+00:00"
+          "first_seen": "2026-09-24T16:32:11+00:00"
         },
         {
-          "text": "What’s the better buy right now? \n\n$GOOGL @ $338\n\nOr \n\n$AAPL @ $337 https://t.co/lZGn1uFaud",
+          "text": "Beginner in trading — Just started trading really struggling in what to do and don’t know if my portfolio is good or bad please be honest as I will take constructive criticism I just really want to get good please offer ",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@JUST_KAWS"
+            "u/Ok_Currency703"
           ],
-          "first_seen": "2026-09-23T17:57:35+00:00"
+          "first_seen": "2026-09-24T16:36:49+00:00"
         }
       ],
       "status": [
-        "twitter: 30 tweets",
+        "twitter: unavailable (CalledProcessError)",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-25T02:53:31.875573+00:00"
+      "checked_at": "2026-09-25T02:59:56.427076+00:00"
     },
     {
       "symbol": "MSFTUSDT",
-      "posts": 49,
-      "accounts": 41,
+      "posts": 30,
+      "accounts": 24,
       "by_channel": {
-        "x": 19,
         "reddit": 30
       },
-      "distinct_stories": 45,
+      "distinct_stories": 26,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "top_stories": [
@@ -244,120 +241,118 @@
           "first_seen": "2026-09-25T01:38:28+00:00"
         },
         {
-          "text": "NEWS: $MSFT planning cuts",
+          "text": "XBox Helix Family of Products... Does this imply different price points and performance. — Are they going to let everyone make their own version of the Xbox?  It seems they might go the direction of the Xbox handheld.  A",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@JoinBlind"
+            "u/NashDaypring1987"
           ],
-          "first_seen": "2026-09-23T04:46:06+00:00"
+          "first_seen": "2026-09-24T18:13:47+00:00"
         },
         {
-          "text": "Which stock is the better buy right now?\n\n$MSFT @ $498 or $NFLX @ $72\n\nMake your case https://t.co/ZUYCbfyb5Z",
+          "text": "30-ish, finally getting serious. 2x margin by accident, 207 positions, 7 Autopilot subscriptions. How do I clean this up? — 30m  \nRan my portfolio through Claude and these are screenshots of the break downs of my holding",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@FlippieFinance"
+            "u/Big-Extension4664"
           ],
-          "first_seen": "2026-09-23T09:38:00+00:00"
+          "first_seen": "2026-09-24T18:14:50+00:00"
         },
         {
-          "text": "President Trump disclosed 1,100 trades made on his behalf in July, which include $MSFT, $AMZN, $SPCX, and others.\n\n\"This is the kind of volume you'd see on an equity desk at a major hedge fund,\" @byjakeconley says https:",
+          "text": "Hit 1M at 26 years old — Hi folks, I figure it's not smart to brag in real life but I need to tell someone so I'm writing this post. My path to getting here:\n\n\\- Went to a very average state school because my family qual",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@YahooFinance"
+            "u/stdtdiscardaway"
           ],
-          "first_seen": "2026-09-23T13:38:15+00:00"
+          "first_seen": "2026-09-24T18:25:09+00:00"
         }
       ],
       "status": [
-        "twitter: 30 tweets",
+        "twitter: unavailable (CalledProcessError)",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-25T02:53:31.875573+00:00"
+      "checked_at": "2026-09-25T02:59:56.427076+00:00"
     },
     {
       "symbol": "METAUSDT",
-      "posts": 55,
-      "accounts": 45,
+      "posts": 30,
+      "accounts": 26,
       "by_channel": {
-        "x": 25,
         "reddit": 30
       },
-      "distinct_stories": 55,
+      "distinct_stories": 30,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "top_stories": [
         {
-          "text": "Lots of announcements coming today at Meta Connect. Tune in at 4pm PT: https://t.co/cvRNESRbDQ",
+          "text": "5 milly o homeless — Amici scimmie anche se non la definirei proprio una scimmiata so che vi fanno impazzire queste giocate e vi mostro quindi la mia posizione su Nebius . Se avete voglia di informarvi un po’ sulla traie",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@finkd"
+            "u/WarmFaithlessness946"
           ],
-          "first_seen": "2026-09-23T22:54:38+00:00"
+          "first_seen": "2026-09-25T02:25:34+00:00"
         },
         {
-          "text": "you can't make this shit up\n\nmeta invested $60B into the metaverse. almost ran out of business.\n\nthen zuck hired the camo crocs intern and suddenly everything's fixed https://t.co/AiQR2xqOsY",
+          "text": "Am I the only 1 who thinks aberrations are in horrible state ? — I understand it is a new tribe and all about it but i feel like if you do not play them you hard lose in midgame while the idea is good, the state of in wh",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@itsnotbernhard"
+            "u/AiiK_UwU"
           ],
-          "first_seen": "2026-09-23T23:26:03+00:00"
+          "first_seen": "2026-09-25T02:25:56+00:00"
         },
         {
-          "text": "I just got to try the new Meta VR glasses which are pretty much the Meta Quest 4 we’ve been waiting for.\n\nFull video: https://t.co/cwJx1yApt0 https://t.co/IDzb1H3nuX",
+          "text": "Regarding new law in india — This posts Is for Indians , meta has agreed to report csam related cases to indian govt directly instead of routing it to ncmec first on 14th sept  . \n\nMy ques is that I was banned on 15th Ju",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@nathie"
+            "u/tenzo3255"
           ],
-          "first_seen": "2026-09-23T23:41:45+00:00"
+          "first_seen": "2026-09-25T02:29:48+00:00"
         },
         {
-          "text": "Meta VR Glasses \nComing Spring 2027. https://t.co/fq7zL3TEzc",
+          "text": "Coincidence? I think not — DICT head said “theres no other motive” for what they did yesterday. We all know about the reddit transparency report from July - December 2025. Look who it is. The congressman pushing for soci",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@MetaVR_Official"
+            "u/ilovehotsauce143"
           ],
-          "first_seen": "2026-09-23T23:59:07+00:00"
+          "first_seen": "2026-09-25T02:30:04+00:00"
         },
         {
-          "text": "Here's everything I announced at Meta Connect today 👇",
+          "text": "Tenho dezesseis anos e perdi bastante dinheiro em apostas (estou viciado) — Sei que é um problema meio bobo pra muita gente afinal sou um adolescente e é normal fazer merda nessa idade mas eu não tenho com quem desabafar",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@finkd"
+            "u/No-Try-6729"
           ],
-          "first_seen": "2026-09-24T00:08:25+00:00"
+          "first_seen": "2026-09-25T02:30:13+00:00"
         }
       ],
       "status": [
-        "twitter: 30 tweets",
+        "twitter: unavailable (CalledProcessError)",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-25T02:53:31.875573+00:00"
+      "checked_at": "2026-09-25T02:59:56.427076+00:00"
     },
     {
       "symbol": "GOOGLUSDT",
-      "posts": 45,
-      "accounts": 39,
+      "posts": 30,
+      "accounts": 28,
       "by_channel": {
-        "x": 18,
-        "reddit": 27
+        "reddit": 30
       },
-      "distinct_stories": 44,
+      "distinct_stories": 29,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "top_stories": [
@@ -372,61 +367,61 @@
           "first_seen": "2026-09-25T02:49:41+00:00"
         },
         {
-          "text": "Anthropic is in talks to lease up to 1GW from Stream Data Centers in a ~$40B buildout using mostly $GOOGL TPUs and $NVDA GPUs.\n\nThat would give Anthropic even more control over its compute stack after signing ~$531B of c",
+          "text": "snatched that too thank ya account GONE",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@StockSavvyShay"
+            "u/DatabaseTop6336"
           ],
-          "first_seen": "2026-09-23T10:49:26+00:00"
+          "first_seen": "2026-09-25T02:44:09+00:00"
         },
         {
-          "text": "If $GOOGL TPUs, $NVDA &amp; $AMD GPUs keep scaling the way I expect then next major spend is everything required to power them from generation &amp; grid equipment to cooling &amp; power delivery inside rack.\n\nI just sha",
+          "text": "Fiz um app de diário de leitura e preciso de leitores para testar 📚 — Oi, pessoal!\n\n\n\nPassei os últimos meses fazendo um app para mim mesmo e\n\nacabou virando coisa séria: o Readora, um diário de leitura.\n\n\n\nO que ele faz",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@StockSavvyShay"
+            "u/Boruto0115"
           ],
-          "first_seen": "2026-09-23T14:21:31+00:00"
+          "first_seen": "2026-09-25T02:44:25+00:00"
         },
         {
-          "text": "$GOOGL is getting close to my buy zone again\n\nCurrent valuation looks pretty good:\n1. 20% EPS growth\n2. 30x P/E\n\nGives us:\n-> Stock price $755\n-> Total return 123% (17.4% annualized)\n\nThis is a pretty good deal consideri",
+          "text": "Looking for office space — I’m an esthetician looking around 500 to 700sqft in office space (like a room or something). Really don’t want to do a sola salon because I’ve heard it’s actually more expensive. I’ve tried goo",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@VJNCapital"
+            "u/glazeddonutdelusion"
           ],
-          "first_seen": "2026-09-23T15:28:00+00:00"
+          "first_seen": "2026-09-25T02:44:40+00:00"
         },
         {
-          "text": "What’s the better buy right now? \n\n$GOOGL @ $338\n\nOr \n\n$AAPL @ $337 https://t.co/lZGn1uFaud",
+          "text": "Carly Rae Jepsen - E·MO·TION (2015) | Round 10 of 21 [Re-Re-Do] — We didn't really really really really really like **I Really Like You**\n\n***\n\n##[Vote Here!](https://docs.google.com/forms/d/e/1FAIpQLSfkYshCh9agP5v2tQ1tI",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@JUST_KAWS"
+            "u/LampSoup"
           ],
-          "first_seen": "2026-09-23T17:57:35+00:00"
+          "first_seen": "2026-09-25T02:44:44+00:00"
         }
       ],
       "status": [
-        "twitter: 30 tweets",
-        "reddit: 27 posts"
+        "twitter: unavailable (CalledProcessError)",
+        "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-25T02:53:31.875573+00:00"
+      "checked_at": "2026-09-25T02:59:56.427076+00:00"
     },
     {
       "symbol": "AMZNUSDT",
-      "posts": 51,
-      "accounts": 41,
+      "posts": 48,
+      "accounts": 40,
       "by_channel": {
-        "x": 21,
+        "x": 18,
         "reddit": 30
       },
-      "distinct_stories": 49,
+      "distinct_stories": 46,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "top_stories": [
@@ -451,24 +446,14 @@
           "first_seen": "2026-09-25T01:38:28+00:00"
         },
         {
-          "text": "🇺🇸🚨 PRESIDENT TRUMP IS PREPARING FOR SOMETHING:\n\n🔴 Discretionary −$18M\n🔴 Tech −$5M\n$AMZN $MSFT $ORCL sold.\n\n🟢 Health +$2M\n🟢 Utilities +$1M\n+ $24M fixed inc.\n\nTake your own conclusions.\nThe chart tells you everything.👇 ht",
+          "text": "AMAZON LAUNCHES ALWAYS-ON AI AGENTS FOR THIRD-PARTY SELLERS\n\n$AMZN is upgrading Seller Assistant with “workflows” that can continuously monitor and act on pricing, inventory, listings and account health, even when a sell",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@FinancePotentia"
+            "@wallstengine"
           ],
-          "first_seen": "2026-09-23T11:38:56+00:00"
-        },
-        {
-          "text": "$AMZN is rolling out a Claude-powered Seller Assistant that can monitor and act on pricing, inventory, ads and compliance 24/7.\n\nIts already live for 90%+ of sellers globally with recommendations accepted over 90% of the",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@StockSavvyShay"
-          ],
-          "first_seen": "2026-09-23T13:16:23+00:00"
+          "first_seen": "2026-09-23T13:12:23+00:00"
         },
         {
           "text": "⚡️JUST IN: Amazon has launched a NEW AI AGENT for third-party sellers on its main e-commerce site.\n\nThe agent can monitor prices and ratings continuously and help manage listings, promotions and inventory. \n\nSellers can ",
@@ -479,23 +464,33 @@
             "@coinbureau"
           ],
           "first_seen": "2026-09-23T14:00:01+00:00"
+        },
+        {
+          "text": "The stock market, on prediction markets.\n\nPredict the price of top stocks in 15-minute windows with our new category of markets, powered by @Chainlink and querying @Binance Futures’ index prices.\n\nOnly on @bnbchain.\n\nNow",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@predictdotfun"
+          ],
+          "first_seen": "2026-09-23T14:01:22+00:00"
         }
       ],
       "status": [
         "twitter: 30 tweets",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-25T02:53:31.875573+00:00"
+      "checked_at": "2026-09-25T02:59:56.427076+00:00"
     },
     {
       "symbol": "COINUSDT",
-      "posts": 47,
-      "accounts": 40,
+      "posts": 53,
+      "accounts": 44,
       "by_channel": {
-        "x": 18,
-        "reddit": 29
+        "x": 23,
+        "reddit": 30
       },
-      "distinct_stories": 45,
+      "distinct_stories": 51,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "top_stories": [
@@ -520,54 +515,64 @@
           "first_seen": "2026-09-25T02:44:54+00:00"
         },
         {
-          "text": "HUGE: 🇨🇦Canada's six biggest banks, managing C$6.24 TRILLION in deposits, are exploring tokenized Canadian dollar deposits.\n\nThe goal is to move deposits between banks more efficiently, paving the way for faster, program",
+          "text": "You make a $100 bet with a friend over a coin flip. You lose. You then say “double or nothing” and your friend agrees. You flip the coin and lose again.\n\nHow much do you owe your friend?",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@SethyPoker"
+          ],
+          "first_seen": "2026-09-23T16:35:57+00:00"
+        },
+        {
+          "text": "Who remembers this Pokémon The Movie 2000 Lugia Promo Coin that came with the VHS tape? 📼 https://t.co/Ffpi4APiyC",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@GGSoFly"
+          ],
+          "first_seen": "2026-09-24T00:40:52+00:00"
+        },
+        {
+          "text": "🚨LATEST: Heads of AI firms warn the UN Security Council that humans could LOSE CONTROL of the future to AI.\n\nOpenAI CEO says AI could advance so quickly that people can no longer understand what is happening or intervene",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
             "@coinbureau"
           ],
-          "first_seen": "2026-09-23T08:35:00+00:00"
-        },
-        {
-          "text": "You want a free 30x?\n\nCheck this:\n\nEvery time Stonk announce a new added coin, there's a runner\n\nEg. Stonk posted about that they've added AVAX (it was live 10 minutes before)\n\nIf you invested just $100 in ACAT when the ",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@FabianoSolana"
-          ],
-          "first_seen": "2026-09-24T10:37:44+00:00"
-        },
-        {
-          "text": "Which coin should Binance list? \n\n$WKC / $TART / $OCICAT / $GTAN / $TWC / $DTG / $PHT / $WINA / $WAR",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@KOSASI_NAKAMOTO"
-          ],
-          "first_seen": "2026-09-24T12:05:24+00:00"
+          "first_seen": "2026-09-24T04:59:44+00:00"
         }
       ],
       "status": [
         "twitter: 30 tweets",
-        "reddit: 29 posts"
+        "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-25T02:53:31.875573+00:00"
+      "checked_at": "2026-09-25T02:59:56.427076+00:00"
     },
     {
       "symbol": "MSTRUSDT",
-      "posts": 36,
-      "accounts": 34,
+      "posts": 44,
+      "accounts": 42,
       "by_channel": {
-        "x": 6,
+        "x": 14,
         "reddit": 30
       },
-      "distinct_stories": 36,
+      "distinct_stories": 44,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "top_stories": [
+        {
+          "text": "JUST IN: U.S. President Donald Trump has just disclosed he bought $51,001–$115,000 worth of shares in #Bitcoin treasury company Strategy $MSTR in June, when it crashed to $95.\n\n$MSTR has surged over 80% since then. 👀🔥\n\nR",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@BTCtreasuries"
+          ],
+          "first_seen": "2026-09-23T08:32:37+00:00"
+        },
         {
           "text": "When does $MSTR hit $1,000?\n\nA) 2027-2029\nB) 2032-2033\nC) 2036-2037\n\nBeing realistic.",
           "posts": 1,
@@ -579,6 +584,26 @@
           "first_seen": "2026-09-23T12:00:02+00:00"
         },
         {
+          "text": "President Trump's latest financial disclosure reveals a $115,000 purchase of $MSTR. \n\nSince then, the stock is up ~83% 📈\n\n\"Think about what happened when he recommended Dell, Intel, Micron, and Palantir. Those are all ma",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@watchbmtv"
+          ],
+          "first_seen": "2026-09-23T13:52:27+00:00"
+        },
+        {
+          "text": "Since Michael Saylor and I are now on good terms, I have decided to invest in his official ponzi $MSTR\n\nPlease don't dilute your shareholders this week while this is open Saylor. Thx. https://t.co/ON38AZd0NZ",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@chooserich"
+          ],
+          "first_seen": "2026-09-23T15:33:20+00:00"
+        },
+        {
           "text": "Loaded up more today! — I couldn’t help myself, these pullbacks are crazy!",
           "posts": 1,
           "accounts": 1,
@@ -587,53 +612,23 @@
             "u/TapeLegacy"
           ],
           "first_seen": "2026-09-23T16:19:04+00:00"
-        },
-        {
-          "text": "My portfolio at 22 — Started investing at the start of last year, still extremely new to this. Is there any big mistakes or things i’m missing from my portfolio? Anything I should change and if so, how should I go about ",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "u/neutraltrainer"
-          ],
-          "first_seen": "2026-09-23T16:30:40+00:00"
-        },
-        {
-          "text": "POLYMARKET VS DISCORD SCHIZO (The $500K Polymarket lawsuit) — **PART 3 of the Polymarket story**\n\nIf you missed Part 2, read it here:\n\n[https://www.reddit.com/r/PredictionsMarkets/comments/1wnc6af/guy\\_sued\\_polymarket\\_",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "u/Rosewood_Rebecca"
-          ],
-          "first_seen": "2026-09-23T16:44:54+00:00"
-        },
-        {
-          "text": "Proud to have finally reached 1000 shares. — I have no one to share with so I’ll share with Reddit group.",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "u/Gold_Opportunity7892"
-          ],
-          "first_seen": "2026-09-23T16:46:31+00:00"
         }
       ],
       "status": [
         "twitter: 30 tweets",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-25T02:53:31.875573+00:00"
+      "checked_at": "2026-09-25T02:59:56.427076+00:00"
     },
     {
       "symbol": "QQQUSDT",
-      "posts": 45,
-      "accounts": 37,
+      "posts": 49,
+      "accounts": 41,
       "by_channel": {
-        "x": 16,
-        "reddit": 29
+        "x": 19,
+        "reddit": 30
       },
-      "distinct_stories": 41,
+      "distinct_stories": 45,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "top_stories": [
@@ -678,34 +673,44 @@
           "first_seen": "2026-09-23T03:59:07+00:00"
         },
         {
-          "text": "Breakouts around the open can be very profitable.\n\nI tested this simple NQ model from 2018–2026.\n\n$100k → $3.77M, 52% CAGR, 1.40 Sharpe, -35% max DD\n\nQQQ over the same period:\n19% CAGR, 0.84 Sharpe, -36% max DD\n\nMNQ comm",
+          "text": "MILLIONS Worth of $QQQ &amp; $QCOM Put Sellers https://t.co/u3jeofTISu",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@SystematicPeter"
+            "@CheddarFlow"
           ],
-          "first_seen": "2026-09-23T14:32:02+00:00"
+          "first_seen": "2026-09-23T17:04:27+00:00"
         }
       ],
       "status": [
         "twitter: 30 tweets",
-        "reddit: 29 posts"
+        "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-25T02:53:31.875573+00:00"
+      "checked_at": "2026-09-25T02:59:56.427076+00:00"
     },
     {
       "symbol": "TQQQUSDT",
-      "posts": 26,
+      "posts": 27,
       "accounts": 22,
       "by_channel": {
-        "x": 7,
+        "x": 8,
         "reddit": 19
       },
-      "distinct_stories": 26,
+      "distinct_stories": 27,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "top_stories": [
+        {
+          "text": "that will be an end to trading today, not a great day, but not bad, thankfully we ran the LONG in the #NASDAQ with the $TQQQ https://t.co/kF6UnEZcdp",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@Trade_TvShawn"
+          ],
+          "first_seen": "2026-09-23T04:25:28+00:00"
+        },
         {
           "text": "Leveraged portfolio is now +$79.8k — still not changing the rules after the rebound — Quick update on the leveraged paper portfolio.\n\nTotal P/L is now **+$79.8k**, with **+$30.8k today**.\n\nCurrent positions:\n\n* TQQQ: **+",
           "posts": 1,
@@ -745,46 +750,26 @@
             "u/Ghost_Idol"
           ],
           "first_seen": "2026-09-23T14:30:19+00:00"
-        },
-        {
-          "text": "$TQQQ — $681K in Nov 60 puts, sold at the bid. https://t.co/iCCV1gUMNE",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@nightglasstrade"
-          ],
-          "first_seen": "2026-09-23T15:20:43+00:00"
         }
       ],
       "status": [
         "twitter: 30 tweets",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-25T02:53:31.875573+00:00"
+      "checked_at": "2026-09-25T02:59:56.427076+00:00"
     },
     {
       "symbol": "SQQQUSDT",
-      "posts": 13,
-      "accounts": 8,
+      "posts": 11,
+      "accounts": 7,
       "by_channel": {
-        "x": 8,
+        "x": 6,
         "reddit": 5
       },
-      "distinct_stories": 13,
+      "distinct_stories": 11,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "top_stories": [
-        {
-          "text": "$652.1k aggressive purchase of ProShares UltraPro Short QQQ $SQQQ $39 strike call option contracts exp 11/20 hitting the tape this morning, 13.57% OTM currently https://t.co/mqfmyejBRT https://t.co/uvCN6y8Fpj",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@Financhle"
-          ],
-          "first_seen": "2026-09-23T14:55:39+00:00"
-        },
         {
           "text": "ETF Movers Snapshot (Sep 23, 2026): Natural Gas (UNG +5.0%) & Gold Miners (GDX +3.5%) Lead Broad Rally — Top ETF price changes for September 23, 2026:\n\nTop Gainers:  \n• United States Natural Gas Fund (UNG): $10.86 (+5.0%",
           "posts": 1,
@@ -806,16 +791,6 @@
           "first_seen": "2026-09-23T16:07:01+00:00"
         },
         {
-          "text": "🔥 3 DAYS. SAME SYSTEM. SAME PROCESS.\n\nFor the third straight day, RTY has produced multiple True Algo ideas that followed through — and the bigger story isn’t just the moves.\n\n🎯 Defined risk before the trade\n📊 Strong ris",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@True_Algo"
-          ],
-          "first_seen": "2026-09-23T16:50:05+00:00"
-        },
-        {
           "text": "ALWAYS early... 🥳🤡🤡🤡🤪😎",
           "posts": 1,
           "accounts": 1,
@@ -824,13 +799,33 @@
             "@jedimarkus77"
           ],
           "first_seen": "2026-09-24T09:23:12+00:00"
+        },
+        {
+          "text": "@jedimarkus77 ok - on way to 720?",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@lski69"
+          ],
+          "first_seen": "2026-09-24T09:26:54+00:00"
+        },
+        {
+          "text": "@lski69 ?  $SQQQ is around 35.20~",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@jedimarkus77"
+          ],
+          "first_seen": "2026-09-24T09:28:45+00:00"
         }
       ],
       "status": [
         "twitter: 30 tweets",
         "reddit: 7 posts"
       ],
-      "checked_at": "2026-09-25T02:53:31.875573+00:00"
+      "checked_at": "2026-09-25T02:59:56.427076+00:00"
     }
   ]
 }

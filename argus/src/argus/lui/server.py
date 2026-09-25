@@ -808,12 +808,35 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def do_POST(self) -> None:
+        """``/mcp`` only: the Model Context Protocol endpoint (`lui/mcp_server.py`). Every other
+        path is read-only and answers GET."""
+        from urllib.parse import urlparse
+
+        if urlparse(self.path).path.rstrip("/") != "/mcp":
+            self._send(b'{"error": "POST is accepted only at /mcp"}', "application/json", 405)
+            return
+        from argus.lui.mcp_server import handle_body
+
+        length = min(int(self.headers.get("Content-Length") or 0), 64_000)
+        status, body = handle_body(self.rfile.read(length))
+        self._send(body, "application/json", status)
+
     def do_GET(self) -> None:
         route = urlparse(self.path)
         path = route.path.rstrip("/") or "/"
         try:
             if path == "/":
                 self._send(PAGE.encode(), "text/html; charset=utf-8")
+                return
+            if path == "/mcp":
+                # The MCP spec lets a server that offers no server-sent stream answer GET with 405;
+                # the body says how to use the endpoint, for a person who opens it in a browser.
+                self._send(json.dumps({
+                    "endpoint": "ARGUS research desk — Model Context Protocol (Streamable HTTP)",
+                    "use": "POST JSON-RPC 2.0 here: initialize, tools/list, tools/call",
+                    "example": {"jsonrpc": "2.0", "id": 1, "method": "tools/list"},
+                }).encode(), "application/json", 405)
                 return
             if path == "/echo":
                 # A diagnostic, and a deliberate one. Chinese questions classified correctly in
