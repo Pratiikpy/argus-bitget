@@ -7998,8 +7998,8 @@ def _yahoo_fundamental_lines(ticker: str, result: dict[str, Any], today: Any, *,
                 days = (when - today).days
                 lines.append(f"Next report: {when.isoformat()}"
                              + (" (an estimated date)" if estimated else "")
-                             + f" — {days} day(s) away (Yahoo Finance; Bitget's data service did "
-                               f"not answer).")
+                             + f" — {days} day(s) away (Yahoo Finance's earnings calendar, read "
+                               f"as the second source).")
                 lines.append(
                     f"Actionable: {ticker} reports in {days} day(s)"
                     + (" — a position held through it carries the earnings gap, and the "

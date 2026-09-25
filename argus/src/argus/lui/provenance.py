@@ -52,6 +52,10 @@ the funding rate asked for — keeps its live label."""
 # Order matters: the first rule that matches decides. Missing and assumed come first because a
 # line that says it could not read something must never be labelled as if it had.
 _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
+    # A FRED series served from the snapshot shipped with the console is a past reading. Checked
+    # before "missing": its line also says FRED did not answer, which is why it is a record and not
+    # a gap (the CPI lead was tagged computed on the live page, 2026-09-25).
+    ("record", re.compile(r"\(the shipped reading\)|last reading shipped with the console", re.I)),
     ("missing", re.compile(
         r"\bnot\s+checkable\b|\bdid\s+not\s+(?:answer|arrive|respond)\b|\bnot\s+known\s+yet\b|"
         r"\bunavailable\b|\bcould\s+not\s+(?:load|read|reach|fetch)\b|\btoo\s+few\b|"
@@ -109,7 +113,7 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"\bis [+-]\d+\.\d+% over 24 hours\b|"
         r"^RSI\(|^MACD\b|^ATR\b|^Price [\d,.]+: nearest support\b|^News:|"
         r"\bthe US (?:stock market|anchor market)\b.*\b(?:open|closed|shut)\b|"
-        r"^Crypto fear|^Most recent report on file\b|^Institutional holders\b|\bmarket cap \$|"
+        r"^Crypto fear|^Most recent report on file\b|^Next report:|^Analyst consensus\b|^Institutional holders\b|\bmarket cap \$|"
         r"^Valuation on \d{4}|^Institutions: [\d,]+ holders\b|^Insider filings\b|"
         r"^Analyst price targets\b|^Now: \w+ is [+-]\d|^Federal Reserve, \d+ \w+:|"
         r"^Bitget's own US-stock brief\b|^Crowd on X and Reddit\b|\bpositioning: \d+% of\b|"
