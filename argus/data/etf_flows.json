@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-09-25T03:02:29.222538+00:00",
+  "source": "SoSoValue /etfs/summary-history and /btc-treasuries (US spot ETFs; creations less redemptions)",
+  "funds": {
+    "BTC": {
+      "asset": "BTC",
+      "date": "2026-09-23",
+      "net_inflow_usd": 346977216.16999996,
+      "five_day_usd": 2653159614.26,
+      "z_latest": 0.58,
+      "streak_days": 5,
+      "net_assets_usd": 108663294328.42632,
+      "cumulative_usd": 57221611529.783,
+      "days": 20
+    },
+    "ETH": {
+      "asset": "ETH",
+      "date": "2026-09-23",
+      "net_inflow_usd": 104633618.265,
+      "five_day_usd": 641484991.605,
+      "z_latest": 0.31,
+      "streak_days": 4,
+      "net_assets_usd": 17504888161.299,
+      "cumulative_usd": 13786954590.661,
+      "days": 20
+    }
+  },
+  "errors": [],
+  "treasury": {
+    "ticker": "MSTR",
+    "holding_btc": 846000.0,
+    "recent": [
+      {
+        "date": "2026-09-21",
+        "btc": 950.0,
+        "usd": 75700000.0
+      },
+      {
+        "date": "2026-08-31",
+        "btc": 4603.0,
+        "usd": 369700000.0
+      },
+      {
+        "date": "2026-08-10",
+        "btc": -1690.0,
+        "usd": -108600000.0
+      },
+      {
+        "date": "2026-08-03",
+        "btc": -1638.0,
+        "usd": -104730000.0
+      },
+      {
+        "date": "2026-07-05",
+        "btc": -2225.0,
+        "usd": -135200000.0
+      }
+    ]
+  }
+}

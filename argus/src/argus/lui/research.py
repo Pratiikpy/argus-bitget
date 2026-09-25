@@ -2894,6 +2894,17 @@ def _coordination_test(symbol: str | None) -> tuple[str, dict[str, Any]] | None:
     return text + ".", {"narratives": len(runs), "finbert_louder": louder, "held": held}
 
 
+def _flow_lines(symbol: str) -> list[str]:
+    """Spot bitcoin and ether ETF flows, and Strategy's bitcoin buying, for the crypto-linked
+    names, from the latest `market/etf_flows` snapshot."""
+    if not symbol:
+        return []
+    from argus.lui.answer import _notes_path
+    from argus.market import etf_flows
+
+    return etf_flows.lines_for(symbol, etf_flows.load(_notes_path().parent / "etf_flows.json"))
+
+
 def _crowd_lines(symbol: str) -> list[str]:
     """What X and Reddit carry about ``symbol``, from the latest `market/social_pulse` snapshot,
     with its age. The snapshot is collected on the desk's machine (the platforms need a logged-in
@@ -5252,6 +5263,12 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                                  "there is nothing honest to report. Try again shortly."])
         crowd = (_crowd_lines(request.symbols[0])
                  if request.kind is ResearchKind.SENTIMENT and request.symbols else [])
+        flows = _flow_lines(request.symbols[0] if request.symbols else "BTCUSDT"
+                            if request.kind is ResearchKind.SENTIMENT else "")
+        if flows:
+            found.extend(flows)
+            extra.append(Source(kind="venue", ref="SoSoValue US spot ETF flows",
+                                detail="creations less redemptions, daily after the US close"))
         if crowd:
             found.extend(crowd)
             extra.append(Source(kind="computation", ref="argus.market.social_pulse",

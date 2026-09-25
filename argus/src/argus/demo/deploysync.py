@@ -73,6 +73,8 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "lui_final_heldout_report.json",
     # X and Reddit crowd read (`market/social_pulse.py`), collected on the desk's machine.
     "social_pulse.json",
+    # Spot bitcoin/ether ETF flows and Strategy's buys (`market/etf_flows.py`, SoSoValue).
+    "etf_flows.json",
     "skill_reliability.json",
     "data_coverage.json",
     "source_health.json",
