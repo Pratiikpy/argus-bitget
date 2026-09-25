@@ -309,6 +309,33 @@ class EstimatesSource:
             return parse(payload, ticker=ticker, fetched_at=stamp)
         raise EstimatesError(f"quoteSummary for {ticker}: authentication failed twice")
 
+    def summary(self, ticker: str, modules: str) -> dict[str, Any]:
+        """One quoteSummary result, raw, for the named ``modules`` (comma-separated) — the same
+        handshake and single retry as :meth:`fetch`. Used as the second source for the earnings
+        date, analyst targets and valuation when Bitget's data service does not answer."""
+        for attempt in (1, 2):
+            if self._opener is None or self._crumb is None:
+                self._handshake()
+            assert self._opener is not None and self._crumb is not None
+            query = urllib.parse.urlencode({"modules": modules, "crumb": self._crumb})
+            url = f"{SUMMARY_URL.format(ticker=urllib.parse.quote(ticker))}?{query}"
+            try:
+                with self._opener.open(url, timeout=TIMEOUT) as response:
+                    payload = json.loads(response.read().decode(errors="replace"))
+            except urllib.error.HTTPError as exc:
+                if exc.code in (401, 403) and attempt == 1:
+                    self._opener = self._crumb = None
+                    continue
+                raise EstimatesError(f"quoteSummary for {ticker}: HTTP {exc.code}") from exc
+            except (urllib.error.URLError, TimeoutError, OSError, json.JSONDecodeError) as exc:
+                raise EstimatesError(f"quoteSummary for {ticker}: {exc}") from exc
+            try:
+                result: dict[str, Any] = payload["quoteSummary"]["result"][0]
+            except (KeyError, IndexError, TypeError) as exc:
+                raise EstimatesError(f"quoteSummary for {ticker}: no result") from exc
+            return result
+        raise EstimatesError(f"quoteSummary for {ticker}: authentication failed twice")
+
     def evidence(
         self, ticker: str, *, as_of: datetime
     ) -> tuple[list[Evidence], list[str]]:

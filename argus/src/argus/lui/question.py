@@ -259,8 +259,19 @@ the reason; the same instruction in Hindi, Arabic, Russian or Turkish got "I did
 that question" (2026-09-25 audit, round 2) — the console never trades, but a refusal says why."""
 
 
+_PLAN_REQUEST = re.compile(
+    r"^\s*(?:(?:pls|please|ok(?:ay)?|now)[\s,]+)*(?:rebalance|re-?weight)\b[^?.]{0,40}\b(?:to|for|"
+    r"into|toward)\s+(?:an?\s+)?(?:equal[\s-](?:risk|weight)\w*|risk[\s-]parity|my\s+risk\s+budget|"
+    r"the\s+risk\s+budget)", re.I)
+"""A request for the rebalanced weights, not an order: "rebalance this to equal risk pls" was
+refused as a trade instruction while the book engine computes exactly those weights (answer audit,
+round 3). The console still places nothing; it states the weights."""
+
+
 def is_order_instruction(raw: str) -> bool:
     """An instruction to trade, in any of the forms the console refuses."""
+    if _PLAN_REQUEST.match(raw):
+        return False
     return bool((_ORDER_VERB.match(raw) and not _INTERROGATIVE.match(raw))
                 or _ORDER_CJK.search(raw) or _ORDER_REQUEST.search(raw)
                 or _ORDER_INTL.search(raw))
@@ -528,6 +539,14 @@ def _listed_on_bitget(token: str) -> bool:
 # Order matters: the first pattern to match wins, so the more specific question comes first.
 # "why did you do nothing on NVDA" must reach ABSTENTION_WHY, not DECISION_WHY.
 TRACK_RECORD = r"\btrack\s+record\b"
+EVER_TRADED = (r"\b(?:did|have|has)\s+(?:the\s+desk|you|argus|it)\s+(?:ever\s+|actually\s+)?"
+               r"(?:trade[ds]?|placed?\s+(?:a\s+|any\s+)?(?:trades?|orders?)|made\s+(?:a\s+|any\s+)?"
+               r"trades?)\s*(?:yet|ever|at\s+all|so\s+far)?\s*[?.!]*\s*$|"
+               r"\bever\s+(?:traded|placed\s+a\s+trade)\s*[?.!]*\s*$|"
+               r"\bhow\s+many\s+(?:decisions|trades|calls)\b")
+"""Whether the desk has traded and how many decisions it has made: the track record's question.
+"did the desk ever trade" and "how many decisions have you made total" were relabelled by the
+n-gram model and answered with one decision's evidence (answer audit, round 3)."""
 SCORED_METRIC = (r"\b(?:your|the\s+desk'?s|its|our)\s+(?:\w+\s+){0,2}(?:sharpe|sortino|calmar|"
                  r"(?:max(?:imum)?\s+)?drawdown|win\s*rate|hit\s*rate|pnl|p&l|"
                  r"(?:biggest|largest|worst)\s+(?:loss|losses|losing\s+trade|trade|day))\b"
@@ -535,10 +554,19 @@ SCORED_METRIC = (r"\b(?:your|the\s+desk'?s|its|our)\s+(?:\w+\s+){0,2}(?:sharpe|s
                  r"hit\s*rate|max(?:imum)?\s+drawdown|(?:biggest|largest|worst)\s+loss)\b")
 """A scored number asked of the desk by name. "What's your win rate" was relabelled calibration by
 the n-gram model at 0.15 and "what's your biggest loss" a decision at 0.19 (2026-09-25 audit)."""
-DECISIVE_PATTERNS: frozenset[str] = frozenset({TRACK_RECORD, SCORED_METRIC})
+DECISIVE_PATTERNS: frozenset[str] = frozenset({TRACK_RECORD, SCORED_METRIC, EVER_TRADED})
 """Patterns that name exactly what is asked, so the n-gram model may not relabel a question they
 matched (`lui/ngram.reclassify`). "What is your track record? How many trades have you made?" was
 relabelled a decision list by the model, which weighs the second sentence's words."""
+
+_MY_HOLDINGS = re.compile(r"\bmy\s+(?:\w+\s+){0,2}(?:book|portfolio|holdings|positions?|"
+                          r"stack|bag|allocation|account)\b|\bwhat'?s\s+my\s+(?:max(?:imum)?\s+)?"
+                          r"(?:drawdown|sharpe|return|volatility|vol)\b|\bi\s+(?:hold|own)\b",
+                          re.I)
+_TAKE_PROFIT = re.compile(r"\btake[\s-]?profits?\b|\bprofit\s+target\b|\btp\s+(?:level|at)\b",
+                          re.I)
+_THE_DESK = re.compile(r"\b(?:your|the\s+desk'?s?|argus'?s?|our)\b", re.I)
+
 
 _PATTERNS: tuple[tuple[str, Intent], ...] = (
     # A track-record question is a performance question whatever else it asks: "What is your
@@ -546,6 +574,11 @@ _PATTERNS: tuple[tuple[str, Intent], ...] = (
     # "how many trades" and answered with a count (a judge's probe, 2026-09-24).
     (TRACK_RECORD, Intent.PERFORMANCE),
     (SCORED_METRIC, Intent.PERFORMANCE),
+    (EVER_TRADED, Intent.PERFORMANCE),
+    # "how is a decision graded" was declined while "how are decisions graded" was answered
+    (r"\bhow\s+(?:is|are|do\s+you|does\s+the\s+desk)\s+(?:a\s+|the\s+|your\s+|each\s+)?"
+     r"(?:decisions?|calls?|leans?|refusals?)\s+(?:graded|scored|judged|marked|settled|grade|"
+     r"score|checked)\b", Intent.CALIBRATION),
     # Review first: its questions carry "decision", "why" and "mistake" words that the ledger
     # patterns below would otherwise claim for a single row.
     (r"\b(?:review\w*|post[\s-]?mortem\w*|retrospective\w*|self[\s-]?evolution|"
@@ -1009,6 +1042,13 @@ def classify(
             if pattern.search(raw):
                 intent, matched = candidate, pattern.pattern
                 break
+
+    if intent is Intent.PERFORMANCE and (_MY_HOLDINGS.search(raw) or _TAKE_PROFIT.search(raw)) \
+            and not _THE_DESK.search(raw):
+        # "what is the sharpe ratio of my book", "what's my max drawdown" and "good take profit
+        # for a nvda long" were answered with the desk's own track record (answer audit, round 3):
+        # they ask about the trader's holdings or trade, which the research engines answer.
+        intent, matched = Intent.UNKNOWN, ""
 
     # A vague reference with nothing in the conversation to bind it to is ambiguous, not answerable
     # — but only for the intents that actually need something to point at.

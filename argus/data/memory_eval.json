@@ -1,0 +1,218 @@
+{
+  "generated_at": "2026-09-25T13:19:57.626748+00:00",
+  "extraction": {
+    "statements": 30,
+    "recalled": 30,
+    "missed": [],
+    "not_about_me": 20,
+    "false_memories": []
+  },
+  "effect": {
+    "tasks": 20,
+    "changed_by_memory": 20,
+    "leaked_to_other_trader": 0,
+    "ablation_carried": 0,
+    "rows": [
+      {
+        "statement": "I can't lose more than 10%",
+        "question": "what if the nasdaq drops 10%? I hold 60% NVDA 40% AAPL",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "I can't lose more than 5%",
+        "question": "what if BTC drops 15%? I hold 50% BTC 50% ETH",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "my max drawdown is 15%",
+        "question": "stress 70% TSLA 30% NVDA for a 10% nasdaq drop",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "my loss limit is 8%",
+        "question": "what if the nasdaq drops 20%? I hold 100% QQQ",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "I never lose more than 20% on anything",
+        "question": "what if gold drops 10%? I hold 50% XAU 50% NVDA",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "I'm a swing trader",
+        "question": "will BTC go up?",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "Im a day trader",
+        "question": "will NVDA be higher?",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "I usually hold for weeks",
+        "question": "will ETH go up?",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "I hold for months",
+        "question": "will gold be higher?",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "I'm a swing trader",
+        "question": "odds TSLA is up",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "I think NVDA will outperform on AI capex",
+        "question": "where is NVDA trading",
+        "marker": "Your thesis on NVDA",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "i believe btc is going to crash",
+        "question": "BTC price",
+        "marker": "Your thesis on BTC",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "I expect TSLA to miss",
+        "question": "TSLA funding rate",
+        "marker": "Your thesis on TSLA",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "I think gold will rally into year end",
+        "question": "gold price",
+        "marker": "Your thesis on XAU",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "I reckon ETH can double",
+        "question": "is ETH overbought",
+        "marker": "Your thesis on ETH",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "I don't trade TSLA",
+        "question": "where is TSLA trading",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "i dont want any MSTR",
+        "question": "MSTR price",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "I won't hold COIN",
+        "question": "COIN funding rate",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "my risk budget is 20%",
+        "question": "I hold 50% NVDA, 50% AAPL \u2014 what does adding 20% TSLA do to my risk?",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      },
+      {
+        "statement": "no single name above 30% of my risk",
+        "question": "how risky is 60% NVDA 40% MSFT",
+        "marker": "Remembered:",
+        "stored": true,
+        "with_memory_carries": true,
+        "without_memory_carries": false,
+        "other_trader_carries": false,
+        "same_engine": true
+      }
+    ]
+  }
+}

@@ -442,6 +442,15 @@ _SINGLE_NAME = re.compile(
 _STOP_QUESTION = re.compile(
     r"\bstop[\s-]?loss\b|\bwhere\s+(?:should|do|would|to)\s+(?:i\s+)?(?:put|place|set)\s+"
     r"(?:my\s+|a\s+|the\s+)?stop\b|\bstop\s+(?:level|placement|distance)\b", re.I)
+_TAKE_PROFIT_Q = re.compile(r"\btake[\s-]?profits?\b|\bprofit\s+(?:target|taking)\b|"
+                            r"\btp\s+(?:level|target|at)\b|\bwhere\s+(?:should|do|to)\s+(?:i\s+)?"
+                            r"(?:sell|exit|take\s+(?:gains|profits?))\b", re.I)
+_WEEKEND_GAP_Q = re.compile(
+    r"\bgap\w*\b[^?.]{0,40}\b(?:weekend|monday|open|overnight)|\b(?:weekend|overnight)\s+gap\w*|"
+    r"\bgap\s+risk\b|\bhold\w*\s+(?:it\s+|my\s+\w+\s+)?(?:over|through)\s+the\s+weekend", re.I)
+"""Weekend or overnight gap risk on a held position: "is my qqq perp long gonna gap over the
+weekend" was answered with the desk's track record and "should i be worried about weekend gap risk
+on my tsla perp long" with position sizing (answer audit, round 3)."""
 _RANGE_QUESTION = re.compile(
     r"\b(?:24\s*h(?:our)?|day'?s|today'?s|daily|intraday)\s+(?:range|high|low)\b|"
     r"\b(?:give|show|tell)\s+me\s+the\s+range\b|\bhigh\s+and\s+(?:the\s+)?low\b|"
@@ -456,9 +465,15 @@ _PERIOD_Q = re.compile(
     r"\b(?:over|in|during|for|across)\s+the\s+(?:last|past)\s+(?:(\d+)\s+)?(days?|weeks?|months?)\b|"
     r"\b(?:this|last|past)\s+(week|month)\b|\bcompare\s+(?:it\s+|that\s+)?(?:to|with)\s+last\s+"
     r"(week|month)\b|\bweek[\s-]on[\s-]week\b|\b(7|30|90)\s*d\b|\b(\d+)\s+days?\s+ago\b|"
-    r"\b(?:over|during|across)\s+(\d+)\s+(days?|weeks?|months?)\b", re.I)
+    r"\b(?:over|during|across)\s+(\d+)\s+(days?|weeks?|months?)\b|"
+    # "sol 30 day price change", "btc 7 day change", "nvda 30 day return" (audit, round 3)
+    r"\b(\d{1,3})\s*-?\s*(days?|d|weeks?|w|months?|m)\s+(?:price\s+)?(?:change|return|move|"
+    r"performance|perf|gain|loss|drop|%)|"
+    r"\b(?:52|fifty[\s-]two)\s*-?\s*w(?:ee)?k?s?\b|\b(?:1|one)[\s-]*year\s+(?:high|low|range)|"
+    r"\byearly\s+(?:high|low|range)\b", re.I)
 _PERIOD_MOVE = re.compile(
     r"\b(?:done|doing|moved?|move|perform\w*|chang\w*|up|down|gain\w*|lost|return\w*|"
+    r"high|low|range|"
     r"compare\w*|vs\.?|versus|went)\b", re.I)
 """A move over a stated period ("how has BTC done over the last week", "and how does that compare
 to last week"): answered with the change over that period from Bitget's daily candles. Neither was
@@ -475,6 +490,13 @@ def _period_days(text: str) -> int | None:
     found = _PERIOD_Q.search(text)
     if found is None:
         return None
+    if re.search(r"\b(?:52|fifty[\s-]two)\s*-?\s*w|\byear(?:ly)?\s+(?:high|low|range)|"
+                 r"\b(?:1|one)[\s-]*year\s+(?:high|low|range)", text, re.I):
+        return 365
+    if found.group(9):
+        unit = found.group(10).lower()
+        scale = 30 if unit.startswith("m") else 7 if unit.startswith("w") else 1
+        return int(found.group(9)) * scale
     number = next((g for g in (found.group(1), found.group(5), found.group(6), found.group(7))
                    if g), None)
     unit = next((g for g in (found.group(2), found.group(3), found.group(4), found.group(8))
@@ -490,8 +512,10 @@ _HOW_MANY = re.compile(r"\bhow\s+many\s+(?:shares|units|coins|contracts|tokens)\
                        r"\bhow\s+much\s+(?:btc|eth|sol|bitcoin|ether)\s+(?:is|does|for|can)\b",
                        re.I)
 _SHARE_OF_BOOK = re.compile(
-    r"(\d+(?:\.\d+)?)\s*%\s+of\s+(?:a|my|the)?\s*\$?\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b", re.I)
-"""A position size to convert into units: "how many shares of AAPL is 60% of a 100k book" was
+    r"(\d+(?:\.\d+)?)\s*(?:%|percent\b|pct\b)\s+of\s+(?:a|my|the)?\s*\$?\s*(\d[\d,]*(?:\.\d+)?)"
+    r"\s*(k|m)?\b", re.I)
+"""A position size to convert into units ("30 percent of 80k" too, audit round 3): "how many
+shares of AAPL is 60% of a 100k book" was
 answered with a Nasdaq stress (2026-09-25 audit)."""
 
 
@@ -805,6 +829,10 @@ _PRICE_FORECAST = re.compile(
     r"(?:价格|價格|价位|多少钱|価格|値段)"
     r"|(?:价格|價格|価格)[^?\uff1f]{0,8}(?:明年|下个月|下周|年底|来年|来月)"
     r"|准确价格|確切價格"
+    # an exact level asked for in Korean, Russian or Arabic (held-out corpus, must refuse):
+    # "내일 나스닥 지수가 몇 포인트일지 정확히 맞춰줄 수 있어?"
+    r"|몇\s*포인트|정확히\s*(?:맞춰|예측|알려)|сколько\s+(?:будет\s+)?пунктов|точн\w*\s+(?:цен|уровен)"
+    r"|بالضبط"
     # a future price in ten more languages ("Giá Bitcoin ngày mai sẽ là bao nhiêu?", "Berapa harga
     # Bitcoin besok?", "Quel sera le prix du Bitcoin demain ?") was quoted as today's price
     # (2026-09-25 audit, round 2)
@@ -861,9 +889,14 @@ _SENTIMENT = re.compile(
 _MARKET_WIDE = re.compile(r"\b(?:the\s+market|markets|stocks|equities|nasdaq|s&p|wall\s+street|"
                           r"tech\s+stocks|crypto\s+market)\b", re.I)
 _BOOK_RISK = re.compile(
-    r"\b(?:how\s+risky\s+is\s+my|risk\s+(?:of|in|on)\s+my|my\s+(?:portfolio|book|holdings)\s+"
+    r"\b(?:how\s+risky\s+is\s+my|how\s+risky\s+(?:is\s+(?:it|this|that)\s+)?now|"
+    r"risk\s+(?:of|in|on)\s+my|my\s+(?:portfolio|book|holdings)\s+"
     r"(?:risk|look|safe)|rebalanc\w*|diversif\w*|concentrat\w*|review\s+my\s+(?:portfolio|"
-    r"book|holdings|positions)|is\s+my\s+(?:portfolio|book)\s+(?:safe|ok|okay|too))\b",
+    r"book|holdings|positions)|is\s+my\s+(?:portfolio|book)\s+(?:safe|ok|okay|too)|"
+    # "hows my risk look, 99% NVDA 1% cash" and "short 20% TSLA and long 80% NVDA, what does that
+    # do to my risk" state the book they mean (answer audit, round 3)
+    r"how'?s\s+my\s+risk|my\s+risk\s+(?:look\w*|now|here)|(?:do|does)\s+(?:that|this|it)\s+do\s+"
+    r"to\s+my\s+risk|risk\s+check|whats?\s+my\s+risk|what(?:'?s|\s+is)\s+my\s+risk)\b",
     re.I,
 )
 """A question about the book already held, with no new name being added."""
@@ -876,12 +909,21 @@ _BOOK_QUESTION_STRONG = re.compile(
     r"\b(?:beta|correlation)\s+of\s+my\s+(?:book|portfolio|holdings)|"
     r"\bmy\s+(?:book|portfolio)'?s?\s+(?:beta|correlation|volatility|concentration)|"
     r"\b(?:dollar\s+)?risk\s+budget\s+(?:for|per|of|on)\s+(?:each|every|all)\s+(?:\w+\s+)?"
-    r"(?:names?|holdings?|positions?)", re.I)
+    r"(?:names?|holdings?|positions?)|"
+    # the book's own history, balance and value (answer audit, round 3)
+    r"\bmy\s+(?:\w+\s+){0,3}(?:book|portfolio|holdings|bag|stack|allocation)\b[^?.]{0,40}"
+    r"\b(?:sharpe|sortino|drawdown|returns?|performance|volatility|balanced|diversified|"
+    r"concentrat\w*|correlation|risk|worth|value)\b|"
+    r"\b(?:sharpe|sortino|drawdown|returns?|performance|balanced?|diversified|concentration|"
+    r"correlation(?:\s+matrix)?|risk\s+check|worth|value)\b[^?.]{0,40}\bmy\s+(?:\w+\s+){0,3}"
+    r"(?:book|portfolio|holdings|bag|stack|allocation)\b|"
+    r"\bwhat'?s\s+my\s+(?:max(?:imum)?\s+)?(?:drawdown|sharpe|volatility)\b", re.I)
 """A question about the saved book that names it only as "my holdings" or "my most concentrated
 risk": "which holding should I cut?" was answered with the desk's open positions and "what's my
 most concentrated risk?" declined (2026-09-25 audit, round 2)."""
 _MY_BOOK = re.compile(
-    r"\bmy\s+(?:book|portfolio|holdings|positions|crypto|coins|stocks|bag)\b", re.I)
+    r"\bmy\s+(?:(?!risk\b)\w+\s+){0,2}(?:book|portfolio|holdings|positions|crypto|coins|"
+    r"stocks|bag)\b", re.I)
 """The trader's own holdings, named without weights — the saved book is what they mean."""
 _BIGGEST_RISK = re.compile(
     r"\b(?:biggest|main|largest|top|worst)\s+risks?\b|\bwhat\s+could\s+hurt\b|"
@@ -1161,7 +1203,9 @@ def _resolve_any(name: str) -> str | None:
 COMPARE_MAX = 8
 
 _UNREAD_PCT_FIRST = re.compile(r"(\d+(?:\.\d+)?)\s*%\s*(?:in\s+|of\s+)?([A-Z][A-Z0-9.]{1,11})\b")
-_UNREAD_NAME_FIRST = re.compile(r"\b([A-Z][A-Z0-9.]{1,11})\s*[:=]?\s*(\d+(?:\.\d+)?)\s*%")
+_UNREAD_NAME_FIRST = re.compile(
+    r"\b([A-Z][A-Z0-9.]{1,11})(?:\s+(?:coin|token|stock|shares?|position))?\s*[:=]?\s*"
+    r"(\d+(?:\.\d+)?)\s*%")
 _NOT_A_HOLDING = frozenset({
     "CASH", "USD", "USDT", "USDC", "STABLES", "STABLE", "STABLECOINS", "STABLECOIN", "THE", "MY",
     "IN", "OF", "A", "AN", "AND", "IS", "RISK", "BUDGET", "BOOK", "PORTFOLIO", "CRYPTO", "TECH",
@@ -1211,6 +1255,13 @@ def _pairs(text: str) -> list[tuple[int, str, float]]:
         if any(not (span[1] <= a or span[0] >= b) for a, b in taken):
             return
         taken.add(span)
+        # A short is a negative weight: "short 20% TSLA", "-20% TSLA", "TSLA short 20%". It was
+        # read as a long and the answer's risk figures pointed the wrong way (audit, round 3).
+        before = text[max(0, span[0] - 14): span[0]]
+        inside = text[span[0]: span[1]]
+        if (re.search(r"\bshort(?:ing)?\s*(?:\w+\s+)?$|-\s*$", before, re.I)
+                or re.search(r"\bshort\b", inside, re.I)):
+            value = -value
         found.append((span[0], symbol, value))
 
     for match in _PAIR_FRACTION.finditer(text):
@@ -1225,8 +1276,27 @@ def _pairs(text: str) -> list[tuple[int, str, float]]:
         # ("40% NVDA") displaces them.
         if not any(abs(pos - other) < 3 for other in named_spans):
             found.append((pos, symbol, weight))
+    rest = _REST.search(text)
+    if rest is not None and found:
+        # "70% cash, the rest in btc": the named remainder gets what the stated weights leave
+        hit = _resolve(rest.group(1), trust_case=trust)
+        cash = _CASH_PCT.search(text)
+        cash_share = float(cash.group(1) or cash.group(2)) / 100 if cash else 0.0
+        left = 1.0 - sum(abs(w) for _, _, w in found) - cash_share
+        if hit is not None and left > 0.001 and all(sym != hit[0] for _, sym, _ in found):
+            found.append((rest.start(), hit[0], left))
+    elif rest is not None and not found:
+        hit = _resolve(rest.group(1), trust_case=trust)
+        cash = _CASH_PCT.search(text)
+        if hit is not None and cash is not None:
+            found.append((rest.start(), hit[0],
+                          1.0 - float(cash.group(1) or cash.group(2)) / 100))
     found.sort()
     return found or _amount_pairs(text)
+
+
+_REST = re.compile(r"\b(?:the\s+)?rest\s+(?:is\s+|in\s+|into\s+|of\s+it\s+in\s+)?"
+                   r"([A-Za-z][A-Za-z.]{1,11})\b", re.I)
 
 
 _GROUP = re.compile(
@@ -1323,7 +1393,15 @@ def _with_stated_cash(request: ResearchRequest | None, text: str) -> ResearchReq
     and 33% MSFT with a note asking the trader to say what the rest was, when they had
     (`eval/figurecheck.py`, 2026-09-25). The book's weights are rescaled to sum to one less the
     cash, and ``cash`` carries the rest, which every risk figure then dilutes by."""
-    if request is None or not request.book or request.cash:
+    if request is None or request.cash:
+        return request
+    if not request.book:
+        # "im 100% cash rn, whats my risk" states an all-cash book; the early all-cash answer
+        # reads it (answer audit, round 3)
+        whole = _CASH_PCT.search(text)
+        if (whole is not None and float(whole.group(1) or whole.group(2)) >= 99.9
+                and request.kind in (ResearchKind.BOOK, ResearchKind.STRESS)):
+            return replace(request, cash=1.0)
         return request
     stated = _CASH_PCT.search(text)
     cash: float | None = None
@@ -1373,6 +1451,18 @@ def _with_leverage_exposure(request: ResearchRequest | None,
 
 
 def _normalise(book: dict[str, float], notes: list[str]) -> dict[str, float]:
+    if book and any(w < 0 for w in book.values()):
+        # A book with shorts is scaled by its gross exposure, so each sign survives: 80% long
+        # NVDA and 20% short TSLA is 0.8 and -0.2, not 0.8 and 0.2 scaled to 1.
+        gross = sum(abs(w) for w in book.values())
+        shorts = ", ".join(f"{_t(s)} {w:+.0%}" for s, w in book.items() if w < 0)
+        notes.append(f"read as short: {shorts} — a negative weight, which offsets the longs in "
+                     f"every figure")
+        if abs(gross - 1.0) > 0.02:
+            notes.append(f"your positions add up to {gross:.0%} gross, so they were scaled to "
+                         f"100% gross before any risk figure was computed")
+            return {s: w / gross for s, w in book.items()}
+        return book
     total = sum(book.values())
     if not book or total <= 0:
         return {}
@@ -1483,9 +1573,9 @@ _LARGE_ORDER = re.compile(r"\b(?:large|big|huge|block|size(?:able)?|whale)\b", r
 def _is_an_order(raw: str) -> bool:
     """An instruction to trade ("sell 10 ETH at 5000") is refused as an order by the console; it
     must never be answered as a question about how to trade."""
-    from argus.lui.question import _INTERROGATIVE, _ORDER_VERB
+    from argus.lui.question import _INTERROGATIVE, _ORDER_VERB, _PLAN_REQUEST
 
-    if re.search(r"\bhow\b|\?|怎么|如何", raw, re.I):
+    if re.search(r"\bhow\b|\?|怎么|如何", raw, re.I) or _PLAN_REQUEST.match(raw):
         return False
     if re.search(r"\b(?:and|then)\s+(?:show|tell|give)\b|\b(?:show|tell)\s+me\b|"
                  r"\b(?:resulting|new|net)\s+(?:exposure|risk|beta|concentration)\b", raw, re.I):
@@ -1757,12 +1847,22 @@ def _forecast_note(text: str) -> tuple[str, ...]:
     return ()
 
 
-_CJK = re.compile(r"[\u4e00-\u9fff]")
+_CJK = re.compile(r"[\u4e00-\u9fff\uac00-\ud7af\u3040-\u30ff\u0600-\u06ff\u0400-\u04ff"
+                  r"\u0900-\u097f]")
+"""Scripts whose questions the kind table below reads: Chinese, Korean, Japanese kana, Arabic,
+Cyrillic and Devanagari (Korean and Arabic were declined whole, answer audit round 3)."""
 _CJK_KINDS: tuple[tuple[re.Pattern[str], ResearchKind], ...] = (
     (re.compile(r"对冲|避险|保护(?:一下)?(?:我的)?(?:仓位|持仓|组合)"), ResearchKind.HEDGE),
     (re.compile(r"(?:CPI|非农|议息|加息|降息|美联储|财报|通胀数据)[^?\uff1f]{0,12}(?:当天|那天|期间|前后|"
                 r"通常|一般|影响|反应|怎么(?:走|波动))|通常怎么(?:波动|走|反应)", re.I),
      ResearchKind.EVENT),
+    # Korean, Japanese, Arabic, Russian and Hindi, for the kinds asked most
+    (re.compile(r"기술적|지표|차트|과매수|과매도|テクニカル|指標|技術的|تحليل\s*فني|مؤشرات|"
+                r"технич|индикатор|RSI|MACD|तकनीकी", re.I), ResearchKind.TECHNICALS),
+    (re.compile(r"실적|어닝|決算|أرباح|نتائج|الأرباح|отчетност|отчёт|прибыл|कमाई|नतीजे"),
+     ResearchKind.FUNDAMENTALS),
+    (re.compile(r"غدا|غدًا|الأسبوع\s+القادم|내일|다음\s*주|明日|来週|завтра|कल\s"),
+     ResearchKind.ANALOGUE),
     (re.compile(r"比较|对比|相比|哪个[^?\uff1f]{0,8}(?:风险|波动|贝塔|beta|更)|"
                 r"和[^?\uff1f]{1,12}比", re.I),
      ResearchKind.COMPARE),
@@ -1805,6 +1905,12 @@ def _cjk_request(raw: str, symbols: tuple[str, ...]) -> ResearchRequest | None:
                 return ResearchRequest(kind=kind, symbols=symbols[:4])
             if kind is ResearchKind.HEDGE:
                 return ResearchRequest(kind=kind, symbols=symbols[:1], book={symbols[0]: 1.0})
+            if kind is ResearchKind.ANALOGUE:
+                # "tomorrow" / "next week" in the question's own language sets the horizon; the
+                # odds engine answers without forecasting
+                week = re.search(r"الأسبوع|다음\s*주|来週|недел|हफ्ते", raw)
+                return ResearchRequest(kind=kind, symbols=symbols[:1],
+                                       horizon_hours=168 if week else 24)
             return ResearchRequest(kind=kind, symbols=symbols[:1])
     if _CJK_MACRO.search(raw):
         return ResearchRequest(kind=ResearchKind.MACRO, symbols=symbols[:1])
@@ -1939,6 +2045,15 @@ def _detect(text: str) -> ResearchRequest | None:
         ether = re.search(r"\beth\w*|\bether|\betha\b|\bfeth\b", raw, re.I)
         return ResearchRequest(kind=ResearchKind.SENTIMENT,
                                symbols=("ETHUSDT",) if ether else ("BTCUSDT",))
+    if (re.search(r"\b(?:beta|correlation|exposure|sensitivity)\s+(?:of|on|for)\s+my\s+"
+                  r"(?:book|portfolio|holdings)|\bmy\s+(?:book|portfolio)'?s?\s+(?:beta|"
+                  r"exposure)", raw, re.I)
+            and all(sym in _SHOCK_SUBJECTS or sym in (BENCHMARK, "SPYUSDT") for sym in symbols)):
+        return ResearchRequest(kind=ResearchKind.BOOK, symbols=())
+    if (symbols == () and re.search(r"\brebalanc\w*|\bdiversif\w*", raw, re.I)
+            and not _is_an_order(raw) and not about_the_record(raw)):
+        # "rebalance this to equal risk pls" names the saved book as "this"
+        return ResearchRequest(kind=ResearchKind.BOOK, symbols=())
     fund = leveraged_fund_asked(raw)
     if fund is not None and not (len(symbols) >= 2 and _COMPARE.search(raw)):
         # "how much does TQQQ decay if QQQ goes sideways for a month?" was declined; `_run`
@@ -1952,6 +2067,12 @@ def _detect(text: str) -> ResearchRequest | None:
         # "NVDA put/call ratio" reached the decision log; the answer says options are not read
         # here (`_scope_lead`) and gives the positioning that is
         return ResearchRequest(kind=ResearchKind.SENTIMENT, symbols=symbols[:1])
+    if symbols and _LIQUIDITY_TIME_Q.search(raw) and not _is_an_order(raw):
+        return ResearchRequest(kind=ResearchKind.QUOTE, symbols=symbols[:1])
+    if symbols and _SPREAD_WIDEN_Q.search(raw) and not _is_an_order(raw):
+        return ResearchRequest(kind=ResearchKind.QUOTE, symbols=symbols[:1])
+    if symbols and PRICE_AT.match(raw) and not _is_an_order(raw):
+        return ResearchRequest(kind=ResearchKind.QUOTE, symbols=symbols[:1])
     if symbols and daily_technicals_asked(raw) and not _is_an_order(raw):
         # "is SPY in a death cross?" reached position sizing (2026-09-25 audit, round 2)
         return ResearchRequest(kind=ResearchKind.TECHNICALS, symbols=symbols[:1])
@@ -2171,7 +2292,9 @@ def _detect(text: str) -> ResearchRequest | None:
             r"\b(?:my|i'?m|i\s+am|i\s+hold|i\s+own)\b", raw, re.I
         ):
             return ResearchRequest(kind=ResearchKind.STRESS, symbols=())
-        if (((_BOOK_RISK.search(raw) or _BIGGEST_RISK.search(raw)) and _MY_BOOK.search(raw))
+        if (((_BOOK_RISK.search(raw) or _BIGGEST_RISK.search(raw))
+             and (_MY_BOOK.search(raw) or _CASH_PCT.search(raw)
+                  or re.search(r"\bmy\s+risk\b", raw, re.I)))
                 or _BOOK_QUESTION_STRONG.search(raw)) and not about_the_record(raw):
             return ResearchRequest(kind=ResearchKind.BOOK, symbols=())
         if (_EXECUTION.search(raw) and _ORDER_WORDS.search(raw) and not about_the_record(raw)
@@ -2233,6 +2356,28 @@ def _detect(text: str) -> ResearchRequest | None:
             side="short" if re.search(r"\bshort", raw, re.I) else "long",
             notes=(*((assumed,) if assumed else ()),
                    "whether to hold is your call; this is how past windows of that length went"))
+    if (symbols and not pairs and _WEEKEND_GAP_Q.search(raw) and not _is_an_order(raw)
+            and not _LEVERAGE.search(raw)
+            and not re.search(r"\bnews\b|\bheadlines?\b|\bwhy\b|\bexplain\w*|\bgapped\b",
+                              raw, re.I)):
+        weekend = bool(re.search(r"\bweekend|\bmonday", raw, re.I))
+        return ResearchRequest(
+            kind=ResearchKind.ANALOGUE, symbols=symbols[:1],
+            horizon_hours=72 if weekend else 16, weekend=weekend,
+            side="short" if re.search(r"\bshort", raw, re.I) else "long",
+            notes=("gap risk was asked for; this is how far past "
+                   + ("weekends (Friday close to Monday close)" if weekend else "overnights")
+                   + " moved, and how far against the position at the worst point",))
+    if symbols and not pairs and _TAKE_PROFIT_Q.search(raw) and not _is_an_order(raw):
+        # "good take profit for a nvda long from here" was answered with the desk's track record
+        # and "where should i take profit on aapl" with position sizing (answer audit, round 3)
+        hours, weekend, assumed = _horizon(raw)
+        return ResearchRequest(
+            kind=ResearchKind.ANALOGUE, symbols=symbols[:1], horizon_hours=hours, weekend=weekend,
+            side="short" if re.search(r"\bshort", raw, re.I) else "long",
+            notes=(*((assumed,) if assumed else ()),
+                   "a take-profit was asked for; the line that answers it is how far in the "
+                   "position's favour ordinary movement went in past windows of this length"))
     if symbols and not pairs and _STOP_QUESTION.search(raw) and not _is_an_order(raw):
         # "where should I put my stop loss if I long BTC here" went to the stress engine and
         # "give me a stop loss for a short on ETH" to a quote (2026-09-25 audit). The odds engine
@@ -2297,7 +2442,9 @@ def _detect(text: str) -> ResearchRequest | None:
         # "eth round trip cost if I buy and sell right now" names buying and selling only to say
         # what the cost is of; the add-a-position words made it an impact question (blind corpus,
         # 2026-09-25). A round trip is the quote engine's cost line.
-        return ResearchRequest(kind=ResearchKind.QUOTE, symbols=symbols[:4])
+        sized = _unit_notional(raw, symbols[0])
+        notional = sized[0] if sized else _parse_notional(raw)
+        return ResearchRequest(kind=ResearchKind.QUOTE, symbols=symbols[:4], notional=notional)
     if (simple and OPEN_INTEREST_QUESTION.search(raw) and not _QUOTE.search(raw)
             and not _is_an_order(raw)):
         return ResearchRequest(kind=ResearchKind.SENTIMENT, symbols=symbols[:1])
@@ -2583,6 +2730,13 @@ def with_book(request: ResearchRequest | None, book_text: str,
         return request
     shown = [f"{w:.0%} {_t(s)}" for s, w in book.items()] + ([f"{cash:.0%} cash"] if cash else [])
     note = f"used your saved book ({', '.join(shown)})"
+    missing = unread_holdings(book_text)
+    if missing:
+        # "20% DOGSHIT, 80% BTC" was scaled to all BTC with no word about DOGSHIT (answer audit,
+        # round 3): the name is not listed, and the note says so
+        note += (" — " + ", ".join(f"{name} ({weight:g}%)" for name, weight in missing)
+                 + " is not a contract Bitget lists, so it was left out and the rest scaled up; "
+                   "check the ticker")
     if cash and not request.cash:
         request = replace(request, cash=cash)
     kept = tuple(n for n in request.notes
@@ -2609,7 +2763,9 @@ def with_book(request: ResearchRequest | None, book_text: str,
 _FOLLOW_UP = re.compile(
     r"^\s*(?:and\s+)?(?:what|how)\s+(?:about|abt|bout)\b|^\s*and\s+(?:for\s+)?\S+\s*\??\s*$|"
     r"^\s*(?:same|now|ok(?:ay)?|also)\b[^?]{0,40}\b(?:for|with)\b|^\s*(?:do|try)\s+(?:the\s+)?"
-    r"same\b|^\s*(?:swap|switch|replace)\b",
+    r"same\b|^\s*(?:swap|switch|replace)\b|"
+    # "actually i meant ethereum" (answer audit, round 3)
+    r"^\s*(?:(?:actually|sorry|no|oops|wait)[,\s]+)*(?:i\s+)?(?:meant|mean)\b",
     re.I,
 )
 
@@ -2636,6 +2792,16 @@ _JUDGE_FOLLOW = re.compile(
 positioning; it was answered with the market-wide index and no ETH at all."""
 
 
+_RATIO_BOOK = re.compile(r"^\s*(?:(?:actually|ok(?:ay)?|no|wait|now|then)[,\s]+)*"
+                         r"(?:(?:make|change|switch|set)\s+(?:it|that)\s+(?:to\s+)?)?"
+                         r"(\d{1,2})\s*/\s*(\d{1,2})\b(?!\s*(?:dte|day))", re.I)
+_COMPARE_IT = re.compile(r"^\s*(?:and\s+)?(?:compare|stack|line)\s+(?:it|that|this)\s+(?:up\s+)?"
+                         r"(?:to|with|against|vs\.?)\s+(.+)$|^\s*(?:and\s+)?(?:vs\.?|versus|"
+                         r"against|compared\s+to)\s+(.+)$", re.I)
+_ASSET_CLASS = re.compile(r"\b(?:crypto\w*|coins?|bitcoin|stocks?|equit\w*|gold|oil|tech)\b",
+                          re.I)
+
+
 def follow_up(text: str, prior: list[str], book_text: str = "") -> ResearchRequest | None:
     """"And what about COIN?" after a research question: the same question, asked of COIN.
 
@@ -2652,11 +2818,14 @@ def follow_up(text: str, prior: list[str], book_text: str = "") -> ResearchReque
     named, _ = research_symbols(text)
     if not named:
         return None
-    for earlier in reversed(prior[-4:]):
-        base = with_book(detect(earlier), book_text, earlier)
-        if base is None:
-            continue
+    found = _previous_request(prior, book_text)
+    for earlier, base in ([found] if found is not None else []):
         new = named[0]
+        if base.kind is ResearchKind.STRESS and base.shock_on and not base.book:
+            # "whats my drawdown if btc drops 20%" -> "and ETH?": the same shock, on ETH
+            return replace(base, shock_on=new, notes=(
+                *base.notes, f"read as the previous question — \"{earlier[:60]}\" — "
+                             f"with the shock on {_t(new)}"))
         if base.kind is ResearchKind.IMPACT and base.book:
             others = tuple(s for s in base.symbols[1:] if s != new)
             symbols: tuple[str, ...] = (new, *others)
@@ -2671,11 +2840,35 @@ def follow_up(text: str, prior: list[str], book_text: str = "") -> ResearchReque
 
 
 def _previous_request(prior: list[str], book_text: str) -> tuple[str, ResearchRequest] | None:
-    for earlier in reversed(prior[-4:]):
+    """The last research request in the history, each turn read as a follow-up of the turns
+    before it when it is not a question on its own: "is that good?" after "BTC funding" then "and
+    ETH?" is about ETH (answer audit, round 3)."""
+    recent = prior[-4:]
+    for i in range(len(recent) - 1, -1, -1):
+        earlier = recent[i]
         base = with_book(detect(earlier), book_text, earlier)
+        if base is None and i > 0:
+            base = follow_up(earlier, recent[:i], book_text)
+            if base is not None:
+                # the words of the question the chain started from ("price of bitcoin?"), not
+                # the follow-up's ("and dogecoin?"), are what the engines read for the lead
+                root = _previous_request(recent[:i], book_text)
+                if root is not None and root[1].kind is base.kind:
+                    return root[0], base
         if base is not None:
             return earlier, base
+    # A turn the patterns do not read as research ("sup with SOL today", answered by the model)
+    # still names what the conversation is about; its name stands in for the request
+    for earlier in reversed(recent):
+        named = research_symbols(earlier)[0]
+        if named:
+            return earlier, ResearchRequest(kind=ResearchKind.QUOTE, symbols=named[:1])
     return None
+
+
+def resolved_previous(prior: list[str], book_text: str) -> tuple[str, ResearchRequest] | None:
+    """The public name the server uses to re-ask the previous question with its context."""
+    return _previous_request(prior, book_text)
 
 
 def _contextual_follow_up(text: str, prior: list[str],
@@ -2702,8 +2895,64 @@ def _contextual_follow_up(text: str, prior: list[str],
             return replace(base, book=holdings, cash=cash_left, symbols=tuple(holdings),
                            notes=(*base.notes, note))
         return None
+    ratio = _RATIO_BOOK.search(text) if rebook or _RATIO_BOOK.match(text) else None
+    if ratio is not None:
+        # "actually make it 60/40" names weights, not names: the last two names the conversation
+        # used get them, in the order they came up (answer audit, round 3)
+        names: list[str] = []
+        for turn in prior[-4:]:
+            for sym in research_symbols(turn)[0]:
+                if sym not in names:
+                    names.append(sym)
+        found = _previous_request(prior, book_text)
+        if len(names) >= 2 and found is not None:
+            earlier, base = found
+            a, b = float(ratio.group(1)), float(ratio.group(2))
+            pair = names[-2:]
+            holdings = {pair[0]: a / (a + b), pair[1]: b / (a + b)}
+            return replace(base, kind=(base.kind if base.kind in (
+                ResearchKind.STRESS, ResearchKind.BOOK, ResearchKind.HEDGE) else ResearchKind.BOOK),
+                book=holdings, symbols=tuple(holdings), notes=(
+                    *base.notes, f"read as the previous question — \"{earlier[:60]}\" — with "
+                                 f"{a:g}% {_t(pair[0])} and {b:g}% {_t(pair[1])}"))
+    against = _COMPARE_IT.match(text)
+    if against is not None:
+        others = research_symbols(against.group(1) or against.group(2))[0]
+        found = _previous_request(prior, book_text)
+        if others and found is not None and found[1].symbols:
+            earlier, base = found
+            first = base.symbols[0]
+            return ResearchRequest(kind=ResearchKind.COMPARE,
+                                   symbols=(first, *(o for o in others if o != first)),
+                                   notes=(f"read as {_t(first)} from \"{earlier[:60]}\" "
+                                          f"against {', '.join(_t(o) for o in others)}",))
+    shock = re.search(r"(-?\d+(?:\.\d+)?)\s*%", text)
+    if shock is not None and _FALL_WORD.search(text) and re.search(
+            r"\binstead\b|^\s*(?:and\s+|what\s+about\s+|how\s+about\s+)", text, re.I):
+        found = _previous_request(prior, book_text)
+        if found is not None and found[1].kind is ResearchKind.STRESS:
+            earlier, base = found
+            size = abs(float(shock.group(1)))
+            move = -size if not re.search(r"\b(?:rally|rallies|spike|surge|rise)", text,
+                                          re.I) else size
+            return replace(base, shock_pct=move, notes=(
+                *base.notes, f"read as the previous question — \"{earlier[:60]}\" — with a "
+                             f"{move:+g}% move"))
     if research_symbols(text)[0]:
         return None
+    asset = _ASSET_CLASS.search(text)
+    if asset is not None and re.search(r"\b(?:that|this|it)\b", text, re.I):
+        found = _previous_request(prior, book_text)
+        if found is not None and found[1].kind in (ResearchKind.MACRO, ResearchKind.EVENT,
+                                                    ResearchKind.SENTIMENT):
+            earlier, base = found
+            word = asset.group(0).lower()
+            symbol = ("BTCUSDT" if word.startswith(("crypto", "coin", "bitcoin")) else
+                      "XAUUSDT" if word.startswith("gold") else
+                      "CLUSDT" if word.startswith("oil") else "QQQUSDT")
+            return replace(base, symbols=(symbol,), notes=(
+                *base.notes, f"read as the previous question — \"{earlier[:60]}\" — for "
+                             f"{word}, with {_t(symbol)} standing for it"))
     if _JUDGE_FOLLOW.match(text):
         found = _previous_request(prior, book_text)
         if found is not None and found[1].symbols:
@@ -3235,6 +3484,9 @@ SESSION_QUESTION = re.compile(
     r"|\bis\s+(?:today|tomorrow|(?:this\s+)?(?:monday|tuesday|wednesday|thursday|friday))\s+a\s+"
     r"(?:us\s+|u\.s\.\s+|stock\s+|market\s+|trading\s+)*(?:holiday|trading\s+day)\b"
     r"|\b(?:us|u\.s\.|stock|nyse|market)\s+(?:market\s+)?holidays?\b"
+    # "session state right now" reached the rates dashboard (answer audit, round 3)
+    r"|\bsession\s+(?:state|status|right\s+now|now|today)\b|\bwhat\s+session\b"
+    r"|\bwhich\s+session\b"
     r"|\u7f8e\u80a1.{0,6}(?:\u5f00\u76d8|\u6536\u76d8|\u4f11\u5e02|\u4ea4\u6613)"
     r"|^\W*(?:the\s+)?(?:us|u\.s\.|american|nyse|nasdaq)\s+(?:stock\s+)?(?:market|session)\s+"
     r"is\s+(?:now\s+|still\s+|currently\s+)?(?:open|closed|shut)\b[^?]*$",
@@ -3330,43 +3582,54 @@ def _book_dollar_lines(request: ResearchRequest, data: MarketData, is_open: Any,
 _BETA_ASKED = re.compile(r"\bbeta\b|\bhow\s+much\s+(?:does|do)\s+my\s+(?:book|portfolio)\s+move\b",
                          re.I)
 _SP500 = re.compile(r"\bs\s*&\s*p(?:\s*500)?\b|\bspx\b|\bspy\b|\bsp500\b", re.I)
+_NASDAQ_NAMED = re.compile(r"\bnasdaq\w*|\bndx\w*|\bqqq\b|\bnq\b", re.I)
 
 
 def _book_beta_line(book: Mapping[str, float], data: MarketData, is_open: Any,
                     text: str) -> tuple[str, Source] | None:
-    """The book's beta to the index the question names — the S&P 500 (SPY on Bitget) or the
-    Nasdaq-100 (QQQ) — in regular hours. "beta of my book to the S&P 500" was answered with a
-    concentration report whose only beta was to QQQ (2026-09-25 audit, round 2)."""
+    """The book's beta to each index the question names — the S&P 500 (SPY on Bitget), the
+    Nasdaq-100 (QQQ), or both — in regular hours. "beta of my book to the S&P 500" was answered
+    with a concentration report whose only beta was to QQQ (2026-09-25 audit, round 2), and "beta
+    of my book to spx and ndx" as a comparison of the two indices (round 3)."""
     from argus.market.history import fetch_range
 
-    bench = "SPYUSDT" if _SP500.search(text) else BENCHMARK
+    benches = [b for b, asked in (("SPYUSDT", _SP500.search(text)),
+                                  (BENCHMARK, _NASDAQ_NAMED.search(text))) if asked] or [BENCHMARK]
     raw = dict(data.raw)
-    if bench not in raw:
-        try:
-            bars = fetch_range(bench, days=30, interval="1H")
-        except Exception:
-            return None
-        from argus.desk.portfolio import returns as to_returns
+    for bench in benches:
+        if bench not in raw:
+            try:
+                bars = fetch_range(bench, days=30, interval="1H")
+            except Exception:
+                return None
+            from argus.desk.portfolio import returns as to_returns
 
-        raw[bench] = to_returns([(b.ts, float(b.close)) for b in bars])
+            raw[bench] = to_returns([(b.ts, float(b.close)) for b in bars])
     columns = _open_columns(raw, is_open)
-    if bench not in columns:
+    read: list[tuple[str, float, float]] = []
+    for bench in benches:
+        if bench not in columns:
+            continue
+        total = seen = 0.0
+        for sym, weight in book.items():
+            value = beta(columns.get(sym, []), columns[bench])
+            if value is not None:
+                total += weight * value
+                seen += abs(weight)
+        if seen:
+            read.append((bench, total, seen))
+    if not read:
         return None
-    total = 0.0
-    seen = 0.0
-    for sym, weight in book.items():
-        value = beta(columns.get(sym, []), columns[bench])
-        if value is not None:
-            total += weight * value
-            seen += weight
-    if not seen:
-        return None
-    name = "the S&P 500 (SPY)" if bench == "SPYUSDT" else "the Nasdaq-100 (QQQ)"
-    return (f"Actionable: this book's beta to {name} is {total:.2f} in regular US hours over the "
-            f"last 30 days — a 1% move in the index moves the book about {total:.2f}%"
-            + (f", from the {seen:.0%} of it with enough history" if seen < 0.99 else "") + ".",
+    names = {"SPYUSDT": "the S&P 500 (SPY)", BENCHMARK: "the Nasdaq-100 (QQQ)"}
+    betas = " and ".join(f"{names[b]} {t:.2f}" for b, t, _ in read)
+    first = read[0]
+    return (f"Actionable: this book's beta to {betas} in regular US hours over the last 30 days — "
+            f"a 1% move in {names[first[0]].split(' (')[0]} moves the book about {first[1]:.2f}%"
+            + (f", from the {first[2]:.0%} of it with enough history" if first[2] < 0.99 else "")
+            + ".",
             Source(kind="computation", ref="argus.desk.portfolio.beta",
-                   detail=f"weighted holding betas to {bench}, open-session hourly returns"))
+                   detail="weighted holding betas to " + ", ".join(b for b, _, _ in read)
+                          + ", open-session hourly returns"))
 
 
 def _open_columns(raw: Mapping[str, Mapping[datetime, float]],
@@ -3949,6 +4212,13 @@ FRED_SERIES: dict[str, str] = {
     "DGS10": "10-year Treasury", "DGS2": "2-year Treasury", "DFF": "fed funds",
     "T10YIE": "10-year breakeven inflation", "DTWEXBGS": "broad dollar index",
 }
+FRED_MONTHLY: dict[str, str] = {
+    "CPIAUCSL": "CPI", "CPILFESL": "core CPI", "PCEPI": "PCE price index",
+    "PCEPILFE": "core PCE price index",
+}
+"""Monthly inflation series, shipped in the snapshot with 480 days so a year-on-year change can
+be read from it: the hosted console cannot reach FRED, and "whats the latest CPI number" was
+answered with the rates dashboard and no CPI at all (answer audit, round 3)."""
 FRED_CSV = "https://fred.stlouisfed.org/graph/fredgraph.csv?id={series}&cosd={start}"
 
 
@@ -4013,6 +4283,7 @@ def write_macro_snapshot(days: int = 120) -> int:
     """Read every series the console uses from FRED and write them to :data:`FRED_SNAPSHOT`.
     Run by the desk cycle, so the hosted console's fallback is never more than a cycle old."""
     series = {sid: _fred_live(sid, days) for sid in FRED_SERIES}
+    series.update({sid: _fred_live(sid, 480) for sid in FRED_MONTHLY})
     FRED_SNAPSHOT.write_text(json.dumps({
         "generated_at": datetime.now(UTC).isoformat(),
         "source": "https://fred.stlouisfed.org (FRED, Federal Reserve Bank of St. Louis)",
@@ -4189,6 +4460,12 @@ def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
         lines.append(brief)
     if _FRED_USED_SNAPSHOT:
         dated = sorted(set(_FRED_USED_SNAPSHOT.values()))
+        # Each series line says it is the shipped reading, so it is not read — or labelled — as
+        # this minute's (the audit's round 3 found the fallback figures tagged live)
+        names = tuple(form for name in FRED_SERIES.values()
+                      for form in (f"{name}:", f"{name[0].upper()}{name[1:]}:"))
+        lines = [line.replace(" on 20", " (the shipped reading) on 20", 1)
+                 if line.startswith(names) else line for line in lines]
         lines.append(f"FRED did not answer from here just now, so these series are the desk "
                      f"cycle's last reading ({', '.join(dated)}), not this minute's.")
         _FRED_USED_SNAPSHOT.clear()
@@ -4198,8 +4475,8 @@ def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
     if brief:
         macro_sources.append(Source(kind="venue", ref="bitget-mcp-server news_label_search",
                                     detail="Bitget UEX Daily, the latest US-stock brief"))
-    if _CPI_Q.search(raw_text):
-        cpi, cpi_sources = _cpi_lines()
+    if _CPI_Q.search(raw_text) or _PCE_Q.search(raw_text):
+        cpi, cpi_sources = _cpi_lines("PCE" if _PCE_Q.search(raw_text) else "CPI")
         if cpi:
             lines = [cpi[0], *(re.sub(r"^Actionable:\s*(\w)", lambda m: m.group(1).upper(), x)
                                for x in lines), *cpi[1:]]
@@ -4207,11 +4484,13 @@ def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
     return lines, macro_sources, readings
 
 
-_CPI_Q = re.compile(r"\bcpi\b|\binflation\s+(?:print|number|data|rate|reading)\b|"
+_PCE_Q = re.compile(r"\bpce\b|personal\s+consumption", re.I)
+_CPI_Q = re.compile(r"\bcpi\b|\binflation\s+(?:print|number|data|rate|reading|looking|now|today)\b|"
+                    r"\bhow\s+(?:high|hot)\s+is\s+inflation|\binflation\s*\??\s*$|"
                     r"\bconsumer\s+prices?\b|通胀|通脹|消费者物价|物価", re.I)
 
 
-def _cpi_lines() -> tuple[list[str], list[Source]]:
+def _cpi_lines(kind: str = "CPI") -> tuple[list[str], list[Source]]:
     """The latest CPI print from FRED (all items and core, year on year and on the month) and how
     QQQ has reacted on CPI days in the desk's own event study. "what's the latest CPI print and how
     did stocks react" was answered without a CPI figure (2026-09-25 audit): the macro answer carried
@@ -4222,7 +4501,7 @@ def _cpi_lines() -> tuple[list[str], list[Source]]:
         # Matched by date, not by position: FRED leaves a month blank when a release is missed
         # (October 2025 is empty in CPIAUCSL), so "13 rows back" is not always a year back.
         try:
-            rows = dict(_fred_live(series, 430))
+            rows = dict(_fred(series, 480))
         except Exception:
             return None
         if not rows:
@@ -4237,9 +4516,12 @@ def _cpi_lines() -> tuple[list[str], list[Source]]:
         on_month = (last / rows[prior] - 1) * 100 if prior in rows else None
         return day, (last / rows[year_ago] - 1) * 100, on_month
 
-    headline, core = yoy("CPIAUCSL"), yoy("CPILFESL")
+    pce = kind == "PCE"
+    headline, core = (yoy("PCEPI"), yoy("PCEPILFE")) if pce else (yoy("CPIAUCSL"),
+                                                                  yoy("CPILFESL"))
     if headline is None:
         return [], []
+    shipped = {k: v for k, v in _FRED_USED_SNAPSHOT.items() if k in FRED_MONTHLY}
 
     def pair(reading: tuple[str, float, float | None]) -> str:
         month_part = (f" and {reading[2]:+.1f}% on the month" if reading[2] is not None else
@@ -4247,9 +4529,17 @@ def _cpi_lines() -> tuple[list[str], list[Source]]:
         return f"{reading[1]:+.1f}% on the year{month_part}"
 
     month = datetime.fromisoformat(headline[0]).strftime("%b %Y")
-    text = (f"Actionable: US CPI for {month}: {pair(headline)}"
-            + (f"; core, excluding food and energy, {pair(core)}" if core else "") + ".")
+    text = (f"Actionable: US {'PCE inflation' if pce else 'CPI'} for {month}: "
+            f"{pair(headline)}"
+            + (f"; core, excluding food and energy, {pair(core)}" if core else "") + "."
+            + (f" (FRED's last reading shipped with the console on "
+               f"{sorted(set(shipped.values()))[-1]}; FRED did not answer just now.)"
+               if shipped else ""))
     lines = [text]
+    if pce:
+        return lines, [Source(kind="venue", ref="FRED PCEPI, PCEPILFE",
+                              detail=f"BEA personal consumption expenditures price index, "
+                                     f"{headline[0]}")]
     try:
         study = json.loads((_notes_path().parent / "event_reactions.json").read_text("utf-8"))
         qqq = next(r for r in study["reactions"] if r.get("symbol") == "QQQUSDT"
@@ -4373,6 +4663,57 @@ def _desk_integrity_read(symbol: str) -> dict[str, Any] | None:
 SPOT_HEDGE_DAYS = 240
 """Nights of history a spot hedge is fitted and tested on: about 165 sessions, enough for a held-out
 third of fifty nights and a dozen weekends, fetched in a few seconds."""
+
+
+_WITH_ITS_PERP = re.compile(r"\bwith\s+(?:the|its|a|an|my)?\s*(?:\w+\s+)?perp(?:etual)?s?\b|"
+                            r"\busing\s+(?:the|its)\s+perp(?:etual)?\b", re.I)
+
+
+def _same_name_perp_hedge(symbol: str, raw: str) -> tuple[list[str], list[Source]] | None:
+    """Shares hedged with the same company's perpetual: one-for-one, and what it costs and misses.
+    "how do i hedge my 500 shares of aapl with the perp" was answered with SPY, QQQ and SMH on a
+    $100,000 default book (answer audit, round 3)."""
+    from argus.market.bitget import fetch_tickers
+
+    try:
+        ticker = fetch_tickers()[symbol]
+    except Exception:
+        return None
+    base = _t(symbol)
+    sized = _unit_notional(raw, symbol)
+    units = None
+    if sized is not None:
+        units = float(sized[0]) / float(ticker.last)
+    last = float(ticker.last)
+    rate = float(ticker.funding_rate) * 100
+    hours = 8
+    week = rate * (24 / hours) * 7
+    lines = [
+        "Actionable: "
+        + (f"short {units:,.0f} {base} on Bitget's {base} perpetual — about ${units * last:,.0f} "
+           f"at {last:,.2f} — to hedge {units:,.0f} shares one for one."
+           if units else
+           f"short the same quantity of {base} on Bitget's {base} perpetual as the shares you "
+           f"hold — one for one.")
+        + " The perpetual tracks the same company, so the hedge removes the share's price risk, "
+          "news included — unlike an index hedge, which leaves the company's own moves open.",
+        ("Carrying it: funding is flat right now, so the short costs nothing to hold beyond "
+         "about 12bps to open and close it." if abs(rate) < 0.00005 else
+         f"Carrying it: a short {'receives' if rate > 0 else 'pays'} funding at the current "
+         f"{rate:+.4f}% per {hours}h, about {abs(week):.2f}% of the hedge a week"
+         + (f" (${abs(week) / 100 * units * last:,.0f} on this size)" if units else "")
+         + ", plus about 12bps to open and close it."),
+    ]
+    premium = _premium_line(symbol, ticker.last, False)
+    if premium is not None:
+        lines.append(premium[0])
+    lines.append("What it misses: while the US market is shut the perpetual keeps trading and the "
+                 "shares do not, so the two can diverge overnight and at weekends and meet again "
+                 "at the open; the hedge is exact at the close, not at every hour. A perpetual "
+                 "short also needs margin and can be liquidated if the stock rallies hard.")
+    sources = [Source(kind="venue", ref="bitget /api/v2/mix/market/tickers",
+                      detail=f"{symbol} last and funding")]
+    return lines, sources
 
 
 def _spot_hedge_answer(question: Question, request: ResearchRequest) -> Answer:
@@ -4898,13 +5239,87 @@ def _news(symbol: str, is_open: Any) -> tuple[list[str], list[Source], dict[str,
                           detail=f"{len(kept)} headline(s), {len(filings)} filing(s)")], payload
 
 
+_BOOK_HISTORY_Q = re.compile(r"\b(?:sharpe|sortino|drawdown|returns?|performance|perf|"
+                             r"how\s+(?:has|did)\s+(?:it|my\s+\w+)\s+(?:done|do|perform\w*))\b",
+                             re.I)
+_WORTH_Q = re.compile(r"\bworth\b|\bvalue\s+of\s+my\b|\bhow\s+much\s+is\s+my\b", re.I)
+
+
+def _book_history_lines(book: Mapping[str, float], cash: float,
+                        question: str) -> tuple[list[str], Source] | None:
+    """The saved book's own history, held at its weights and rebalanced daily: annual return and
+    volatility, the Sharpe ratio, and the deepest fall from a high with its dates. "What is the
+    Sharpe ratio of my book" and "what's my max drawdown" were answered with the desk's own track
+    record (answer audit, round 3). Bitget's daily candles for every holding, so a mixed book is
+    read on one venue's calendar; the risk-free rate is not subtracted, and that is said."""
+    from argus.market.history import CandleType, fetch_window
+
+    series: dict[str, dict[Any, float]] = {}
+    for symbol in book:
+        try:
+            with _FETCH_SLOTS:
+                bars = fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=500),
+                                    interval="1D", candle_type=CandleType.MARKET, pause=0.05)
+        except Exception:
+            return None
+        series[symbol] = {b.ts.date(): float(b.close) for b in bars if float(b.close) > 0}
+    days = sorted(set.intersection(*(set(v) for v in series.values())))
+    if len(days) < 60:
+        return None
+    invested = 1.0 - cash
+    returns = [sum(w * (series[s][b] / series[s][a] - 1) for s, w in book.items()) * invested
+               for a, b in itertools.pairwise(days)]
+    level, peak, deepest, peak_day, trough_day, low_from = 1.0, 1.0, 0.0, days[0], days[0], days[0]
+    for day, r in zip(days[1:], returns, strict=True):
+        level *= 1 + r
+        if level > peak:
+            peak, low_from = level, day
+        fall = level / peak - 1
+        if fall < deepest:
+            deepest, peak_day, trough_day = fall, low_from, day
+    span_years = (days[-1] - days[0]).days / 365.25
+    growth = level ** (1 / span_years) - 1 if span_years > 0 else 0.0
+    per_year = len(returns) / span_years if span_years > 0 else 252
+    import statistics
+
+    vol = statistics.pstdev(returns) * math.sqrt(per_year)
+    sharpe = (statistics.mean(returns) * per_year) / vol if vol > 0 else None
+    held = ", ".join(f"{_t(s)} {w:.0%}" for s, w in book.items()) + (
+        f", {cash:.0%} cash" if cash else "")
+    lead_on = ("drawdown" if re.search(r"drawdown", question, re.I) else
+               "sharpe" if re.search(r"sharpe|sortino", question, re.I) else "return")
+    figures = {
+        "sharpe": (f"a Sharpe ratio of {sharpe:.2f}" if sharpe is not None else
+                   "no Sharpe ratio (it did not move)"),
+        "drawdown": (f"a deepest fall of {deepest:.1%}, from its high on {peak_day:%d %b %Y} to "
+                     f"{trough_day:%d %b %Y}"),
+        "return": f"{growth:+.1%} a year",
+    }
+    order = [lead_on, *(k for k in ("return", "sharpe", "drawdown") if k != lead_on)]
+    text = (f"Actionable: held at {held} and rebalanced daily over the last {len(days)} days "
+            f"({days[0]:%d %b %Y} to {days[-1]:%d %b %Y}), this book shows "
+            + "; ".join(figures[k] for k in order)
+            + f"; volatility {vol:.0%} a year.")
+    note = ("The Sharpe ratio here is return over volatility with no risk-free rate taken off, "
+            "and it describes this window only — a different window gives a different figure."
+            + (" It is positive while the yearly return is negative because it uses the average "
+               "daily return, which volatility drag puts above the compounded one."
+               if sharpe is not None and sharpe > 0 > growth else ""))
+    return [text, note], Source(kind="computation", ref="argus.lui.research._book_history_lines",
+                                detail=f"Bitget daily candles, {len(days)} shared days")
+
+
 def _book_report(request: ResearchRequest, data: MarketData,
                  is_open: Any) -> tuple[list[str], list[Source], dict[str, Any]]:
     """The whole book as held: risk by holding against weight, volatility, beta and how much of the
     book's movement QQQ explains, the stress and the worst realised 24 hours, and the one trim that
     brings every holding inside the risk budget."""
     columns = _open_columns(data.raw, is_open)
-    weights = {s: w for s, w in request.book.items() if w > 0}
+    # Shorts are kept, as negative weights: the Euler decomposition, the beta stress and the worst
+    # window are all linear in the weights and read a short as the offset it is. Dropping them
+    # reported "NVDA 80% of the money, 100% of the risk" for a book 20% short TSLA (audit, round 3).
+    weights = {s: w for s, w in request.book.items() if w != 0}
+    has_short = any(w < 0 for w in weights.values())
     risk = decompose(weights, columns)
     if risk is None:
         return ([f"Not enough shared history across {', '.join(_t(s) for s in weights)} to "
@@ -4912,14 +5327,15 @@ def _book_report(request: ResearchRequest, data: MarketData,
     shares = {c.symbol: c.contribution / risk.volatility for c in risk.contributions}
     lines: list[str] = []
     budget = request.budget
-    over = sorted((s for s in shares if shares[s] > budget), key=lambda s: -shares[s])
+    over = sorted((s for s in shares if shares[s] > budget and weights[s] > 0),
+                  key=lambda s: -shares[s])
     # With N holdings the fairest a book can be is 1/N of the risk each, so a 25% budget cannot be
     # met by four or fewer names without parking the rest in cash. A trader asking how risky a
     # three-coin book is was told to go 43% cash. For such a book, unless the trader set the budget
     # themselves, the actionable is the equal-risk rebalance instead: every name carrying the same
     # share, the money fully invested, correlation included.
     balanced = (_equal_risk_weights(tuple(weights), columns)
-                if len(weights) >= 2 and not request.budget_stated
+                if len(weights) >= 2 and not request.budget_stated and not has_short
                 and len(weights) * budget <= 1.0 else None)
     if balanced is not None:
         top = max(shares, key=lambda s: shares[s])
@@ -4931,6 +5347,26 @@ def _book_report(request: ResearchRequest, data: MarketData,
             + f" — each name then carries about {1 / len(weights):.0%} of the risk, fully "
               f"invested."
         )
+    elif has_short:
+        top = max(shares, key=lambda s: shares[s])
+        offsets = [s for s in shares if weights[s] < 0]
+        cut = sum(-shares[s] for s in offsets if shares[s] < 0)
+        lines.append(
+            f"Actionable: {_t(top)} carries {shares[top]:.0%} of this book's risk; the short "
+            + " and ".join(f"{_t(s)} ({weights[s]:.0%})" for s in offsets)
+            + (f" offsets {cut:.0%} of it — a hedge that works because the two move together"
+               if cut > 0 else
+               " adds risk rather than offsetting it — it does not move with the longs enough "
+               "to hedge them")
+            + ".")
+    elif len(weights) == 1:
+        only = next(iter(weights))
+        lines.append(
+            f"Actionable: the whole invested book is {_t(only)}, so it carries all of the risk — "
+            + (f"the {request.cash:.0%} in cash is the only diversification; "
+               if request.cash else "there is no diversification; ")
+            + "the figures below are its own volatility, beta and worst day, and the lever is its "
+              "size, or a second name that does not move with it.")
     elif over:
         top = over[0]
         target = _trim_to_budget(top, weights, columns, budget)
@@ -4951,8 +5387,10 @@ def _book_report(request: ResearchRequest, data: MarketData,
             f"risk grounds."
         )
     lines.append("Where the risk sits: " + "; ".join(
-        f"{_t(s)} {weights[s]:.0%} of the money, {shares[s]:.0%} of the risk"
-        for s in sorted(shares, key=lambda s: -shares[s])) + ".")
+        (f"{_t(s)} {weights[s]:.0%} of the money, {shares[s]:.0%} of the risk" if weights[s] > 0
+         else f"{_t(s)} short {abs(weights[s]):.0%} of the money, {shares[s]:+.0%} of the risk")
+        for s in sorted(shares, key=lambda s: -shares[s]))
+        + (" — a negative share is risk the position takes away." if has_short else "."))
     hourly_vol = risk.volatility
     annual = hourly_vol * math.sqrt(24 * 365)
     spread = risk.effective_positions
@@ -5948,6 +6386,24 @@ CRYPTO_ETF_QUESTION = re.compile(
     r"\b(?:ibit|fbtc|gbtc|etha|arkb|bitb|feth)\b|\betf\s+(?:flows?|inflows?|outflows?)\b", re.I)
 """Spot crypto ETF questions: "how are spot ETH ETFs doing?" was answered with position sizing for
 ETH (2026-09-25 audit, round 2). The answer is the funds' own creations and redemptions."""
+PRICE_AT = re.compile(
+    r"^\s*(?:(?:what'?s|whats|where'?s|wheres|where\s+is|what\s+is)\s+)?(?:\w+\s+){0,2}"
+    r"(?:stock|price|perp|token|coin)?\s*(?:at|trading|trade)\s*(?:rn|now|right\s+now|today)?"
+    r"\s*\??\s*$", re.I)
+""""whats nvda stock at" was answered with a news summary (answer audit, round 3)."""
+_SPREAD_WIDEN_Q = re.compile(
+    r"\bspread\w*\b[^?.]{0,40}\b(?:widen\w*|wider|blow\w*\s+out|increas\w*|jump\w*|doubl\w*)|"
+    r"\b(?:widen\w*|wider)\s+spread", re.I)
+""""if the spread on btc widens does my execution cost go up, show me the math" was answered with
+a one-day direction forecast (answer audit, round 3)."""
+_LIQUIDITY_TIME_Q = re.compile(
+    r"\bbest\s+(?:time|hours?)\s+(?:of\s+(?:the\s+)?day\s+)?to\s+(?:trade|buy|sell|execute|enter)|"
+    r"\bwhen\s+is\s+\S+\s+(?:most\s+)?liquid|\bliquidity\s+(?:dry|dries|dried|thin\w*)|"
+    r"\bweekend\s+liquidity|\bliquid\w*\s+(?:on|over|at|during)\s+(?:the\s+)?weekends?|"
+    r"\bwhat\s+hours?\s+(?:is|are|does)\s+\S+\s+(?:most\s+)?(?:liquid|active|traded)|"
+    r"\bmost\s+liquid\s+(?:hours?|time)", re.I)
+""""whats the best time of day to trade nvda perps" and "does liquidity dry up on weekends for
+stock perps" were refused or misrouted (answer audit, round 3); `market/liquidity_profile.py`."""
 _HOLD_DECISION = re.compile(
     r"\bshould\s+(?:i|we)\s+(?:still\s+)?(?:hold|keep|stay\s+in|ride)\b", re.I)
 _HOLD_COST = re.compile(r"\b(?:cost\w*|pay|paid|expensive|carry|funding)\b", re.I)
@@ -6036,6 +6492,55 @@ def _rtoken_tracking(spot: str, perp: str, days: int) -> tuple[str, Source] | No
             f"average, ranging {gaps[0]:+.1f} to {gaps[-1]:+.1f}bps.",
             Source(kind="computation", ref="argus.market.rtoken_spot.hourly_bars",
                    detail=f"{spot} vs {perp}, hourly closes, {days} days"))
+
+
+def _sized_round_trip(symbol: str, notional: Decimal,
+                      fee_bps: Any) -> tuple[str, Source] | None:
+    """A round trip of a stated size: the asks walked for the entry, the bids for the exit, plus
+    both taker fees. "Round trip cost of trading 500 btc perp" got the flat 12bps a one-lot trade
+    pays (answer audit, round 3); at size the book is the cost."""
+    from argus.market.depth import fetch_orderbook
+
+    try:
+        with _FETCH_SLOTS:
+            book = fetch_orderbook(symbol, limit=50)
+        entry = book.sweep(notional, direction="BUY")
+        exit_ = book.sweep(notional, direction="SELL")
+    except Exception:
+        return None
+    total = float(fee_bps) + float(entry.slippage_bps) + float(exit_.slippage_bps)
+    thin = not (entry.complete and exit_.complete)
+    if thin:
+        # Past the visible book the walk understates the cost; each leg is priced instead by the
+        # square-root impact law the execution plan uses, on the day's volume and volatility.
+        try:
+            from argus.cost.model import CostModel
+            from argus.market.bitget import fetch_tickers
+
+            ticker = fetch_tickers()[symbol]
+            adv = ticker.base_volume * ticker.last
+            leg = float(CostModel.bitget_perp().impact_bps(notional / adv,
+                                                           _daily_volatility_bps(symbol)))
+            law_total = float(fee_bps) + 2 * leg
+            return (f"Actionable: a round trip of ${float(notional):,.0f} in {_t(symbol)} is "
+                    f"{float(notional / adv):.1%} of its 24h volume each way, more than the 50 "
+                    f"visible levels hold — the square-root impact law puts each leg near "
+                    f"{leg:.1f}bps, so about {law_total:.1f}bps "
+                    f"(${float(notional) * law_total / 10_000:,.0f}) with {float(fee_bps):.0f}bps "
+                    f"of taker fees; ask how to split it to bring that down.",
+                    Source(kind="computation", ref="argus.cost.model.CostModel.impact_bps",
+                           detail=f"{symbol} square-root impact on 24h volume, both legs"))
+        except Exception:
+            pass
+    text = (f"Actionable: a round trip of ${float(notional):,.0f} in {_t(symbol)} costs about "
+            f"{total:.1f}bps (${float(notional) * total / 10_000:,.0f}) on the book right now — "
+            f"{float(entry.slippage_bps):.1f}bps walking the asks to get in, "
+            f"{float(exit_.slippage_bps):.1f}bps walking the bids to get out, and "
+            f"{float(fee_bps):.0f}bps in taker fees"
+            + (" — more than the 50 visible levels hold, so the real cost is higher; ask how to "
+               "split it for the impact law's estimate beyond the book." if thin else "."))
+    return text, Source(kind="venue", ref="bitget /api/v2/mix/market/merge-depth",
+                        detail=f"{symbol} both sides walked for ${float(notional):,.0f}")
 
 
 def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
@@ -6255,6 +6760,62 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
                 f"{_t(b_sym)} on Bitget ({a.last} against {b.last}).")
         lines.append(text)
         lead = lead or text
+    if re.search(r"\b(?:52|fifty[\s-]two)\s*-?\s*w|\byear(?:ly)?\s+(?:high|low|range)|"
+                 r"\b(?:1|one)[\s-]*year\s+(?:high|low|range)", raw_text, re.I) \
+            and _is_equity(symbol):
+        # "tsla 52 week high and low" was answered with the 24h range (answer audit, round 3);
+        # the figure a trader means is the share's own closing high and low over 52 weeks
+        try:
+            from argus.market import equity_history
+
+            sessions = equity_history.daily(base)[-252:]
+            peak = max(sessions, key=lambda d: d.close)
+            trough = min(sessions, key=lambda d: d.close)
+            last_close = sessions[-1].close
+            text = (f"{base}'s 52-week closing high is {peak.close:,.2f} ({peak.day:%d %b %Y}) and "
+                    f"low {trough.close:,.2f} ({trough.day:%d %b %Y}), split-adjusted (Yahoo "
+                    f"Finance); the last close, {last_close:,.2f}, is "
+                    f"{(last_close / peak.close - 1):.0%} from the high and "
+                    f"{(last_close / trough.close - 1):+.0%} from the low.")
+            lines.append(text)
+            lead = text  # the 52-week figures are what was asked
+            sources.append(Source(kind="venue", ref="Yahoo Finance daily chart",
+                                  detail=f"{base} split-adjusted closes, 252 sessions"))
+        except Exception:
+            lines.append(f"{base}'s 52-week closing range did not arrive from Yahoo just now; "
+                         f"the perpetual's own range over the year is given below.")
+    if _LIQUIDITY_TIME_Q.search(raw_text):
+        from argus.market import liquidity_profile
+        from argus.market.history import fetch_range
+
+        try:
+            with _FETCH_SLOTS:
+                hourly = fetch_range(symbol, days=30, interval="1H")
+            prof = liquidity_profile.profile(
+                symbol, [(b.ts, float(b.volume), float(b.close)) for b in hourly])
+        except Exception:
+            prof = None
+        if prof is not None:
+            found = [line.replace("Actionable: ", "", 1)
+                     for line in liquidity_profile.lines(prof, base, _is_equity(symbol))]
+            lead = next((line for line in found if line.startswith("Weekends")), found[0]) \
+                if re.search(r"weekend", raw_text, re.I) else found[0]
+            lines.extend(line for line in found if line is not lead)
+            sources.append(Source(kind="computation", ref="argus.market.liquidity_profile",
+                                  detail=f"{symbol} hourly volume x close, "
+                                         f"{prof.hours_read} hours"))
+    if _SPREAD_WIDEN_Q.search(raw_text):
+        spread = float(ticker.spread_bps)
+        wider = [(w, fee + w) for w in (max(1.0, spread * 5), 10.0, 25.0)]
+        text = (f"Yes — a taker round trip pays the whole spread once (half going in, half coming "
+                f"out) on top of {fee:.0f}bps of fees: at {base}'s spread now, {spread:.1f}bps, "
+                f"that is {fee + spread:.1f}bps; "
+                + "; ".join(f"at {w:.0f}bps it is {total:.0f}bps" for w, total in wider)
+                + ". Every basis point of spread is a basis point of round-trip cost, and a size "
+                  "larger than the touch also walks deeper into a book that thinned as the spread "
+                  "widened — ask the round-trip cost of your size for that part.")
+        lines.append(text)
+        lead = text
     if lead is None and (_FUNDING_WORDS.search(raw_text)
                          or re.search(r"\bfunding\b", raw_text, re.I)):
         # "BTC funding rate" opened on the round-trip cost with the rate inside the quote line
@@ -6882,6 +7443,11 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
         return True
     if request.kind is ResearchKind.TECHNICALS and daily_technicals_asked(text):
         return True
+    if (request.kind is ResearchKind.BOOK and not _ADD_VERB.search(text)
+            and (request.book or request.cash or _BOOK_QUESTION_STRONG.search(text))):
+        # A book stated or named with no name being added is the book engine's: the model read
+        # "short 20% TSLA and long 80% NVDA" as adding TSLA, long (answer audit, round 3)
+        return True
     if leveraged_fund_asked(text) is not None and request.kind is not ResearchKind.COMPARE:
         return True
     if request.kind is ResearchKind.SENTIMENT and CRYPTO_ETF_QUESTION.search(text):
@@ -6895,6 +7461,13 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
             and not _ADD_VERB.search(text)):
         # "what price does a 5x ETH short get liquidated at?" and "is 20x on SOL safe?" were read
         # by the model as position sizing; a stated multiple has one engine (2026-09-25 audit)
+        return True
+    if (request.kind is ResearchKind.QUOTE and request.notional is not None
+            and _ROUND_TRIP.search(text)):
+        return True
+    if request.kind is ResearchKind.QUOTE and (PRICE_AT.match(text)
+                                               or _SPREAD_WIDEN_Q.search(text)
+                                               or _LIQUIDITY_TIME_Q.search(text)):
         return True
     if request.kind is ResearchKind.QUOTE and (_RANGE_QUESTION.search(text)
                                                or hold_cost_question(text)
@@ -6910,7 +7483,9 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
         # answered with the perpetual's round trip (2026-09-25 audit, round 2).
         return True
     if request.kind is ResearchKind.ANALOGUE and (_ANALOGUE.search(text)
-                                                  or _STOP_QUESTION.search(text)):
+                                                  or _STOP_QUESTION.search(text)
+                                                  or _TAKE_PROFIT_Q.search(text)
+                                                  or _WEEKEND_GAP_Q.search(text)):
         return True
     if request.kind is ResearchKind.ANALOGUE and _ANALOGUE.search(text):
         # "analogues for the current BTC setup" names the engine; the kind model read it as a
@@ -7185,6 +7760,10 @@ def _fundamentals(symbol: str, raw_text: str = "") -> tuple[list[str], list[Sour
         for entry_id in ("equity_fundamental_ratios", "equity_ownership_inst_position_summary",
                          "equity_ownership_insider_trading"):
             pending[entry_id] = pool.submit(entry, entry_id)
+        # The second source, read side by side and used only for what the first did not return:
+        # Bitget's data service answered 503 for a whole afternoon (2026-09-25) and every
+        # earnings-date and analyst-target question lost its answer without a word (audit round 3).
+        pending["yahoo"] = pool.submit(_yahoo_summary, ticker)
 
     def safe(name: str) -> Any:
         try:
@@ -7264,6 +7843,22 @@ def _fundamentals(symbol: str, raw_text: str = "") -> tuple[list[str], list[Sour
         sources.append(Source(kind="venue", ref="bitget-mcp-server equity_estimates_price_target",
                               detail=f"{ticker} analyst targets, last "
                                      f"{PRICE_TARGET_WINDOW_DAYS} days"))
+
+    yahoo = safe("yahoo")
+    if isinstance(yahoo, dict):
+        backup, backup_sources = _yahoo_fundamental_lines(
+            ticker, yahoo, today,
+            need_date=not any(line.startswith(("Next report", "Most recent report"))
+                              for line in lines),
+            need_targets=target_line is None,
+            need_consensus=not any(line.startswith(("Analyst consensus", "The analyst consensus"))
+                                   for line in lines))
+        for line in backup:
+            if line.startswith("Actionable:"):
+                lines.insert(0, line)
+            else:
+                lines.append(line)
+        sources.extend(backup_sources)
 
     surprise = safe("surprise")
     if surprise is not None:
@@ -7365,6 +7960,86 @@ _FOCUS: tuple[tuple[re.Pattern[str], tuple[str, ...], str], ...] = (
 """What the question asked for, and the line that answers it. The fundamentals engine gathers the
 whole picture and used to lead with the earnings date whatever was asked: "what's the dividend
 yield on AAPL" and "is AAPL expensive" both opened on the next report (2026-09-25 audit)."""
+
+
+def _yahoo_summary(ticker: str) -> dict[str, Any]:
+    from argus.market.estimates import EstimatesSource
+
+    return EstimatesSource().summary(
+        ticker, "calendarEvents,financialData,summaryDetail,defaultKeyStatistics")
+
+
+def _raw_number(node: Any) -> float | None:
+    value = node.get("raw") if isinstance(node, dict) else node
+    try:
+        return None if value is None else float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _yahoo_fundamental_lines(ticker: str, result: dict[str, Any], today: Any, *,
+                             need_date: bool, need_targets: bool,
+                             need_consensus: bool) -> tuple[list[str], list[Source]]:
+    """The earnings date, the analysts' price targets and the next-quarter consensus from Yahoo's
+    quoteSummary, for whichever of them Bitget's data service did not return. Each line names
+    Yahoo, so a reader can tell the second source from the first."""
+    from datetime import date
+
+    lines: list[str] = []
+    sources: list[Source] = []
+    calendar = (result.get("calendarEvents") or {}).get("earnings") or {}
+    finance = result.get("financialData") or {}
+    if need_date:
+        stamps = [d.get("fmt") for d in calendar.get("earningsDate") or [] if d.get("fmt")]
+        if stamps:
+            when = date.fromisoformat(str(stamps[0])[:10])
+            estimated = bool(calendar.get("isEarningsDateEstimate"))
+            if when >= today:
+                days = (when - today).days
+                lines.append(f"Next report: {when.isoformat()}"
+                             + (" (an estimated date)" if estimated else "")
+                             + f" — {days} day(s) away (Yahoo Finance; Bitget's data service did "
+                               f"not answer).")
+                lines.append(
+                    f"Actionable: {ticker} reports in {days} day(s)"
+                    + (" — a position held through it carries the earnings gap, and the "
+                       "perpetual and rToken can reprice before the stock does."
+                       if days <= EARNINGS_NEAR_DAYS else
+                       f", on {when:%d %b} — no earnings gap inside {EARNINGS_NEAR_DAYS} days "
+                       f"for a position opened now."))
+                sources.append(Source(kind="venue", ref="Yahoo Finance quoteSummary calendarEvents",
+                                      detail=f"{ticker} next report {when.isoformat()}"))
+    if need_targets:
+        mean = _raw_number(finance.get("targetMeanPrice"))
+        low = _raw_number(finance.get("targetLowPrice"))
+        high = _raw_number(finance.get("targetHighPrice"))
+        median = _raw_number(finance.get("targetMedianPrice"))
+        count = _raw_number(finance.get("numberOfAnalystOpinions"))
+        price = _raw_number(finance.get("currentPrice"))
+        if mean and count:
+            rating = str(finance.get("recommendationKey") or "").replace("_", " ")
+            gap = f", {abs(mean / price - 1):.0%} {'above' if mean >= price else 'below'} the " \
+                f"last close of ${price:,.2f}" if price else ""
+            lines.append(f"Analyst price targets ({count:.0f} analysts, Yahoo Finance): mean "
+                         f"${mean:,.2f}" + (f", median ${median:,.2f}" if median else "")
+                         + (f", range ${low:,.2f} to ${high:,.2f}" if low and high else "")
+                         + gap + (f"; the consensus rating is {rating}" if rating else "")
+                         + ". A target is an analyst's opinion, not a forecast this desk makes.")
+            sources.append(Source(kind="venue", ref="Yahoo Finance quoteSummary financialData",
+                                  detail=f"{ticker} analyst targets"))
+    if need_consensus:
+        eps = _raw_number(calendar.get("earningsAverage"))
+        if eps is not None:
+            low = _raw_number(calendar.get("earningsLow"))
+            high = _raw_number(calendar.get("earningsHigh"))
+            revenue = _raw_number(calendar.get("revenueAverage"))
+            lines.append(f"Analyst consensus for the next report (Yahoo Finance): EPS {eps:.2f}"
+                         + (f" (range {low:.2f} to {high:.2f})" if low is not None
+                            and high is not None else "")
+                         + (f", revenue ${revenue / 1e9:,.1f}bn" if revenue else "") + ".")
+            sources.append(Source(kind="venue", ref="Yahoo Finance quoteSummary calendarEvents",
+                                  detail=f"{ticker} EPS and revenue consensus"))
+    return lines, sources
 
 
 def _fundamentals_focus(lines: list[str], question: str, ticker: str) -> list[str]:
@@ -7582,6 +8257,15 @@ def _odds_lines(request: ResearchRequest,
             f"more than {abs(odds.adverse_p90_bps):.0f}bps against it at the worst point, on the "
             f"bars' {'highs' if side == 'short' else 'lows'} — a stop closer than that is taken "
             f"out by ordinary movement more than one time in ten.")
+    if odds.favourable_bps is not None:
+        half, quarter, tenth = odds.favourable_bps
+        lines.append(
+            f"Where a take-profit sits: at its best point inside past {kind} windows a {side} was "
+            f"{half:+.0f}bps in its favour half the time, {quarter:+.0f}bps a quarter of the time "
+            f"and {tenth:+.0f}bps one time in ten, on the bars' "
+            f"{'lows' if side == 'short' else 'highs'} — a target beyond {tenth:.0f}bps is "
+            f"reached less often than that, and one inside {half:.0f}bps is reached more often "
+            f"than not. Base rates from its own history, not a forecast.")
     if odds.after_like_share is not None and odds.last_move_bps is not None:
         lines.append(
             f"After a {kind} {'rise' if odds.last_move_bps > 0 else 'fall'} like the last one "
@@ -7932,6 +8616,17 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
             if symbol and (request.kind in _PREDICTION_KINDS or (
                     request.kind is ResearchKind.ANALOGUE and request.horizon_hours is not None)):
                 _add_prediction_markets(answer, symbol)
+    # A sentence said twice is noise: "Funding means longs pay shorts every 8h" appeared three
+    # times in one funding answer (answer audit, round 3). A line whose whole text already sits
+    # inside an earlier line is dropped.
+    kept_lines: list[str] = []
+    for line in answer.lines:
+        bare = re.sub(r"^Actionable(?: \(\w+\))?:\s*", "", line).strip()
+        if bare and any(bare in re.sub(r"^Actionable(?: \(\w+\))?:\s*", "", earlier)
+                        for earlier in kept_lines):
+            continue
+        kept_lines.append(line)
+    answer.lines[:] = kept_lines
     unread = unread_holdings(raw_text) if request.kind in (
         ResearchKind.IMPACT, ResearchKind.STRESS, ResearchKind.BOOK, ResearchKind.COMPARE,
         ResearchKind.HEDGE) else []
@@ -8355,7 +9050,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
              else None)
     if decay is not None:
         return decay
-    if request.kind in (ResearchKind.STRESS, ResearchKind.IMPACT) and request.cash >= 0.999:
+    if (request.kind in (ResearchKind.STRESS, ResearchKind.IMPACT, ResearchKind.BOOK)
+            and request.cash >= 0.999 and not request.book):
         # "how much VaR do I have at 95% if I hold nothing but stablecoins" was answered with the
         # desk's own track record (2026-09-25 audit).
         return Answer(question=question, sources=[], lines=[
@@ -8394,6 +9090,11 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             # "open interest on ETH futures" opened on the sentiment summary with the open
             # interest four lines down (live, 2026-09-25): the figure asked for leads.
             found = _lead_with(found, "Open interest:")
+        if (request.kind is ResearchKind.MACRO and request.symbols
+                and any("standing for it" in note for note in request.notes)):
+            # "how does that affect crypto" after a Fed question: the name's own sensitivity to
+            # rates is the answer, not the rates dashboard (answer audit, round 3)
+            found = _lead_with(found, f"{_t(request.symbols[0])} has ")
         if request.kind is ResearchKind.SENTIMENT and LONG_SHORT_QUESTION.search(raw_text):
             led = _lead_with(found, "Long/short on Bitget")
             found = led if led is not found else [
@@ -8427,6 +9128,12 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
         request = replace(request, book={s: 1.0 / len(named) for s in named}, notes=(
             *request.notes, f"no weights were given, so {', '.join(_t(s) for s in named)} "
                             f"{'is' if len(named) == 1 else 'are'} hedged as the whole position"))
+    if (request.kind is ResearchKind.HEDGE and len(request.symbols) == 1
+            and _WITH_ITS_PERP.search(raw_text)):
+        same = _same_name_perp_hedge(request.symbols[0], raw_text)
+        if same is not None:
+            return Answer(question=question, lines=same[0], sources=same[1],
+                          data={"request": request.as_dict()})
     if request.kind is ResearchKind.HEDGE and request.book:
         value = request.notional or HEDGE_BOOK_VALUE
         found, extra, hedge_found = _hedge_plan(request.book, value, raw_text)
@@ -8440,6 +9147,16 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                      "This is analysis, not advice — you make the call.")
         return Answer(question=question, lines=found, sources=extra,
                       data={"request": request.as_dict(), "hedge": hedge_found})
+    if (request.kind is ResearchKind.STRESS and not request.symbols and request.shock_on
+            and not request.cash):
+        # "whats my drawdown if btc drops 20%" names the holding the shock is on and no book; it
+        # asked for holdings twice in a row (answer audit, round 3). Read as a position in that
+        # name, and said.
+        request = replace(request, book={request.shock_on: 1.0}, symbols=(request.shock_on,),
+                          notes=(*request.notes, f"no other holdings were stated, so the book is "
+                                                 f"read as a position in {_t(request.shock_on)} "
+                                                 f"itself — say what you hold for your whole "
+                                                 f"book's figure"))
     if not request.symbols:
         return Answer(
             question=question, refused=True,
@@ -8606,6 +9323,37 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                     lines = [dollar_lines[0], *(re.sub(r"^Actionable:\s*(\w)",
                                                        lambda m: m.group(1).upper(), x)
                                                 for x in lines), *dollar_lines[1:]]
+            if _BOOK_HISTORY_Q.search(raw_text) and request.book:
+                history = _book_history_lines(request.book, request.cash, raw_text)
+                if history is not None:
+                    lines = [*history[0], *(re.sub(r"^Actionable:\s*(\w)",
+                                                   lambda m: m.group(1).upper(), x)
+                                            for x in lines)]
+                    sources.append(history[1])
+            if re.search(r"\bcorrelat\w*", raw_text, re.I) and len(request.book) >= 2:
+                # "correlation matrix for my book" was declined; every pair, open-session hours
+                columns = _open_columns(data.raw, is_open)
+                held_names = [s for s in request.book if s in columns]
+                pairs_read = [(a, b, correlation(columns[a], columns[b]))
+                              for i, a in enumerate(held_names) for b in held_names[i + 1:]]
+                pairs_read = [(a, b, r) for a, b, r in pairs_read if r is not None]
+                if pairs_read:
+                    pairs_read.sort(key=lambda t: -(t[2] or 0))
+                    lines = [
+                        "Actionable: correlation between your holdings (hourly returns, "
+                        "open-session hours, last 30 days): "
+                        + "; ".join(f"{_t(a)}-{_t(b)} {r:+.2f}" for a, b, r in pairs_read)
+                        + f" — the tightest pair, {_t(pairs_read[0][0])} and "
+                          f"{_t(pairs_read[0][1])}, is the least diversification in the book.",
+                        *(re.sub(r"^Actionable:\s*(\w)", lambda m: m.group(1).upper(), x)
+                          for x in lines)]
+            if _WORTH_Q.search(raw_text) and not worth:
+                lines.insert(0, "Actionable: the book you saved is weights, not dollars, so what "
+                                "it is worth is not known here — say its value (\"my book is "
+                                "$50k\") and each holding's dollars, dollar risk and a "
+                                "Nasdaq-drop loss in dollars follow.")
+                lines[1:] = [re.sub(r"^Actionable:\s*(\w)", lambda m: m.group(1).upper(), x)
+                             for x in lines[1:]]
             if _BETA_ASKED.search(raw_text) and request.book:
                 beta_line = _book_beta_line(request.book, data, is_open, raw_text)
                 if beta_line is not None:
@@ -8849,7 +9597,14 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                     f"({fee:.0f}bps taker fees + the {ticker.spread_bps:.1f}bps spread) — a trade "
                     f"needs a move bigger than that just to break even."
                 ))
-                if (len(quoted) == 1 and _PRICE_ASKED.search(raw_text)
+                if request.notional and _ROUND_TRIP.search(raw_text) and len(quoted) == 1:
+                    sized_line = _sized_round_trip(symbol, Decimal(str(request.notional)), fee)
+                    if sized_line is not None:
+                        lines[0] = lines[0].replace("Actionable: ", "", 1)
+                        lines.insert(0, sized_line[0])
+                        sources.append(sized_line[1])
+                if (len(quoted) == 1 and (_PRICE_ASKED.search(raw_text)
+                                          or PRICE_AT.match(raw_text))
                         and not re.search(r"\bcost|\bspread|\bfees?\b|round[\s-]?trip|"
                                           r"\bbreak[\s-]?even", raw_text, re.I)):
                     # "what is the NVDA price?" opened on the round-trip cost with the price
@@ -8991,6 +9746,13 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                         else line for line in lines)]
                     sources[0:0] = odds_sources
                     payload["odds"] = odds_dict
+                    # the line the question asked for leads: a stop, a take-profit, a gap
+                    if _TAKE_PROFIT_Q.search(raw_text):
+                        lines = _lead_with(lines, "Where a take-profit sits")
+                    elif _STOP_QUESTION.search(raw_text):
+                        lines = _lead_with(lines, "Where a stop sits")
+                    elif _WEEKEND_GAP_Q.search(raw_text):
+                        lines = _lead_with(lines, "Typical ")
 
         elif request.kind is ResearchKind.EXECUTION:
             from argus.desk.workbench import plan_execution

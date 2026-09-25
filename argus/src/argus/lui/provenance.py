@@ -18,6 +18,8 @@ a price read a second ago from a figure computed on it or from a record measured
   The analyst text in it was written by a model at the time; the console quotes it, never edits it.
 * ``assumed`` — a default the answer applied because the question did not say.
 * ``missing`` — something that could not be read or checked, said as such.
+* ``memory`` — something the trader told the console earlier (`lui/memory.py`), shown where it
+  shaped the answer.
 
 **How a line gets its label.** The rivals attach a label where the number is made; ARGUS's lines
 are made in several hundred places, so the label is read from the wording those places share —
@@ -35,7 +37,7 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 
-LABELS = ("live", "computed", "record", "desk", "assumed", "missing")
+LABELS = ("live", "computed", "record", "desk", "assumed", "missing", "memory")
 
 _META = re.compile(r"^(?:Data:|Sources reached|Sources:|Quoted \d|Caveat:|Method:|Corrected:|"
                    r"Computed by ARGUS\b|Read as filed:|"
@@ -61,7 +63,11 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("assumed", re.compile(r"^Assumed:|\bno\s+\w+\s+was\s+(?:stated|given)\b|"
                            r"\bis\s+assessed\s+at\b|\bwere\s+scaled\s+to\s+100%|"
                            r"^Sized on a \$[\d,]+ book\b", re.I)),
+    # the trader's own words, kept by `lui/memory.py` and shown where they shaped the answer
+    ("memory", re.compile(r"^Remembered:|^Your thesis on\b|^(?:Actionable: )?noted —", re.I)),
     ("live", re.compile(r"^Crypto fear & greed:", re.I)),
+    # a FRED series served from the snapshot shipped with the console is a past reading
+    ("record", re.compile(r"\(the shipped reading\)|last reading shipped with the console", re.I)),
     # A conclusion or a derived figure that quotes its inputs or its own record is still derived:
     # "Implied open: ... missed by 30bps" is the figure first and its record second.
     ("computed", re.compile(
@@ -148,7 +154,12 @@ def label(line: str) -> str | None:
             # only a reading promoted as it was read; a conclusion drawn on live counts ("2
             # headlines name NVDA ... so the move is sentiment") is computed, as reviewed
             return "live" if _LIVE_LEAD.match(rest) else "computed"
-        return inner if inner in ("record", "missing", "desk") else "computed"
+        if inner == "missing":
+            # missing only when the lead's own first clause is the gap; "XAU removes 11%; TLT
+            # could not be measured ..." answers with a figure and notes one gap (seen live)
+            first = re.split(r";\s|\.\s", rest, maxsplit=1)[0]
+            return "missing" if label(first) == "missing" else "computed"
+        return inner if inner in ("record", "desk", "memory") else "computed"
     for name, pattern in _RULES:
         if pattern.search(text):
             return name

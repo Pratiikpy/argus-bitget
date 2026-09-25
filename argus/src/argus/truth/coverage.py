@@ -169,7 +169,11 @@ def _observed(url: Any, *args: Any, **kwargs: Any) -> Any:
         # (`"isError": true`; `agent-mcp/src/server.ts:119-124`). Read it, note it, and hand the
         # caller an identical copy of the body.
         response = _Replayed(response)
-        failed = b'"isError":true' in response.body.replace(b" ", b"")
+        # bitget-mcp-server's own upstream failure arrives as a tool result that reads
+        # {"success": false, "status_code": 503}, JSON escaped inside the text content; it was
+        # counted as answered while the service was down (answer audit, round 3).
+        flat = response.body.replace(b" ", b"").replace(b"\\", b"")
+        failed = b'"isError":true' in flat or b'"success":false' in flat
         record.note(name, not failed, "tool reported an error" if failed else "")
         return response
     record.note(name, True)

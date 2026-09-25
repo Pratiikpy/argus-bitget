@@ -80,6 +80,10 @@ class Odds:
     """The move against ``side`` that 90% of past windows stayed inside, measured on the bars'
     lows (a long) or highs (a short) rather than closes: where a stop is still inside ordinary
     noise. None when the bars carry no intrawindow extremes."""
+    favourable_bps: tuple[float, float, float] | None = None
+    """The best point in ``side``'s favour that half, a quarter and a tenth of past windows reached
+    (on the bars' highs for a long, lows for a short): where a take-profit sits against what the
+    market ordinarily gives. None without intrawindow extremes."""
 
     @property
     def after_like_differs(self) -> bool:
@@ -163,7 +167,20 @@ def directional_odds(closes: list[tuple[datetime, float]], horizon_bars: int, *,
                 after_share = sum(1 for m in like if m > 0) / len(like)
                 after_low, after_high = wilson(after_share * len(like) / h, len(like) / h)
     adverse: float | None = None
+    favourable: tuple[float, float, float] | None = None
     if extremes is not None and len(extremes) == len(closes):
+        best = []
+        for i, j in pairs:
+            start = closes[i][1]
+            window = extremes[i + 1: j + 1]
+            if start <= 0 or not window:
+                continue
+            if side == "short":
+                best.append((1 - min(lo for lo, _ in window) / start) * 10_000)
+            else:
+                best.append((max(h for _, h in window) / start - 1) * 10_000)
+        if len(best) >= 2:
+            favourable = (_quantile(best, 0.5), _quantile(best, 0.75), _quantile(best, 0.9))
         worst = []
         for i, j in pairs:
             start = closes[i][1]
@@ -183,5 +200,5 @@ def directional_odds(closes: list[tuple[datetime, float]], horizon_bars: int, *,
         p90_bps=_quantile(moves, 0.9), cost_bps=cost_bps, side=side, cleared_share=cleared,
         last_move_bps=last_move, after_like_share=after_share, after_like_windows=after_n,
         after_like_low=after_low, after_like_high=after_high,
-        span_days=span, adverse_p90_bps=adverse,
+        span_days=span, adverse_p90_bps=adverse, favourable_bps=favourable,
     )

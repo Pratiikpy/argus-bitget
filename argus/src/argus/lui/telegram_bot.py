@@ -55,7 +55,8 @@ HELP = (
     "• if the Nasdaq drops 10%, what happens to my book?\n"
     "• 英伟达的资金费率贵吗？\n\n"  # noqa: RUF001 - a real Chinese question
     "/book 40% NVDA, 30% MSFT, 30% AAPL — save your holdings for portfolio questions\n"
-    "/book — show them · /clear — forget this chat's history and book"
+    "/book — show them · /memory — what you told the desk · /clear — forget this chat's "
+    "history, book and memory"
 )
 
 
@@ -64,17 +65,22 @@ class ChatState:
     turns: list[str] = field(default_factory=list)
     book: str = ""
     asked_at: list[float] = field(default_factory=list)
+    memory: str = ""
+    """What this chat told the desk (`lui/memory.py`), kept by this process. Behind the webhook
+    each serverless instance keeps its own, so a fact may need saying again after a cold start;
+    the web console keeps it in the browser and has no such gap."""
 
 
 Ask = Callable[..., dict[str, Any]]
 
 
-def _default_ask(text: str, prior: list[str], *, visitor: str, book: str) -> dict[str, Any]:
+def _default_ask(text: str, prior: list[str], *, visitor: str, book: str,
+                 memory: str = "") -> dict[str, Any]:
     """The console's answer, with the signed translation offer when the question was not English
     (`server.offer_translation`)."""
     from argus.lui.server import handle_ask, offer_translation
 
-    payload = handle_ask(text, prior, visitor=visitor, book=book)
+    payload = handle_ask(text, prior, visitor=visitor, book=book, memory=memory)
     offer_translation(payload, text)
     return payload
 
@@ -184,7 +190,8 @@ def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
         return [(chat_id, HELP)]
     if command == "/clear":
         states[chat_id] = ChatState(asked_at=state.asked_at)
-        return [(chat_id, "Forgotten: this chat's earlier questions and its saved book.")]
+        return [(chat_id, "Forgotten: this chat's earlier questions, its saved book and "
+                          "everything it told the desk.")]
     if command == "/book":
         if rest.strip():
             state.book = rest.strip()[:300]
@@ -192,9 +199,17 @@ def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
                               f"in this chat now use it.")]
         return [(chat_id, f"Your saved book: {html.escape(state.book)}." if state.book else
                  "No book saved. Send, for example: /book 40% NVDA, 30% MSFT, 30% AAPL")]
+    if command == "/memory":
+        from argus.lui import memory as mem
+
+        facts = mem.parse(state.memory)
+        return [(chat_id, "Remembered for this chat: " + "; ".join(
+            f"\u201c{html.escape(f.text)}\u201d ({f.at})" for f in facts) + ". /clear forgets it."
+            if facts else "Nothing remembered yet. Tell me, for example: I can't lose more "
+                          "than 10%, or I'm a swing trader.")]
     if command.startswith("/"):
-        return [(chat_id, "I only know /start, /help, /book and /clear — anything else, just "
-                          "ask it as a question.")]
+        return [(chat_id, "I only know /start, /help, /book, /memory and /clear — anything "
+                          "else, just ask it as a question.")]
     state.asked_at = [t for t in state.asked_at if clock - t < 3600.0]
     if len(state.asked_at) >= HOURLY_LIMIT:
         return [(chat_id, f"That is {HOURLY_LIMIT} questions this hour from this chat, the same "
@@ -202,11 +217,14 @@ def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
                           f'<a href="{CONSOLE}">the console</a>.')]
     state.asked_at.append(clock)
     try:
-        payload = ask(text[:500], list(state.turns), visitor=f"tg-{chat_id}", book=state.book)
+        payload = ask(text[:500], list(state.turns), visitor=f"tg-{chat_id}", book=state.book,
+                      **({"memory": state.memory} if state.memory else {}))
     except Exception as exc:
         return [(chat_id, f"The desk could not answer just now ({html.escape(type(exc).__name__)})"
                           f". Nothing was guessed; try again in a minute.")]
     state.turns = [*state.turns, text[:500]][-MAX_TURNS:]
+    if payload.get("memory"):
+        state.memory = str(payload["memory"])
     if payload.get("translate"):
         PENDING[chat_id] = (payload, text[:500], state.book)
     return [(chat_id, part) for part in split_message(format_answer(payload, text, state.book))]

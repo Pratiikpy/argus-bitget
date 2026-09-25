@@ -175,13 +175,20 @@ class TestTheFeeIsArgusOwnFee:
     def test_the_concentrated_allocator_is_charged_more_than_argus(
         self, uncapped: dict[str, Any],
     ) -> None:
-        """Not a result, a sanity check on the accounting: NCO refits to a far more concentrated
-        book each window, so if it were not paying more turnover than ARGUS the fee would not be
-        reaching it at all."""
+        """Not a result, a sanity check on the accounting: the fee reaches both allocators, at the
+        same rate per unit of turnover.
+
+        It used to assert NCO turns over more than ARGUS, on the reasoning that NCO refits to a
+        more concentrated book. That is a property of the live history, not of the accounting: on
+        2026-09-25's data NCO turned over 0.600 against ARGUS's 0.611 and the test failed with
+        the harness correct. What must hold on any data is that each allocator is charged the
+        same fee on whatever it trades — cost over turnover equal for both, and above zero."""
         nco = uncapped["results"]["riskfolio_nco_ward"]
         argus = uncapped["results"]["argus_hrp"]
-        assert nco["mean_turnover"] > argus["mean_turnover"]
-        assert nco["mean_cost_bps"] > argus["mean_cost_bps"]
+        assert nco["mean_turnover"] > 0 and argus["mean_turnover"] > 0
+        assert nco["mean_cost_bps"] > 0 and argus["mean_cost_bps"] > 0
+        assert (nco["mean_cost_bps"] / nco["mean_turnover"]
+                == pytest.approx(argus["mean_cost_bps"] / argus["mean_turnover"], rel=1e-9))
 
 
 class TestNothingSeesTheFuture:

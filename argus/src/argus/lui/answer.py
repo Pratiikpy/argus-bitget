@@ -20,6 +20,7 @@ to, a statistic the sample cannot support. Answering those anyway is the failure
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -306,7 +307,18 @@ def _how_it_was_reached(seq: int) -> list[str]:
         for note in found[:keep]:
             text = note[len(prefix):].strip() if prefix.startswith("[") else note
             text = text.removeprefix("panel:").removeprefix("ENTITY GATE —").strip()
-            out.append(f"{label}: {text[:1].upper()}{text[1:]}".rstrip(".") + ".")
+            line = f"{label}: {text[:1].upper()}{text[1:]}".rstrip(".") + "."
+            if prefix == "[grounding]" and "do not resolve" in line:
+                # A flagged figure that the desk's own agreement step produced is not an outside
+                # fact: "0.53" was flagged two lines below "neutral at 0.53 after provenance
+                # discount" and read as a contradiction (answer audit, round 3). Said, not hidden.
+                flagged = re.findall(r"[-+]?\d+(?:\.\d+)?%?", line.split(":")[-1])
+                own = [f for f in flagged if any(f in o for o in out if not o.startswith(label))]
+                if own:
+                    line += (f" {', '.join(own)} also appear{'s' if len(own) == 1 else ''} in the "
+                             f"desk's own agreement step above — a figure the desk computed, which "
+                             f"the check (run on the thesis against its inputs) could not see.")
+            out.append(line)
     if out:
         out.insert(0, f"How the desk reached decision {seq}, from the notes it wrote at the time:")
     return out
@@ -448,10 +460,22 @@ def answer_calibration(ledger: PaperLedger, question: Question) -> Answer:
     graded = int(card.get("graded_predictions", 0))
     sources = [Source("computation", "argus.eval.scorecard:scorecard",
                       f"{graded} graded prediction(s)")]
+    how = ([
+        "How a decision is graded: every decision is hash-chained before its outcome is known. A "
+        "trade is settled on its profit after fees at its horizon; a refusal is graded on the "
+        "direction it leaned, against the move that followed at about 2 hours, and on the cost "
+        "it avoided; the stated confidence is graded by calibration (expected calibration error "
+        "and Brier score) once at least 5 trades have settled. None of it can be edited after "
+        "the fact."]
+        if question.language == "en" and re.search(
+            r"\bhow\s+(?:is|are|do\s+you|does\s+the\s+desk)\b[^?]*\b(?:grad|scor|judg|mark|settl|"
+            r"check)\w*", question.raw, re.I) else [])
+    # "how is a decision graded" asks for the method first; the figures follow (audit, round 3)
     if "ece" not in card:
         return Answer(
             question=question,
             lines=[
+                *how,
                 t("calib.insufficient", question.language, graded=graded, floor=5),
                 t("calib.insufficient_why", question.language),
                 *([] if question.language != "en" or not _lean_grading() else [
@@ -464,6 +488,7 @@ def answer_calibration(ledger: PaperLedger, question: Question) -> Answer:
     return Answer(
         question=question,
         lines=[
+            *how,
             t("calib.headline", question.language, ece=card["ece"], brier=card["brier"],
               accuracy=card.get("accuracy_pct"), graded=graded),
             t("calib.deterministic", question.language),

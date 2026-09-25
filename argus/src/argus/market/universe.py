@@ -154,6 +154,17 @@ CJK_ALIASES: dict[str, str] = {
     "マイクロソフト": "MSFTUSDT", "グーグル": "GOOGLUSDT", "アマゾン": "AMZNUSDT",
     "ビットコイン": "BTCUSDT", "イーサリアム": "ETHUSDT", "ソラナ": "SOLUSDT", "原油価格": "CLUSDT",
     "ナスダック": "NDX100USDT", "コインベース": "COINUSDT",
+    # Arabic, Russian and Hindi: "متى موعد أرباح شركة آبل القادمة؟" (when does Apple report?) and
+    # "هل يجب أن أشتري نيفيديا غدا؟" named no contract the reader knew (answer audit, round 3).
+    "آبل": "AAPLUSDT", "أبل": "AAPLUSDT", "ابل": "AAPLUSDT", "نيفيديا": "NVDAUSDT",
+    "إنفيديا": "NVDAUSDT", "انفيديا": "NVDAUSDT", "تسلا": "TSLAUSDT", "مايكروسوفت": "MSFTUSDT",
+    "جوجل": "GOOGLUSDT", "غوغل": "GOOGLUSDT", "أمازون": "AMZNUSDT", "امازون": "AMZNUSDT",
+    "ميتا": "METAUSDT", "بيتكوين": "BTCUSDT", "البيتكوين": "BTCUSDT", "إيثريوم": "ETHUSDT",
+    "ايثريوم": "ETHUSDT", "الإيثيريوم": "ETHUSDT", "الذهب": "XAUUSDT", "النفط": "CLUSDT",
+    "нвидиа": "NVDAUSDT", "нвидия": "NVDAUSDT", "тесла": "TSLAUSDT", "эппл": "AAPLUSDT",
+    "майкрософт": "MSFTUSDT", "биткоин": "BTCUSDT", "биткойн": "BTCUSDT", "эфириум": "ETHUSDT",
+    "золото": "XAUUSDT", "нефть": "CLUSDT", "एनवीडिया": "NVDAUSDT", "टेस्ला": "TSLAUSDT",
+    "एप्पल": "AAPLUSDT", "बिटकॉइन": "BTCUSDT", "सोना": "XAUUSDT",
 }
 """Chinese names for the contracts a Chinese-speaking trader asks about most. "英伟达现在值得买吗?"
 (is Nvidia worth buying now?) was answered with the session clock because no Latin ticker appeared

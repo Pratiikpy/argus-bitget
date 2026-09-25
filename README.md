@@ -57,7 +57,12 @@ left open) or **missing** (could not be read). On 18 questions never seen while 
 written, 94% of content lines carried one; a line no rule recognises carries none rather than a
 guess (`python -m argus.eval.provenance_audit`).
 
-Put your holdings in **My book** once and every answer uses them. Every answer ends by naming the
+Put your holdings in **My book** once and every answer uses them. Tell it about yourself — *I
+can't lose more than 10%*, *I'm a swing trader*, *I think NVDA runs on AI capex* — and it remembers,
+in your browser only: later answers apply your loss limit, holding period and risk budget, and show
+your thesis beside every answer about that name with the move since you stated it, each time on a
+**memory** line saying so. Measured on 20 two-session tasks: 20 answers changed by memory, none
+with memory off, none reaching another trader (`python -m argus.eval.memory_eval`). Every answer ends by naming the
 sources it reached and any that did not answer. If the desk cannot source a figure, it refuses and
 says why. Ask in Chinese, Japanese, Korean, Spanish, Portuguese, French or German and the answer
 comes back in that language: the engines write English, Qwen translates, and every number in each
@@ -165,7 +170,7 @@ a test that reaches the network shows itself.
 | | |
 |---|---|
 | Tests | **6,700 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 352 source files** |
+| Types | **`mypy --strict` clean on 355 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes**, resolved by import at runtime, not claimed in prose |

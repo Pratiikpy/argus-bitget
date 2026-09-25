@@ -253,3 +253,9 @@ def test_a_ticker_list_is_not_shouting() -> None:
 ])
 def test_new_lines_carry_their_provenance(line: str, expected: str | None) -> None:
     assert label(line) == expected
+
+
+def test_a_lead_with_one_gap_is_still_computed() -> None:
+    # seen on the live page: the named-hedge answer was chipped MISSING for its TLT clause
+    assert label("Actionable: Of the hedges you named, XAU (short $25,700) removes about 11% of "
+                 "the book's variance; TLT could not be measured (only 95 hours).") == "computed"

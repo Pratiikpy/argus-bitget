@@ -42,7 +42,12 @@ TOOLS: tuple[dict[str, Any], ...] = (
         "inputSchema": {"type": "object", "properties": {
             "question": {"type": "string", "description": "The question, in any language."},
             "book": {"type": "string",
-                     "description": "Optional holdings, e.g. '40% NVDA, 30% MSFT, 30% AAPL'."}},
+                     "description": "Optional holdings, e.g. '40% NVDA, 30% MSFT, 30% AAPL'."},
+            "memory": {"type": "string",
+                       "description": ("Optional: the memory string the previous argus_ask "
+                                       "returned. The desk keeps nothing between calls; pass it "
+                                       "back and what the trader said earlier (a loss limit, a "
+                                       "holding period, a thesis) shapes this answer.")}},
             "required": ["question"]},
     },
     {
@@ -160,8 +165,12 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         if not question:
             raise ToolError("question is required")
         payload = server.handle_ask(question[:500], [], visitor="mcp",
-                                    book=str(args.get("book") or "")[:300])
-        return _answer_text(payload), bool(payload.get("refused"))
+                                    book=str(args.get("book") or "")[:300],
+                                    memory=str(args.get("memory") or "")[:12000])
+        text = _answer_text(payload)
+        if payload.get("memory") and payload.get("memory") != "[]":
+            text += f"\n\nMemory (pass back as `memory` next time): {payload['memory']}"
+        return text, bool(payload.get("refused"))
     if name == "argus_quote":
         symbols = [_symbol(s) for s in (args.get("symbols") or [])][:4]
         if not symbols:

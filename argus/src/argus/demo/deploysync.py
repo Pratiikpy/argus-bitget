@@ -228,6 +228,16 @@ def sync(*, dry_run: bool = False) -> SyncResult:
         raise SyncError(f"no package to copy at {SOURCE_PACKAGE}")
 
     result = SyncResult(dry_run=dry_run)
+    if not dry_run:
+        # The hosted console cannot reach FRED, so it answers rates and inflation from the
+        # snapshot it ships with; every deploy ships a fresh one (a two-day-old 10-year was
+        # served as live in the answer audit's round 3). A failed read keeps the last snapshot.
+        try:
+            from argus.lui.research import write_macro_snapshot
+
+            write_macro_snapshot()
+        except Exception:
+            pass
     result.ledger_before = _count_lines(DEPLOY_DATA / "paper_ledger.jsonl")
     result.ledger_after = _count_lines(SOURCE_DATA / "paper_ledger.jsonl")
 

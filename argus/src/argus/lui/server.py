@@ -22,6 +22,7 @@ returns it; the server keeps no session state.
 
 from __future__ import annotations
 
+import contextvars
 import json
 import os
 import re
@@ -50,6 +51,7 @@ from argus.lui.research import (
     plan_with_model,
     price_forecast_asked,
     research_symbols,
+    resolved_previous,
     with_book,
     worth_asking_the_model,
 )
@@ -120,6 +122,13 @@ PAGE = """<!doctype html>
         color:var(--dim); border:1px solid color-mix(in srgb, var(--dim) 45%, transparent) }
   .pv-live { color:var(--accent); border-color:color-mix(in srgb, var(--accent) 55%, transparent) }
   .pv-record { font-style:italic }
+  .pv-memory { color:var(--ink); border-style:dotted }
+  .mem { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin:-8px 0 16px;
+    font-size:12.5px; color:var(--dim) }
+  .mem .fact { border:1px dotted var(--line); border-radius:999px; padding:3px 9px;
+    background:var(--panel); color:var(--ink) }
+  .mem button { padding:0 0 0 6px; border:0; background:none; color:var(--dim); font-size:12.5px;
+    cursor:pointer }
   .pv-missing, .pv-assumed { border-style:dashed }
   .stat { font:12px/1.6 var(--mono); color:var(--dim); margin:0 0 14px }
   .jump { display:flex; gap:10px 22px; flex-wrap:wrap; margin:0 0 30px; font-weight:500 }
@@ -149,6 +158,7 @@ question and never writes a number. No source, no answer: you get a refusal and 
     title="Used by every research question that does not name its own holdings">
   <span class="saved" id="saved"></span>
 </div>
+<div class="mem" id="mem" hidden></div>
 <p class="group">Research</p>
 <div class="chips" id="chips-research"></div>
 <p class="group">The desk's own record</p>
@@ -185,6 +195,25 @@ bookEl.addEventListener('change', () => {
   savedEl.textContent = bookEl.value.trim() ? 'saved in this browser' : '';
 });
 
+// What the trader has told the console ("I can't lose more than 10%", "I think NVDA runs on AI
+// capex"): kept in this browser, sent with each question, shown here, forgettable one by one.
+const memEl = document.getElementById('mem');
+let memory = [];
+try { memory = JSON.parse(localStorage.getItem('argus.memory') || '[]'); }
+catch (e) { memory = []; }
+function saveMemory() {
+  try { localStorage.setItem('argus.memory', JSON.stringify(memory)); } catch (e) {}
+  memEl.hidden = !memory.length;
+  memEl.innerHTML = memory.length ? '<span>Remembered:</span>' + memory.map((f, i) =>
+    `<span class="fact">${esc0(f.text)}<button data-i="${i}" title="forget this">&times;</button>` +
+    `</span>`).join('') : '';
+}
+memEl.addEventListener('click', e => {
+  if (e.target.dataset.i === undefined) return;
+  memory.splice(Number(e.target.dataset.i), 1); saveMemory();
+});
+saveMemory();
+
 for (const [id, list] of [['chips-research', RESEARCH], ['chips', SUGGEST]]) {
   const el = document.getElementById(id);
   el.innerHTML = list.map(s => `<span class="chip">${esc0(s)}</span>`).join('');
@@ -202,6 +231,7 @@ const PV = {
   record: 'a measured past record, with its sample named',
   desk: "quoted from the desk's own logged decision",
   assumed: 'a default applied because the question did not say',
+  memory: 'something you told the console earlier, kept in this browser',
   missing: 'could not be read or checked'};
 const pv = t => t ? `<span class="pv pv-${t}" title="${PV[t]}">${t}</span>` : '';
 const lineClass = l => l.startsWith('Actionable:') ? 'line act'
@@ -236,9 +266,11 @@ document.getElementById('f').addEventListener('submit', async ev => {
   if (first) { out.innerHTML = ''; first = false; }
   try {
     const r = await fetch('ask?' + new URLSearchParams(
-      {q: text, turns: JSON.stringify(turns), book: bookEl.value.trim()}));
+      {q: text, turns: JSON.stringify(turns), book: bookEl.value.trim(),
+       memory: JSON.stringify(memory)}));
     const a = await r.json();
     turns = a.turns || turns;
+    if (a.memory) { try { memory = JSON.parse(a.memory); } catch (e) {} saveMemory(); }
     const over = a.elapsed_ms > a.budget_ms;
     out.insertAdjacentHTML('afterbegin', `
       <div class="card ${a.refused ? 'refused' : ''}">
@@ -358,6 +390,57 @@ def repair_mojibake(text: str) -> str:
 
 
 _PRONOUN = re.compile(r"\b(?:that|it|this|those|them|its)\b", re.I)
+_NAME_SWAP = re.compile(r"^\s*(?:and\s+)?(?:what|how)\s+(?:about|abt|bout)\s+\S+\s*\??\s*$|"
+                        r"^\s*and\s+(?:for\s+)?\S+\s*\??\s*$|^\s*(?:(?:actually|sorry|no|oops|"
+                        r"wait)[,\s]+)*(?:i\s+)?(?:meant|mean)\b", re.I)
+_WHICH_ONE = re.compile(
+    r"^\s*(?:so\s+|and\s+)?which\s+(?:one|of\s+(?:them|the\s+two)|is)\s+(?:is\s+)?(?:more|less|"
+    r"the\s+(?:most|least)|riskier|safer|better|worse|bigger|cheaper|volatile)\b[^?]*\??\s*$", re.I)
+_BETTER_WORSE = re.compile(
+    r"^\s*(?:so\s+)?(?:is|was)\s+(?:that|it|this)\s+(?:any\s+)?(?:better|worse|safer|riskier)"
+    r"(?:\s+or\s+(?:better|worse|safer|riskier))?(?:\s+than\s+(?:before|the\s+last|that))?"
+    r"\s*\??\s*$", re.I)
+
+
+def _compare_last_two_books(text: str, prior: list[str], book: str, ledger: Any, started: float,
+                            audit: dict[str, Any]) -> dict[str, Any] | None:
+    """"Is that better or worse than before?" after two book questions: both books read by the
+    same engine and the change stated — volatility, beta and the largest risk share. It was told
+    "that" had nothing to refer to (answer audit, round 3)."""
+    from argus.lui.research import resolved_previous
+
+    latest = resolved_previous(prior, book)
+    earlier = resolved_previous(prior[:-1], book) if len(prior) > 1 else None
+    if latest is None or earlier is None or latest[1].book == earlier[1].book:
+        return None
+    if not latest[1].book and not latest[1].cash:
+        return None
+    first = _research_payload(earlier[0], prior[:-1], earlier[1], ledger, started,
+                              "research-follow-up", audit)
+    second = _research_payload(latest[0], prior, latest[1], ledger, started,
+                               "research-follow-up", audit)
+
+    def vol(payload: dict[str, Any]) -> float | None:
+        found = next((re.search(r"volatility about (\d+)% a year", line)
+                      for line in payload.get("lines") or []
+                      if "volatility about" in line), None)
+        return float(found.group(1)) if found else None
+
+    before, after = vol(first), vol(second)
+    if before is None or after is None:
+        return None
+    verdict = ("less risky" if after < before else "riskier" if after > before
+               else "about as risky")
+    lead = (f"Actionable: {verdict} — the book now runs about {after:.0f}% volatility a year "
+            f"against {before:.0f}% before ({after - before:+.0f} points), on the same engine and "
+            f"the same hours. The new book's full read follows.")
+    lines = [lead, *(re.sub(r"^Actionable:\s*(\w)", lambda m: m.group(1).upper(), x)
+                     for x in second.get("lines") or [])]
+    second["lines"] = lines
+    second["turns"] = [*prior, text][-12:]
+    return second
+
+
 _BARE_WHY = re.compile(r"^\s*(?:but\s+|and\s+|so\s+)?(?:why|how\s+come|what\s+was\s+the\s+"
                        r"reason(?:ing)?|explain(?:\s+(?:that|it|why))?|reasoning)\s*[?.!]*\s*$",
                        re.I)
@@ -378,7 +461,48 @@ def _carry_prior_name(text: str, prior: list[str]) -> str | None:
     return None
 
 
+def _price_now(symbol: str) -> float:
+    from argus.market.bitget import fetch_tickers
+
+    return float(fetch_tickers()[symbol].last)
+
+
+_MEMORY: contextvars.ContextVar[tuple[Any, ...]] = contextvars.ContextVar("argus_memory",
+                                                                          default=())
+"""The asking trader's remembered facts (`lui/memory.py`) for the duration of one answer. A context
+variable rather than a parameter threaded through every answering path, and scoped to the request,
+so one visitor's memory can never reach another's answer."""
+
+
 def handle_ask(
+    text: str, prior: list[str], *, now: datetime | None = None, visitor: str = "local",
+    book: str = "", memory: str = "",
+) -> dict[str, Any]:
+    """Answer one question with the trader's memory in scope, and hand the updated memory back.
+
+    ``memory`` is the client's own stored facts (`lui/memory.py`); the server keeps none. A
+    message that only tells the console something ("I can't lose more than 10%") is answered
+    with what was noted."""
+    from argus.lui import memory as mem
+
+    facts = mem.parse(memory)
+    new = mem.extract(text, now, price_of=_price_now)
+    facts = mem.merge(facts, new)
+    token = _MEMORY.set(tuple(facts))
+    try:
+        payload = _answer(text, prior, now=now, visitor=visitor, book=book)
+    finally:
+        _MEMORY.reset(token)
+    by = str(payload.get("classified_by") or "")
+    if new and (payload.get("refused") or by.startswith("declined") or by == "ngram"):
+        payload.update(lines=mem.acknowledgement(new), refused=False, reason="",
+                       classified_by="memory", sources=[])
+    payload["memory"] = mem.dumps(facts)
+    payload["remembered"] = [f.text for f in new]
+    return payload
+
+
+def _answer(
     text: str, prior: list[str], *, now: datetime | None = None, visitor: str = "local",
     book: str = "",
 ) -> dict[str, Any]:
@@ -481,21 +605,30 @@ def handle_ask(
     if decision:
         # "why?" after "Show me decision 12" was answered with a summary of 673 abstentions
         # (2026-09-25 audit, round 2): its subject is that decision.
-        return handle_ask(f"why was decision {decision.group(1) or decision.group(2)} made?",
+        return _answer(f"why was decision {decision.group(1) or decision.group(2)} made?",
                           prior, now=now, visitor=visitor, book=book)
-    if BARE_FOLLOW.match(text) or _BARE_WHY.match(text):
-        # "what about that one?" or "why?" after a research question is that question again:
-        # re-asked whole, so the engines read its own words, and marked as a follow-up.
-        previous = next((e for e in reversed(prior[-4:]) if detect_research(e) is not None), None)
-        if previous is not None:
-            again = handle_ask(previous, prior, now=now, visitor=visitor, book=book)
+    if _BETTER_WORSE.match(text) and prior:
+        compared = _compare_last_two_books(text, prior, book, ledger, started, audit)
+        if compared is not None:
+            return compared
+    if BARE_FOLLOW.match(text) or _BARE_WHY.match(text) or _WHICH_ONE.match(text):
+        # "what about that one?", "why?" or "which one is more volatile" after a research question
+        # is that question again: re-asked with its own words and its resolved context (a
+        # "compare it to BNB" two turns back is SOL against BNB), and marked as a follow-up.
+        found = resolved_previous(prior, book)
+        if found is not None:
+            previous, prev_request = found
+            again = _research_payload(previous, prior, prev_request, ledger, started,
+                                      "research-follow-up", audit)
             note = (f"Assumed: read as the previous question again — \"{previous[:60]}\"; "
                     + ("each line above says what it was computed from, which is the reasoning."
-                       if _BARE_WHY.match(text) else "ask it with a name to change the subject."))
+                       if _BARE_WHY.match(text) else
+                       "the comparison above ranks them." if _WHICH_ONE.match(text) else
+                       "ask it with a name to change the subject."))
             lines = again.get("lines") or []
             at = next((i for i, line in enumerate(lines) if line.startswith("Data:")), len(lines))
             lines.insert(at, note)
-            again["classified_by"] = "research-follow-up"
+            again["turns"] = [*prior, text][-12:]
             return again
     carried = _carry_prior_name(text, prior)
     if carried is not None:
@@ -511,8 +644,18 @@ def handle_ask(
                                      {**audit, "detail": "the previous turn's name carried"})
     followed = follow_up(text, prior, book)
     if followed is not None:
-        return _research_payload(text, prior, followed, ledger, started, "research-follow-up",
-                                 {**audit, "detail": "a follow-up to the previous question"})
+        # A name swap ("and ETH?", "actually i meant ethereum") re-asks the earlier question, so
+        # its words are the ones the engines read: "price of bitcoin?" then led with the round
+        # trip instead of the price for ETH (answer audit, round 3). The turns keep what the
+        # trader typed.
+        swapped_from = resolved_previous(prior, book)
+        wording = (swapped_from[0] if swapped_from is not None and _NAME_SWAP.search(text)
+                   and swapped_from[1].kind is followed.kind else text)
+        payload = _research_payload(wording, prior, followed, ledger, started,
+                                    "research-follow-up",
+                                    {**audit, "detail": "a follow-up to the previous question"})
+        payload["turns"] = [*prior, text][-12:]
+        return payload
     model = _model_for(visitor) if worth_asking_the_model(text, now=clock) else None
     instruction = classify(text, now=clock, conversation=conversation).intent is Intent.ORDER
     if model is None and not instruction:
@@ -574,6 +717,8 @@ def handle_ask(
                      or planned.shock_pct != patterned.shock_pct
                      or planned.shock_on != patterned.shock_on
                      or planned.leverage != patterned.leverage
+                     or (patterned.notional is not None
+                         and planned.notional != patterned.notional)
                      or (planned.kind is ResearchKind.IMPACT
                          and planned.symbols[:1] != patterned.symbols[:1]))):
             # The model read "order book depth on NVDA" as a quote and "who is selling NVDA" as
@@ -781,7 +926,19 @@ def _research_payload(
     client reading ``/ask`` need no second code path."""
     import time
 
+    from argus.lui import memory as mem
+
+    facts = list(_MEMORY.get())
+    used: list[str] = []
+    if facts:
+        request, used = mem.apply(request, facts, text)
     result = run_research(text, request, ledger=ledger)
+    if facts:
+        extra = [*used, *mem.after(result.lines, request, facts, price_now=_price_now)]
+        if extra:
+            at = next((i for i, line in enumerate(result.lines) if line.startswith("Data:")),
+                      len(result.lines))
+            result.lines[at:at] = extra
     payload = result.as_dict()
     note = _language_note(text)
     if note:
@@ -817,7 +974,14 @@ def _language_note(text: str) -> str | None:
     if len({m.lower() for m in _SPANISH.findall(text)}) >= 2:
         return ("Respuesta en inglés: todas las cifras las calculan los motores a partir de datos "
                 "en vivo, y su redacción por ahora solo está en inglés.")
-    if _LATIN_OTHER.search(text):
+    from argus.lui import translate
+
+    # Every language the console detects gets the note, not only some: a Spanish price question
+    # carried it and the same question in French did not (answer audit, round 3)
+    if _LATIN_OTHER.search(text) or translate.target_language(text) is not None \
+            or re.search(r"\b(?:quel|quelle|prix|actuel|cours|combien|welcher|aktuelle|preis|"
+                         r"qual|preço|atual|quanto)\b|[؀-ۿЀ-ӿऀ-ॿ"
+                         r"가-힯぀-ヿ]", text, re.I):
         return ("Answered in English: the research engines' wording is English only; every "
                 "figure is computed from live data.")
     return None
@@ -1190,7 +1354,8 @@ class Handler(BaseHTTPRequestHandler):
                 visitor = (self.headers.get("x-forwarded-for") or "").split(",")[0].strip() \
                     or self.client_address[0]
                 book = repair_mojibake((params.get("book") or [""])[0])[:300]
-                payload = handle_ask(text, prior, visitor=visitor, book=book)
+                remembered = (params.get("memory") or [""])[0][:12000]
+                payload = handle_ask(text, prior, visitor=visitor, book=book, memory=remembered)
                 offer_translation(payload, text)
                 # Where each line comes from — live, computed, record, desk, assumed, missing
                 # (`lui/provenance.py`); a line no rule recognises carries none.

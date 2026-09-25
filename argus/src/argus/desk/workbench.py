@@ -669,8 +669,12 @@ def plan_execution(
         rationale = (
             "low urgency in a liquid session: work the order passively"
             if book is not None
-            else "low urgency in a liquid session, but no book was supplied — passive slices are "
-                 "quoted at taker, so this plan's cost is an upper bound rather than a forecast"
+            # the visible book is walked for impact elsewhere; what is missing here is how fast
+            # the queue at the touch trades, which a resting order's fill depends on. "no book was
+            # supplied" read as a contradiction beside a book-walk figure (answer audit, round 3)
+            else "low urgency in a liquid session, but the queue at the touch was not observed "
+                 "trading, so passive slices are quoted at taker — this plan's cost is an upper "
+                 "bound rather than a forecast"
         )
 
     expected = sum(
