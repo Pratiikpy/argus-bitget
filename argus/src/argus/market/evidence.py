@@ -782,12 +782,18 @@ class RedditSource:
         self._timeout = timeout
 
     def evidence(
-        self, symbol: str, *, as_of: datetime, max_posts: int = 10,
+        self, symbol: str, *, as_of: datetime, max_posts: int = 10, newest: bool = False,
     ) -> tuple[list[Evidence], list[str]]:
+        """``newest`` asks for the latest posts of the past week instead of the most relevant of
+        all time. Relevance is the CLI's default, and for a live crowd read it returns threads
+        weeks old — every one fell outside a 48-hour window (`market/social_pulse.py`,
+        2026-09-25). `rdt-cli` takes ``--sort new --time week`` for this, as the Track 2 agent's
+        own collector already does."""
         query = underlying_ticker(symbol)
+        order = ["--sort", "new", "--time", "week"] if newest else []
         try:
             result = subprocess.run(
-                [self._cli, "search", query, "-n", str(max_posts), "--json"],
+                [self._cli, "search", query, *order, "-n", str(max_posts), "--json"],
                 capture_output=True, text=True, encoding="utf-8", errors="replace",
                 timeout=self._timeout, check=True, env=_utf8_subprocess_env(),
             )

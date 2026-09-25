@@ -2894,6 +2894,17 @@ def _coordination_test(symbol: str | None) -> tuple[str, dict[str, Any]] | None:
     return text + ".", {"narratives": len(runs), "finbert_louder": louder, "held": held}
 
 
+def _crowd_lines(symbol: str) -> list[str]:
+    """What X and Reddit carry about ``symbol``, from the latest `market/social_pulse` snapshot,
+    with its age. The snapshot is collected on the desk's machine (the platforms need a logged-in
+    session the hosted console cannot hold) and published beside the other slow sweeps."""
+    from argus.lui.answer import _notes_path
+    from argus.market import social_pulse
+
+    return social_pulse.lines_for(symbol, social_pulse.load(
+        _notes_path().parent / "social_pulse.json"))
+
+
 def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict[str, Any]]:
     """Whether the talk about a name is information or repetition, and how it is positioned.
 
@@ -5239,6 +5250,13 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                           reason="the backdrop sources did not answer",
                           lines=["Neither FRED nor the sentiment source answered just now, so "
                                  "there is nothing honest to report. Try again shortly."])
+        crowd = (_crowd_lines(request.symbols[0])
+                 if request.kind is ResearchKind.SENTIMENT and request.symbols else [])
+        if crowd:
+            found.extend(crowd)
+            extra.append(Source(kind="computation", ref="argus.market.social_pulse",
+                                detail="X and Reddit posts grouped into stories by the desk's "
+                                       "coordination detector; a dated snapshot"))
         found.extend(f"Assumed: {note}." for note in request.notes)
         found.append(f"Data: {extra[0].detail if extra else 'public sources'}. This is analysis, "
                      f"not advice — you make the call.")

@@ -71,6 +71,8 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "bitget_skills_health.json",
     "skill_mirror.json",
     "lui_final_heldout_report.json",
+    # X and Reddit crowd read (`market/social_pulse.py`), collected on the desk's machine.
+    "social_pulse.json",
     "skill_reliability.json",
     "data_coverage.json",
     "source_health.json",
