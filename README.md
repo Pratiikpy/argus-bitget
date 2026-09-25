@@ -47,7 +47,12 @@ Open the console and ask any of these. Each one exercises something different.
 
 Put your holdings in **My book** once and every answer uses them. Every answer ends by naming the
 sources it reached and any that did not answer. If the desk cannot source a figure, it refuses and
-says why.
+says why. Ask in Chinese, Japanese, Korean, Spanish, Portuguese, French or German and the answer
+comes back in that language: the engines write English, Qwen translates, and every number in each
+translated line is checked against the English — a line whose figures do not match stays English.
+
+The same desk answers in Telegram at [@argusbitgetbot](https://t.me/argusbitgetbot): `/book` saves
+your holdings for the chat, and orders are refused there as everywhere.
 
 **Who it is for:** a trader holding Bitget's tokenized US equities who wants a second desk that
 shows its work. **What it is not:** a signal service. No strategy here has cleared its own
@@ -140,7 +145,7 @@ a test that reaches the network shows itself.
 | | |
 |---|---|
 | Tests | **6,700 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 343 source files** |
+| Types | **`mypy --strict` clean on 344 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes**, resolved by import at runtime, not claimed in prose |

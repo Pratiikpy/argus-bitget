@@ -70,9 +70,32 @@ Ask = Callable[..., dict[str, Any]]
 
 
 def _default_ask(text: str, prior: list[str], *, visitor: str, book: str) -> dict[str, Any]:
-    from argus.lui.server import handle_ask
+    """The console's answer, with the signed translation offer when the question was not English
+    (`server.offer_translation`)."""
+    from argus.lui.server import handle_ask, offer_translation
 
-    return handle_ask(text, prior, visitor=visitor, book=book)
+    payload = handle_ask(text, prior, visitor=visitor, book=book)
+    offer_translation(payload, text)
+    return payload
+
+
+def _translated(payload: dict[str, Any], question: str, book: str, visitor: str) -> str | None:
+    """The same answer in the question's language, or None when there is no offer or nothing
+    was translated. A translation measured 9 to 32 seconds on the hackathon Qwen, so the bot sends
+    the English at once and edits it into this when it arrives (`lui/translate.py`)."""
+    offer = payload.get("translate")
+    if not offer:
+        return None
+    from argus.lui import translate
+    from argus.lui.server import _model_for
+
+    lines = [str(line) for line in payload.get("lines") or []]
+    skip = int(offer["skip"])
+    done = translate.translate(lines[skip:], str(offer["lang"]), _model_for(visitor))
+    if len(done["kept_english"]) == len(lines) - skip:
+        return None
+    head = [done["note"]] if done.get("note") else lines[:skip]
+    return format_answer({**payload, "lines": [*head, *done["lines"]]}, question, book)
 
 
 def split_message(text: str, limit: int = MAX_MESSAGE) -> list[str]:
@@ -165,7 +188,34 @@ def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
         return [(chat_id, f"The desk could not answer just now ({html.escape(type(exc).__name__)})"
                           f". Nothing was guessed; try again in a minute.")]
     state.turns = [*state.turns, text[:500]][-MAX_TURNS:]
+    if payload.get("translate"):
+        PENDING[chat_id] = (payload, text[:500], state.book)
     return [(chat_id, part) for part in split_message(format_answer(payload, text, state.book))]
+
+
+PENDING: dict[int, tuple[dict[str, Any], str, str]] = {}
+"""An answer sent in English whose translation is still to come, by chat."""
+
+
+def follow_up(token: str, chat_id: int, message_id: int | None) -> None:
+    """Edit the English answer just sent into the question's language, or send the translation
+    as a new message when it is too long for one. Nothing happens when there is none."""
+    pending = PENDING.pop(chat_id, None)
+    if pending is None:
+        return
+    payload, question, book = pending
+    text = _translated(payload, question, book, f"tg-{chat_id}")
+    if text is None:
+        return
+    parts = split_message(text)
+    if message_id is not None and len(parts) == 1:
+        _call(token, "editMessageText", {"chat_id": chat_id, "message_id": message_id,
+                                         "text": parts[0], "parse_mode": "HTML",
+                                         "link_preview_options": {"is_disabled": True}},
+              timeout=30.0)
+        return
+    for part in parts:
+        send(token, chat_id, part)
 
 
 # --- Telegram transport -------------------------------------------------------------------------
@@ -181,9 +231,11 @@ def _call(token: str, method: str, params: dict[str, Any], *, timeout: float = 7
     return payload.get("result")
 
 
-def send(token: str, chat_id: int, text: str) -> None:
-    _call(token, "sendMessage", {"chat_id": chat_id, "text": text, "parse_mode": "HTML",
-                                 "link_preview_options": {"is_disabled": True}}, timeout=30.0)
+def send(token: str, chat_id: int, text: str) -> int | None:
+    sent = _call(token, "sendMessage", {"chat_id": chat_id, "text": text, "parse_mode": "HTML",
+                                        "link_preview_options": {"is_disabled": True}},
+                 timeout=30.0)
+    return sent.get("message_id") if isinstance(sent, dict) else None
 
 
 _WEBHOOK_STATES: dict[int, ChatState] = {}
@@ -205,9 +257,15 @@ def handle_webhook(body: bytes, secret_header: str | None, *,
     except (UnicodeDecodeError, json.JSONDecodeError):
         return 400, b'{"error": "not JSON"}'
     failures = 0
+    last: dict[int, int | None] = {}
     for chat_id, text in handle_update(update, _WEBHOOK_STATES, ask=ask):
         try:
-            send(token, chat_id, text)
+            last[chat_id] = send(token, chat_id, text)
+        except Exception:
+            failures += 1
+    for chat_id, message_id in last.items():
+        try:
+            follow_up(token, chat_id, message_id)
         except Exception:
             failures += 1
     return 200, json.dumps({"ok": True, "send_failures": failures}).encode()
@@ -229,11 +287,17 @@ def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - 
             continue
         for update in updates:
             offset = max(offset, int(update["update_id"]) + 1)
+            last: dict[int, int | None] = {}
             for chat_id, text in handle_update(update, states, ask=ask):
                 try:
-                    send(token, chat_id, text)
+                    last[chat_id] = send(token, chat_id, text)
                 except Exception as exc:
                     print(f"sendMessage failed ({type(exc).__name__})", flush=True)
+            for chat_id, message_id in last.items():
+                try:
+                    follow_up(token, chat_id, message_id)
+                except Exception as exc:
+                    print(f"translation follow-up failed ({type(exc).__name__})", flush=True)
 
 
 def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI

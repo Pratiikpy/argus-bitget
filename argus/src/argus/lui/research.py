@@ -6108,8 +6108,13 @@ _FUNDING_CLAIM = re.compile(
     r"\bfunding\s+(?:rate\s+)?(?:looks?|is|seems?|feels?|being|still|now|so|pretty|very|too|"
     r"really|quite|\s)*\s*(?P<a>cheap|low|negative|free|expensive|high|rich|elevated|hot|"
     r"crowded|stretched|positive)\b"
-    r"|\b(?P<b>cheap|low|negative|expensive|high|rich|elevated)\s+funding\b",
+    r"|\b(?P<b>cheap|low|negative|expensive|high|rich|elevated)\s+funding\b"
+    # 资金费率贵吗 / 资金费率很低 / 资金费便宜: the same premise asked in Chinese.
+    r"|\u8d44\u91d1\u8d39(?:\u7387)?(?:\u5f88|\u592a|\u6bd4\u8f83|\u633a|\u662f\u5426|\u662f\u4e0d\u662f)?"
+    r"(?P<c>\u8d35|\u4fbf\u5b9c|\u9ad8|\u4f4e)",
     re.IGNORECASE)
+_CJK_FUNDING_WORD = {"\u8d35": "expensive", "\u4fbf\u5b9c": "cheap", "\u9ad8": "high",
+                     "\u4f4e": "low"}
 _PREMIUM_CLAIM = re.compile(
     r"\b(?:perp\w*|contract|token|rtoken)\b[^.?!]{0,40}?\b(?:at\s+an?\s+|trad\w+\s+(?:at\s+)?an?\s+)?"
     r"(?P<c>premium|discount)\b|\bbasis\s+(?:looks?\s+|is\s+)?(?P<d>wide|rich|tight|cheap)\b",
@@ -6221,7 +6226,8 @@ def _claim_check(raw_text: str, symbol: str) -> tuple[list[str], list[Source]] |
         sources.append(Source(kind="venue", ref="bitget /api/v2/mix/market/tickers",
                               detail=f"{symbol} 24h change, live"))
     if funding:
-        word = (funding.group("a") or funding.group("b") or "").lower()
+        word = (funding.group("a") or funding.group("b")
+                or _CJK_FUNDING_WORD.get(funding.group("c") or "", "")).lower()
         line = _funding_claim_line(symbol, word, ticker)
         if line:
             lines.append(line[0])

@@ -230,12 +230,29 @@ document.getElementById('f').addEventListener('submit', async ev => {
             ${a.budget_ms}ms${over ? ' OVER BUDGET' : ''}</span>
           ${a.refused ? '<span class="tag over">refused</span>' : ''}
         </div>
-        ${a.lines.map(l => `<div class="${lineClass(l)}">${esc(l)}</div>`).join('')}
+        <div class="lines">${a.lines.map(l =>
+          `<div class="${lineClass(l)}">${esc(l)}</div>`).join('')}</div>
         ${a.sources.length ? `<div class="src"><span class="rk">Receipt · ${a.sources.length}` +
           ` source${a.sources.length === 1 ? '' : 's'}</span>` +
           a.sources.map(s => `&nbsp;&nbsp;<b>${esc(s.kind)}</b>:${esc(s.ref)}` +
             (s.detail ? ' — ' + esc(s.detail) : '')).join('<br>') + `</div>` : ''}
       </div>`);
+    if (a.translate) {
+      // English first, then the reader's language: every figure in the translation was checked
+      // against the English by the server before it was sent (`lui/translate.py`).
+      const card = out.firstElementChild;
+      const body = a.lines.slice(a.translate.skip);
+      fetch('translate?' + new URLSearchParams({lang: a.translate.lang,
+        token: a.translate.token, lines: JSON.stringify(body)}))
+        .then(r => r.ok ? r.json() : null).then(t => {
+          if (!t || !t.lines) return;
+          // Each translated line keeps the styling of the English line it came from.
+          const note = t.note ? [t.note] : a.lines.slice(0, a.translate.skip);
+          card.querySelector('.lines').innerHTML =
+            note.map(l => `<div class="line fine">${esc(l)}</div>`).join('') +
+            t.lines.map((l, i) => `<div class="${lineClass(body[i])}">${esc(l)}</div>`).join('');
+        }).catch(() => {});
+    }
   } catch (e) {
     out.insertAdjacentHTML('afterbegin',
       `<div class="card refused"><div class="q">${esc(text)}</div>
@@ -677,6 +694,23 @@ def _language_note(text: str) -> str | None:
     return None
 
 
+def offer_translation(payload: dict[str, Any], text: str) -> None:
+    """Attach a signed offer to translate ``payload``'s lines into the question's language, when
+    the question was not in English and a language model is configured. The first line is left
+    out when it is the "answered in English" note, which the translation replaces."""
+    from argus.lui import translate
+
+    lang = translate.target_language(text)
+    if lang is None or _router() is None:
+        return
+    lines = [str(line) for line in payload.get("lines") or []]
+    skip = 1 if lines and lines[0] == _language_note(text) else 0
+    body = lines[skip:]
+    if not body or sum(len(line) for line in body) > translate.MAX_CHARS:
+        return
+    payload["translate"] = {"lang": lang, "skip": skip, "token": translate.sign(lang, body)}
+
+
 UNRELATED_CONFIDENCE = 0.8
 """How sure the planner must be that a question is unrelated before its view overrules the n-gram
 layer. High on purpose: withdrawing a guess that was right costs a real answer."""
@@ -1028,7 +1062,31 @@ class Handler(BaseHTTPRequestHandler):
                     or self.client_address[0]
                 book = repair_mojibake((params.get("book") or [""])[0])[:300]
                 payload = handle_ask(text, prior, visitor=visitor, book=book)
+                offer_translation(payload, text)
                 self._send(json.dumps(payload, default=str).encode(), "application/json")
+                return
+            if path == "/translate":
+                # The second half of a non-English answer: the page shows the English at once and
+                # asks here for the translation, signed by this server so only its own answers
+                # are translated (`lui/translate.py`).
+                from argus.lui import translate
+
+                params = parse_qs(route.query)
+                lang = (params.get("lang") or [""])[0]
+                token = (params.get("token") or [""])[0]
+                try:
+                    lines = json.loads((params.get("lines") or ["[]"])[0])
+                except ValueError:
+                    lines = None
+                if (not isinstance(lines, list) or not all(isinstance(x, str) for x in lines)
+                        or not translate.verify(lang, lines, token)):
+                    self._send(b'{"error": "not an answer this console wrote"}',
+                               "application/json", 403)
+                    return
+                visitor = (self.headers.get("x-forwarded-for") or "").split(",")[0].strip() \
+                    or self.client_address[0]
+                result = translate.translate(lines, lang, _model_for(visitor))
+                self._send(json.dumps(result, ensure_ascii=False).encode(), "application/json")
                 return
             self._send(b'{"error":"not found"}', "application/json", 404)
         except Exception as exc:  # a demo that 500s silently is worse than one that says why

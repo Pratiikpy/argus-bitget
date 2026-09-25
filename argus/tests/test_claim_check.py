@@ -186,3 +186,11 @@ def test_a_liquidity_claim_is_measured_on_the_live_book(
     monkeypatch.setattr(depth, "fetch_orderbook", lambda symbol, **_: book)
     lines, _ = research._claim_check(text, "NVDAUSDT") or ([], [])
     assert lines[0].startswith(verdict)
+
+
+def test_a_funding_premise_in_chinese_is_read(venue: dict[str, Any]) -> None:
+    venue["tickers"] = {"MSTRUSDT": _ticker("MSTRUSDT", "0.000395")}
+    venue["history"] = [0.0] * 90 + [1.0] * 10
+    lines, _ = research._claim_check("微策略的资金费率贵"
+                                     "吗", "MSTRUSDT") or ([], [])
+    assert lines[0].startswith("Your premise that funding looks expensive: holds")
