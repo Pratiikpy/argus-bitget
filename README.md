@@ -177,7 +177,7 @@ a test that reaches the network shows itself.
 | | |
 |---|---|
 | Tests | **6,700 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 472 source files** |
+| Types | **`mypy --strict` clean on 473 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes**, resolved by import at runtime, not claimed in prose |
