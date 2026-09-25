@@ -95,7 +95,9 @@ def _translated(payload: dict[str, Any], question: str, book: str, visitor: str)
     if len(done["kept_english"]) == len(lines) - skip:
         return None
     head = [done["note"]] if done.get("note") else lines[:skip]
-    return format_answer({**payload, "lines": [*head, *done["lines"]]}, question, book)
+    lead = {len(head) + i for i, line in enumerate(lines[skip:])
+            if line.startswith("Actionable:")}
+    return format_answer({**payload, "lines": [*head, *done["lines"]]}, question, book, lead)
 
 
 def split_message(text: str, limit: int = MAX_MESSAGE) -> list[str]:
@@ -122,15 +124,19 @@ def split_message(text: str, limit: int = MAX_MESSAGE) -> list[str]:
     return parts
 
 
-def format_answer(payload: dict[str, Any], question: str, book: str) -> str:
+def format_answer(payload: dict[str, Any], question: str, book: str,
+                  lead: set[int] | None = None) -> str:
     """The console's answer as a Telegram message: its lines, its sources by name, and a link to
     the same question on the web console where every source is expandable."""
     lines = [str(line) for line in payload.get("lines") or []]
     body = []
-    for line in lines:
+    for index, line in enumerate(lines):
         text = html.escape(line, quote=False)
         if text.startswith("Actionable:"):
             text = "<b>Actionable:</b>" + text[len("Actionable:"):]
+        elif lead and index in lead:
+            # A translated lead line no longer starts with "Actionable:"; it stays bold.
+            text = f"<b>{text}</b>"
         body.append(text)
     refs: list[str] = []
     for source in payload.get("sources") or []:
