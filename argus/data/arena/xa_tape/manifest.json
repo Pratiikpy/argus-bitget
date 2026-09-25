@@ -1,0 +1,175 @@
+{
+  "name": "xa_tape",
+  "frozen_at": "2026-09-25T16:05:02.529098+00:00",
+  "window_start": "2026-02-27T00:00:00+00:00",
+  "window_end": "2026-09-25T00:00:00+00:00",
+  "files": {
+    "spot_RNVDAUSDT.json": {
+      "sha256": "9d25d8f0a791560887d50795089b60c9f34c7e6157369ab32bfeab1cd0b1c8f0",
+      "bytes": 247422,
+      "rows": 4131
+    },
+    "spot_RAAPLUSDT.json": {
+      "sha256": "1c31122abead59cd57536ef7e9fb9ddca0f8177fb939e23eef7281c0884db87b",
+      "bytes": 235432,
+      "rows": 3973
+    },
+    "spot_RTSLAUSDT.json": {
+      "sha256": "dfd17abd8a26047d58eade82e79229092129629a6ac9b569e27aa4b179aeb505",
+      "bytes": 246411,
+      "rows": 4123
+    },
+    "spot_RQQQUSDT.json": {
+      "sha256": "4e81d4b39f16c9494452ec8a571218de429daeb8642832b18c82a764ade59cb3",
+      "bytes": 242557,
+      "rows": 4042
+    },
+    "spot_RSPYUSDT.json": {
+      "sha256": "453778ddeaf01582696c18930bb96eeafd64a58bf282ee6f97d3fae7bccb05e6",
+      "bytes": 221625,
+      "rows": 3686
+    },
+    "spot_BTCUSDT.json": {
+      "sha256": "c3a463ac654c2b88ee06b11237648ebaabe46ab2099c24ca70c120a75049879b",
+      "bytes": 343663,
+      "rows": 5040
+    },
+    "spot_ETHUSDT.json": {
+      "sha256": "383f7bdc016de77b6a474d0e5264bd9eb725dadeef5afacc1fbc7f478d091930",
+      "bytes": 313843,
+      "rows": 5040
+    },
+    "perp_NVDAUSDT.json": {
+      "sha256": "e68797eccbed30caa7adff77d576f38726ee361ce10f8cd9cdc1397dde10bc31",
+      "bytes": 279177,
+      "rows": 5040
+    },
+    "funding_NVDAUSDT.json": {
+      "sha256": "0d7a6b1e05d2dd841358ff5b8de140ed61698cdfa02757e1abe0edab1bbeb22a",
+      "bytes": 5630,
+      "rows": 270
+    },
+    "perp_AAPLUSDT.json": {
+      "sha256": "d4747dddaf78c3e2a23bee9d155da4e44ff9db81915b8dab53e9345a7eecdc4b",
+      "bytes": 275979,
+      "rows": 5040
+    },
+    "funding_AAPLUSDT.json": {
+      "sha256": "ff00606711ade50848ffc0e68f9712397cc0a25221148610185c7b93b5a8c845",
+      "bytes": 5592,
+      "rows": 270
+    },
+    "perp_TSLAUSDT.json": {
+      "sha256": "62d981791b6384b0263d2a2e84f2961ad585f3a407c203714ff8a52f14d637ea",
+      "bytes": 278941,
+      "rows": 5040
+    },
+    "funding_TSLAUSDT.json": {
+      "sha256": "d36828e8ab25f49f920e7a7ab11bd1ce933f660652b88e95bc51564e95eefefb",
+      "bytes": 5595,
+      "rows": 270
+    },
+    "perp_QQQUSDT.json": {
+      "sha256": "12b17ed037bdea6ed6d7875ee17f2e497fd30fab0cd997431d1379adc6be4adc",
+      "bytes": 276765,
+      "rows": 5040
+    },
+    "funding_QQQUSDT.json": {
+      "sha256": "2883d473ac3a8146a1e75b954b214b181314b48ed1481db484cf68fd245bc93d",
+      "bytes": 5811,
+      "rows": 270
+    },
+    "perp_SPYUSDT.json": {
+      "sha256": "119af8ac877e6d4ef32ebd06c81ad5e2457c25f742d04c67dbea7ffd937d24cc",
+      "bytes": 274302,
+      "rows": 5040
+    },
+    "funding_SPYUSDT.json": {
+      "sha256": "a150a2e18296996fc4f7b20bf50b58baa0ac3cbcdf92fe32b88a2649b28335b4",
+      "bytes": 5554,
+      "rows": 270
+    },
+    "perp_SQQQUSDT.json": {
+      "sha256": "da7bb9ceb44eaaa5c0c0679db89fa04b9ff0bf6d8fc6fb8e9be5a5ec51b4bba8",
+      "bytes": 212509,
+      "rows": 4265
+    },
+    "funding_SQQQUSDT.json": {
+      "sha256": "d805782d47145b41f21bd6c2b61f66a324039b484c922520c805bd603ac9c875",
+      "bytes": 5529,
+      "rows": 270
+    },
+    "perp_BTCUSDT.json": {
+      "sha256": "6822bbb7a73c9df4792f8d3d076268ab4d43788d4bda4f662b7e6fa0d42190f1",
+      "bytes": 319089,
+      "rows": 5040
+    },
+    "funding_BTCUSDT.json": {
+      "sha256": "6b0d8ec03d2834dd96a54cfc7ee732c1cb96eafc9f4d03ec85b4bc410f8a8541",
+      "bytes": 6361,
+      "rows": 270
+    },
+    "perp_ETHUSDT.json": {
+      "sha256": "6fbd33791c300b3ddb24ab1b8be227aa89a4da9c976fe06731959afef51cd1d1",
+      "bytes": 309568,
+      "rows": 5040
+    },
+    "funding_ETHUSDT.json": {
+      "sha256": "6f9881f1f888b9698869e91c66f6a65d334af75dee7d81de9a5c71ead14b7cd7",
+      "bytes": 6380,
+      "rows": 270
+    },
+    "fng.json": {
+      "sha256": "8cebf5f39df710c8f0171f9466ae7c350dcb7a0489447f714feb56435e43a046",
+      "bytes": 8378,
+      "rows": 400
+    },
+    "fees.json": {
+      "sha256": "8803fdd91e0d053b13d2058450eacc1b8e2bb9d485dcc816f2e85787dadc7c28",
+      "bytes": 408,
+      "rows": null
+    },
+    "slippage.json": {
+      "sha256": "9240be5e4edf6b9073210189db1a8c146579a398abc57477ce794a11a6a71d1b",
+      "bytes": 6296,
+      "rows": null
+    },
+    "venue_risk.json": {
+      "sha256": "6315833e8d6138e7a660d0cb6fb49b13826d3be5f13e3a616f3773cba6b3f075",
+      "bytes": 10911,
+      "rows": null
+    },
+    "macro_calendar.json": {
+      "sha256": "3a04d332537669f42199e190f57529ad0480d92877a882364f0436c5f6341ed5",
+      "bytes": 1097,
+      "rows": null
+    },
+    "perp_METAUSDT.json": {
+      "sha256": "7eef0aefdd9644c1115e5cc85de281fb41c5802da19bfdc0fb6e82084af67208",
+      "bytes": 273808,
+      "rows": 5040
+    },
+    "perp_AMZNUSDT.json": {
+      "sha256": "28187bbc4b2d41e659a2f8f89922650f7adaf0b614f5bfb311724edef24f3c54",
+      "bytes": 274558,
+      "rows": 5040
+    },
+    "perp_MSFTUSDT.json": {
+      "sha256": "73e91202a91eca005e9fa9142b6749e1bc353e477b73651a0d49ab2b6545c82e",
+      "bytes": 274346,
+      "rows": 5040
+    },
+    "perp_GOOGLUSDT.json": {
+      "sha256": "d1a491992a885b00c4bf80d09cccf54ddf54a7559f84ce7c15d3837e39972507",
+      "bytes": 275949,
+      "rows": 5040
+    },
+    "reality.json": {
+      "sha256": "11ec8760fe9dc6d9b41e5167e47bc266aef1c0e8a2bd469c1e64f36431ce44b2",
+      "bytes": 1780,
+      "rows": null
+    }
+  },
+  "licence_of_data": "Bitget public market data and alternative.me Fear & Greed; recorded for evaluation, not redistributed as a product",
+  "extra_frozen_at": "2026-09-25T16:25:51.015343+00:00"
+}

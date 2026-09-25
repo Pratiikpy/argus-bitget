@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-25T22:57:37.909305+00:00",
+  "generated_at": "2026-09-25T23:08:15.011315+00:00",
   "benchmark": {
     "repository": "https://github.com/patronus-ai/financebench",
     "commit": "cc39aeb4afdf33909ee1412188bf89035950c2eb",
@@ -41,7 +41,7 @@
       "ungraded": 0,
       "abstained": 92
     },
-    "seconds": 1.5,
+    "seconds": 1.6,
     "offline_replay": true
   },
   "rivals": {
@@ -1549,7 +1549,7 @@
       "class": "novel-generated",
       "status": "answered",
       "grade": "correct",
-      "answer": "+$1,137.00 (USD millions): $13,745.00 (USD millions) in FY2020, $14,882.00 (USD millions) in FY2021",
+      "answer": "+$1,137.00 (USD millions) (+8.3%): $13,745.00 (USD millions) in FY2020, $14,882.00 (USD millions) in FY2021",
       "reason": "",
       "formula": "ppe_net[FY2021] - ppe_net[FY2020]"
     },

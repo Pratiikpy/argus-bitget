@@ -708,10 +708,14 @@ def _answer(
             return _research_payload(text, prior, with_book(request, book, text), ledger,
                                      started, "research-follow-up",
                                      {**audit, "detail": "the previous turn's name carried"})
-    computed = _xbrl_answer(text, clock, conversation, started, prior, audit)
+    computed, declined = _xbrl_answer(text, clock, conversation, started, prior, audit)
     if computed is not None:
         return computed
-    filed = _filing_answer(text, visitor, clock, conversation, started, prior, audit)
+    # A quarter or a cause is what the filing reader is for: the XBRL engine declines both, and a
+    # question worded without "10-Q" or "filing" would otherwise not reach the reader at all.
+    prose = declined.startswith("out of scope: a quarterly") or "a cause or an event" in declined
+    filed = _filing_answer(text, visitor, clock, conversation, started, prior, audit,
+                           force=prose)
     if filed is not None:
         return filed
     if _SKILLS_Q.search(text):
@@ -1232,10 +1236,11 @@ _XBRL: Any = None
 
 
 def _xbrl_answer(text: str, clock: datetime, conversation: Any, started: float,
-                 prior: list[str], audit: dict[str, Any]) -> dict[str, Any] | None:
+                 prior: list[str], audit: dict[str, Any]) -> tuple[dict[str, Any] | None, str]:
     """A numeric question about a company's own annual figures, computed from what it filed in
     XBRL (`research/filing_qa.py`): the figure, the formula and every filed line it used. None —
-    and the question takes the usual route — whenever the engine abstains, for any reason.
+    and the question takes the usual route — whenever the engine abstains, for any reason; the
+    reason comes back beside it so the caller can send a quarter or a cause to the filing reader.
 
     On FinanceBench's 50 numeric questions the engine answers all 50 within rounding of the gold
     figure, where the best of FinanceBench's own sixteen graded model runs answers 46
@@ -1243,7 +1248,7 @@ def _xbrl_answer(text: str, clock: datetime, conversation: Any, started: float,
     import time
 
     if not _FISCAL_YEAR.search(text):
-        return None
+        return None, ""
     global _XBRL
     from argus.lui.answer import Source
     from argus.research.filing_qa import FilingQA
@@ -1253,9 +1258,9 @@ def _xbrl_answer(text: str, clock: datetime, conversation: Any, started: float,
     try:
         found = _XBRL.answer(text)
     except Exception:
-        return None
+        return None, ""
     if found.status != "answered":
-        return None
+        return None, found.reason
     metric = found.metric.replace("_", " ")
     years = "-".join(f"FY{y}" for y in found.fiscal_years)
     lines = [f"Actionable: {found.company} — {metric}, {years}: {found.text}, computed from the "
@@ -1281,18 +1286,19 @@ def _xbrl_answer(text: str, clock: datetime, conversation: Any, started: float,
     payload.update(elapsed_ms=(time.perf_counter() - started) * 1000,
                    budget_ms=BUDGET_MS[q.speed], routing=audit, classified_by="research-xbrl",
                    matched="filing_qa", refused=False, turns=[*prior, text][-12:])
-    return payload
+    return payload, ""
 
 
 def _filing_answer(text: str, visitor: str, clock: datetime, conversation: Any, started: float,
-                   prior: list[str], audit: dict[str, Any]) -> dict[str, Any] | None:
+                   prior: list[str], audit: dict[str, Any],
+                   force: bool = False) -> dict[str, Any] | None:
     """A question about what a filing says, answered from the filing with every sentence citing
     the passage it rests on (`research/document_qa.py`). None — and the question takes the usual
     route — when it is not such a question, names no company with SEC filings, or no model is
     available to this visitor."""
     import time
 
-    if not _FILING_Q.search(text):
+    if not force and not _FILING_Q.search(text):
         return None
     named = [s.removesuffix("USDT") for s in research_symbols(text)[0]]
     if not named or _model_for(visitor) is None:

@@ -2257,7 +2257,8 @@ REGISTER: tuple[Capability, ...] = (
             "argus/desk/execution.py,argus/eval/execution_comparison.py,"
             "argus/eval/baselines/crypto_sor_shim/src/lib/CompositeOrderBook.ts,"
             "argus/eval/baselines/crypto_sor_shim/src/lib/common.ts,"
-            "argus/eval/baselines/crypto_sor_loader.py"
+            "argus/eval/baselines/crypto_sor_loader.py,"
+            "argus/desk/crossasset.py,argus/eval/xa_arena.py,argus/eval/xa_tape.py"
         ),
         state=State.IMPLEMENTED,
         baseline="crypto_sor real composite order-book router (CompositeOrderBook.newOrder)",
@@ -2413,6 +2414,22 @@ REGISTER: tuple[Capability, ...] = (
             "question, not a cross-exchange one. The Node/ts-node subprocess adds a real, "
             "external-process dependency (Node 22, npm packages pinned in crypto_sor_shim/"
             "package.json) that the rest of this pure-Python project does not otherwise carry",
+            "Cross-asset arena, 2026-09-26 (eval/xa_arena.py, data/xa_arena.json, tape digest "
+            "cb1f49f19d9b43cd, reproducibility checked: two runs, identical NAV path): the router "
+            "desk/crossasset.py against seven rival configurations run from their pinned clones "
+            "(Triad and Triad x10, Omni, Crossfire, VIGIL, HedgeAgents and its optimizer) and "
+            "four naive baselines, on one book, in two periods. Pre-registered primary (certainty "
+            "equivalent at gamma 5, stationary bootstrap, Holm): TIE with every rival and every "
+            "baseline in both. It does not beat holding the book: in period B (2026-06-28 to "
+            "2026-09-25, funding observed) CE 0.784 against 0.844 for holding; in period A "
+            "(2026-03-29 to 2026-06-28, the holdout, funding not yet observed) -0.134 against "
+            "-0.138. In period A VIGIL (CE 0.176, max drawdown 11%) and Triad (0.108, 5%) are "
+            "ahead of ARGUS (-0.134, 20%) on the point estimates, not significantly. Of nine "
+            "ablations only removing costs from the objective changes the verdict (a WIN for the "
+            "full router in period B: -0.380 without them); the other eight TIE, so funding, "
+            "regime, phase and the stability gate are not shown to matter. All six constructed "
+            "cases pass (normal risk and carry places no order; a risk shock, a funding spike, "
+            "prohibitive costs, a calm forecast and thin history each behave as stated).",
         ),
     ),
     Capability(

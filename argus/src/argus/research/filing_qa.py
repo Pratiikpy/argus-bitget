@@ -1205,8 +1205,10 @@ def _format_change(facts: CompanyFacts, und: Understanding, q: ParsedQuestion, v
     _, _, start_text = _format(start_v, und.output, q)
     _, _, end_text = _format(end_v, und.output, q)
     sign = "+" if value >= 0 else ""
-    return (change, unit, f"{sign}{change_text}: {start_text} in FY{prior}, {end_text} in "
-                          f"FY{target}")
+    # "how much did revenue grow" is asked in dollars and in percent alike; the answer gives both
+    relative = f" ({value / start_v:+.1%})" if start_v > 0 else ""
+    return (change, unit, f"{sign}{change_text}{relative}: {start_text} in FY{prior}, "
+                          f"{end_text} in FY{target}")
 
 
 class FilingQA:
