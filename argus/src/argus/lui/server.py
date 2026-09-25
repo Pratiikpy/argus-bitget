@@ -149,7 +149,8 @@ question and never writes a number. No source, no answer: you get a refusal and 
 <p class="stat"><span id="stat"></span></p>
 <p class="jump"><a href="/research">Run a full research task &rarr;</a>
 <a href="/proof">What we beat &rarr;</a><a href="/wrong">What we got wrong &rarr;</a>
-<a href="/status">What the desk can see &rarr;</a></p>
+<a href="/status">What the desk can see &rarr;</a>
+<a href="/materials">Every deliverable on one page &rarr;</a></p>
 
 <form class="bar" id="f">
   <input type="text" id="q" autocomplete="off"
@@ -1623,6 +1624,23 @@ class Handler(BaseHTTPRequestHandler):
                 from argus.lui.brand_page import render as render_brand
 
                 self._send(render_brand().encode(), "text/html; charset=utf-8")
+                return
+            if path == "/materials":
+                # Every deliverable on one page, for the form's single materials field; its
+                # figures are read from the same artefacts /proof and /wrong render.
+                from argus.lui.materials_page import collect as collect_materials
+                from argus.lui.materials_page import render as render_materials
+
+                # full URLs, so a judge can copy one straight into a message
+                host = self.headers.get("Host") or ""
+                proto = self.headers.get("X-Forwarded-Proto") or "http"
+                items = collect_materials(_ledger_path().parent,
+                                          f"{proto}://{host}" if host else "")
+                if (parse_qs(route.query).get("format") or [""])[0] == "json":
+                    self._send(json.dumps([i.as_dict() for i in items],
+                                          ensure_ascii=False).encode(), "application/json")
+                    return
+                self._send(render_materials(items).encode(), "text/html; charset=utf-8")
                 return
             if path == "/proof":
                 # **The wins, reachable.** Every comparison against a named rival, grouped by the

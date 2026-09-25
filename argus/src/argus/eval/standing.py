@@ -3896,9 +3896,12 @@ REGISTER: tuple[Capability, ...] = (
             "corrupted feeds, 2026-09-25 (data/feedbugged.json, openai/evals' bugged-tools "
             "pattern): with one input corrupted on each of six snapshots (price, 24h change, VIX, "
             "SUE, fear-and-greed, spread), no decision moved and none said a feed was wrong - "
-            "detection F1 0.0, 0 of 6 caught. Recorded as a LOSS until the feed-sanity gate (S17) "
-            "is built and measured on the same cases. A wrong line of reasoning injected into the "
-            "prompt moved one of six decisions to the wrong direction",
+            "detection F1 0.0, 0 of 6 caught, and a wrong line of reasoning injected into the "
+            "prompt moved one of six decisions to the wrong direction. That first measurement "
+            "stays recorded. The feed-sanity gate (desk/feed_sanity.py, S17) was then built and "
+            "measured on the same cases (data/feed_sanity_gate.json): 12 of 12 planted faults "
+            "caught before the model reads the frame, 0 false flags on 255 clean items across 12 "
+            "snapshots, deterministic, no model call",
         ),
     ),
     Capability(

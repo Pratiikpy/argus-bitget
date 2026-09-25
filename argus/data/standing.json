@@ -2080,7 +2080,7 @@
         "The as-of evidence gate is INERT on live data: across 11 live frames it dropped nothing, so its protection against future-dated evidence is real in code and untested in production (data/ablations.json). That is a different statement from 'the gate is working'",
         "Per-feed effect is still untested. Ablating a feed changes what a model reasons over, so it needs the paired protocol and a budget of real cycles; only the deterministic components have been measured",
         "Bitget's own tool surface is mostly not answering (data/skill_matrix.json, 2026-09-25, one round, keyless, through market/rpc.py): 3 of 86 tools returned data - technical_analysis, social_trending and crypto_derivatives, all on bitget-signal (3 of 19) - and all 67 bitget-mcp-server catalog entries answered 503 upstream. Of the five research Skills, technical-analysis answered on its one tool and news-briefing on one of three; macro-analyst, market-intel and sentiment-analyst returned nothing. One round does not characterise a service",
-        "corrupted feeds, 2026-09-25 (data/feedbugged.json, openai/evals' bugged-tools pattern): with one input corrupted on each of six snapshots (price, 24h change, VIX, SUE, fear-and-greed, spread), no decision moved and none said a feed was wrong - detection F1 0.0, 0 of 6 caught. Recorded as a LOSS until the feed-sanity gate (S17) is built and measured on the same cases. A wrong line of reasoning injected into the prompt moved one of six decisions to the wrong direction"
+        "corrupted feeds, 2026-09-25 (data/feedbugged.json, openai/evals' bugged-tools pattern): with one input corrupted on each of six snapshots (price, 24h change, VIX, SUE, fear-and-greed, spread), no decision moved and none said a feed was wrong - detection F1 0.0, 0 of 6 caught, and a wrong line of reasoning injected into the prompt moved one of six decisions to the wrong direction. That first measurement stays recorded. The feed-sanity gate (desk/feed_sanity.py, S17) was then built and measured on the same cases (data/feed_sanity_gate.json): 12 of 12 planted faults caught before the model reads the frame, 0 false flags on 255 clean items across 12 snapshots, deterministic, no model call"
       ],
       "note": "",
       "measured_outcomes": []
@@ -4216,12 +4216,12 @@
     {
       "capability": "Typed factor grammar with no execution surface",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "the groupwise audit flags data/grammar_comparison.json :: rank on real market series: ARGUS vs qlib [single_group:symbol=NVDAUSDT]"
+      "detail": "the groupwise audit predates the current data/grammar_comparison.json; re-run python -m argus.eval.groupwise_audit"
     },
     {
       "capability": "Typed factor grammar with no execution surface",
       "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "the groupwise audit flags data/grammar_comparison.json :: rank on real market series: ARGUS vs qlib [single_group:symbol=NVDAUSDT]"
+      "detail": "the groupwise audit predates the current data/grammar_comparison.json; re-run python -m argus.eval.groupwise_audit"
     },
     {
       "capability": "Factor-discovery safety: no execution surface and trial-corrected selection, vs. RD-Agent",

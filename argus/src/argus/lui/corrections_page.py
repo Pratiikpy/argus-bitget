@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -277,27 +278,105 @@ def collect(data_dir: Path) -> list[Correction]:
         artefact="data/theme_audit.json", kind="bug",
     ))
 
-    # 10. Wins claimed against the wrong rival, withdrawn. Read from the register's own blockers,
-    #     so a re-grade appears here the moment the register records it.
+    # 10. Every comparison the register records losing, one entry per capability, and every
+    #     OWNED grade it withdrew, grouped by the review that withdrew it. Read from the register's
+    #     own text at request time, so a loss or a re-grade appears here the moment it is recorded.
+    #     Until 2026-09-26 this page carried one loss (regime detection) while the register held
+    #     fourteen and the README promised the TWAP and Ballast losses were here.
     if standing is not None:
-        regraded = [c for c in standing.get("capabilities", [])
-                    if any(str(b).startswith("RE-GRADED") for b in c.get("blockers", []))]
-        if regraded:
-            names = "; ".join(str(c.get("name")) for c in regraded)
-            out.append(Correction(
-                headline=f"{len(regraded)} OWNED claims withdrawn: they beat a rival that does not "
-                         f"lead the sub-theme",
-                detail=(
-                    f"A review of the right rivals for each Track 2 and Track 3 sub-theme "
-                    f"(2026-09-24) found these wins were measured against a "
-                    f"weak, archived or adjacent system, or proved only that the rival could not "
-                    f"express the quantity: {names}. Each is IMPLEMENTED until it is run against "
-                    f"the systems that lead its sub-theme, on the same input. The same review "
-                    f"found the event agent had never asked for the falsifiers its chain grading "
-                    f"needs, so no recorded causal link had ever been graded."
-                ),
-                artefact="data/standing.json", kind="withdrawn",
-            ))
+        out.extend(register_losses(standing))
+        out.extend(register_regrades(standing))
+
+    # 11. Sentiment classification, lost to every published baseline.
+    tweeteval = _read(data_dir, "sentiment_tweeteval.json")
+    verdict = None if tweeteval is None else (tweeteval.get("sentiment") or {}).get("verdict")
+    if tweeteval is None or not verdict:
+        out.append(missing("sentiment_tweeteval.json", "The sentiment benchmark"))
+    else:
+        scorers = tweeteval["sentiment"].get("scorers", {})
+        ours = (scorers.get("argus_crowd_read") or {}).get("macro_recall")
+        out.append(Correction(
+            headline=(
+                "Sentiment classification lost to every published baseline on TweetEval"
+                + (f" ({float(ours):.3f} macro-recall)" if ours is not None else "")
+            ),
+            detail=str(verdict),
+            artefact="data/sentiment_tweeteval.json", kind="loss",
+        ))
+    return out
+
+
+_LOSS = re.compile(r"\bLOSS\b|\bLOST\b|\bLOSES\b|\bfirst run was a (?:clean |clear )?loss\b")
+"""The register's own words for a comparison it lost: the loss sentences are written in capitals
+("a clean LOSS", "LOST on the tail") so they cannot be confused with a trading loss or an avoided
+loss, which the same text discusses in lower case."""
+_SENTENCE = re.compile(r"(?<=[.;])\s+(?=[A-Z(])")
+
+_REGRADE_REASONS = {
+    "2026-09-24": "the rival they beat does not lead the sub-theme",
+    "2026-09-25": "a per-group check, by symbol and by half of the sample, could not confirm the "
+                  "proof",
+    "2026-09-26": "a general-purpose tool configured to the same job matched them",
+}
+
+
+def register_losses(standing: dict[str, Any]) -> list[Correction]:
+    """One entry per capability whose register text records a comparison it lost."""
+    out: list[Correction] = []
+    for cap in standing.get("capabilities", []):
+        texts = [str(b) for b in cap.get("blockers", [])]
+        texts += [str(cap.get("note") or "")]
+        texts += [str(p.get("how", "")) for p in cap.get("proofs", [])]
+        found: list[str] = []
+        for text in texts:
+            if text.startswith("RE-GRADED"):
+                continue  # a withdrawn grade, listed by register_regrades
+            sentences = _SENTENCE.split(text)
+            for index, sentence in enumerate(sentences):
+                if not _LOSS.search(sentence):
+                    continue
+                # "LOST first, then TIED." says nothing on its own; the sentence after it is the
+                # measurement, so the two travel together.
+                chunk = sentence.strip()
+                if len(chunk) < 120 and index + 1 < len(sentences):
+                    chunk = f"{chunk} {sentences[index + 1].strip()}"
+                if len(chunk) > 420:
+                    chunk = chunk[:417].rstrip() + "..."
+                if chunk not in found:
+                    found.append(chunk)
+        if not found:
+            continue
+        state = str(cap.get("state", ""))
+        name = str(cap.get("name", ""))
+        headline = {
+            "tied": f"Lost, then rebuilt to a tie: {name}",
+            "owned": f"Lost in part: {name}",
+        }.get(state, f"Lost to a rival, still open: {name}")
+        out.append(Correction(headline=headline, detail=" ".join(found[:3]),
+                              artefact="data/standing.json", kind="loss"))
+    return out
+
+
+def register_regrades(standing: dict[str, Any]) -> list[Correction]:
+    """The OWNED grades the register withdrew, one entry per review that withdrew them."""
+    by_date: dict[str, list[str]] = {}
+    for cap in standing.get("capabilities", []):
+        for blocker in cap.get("blockers", []):
+            match = re.match(r"RE-GRADED (\d{4}-\d{2}-\d{2}) from OWNED", str(blocker))
+            if match:
+                by_date.setdefault(match.group(1), []).append(str(cap.get("name")))
+                break
+    out: list[Correction] = []
+    for date in sorted(by_date):
+        names = by_date[date]
+        reason = _REGRADE_REASONS.get(date, "each row's first blocker says why")
+        out.append(Correction(
+            headline=f"{len(names)} OWNED grade{'s' if len(names) != 1 else ''} withdrawn on "
+                     f"{date}: {reason}",
+            detail=(f"{'; '.join(names)}. Each stays in the register below OWNED with the reason "
+                    f"and the route back as its first blocker, on /proof."),
+            artefact="data/standing.json", kind="withdrawn",
+        ))
     return out
 
 
@@ -348,4 +427,4 @@ artefact behind them.</p>
 </div>{design.footer()}</body></html>"""
 
 
-__all__ = ["Correction", "collect", "render"]
+__all__ = ["Correction", "collect", "register_losses", "register_regrades", "render"]

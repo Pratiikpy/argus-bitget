@@ -937,9 +937,10 @@ class TestTheEvaluatorSpineFindingsAreApplied:
         assert any(ref in " ".join((*c.blockers, c.note, *(p.artefact for p in c.proofs)))
                    for c in REGISTER), ref
 
-    def test_the_corrupted_feed_result_is_recorded_as_a_loss(self) -> None:
+    def test_the_corrupted_feed_result_stays_recorded_beside_the_gate_that_fixed_it(self) -> None:
         text = " ".join(self._row("Perception layer").blockers)
-        assert "detection F1 0.0" in text and "LOSS" in text
+        assert "detection F1 0.0" in text and "first measurement stays recorded" in text
+        assert "12 of 12 planted faults caught" in text and "data/feed_sanity_gate.json" in text
 
     def test_the_qwen_proposer_is_recorded_as_beating_neither_baseline(self) -> None:
         text = " ".join(self._row("Self-evolving review rules").blockers)
