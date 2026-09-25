@@ -708,6 +708,9 @@ def _answer(
             return _research_payload(text, prior, with_book(request, book, text), ledger,
                                      started, "research-follow-up",
                                      {**audit, "detail": "the previous turn's name carried"})
+    computed = _xbrl_answer(text, clock, conversation, started, prior, audit)
+    if computed is not None:
+        return computed
     filed = _filing_answer(text, visitor, clock, conversation, started, prior, audit)
     if filed is not None:
         return filed
@@ -1220,6 +1223,65 @@ def _filing_model() -> Any:
         except Exception:
             _DOC_MODEL = None
     return _DOC_MODEL
+
+
+_FISCAL_YEAR = re.compile(r"\bfy\s?'?\d{2,4}\b|\bfiscal\s+(?:year\s+)?(?:19|20)\d\d\b", re.I)
+"""The XBRL route runs only when a fiscal year is named: its figures are a 10-K's, by year."""
+
+_XBRL: Any = None
+
+
+def _xbrl_answer(text: str, clock: datetime, conversation: Any, started: float,
+                 prior: list[str], audit: dict[str, Any]) -> dict[str, Any] | None:
+    """A numeric question about a company's own annual figures, computed from what it filed in
+    XBRL (`research/filing_qa.py`): the figure, the formula and every filed line it used. None —
+    and the question takes the usual route — whenever the engine abstains, for any reason.
+
+    On FinanceBench's 50 numeric questions the engine answers all 50 within rounding of the gold
+    figure, where the best of FinanceBench's own sixteen graded model runs answers 46
+    (`eval/financebench_xbrl.py`; not a held-out score, which the artefact says)."""
+    import time
+
+    if not _FISCAL_YEAR.search(text):
+        return None
+    global _XBRL
+    from argus.lui.answer import Source
+    from argus.research.filing_qa import FilingQA
+
+    if _XBRL is None:
+        _XBRL = FilingQA()
+    try:
+        found = _XBRL.answer(text)
+    except Exception:
+        return None
+    if found.status != "answered":
+        return None
+    metric = found.metric.replace("_", " ")
+    years = "-".join(f"FY{y}" for y in found.fiscal_years)
+    lines = [f"Actionable: {found.company} — {metric}, {years}: {found.text}, computed from the "
+             f"company's own filed XBRL; no model wrote the figure.",
+             f"Formula: {found.formula}"]
+    anchor = next((s.removeprefix("anchor: ") for s in found.steps if s.startswith("anchor: ")),
+                  "")
+    if anchor:
+        lines.append(f"Anchor filing: {anchor}")
+    seen: set[str] = set()
+    for filed_line in found.lines:
+        cite = filed_line.cite()
+        if cite not in seen and len(seen) < 6:
+            seen.add(cite)
+            lines.append(f"Filed: {cite}")
+    lines.append("Data: SEC XBRL companyfacts and the filing's own statement pages, read now. A "
+                 "quarter, a segment, a non-GAAP figure or a cause is declined by this engine, "
+                 "not estimated.")
+    q = classify(text, now=clock, conversation=conversation)
+    sources = [Source(kind="filing", ref=f"SEC EDGAR {found.anchor_accn}",
+                      detail=found.formula[:120])]
+    payload = Answer(question=q, lines=lines, sources=sources).as_dict()
+    payload.update(elapsed_ms=(time.perf_counter() - started) * 1000,
+                   budget_ms=BUDGET_MS[q.speed], routing=audit, classified_by="research-xbrl",
+                   matched="filing_qa", refused=False, turns=[*prior, text][-12:])
+    return payload
 
 
 def _filing_answer(text: str, visitor: str, clock: datetime, conversation: Any, started: float,

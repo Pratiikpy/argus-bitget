@@ -1,0 +1,1728 @@
+{
+  "generated_at": "2026-09-25T22:57:37.909305+00:00",
+  "benchmark": {
+    "repository": "https://github.com/patronus-ai/financebench",
+    "commit": "cc39aeb4afdf33909ee1412188bf89035950c2eb",
+    "questions": 150,
+    "by_class": {
+      "metrics-generated": 50,
+      "other": 100
+    }
+  },
+  "grading_rule": {
+    "relative_tolerance": 0.01,
+    "absolute_tolerance_below": [
+      0.011,
+      1.1
+    ],
+    "hand_graded_ids": [
+      "financebench_id_00005",
+      "financebench_id_00070",
+      "financebench_id_00080",
+      "financebench_id_00302",
+      "financebench_id_00585",
+      "financebench_id_01254",
+      "financebench_id_01346",
+      "financebench_id_01351"
+    ]
+  },
+  "argus": {
+    "metrics-generated": {
+      "correct": 50,
+      "wrong": 0,
+      "disputed": 0,
+      "ungraded": 0,
+      "abstained": 0
+    },
+    "other": {
+      "correct": 5,
+      "wrong": 0,
+      "disputed": 3,
+      "ungraded": 0,
+      "abstained": 92
+    },
+    "seconds": 1.5,
+    "offline_replay": true
+  },
+  "rivals": {
+    "claude-2_inContext": {
+      "metrics-generated": {
+        "correct": 15,
+        "incorrect": 34,
+        "refusal": 1
+      },
+      "other": {
+        "correct": 41,
+        "incorrect": 57,
+        "refusal": 2
+      },
+      "all": {
+        "correct": 56,
+        "incorrect": 91,
+        "refusal": 3
+      }
+    },
+    "claude-2_inContext_reverse": {
+      "metrics-generated": {
+        "correct": 38,
+        "incorrect": 10,
+        "refusal": 2
+      },
+      "other": {
+        "correct": 76,
+        "incorrect": 22,
+        "refusal": 2
+      },
+      "all": {
+        "correct": 114,
+        "incorrect": 32,
+        "refusal": 4
+      }
+    },
+    "gpt-4-1106-preview_closedBook": {
+      "metrics-generated": {
+        "correct": 0,
+        "incorrect": 0,
+        "refusal": 50
+      },
+      "other": {
+        "correct": 14,
+        "incorrect": 5,
+        "refusal": 81
+      },
+      "all": {
+        "correct": 14,
+        "incorrect": 5,
+        "refusal": 131
+      }
+    },
+    "gpt-4-1106-preview_inContext": {
+      "metrics-generated": {
+        "correct": 6,
+        "incorrect": 20,
+        "refusal": 24
+      },
+      "other": {
+        "correct": 31,
+        "incorrect": 34,
+        "refusal": 35
+      },
+      "all": {
+        "correct": 37,
+        "incorrect": 54,
+        "refusal": 59
+      }
+    },
+    "gpt-4-1106-preview_inContext_reverse": {
+      "metrics-generated": {
+        "correct": 46,
+        "incorrect": 3,
+        "refusal": 1
+      },
+      "other": {
+        "correct": 72,
+        "incorrect": 23,
+        "refusal": 5
+      },
+      "all": {
+        "correct": 118,
+        "incorrect": 26,
+        "refusal": 6
+      }
+    },
+    "gpt-4-1106-preview_oracle": {
+      "metrics-generated": {
+        "correct": 45,
+        "incorrect": 5,
+        "refusal": 0
+      },
+      "other": {
+        "correct": 83,
+        "incorrect": 17,
+        "refusal": 0
+      },
+      "all": {
+        "correct": 128,
+        "incorrect": 22,
+        "refusal": 0
+      }
+    },
+    "gpt-4-1106-preview_oracle_reverse": {
+      "metrics-generated": {
+        "correct": 46,
+        "incorrect": 4,
+        "refusal": 0
+      },
+      "other": {
+        "correct": 88,
+        "incorrect": 10,
+        "refusal": 2
+      },
+      "all": {
+        "correct": 134,
+        "incorrect": 14,
+        "refusal": 2
+      }
+    },
+    "gpt-4-1106-preview_sharedStore": {
+      "metrics-generated": {
+        "correct": 6,
+        "incorrect": 5,
+        "refusal": 39
+      },
+      "other": {
+        "correct": 23,
+        "incorrect": 15,
+        "refusal": 62
+      },
+      "all": {
+        "correct": 29,
+        "incorrect": 20,
+        "refusal": 101
+      }
+    },
+    "gpt-4-1106-preview_singleStore": {
+      "metrics-generated": {
+        "correct": 23,
+        "incorrect": 1,
+        "refusal": 26
+      },
+      "other": {
+        "correct": 52,
+        "incorrect": 16,
+        "refusal": 32
+      },
+      "all": {
+        "correct": 75,
+        "incorrect": 17,
+        "refusal": 58
+      }
+    },
+    "gpt-4_closedBook": {
+      "metrics-generated": {
+        "correct": 0,
+        "incorrect": 0,
+        "refusal": 50
+      },
+      "other": {
+        "correct": 7,
+        "incorrect": 1,
+        "refusal": 92
+      },
+      "all": {
+        "correct": 7,
+        "incorrect": 1,
+        "refusal": 142
+      }
+    },
+    "gpt-4_oracle": {
+      "metrics-generated": {
+        "correct": 46,
+        "incorrect": 3,
+        "refusal": 1
+      },
+      "other": {
+        "correct": 80,
+        "incorrect": 12,
+        "refusal": 8
+      },
+      "all": {
+        "correct": 126,
+        "incorrect": 15,
+        "refusal": 9
+      }
+    },
+    "gpt-4_oracle_reverse": {
+      "metrics-generated": {
+        "correct": 44,
+        "incorrect": 5,
+        "refusal": 1
+      },
+      "other": {
+        "correct": 74,
+        "incorrect": 12,
+        "refusal": 14
+      },
+      "all": {
+        "correct": 118,
+        "incorrect": 17,
+        "refusal": 15
+      }
+    },
+    "gpt-4_sharedStore": {
+      "metrics-generated": {
+        "correct": 5,
+        "incorrect": 3,
+        "refusal": 42
+      },
+      "other": {
+        "correct": 20,
+        "incorrect": 10,
+        "refusal": 70
+      },
+      "all": {
+        "correct": 25,
+        "incorrect": 13,
+        "refusal": 112
+      }
+    },
+    "gpt-4_singleStore": {
+      "metrics-generated": {
+        "correct": 22,
+        "incorrect": 3,
+        "refusal": 25
+      },
+      "other": {
+        "correct": 41,
+        "incorrect": 13,
+        "refusal": 46
+      },
+      "all": {
+        "correct": 63,
+        "incorrect": 16,
+        "refusal": 71
+      }
+    },
+    "llama2_sharedStore": {
+      "metrics-generated": {
+        "correct": 3,
+        "incorrect": 45,
+        "refusal": 2
+      },
+      "other": {
+        "correct": 26,
+        "incorrect": 59,
+        "refusal": 15
+      },
+      "all": {
+        "correct": 29,
+        "incorrect": 104,
+        "refusal": 17
+      }
+    },
+    "llama2_singleStore": {
+      "metrics-generated": {
+        "correct": 13,
+        "incorrect": 37,
+        "refusal": 0
+      },
+      "other": {
+        "correct": 49,
+        "incorrect": 44,
+        "refusal": 7
+      },
+      "all": {
+        "correct": 62,
+        "incorrect": 81,
+        "refusal": 7
+      }
+    }
+  },
+  "headline": {
+    "argus_correct_of_50": 50,
+    "best_rival": "gpt-4-1106-preview_inContext_reverse",
+    "best_rival_correct_of_50": 46,
+    "rivals_with_more_correct": []
+  },
+  "ablation_coverage_guard_off": {
+    "other": {
+      "correct": 5,
+      "wrong": 0,
+      "disputed": 3,
+      "ungraded": 6,
+      "abstained": 86
+    },
+    "note": "the same run with every arithmetic phrase no longer required to be used by the formula: answers it gives that the guarded run refuses",
+    "extra_answers": [
+      {
+        "id": "financebench_id_00540",
+        "answer": "12.14",
+        "grade": "wrong",
+        "why": "inventory turnover 12.14 against the gold 9.5"
+      },
+      {
+        "id": "financebench_id_00799",
+        "answer": "0.57",
+        "grade": "wrong",
+        "why": "one year's quick ratio, 0.57, for a two-year comparison (gold 0.67 to 0.69)"
+      },
+      {
+        "id": "financebench_id_00684",
+        "answer": "18.5%",
+        "grade": "wrong",
+        "why": "one year's gross margin, 18.5%, for 'is it improving' (gold: no, down 0.8 points)"
+      },
+      {
+        "id": "financebench_id_00222",
+        "answer": "1.57",
+        "grade": "correct",
+        "why": "quick ratio 1.57, the gold figure"
+      },
+      {
+        "id": "financebench_id_00517",
+        "answer": "$66,608.00 (USD millions)",
+        "grade": "wrong",
+        "why": "total revenue for a question about categories over 20% of it"
+      },
+      {
+        "id": "financebench_id_00678",
+        "answer": "5.3%",
+        "grade": "wrong",
+        "why": "one year's gross margin, 5.3%, for 'is it improving' (gold: yes)"
+      }
+    ]
+  },
+  "not_held_out": "both classes were seen: the 50 metrics-generated questions while the engine was built, the other 100 on 2026-09-26 when four fixes followed ten wrong answers in thirteen",
+  "answers": [
+    {
+      "id": "financebench_id_03029",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$1,577.00 (USD millions)",
+      "reason": "",
+      "formula": "capex"
+    },
+    {
+      "id": "financebench_id_04672",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$8.74 (USD billions)",
+      "reason": "",
+      "formula": "ppe_net"
+    },
+    {
+      "id": "financebench_id_00499",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01226",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: the question asks for a cause or an event, which a filing states in prose, not as a number",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01865",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: segment data lives in dimensional XBRL this module does not read",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00807",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: a quarterly figure is filed in a 10-Q; this engine reads the annual 10-K",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00941",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: a quarterly figure is filed in a 10-Q; this engine reads the annual 10-K",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01858",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question names no fiscal year",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_02987",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "24.26",
+      "reason": "",
+      "formula": "(revenue / avg(ppe_net[t-1], ppe_net))"
+    },
+    {
+      "id": "financebench_id_07966",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "1.9%",
+      "reason": "",
+      "formula": "mean over FY2017..FY2019 of (capex / revenue)"
+    },
+    {
+      "id": "financebench_id_04735",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "0.66",
+      "reason": "",
+      "formula": "(cfo / current_liabilities)"
+    },
+    {
+      "id": "financebench_id_07507",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "65.4%",
+      "reason": "",
+      "formula": "operating_income[FY2016] / operating_income[FY2015] - 1"
+    },
+    {
+      "id": "financebench_id_03856",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "0.83",
+      "reason": "",
+      "formula": "(cfo / current_liabilities)"
+    },
+    {
+      "id": "financebench_id_00438",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00591",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01319",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00540",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question says 'ratio' (... calculate inventory turnover ratio for the fy2022; if convention...), which the parsed formula (cogs / avg(inventory, inventory[t-1])) does not use",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_10420",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "-0.02",
+      "reason": "",
+      "formula": "(net_income / avg(total_assets[t-1], total_assets))"
+    },
+    {
+      "id": "financebench_id_06655",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "93.86 days",
+      "reason": "",
+      "formula": "((365 * avg(accounts_payable[t-1], accounts_payable)) / (cogs + (inventory - inventory[t-1])))"
+    },
+    {
+      "id": "financebench_id_08135",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "30.8%",
+      "reason": "",
+      "formula": "revenue[FY2017] / revenue[FY2016] - 1"
+    },
+    {
+      "id": "financebench_id_08286",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$11,588.00 (USD millions)",
+      "reason": "",
+      "formula": "net_income"
+    },
+    {
+      "id": "financebench_id_03882",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$1,615.90 (USD millions)",
+      "reason": "",
+      "formula": "accounts_receivable"
+    },
+    {
+      "id": "financebench_id_01935",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00799",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question says 'ratio' (...2023 and fy2022? if the quick ratio is not something that a finan...), which the parsed formula ((cash + short_term_investments? + accounts_receivable) / current_liabilities) does not use",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01079",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01148",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question names no fiscal year",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00684",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question says 'margin' (...rofile as of fy2023? if gross margin is not a useful metric for a ...), which the parsed formula ((revenue - cogs) / revenue) does not use",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01936",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: a quarterly figure is filed in a 10-Q; this engine reads the annual 10-K",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01928",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: an adjusted (non-GAAP) figure is the company's own definition, not a filed line",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01930",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_03069",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "4.2%",
+      "reason": "",
+      "formula": "(dna / revenue)"
+    },
+    {
+      "id": "financebench_id_00222",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question says 'ratio' (... ratio for fy22? if the quick ratio is not relevant to measure li...), which the parsed formula ((cash + short_term_investments? + accounts_receivable) / current_liabilities) does not use",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00995",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01198",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: the question asks for a cause or an event, which a filing states in prose, not as a number",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00917",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: the question asks for a cause or an event, which a filing states in prose, not as a number",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01279",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00563",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: segment data lives in dimensional XBRL this module does not read",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00757",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00476",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01028",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00723",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00720",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: the question asks for a cause or an event, which a filing states in prose, not as a number",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01351",
+      "class": "domain-relevant",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "-3.0 percentage points: 24.6% in FY2021, 21.6% in FY2022",
+      "reason": "",
+      "formula": "(income_tax / pretax_income)[FY2022] - (income_tax / pretax_income)[FY2021]"
+    },
+    {
+      "id": "financebench_id_01964",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01981",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_05718",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$0.39 (USD billions)",
+      "reason": "",
+      "formula": "dividends_paid"
+    },
+    {
+      "id": "financebench_id_04254",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$1,832.00 (USD millions)",
+      "reason": "",
+      "formula": "(operating_income + dna)"
+    },
+    {
+      "id": "financebench_id_00070",
+      "class": "domain-relevant",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$-1,561.00 (USD millions)",
+      "reason": "",
+      "formula": "(current_assets - current_liabilities)"
+    },
+    {
+      "id": "financebench_id_02608",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "2.8%",
+      "reason": "",
+      "formula": "mean over FY2015..FY2017 of (net_income / revenue)"
+    },
+    {
+      "id": "financebench_id_04417",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$5,409.00 (USD millions)",
+      "reason": "",
+      "formula": "inventory"
+    },
+    {
+      "id": "financebench_id_00685",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question names no fiscal year",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01077",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01275",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00288",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: a quarterly figure is filed in a 10-Q; this engine reads the annual 10-K",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00460",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: an operating statistic, not a financial statement line",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01902",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: a quarterly figure is filed in a 10-Q; this engine reads the annual 10-K",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_04660",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "1.73",
+      "reason": "",
+      "formula": "(current_assets / current_liabilities)"
+    },
+    {
+      "id": "financebench_id_03838",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "101.5%",
+      "reason": "",
+      "formula": "revenue[FY2020] / revenue[FY2019] - 1"
+    },
+    {
+      "id": "financebench_id_07661",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$381.60 (USD millions)",
+      "reason": "",
+      "formula": "cfo"
+    },
+    {
+      "id": "financebench_id_10285",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$12,645.00 (USD millions)",
+      "reason": "",
+      "formula": "ppe_net"
+    },
+    {
+      "id": "financebench_id_00517",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question says '% of' (...es that represent more than 20% of boeing's revenue for fy2022?...), which the parsed formula revenue does not use",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01091",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00678",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question says 'margin' (...rofile as of fy2022? if gross margin is not a useful metric for a ...), which the parsed formula ((revenue - cogs) / revenue) does not use",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01290",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: an operating statistic, not a financial statement line",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00464",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question names no fiscal year",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00494",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00585",
+      "class": "novel-generated",
+      "status": "answered",
+      "grade": "disputed",
+      "answer": "-15.4 percentage points: 14.8% in FY2021, -0.6% in FY2022",
+      "reason": "",
+      "formula": "(income_tax / pretax_income)[FY2022] - (income_tax / pretax_income)[FY2021]"
+    },
+    {
+      "id": "financebench_id_03473",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "0.01",
+      "reason": "",
+      "formula": "(net_income / avg(total_assets[t-1], total_assets))"
+    },
+    {
+      "id": "financebench_id_09724",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "39.7%",
+      "reason": "",
+      "formula": "(cogs / revenue)"
+    },
+    {
+      "id": "financebench_id_06272",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "0.80",
+      "reason": "",
+      "formula": "(dividends_paid / net_income)"
+    },
+    {
+      "id": "financebench_id_10130",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "63.86 days",
+      "reason": "",
+      "formula": "((365 * avg(accounts_payable[t-1], accounts_payable)) / (cogs + (inventory - inventory[t-1])))"
+    },
+    {
+      "id": "financebench_id_02981",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "10.3%",
+      "reason": "",
+      "formula": "mean over FY2019..FY2021 of (operating_income / revenue)"
+    },
+    {
+      "id": "financebench_id_01346",
+      "class": "domain-relevant",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "+2.6 percentage points: 20.2% in FY2021, 22.9% in FY2022",
+      "reason": "",
+      "formula": "(income_tax / pretax_income)[FY2022] - (income_tax / pretax_income)[FY2021]"
+    },
+    {
+      "id": "financebench_id_00005",
+      "class": "domain-relevant",
+      "status": "answered",
+      "grade": "disputed",
+      "answer": "$2,278.00 (USD millions)",
+      "reason": "",
+      "formula": "(current_assets - current_liabilities)"
+    },
+    {
+      "id": "financebench_id_04209",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$59,268.00 (USD millions)",
+      "reason": "",
+      "formula": "total_assets"
+    },
+    {
+      "id": "financebench_id_05915",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "17.98",
+      "reason": "",
+      "formula": "(revenue / avg(ppe_net[t-1], ppe_net))"
+    },
+    {
+      "id": "financebench_id_00790",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01107",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01244",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: a quarterly figure is filed in a 10-Q; this engine reads the annual 10-K",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00839",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question names no fiscal year",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00822",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: the question asks for a cause or an event, which a filing states in prose, not as a number",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_04103",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "-3.70 days",
+      "reason": "",
+      "formula": "((((365 * avg(inventory[t-1], inventory)) / cogs) + ((365 * avg(accounts_receivable[t-1], accounts_receivable)) / revenue)) - ((365 * avg(accounts_payable[t-1], accounts_payable)) / (cogs + (inventory - inventory[t-1]))))"
+    },
+    {
+      "id": "financebench_id_03471",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "0.68",
+      "reason": "",
+      "formula": "(current_assets / current_liabilities)"
+    },
+    {
+      "id": "financebench_id_04854",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$3,215.40 (USD millions)",
+      "reason": "",
+      "formula": "(cfo - capex)"
+    },
+    {
+      "id": "financebench_id_10136",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "0.54",
+      "reason": "",
+      "formula": "(1 - (dividends_paid / net_income))"
+    },
+    {
+      "id": "financebench_id_00956",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00669",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: the question asks for a cause or an event, which a filing states in prose, not as a number",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00711",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question says 'ratio' (... calculate inventory turnover ratio for fy2022; if conventional i...), which the parsed formula (cogs / avg(inventory, inventory[t-1])) does not use",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00651",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: an adjusted (non-GAAP) figure is the company's own definition, not a filed line",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01484",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01488",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: segment data lives in dimensional XBRL this module does not read",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01490",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: segment data lives in dimensional XBRL this module does not read",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01491",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: segment data lives in dimensional XBRL this module does not read",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01487",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: a quarterly figure is filed in a 10-Q; this engine reads the annual 10-K",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00299",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: segment data lives in dimensional XBRL this module does not read",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_02119",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: a quarterly figure is filed in a 10-Q; this engine reads the annual 10-K",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00206",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question names no fiscal year",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00394",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: segment data lives in dimensional XBRL this module does not read",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_02049",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: a quarterly figure is filed in a 10-Q; this engine reads the annual 10-K",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_10499",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "6.25",
+      "reason": "",
+      "formula": "(cogs / avg(inventory[t-1], inventory))"
+    },
+    {
+      "id": "financebench_id_04412",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "1.33",
+      "reason": "",
+      "formula": "(revenue / avg(total_assets[t-1], total_assets))"
+    },
+    {
+      "id": "financebench_id_03031",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$5,818.00 (USD millions)",
+      "reason": "",
+      "formula": "(current_assets - current_liabilities)"
+    },
+    {
+      "id": "financebench_id_03718",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "0.4%",
+      "reason": "",
+      "formula": "(revenue[FY2022] / revenue[FY2020])^(1/2) - 1"
+    },
+    {
+      "id": "financebench_id_04171",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$302.58 (USD millions)",
+      "reason": "",
+      "formula": "accounts_payable"
+    },
+    {
+      "id": "financebench_id_03849",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "7.9%",
+      "reason": "",
+      "formula": "mean over FY2018..FY2020 of (capex / revenue)"
+    },
+    {
+      "id": "financebench_id_01254",
+      "class": "domain-relevant",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$4.05 (USD millions)",
+      "reason": "",
+      "formula": "dividends_paid"
+    },
+    {
+      "id": "financebench_id_00382",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01911",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: an adjusted (non-GAAP) figure is the company's own definition, not a filed line",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01912",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00407",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_04700",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$32,780.00 (USD millions)",
+      "reason": "",
+      "formula": "cogs"
+    },
+    {
+      "id": "financebench_id_00552",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_04458",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "5.4%",
+      "reason": "",
+      "formula": "((operating_income + dna) / revenue)"
+    },
+    {
+      "id": "financebench_id_03282",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$5,466.31 (USD millions)",
+      "reason": "",
+      "formula": "current_liabilities"
+    },
+    {
+      "id": "financebench_id_04302",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "55.1%",
+      "reason": "",
+      "formula": "mean over FY2016..FY2018 of (cogs / revenue)"
+    },
+    {
+      "id": "financebench_id_03531",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$16,525.00 (USD millions)",
+      "reason": "",
+      "formula": "current_assets"
+    },
+    {
+      "id": "financebench_id_04080",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "3.46",
+      "reason": "",
+      "formula": "(cogs / avg(inventory[t-1], inventory))"
+    },
+    {
+      "id": "financebench_id_01163",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00080",
+      "class": "domain-relevant",
+      "status": "answered",
+      "grade": "disputed",
+      "answer": "$12,416.00 (USD millions)",
+      "reason": "",
+      "formula": "(current_assets - current_liabilities)"
+    },
+    {
+      "id": "financebench_id_04980",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$4.62 (USD billions)",
+      "reason": "",
+      "formula": "capex"
+    },
+    {
+      "id": "financebench_id_01009",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00735",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01328",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_03620",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "$9,068.00 (USD millions)",
+      "reason": "",
+      "formula": "((operating_income + dna) - capex)"
+    },
+    {
+      "id": "financebench_id_04481",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "16.5%",
+      "reason": "",
+      "formula": "((operating_income + dna) / revenue)"
+    },
+    {
+      "id": "financebench_id_01482",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00705",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00882",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01474",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: guidance is prose, not a filed line item",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_01476",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: guidance is prose, not a filed line item",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00302",
+      "class": "novel-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "+$1,137.00 (USD millions): $13,745.00 (USD millions) in FY2020, $14,882.00 (USD millions) in FY2021",
+      "reason": "",
+      "formula": "ppe_net[FY2021] - ppe_net[FY2020]"
+    },
+    {
+      "id": "financebench_id_00702",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: the question asks for a cause or an event, which a filing states in prose, not as a number",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_02416",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question names no fiscal year",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00283",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question names no fiscal year",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00724",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question names no fiscal year",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_02419",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: segment data lives in dimensional XBRL this module does not read",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00746",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00521",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00601",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: the question asks for a cause or an event, which a filing states in prose, not as a number",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00603",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: the question asks for a cause or an event, which a filing states in prose, not as a number",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00605",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "out of scope: a quarterly figure is filed in a 10-Q; this engine reads the annual 10-K",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00606",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the quantity taken as a share of revenue (...did ulta beauty's wages expense) is not a line this engine reads",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00859",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_02024",
+      "class": "novel-generated",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00216",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "the question says 'ratio' (...tio for fy 2022? if the quick ratio is not relevant to measure li...), which the parsed formula ((cash + short_term_investments? + accounts_receivable) / current_liabilities) does not use",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00215",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_00566",
+      "class": "domain-relevant",
+      "status": "abstained",
+      "grade": "abstained",
+      "answer": "",
+      "reason": "no metric in the library matches the question",
+      "formula": ""
+    },
+    {
+      "id": "financebench_id_06247",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "42.69 days",
+      "reason": "",
+      "formula": "((365 * avg(accounts_payable[t-1], accounts_payable)) / (cogs + (inventory - inventory[t-1])))"
+    },
+    {
+      "id": "financebench_id_04784",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "+0.2 percentage points: 4.1% in FY2018, 4.3% in FY2019",
+      "reason": "",
+      "formula": "(operating_income / revenue)[FY2019] - (operating_income / revenue)[FY2018]"
+    },
+    {
+      "id": "financebench_id_06741",
+      "class": "metrics-generated",
+      "status": "answered",
+      "grade": "correct",
+      "answer": "6.2%",
+      "reason": "",
+      "formula": "mean over FY2018..FY2020 of ((operating_income + dna) / revenue)"
+    }
+  ]
+}

@@ -43,7 +43,8 @@ def _register_line(counts: dict[str, int]) -> str:
     total = sum(counts.values())
     order = ("owned", "tied", "implemented", "lost")
     parts = [f"{counts.get(state, 0)} {state.upper()}" for state in order]
-    return (f"{total} capabilities, each run against a named rival on the same input: "
+    return (f"{total} capabilities, each graded against a named rival and OWNED only where that "
+            f"rival was run on the same input and beaten under all thirteen conditions: "
             f"{', '.join(parts)} — read from the register now.")
 
 
@@ -90,11 +91,18 @@ def collect(data_dir: Path, base: str = "") -> list[Item]:
     return items
 
 
+def _prose(text: str) -> str:
+    """Escaped text with `inline code` set as code, so a command reads as one."""
+    parts = escape(text).split("`")
+    return "".join(f"<code>{part}</code>" if index % 2 else part
+                   for index, part in enumerate(parts))
+
+
 def _row(item: Item) -> str:
     shown = item.href.removeprefix("https://")
     return (f'<li class="it"><div class="lab">{escape(item.label)}</div><div>'
             f'<a href="{escape(item.href, quote=True)}">{escape(shown)}</a>'
-            f'<p>{escape(item.shows)}</p></div></li>')
+            f'<p>{_prose(item.shows)}</p></div></li>')
 
 
 def render(items: list[Item]) -> str:
@@ -119,6 +127,7 @@ def render(items: list[Item]) -> str:
   .lab {{ font:600 17px/1.3 var(--sans) }}
   .it a {{ font:500 14px/1.4 var(--mono); overflow-wrap:anywhere }}
   .it p {{ margin:6px 0 0; color:var(--dim); max-width:680px }}
+  .it p code {{ font:13px/1.4 var(--mono); color:var(--ink) }}
   @media (max-width: 720px) {{ .it {{ grid-template-columns:1fr; gap:6px }} }}
 {design.BASE_CSS}</style></head><body>{design.nav('/materials')}<div class="wrap">
 <p class="kicker">Submission materials · Track 3 · AI Trading Desk · Open Theme</p>

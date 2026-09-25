@@ -4126,7 +4126,8 @@ REGISTER: tuple[Capability, ...] = (
             "argus/desk/review.py,argus/eval/review_comparison.py,"
             "argus/eval/baselines/tradingagents_loader.py,"
             "argus/eval/baselines/tradingagents_memory.py,"
-            "argus/eval/baselines/tradingagents_rating.py"
+            "argus/eval/baselines/tradingagents_rating.py,"
+            "argus/desk/rule_lifecycle.py,argus/eval/review_rivals.py"
         ),
         # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts instead
         # of checking that files existed: failure_cases_documented and out_of_sample_test were
@@ -4310,6 +4311,22 @@ REGISTER: tuple[Capability, ...] = (
             "none on the same 29 pairs and 2 on every pair, induction 1 and 17 - the model beat "
             "neither. Groupwise: the induced rules' held-out lift is carried by the conflict "
             "kind alone (data/groupwise_audit.json)",
+            "The four named specialists were run on 2026-09-26 (eval/review_rivals.py, "
+            "data/review_rivals.json, 40 seeds a cell, no model call), each from its own source "
+            "at a recorded commit: tradememory-protocol, cholhwanjung/trading-agent, QuantDinger "
+            "and TradePilot-AI (its TypeScript run unmodified), with TradingAgents' unconditional "
+            "memory beside them. On the held-out half of the real record ARGUS's rules catch the "
+            "most defects beyond chance: +30.0 excess for the lifecycle on active rules (4,212 "
+            "warnings), against +14.5 for QuantDinger's low-win-rate diagnostic, the best rival "
+            "(9,803), and +5.9 for cholhwanjung (6,101). With planted rules at 5% and 25% base "
+            "rates ARGUS admits almost no null rule (false admission 0.2-2%) where TradePilot "
+            "admits 70% and tradememory 100%. It LOSES where the defect is common or falling: at "
+            "60% and 75% base rates it warns with no real rule (power 0.3%, where the rivals warn "
+            "with every rule, real or null), and when the base rate falls from 50% to 20% while "
+            "every rule keeps its lift, its lifecycle retires 68% of the real rules as decayed; "
+            "the rivals, which never retire anything, keep them all, and keep 100% of the dead "
+            "rules warning too (ARGUS 2%). OWNED needs a lifecycle that holds a real rule through "
+            "a falling base rate.",
         ),
     ),
     Capability(
@@ -5457,7 +5474,9 @@ REGISTER: tuple[Capability, ...] = (
         name="Structured filing extraction vs. FinanceBench's real, published LLM measurement",
         subtheme="t3-infoextract",
         module=(
-            "argus/market/fundamentals.py,argus/eval/infoextract_comparison.py"
+            "argus/market/fundamentals.py,argus/eval/infoextract_comparison.py,"
+            "argus/research/filing_qa.py,argus/market/statement_facts.py,"
+            "argus/eval/financebench_xbrl.py"
         ),
         state=State.IMPLEMENTED,
         baseline=(
@@ -5617,6 +5636,24 @@ REGISTER: tuple[Capability, ...] = (
             "unanswerable ones refused, 0 fabricated citation ids, and the groupwise audit finds "
             "no issuer carries the result. One run of 30 questions; the support audit is judged "
             "by Qwen (54 calls, served from cache on the recorded run)",
+            "Run 2026-09-26 on FinanceBench's own 150 open questions, against its sixteen "
+            "human-graded model configurations on the same question ids "
+            "(eval/financebench_xbrl.py, data/financebench_xbrl.json; questions and grades read "
+            "from the local clone at run time, not vendored; replayable offline from a committed "
+            "SEC snapshot). research/filing_qa.py, which computes from the company's filed XBRL "
+            "and never reads prose, answers all 50 metrics-generated questions within 1% of the "
+            "gold figure. The best FinanceBench configurations answer 46: GPT-4 and GPT-4-Turbo "
+            "handed the evidence page itself (oracle) or the whole filing in context. With "
+            "retrieval, as a deployed system would run, GPT-4 answers 22-23 from a "
+            "single-document store and 5-6 from a shared one. On the other 100 questions it "
+            "abstains on 92 and answers 8: 5 correct, 3 disputed on a definition or a sign "
+            "convention, none wrong. NOT held out: the 50 were in view while the engine was "
+            "built, and the other 100 when four fixes were made on 2026-09-26 after ten wrong "
+            "answers in thirteen. Against the best configuration the paired difference is 4 "
+            "questions, all ARGUS's, which alone is not significant (exact two-sided p 0.125). "
+            "Coverage-guard ablation: without it the engine answers 6 more of the other 100, 1 "
+            "correct and 5 wrong. The specialists that lead the sub-theme are still not run on "
+            "this input.",
         ),
     ),
     Capability(

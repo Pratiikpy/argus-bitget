@@ -67,6 +67,10 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("computed", re.compile(r"^Closest past states: ")),
     # a saved book written as amounts, priced at Bitget's last price for this answer
     ("live", re.compile(r"^Priced at Bitget's last price: ")),
+    # an XBRL answer (`research/filing_qa.py`): the filed lines are read from SEC now, the
+    # formula is what was computed from them
+    ("live", re.compile(r"^(?:Filed|Anchor filing): ")),
+    ("computed", re.compile(r"^Formula: ")),
     # the stress answer's scenario tree (`desk/stress_tree.py`) and its loss-share line: every
     # figure worked out for this answer from the candles it just read
     ("computed", re.compile(r"^Scenario tree: \d+ scenarios|^\d+(?:\.\d+){0,3}\. (?:Stated shock|"

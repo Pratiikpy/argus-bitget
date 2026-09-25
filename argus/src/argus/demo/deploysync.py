@@ -60,8 +60,10 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     # Bitget's contract list, frozen on the date it records. `market/universe.py` reads it only
     # when the live contracts call fails — without it an offline answer would not know gold trades.
     "venue_universe.json",
-    # Read by the "what we got wrong" page: the Skill MACD check (`eval/skillmacd.py`).
+    # Read by the "what we got wrong" page: the Skill MACD check (`eval/skillmacd.py`) and the
+    # sentiment benchmark ARGUS loses on (`eval/sentiment_tweeteval.py`).
     "skill_macd_check.json",
+    "sentiment_tweeteval.json",
     # FRED series the console answers macro questions from when FRED is unreachable from the host.
     "macro_snapshot.json",
     # How the desk's refusals' leans graded — the track-record answer reads it.

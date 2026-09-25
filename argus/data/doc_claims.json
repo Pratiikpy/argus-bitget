@@ -1,11 +1,11 @@
 {
-  "total": 77,
-  "checked": 71,
-  "ok": 61,
+  "total": 76,
+  "checked": 70,
+  "ok": 60,
   "lagging": 10,
   "stale": 0,
   "absent": 51,
-  "deleted": 0,
+  "deleted": 1,
   "unchecked": 6,
   "findings": [
     {
@@ -88,26 +88,26 @@
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "457"
+        "462"
       ],
       "live": [
-        457
+        462
       ],
       "status": "OK",
-      "excerpt": "strict clean on 457 source files"
+      "excerpt": "strict clean on 462 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 183,
       "quoted": [
-        "457"
+        "462"
       ],
       "live": [
-        457
+        462
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 457 source files"
+      "excerpt": "strict` clean on 462 source files"
     },
     {
       "claim": "source_files",
@@ -115,7 +115,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        457
+        462
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -125,13 +125,13 @@
       "doc": "explained",
       "line": 1956,
       "quoted": [
-        "457"
+        "462"
       ],
       "live": [
-        457
+        462
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 457 source files"
+      "excerpt": "strict` clean on 462 source files"
     },
     {
       "claim": "register_claims",
@@ -322,17 +322,14 @@
     {
       "claim": "standing_owned",
       "doc": "public-readme",
-      "line": 85,
-      "quoted": [
-        "7",
-        "43"
-      ],
+      "line": null,
+      "quoted": [],
       "live": [
         7,
         43
       ],
-      "status": "OK",
-      "excerpt": "7 of 43 capabilities are OWNED"
+      "status": "DELETED",
+      "excerpt": "last seen at line 85"
     },
     {
       "claim": "standing_owned",
@@ -389,7 +386,7 @@
     {
       "claim": "standing_tied",
       "doc": "public-readme",
-      "line": 85,
+      "line": 86,
       "quoted": [
         "12"
       ],
@@ -463,7 +460,7 @@
     {
       "claim": "standing_implemented",
       "doc": "public-readme",
-      "line": 85,
+      "line": 86,
       "quoted": [
         "24"
       ],
