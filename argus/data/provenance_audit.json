@@ -1,0 +1,41 @@
+{
+  "sample": "provenance_sample.json",
+  "lines": 229,
+  "content_lines": 176,
+  "coverage": 1.0,
+  "agreement": 1.0,
+  "by_label": {
+    "computed": 89,
+    "live": 48,
+    "record": 14,
+    "desk": 20,
+    "assumed": 4,
+    "missing": 1
+  },
+  "disagreements": {},
+  "limitations": "labels hand-reviewed after the rules were written: a regression check, not an independent accuracy estimate",
+  "later_samples": [
+    {
+      "sample": "provenance_fresh.json",
+      "content_lines": 117,
+      "coverage_now": 1.0,
+      "first_read": {
+        "content_lines": 107,
+        "unlabelled": 33,
+        "coverage": 0.692
+      },
+      "note": "15 questions written after the first rules; coverage 69.2% on first read, then its unlabelled lines were given rules, so later coverage on this file is a training figure"
+    },
+    {
+      "sample": "provenance_unseen.json",
+      "content_lines": 156,
+      "coverage_now": 1.0,
+      "first_read": {
+        "content_lines": 156,
+        "unlabelled": 9,
+        "coverage": 0.942
+      },
+      "note": "18 questions never seen while the rules were written; coverage measured once, then the nine unlabelled lines were given rules, so later coverage on this file is no longer unseen"
+    }
+  ]
+}

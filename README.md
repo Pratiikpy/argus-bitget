@@ -44,6 +44,15 @@ Open the console and ask any of these. Each one exercises something different.
 | *Long MSTR perp into earnings — funding looks cheap* | Your own premise tested first — funding against the contract's last 100 settlements — then the earnings half: report date, analyst targets, the last surprise, holders, filings. |
 | *Will MSTR be higher in 48 hours?* | Not a forecast: how often it finished higher over every past 48-hour window, with an interval that counts overlapping windows honestly, the cost of holding, and what Polymarket prices. |
 | *What if I trim TSLA to 10% of my book?* | A resize, not an add: every other holding rescaled, risk share before and after, and the weight that fits your budget. |
+| *Where will NVDA open?* | While the US market is shut: the price the stock's own perpetual implies for the next open, with that reading's measured miss beside two S2 rivals'. |
+| *ETH open interest* | How much is held open, how many days of today's volume that is, and where it ranks among every liquid Bitget perpetual. |
+
+Every line of an answer is tagged with where it comes from: **live** (read just now),
+**computed** (worked out for this answer), **record** (a measured past result, its sample
+named), **desk** (quoted from the agent's logged decision), **assumed** (a default the question
+left open) or **missing** (could not be read). On 18 questions never seen while the tags were
+written, 94% of content lines carried one; a line no rule recognises carries none rather than a
+guess (`python -m argus.eval.provenance_audit`).
 
 Put your holdings in **My book** once and every answer uses them. Every answer ends by naming the
 sources it reached and any that did not answer. If the desk cannot source a figure, it refuses and
@@ -64,7 +73,7 @@ deflation gate, and the console says so.
 
 Every capability is held against the specialist that leads its sub-theme, run on the same input,
 and graded by a register that opens the evidence rather than trusting a filename
-(`python -m argus.eval.standing`). **20 of 42 capabilities are OWNED, 11 are TIED, 11 are
+(`python -m argus.eval.standing`). **20 of 43 capabilities are OWNED, 11 are TIED, 12 are
 IMPLEMENTED, and 0 are LOST.** OWNED needs all thirteen conditions: the rival's best
 implementation read and reproduced, a same-input comparison with costs, out-of-sample, ablation,
 an adversarial test, documented failure cases and reproducibility.
@@ -84,6 +93,14 @@ path through each weekend and Bitget's live margin tier — a tie, since baserat
 current regime to past weekends. Rook ends each thesis with an invalidation price: on six names its
 stops sat 0.1-1.7% away and ordinary movement reached them on 62% of held-out days, against 11%
 for ARGUS's measured stop, fitted out of sample — ahead on that one measure, six names, one run.
+Two desks estimate where a stock should open while the US market is shut. gloaming blends index
+futures, crypto and the dollar; over 113 nights and 8 stocks its best variant missed the next
+open by 81bps on average, against 30bps for ARGUS's reading of the stock's own perpetual (93% of
+directions right) and 90bps for assuming no gap — level only on QQQ. nocturne fades the rToken's
+weekend move back to Friday's price; on its own question (the rToken's Monday 10:00 price) its
+reproduced walk-forward and ARGUS came out level, 1.92% against 2.07%. But on the stock's real
+Monday open, read at nocturne's Sunday-evening moment, the perpetual's weekend move carried
+through (slope +0.83, 160 stock-weekends) rather than reversing, and beat Friday's close.
 The full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.vercel.app/proof).
 
 ---
@@ -145,7 +162,7 @@ a test that reaches the network shows itself.
 | | |
 |---|---|
 | Tests | **6,700 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 344 source files** |
+| Types | **`mypy --strict` clean on 350 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes**, resolved by import at runtime, not claimed in prose |

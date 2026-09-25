@@ -97,7 +97,11 @@ def _translated(payload: dict[str, Any], question: str, book: str, visitor: str)
     head = [done["note"]] if done.get("note") else lines[:skip]
     lead = {len(head) + i for i, line in enumerate(lines[skip:])
             if line.startswith("Actionable:")}
-    return format_answer({**payload, "lines": [*head, *done["lines"]]}, question, book, lead)
+    from argus.lui.provenance import labels as provenance_labels
+
+    tags = [None] * len(head) + provenance_labels(lines[skip:])
+    return format_answer({**payload, "lines": [*head, *done["lines"]], "line_labels": tags},
+                         question, book, lead)
 
 
 def split_message(text: str, limit: int = MAX_MESSAGE) -> list[str]:
@@ -128,7 +132,12 @@ def format_answer(payload: dict[str, Any], question: str, book: str,
                   lead: set[int] | None = None) -> str:
     """The console's answer as a Telegram message: its lines, its sources by name, and a link to
     the same question on the web console where every source is expandable."""
+    from argus.lui.provenance import labels as provenance_labels
+
     lines = [str(line) for line in payload.get("lines") or []]
+    tags = payload.get("line_labels")
+    if not isinstance(tags, list) or len(tags) != len(lines):
+        tags = provenance_labels(lines)
     body = []
     for index, line in enumerate(lines):
         text = html.escape(line, quote=False)
@@ -137,6 +146,8 @@ def format_answer(payload: dict[str, Any], question: str, book: str,
         elif lead and index in lead:
             # A translated lead line no longer starts with "Actionable:"; it stays bold.
             text = f"<b>{text}</b>"
+        if tags[index]:
+            text += f" <i>· {tags[index]}</i>"
         body.append(text)
     refs: list[str] = []
     for source in payload.get("sources") or []:

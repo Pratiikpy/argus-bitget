@@ -1,0 +1,21 @@
+{
+ "fetched": "2026-09-25T08:14:55+00:00",
+ "perpetuals": [
+  "AAPLUSDT",
+  "AMDUSDT",
+  "AMZNUSDT",
+  "AVGOUSDT",
+  "BABAUSDT",
+  "COINUSDT",
+  "GOOGLUSDT",
+  "INTCUSDT",
+  "METAUSDT",
+  "MSFTUSDT",
+  "MUUSDT",
+  "NVDAUSDT",
+  "ORCLUSDT",
+  "PLTRUSDT",
+  "TSLAUSDT"
+ ],
+ "failures": {}
+}

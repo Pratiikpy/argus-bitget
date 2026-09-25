@@ -1,0 +1,1151 @@
+{
+ "collected": "2026-09-25",
+ "reviewed_by": "hand, line by line, after the rules were written",
+ "lines": [
+  {
+   "question": "NVDA price",
+   "text": "Actionable: a round trip in NVDA costs about 12.4bps (12bps taker fees + the 0.4bps spread) — a trade needs a move bigger than that just to break even.",
+   "gold": "computed"
+  },
+  {
+   "question": "NVDA price",
+   "text": "NVDA last 225.82 USDT on Bitget (+1.12% over 24h); bid 225.82 / ask 225.83, spread 0.4bps; 24h range 221.41 to 225.93; funding +0.0000% per interval; 24h volume about $13,902,753.",
+   "gold": "live"
+  },
+  {
+   "question": "NVDA price",
+   "text": "Funding: flat, so holding NVDA costs nothing beyond fees.",
+   "gold": "live"
+  },
+  {
+   "question": "NVDA price",
+   "text": "The US anchor market is shut: this stock perpetual is trading without its anchor, so its price is being discovered on a thinner book and can gap at the open.",
+   "gold": "live"
+  },
+  {
+   "question": "NVDA price",
+   "text": "Implied open: NVDA's perpetual has moved +0.49% since the Thu 20:00 UTC close, which puts the stock near 225.68 at the next open (last close 224.58). Read this way on NVDA on 113 nights, the open was missed by 29bps on average, with the direction right 95% of the time; gloaming, an S2 desk that estimates overnight fair value from index futures, crypto and the dollar, missed by 69bps, and assuming no gap by 105bps.",
+   "gold": "computed"
+  },
+  {
+   "question": "NVDA price",
+   "text": "Quoted 2026-09-25 08:22:09 UTC.",
+   "gold": null
+  },
+  {
+   "question": "NVDA price",
+   "text": "Sources reached: 4 of 4 answered.",
+   "gold": null
+  },
+  {
+   "question": "NVDA price",
+   "text": "Data: Bitget live ticker. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "is NVDA overbought?",
+   "text": "Actionable: No — NVDA is not overbought: RSI 54.7, below the 70 line; momentum turning down.",
+   "gold": "computed"
+  },
+  {
+   "question": "is NVDA overbought?",
+   "text": "RSI(14, 4h) 54.7 — neutral.",
+   "gold": "live"
+  },
+  {
+   "question": "is NVDA overbought?",
+   "text": "MACD 0.219 vs signal 0.495 (histogram -0.276).",
+   "gold": "live"
+  },
+  {
+   "question": "is NVDA overbought?",
+   "text": "Corrected: bitget-signal returns MACD's signal line and histogram in each other's fields; recomputed from Bitget's 4h candles, the figures above are the right way round and its cross flag is replaced.",
+   "gold": null
+  },
+  {
+   "question": "is NVDA overbought?",
+   "text": "Price 225.81: nearest support 222.64 (1.4% below).",
+   "gold": "live"
+  },
+  {
+   "question": "is NVDA overbought?",
+   "text": "ATR 1.527 (4h).",
+   "gold": "live"
+  },
+  {
+   "question": "is NVDA overbought?",
+   "text": "Caveat: technicals describe the tape, not an edge — the systematic signals this desk tested on these names did not clear costs.",
+   "gold": null
+  },
+  {
+   "question": "is NVDA overbought?",
+   "text": "Sources reached: 2 of 2 answered.",
+   "gold": null
+  },
+  {
+   "question": "is NVDA overbought?",
+   "text": "Data: Bitget's bitget-signal technical-analysis Skill, live. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "is TSLA funding expensive?",
+   "text": "Your premise that funding looks expensive: does not hold — the rate is at or below this contract's usual. TSLA funding is +0.0000% per 8h — higher than 39% of its last 100 settlements (median +0.0000%); holding costs nothing in funding at this rate.",
+   "gold": "computed"
+  },
+  {
+   "question": "is TSLA funding expensive?",
+   "text": "Actionable: a round trip in TSLA costs about 12.3bps (12bps taker fees + the 0.3bps spread) — a trade needs a move bigger than that just to break even.",
+   "gold": "computed"
+  },
+  {
+   "question": "is TSLA funding expensive?",
+   "text": "TSLA last 381.98 USDT on Bitget (+1.00% over 24h); bid 381.97 / ask 381.98, spread 0.3bps; 24h range 374.5 to 383.38; funding +0.0000% per interval; 24h volume about $26,042,170.",
+   "gold": "live"
+  },
+  {
+   "question": "is TSLA funding expensive?",
+   "text": "Funding: flat, so holding TSLA costs nothing beyond fees.",
+   "gold": "live"
+  },
+  {
+   "question": "is TSLA funding expensive?",
+   "text": "The US anchor market is shut: this stock perpetual is trading without its anchor, so its price is being discovered on a thinner book and can gap at the open.",
+   "gold": "live"
+  },
+  {
+   "question": "is TSLA funding expensive?",
+   "text": "Implied open: TSLA's perpetual has moved +1.00% since the Thu 20:00 UTC close, which puts the stock near 381.73 at the next open (last close 377.94). Read this way on TSLA on 113 nights, the open was missed by 35bps on average, with the direction right 95% of the time; gloaming, an S2 desk that estimates overnight fair value from index futures, crypto and the dollar, missed by 84bps, and assuming no gap by 102bps.",
+   "gold": "computed"
+  },
+  {
+   "question": "is TSLA funding expensive?",
+   "text": "Quoted 2026-09-25 08:22:24 UTC.",
+   "gold": null
+  },
+  {
+   "question": "is TSLA funding expensive?",
+   "text": "Sources reached: 4 of 4 answered.",
+   "gold": null
+  },
+  {
+   "question": "is TSLA funding expensive?",
+   "text": "Data: Bitget live ticker. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "where will NVDA open?",
+   "text": "Actionable: a round trip in NVDA costs about 12.4bps (12bps taker fees + the 0.4bps spread) — a trade needs a move bigger than that just to break even.",
+   "gold": "computed"
+  },
+  {
+   "question": "where will NVDA open?",
+   "text": "NVDA last 225.82 USDT on Bitget (+1.12% over 24h); bid 225.82 / ask 225.83, spread 0.4bps; 24h range 221.41 to 225.93; funding +0.0000% per interval; 24h volume about $13,903,092.",
+   "gold": "live"
+  },
+  {
+   "question": "where will NVDA open?",
+   "text": "Funding: flat, so holding NVDA costs nothing beyond fees.",
+   "gold": "live"
+  },
+  {
+   "question": "where will NVDA open?",
+   "text": "The US anchor market is shut: this stock perpetual is trading without its anchor, so its price is being discovered on a thinner book and can gap at the open.",
+   "gold": "live"
+  },
+  {
+   "question": "where will NVDA open?",
+   "text": "Implied open: NVDA's perpetual has moved +0.49% since the Thu 20:00 UTC close, which puts the stock near 225.68 at the next open (last close 224.58). Read this way on NVDA on 113 nights, the open was missed by 29bps on average, with the direction right 95% of the time; gloaming, an S2 desk that estimates overnight fair value from index futures, crypto and the dollar, missed by 69bps, and assuming no gap by 105bps.",
+   "gold": "computed"
+  },
+  {
+   "question": "where will NVDA open?",
+   "text": "Quoted 2026-09-25 08:22:27 UTC.",
+   "gold": null
+  },
+  {
+   "question": "where will NVDA open?",
+   "text": "Sources reached: 2 of 2 answered.",
+   "gold": null
+  },
+  {
+   "question": "where will NVDA open?",
+   "text": "Data: Bitget live ticker. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "Actionable: to keep TSLA under 25% of book risk, size it at no more than 19% — the 15% proposed is inside that budget.",
+   "gold": "computed"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "At 15% of the book, TSLA would carry 17% of your total risk.",
+   "gold": "computed"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "Open-session beta 0.99 → 1.05",
+   "gold": "computed"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "Risk spread across 2.4 → 3.1 effective position(s)",
+   "gold": "computed"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "Most correlated with NVDA at +0.37; partly the same trade; the diversification is real but smaller than the position count suggests",
+   "gold": "computed"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "Hedge: short QQQ worth about 105% of the book's value neutralises its market exposure (book beta 1.05); it does nothing for single-name news risk.",
+   "gold": "computed"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "After the trade: NVDA 34% weight / 49% risk; AAPL 26% weight / 18% risk; TSLA 15% weight / 17% risk; MSFT 26% weight / 16% risk.",
+   "gold": "computed"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "In the book's worst 5% of hours (an average loss of 0.42% an hour), TSLA would carry 17% of the loss, against 17% of the ordinary swing.",
+   "gold": "computed"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "If QQQ falls 5%, the book moves about -5.3% through beta alone.",
+   "gold": "computed"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "If QQQ falls 10%, the book moves about -10.5% through beta alone.",
+   "gold": "computed"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "Realised worst case: the worst 24-bar window in the observed history would have moved this book -2.05% — driven by TSLA -7.83%, MSFT -1.94%, AAPL -1.81%",
+   "gold": "record"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "How far to trust that beta: on 1,800 test books, it missed the next four weeks' realised beta by 0.24 on average. weekend-copilot, an S2 entry answering this same question, missed by 0.55 as it ships (p = 0.01) and by 0.36 on the same benchmark (p = 0.10, not significant); simply assuming a beta of 1.0 missed by 0.30. The QQQ-fall lines were off by 0.92 points on the 39 days QQQ really fell 1% or more (skfolio's vine copula: 1.00), and they are a centre, not a worst case",
+   "gold": "record"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "The desk's own last call on TSLA (decision 665, 2026-09-24T19:41Z): no_trade at stated confidence 0.45 — Under a general mandate with no specific risk budget or directional bias, the evidence presents a mildly bullish setup (strong Q2 beat, bullish technicals, large block buys) but the forward consensus revisions are heavily negative (4 up / 15 down current quarter), the stock is sitting right at resistance (380.51), and the 24h change is essentially flat (-0.013%).",
+   "gold": "desk"
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "Sources reached: 1 of 1 answered.",
+   "gold": null
+  },
+  {
+   "question": "what does adding 15% TSLA do to my risk? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+   "text": "Data: live Bitget hourly candles, last 30 days, fetched just now. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "what happens to my book if QQQ falls 10%? I hold 50% NVDA 50% AAPL",
+   "text": "Actionable: NVDA is 50% of the book but 68% of its loss when QQQ falls — trimming it cuts the drawdown fastest; the QQQ hedge below is the other lever.",
+   "gold": "computed"
+  },
+  {
+   "question": "what happens to my book if QQQ falls 10%? I hold 50% NVDA 50% AAPL",
+   "text": "If QQQ moves -5%: your book moves about -5.57%, hardest hit NVDA -7.59% (market-driven part only, through each beta).",
+   "gold": "computed"
+  },
+  {
+   "question": "what happens to my book if QQQ falls 10%? I hold 50% NVDA 50% AAPL",
+   "text": "If QQQ moves -10%: your book moves about -11.13%, hardest hit NVDA -15.17% (market-driven part only, through each beta).",
+   "gold": "computed"
+  },
+  {
+   "question": "what happens to my book if QQQ falls 10%? I hold 50% NVDA 50% AAPL",
+   "text": "Hedge: short QQQ worth about 111% of the book's value neutralises its market exposure (book beta 1.11); it does nothing for single-name news risk.",
+   "gold": "computed"
+  },
+  {
+   "question": "what happens to my book if QQQ falls 10%? I hold 50% NVDA 50% AAPL",
+   "text": "What actually happened, not a model — the worst 24-bar window in the observed history would have moved this book -1.87% — driven by NVDA -3.31%, AAPL -0.87%",
+   "gold": "record"
+  },
+  {
+   "question": "what happens to my book if QQQ falls 10%? I hold 50% NVDA 50% AAPL",
+   "text": "Data: live Bitget hourly candles, last 30 days, fetched just now. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "how do I hedge my rNVDA over the weekend",
+   "text": "Actionable: to carry RNVDAUSDT through the hours the US market is shut, short 1.01 NVDAUSDT (Bitget's NVDA stock perpetual) for every 1 of RNVDAUSDT you hold — the same company, so it moves with your token when nothing else does.",
+   "gold": "computed"
+  },
+  {
+   "question": "how do I hedge my rNVDA over the weekend",
+   "text": "Tested on nights it had not seen: over the last 50 of 165 nights (28 Jan 2026 to 23 Sep 2026), that hedge removed 99.9% of the overnight swing and cut the worst 1-in-20 night by 96%. A typical night moved 135 bp unhedged and 4 bp hedged.",
+   "gold": "record"
+  },
+  {
+   "question": "how do I hedge my rNVDA over the weekend",
+   "text": "Why not an index hedge: shorting QQQUSDT against the same token removed only 52.2% of its overnight swing on the same held-out nights — the other 48% is NVDA's own.",
+   "gold": "record"
+  },
+  {
+   "question": "how do I hedge my rNVDA over the weekend",
+   "text": "Weekends (Friday close to Monday open), the longest window: 99.9% of the swing removed on 10 held-out weekends.",
+   "gold": "record"
+  },
+  {
+   "question": "how do I hedge my rNVDA over the weekend",
+   "text": "Cost: about 12 bp of the position each night the hedge is put on and taken off (Bitget's 0.06% perpetual taker fee each way), before funding. Held across several nights, you pay the fee once and the funding rate instead.",
+   "gold": "computed"
+  },
+  {
+   "question": "how do I hedge my rNVDA over the weekend",
+   "text": "Assumed: RNVDAUSDT read as the spot rToken you hold.",
+   "gold": "assumed"
+  },
+  {
+   "question": "how do I hedge my rNVDA over the weekend",
+   "text": "Data: live Bitget hourly candles for RNVDAUSDT (spot) and NVDAUSDT (perpetual), 240 days, each night measured from the US close to the next open. Method from Ballast (an S2 entry, MIT). This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "long NVDA over the weekend at 3x with 5000 USDT",
+   "text": "Actionable: at 3x long a 32.7% fall in NVDA wipes the margin — and NVDA moved that far against a long within 24 hours from 0% of the hourly entry points in the last 29 days. Its worst 24 hours against a long was 4.9%, so 3x would have survived every day in the window (anything up to 17x did).",
+   "gold": "computed"
+  },
+  {
+   "question": "long NVDA over the weekend at 3x with 5000 USDT",
+   "text": "NVDA's own weekends since 1999 (1,443 of them, Friday close to Monday open, split-adjusted): 23% opened more than 1% in a long's favour, 58% within 1%, 18% 1-5% against, 1% more than 5% against. The worst was -14.7% (25 Jan 2019); 0 of 1,443 opened past the 32.7% liquidation line.",
+   "gold": "record"
+  },
+  {
+   "question": "long NVDA over the weekend at 3x with 5000 USDT",
+   "text": "Going into this weekend NVDA is in an uptrend after an ordinary week (+2.4%). In the 268 past weekends that began that way, 12% opened more than 1% against a long (95% interval 9% to 16%), against 19% across all weekends — a measurable difference, found in-sample. The worst of them was -9.8% (06 Mar 2020).",
+   "gold": "record"
+  },
+  {
+   "question": "long NVDA over the weekend at 3x with 5000 USDT",
+   "text": "On the perpetual, which trades through the weekend and is liquidated on its own path: in 90% of its last 57 weekends the worst point was within 4.0% of Friday's close, and 0 of 57 touched the 32.7% line.",
+   "gold": "record"
+  },
+  {
+   "question": "long NVDA over the weekend at 3x with 5000 USDT",
+   "text": "Funding across the weekend (72h, 9 settlements) at today's rate: nothing — the rate is flat.",
+   "gold": "computed"
+  },
+  {
+   "question": "long NVDA over the weekend at 3x with 5000 USDT",
+   "text": "The liquidation distance is the 33.3% margin less Bitget's 0.66% maintenance margin at this position's tier, before fees, which bring it closer; hourly highs and lows understate the extremes inside each hour.",
+   "gold": "computed"
+  },
+  {
+   "question": "long NVDA over the weekend at 3x with 5000 USDT",
+   "text": "Assumed: 5,000 USDT read as the margin, so the position is 15,000 USDT.",
+   "gold": "assumed"
+  },
+  {
+   "question": "long NVDA over the weekend at 3x with 5000 USDT",
+   "text": "Sources reached: 3 of 3 answered.",
+   "gold": null
+  },
+  {
+   "question": "long NVDA over the weekend at 3x with 5000 USDT",
+   "text": "Data: live Bitget hourly candles (highs and lows) for 30 days, Bitget daily candles for the perpetual's weekends, the stock's daily history from Yahoo Finance, Bitget's maintenance-margin tiers, the live funding rate. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "how should I split a $250k BTC buy",
+   "text": "Actionable: in one market order this costs about 6.2bps (6.0bps fee + 0.2bps book impact) — the book absorbs it; one order is the plan.",
+   "gold": "computed"
+  },
+  {
+   "question": "how should I split a $250k BTC buy",
+   "text": "A $250,000 order is 0.01% of BTC's 24h volume ($3,027,175,197); the fees come to about 6.0bps, and the square-root impact law — calibrated on Bitget's own books, at BTC's own 218bps daily volatility — puts this size's market impact near 0.7bps; the live book below shows what taking it at once costs.",
+   "gold": "computed"
+  },
+  {
+   "question": "how should I split a $250k BTC buy",
+   "text": "Plan: at 0.008% of 24h volume the order cannot move the price; one order is cheapest — splitting would only add time in the market and a fee per slice.",
+   "gold": "computed"
+  },
+  {
+   "question": "how should I split a $250k BTC buy",
+   "text": "Order book (buy side, live): taking all $250,000 at once walks 18 level(s) for 0.2bps of slippage on top of the fee.",
+   "gold": "computed"
+  },
+  {
+   "question": "how should I split a $250k BTC buy",
+   "text": "Slice 1: 100% ($250,000) as single order: near-touch limit, market if unfilled — about 6.0bps fee plus 0.2bps book impact.",
+   "gold": "computed"
+  },
+  {
+   "question": "how should I split a $250k BTC buy",
+   "text": "Sources reached: 3 of 3 answered.",
+   "gold": null
+  },
+  {
+   "question": "how should I split a $250k BTC buy",
+   "text": "Data: Bitget live 24h ticker and order book (50 levels). This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "NVDA earnings",
+   "text": "Earnings surprise: the quarter ending 2026-07-26 was a large beat — SUE +2.84, i.e. diluted EPS changed +1.70 year over year against a usual swing of 0.60 (SEC filing, filed 2026-08-26).",
+   "gold": "computed"
+  },
+  {
+   "question": "NVDA earnings",
+   "text": "Sources reached: 3 of 3 answered.",
+   "gold": null
+  },
+  {
+   "question": "NVDA earnings",
+   "text": "Data: Bitget's bitget-mcp-server (US equity data) and the company's SEC filings, live. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "latest news on TSLA",
+   "text": "Actionable: 11 headlines name TSLA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+   "gold": "computed"
+  },
+  {
+   "question": "latest news on TSLA",
+   "text": "TSLA is +0.99% over 24 hours on Bitget. QQQ moved +1.44%, which at TSLA's beta of 1.40 explains +2.02%; the other -1.03% is TSLA's own.",
+   "gold": "computed"
+  },
+  {
+   "question": "latest news on TSLA",
+   "text": "3h ago — TSLA Stock Climbs Overnight: Roadster Teaser Stokes SpaceX Buzz — Musk Calls New Semi A ‘Game-Changer’ (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/tsla-stock-roadster-teaser-spacex-buzz-musk-new-semi-game-changer/cZMay3XRBaQ?.tsrc=rss",
+   "gold": "live"
+  },
+  {
+   "question": "latest news on TSLA",
+   "text": "5h ago — Tesla has begun ‘high volume’ production of semi truck, Musk says (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/tesla-begun-high-volume-production-031247063.html?.tsrc=rss",
+   "gold": "live"
+  },
+  {
+   "question": "latest news on TSLA",
+   "text": "5h ago — Dow Jones Futures: Market Rally Resilient As Yields, Oil Prices Keep Rising; Tesla Holds Semi Event (Yahoo Finance) https://finance.yahoo.com/m/f20152d5-c38c-3d1c-80ad-574b31be1248/dow-jones-futures%3A-market.html?.tsrc=rss",
+   "gold": "live"
+  },
+  {
+   "question": "latest news on TSLA",
+   "text": "7h ago — Tesla poised to scale production of heavy-duty Semi trucks with opening of Nevada factory (cnbc) https://www.cnbc.com/2026/09/24/tesla-aims-to-scale-semi-truck-production-with-nevada-factory-opening.html",
+   "gold": "live"
+  },
+  {
+   "question": "latest news on TSLA",
+   "text": "8h ago — Tesla (TSLA) vs Rivian (RIVN): Which is a Better EV Stock to Buy (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/tesla-tsla-vs-rivian-rivn-235302515.html?.tsrc=rss",
+   "gold": "live"
+  },
+  {
+   "question": "latest news on TSLA",
+   "text": "Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31?\" priced at 18% — $191,531 traded, closes 2027-01-01.",
+   "gold": "live"
+  },
+  {
+   "question": "latest news on TSLA",
+   "text": "Prediction market on TSLA (Polymarket): \"Will Tesla release Optimus by December 31, 2026?\" priced at 13% — $30,343 traded, closes 2027-01-01.",
+   "gold": "live"
+  },
+  {
+   "question": "latest news on TSLA",
+   "text": "Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31, 2027?\" priced at 66% — $28,587 traded, closes 2028-01-01.",
+   "gold": "live"
+  },
+  {
+   "question": "latest news on TSLA",
+   "text": "Sources reached: 12 of 12 answered.",
+   "gold": null
+  },
+  {
+   "question": "latest news on TSLA",
+   "text": "Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "sentiment on BTC",
+   "text": "Actionable: BTC's own positioning is not crowded either way after a +0.2% day; the crypto market backdrop is stretched toward greed — the side of the index where crypto has historically been more exposed to pullbacks. Read both as positioning, not a signal — this desk's own sentiment work found the index adds nothing on its own, and funding is a cost before it is a view.",
+   "gold": "computed"
+  },
+  {
+   "question": "sentiment on BTC",
+   "text": "Crypto fear & greed: 71 (Greed); over the last 8 days it ranged 56 to 78.",
+   "gold": "live"
+  },
+  {
+   "question": "sentiment on BTC",
+   "text": "BTC on Bitget: funding +0.0053% per interval, +0.22% over 24h.",
+   "gold": "live"
+  },
+  {
+   "question": "sentiment on BTC",
+   "text": "Funding means longs pay shorts every 8h: 0.016% of the position a day, about 5.8% a year if it held — no crowding either way.",
+   "gold": "computed"
+  },
+  {
+   "question": "sentiment on BTC",
+   "text": "ETH funding +0.0070% per interval — longs pay shorts, no crowding on Bitget.",
+   "gold": "live"
+  },
+  {
+   "question": "sentiment on BTC",
+   "text": "Tested, not assumed (2026-09-22, data/sentiment_comparison.json): 5 near-identical unsourced posts per narrative across 2 narratives. finBERT, the standard finance sentiment model, grew louder with every repeat on 2 of 2; this desk's sentiment analyst stayed non-actionable on 2 of 2.",
+   "gold": "record"
+  },
+  {
+   "question": "sentiment on BTC",
+   "text": "US spot BTC ETFs, 24 Sep: net +$191m (creations less redemptions), an ordinary day for it; five days +$2.68bn; 6 inflow days running; $109bn held (SoSoValue).",
+   "gold": "live"
+  },
+  {
+   "question": "sentiment on BTC",
+   "text": "Prediction market on BTC (Polymarket): \"Will Bitcoin reach $87,500 in September?\" priced at 30%, -3 points in 24h — $927,638 traded, closes 2026-10-01.",
+   "gold": "live"
+  },
+  {
+   "question": "sentiment on BTC",
+   "text": "Prediction market on BTC (Polymarket): \"Will Bitcoin reach $90,000 in September?\" priced at 12%, -4 points in 24h — $923,051 traded, closes 2026-10-01.",
+   "gold": "live"
+  },
+  {
+   "question": "sentiment on BTC",
+   "text": "Prediction market on BTC (Polymarket): \"Will Bitcoin reach $92,500 in September?\" priced at 5%, -3 points in 24h — $359,453 traded, closes 2026-10-01.",
+   "gold": "live"
+  },
+  {
+   "question": "sentiment on BTC",
+   "text": "Sources reached: 3 of 3 answered.",
+   "gold": null
+  },
+  {
+   "question": "sentiment on BTC",
+   "text": "Data: alternative.me fear & greed (the source Bitget's sentiment Skill wraps; Bitget's data service did not answer) and Bitget funding rates, live. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "what is the VaR of 50% BTC 50% ETH",
+   "text": "Actionable: ETH is 50% of the book but 55% of its loss when QQQ falls — trimming it cuts the drawdown fastest; the QQQ hedge below is the other lever.",
+   "gold": "computed"
+  },
+  {
+   "question": "what is the VaR of 50% BTC 50% ETH",
+   "text": "If QQQ moves -5%: your book moves about -4.89%, hardest hit ETH -5.40% (market-driven part only, through each beta).",
+   "gold": "computed"
+  },
+  {
+   "question": "what is the VaR of 50% BTC 50% ETH",
+   "text": "If QQQ moves -10%: your book moves about -9.78%, hardest hit ETH -10.79% (market-driven part only, through each beta).",
+   "gold": "computed"
+  },
+  {
+   "question": "what is the VaR of 50% BTC 50% ETH",
+   "text": "Hedge: short QQQ worth about 98% of the book's value neutralises its market exposure (book beta 0.98); it does nothing for single-name news risk.",
+   "gold": "computed"
+  },
+  {
+   "question": "what is the VaR of 50% BTC 50% ETH",
+   "text": "What actually happened, not a model — the worst 24-bar window in the observed history would have moved this book -3.64% — driven by ETH -6.15%, BTC -4.21%",
+   "gold": "record"
+  },
+  {
+   "question": "what is the VaR of 50% BTC 50% ETH",
+   "text": "Sources reached: 1 of 1 answered.",
+   "gold": null
+  },
+  {
+   "question": "what is the VaR of 50% BTC 50% ETH",
+   "text": "Data: live Bitget hourly candles, last 30 days, fetched just now. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "resize NVDA to 20% in 40% NVDA 60% AAPL",
+   "text": "Resizing NVDA changes every other holding's share too, so I need what you hold — say it with weights, e.g. \"trim NVDA to 10%; I hold 30% NVDA, 40% NVDA, 30% AAPL\", or save your book once on the console.",
+   "gold": "missing"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "seq 664 · NVDAUSDT · no_trade · decided 2026-09-24T19:41:11.225087+00:00 (rth session)",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Stated confidence 0.52. 0h to genuine price discovery.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Thesis: General mandate: the fundamental momentum (SUE +2.84, 35:1 revision ratio, 17.9% QoQ revenue growth) is genuinely strong, but the near-term technical picture is deteriorating (price below MA7/MA25, negative MACD histogram, intraday decline of -0.885%), insider selling is persistent and heavy (4.2M shares in September), and the macro backdrop (10y at 5.11%, CPI 3.35%) creates a discount-rate headwind that caps upside for high-multiple names. The debate gap of 55bps is wide, the panel consensus is only 0.53, and the event panel is bearish at 89bps with 0.72 confidence. The edge does not clear the 16.27bps total hurdle with sufficient directional conviction in either direction over the near-zero horizon.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Invalidation: A decisive break above MA25 (225.75) on the 4h with rising volume would invalidate the bearish technical read and suggest the dip is being bought aggressively; A new Form 4 showing Mark Stevens ceasing sales or any insider buying would remove the supply overhang thesis; A sharp drop in the 10-year yield below 4.8% would remove the discount-rate headwind and re-rate growth multiples higher",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Not yet settled.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Entry hash 2c49543174c5b5e7 (chain position after 831104ad).",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "How the desk reached decision 664, from the notes it wrote at the time:",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Evidence screen: 66 evidence item(s) screened, none withheld.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Panel: 3 of 3 analysts run: event, sentiment, earnings.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Panel: 3 analyst(s) ran concurrently in 105.2s; none could read another's answer, so agreement is consensus rather than contagion.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Agreement, discounted for shared sources: 4 analysts, 24 distinct sources, independence 6.00 -> neutral at 0.53 after provenance discount.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Memory: 8 prior decision(s) on NVDAUSDT shown to the PM, 8 of them graded; 2 pattern(s) stated from the record.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Debate: NVDAUSDT: 1 round(s), ended exhausted_budget, cost 2.0bps\n  [bull, round 1] up 30.0bps — The bull case rests on three pillars: (1) Fundamental momentum is exceptional. Revenue of $96.22B for Q2 FY2027 (ending 2026-07-26) grew +17.9% QoQ, net income hit $59.69B, and the Standardized Unexpected Earnings score of +2.84 standard deviations above the company's own trailing YoY EPS-change volatility signals a massive beat relative to expectations. EPS was $2.46, up 2.9% QoQ. (2) Forward estimates are being revised sharply higher: 35 of 43 analysts raised current-quarter EPS estimates in the past 30 days (consensus $2.4736), and 26 of 41 raised next-quarter estimates. This breadth of upward revision is a strong leading indicator of continued price appreciation. (3) Strategic positioning reinforces the growth narrative: Nvidia is reportedly buying an additional $1.5B of SB Energy shares (total $3B stake) tied to an 8GW data center campus with OpenAI as main tenant, and OpenAI's former head of data centers just joined Nvidia as VP of DSX Platform. Berkshire Hathaway's CEO calling AI data center demand a 'significant opportunity' further validates the demand thesis. The Fear & Greed index at 71 (Greed) and VIX at 15.57 (36th percentile, normal regime) indicate a risk-on environment without extreme complacency. The 24h decline of -0.82% provides a modest entry point against this backdrop.\n      concedes: Director Mark Stevens has been consistently selling large blocks of NVDA — 1.85M shares at ~$222 in early September, 1.02M shares at ~$230 on Sep 8, and 1.37M shares at ~$220 on Sep 22 — totaling over 4.2M shares in open-market sales within one month. This sustained insider selling at current price levels suggests someone with deep knowledge of the company sees limited near-term upside or is de-risking. Additionally, the stock is already down 0.82% on the day, MACD histogram is negative (-0.77), price is below both the 7-period and 25-period moving averages on the 4h timeframe, and the 10-year Treasury yield at 5.11% creates a headwind for high-multiple growth stocks.\n  [bear, round 1] down 25.0bps — The bear case for NVDAUSDT over a near-zero horizon rests on three converging signals: (1) Persistent and heavy insider selling by director Mark Stevens — three separate Form 4 filings show open-market disposals of 1,848,501 shares at avg $222.26 (Sep 2), 1,022,239 shares at avg $230.51 (Sep 8), and 1,366,000 shares at avg $219.73 (Sep 22). That is over 4.2 million shares sold in under a month, with the most recent tranche sold just two days ago at prices near the current level. This is not compensation-related (the feed explicitly discards 17 lines as compensation machinery); these are discretionary open-market sales by a director with deep company knowledge. (2) Technical deterioration on the 4-hour timeframe: MACD histogram is negative at -0.77, price (223.71) sits below both the MA7 (224.29) and MA25 (225.75), and the Bollinger band reading shows price 'above_upper' with a negative bandwidth (-0.0415), suggesting a mean-reversion setup. The stock is already down -0.885% on the day (prior close 225.51 vs current 223.51). RSI at 45.18 is neutral-to-weak, not oversold, meaning there is room to fall further before technical support. (3) Macro headwinds: the 10-year Treasury yield at 5.11% and 30-year at 5.40% represent a significant discount-rate headwind for a stock trading at elevated multiples. CPI YoY at 3.35% suggests inflation remains sticky, reducing the likelihood of near-term rate relief. The VIX at 15.57 implies only ~98bps of expected daily equity movement, capping upside potential while the negative technicals bias the limited range downward. FINRA short volume at 37.8% of total prints on Sep 23 indicates meaningful institutional short interest.\n      concedes: The fundamental momentum is genuinely exceptional — revenue grew 17.9% QoQ to $96.22B, SUE of +2.84 standard deviations signals a massive earnings beat, and 35 of 43 analysts raised current-quarter estimates in 30 days. Combined with strategic moves (SB Energy investment, hiring OpenAI's data center head), the growth narrative remains intact and could overwhelm technical weakness at any moment, especially in a low-VIX environment where dips get bought aggressively.\n  final gap: 55.0bps\n  engagement: bull named the bear's best point 1 time(s), bear named the bull's 1 time(s). A side that never concedes a point has not argued, it has repeated.\n  Both seats share a model, so agreement here is self-consistency and NOT corroboration. Seat a second model to make this line go away.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Grounding check: 1 of 13 figure(s) do not resolve to anything the desk was given: 0.53.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Entity check: 2 instrument(s) named, 0 unsupported.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Adversary: Not run — the decision opens no exposure, so there is nothing to falsify.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Constitution: Nothing bound, so the decision was not re-put to the model: asking it to reconsider an unconstrained choice would have told it something untrue and paid for a second opinion on a question nobody asked.",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "Protocol: Within the committed protocol; nothing changed (argus-paper-v1 v3: opens no position).",
+   "gold": "desk"
+  },
+  {
+   "question": "what did the desk do last on NVDA",
+   "text": "(82 decisions matched; this is the most recent.)",
+   "gold": null
+  },
+  {
+   "question": "is the US market open right now?",
+   "text": "Actionable: the US stock market (NYSE regular session) is closed at 08:22 UTC — it is outside regular hours. It opens Fri 25 Sep 13:30 UTC, in 5h 07m.",
+   "gold": "computed"
+  },
+  {
+   "question": "is the US market open right now?",
+   "text": "Bitget's stock perpetuals trade around the clock, so while the market is shut they are the only price moving; the stock's own last price is its last close.",
+   "gold": "computed"
+  },
+  {
+   "question": "is the US market open right now?",
+   "text": "Data: NYSE regular hours (09:30 to 16:00 New York time) and the US equity holiday calendar from QuantConnect Lean. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "NVDA fundamentals",
+   "text": "Earnings surprise: the quarter ending 2026-07-26 was a large beat — SUE +2.84, i.e. diluted EPS changed +1.70 year over year against a usual swing of 0.60 (SEC filing, filed 2026-08-26).",
+   "gold": "computed"
+  },
+  {
+   "question": "NVDA fundamentals",
+   "text": "Sources reached: 2 of 2 answered.",
+   "gold": null
+  },
+  {
+   "question": "NVDA fundamentals",
+   "text": "Data: Bitget's bitget-mcp-server (US equity data) and the company's SEC filings, live. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "what's the macro backdrop",
+   "text": "Actionable: the 10-year is 5.11% and the curve upward — and rates have been driving it: rising yields have come with falling prices, so size it against the rates calendar.",
+   "gold": "computed"
+  },
+  {
+   "question": "what's the macro backdrop",
+   "text": "10-year Treasury: 5.11% on 2026-09-23 (+41bp over the last 31 readings, about six weeks).",
+   "gold": "live"
+  },
+  {
+   "question": "what's the macro backdrop",
+   "text": "2-year Treasury: 4.85% on 2026-09-23 (+63bp over the last 31 readings, about six weeks).",
+   "gold": "live"
+  },
+  {
+   "question": "what's the macro backdrop",
+   "text": "fed funds: 3.88% on 2026-09-23 (+25bp over the last 44 readings, about six weeks).",
+   "gold": "live"
+  },
+  {
+   "question": "what's the macro backdrop",
+   "text": "10-year breakeven inflation: 2.33% on 2026-09-24 (+6bp over the last 32 readings, about six weeks).",
+   "gold": "live"
+  },
+  {
+   "question": "what's the macro backdrop",
+   "text": "broad dollar index: 119.51 on 2026-09-18 (+0.33 over the last 28 readings, about six weeks).",
+   "gold": "live"
+  },
+  {
+   "question": "what's the macro backdrop",
+   "text": "Curve: 10-year minus 2-year is +26bp — positively sloped.",
+   "gold": "computed"
+  },
+  {
+   "question": "what's the macro backdrop",
+   "text": "Real 10-year yield (nominal less breakeven inflation): about 2.78%.",
+   "gold": "computed"
+  },
+  {
+   "question": "what's the macro backdrop",
+   "text": "tech (QQQ) has moved moderately with rates over 61 trading days — correlation -0.38 between its daily return and the daily change in the 10-year yield, about -1.06% for each +10bp; -0.34 with the broad dollar index, so a stronger dollar has hurt tech (QQQ). Correlation, not a cause.",
+   "gold": "computed"
+  },
+  {
+   "question": "what's the macro backdrop",
+   "text": "Scheduled: US CPI release Wed 14 Oct 12:30 UTC; FOMC rate decision Wed 28 Oct 18:00 UTC (BLS and Federal Reserve schedules, read 2026-09-24).",
+   "gold": "live"
+  },
+  {
+   "question": "what's the macro backdrop",
+   "text": "Sources reached: 2 of 3 answered. Did not answer: news feed federalreserve.gov (HTTP 404) — everything above is built without it.",
+   "gold": null
+  },
+  {
+   "question": "what's the macro backdrop",
+   "text": "Data: FRED series DGS10, DGS2, DFF, T10YIE, DTWEXBGS; Bitget hourly candles; Federal Reserve press feed, live. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "BTC technical analysis",
+   "text": "Actionable: momentum turning down.",
+   "gold": "computed"
+  },
+  {
+   "question": "BTC technical analysis",
+   "text": "RSI(14, 4h) 52.8 — neutral.",
+   "gold": "live"
+  },
+  {
+   "question": "BTC technical analysis",
+   "text": "MACD 337.929 vs signal 623.276 (histogram -285.346).",
+   "gold": "live"
+  },
+  {
+   "question": "BTC technical analysis",
+   "text": "Corrected: bitget-signal returns MACD's signal line and histogram in each other's fields; recomputed from Bitget's 4h candles, the figures above are the right way round and its cross flag is replaced.",
+   "gold": null
+  },
+  {
+   "question": "BTC technical analysis",
+   "text": "Price 84350: nearest support 83494.6 (1.0% below).",
+   "gold": "live"
+  },
+  {
+   "question": "BTC technical analysis",
+   "text": "ATR 950.619 (4h).",
+   "gold": "live"
+  },
+  {
+   "question": "BTC technical analysis",
+   "text": "Caveat: technicals describe the tape, not an edge — the systematic signals this desk tested on these names did not clear costs.",
+   "gold": null
+  },
+  {
+   "question": "BTC technical analysis",
+   "text": "Sources reached: 2 of 2 answered.",
+   "gold": null
+  },
+  {
+   "question": "BTC technical analysis",
+   "text": "Data: Bitget's bitget-signal technical-analysis Skill, live. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "ETH open interest",
+   "text": "Actionable: size ETH so that its worst observed 24 hours (-6.3%) is a loss you would accept — on a $10,000 position that is about $634; tell me what you hold to see its share of your risk.",
+   "gold": "computed"
+  },
+  {
+   "question": "ETH open interest",
+   "text": "ETH moves 1.08x the Nasdaq-100 (QQQ) while US markets are open and 1.35x while they are shut — the open-session figure is the one that prices it.",
+   "gold": "computed"
+  },
+  {
+   "question": "ETH open interest",
+   "text": "If QQQ falls 5%, this position moves about -5.4% through beta alone.",
+   "gold": "computed"
+  },
+  {
+   "question": "ETH open interest",
+   "text": "If QQQ falls 10%, this position moves about -10.8% through beta alone.",
+   "gold": "computed"
+  },
+  {
+   "question": "ETH open interest",
+   "text": "Realised worst case: the worst 24-bar window in the observed history would have moved this position -6.34% — driven by ETH -6.34%",
+   "gold": "record"
+  },
+  {
+   "question": "ETH open interest",
+   "text": "Return shape over 719 hourly bars: realised volatility 47% a year, skew +0.87, excess kurtosis 14.8 (fat-tailed — large hourly moves are far more common than a normal curve implies); QQQ explains 18% of its open-session moves (R²), so a QQQ hedge leaves most of its risk in place.",
+   "gold": "computed"
+  },
+  {
+   "question": "ETH open interest",
+   "text": "The desk itself trades twelve stock perpetuals and ETH is not one of them, so there is no desk call on it — this answer is the analysis alone.",
+   "gold": "computed"
+  },
+  {
+   "question": "ETH open interest",
+   "text": "Assumed: no specific research question was recognised, so this is the name's risk profile — ask for its technicals, news, earnings or what it does to your book for more.",
+   "gold": "assumed"
+  },
+  {
+   "question": "ETH open interest",
+   "text": "Data: live Bitget hourly candles, last 30 days, fetched just now. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "NVDA is up 5% today because of earnings",
+   "text": "Your premise that NVDA is up: holds — NVDA is +1.18% over 24 hours; the reason you give is not something a price can confirm — the lines below say whether a filing or headline backs it.",
+   "gold": "computed"
+  },
+  {
+   "question": "NVDA is up 5% today because of earnings",
+   "text": "Actionable: 2 headlines name NVDA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+   "gold": "computed"
+  },
+  {
+   "question": "NVDA is up 5% today because of earnings",
+   "text": "NVDA is +1.17% over 24 hours on Bitget. QQQ moved +1.48%, which at NVDA's beta of 1.52 explains +2.24%; the other -1.07% is NVDA's own.",
+   "gold": "computed"
+  },
+  {
+   "question": "NVDA is up 5% today because of earnings",
+   "text": "0h ago — SPCX Stock Climbs Premarket As Musk Teases 3 Nvidia Chip Waves — Google Books SpaceX Ride For Orbital AI Test (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/spcx-stock-musk-3-nvidia-chip-waves-google-spacex-orbital-ai-test/cZMORwwRBaj?.tsrc=rss",
+   "gold": "live"
+  },
+  {
+   "question": "NVDA is up 5% today because of earnings",
+   "text": "4h ago — AMD vs. Nvidia: Which AI Stock Is the Better Buy? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amd-vs-nvidia-ai-stock-035909345.html?.tsrc=rss",
+   "gold": "live"
+  },
+  {
+   "question": "NVDA is up 5% today because of earnings",
+   "text": "Sources reached: 11 of 11 answered.",
+   "gold": null
+  },
+  {
+   "question": "NVDA is up 5% today because of earnings",
+   "text": "Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "NVDA trades at a premium",
+   "text": "Actionable: a round trip in NVDA costs about 12.4bps (12bps taker fees + the 0.4bps spread) — a trade needs a move bigger than that just to break even.",
+   "gold": "computed"
+  },
+  {
+   "question": "NVDA trades at a premium",
+   "text": "NVDA last 225.89 USDT on Bitget (+1.18% over 24h); bid 225.89 / ask 225.9, spread 0.4bps; 24h range 221.41 to 225.93; funding +0.0000% per interval; 24h volume about $13,910,162.",
+   "gold": "live"
+  },
+  {
+   "question": "NVDA trades at a premium",
+   "text": "Funding: flat, so holding NVDA costs nothing beyond fees.",
+   "gold": "live"
+  },
+  {
+   "question": "NVDA trades at a premium",
+   "text": "The US anchor market is shut: this stock perpetual is trading without its anchor, so its price is being discovered on a thinner book and can gap at the open.",
+   "gold": "live"
+  },
+  {
+   "question": "NVDA trades at a premium",
+   "text": "Implied open: NVDA's perpetual has moved +0.52% since the Thu 20:00 UTC close, which puts the stock near 225.75 at the next open (last close 224.58). Read this way on NVDA on 113 nights, the open was missed by 29bps on average, with the direction right 95% of the time; gloaming, an S2 desk that estimates overnight fair value from index futures, crypto and the dollar, missed by 69bps, and assuming no gap by 105bps.",
+   "gold": "computed"
+  },
+  {
+   "question": "NVDA trades at a premium",
+   "text": "Quoted 2026-09-25 08:23:01 UTC.",
+   "gold": null
+  },
+  {
+   "question": "NVDA trades at a premium",
+   "text": "Sources reached: 2 of 2 answered.",
+   "gold": null
+  },
+  {
+   "question": "NVDA trades at a premium",
+   "text": "Data: Bitget live ticker. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "what are the odds NVDA is higher in 24 hours",
+   "text": "Actionable: 2 headlines name NVDA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+   "gold": "computed"
+  },
+  {
+   "question": "what are the odds NVDA is higher in 24 hours",
+   "text": "NVDA is +1.18% over 24 hours on Bitget. QQQ moved +1.48%, which at NVDA's beta of 1.52 explains +2.24%; the other -1.06% is NVDA's own.",
+   "gold": "computed"
+  },
+  {
+   "question": "what are the odds NVDA is higher in 24 hours",
+   "text": "0h ago — SPCX Stock Climbs Premarket As Musk Teases 3 Nvidia Chip Waves — Google Books SpaceX Ride For Orbital AI Test (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/spcx-stock-musk-3-nvidia-chip-waves-google-spacex-orbital-ai-test/cZMORwwRBaj?.tsrc=rss",
+   "gold": "live"
+  },
+  {
+   "question": "what are the odds NVDA is higher in 24 hours",
+   "text": "4h ago — AMD vs. Nvidia: Which AI Stock Is the Better Buy? (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amd-vs-nvidia-ai-stock-035909345.html?.tsrc=rss",
+   "gold": "live"
+  },
+  {
+   "question": "what are the odds NVDA is higher in 24 hours",
+   "text": "Sources reached: 11 of 11 answered.",
+   "gold": null
+  },
+  {
+   "question": "what are the odds NVDA is higher in 24 hours",
+   "text": "Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "compare NVDA and AMD",
+   "text": "Actionable: AMD carries the most market risk per dollar of the 2. Listed from most to least volatile.",
+   "gold": "computed"
+  },
+  {
+   "question": "compare NVDA and AMD",
+   "text": "NVDA and AMD move together at +0.42 in the open session — partly the same bet.",
+   "gold": "computed"
+  },
+  {
+   "question": "compare NVDA and AMD",
+   "text": "AMD: realised vol 52% a year; beta 2.06 open / 2.27 shut; QQQ -10% implies -20.6%; worst 24-hour window -3.8%.",
+   "gold": "computed"
+  },
+  {
+   "question": "compare NVDA and AMD",
+   "text": "NVDA: realised vol 34% a year; beta 1.52 open / 1.22 shut; QQQ -10% implies -15.2%; worst 24-hour window -4.4%.",
+   "gold": "computed"
+  },
+  {
+   "question": "compare NVDA and AMD",
+   "text": "Sources reached: 1 of 1 answered.",
+   "gold": null
+  },
+  {
+   "question": "compare NVDA and AMD",
+   "text": "Data: live Bitget hourly candles, last 30 days, fetched just now. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Your premise that AAPL is liquid: does not hold — the visible 50 levels cannot absorb a $500,000 buy, against a 6bps taker fee each way.",
+   "gold": "computed"
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Actionable: in one market order this costs at least 21.7bps (6.0bps fee + at least 15.7bps book impact) — enough book impact that splitting on the schedule below is worth doing.",
+   "gold": "computed"
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "A $500,000 order is 7.43% of AAPL's 24h volume ($6,733,343); the fees come to about 6.0bps, and the square-root impact law — calibrated on Bitget's own books, at AAPL's own 149bps daily volatility — puts this size's market impact near 13.9bps; the live book below shows what taking it at once costs.",
+   "gold": "computed"
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Plan: high urgency or large footprint: take liquidity early, finish opportunistically.",
+   "gold": "computed"
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Order book (buy side, live): taking all $500,000 at once walks 50 level(s) for 15.7bps of slippage on top of the fee — the visible 50 levels hold only $324,307, so the rest would fill beyond what can be seen.",
+   "gold": "computed"
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Slice 1: 50% ($250,000) as market — about 6.0bps fee plus 14.3bps book impact.",
+   "gold": "computed"
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Slice 2: 30% ($150,000) as near-touch limit — about 6.0bps fee plus 11.1bps book impact.",
+   "gold": "computed"
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Slice 3: 20% ($100,000) as opportunistic limit (quoted at taker: no book supplied to price the fill) — about 6.0bps fee plus 7.9bps book impact.",
+   "gold": "computed"
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Schedule (Almgren-Chriss optimum, inventory decaying e-fold over 6 hour(s)): trade 21%, 18%, 17%, 15%, 15%, 14% of $168,334 hour by hour — expected cost 12.5bps with a one-standard-deviation risk of ±34.3bps, against 12.4bps ± 37.1bps for an even split, with the slice styles above applied inside each hour. Impact is priced from sweeping one hour's share of the order on the live book.",
+   "gold": "computed"
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Cadence: send each hour's share as one-minute children, as Bitget's own TWAP does at a 60-second interval. Replaying a full day of Bitget's NVDA order book, $100,000 orders cost 6.9bps with fees in one-minute children against 12.2bps in hourly ones (Bitget's TWAP: 6.9bps; all at once: 19.6bps).",
+   "gold": "computed"
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Waiting costs too: at this volatility the price drifts an expected 3.9bps in the minute between deciding and the first order landing, 12.3bps in ten — a cost of deliberating, separate from the impact above.",
+   "gold": "computed"
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Session: the stock's own market opens in about 6 hour(s), and depth on the token changes with it, so the schedule covers only the $168,334 that fits before then at 10% of an hour's volume — plan the remaining $331,666 after it opens rather than assume this book survives it.",
+   "gold": "computed"
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Sources reached: 3 of 3 answered.",
+   "gold": null
+  },
+  {
+   "question": "is AAPL liquid enough for $500k",
+   "text": "Data: Bitget live 24h ticker and order book (50 levels). This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "analogues for the current BTC setup",
+   "text": "Actionable: BTC is a crypto contract, so there is no earnings calendar, analyst consensus or 13F filing to report — ask for its technicals, a quote, or what it does to your book instead.",
+   "gold": "computed"
+  },
+  {
+   "question": "analogues for the current BTC setup",
+   "text": "Prediction market on BTC (Polymarket): \"Will Bitcoin reach $87,500 in September?\" priced at 30%, -3 points in 24h — $927,638 traded, closes 2026-10-01.",
+   "gold": "live"
+  },
+  {
+   "question": "analogues for the current BTC setup",
+   "text": "Prediction market on BTC (Polymarket): \"Will Bitcoin reach $90,000 in September?\" priced at 12%, -4 points in 24h — $923,051 traded, closes 2026-10-01.",
+   "gold": "live"
+  },
+  {
+   "question": "analogues for the current BTC setup",
+   "text": "Prediction market on BTC (Polymarket): \"Will Bitcoin reach $92,500 in September?\" priced at 5%, -3 points in 24h — $359,453 traded, closes 2026-10-01.",
+   "gold": "live"
+  },
+  {
+   "question": "analogues for the current BTC setup",
+   "text": "Data: Bitget's contract list, which flags this contract as not a company's shares — no equity data was requested. This is analysis, not advice — you make the call.",
+   "gold": null
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "Actionable: to keep NVDA under 50% of book risk (your budget), size it at no more than 35% — the 20% proposed is inside that budget.",
+   "gold": "computed"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "At 20% of the book, NVDA would carry 22% of your total risk.",
+   "gold": "computed"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "Open-session beta 0.64 → 0.81",
+   "gold": "computed"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "Risk spread across 2.0 → 2.8 effective position(s)",
+   "gold": "computed"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "Most correlated with MSFT at +0.22; largely a different bet from what you already own",
+   "gold": "computed"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "Hedge: short QQQ worth about 81% of the book's value neutralises its market exposure (book beta 0.81); it does nothing for single-name news risk.",
+   "gold": "computed"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "After the trade: AAPL 40% weight / 42% risk; MSFT 40% weight / 35% risk; NVDA 20% weight / 22% risk.",
+   "gold": "computed"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "In the book's worst 5% of hours (an average loss of 0.40% an hour), NVDA would carry 20% of the loss, against 22% of the ordinary swing.",
+   "gold": "computed"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "If QQQ falls 5%, the book moves about -4.1% through beta alone.",
+   "gold": "computed"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "If QQQ falls 10%, the book moves about -8.1% through beta alone.",
+   "gold": "computed"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "Realised worst case: the worst 24-bar window in the observed history would have moved this book -1.80% — driven by AAPL -2.40%, MSFT -2.12%, NVDA +0.01%",
+   "gold": "record"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "How far to trust that beta: on 1,800 test books, it missed the next four weeks' realised beta by 0.24 on average. weekend-copilot, an S2 entry answering this same question, missed by 0.55 as it ships (p = 0.01) and by 0.36 on the same benchmark (p = 0.10, not significant); simply assuming a beta of 1.0 missed by 0.30. The QQQ-fall lines were off by 0.92 points on the 39 days QQQ really fell 1% or more (skfolio's vine copula: 1.00), and they are a centre, not a worst case",
+   "gold": "record"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "The desk's own last call on NVDA (decision 664, 2026-09-24T19:41Z): no_trade at stated confidence 0.52 — General mandate: the fundamental momentum (SUE +2.84, 35:1 revision ratio, 17.9% QoQ revenue growth) is genuinely strong, but the near-term technical picture is deteriorating (price below MA7/MA25, negative MACD histogram, intraday decline of -0.885%), insider selling is persistent and heavy (4.2M shares in September), and the macro backdrop (10y at 5.11%, CPI 3.35%) creates a discount-rate headwind that caps upside for high-multiple names.",
+   "gold": "desk"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "Assumed: no size was given, so NVDA is assessed at 20%.",
+   "gold": "assumed"
+  },
+  {
+   "question": "what's my max size in NVDA with a 25% risk budget, I hold 50% AAPL 50% MSFT",
+   "text": "Data: live Bitget hourly candles, last 30 days, fetched just now. This is analysis, not advice — you make the call.",
+   "gold": null
+  }
+ ]
+}

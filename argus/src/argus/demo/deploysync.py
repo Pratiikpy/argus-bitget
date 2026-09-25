@@ -89,6 +89,8 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     # Read by add-to-book questions: the post-trade beta's measured record against weekend-copilot.
     "copilot_rivals.json",
     "copilot_stress.json",
+    # Read by quote answers while the US market is shut: the implied open's measured record.
+    "overnight_comparison.json",
     # Read by execution questions: one-minute against hourly children on a full-depth replay.
     "execution_arena.json",
 )

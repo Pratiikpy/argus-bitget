@@ -1,0 +1,140 @@
+{
+  "generated": "2026-09-25T08:14:57+00:00",
+  "target": "rToken price Monday 10:00 ET, predicted from Sunday 19:00 ET (nocturne's own)",
+  "baseline_reproduced": {
+    "nocturne_published_large_caps": {
+      "M0": 2.117,
+      "MF": 1.922
+    },
+    "rerun_here": {
+      "M0": 2.117,
+      "MF": 1.922,
+      "M1": 2.085,
+      "M2": 2.18
+    }
+  },
+  "rows_nocturne": 61,
+  "rows_both": 61,
+  "weekends": 7,
+  "symbols": [
+    "RAAPL",
+    "RAMD",
+    "RAMZN",
+    "RAVGO",
+    "RCOIN",
+    "RGOOGL",
+    "RINTC",
+    "RMETA",
+    "RMSFT",
+    "RMU",
+    "RNVDA",
+    "RORCL",
+    "RTSLA"
+  ],
+  "summary": {
+    "M0": {
+      "mae_pct": 2.117,
+      "rmse_pct": 2.759,
+      "direction_hit_rate": null,
+      "direction_scored": 0
+    },
+    "MF": {
+      "mae_pct": 1.922,
+      "rmse_pct": 2.514,
+      "direction_hit_rate": 0.574,
+      "direction_scored": 54
+    },
+    "M1": {
+      "mae_pct": 2.085,
+      "rmse_pct": 2.724,
+      "direction_hit_rate": 0.5,
+      "direction_scored": 54
+    },
+    "M2": {
+      "mae_pct": 2.18,
+      "rmse_pct": 2.844,
+      "direction_hit_rate": 0.444,
+      "direction_scored": 54
+    },
+    "ARGUS": {
+      "mae_pct": 2.07,
+      "rmse_pct": 2.809,
+      "direction_hit_rate": 0.519,
+      "direction_scored": 54
+    }
+  },
+  "paired": [
+    {
+      "a": "ARGUS",
+      "b": "MF",
+      "mean_diff_pp": 0.148,
+      "ci95_pp": [
+        -0.115,
+        0.548
+      ],
+      "weekends": 7,
+      "verdict": "not separable"
+    },
+    {
+      "a": "ARGUS",
+      "b": "M0",
+      "mean_diff_pp": -0.046,
+      "ci95_pp": [
+        -0.174,
+        0.091
+      ],
+      "weekends": 7,
+      "verdict": "not separable"
+    },
+    {
+      "a": "MF",
+      "b": "M0",
+      "mean_diff_pp": -0.195,
+      "ci95_pp": [
+        -0.531,
+        0.053
+      ],
+      "weekends": 7,
+      "verdict": "not separable"
+    }
+  ],
+  "per_weekend": {
+    "2026-07-24": {
+      "M0": 4.048,
+      "MF": 2.844,
+      "ARGUS": 4.497
+    },
+    "2026-07-31": {
+      "M0": 3.303,
+      "MF": 3.159,
+      "ARGUS": 3.167
+    },
+    "2026-08-07": {
+      "M0": 2.259,
+      "MF": 1.61,
+      "ARGUS": 1.83
+    },
+    "2026-08-14": {
+      "M0": 1.623,
+      "MF": 1.42,
+      "ARGUS": 1.588
+    },
+    "2026-08-21": {
+      "M0": 2.254,
+      "MF": 2.252,
+      "ARGUS": 2.25
+    },
+    "2026-08-28": {
+      "M0": 1.613,
+      "MF": 1.416,
+      "ARGUS": 1.605
+    },
+    "2026-09-04": {
+      "M0": 0.444,
+      "MF": 0.813,
+      "ARGUS": 0.423
+    }
+  },
+  "failures": {},
+  "limitations": "nocturne's data ends where its clone was taken; the perpetuals are fetched fresh over the same weekends. Symbols without a Bitget perpetual are scored by nocturne alone and left out of the paired rows."
+}

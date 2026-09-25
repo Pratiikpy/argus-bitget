@@ -1,0 +1,479 @@
+{
+ "collected": "2026-09-25",
+ "note": "15 questions written after the first rules; coverage 69.2% on first read, then its unlabelled lines were given rules, so later coverage on this file is a training figure",
+ "lines": [
+  {
+   "question": "how risky is MSTR",
+   "text": "Actionable: size MSTR so that its worst observed 24 hours (-9.0%) is a loss you would accept — on a $10,000 position that is about $897; tell me what you hold to see its share of your risk."
+  },
+  {
+   "question": "how risky is MSTR",
+   "text": "MSTR moves 1.73x the Nasdaq-100 (QQQ) while US markets are open and 2.03x while they are shut — the open-session figure is the one that prices it."
+  },
+  {
+   "question": "how risky is MSTR",
+   "text": "If QQQ falls 5%, this position moves about -8.7% through beta alone."
+  },
+  {
+   "question": "how risky is MSTR",
+   "text": "If QQQ falls 10%, this position moves about -17.3% through beta alone."
+  },
+  {
+   "question": "how risky is MSTR",
+   "text": "Realised worst case: the worst 24-bar window in the observed history would have moved this position -8.97% — driven by MSTR -8.97%"
+  },
+  {
+   "question": "how risky is MSTR",
+   "text": "Return shape over 719 hourly bars: realised volatility 77% a year, skew +1.19, excess kurtosis 9.9 (fat-tailed — large hourly moves are far more common than a normal curve implies); QQQ explains 14% of its open-session moves (R²), so a QQQ hedge leaves most of its risk in place."
+  },
+  {
+   "question": "how risky is MSTR",
+   "text": "The desk's own last call on MSTR (decision 672, 2026-09-24T19:41Z): no_trade at stated confidence 0.55 — Under a general mandate with no specific risk budget or horizon constraint, the evidence presents a mildly bearish consensus (director selling, 50% short volume, fading momentum) against a mildly bullish technical narrative (downtrend break, Trump disclosure), but neither side clears the 14.27bps hurdle with sufficient conviction."
+  },
+  {
+   "question": "how risky is MSTR",
+   "text": "Assumed: no size was given, so MSTR is assessed at 20%."
+  },
+  {
+   "question": "COIN vs MSTR which is more volatile",
+   "text": "Actionable: MSTR carries the most market risk per dollar of the 2. Listed from most to least volatile."
+  },
+  {
+   "question": "COIN vs MSTR which is more volatile",
+   "text": "COIN and MSTR move together at +0.78 in the open session — mostly the same bet."
+  },
+  {
+   "question": "COIN vs MSTR which is more volatile",
+   "text": "MSTR: realised vol 77% a year; beta 1.73 open / 2.03 shut; QQQ -10% implies -17.3%; worst 24-hour window -9.0%."
+  },
+  {
+   "question": "COIN vs MSTR which is more volatile",
+   "text": "COIN: realised vol 64% a year; beta 1.52 open / 1.55 shut; QQQ -10% implies -15.2%; worst 24-hour window -10.0%."
+  },
+  {
+   "question": "hedge my TSLA with QQQ",
+   "text": "Actionable: no listed hedge explains much of this book — the best, QQQ, removes 19% of its variance — so the risk is mostly its own; reduce the largest holding rather than hedge it."
+  },
+  {
+   "question": "hedge my TSLA with QQQ",
+   "text": "QQQ: short $106,400 (beta 1.06) removes about 19% of the book's variance; entry 8.9bps, no funding at the current rate — 8.9bps all in."
+  },
+  {
+   "question": "hedge my TSLA with QQQ",
+   "text": "SPY: short $129,940 (beta 1.30) removes about 12% of the book's variance; entry 9.8bps, no funding at the current rate — 9.8bps all in."
+  },
+  {
+   "question": "hedge my TSLA with QQQ",
+   "text": "SMH: short $35,140 (beta 0.35) removes about 9% of the book's variance; entry 43.7bps, no funding at the current rate — 43.7bps all in."
+  },
+  {
+   "question": "hedge my TSLA with QQQ",
+   "text": "Sized on a $100,000 book — say your book's value for its own sizes."
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "Actionable: 7 headlines name AMZN in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact."
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "AMZN is +1.23% over 24 hours on Bitget. QQQ moved +1.68%, which at AMZN's beta of 1.06 explains +1.78%; the other -0.56% is AMZN's own."
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "3h ago — AMZN, META, GOOGL, MSFT, ORCL: Michael Burry Sounds Fresh Alarm On Big Tech’s AI Spending, Warns Of Massive Write-Offs In Two Years (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/amzn-meta-googl-msft-orcl-michael-burry-sounds-fresh-alarm-on-big-tech-s-ai-spending-warns-of-massive-write-offs-in-two-years/cZMay4jRBaX?.tsrc=rss"
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "5h ago — Microsoft vs. Amazon: Which AI Cloud Stock Converts Capex Into Profits Better? (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/microsoft-vs-amazon-ai-cloud-035215434.html?.tsrc=rss"
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "12h ago — Shopify Opens Its Doors to Muse, Here’s Why Amazon Won’t (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/shopify-opens-doors-muse-why-204347730.html?.tsrc=rss"
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "12h ago — Amazon Stock Dips After $100 Million Indiana Manufacturing Push (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amazon-stock-dips-100-million-201553864.html?.tsrc=rss"
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "13h ago — Amazon Opens Seller Data to Claude Days After Blocking Meta’s Muse (Yahoo Finance) https://www.benzinga.com/markets/prediction-markets/26/09/61984835/amazon-claude-seller-data-meta-muse?utm_source=yahooFinance&utm_campaign=partner_feed&utm_medium=referral&.tsrc=rss"
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Actionable: analyst price targets, last 90 days (16 firms, each firm's latest): median 422.5, range 350 to 515, +23% from the stock's 343.18; 14 buy, 2 hold, 0 sell; 5 raised and 7 cut their target."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "GOOGL's next report date is not published yet. It reports quarterly, so expect it around 20 Oct — an estimate, not a date; confirm it before holding a position into that window."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Most recent report on file: 2026-07-21 (period ending 2026-06-29); the source has not yet published the next date."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "The analyst consensus the source holds was scraped 2019-02-16 — too old to present as today's expectation, so it is withheld rather than quoted."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Institutional holders: the source returned one 13F record for the period ending 2026-06-30 — QRG CAPITAL MANAGEMENT, INC. (1,110,108 sh). A sample of filers, not a full ownership table."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Earnings surprise: the quarter ending 2026-06-30 was a large beat — SUE +3.37, i.e. diluted EPS changed +6.30 year over year against a usual swing of 1.87 (SEC filing, filed 2026-07-23)."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "GOOGL market cap $4,197bn."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Valuation on 2026-09-24: P/E (trailing 12m) 16.9, P/S (trailing 12m) 9.3, P/B (latest quarter) 6.5, EV/EBITDA 23.6, dividend yield 0.25%."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Institutions: 6,166 holders own 89.7% of the shares (as of 2026-09-23)."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Insider filings (SEC Form 4) in the last 30 days: Schindler Philipp (Officer), filed 2026-09-16; Schindler Philipp (Officer), filed 2026-09-03; ARNOLD FRANCES (Director), filed 2026-08-31 — read the filing for direction and size: https://www.sec.gov:443/Archives/edgar/data/1652044/000119312526393491/0001193125-26-393491-index.htm"
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Prediction market on GOOGL (Polymarket): \"Will Erling Haaland be the #1 searched person on Google this year?\" priced at 22%, +1 points in 24h — $91,393 traded, closes 2027-04-01."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Prediction market on GOOGL (Polymarket): \"Will Donald Trump be the #1 searched person on Google in the US this year?\" priced at 6% — $87,086 traded, closes 2027-04-01."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Prediction market on GOOGL (Polymarket): \"Will Donald Trump be the #1 searched person on Google this year?\" priced at 4% — $70,065 traded, closes 2027-04-01."
+  },
+  {
+   "question": "is META cheap right now",
+   "text": "No open positions."
+  },
+  {
+   "question": "is META cheap right now",
+   "text": "The record holds 673 decision(s), of which 673 are abstentions."
+  },
+  {
+   "question": "what happens if BTC drops 15%? I hold 60% BTC 40% ETH",
+   "text": "Actionable: ETH is 40% of the book but 43% of its loss when BTC falls — trimming it cuts the drawdown fastest; the BTC hedge below is the other lever."
+  },
+  {
+   "question": "what happens if BTC drops 15%? I hold 60% BTC 40% ETH",
+   "text": "If BTC moves -5%: your book moves about -5.26%, hardest hit ETH -5.66% (market-driven part only, through each beta)."
+  },
+  {
+   "question": "what happens if BTC drops 15%? I hold 60% BTC 40% ETH",
+   "text": "If BTC moves -10%: your book moves about -10.53%, hardest hit ETH -11.32% (market-driven part only, through each beta)."
+  },
+  {
+   "question": "what happens if BTC drops 15%? I hold 60% BTC 40% ETH",
+   "text": "Hedge: short BTC worth about 105% of the book's value offsets the part of this shock that reaches the book through beta (book beta to BTC 1.05); it does nothing for moves the holdings make on their own."
+  },
+  {
+   "question": "what happens if BTC drops 15%? I hold 60% BTC 40% ETH",
+   "text": "What actually happened, not a model — the worst 24-bar window in the observed history would have moved this book -3.51% — driven by ETH -6.15%, BTC -4.21%"
+  },
+  {
+   "question": "execute a 100k ETH sell slowly",
+   "text": "Actionable: in one market order this costs about 6.0bps (6.0bps fee + 0.0bps book impact) — the book absorbs it; one order is the plan."
+  },
+  {
+   "question": "execute a 100k ETH sell slowly",
+   "text": "A $100,000 order is 0.01% of ETH's 24h volume ($1,715,774,041); the fees come to about 6.0bps, and the square-root impact law — calibrated on Bitget's own books, at ETH's own 245bps daily volatility — puts this size's market impact near 0.6bps; the live book below shows what taking it at once costs."
+  },
+  {
+   "question": "execute a 100k ETH sell slowly",
+   "text": "Plan: at 0.006% of 24h volume the order cannot move the price; one order is cheapest — splitting would only add time in the market and a fee per slice."
+  },
+  {
+   "question": "execute a 100k ETH sell slowly",
+   "text": "Order book (sell side, live): taking all $100,000 at once walks 1 level(s) for 0.0bps of slippage on top of the fee."
+  },
+  {
+   "question": "execute a 100k ETH sell slowly",
+   "text": "Slice 1: 100% ($100,000) as single order: near-touch limit, market if unfilled — about 6.0bps fee plus 0.0bps book impact."
+  },
+  {
+   "question": "is gold a good hedge right now",
+   "text": "Actionable: no listed hedge explains much of this book — the best, QQQ, removes 26% of its variance — so the risk is mostly its own; reduce the largest holding rather than hedge it."
+  },
+  {
+   "question": "is gold a good hedge right now",
+   "text": "QQQ: short $78,060 (beta 0.78) removes about 26% of the book's variance; entry 8.6bps, no funding at the current rate — 8.6bps all in."
+  },
+  {
+   "question": "is gold a good hedge right now",
+   "text": "ETH: short $18,030 (beta 0.18) removes about 13% of the book's variance; entry 6.0bps, funding over 7 days 15.3bps received — earns 9.3bps net."
+  },
+  {
+   "question": "is gold a good hedge right now",
+   "text": "BTC: short $23,400 (beta 0.23) removes about 12% of the book's variance; entry 6.0bps, funding over 7 days 11.1bps received — earns 5.1bps net."
+  },
+  {
+   "question": "is gold a good hedge right now",
+   "text": "Sized on a $100,000 book — say your book's value for its own sizes."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "69 abstention(s), across 1 symbol(s), all in rth/weekend session(s)."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "An abstention here is a recorded decision, not an absence of one: it is hash-chained, settled against the move that actually happened, and scored by abstention value."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "  seq 641 TSLAUSDT: General mandate: no specific client constraint applies, so the decision is governed purely by edge versus the 14.27 bps hurdle."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "  seq 653 TSLAUSDT: General mandate: no specific client constraint applies. TSLA shows mild bullish momentum (price above all MAs, RSI 65.9, strong Q2 earnings beat) but the forward consensus revisions are heavily negative (4 up / 15 down current quarter, 3 up / 16 down next quarter), and the price is already above the upper Bollinger band with resistance at 380.51 — suggesting limited near-term upside relative to the 14.27bps hurdle."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "  seq 665 TSLAUSDT: Under a general mandate with no specific risk budget or directional bias, the evidence presents a mildly bullish setup (strong Q2 beat, bullish technicals, large block buys) but the forward consensus revisions are heavily negative (4 up / 15 down current quarter), the stock is sitting right at resistance (380.51), and the 24h change is essentially flat (-0.013%)."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "65 of them have a counterfactual recorded — the move that would have happened — so standing aside can be graded rather than assumed correct."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "How the desk reached decision 665, from the notes it wrote at the time:"
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "Evidence screen: 63 evidence item(s) screened, none withheld."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "Panel: 3 of 3 analysts run: event, sentiment, earnings."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "Panel: 3 analyst(s) ran concurrently in 101.0s; none could read another's answer, so agreement is consensus rather than contagion."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "Agreement, discounted for shared sources: 4 analysts, 22 distinct sources, independence 5.50 -> bullish at 0.48 after provenance discount."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "Memory: 8 prior decision(s) on TSLAUSDT shown to the PM, 8 of them graded; 2 pattern(s) stated from the record."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "Debate: Not held — the panel agreed on direction across 4 analyst(s), and a debate between two seats that already agree is paid restatement. It runs when they split."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "Grounding check: All 6 figure(s) resolve to a computed value or a cited fact."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "Entity check: 0 instrument(s) named, 0 unsupported."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "Adversary: Not run — the decision opens no exposure, so there is nothing to falsify."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "Constitution: Nothing bound, so the decision was not re-put to the model: asking it to reconsider an unconstrained choice would have told it something untrue and paid for a second opinion on a question nobody asked."
+  },
+  {
+   "question": "what did the desk decide on TSLA",
+   "text": "Protocol: Within the committed protocol; nothing changed (argus-paper-v1 v3: opens no position)."
+  },
+  {
+   "question": "SOL funding",
+   "text": "Actionable: a round trip in SOL costs about 12.1bps (12bps taker fees + the 0.1bps spread) — a trade needs a move bigger than that just to break even."
+  },
+  {
+   "question": "SOL funding",
+   "text": "SOL last 116.962 USDT on Bitget (+2.58% over 24h); bid 116.962 / ask 116.963, spread 0.1bps; 24h range 112.41 to 118.397; funding +0.0088% per interval; 24h volume about $230,067,003."
+  },
+  {
+   "question": "SOL funding",
+   "text": "Funding means longs pay shorts every 8h: 0.026% of the position a day, about 9.6% a year if it held — no crowding either way."
+  },
+  {
+   "question": "SOL funding",
+   "text": "A crypto contract: it trades around the clock on its own market, with no off-chain anchor to gap against."
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "Actionable: AAPL's next report date is not published yet. It reports quarterly, so expect it around 28 Oct — an estimate, not a date; confirm it before holding a position into that window."
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "Most recent report on file: 2026-07-29 (period ending 2026-06-29); the source has not yet published the next date."
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "The analyst consensus the source holds was scraped 2024-02-02 — too old to present as today's expectation, so it is withheld rather than quoted."
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "Institutional holders: the source returned one 13F record for the period ending 2026-06-30 — Envestnet Portfolio Solutions, Inc. (683,492 sh). A sample of filers, not a full ownership table."
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "Analyst price targets, last 90 days (14 firms, each firm's latest): median 345, range 245 to 400, +3% from the stock's 335.99; 8 buy, 3 hold, 3 sell; 2 raised and 4 cut their target."
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "Earnings surprise: the quarter ending 2026-06-27 was a small beat — SUE +0.54, i.e. diluted EPS changed +0.37 year over year against a usual swing of 0.69 (SEC filing, filed 2026-07-31)."
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "AAPL market cap $4,903bn."
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "Valuation on 2026-09-24: P/E (trailing 12m) 38.1, P/S (trailing 12m) 10.5, P/B (latest quarter) 45.7, EV/EBITDA 34.6, dividend yield 0.31%."
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "Institutions: 6,493 holders own 76.6% of the shares (as of 2026-09-23)."
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "Insider filings (SEC Form 4) in the last 30 days: Newstead Jennifer (Officer), filed 2026-09-10; Newstead Jennifer (Officer), filed 2026-09-03; Newstead Jennifer (Officer), filed 2026-08-27 — read the filing for direction and size: https://www.sec.gov:443/Archives/edgar/data/320193/000114036126036226/0001140361-26-036226-index.htm"
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "Prediction market on AAPL (Polymarket): \"Will Apple release a new product line before 2027?\" priced at 22% — $312,668 traded, closes 2027-01-01."
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "Prediction market on AAPL (Polymarket): \"Will Apple release a touchscreen MacBook in 2026?\" priced at 62%, -8 points in 24h — $76,558 traded, closes 2027-01-01."
+  },
+  {
+   "question": "AAPL earnings date",
+   "text": "Prediction market on AAPL (Polymarket): \"Will Apple purchase memory CXMT chips in 2026?\" priced at 16% — $22,416 traded, closes 2027-01-01."
+  },
+  {
+   "question": "is it a good time to buy QQQ",
+   "text": "Actionable: no one can know whether QQQ will be higher after 1 day, and I will not guess. Its own record: over 331 past 1-day windows, from daily closes over 331 days, it finished higher 50% of the time (95% interval 45% to 56%) — indistinguishable from a coin flip."
+  },
+  {
+   "question": "is it a good time to buy QQQ",
+   "text": "Clearing the cost: a long held 1 day needs about 12bps (12bps round trip); it cleared that in 44% of past windows."
+  },
+  {
+   "question": "is it a good time to buy QQQ",
+   "text": "Typical 1-day move: median +0bps, 10th to 90th percentile -108 to +122bps — the width is the risk."
+  },
+  {
+   "question": "is it a good time to buy QQQ",
+   "text": "Where a stop sits in the noise: in 90% of past 1-day windows a long was never more than 175bps against it at the worst point, on the bars' lows — a stop closer than that is taken out by ordinary movement more than one time in ten."
+  },
+  {
+   "question": "is it a good time to buy QQQ",
+   "text": "After a 1-day fall like the last one (-58bps), it finished higher 48% of 164 windows — no measurable difference from its usual rate, so the last move says nothing here."
+  },
+  {
+   "question": "is it a good time to buy QQQ",
+   "text": "Comparable states, next 24h: in 50 comparable past states (11 independent episodes over 89 days), the next 24h median was +58bps and it rose 72% of the time — against a ~12bps round trip."
+  },
+  {
+   "question": "is it a good time to buy QQQ",
+   "text": "Path match (the shape of the last 24 hours, not only its size): the closest past stretch ended 26 Jul 17:00 UTC and looks alike, but shuffling QQQ's own returns produced a match that close in 24% of 50 tries. The shape is not distinguishable from chance, so what followed it says nothing about what comes next."
+  },
+  {
+   "question": "is it a good time to buy QQQ",
+   "text": "Next 5 sessions, 80% band: -2.4% to +3.0% — QQQ's own 327 past 5-session moves, widened or narrowed by its current volatility. On AnalogDesk's own 2,698-query test this band scored best of every method tried, AnalogDesk's included, though not by a significant margin."
+  },
+  {
+   "question": "is it a good time to buy QQQ",
+   "text": "Now: QQQ is +174bps over the last 24h with hourly volatility of 21bps."
+  },
+  {
+   "question": "is it a good time to buy QQQ",
+   "text": "Spread of outcomes: 25th percentile -16bps, 75th +132bps — the range, not the median, is the risk."
+  },
+  {
+   "question": "is it a good time to buy QQQ",
+   "text": "Assumed: no horizon was stated, so the next 24 hours are read."
+  },
+  {
+   "question": "is it a good time to buy QQQ",
+   "text": "Assumed: a direction was asked for; this is how often the contract finished that way over past windows of the same length, not a prediction."
+  },
+  {
+   "question": "how did the desk do this week",
+   "text": "Track record: 673 decisions on the ledger and no trade settled — every decision so far is a refusal, so there is no Sharpe, drawdown or win rate to report."
+  },
+  {
+   "question": "how did the desk do this week",
+   "text": "Every refusal still states which way it leans, hashed before the outcome: at about 2 hours 194 of 325 leans went the right way (59.7%, 95% interval 52.3 to 66.8% over 29 decision cycles), against 54.5% for simply calling `up` every time — the lean beat that naive call in 13 cycles and lost in 10, so there is no evidence yet that it knows more than the tape's direction; overnight 48 of 99 (48.5%) — graded 2026-09-24, `python -m argus.eval.refusal`."
+  },
+  {
+   "question": "how did the desk do this week",
+   "text": "sharpe: not available — the window is 13 day(s); a standard deviation needs at least 30"
+  },
+  {
+   "question": "how did the desk do this week",
+   "text": "sortino: not available — the window is 13 day(s); a standard deviation needs at least 30"
+  },
+  {
+   "question": "how did the desk do this week",
+   "text": "win_rate: not available — no settled trades; a win rate over zero trades is undefined, not zero per cent"
+  },
+  {
+   "question": "how did the desk do this week",
+   "text": "max_drawdown: not available — no settled trades; equity never moved, so the 0.0% this would otherwise report measures an account that never took a position rather than the desk's risk control, and is not comparable to a traded strategy's drawdown"
+  },
+  {
+   "question": "how did the desk do this week",
+   "text": "The log holds 673 abstention(s) and 0 settled trade(s) over 13 day(s). Sharpe, win rate and drawdown need trades; abstentions are scored separately, by abstention value."
+  },
+  {
+   "question": "how did the desk do this week",
+   "text": "Net PnL 0 on stated capital 10000."
+  },
+  {
+   "question": "TQQQ weekend risk at 2x",
+   "text": "Actionable: size TQQQ so that its worst observed 24 hours (-5.5%) is a loss you would accept — on a $10,000 position that is about $551; tell me what you hold to see its share of your risk."
+  },
+  {
+   "question": "TQQQ weekend risk at 2x",
+   "text": "TQQQ moves 2.94x the Nasdaq-100 (QQQ) while US markets are open and 2.88x while they are shut — the open-session figure is the one that prices it."
+  },
+  {
+   "question": "TQQQ weekend risk at 2x",
+   "text": "If QQQ falls 5%, this position moves about -14.7% through beta alone."
+  },
+  {
+   "question": "TQQQ weekend risk at 2x",
+   "text": "If QQQ falls 10%, this position moves about -29.4% through beta alone."
+  },
+  {
+   "question": "TQQQ weekend risk at 2x",
+   "text": "Realised worst case: the worst 24-bar window in the observed history would have moved this position -5.51% — driven by TQQQ -5.51%"
+  },
+  {
+   "question": "TQQQ weekend risk at 2x",
+   "text": "Return shape over 719 hourly bars: realised volatility 46% a year, skew -0.09, excess kurtosis 5.0 (fat-tailed — large hourly moves are far more common than a normal curve implies); QQQ explains 99% of its open-session moves (R²), so a QQQ hedge covers most of its risk."
+  },
+  {
+   "question": "TQQQ weekend risk at 2x",
+   "text": "The desk's own last call on TQQQ (decision 662, 2026-09-24T17:41Z): no_trade at stated confidence 0.55 — General mandate: no edge clears the 14.27bps hurdle. The 24h change is -0.064% (essentially flat), VIX is in normal regime at 36th percentile, short interest is elevated at 56.6% but not extreme, and the sentiment panel found no actionable signal."
+  },
+  {
+   "question": "TQQQ weekend risk at 2x",
+   "text": "Assumed: at 2x the position's exposure is 2 times its margin, so with no size given, 20% of margin is read as 40% of exposure — say the margin you have in mind."
+  }
+ ],
+ "first_read": {
+  "content_lines": 107,
+  "unlabelled": 33,
+  "coverage": 0.692
+ }
+}

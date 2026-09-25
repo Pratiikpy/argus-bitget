@@ -396,22 +396,45 @@ _QUOTE = re.compile(
     r"where\s+is\s+(?:the\s+)?\w+\s+trading|where'?s\s+(?:the\s+)?\w+\s+trading)\b",
     re.I,
 )
+OPEN_INTEREST_QUESTION = re.compile(
+    r"\bopen[\s-]+interest\b|\bOI\b|\bpositioning\b|\bhow\s+(?:crowded|levered|leveraged)\b|"
+    r"\blong[\s/-]+short\s+ratio\b|持仓量|未平仓", re.I)
+"""Open interest and positioning, answered by the sentiment engine's positioning lines."""
+
+IMPLIED_OPEN_QUESTION = re.compile(
+    r"\b(?:where|what|how)\s+(?:will|would|does|do|is|should)\s+(?:\w+\s+){0,3}"
+    r"(?:open|opening)\b(?!\s+(?:interest|a|an|my|the|position|positions|orders?)\b)|"
+    r"\bopen(?:ing)?\s+(?:price|level|at)\b|\bimplied\s+open\b|"
+    r"\bfair\s+(?:value|price)\b|\bworth\s+(?:right\s+)?now\b|\bpre-?market\b|"
+    r"\bgap\s+(?:up|down)\s+(?:at|on)\s+the\s+open\b|开盘|開盤|寄り付き",
+    re.I,
+)
+"""Where a stock should open, or what it is worth while its market is shut. Answered by the quote
+engine's implied-open line (`_implied_open_line`), a measured reading of the perpetual rather than
+a forecast, so these questions are not refused as forecasts. "Open interest" and "open a position"
+do not match: an open here is a price or a time the stock opens."""
+
 _ROUND_TRIP = re.compile(r"\bround[\s-]?trip\b|\bbid[\s/-]+(?:and\s+)?ask\b", re.I)
 _BUDGET = re.compile(
     r"(?:risk\s+budget|max(?:imum)?\s+(?:risk|share\s+of\s+risk)|no\s+(?:single\s+)?name\s+"
     r"(?:above|over|more\s+than)|(?:any|each|one|a\s+single)\s+name\s+(?:under|below|at\s+"
-    r"most)|cap\s+(?:each|any|per)\s+name\s+at)\D{0,30}?(\d+(?:\.\d+)?)\s*%",
+    r"most)|cap\s+(?:each|any|per)\s+name\s+at)[^\d,;]{0,30}?(\d+(?:\.\d+)?)\s*%"
+    r"|(\d+(?:\.\d+)?)\s*%\s+(?:risk\s+budget|(?:single[\s-]+)?name\s+(?:risk\s+)?(?:cap|limit)|"
+    r"(?:risk\s+)?cap\s+(?:per|on\s+(?:each|any))\s+name|max(?:imum)?\s+(?:risk\s+)?per\s+name)",
     re.I,
 )
 """A trader's own single-name risk cap. Kept deliberately narrow: a percentage near these words is
-a budget, and every other percentage in the question is a weight, a size or a shock."""
+a budget, and every other percentage in the question is a weight, a size or a shock. Both orders
+are read — "a risk budget of 25%" and "a 25% risk budget" — and the gap after the words stops at a
+comma: "with a 25% risk budget, I hold 50% AAPL" once read the holding's 50% as the budget, because
+the old gap crossed the comma to the next number (found in a sample of answers, 2026-09-25)."""
 
 
 def parse_budget(text: str) -> float | None:
     match = _BUDGET.search(text)
     if match is None:
         return None
-    value = float(match.group(1)) / 100.0
+    value = float(match.group(1) or match.group(2)) / 100.0
     return value if 0.0 < value < 1.0 else None
 
 
@@ -527,7 +550,13 @@ _DIRECTIONAL = re.compile(
     r"(?:be\s+(?:higher|lower|up|down|green|red)|go(?:ing)?\s+(?:up|down|higher|lower)|"
     r"(?:close|end|finish)\s+(?:higher|lower|up|down|green|red)|rise|fall|drop|dump|pump|climb|"
     r"sink|rally|bounce)\b"
-    r"|\b(?:up\s+or\s+down|higher\s+or\s+lower|green\s+or\s+red)\b",
+    r"|\b(?:up\s+or\s+down|higher\s+or\s+lower|green\s+or\s+red)\b"
+    # "is it a good time to buy QQQ": a timing question, answered with the record at the
+    # horizon rather than refused or guessed (unrecognised until 2026-09-25)
+    r"|\b(?:good|right|bad)\s+(?:time|moment|entry)\s+to\s+(?:buy|sell|enter|short|get\s+in)\b"
+    # "what are the odds NVDA is higher in 24 hours", "chance BTC ends the week lower"
+    r"|\b(?:odds|chances?|probability|likelihood|likely)\b[^.?!]{0,40}?\b(?:is|are|ends?|"
+    r"closes?|finish(?:es)?|be|stays?)\s+(?:\w+\s+){0,2}?(?:higher|lower|up|down|green|red)\b",
     re.I)
 """A yes/no question about direction over a horizon. Answered with the contract's own record at
 that horizon (`desk/odds.py`) — how often it finished higher — never with a prediction. A price
@@ -551,8 +580,9 @@ def _horizon(text: str) -> tuple[int, bool, str | None]:
         return max(1, min(round(amount * scale), 24 * 90)), False, None
     for pattern, hours in ((r"\b(?:tonight|overnight|today|by\s+the\s+close|eod)\b", 12),
                            (r"\b(?:tomorrow|next\s+day|24\s*h)\b", 24),
-                           (r"\b(?:this|next|in\s+a)\s+week\b|\bby\s+(?:monday|friday)\b", 168),
-                           (r"\b(?:this|next|in\s+a)\s+month\b", 720)):
+                           (r"\b(?:this|next|in\s+a|the|a)\s+week\b|\bweekly\b|"
+                            r"\bby\s+(?:monday|friday)\b", 168),
+                           (r"\b(?:this|next|in\s+a|the|a)\s+month\b|\bmonthly\b", 720)):
         if re.search(pattern, text, re.I):
             return hours, False, None
     return 24, False, "no horizon was stated, so the next 24 hours are read"
@@ -1506,6 +1536,20 @@ def _detect(text: str) -> ResearchRequest | None:
         return ResearchRequest(
             kind=ResearchKind.STRESS, symbols=(), book={},
             shock_pct=-float(drop.group(1).replace(",", ".")) if drop else None)
+    if _VAR.search(raw) and not _ADD_VERB.search(raw) and not _is_an_order(raw):
+        stated_book: dict[str, float] = {}
+        for _, holding, share in _pairs(raw):
+            stated_book[holding] = stated_book.get(holding, 0.0) + share
+        total = sum(stated_book.values())
+        if len(stated_book) >= 1 and total > 0:
+            # A book and "VaR" / "value at risk" / "expected shortfall": the book's own tail,
+            # read from its daily history (`_var_lines`), beside the usual stress lines.
+            var_book = {k: v / total for k, v in stated_book.items()}
+            scaled = (() if abs(total - 1.0) < 0.01 else (
+                f"your holdings add up to {total * 100:.0f}%, so they were scaled to 100% — say "
+                f"the rest if it is cash or another name",))
+            return ResearchRequest(kind=ResearchKind.STRESS, symbols=tuple(var_book),
+                                   book=var_book, notes=scaled)
     resized = _resize(raw) if symbols else None
     if resized is not None and not _is_an_order(raw) and not _STRESS.search(raw):
         # "Trim my TSLA weight to 10%", "resizing NVDA from 8% to 20%", 把英伟达从15%降到5% set
@@ -1514,13 +1558,17 @@ def _detect(text: str) -> ResearchRequest | None:
         to_weight, from_weight, by_share = resized
         stated: dict[str, float] = {}
         for _, holding, share in _pairs(raw):
-            if holding != symbols[0]:
-                stated[holding] = stated.get(holding, 0.0) + share
+            # The resized name's own stated weight is its current holding: "resize NVDA to 20% in
+            # 40% NVDA, 60% AAPL" holds 40% now. It used to be dropped with the other pairs of that
+            # name, so the answer asked for a book it had just been given (2026-09-25). The target
+            # itself is never a pair ("to 20%" is read by `_resize`), so it cannot be counted here.
+            stated[holding] = stated.get(holding, 0.0) + share
         if to_weight is not None and not 0.0 <= to_weight < 1.0:
             to_weight = None
         return ResearchRequest(
-            kind=ResearchKind.IMPACT, symbols=(symbols[0], *stated), book=stated,
-            size=to_weight if to_weight else DEFAULT_SIZE, size_stated=to_weight is not None,
+            kind=ResearchKind.IMPACT, symbols=(symbols[0], *(k for k in stated if k != symbols[0])),
+            book=stated, size=to_weight if to_weight else DEFAULT_SIZE,
+            size_stated=to_weight is not None,
             target=to_weight, resize_from=from_weight, resize_by=by_share)
     cjk = _cjk_request(raw, symbols)
     if cjk is not None:
@@ -1723,6 +1771,11 @@ def _detect(text: str) -> ResearchRequest | None:
         # "eth round trip cost if I buy and sell right now" names buying and selling only to say
         # what the cost is of; the add-a-position words made it an impact question (blind corpus,
         # 2026-09-25). A round trip is the quote engine's cost line.
+        return ResearchRequest(kind=ResearchKind.QUOTE, symbols=symbols[:4])
+    if (simple and OPEN_INTEREST_QUESTION.search(raw) and not _QUOTE.search(raw)
+            and not _is_an_order(raw)):
+        return ResearchRequest(kind=ResearchKind.SENTIMENT, symbols=symbols[:1])
+    if simple and IMPLIED_OPEN_QUESTION.search(raw) and not _is_an_order(raw):
         return ResearchRequest(kind=ResearchKind.QUOTE, symbols=symbols[:4])
     if simple and _QUOTE.search(raw):
         if _FORECAST.search(raw):
@@ -2584,9 +2637,11 @@ def _resolve_resize(request: ResearchRequest, before: dict[str, float],
             book = {s: w * (1.0 - request.resize_from) / rest for s, w in book.items() if s != add}
             book[add] = request.resize_from
     if add not in book or len(book) < 2:
+        others = [n for n in ("AAPL", "MSFT", "NVDA") if n != _t(add)][:2]
         return (f"Resizing {_t(add)} changes every other holding's share too, so I need what "
-                f"you hold — say it with weights, e.g. \"trim {_t(add)} to 10%; I hold 30% "
-                f"{_t(add)}, 40% NVDA, 30% AAPL\", or save your book once on the console.")
+                f"you hold — say it with weights, e.g. \"what if I trim {_t(add)} to 10%? I hold "
+                f"30% {_t(add)}, 40% {others[0]}, 30% {others[1]}\", or save your book once on "
+                f"the console.")
     current = book[add]
     if request.target is not None:
         target = request.target
@@ -3641,6 +3696,17 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
         except Exception:
             crowd_lines = []
     extra = [line for line in (stock_line, *crowd_lines) if line]
+    oi_symbol = symbol or "BTCUSDT"
+    try:
+        # Open interest set against its own volume and the whole venue (`market/open_interest`);
+        # "ETH open interest" had no answer at all until 2026-09-25.
+        from argus.market import open_interest
+
+        reading = open_interest.read(oi_symbol)
+        oi_lines = open_interest.lines(reading, _t(oi_symbol)) if reading else []
+    except Exception:
+        oi_lines = []
+    extra.extend(oi_lines)
     integrity = _desk_integrity_read(symbol) if symbol else None
     tested = _coordination_test(symbol)
     story_line = None
@@ -4966,14 +5032,34 @@ def _premium_line(symbol: str, rtoken_last: Decimal,
 
     if symbol not in TRADED_SYMBOLS and not universe.is_equity(symbol):
         return None
-    try:
-        stock = BitgetDataService().quote(_t(symbol))
-        last = float(stock.get("last_price") or 0)
-    except Exception:
-        return None
-    if last <= 0:
+    last = _stock_last(symbol, BitgetDataService)
+    if last is None and not anchor_open:
+        # While the market is shut the stock's price is its last close, which Yahoo's daily bars
+        # carry when `bitget-mcp-server` does not answer (503 on 2026-09-25).
+        close = _last_regular_close(datetime.now(UTC))
+        last = _yahoo_close(symbol, close) if close is not None else None
+    if last is None:
         return None
     premium = (float(rtoken_last) / last - 1.0) * 10_000
+    if not anchor_open:
+        # While the stock is shut its price is its last close, so perpetual-now over that close
+        # is mostly the overnight move. The premium is the gap at the close itself; the move
+        # since is stated as a move (on 2026-09-25 a 6bps premium read as 60bps this way).
+        close = _last_regular_close(datetime.now(UTC))
+        at_close = _perp_at_close(symbol, close) if close is not None else None
+        if at_close is not None:
+            gap = (at_close / last - 1.0) * 10_000
+            since = (float(rtoken_last) / at_close - 1.0) * 100
+            if abs(gap) <= PREMIUM_SANITY_BPS:
+                return (
+                    f"Versus the stock: {_t(symbol)} closed at {last:g} → the perpetual traded at "
+                    f"a {abs(gap):.1f}bps {'premium' if gap >= 0 else 'discount'} at that close; "
+                    f"it has moved {since:+.2f}% since, which is the overnight move, not a "
+                    f"premium.",
+                    Source(kind="venue", ref="bitget-mcp-server quote",
+                           detail=f"{_t(symbol)} last {last:g}; perpetual at the close "
+                                  f"{at_close:g}"),
+                )
     if abs(premium) > PREMIUM_SANITY_BPS:
         # A tokenised share trades within basis points of its stock. A gap this wide means the
         # two tickers are not the same company, or one price is bad — not a premium to report.
@@ -4986,6 +5072,143 @@ def _premium_line(symbol: str, rtoken_last: Decimal,
         Source(kind="venue", ref="bitget-mcp-server quote", detail=f"{_t(symbol)} "
                f"last {last:g}"),
     )
+
+
+_STOCK_LAST: dict[str, tuple[float, float]] = {}
+
+
+def _stock_last(symbol: str, service: Any) -> float | None:
+    """The stock's own last price from `bitget-mcp-server`, held for a minute so the premium and
+    implied-open lines of one answer read the same quote."""
+    hit = _STOCK_LAST.get(symbol)
+    if hit and time.monotonic() - hit[0] < 60:
+        return hit[1]
+    try:
+        last = float(service().quote(_t(symbol)).get("last_price") or 0)
+    except Exception:
+        return None
+    if last <= 0:
+        return None
+    _STOCK_LAST[symbol] = (time.monotonic(), last)
+    return last
+
+
+def _last_regular_close(now: datetime) -> datetime | None:
+    """16:00 New York on the most recent session day at or before ``now``, from the session clock
+    with its holiday calendar. Early-close days (13:00) are not in that calendar and read as 16:00:
+    the perpetual's price three hours after such a close is then the reference, stated here
+    rather than hidden."""
+    from datetime import time as clock_time
+    from zoneinfo import ZoneInfo
+
+    from argus.truth.clocks import SessionPhase
+
+    new_york = ZoneInfo("America/New_York")
+    clock, _ = _dual_clock()
+    local = now.astimezone(new_york)
+    for back in range(10):
+        close = datetime.combine(local.date() - timedelta(days=back), clock_time(16),
+                                 tzinfo=new_york)
+        if close <= now and clock.phase(close - timedelta(minutes=1)) is SessionPhase.RTH:
+            return close
+    return None
+
+
+def _yahoo_close(symbol: str, close: datetime) -> float | None:
+    """The session's close from Yahoo's daily bars when `bitget-mcp-server` does not answer (it
+    returned 503 on 2026-09-25); only a bar dated that session is used, never an older one."""
+    from zoneinfo import ZoneInfo
+
+    from argus.market import equity_history
+
+    try:
+        days = equity_history.daily(_t(symbol))
+    except Exception:
+        return None
+    session = close.astimezone(ZoneInfo("America/New_York")).date()
+    same = [d for d in days if d.day == session]
+    return float(same[-1].close) if same else None
+
+
+def _perp_at_close(symbol: str, close: datetime) -> float | None:
+    """The perpetual's price at a regular close: the close of the hourly bar ending then."""
+    from argus.market.history import fetch
+
+    try:
+        bars = fetch(symbol, interval="1H", start=close - timedelta(hours=3), end=close)
+    except Exception:
+        return None
+    at_close = [b for b in bars if b.ts + timedelta(hours=1) == close]
+    return float(at_close[0].close) if at_close and at_close[0].close > 0 else None
+
+
+def _overnight_record(symbol: str) -> dict[str, Any] | None:
+    """The implied open's record on this stock when it was scored, else across all scored stocks.
+    Per stock because the pooled figure would overstate the lead where it is small: on QQQ the
+    index futures gloaming reads are nearly the same instrument, and the two came out level."""
+    from argus.lui.answer import _notes_path
+
+    try:
+        report = json.loads((_notes_path().parent / "overnight_comparison.json")
+                            .read_text(encoding="utf-8"))
+        rival = report["best_gloaming"]
+        own = report["per_stock"].get(_t(symbol))
+        if own:
+            paired = own["argus_perp_vs_best_gloaming"]
+            return {"scope": f"{_t(symbol)} on {own['nights']} nights",
+                    "argus": own["argus_perp"], "hit": own["argus_perp_direction_hit_rate"],
+                    "rival": own[rival], "zero": own["zero"],
+                    "separable": paired["verdict"] != "not separable"}
+        summary = report["summary"]
+        return {"scope": f"{report['nights']} nights across {len(report['per_stock'])} stocks",
+                "argus": summary["argus_perp"]["mae_bps"],
+                "hit": summary["argus_perp"]["direction_hit_rate"],
+                "rival": summary[rival]["mae_bps"], "zero": summary["zero"]["mae_bps"],
+                "separable": True}
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+
+
+def _implied_open_line(symbol: str, perp_last: Decimal,
+                       now: datetime | None = None) -> tuple[str, Source] | None:
+    """While the US market is shut: where the stock should open, read from its own perpetual's
+    move since the last regular close, with that reading's measured record.
+
+    `eval/overnight_comparison.py` scored it on every night since April across eight names
+    against gloaming's overnight fair value (index futures, BTC/ETH and the dollar, blended as it
+    ships and OLS-refit) and against assuming no gap; the perpetual's own move was the closest to
+    the real open, and adding the futures to it did not improve it, so it is used alone."""
+    from argus.market import universe
+    from argus.market.bitget_mcp import BitgetDataService
+
+    if symbol not in TRADED_SYMBOLS and not universe.is_equity(symbol):
+        return None
+    instant = now or datetime.now(UTC)
+    close = _last_regular_close(instant)
+    if close is None:
+        return None
+    stock = _stock_last(symbol, BitgetDataService) or _yahoo_close(symbol, close)
+    if stock is None:
+        return None
+    perp_close = _perp_at_close(symbol, close)
+    if perp_close is None:
+        return None
+    move = float(perp_last) / perp_close - 1.0
+    implied = stock * (1.0 + move)
+    text = (f"Implied open: {_t(symbol)}'s perpetual has moved {move * 100:+.2f}% since the "
+            f"{close.astimezone(UTC):%a %H:%M} UTC close, which puts the stock near "
+            f"{implied:,.2f} at the next open (last close {stock:g}).")
+    record = _overnight_record(symbol)
+    if record:
+        tie = "" if record["separable"] else " (a difference too small to call)"
+        text += (f" Read this way on {record['scope']}, the open was missed by "
+                 f"{record['argus']:.0f}bps on average, with the direction right "
+                 f"{record['hit'] * 100:.0f}% of the time; gloaming, an S2 desk that estimates "
+                 f"overnight fair value from index futures, crypto and the dollar, missed by "
+                 f"{record['rival']:.0f}bps{tie}, and assuming no gap by {record['zero']:.0f}bps.")
+    return text, Source(kind="computation", ref="argus.eval.overnight_comparison",
+                        detail=f"{symbol} 1H close at {close.astimezone(UTC):%Y-%m-%d %H:%M} "
+                               f"UTC {perp_close:g}; stock last {stock:g}")
 
 
 EARNINGS_NEAR_DAYS = 7
@@ -5190,13 +5413,24 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
         # A directional question is read by every model as a forecast and refused; it has one
         # engine that answers it without forecasting (`desk/odds.py`).
         return True
+    if request.kind is ResearchKind.ANALOGUE and _ANALOGUE.search(text):
+        # "analogues for the current BTC setup" names the engine; the kind model read it as a
+        # fundamentals question at 0.13 and answered that crypto has no earnings (2026-09-25).
+        # Limited to the analogue words themselves: the patterns also reach ANALOGUE from a
+        # horizon ("support on QQQ into next week"), and there the model is right.
+        return True
+    if request.kind is ResearchKind.STRESS and request.book and _VAR.search(text):
+        # "expected shortfall at 99% for 60% NVDA, 40% AAPL" was read by the kind model as adding
+        # 20% NVDA (2026-09-25). A book and a VaR word have one engine.
+        return True
     if request.kind is ResearchKind.IMPACT and request.size_stated and _ADD_VERB.search(text):
         # "I'm a conservative investor, should I add 15% TSLA?" — the README's own example — was
         # read by the live model as a fundamentals question and answered with TSLA's earnings
         # date (a judge-style pass, 2026-09-25). A stated add of a stated size has one engine.
         return True
     if request.kind is ResearchKind.SENTIMENT:
-        return bool(_HYPE.search(text))
+        return bool(_HYPE.search(text) or (OPEN_INTEREST_QUESTION.search(text)
+                                           and not _QUOTE.search(text)))
     return request.kind is ResearchKind.FUNDAMENTALS and bool(
         _FLOW.search(text) or _EARNINGS_CALL.search(text) or _LINE_ITEM.search(text))
 
@@ -6122,7 +6356,10 @@ _CJK_FUNDING_WORD = {"\u8d35": "expensive", "\u4fbf\u5b9c": "cheap", "\u9ad8": "
                      "\u4f4e": "low"}
 _PREMIUM_CLAIM = re.compile(
     r"\b(?:perp\w*|contract|token|rtoken)\b[^.?!]{0,40}?\b(?:at\s+an?\s+|trad\w+\s+(?:at\s+)?an?\s+)?"
-    r"(?P<c>premium|discount)\b|\bbasis\s+(?:looks?\s+|is\s+)?(?P<d>wide|rich|tight|cheap)\b",
+    r"(?P<c>premium|discount)\b|\bbasis\s+(?:looks?\s+|is\s+)?(?P<d>wide|rich|tight|cheap)\b"
+    # "NVDA trades at a premium": the ticker is the subject. Only read for a stock, where the
+    # premium has a stock to be measured against (see `_claim_check`).
+    r"|\btrad\w*\s+(?:at\s+)?an?\s+(?P<e>premium|discount)\b(?!\s+to\s+(?:its\s+)?peers)",
     re.IGNORECASE)
 _CHEAP_WORDS = frozenset({"cheap", "low", "negative", "free"})
 _MOVE_UP = (r"up|higher|green|rall(?:y|ying|ied)|pump(?:ing|ed)?|surg(?:e|ing|ed)|"
@@ -6138,6 +6375,17 @@ _MOVE_CLAIM = re.compile(
     r"dropped|fell|slid|sank|plunged|tanked|crashed|dumped|slumped)\b"
     r"(?!\s+(?:to\b|in\s+\d|if\b))",
     re.IGNORECASE)
+_STATED_SIZE = re.compile(
+    r"\s*(?:by\s+|about\s+|around\s+|over\s+|nearly\s+|almost\s+|like\s+|some\s+)?[+-]?"
+    r"(\d+(?:\.\d+)?)\s*(?:%|percent\b|pct\b)", re.I)
+
+
+def _stated_move_size(text: str, after: int) -> float | None:
+    """The size a move claim states right after its verb ("up 5%", "rallied by 8 percent")."""
+    found = _STATED_SIZE.match(text, after)
+    return float(found.group(1)) if found else None
+
+
 _LIQUIDITY_CLAIM = re.compile(
     r"\b(?:is|looks?|seems?|are|it's|plenty|very|super|quite|pretty|really|too)\s+"
     r"(?:(?:very|super|quite|pretty|really|too|plenty)\s+)?(?P<word>liquid|illiquid|deep|thin|"
@@ -6183,6 +6431,11 @@ def _claim_check(raw_text: str, symbol: str) -> tuple[list[str], list[Source]] |
     # A claim about the session needs no instrument; every other premise is about one.
     funding = _FUNDING_CLAIM.search(raw_text) if symbol else None
     premium = _PREMIUM_CLAIM.search(raw_text) if symbol else None
+    if premium is not None and premium.group("e"):
+        from argus.market import universe
+
+        if symbol not in TRADED_SYMBOLS and not universe.is_equity(symbol):
+            premium = None  # "BTC trades at a premium" has no stock to measure it against
     move = None if not symbol or (_DIRECTIONAL.search(raw_text) and not re.search(
         r"\bwhy\b", raw_text, re.I)) or _HYPOTHETICAL.search(raw_text) \
         else _MOVE_CLAIM.search(raw_text)
@@ -6221,6 +6474,16 @@ def _claim_check(raw_text: str, symbol: str) -> tuple[list[str], list[Source]] |
                        f"flat and if anything {'up' if change > 0 else 'down'}")
         elif (change > 0) == claimed_up:
             verdict = f"holds — {_t(symbol)} is {change:+.2f}% over 24 hours"
+            stated = _stated_move_size(raw_text, move.end())
+            if stated is not None and abs(change) < stated / 2:
+                # "NVDA is up 5% today" with NVDA +1.18%: the direction holds and the size does
+                # not, and saying "holds" alone let a four-fold overstatement stand (found in a
+                # sample of answers, 2026-09-25).
+                verdict = (f"holds in direction, not in size — {_t(symbol)} is {change:+.2f}% over "
+                           f"24 hours, not the {stated:g}% stated")
+            elif stated is not None and abs(change) > stated * 2:
+                verdict = (f"holds, and understates it — {_t(symbol)} is {change:+.2f}% over 24 "
+                           f"hours, more than the {stated:g}% stated")
         else:
             verdict = (f"does not hold — {_t(symbol)} is {change:+.2f}% over 24 hours, "
                        f"{'up' if change > 0 else 'down'}, not {'up' if claimed_up else 'down'}")
@@ -6238,7 +6501,7 @@ def _claim_check(raw_text: str, symbol: str) -> tuple[list[str], list[Source]] |
             lines.append(line[0])
             sources.append(line[1])
     if premium and ticker is not None:
-        word = (premium.group("c") or premium.group("d") or "").lower()
+        word = (premium.group("c") or premium.group("d") or premium.group("e") or "").lower()
         measured = _premium_line(symbol, ticker.last, _anchor_open_now())
         if measured is None:
             lines.append(f"Your premise that the contract trades at a {word}: not checkable — the "
@@ -6603,10 +6866,14 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
         elif request.kind is ResearchKind.STRESS:
             columns = _open_columns(data.raw, is_open)
             vol_multiple = _vol_multiple(raw_text)
-            if vol_multiple is not None and request.book:
+            if request.book and (vol_multiple is not None or _VAR.search(raw_text)):
+                # "What is the VaR of 50% BTC, 50% ETH" is answered with the book's VaR and
+                # expected shortfall first; it used to get the Nasdaq stress lines alone
+                # (a sample of answers, 2026-09-25).
                 vol_lines, vol_sources = _var_lines({}, request.book, raw_text,
-                                                    scale=vol_multiple)
-                vol_first = [f"Actionable: {line[0].lower()}{line[1:]}" for line in vol_lines]
+                                                    scale=vol_multiple or 1.0)
+                vol_first = [f"Actionable: {line[0].lower()}{line[1:]}" if i == 0 else line
+                             for i, line in enumerate(vol_lines)]
                 lines.extend(vol_first)
                 sources.extend(vol_sources)
             shocks = [Shock("benchmark -5%", -5.0), Shock("benchmark -10%", -10.0)]
@@ -6787,6 +7054,24 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 if premium is not None:
                     lines.append(premium[0])
                     sources.append(premium[1])
+                implied = None if anchor_open else _implied_open_line(symbol, ticker.last)
+                if implied is not None:
+                    lines.append(implied[0])
+                    sources.append(implied[1])
+                if OPEN_INTEREST_QUESTION.search(raw_text):
+                    # "current funding rate and open interest on ETH perp" is a quote with its
+                    # open interest; the positioning lines answer the second half.
+                    try:
+                        from argus.market import open_interest
+
+                        reading = open_interest.read(symbol)
+                    except Exception:
+                        reading = None
+                    if reading is not None:
+                        lines.extend(open_interest.lines(reading, _t(symbol)))
+                        sources.append(Source(kind="venue",
+                                              ref="bitget /api/v2/mix/market/tickers",
+                                              detail="holdingAmount, every USDT perpetual"))
                 stamp = quoted[0][1].fetched_at.strftime("%Y-%m-%d %H:%M:%S UTC")
                 lines.append(f"Quoted {stamp}.")
             payload["quotes"] = {

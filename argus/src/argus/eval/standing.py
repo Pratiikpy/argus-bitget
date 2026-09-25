@@ -5915,6 +5915,69 @@ REGISTER: tuple[Capability, ...] = (
             "the next 24 hours",
         ),
     ),
+    Capability(
+        name="Where a shut stock should open: the perpetual-implied open, against gloaming "
+             "and nocturne",
+        subtheme="t3-execassist",
+        module="argus/eval/overnight_comparison.py, argus/eval/void_comparison.py",
+        state=State.IMPLEMENTED,
+        baseline="angelraph/gloaming (Season 2, MIT): overnight fair value from index futures, "
+                 "BTC/ETH and the dollar, its own model functions run from its clone; "
+                 "egbujor-emmanuel/nocturne (Season 2, MIT): the weekend reference price, its "
+                 "own observations and walk-forward run from its clone",
+        proofs=(
+            Proof("best_implementation_studied",
+                  "the two S2 desks built for this question read in full: gloaming's "
+                  "engine/fairvalue and agent_loop (its futures input is a five-day change), "
+                  "nocturne's core.observations, study_v2 and fairvalue_v2",
+                  artefact="data/overnight_comparison.json"),
+            Proof("baseline_reproduced",
+                  "nocturne's published walk-forward reproduced exactly from its clone (large "
+                  "caps: current price 2.117%, full fade 1.922%)",
+                  artefact="data/void_comparison.json"),
+            Proof("same_input_comparison",
+                  "every candidate read at 09:00 New York from the same saved hourly bars and "
+                  "scored on the same Yahoo opens; nocturne's own rows with an ARGUS column",
+                  artefact="data/overnight_comparison.json"),
+            Proof("statistically_valid_evaluation",
+                  "paired error differences bootstrapped over nights, the shared unit",
+                  artefact="data/overnight_comparison.json"),
+            Proof("out_of_sample_test",
+                  "gloaming's OLS and ARGUS's fitted slope refit before each night on earlier "
+                  "nights only; rows before a stock's 11th night excluded for every candidate",
+                  artefact="data/overnight_comparison.json"),
+            Proof("ablation",
+                  "the perpetual alone, against the close (basis left in), with a fitted slope; "
+                  "perpetual plus gloaming's futures was no better (31.0 vs 30.4bps, not "
+                  "separable) and is not shipped",
+                  artefact="data/overnight_comparison.json"),
+            Proof("failure_cases_documented",
+                  "QQQ level with gloaming; nocturne's own frame level; early closes read as "
+                  "16:00",
+                  artefact="data/overnight_comparison.json"),
+            Proof("implementation_complete",
+                  "the console line, its record per stock, and the Yahoo close fallback",
+                  test="test_overnight_comparison.py::test_the_console_states_the_implied_open_"
+                       "with_its_record"),
+        ),
+        blockers=(
+            "ahead of gloaming, not OWNED: over 113 nights and 8 stocks (April to September "
+            "2026) the perpetual's move since the close missed the open by 30bps on average "
+            "with the direction right 93% of the time; gloaming's best variant (its OLS refit) "
+            "missed by 81bps, its shipped inputs by 135bps, and assuming no gap by 90bps. The "
+            "lead holds on weekends (31bps against 78bps) and on 7 of 8 names; on QQQ, where "
+            "gloaming's Nasdaq futures are nearly the same instrument, the two are level",
+            "level with nocturne on nocturne's own question: predicting the rToken's Monday "
+            "10:00 price from Sunday 19:00 on its 61 large-cap rows, its full fade missed by "
+            "1.92% and ARGUS by 2.07%, a difference the 7 weekends cannot separate",
+            "nocturne's reversal is a property of the rToken, not of the stock: on the real "
+            "Monday open, read at nocturne's own Sunday-evening moment, the perpetual's weekend "
+            "move carried through (slope +0.83 on 160 stock-weekends) and beat the last "
+            "regular close its claim names (70bps against 86bps, 95% interval excluding zero)",
+            "no costs condition: this is a price estimate, not a trade, so there is no fee to "
+            "net; adversarial and reproducibility runs not yet recorded",
+        ),
+    ),
 )
 
 

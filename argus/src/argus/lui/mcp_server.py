@@ -127,9 +127,12 @@ def _book(raw: Any) -> dict[str, float]:
 
 
 def _answer_text(payload: Mapping[str, Any]) -> str:
-    lines = list(payload.get("lines") or [])
+    from argus.lui.provenance import labels as provenance_labels
+
+    lines = [str(line) for line in payload.get("lines") or []]
     sources = [s.get("ref") for s in payload.get("sources") or [] if isinstance(s, dict)]
-    text = "\n".join(str(line) for line in lines)
+    text = "\n".join(f"[{tag}] {line}" if tag else line
+                     for line, tag in zip(lines, provenance_labels(lines), strict=True))
     if sources:
         text += "\n\nSources: " + "; ".join(str(s) for s in sources if s)
     return text

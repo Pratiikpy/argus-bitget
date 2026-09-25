@@ -1,0 +1,635 @@
+{
+ "collected": "2026-09-25",
+ "first_read": {
+  "content_lines": 156,
+  "unlabelled": 9,
+  "coverage": 0.942
+ },
+ "note": "18 questions never seen while the rules were written; coverage measured once, then the nine unlabelled lines were given rules, so later coverage on this file is no longer unseen",
+ "lines": [
+  {
+   "question": "NFLX price",
+   "text": "Actionable: a round trip in NFLX costs about 13.4bps (12bps taker fees + the 1.4bps spread) — a trade needs a move bigger than that just to break even."
+  },
+  {
+   "question": "NFLX price",
+   "text": "NFLX last 71.74 USDT on Bitget (+0.29% over 24h); bid 71.77 / ask 71.78, spread 1.4bps; 24h range 71.38 to 72.06; funding +0.0000% per interval; 24h volume about $316,754."
+  },
+  {
+   "question": "NFLX price",
+   "text": "Funding: flat, so holding NFLX costs nothing beyond fees."
+  },
+  {
+   "question": "NFLX price",
+   "text": "The US anchor market is shut: this stock perpetual is trading without its anchor, so its price is being discovered on a thinner book and can gap at the open."
+  },
+  {
+   "question": "NFLX price",
+   "text": "Versus the stock: NFLX closed at 71.59 → the perpetual traded at a 36.3bps premium at that close; it has moved -0.15% since, which is the overnight move, not a premium."
+  },
+  {
+   "question": "NFLX price",
+   "text": "Implied open: NFLX's perpetual has moved -0.15% since the Thu 20:00 UTC close, which puts the stock near 71.48 at the next open (last close 71.59). Read this way on 113 nights across 8 stocks, the open was missed by 30bps on average, with the direction right 93% of the time; gloaming, an S2 desk that estimates overnight fair value from index futures, crypto and the dollar, missed by 81bps, and assuming no gap by 90bps."
+  },
+  {
+   "question": "is AMD oversold",
+   "text": "Actionable: No — AMD is not oversold: RSI 74.8, above the 30 line; RSI is overbought; momentum turning up."
+  },
+  {
+   "question": "is AMD oversold",
+   "text": "RSI(14, 4h) 74.8 — overbought."
+  },
+  {
+   "question": "is AMD oversold",
+   "text": "MACD 14.375 vs signal 13.654 (histogram +0.721)."
+  },
+  {
+   "question": "is AMD oversold",
+   "text": "Price 644.96: nearest support 599.64 (7.0% below)."
+  },
+  {
+   "question": "is AMD oversold",
+   "text": "ATR 9.425 (4h)."
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "Actionable: to keep COIN under 25% of book risk, size it at no more than 15% — the 10% proposed is inside that budget."
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "At 10% of the book, COIN would carry 14% of your total risk."
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "Open-session beta 1.04 → 1.09"
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "Risk spread across 1.8 → 2.4 effective position(s)"
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "Most correlated with NVDA at +0.20; largely a different bet from what you already own"
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "Hedge: short QQQ worth about 109% of the book's value neutralises its market exposure (book beta 1.09); it does nothing for single-name news risk."
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "After the trade: NVDA 45% weight / 56% risk; MSFT 45% weight / 30% risk; COIN 10% weight / 14% risk."
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "In the book's worst 5% of hours (an average loss of 0.54% an hour), COIN would carry 17% of the loss, against 14% of the ordinary swing."
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "If QQQ falls 5%, the book moves about -5.5% through beta alone."
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "If QQQ falls 10%, the book moves about -10.9% through beta alone."
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "Realised worst case: the worst 24-bar window in the observed history would have moved this book -2.34% — driven by COIN -3.41%, NVDA -2.28%, MSFT -2.16%"
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "How far to trust that beta: on 1,800 test books, it missed the next four weeks' realised beta by 0.24 on average. weekend-copilot, an S2 entry answering this same question, missed by 0.55 as it ships (p = 0.01) and by 0.36 on the same benchmark (p = 0.10, not significant); simply assuming a beta of 1.0 missed by 0.30. The QQQ-fall lines were off by 0.92 points on the 39 days QQQ really fell 1% or more (skfolio's vine copula: 1.00), and they are a centre, not a worst case"
+  },
+  {
+   "question": "what if I add 10% COIN? I hold 50% NVDA 50% MSFT",
+   "text": "The desk's own last call on COIN (decision 671, 2026-09-24T19:41Z): no_trade at stated confidence 0.55 — Under a general mandate with no stated risk appetite or horizon, the evidence on COIN is directionally mixed and does not clear the 14.27bps total hurdle."
+  },
+  {
+   "question": "how do I hedge rTSLA overnight",
+   "text": "Actionable: to carry RTSLAUSDT through the hours the US market is shut, short 1.01 TSLAUSDT (Bitget's TSLA stock perpetual) for every 1 of RTSLAUSDT you hold — the same company, so it moves with your token when nothing else does."
+  },
+  {
+   "question": "how do I hedge rTSLA overnight",
+   "text": "Tested on nights it had not seen: over the last 50 of 165 nights (28 Jan 2026 to 23 Sep 2026), that hedge removed 99.9% of the overnight swing and cut the worst 1-in-20 night by 95%. A typical night moved 130 bp unhedged and 5 bp hedged."
+  },
+  {
+   "question": "how do I hedge rTSLA overnight",
+   "text": "Why not an index hedge: shorting QQQUSDT against the same token removed only 32.0% of its overnight swing on the same held-out nights — the other 68% is TSLA's own."
+  },
+  {
+   "question": "how do I hedge rTSLA overnight",
+   "text": "Weekends (Friday close to Monday open), the longest window: 99.8% of the swing removed on 10 held-out weekends."
+  },
+  {
+   "question": "how do I hedge rTSLA overnight",
+   "text": "Cost: about 12 bp of the position each night the hedge is put on and taken off (Bitget's 0.06% perpetual taker fee each way), before funding. Held across several nights, you pay the fee once and the funding rate instead."
+  },
+  {
+   "question": "how do I hedge rTSLA overnight",
+   "text": "Assumed: RTSLAUSDT read as the spot rToken you hold."
+  },
+  {
+   "question": "PLTR news",
+   "text": "Actionable: 12 headlines name PLTR in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact."
+  },
+  {
+   "question": "PLTR news",
+   "text": "PLTR is +1.65% over 24 hours on Bitget. QQQ moved +1.69%, which at PLTR's beta of 0.76 explains +1.29%; the other +0.36% is PLTR's own."
+  },
+  {
+   "question": "PLTR news",
+   "text": "11h ago — Could Palantir (PLTR)’s Partnership with Nebius Group (NBIS) Accelerate its AI Growth? (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/could-palantir-pltr-partnership-nebius-220317492.html?.tsrc=rss"
+  },
+  {
+   "question": "PLTR news",
+   "text": "11h ago — Does Palantir (PLTR) Have a Moat Strong Enough to Protect Its AI Dominance? (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/does-palantir-pltr-moat-strong-211858600.html?.tsrc=rss"
+  },
+  {
+   "question": "PLTR news",
+   "text": "12h ago — Rosenblatt Has Message For Palantir Stock Investors (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/rosenblatt-message-palantir-stock-investors-202721575.html?.tsrc=rss"
+  },
+  {
+   "question": "PLTR news",
+   "text": "14h ago — Palantir Slips as Karp Puts Liability Before AI Listings (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/palantir-slips-karp-puts-liability-191214673.html?.tsrc=rss"
+  },
+  {
+   "question": "PLTR news",
+   "text": "15h ago — Palantir Technologies (PLTR) Ties Aviation AI Push To Fresh Short Seller Pressure (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/palantir-technologies-pltr-ties-aviation-181214201.html?.tsrc=rss"
+  },
+  {
+   "question": "compare BTC and ETH risk",
+   "text": "Actionable: ETH carries the most market risk per dollar of the 2. Listed from most to least volatile."
+  },
+  {
+   "question": "compare BTC and ETH risk",
+   "text": "BTC and ETH move together at +0.91 in the open session — mostly the same bet."
+  },
+  {
+   "question": "compare BTC and ETH risk",
+   "text": "ETH: realised vol 47% a year; beta 1.08 open / 1.35 shut; QQQ -10% implies -10.8%; worst 24-hour window -6.3%."
+  },
+  {
+   "question": "compare BTC and ETH risk",
+   "text": "BTC: realised vol 35% a year; beta 0.88 open / 0.98 shut; QQQ -10% implies -8.8%; worst 24-hour window -4.2%."
+  },
+  {
+   "question": "sell 200k of SOL, how should I split it",
+   "text": "Actionable: in one market order this costs about 9.1bps (6.0bps fee + 3.1bps book impact) — one order is the plan; the book impact is the price of filling now, and a limit at the touch saves it if the fill can wait."
+  },
+  {
+   "question": "sell 200k of SOL, how should I split it",
+   "text": "A $200,000 order is 0.09% of SOL's 24h volume ($229,129,765); the fees come to about 6.0bps, and the square-root impact law — calibrated on Bitget's own books, at SOL's own 387bps daily volatility — puts this size's market impact near 3.9bps; the live book below shows what taking it at once costs."
+  },
+  {
+   "question": "sell 200k of SOL, how should I split it",
+   "text": "Plan: at 0.087% of 24h volume the order cannot move the price; one order is cheapest — splitting would only add time in the market and a fee per slice."
+  },
+  {
+   "question": "sell 200k of SOL, how should I split it",
+   "text": "Order book (sell side, live): taking all $200,000 at once walks 35 level(s) for 3.1bps of slippage on top of the fee."
+  },
+  {
+   "question": "sell 200k of SOL, how should I split it",
+   "text": "Slice 1: 100% ($200,000) as single order: near-touch limit, market if unfilled — about 6.0bps fee plus 3.1bps book impact."
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "Actionable: the 10-year is 5.11% and the curve upward — and rates have been driving it: rising yields have come with falling prices, so size it against the rates calendar."
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "10-year Treasury: 5.11% on 2026-09-23 (+41bp over the last 31 readings, about six weeks)."
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "2-year Treasury: 4.85% on 2026-09-23 (+63bp over the last 31 readings, about six weeks)."
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "fed funds: 3.88% on 2026-09-23 (+25bp over the last 44 readings, about six weeks)."
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "10-year breakeven inflation: 2.33% on 2026-09-24 (+6bp over the last 32 readings, about six weeks)."
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "broad dollar index: 119.51 on 2026-09-18 (+0.33 over the last 28 readings, about six weeks)."
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "Curve: 10-year minus 2-year is +26bp — positively sloped."
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "Real 10-year yield (nominal less breakeven inflation): about 2.78%."
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "tech (QQQ) has moved moderately with rates over 61 trading days — correlation -0.38 between its daily return and the daily change in the 10-year yield, about -1.06% for each +10bp; -0.34 with the broad dollar index, so a stronger dollar has hurt tech (QQQ). Correlation, not a cause."
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "Federal Reserve, 16 Sep: Federal Reserve issues FOMC statement https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm"
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "Federal Reserve, 16 Sep: Federal Reserve Board and Federal Open Market Committee release economic projections from the September 15-16 FOMC meeting https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916b.htm"
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "Scheduled: US CPI release Wed 14 Oct 12:30 UTC; FOMC rate decision Wed 28 Oct 18:00 UTC (BLS and Federal Reserve schedules, read 2026-09-24)."
+  },
+  {
+   "question": "what is the 2 year yield doing",
+   "text": "Bitget's own US-stock brief: “Bitget UEX Daily | US–China Trade Truce Extended by Just Two Months; Nasdaq Edges Up 0.01%; Meta Jumps 4.50% (September 25, 2026)” (Bitget's data service, bitget-mcp-server, news_label_search)."
+  },
+  {
+   "question": "is NVDA crowded",
+   "text": "Actionable: no position signal on NVDA — NVDA's funding is not crowded either way; the desk's own panel last read it neutral at 0.53 once agreement that shared sources was discounted (4 analysts, 24 distinct sources; decision 664, 2026-09-24 19:41 UTC)."
+  },
+  {
+   "question": "is NVDA crowded",
+   "text": "News: 4 headline(s) name NVDA in 48h, each a different story — none is carried twice, so the count is not inflated by syndication."
+  },
+  {
+   "question": "is NVDA crowded",
+   "text": "US stock-market fear & greed: 36 (fear); a week ago 30, a month ago 60 (Bitget's data service, bitget-mcp-server)."
+  },
+  {
+   "question": "is NVDA crowded",
+   "text": "Open interest: 62,971.68 NVDA held open on Bitget, about $14,250,491."
+  },
+  {
+   "question": "is NVDA crowded",
+   "text": "That is 1.04 days of today's volume ($13,763,670) held open — higher than 53% of the 220 USDT perpetuals trading over $1m a day. Positions that sit far longer than the contract trades are where forced unwinds come from."
+  },
+  {
+   "question": "is NVDA crowded",
+   "text": "Funding is +0.0000% — neither side pays. The day's change in open interest is not known yet: Bitget publishes only the current figure, and this desk's own hourly record of it has no reading from a day ago."
+  },
+  {
+   "question": "is NVDA crowded",
+   "text": "NVDA on Bitget: funding +0.0000% per interval, +1.40% over 24h."
+  },
+  {
+   "question": "is NVDA crowded",
+   "text": "Funding: flat, so holding NVDA costs nothing beyond fees."
+  },
+  {
+   "question": "is NVDA crowded",
+   "text": "Tested, not assumed (2026-09-22, data/sentiment_comparison.json): 5 near-identical unsourced posts per narrative across 2 narratives. finBERT, the standard finance sentiment model, grew louder with every repeat on 2 of 2; this desk's sentiment analyst stayed non-actionable on 2 of 2. On the NVDA narrative finBERT counted 4 of 5 posts as positive; the analyst's reason: “All five narratives are variations of a single unsourced claim about a 'leaked internal memo,' posted within 8 minutes by low-credibility social accounts with no independent corroboration, no named source, and no price confirmation.”."
+  },
+  {
+   "question": "is NVDA crowded",
+   "text": "Crowd on X and Reddit (25 Sep 06:19 UTC, 2h ago): 52 posts from 40 accounts (30 on Reddit, 22 on X) carry 51 distinct stories."
+  },
+  {
+   "question": "is NVDA crowded",
+   "text": "None of them looks coordinated, so the volume is independent voices, not one line repeated."
+  },
+  {
+   "question": "is NVDA crowded",
+   "text": "No story is carried by more than one account — the talk is scattered, not converging on a single narrative."
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "Actionable: TSLA's next report date is not published yet. It reports quarterly, so expect it around 20 Oct — an estimate, not a date; confirm it before holding a position into that window."
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "Most recent report on file: 2026-07-21 (period ending 2026-06-29); the source has not yet published the next date."
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "The analyst consensus the source holds was scraped 2025-01-30 — too old to present as today's expectation, so it is withheld rather than quoted."
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "Institutional holders: the source returned one 13F record for the period ending 2026-06-30 — Envestnet Portfolio Solutions, Inc. (99,244 sh). A sample of filers, not a full ownership table."
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "Analyst price targets, last 90 days (19 firms, each firm's latest): median 420, range 24.86 to 505, +10% from the stock's 381.4; 9 buy, 8 hold, 2 sell; 4 raised and 10 cut their target."
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "Earnings surprise: the quarter ending 2026-06-30 was a small beat — SUE +0.83, i.e. diluted EPS changed +0.20 year over year against a usual swing of 0.24 (SEC filing, filed 2026-07-23)."
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "TSLA market cap $1,506bn."
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "Valuation on 2026-09-24: P/E (trailing 12m) 394.5, P/S (trailing 12m) 14.5, P/B (latest quarter) 17.3, EV/EBITDA 149.9."
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "Institutions: 4,646 holders own 49.3% of the shares (as of 2026-09-23)."
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "Insider filings (SEC Form 4) in the last 30 days: Taneja Vaibhav (Officer), filed 2026-09-09 — read the filing for direction and size: https://www.sec.gov:443/Archives/edgar/data/1318605/000110465926106432/0001104659-26-106432-index.htm"
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31?\" priced at 18% — $191,531 traded, closes 2027-01-01."
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "Prediction market on TSLA (Polymarket): \"Will Tesla release Optimus by December 31, 2026?\" priced at 13% — $30,343 traded, closes 2027-01-01."
+  },
+  {
+   "question": "TSLA fundamentals",
+   "text": "Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31, 2027?\" priced at 66% — $28,587 traded, closes 2028-01-01."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "52 abstention(s), across 1 symbol(s), all in rth/weekend session(s)."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "An abstention here is a recorded decision, not an absence of one: it is hash-chained, settled against the move that actually happened, and scored by abstention value."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "  seq 648 MSTRUSDT: General mandate: no edge clears the 16.27bps total hurdle. The bear case (Bitcoin below $84K, 10y at 5.11%, 50.2% short volume, insider selling, MACD histogram negative, price below MA7/MA25) is stronger than the bull case (stale Trump disclosure, low-credibility technical breakout tweet, mixed RSI), but the 0-hour horizon means any directional move is unlikely to exceed the hurdle before the next genuine price discovery event."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "  seq 660 MSTRUSDT: Under a general mandate with no specific risk appetite or horizon constraint, the evidence on MSTRUSDT is directionally ambiguous: technicals are mixed (RSI neutral, MACD histogram negative without a cross, price between MA7 and MA25), insider selling is a mild negative but small in size relative to float, short volume is balanced at 50.2%, and the 24h move is essentially flat (-1%)."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "  seq 672 MSTRUSDT: Under a general mandate with no specific risk budget or horizon constraint, the evidence presents a mildly bearish consensus (director selling, 50% short volume, fading momentum) against a mildly bullish technical narrative (downtrend break, Trump disclosure), but neither side clears the 14.27bps hurdle with sufficient conviction."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "47 of them have a counterfactual recorded — the move that would have happened — so standing aside can be graded rather than assumed correct."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "How the desk reached decision 672, from the notes it wrote at the time:"
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "Evidence screen: 67 evidence item(s) screened, none withheld."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "Panel: 3 of 3 analysts run: event, sentiment, earnings."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "Panel: 3 analyst(s) ran concurrently in 86.9s; none could read another's answer, so agreement is consensus rather than contagion."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "Agreement, discounted for shared sources: 4 analysts, 19 distinct sources, independence 4.75 -> bearish at 0.55 after provenance discount."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "Memory: 8 prior decision(s) on MSTRUSDT shown to the PM, 8 of them graded; 2 pattern(s) stated from the record."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "Debate: Not held — the panel split on direction, but the cycle's token budget is reserved for the symbols still to decide; this decision was taken without the debate, and that is recorded rather than hidden."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "Grounding check: 1 of 5 figure(s) do not resolve to anything the desk was given: 215.8bps."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "Entity check: 4 instrument(s) named, 1 unsupported."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "Adversary: Not run — the decision opens no exposure, so there is nothing to falsify."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "Constitution: Nothing bound, so the decision was not re-put to the model: asking it to reconsider an unconstrained choice would have told it something untrue and paid for a second opinion on a question nobody asked."
+  },
+  {
+   "question": "why did the desk pass on MSTR",
+   "text": "Protocol: Within the committed protocol; nothing changed (argus-paper-v1 v3: opens no position)."
+  },
+  {
+   "question": "where will TSLA open",
+   "text": "Actionable: a round trip in TSLA costs about 12.5bps (12bps taker fees + the 0.5bps spread) — a trade needs a move bigger than that just to break even."
+  },
+  {
+   "question": "where will TSLA open",
+   "text": "TSLA last 382.06 USDT on Bitget (+1.68% over 24h); bid 382.02 / ask 382.04, spread 0.5bps; 24h range 374.5 to 383.38; funding +0.0000% per interval; 24h volume about $25,606,532."
+  },
+  {
+   "question": "where will TSLA open",
+   "text": "Funding: flat, so holding TSLA costs nothing beyond fees."
+  },
+  {
+   "question": "where will TSLA open",
+   "text": "The US anchor market is shut: this stock perpetual is trading without its anchor, so its price is being discovered on a thinner book and can gap at the open."
+  },
+  {
+   "question": "where will TSLA open",
+   "text": "Versus the stock: TSLA closed at 381.46 → the perpetual traded at a 85.7bps discount at that close; it has moved +1.02% since, which is the overnight move, not a premium."
+  },
+  {
+   "question": "where will TSLA open",
+   "text": "Implied open: TSLA's perpetual has moved +1.02% since the Thu 20:00 UTC close, which puts the stock near 385.36 at the next open (last close 381.46). Read this way on TSLA on 113 nights, the open was missed by 35bps on average, with the direction right 95% of the time; gloaming, an S2 desk that estimates overnight fair value from index futures, crypto and the dollar, missed by 84bps, and assuming no gap by 102bps."
+  },
+  {
+   "question": "what happens to 70% QQQ 30% BTC if QQQ falls 8%",
+   "text": "Actionable: QQQ is 70% of the book but 73% of its loss when QQQ falls — trimming it cuts the drawdown fastest; the QQQ hedge below is the other lever."
+  },
+  {
+   "question": "what happens to 70% QQQ 30% BTC if QQQ falls 8%",
+   "text": "If QQQ moves -8%: your book moves about -7.70%, hardest hit QQQ -8.00% (market-driven part only, through each beta)."
+  },
+  {
+   "question": "what happens to 70% QQQ 30% BTC if QQQ falls 8%",
+   "text": "If QQQ moves -5%: your book moves about -4.81%, hardest hit QQQ -5.00% (market-driven part only, through each beta)."
+  },
+  {
+   "question": "what happens to 70% QQQ 30% BTC if QQQ falls 8%",
+   "text": "If QQQ moves -10%: your book moves about -9.63%, hardest hit QQQ -10.00% (market-driven part only, through each beta)."
+  },
+  {
+   "question": "what happens to 70% QQQ 30% BTC if QQQ falls 8%",
+   "text": "Hedge: short QQQ worth about 96% of the book's value neutralises its market exposure (book beta 0.96); it does nothing for single-name news risk."
+  },
+  {
+   "question": "what happens to 70% QQQ 30% BTC if QQQ falls 8%",
+   "text": "What actually happened, not a model — the worst 24-bar window in the observed history would have moved this book -1.58% — driven by BTC -3.03%, QQQ -1.86%"
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "Actionable: 7 headlines name AMZN in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact."
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "AMZN is +1.25% over 24 hours on Bitget. QQQ moved +1.69%, which at AMZN's beta of 1.06 explains +1.79%; the other -0.55% is AMZN's own."
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "3h ago — AMZN, META, GOOGL, MSFT, ORCL: Michael Burry Sounds Fresh Alarm On Big Tech’s AI Spending, Warns Of Massive Write-Offs In Two Years (Yahoo Finance) https://stocktwits.com/news-articles/markets/equity/amzn-meta-googl-msft-orcl-michael-burry-sounds-fresh-alarm-on-big-tech-s-ai-spending-warns-of-massive-write-offs-in-two-years/cZMay4jRBaX?.tsrc=rss"
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "5h ago — Microsoft vs. Amazon: Which AI Cloud Stock Converts Capex Into Profits Better? (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/microsoft-vs-amazon-ai-cloud-035215434.html?.tsrc=rss"
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "12h ago — Shopify Opens Its Doors to Muse, Here’s Why Amazon Won’t (Yahoo Finance) https://finance.yahoo.com/technology/ai/articles/shopify-opens-doors-muse-why-204347730.html?.tsrc=rss"
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "13h ago — Amazon Stock Dips After $100 Million Indiana Manufacturing Push (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/amazon-stock-dips-100-million-201553864.html?.tsrc=rss"
+  },
+  {
+   "question": "what moved AMZN today",
+   "text": "13h ago — Amazon Opens Seller Data to Claude Days After Blocking Meta’s Muse (Yahoo Finance) https://www.benzinga.com/markets/prediction-markets/26/09/61984835/amazon-claude-seller-data-meta-muse?utm_source=yahooFinance&utm_campaign=partner_feed&utm_medium=referral&.tsrc=rss"
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Actionable: analyst price targets, last 90 days (16 firms, each firm's latest): median 422.5, range 350 to 515, +23% from the stock's 343.018; 14 buy, 2 hold, 0 sell; 5 raised and 7 cut their target."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "GOOGL's next report date is not published yet. It reports quarterly, so expect it around 20 Oct — an estimate, not a date; confirm it before holding a position into that window."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Most recent report on file: 2026-07-21 (period ending 2026-06-29); the source has not yet published the next date."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "The analyst consensus the source holds was scraped 2019-02-16 — too old to present as today's expectation, so it is withheld rather than quoted."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Institutional holders: the source returned one 13F record for the period ending 2026-06-30 — QRG CAPITAL MANAGEMENT, INC. (1,110,108 sh). A sample of filers, not a full ownership table."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Earnings surprise: the quarter ending 2026-06-30 was a large beat — SUE +3.37, i.e. diluted EPS changed +6.30 year over year against a usual swing of 1.87 (SEC filing, filed 2026-07-23)."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "GOOGL market cap $4,195bn."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Valuation on 2026-09-24: P/E (trailing 12m) 16.9, P/S (trailing 12m) 9.3, P/B (latest quarter) 6.5, EV/EBITDA 23.6, dividend yield 0.25%."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Institutions: 6,166 holders own 89.7% of the shares (as of 2026-09-23)."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Insider filings (SEC Form 4) in the last 30 days: Schindler Philipp (Officer), filed 2026-09-16; Schindler Philipp (Officer), filed 2026-09-03; ARNOLD FRANCES (Director), filed 2026-08-31 — read the filing for direction and size: https://www.sec.gov:443/Archives/edgar/data/1652044/000119312526393491/0001193125-26-393491-index.htm"
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Prediction market on GOOGL (Polymarket): \"Will Erling Haaland be the #1 searched person on Google this year?\" priced at 22%, +1 points in 24h — $91,393 traded, closes 2027-04-01."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Prediction market on GOOGL (Polymarket): \"Will Donald Trump be the #1 searched person on Google in the US this year?\" priced at 6% — $87,086 traded, closes 2027-04-01."
+  },
+  {
+   "question": "GOOGL analyst estimates",
+   "text": "Prediction market on GOOGL (Polymarket): \"Will Donald Trump be the #1 searched person on Google this year?\" priced at 4% — $70,065 traded, closes 2027-04-01."
+  },
+  {
+   "question": "is META cheap right now",
+   "text": "No open positions."
+  },
+  {
+   "question": "is META cheap right now",
+   "text": "The record holds 673 decision(s), of which 673 are abstentions."
+  },
+  {
+   "question": "long AMZN at 5x over the weekend with 2000 USDT",
+   "text": "Actionable: at 5x long a 19.3% fall in AMZN wipes the margin — and AMZN moved that far against a long within 24 hours from 0% of the hourly entry points in the last 29 days. Its worst 24 hours against a long was 3.9%, so 5x would have survived every day in the window (anything up to 21x did)."
+  },
+  {
+   "question": "long AMZN at 5x over the weekend with 2000 USDT",
+   "text": "AMZN's own weekends since 1997 (1,531 of them, Friday close to Monday open, split-adjusted): 15% opened more than 1% in a long's favour, 70% within 1%, 14% 1-5% against, 1% more than 5% against. The worst was -9.3% (15 Dec 2000); 0 of 1,531 opened past the 19.3% liquidation line."
+  },
+  {
+   "question": "long AMZN at 5x over the weekend with 2000 USDT",
+   "text": "Going into this weekend AMZN is without a trend after an ordinary week (-0.7%). In the 151 past weekends that began that way, 8% opened more than 1% against a long (95% interval 5% to 13%), against 15% across all weekends — a measurable difference, found in-sample. The worst of them was -2.4% (29 Aug 2025)."
+  },
+  {
+   "question": "long AMZN at 5x over the weekend with 2000 USDT",
+   "text": "On the perpetual, which trades through the weekend and is liquidated on its own path: in 90% of its last 56 weekends the worst point was within 3.7% of Friday's close, and 0 of 56 touched the 19.3% line."
+  },
+  {
+   "question": "long AMZN at 5x over the weekend with 2000 USDT",
+   "text": "Funding across the weekend (72h, 9 settlements) at today's rate: nothing — the rate is flat."
+  },
+  {
+   "question": "long AMZN at 5x over the weekend with 2000 USDT",
+   "text": "The liquidation distance is the 20.0% margin less Bitget's 0.70% maintenance margin at this position's tier, before fees, which bring it closer; hourly highs and lows understate the extremes inside each hour."
+  },
+  {
+   "question": "long AMZN at 5x over the weekend with 2000 USDT",
+   "text": "Assumed: 2,000 USDT read as the margin, so the position is 10,000 USDT."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "Actionable: sentiment is stretched toward greed — the side of the index where crypto has historically been more exposed to pullbacks; read it as positioning, not a signal — this desk's own sentiment work found the index adds nothing on its own."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "Crypto fear & greed: 71 (Greed); over the last 8 days it ranged 56 to 78."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "US stock-market fear & greed: 36 (fear); a week ago 30, a month ago 60 (Bitget's data service, bitget-mcp-server)."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "BTC positioning: 56% of all accounts are long, against 65% of the largest traders' positions — the largest traders are longer than the crowd (Binance, via Bitget's data service, bitget-mcp-server)."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "Large Hyperliquid wallets hold $976m long and $854m short in BTC (Bitget's data service, bitget-mcp-server)."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "BTC liquidations on 2026-09-24: $20.5m of longs and $14.4m of shorts forced out — the longs took the larger flush (Binance, via Bitget's data service, bitget-mcp-server)."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "Open interest: 31,936.59 BTC held open on Bitget, about $2,691,903,285."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "That is 0.92 days of today's volume ($2,938,672,570) held open — higher than 47% of the 220 USDT perpetuals trading over $1m a day. Positions that sit far longer than the contract trades are where forced unwinds come from."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "Funding is +0.0052% — longs pay shorts. The day's change in open interest is not known yet: Bitget publishes only the current figure, and this desk's own hourly record of it has no reading from a day ago."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "BTC funding +0.0052% per interval — longs pay shorts, no crowding on Bitget."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "ETH funding +0.0073% per interval — longs pay shorts, no crowding on Bitget."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "Tested, not assumed (2026-09-22, data/sentiment_comparison.json): 5 near-identical unsourced posts per narrative across 2 narratives. finBERT, the standard finance sentiment model, grew louder with every repeat on 2 of 2; this desk's sentiment analyst stayed non-actionable on 2 of 2."
+  },
+  {
+   "question": "market sentiment today",
+   "text": "US spot BTC ETFs, 24 Sep: net +$191m (creations less redemptions), an ordinary day for it; five days +$2.68bn; 6 inflow days running; $109bn held (SoSoValue)."
+  }
+ ]
+}

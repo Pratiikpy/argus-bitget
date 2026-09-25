@@ -37,6 +37,7 @@ from argus.lui.answer import Answer, answer
 from argus.lui.cli import BUDGET_MS
 from argus.lui.kindmodel import LocalPlanner, kind_model
 from argus.lui.ngram import reclassify
+from argus.lui.provenance import labels as provenance_labels
 from argus.lui.question import TRADED_SYMBOLS, Conversation, Intent, classify
 from argus.lui.research import (
     _PRICE_FORECAST,
@@ -110,6 +111,14 @@ PAGE = """<!doctype html>
   .line.act { font-weight:600; color:var(--accent) }
   .line.hedge { font-weight:600 }
   .line.fine { color:var(--dim); font-size:13px }
+  .pv { display:inline-block; min-width:4.6em; margin-right:.5em; padding:0 .35em;
+        border-radius:3px;
+        font:600 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.04em;
+        text-transform:uppercase; vertical-align:1px; text-align:center;
+        color:var(--dim); border:1px solid color-mix(in srgb, var(--dim) 45%, transparent) }
+  .pv-live { color:var(--accent); border-color:color-mix(in srgb, var(--accent) 55%, transparent) }
+  .pv-record { font-style:italic }
+  .pv-missing, .pv-assumed { border-style:dashed }
   .stat { font:12px/1.6 var(--mono); color:var(--dim); margin:0 0 14px }
   .jump { display:flex; gap:10px 22px; flex-wrap:wrap; margin:0 0 30px; font-weight:500 }
   .jump a { text-decoration:none; color:var(--ink); border-bottom:1px solid var(--line);
@@ -185,6 +194,14 @@ for (const [id, list] of [['chips-research', RESEARCH], ['chips', SUGGEST]]) {
 function esc0(s) {
   return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 }
+const PV = {
+  live: 'read from a source just now',
+  computed: 'worked out for this answer from live data',
+  record: 'a measured past record, with its sample named',
+  desk: "quoted from the desk's own logged decision",
+  assumed: 'a default applied because the question did not say',
+  missing: 'could not be read or checked'};
+const pv = t => t ? `<span class="pv pv-${t}" title="${PV[t]}">${t}</span>` : '';
 const lineClass = l => l.startsWith('Actionable:') ? 'line act'
   : l.startsWith('Hedge:') ? 'line hedge'
   : (l.startsWith('Assumed:') || l.startsWith('Data:')) ? 'line fine' : 'line';
@@ -230,8 +247,9 @@ document.getElementById('f').addEventListener('submit', async ev => {
             ${a.budget_ms}ms${over ? ' OVER BUDGET' : ''}</span>
           ${a.refused ? '<span class="tag over">refused</span>' : ''}
         </div>
-        <div class="lines">${a.lines.map(l =>
-          `<div class="${lineClass(l)}">${esc(l)}</div>`).join('')}</div>
+        <div class="lines">${a.lines.map((l, i) =>
+          `<div class="${lineClass(l)}">${pv((a.line_labels || [])[i])}${esc(l)}</div>`)
+          .join('')}</div>
         ${a.sources.length ? `<div class="src"><span class="rk">Receipt · ${a.sources.length}` +
           ` source${a.sources.length === 1 ? '' : 's'}</span>` +
           a.sources.map(s => `&nbsp;&nbsp;<b>${esc(s.kind)}</b>:${esc(s.ref)}` +
@@ -250,7 +268,8 @@ document.getElementById('f').addEventListener('submit', async ev => {
           const note = t.note ? [t.note] : a.lines.slice(0, a.translate.skip);
           card.querySelector('.lines').innerHTML =
             note.map(l => `<div class="line fine">${esc(l)}</div>`).join('') +
-            t.lines.map((l, i) => `<div class="${lineClass(body[i])}">${esc(l)}</div>`).join('');
+            t.lines.map((l, i) => `<div class="${lineClass(body[i])}">` +
+              `${pv((a.line_labels || [])[a.translate.skip + i])}${esc(l)}</div>`).join('');
         }).catch(() => {});
     }
   } catch (e) {
@@ -391,6 +410,17 @@ def handle_ask(
                        budget_ms=BUDGET_MS[q.speed], routing=audit, classified_by="session-clock",
                        matched=SESSION_QUESTION.pattern, turns=[*prior, text][-12:])
         return payload
+    from argus.lui.research import IMPLIED_OPEN_QUESTION, _is_an_order
+
+    opening = research_symbols(text)[0]
+    if opening and IMPLIED_OPEN_QUESTION.search(text) and not _is_an_order(text):
+        # "Where will NVDA open?" and "what is TSLA worth right now?" have one measured answer,
+        # the perpetual-implied open (`eval/overnight_comparison.py`), and are read here, before
+        # the model: on 2026-09-25 the model declined the first and sent the second to the desk's
+        # positions.
+        implied = ResearchRequest(kind=ResearchKind.QUOTE, symbols=tuple(opening[:4]))
+        return _research_payload(text, prior, implied, ledger, started, "implied-open",
+                                 {**audit, "detail": "an implied-open question"})
     followed = follow_up(text, prior, book)
     if followed is not None:
         return _research_payload(text, prior, followed, ledger, started, "research-follow-up",
@@ -1065,6 +1095,9 @@ class Handler(BaseHTTPRequestHandler):
                 book = repair_mojibake((params.get("book") or [""])[0])[:300]
                 payload = handle_ask(text, prior, visitor=visitor, book=book)
                 offer_translation(payload, text)
+                # Where each line comes from — live, computed, record, desk, assumed, missing
+                # (`lui/provenance.py`); a line no rule recognises carries none.
+                payload["line_labels"] = provenance_labels(payload.get("lines") or [])
                 self._send(json.dumps(payload, default=str).encode(), "application/json")
                 return
             if path == "/translate":
