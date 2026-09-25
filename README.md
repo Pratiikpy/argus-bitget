@@ -85,6 +85,16 @@ it came from the source, not the Skill, and the two counts are never merged
 
 ---
 
+## Call it from an agent
+
+ARGUS is also a **Model Context Protocol server**: any MCP client can add
+`https://deploy-topaz-seven-64.vercel.app/mcp` (Streamable HTTP) and call six tools — `argus_ask`
+(the whole console, any language), `argus_quote`, `argus_portfolio_impact`, `argus_stress` (a shock
+on the Nasdaq or on any instrument), `argus_execution_plan` and `argus_scoreboard`. They run the
+same engines as the page; none of them writes or trades.
+
+---
+
 ## Run it yourself
 
 ```bash

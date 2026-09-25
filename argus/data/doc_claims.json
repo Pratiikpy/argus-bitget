@@ -22,7 +22,7 @@
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 95,
+      "line": 105,
       "quoted": [
         "6,700"
       ],
@@ -33,7 +33,7 @@
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 117,
+      "line": 127,
       "quoted": [
         "6,700"
       ],
@@ -134,7 +134,7 @@
     {
       "claim": "source_files",
       "doc": "public-readme",
-      "line": 118,
+      "line": 128,
       "quoted": [
         "334"
       ],
@@ -318,7 +318,7 @@
     {
       "claim": "refusal_accuracy_2h",
       "doc": "public-readme",
-      "line": 140,
+      "line": 150,
       "quoted": [
         "194",
         "325"
@@ -346,7 +346,7 @@
     {
       "claim": "refusal_forgone_2h",
       "doc": "public-readme",
-      "line": 142,
+      "line": 152,
       "quoted": [
         "-4.5"
       ],
@@ -657,7 +657,7 @@
     {
       "claim": "modules_importable",
       "doc": "public-readme",
-      "line": 120,
+      "line": 130,
       "quoted": [
         "152",
         "152"
@@ -702,7 +702,7 @@
     {
       "claim": "subthemes",
       "doc": "public-readme",
-      "line": 121,
+      "line": 131,
       "quoted": [
         "18",
         "18"
