@@ -367,6 +367,17 @@ def handle_ask(
         model = LocalPlanner(local) if local is not None else None
     if model is not None:
         planned, audit = plan_with_model(text, model)
+        if (planned is None and not isinstance(model, LocalPlanner)
+                and str(audit.get("detail", "")).startswith("planner unavailable")):
+            # **A failed language-model call falls back to the kind model, not to the patterns.**
+            # Scoring the blind set with Qwen reading first (2026-09-25) read 58.8% against the kind
+            # model's 81.7%: under load some Qwen calls errored, and each error dropped the question
+            # to the patterns alone. On the live site that is every question asked while the model
+            # is rate-limited or down.
+            local = kind_model()
+            if local is not None:
+                planned, local_audit = plan_with_model(text, LocalPlanner(local))
+                audit = {**local_audit, "fallback_from": audit.get("detail")}
         planned = with_book(planned, book, text)
         patterned = detect_research(text)
         # A spot rToken holding is a field the model's plan does not carry, so a model reading of

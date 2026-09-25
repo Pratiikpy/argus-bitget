@@ -106,3 +106,19 @@ def test_the_threshold_rule_prefers_abstaining_to_confident_errors() -> None:
     threshold, stats = choose_threshold(oof)
     # Answering the 0.2 band gains 2 correct and costs 5 x 3: the rule stops above it.
     assert threshold > 0.2 and stats["wrong"] == 0
+
+
+def test_a_failing_language_model_falls_back_to_the_kind_model(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    from argus.lui import server
+
+    class _Broken:
+        def complete_json(self, *args: Any, **kwargs: Any) -> Any:
+            raise TimeoutError("rate limited")
+
+    monkeypatch.setattr(server, "_model_for", lambda visitor: _Broken())
+    payload = server.handle_ask("how should I split a $200k NVDA buy to keep slippage down", [],
+                                visitor="t")
+    assert payload["intent"] == "research"
+    assert payload["routing"].get("fallback_from", "").startswith("planner unavailable")
+    assert "kind model" in str((payload["routing"].get("model") or {}).get("why", ""))
