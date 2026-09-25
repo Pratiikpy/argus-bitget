@@ -159,6 +159,14 @@ def sweep_lines(data: Path) -> list[tuple[str, str]]:
                     f"with Qwen reading first "
                     f"{qwen.get('no_book', 'not measured')} — "
                     f"measured {understanding.get('measured_at', '')}"))
+    figures = _load(data, "figurecheck.json")
+    if figures:
+        asked = figures.get("questions_with_numbers", 0)
+        lost = figures.get("with_a_dropped_number", 0)
+        out.append(("Numbers read from questions",
+                    f"of {asked} blind-corpus questions that state a percentage, amount or "
+                    f"multiple, {asked - lost} carry every one into the analysis; {lost} lose one "
+                    f"— each listed in data/figurecheck.json, none silently"))
     mirror = _load(data, "skill_mirror.json")
     if mirror:
         substitutes = (mirror.get("answered_by_mirror", 0)

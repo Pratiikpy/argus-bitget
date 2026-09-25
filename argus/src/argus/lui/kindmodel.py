@@ -83,7 +83,12 @@ class LocalPlanner:
             # "declined by the model" rule reads this field on the same terms as the LLM's.
             return {"kind": "none" if label == REFUSE else "record",
                     "confidence": 1.0, "why": f"kind model: {label} at {confidence:.2f}"}
-        pairs = research._pairs(text)
+        # A percentage beside a shock word or signed ("a -10% NVDA shock", "qqq -10% scenario")
+        # is the shock, not a holding weight; the patterns draw the same line
+        # (`research._named_shock_request`).
+        pairs = [(pos, symbol, weight) for pos, symbol, weight in research._pairs(text)
+                 if not research._SHOCK_WEIGHT.search(text[max(0, pos - 2): pos + 16])
+                 and not text[max(0, pos - 1): pos + 1].startswith("-")]
         holdings: dict[str, float] = {}
         for _pos, symbol, weight in pairs:
             holdings[symbol] = holdings.get(symbol, 0.0) + weight * 100.0
@@ -100,7 +105,9 @@ class LocalPlanner:
         }
         if candidate is not None:
             plan["candidate"] = candidate
-        patterned = research.detect(text)
+        # The raw reading, before cash and leverage adjustments: `plan_with_model` applies those
+        # to the plan once, and taking them here too applied a 3x multiple twice (90% for 10%).
+        patterned = research._detect(text)
         if (patterned is not None and patterned.size_stated and patterned.symbols
                 and patterned.symbols[0] == candidate):
             # "what does adding 15% TSLA do to my risk?" was answered for 20%: the 15% was read as
@@ -111,7 +118,11 @@ class LocalPlanner:
         notional = research._parse_notional(text)
         if label == "execution" and notional is not None:
             plan["order_usd"] = str(notional)
-        shock = next((m for m in research._SHOCK_NUMBER.finditer(text)), None)
+        # The shock is a percentage that is not a holding weight: "I hold 50% BTC, 30% ETH, how
+        # risky is my book" was stressed with a +50% Nasdaq move read from "50% BTC".
+        weights = {pos for pos, _, _ in pairs}
+        shock = next((m for m in research._SHOCK_NUMBER.finditer(text)
+                      if not any(abs(pos - m.start()) < 16 for pos in weights)), None)
         if label == "stress" and shock is not None:
             value = abs(float(shock.group(1)))
             down = research._DOWN_WORDS.search(text) or shock.group(1).startswith("-")

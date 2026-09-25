@@ -75,6 +75,8 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "social_pulse.json",
     # Spot bitcoin/ether ETF flows and Strategy's buys (`market/etf_flows.py`, SoSoValue).
     "etf_flows.json",
+    # Does every figure a question states reach the analysis (`eval/figurecheck.py`), for /status.
+    "figurecheck.json",
     "skill_reliability.json",
     "data_coverage.json",
     "source_health.json",

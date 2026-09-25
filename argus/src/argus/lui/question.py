@@ -419,12 +419,34 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
     for token in _TICKER_SHAPED.findall(text):
         if token in _NOT_A_TICKER or token in TRADED_SYMBOLS or token in _TICKER_TO_SYMBOL:
             continue
+        if not _listed_on_bitget(token):
+            # "I have $25,000 to put into JNJ shares, what's the safest way to place that order"
+            # was told JNJ has no decision on the record (`eval/figurecheck.py`, 2026-09-25).
+            # The fact that matters is that Bitget does not list it at all.
+            return (), (
+                f"{token} is not listed on Bitget — there is no perpetual or rToken for it in "
+                f"Bitget's contract list — so there is no Bitget order book to plan an order "
+                f"against and no market to research; any contract Bitget lists can be asked about"
+            )
         return (), (
             f"{token} is not among the twelve stock perpetuals ARGUS decides on, so there is no "
-            f"decision about it on the record — if Bitget lists it, research questions about it "
-            f"are answered (\"is {token} overbought\")"
+            f"decision about it on the record — research questions about it are answered "
+            f"(\"is {token} overbought\")"
         )
     return (), ""
+
+
+def _listed_on_bitget(token: str) -> bool:
+    """Whether Bitget's contract list carries ``token`` as a perpetual (``XUSDT`` or
+    ``XSTOCKUSDT``). True when the list cannot be read, so an outage never makes the console call a
+    listed name unlisted."""
+    try:
+        from argus.market import universe
+
+        listed = universe.contracts()
+    except Exception:
+        return True
+    return f"{token}USDT" in listed or f"{token}STOCKUSDT" in listed
 
 
 # --- intent ---------------------------------------------------------------------------------

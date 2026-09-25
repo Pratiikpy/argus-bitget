@@ -73,3 +73,38 @@ def test_a_leveraged_hold_across_a_closure_is_a_leverage_question(
 def test_a_hedge_request_on_a_spot_token_is_still_a_hedge() -> None:
     request = _detect("I hold RNVDAUSDT, protect it over the weekend")
     assert request is not None and request.kind is ResearchKind.HEDGE
+
+
+def _series(n: int, drift: float) -> list[eh.Day]:
+    from datetime import timedelta
+
+    start, days, level = date(2020, 1, 6), [], 100.0  # a Monday
+    d = start
+    while len(days) < n:
+        if d.weekday() < 5:
+            level *= 1 + drift
+            days.append(eh.Day(d, level, level))
+        d += timedelta(days=1)
+    return days
+
+
+def test_the_state_is_read_on_the_stocks_own_scale() -> None:
+    rising = _series(300, 0.004)
+    states = eh._states(rising)
+    last = states[rising[-1].day]
+    assert last.trend == "up" and last.five_day == pytest.approx(1.004 ** 5 - 1)
+
+
+def test_matched_weekends_are_tested_before_being_called_different() -> None:
+    days = _series(400, 0.004)
+    gaps = eh.closure_gaps(days)
+    # a flat series has no gaps against a long: the matched share equals the overall one
+    matched = eh.matched_record(days, gaps, side="long")
+    assert matched is not None and matched.n >= 10
+    assert matched.against_share == matched.all_against_share == 0.0
+    assert not matched.differs
+
+
+def test_too_few_matched_weekends_is_none() -> None:
+    days = _series(60, 0.004)
+    assert eh.matched_record(days, eh.closure_gaps(days), side="long") is None

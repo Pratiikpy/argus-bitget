@@ -157,3 +157,91 @@ def record(gaps: list[Gap], *, side: str, adverse: float) -> GapRecord:
         down_1_5=sum(-0.05 <= m < -0.01 for m in moves) / n,
         down_5=sum(m < -0.05 for m in moves) / n,
         worst=gaps[worst_index], beyond=sum(m <= -adverse for m in moves))
+
+
+TREND_BAND = 0.02
+"""A 20-day average more than 2% above (below) the 50-day is an up (down) trend. The band is
+baserate's (`TREND_UP_SMA_MULTIPLIER = 1.02`); its fixed +/-8% five-day thresholds are not
+used — momentum here is the stock's own tercile, so a quiet utility and NVDA are read on their own
+scale."""
+
+
+@dataclass(frozen=True, slots=True)
+class State:
+    trend: str
+    """up, down or flat: the 20-day average against the 50-day."""
+    momentum: str
+    """low, mid or high: the five-day return's tercile in this stock's own history."""
+    five_day: float
+
+    def words(self) -> str:
+        trend = {"up": "in an uptrend", "down": "in a downtrend", "flat": "without a trend"}
+        pace = {"low": "a weak", "mid": "an ordinary", "high": "a strong"}
+        return f"{trend[self.trend]} after {pace[self.momentum]} week ({self.five_day:+.1%})"
+
+
+def _states(days: list[Day]) -> dict[date, State]:
+    closes = [d.close for d in days]
+    fives = [closes[i] / closes[i - 5] - 1 for i in range(5, len(closes))]
+    if len(fives) < 30:
+        return {}
+    ordered = sorted(fives)
+    low_cut, high_cut = ordered[len(ordered) // 3], ordered[2 * len(ordered) // 3]
+    states: dict[date, State] = {}
+    for i in range(50, len(days)):
+        sma20 = sum(closes[i - 19:i + 1]) / 20
+        sma50 = sum(closes[i - 49:i + 1]) / 50
+        trend = ("up" if sma20 > sma50 * (1 + TREND_BAND) else
+                 "down" if sma20 < sma50 * (1 - TREND_BAND) else "flat")
+        five = closes[i] / closes[i - 5] - 1
+        momentum = "low" if five < low_cut else "high" if five > high_cut else "mid"
+        states[days[i].day] = State(trend=trend, momentum=momentum, five_day=five)
+    return states
+
+
+@dataclass(frozen=True, slots=True)
+class Matched:
+    state: State
+    n: int
+    against_share: float
+    against_low: float
+    against_high: float
+    all_against_share: float
+    worst: Gap | None
+
+    @property
+    def differs(self) -> bool:
+        return not self.against_low <= self.all_against_share <= self.against_high
+
+    def as_dict(self) -> dict[str, Any]:
+        return {"trend": self.state.trend, "momentum": self.state.momentum,
+                "five_day": self.state.five_day, "n": self.n,
+                "against_share": self.against_share,
+                "interval": [self.against_low, self.against_high],
+                "all_against_share": self.all_against_share, "differs": self.differs,
+                "worst": None if self.worst is None else {
+                    "move": self.worst.move, "closed": self.worst.closed.isoformat()}}
+
+
+def matched_record(days: list[Day], gaps: list[Gap], *, side: str) -> Matched | None:
+    """Weekends that began in the same state as the latest day, and whether they behaved
+    differently from all weekends: the share that opened more than 1% against ``side``, with a
+    Wilson interval, against the unconditional share. None when there is no state to read."""
+    from argus.desk.odds import wilson
+
+    states = _states(days)
+    if not days or days[-1].day not in states:
+        return None
+    now = states[days[-1].day]
+    sign = -1.0 if side == "short" else 1.0
+    against_all = [sign * g.move < -0.01 for g in gaps]
+    matched = [g for g in gaps if (s := states.get(g.closed)) is not None
+               and (s.trend, s.momentum) == (now.trend, now.momentum)]
+    if len(matched) < 10 or not against_all:
+        return None
+    hits = sum(sign * g.move < -0.01 for g in matched)
+    low, high = wilson(hits, len(matched))
+    worst = min(matched, key=lambda g: sign * g.move)
+    return Matched(state=now, n=len(matched), against_share=hits / len(matched),
+                   against_low=low, against_high=high,
+                   all_against_share=sum(against_all) / len(against_all), worst=worst)

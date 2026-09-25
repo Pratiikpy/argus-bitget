@@ -640,7 +640,8 @@ def _research_payload(
 _SPANISH = re.compile(r"[¿¡]|\b(?:qué|cómo|como|cuál|cuánto|los|las|del|tasas|oro|acciones|"
                       r"comprar|vender|debería|precio|pasa|está|baja|sube|cartera|riesgo)\b",
                       re.I)
-_LATIN_OTHER = re.compile(r"\b(?:quoi|pourquoi|est-ce|wie|warum|welche|ist|devo|preço|ações)\b",
+_LATIN_OTHER = re.compile(r"\b(?:quoi|pourquoi|est-ce|wie|warum|welche|ist|wenn|meinem|meine|"
+                          r"passiert|devo|preço|ações)\b",
                           re.I)
 
 

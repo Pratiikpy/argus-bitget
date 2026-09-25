@@ -286,7 +286,12 @@ class ResearchRequest:
 _WORDISH = r"[A-Za-z][A-Za-z0-9]{1,15}"
 _PCT = r"(\d+(?:\.\d+)?)\s*(?:%|percent\b|pct\b)"
 _PAIR_PCT_FIRST = re.compile(rf"{_PCT}\s*(?:of\s+|in\s+|into\s+)?(?:my\s+)?({_WORDISH})", re.I)
-_PAIR_NAME_FIRST = re.compile(rf"({_WORDISH})\s*(?:at|=|:|-)?\s*{_PCT}", re.I)
+_PAIR_NAME_FIRST = re.compile(
+    rf"({_WORDISH})(?:\s+(?:etf|stock|stocks|shares?|position|token|perps?|spot|coins?))?"
+    rf"\s*(?:at|=|:|-)?\s*{_PCT}", re.I)
+""""NVDA 40%", and "spy etf 30% of book" or "BTC position 25%": a figure-level check of the corpora
+(`eval/figurecheck.py`, 2026-09-25) found "holding spy etf 30% of book, thinking of adding qqq"
+read with no holdings at all, so SPY — the holding — was analysed as the add."""
 _PAIR_FRACTION = re.compile(rf"({_WORDISH})\s*=\s*(0?\.\d+|1(?:\.0+)?)\b", re.I)
 
 _ADD_VERB = re.compile(
@@ -332,6 +337,18 @@ _STRESS = re.compile(
     r"-\s?\d+(?:\.\d+)?\s*%)",
     re.I,
 )
+_STRESS_OTHER = re.compile(
+    r"\b(?:si|se|wenn|falls|si\s+jamais)\b[^?]{0,60}?\b(?:mercado|bolsa|acciones|a[cç][oõ]es|"
+    r"markt|b[oö]rse|aktien|march[eé]|bourse|actions|nasdaq|s&p)\b[^?]{0,40}?"
+    r"\b(?:cae|cayera|caiga|cai|cair|ca[ií]sse|f[aä]llt|fiele|einbricht|crash\w*|chute|baisse|"
+    r"s'effondre|tomba)\w*\b[^?]{0,20}?\d+(?:[.,]\d+)?\s*%"
+    # German and French put the size before the verb: "wenn der Markt um 15% fällt".
+    r"|\b(?:wenn|falls|si|se)\b[^?]{0,60}?\b(?:markt|b[oö]rse|aktien|mercado|bolsa|march[eé]|"
+    r"bourse)\b[^?]{0,20}?\d+(?:[.,]\d+)?\s*%[^?]{0,15}?(?:f[aä]llt|fiele|einbricht|sinkt|cae|"
+    r"cai|chute|baisse)",
+    re.I)
+"""A market drop asked in Spanish, Portuguese, German or French ("¿qué pasaría con mi cuenta si el
+mercado de acciones cae un 20%?"), declined until 2026-09-25 (`eval/figurecheck.py`)."""
 _STRESS_BARE = re.compile(
     r"\bstress[\s-]?test\w*\b|\bworst[\s-]case\b|\bbear\s+case\b|\bhow\s+bad\b|"
     r"\bwhat'?s\s+the\s+damage\b|\bp\s?&\s?l\s+on\b|\bhow\s+exposed\b|\bhow\s+(?:bad|much)\s+"
@@ -556,7 +573,9 @@ _RESIZE_BY = re.compile(
     rf"\b{_RESIZE_VERB}\b[^.?!\n]{{0,40}}?\bby\s+(\d+(?:\.\d+)?)\s*%"
     r"|\b(?:close|sell|exit|cerrar|vender|reducir)\w*\s+(\d+(?:\.\d+)?)\s*%\s+(?:of|de)\s+"
     r"(?:my|mi|the|la)?\s*(?:position|posici[o\u00f3]n|holding|stake)"
-    r"|\b(?:position|holding|stake)\b[^.?!\n]{0,30}?\bby\s+(\d+(?:\.\d+)?)\s*%", re.I)
+    r"|\b(?:position|holding|stake)\b[^.?!\n]{0,30}?\bby\s+(\d+(?:\.\d+)?)\s*%"
+    # German: "meine BTC-Position um 40% reduziere", "um 20% aufstocken"
+    r"|\bum\s+(\d+(?:[.,]\d+)?)\s*%\s*(?:reduzier|verringer|senk|abbau|k[uü]rz|verkauf)", re.I)
 _RAISE_WORDS = re.compile(r"\b(?:rais|increas|lift|add|scal\w*\s+up|up\b)\w*|\u63d0|\u52a0|\u5347",
                           re.I)
 
@@ -574,9 +593,10 @@ def _resize(raw: str) -> tuple[float | None, float | None, float | None] | None:
         return float(to.group(1)) / 100, None, None
     by = _RESIZE_BY.search(raw)
     if by:
-        amount = float(next(g for g in by.groups() if g)) / 100
+        amount = float(next(g for g in by.groups() if g).replace(",", ".")) / 100
         raising = bool(_RAISE_WORDS.search(by.group(0))) and not re.search(
-            r"\b(?:close|sell|exit|cerrar|vender|reducir|trim|cut|reduc)", by.group(0), re.I)
+            r"\b(?:close|sell|exit|cerrar|vender|reducir|trim|cut|reduc|reduzier|verringer|"
+            r"senk|abbau|k[uü]rz|verkauf)", by.group(0), re.I)
         return None, None, amount if raising else -amount
     return None
 
@@ -856,10 +876,19 @@ def _pairs(text: str) -> list[tuple[int, str, float]]:
     taken: set[tuple[int, int]] = set()
 
     trust = not _shouting(text)
+    named: set[str] | None = None
 
     def keep(span: tuple[int, int], name: str, value: float) -> None:
+        nonlocal named
         hit = _resolve(name, trust_case=trust)
         symbol = None if hit is None else hit[0]
+        if symbol is None and name.islower():
+            # "spy etf 30%": a lowercase ticker is not trusted on its own, but when the reader of
+            # names already took it as one (a market cue beside it), its weight is kept too.
+            if named is None:
+                named = set(research_symbols(text)[0])
+            upper = _resolve(name.upper(), trust_case=True)
+            symbol = upper[0] if upper is not None and upper[0] in named else None
         if symbol is None or value <= 0:
             return
         if any(not (span[1] <= a or span[0] >= b) for a, b in taken):
@@ -873,8 +902,118 @@ def _pairs(text: str) -> list[tuple[int, str, float]]:
         keep(match.span(), match.group(2), float(match.group(1)) / 100.0)
     for match in _PAIR_NAME_FIRST.finditer(text):
         keep(match.span(), match.group(1), float(match.group(2)) / 100.0)
+    named_spans = [pos for pos, _, _ in found]
+    for pos, symbol, weight in _group_pairs(text):
+        # A group's members sit at its own position; only a weight already read there by name
+        # ("40% NVDA") displaces them.
+        if not any(abs(pos - other) < 3 for other in named_spans):
+            found.append((pos, symbol, weight))
     found.sort()
     return found or _amount_pairs(text)
+
+
+_GROUP = re.compile(
+    r"(\d+(?:\.\d+)?)\s*%\s*(?:in\s+|of\s+|is\s+)?(crypto\w*|tech\w*|semi\w*|chips?|"
+    r"commodit\w*)(?:\s+(?:stocks?|names|coins|shares))?\s*(?:\(([^)]{2,60})\))?", re.I)
+"""A weight on a group rather than a name: "60% crypto (btc+eth), 40% tech stocks". Read as
+nothing until 2026-09-25 (`eval/figurecheck.py`), so the book was whatever else was named."""
+
+
+def _group_pairs(text: str) -> list[tuple[int, str, float]]:
+    """A group weight split equally over the names in its brackets, or over the theme's names
+    when none are given. `_group_note` says which split was used."""
+    out: list[tuple[int, str, float]] = []
+    for match in _GROUP.finditer(text):
+        inside = match.group(3)
+        names = list(research_symbols(inside.replace("+", " "))[0]) if inside else []
+        if not names:
+            theme = _theme(match.group(2))
+            names = list(theme[1]) if theme else []
+        if not names:
+            continue
+        share = float(match.group(1)) / 100.0 / len(names)
+        out.extend((match.start() + k, name, share) for k, name in enumerate(names))
+    return out
+
+
+def _group_note(text: str) -> tuple[str, ...]:
+    notes = []
+    for match in _GROUP.finditer(text):
+        inside = match.group(3)
+        named = list(research_symbols(inside.replace("+", " "))[0]) if inside else []
+        theme = None if named else _theme(match.group(2))
+        names = named or (list(theme[1]) if theme else [])
+        if names:
+            notes.append(f"{match.group(1)}% {match.group(2)} split equally across "
+                         f"{', '.join(_t(n) for n in names)}"
+                         + ("" if named else " — name the holdings to use your own"))
+    return tuple(notes)
+
+
+_CASH_WORD = r"(?:cash|usdt|usdc|usd|stables?|stablecoins?|dry\s+powder)"
+_CASH_REST = re.compile(
+    rf"\b{_CASH_WORD}\s+(?:is\s+|for\s+|as\s+)?(?:the\s+)?(?:rest|remainder|balance)\b"
+    rf"|\b(?:the\s+)?(?:rest|remainder|balance)\s+(?:is\s+|in\s+|as\s+)?(?:in\s+)?{_CASH_WORD}\b",
+    re.I)
+_CASH_PCT = re.compile(
+    rf"(\d+(?:\.\d+)?)\s*%\s*(?:in\s+|as\s+)?{_CASH_WORD}\b|\b{_CASH_WORD}\s*(?:at|=|:|-)?\s*"
+    rf"(\d+(?:\.\d+)?)\s*%", re.I)
+
+
+def _with_stated_cash(request: ResearchRequest | None, text: str) -> ResearchRequest | None:
+    """The cash a question states — "cash rest", "20% in USDT" — held as cash, not scaled away.
+
+    "Portfolio is nvda 40%, msft 20%, cash rest — want to add 5k of coin" was scaled to 67% NVDA
+    and 33% MSFT with a note asking the trader to say what the rest was, when they had
+    (`eval/figurecheck.py`, 2026-09-25). The book's weights are rescaled to sum to one less the
+    cash, and ``cash`` carries the rest, which every risk figure then dilutes by."""
+    if request is None or not request.book or request.cash:
+        return request
+    stated = _CASH_PCT.search(text)
+    cash: float | None = None
+    if stated is not None:
+        cash = float(stated.group(1) or stated.group(2)) / 100.0
+    elif _CASH_REST.search(text):
+        held = sum(w for _, sym, w in _pairs(text) if sym in request.book)
+        cash = 1.0 - held if 0.0 < held < 1.0 else None
+    if cash is None or not 0.0 < cash < 1.0:
+        return request
+    total = sum(request.book.values())
+    book = {sym: w / total * (1.0 - cash) for sym, w in request.book.items()}
+    notes = tuple(n for n in request.notes if not n.startswith("your holdings add up to"))
+    return replace(request, book=book, cash=cash,
+                   notes=(*notes, f"the rest of the book, {cash:.0%}, read as cash"))
+
+
+_ADD_MULTIPLE = re.compile(r"\b(\d+(?:\.\d+)?)\s*x\b(?!\s*(?:vol|volatility))", re.I)
+
+
+def _with_leverage_exposure(request: ResearchRequest | None,
+                            text: str) -> ResearchRequest | None:
+    """An add at a stated multiple is that multiple of exposure: "add 10% ETH at 3x" puts 30% of
+    the book's value to work, and the risk figures are about exposure, not margin.
+
+    "wanna add 3x ETH perp longs, 2 BTC worth, how bad does that wreck my portfolio beta" was
+    analysed as an unlevered add (`eval/figurecheck.py`, 2026-09-25)."""
+    if request is None or request.kind is not ResearchKind.IMPACT or request.leverage:
+        return request
+    if request.target is not None or request.resize_by is not None:
+        return request
+    found = _ADD_MULTIPLE.search(text)
+    if found is None:
+        return request
+    multiple = float(found.group(1))
+    if not 1.0 < multiple <= 125.0:
+        return request
+    exposure = min(request.size * multiple, 1.0)
+    capped = " (capped at the whole book)" if request.size * multiple > 1.0 else ""
+    note = (f"at {multiple:g}x the position's exposure is {multiple:g} times its margin, so "
+            + (f"the {request.size:.0%} stated is read as {exposure:.0%} of exposure{capped}"
+               if request.size_stated else
+               f"with no size given, {request.size:.0%} of margin is read as {exposure:.0%} of "
+               f"exposure{capped} — say the margin you have in mind"))
+    notes = tuple(n for n in request.notes if not n.startswith("no size was given"))
+    return replace(request, size=exposure, leverage=multiple, notes=(*notes, note))
 
 
 def _normalise(book: dict[str, float], notes: list[str]) -> dict[str, float]:
@@ -965,6 +1104,10 @@ def _is_an_order(raw: str) -> bool:
     from argus.lui.question import _INTERROGATIVE, _ORDER_VERB
 
     if re.search(r"\bhow\b|\?|怎么|如何", raw, re.I):
+        return False
+    if re.search(r"\b(?:and|then)\s+(?:show|tell|give)\b|\b(?:show|tell)\s+me\b|"
+                 r"\b(?:resulting|new|net)\s+(?:exposure|risk|beta|concentration)\b", raw, re.I):
+        # "trim QQQ by 30% and show me the resulting net exposure" asks for the analysis.
         return False
     return bool(_ORDER_VERB.match(raw)) and not _INTERROGATIVE.match(raw)
 
@@ -1170,7 +1313,9 @@ def detect(text: str) -> ResearchRequest | None:
     analyses: in "what if the Nasdaq drops 10%? I hold 40% gold" the Nasdaq is the shock, not a
     holding, and a note saying it was read as NDX100USDT would describe a reading never used.
     """
-    request = _detect(text)
+    request = _with_leverage_exposure(_with_stated_cash(_detect(text), text), text)
+    if request is not None and request.book and _GROUP.search(text):
+        request = replace(request, notes=(*request.notes, *_group_note(text)))
     if request is None:
         return None
     read_as = [n for s, n in _read(text).items() if n and s in request.symbols
@@ -1352,6 +1497,15 @@ def _detect(text: str) -> ResearchRequest | None:
     named_shock = _named_shock_request(raw)
     if named_shock is not None:
         return named_shock
+    other = _STRESS_OTHER.search(raw)
+    if other is not None and not _STRESS.search(raw):
+        # A market drop asked in another language: the Nasdaq shocked by the stated size, on the
+        # trader's book (the saved one, or the answer asks for it). The verbs matched are all
+        # falls, so the shock is negative.
+        drop = re.search(r"(\d+(?:[.,]\d+)?)\s*%", other.group(0))
+        return ResearchRequest(
+            kind=ResearchKind.STRESS, symbols=(), book={},
+            shock_pct=-float(drop.group(1).replace(",", ".")) if drop else None)
     resized = _resize(raw) if symbols else None
     if resized is not None and not _is_an_order(raw) and not _STRESS.search(raw):
         # "Trim my TSLA weight to 10%", "resizing NVDA from 8% to 20%", 把英伟达从15%降到5% set
@@ -2137,7 +2291,13 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
     else:
         lead = candidate or symbols[0]
         if size is None:
-            notes.append(f"no size was given, so {lead} is assessed at {DEFAULT_SIZE:.0%}")
+            amount = _parse_notional(text)
+            notes.append(
+                f"${amount:,.0f} was stated but not what the whole book is worth, so it cannot be "
+                f"turned into a share of it: {lead} is assessed at {DEFAULT_SIZE:.0%} — say the "
+                f"book's value, or the share, to size it exactly"
+                if amount is not None and not valued else
+                f"no size was given, so {lead} is assessed at {DEFAULT_SIZE:.0%}")
         request = ResearchRequest(
             kind=ResearchKind.IMPACT,
             symbols=(lead, *[s for s in book if s != lead]),
@@ -2152,6 +2312,9 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
                  if n and s in request.symbols and n not in request.notes]
         if extra:
             request = replace(request, notes=(*request.notes, *extra))
+    request = _with_leverage_exposure(_with_stated_cash(request, text), text)
+    if request is not None and request.book and _GROUP.search(text):
+        request = replace(request, notes=(*request.notes, *_group_note(text)))
     audit["applied"] = request is not None
     return request, audit
 
@@ -2440,6 +2603,101 @@ def _resolve_resize(request: ResearchRequest, before: dict[str, float],
         + ", every other holding scaled so the book still sums to 100%.")
 
 
+_VAR = re.compile(r"\bvar\b(?!\s*\()|\bvalue[\s-]+at[\s-]+risk\b|\bexpected\s+shortfall\b|\bcvar\b",
+                  re.I)
+_VAR_LEVEL = re.compile(r"\b(9\d(?:\.\d+)?)\s*%", re.I)
+VAR_DAYS = 500
+
+
+_VOL_SPIKE = re.compile(
+    r"\b(\d+(?:\.\d+)?)\s*x\s+(?:the\s+)?(?:vol\w*|variance)\b|\b(?:vol\w*)\s+(?:spike|jump|"
+    r"shock|doubl\w*|tripl\w*)\s*(?:of\s+|by\s+)?(\d+(?:\.\d+)?)?\s*x?\b|\b(doubl|tripl)\w*\s+"
+    r"(?:the\s+)?vol\w*", re.I)
+"""A volatility scenario ("a 2x vol spike across all crypto perps", "if volatility doubles"),
+read as nothing until 2026-09-25 (`eval/figurecheck.py`)."""
+
+
+def _vol_multiple(text: str) -> float | None:
+    found = _VOL_SPIKE.search(text)
+    if found is None:
+        return None
+    if found.group(1) or found.group(2):
+        return float(found.group(1) or found.group(2))
+    word = (found.group(3) or "").lower()
+    return 3.0 if word.startswith("tripl") else 2.0
+
+
+def _var_lines(before: Mapping[str, float], after: Mapping[str, float],
+               text: str, *, scale: float = 1.0) -> tuple[list[str], list[Source]]:
+    """One-day historical value at risk and expected shortfall of the book, before and after.
+
+    Asked for by name ("recompute portfolio VaR at 95%") and answered by nothing until
+    2026-09-25 (`eval/figurecheck.py` found the 95% dropped). Thirty days of hourly bars hold
+    thirty daily outcomes, one or two of them past a 95% line, so daily VaR is read from up to 500
+    days of Bitget daily closes, aligned on the dates every held name traded. Historical, not
+    parametric: the loss the book would actually have taken on its worst days, at today's
+    weights. Expected shortfall is the average of the days past the line (skfolio's CVaR
+    definition is the one `desk/portfolio.tail_contributions` uses; the plain tail mean is used
+    here for a daily series)."""
+    from argus.market.history import CandleType, fetch_window
+
+    found = _VAR_LEVEL.search(text)
+    level = float(found.group(1)) / 100 if found else 0.95
+    names = sorted({*before, *after})
+    closes: dict[str, dict[Any, float]] = {}
+    for name in names:
+        try:
+            with _FETCH_SLOTS:
+                bars = fetch_window(name, start=datetime.now(UTC) - timedelta(days=VAR_DAYS),
+                                    interval="1D", candle_type=CandleType.MARKET, pause=0.05)
+        except Exception:
+            return [], []
+        closes[name] = {b.ts.date(): float(b.close) for b in bars if float(b.close) > 0}
+    dates = sorted(set.intersection(*(set(c) for c in closes.values()))) if closes else []
+    if len(dates) < 60:
+        return [f"Value at risk: the names share only {len(dates)} days of Bitget history, too "
+                f"few for a {level:.0%} one-day figure."], []
+    rets = {n: [closes[n][b] / closes[n][a] - 1 for a, b in itertools.pairwise(dates)]
+            for n in names}
+
+    def var_es(weights: Mapping[str, float]) -> tuple[float, float] | None:
+        if not weights:
+            return None
+        book = sorted(sum(float(weights.get(n, 0.0)) * rets[n][t] for n in names)
+                      for t in range(len(dates) - 1))
+        cut = max(1, int((1 - level) * len(book)))
+        return -book[cut - 1], -sum(book[:cut]) / cut
+
+    now, then = var_es(after), var_es(before)
+    if now is None:
+        return [], []
+    if scale != 1.0:
+        # Filtered historical simulation, the simplest honest form: every past day's move scaled
+        # by the stated multiple, so the shape of the book's worst days is kept and only their
+        # size changes. It says nothing about correlations rising together, which in a real
+        # volatility spike they do — so this is a floor on the damage, and says so.
+        worst_day = min(sum(float(after.get(n, 0.0)) * rets[n][t] for n in names)
+                        for t in range(len(dates) - 1))
+        return ([f"Volatility at {scale:g}x: every past day's move scaled by {scale:g}, the book's "
+                 f"{level:.0%} one-day value at risk goes from {now[0]:.2%} to "
+                 f"{now[0] * scale:.2%} and its expected shortfall from {now[1]:.2%} to "
+                 f"{now[1] * scale:.2%}; its worst day in {len(dates) - 1} would have been "
+                 f"{worst_day * scale:+.2%} instead of {worst_day:+.2%}. Correlations are held "
+                 f"where they were, and in a real spike they rise, so read this as the least it "
+                 f"would cost."],
+                [Source(kind="computation", ref="argus.lui.research._var_lines",
+                        detail=f"filtered historical simulation, vol x{scale:g}, "
+                               f"{len(dates) - 1} aligned daily returns")])
+    change = (f" (was {then[0]:.2%} and {then[1]:.2%})" if then is not None else "")
+    lines = [f"Value at risk, {level:.0%}, one day: the book at these weights lost more than "
+             f"{now[0]:.2%} on {1 - level:.0%} of its {len(dates) - 1} past days, and "
+             f"{now[1]:.2%} on average on those days (expected shortfall){change}. Historical, "
+             f"from Bitget daily closes; a figure for normal days, not a floor for bad ones."]
+    return lines, [Source(kind="computation", ref="argus.lui.research._var_lines",
+                          detail=f"historical {level:.0%} VaR and expected shortfall, "
+                                 f"{len(dates) - 1} aligned daily returns")]
+
+
 def max_size_within_budget(
     *, add: str, before: Mapping[str, float], columns: Mapping[str, Sequence[float]],
     budget: float = RISK_BUDGET, as_target: bool = False,
@@ -2711,10 +2969,12 @@ def _closure_risk(symbol: str, multiple: float, side: str, distance: float, clos
     name = _t(symbol)
     if closure == "weekend" and (symbol in TRADED_SYMBOLS or _is_equity(symbol)):
         try:
-            gaps = equity_history.closure_gaps(equity_history.daily(name))
+            stock_days = equity_history.daily(name)
+            gaps = equity_history.closure_gaps(stock_days)
             rec = equity_history.record(gaps, side=side, adverse=distance)
+            matched = equity_history.matched_record(stock_days, gaps, side=side)
         except equity_history.HistoryError:
-            rec = None
+            rec, matched = None, None
         if rec is not None:
             worst_move = rec.worst.move * (-1 if side == "short" else 1)
             lines.append(
@@ -2727,6 +2987,24 @@ def _closure_risk(symbol: str, multiple: float, side: str, distance: float, clos
             sources.append(Source(kind="venue", ref="Yahoo Finance daily chart",
                                   detail=f"{name} since {rec.since.isoformat()}, adjusted"))
             payload["stock_weekends"] = rec.as_dict()
+        if matched is not None:
+            # baserate matches the current regime to past weekends and filters; the filter is
+            # kept here and tested: the matched share is shown with its interval, and only
+            # called different when the interval excludes the share across all weekends.
+            signed = -1 if side == "short" else 1
+            worst_note = ("" if matched.worst is None else
+                          f" The worst of them was {matched.worst.move * signed:+.1%}"
+                          f" ({matched.worst.closed:%d %b %Y}).")
+            lines.append(
+                f"Going into this weekend {name} is {matched.state.words()}. In the "
+                f"{matched.n} past weekends that began that way, {matched.against_share:.0%} "
+                f"opened more than 1% against a {side} (95% interval {matched.against_low:.0%} to "
+                f"{matched.against_high:.0%}), against {matched.all_against_share:.0%} across all "
+                f"weekends — "
+                + ("a measurable difference, found in-sample." if matched.differs else
+                   "no measurable difference, so the state adds nothing here.")
+                + worst_note)
+            payload["matched_weekends"] = matched.as_dict()
     try:
         with _FETCH_SLOTS:
             daily = fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=500),
@@ -6212,6 +6490,10 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             lines = _impact_lines(report, request, columns)
             if resized is not None:
                 lines.insert(0, resize_line)
+            if _VAR.search(raw_text):
+                var_lines, var_sources = _var_lines(before, report.weights_after, raw_text)
+                lines[1:1] = var_lines
+                sources.extend(var_sources)
             payload["report"] = report.as_dict()
             sources.append(Source(kind="computation", ref="argus.desk.portfolio.copilot",
                                   detail="session beta, Euler risk decomposition, beta stress, "
@@ -6309,6 +6591,13 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
 
         elif request.kind is ResearchKind.STRESS:
             columns = _open_columns(data.raw, is_open)
+            vol_multiple = _vol_multiple(raw_text)
+            if vol_multiple is not None and request.book:
+                vol_lines, vol_sources = _var_lines({}, request.book, raw_text,
+                                                    scale=vol_multiple)
+                vol_first = [f"Actionable: {line[0].lower()}{line[1:]}" for line in vol_lines]
+                lines.extend(vol_first)
+                sources.extend(vol_sources)
             shocks = [Shock("benchmark -5%", -5.0), Shock("benchmark -10%", -10.0)]
             if request.shock_pct is not None and request.shock_pct not in (-5.0, -10.0):
                 shocks.insert(0, Shock(f"benchmark {request.shock_pct:+g}%", request.shock_pct))
@@ -6343,15 +6632,17 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 # COIN carried 48% of the loss on 40% of the weight.
                 top = max(driven, key=lambda s: driven[s] / book_beta - request.book[s])
                 share = driven[top] / book_beta
+                prefix = "" if vol_multiple is not None else "Actionable: "
                 if share - request.book[top] >= 0.02:
                     lines.append(
-                        f"Actionable: {_t(top)} is {request.book[top]:.0%} of the book but "
+                        f"{prefix}{_t(top)} is {request.book[top]:.0%} of the book but "
                         f"{share:.0%} of its loss when {shocked_name} falls — trimming it cuts "
                         f"the drawdown fastest; the {shocked_name} hedge below is the other lever."
                     )
                 else:
                     lines.append(
-                        "Actionable: the loss is spread roughly in line with your weights, so "
+                        f"{prefix}{'the' if prefix else 'The'} loss is spread roughly in line with "
+                        "your weights, so "
                         f"trimming any one name barely helps — the {shocked_name} hedge below is "
                         "the lever."
                     )

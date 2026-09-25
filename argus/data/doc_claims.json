@@ -123,65 +123,65 @@
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "341"
+        "343"
       ],
       "live": [
-        341
+        343
       ],
       "status": "OK",
-      "excerpt": "strict clean on 341 source files"
+      "excerpt": "strict clean on 343 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 143,
       "quoted": [
-        "341"
+        "343"
       ],
       "live": [
-        341
+        343
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 341 source files"
+      "excerpt": "strict` clean on 343 source files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 419,
       "quoted": [
-        "341"
+        "343"
       ],
       "live": [
-        341
+        343
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 341 files"
+      "excerpt": "strict` clean on 343 files"
     },
     {
       "claim": "source_files",
       "doc": "submission",
       "line": 620,
       "quoted": [
-        "341"
+        "343"
       ],
       "live": [
-        341
+        343
       ],
       "status": "OK",
-      "excerpt": "strict` clean across 341 source files"
+      "excerpt": "strict` clean across 343 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 1956,
       "quoted": [
-        "341"
+        "343"
       ],
       "live": [
-        341
+        343
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 341 source files"
+      "excerpt": "strict` clean on 343 source files"
     },
     {
       "claim": "register_claims",
