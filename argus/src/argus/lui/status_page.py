@@ -165,8 +165,9 @@ def sweep_lines(data: Path) -> list[tuple[str, str]]:
         lost = figures.get("with_a_dropped_number", 0)
         out.append(("Numbers read from questions",
                     f"of {asked} blind-corpus questions that state a percentage, amount or "
-                    f"multiple, {asked - lost} carry every one into the analysis; {lost} lose one "
-                    f"— each listed in data/figurecheck.json, none silently"))
+                    f"multiple, {asked - lost} carry every one into the analysis; {lost} "
+                    f"{'loses' if lost == 1 else 'lose'} one — each listed in "
+                    f"data/figurecheck.json, none silently"))
     mirror = _load(data, "skill_mirror.json")
     if mirror:
         substitutes = (mirror.get("answered_by_mirror", 0)
