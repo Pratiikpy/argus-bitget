@@ -414,6 +414,18 @@ def handle_ask(
             # margin or liquidation named, the leverage engine has nothing it was asked.
             planned = with_book(patterned, book, text) if patterned is not None else None
             audit = {**audit, "detail": "a leverage reading with no leverage named was dropped"}
+        if (planned is not None and patterned is not None
+                and planned.kind is ResearchKind.IMPACT and patterned.kind is ResearchKind.IMPACT
+                and planned.symbols and patterned.symbols
+                and planned.symbols[0] in planned.book
+                and patterned.symbols[0] not in planned.book):
+            # The hosted model read "nvda 40%, msft 20%, cash rest — want to add 5k of coin" as
+            # adding bitcoin, named no candidate it could resolve, and the plan fell back to a
+            # name already held — so the answer was about adding NVDA (live, 2026-09-25). When the
+            # model's add is a holding and the patterns found a name outside the book, theirs is
+            # the add that was asked about.
+            planned = with_book(patterned, book, text)
+            audit = {**audit, "detail": "the model's add was a holding; the patterns' add kept"}
         if (patterned is not None and pattern_reading_wins(patterned, text)
                 and (planned is None or planned.kind is not patterned.kind
                      or (patterned.spot is not None and planned.spot != patterned.spot)

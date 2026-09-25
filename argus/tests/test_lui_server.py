@@ -442,3 +442,24 @@ class TestAModelReadingIsHeldToTheWords:
         seen.clear()
         handle_ask("10x long MSTR over the weekend", [])
         assert seen and seen[0].kind is research.ResearchKind.LEVERAGE
+
+    def test_an_add_the_model_reads_as_a_holding_keeps_the_patterns_add(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """The hosted model read "add 5k of coin" as bitcoin with no candidate it could resolve,
+        and the answer was about adding NVDA, already held (live, 2026-09-25)."""
+        from argus.lui import research, server
+
+        class Planner:
+            def complete_json(self, messages: list[dict[str, str]], **_: Any) -> dict[str, Any]:
+                return {"kind": "impact", "names": ["NVDA", "MSFT"], "candidate": "coin",
+                        "holdings": {"NVDA": 40, "MSFT": 20}, "confidence": 0.85, "why": "add"}
+
+        seen: list[Any] = []
+        monkeypatch.setattr(server, "_model_for", lambda visitor: Planner())
+        monkeypatch.setattr(server, "worth_asking_the_model", lambda text, **_: True)
+        monkeypatch.setattr(server, "_research_payload",
+                            lambda text, prior, request, *a, **k: seen.append(request) or {})
+        handle_ask("portfolio is nvda 40%, msft 20%, cash rest — want to add 5k of coin, bad "
+                   "idea?", [])
+        assert seen and seen[0].kind is research.ResearchKind.IMPACT
+        assert seen[0].symbols[0] == "COINUSDT"
