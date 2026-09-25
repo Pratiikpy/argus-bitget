@@ -185,9 +185,31 @@ class TestTheSurfaceIsReadOnly:
         assert payload["intent"] == "order"
 
     def test_the_handler_exposes_no_write_verb(self) -> None:
-        """No POST, PUT, PATCH or DELETE handler exists, so there is no write path to secure."""
-        for verb in ("do_POST", "do_PUT", "do_PATCH", "do_DELETE"):
+        """No PUT, PATCH or DELETE handler exists. POST exists for one reason — the Model Context
+        Protocol sends its JSON-RPC by POST (`lui/mcp_server.py`, 2026-09-25) — and it is held to
+        the same property this test always guarded: nothing it can reach writes or trades."""
+        for verb in ("do_PUT", "do_PATCH", "do_DELETE"):
             assert not hasattr(Handler, verb), f"{verb} would be a write path"
+
+    def test_post_is_answered_only_at_mcp(self, base_url: str) -> None:
+        import urllib.error
+        import urllib.request
+
+        request = urllib.request.Request(base_url + "/ask", data=b"{}", method="POST")
+        try:
+            urllib.request.urlopen(request, timeout=10)
+            raise AssertionError("POST /ask was accepted")
+        except urllib.error.HTTPError as exc:
+            assert exc.code == 405
+
+    def test_no_mcp_tool_writes_and_an_order_through_it_is_refused(self) -> None:
+        from argus.lui.mcp_server import TOOLS, call_tool
+
+        for tool in TOOLS:
+            words = f"{tool['name']} {tool['description']}".lower()
+            assert not any(w in words for w in ("place an order", "submit", "cancel", "delete"))
+        text, is_error = call_tool("argus_ask", {"question": "sell half of NVDA now"})
+        assert is_error and "does not place" in text
 
 
 class TestThePageHoldsUpAtPhoneWidthAndInBothThemes:
