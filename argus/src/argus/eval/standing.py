@@ -1874,6 +1874,14 @@ REGISTER: tuple[Capability, ...] = (
             "HiGHS on every snapshot (largest difference 3.4e-14 USDT) in about 16us against "
             "4-6ms. That is a tie with the general tool, not a win, and the deployed path still "
             "uses decompose().",
+            "Weekend capture, 2026-09-26 03:57-03:59Z (data/general_arb_books_weekend.json, 240 "
+            "scored snapshots, US anchor market shut): 34 books were monetisable after both "
+            "taker fees. The exact walk and NetworkX's cycle test each got all 240 right; the "
+            "deployed decompose() made 79 false accepts (precision 0.30) and maxme 94. The "
+            "loss for decompose() holds outside regular hours, and the exact walk's tie with the "
+            "general tools holds in a second session phase. decompose() feeds only "
+            "research/arbitrage_study.study(), which scores hourly index basis rather than "
+            "order books; the console answers no arbitrage question.",
         ),
     ),
     Capability(

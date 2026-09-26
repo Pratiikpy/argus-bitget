@@ -77,6 +77,10 @@ from argus.truth.clocks import DualClock
 DATA = Path(__file__).resolve().parents[3] / "data"
 BOOKS_PATH = DATA / "general_arb_books.json"
 HOLDOUT_PATH = DATA / "general_arb_books_holdout.json"
+WEEKEND_PATH = DATA / "general_arb_books_weekend.json"
+"""A third capture, on a Saturday (2026-09-26 03:57-03:59Z), when the US anchor market is shut and
+the spot rTokens and perpetuals trade on their own. Both earlier captures fell in regular trading
+hours, so the per-group audit flagged the result as holding for one session phase only."""
 ARTEFACT_PATH = DATA / "general_arb_comparison.json"
 
 TOLERANCE = 1e-6
@@ -877,8 +881,11 @@ def _version(package: str) -> str:
 def main(*, include_holdout: bool = True) -> dict[str, Any]:
     dev, dev_rows = evaluate(load(BOOKS_PATH))
     held: dict[str, Any] | None = None
+    weekend: dict[str, Any] | None = None
     if include_holdout and HOLDOUT_PATH.is_file():
         held, _ = evaluate(load(HOLDOUT_PATH))
+    if include_holdout and WEEKEND_PATH.is_file():
+        weekend, _ = evaluate(load(WEEKEND_PATH))
     constructed = evaluate_constructed()
     books = load(BOOKS_PATH).books
     again, _ = evaluate(load(BOOKS_PATH))
@@ -897,8 +904,8 @@ def main(*, include_holdout: bool = True) -> dict[str, Any]:
             "hummingbot": "read only, not run (Cython build + live connector); Apache-2.0",
         },
         "real_books": dev,
-        "out_of_sample": {"held_out": held} if held is not None else {
-            "held_out": None, "note": "no held-out capture on disk"},
+        "out_of_sample": {"held_out": held, "weekend": weekend} if held is not None else {
+            "held_out": None, "weekend": weekend, "note": "no held-out capture on disk"},
         "constructed_input": constructed,
         "adversarial": adversarial_cases(),
         "failure_cases": failure_cases(),
@@ -916,7 +923,8 @@ def main(*, include_holdout: bool = True) -> dict[str, Any]:
 def render(report: dict[str, Any]) -> str:
     lines = ["GENERAL-PURPOSE RIVAL: HiGHS LP vs ARGUS net executable arbitrage", ""]
     for label, rep in (("development", report["real_books"]),
-                       ("held-out", report["out_of_sample"]["held_out"])):
+                       ("held-out", report["out_of_sample"]["held_out"]),
+                       ("weekend", report["out_of_sample"].get("weekend"))):
         if rep is None:
             continue
         c = rep["comparison"]

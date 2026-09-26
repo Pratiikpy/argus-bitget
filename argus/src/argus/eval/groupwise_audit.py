@@ -990,6 +990,8 @@ def _general_arb(path: str) -> Entry:
     blob = _load(path)
     real = blob["real_books"]["per_snapshot"]
     held = blob["out_of_sample"]["held_out"]["per_snapshot"]
+    weekend = (blob["out_of_sample"].get("weekend") or {}).get("per_snapshot", [])
+    held = [*held, *weekend]
 
     def right(row: dict[str, Any], arm: str) -> float:
         return 1.0 if bool(row[arm]) == bool(row["truth_monetizable"]) else 0.0
@@ -1003,7 +1005,7 @@ def _general_arb(path: str) -> Entry:
         a, b = items(real, arm, rival), items(held, arm, rival)
         return halves_from(sum(i.value for i in a) / len(a), sum(i.value for i in b) / len(b),
                            first_items=len(a), second_items=len(b),
-                           label="design snapshots vs held-out snapshots")
+                           label="design snapshots vs held-out and weekend snapshots")
 
     return Entry(path, CHECKED, "one row per two-sided book snapshot, design and held-out", (
         _headline("exact net walk vs NetworkX's Bellman-Ford cycle test", items(

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-26T03:12:16+00:00",
+  "generated_at": "2026-09-26T04:00:32+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
@@ -151,28 +151,6 @@
       ],
       "readings": [
         "the whole headline is one moment (20260925T135626Z)"
-      ]
-    },
-    {
-      "artefact": "data/general_arb_comparison.json",
-      "headline": "exact net walk vs NetworkX's Bellman-Ford cycle test",
-      "role": "argus_vs_rival",
-      "flags": [
-        "single_group:phase=rth"
-      ],
-      "readings": [
-        "the headline has no direction, so no group can carry it"
-      ]
-    },
-    {
-      "artefact": "data/general_arb_comparison.json",
-      "headline": "the deployed decomposition against the truth",
-      "role": "argus_result",
-      "flags": [
-        "single_group:phase=rth"
-      ],
-      "readings": [
-        "the whole headline is one phase (rth)"
       ]
     },
     {
@@ -380,28 +358,6 @@
       ],
       "readings": [
         "the whole headline is one moment (20260925T135626Z)"
-      ]
-    },
-    {
-      "artefact": "data/general_arb_comparison.json",
-      "headline": "exact net walk vs NetworkX's Bellman-Ford cycle test",
-      "role": "argus_vs_rival",
-      "flags": [
-        "single_group:phase=rth"
-      ],
-      "readings": [
-        "the headline has no direction, so no group can carry it"
-      ]
-    },
-    {
-      "artefact": "data/general_arb_comparison.json",
-      "headline": "the deployed decomposition against the truth",
-      "role": "argus_result",
-      "flags": [
-        "single_group:phase=rth"
-      ],
-      "readings": [
-        "the whole headline is one phase (rth)"
       ]
     },
     {
@@ -5632,21 +5588,19 @@
     "data/general_arb_comparison.json": {
       "status": "checked",
       "reason": "one row per two-sided book snapshot, design and held-out",
-      "sha256": "7a5a1662224f62ec75b441f8735e5a7a6378cf127833c281b9f49063ac697ff7",
-      "flagged": true,
+      "sha256": "66a494cbe26832a76abd690ba05c6a758ba94806c6719fc053c3a892479b334d",
+      "flagged": false,
       "headlines": [
         {
           "name": "exact net walk vs NetworkX's Bellman-Ford cycle test",
           "headline": "(ARGUS right) - (rival right) against the monetisable truth",
           "orientation": "positive = ARGUS right where the rival was wrong",
-          "items": 400,
+          "items": 640,
           "micro_mean": 0.0,
           "total": 0.0,
           "broken_down": true,
-          "flags": [
-            "single_group:phase=rth"
-          ],
-          "flagged": true,
+          "flags": [],
+          "flagged": false,
           "tables": [
             {
               "key": "ticker",
@@ -5671,8 +5625,8 @@
               "per_group": [
                 {
                   "group": "AAOI",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5680,8 +5634,8 @@
                 },
                 {
                   "group": "AAPL",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5689,8 +5643,8 @@
                 },
                 {
                   "group": "ABNB",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5698,8 +5652,8 @@
                 },
                 {
                   "group": "ADBE",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5707,8 +5661,8 @@
                 },
                 {
                   "group": "AEHR",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5716,8 +5670,8 @@
                 },
                 {
                   "group": "AMAT",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5725,8 +5679,8 @@
                 },
                 {
                   "group": "AMD",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5734,8 +5688,8 @@
                 },
                 {
                   "group": "AMZN",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5743,8 +5697,8 @@
                 },
                 {
                   "group": "APLD",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5752,8 +5706,8 @@
                 },
                 {
                   "group": "APP",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5761,8 +5715,8 @@
                 },
                 {
                   "group": "ARM",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5770,8 +5724,8 @@
                 },
                 {
                   "group": "ASML",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5779,8 +5733,8 @@
                 },
                 {
                   "group": "ASTS",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5788,8 +5742,8 @@
                 },
                 {
                   "group": "AVGO",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5797,8 +5751,8 @@
                 },
                 {
                   "group": "AXTI",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5806,8 +5760,8 @@
                 },
                 {
                   "group": "BABA",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5815,8 +5769,8 @@
                 },
                 {
                   "group": "BE",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5824,8 +5778,8 @@
                 },
                 {
                   "group": "COHR",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5833,8 +5787,8 @@
                 },
                 {
                   "group": "COIN",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5842,8 +5796,8 @@
                 },
                 {
                   "group": "CRCL",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5851,8 +5805,8 @@
                 },
                 {
                   "group": "CRWD",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5860,8 +5814,8 @@
                 },
                 {
                   "group": "CRWV",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5869,8 +5823,8 @@
                 },
                 {
                   "group": "CSCO",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5878,8 +5832,8 @@
                 },
                 {
                   "group": "DDOG",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5887,8 +5841,8 @@
                 },
                 {
                   "group": "DELL",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5896,8 +5850,8 @@
                 },
                 {
                   "group": "DRAM",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5905,8 +5859,8 @@
                 },
                 {
                   "group": "EWY",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5914,8 +5868,8 @@
                 },
                 {
                   "group": "FUTU",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5923,8 +5877,8 @@
                 },
                 {
                   "group": "GLW",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5932,8 +5886,8 @@
                 },
                 {
                   "group": "GOOGL",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5941,8 +5895,8 @@
                 },
                 {
                   "group": "HOOD",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5950,8 +5904,8 @@
                 },
                 {
                   "group": "IBM",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5959,8 +5913,8 @@
                 },
                 {
                   "group": "INTC",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5968,8 +5922,8 @@
                 },
                 {
                   "group": "IONQ",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5977,8 +5931,8 @@
                 },
                 {
                   "group": "IREN",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5986,8 +5940,8 @@
                 },
                 {
                   "group": "ISRG",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -5995,8 +5949,8 @@
                 },
                 {
                   "group": "IWM",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6004,8 +5958,8 @@
                 },
                 {
                   "group": "KO",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6013,8 +5967,8 @@
                 },
                 {
                   "group": "LITE",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6022,8 +5976,8 @@
                 },
                 {
                   "group": "LMT",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6031,8 +5985,8 @@
                 },
                 {
                   "group": "LRCX",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6040,8 +5994,8 @@
                 },
                 {
                   "group": "MARA",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6049,8 +6003,8 @@
                 },
                 {
                   "group": "MELI",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6058,8 +6012,8 @@
                 },
                 {
                   "group": "META",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6067,8 +6021,8 @@
                 },
                 {
                   "group": "MRVL",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6076,8 +6030,8 @@
                 },
                 {
                   "group": "MSFT",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6085,8 +6039,8 @@
                 },
                 {
                   "group": "MSTR",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6094,8 +6048,8 @@
                 },
                 {
                   "group": "MU",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6103,8 +6057,8 @@
                 },
                 {
                   "group": "NBIS",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6112,8 +6066,8 @@
                 },
                 {
                   "group": "NOW",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6121,8 +6075,8 @@
                 },
                 {
                   "group": "NVDA",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6130,8 +6084,8 @@
                 },
                 {
                   "group": "ONDS",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6139,8 +6093,8 @@
                 },
                 {
                   "group": "ORCL",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6148,8 +6102,8 @@
                 },
                 {
                   "group": "PDD",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6157,8 +6111,8 @@
                 },
                 {
                   "group": "PLTR",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6166,8 +6120,8 @@
                 },
                 {
                   "group": "QCOM",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6175,8 +6129,8 @@
                 },
                 {
                   "group": "QQQ",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6184,8 +6138,8 @@
                 },
                 {
                   "group": "RKLB",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6193,8 +6147,8 @@
                 },
                 {
                   "group": "SGOV",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6202,8 +6156,8 @@
                 },
                 {
                   "group": "SKHY",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6211,8 +6165,8 @@
                 },
                 {
                   "group": "SMH",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6220,8 +6174,8 @@
                 },
                 {
                   "group": "SNDK",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6229,8 +6183,8 @@
                 },
                 {
                   "group": "SNOW",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6238,8 +6192,8 @@
                 },
                 {
                   "group": "SOFI",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6247,8 +6201,8 @@
                 },
                 {
                   "group": "SONY",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6256,8 +6210,8 @@
                 },
                 {
                   "group": "SOXS",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6265,8 +6219,8 @@
                 },
                 {
                   "group": "SOXX",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6274,8 +6228,8 @@
                 },
                 {
                   "group": "SPCX",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6283,8 +6237,8 @@
                 },
                 {
                   "group": "SPY",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6292,8 +6246,8 @@
                 },
                 {
                   "group": "SQQQ",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6301,8 +6255,8 @@
                 },
                 {
                   "group": "STRC",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6310,8 +6264,8 @@
                 },
                 {
                   "group": "TEM",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6319,8 +6273,8 @@
                 },
                 {
                   "group": "TLT",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6328,8 +6282,8 @@
                 },
                 {
                   "group": "TQQQ",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6337,8 +6291,8 @@
                 },
                 {
                   "group": "TSLA",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6346,8 +6300,8 @@
                 },
                 {
                   "group": "TSM",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6355,8 +6309,8 @@
                 },
                 {
                   "group": "TTWO",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6364,8 +6318,8 @@
                 },
                 {
                   "group": "VOO",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6373,8 +6327,8 @@
                 },
                 {
                   "group": "VRT",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6382,8 +6336,8 @@
                 },
                 {
                   "group": "WDC",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": null,
@@ -6393,7 +6347,7 @@
             },
             {
               "key": "phase",
-              "groups": 1,
+              "groups": 2,
               "micro_mean": 0.0,
               "macro_mean": 0.0,
               "direction": 0,
@@ -6408,10 +6362,19 @@
                 ">3": 0.0
               },
               "carried_by_one_group": false,
-              "single_group": true,
+              "single_group": false,
               "macro_disagrees": false,
               "reading": "the headline has no direction, so no group can carry it",
               "per_group": [
+                {
+                  "group": "overnight",
+                  "rows": 240,
+                  "weight": 240.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
                 {
                   "group": "rth",
                   "rows": 400,
@@ -6425,16 +6388,16 @@
             }
           ],
           "split_half": {
-            "label": "design snapshots vs held-out snapshots",
+            "label": "design snapshots vs held-out and weekend snapshots",
             "cut": "",
             "first_items": 240,
-            "second_items": 160,
+            "second_items": 400,
             "first_mean": 0.0,
             "second_mean": 0.0,
             "full_mean": 0.0,
             "flips_across_halves": false,
             "contradicts_full_sample": false,
-            "reading": "design snapshots vs held-out snapshots: both halves point the same way as the full sample \u2014 first 0.0, second 0.0, full 0.0"
+            "reading": "design snapshots vs held-out and weekend snapshots: both halves point the same way as the full sample \u2014 first 0.0, second 0.0, full 0.0"
           },
           "split_half_note": "halves as the artefact recorded them",
           "notes": [],
@@ -6448,24 +6411,22 @@
           "name": "the deployed decomposition against the truth",
           "headline": "(deployed path right) - 1 against the monetisable truth",
           "orientation": "0 = right, -1 = wrong",
-          "items": 400,
-          "micro_mean": -0.1825,
-          "total": -73.0,
+          "items": 640,
+          "micro_mean": -0.2375,
+          "total": -152.0,
           "broken_down": true,
-          "flags": [
-            "single_group:phase=rth"
-          ],
-          "flagged": true,
+          "flags": [],
+          "flagged": false,
           "tables": [
             {
               "key": "ticker",
               "groups": 80,
-              "micro_mean": -0.1825,
-              "macro_mean": -0.1825,
+              "micro_mean": -0.2375,
+              "macro_mean": -0.2375,
               "direction": -1,
-              "largest_contributor": "COIN",
-              "largest_share_of_total": 0.0685,
-              "total_without_largest": -68.0,
+              "largest_contributor": "HOOD",
+              "largest_share_of_total": 0.0526,
+              "total_without_largest": -144.0,
               "loss_histogram": {
                 "0": 1.0,
                 "1": 0.0,
@@ -6476,327 +6437,444 @@
               "carried_by_one_group": false,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "no single ticker carries the headline: without the largest contributor (COIN, 6.8% of the total) the rest still point the same way",
+              "reading": "no single ticker carries the headline: without the largest contributor (HOOD, 5.3% of the total) the rest still point the same way",
               "per_group": [
                 {
-                  "group": "COIN",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -5.0,
-                  "mean": -1.0,
-                  "share_of_total": 0.0685,
-                  "opposing": 0
-                },
-                {
                   "group": "HOOD",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -5.0,
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -8.0,
                   "mean": -1.0,
-                  "share_of_total": 0.0685,
+                  "share_of_total": 0.0526,
                   "opposing": 0
                 },
                 {
                   "group": "ORCL",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -5.0,
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -8.0,
                   "mean": -1.0,
-                  "share_of_total": 0.0685,
-                  "opposing": 0
-                },
-                {
-                  "group": "PDD",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -5.0,
-                  "mean": -1.0,
-                  "share_of_total": 0.0685,
+                  "share_of_total": 0.0526,
                   "opposing": 0
                 },
                 {
                   "group": "AVGO",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -4.0,
-                  "mean": -0.8,
-                  "share_of_total": 0.0548,
-                  "opposing": 0
-                },
-                {
-                  "group": "FUTU",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -4.0,
-                  "mean": -0.8,
-                  "share_of_total": 0.0548,
-                  "opposing": 0
-                },
-                {
-                  "group": "MELI",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -4.0,
-                  "mean": -0.8,
-                  "share_of_total": 0.0548,
-                  "opposing": 0
-                },
-                {
-                  "group": "BABA",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -3.0,
-                  "mean": -0.6,
-                  "share_of_total": 0.0411,
-                  "opposing": 0
-                },
-                {
-                  "group": "MSTR",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -3.0,
-                  "mean": -0.6,
-                  "share_of_total": 0.0411,
-                  "opposing": 0
-                },
-                {
-                  "group": "TTWO",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -3.0,
-                  "mean": -0.6,
-                  "share_of_total": 0.0411,
-                  "opposing": 0
-                },
-                {
-                  "group": "VRT",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -3.0,
-                  "mean": -0.6,
-                  "share_of_total": 0.0411,
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -7.0,
+                  "mean": -0.875,
+                  "share_of_total": 0.0461,
                   "opposing": 0
                 },
                 {
                   "group": "AAOI",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -2.0,
-                  "mean": -0.4,
-                  "share_of_total": 0.0274,
-                  "opposing": 0
-                },
-                {
-                  "group": "ABNB",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -2.0,
-                  "mean": -0.4,
-                  "share_of_total": 0.0274,
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -5.0,
+                  "mean": -0.625,
+                  "share_of_total": 0.0329,
                   "opposing": 0
                 },
                 {
                   "group": "AEHR",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -2.0,
-                  "mean": -0.4,
-                  "share_of_total": 0.0274,
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -5.0,
+                  "mean": -0.625,
+                  "share_of_total": 0.0329,
+                  "opposing": 0
+                },
+                {
+                  "group": "BABA",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -5.0,
+                  "mean": -0.625,
+                  "share_of_total": 0.0329,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -5.0,
+                  "mean": -0.625,
+                  "share_of_total": 0.0329,
                   "opposing": 0
                 },
                 {
                   "group": "CRCL",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -2.0,
-                  "mean": -0.4,
-                  "share_of_total": 0.0274,
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -5.0,
+                  "mean": -0.625,
+                  "share_of_total": 0.0329,
                   "opposing": 0
                 },
                 {
-                  "group": "LMT",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -2.0,
-                  "mean": -0.4,
-                  "share_of_total": 0.0274,
-                  "opposing": 0
-                },
-                {
-                  "group": "ONDS",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -2.0,
-                  "mean": -0.4,
-                  "share_of_total": 0.0274,
-                  "opposing": 0
-                },
-                {
-                  "group": "SNOW",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -2.0,
-                  "mean": -0.4,
-                  "share_of_total": 0.0274,
-                  "opposing": 0
-                },
-                {
-                  "group": "AMAT",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
+                  "group": "PDD",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -5.0,
+                  "mean": -0.625,
+                  "share_of_total": 0.0329,
                   "opposing": 0
                 },
                 {
                   "group": "APLD",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -4.0,
+                  "mean": -0.5,
+                  "share_of_total": 0.0263,
                   "opposing": 0
                 },
                 {
-                  "group": "APP",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
-                  "opposing": 0
-                },
-                {
-                  "group": "ARM",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
-                  "opposing": 0
-                },
-                {
-                  "group": "AXTI",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
-                  "opposing": 0
-                },
-                {
-                  "group": "CRWD",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
+                  "group": "FUTU",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -4.0,
+                  "mean": -0.5,
+                  "share_of_total": 0.0263,
                   "opposing": 0
                 },
                 {
                   "group": "IBM",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -4.0,
+                  "mean": -0.5,
+                  "share_of_total": 0.0263,
                   "opposing": 0
                 },
                 {
                   "group": "IONQ",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -4.0,
+                  "mean": -0.5,
+                  "share_of_total": 0.0263,
                   "opposing": 0
                 },
                 {
-                  "group": "ISRG",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
+                  "group": "MELI",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -4.0,
+                  "mean": -0.5,
+                  "share_of_total": 0.0263,
                   "opposing": 0
                 },
                 {
-                  "group": "IWM",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
-                  "opposing": 0
-                },
-                {
-                  "group": "MARA",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
-                  "opposing": 0
-                },
-                {
-                  "group": "NOW",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
+                  "group": "ONDS",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -4.0,
+                  "mean": -0.5,
+                  "share_of_total": 0.0263,
                   "opposing": 0
                 },
                 {
                   "group": "SOFI",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
-                  "opposing": 0
-                },
-                {
-                  "group": "SQQQ",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
-                  "opposing": 0
-                },
-                {
-                  "group": "TLT",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": -1.0,
-                  "mean": -0.2,
-                  "share_of_total": 0.0137,
-                  "opposing": 0
-                },
-                {
-                  "group": "AAPL",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -4.0,
+                  "mean": -0.5,
+                  "share_of_total": 0.0263,
                   "opposing": 0
                 },
                 {
                   "group": "ADBE",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
                   "opposing": 0
                 },
                 {
                   "group": "AMD",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "ASML",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "ASTS",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "COHR",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "LMT",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "LRCX",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "MRVL",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTR",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "PLTR",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "RKLB",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "SMH",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "SONY",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "TEM",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "TQQQ",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "TTWO",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "VOO",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "VRT",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -3.0,
+                  "mean": -0.375,
+                  "share_of_total": 0.0197,
+                  "opposing": 0
+                },
+                {
+                  "group": "ABNB",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -2.0,
+                  "mean": -0.25,
+                  "share_of_total": 0.0132,
+                  "opposing": 0
+                },
+                {
+                  "group": "SNOW",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -2.0,
+                  "mean": -0.25,
+                  "share_of_total": 0.0132,
+                  "opposing": 0
+                },
+                {
+                  "group": "SQQQ",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -2.0,
+                  "mean": -0.25,
+                  "share_of_total": 0.0132,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMAT",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -1.0,
+                  "mean": -0.125,
+                  "share_of_total": 0.0066,
+                  "opposing": 0
+                },
+                {
+                  "group": "APP",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -1.0,
+                  "mean": -0.125,
+                  "share_of_total": 0.0066,
+                  "opposing": 0
+                },
+                {
+                  "group": "ARM",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -1.0,
+                  "mean": -0.125,
+                  "share_of_total": 0.0066,
+                  "opposing": 0
+                },
+                {
+                  "group": "AXTI",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -1.0,
+                  "mean": -0.125,
+                  "share_of_total": 0.0066,
+                  "opposing": 0
+                },
+                {
+                  "group": "CRWD",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -1.0,
+                  "mean": -0.125,
+                  "share_of_total": 0.0066,
+                  "opposing": 0
+                },
+                {
+                  "group": "DELL",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -1.0,
+                  "mean": -0.125,
+                  "share_of_total": 0.0066,
+                  "opposing": 0
+                },
+                {
+                  "group": "ISRG",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -1.0,
+                  "mean": -0.125,
+                  "share_of_total": 0.0066,
+                  "opposing": 0
+                },
+                {
+                  "group": "IWM",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -1.0,
+                  "mean": -0.125,
+                  "share_of_total": 0.0066,
+                  "opposing": 0
+                },
+                {
+                  "group": "MARA",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -1.0,
+                  "mean": -0.125,
+                  "share_of_total": 0.0066,
+                  "opposing": 0
+                },
+                {
+                  "group": "NOW",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -1.0,
+                  "mean": -0.125,
+                  "share_of_total": 0.0066,
+                  "opposing": 0
+                },
+                {
+                  "group": "TLT",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -1.0,
+                  "mean": -0.125,
+                  "share_of_total": 0.0066,
+                  "opposing": 0
+                },
+                {
+                  "group": "AAPL",
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6804,26 +6882,8 @@
                 },
                 {
                   "group": "AMZN",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "ASML",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "ASTS",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6831,17 +6891,8 @@
                 },
                 {
                   "group": "BE",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "COHR",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6849,8 +6900,8 @@
                 },
                 {
                   "group": "CRWV",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6858,8 +6909,8 @@
                 },
                 {
                   "group": "CSCO",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6867,17 +6918,8 @@
                 },
                 {
                   "group": "DDOG",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "DELL",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6885,8 +6927,8 @@
                 },
                 {
                   "group": "DRAM",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6894,8 +6936,8 @@
                 },
                 {
                   "group": "EWY",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6903,8 +6945,8 @@
                 },
                 {
                   "group": "GLW",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6912,8 +6954,8 @@
                 },
                 {
                   "group": "GOOGL",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6921,8 +6963,8 @@
                 },
                 {
                   "group": "INTC",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6930,8 +6972,8 @@
                 },
                 {
                   "group": "IREN",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6939,8 +6981,8 @@
                 },
                 {
                   "group": "KO",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6948,17 +6990,8 @@
                 },
                 {
                   "group": "LITE",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "LRCX",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6966,17 +6999,8 @@
                 },
                 {
                   "group": "META",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "MRVL",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6984,8 +7008,8 @@
                 },
                 {
                   "group": "MSFT",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -6993,8 +7017,8 @@
                 },
                 {
                   "group": "MU",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7002,8 +7026,8 @@
                 },
                 {
                   "group": "NBIS",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7011,17 +7035,8 @@
                 },
                 {
                   "group": "NVDA",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "PLTR",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7029,8 +7044,8 @@
                 },
                 {
                   "group": "QCOM",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7038,17 +7053,8 @@
                 },
                 {
                   "group": "QQQ",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "RKLB",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7056,8 +7062,8 @@
                 },
                 {
                   "group": "SGOV",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7065,17 +7071,8 @@
                 },
                 {
                   "group": "SKHY",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "SMH",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7083,17 +7080,8 @@
                 },
                 {
                   "group": "SNDK",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "SONY",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7101,8 +7089,8 @@
                 },
                 {
                   "group": "SOXS",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7110,8 +7098,8 @@
                 },
                 {
                   "group": "SOXX",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7119,8 +7107,8 @@
                 },
                 {
                   "group": "SPCX",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7128,8 +7116,8 @@
                 },
                 {
                   "group": "SPY",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7137,26 +7125,8 @@
                 },
                 {
                   "group": "STRC",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "TEM",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "TQQQ",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7164,8 +7134,8 @@
                 },
                 {
                   "group": "TSLA",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7173,17 +7143,8 @@
                 },
                 {
                   "group": "TSM",
-                  "rows": 5,
-                  "weight": 5.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": -0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "VOO",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7191,8 +7152,8 @@
                 },
                 {
                   "group": "WDC",
-                  "rows": 5,
-                  "weight": 5.0,
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": -0.0,
@@ -7202,13 +7163,13 @@
             },
             {
               "key": "phase",
-              "groups": 1,
-              "micro_mean": -0.1825,
-              "macro_mean": -0.1825,
+              "groups": 2,
+              "micro_mean": -0.2375,
+              "macro_mean": -0.255833,
               "direction": -1,
-              "largest_contributor": null,
-              "largest_share_of_total": null,
-              "total_without_largest": null,
+              "largest_contributor": "overnight",
+              "largest_share_of_total": 0.5197,
+              "total_without_largest": -73.0,
               "loss_histogram": {
                 "0": 1.0,
                 "1": 0.0,
@@ -7217,33 +7178,42 @@
                 ">3": 0.0
               },
               "carried_by_one_group": false,
-              "single_group": true,
+              "single_group": false,
               "macro_disagrees": false,
-              "reading": "the whole headline is one phase (rth)",
+              "reading": "no single phase carries the headline: without the largest contributor (overnight, 52.0% of the total) the rest still point the same way",
               "per_group": [
+                {
+                  "group": "overnight",
+                  "rows": 240,
+                  "weight": 240.0,
+                  "total": -79.0,
+                  "mean": -0.329167,
+                  "share_of_total": 0.5197,
+                  "opposing": 0
+                },
                 {
                   "group": "rth",
                   "rows": 400,
                   "weight": 400.0,
                   "total": -73.0,
                   "mean": -0.1825,
-                  "share_of_total": 1.0,
+                  "share_of_total": 0.4803,
                   "opposing": 0
                 }
               ]
             }
           ],
           "split_half": {
-            "label": "design snapshots vs held-out snapshots",
+            "label": "design snapshots vs held-out and weekend snapshots",
             "cut": "",
             "first_items": 240,
-            "second_items": 160,
+            "second_items": 400,
             "first_mean": -0.204167,
-            "second_mean": -0.15,
-            "full_mean": -0.1825,
+            "second_mean": -0.2575,
+            "full_mean": -0.2375,
             "flips_across_halves": false,
             "contradicts_full_sample": false,
-            "reading": "design snapshots vs held-out snapshots: both halves point the same way as the full sample \u2014 first -0.204167, second -0.15, full -0.1825"
+            "reading": "design snapshots vs held-out and weekend snapshots: both halves point the same way as the full sample \u2014 first -0.204167, second -0.2575, full -0.2375"
           },
           "split_half_note": "halves as the artefact recorded them",
           "notes": [],

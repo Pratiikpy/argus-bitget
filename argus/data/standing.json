@@ -875,7 +875,8 @@
       "blockers": [
         "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate (data/groupwise_audit.json): data/arbitrage_comparison.json holds three designed spreads and 60 constructed spreads reduced to counts; no population of real observations is recorded for the comparison. Route back: score both detectors on the real basis series behind data/arbitrage_study.json (23,749 hourly observations on 11 symbols) and record each observation's two verdicts with its symbol and session phase.",
         "The swept disagreement rate (100% at n=60) is measured on a Gaussian-shaped construction matched to ARGUS's own real distribution's mean/spread, not on the real historical series bar-for-bar \u2014 research/arbitrage_study.py's own real study() already runs the full decomposition against the live index series; this comparison adds the maxme side, not a new live measurement",
-        "General-purpose rival run 2026-09-26 on real books (data/general_arb_comparison.json): 400 two-sided Bitget spot-rToken/perpetual snapshots (240 + 160 from a second capture ten minutes later, 80 tickers, taker fees 10bps spot and 6bps perpetual) scored against the HiGHS linear-programming optimum, one verdict per snapshot. LOSS for the deployed decompose(): 49 of its 52 accepts lose money on the first capture (precision 0.058, ticker-bootstrap interval 0 to 0.156) and 24 of 25 on the second. The cause is the flat 0.6bps spread constant: the measured touch alone takes 49 false accepts to 1. research/executable_arb.py ties HiGHS on every snapshot (largest difference 3.4e-14 USDT) in about 16us against 4-6ms. That is a tie with the general tool, not a win, and the deployed path still uses decompose()."
+        "General-purpose rival run 2026-09-26 on real books (data/general_arb_comparison.json): 400 two-sided Bitget spot-rToken/perpetual snapshots (240 + 160 from a second capture ten minutes later, 80 tickers, taker fees 10bps spot and 6bps perpetual) scored against the HiGHS linear-programming optimum, one verdict per snapshot. LOSS for the deployed decompose(): 49 of its 52 accepts lose money on the first capture (precision 0.058, ticker-bootstrap interval 0 to 0.156) and 24 of 25 on the second. The cause is the flat 0.6bps spread constant: the measured touch alone takes 49 false accepts to 1. research/executable_arb.py ties HiGHS on every snapshot (largest difference 3.4e-14 USDT) in about 16us against 4-6ms. That is a tie with the general tool, not a win, and the deployed path still uses decompose().",
+        "Weekend capture, 2026-09-26 03:57-03:59Z (data/general_arb_books_weekend.json, 240 scored snapshots, US anchor market shut): 34 books were monetisable after both taker fees. The exact walk and NetworkX's cycle test each got all 240 right; the deployed decompose() made 79 false accepts (precision 0.30) and maxme 94. The loss for decompose() holds outside regular hours, and the exact walk's tie with the general tools holds in a second session phase. decompose() feeds only research/arbitrage_study.study(), which scores hourly index basis rather than order books; the console answers no arbitrage question."
       ],
       "note": "",
       "measured_outcomes": []
@@ -4243,16 +4244,6 @@
       "capability": "Cross-market cointegration with corrected multiple testing",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
       "detail": "no groupwise check has run on its artefacts: data/cointegration_comparison.json: designed_cases - three designed ADF series, two self-inclusion cases and a synthetic 190-pair noise panel reduced to counts; data/general_coint_comparison.json: aggregate_without_rows - 160 simulated universes reduced to FDR, FWER and power per pipeline; eval/general_coint_comparison.py would need to record each universe's discoveries"
-    },
-    {
-      "capability": "Net executable arbitrage vs. a fee-blind detector",
-      "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "the groupwise audit flags data/general_arb_comparison.json :: exact net walk vs NetworkX's Bellman-Ford cycle test [single_group:phase=rth]; data/general_arb_comparison.json :: the deployed decomposition against the truth [single_group:phase=rth]"
-    },
-    {
-      "capability": "Net executable arbitrage vs. a fee-blind detector",
-      "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "the groupwise audit flags data/general_arb_comparison.json :: exact net walk vs NetworkX's Bellman-Ford cycle test [single_group:phase=rth]; data/general_arb_comparison.json :: the deployed decomposition against the truth [single_group:phase=rth]"
     },
     {
       "capability": "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
