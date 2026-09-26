@@ -256,8 +256,9 @@ class TruthReplay:
         if vs:
             total = self.totals.get((side, px), 0.0)
             for v in vs:
-                if not v.filled:
-                    v.step(STEP_DEPTH, total)
+                # Recorded after the truth has filled too: an L2 model has not seen that fill,
+                # and hftbacktest's engine keeps reading the feed until the order's horizon.
+                v.step(STEP_DEPTH, total)
 
     def _level_delta(self, side: str, px: int, seq: int, delta: float) -> None:
         """An order of seniority ``seq`` at this level changed by ``delta`` (negative = left). It is
@@ -289,9 +290,14 @@ class TruthReplay:
         """A quote on ``side`` at ``px`` crosses synthetic orders resting on the other side —
         hftbacktest's ``fill_*_orders_by_crossing``. Truth and every L2 model fill here alike."""
         for v in self.active:
-            if v.filled or v.ep.side == side:
+            if v.ep.side == side:
                 continue
             if (v.ep.side == "B" and px <= v.ep.px) or (v.ep.side == "A" and px >= v.ep.px):
+                if v.filled:
+                    # The truth filled earlier; the L2 view still sees its level crossed.
+                    v.step(STEP_THROUGH)
+                    v.touched = True
+                    continue
                 self.stats.crossings += 1
                 self._fill(v, through=True)
 
@@ -424,7 +430,7 @@ class TruthReplay:
             return   # hftbacktest ignores a trade with no side (auction prints)
         resting = "A" if aggressor == "B" else "B"
         for v in self.active:
-            if v.filled or v.ep.side != resting:
+            if v.ep.side != resting:
                 continue
             if v.ep.px == px:
                 v.step(STEP_TRADE, size)
@@ -480,12 +486,22 @@ class TruthReplay:
                 v.touched = False
                 if v.filled and v.ep.true_fill_batch < 0:
                     v.ep.true_fill_batch = len(v.ep.truth) - 1
+            expired = (ts - v.ep.t_join >= self.cfg.horizon_ns
+                       or v.steps >= self.cfg.max_steps)
             if v.filled:
-                self._close(v, "filled")
+                # Kept open to the order's horizon after the truth fills, so every L2 model reads
+                # the same feed hftbacktest's engine reads before it cancels the order. Closing
+                # here scored a model that fills a few events after the truth as a missed fill:
+                # 178 of 1,438 orders on the ESH4 file for hftbacktest's default model
+                # (data/hftbacktest_run.json, 2026-09-26).
+                if expired:
+                    self._close(v, "filled")
+                else:
+                    still.append(v)
             elif reason is not None:
                 self.stats.inconsistent += reason.startswith("inconsistent")
                 self._close(v, f"censored:{reason}")
-            elif ts - v.ep.t_join >= self.cfg.horizon_ns or v.steps >= self.cfg.max_steps:
+            elif expired:
                 self._close(v, "horizon")
             else:
                 still.append(v)
@@ -541,7 +557,7 @@ class TruthReplay:
 
     def finish(self) -> list[RealEpisode]:
         for v in self.active:
-            self._close(v, "end_of_data")
+            self._close(v, "filled" if v.filled else "end_of_data")
         self.active = []
         return self.episodes
 

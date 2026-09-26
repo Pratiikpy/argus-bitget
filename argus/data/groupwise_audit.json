@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-26T04:00:32+00:00",
+  "generated_at": "2026-09-26T04:26:40+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",

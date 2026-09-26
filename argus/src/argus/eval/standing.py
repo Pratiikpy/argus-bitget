@@ -4864,9 +4864,21 @@ REGISTER: tuple[Capability, ...] = (
             "inconsistent levels. hftbacktest's shipped default LogProbQueueFunc2 has a queue "
             "error of 0.0772; PowerProbQueueFunc3 with n=3 beats it by 0.0046 (5-minute cluster "
             "bootstrap interval -0.0084 to -0.0007). These supersede data/mbo_queue_proof.json, "
-            "made before the double-count fix, but have no committed artefact yet. hftbacktest's "
-            "own engine has not been run against the replay (eval/hftbacktest_run.py; hftbacktest "
-            "is not installed).",
+            "made before the double-count fix, and are themselves superseded by the run below: "
+            "they were measured before the replay kept a filled order's feed open.",
+            "hftbacktest's own engine run against the replay, 2026-09-26 "
+            "(eval/hftbacktest_run.py, data/hftbacktest_run.json; hftbacktest 2.4.4 from PyPI in "
+            "its own environment, the file converted by hftbacktest's databento converter, 1,438 "
+            "orders). L3: hftbacktest's L3 FIFO engine and ARGUS's truth replay agree on every "
+            "order, with the same fill timestamp on all 1,130 fills. L2: the first run put "
+            "ARGUS's port 8 to 29 points of fill agreement behind the engine on the same models; "
+            "the cause was ARGUS's replay closing an order's L2 feed when the truth filled it, "
+            "so a model that fills a few events later was scored as a miss — a bias against "
+            "every model ARGUS scores, its own included. Fixed in eval/l3queue.py; the port now "
+            "matches the engine exactly on four models and within one point on the rest "
+            "(0.935 to 0.949). On the corrected replay PowerProbQueueFunc3 n=3 has the lowest "
+            "queue error (0.0474) and the shipped default LogProbQueueFunc2 is next (0.0481). "
+            "Engine parity is a reproduction of the rival, not a win over it.",
         ),
         note="Twelve of thirteen. The book recorder is running so the simulator's parameters stop "
              "being ours — and as of 2026-09-15 that calibration is read per elapsed-time horizon "

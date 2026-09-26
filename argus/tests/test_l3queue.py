@@ -137,7 +137,10 @@ class TestTheEsh4Match:
         seeded(r, ev(3, FILL, "A", 100, 7, 1, False), ev(3, CANCEL, "A", 100, 7, 1))
         assert not v.filled
         seeded(r, ev(4, FILL, "A", 100, 1, 2, False), ev(4, MODIFY, "A", 100, 3, 2))
-        assert [e.end for e in r.episodes if e.side == "A"] == ["filled"]
+        assert v.filled
+        # A filled order stays open to its horizon so L2 models read the same feed as
+        # hftbacktest's engine; it closes as filled.
+        assert [e.end for e in r.finish() if e.side == "A"] == ["filled"]
         ep = next(e for e in r.episodes if e.side == "A")
         assert ep.fill_ts == 4 and ep.truth[-1] == 0.0 and ep.true_fill_batch == ep.batches - 1
 
@@ -296,3 +299,23 @@ class TestDatabento:
         assert meta["unknown_order_refs"] == 0
         assert len(episodes) == meta["joins"] == 1454
         assert sum(e.end == "filled" for e in episodes) == 1133
+
+
+class TestAFilledOrderKeepsItsFeed:
+    """After the truth fills, the L2 view keeps recording to the horizon (2026-09-26): an L2 model
+    that fills a few events later than the truth, as hftbacktest's engine does, is not a miss."""
+
+    def test_depth_after_the_fill_still_reaches_the_episode(self) -> None:
+        r = TruthReplay("t", ONE_JOIN)
+        seeded(r, ev(1, ADD, "A", 100, 7, 1))
+        v = the_ask(r)
+        seeded(r, ev(2, ADD, "A", 100, 4, 2))
+        seeded(r, ev(3, FILL, "A", 100, 7, 1, False), ev(3, CANCEL, "A", 100, 7, 1))
+        seeded(r, ev(4, FILL, "A", 100, 1, 2, False), ev(4, MODIFY, "A", 100, 3, 2))
+        assert v.filled
+        assert v in r.active
+        steps_at_fill = len(v.ep.kinds)
+        seeded(r, ev(5, ADD, "A", 100, 5, 3))
+        assert len(v.ep.kinds) > steps_at_fill
+        assert v.ep.truth[-1] == 0.0
+        assert v.ep.true_fill_batch < v.ep.batches - 1

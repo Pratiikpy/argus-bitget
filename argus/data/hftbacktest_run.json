@@ -1,0 +1,175 @@
+{
+ "input": {
+  "file": "esh4-glbx-mdp3-20231225.mbo.dbn.zst (nautilus_trader test data)",
+  "converted_by": "hftbacktest.data.utils.databento.convert(symbol='ESH4')",
+  "records": 68792,
+  "events": 68792,
+  "orders": 1438,
+  "replay": {
+   "every_ns": 5000000000,
+   "horizon_ns": 120000000000,
+   "start_ns": 1703545200000000000
+  }
+ },
+ "versions": {
+  "hftbacktest": "2.4.4",
+  "numpy": "2.2.6",
+  "numba": "0.67.0",
+  "python": "3.11.9"
+ },
+ "l3_truth_vs_hftbacktest_l3_fifo": {
+  "orders": 1438,
+  "both_filled": 1130,
+  "argus_only": 0,
+  "engine_only": 0,
+  "neither": 308,
+  "fill_agreement": 1.0,
+  "same_fill_timestamp_of_both_filled": 1130
+ },
+ "l2_models": {
+  "hftbacktest default: LogProbQueueFunc2": {
+   "hftbacktest_engine": {
+    "orders": 1438,
+    "fill_agreement": 0.94784,
+    "false_fill_rate": 0.00417,
+    "missed_fill_rate": 0.04798
+   },
+   "argus_port": {
+    "model": "hftbacktest default: LogProbQueueFunc2",
+    "episodes": 1438,
+    "queue_error": 0.04809,
+    "false_fill_rate": 0.00487,
+    "missed_fill_rate": 0.04798,
+    "fill_agreement": 0.94715,
+    "fill_batch_mae": 5.112,
+    "cost_bps": 0.0195
+   }
+  },
+  "hftbacktest PowerProbQueueFunc n=1": {
+   "hftbacktest_engine": {
+    "orders": 1438,
+    "fill_agreement": 0.94645,
+    "false_fill_rate": 0.01321,
+    "missed_fill_rate": 0.04033
+   },
+   "argus_port": {
+    "model": "hftbacktest PowerProbQueueFunc n=1",
+    "episodes": 1438,
+    "queue_error": 0.07913,
+    "false_fill_rate": 0.01599,
+    "missed_fill_rate": 0.04033,
+    "fill_agreement": 0.94367,
+    "fill_batch_mae": 6.903,
+    "cost_bps": 0.064
+   }
+  },
+  "hftbacktest PowerProbQueueFunc n=2": {
+   "hftbacktest_engine": {
+    "orders": 1438,
+    "fill_agreement": 0.94437,
+    "false_fill_rate": 0.01113,
+    "missed_fill_rate": 0.04451
+   },
+   "argus_port": {
+    "model": "hftbacktest PowerProbQueueFunc n=2",
+    "episodes": 1438,
+    "queue_error": 0.07192,
+    "false_fill_rate": 0.01113,
+    "missed_fill_rate": 0.04451,
+    "fill_agreement": 0.94437,
+    "fill_batch_mae": 6.366,
+    "cost_bps": 0.0445
+   }
+  },
+  "hftbacktest PowerProbQueueFunc n=3": {
+   "hftbacktest_engine": {
+    "orders": 1438,
+    "fill_agreement": 0.94784,
+    "false_fill_rate": 0.00765,
+    "missed_fill_rate": 0.04451
+   },
+   "argus_port": {
+    "model": "hftbacktest PowerProbQueueFunc n=3",
+    "episodes": 1438,
+    "queue_error": 0.06931,
+    "false_fill_rate": 0.00765,
+    "missed_fill_rate": 0.04451,
+    "fill_agreement": 0.94784,
+    "fill_batch_mae": 6.22,
+    "cost_bps": 0.0306
+   }
+  },
+  "hftbacktest PowerProbQueueFunc2 n=2": {
+   "hftbacktest_engine": {
+    "orders": 1438,
+    "fill_agreement": 0.94506,
+    "false_fill_rate": 0.01947,
+    "missed_fill_rate": 0.03547
+   },
+   "argus_port": {
+    "model": "hftbacktest PowerProbQueueFunc2 n=2",
+    "episodes": 1438,
+    "queue_error": 0.10003,
+    "false_fill_rate": 0.03338,
+    "missed_fill_rate": 0.03129,
+    "fill_agreement": 0.93533,
+    "fill_batch_mae": 9.07,
+    "cost_bps": 0.1335
+   }
+  },
+  "hftbacktest PowerProbQueueFunc3 n=3": {
+   "hftbacktest_engine": {
+    "orders": 1438,
+    "fill_agreement": 0.94924,
+    "false_fill_rate": 0.0007,
+    "missed_fill_rate": 0.05007
+   },
+   "argus_port": {
+    "model": "hftbacktest PowerProbQueueFunc3 n=3",
+    "episodes": 1438,
+    "queue_error": 0.04736,
+    "false_fill_rate": 0.0007,
+    "missed_fill_rate": 0.05007,
+    "fill_agreement": 0.94924,
+    "fill_batch_mae": 4.783,
+    "cost_bps": 0.0028
+   }
+  },
+  "hftbacktest LogProbQueueFunc": {
+   "hftbacktest_engine": {
+    "orders": 1438,
+    "fill_agreement": 0.94576,
+    "false_fill_rate": 0.01599,
+    "missed_fill_rate": 0.03825
+   },
+   "argus_port": {
+    "model": "hftbacktest LogProbQueueFunc",
+    "episodes": 1438,
+    "queue_error": 0.08491,
+    "false_fill_rate": 0.02712,
+    "missed_fill_rate": 0.03477,
+    "fill_agreement": 0.93811,
+    "fill_batch_mae": 8.439,
+    "cost_bps": 0.1085
+   }
+  },
+  "hftbacktest RiskAdverseQueueModel": {
+   "hftbacktest_engine": {
+    "orders": 1438,
+    "fill_agreement": 0.94854,
+    "false_fill_rate": 0.0,
+    "missed_fill_rate": 0.05146
+   },
+   "argus_port": {
+    "model": "hftbacktest RiskAdverseQueueModel",
+    "episodes": 1438,
+    "queue_error": 0.05632,
+    "false_fill_rate": 0.0,
+    "missed_fill_rate": 0.05146,
+    "fill_agreement": 0.94854,
+    "fill_batch_mae": 4.816,
+    "cost_bps": 0.0
+   }
+  }
+ }
+}

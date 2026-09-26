@@ -144,6 +144,8 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 # broken to a Chinese speaker. Scoped to this one file so the check keeps working everywhere else,
 # where a full-width character really would be a mistake.
 "src/argus/lui/phrasebook.py" = ["RUF001"]
+# hftbacktest's notebook converter, verbatim (MIT): its casts and nesting are upstream's
+"src/argus/eval/hftbacktest_numba.py" = ["RUF046", "SIM102"]
 # `lui/honesty.py` answers Chinese questions in Chinese typography for the same reason.
 "src/argus/lui/honesty.py" = ["RUF001"]
 # the characters under test are the full-width and Traditional forms the fold maps
@@ -223,6 +225,12 @@ exclude = ["src/argus/vendor/"]
 # `from src.live.mandate.model import (...)` line is real code that only resolves at runtime via
 # `eval/baselines/loader.py`'s `sys.modules` shim, which mypy's static import resolution cannot see
 # — expected, not a defect.
+# numba, not annotations, types the compiled half of the hftbacktest run; its converter is
+# hftbacktest's notebook code verbatim (MIT). See the module docstring.
+[[tool.mypy.overrides]]
+module = ["argus.eval.hftbacktest_numba"]
+ignore_errors = true
+
 [[tool.mypy.overrides]]
 module = [
     "argus.eval.baselines.vibe_trading_enforcement",
