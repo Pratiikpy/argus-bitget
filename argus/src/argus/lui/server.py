@@ -45,6 +45,7 @@ from argus.lui.research import (
     BARE_FOLLOW,
     ResearchKind,
     ResearchRequest,
+    about_the_desk,
     about_the_record,
     follow_up,
     pattern_reading_wins,
@@ -775,7 +776,10 @@ def _answer(
             # longest span that exists is an answer
             answered_honestly.update(refused=True, reason=honest[0].replace("_", " "))
         return answered_honestly
-    followed = follow_up(text, prior, book)
+    # A question about what the desk did or holds goes to the record, whatever ticker it names
+    # (`research.about_the_desk`); an instruction is still refused as an order below.
+    desk_first = about_the_desk(text)
+    followed = None if desk_first else follow_up(text, prior, book)
     if followed is not None:
         # A name swap ("and ETH?", "actually i meant ethereum") re-asks the earlier question, so
         # its words are the ones the engines read: "price of bitcoin?" then led with the round
@@ -789,9 +793,10 @@ def _answer(
                                     {**audit, "detail": "a follow-up to the previous question"})
         payload["turns"] = [*prior, text][-12:]
         return payload
-    model = _model_for(visitor) if worth_asking_the_model(text, now=clock) else None
+    model = (_model_for(visitor) if worth_asking_the_model(text, now=clock) and not desk_first
+             else None)
     instruction = classify(text, now=clock, conversation=conversation).intent is Intent.ORDER
-    if model is None and not instruction:
+    if model is None and not instruction and not desk_first:
         # **No language model: the trained kind model reads the question instead.** It fills the
         # same slot and goes through the same validation (`plan_with_model`), deciding only which
         # engine answers; names, weights and the shock are read from the text by the pattern
@@ -869,7 +874,7 @@ def _answer(
     # the patterns name the one engine that answers exactly (`pattern_reading_wins`) they still
     # stand, as they do over the language model.
     kind_said = _not_research(audit)
-    patterned_only = detect_research(text)
+    patterned_only = None if desk_first else detect_research(text)
     if kind_said is not None and (patterned_only is None
                                   or kind_said[1] >= BINDING_KIND_CONFIDENCE):
         # Binding only when the patterns found nothing, or when the model is sure: "could you
@@ -902,7 +907,8 @@ def _answer(
         payload["turns"] = [*prior, text][-12:]
         return payload
     is_order = classify(text, now=clock, conversation=conversation).intent is Intent.ORDER
-    if request is None and not about_the_record(text) and not is_order and kind_said is None:
+    if (request is None and not about_the_record(text) and not desk_first and not is_order
+            and kind_said is None):
         # A question that names a listed contract the desk does not trade, in words no research
         # kind recognises ("give me a thesis on Solana for a conservative investor"), used to fall
         # through to the ledger and come back as the latest decision on an unrelated rToken. The
@@ -928,7 +934,7 @@ def _answer(
     # dependency; see `eval/ngrambench.py`.
     question, classified_by = reclassify(question)
     if (classified_by == "ngram" or (classified_by == "patterns" and not prior)) and not in_domain(
-            text) and question.intent is not Intent.ORDER:
+            text) and question.intent is not Intent.ORDER and not desk_first:
         # An order is refused as an order whatever language it is in; "अभी 1 बिटकॉइन खरीद लो" was
         # recognised as an order and then declined as off-topic (2026-09-25 audit, round 2).
         # **The n-gram layer only knows wording, so it needs a topic gate.** It answers with a
@@ -1022,8 +1028,14 @@ _DOMAIN = re.compile(
     r"crypto\w*|coins?|bitcoin|hedg\w*|portfolio|book|fees?|costs?|win\s+rate|exposure|"
     r"leverage|long|short|buy\w*|sell\w*|bought|sold|calls?|bets?|accura\w*|wrong|right|"
     r"perform\w*|history|past|latest|recent|last\s+(?:call|decision|trade|week|month)|why|"
-    r"rtokens?|perp\w*|futures|equit\w*|index|nasdaq|volatil\w*|beta|you|your|yours)\b|"
-    r"交易|决策|仓位|持仓|风险|收益|盈亏|亏损|盈利|订单|市场|价格|策略|对冲|股票|币|夏普|回撤|记录|"
+    r"rtokens?|perp\w*|futures|equit\w*|index|nasdaq|volatil\w*|beta|you|your|yours|"
+    r"up\s+or\s+down|in\s+the\s+(?:red|green|black)|overall|certain\w*|outcomes?|"
+    r"audit\w*|entries|logged|rewrit\w*|modifi\w*|retroactiv\w*|holiday|inaction|"
+    r"sidelines?|informat\w*|data\s+points?|recap|activity|tickers?|authentic\w*|conviction|"
+    r"overconfiden\w*|minutes?|pre[\s-]?market|after[\s-]?hours|inputs?|indicators?)\b|"
+    r"交易|决策|决定|操作|仓位|持仓|风险|收益|盈亏|亏损|盈利|赚|亏|胜率|表现|订单|市场|价格|策略|对冲|"
+    r"股票|币|夏普|回撤|记录|账本|日志|修改|篡改|验证|加密|置信|确信|依据|判断|消息|信息|观望|平仓|"
+    r"开仓|做空|做多|收盘|开盘|休市|盘前|盘后|时段|把握|信心|自信|参考|指标|敞口|删改|手脚|"
     r"为什么|理由|证据|校准|你", re.I)
 """Words that make a question about markets or the desk. Deliberately wide — it exists to stop
 the n-gram layer answering chit-chat, not to judge a trading question."""

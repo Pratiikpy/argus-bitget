@@ -13,39 +13,39 @@
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "9,110"
+        "9,138"
       ],
       "live": [
-        9110
+        9138
       ],
       "status": "OK",
-      "excerpt": "9,110 tests collected"
+      "excerpt": "9,138 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 161,
       "quoted": [
-        "9,110"
+        "9,138"
       ],
       "live": [
-        9110
+        9138
       ],
       "status": "OK",
-      "excerpt": "9,110 tests collected"
+      "excerpt": "9,138 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 183,
       "quoted": [
-        "9,110"
+        "9,138"
       ],
       "live": [
-        9110
+        9138
       ],
       "status": "OK",
-      "excerpt": "9,110 tests collected"
+      "excerpt": "9,138 tests collected"
     },
     {
       "claim": "tests_passing",
@@ -53,7 +53,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        9110
+        9138
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -63,65 +63,65 @@
       "doc": "explained",
       "line": 661,
       "quoted": [
-        "9,110"
+        "9,138"
       ],
       "live": [
-        9110
+        9138
       ],
       "status": "OK",
-      "excerpt": "9,110 tests"
+      "excerpt": "9,138 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1710,
       "quoted": [
-        "9,110"
+        "9,138"
       ],
       "live": [
-        9110
+        9138
       ],
       "status": "OK",
-      "excerpt": "9,110 tests collected"
+      "excerpt": "9,138 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1959,
       "quoted": [
-        "9,110"
+        "9,138"
       ],
       "live": [
-        9110
+        9138
       ],
       "status": "OK",
-      "excerpt": "9,110 tests collected"
+      "excerpt": "9,138 tests collected"
     },
     {
       "claim": "source_files",
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "469"
+        "470"
       ],
       "live": [
-        469
+        470
       ],
       "status": "OK",
-      "excerpt": "strict clean on 469 source files"
+      "excerpt": "strict clean on 470 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 184,
       "quoted": [
-        "469"
+        "470"
       ],
       "live": [
-        469
+        470
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 469 source files"
+      "excerpt": "strict` clean on 470 source files"
     },
     {
       "claim": "source_files",
@@ -129,7 +129,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        469
+        470
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -139,13 +139,13 @@
       "doc": "explained",
       "line": 1956,
       "quoted": [
-        "469"
+        "470"
       ],
       "live": [
-        469
+        470
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 469 source files"
+      "excerpt": "strict` clean on 470 source files"
     },
     {
       "claim": "register_claims",

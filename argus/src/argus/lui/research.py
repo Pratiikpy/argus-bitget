@@ -1972,6 +1972,50 @@ def about_the_record(text: str) -> bool:
     return bool(_ABOUT_THE_RECORD.search(text))
 
 
+_THE_DESK_ACTS = re.compile(
+    r"\b(?:we|us|our|ours|the\s+desk|argus)\b|\bdecision\s+log\b|"
+    r"\b(?:your|the\s+desk'?s|today'?s|yesterday'?s|this\s+week'?s|recent|latest)\s+decisions\b|"
+    r"\bno\s+(?:action|trades?|positions?|moves?)\s+(?:on|in|for)\b|"
+    # "that COIN trade" and "the BTC call" are the desk's; "the AI trade" is a market theme
+    r"\b(?:that|this)\s+(?:\w+\s+)?(?:trade|call|decision)\b|\bthe\s+(?:\w+\s+)?(?:call|decision)\b|"
+    r"\ball\s+(?:the\s+)?decisions\b|"
+    r"\bdecisions\s+(?:on|for|about)\b|\bequity\s+curve\b|\bnothing\s+(?:has\s+)?happened\s+on\b|"
+    r"我们|咱们|这个系统|你们的系统|账本|决策|敞口|"
+    r"为什么.{0,10}(?:做空|做多|平仓|开仓|买入|卖出|买了|卖了|观望|没有?(?:交易|操作|动作)|按兵不动)|"
+    r"持仓|仓位",
+    re.I,
+)
+_A_PLAN_NOT_A_RECORD = re.compile(
+    r"\b(?:if|would|should|could|shall|hedg\w*|stress\w*|drops?|crash\w*|add(?:ing)?|"
+    r"what\s+happens|simulat\w*|scenario|siz(?:e|ing)|i\s+(?:hold|own)|my)\b|"
+    # "are we still in a hiking cycle" is about the market, not the desk
+    r"\bare\s+we\s+(?:still\s+)?in\s+(?:a|an)\s|"
+    # "are we heading into a recession": the economy's "we", not the desk's
+    r"\b(?:recession\w*|inflation\w*|econom\w*|bull\s+market|bear\s+market|soft\s+landing|"
+    r"hard\s+landing|rate\s+cuts?|rate\s+hikes?)\b|衰退|通胀|经济|牛市|熊市|降息|加息|"
+    # a central bank's decision is the market's, not the desk's
+    r"\b(?:fed|fomc|ecb|boj|central\s+bank|rate\s+decision|policy\s+decision)\b|"
+    r"如果|假如|要是|应该|该不该|要不要|对冲|加仓|我(?!们)|"
+    # other holders' positions are sentiment and fundamentals: institutions, the crowd, retail
+    r"机构|大家|散户|市场|资金|多空|主力",
+    re.I,
+)
+
+
+def about_the_desk(text: str) -> bool:
+    """A question whose subject is the desk and what it did or holds, asked in the first person
+    plural or of "the desk": the record answers it, and research must not claim it for the ticker
+    it names.
+
+    Found on a blind set of record questions (`data/lui_record_intents_2026-09-26_tune.jsonl`):
+    "are we long or short NVDA at the moment" was answered with NVDA's crowd long/short ratio,
+    "why did we short TSLA overnight" with TSLA's news, and "how many contracts of TQQQ are we
+    holding" with a TQQQ quote, because the research planner reads every named ticker as a
+    research subject. A question that plans rather than asks about the record ("what would adding
+    NVDA do to our book", "should we hedge") stays with research."""
+    return bool(_THE_DESK_ACTS.search(text)) and not _A_PLAN_NOT_A_RECORD.search(text)
+
+
 def detect(text: str) -> ResearchRequest | None:
     """A research request, or None when the question is not one — see :func:`_detect`.
 

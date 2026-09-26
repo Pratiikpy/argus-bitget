@@ -938,6 +938,126 @@ def _skill_matrix(path: str) -> Entry:
 
 
 # ---------------------------------------------------------------------------------------------
+# Artefacts the register began citing on 2026-09-26. The audit refused to run until each had a
+# decision here, which is its design: an artefact the register leans on and this module has never
+# read is exactly what it exists to catch.
+
+
+def _nco_bakeoff(path: str) -> Entry:
+    import math
+
+    holdout = _load(path)["holdout"]
+    results = holdout["results"]
+    argus = results[holdout["argus_pick"]]
+    origins = argus["origins"]
+    middle = origins[len(origins) // 2]
+    headlines = []
+    for rival in holdout["decisive_rivals"]:
+        theirs = dict(zip(results[rival]["origins"], results[rival]["oos_vol_bps"], strict=True))
+        items = [
+            Item(value=math.log(_f(theirs[o]) / _f(v)),
+                 groups={"holdout_half": "first" if o < middle else "second"},
+                 order=f"{o:08d}")
+            for o, v in zip(origins, argus["oos_vol_bps"], strict=True) if o in theirs
+        ]
+        headlines.append(_headline(
+            f"held-out volatility: ARGUS's pick vs {rival}", items, ("holdout_half",),
+            headline="mean log(rival realised vol / ARGUS realised vol) over held-out windows",
+            orientation="positive = ARGUS's allocation was calmer", role=VS_RIVAL,
+            role_reason="the bake-off's decisive comparison, picked on the selection period",
+            source="holdout.results.*.oos_vol_bps"))
+    return Entry(path, CHECKED, "one row per held-out walk-forward window per allocator",
+                 tuple(headlines))
+
+
+def _financebench(path: str) -> Entry:
+    answers = _load(path)["answers"]
+    value = {"correct": 1.0, "wrong": -1.0, "disputed": 0.0}
+    items = [Item(value=value[r["grade"]],
+                  groups={"class": str(r["class"]), "formula": str(r.get("formula") or "none")},
+                  order=str(r["id"]))
+             for r in answers if r["status"] == "answered"]
+    return Entry(path, CHECKED, "one row per FinanceBench question ARGUS answered", (
+        _headline("filed-XBRL answers graded against FinanceBench's gold", items,
+                  ("class", "formula"),
+                  headline="+1 correct, 0 disputed, -1 wrong, over answered questions",
+                  orientation="+1 correct, -1 wrong", role=RESULT,
+                  role_reason="the engine's answers; abstentions are not scored here",
+                  source="answers"),))
+
+
+def _general_arb(path: str) -> Entry:
+    blob = _load(path)
+    real = blob["real_books"]["per_snapshot"]
+    held = blob["out_of_sample"]["held_out"]["per_snapshot"]
+
+    def right(row: dict[str, Any], arm: str) -> float:
+        return 1.0 if bool(row[arm]) == bool(row["truth_monetizable"]) else 0.0
+
+    def items(rows: Sequence[dict[str, Any]], arm: str, rival: str | None) -> list[Item]:
+        return [Item(value=right(r, arm) - (right(r, rival) if rival else 1.0),
+                     groups={"ticker": str(r["ticker"]), "phase": str(r["phase"])},
+                     order=f"{int(r['round']):04d}") for r in rows]
+
+    def halves(arm: str, rival: str | None) -> Any:
+        a, b = items(real, arm, rival), items(held, arm, rival)
+        return halves_from(sum(i.value for i in a) / len(a), sum(i.value for i in b) / len(b),
+                           first_items=len(a), second_items=len(b),
+                           label="design snapshots vs held-out snapshots")
+
+    return Entry(path, CHECKED, "one row per two-sided book snapshot, design and held-out", (
+        _headline("exact net walk vs NetworkX's Bellman-Ford cycle test", items(
+            real + held, "argus_exact", "networkx_cycle"), ("ticker", "phase"),
+            headline="(ARGUS right) - (rival right) against the monetisable truth",
+            orientation="positive = ARGUS right where the rival was wrong", role=VS_RIVAL,
+            role_reason="the general-purpose rival on the same books", source="per_snapshot",
+            halves=halves("argus_exact", "networkx_cycle")),
+        _headline("the deployed decomposition against the truth", items(
+            real + held, "argus_deployed", None), ("ticker", "phase"),
+            headline="(deployed path right) - 1 against the monetisable truth",
+            orientation="0 = right, -1 = wrong", role=RESULT,
+            role_reason="what the desk runs, which the artefact records false accepts for",
+            source="per_snapshot", halves=halves("argus_deployed", None)),
+    ))
+
+
+def _eventdriven_agents(path: str) -> Entry:
+    trades = _load(path)["walk_forward"]["test_trades"]
+    headlines = []
+    for rival in ("no_gate_follow", "ballast_pooled_t"):
+        rows = trades[rival]
+        items = [Item(value=-_f(t["net_bps"]),
+                      groups={"symbol": str(t["symbol"]), "class": str(t["class"])},
+                      order=str(t["at"])) for t in rows]
+        headlines.append(_headline(
+            f"ARGUS's significance gate (no trade taken) vs {rival}", items,
+            ("symbol", "class"),
+            headline="per rival trade: ARGUS's 0 bps minus the rival's net bps after costs",
+            orientation="positive = the trade ARGUS declined lost money", role=VS_RIVAL,
+            role_reason="the out-of-sample trades the gate declined and the rival took",
+            source=f"walk_forward.test_trades.{rival}"))
+    return Entry(path, CHECKED, "one row per out-of-sample trade the rivals took", tuple(headlines))
+
+
+def _general_sue(path: str) -> Entry:
+    rows = _load(path)["alignment"]["anchor_detail"]
+
+    def answered(arm: dict[str, Any]) -> bool:
+        return arm.get("sue") is not None
+
+    items = [Item(value=(1.0 if answered(r["argus_dated_after"]) else 0.0)
+                  - (1.0 if answered(r["pandas_period_lenient"]) else 0.0),
+                  groups={"symbol": str(r["symbol"])}) for r in rows]
+    return Entry(path, CHECKED, "one row per real anchor symbol", (
+        _headline("SUE: dated alignment answers where pandas' lenient period index refuses",
+                  items, ("symbol",),
+                  headline="(ARGUS answers) - (pandas answers) per anchor",
+                  orientation="+1 = only ARGUS aligned the filings, 0 = both did",
+                  role=VS_RIVAL, role_reason="the general-purpose rival on the same filings",
+                  source="alignment.anchor_detail"),))
+
+
+# ---------------------------------------------------------------------------------------------
 # Artefacts with no population to break down, with the reason read from each
 
 
@@ -977,6 +1097,41 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
     "data/review_oos.json": _review_oos,
     "data/skill_reliability.json": _desk_skill_rows,
     "data/cointegration.json": _cointegration_study,
+    # cited from 2026-09-26
+    "data/nco_bakeoff.json": _nco_bakeoff,
+    "data/financebench_xbrl.json": _financebench,
+    "data/general_arb_comparison.json": _general_arb,
+    "data/eventdriven_agents.json": _eventdriven_agents,
+    "data/general_sue_comparison.json": _general_sue,
+    "data/eventdriven_rivals.json": _not_checkable(
+        WITHOUT_ROWS, "seven null processes and power draws reduced to rejection rates; "
+        "eval/eventdriven_rivals.py would need to record each draw's verdict per test"),
+    "data/general_abstention_comparison.json": _not_checkable(
+        WITHOUT_ROWS, "470 settled leans reduced to risk-coverage curves and AURC per scorer; "
+        "eval/general_abstention_comparison.py would need to record each lean's score per arm"),
+    "data/general_coint_comparison.json": _not_checkable(
+        WITHOUT_ROWS, "160 simulated universes reduced to FDR, FWER and power per pipeline; "
+        "eval/general_coint_comparison.py would need to record each universe's discoveries"),
+    "data/review_rivals.json": _not_checkable(
+        WITHOUT_ROWS, "40 seeds a cell reduced to false-admission and power rates per rule "
+        "learner; eval/review_rivals.py would need to record each seed's outcome"),
+    "data/xa_arena.json": _not_checkable(
+        WITHOUT_ROWS, "hourly net asset values reduced to per-period scores per arm; "
+        "eval/xa_arena.py would need to record each arm's hourly return path"),
+    "data/lui_rematch.json": _not_checkable(
+        WITHOUT_ROWS, "per-question router predictions are recomputed from the live router and "
+        "not kept (Rasa's are in data/lui_rematch_rasa_predictions.json); eval/lui_rematch.py "
+        "would need to record ARGUS's per-question labels"),
+    "data/general_grammar_comparison.json": _not_checkable(
+        DESIGNED, "15 designed ill-typed expressions, 39 operator checks on one symbol's series "
+        "and eight designed factors: properties of the grammar on chosen inputs"),
+    "data/general_overfitgates_comparison.json": _not_checkable(
+        WITHOUT_ROWS, "1,332 gate calls reduced to grade counts per arm and tier; "
+        "eval/general_overfitgates_comparison.py would need to record each call's grade"),
+    "data/general_rotation_comparison.json": _not_checkable(
+        DESIGNED, "36 designed contract cases for the breadth-rotation inputs"),
+    "data/lui_rematch_inputs.json": _not_checkable(
+        NO_ROWS, "the rematch's frozen inputs: questions and labels, no result"),
     # outside the register
     "data/weekend_significance.json": _weekend,
     "data/shadow_record.json": _shadow,

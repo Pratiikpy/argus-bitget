@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-25T21:10:59+00:00",
+  "generated_at": "2026-09-26T03:12:16+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
@@ -19,20 +19,33 @@
     "data/desk_notes.jsonl",
     "data/dsr_comparison.json",
     "data/earnings_comparison.json",
+    "data/eventdriven_agents.json",
     "data/eventdriven_comparison.json",
+    "data/eventdriven_rivals.json",
     "data/execassist_comparison.json",
     "data/execution_arena.json",
     "data/execution_comparison.json",
     "data/explainability_comparison.json",
     "data/factor_divergence_comparison.json",
     "data/feedlist_comparison.json",
+    "data/financebench_xbrl.json",
+    "data/general_abstention_comparison.json",
+    "data/general_arb_comparison.json",
+    "data/general_coint_comparison.json",
+    "data/general_grammar_comparison.json",
+    "data/general_overfitgates_comparison.json",
+    "data/general_rotation_comparison.json",
+    "data/general_sue_comparison.json",
     "data/grammar_comparison.json",
     "data/h2h_baserate/summary.json",
     "data/h2h_optic/summary.json",
     "data/infoextract_comparison.json",
     "data/journal_comparison.json",
     "data/lui_comparison.json",
+    "data/lui_rematch.json",
+    "data/lui_rematch_inputs.json",
     "data/mandate_comparison.json",
+    "data/nco_bakeoff.json",
     "data/overfit_gates.json",
     "data/overnight_comparison.json",
     "data/paper_ledger.jsonl",
@@ -45,6 +58,7 @@
     "data/review_comparison.json",
     "data/review_oos.json",
     "data/review_report.json",
+    "data/review_rivals.json",
     "data/risk_layer_comparison.json",
     "data/risk_proof.json",
     "data/rotation_comparison.json",
@@ -55,13 +69,14 @@
     "data/stopquality_comparison.json",
     "data/track1_study.json",
     "data/void_comparison.json",
-    "data/workbench_comparison.json"
+    "data/workbench_comparison.json",
+    "data/xa_arena.json"
   ],
   "counts": {
-    "checked": 43,
-    "designed_cases": 22,
-    "aggregate_without_rows": 11,
-    "no_rows": 3
+    "checked": 48,
+    "designed_cases": 24,
+    "aggregate_without_rows": 18,
+    "no_rows": 4
   },
   "flagged": [
     {
@@ -139,6 +154,28 @@
       ]
     },
     {
+      "artefact": "data/general_arb_comparison.json",
+      "headline": "exact net walk vs NetworkX's Bellman-Ford cycle test",
+      "role": "argus_vs_rival",
+      "flags": [
+        "single_group:phase=rth"
+      ],
+      "readings": [
+        "the headline has no direction, so no group can carry it"
+      ]
+    },
+    {
+      "artefact": "data/general_arb_comparison.json",
+      "headline": "the deployed decomposition against the truth",
+      "role": "argus_result",
+      "flags": [
+        "single_group:phase=rth"
+      ],
+      "readings": [
+        "the whole headline is one phase (rth)"
+      ]
+    },
+    {
       "artefact": "data/grammar_comparison.json",
       "headline": "rank on real market series: ARGUS vs qlib",
       "role": "argus_result",
@@ -147,6 +184,19 @@
       ],
       "readings": [
         "the whole headline is one symbol (NVDAUSDT)"
+      ]
+    },
+    {
+      "artefact": "data/nco_bakeoff.json",
+      "headline": "held-out volatility: ARGUS's pick vs skfolio_nco[cv=ignore]",
+      "role": "argus_vs_rival",
+      "flags": [
+        "carried_by_one_group:holdout_half=second",
+        "flips_across_halves:chronological halves"
+      ],
+      "readings": [
+        "second carries the headline: without it the other 1 holdout_half group(s) total -0.014494, which does not point the same way",
+        "chronological halves: the halves disagree \u2014 first -0.001449, second 0.103053 (full 0.050802)"
       ]
     },
     {
@@ -333,6 +383,28 @@
       ]
     },
     {
+      "artefact": "data/general_arb_comparison.json",
+      "headline": "exact net walk vs NetworkX's Bellman-Ford cycle test",
+      "role": "argus_vs_rival",
+      "flags": [
+        "single_group:phase=rth"
+      ],
+      "readings": [
+        "the headline has no direction, so no group can carry it"
+      ]
+    },
+    {
+      "artefact": "data/general_arb_comparison.json",
+      "headline": "the deployed decomposition against the truth",
+      "role": "argus_result",
+      "flags": [
+        "single_group:phase=rth"
+      ],
+      "readings": [
+        "the whole headline is one phase (rth)"
+      ]
+    },
+    {
       "artefact": "data/grammar_comparison.json",
       "headline": "rank on real market series: ARGUS vs qlib",
       "role": "argus_result",
@@ -341,6 +413,19 @@
       ],
       "readings": [
         "the whole headline is one symbol (NVDAUSDT)"
+      ]
+    },
+    {
+      "artefact": "data/nco_bakeoff.json",
+      "headline": "held-out volatility: ARGUS's pick vs skfolio_nco[cv=ignore]",
+      "role": "argus_vs_rival",
+      "flags": [
+        "carried_by_one_group:holdout_half=second",
+        "flips_across_halves:chronological halves"
+      ],
+      "readings": [
+        "second carries the headline: without it the other 1 holdout_half group(s) total -0.014494, which does not point the same way",
+        "chronological halves: the halves disagree \u2014 first -0.001449, second 0.103053 (full 0.050802)"
       ]
     },
     {
@@ -3729,10 +3814,433 @@
         }
       ]
     },
+    "data/eventdriven_agents.json": {
+      "status": "checked",
+      "reason": "one row per out-of-sample trade the rivals took",
+      "sha256": "98e2247d2337273280575d639ec73ca5cf9074b8285e2bdabda41f92c8378371",
+      "flagged": false,
+      "headlines": [
+        {
+          "name": "ARGUS's significance gate (no trade taken) vs no_gate_follow",
+          "headline": "per rival trade: ARGUS's 0 bps minus the rival's net bps after costs",
+          "orientation": "positive = the trade ARGUS declined lost money",
+          "items": 2924,
+          "micro_mean": 10.319518,
+          "total": 30174.271,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "symbol",
+              "groups": 10,
+              "micro_mean": 10.319518,
+              "macro_mean": 10.361822,
+              "direction": 1,
+              "largest_contributor": "AMZNUSDT",
+              "largest_share_of_total": 0.2372,
+              "total_without_largest": 23017.061,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 1.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single symbol carries the headline: without the largest contributor (AMZNUSDT, 23.7% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "AMZNUSDT",
+                  "rows": 298,
+                  "weight": 298.0,
+                  "total": 7157.21,
+                  "mean": 24.017483,
+                  "share_of_total": 0.2372,
+                  "opposing": 85
+                },
+                {
+                  "group": "TSLAUSDT",
+                  "rows": 284,
+                  "weight": 284.0,
+                  "total": 6996.985,
+                  "mean": 24.637271,
+                  "share_of_total": 0.2319,
+                  "opposing": 94
+                },
+                {
+                  "group": "AAPLUSDT",
+                  "rows": 292,
+                  "weight": 292.0,
+                  "total": 4918.526,
+                  "mean": 16.844267,
+                  "share_of_total": 0.163,
+                  "opposing": 87
+                },
+                {
+                  "group": "NVDAUSDT",
+                  "rows": 279,
+                  "weight": 279.0,
+                  "total": 4201.29,
+                  "mean": 15.058387,
+                  "share_of_total": 0.1392,
+                  "opposing": 104
+                },
+                {
+                  "group": "COINUSDT",
+                  "rows": 304,
+                  "weight": 304.0,
+                  "total": 3307.332,
+                  "mean": 10.879382,
+                  "share_of_total": 0.1096,
+                  "opposing": 130
+                },
+                {
+                  "group": "HOODUSDT",
+                  "rows": 306,
+                  "weight": 306.0,
+                  "total": 3025.928,
+                  "mean": 9.888654,
+                  "share_of_total": 0.1003,
+                  "opposing": 135
+                },
+                {
+                  "group": "GOOGLUSDT",
+                  "rows": 295,
+                  "weight": 295.0,
+                  "total": 903.364,
+                  "mean": 3.062251,
+                  "share_of_total": 0.0299,
+                  "opposing": 116
+                },
+                {
+                  "group": "MSTRUSDT",
+                  "rows": 271,
+                  "weight": 271.0,
+                  "total": 797.664,
+                  "mean": 2.94341,
+                  "share_of_total": 0.0264,
+                  "opposing": 130
+                },
+                {
+                  "group": "CRCLUSDT",
+                  "rows": 293,
+                  "weight": 293.0,
+                  "total": 414.699,
+                  "mean": 1.415355,
+                  "share_of_total": 0.0137,
+                  "opposing": 135
+                },
+                {
+                  "group": "METAUSDT",
+                  "rows": 302,
+                  "weight": 302.0,
+                  "total": -1548.727,
+                  "mean": -5.128235,
+                  "share_of_total": -0.0513,
+                  "opposing": 122
+                }
+              ]
+            },
+            {
+              "key": "class",
+              "groups": 6,
+              "micro_mean": 10.319518,
+              "macro_mean": 12.83076,
+              "direction": 1,
+              "largest_contributor": "volume_spike_down",
+              "largest_share_of_total": 0.5463,
+              "total_without_largest": 13688.746,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 1.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single class carries the headline: without the largest contributor (volume_spike_down, 54.6% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "volume_spike_down",
+                  "rows": 1029,
+                  "weight": 1029.0,
+                  "total": 16485.525,
+                  "mean": 16.020918,
+                  "share_of_total": 0.5463,
+                  "opposing": 363
+                },
+                {
+                  "group": "range_expansion_down",
+                  "rows": 244,
+                  "weight": 244.0,
+                  "total": 4593.748,
+                  "mean": 18.826836,
+                  "share_of_total": 0.1522,
+                  "opposing": 68
+                },
+                {
+                  "group": "price_move_down",
+                  "rows": 170,
+                  "weight": 170.0,
+                  "total": 3853.686,
+                  "mean": 22.668741,
+                  "share_of_total": 0.1277,
+                  "opposing": 83
+                },
+                {
+                  "group": "price_move_up",
+                  "rows": 169,
+                  "weight": 169.0,
+                  "total": 2997.011,
+                  "mean": 17.733793,
+                  "share_of_total": 0.0993,
+                  "opposing": 70
+                },
+                {
+                  "group": "volume_spike_up",
+                  "rows": 1036,
+                  "weight": 1036.0,
+                  "total": 2406.85,
+                  "mean": 2.323214,
+                  "share_of_total": 0.0798,
+                  "opposing": 437
+                },
+                {
+                  "group": "range_expansion_up",
+                  "rows": 276,
+                  "weight": 276.0,
+                  "total": -162.549,
+                  "mean": -0.588946,
+                  "share_of_total": -0.0054,
+                  "opposing": 117
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "2026-08-12T03:00:00+00:00",
+            "first_items": 1462,
+            "second_items": 1462,
+            "first_mean": 10.881972,
+            "second_mean": 9.757064,
+            "full_mean": 10.319518,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 10.881972, second 9.757064, full 10.319518"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the out-of-sample trades the gate declined and the rival took",
+          "source": "walk_forward.test_trades.no_gate_follow",
+          "split_ran": true,
+          "favours": "argus"
+        },
+        {
+          "name": "ARGUS's significance gate (no trade taken) vs ballast_pooled_t",
+          "headline": "per rival trade: ARGUS's 0 bps minus the rival's net bps after costs",
+          "orientation": "positive = the trade ARGUS declined lost money",
+          "items": 795,
+          "micro_mean": 18.217248,
+          "total": 14482.712,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "symbol",
+              "groups": 10,
+              "micro_mean": 18.217248,
+              "macro_mean": 18.536573,
+              "direction": 1,
+              "largest_contributor": "METAUSDT",
+              "largest_share_of_total": 0.1927,
+              "total_without_largest": 11691.851,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 1.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single symbol carries the headline: without the largest contributor (METAUSDT, 19.3% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "METAUSDT",
+                  "rows": 95,
+                  "weight": 95.0,
+                  "total": 2790.861,
+                  "mean": 29.377484,
+                  "share_of_total": 0.1927,
+                  "opposing": 37
+                },
+                {
+                  "group": "TSLAUSDT",
+                  "rows": 61,
+                  "weight": 61.0,
+                  "total": 2554.987,
+                  "mean": 41.885033,
+                  "share_of_total": 0.1764,
+                  "opposing": 21
+                },
+                {
+                  "group": "CRCLUSDT",
+                  "rows": 81,
+                  "weight": 81.0,
+                  "total": 2254.877,
+                  "mean": 27.837988,
+                  "share_of_total": 0.1557,
+                  "opposing": 32
+                },
+                {
+                  "group": "MSTRUSDT",
+                  "rows": 84,
+                  "weight": 84.0,
+                  "total": 1570.842,
+                  "mean": 18.7005,
+                  "share_of_total": 0.1085,
+                  "opposing": 38
+                },
+                {
+                  "group": "HOODUSDT",
+                  "rows": 87,
+                  "weight": 87.0,
+                  "total": 1367.153,
+                  "mean": 15.714402,
+                  "share_of_total": 0.0944,
+                  "opposing": 34
+                },
+                {
+                  "group": "AAPLUSDT",
+                  "rows": 71,
+                  "weight": 71.0,
+                  "total": 1209.83,
+                  "mean": 17.039859,
+                  "share_of_total": 0.0835,
+                  "opposing": 22
+                },
+                {
+                  "group": "GOOGLUSDT",
+                  "rows": 75,
+                  "weight": 75.0,
+                  "total": 986.838,
+                  "mean": 13.15784,
+                  "share_of_total": 0.0681,
+                  "opposing": 27
+                },
+                {
+                  "group": "AMZNUSDT",
+                  "rows": 88,
+                  "weight": 88.0,
+                  "total": 706.624,
+                  "mean": 8.029818,
+                  "share_of_total": 0.0488,
+                  "opposing": 28
+                },
+                {
+                  "group": "COINUSDT",
+                  "rows": 94,
+                  "weight": 94.0,
+                  "total": 636.392,
+                  "mean": 6.770128,
+                  "share_of_total": 0.0439,
+                  "opposing": 46
+                },
+                {
+                  "group": "NVDAUSDT",
+                  "rows": 59,
+                  "weight": 59.0,
+                  "total": 404.308,
+                  "mean": 6.852678,
+                  "share_of_total": 0.0279,
+                  "opposing": 26
+                }
+              ]
+            },
+            {
+              "key": "class",
+              "groups": 2,
+              "micro_mean": 18.217248,
+              "macro_mean": 18.535198,
+              "direction": 1,
+              "largest_contributor": "range_expansion_up",
+              "largest_share_of_total": 0.7215,
+              "total_without_largest": 4033.943,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 1.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single class carries the headline: without the largest contributor (range_expansion_up, 72.1% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "range_expansion_up",
+                  "rows": 585,
+                  "weight": 585.0,
+                  "total": 10448.769,
+                  "mean": 17.861144,
+                  "share_of_total": 0.7215,
+                  "opposing": 225
+                },
+                {
+                  "group": "price_move_up",
+                  "rows": 210,
+                  "weight": 210.0,
+                  "total": 4033.943,
+                  "mean": 19.209252,
+                  "share_of_total": 0.2785,
+                  "opposing": 86
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "2026-07-21T09:30:00+00:00",
+            "first_items": 397,
+            "second_items": 398,
+            "first_mean": 12.65233,
+            "second_mean": 23.768183,
+            "full_mean": 18.217248,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 12.65233, second 23.768183, full 18.217248"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the out-of-sample trades the gate declined and the rival took",
+          "source": "walk_forward.test_trades.ballast_pooled_t",
+          "split_ran": true,
+          "favours": "argus"
+        }
+      ]
+    },
     "data/eventdriven_comparison.json": {
       "status": "aggregate_without_rows",
       "reason": "the false-positive sweep draws 40 seeds of 150 events, but only the rates are kept (eval/eventdriven_comparison.py would need to record per-seed verdicts)",
       "sha256": "459a16805e0f6ad8dc03c4648b596ec4bbc6c132bdcfb76e006562d97fc5092e",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/eventdriven_rivals.json": {
+      "status": "aggregate_without_rows",
+      "reason": "seven null processes and power draws reduced to rejection rates; eval/eventdriven_rivals.py would need to record each draw's verdict per test",
+      "sha256": "3563e7e3234853c325c1e5a33e4a7f32436d72dd8575c614d741e18d9c8d56dc",
       "flagged": false,
       "headlines": []
     },
@@ -4546,6 +5054,497 @@
       "flagged": false,
       "headlines": []
     },
+    "data/financebench_xbrl.json": {
+      "status": "checked",
+      "reason": "one row per FinanceBench question ARGUS answered",
+      "sha256": "32d726a1e929840b70909e3c5ba1f7d0c7920387ed2d76f3f0200babce954ed0",
+      "flagged": false,
+      "headlines": [
+        {
+          "name": "filed-XBRL answers graded against FinanceBench's gold",
+          "headline": "+1 correct, 0 disputed, -1 wrong, over answered questions",
+          "orientation": "+1 correct, -1 wrong",
+          "items": 58,
+          "micro_mean": 0.948276,
+          "total": 55.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "class",
+              "groups": 3,
+              "micro_mean": 0.948276,
+              "macro_mean": 0.722222,
+              "direction": 1,
+              "largest_contributor": "metrics-generated",
+              "largest_share_of_total": 0.9091,
+              "total_without_largest": 5.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single class carries the headline: without the largest contributor (metrics-generated, 90.9% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "metrics-generated",
+                  "rows": 50,
+                  "weight": 50.0,
+                  "total": 50.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.9091,
+                  "opposing": 0
+                },
+                {
+                  "group": "domain-relevant",
+                  "rows": 6,
+                  "weight": 6.0,
+                  "total": 4.0,
+                  "mean": 0.666667,
+                  "share_of_total": 0.0727,
+                  "opposing": 0
+                },
+                {
+                  "group": "novel-generated",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 1.0,
+                  "mean": 0.5,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "formula",
+              "groups": 42,
+              "micro_mean": 0.948276,
+              "macro_mean": 0.980159,
+              "direction": 1,
+              "largest_contributor": "((365 * avg(accounts_payable[t-1], accounts_payable)) / (cogs + (inventory - inventory[t-1])))",
+              "largest_share_of_total": 0.0545,
+              "total_without_largest": 52.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single formula carries the headline: without the largest contributor (((365 * avg(accounts_payable[t-1], accounts_payable)) / (cogs + (inventory - inventory[t-1]))), 5.5% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "((365 * avg(accounts_payable[t-1], accounts_payable)) / (cogs + (inventory - inventory[t-1])))",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 3.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0545,
+                  "opposing": 0
+                },
+                {
+                  "group": "((operating_income + dna) / revenue)",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0364,
+                  "opposing": 0
+                },
+                {
+                  "group": "(cfo / current_liabilities)",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0364,
+                  "opposing": 0
+                },
+                {
+                  "group": "(cogs / avg(inventory[t-1], inventory))",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0364,
+                  "opposing": 0
+                },
+                {
+                  "group": "(current_assets - current_liabilities)",
+                  "rows": 4,
+                  "weight": 4.0,
+                  "total": 2.0,
+                  "mean": 0.5,
+                  "share_of_total": 0.0364,
+                  "opposing": 0
+                },
+                {
+                  "group": "(current_assets / current_liabilities)",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0364,
+                  "opposing": 0
+                },
+                {
+                  "group": "(income_tax / pretax_income)[FY2022] - (income_tax / pretax_income)[FY2021]",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 2.0,
+                  "mean": 0.666667,
+                  "share_of_total": 0.0364,
+                  "opposing": 0
+                },
+                {
+                  "group": "(net_income / avg(total_assets[t-1], total_assets))",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0364,
+                  "opposing": 0
+                },
+                {
+                  "group": "(revenue / avg(ppe_net[t-1], ppe_net))",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0364,
+                  "opposing": 0
+                },
+                {
+                  "group": "capex",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0364,
+                  "opposing": 0
+                },
+                {
+                  "group": "dividends_paid",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0364,
+                  "opposing": 0
+                },
+                {
+                  "group": "ppe_net",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0364,
+                  "opposing": 0
+                },
+                {
+                  "group": "((((365 * avg(inventory[t-1], inventory)) / cogs) + ((365 * avg(accounts_receivable[t-1], accounts_receivable)) / revenue)) - ((365 * avg(accounts_payable[t-1], accounts_payable)) / (cogs + (inventory - inventory[t-1]))))",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "((operating_income + dna) - capex)",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "(1 - (dividends_paid / net_income))",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "(cfo - capex)",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "(cogs / revenue)",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "(dividends_paid / net_income)",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "(dna / revenue)",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "(operating_income + dna)",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "(operating_income / revenue)[FY2019] - (operating_income / revenue)[FY2018]",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "(revenue / avg(total_assets[t-1], total_assets))",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "(revenue[FY2022] / revenue[FY2020])^(1/2) - 1",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "accounts_payable",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "accounts_receivable",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "cfo",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "cogs",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "current_assets",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "current_liabilities",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "inventory",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "mean over FY2015..FY2017 of (net_income / revenue)",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "mean over FY2016..FY2018 of (cogs / revenue)",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "mean over FY2017..FY2019 of (capex / revenue)",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "mean over FY2018..FY2020 of ((operating_income + dna) / revenue)",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "mean over FY2018..FY2020 of (capex / revenue)",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "mean over FY2019..FY2021 of (operating_income / revenue)",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "net_income",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "operating_income[FY2016] / operating_income[FY2015] - 1",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "ppe_net[FY2021] - ppe_net[FY2020]",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "revenue[FY2017] / revenue[FY2016] - 1",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "revenue[FY2020] / revenue[FY2019] - 1",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                },
+                {
+                  "group": "total_assets",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0182,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "financebench_id_04302",
+            "first_items": 29,
+            "second_items": 29,
+            "first_mean": 0.896552,
+            "second_mean": 1.0,
+            "full_mean": 0.948276,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 0.896552, second 1.0, full 0.948276"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_result",
+          "role_reason": "the engine's answers; abstentions are not scored here",
+          "source": "answers",
+          "split_ran": true,
+          "favours": "neither"
+        }
+      ]
+    },
     "data/forecastbench_restatement.json": {
       "status": "aggregate_without_rows",
       "reason": "the same forecasts as reliability bins only",
@@ -4620,6 +5619,1800 @@
           "source": "by_phase",
           "split_ran": false,
           "favours": "neither"
+        }
+      ]
+    },
+    "data/general_abstention_comparison.json": {
+      "status": "aggregate_without_rows",
+      "reason": "470 settled leans reduced to risk-coverage curves and AURC per scorer; eval/general_abstention_comparison.py would need to record each lean's score per arm",
+      "sha256": "b3ea07e1fcb9d0a2947c2cce541607c27774c5ef30fd0c9aeda38a0ffa8359c7",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/general_arb_comparison.json": {
+      "status": "checked",
+      "reason": "one row per two-sided book snapshot, design and held-out",
+      "sha256": "7a5a1662224f62ec75b441f8735e5a7a6378cf127833c281b9f49063ac697ff7",
+      "flagged": true,
+      "headlines": [
+        {
+          "name": "exact net walk vs NetworkX's Bellman-Ford cycle test",
+          "headline": "(ARGUS right) - (rival right) against the monetisable truth",
+          "orientation": "positive = ARGUS right where the rival was wrong",
+          "items": 400,
+          "micro_mean": 0.0,
+          "total": 0.0,
+          "broken_down": true,
+          "flags": [
+            "single_group:phase=rth"
+          ],
+          "flagged": true,
+          "tables": [
+            {
+              "key": "ticker",
+              "groups": 80,
+              "micro_mean": 0.0,
+              "macro_mean": 0.0,
+              "direction": 0,
+              "largest_contributor": null,
+              "largest_share_of_total": null,
+              "total_without_largest": null,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "the headline has no direction, so no group can carry it",
+              "per_group": [
+                {
+                  "group": "AAOI",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "AAPL",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "ABNB",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "ADBE",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "AEHR",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMAT",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMD",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "APLD",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "APP",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "ARM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "ASML",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "ASTS",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "AVGO",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "AXTI",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "BABA",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "BE",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "COHR",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "CRCL",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "CRWD",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "CRWV",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "CSCO",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "DDOG",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "DELL",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "DRAM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "EWY",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "FUTU",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "GLW",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "HOOD",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "IBM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "INTC",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "IONQ",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "IREN",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "ISRG",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "IWM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "KO",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "LITE",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "LMT",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "LRCX",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "MARA",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "MELI",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "MRVL",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTR",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "MU",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "NBIS",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "NOW",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "ONDS",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "ORCL",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "PDD",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "PLTR",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "QCOM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "QQQ",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "RKLB",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "SGOV",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "SKHY",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "SMH",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "SNDK",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "SNOW",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "SOFI",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "SONY",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "SOXS",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "SOXX",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "SPCX",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "SPY",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "SQQQ",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "STRC",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "TEM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "TLT",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "TQQQ",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "TTWO",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "VOO",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "VRT",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "WDC",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "phase",
+              "groups": 1,
+              "micro_mean": 0.0,
+              "macro_mean": 0.0,
+              "direction": 0,
+              "largest_contributor": null,
+              "largest_share_of_total": null,
+              "total_without_largest": null,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": true,
+              "macro_disagrees": false,
+              "reading": "the headline has no direction, so no group can carry it",
+              "per_group": [
+                {
+                  "group": "rth",
+                  "rows": 400,
+                  "weight": 400.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "design snapshots vs held-out snapshots",
+            "cut": "",
+            "first_items": 240,
+            "second_items": 160,
+            "first_mean": 0.0,
+            "second_mean": 0.0,
+            "full_mean": 0.0,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "design snapshots vs held-out snapshots: both halves point the same way as the full sample \u2014 first 0.0, second 0.0, full 0.0"
+          },
+          "split_half_note": "halves as the artefact recorded them",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the general-purpose rival on the same books",
+          "source": "per_snapshot",
+          "split_ran": true,
+          "favours": "neither"
+        },
+        {
+          "name": "the deployed decomposition against the truth",
+          "headline": "(deployed path right) - 1 against the monetisable truth",
+          "orientation": "0 = right, -1 = wrong",
+          "items": 400,
+          "micro_mean": -0.1825,
+          "total": -73.0,
+          "broken_down": true,
+          "flags": [
+            "single_group:phase=rth"
+          ],
+          "flagged": true,
+          "tables": [
+            {
+              "key": "ticker",
+              "groups": 80,
+              "micro_mean": -0.1825,
+              "macro_mean": -0.1825,
+              "direction": -1,
+              "largest_contributor": "COIN",
+              "largest_share_of_total": 0.0685,
+              "total_without_largest": -68.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single ticker carries the headline: without the largest contributor (COIN, 6.8% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "COIN",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -5.0,
+                  "mean": -1.0,
+                  "share_of_total": 0.0685,
+                  "opposing": 0
+                },
+                {
+                  "group": "HOOD",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -5.0,
+                  "mean": -1.0,
+                  "share_of_total": 0.0685,
+                  "opposing": 0
+                },
+                {
+                  "group": "ORCL",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -5.0,
+                  "mean": -1.0,
+                  "share_of_total": 0.0685,
+                  "opposing": 0
+                },
+                {
+                  "group": "PDD",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -5.0,
+                  "mean": -1.0,
+                  "share_of_total": 0.0685,
+                  "opposing": 0
+                },
+                {
+                  "group": "AVGO",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -4.0,
+                  "mean": -0.8,
+                  "share_of_total": 0.0548,
+                  "opposing": 0
+                },
+                {
+                  "group": "FUTU",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -4.0,
+                  "mean": -0.8,
+                  "share_of_total": 0.0548,
+                  "opposing": 0
+                },
+                {
+                  "group": "MELI",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -4.0,
+                  "mean": -0.8,
+                  "share_of_total": 0.0548,
+                  "opposing": 0
+                },
+                {
+                  "group": "BABA",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -3.0,
+                  "mean": -0.6,
+                  "share_of_total": 0.0411,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTR",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -3.0,
+                  "mean": -0.6,
+                  "share_of_total": 0.0411,
+                  "opposing": 0
+                },
+                {
+                  "group": "TTWO",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -3.0,
+                  "mean": -0.6,
+                  "share_of_total": 0.0411,
+                  "opposing": 0
+                },
+                {
+                  "group": "VRT",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -3.0,
+                  "mean": -0.6,
+                  "share_of_total": 0.0411,
+                  "opposing": 0
+                },
+                {
+                  "group": "AAOI",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -2.0,
+                  "mean": -0.4,
+                  "share_of_total": 0.0274,
+                  "opposing": 0
+                },
+                {
+                  "group": "ABNB",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -2.0,
+                  "mean": -0.4,
+                  "share_of_total": 0.0274,
+                  "opposing": 0
+                },
+                {
+                  "group": "AEHR",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -2.0,
+                  "mean": -0.4,
+                  "share_of_total": 0.0274,
+                  "opposing": 0
+                },
+                {
+                  "group": "CRCL",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -2.0,
+                  "mean": -0.4,
+                  "share_of_total": 0.0274,
+                  "opposing": 0
+                },
+                {
+                  "group": "LMT",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -2.0,
+                  "mean": -0.4,
+                  "share_of_total": 0.0274,
+                  "opposing": 0
+                },
+                {
+                  "group": "ONDS",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -2.0,
+                  "mean": -0.4,
+                  "share_of_total": 0.0274,
+                  "opposing": 0
+                },
+                {
+                  "group": "SNOW",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -2.0,
+                  "mean": -0.4,
+                  "share_of_total": 0.0274,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMAT",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "APLD",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "APP",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "ARM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "AXTI",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "CRWD",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "IBM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "IONQ",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "ISRG",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "IWM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "MARA",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "NOW",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "SOFI",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "SQQQ",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "TLT",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -1.0,
+                  "mean": -0.2,
+                  "share_of_total": 0.0137,
+                  "opposing": 0
+                },
+                {
+                  "group": "AAPL",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "ADBE",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMD",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "ASML",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "ASTS",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "BE",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "COHR",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "CRWV",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "CSCO",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "DDOG",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "DELL",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "DRAM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "EWY",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "GLW",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "INTC",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "IREN",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "KO",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "LITE",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "LRCX",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "MRVL",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "MU",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "NBIS",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "PLTR",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "QCOM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "QQQ",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "RKLB",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "SGOV",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "SKHY",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "SMH",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "SNDK",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "SONY",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "SOXS",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "SOXX",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "SPCX",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "SPY",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "STRC",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "TEM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "TQQQ",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSM",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "VOO",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "WDC",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "phase",
+              "groups": 1,
+              "micro_mean": -0.1825,
+              "macro_mean": -0.1825,
+              "direction": -1,
+              "largest_contributor": null,
+              "largest_share_of_total": null,
+              "total_without_largest": null,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": true,
+              "macro_disagrees": false,
+              "reading": "the whole headline is one phase (rth)",
+              "per_group": [
+                {
+                  "group": "rth",
+                  "rows": 400,
+                  "weight": 400.0,
+                  "total": -73.0,
+                  "mean": -0.1825,
+                  "share_of_total": 1.0,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "design snapshots vs held-out snapshots",
+            "cut": "",
+            "first_items": 240,
+            "second_items": 160,
+            "first_mean": -0.204167,
+            "second_mean": -0.15,
+            "full_mean": -0.1825,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "design snapshots vs held-out snapshots: both halves point the same way as the full sample \u2014 first -0.204167, second -0.15, full -0.1825"
+          },
+          "split_half_note": "halves as the artefact recorded them",
+          "notes": [],
+          "role": "argus_result",
+          "role_reason": "what the desk runs, which the artefact records false accepts for",
+          "source": "per_snapshot",
+          "split_ran": true,
+          "favours": "neither"
+        }
+      ]
+    },
+    "data/general_coint_comparison.json": {
+      "status": "aggregate_without_rows",
+      "reason": "160 simulated universes reduced to FDR, FWER and power per pipeline; eval/general_coint_comparison.py would need to record each universe's discoveries",
+      "sha256": "e3ad80222016741c5325196e2f31f1d9105f6747bf5cd3d4ec7634e347200259",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/general_grammar_comparison.json": {
+      "status": "designed_cases",
+      "reason": "15 designed ill-typed expressions, 39 operator checks on one symbol's series and eight designed factors: properties of the grammar on chosen inputs",
+      "sha256": "08e473947b72bc0420da89452bb9cf8bcb370418e3797e0e9e1eef74f473ec0f",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/general_overfitgates_comparison.json": {
+      "status": "aggregate_without_rows",
+      "reason": "1,332 gate calls reduced to grade counts per arm and tier; eval/general_overfitgates_comparison.py would need to record each call's grade",
+      "sha256": "bb0a567c0bf1e3e2fefb922669859a59d700a79633f64784c3f94d7efbaaea3e",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/general_rotation_comparison.json": {
+      "status": "designed_cases",
+      "reason": "36 designed contract cases for the breadth-rotation inputs",
+      "sha256": "9b90b1db07bdbeaa764cff960f9f6078c0560bf08f63c31a6c0a4480b2afe1e4",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/general_sue_comparison.json": {
+      "status": "checked",
+      "reason": "one row per real anchor symbol",
+      "sha256": "0e705b23c73db3bd190e5170b1a0756a0e28b0c08aac6bf136f988976e0f86fd",
+      "flagged": false,
+      "headlines": [
+        {
+          "name": "SUE: dated alignment answers where pandas' lenient period index refuses",
+          "headline": "(ARGUS answers) - (pandas answers) per anchor",
+          "orientation": "+1 = only ARGUS aligned the filings, 0 = both did",
+          "items": 9,
+          "micro_mean": 0.222222,
+          "total": 2.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "symbol",
+              "groups": 9,
+              "micro_mean": 0.222222,
+              "macro_mean": 0.222222,
+              "direction": 1,
+              "largest_contributor": "AAPL",
+              "largest_share_of_total": 0.5,
+              "total_without_largest": 1.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single symbol carries the headline: without the largest contributor (AAPL, 50.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "AAPL",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.5,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.5,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTR",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the general-purpose rival on the same filings",
+          "source": "alignment.anchor_detail",
+          "split_ran": false,
+          "favours": "argus"
         }
       ]
     },
@@ -4825,6 +7618,20 @@
       "flagged": false,
       "headlines": []
     },
+    "data/lui_rematch.json": {
+      "status": "aggregate_without_rows",
+      "reason": "per-question router predictions are recomputed from the live router and not kept (Rasa's are in data/lui_rematch_rasa_predictions.json); eval/lui_rematch.py would need to record ARGUS's per-question labels",
+      "sha256": "471bcd47a7a7cc1be9855c1fef531fd91f8966db57130cdef131e68db6e3d529",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/lui_rematch_inputs.json": {
+      "status": "no_rows",
+      "reason": "the rematch's frozen inputs: questions and labels, no result",
+      "sha256": "141bacadf2aff3fa334795d0a3829a0f63bea7d5d7b075b20dc15832ef50e27c",
+      "flagged": false,
+      "headlines": []
+    },
     "data/mandate_comparison.json": {
       "status": "designed_cases",
       "reason": "eleven designed boundary scenarios and a 19,440-scenario grid reduced to counts",
@@ -4845,6 +7652,309 @@
       "sha256": "a61a8c73f4dbcbec5b6a25c34cccf7f8c6d00b9f52b0de8e2a42b9ff651786c2",
       "flagged": false,
       "headlines": []
+    },
+    "data/nco_bakeoff.json": {
+      "status": "checked",
+      "reason": "one row per held-out walk-forward window per allocator",
+      "sha256": "a4020f710f2351e90c5b5ec83ba6fd7370bbfcbd7f62add1103b8c220abd62a6",
+      "flagged": true,
+      "headlines": [
+        {
+          "name": "held-out volatility: ARGUS's pick vs riskfolio_nco[hist,single]",
+          "headline": "mean log(rival realised vol / ARGUS realised vol) over held-out windows",
+          "orientation": "positive = ARGUS's allocation was calmer",
+          "items": 20,
+          "micro_mean": 0.622601,
+          "total": 12.452016,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "holdout_half",
+              "groups": 2,
+              "micro_mean": 0.622601,
+              "macro_mean": 0.622601,
+              "direction": 1,
+              "largest_contributor": "second",
+              "largest_share_of_total": 0.5159,
+              "total_without_largest": 6.027757,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single holdout_half carries the headline: without the largest contributor (second, 51.6% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "second",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": 6.424259,
+                  "mean": 0.642426,
+                  "share_of_total": 0.5159,
+                  "opposing": 0
+                },
+                {
+                  "group": "first",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": 6.027757,
+                  "mean": 0.602776,
+                  "share_of_total": 0.4841,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "00002784",
+            "first_items": 10,
+            "second_items": 10,
+            "first_mean": 0.602776,
+            "second_mean": 0.642426,
+            "full_mean": 0.622601,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 0.602776, second 0.642426, full 0.622601"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the bake-off's decisive comparison, picked on the selection period",
+          "source": "holdout.results.*.oos_vol_bps",
+          "split_ran": true,
+          "favours": "argus"
+        },
+        {
+          "name": "held-out volatility: ARGUS's pick vs riskfolio_minvar[hist]",
+          "headline": "mean log(rival realised vol / ARGUS realised vol) over held-out windows",
+          "orientation": "positive = ARGUS's allocation was calmer",
+          "items": 20,
+          "micro_mean": 4e-06,
+          "total": 7.7e-05,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "holdout_half",
+              "groups": 2,
+              "micro_mean": 4e-06,
+              "macro_mean": 4e-06,
+              "direction": 1,
+              "largest_contributor": "second",
+              "largest_share_of_total": 0.6648,
+              "total_without_largest": 2.6e-05,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.5,
+                ">3": 0.5
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single holdout_half carries the headline: without the largest contributor (second, 66.5% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "second",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": 5.1e-05,
+                  "mean": 5e-06,
+                  "share_of_total": 0.6648,
+                  "opposing": 4
+                },
+                {
+                  "group": "first",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": 2.6e-05,
+                  "mean": 3e-06,
+                  "share_of_total": 0.3352,
+                  "opposing": 3
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "00002784",
+            "first_items": 10,
+            "second_items": 10,
+            "first_mean": 3e-06,
+            "second_mean": 5e-06,
+            "full_mean": 4e-06,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 3e-06, second 5e-06, full 4e-06"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the bake-off's decisive comparison, picked on the selection period",
+          "source": "holdout.results.*.oos_vol_bps",
+          "split_ran": true,
+          "favours": "argus"
+        },
+        {
+          "name": "held-out volatility: ARGUS's pick vs skfolio_nco[default]",
+          "headline": "mean log(rival realised vol / ARGUS realised vol) over held-out windows",
+          "orientation": "positive = ARGUS's allocation was calmer",
+          "items": 20,
+          "micro_mean": 0.051527,
+          "total": 1.030548,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "holdout_half",
+              "groups": 2,
+              "micro_mean": 0.051527,
+              "macro_mean": 0.051527,
+              "direction": 1,
+              "largest_contributor": "second",
+              "largest_share_of_total": 0.9859,
+              "total_without_largest": 0.014503,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 1.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single holdout_half carries the headline: without the largest contributor (second, 98.6% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "second",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": 1.016046,
+                  "mean": 0.101605,
+                  "share_of_total": 0.9859,
+                  "opposing": 5
+                },
+                {
+                  "group": "first",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": 0.014503,
+                  "mean": 0.00145,
+                  "share_of_total": 0.0141,
+                  "opposing": 6
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "00002784",
+            "first_items": 10,
+            "second_items": 10,
+            "first_mean": 0.00145,
+            "second_mean": 0.101605,
+            "full_mean": 0.051527,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 0.00145, second 0.101605, full 0.051527"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the bake-off's decisive comparison, picked on the selection period",
+          "source": "holdout.results.*.oos_vol_bps",
+          "split_ran": true,
+          "favours": "argus"
+        },
+        {
+          "name": "held-out volatility: ARGUS's pick vs skfolio_nco[cv=ignore]",
+          "headline": "mean log(rival realised vol / ARGUS realised vol) over held-out windows",
+          "orientation": "positive = ARGUS's allocation was calmer",
+          "items": 20,
+          "micro_mean": 0.050802,
+          "total": 1.016032,
+          "broken_down": true,
+          "flags": [
+            "carried_by_one_group:holdout_half=second",
+            "flips_across_halves:chronological halves"
+          ],
+          "flagged": true,
+          "tables": [
+            {
+              "key": "holdout_half",
+              "groups": 2,
+              "micro_mean": 0.050802,
+              "macro_mean": 0.050802,
+              "direction": 1,
+              "largest_contributor": "second",
+              "largest_share_of_total": 1.0143,
+              "total_without_largest": -0.014494,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 1.0
+              },
+              "carried_by_one_group": true,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "second carries the headline: without it the other 1 holdout_half group(s) total -0.014494, which does not point the same way",
+              "per_group": [
+                {
+                  "group": "second",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": 1.030527,
+                  "mean": 0.103053,
+                  "share_of_total": 1.0143,
+                  "opposing": 5
+                },
+                {
+                  "group": "first",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": -0.014494,
+                  "mean": -0.001449,
+                  "share_of_total": -0.0143,
+                  "opposing": 6
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "00002784",
+            "first_items": 10,
+            "second_items": 10,
+            "first_mean": -0.001449,
+            "second_mean": 0.103053,
+            "full_mean": 0.050802,
+            "flips_across_halves": true,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: the halves disagree \u2014 first -0.001449, second 0.103053 (full 0.050802)"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the bake-off's decisive comparison, picked on the selection period",
+          "source": "holdout.results.*.oos_vol_bps",
+          "split_ran": true,
+          "favours": "argus"
+        }
+      ]
     },
     "data/overfit_gates.json": {
       "status": "checked",
@@ -9017,6 +12127,13 @@
       "flagged": false,
       "headlines": []
     },
+    "data/review_rivals.json": {
+      "status": "aggregate_without_rows",
+      "reason": "40 seeds a cell reduced to false-admission and power rates per rule learner; eval/review_rivals.py would need to record each seed's outcome",
+      "sha256": "f4432ea7ac745b5faad8489ad2605a88728946e940880642ee8c9f0cdbf3c648",
+      "flagged": false,
+      "headlines": []
+    },
     "data/risk_layer_comparison.json": {
       "status": "checked",
       "reason": "per-checkpoint rows regenerated from the frozen candle fixture",
@@ -10063,7 +13180,7 @@
     "data/skill_matrix.json": {
       "status": "checked",
       "reason": "one row per tool",
-      "sha256": "09a3d5a62c54961ef73b9e8d0cbbb4184610987ff773bcbd2ccf462cd25ccd6f",
+      "sha256": "340da1e4c379033d314343a5d7e902065fedb95e9f356fc360d8f9b007a5f5f6",
       "flagged": true,
       "headlines": [
         {
@@ -11790,6 +14907,13 @@
       "status": "designed_cases",
       "reason": "a source-breadth count and one point-in-time boundary on one fact",
       "sha256": "daaeeed9d65cc4c1483019d1490a02cc7151667356cbf05547d6c47c9c3fd210",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/xa_arena.json": {
+      "status": "aggregate_without_rows",
+      "reason": "hourly net asset values reduced to per-period scores per arm; eval/xa_arena.py would need to record each arm's hourly return path",
+      "sha256": "1619a24d5c07f3c228555e296bbf40317718c86083bffcd888a5f7fecd408ced",
       "flagged": false,
       "headlines": []
     }

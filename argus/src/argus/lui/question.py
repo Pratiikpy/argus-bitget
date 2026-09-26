@@ -594,10 +594,77 @@ SCORED_METRIC = (r"\b(?:your|the\s+desk'?s|its|our)\s+(?:\w+\s+){0,2}(?:sharpe|s
                  r"hit\s*rate|max(?:imum)?\s+drawdown|(?:biggest|largest|worst)\s+loss)\b")
 """A scored number asked of the desk by name. "What's your win rate" was relabelled calibration by
 the n-gram model at 0.15 and "what's your biggest loss" a decision at 0.19 (2026-09-25 audit)."""
-DECISIVE_PATTERNS: frozenset[str] = frozenset({TRACK_RECORD, SCORED_METRIC, EVER_TRADED})
-"""Patterns that name exactly what is asked, so the n-gram model may not relabel a question they
-matched (`lui/ngram.reclassify`). "What is your track record? How many trades have you made?" was
+_DECISIVE_ENGLISH: frozenset[str] = frozenset({TRACK_RECORD, SCORED_METRIC, EVER_TRADED})
+"""English patterns that name exactly what is asked (the full set, with the Chinese ones, is
+:data:`DECISIVE_PATTERNS`). "What is your track record? How many trades have you made?" was
 relabelled a decision list by the model, which weighs the second sentence's words."""
+
+# --- The record in a trader's own words (2026-09-26) ------------------------------------------
+#
+# Each is a *family* of phrasings for one kind, not a sentence: found by scoring a blind set of
+# record questions (`data/lui_record_intents_2026-09-26_tune.jsonl`; its other half is held out),
+# where these families were answered with the wrong kind, usually because the n-gram model
+# relabelled a question no pattern claimed. They are decisive (:data:`DECISIVE_PATTERNS`): the model
+# may not relabel a question one of them matched.
+STAND_ASIDE_IDIOMS = (
+    r"\b(?:hold(?:ing)?\s+off|held\s+off|on\s+the\s+(?:bench|sidelines?)|sidelined|inaction|"
+    r"s[ai]t(?:ting)?\s+(?:it\s+)?out|stay(?:ed|ing)?\s+(?:out|away)|"
+    r"avoid(?:ed|ing)?\s+(?:getting\s+)?(?:involved|the\s+trade)|"
+    r"no\s+(?:action|moves?|trades?)\s+(?:on|in|for)|"
+    r"(?:why|y|how\s+come)\s+(?:are|were|is)\s+(?:we|you|the\s+desk)\s+(?:still\s+)?flat)\b")
+WHAT_THE_DESK_SAW = (
+    r"\bwhat\s+(?:\w+\s+){0,3}(?:was|were|did)\s+(?:the\s+desk|we|you|the\s+model|it)\s+"
+    r"(?:watching|seeing|looking\s+at|know|reading|use|using|review\w*|have\s+access\s+to)\b|"
+    r"\b(?:information|info|data\s+points?|data|inputs?|sources?|indicators?|signals?|news)\b"
+    r"[^?]{0,30}\b(?:support\w*|drove|driv\w*|fed|behind|went\s+into|informed|factored\s+in\w*|"
+    r"reviewed)\b|\binformation\s+set\b|\bevidentiary\b")
+CONFIDENCE_CHECKED = (
+    r"\bover[\s-]?confident\b|\bhigh[\s-]conviction\b|\bconviction\b[^?]{0,40}\b(?:pan|track|"
+    r"match|hold|right|wrong)\w*|\bas\s+(?:sure|confident|certain)\s+as\b|\b(?:low|high)[\s-]confidence\s+(?:decisions?|calls?|"
+    r"trades?)\b|\bstated\s+(?:certainty|confidence|conviction)\b|\bconfidence\b[^?]{0,25}\bmatch\w*")
+RECORD_ALTERED = (
+    r"\b(?:authentic\w*|genuine)\b[^?]{0,30}\b(?:log|record|ledger)\b|"
+    r"\b(?:log|record|ledger)\b[^?]{0,30}\b(?:authentic\w*|genuine)\b|"
+    r"\b(?:modifi\w*|rewr(?:ite|itten|ote)|delet\w*|alter\w*|retroactiv\w*|unmodified|tamper\w*)\b"
+    r"[^?]{0,60}\b(?:log|record|entr(?:y|ies)|ledger|decisions?|history|fact)\b|"
+    r"\b(?:log|record|entr(?:y|ies)|ledger|decision)\b[^?]{0,60}\b(?:modifi\w*|rewr(?:ite|itten|ote)|"
+    r"delet\w*|alter\w*|retroactiv\w*|unmodified|tamper\w*)")
+TRADING_DAY = (
+    r"\b(?:pre[\s-]?market|after[\s-]?hours|regular\s+(?:trading\s+)?hours|minutes?\s+(?:to|until|"
+    r"till)\s+(?:the\s+)?(?:close|open|bell)|trading\s+day|market\s+holiday|holiday|trading\s+resumes?|resume\s+trading|"
+    r"exchange\s+(?:open|closed)|(?:is|are)\s+(?:the\s+)?(?:exchange|markets?)\s+(?:open|closed))\b")
+WIN_RATE_OR_BENCHMARK = (
+    r"\bhow\s+much\s+(?:did|have)\s+(?:we|you|the\s+desk)\s+(?:lose|lost|make|made|earn\w*|"
+    r"gain\w*|win|won)\b|\bperformance\s+recap\b|\bequity\s+curve\b|\bwin\s*rate\b|\bbeat(?:ing)?\s+(?:buy[\s-]and[\s-]hold|the\s+market|the\s+benchmark|"
+    r"(?:just\s+)?holding)\b")
+THE_DECISION_LOG = (
+    r"\b(?:list|show)\s+(?:me\s+)?(?:all\s+(?:of\s+)?(?:the\s+)?(?:decisions|calls|trades)|"
+    r"every\s+(?:single\s+)?(?:decision|call|trade))\b|"
+    r"\bdecision\s+history\b|\beverything\s+(?:the\s+desk|we|you|it)\s+(?:did|decided)\b|"
+    r"\beverything\s+decided\b|\bcalls\s+made\b|\ball\s+the\s+decisions\b|"
+    r"\bdecision\s+log\b|\bwhat\s+did\s+(?:we|you|the\s+desk)\s+decide\b(?![^?]*\bwhy\b)|"
+    r"\bacross\s+all\s+(?:tickers|names|symbols)\b")
+WHY_WE_ACTED = (
+    r"\b(?:why|y|how\s+come)\s+did\s+(?:we|you|the\s+desk)\s+(?:close|open|short|long|buy|sell|"
+    r"exit|enter|trim|cut|add|flip|go\s+(?:long|short))\w*\b|\bexplain\s+(?:that|the|this)\s+"
+    r"(?:\w+\s+){0,2}(?:trade|call|decision|position)\b")
+STILL_IN_IT = (
+    r"\bare\s+we\s+still\s+in\s+(?:the|that|our)\s+(?:\w+\s+)?(?:trade|position)\b|"
+    # "why are we flat" asks why the desk stood aside; the stand-aside patterns answer it
+    r"(?<!why )(?<!y )\bare\s+we\s+(?:currently\s+|still\s+|now\s+)?(?:long|short|flat)\b|"
+    r"\b(?:the|our)\s+book\s+look\w*\b|\bwhat'?s\s+on\s+(?:the|our)\s+book\b|"
+    r"\b(?:our|the\s+desk'?s)\s+(?:current\s+)?exposure\b")
+RECORD_IDIOMS: tuple[tuple[str, Intent], ...] = (
+    (STAND_ASIDE_IDIOMS, Intent.ABSTENTION_WHY),
+    (STILL_IN_IT, Intent.POSITION),
+    (RECORD_ALTERED, Intent.INTEGRITY),
+    (CONFIDENCE_CHECKED, Intent.CALIBRATION),
+    (WHAT_THE_DESK_SAW, Intent.EVIDENCE),
+    (TRADING_DAY, Intent.SESSION),
+    (WIN_RATE_OR_BENCHMARK, Intent.PERFORMANCE),
+    (THE_DECISION_LOG, Intent.DECISION_LIST),
+    (WHY_WE_ACTED, Intent.DECISION_WHY),
+)
 
 _MY_HOLDINGS = re.compile(r"\bmy\s+(?:\w+\s+){0,2}(?:book|portfolio|holdings|positions?|"
                           r"stack|bag|allocation|account)\b|\bwhat'?s\s+my\s+(?:max(?:imum)?\s+)?"
@@ -630,6 +697,7 @@ _PATTERNS: tuple[tuple[str, Intent], ...] = (
      r"(?:keep|repeat)\w*|iterate\s+(?:on\s+)?(?:the|your)\s+(?:research\s+)?"
      r"(?:framework|process))\b",
      Intent.REVIEW),
+    *RECORD_IDIOMS,
     # The stems matter. "no trade" does not match "no trades" — there is no word boundary between
     # "e" and "s" — and "didn't trade" does not match "didn't you trade", because the words are
     # not adjacent. Both were real misses found by the phrasing corpus.
@@ -891,7 +959,8 @@ _CHINESE_PATTERNS: tuple[tuple[str, Intent], ...] = (
     # 还是 is what makes it a question about a total rather than a report of a direction.
     (r"(?:亏|赔|跌).{0,4}还是.{0,4}(?:赚|挣|赢|涨)|(?:赚|挣|赢|涨).{0,4}还是.{0,4}(?:亏|赔|跌)",
      Intent.PERFORMANCE),
-    (r"(?:校准|准确率|预测.{0,4}准|置信度.{0,6}(?:准确|可靠))", Intent.CALIBRATION),
+    (r"(?:校准|准确率|预测.{0,4}准|置信度.{0,6}(?:准确|可靠)|过度自信|把握.{0,12}准不准|"
+     r"信心.{0,8}(?:吻合|匹配|对得上))", Intent.CALIBRATION),
     # `完整` not `完整性`: "账本完整吗" (is the ledger intact) is the plainest way to ask this and
     # the noun form missed it. Found by driving the console in Chinese, not by reading the list.
     # **`完整` is anchored to the record, because on its own it means "complete", not "unaltered".**
@@ -900,7 +969,9 @@ _CHINESE_PATTERNS: tuple[tuple[str, Intent], ...] = (
     # answered with a chain-verification report instead of the log. The other tokens here name the
     # record or an attack on it and need no anchor; this one is an ordinary adjective.
     (r"(?:篡改|被改|哈希|散列|可验证|审计|账本|记录.{0,4}可信)|"
-     r"(?:账本|日志|记录|链|数据).{0,6}完整|完整.{0,4}(?:性|吗|么)",
+     r"(?:账本|日志|记录|链|数据).{0,6}完整|完整.{0,4}(?:性|吗|么)|"
+     r"(?:记录|账本|日志|决策).{0,8}(?:修改|改动|删除|删改|改过|动过手脚)|"
+     r"(?:修改|改动|删除|删改|改过).{0,8}(?:记录|账本|日志)",
      Intent.INTEGRITY),
     # **An imperative about a position is an order, and must be caught before the noun is.**
     # ``平掉所有仓位`` ("close all positions") reached POSITION, because the positions pattern
@@ -909,13 +980,18 @@ _CHINESE_PATTERNS: tuple[tuple[str, Intent], ...] = (
     # as a question, and it was found only by sweeping the Chinese half of a generated corpus.
     # The interrogative guard is the same one the main order pattern carries, so ``要不要平仓``
     # stays a question.
-    (r"^(?!.*(?:为何|为什么|理由|原因|凭啥|思路|逻辑|解释|要不要|该不该|吗|呢|\?|？))"
-     r".*?(?:平掉|平仓|清掉|清仓|了结)(?:所有|全部|一半)?(?:的)?(?:仓位|持仓|头寸)?",
+    # 卖掉 / 买入 with 帮我 ("sell half my NVDA for me") is the same imperative; 怎么 / 如何 mark a
+    # question about how to execute, which the execution engine answers.
+    (r"^(?!.*(?:为何|为什么|理由|原因|凭啥|思路|逻辑|解释|要不要|该不该|怎么|如何|吗|呢|\?|？))"
+     r".*?(?:平掉|平仓|清掉|清仓|了结|帮我(?:卖掉|卖出|买入|买进|加仓|减仓))(?:所有|全部|一半)?"
+     r"(?:的)?(?:仓位|持仓|头寸)?",
      Intent.ORDER),
-    (r"(?:持仓|仓位|头寸|现在持有|有没有开仓)", Intent.POSITION),
-    (r"(?:证据|依据|消息面|公告|新闻|财报|看到了什么)", Intent.EVIDENCE),
-    (r"(?:开盘|收盘|交易时段|盘前|盘后|休市|多久.{0,6}开市)", Intent.SESSION),
-    (r"(?:做了什么|有哪些决定|决策列表|都决定了什么|总结一下|复盘)", Intent.DECISION_LIST),
+    (r"(?:持仓|仓位|头寸|现在持有|有没有开仓|本子上|账上有|敞口)", Intent.POSITION),
+    (r"(?:证据|依据|消息面|公告|新闻|财报|看到了什么|基于什么|根据什么|参考了?(?:哪些|什么))",
+     Intent.EVIDENCE),
+    (r"(?:开盘|收盘|交易时段|盘前|盘后|休市|多久.{0,6}开市|时段)", Intent.SESSION),
+    (r"(?:做了什么|(?:做了|有)哪些(?:决定|决策|操作)|决策(?:列表|汇总)|都决定了什么|总结一下|复盘|"
+     r"(?:都|全部)列出来)", Intent.DECISION_LIST),
     # An instruction, not a question. Refused by name in Chinese exactly as in English: an
     # interface that quietly reads an imperative as a query is more dangerous than one that
     # plainly declines.
@@ -940,6 +1016,20 @@ _CHINESE_PATTERNS: tuple[tuple[str, Intent], ...] = (
 _CHINESE_COMPILED: tuple[tuple[re.Pattern[str], Intent], ...] = tuple(
     (re.compile(p), i) for p, i in _CHINESE_PATTERNS
 )
+
+DECISIVE_PATTERNS: frozenset[str] = (
+    _DECISIVE_ENGLISH
+    | frozenset(p for p, _ in RECORD_IDIOMS)
+    | frozenset(p for p, _ in _CHINESE_PATTERNS)
+)
+"""Patterns the n-gram model may not relabel (`lui/ngram.reclassify`).
+
+**Every Chinese pattern is one.** On a blind set of questions about the desk's own record written
+on 2026-09-26 (`data/lui_record_intents_2026-09-26_tune.jsonl`), the model overruled Chinese
+pattern matches that were right: "为什么今早选择观望" (why stand aside this morning) matched the
+abstention pattern and was relabelled a decision question, "今天的判断依据是什么消息面信息" matched
+the evidence pattern and was relabelled the same. The Chinese patterns are anchored on words that
+carry the intent (观望, 依据, 收盘), and the model was trained mostly on English wording."""
 
 HAN = re.compile(r"[一-鿿]")
 

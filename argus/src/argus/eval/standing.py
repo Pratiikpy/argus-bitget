@@ -4928,8 +4928,11 @@ REGISTER: tuple[Capability, ...] = (
                     "every comparison; ARGUS's own NCO is compared against Riskfolio's real NCO "
                     "as a null control (parity, like the HRP parity-twin check), not scored "
                     "with a significance test against it, because the claim is a tie, and a "
-                    "sign test has nothing to say about one",
-                artefact="data/allocation_comparison.json",
+                    "sign test has nothing to say about one. Since 2026-09-26 also the "
+                    "bake-off's per-window held-out volatilities for every pick: exact sign "
+                    "test, Wilcoxon signed-rank, stationary-bootstrap 95% interval, Holm across "
+                    "the family",
+                artefact="data/nco_bakeoff.json",
             ),
             Proof(
                 condition="costs_included",
@@ -4983,6 +4986,21 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "Bake-off, 2026-09-26 (eval/nco_bakeoff.py, data/nco_bakeoff.json; every stage ran, "
+            "López de Prado's own optPort_nco unmodified in an environment pinned to pandas "
+            "2.2.3, which his code needs). Each family — ARGUS, Riskfolio, skfolio — picked its "
+            "configuration on the selection half. On the 20 held-out windows ARGUS's pick "
+            "(sample minimum variance) beats Riskfolio's single-linkage NCO and ties Riskfolio's "
+            "minimum variance and both skfolio NCO variants: overall TIE. Monte Carlo, 120 draws "
+            "each: on de Prado's block-diagonal process every NCO has lower true-variance excess "
+            "than minimum variance (ARGUS's pick worse in 110 of 120 against ARGUS's own NCO), "
+            "and his snippet 7.9 reproduces (NCO lowers weight RMSE against Markowitz in 100 of "
+            "120); on a process calibrated to the real book, Gaussian and Student-t(4), the "
+            "order reverses — minimum variance beats every NCO in 88 to 120 of 120 draws, and "
+            "his NCO's RMSE is worse than Markowitz's in all 120. NCO's gain is real where the "
+            "covariance has block structure and absent on this book, which is why the desk "
+            "keeps minimum variance and the grade stays TIED. This closes the unswept-"
+            "configuration gap named below.",
             "no_specialist_capability_superior is now a TIE, not a FAIL or a PASS — the state "
             "this project's own vocabulary has a name for. ARGUS's own NCO does not beat "
             "Riskfolio's real NCO (8.203bps vs 8.203bps, ratio 1.0000 on the real walk-forward "

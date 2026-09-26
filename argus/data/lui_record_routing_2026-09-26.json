@@ -1,0 +1,161 @@
+{
+ "what": "record-intent routing on a blind set written 2026-09-26 by an agent that never read the router; split by kind with seed 20260926 into a tuning half and a held-out half",
+ "test_sha256": "29e0b17b1bf3efd1600255905c5f2edefae2c6850ac3898200a130feb93a885f",
+ "round_1": {
+  "tune_before": {
+   "correct": 63,
+   "rows": 120,
+   "by_lang": {
+    "en": [
+     55,
+     94
+    ],
+    "zh": [
+     8,
+     26
+    ]
+   }
+  },
+  "tune_after": {
+   "correct": 111,
+   "rows": 120,
+   "by_lang": {
+    "en": [
+     87,
+     94
+    ],
+    "zh": [
+     24,
+     26
+    ]
+   }
+  },
+  "held_out_before": {
+   "correct": 63,
+   "rows": 120,
+   "by_lang": {
+    "en": [
+     47,
+     86
+    ],
+    "zh": [
+     16,
+     34
+    ]
+   }
+  },
+  "held_out_after": {
+   "correct": 79,
+   "rows": 120,
+   "by_lang": {
+    "en": [
+     56,
+     86
+    ],
+    "zh": [
+     23,
+     34
+    ]
+   }
+  }
+ },
+ "note": "the held-out half was scored once after the round-1 changes and is now burned for tuning; a fresh blind set measures round 2; round 1 is in round_1, round 2 in round_2",
+ "research_sets_unchanged": {
+  "blind": "237/240",
+  "heldout": "190/200",
+  "final": "210/240"
+ },
+ "honesty": "73/73 declined with the true reason, 0 false alarms (eval/honesty_eval.py)",
+ "round_2": {
+  "set": "data/lui_record_intents_2026-09-26_round2.jsonl",
+  "set_sha256": "b4241c09c8dcd57531d41af4e90b559800eba02f3008a7a336a1bd465f14dc9f",
+  "before_public_commit_5637fa0": {
+   "correct": 131,
+   "rows": 200,
+   "by_lang": {
+    "en": [
+     106,
+     160
+    ],
+    "zh": [
+     25,
+     40
+    ]
+   }
+  },
+  "after_held_out": {
+   "correct": 147,
+   "rows": 200,
+   "by_lang": {
+    "en": [
+     115,
+     160
+    ],
+    "zh": [
+     32,
+     40
+    ]
+   }
+  },
+  "per_kind_before_after": {
+   "abstention_why": [
+    12,
+    13,
+    20
+   ],
+   "calibration": [
+    16,
+    18,
+    20
+   ],
+   "decision_list": [
+    13,
+    16,
+    20
+   ],
+   "decision_why": [
+    8,
+    12,
+    20
+   ],
+   "evidence": [
+    9,
+    10,
+    20
+   ],
+   "integrity": [
+    14,
+    17,
+    20
+   ],
+   "none": [
+    20,
+    16,
+    20
+   ],
+   "performance": [
+    16,
+    17,
+    20
+   ],
+   "position": [
+    12,
+    13,
+    20
+   ],
+   "session": [
+    11,
+    15,
+    20
+   ]
+  },
+  "newly_wrong_at_measurement": [
+   "Are we heading into a recession?",
+   "we heading into a recession or nah",
+   "我们是不是要进入衰退了？",
+   "Are we heading into a recession, in your model's view?"
+  ],
+  "note": "the four newly wrong questions (the economy's 'we') were fixed after this measurement; any later score on this set is not held out"
+ },
+ "headline": "On a blind 200-question set never used for tuning, record-question routing went from 131 to 147 correct (65.5% to 73.5%); Chinese 25 to 32 of 40. The three research corpora stayed at 237/240, 190/200 and 210/240."
+}

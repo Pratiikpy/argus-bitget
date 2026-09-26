@@ -2676,8 +2676,8 @@
         },
         {
           "condition": "statistically_valid_evaluation",
-          "how": "paired sign test per allocator vs ARGUS's own HRP, Holm correction across every comparison; ARGUS's own NCO is compared against Riskfolio's real NCO as a null control (parity, like the HRP parity-twin check), not scored with a significance test against it, because the claim is a tie, and a sign test has nothing to say about one",
-          "artefact": "data/allocation_comparison.json",
+          "how": "paired sign test per allocator vs ARGUS's own HRP, Holm correction across every comparison; ARGUS's own NCO is compared against Riskfolio's real NCO as a null control (parity, like the HRP parity-twin check), not scored with a significance test against it, because the claim is a tie, and a sign test has nothing to say about one. Since 2026-09-26 also the bake-off's per-window held-out volatilities for every pick: exact sign test, Wilcoxon signed-rank, stationary-bootstrap 95% interval, Holm across the family",
+          "artefact": "data/nco_bakeoff.json",
           "test": ""
         },
         {
@@ -2712,6 +2712,7 @@
         }
       ],
       "blockers": [
+        "Bake-off, 2026-09-26 (eval/nco_bakeoff.py, data/nco_bakeoff.json; every stage ran, L\u00f3pez de Prado's own optPort_nco unmodified in an environment pinned to pandas 2.2.3, which his code needs). Each family \u2014 ARGUS, Riskfolio, skfolio \u2014 picked its configuration on the selection half. On the 20 held-out windows ARGUS's pick (sample minimum variance) beats Riskfolio's single-linkage NCO and ties Riskfolio's minimum variance and both skfolio NCO variants: overall TIE. Monte Carlo, 120 draws each: on de Prado's block-diagonal process every NCO has lower true-variance excess than minimum variance (ARGUS's pick worse in 110 of 120 against ARGUS's own NCO), and his snippet 7.9 reproduces (NCO lowers weight RMSE against Markowitz in 100 of 120); on a process calibrated to the real book, Gaussian and Student-t(4), the order reverses \u2014 minimum variance beats every NCO in 88 to 120 of 120 draws, and his NCO's RMSE is worse than Markowitz's in all 120. NCO's gain is real where the covariance has block structure and absent on this book, which is why the desk keeps minimum variance and the grade stays TIED. This closes the unswept-configuration gap named below.",
         "no_specialist_capability_superior is now a TIE, not a FAIL or a PASS \u2014 the state this project's own vocabulary has a name for. ARGUS's own NCO does not beat Riskfolio's real NCO (8.203bps vs 8.203bps, ratio 1.0000 on the real walk-forward book): it matches it, using an ARGUS-owned implementation rather than a dependency on the library. ARGUS's HRP (the older, simpler allocator, still the module's leaf_order=True default) still loses to both NCO variants decisively \u2014 the tie is specifically ARGUS's own NCO against Riskfolio's, not a claim that every ARGUS allocator matches every Riskfolio one.",
         "The adversarial-covariance sweep (2026-09-22) is a real, measured, reproducible finding and it is NOT counted as a win \u2014 the near-singular family it tests is genuinely ill-posed (no ground truth for what a minimum-variance solve should return there), so 'ARGUS refuses more often' is a documented behavioural difference, not evidence ARGUS's weights are more correct. What it establishes: Riskfolio's real NCO never refuses across the sweep (0/20) and flags its own covariance as untrustworthy every time it proceeds anyway (20/20); ARGUS's nco_weights refuses cleanly on the genuinely singular cases (16/20) rather than returning a number its own math cannot stand behind. Whether that is better for a real user is a judgement about what they want from a tool facing bad input \u2014 an always-an-answer library or a sometimes-refuses one \u2014 not a fact this sweep alone settles, which is why the state stays TIED rather than moving to OWNED on the strength of this one axis.",
         "best_method_studied is not proven beyond reproducing NCO's own default configuration (MinRisk/MV, Ward linkage, two-diff gap statistic for k): NCO's own clustering hyperparameters were not swept for sensitivity, so it is not established that the tie is robust to configuration choices NCO itself exposes.",
@@ -4206,12 +4207,12 @@
     {
       "capability": "Abstention scored as a decision",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/abstention_comparison.json: designed_cases - three designed netting cases and a twelve-point avoided-loss/blocked-upside ratio sweep; no population of real abstentions is scored against the rival; data/general_abstention_comparison.json: not in the audit; data/paper_ledger.jsonl: only context headlines were checked"
+      "detail": "no groupwise check has run on its artefacts: data/abstention_comparison.json: designed_cases - three designed netting cases and a twelve-point avoided-loss/blocked-upside ratio sweep; no population of real abstentions is scored against the rival; data/general_abstention_comparison.json: aggregate_without_rows - 470 settled leans reduced to risk-coverage curves and AURC per scorer; eval/general_abstention_comparison.py would need to record each lean's score per arm; data/paper_ledger.jsonl: only context headlines were checked"
     },
     {
       "capability": "Abstention scored as a decision",
       "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/abstention_comparison.json: designed_cases - three designed netting cases and a twelve-point avoided-loss/blocked-upside ratio sweep; no population of real abstentions is scored against the rival; data/general_abstention_comparison.json: not in the audit; data/paper_ledger.jsonl: only context headlines were checked"
+      "detail": "no groupwise check has run on its artefacts: data/abstention_comparison.json: designed_cases - three designed netting cases and a twelve-point avoided-loss/blocked-upside ratio sweep; no population of real abstentions is scored against the rival; data/general_abstention_comparison.json: aggregate_without_rows - 470 settled leans reduced to risk-coverage curves and AURC per scorer; eval/general_abstention_comparison.py would need to record each lean's score per arm; data/paper_ledger.jsonl: only context headlines were checked"
     },
     {
       "capability": "Overfitting gates that raise instead of returning NaN",
@@ -4241,27 +4242,17 @@
     {
       "capability": "Cross-market cointegration with corrected multiple testing",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/cointegration_comparison.json: designed_cases - three designed ADF series, two self-inclusion cases and a synthetic 190-pair noise panel reduced to counts; data/general_coint_comparison.json: not in the audit"
+      "detail": "no groupwise check has run on its artefacts: data/cointegration_comparison.json: designed_cases - three designed ADF series, two self-inclusion cases and a synthetic 190-pair noise panel reduced to counts; data/general_coint_comparison.json: aggregate_without_rows - 160 simulated universes reduced to FDR, FWER and power per pipeline; eval/general_coint_comparison.py would need to record each universe's discoveries"
     },
     {
       "capability": "Net executable arbitrage vs. a fee-blind detector",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/arbitrage_comparison.json: designed_cases - three designed spreads and 60 constructed spreads reduced to counts; the real per-symbol basis lives in data/arbitrage_study.json, which no proof cites; data/general_arb_comparison.json: not in the audit"
+      "detail": "the groupwise audit flags data/general_arb_comparison.json :: exact net walk vs NetworkX's Bellman-Ford cycle test [single_group:phase=rth]; data/general_arb_comparison.json :: the deployed decomposition against the truth [single_group:phase=rth]"
     },
     {
       "capability": "Net executable arbitrage vs. a fee-blind detector",
       "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/arbitrage_comparison.json: designed_cases - three designed spreads and 60 constructed spreads reduced to counts; the real per-symbol basis lives in data/arbitrage_study.json, which no proof cites; data/general_arb_comparison.json: not in the audit"
-    },
-    {
-      "capability": "Clustering-corrected, base-rate-honest event significance vs. a fixed-null test",
-      "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/eventdriven_agents.json: not in the audit; data/eventdriven_comparison.json: aggregate_without_rows - the false-positive sweep draws 40 seeds of 150 events, but only the rates are kept (eval/eventdriven_comparison.py would need to record per-seed verdicts); data/eventdriven_rivals.json: not in the audit"
-    },
-    {
-      "capability": "Clustering-corrected, base-rate-honest event significance vs. a fixed-null test",
-      "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/eventdriven_agents.json: not in the audit; data/eventdriven_comparison.json: aggregate_without_rows - the false-positive sweep draws 40 seeds of 150 events, but only the rates are kept (eval/eventdriven_comparison.py would need to record per-seed verdicts); data/eventdriven_rivals.json: not in the audit"
+      "detail": "the groupwise audit flags data/general_arb_comparison.json :: exact net walk vs NetworkX's Bellman-Ford cycle test [single_group:phase=rth]; data/general_arb_comparison.json :: the deployed decomposition against the truth [single_group:phase=rth]"
     },
     {
       "capability": "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
@@ -4326,7 +4317,7 @@
     {
       "capability": "Portfolio allocation, measured against Riskfolio-Lib's NCO",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/allocation_comparison.json: aggregate_without_rows - nine walk-forward windows reduced to windows-beating counts (eval/allocation_comparison.py would need to record per-window out-of-sample volatility per method)"
+      "detail": "the groupwise audit flags data/nco_bakeoff.json :: held-out volatility: ARGUS's pick vs skfolio_nco[cv=ignore] [carried_by_one_group:holdout_half=second, flips_across_halves:chronological halves]"
     },
     {
       "capability": "Portfolio allocation, measured against Riskfolio-Lib's NCO",

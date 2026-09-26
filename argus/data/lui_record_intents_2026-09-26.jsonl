@@ -1,0 +1,240 @@
+{"id": 1, "lang": "en", "text": "How did we do this week?", "expected": "performance", "window": "this week"}
+{"id": 2, "lang": "en", "text": "What's our Sharpe ratio so far?", "expected": "performance", "window": "so far"}
+{"id": 3, "lang": "en", "text": "did we make money today", "expected": "performance", "window": "today"}
+{"id": 4, "lang": "en", "text": "whats the max drawdown on the desk right now", "expected": "performance", "window": null}
+{"id": 5, "lang": "en", "text": "give me the win rate over the last month", "expected": "performance", "window": "last month"}
+{"id": 6, "lang": "en", "text": "r we up or down overall", "expected": "performance", "window": null}
+{"id": 7, "lang": "en", "text": "Could you tell me how the portfolio has performed since inception, in terms of overall P&L?", "expected": "performance", "window": "since inception"}
+{"id": 8, "lang": "en", "text": "hows performance lookin this weekend", "expected": "performance", "window": "this weekend"}
+{"id": 9, "lang": "en", "text": "yo whats our pnl overnight", "expected": "performance", "window": "overnight"}
+{"id": 10, "lang": "en", "text": "How much did we lose yesterday?", "expected": "performance", "window": "yesterday"}
+{"id": 11, "lang": "en", "text": "Sharpe and drawdown for last week please", "expected": "performance", "window": "last week"}
+{"id": 12, "lang": "en", "text": "are we beating buy and hold this quarter", "expected": "performance", "window": "this quarter"}
+{"id": 13, "lang": "en", "text": "whats the return since last weekend", "expected": "performance", "window": "last weekend"}
+{"id": 14, "lang": "en", "text": "give me a performance recap for the past 24 hours", "expected": "performance", "window": "past 24 hours"}
+{"id": 15, "lang": "en", "text": "how's the equity curve looking", "expected": "performance", "window": null}
+{"id": 16, "lang": "en", "text": "win rate on the QQQ trades so far", "expected": "performance", "window": "so far"}
+{"id": 17, "lang": "en", "text": "Can you break down our total returns and drawdown for the last 7 days?", "expected": "performance", "window": "last 7 days"}
+{"id": 18, "lang": "zh", "text": "这周我们赚了多少钱", "expected": "performance", "window": "这周"}
+{"id": 19, "lang": "zh", "text": "夏普比率现在是多少", "expected": "performance", "window": null}
+{"id": 20, "lang": "zh", "text": "昨天亏了还是赚了", "expected": "performance", "window": "昨天"}
+{"id": 21, "lang": "zh", "text": "最大回撤是多少啊", "expected": "performance", "window": null}
+{"id": 22, "lang": "zh", "text": "上周整体表现怎么样,胜率高不高", "expected": "performance", "window": "上周"}
+{"id": 23, "lang": "en", "text": "Why did we buy NVDA on Tuesday?", "expected": "decision_why", "window": "Tuesday"}
+{"id": 24, "lang": "en", "text": "whats the reasoning behind decision #482", "expected": "decision_why", "window": null}
+{"id": 25, "lang": "en", "text": "why did we short TSLA overnight", "expected": "decision_why", "window": "overnight"}
+{"id": 26, "lang": "en", "text": "explain that COIN trade from yesterday", "expected": "decision_why", "window": "yesterday"}
+{"id": 27, "lang": "en", "text": "why decision 217 went long on BTC", "expected": "decision_why", "window": null}
+{"id": 28, "lang": "en", "text": "y did we close the MSTR position this morning", "expected": "decision_why", "window": "this morning"}
+{"id": 29, "lang": "en", "text": "Can you walk me through the rationale for the AMZN call we made last weekend?", "expected": "decision_why", "window": "last weekend"}
+{"id": 30, "lang": "en", "text": "whats the thinking behind that GOOGL trade", "expected": "decision_why", "window": null}
+{"id": 31, "lang": "en", "text": "why'd we enter QQQ at that price on monday", "expected": "decision_why", "window": "monday"}
+{"id": 32, "lang": "en", "text": "reasoning for decision no. 305 pls", "expected": "decision_why", "window": null}
+{"id": 33, "lang": "en", "text": "why did the desk go short SQQQ this afternoon", "expected": "decision_why", "window": "this afternoon"}
+{"id": 34, "lang": "en", "text": "what was the basis for the META decision from earlier today", "expected": "decision_why", "window": "earlier today"}
+{"id": 35, "lang": "en", "text": "why did we flip our AAPL position last week", "expected": "decision_why", "window": "last week"}
+{"id": 36, "lang": "en", "text": "the NVDA call on Tuesday, why was that made", "expected": "decision_why", "window": "Tuesday"}
+{"id": 37, "lang": "en", "text": "explain the logic behind trade 199", "expected": "decision_why", "window": null}
+{"id": 38, "lang": "en", "text": "why we bought TQQQ right before the close yesterday", "expected": "decision_why", "window": "yesterday"}
+{"id": 39, "lang": "en", "text": "I'm curious about decision #391 — what drove that call?", "expected": "decision_why", "window": null}
+{"id": 40, "lang": "zh", "text": "周二为什么买入英伟达", "expected": "decision_why", "window": "周二"}
+{"id": 41, "lang": "zh", "text": "昨晚为什么做空比特币", "expected": "decision_why", "window": "昨晚"}
+{"id": 42, "lang": "zh", "text": "395号决策的理由是什么", "expected": "decision_why", "window": null}
+{"id": 43, "lang": "zh", "text": "为什么今早平仓了MSTR", "expected": "decision_why", "window": "今早"}
+{"id": 44, "lang": "zh", "text": "上周那笔特斯拉的交易是怎么想的", "expected": "decision_why", "window": "上周"}
+{"id": 45, "lang": "en", "text": "list all decisions from today", "expected": "decision_list", "window": "today"}
+{"id": 46, "lang": "en", "text": "what did you decide this week", "expected": "decision_list", "window": "this week"}
+{"id": 47, "lang": "en", "text": "show me everything the desk did yesterday", "expected": "decision_list", "window": "yesterday"}
+{"id": 48, "lang": "en", "text": "recap of trades over the weekend", "expected": "decision_list", "window": "the weekend"}
+{"id": 49, "lang": "en", "text": "gimme a summary of decisions made last week", "expected": "decision_list", "window": "last week"}
+{"id": 50, "lang": "en", "text": "what activity happened overnight", "expected": "decision_list", "window": "overnight"}
+{"id": 51, "lang": "en", "text": "Could you provide a full list of every decision the desk made over the past month?", "expected": "decision_list", "window": "the past month"}
+{"id": 52, "lang": "en", "text": "whats on the decision log for this morning", "expected": "decision_list", "window": "this morning"}
+{"id": 53, "lang": "en", "text": "show all the calls made since monday", "expected": "decision_list", "window": "since monday"}
+{"id": 54, "lang": "en", "text": "what did we decide to do today across all tickers", "expected": "decision_list", "window": "today"}
+{"id": 55, "lang": "en", "text": "give me the decision history for the last 7 days", "expected": "decision_list", "window": "last 7 days"}
+{"id": 56, "lang": "en", "text": "list of trades/no-trades from last weekend", "expected": "decision_list", "window": "last weekend"}
+{"id": 57, "lang": "en", "text": "whats the rundown of everything decided so far", "expected": "decision_list", "window": "so far"}
+{"id": 58, "lang": "en", "text": "can u list the decisions taken this quarter", "expected": "decision_list", "window": "this quarter"}
+{"id": 59, "lang": "en", "text": "show me a recap of activity from tuesday", "expected": "decision_list", "window": "tuesday"}
+{"id": 60, "lang": "en", "text": "what were all the decisions on BTC and QQQ today", "expected": "decision_list", "window": "today"}
+{"id": 61, "lang": "en", "text": "Please summarize every trading decision logged in the last 24 hours.", "expected": "decision_list", "window": "last 24 hours"}
+{"id": 62, "lang": "zh", "text": "今天所有的决策列一下", "expected": "decision_list", "window": "今天"}
+{"id": 63, "lang": "zh", "text": "这周做了哪些决定", "expected": "decision_list", "window": "这周"}
+{"id": 64, "lang": "zh", "text": "把上周末的交易记录都列出来", "expected": "decision_list", "window": "上周末"}
+{"id": 65, "lang": "zh", "text": "给我一份本周决策汇总", "expected": "decision_list", "window": "本周"}
+{"id": 66, "lang": "zh", "text": "昨天有哪些操作,都列出来", "expected": "decision_list", "window": "昨天"}
+{"id": 67, "lang": "en", "text": "why did we sit out NVDA today", "expected": "abstention_why", "window": "today"}
+{"id": 68, "lang": "en", "text": "why are we flat on BTC right now", "expected": "abstention_why", "window": null}
+{"id": 69, "lang": "en", "text": "what kept us on the sidelines this morning", "expected": "abstention_why", "window": "this morning"}
+{"id": 70, "lang": "en", "text": "why didn't we do anything overnight", "expected": "abstention_why", "window": "overnight"}
+{"id": 71, "lang": "en", "text": "why did we pass on the MSTR setup", "expected": "abstention_why", "window": null}
+{"id": 72, "lang": "en", "text": "explain why the desk stayed out of the market yesterday", "expected": "abstention_why", "window": "yesterday"}
+{"id": 73, "lang": "en", "text": "why no action on TSLA this week", "expected": "abstention_why", "window": "this week"}
+{"id": 74, "lang": "en", "text": "what stopped us from acting on the COIN signal", "expected": "abstention_why", "window": null}
+{"id": 75, "lang": "en", "text": "why did we hold off during the selloff last weekend", "expected": "abstention_why", "window": "last weekend"}
+{"id": 76, "lang": "en", "text": "why are we still on the bench for AAPL", "expected": "abstention_why", "window": null}
+{"id": 77, "lang": "en", "text": "reason we skipped the QQQ setup this afternoon", "expected": "abstention_why", "window": "this afternoon"}
+{"id": 78, "lang": "en", "text": "why did we choose inaction on GOOGL earlier", "expected": "abstention_why", "window": "earlier"}
+{"id": 79, "lang": "en", "text": "what made us stand down on the META signal", "expected": "abstention_why", "window": null}
+{"id": 80, "lang": "en", "text": "why is the desk doing nothing right now", "expected": "abstention_why", "window": null}
+{"id": 81, "lang": "en", "text": "why did we avoid getting involved overnight", "expected": "abstention_why", "window": "overnight"}
+{"id": 82, "lang": "en", "text": "what was behind staying flat through the weekend", "expected": "abstention_why", "window": "the weekend"}
+{"id": 83, "lang": "en", "text": "why has nothing happened on SQQQ since monday", "expected": "abstention_why", "window": "since monday"}
+{"id": 84, "lang": "zh", "text": "为什么这周我们一直按兵不动", "expected": "abstention_why", "window": "这周"}
+{"id": 85, "lang": "zh", "text": "为什么昨晚什么都没做", "expected": "abstention_why", "window": "昨晚"}
+{"id": 86, "lang": "zh", "text": "为什么没有介入英伟达那个信号", "expected": "abstention_why", "window": null}
+{"id": 87, "lang": "zh", "text": "周末为什么保持空仓不动", "expected": "abstention_why", "window": "周末"}
+{"id": 88, "lang": "zh", "text": "为什么今早选择观望", "expected": "abstention_why", "window": "今早"}
+{"id": 89, "lang": "en", "text": "what data was the desk looking at for NVDA", "expected": "evidence", "window": null}
+{"id": 90, "lang": "en", "text": "what sources fed into today's decisions", "expected": "evidence", "window": "today"}
+{"id": 91, "lang": "en", "text": "what evidence did we have before shorting TSLA", "expected": "evidence", "window": null}
+{"id": 92, "lang": "en", "text": "what was the desk watching overnight", "expected": "evidence", "window": "overnight"}
+{"id": 93, "lang": "en", "text": "which indicators informed the BTC call this morning", "expected": "evidence", "window": "this morning"}
+{"id": 94, "lang": "en", "text": "what news was factored into the MSTR decision", "expected": "evidence", "window": null}
+{"id": 95, "lang": "en", "text": "what signals did we have access to this week", "expected": "evidence", "window": "this week"}
+{"id": 96, "lang": "en", "text": "what information supported the AAPL trade yesterday", "expected": "evidence", "window": "yesterday"}
+{"id": 97, "lang": "en", "text": "what was the desk's data feed for the QQQ analysis", "expected": "evidence", "window": null}
+{"id": 98, "lang": "en", "text": "what did the desk know before making that call", "expected": "evidence", "window": null}
+{"id": 99, "lang": "en", "text": "which data points drove the decision on COIN", "expected": "evidence", "window": null}
+{"id": 100, "lang": "en", "text": "what was the evidentiary basis for going long GOOGL", "expected": "evidence", "window": null}
+{"id": 101, "lang": "en", "text": "what inputs did the model use this weekend", "expected": "evidence", "window": "this weekend"}
+{"id": 102, "lang": "en", "text": "show me what the desk had in front of it before the META trade", "expected": "evidence", "window": null}
+{"id": 103, "lang": "en", "text": "what sentiment or news data was reviewed last week", "expected": "evidence", "window": "last week"}
+{"id": 104, "lang": "en", "text": "what was the information set at the time of the TQQQ decision", "expected": "evidence", "window": null}
+{"id": 105, "lang": "zh", "text": "做出这个决定前看了哪些数据", "expected": "evidence", "window": null}
+{"id": 106, "lang": "zh", "text": "今天的判断依据是什么消息面信息", "expected": "evidence", "window": "今天"}
+{"id": 107, "lang": "zh", "text": "这周决策用了哪些信号源", "expected": "evidence", "window": "这周"}
+{"id": 108, "lang": "zh", "text": "做空之前掌握了什么证据", "expected": "evidence", "window": null}
+{"id": 109, "lang": "zh", "text": "这个模型当时参考了哪些指标", "expected": "evidence", "window": null}
+{"id": 110, "lang": "zh", "text": "昨晚的决策是基于什么信息", "expected": "evidence", "window": "昨晚"}
+{"id": 111, "lang": "en", "text": "was the desk's confidence justified on that NVDA call", "expected": "calibration", "window": null}
+{"id": 112, "lang": "en", "text": "how well did our stated confidence match what actually happened this week", "expected": "calibration", "window": "this week"}
+{"id": 113, "lang": "en", "text": "were the high-confidence calls actually more accurate", "expected": "calibration", "window": null}
+{"id": 114, "lang": "en", "text": "did the desk overstate its confidence yesterday", "expected": "calibration", "window": "yesterday"}
+{"id": 115, "lang": "en", "text": "is our confidence calibrated against actual outcomes", "expected": "calibration", "window": null}
+{"id": 116, "lang": "en", "text": "how accurate were the confidence levels over the last month", "expected": "calibration", "window": "last month"}
+{"id": 117, "lang": "en", "text": "when we said high conviction, did it pan out", "expected": "calibration", "window": null}
+{"id": 118, "lang": "en", "text": "check if confidence scores line up with results this quarter", "expected": "calibration", "window": "this quarter"}
+{"id": 119, "lang": "en", "text": "were we overconfident on the BTC trades overnight", "expected": "calibration", "window": "overnight"}
+{"id": 120, "lang": "en", "text": "does stated certainty match realized outcomes so far", "expected": "calibration", "window": "so far"}
+{"id": 121, "lang": "en", "text": "how well calibrated is the desk historically", "expected": "calibration", "window": null}
+{"id": 122, "lang": "en", "text": "were low-confidence decisions actually the ones that failed", "expected": "calibration", "window": null}
+{"id": 123, "lang": "en", "text": "did the desk's conviction level track with what actually happened this weekend", "expected": "calibration", "window": "this weekend"}
+{"id": 124, "lang": "en", "text": "is there a gap between confidence and accuracy", "expected": "calibration", "window": null}
+{"id": 125, "lang": "en", "text": "how trustworthy is our confidence signal based on last week's results", "expected": "calibration", "window": "last week"}
+{"id": 126, "lang": "en", "text": "were we as sure as we should've been on that COIN call", "expected": "calibration", "window": null}
+{"id": 127, "lang": "zh", "text": "我们的置信度和实际结果匹配吗", "expected": "calibration", "window": null}
+{"id": 128, "lang": "zh", "text": "上周说的高把握的那些决策,后来准不准", "expected": "calibration", "window": "上周"}
+{"id": 129, "lang": "zh", "text": "这周的信心水平和结果吻合吗", "expected": "calibration", "window": "这周"}
+{"id": 130, "lang": "zh", "text": "是不是经常过度自信", "expected": "calibration", "window": null}
+{"id": 131, "lang": "zh", "text": "低置信度的决策是不是反而更容易出错", "expected": "calibration", "window": null}
+{"id": 132, "lang": "zh", "text": "昨晚那个高确信度的判断最后对了吗", "expected": "calibration", "window": "昨晚"}
+{"id": 133, "lang": "en", "text": "is the decision log tamper-proof", "expected": "integrity", "window": null}
+{"id": 134, "lang": "en", "text": "can you verify the record hasn't been altered", "expected": "integrity", "window": null}
+{"id": 135, "lang": "en", "text": "is there any sign of tampering in the trade history", "expected": "integrity", "window": null}
+{"id": 136, "lang": "en", "text": "how do we know this log is authentic", "expected": "integrity", "window": null}
+{"id": 137, "lang": "en", "text": "is the record from this week verifiable", "expected": "integrity", "window": "this week"}
+{"id": 138, "lang": "en", "text": "can the integrity of the decision database be proven", "expected": "integrity", "window": null}
+{"id": 139, "lang": "en", "text": "has anything in the log been modified after the fact", "expected": "integrity", "window": null}
+{"id": 140, "lang": "en", "text": "is there a hash chain confirming nothing was edited", "expected": "integrity", "window": null}
+{"id": 141, "lang": "en", "text": "can I trust that yesterday's entries are unmodified", "expected": "integrity", "window": "yesterday"}
+{"id": 142, "lang": "en", "text": "how is the audit trail secured", "expected": "integrity", "window": null}
+{"id": 143, "lang": "en", "text": "is there proof the record is complete and untouched", "expected": "integrity", "window": null}
+{"id": 144, "lang": "en", "text": "does the system detect if a decision was retroactively changed", "expected": "integrity", "window": null}
+{"id": 145, "lang": "en", "text": "is the ledger cryptographically verifiable", "expected": "integrity", "window": null}
+{"id": 146, "lang": "en", "text": "can we confirm no entries were deleted from last month", "expected": "integrity", "window": "last month"}
+{"id": 147, "lang": "en", "text": "how do you guarantee the log wasn't rewritten", "expected": "integrity", "window": null}
+{"id": 148, "lang": "en", "text": "is there a way to check the record's integrity right now", "expected": "integrity", "window": null}
+{"id": 149, "lang": "zh", "text": "这个决策记录能验证没被篡改吗", "expected": "integrity", "window": null}
+{"id": 150, "lang": "zh", "text": "日志是不是完整可信的", "expected": "integrity", "window": null}
+{"id": 151, "lang": "zh", "text": "怎么证明记录没有被事后修改过", "expected": "integrity", "window": null}
+{"id": 152, "lang": "zh", "text": "上周的记录有没有被删改的痕迹", "expected": "integrity", "window": "上周"}
+{"id": 153, "lang": "zh", "text": "这个账本是不是可以加密验证", "expected": "integrity", "window": null}
+{"id": 154, "lang": "zh", "text": "系统能检测出记录被动过手脚吗", "expected": "integrity", "window": null}
+{"id": 155, "lang": "en", "text": "what are we holding right now", "expected": "position", "window": null}
+{"id": 156, "lang": "en", "text": "show me the open positions", "expected": "position", "window": null}
+{"id": 157, "lang": "en", "text": "what's currently on the book", "expected": "position", "window": null}
+{"id": 158, "lang": "en", "text": "are we long or short NVDA at the moment", "expected": "position", "window": null}
+{"id": 159, "lang": "en", "text": "what's our current exposure to BTC", "expected": "position", "window": null}
+{"id": 160, "lang": "en", "text": "list everything we're holding as of now", "expected": "position", "window": null}
+{"id": 161, "lang": "en", "text": "do we have an open position in TSLA", "expected": "position", "window": null}
+{"id": 162, "lang": "en", "text": "what's the current size of our QQQ position", "expected": "position", "window": null}
+{"id": 163, "lang": "en", "text": "are we flat or in a position on MSTR right now", "expected": "position", "window": null}
+{"id": 164, "lang": "en", "text": "what's the book look like currently", "expected": "position", "window": null}
+{"id": 165, "lang": "en", "text": "how many contracts of TQQQ are we holding", "expected": "position", "window": null}
+{"id": 166, "lang": "en", "text": "current holdings across all tickers please", "expected": "position", "window": null}
+{"id": 167, "lang": "en", "text": "are we still in the COIN trade", "expected": "position", "window": null}
+{"id": 168, "lang": "en", "text": "what positions are open at this moment", "expected": "position", "window": null}
+{"id": 169, "lang": "en", "text": "give me the live position sheet", "expected": "position", "window": null}
+{"id": 170, "lang": "en", "text": "are we net long or net short the book right now", "expected": "position", "window": null}
+{"id": 171, "lang": "zh", "text": "现在手里还有什么持仓", "expected": "position", "window": null}
+{"id": 172, "lang": "zh", "text": "现在英伟达是多头还是空头", "expected": "position", "window": null}
+{"id": 173, "lang": "zh", "text": "目前的仓位情况是怎样的", "expected": "position", "window": null}
+{"id": 174, "lang": "zh", "text": "现在账上还有比特币仓位吗", "expected": "position", "window": null}
+{"id": 175, "lang": "zh", "text": "目前敞口有多大", "expected": "position", "window": null}
+{"id": 176, "lang": "zh", "text": "现在这本子上都有什么", "expected": "position", "window": null}
+{"id": 177, "lang": "en", "text": "is the market open right now", "expected": "session", "window": null}
+{"id": 178, "lang": "en", "text": "how long until the close", "expected": "session", "window": null}
+{"id": 179, "lang": "en", "text": "what session are we in", "expected": "session", "window": null}
+{"id": 180, "lang": "en", "text": "is this pre-market or regular hours", "expected": "session", "window": null}
+{"id": 181, "lang": "en", "text": "when does trading resume after the weekend", "expected": "session", "window": "the weekend"}
+{"id": 182, "lang": "en", "text": "how much time is left before market open", "expected": "session", "window": null}
+{"id": 183, "lang": "en", "text": "are we in the overnight session right now", "expected": "session", "window": null}
+{"id": 184, "lang": "en", "text": "is the exchange closed for the holiday today", "expected": "session", "window": "today"}
+{"id": 185, "lang": "en", "text": "what time does the market open tomorrow", "expected": "session", "window": "tomorrow"}
+{"id": 186, "lang": "en", "text": "are we currently in a trading session", "expected": "session", "window": null}
+{"id": 187, "lang": "en", "text": "is it after hours right now", "expected": "session", "window": null}
+{"id": 188, "lang": "en", "text": "when's the next session start", "expected": "session", "window": null}
+{"id": 189, "lang": "en", "text": "how many minutes to close", "expected": "session", "window": null}
+{"id": 190, "lang": "en", "text": "is the desk active in this session", "expected": "session", "window": null}
+{"id": 191, "lang": "en", "text": "what's the market status at the moment", "expected": "session", "window": null}
+{"id": 192, "lang": "en", "text": "is today a trading day", "expected": "session", "window": "today"}
+{"id": 193, "lang": "zh", "text": "现在是开盘还是收盘", "expected": "session", "window": null}
+{"id": 194, "lang": "zh", "text": "还有多久收盘", "expected": "session", "window": null}
+{"id": 195, "lang": "zh", "text": "今天是不是交易日", "expected": "session", "window": "今天"}
+{"id": 196, "lang": "zh", "text": "现在是不是盘前时段", "expected": "session", "window": null}
+{"id": 197, "lang": "zh", "text": "周末休市吗", "expected": "session", "window": "周末"}
+{"id": 198, "lang": "zh", "text": "现在处于哪个交易时段", "expected": "session", "window": null}
+{"id": 199, "lang": "en", "text": "sell half my NVDA position", "expected": "none", "window": null}
+{"id": 200, "lang": "en", "text": "what's the price of BTC right now", "expected": "none", "window": null}
+{"id": 201, "lang": "en", "text": "buy 10 QQQ at market", "expected": "none", "window": null}
+{"id": 202, "lang": "en", "text": "what do you think TSLA will do tomorrow", "expected": "none", "window": "tomorrow"}
+{"id": 203, "lang": "en", "text": "NVDA last", "expected": "none", "window": null}
+{"id": 204, "lang": "en", "text": "close everything now", "expected": "none", "window": null}
+{"id": 205, "lang": "en", "text": "what's your forecast for AAPL next week", "expected": "none", "window": "next week"}
+{"id": 206, "lang": "en", "text": "good morning how are you", "expected": "none", "window": null}
+{"id": 207, "lang": "en", "text": "set a stop loss on MSTR at 210", "expected": "none", "window": null}
+{"id": 208, "lang": "en", "text": "what's the current quote on COIN", "expected": "none", "window": null}
+{"id": 209, "lang": "en", "text": "place a limit order for GOOGL", "expected": "none", "window": null}
+{"id": 210, "lang": "en", "text": "haha nice one", "expected": "none", "window": null}
+{"id": 211, "lang": "en", "text": "what's the weather like today", "expected": "none", "window": "today"}
+{"id": 212, "lang": "en", "text": "predict where BTC goes this weekend", "expected": "none", "window": "this weekend"}
+{"id": 213, "lang": "en", "text": "cancel my open order on TQQQ", "expected": "none", "window": null}
+{"id": 214, "lang": "en", "text": "what's SQQQ trading at", "expected": "none", "window": null}
+{"id": 215, "lang": "en", "text": "increase my META position by 20%", "expected": "none", "window": null}
+{"id": 216, "lang": "en", "text": "thanks for the help", "expected": "none", "window": null}
+{"id": 217, "lang": "en", "text": "what's your favorite stock", "expected": "none", "window": null}
+{"id": 218, "lang": "en", "text": "give me a price target for AMZN", "expected": "none", "window": null}
+{"id": 219, "lang": "en", "text": "short QQQ for me", "expected": "none", "window": null}
+{"id": 220, "lang": "en", "text": "what's the ticker for Amazon", "expected": "none", "window": null}
+{"id": 221, "lang": "en", "text": "how do options work", "expected": "none", "window": null}
+{"id": 222, "lang": "en", "text": "who won the game last night", "expected": "none", "window": "last night"}
+{"id": 223, "lang": "en", "text": "raise my risk limit to 5%", "expected": "none", "window": null}
+{"id": 224, "lang": "en", "text": "what's the funding rate on BTC perp", "expected": "none", "window": null}
+{"id": 225, "lang": "en", "text": "tell me a joke", "expected": "none", "window": null}
+{"id": 226, "lang": "en", "text": "convert 100 USDT to BTC", "expected": "none", "window": null}
+{"id": 227, "lang": "en", "text": "what's the bid ask spread on TSLA", "expected": "none", "window": null}
+{"id": 228, "lang": "en", "text": "will the fed cut rates next week", "expected": "none", "window": "next week"}
+{"id": 229, "lang": "en", "text": "add AAPL to my watchlist", "expected": "none", "window": null}
+{"id": 230, "lang": "en", "text": "what's your take on crypto in general", "expected": "none", "window": null}
+{"id": 231, "lang": "zh", "text": "帮我卖掉一半的英伟达仓位", "expected": "none", "window": null}
+{"id": 232, "lang": "zh", "text": "比特币现在多少钱", "expected": "none", "window": null}
+{"id": 233, "lang": "zh", "text": "特斯拉明天会涨吗", "expected": "none", "window": "明天"}
+{"id": 234, "lang": "zh", "text": "英伟达最新价", "expected": "none", "window": null}
+{"id": 235, "lang": "zh", "text": "帮我下单买10个QQQ", "expected": "none", "window": null}
+{"id": 236, "lang": "zh", "text": "你好呀今天怎么样", "expected": "none", "window": "今天"}
+{"id": 237, "lang": "zh", "text": "给我讲个笑话", "expected": "none", "window": null}
+{"id": 238, "lang": "zh", "text": "帮我设置一个止损单", "expected": "none", "window": null}
+{"id": 239, "lang": "zh", "text": "今晚球赛谁赢了", "expected": "none", "window": "今晚"}
+{"id": 240, "lang": "zh", "text": "你怎么看整体加密市场", "expected": "none", "window": null}

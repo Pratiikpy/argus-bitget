@@ -1,0 +1,200 @@
+{"id": 1, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What was the desk's realized Sharpe ratio since launch?", "expected": "performance", "window": null}
+{"id": 2, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Give me the maximum drawdown for last month.", "expected": "performance", "window": "last month"}
+{"id": 3, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What is the win rate on closed positions this week?", "expected": "performance", "window": "this week"}
+{"id": 4, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "How did the portfolio perform overnight relative to its benchmark?", "expected": "performance", "window": "overnight"}
+{"id": 5, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Why did the desk open a long position in MSTR yesterday?", "expected": "decision_why", "window": "yesterday"}
+{"id": 6, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What was the rationale for exiting the COIN position last week?", "expected": "decision_why", "window": "last week"}
+{"id": 7, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Why did the agent increase exposure to QQQ during the weekend?", "expected": "decision_why", "window": "the weekend"}
+{"id": 8, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Explain the reasoning behind the TSLA short entered today.", "expected": "decision_why", "window": "today"}
+{"id": 9, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "List every trade the desk executed since launch.", "expected": "decision_list", "window": null}
+{"id": 10, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Give me a recap of all decisions made this week.", "expected": "decision_list", "window": "this week"}
+{"id": 11, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What actions did the desk take on BTC last month?", "expected": "decision_list", "window": "last month"}
+{"id": 12, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Provide the full trading log for yesterday.", "expected": "decision_list", "window": "yesterday"}
+{"id": 13, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Why did the desk stay flat on AAPL last week instead of entering a position?", "expected": "abstention_why", "window": "last week"}
+{"id": 14, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Why did the agent decline to trade overnight despite the volatility spike?", "expected": "abstention_why", "window": "overnight"}
+{"id": 15, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What stopped the desk from acting on the GOOGL signal today?", "expected": "abstention_why", "window": "today"}
+{"id": 16, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Why has the desk done nothing since the weekend?", "expected": "abstention_why", "window": "the weekend"}
+{"id": 17, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What data sources supported the NVDA entry decision?", "expected": "evidence", "window": null}
+{"id": 18, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What evidence did the desk have before the META trade this week?", "expected": "evidence", "window": "this week"}
+{"id": 19, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What signals fed into the decision to avoid TQQQ overnight?", "expected": "evidence", "window": "overnight"}
+{"id": 20, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What information was the SQQQ position based on since launch?", "expected": "evidence", "window": null}
+{"id": 21, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Did the desk's stated confidence on the AMZN trade match the actual outcome?", "expected": "calibration", "window": null}
+{"id": 22, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "How well calibrated were the desk's confidence scores last month?", "expected": "calibration", "window": "last month"}
+{"id": 23, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Were the high-confidence calls this week actually correct?", "expected": "calibration", "window": "this week"}
+{"id": 24, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Has the agent's confidence tracked realized accuracy since launch?", "expected": "calibration", "window": null}
+{"id": 25, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Can you confirm the decision record has not been altered since launch?", "expected": "integrity", "window": null}
+{"id": 26, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Is last week's trading log tamper-evident?", "expected": "integrity", "window": "last week"}
+{"id": 27, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Verify the record's hash chain is intact for today's entries.", "expected": "integrity", "window": "today"}
+{"id": 28, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Has any entry in the audit trail been modified overnight?", "expected": "integrity", "window": "overnight"}
+{"id": 29, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What is the desk's current net exposure across all instruments?", "expected": "position", "window": null}
+{"id": 30, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What positions does the desk currently hold in MSTR and COIN?", "expected": "position", "window": null}
+{"id": 31, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What is the current TQQQ position size as of this week?", "expected": "position", "window": "this week"}
+{"id": 32, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What is the current position, and was it opened last week?", "expected": "position", "window": "last week"}
+{"id": 33, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Is the market currently open for these instruments?", "expected": "session", "window": null}
+{"id": 34, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What are the trading hours for the desk's paper account today?", "expected": "session", "window": "today"}
+{"id": 35, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Is there a market holiday this week affecting trading?", "expected": "session", "window": "this week"}
+{"id": 36, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "When does the session close tonight?", "expected": "session", "window": null}
+{"id": 37, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Place an order to close the TSLA position.", "expected": "none", "window": null}
+{"id": 38, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What is the live price of BTC right now?", "expected": "none", "window": null}
+{"id": 39, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "Are we heading into a recession?", "expected": "none", "window": null}
+{"id": 40, "lang": "en", "persona": "hedge-fund risk officer auditing the desk", "text": "What is the Fed's current interest rate stance?", "expected": "none", "window": null}
+{"id": 41, "lang": "en", "persona": "retail trader on a phone", "text": "hows pnl looking rn", "expected": "performance", "window": null}
+{"id": 42, "lang": "en", "persona": "retail trader on a phone", "text": "wut was sharpe since launch", "expected": "performance", "window": null}
+{"id": 43, "lang": "en", "persona": "retail trader on a phone", "text": "did we make money last week", "expected": "performance", "window": "last week"}
+{"id": 44, "lang": "en", "persona": "retail trader on a phone", "text": "drawdown today?", "expected": "performance", "window": "today"}
+{"id": 45, "lang": "en", "persona": "retail trader on a phone", "text": "why'd it short tsla yest", "expected": "decision_why", "window": "yesterday"}
+{"id": 46, "lang": "en", "persona": "retail trader on a phone", "text": "why buy coin overnight", "expected": "decision_why", "window": "overnight"}
+{"id": 47, "lang": "en", "persona": "retail trader on a phone", "text": "y did bot go long mstr this wk", "expected": "decision_why", "window": "this week"}
+{"id": 48, "lang": "en", "persona": "retail trader on a phone", "text": "reason for the aapl exit?", "expected": "decision_why", "window": null}
+{"id": 49, "lang": "en", "persona": "retail trader on a phone", "text": "wut did it trade today", "expected": "decision_list", "window": "today"}
+{"id": 50, "lang": "en", "persona": "retail trader on a phone", "text": "gimme the log since launch", "expected": "decision_list", "window": null}
+{"id": 51, "lang": "en", "persona": "retail trader on a phone", "text": "recap last month pls", "expected": "decision_list", "window": "last month"}
+{"id": 52, "lang": "en", "persona": "retail trader on a phone", "text": "list of trades over the weekend", "expected": "decision_list", "window": "the weekend"}
+{"id": 53, "lang": "en", "persona": "retail trader on a phone", "text": "why didnt it trade yesterday", "expected": "abstention_why", "window": "yesterday"}
+{"id": 54, "lang": "en", "persona": "retail trader on a phone", "text": "y no action on btc rn", "expected": "abstention_why", "window": null}
+{"id": 55, "lang": "en", "persona": "retail trader on a phone", "text": "why stayed flat last week", "expected": "abstention_why", "window": "last week"}
+{"id": 56, "lang": "en", "persona": "retail trader on a phone", "text": "how come it didnt enter on the meta signal today", "expected": "abstention_why", "window": "today"}
+{"id": 57, "lang": "en", "persona": "retail trader on a phone", "text": "wut data did it use for the qqq call", "expected": "evidence", "window": null}
+{"id": 58, "lang": "en", "persona": "retail trader on a phone", "text": "wut info backed the nvda trade last week", "expected": "evidence", "window": "last week"}
+{"id": 59, "lang": "en", "persona": "retail trader on a phone", "text": "sources for the tsla short?", "expected": "evidence", "window": null}
+{"id": 60, "lang": "en", "persona": "retail trader on a phone", "text": "wut signals made it skip amzn overnight", "expected": "evidence", "window": "overnight"}
+{"id": 61, "lang": "en", "persona": "retail trader on a phone", "text": "was its confidence right on that coin trade", "expected": "calibration", "window": null}
+{"id": 62, "lang": "en", "persona": "retail trader on a phone", "text": "is the bot actually calibrated or just lucky", "expected": "calibration", "window": null}
+{"id": 63, "lang": "en", "persona": "retail trader on a phone", "text": "how accurate were the high conf calls last month", "expected": "calibration", "window": "last month"}
+{"id": 64, "lang": "en", "persona": "retail trader on a phone", "text": "did confidence match results since launch", "expected": "calibration", "window": null}
+{"id": 65, "lang": "en", "persona": "retail trader on a phone", "text": "is the log legit or can it be edited", "expected": "integrity", "window": null}
+{"id": 66, "lang": "en", "persona": "retail trader on a phone", "text": "was anything changed in the record overnight", "expected": "integrity", "window": "overnight"}
+{"id": 67, "lang": "en", "persona": "retail trader on a phone", "text": "can u verify todays entries are untampered", "expected": "integrity", "window": "today"}
+{"id": 68, "lang": "en", "persona": "retail trader on a phone", "text": "is the trade history tamper proof since launch", "expected": "integrity", "window": null}
+{"id": 69, "lang": "en", "persona": "retail trader on a phone", "text": "wut we holding rn", "expected": "position", "window": null}
+{"id": 70, "lang": "en", "persona": "retail trader on a phone", "text": "current position on mstr?", "expected": "position", "window": null}
+{"id": 71, "lang": "en", "persona": "retail trader on a phone", "text": "wut exposure do we have this week", "expected": "position", "window": "this week"}
+{"id": 72, "lang": "en", "persona": "retail trader on a phone", "text": "still long tqqq from last week?", "expected": "position", "window": "last week"}
+{"id": 73, "lang": "en", "persona": "retail trader on a phone", "text": "market open rn?", "expected": "session", "window": null}
+{"id": 74, "lang": "en", "persona": "retail trader on a phone", "text": "is it a holiday today", "expected": "session", "window": "today"}
+{"id": 75, "lang": "en", "persona": "retail trader on a phone", "text": "wut time market close tngt", "expected": "session", "window": null}
+{"id": 76, "lang": "en", "persona": "retail trader on a phone", "text": "trading hours this week?", "expected": "session", "window": "this week"}
+{"id": 77, "lang": "en", "persona": "retail trader on a phone", "text": "close my tsla position now", "expected": "none", "window": null}
+{"id": 78, "lang": "en", "persona": "retail trader on a phone", "text": "wuts btc price rn", "expected": "none", "window": null}
+{"id": 79, "lang": "en", "persona": "retail trader on a phone", "text": "we heading into a recession or nah", "expected": "none", "window": null}
+{"id": 80, "lang": "en", "persona": "retail trader on a phone", "text": "gimme a forecast for nvda next week", "expected": "none", "window": null}
+{"id": 81, "lang": "en", "persona": "journalist writing about AI trading", "text": "What kind of returns has the AI desk generated since it launched?", "expected": "performance", "window": null}
+{"id": 82, "lang": "en", "persona": "journalist writing about AI trading", "text": "How did the strategy perform over the weekend markets?", "expected": "performance", "window": "the weekend"}
+{"id": 83, "lang": "en", "persona": "journalist writing about AI trading", "text": "What's the current drawdown figure I could cite in the story?", "expected": "performance", "window": null}
+{"id": 84, "lang": "en", "persona": "journalist writing about AI trading", "text": "What was the win rate over the last month?", "expected": "performance", "window": "last month"}
+{"id": 85, "lang": "en", "persona": "journalist writing about AI trading", "text": "Why did the agent decide to short MSTR last week, in its own words?", "expected": "decision_why", "window": "last week"}
+{"id": 86, "lang": "en", "persona": "journalist writing about AI trading", "text": "What drove the decision to buy AAPL today?", "expected": "decision_why", "window": "today"}
+{"id": 87, "lang": "en", "persona": "journalist writing about AI trading", "text": "Can you explain why ARGUS opened a QQQ position overnight?", "expected": "decision_why", "window": "overnight"}
+{"id": 88, "lang": "en", "persona": "journalist writing about AI trading", "text": "What was the stated reason behind the COIN trade?", "expected": "decision_why", "window": null}
+{"id": 89, "lang": "en", "persona": "journalist writing about AI trading", "text": "Can you walk me through everything the desk decided this week for my article?", "expected": "decision_list", "window": "this week"}
+{"id": 90, "lang": "en", "persona": "journalist writing about AI trading", "text": "What's the full list of trades since the project launched?", "expected": "decision_list", "window": null}
+{"id": 91, "lang": "en", "persona": "journalist writing about AI trading", "text": "What did the bot do yesterday that I could feature?", "expected": "decision_list", "window": "yesterday"}
+{"id": 92, "lang": "en", "persona": "journalist writing about AI trading", "text": "Give me a summary of trading activity last month.", "expected": "decision_list", "window": "last month"}
+{"id": 93, "lang": "en", "persona": "journalist writing about AI trading", "text": "Why did the desk choose to do nothing during last week's volatility?", "expected": "abstention_why", "window": "last week"}
+{"id": 94, "lang": "en", "persona": "journalist writing about AI trading", "text": "What made ARGUS sit out the TSLA move today?", "expected": "abstention_why", "window": "today"}
+{"id": 95, "lang": "en", "persona": "journalist writing about AI trading", "text": "Why didn't the agent act on the BTC breakout overnight?", "expected": "abstention_why", "window": "overnight"}
+{"id": 96, "lang": "en", "persona": "journalist writing about AI trading", "text": "What's the explanation for staying flat since launch?", "expected": "abstention_why", "window": null}
+{"id": 97, "lang": "en", "persona": "journalist writing about AI trading", "text": "What sources fed the decision to trade NVDA this week?", "expected": "evidence", "window": "this week"}
+{"id": 98, "lang": "en", "persona": "journalist writing about AI trading", "text": "What data did the desk have on hand for the META call?", "expected": "evidence", "window": null}
+{"id": 99, "lang": "en", "persona": "journalist writing about AI trading", "text": "What evidence supported the SQQQ trade last week?", "expected": "evidence", "window": "last week"}
+{"id": 100, "lang": "en", "persona": "journalist writing about AI trading", "text": "What information base does ARGUS use for its decisions in general?", "expected": "evidence", "window": null}
+{"id": 101, "lang": "en", "persona": "journalist writing about AI trading", "text": "Has the AI's confidence level matched its actual results so far?", "expected": "calibration", "window": null}
+{"id": 102, "lang": "en", "persona": "journalist writing about AI trading", "text": "Were last month's high-confidence trades actually the winners?", "expected": "calibration", "window": "last month"}
+{"id": 103, "lang": "en", "persona": "journalist writing about AI trading", "text": "Is there a calibration gap between what it claims and what happens?", "expected": "calibration", "window": null}
+{"id": 104, "lang": "en", "persona": "journalist writing about AI trading", "text": "How well did the desk's confidence hold up this week?", "expected": "calibration", "window": "this week"}
+{"id": 105, "lang": "en", "persona": "journalist writing about AI trading", "text": "Can the public verify this record hasn't been edited after the fact?", "expected": "integrity", "window": null}
+{"id": 106, "lang": "en", "persona": "journalist writing about AI trading", "text": "Is the trading log since launch cryptographically verifiable?", "expected": "integrity", "window": null}
+{"id": 107, "lang": "en", "persona": "journalist writing about AI trading", "text": "Was last week's data tampered with in any way?", "expected": "integrity", "window": "last week"}
+{"id": 108, "lang": "en", "persona": "journalist writing about AI trading", "text": "How do I know today's entries are the originals?", "expected": "integrity", "window": "today"}
+{"id": 109, "lang": "en", "persona": "journalist writing about AI trading", "text": "What is the desk currently holding, for the record?", "expected": "position", "window": null}
+{"id": 110, "lang": "en", "persona": "journalist writing about AI trading", "text": "What's its exposure to BTC right now?", "expected": "position", "window": null}
+{"id": 111, "lang": "en", "persona": "journalist writing about AI trading", "text": "Does it still hold the TQQQ position from last week?", "expected": "position", "window": "last week"}
+{"id": 112, "lang": "en", "persona": "journalist writing about AI trading", "text": "What's the current book look like this week?", "expected": "position", "window": "this week"}
+{"id": 113, "lang": "en", "persona": "journalist writing about AI trading", "text": "Is the market open at the moment I'm writing this?", "expected": "session", "window": null}
+{"id": 114, "lang": "en", "persona": "journalist writing about AI trading", "text": "Are there any holidays this week that pause trading?", "expected": "session", "window": "this week"}
+{"id": 115, "lang": "en", "persona": "journalist writing about AI trading", "text": "What are the desk's trading hours today?", "expected": "session", "window": "today"}
+{"id": 116, "lang": "en", "persona": "journalist writing about AI trading", "text": "When does the session start again after the weekend?", "expected": "session", "window": "the weekend"}
+{"id": 117, "lang": "en", "persona": "journalist writing about AI trading", "text": "Can you place a trade for me to see how it works?", "expected": "none", "window": null}
+{"id": 118, "lang": "en", "persona": "journalist writing about AI trading", "text": "What's the live price of TSLA right now?", "expected": "none", "window": null}
+{"id": 119, "lang": "en", "persona": "journalist writing about AI trading", "text": "Are we entering a recession, in your view?", "expected": "none", "window": null}
+{"id": 120, "lang": "en", "persona": "journalist writing about AI trading", "text": "What's your forecast for AAPL next quarter?", "expected": "none", "window": null}
+{"id": 121, "lang": "zh", "persona": "Chinese-speaking trader", "text": "这个礼拜的盈亏情况怎么样？", "expected": "performance", "window": "这个礼拜"}
+{"id": 122, "lang": "zh", "persona": "Chinese-speaking trader", "text": "自上线以来夏普比率是多少？", "expected": "performance", "window": null}
+{"id": 123, "lang": "zh", "persona": "Chinese-speaking trader", "text": "上個月的最大回撤是多少？", "expected": "performance", "window": "上个月"}
+{"id": 124, "lang": "zh", "persona": "Chinese-speaking trader", "text": "昨晚的表现如何，有賺錢嗎？", "expected": "performance", "window": "昨晚"}
+{"id": 125, "lang": "zh", "persona": "Chinese-speaking trader", "text": "为什么昨天做空了TSLA？", "expected": "decision_why", "window": "昨天"}
+{"id": 126, "lang": "zh", "persona": "Chinese-speaking trader", "text": "上周为什么加仓MSTR？", "expected": "decision_why", "window": "上周"}
+{"id": 127, "lang": "zh", "persona": "Chinese-speaking trader", "text": "这个週末为什么買入COIN？", "expected": "decision_why", "window": "这个周末"}
+{"id": 128, "lang": "zh", "persona": "Chinese-speaking trader", "text": "为什么今天平掉了AAPL的仓位？", "expected": "decision_why", "window": "今天"}
+{"id": 129, "lang": "zh", "persona": "Chinese-speaking trader", "text": "把这周所有的交易决策列出来。", "expected": "decision_list", "window": "这周"}
+{"id": 130, "lang": "zh", "persona": "Chinese-speaking trader", "text": "上个月一共做了哪些操作？", "expected": "decision_list", "window": "上个月"}
+{"id": 131, "lang": "zh", "persona": "Chinese-speaking trader", "text": "自成立以来的完整交易记录是什么？", "expected": "decision_list", "window": null}
+{"id": 132, "lang": "zh", "persona": "Chinese-speaking trader", "text": "昨天都做了什么决定？", "expected": "decision_list", "window": "昨天"}
+{"id": 133, "lang": "zh", "persona": "Chinese-speaking trader", "text": "为什么上周没有交易QQQ？", "expected": "abstention_why", "window": "上周"}
+{"id": 134, "lang": "zh", "persona": "Chinese-speaking trader", "text": "为什么昨晚波动那么大却没有操作？", "expected": "abstention_why", "window": "昨晚"}
+{"id": 135, "lang": "zh", "persona": "Chinese-speaking trader", "text": "这周为什么一直空仓？", "expected": "abstention_why", "window": "这周"}
+{"id": 136, "lang": "zh", "persona": "Chinese-speaking trader", "text": "为什么自上线以来没碰过BTC？", "expected": "abstention_why", "window": null}
+{"id": 137, "lang": "zh", "persona": "Chinese-speaking trader", "text": "做NVDA这笔交易时用了哪些数据？", "expected": "evidence", "window": null}
+{"id": 138, "lang": "zh", "persona": "Chinese-speaking trader", "text": "上周META的决策依据是什么？", "expected": "evidence", "window": "上周"}
+{"id": 139, "lang": "zh", "persona": "Chinese-speaking trader", "text": "有什么信息支持了做空SQQQ？", "expected": "evidence", "window": null}
+{"id": 140, "lang": "zh", "persona": "Chinese-speaking trader", "text": "这周的决策用了哪些消息来源？", "expected": "evidence", "window": "这周"}
+{"id": 141, "lang": "zh", "persona": "Chinese-speaking trader", "text": "它给出的信心水平和实际结果相符吗？", "expected": "calibration", "window": null}
+{"id": 142, "lang": "zh", "persona": "Chinese-speaking trader", "text": "上个月高信心的交易真的准确吗？", "expected": "calibration", "window": "上个月"}
+{"id": 143, "lang": "zh", "persona": "Chinese-speaking trader", "text": "自上线以来置信度校准得怎么样？", "expected": "calibration", "window": null}
+{"id": 144, "lang": "zh", "persona": "Chinese-speaking trader", "text": "这周的预测信心靠谱吗？", "expected": "calibration", "window": "这周"}
+{"id": 145, "lang": "zh", "persona": "Chinese-speaking trader", "text": "这个记录自上线以来有没有被篡改过？", "expected": "integrity", "window": null}
+{"id": 146, "lang": "zh", "persona": "Chinese-speaking trader", "text": "上周的交易日志是防篡改的吗？", "expected": "integrity", "window": "上周"}
+{"id": 147, "lang": "zh", "persona": "Chinese-speaking trader", "text": "今天的记录能验证是原始未修改的吗？", "expected": "integrity", "window": "今天"}
+{"id": 148, "lang": "zh", "persona": "Chinese-speaking trader", "text": "整个交易台的记录是完整可核实的嗎？", "expected": "integrity", "window": null}
+{"id": 149, "lang": "zh", "persona": "Chinese-speaking trader", "text": "现在持有哪些仓位？", "expected": "position", "window": null}
+{"id": 150, "lang": "zh", "persona": "Chinese-speaking trader", "text": "目前MSTR的仓位是多少？", "expected": "position", "window": null}
+{"id": 151, "lang": "zh", "persona": "Chinese-speaking trader", "text": "这周还持有TQQQ吗？", "expected": "position", "window": "这周"}
+{"id": 152, "lang": "zh", "persona": "Chinese-speaking trader", "text": "上周开的仓位现在还在吗？", "expected": "position", "window": "上周"}
+{"id": 153, "lang": "zh", "persona": "Chinese-speaking trader", "text": "现在市场开盘了吗？", "expected": "session", "window": null}
+{"id": 154, "lang": "zh", "persona": "Chinese-speaking trader", "text": "今天是不是假期不交易？", "expected": "session", "window": "今天"}
+{"id": 155, "lang": "zh", "persona": "Chinese-speaking trader", "text": "这周的交易时间是怎样的？", "expected": "session", "window": "这周"}
+{"id": 156, "lang": "zh", "persona": "Chinese-speaking trader", "text": "晚上几点收盘？", "expected": "session", "window": null}
+{"id": 157, "lang": "zh", "persona": "Chinese-speaking trader", "text": "帮我把TSLA仓位平掉。", "expected": "none", "window": null}
+{"id": 158, "lang": "zh", "persona": "Chinese-speaking trader", "text": "BTC现在的实时价格是多少？", "expected": "none", "window": null}
+{"id": 159, "lang": "zh", "persona": "Chinese-speaking trader", "text": "我们是不是要进入衰退了？", "expected": "none", "window": null}
+{"id": 160, "lang": "zh", "persona": "Chinese-speaking trader", "text": "你觉得下个月大盘会怎么走？", "expected": "none", "window": null}
+{"id": 161, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Prove to me the Sharpe ratio you're claiming since launch is real.", "expected": "performance", "window": null}
+{"id": 162, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What was the actual drawdown last week, not the marketing number?", "expected": "performance", "window": "last week"}
+{"id": 163, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What's the win rate this week, exactly?", "expected": "performance", "window": "this week"}
+{"id": 164, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "How did this thing actually perform overnight when no one was watching?", "expected": "performance", "window": "overnight"}
+{"id": 165, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Why exactly did it short MSTR yesterday — walk me through the logic?", "expected": "decision_why", "window": "yesterday"}
+{"id": 166, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What was the real reason it bought COIN last week?", "expected": "decision_why", "window": "last week"}
+{"id": 167, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Why did the agent open a QQQ position over the weekend?", "expected": "decision_why", "window": "the weekend"}
+{"id": 168, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Justify the AAPL trade it made today.", "expected": "decision_why", "window": "today"}
+{"id": 169, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Show me every single decision this thing has made since launch.", "expected": "decision_list", "window": null}
+{"id": 170, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "List all trades from this week so I can check them myself.", "expected": "decision_list", "window": "this week"}
+{"id": 171, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What did it decide to do last month?", "expected": "decision_list", "window": "last month"}
+{"id": 172, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Give me the complete log for yesterday, not a summary.", "expected": "decision_list", "window": "yesterday"}
+{"id": 173, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Why did it do absolutely nothing last week if it's supposed to be autonomous?", "expected": "abstention_why", "window": "last week"}
+{"id": 174, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What's the excuse for not trading overnight during the volatility?", "expected": "abstention_why", "window": "overnight"}
+{"id": 175, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Why did it sit out the TSLA move today?", "expected": "abstention_why", "window": "today"}
+{"id": 176, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Why has it avoided BTC since launch?", "expected": "abstention_why", "window": null}
+{"id": 177, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What actual data backed the NVDA call, or did it just guess?", "expected": "evidence", "window": null}
+{"id": 178, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What evidence existed for the META trade last week?", "expected": "evidence", "window": "last week"}
+{"id": 179, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What sources fed this week's decisions?", "expected": "evidence", "window": "this week"}
+{"id": 180, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What information did it have before skipping the SQQQ trade overnight?", "expected": "evidence", "window": "overnight"}
+{"id": 181, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Does its stated confidence actually match reality, or is it just noise?", "expected": "calibration", "window": null}
+{"id": 182, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Were last month's 'high confidence' calls actually better than the low confidence ones?", "expected": "calibration", "window": "last month"}
+{"id": 183, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Is there any evidence of real calibration since launch, or is it made up?", "expected": "calibration", "window": null}
+{"id": 184, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "How calibrated was it this week specifically?", "expected": "calibration", "window": "this week"}
+{"id": 185, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Can you actually prove this record hasn't been edited after the fact?", "expected": "integrity", "window": null}
+{"id": 186, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Is the log from last week tamper-evident or just a claim?", "expected": "integrity", "window": "last week"}
+{"id": 187, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Verify right now that today's entries are unaltered.", "expected": "integrity", "window": "today"}
+{"id": 188, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Has anyone been able to modify the record since launch without detection?", "expected": "integrity", "window": null}
+{"id": 189, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What is it actually holding right now, no spin?", "expected": "position", "window": null}
+{"id": 190, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What's the current exposure to MSTR and COIN?", "expected": "position", "window": null}
+{"id": 191, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Is it still holding the TQQQ position from last week?", "expected": "position", "window": "last week"}
+{"id": 192, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What's the net position as of this week?", "expected": "position", "window": "this week"}
+{"id": 193, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Is the market even open right now for this demo?", "expected": "session", "window": null}
+{"id": 194, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Is today a trading holiday I should know about?", "expected": "session", "window": "today"}
+{"id": 195, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What are the trading hours this week for the underlying instruments?", "expected": "session", "window": "this week"}
+{"id": 196, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "When does the session close tonight for this demo?", "expected": "session", "window": null}
+{"id": 197, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Just place an order and close the TSLA position for the demo.", "expected": "none", "window": null}
+{"id": 198, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What's the live price of BTC right now?", "expected": "none", "window": null}
+{"id": 199, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "Are we heading into a recession, in your model's view?", "expected": "none", "window": null}
+{"id": 200, "lang": "en", "persona": "skeptical judge at a hackathon", "text": "What's your price prediction for AAPL next week?", "expected": "none", "window": null}

@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-09-25T20:30:32.352593+00:00",
+  "generated_at": "2026-09-26T02:59:52.835942+00:00",
   "item": "lui/honesty.py \u2014 true reasons for questions no console can answer as asked",
-  "method": "HONESTY-EVAL \u2014 `lui/honesty.py` graded by INFEASIBILITY-BENCH's own grader, and its false positives.\n\n**What it measures.** (a) Every infeasible case of ``data/infeasibility_bench.json`` is re-asked of\n:func:`argus.lui.honesty.honest_answer` (and :func:`~argus.lui.honesty.order_prefix` for orders);\nwhere it answers, its lines replace the console's recorded reply, where it does not, the recorded\nreply stands, and each is graded by `eval/infeasibilitybench.grade_infeasible` \u2014 the same\nvocabulary that produced the \"before\" counts, so the two columns are comparable. (b) Detection is\nrun over every question of the three 2026-09-25 LUI corpora (the rows marked answerable; the\n``refuse`` rows are counted separately as coverage) and over the bench's 72 controls: any hit on\nan answerable question is a false positive and is listed verbatim.\n\nNot measured here: the reply as served through `lui/server._answer` (this module is not wired in\nyet), the Qwen path, and whether the figures the two data builders print are correct beyond the\narithmetic tested in ``tests/test_honesty.py``.\n",
+  "method": "HONESTY-EVAL \u2014 `lui/honesty.py` graded by the infeasibility bench's own grader, and its false\npositives.\n\n**What it measures.** (a) Every infeasible case of ``data/infeasibility_bench.json`` is re-asked of\n:func:`argus.lui.honesty.honest_answer` (and :func:`~argus.lui.honesty.order_prefix` for orders);\nwhere it answers, its lines replace the console's recorded reply, where it does not, the recorded\nreply stands, and each is graded by `eval/infeasibilitybench.grade_infeasible` \u2014 the same\nvocabulary that produced the \"before\" counts, so the two columns are comparable. (b) Detection is\nrun over every question of the three 2026-09-25 LUI corpora (the rows marked answerable; the\n``refuse`` rows are counted separately as coverage) and over the bench's 72 controls: any hit on\nan answerable question is a false positive and is listed verbatim.\n\nNot measured here: the reply as served through `lui/server._answer` (this module is not wired in\nyet), the Qwen path, and whether the figures the two data builders print are correct beyond the\narithmetic tested in ``tests/test_honesty.py``.\n",
   "detection_offline": {
     "ambiguous_name": {
-      "declined_right_reason": 3,
-      "detected_right_cause": 7
+      "declined_right_reason": 4,
+      "detected_right_cause": 6
     },
     "before_data": {
       "detected_right_cause": 9
@@ -30,8 +30,8 @@
       "detected_right_cause": 9
     },
     "ALL": {
-      "declined_right_reason": 19,
-      "detected_right_cause": 54
+      "declined_right_reason": 20,
+      "detected_right_cause": 53
     }
   },
   "regrade": {
@@ -301,7 +301,7 @@
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if HSBC trades under another ticker, name the ticker.",
           "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
         ],
-        "elapsed_ms": 968.3
+        "elapsed_ms": 909.9
       },
       {
         "id": "unl-02",
@@ -318,7 +318,7 @@
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Deutsche Bank trades under another ticker, name the ticker.",
           "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
         ],
-        "elapsed_ms": 543.6
+        "elapsed_ms": 549.3
       },
       {
         "id": "unl-03",
@@ -335,7 +335,7 @@
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if TotalEnergies trades under another ticker, name the ticker.",
           "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
         ],
-        "elapsed_ms": 541.5
+        "elapsed_ms": 505.5
       },
       {
         "id": "unl-04",
@@ -352,7 +352,7 @@
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Nestle trades under another ticker, name the ticker.",
           "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
         ],
-        "elapsed_ms": 529.9
+        "elapsed_ms": 662.5
       },
       {
         "id": "unl-05",
@@ -370,7 +370,7 @@
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Reliance Industries trades under another ticker, name the ticker.",
           "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
         ],
-        "elapsed_ms": 525.1
+        "elapsed_ms": 514.2
       },
       {
         "id": "unl-06",
@@ -388,7 +388,7 @@
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Saudi Aramco trades under another ticker, name the ticker.",
           "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
         ],
-        "elapsed_ms": 506.5
+        "elapsed_ms": 556.7
       },
       {
         "id": "unl-08",
@@ -406,7 +406,7 @@
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Stripe trades under another ticker, name the ticker.",
           "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
         ],
-        "elapsed_ms": 555.8
+        "elapsed_ms": 553.3
       },
       {
         "id": "unl-09",
@@ -422,7 +422,7 @@
           "ZQXV is not listed on Bitget \u2014 there is no perpetual or rToken for it in Bitget's contract list \u2014 so there is no Bitget order book to plan an order against and no market to research; any contract Bitget lists can be asked about",
           "ARGUS decides on: NVDAUSDT, TSLAUSDT, AAPLUSDT, MSFTUSDT, METAUSDT, GOOGLUSDT, AMZNUSDT, COINUSDT, MSTRUSDT, QQQUSDT, TQQQUSDT, SQQQUSDT."
         ],
-        "elapsed_ms": 0.4
+        "elapsed_ms": 0.3
       },
       {
         "id": "unl-10",
@@ -456,7 +456,7 @@
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Credit Suisse trades under another ticker, name the ticker.",
           "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
         ],
-        "elapsed_ms": 514.4
+        "elapsed_ms": 547.8
       },
       {
         "id": "unl-12",
@@ -474,7 +474,7 @@
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Twitter trades under another ticker, name the ticker.",
           "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
         ],
-        "elapsed_ms": 497.7
+        "elapsed_ms": 539.5
       },
       {
         "id": "fut-01",
@@ -490,7 +490,7 @@
           "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for NVDA at that date.",
           "What it can give is the historical range: ask \"what are the odds NVDA is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has NVDA been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "fut-02",
@@ -506,7 +506,7 @@
           "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for BTC at that date.",
           "What it can give is the historical range: ask \"what are the odds BTC is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has BTC been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.2
+        "elapsed_ms": 0.4
       },
       {
         "id": "fut-03",
@@ -522,7 +522,7 @@
           "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for TSLA at that date.",
           "What it can give is the historical range: ask \"what are the odds TSLA is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has TSLA been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "fut-04",
@@ -538,7 +538,7 @@
           "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for XAU at that date.",
           "What it can give is the historical range: ask \"what are the odds XAU is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has XAU been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "fut-05",
@@ -554,7 +554,7 @@
           "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for SP500 at that date.",
           "What it can give is the historical range: ask \"what are the odds SP500 is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has SP500 been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.2
+        "elapsed_ms": 0.3
       },
       {
         "id": "fut-06",
@@ -586,7 +586,7 @@
           "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for ETH at that date.",
           "What it can give is the historical range: ask \"what are the odds ETH is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has ETH been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "fut-08",
@@ -727,7 +727,7 @@
         "cause_agrees": true,
         "matched": "not public",
         "lines": [
-          "Actionable: Other traders' positions are not public \u2014 no one outside the account can see them, and this console has no access to any account but none at all to other people's.",
+          "Actionable: Other traders' positions are not public \u2014 no one outside the account can see them, and this console has no access to anyone's account.",
           "What is public: 13F filings (quarterly, filed up to 45 days after the quarter ends) for a named manager's US holdings, and Bitget's aggregate long/short split, which shows how the crowd leans without naming anyone \u2014 ask \"what's the long/short ratio on TSLA\"."
         ],
         "elapsed_ms": 0.1
@@ -743,10 +743,10 @@
         "cause_agrees": true,
         "matched": "not public",
         "lines": [
-          "Actionable: what are Citadel's live positions are not public \u2014 no one outside the account can see them, and this console has no access to any account but none at all to other people's.",
+          "Actionable: Citadel's live positions are not public \u2014 no one outside the account can see them, and this console has no access to anyone's account.",
           "What is public: 13F filings (quarterly, filed up to 45 days after the quarter ends) for a named manager's US holdings, and Bitget's aggregate long/short split, which shows how the crowd leans without naming anyone \u2014 ask \"what's the long/short ratio on NVDA\"."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "prv-08",
@@ -795,7 +795,7 @@
           "What it holds: 707 decisions from 2026-09-12 to 2026-09-25; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 33.8
+        "elapsed_ms": 27.3
       },
       {
         "id": "bef-02",
@@ -812,7 +812,7 @@
           "What it holds: 707 decisions from 2026-09-12 to 2026-09-25; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 35.4
+        "elapsed_ms": 23.5
       },
       {
         "id": "bef-03",
@@ -829,7 +829,7 @@
           "What it holds: 707 decisions from 2026-09-12 to 2026-09-25; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 22.8
+        "elapsed_ms": 23.9
       },
       {
         "id": "bef-04",
@@ -846,7 +846,7 @@
           "What it holds: 707 decisions from 2026-09-12 to 2026-09-25; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 31.9
+        "elapsed_ms": 24.2
       },
       {
         "id": "bef-05",
@@ -864,7 +864,7 @@
           "Today's quote is not an answer to a past date; ask \"where is NVDA trading right now\" for that.",
           "Data: Bitget NVDAUSDT daily candles (history-candles, 1D); Yahoo Finance daily closes for NVDA, split-adjusted."
         ],
-        "elapsed_ms": 4373.1
+        "elapsed_ms": 3867.6
       },
       {
         "id": "bef-06",
@@ -882,7 +882,7 @@
           "Today's quote is not an answer to a past date; ask \"where is COIN trading right now\" for that.",
           "Data: Bitget COINUSDT daily candles (history-candles, 1D); Yahoo Finance daily closes for COIN, split-adjusted."
         ],
-        "elapsed_ms": 3675.2
+        "elapsed_ms": 3518.8
       },
       {
         "id": "bef-07",
@@ -899,7 +899,7 @@
           "Today's quote is not an answer to a past date; ask \"where is COIN trading right now\" for that.",
           "Data: Yahoo Finance daily closes for COIN, split-adjusted."
         ],
-        "elapsed_ms": 0.5
+        "elapsed_ms": 0.7
       },
       {
         "id": "bef-08",
@@ -916,7 +916,7 @@
           "What it holds: 707 decisions from 2026-09-12 to 2026-09-25; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 33.4
+        "elapsed_ms": 23.4
       },
       {
         "id": "bef-09",
@@ -934,7 +934,7 @@
           "Today's quote is not an answer to a past date; ask \"where is MSTR trading right now\" for that.",
           "Data: Bitget MSTRUSDT daily candles (history-candles, 1D); Yahoo Finance daily closes for MSTR, split-adjusted."
         ],
-        "elapsed_ms": 4266.5
+        "elapsed_ms": 4688.3
       },
       {
         "id": "hor-01",
@@ -951,7 +951,7 @@
           "Over the 5.4 years that do exist (2021-04-14 to 2026-09-25): annualised return -9.1% (total -40.6%), max drawdown -90.9%.",
           "Data: Yahoo Finance daily closes for COIN, split-adjusted."
         ],
-        "elapsed_ms": 2.0
+        "elapsed_ms": 1.5
       },
       {
         "id": "hor-02",
@@ -968,7 +968,7 @@
           "Over the 7.2 years that do exist (2019-07-09 to 2026-09-24): max drawdown -76.4% (peak 2021-11-09, trough 2022-11-20).",
           "Data: Bitget BTCUSDT daily candles (history-candles, 1D)."
         ],
-        "elapsed_ms": 17255.2
+        "elapsed_ms": 17358.5
       },
       {
         "id": "hor-03",
@@ -985,7 +985,7 @@
           "Over the 16.6 years that do exist (2010-02-11 to 2026-09-25): annualised return +43.1% (total +38694.2%), max drawdown -81.7%.",
           "Data: Yahoo Finance daily closes for TQQQ, split-adjusted."
         ],
-        "elapsed_ms": 924.9
+        "elapsed_ms": 602.2
       },
       {
         "id": "hor-04",
@@ -1002,7 +1002,7 @@
           "What it holds: 707 decisions over those 13 days; ask \"what is the sharpe\" or \"are you well calibrated\" for the whole record as it stands.",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 25.0
+        "elapsed_ms": 48.4
       },
       {
         "id": "hor-05",
@@ -1019,7 +1019,7 @@
           "Over the 5.2 years that do exist (2021-07-22 to 2026-09-24): Sharpe 0.79 (risk-free rate taken as 0%; annualised return +33.5%, volatility 96.5%).",
           "Data: Bitget SOLUSDT daily candles (history-candles, 1D)."
         ],
-        "elapsed_ms": 12879.9
+        "elapsed_ms": 12925.8
       },
       {
         "id": "hor-06",
@@ -1036,7 +1036,7 @@
           "Over the 6.0 years that do exist (2020-09-30 to 2026-09-25): beta to QQQ 1.59 on 1503 daily returns.",
           "Data: Yahoo Finance daily closes for PLTR, split-adjusted; Yahoo Finance daily closes for QQQ, split-adjusted."
         ],
-        "elapsed_ms": 1754.3
+        "elapsed_ms": 1012.2
       },
       {
         "id": "hor-07",
@@ -1053,7 +1053,7 @@
           "What it holds: 707 decisions over those 13 days; ask \"what is the sharpe\" or \"are you well calibrated\" for the whole record as it stands.",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 37.4
+        "elapsed_ms": 39.4
       },
       {
         "id": "hor-08",
@@ -1070,7 +1070,7 @@
           "Over the 7.1 years that do exist (2019-08-09 to 2026-09-24): annualised return +43.4% (total +1207.4%), max drawdown -79.6%.",
           "Data: Bitget ETHUSDT daily candles (history-candles, 1D)."
         ],
-        "elapsed_ms": 16897.9
+        "elapsed_ms": 16982.0
       },
       {
         "id": "hor-09",
@@ -1087,7 +1087,7 @@
           "Over the 1.3 years that do exist (2025-06-05 to 2026-09-25): annualised volatility 110.6%.",
           "Data: Yahoo Finance daily closes for CRCL, split-adjusted."
         ],
-        "elapsed_ms": 425.9
+        "elapsed_ms": 364.0
       },
       {
         "id": "hor-10",
@@ -1104,7 +1104,7 @@
           "Ask \"what's the funding on NVDA\" for the current rate and what it costs to hold.",
           "Data: Bitget NVDAUSDT daily candles (history-candles, 1D)."
         ],
-        "elapsed_ms": 3132.0
+        "elapsed_ms": 3346.3
       },
       {
         "id": "amb-01",
@@ -1120,7 +1120,7 @@
           "\"that\" has nothing to refer to yet \u2014 name a symbol or a decision number",
           "Name a symbol or a decision number."
         ],
-        "elapsed_ms": 0.2
+        "elapsed_ms": 0.1
       },
       {
         "id": "amb-02",
@@ -1136,7 +1136,7 @@
           "\"that\" has nothing to refer to yet \u2014 name a symbol or a decision number",
           "Name a symbol or a decision number."
         ],
-        "elapsed_ms": 0.2
+        "elapsed_ms": 0.1
       },
       {
         "id": "amb-03",
@@ -1144,15 +1144,15 @@
         "cause": "ambiguous_name",
         "before": "declined_right_reason",
         "after": "declined_right_reason",
-        "answered_by": "honesty",
-        "honesty_cause": "ambiguous",
-        "cause_agrees": true,
-        "matched": "which one",
+        "answered_by": "console (unchanged)",
+        "honesty_cause": "",
+        "cause_agrees": null,
+        "matched": "has nothing to refer to",
         "lines": [
-          "Actionable: which one? \"those two\" names no instrument, and there is no earlier question for it to refer to \u2014 so nothing was looked up.",
-          "Name the ticker \u2014 e.g. \"how risky is NVDA?\" \u2014 or ask about two by name: \"is TSLA riskier than NVDA\"."
+          "\"that\" has nothing to refer to yet \u2014 name a symbol or a decision number",
+          "Name a symbol or a decision number."
         ],
-        "elapsed_ms": 0.2
+        "elapsed_ms": 0.1
       },
       {
         "id": "amb-04",
@@ -1333,7 +1333,7 @@
           "The log holds 684 abstention(s) and 0 settled trade(s) over 14 day(s). Sharpe, win rate and drawdown need trades; abstentions are scored separately, by abstention value.",
           "Net PnL 0 on stated capital 10000."
         ],
-        "elapsed_ms": 13.2
+        "elapsed_ms": 14.6
       }
     ]
   },
@@ -1342,13 +1342,12 @@
     "false_positives": 0,
     "hits": [],
     "refuse_rows": 147,
-    "refuse_rows_detected": 34,
+    "refuse_rows_detected": 32,
     "refuse_detected_by_cause": {
       "order_prefix": 20,
-      "ambiguous": 2,
       "future_price": 12
     },
-    "detection_ms_total": 404.7
+    "detection_ms_total": 405.7
   },
   "call_site": "argus.lui.server._answer, directly after the multistep block (the `if split is not None:` return) and before `followed = follow_up(text, prior, book)`: `honest = honesty.honest_answer(text, prior=prior, book=book)`; when not None, `return engine_payload(honest[1], [], {'cause': honest[0]}, by='honesty')`. order_prefix: in _answer, compute `prefix = honesty.order_prefix(text)` once at the top; wherever a payload is returned (the research payload included), insert it at lines[0] when not None."
 }
