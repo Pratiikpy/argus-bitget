@@ -395,7 +395,9 @@ def _artefact(path: str) -> str:
 
     shown = html.escape(path)
     if re.fullmatch(r"[\w./-]+\.(json|jsonl|md|py|csv|txt)", path):
-        return f"<a href='{REPOSITORY}{shown}'><code>{shown}</code></a>"
+        # "argus/paper/corrections.py" names a module; its file is under src/ in the repository.
+        target = f"src/{path}" if path.startswith("argus/") else path
+        return f"<a href='{REPOSITORY}{html.escape(target)}'><code>{shown}</code></a>"
     return f"<code>{shown}</code>"
 
 

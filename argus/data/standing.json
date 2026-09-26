@@ -1322,7 +1322,7 @@
     {
       "name": "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
       "subtheme": "t1-afterhours",
-      "module": "argus/research/gap_study.py,argus/eval/afterhours_comparison.py,argus/eval/baselines/quantconnect_preholiday_decision.py,argus/eval/baselines/quantconnect_preholiday_loader.py,argus/truth/data/us_equity_holidays.json,argus/eval/baselines/lean_market_holidays_loader.py",
+      "module": "argus/research/gap_study.py,argus/eval/afterhours_comparison.py,argus/eval/baselines/quantconnect_preholiday_decision.py,argus/eval/baselines/quantconnect_preholiday_loader.py,argus/eval/baselines/lean_market_holidays_usa.json,argus/eval/baselines/lean_market_holidays_loader.py",
       "state": "implemented",
       "baseline": "QuantConnect/Tutorials real Pre-Holiday Effect (unconditional long-before-holiday decision logic)",
       "conditions_met": [
@@ -1760,7 +1760,7 @@
     {
       "name": "Risk layer proved by domain sweep",
       "subtheme": "t2-riskcontrol",
-      "module": "argus/eval/riskproof.py,argus/eval/freqtrade_baseline.py,argus/eval/risk_layer_comparison.py,argus/eval/gate_ablation.py,argus/risk/constitution.py,argus/desk/book.py,argus/risk/circuit.py",
+      "module": "argus/eval/riskproof.py,argus/eval/freqtrade_baseline.py,argus/eval/risk_layer_comparison.py,argus/eval/gate_ablation.py,argus/agents/desk.py,argus/desk/book.py,argus/risk/circuit.py",
       "state": "owned",
       "baseline": "nautechsystems/nautilus_trader risk engine, QuantConnect brokerage models, freqtrade's MaxDrawdown/StoplossGuard/LowProfitPairs/CooldownPeriod protections",
       "conditions_met": [
@@ -4312,12 +4312,12 @@
     {
       "capability": "Typed factor grammar with no execution surface",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "the groupwise audit predates the current data/grammar_comparison.json; re-run python -m argus.eval.groupwise_audit"
+      "detail": "the groupwise audit flags data/grammar_comparison.json :: rank on real market series: ARGUS vs qlib [single_group:symbol=NVDAUSDT]"
     },
     {
       "capability": "Typed factor grammar with no execution surface",
       "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "the groupwise audit predates the current data/grammar_comparison.json; re-run python -m argus.eval.groupwise_audit"
+      "detail": "the groupwise audit flags data/grammar_comparison.json :: rank on real market series: ARGUS vs qlib [single_group:symbol=NVDAUSDT]"
     },
     {
       "capability": "Factor-discovery safety: no execution surface and trial-corrected selection, vs. RD-Agent",
@@ -4343,11 +4343,6 @@
       "capability": "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
       "problem": "out_of_sample_test is claimed but not evidenced",
       "detail": "no groupwise check has run on its artefacts: data/afterhours_comparison.json: only context headlines were checked"
-    },
-    {
-      "capability": "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
-      "problem": "test for ablation is not in the file",
-      "detail": "test_gap_study.py::TestRealHolidayCalendarThreading::test_study_with_no_holidays_keeps_its_old_behaviour"
     },
     {
       "capability": "Episodic memory across decisions",

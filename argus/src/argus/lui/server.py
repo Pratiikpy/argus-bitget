@@ -1795,8 +1795,11 @@ class Handler(BaseHTTPRequestHandler):
                 # the body says how to use the endpoint. A browser gets that as a page (/materials
                 # links here, and a judge who followed it met a JSON error, audit 2026-09-26).
                 if self._wants_html():
+                    # A 200 for the person: an MCP client asks for text/event-stream, never
+                    # text/html, so this branch is never what the spec's 405 is addressed to, and
+                    # a 405 page load is logged as an error in the visitor's console.
                     self._send(mcp_page(self.headers.get("Host") or "").encode(),
-                               "text/html; charset=utf-8", 405)
+                               "text/html; charset=utf-8")
                     return
                 self._send(json.dumps({
                     "endpoint": "ARGUS research desk — Model Context Protocol (Streamable HTTP)",
@@ -1940,8 +1943,11 @@ def mcp_page(host: str) -> str:
     base = f"https://{host}" if host and not host.startswith(("127.", "localhost")) else (
         f"http://{host}" if host else design.PUBLIC_URL)
     endpoint = _html.escape(f"{base}/mcp")
+    def first_sentence(text: str) -> str:
+        return text.split(". ")[0].rstrip(".") + "."
+
     tools = "".join(f"<li><code>{_html.escape(str(t['name']))}</code> — "
-                    f"{_html.escape(str(t['description']).split('. ')[0])}.</li>" for t in TOOLS)
+                    f"{_html.escape(first_sentence(str(t['description'])))}</li>" for t in TOOLS)
     title = "ARGUS over the Model Context Protocol"
     return f"""<!doctype html><html lang="en"><head>{design.head("ARGUS — MCP", title, "/mcp")}
 <style>{design.TOKENS_CSS}{design.BASE_CSS}

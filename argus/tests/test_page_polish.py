@@ -78,9 +78,13 @@ class TestTheMcpEndpointInABrowser:
         except HTTPError as exc:
             return exc.code, exc.headers.get("Content-Type", "")
 
-    def test_a_browser_gets_html_and_a_client_still_gets_json(self, base_url: str) -> None:
-        assert self._get(f"{base_url}/mcp", "text/html") == (405, "text/html; charset=utf-8")
+    def test_a_browser_gets_a_page_and_a_client_still_gets_the_405(self, base_url: str) -> None:
+        assert self._get(f"{base_url}/mcp", "text/html") == (200, "text/html; charset=utf-8")
         assert self._get(f"{base_url}/mcp", "application/json") == (405, "application/json")
+        assert self._get(f"{base_url}/mcp", "text/event-stream")[0] == 405
+
+    def test_no_description_ends_in_a_doubled_full_stop(self) -> None:
+        assert ".." not in mcp_page("example.test")
 
 
 class TestTheCorrectionsPage:
@@ -89,6 +93,11 @@ class TestTheCorrectionsPage:
         page = corrections_page.render([Correction("h", "d", "data/x_comparison.json", "bug")])
         assert ("href='https://github.com/Pratiikpy/argus-bitget/blob/main/argus/"
                 "data/x_comparison.json'") in page
+
+    def test_a_module_path_links_to_its_file_under_src(self) -> None:
+        page = corrections_page.render(
+            [Correction("h", "d", "argus/paper/corrections.py", "bug")])
+        assert "blob/main/argus/src/argus/paper/corrections.py'" in page
 
     def test_something_that_is_not_a_path_stays_plain_text(self) -> None:
         page = corrections_page.render([Correction("h", "d", "the register", "open")])
