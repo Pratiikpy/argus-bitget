@@ -287,10 +287,10 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
         body = (f"<p class='sub'>{reachable} of {len(wins)} run live from a question in the "
                 f"console; the rest are named as gaps below. Losses and withdrawn claims are on "
                 f"<a href='/wrong'>what we got wrong</a>.</p>" + "".join(sections))
-    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">{design.FONTS}
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" href="{FAVICON}">
-<title>ARGUS — measured against the specialists</title>
+    head = design.head("ARGUS — measured against the specialists",
+                       "Every capability ARGUS claims, the specialist it was run against on the "
+                       "same input, and who won.", "/proof")
+    return f"""<!doctype html><html lang="en"><head>{head}
 <style>{design.TOKENS_CSS}
  body {{ margin:0; background:var(--bg); color:var(--ink); font:15px/1.6 system-ui,sans-serif }}
  .wrap {{ max-width:820px; margin:0 auto; padding:30px 18px 70px }}
@@ -306,8 +306,13 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  .head {{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }}
  .st {{ font:600 10.5px var(--mono); letter-spacing:.08em; padding:2px 7px; border-radius:4px;
    border:1px solid currentColor }}
- .st.owned {{ color:var(--ok) }} .st.tied {{ color:var(--accent) }}
- .st.implemented {{ color:var(--warn) }} .st.lost {{ color:var(--bad) }}
+ /* Four states, four looks: OWNED is the one filled proof pill; TIED is outlined ink; IMPLEMENTED
+    is graphite and dashed (unproven, not a failure); only LOST wears Redline. Until 2026-09-26
+    OWNED and TIED were the same indigo and IMPLEMENTED wore the loss colour (judge audit). */
+ .st.owned {{ color:var(--on-accent); background:var(--proof); border-color:var(--proof) }}
+ .st.tied {{ color:var(--ink); border-color:var(--ink) }}
+ .st.implemented {{ color:var(--graphite); border-style:dashed }}
+ .st.lost {{ color:var(--redline); background:var(--redline-soft); border-color:var(--redline) }}
  .cn {{ font:11px var(--mono); color:var(--dim) }}
  .lbl {{ display:inline-block; min-width:118px; font:11px var(--mono); color:var(--dim);
    text-transform:uppercase; letter-spacing:.06em }}
@@ -323,7 +328,7 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  details li {{ margin-bottom:6px; overflow-wrap:anywhere }}
  details b {{ color:var(--ink); font-weight:600 }}
  .note {{ font-size:12.5px; overflow-wrap:anywhere }}
- .why {{ color:var(--warn) }}
+ .why {{ color:var(--ink) }} .why .lbl {{ color:var(--redline) }}
  a {{ color:var(--accent) }}
  a:focus-visible, summary:focus-visible {{ outline:2px solid var(--accent); outline-offset:2px }}
  @media (max-width:520px) {{ .lbl {{ display:block; min-width:0 }} }}

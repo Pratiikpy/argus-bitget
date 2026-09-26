@@ -25,7 +25,7 @@ import json
 import re
 import subprocess
 import sys
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -84,6 +84,44 @@ So the pairs are remembered. A pair in this file that no longer matches is repor
 fails the run. The fix is either to restore the sentence or to remove the claim deliberately — both
 are fine, and both are a decision somebody made rather than a guard that evaporated.
 """
+
+
+RETIRED_PHRASES: tuple[tuple[str, str], ...] = (
+    ("all 19 are covered",
+     "counted direct reads of the sources the Skills name as Skill coverage (judge audit, "
+     "2026-09-26); say how many tools Bitget answered and how many ARGUS read from the source"),
+    ("19 of 19",
+     "summed Bitget's answers and ARGUS's own upstream reads into one Skill count"),
+    ("9 of 19 tools answer",
+     "a withdrawn reliability figure: three of the nine returned only an error envelope"),
+)
+"""Sentences withdrawn because they were wrong, and why. A number can be re-checked against its
+artefact; a withdrawn phrasing has no artefact to disagree with, so it is named here and
+:func:`retired_phrases` fails when one comes back, in a document or in a test's docstring."""
+
+
+def retired_phrases(paths: Iterable[Path] | None = None) -> list[str]:
+    """Every place a retired phrase reappears, as ``file:line — phrase (why)``."""
+    targets = list(paths) if paths is not None else [
+        *(path for path in DOCS.values() if path.exists()),
+        # this gate's own tests write a retired phrase on purpose, to see it caught
+        *(t for t in sorted((PACKAGE / "tests").glob("test_*.py"))
+          if t.name != "test_docclaims.py"),
+    ]
+    found: list[str] = []
+    for path in targets:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        for phrase, why in RETIRED_PHRASES:
+            # Across a line break too: prose is wrapped, and a phrase split over two lines is
+            # the same sentence.
+            pattern = re.compile(r"\s+".join(map(re.escape, phrase.split())), re.IGNORECASE)
+            for match in pattern.finditer(text):
+                line = text.count("\n", 0, match.start()) + 1
+                found.append(f"{path.name}:{line} — {phrase!r} ({why})")
+    return found
 
 
 def _seen() -> dict[str, int]:
@@ -490,6 +528,24 @@ def standing_implemented() -> Number:
     return sum(1 for cap in REGISTER if cap.state is State.IMPLEMENTED)
 
 
+def standing_lost() -> Number:
+    """Capabilities the register grades LOST. Pinned 2026-09-26: the register had no LOST row while
+    a loss sat on /wrong, and the documents said "0 LOST" beside it; once the row existed, nothing
+    checked the documents' figure."""
+    from argus.eval.standing import REGISTER, State
+
+    return sum(1 for cap in REGISTER if cap.state is State.LOST)
+
+
+def standing_states() -> tuple[Number, Number, Number, Number]:
+    """OWNED, TIED, IMPLEMENTED and LOST together, for the sentences that quote all four at once
+    ("6 OWNED, 12 TIED, 25 IMPLEMENTED, 1 LOST", and the Chinese summary's form)."""
+    from argus.eval.standing import REGISTER, State
+
+    return tuple(sum(1 for cap in REGISTER if cap.state is s)  # type: ignore[return-value]
+                 for s in (State.OWNED, State.TIED, State.IMPLEMENTED, State.LOST))
+
+
 def reliable_skill_tools() -> tuple[Number, Number]:
     """Bitget Skill tools that answer every attempt, and the total probed.
 
@@ -666,6 +722,23 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("standing_implemented", r"(?P<q>\d+)\s+are\s+IMPLEMENTED",
           standing_implemented, ("readme", "public-readme", "submission", "explained",
                                  "architecture")),
+    Claim("standing_lost", r"(?P<q>\d+)\s+(?:is|are)\s+LOST",
+          standing_lost, ("readme", "public-readme", "submission", "explained",
+                          "architecture")),
+    # The compact form ("6 OWNED, 12 TIED, 25 IMPLEMENTED, 1 LOST") and the Chinese summary quote
+    # all four states at once; until 2026-09-26 neither was checked, and the Chinese summary said
+    # 7/12/24 while the English said 6/12/25 (judge audit).
+    Claim("standing_states",
+          r"(?P<q1>\d+) OWNED\W+(?P<q2>\d+) TIED\W+(?P<q3>\d+) IMPLEMENTED\W+(?P<q4>\d+) LOST",
+          standing_states, ("submission",)),
+    Claim("standing_tied_implemented_lost",
+          r"(?P<q1>\d+) TIED\W+(?P<q2>\d+) IMPLEMENTED\W+(?P<q3>\d+) LOST",
+          lambda: standing_states()[1:], ("readme", "public-readme", "submission", "explained",
+                                           "architecture")),
+    Claim("standing_states_zh",
+          r"(?P<q1>\d+) 项领先（OWNED）、(?P<q2>\d+) 项\s*持平、(?P<q3>\d+) 项已实现、"  # noqa: RUF001 - the summary's own punctuation
+          r"(?P<q4>\d+) 项落后",
+          standing_states, ("readme", "public-readme")),
     # Both LUI figures are guarded because both are *losses*, and a losing number left ungated is
     # the one that quietly improves between drafts. The phrasings are anchored to the sentences
     # actually written in SUBMISSION-DRAFT.md.

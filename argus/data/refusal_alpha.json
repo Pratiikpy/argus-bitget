@@ -1,8 +1,8 @@
 {
-  "as_of": "2026-09-25T20:27:35.754761+00:00",
+  "as_of": "2026-09-26T16:15:40.474683+00:00",
   "round_trip_bps": 12.0,
   "min_directional_for_a_rate": 30,
-  "total_marks": 462,
+  "total_marks": 474,
   "outside_buckets": 0,
   "horizons": [
     {
@@ -54,26 +54,26 @@
     },
     {
       "horizon": "overnight_12h_plus",
-      "marks": 112,
-      "directional": 109,
-      "correct": 53,
-      "coverage_pct": 97.3,
-      "accuracy_pct": 48.6,
+      "marks": 124,
+      "directional": 121,
+      "correct": 58,
+      "coverage_pct": 97.6,
+      "accuracy_pct": 47.9,
       "accuracy_ci95": [
-        35.6,
-        59.6
+        36.1,
+        58.1
       ],
       "interval_method": "bootstrap over decision cycles",
-      "cycles": 10,
+      "cycles": 11,
       "beats_a_coin": false,
       "naive_lean": "up",
-      "naive_accuracy_pct": 53.2,
-      "cycles_lean_beat_naive": 3,
+      "naive_accuracy_pct": 51.2,
+      "cycles_lean_beat_naive": 4,
       "cycles_naive_beat_lean": 4,
       "cycles_tied": 3,
       "sign_test_p_vs_naive": 1.0,
       "beats_the_naive_call": false,
-      "hurdle_clearance_pct": 90.2,
+      "hurdle_clearance_pct": 87.1,
       "median_forgone_bps": -18.11,
       "enough_for_a_rate": true
     }

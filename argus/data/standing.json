@@ -2062,7 +2062,7 @@
         },
         {
           "condition": "failure_cases_documented",
-          "how": "every tool that does not answer is named, with the service's own error text attached: 10 of 19 are recorded down across three separated attempts, carrying envelopes like `Error executing tool cross_asset` and an explicit upstream ConnectTimeout. Repointed from the single-sweep artefact on 2026-09-21: that file recorded 6 ok / 10 empty / 3 tool_error one day and 6 ok / 13 timeout the next, from the same code against the same endpoint, so it could not distinguish a dead tool from an unlucky call. Repeating the measurement showed 9 of 19 answer three for three \u2014 the snapshot was understating the integration \u2014 and produced a failure set that is stable rather than whichever error happened to occur. The feed-list comparison's SCOPE_STATEMENT still states what is NOT claimed: not that TradingAgents' raise-on-core-failure design is a defect, only that ARGUS's own design cannot be aborted by one live source the same way",
+          "how": "every tool that does not answer is named, with the service's own error text attached: 13 of 19 are recorded down across three separated attempts, carrying envelopes like `Error executing tool cross_asset` and an explicit upstream ConnectTimeout. Repointed from the single-sweep artefact on 2026-09-21: that file recorded 6 ok / 10 empty / 3 tool_error one day and 6 ok / 13 timeout the next, from the same code against the same endpoint, so it could not distinguish a dead tool from an unlucky call. Repeating the measurement produced a failure set that is stable rather than whichever error happened to occur: 6 of 19 answer three for three, all of them technical analysis. (An earlier run read 9, counting three tools that return only an upstream error envelope as answers; the classifier was corrected 2026-09-26.) The feed-list comparison's SCOPE_STATEMENT still states what is NOT claimed: not that TradingAgents' raise-on-core-failure design is a defect, only that ARGUS's own design cannot be aborted by one live source the same way",
           "artefact": "data/skill_reliability.json",
           "test": ""
         },
@@ -2197,6 +2197,93 @@
         "Published evidence is against raw classification value: BloombergGPT trails an always-neutral predictor on two of its own five sentiment tasks, and FinMA is at chance. This is separate from the coordination-defense finding above \u2014 the analyst does not claim classification edge, only integrity."
       ],
       "note": "PROMOTION GATE: 30 differing paired frames through argus.eval.ablation.paired, scored on realised basis points. HELPS promotes it; NO_EFFECT removes it from the panel. Kept in the code rather than deleted so the gate can actually be run \u2014 a deletion would hide the finding, and an unmarked analyst would let a dead feed count as a data source.",
+      "measured_outcomes": []
+    },
+    {
+      "name": "Crowd sentiment classification, vs. RoB-RT on TweetEval",
+      "subtheme": "t2-sentiment",
+      "module": "argus/market/social_pulse.py,argus/market/abuse.py,argus/eval/sentiment_tweeteval.py",
+      "state": "lost",
+      "baseline": "RoB-RT (TweetEval, Barbieri et al. 2020), its published test predictions re-scored on the same tweets; finBERT and VADER beside it",
+      "conditions_met": [
+        "best_implementation_studied",
+        "best_method_studied",
+        "baseline_reproduced",
+        "implementation_complete",
+        "same_input_comparison",
+        "statistically_valid_evaluation",
+        "out_of_sample_test",
+        "ablation",
+        "reproducibility_proven"
+      ],
+      "conditions_missing": [
+        "costs_included",
+        "adversarial_test",
+        "failure_cases_documented",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "TweetEval's paper (arXiv:2010.12421v2, Table 3) and repository leaderboard: SVM, FastText, BLSTM, three RoBERTa variants, BERTweet and TimeLMs-2021",
+          "artefact": "data/sentiment_tweeteval.json",
+          "test": ""
+        },
+        {
+          "condition": "best_method_studied",
+          "how": "macro-averaged recall, TweetEval's and SemEval-2017 Task 4's own metric, because accuracy on this imbalanced set rewards an always-neutral scorer",
+          "artefact": "data/sentiment_tweeteval.json",
+          "test": ""
+        },
+        {
+          "condition": "baseline_reproduced",
+          "how": "RoB-RT's own test predictions re-scored through this module's metric: 0.729, against Table 3's 72.6 and the README's 72.8",
+          "artefact": "data/sentiment_tweeteval.json",
+          "test": "test_sentiment_tweeteval.py"
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "the crowd read (`market/social_pulse.pulse`) run end to end on every tweet",
+          "artefact": "data/sentiment_tweeteval.json",
+          "test": ""
+        },
+        {
+          "condition": "same_input_comparison",
+          "how": "all 12,284 TweetEval sentiment test tweets, every scorer on the same items",
+          "artefact": "data/sentiment_tweeteval.json",
+          "test": ""
+        },
+        {
+          "condition": "statistically_valid_evaluation",
+          "how": "paired bootstrap of macro-recall differences on the same tweets: RoB-RT minus ARGUS +0.185, the 95% interval excluding zero",
+          "artefact": "data/sentiment_tweeteval.json",
+          "test": ""
+        },
+        {
+          "condition": "out_of_sample_test",
+          "how": "the abuse screen's configuration was fixed on TweetEval's validation splits and the test splits were read once afterwards",
+          "artefact": "data/sentiment_tweeteval.json",
+          "test": ""
+        },
+        {
+          "condition": "ablation",
+          "how": "the same tweets run with the abuse screen off: VADER alone, 0.570, so the screen costs 0.026 of macro-recall",
+          "artefact": "data/sentiment_tweeteval.json",
+          "test": ""
+        },
+        {
+          "condition": "reproducibility_proven",
+          "how": "every input file pinned by its upstream git blob hash; one command re-runs it with no model call (python -m argus.eval.sentiment_tweeteval)",
+          "artefact": "data/sentiment_tweeteval.json",
+          "test": "test_sentiment_tweeteval.py"
+        }
+      ],
+      "blockers": [
+        "LOST to RoB-RT by 0.185 of macro-recall on the same 12,284 test tweets: ARGUS's crowd read scores 0.544 (95% CI 0.535 to 0.553) against RoB-RT's 0.729, and trails every published TweetEval baseline, the weakest of them BLSTM at 0.583.",
+        "It beats finBERT, the Market sentiment capability's named baseline, by 0.148 (95% CI 0.138 to 0.159): finBERT, trained on financial news, reads tweets worse than a lexicon.",
+        "What would close it: a tweet-domain transformer (RoB-RT or TimeLMs) in the runtime, which adds torch to the console; the LLM analyst was not scored (Qwen budget zero)."
+      ],
+      "note": "The classification race ARGUS's sentiment analyst had disclaimed, run so the disclaimed axis is a number: it is lost, and it is kept in the register.",
       "measured_outcomes": []
     },
     {
@@ -4191,7 +4278,7 @@
     }
   ],
   "by_state": {
-    "lost": 0,
+    "lost": 1,
     "tied": 12,
     "implemented": 25,
     "owned": 6
@@ -4258,16 +4345,6 @@
       "detail": "no groupwise check has run on its artefacts: data/afterhours_comparison.json: only context headlines were checked"
     },
     {
-      "capability": "rToken factor divergence vs. Alphalens' real Information Coefficient",
-      "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "the groupwise audit predates the current data/factor_divergence_comparison.json; re-run python -m argus.eval.groupwise_audit"
-    },
-    {
-      "capability": "rToken factor divergence vs. Alphalens' real Information Coefficient",
-      "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "the groupwise audit predates the current data/factor_divergence_comparison.json; re-run python -m argus.eval.groupwise_audit"
-    },
-    {
       "capability": "Episodic memory across decisions",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
       "detail": "no groupwise check has run on its artefacts: data/recall_comparison.json: designed_cases - three designed boundary cases for the point-in-time guard"
@@ -4296,6 +4373,16 @@
       "capability": "Perception layer: what the desk can see",
       "problem": "out_of_sample_test is claimed but not evidenced",
       "detail": "no groupwise check has run on its artefacts: data/desk_notes.jsonl: no_rows - free-text notes per live cycle; the feedlist harness reduces them to one distinct-source count and no per-cycle value is recorded; data/feedlist_comparison.json: designed_cases - designed vendor-failure scenarios over the rival's own category list; data/skill_reliability.json: only context headlines were checked"
+    },
+    {
+      "capability": "Crowd sentiment classification, vs. RoB-RT on TweetEval",
+      "problem": "statistically_valid_evaluation is claimed but not evidenced",
+      "detail": "no groupwise check has run on its artefacts: data/sentiment_tweeteval.json: aggregate_without_rows - 12,284 TweetEval test tweets scored, but only per-class recall, confusion counts and paired-bootstrap differences are kept: TweetEval publishes no licence, so no per-tweet row is written (eval/sentiment_tweeteval.py would need to keep per-tweet labels by id to allow a breakdown by class and by topic)"
+    },
+    {
+      "capability": "Crowd sentiment classification, vs. RoB-RT on TweetEval",
+      "problem": "out_of_sample_test is claimed but not evidenced",
+      "detail": "no groupwise check has run on its artefacts: data/sentiment_tweeteval.json: aggregate_without_rows - 12,284 TweetEval test tweets scored, but only per-class recall, confusion counts and paired-bootstrap differences are kept: TweetEval publishes no licence, so no per-tweet row is written (eval/sentiment_tweeteval.py would need to keep per-tweet labels by id to allow a breakdown by class and by topic)"
     },
     {
       "capability": "Path-shape matching with a calibrated null",
@@ -4379,13 +4466,7 @@
     "reproducibility_proven",
     "no_specialist_capability_superior"
   ],
-  "transitions_this_write": [
-    {
-      "capability": "rToken factor divergence vs. Alphalens' real Information Coefficient",
-      "from": "owned",
-      "to": "implemented"
-    }
-  ],
+  "transitions_this_write": [],
   "transition_log": [
     {
       "capability": "Deliberation priced as a trading cost",
@@ -4470,6 +4551,12 @@
       "from": "owned",
       "to": "implemented",
       "at": "2026-09-26T09:24:05+00:00"
+    },
+    {
+      "capability": "Crowd sentiment classification, vs. RoB-RT on TweetEval",
+      "from": null,
+      "to": "lost",
+      "at": "2026-09-26T16:01:13+00:00"
     }
   ]
 }

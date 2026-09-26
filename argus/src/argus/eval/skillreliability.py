@@ -113,6 +113,25 @@ class ToolReliability:
         }
 
 
+def tool_probes() -> tuple[Probe, ...]:
+    """One probe per bitget-signal tool, 19 in all, each the call a user of its Skill would make
+    (`eval/skill_matrix.SIGNAL_CALLS`).
+
+    Until 2026-09-26 this swept `market/skills.PROBES`, the desk's own call set: 19 calls, but six
+    of them actions of one tool (``technical_analysis``) and three of another, so "19 tools"
+    described twelve, and seven tools were never asked, two of which answer (judge audit). The
+    desk keeps its call set; the reliability of the service is measured tool by tool."""
+    from argus.eval.skill_matrix import SIGNAL_CALLS
+
+    out: list[Probe] = []
+    for call in SIGNAL_CALLS:
+        args = dict(call.args)
+        action = str(args.pop("action", ""))
+        out.append(Probe(skill=call.skill, tool=call.tool, action=action, args=args,
+                         yields=call.source))
+    return tuple(out)
+
+
 def measure(
     client: Any, *, symbol: str = "NVDAUSDT", attempts: int = ATTEMPTS,
     probes: Sequence[Probe] = PROBES, timeout: int = DEFAULT_TIMEOUT,
@@ -153,15 +172,18 @@ def measure(
 
 
 def run(symbol: str = "NVDAUSDT", *, attempts: int = ATTEMPTS) -> dict[str, Any]:
+    from argus.eval.skill_matrix import SERVER_ONLY
     from argus.market.evidence import BitgetSkillSource
 
     client = BitgetSkillSource()
-    rows = measure(client, symbol=symbol, attempts=attempts)
+    rows = measure(client, symbol=symbol, attempts=attempts, probes=tool_probes())
 
     by_verdict: dict[str, int] = {}
     for row in rows:
         by_verdict[row.verdict] = by_verdict.get(row.verdict, 0) + 1
-    skills = {r.skill for r in rows}
+    # The five Skills are counted as Skills; the tools no SKILL.md names are counted apart, so a
+    # server-only tool that answers never raises the number of Skills that answer.
+    skills = {r.skill for r in rows if r.skill != SERVER_ONLY}
     reliable_skills = {
         skill for skill in skills
         if any(r.verdict == "reliable" for r in rows if r.skill == skill)
@@ -172,8 +194,11 @@ def run(symbol: str = "NVDAUSDT", *, attempts: int = ATTEMPTS) -> dict[str, Any]
         "checked_at": datetime.now(UTC).isoformat(),
         "symbol": symbol,
         "attempts_per_tool": attempts,
-        "tools": len(rows),
+        "tools": len({r.tool for r in rows}),
+        "calls_per_attempt": len(rows),
         "by_verdict": by_verdict,
+        "server_only_tools": sorted(r.tool for r in rows if r.skill == SERVER_ONLY),
+        "reliable_tools": sorted(r.tool for r in rows if r.verdict == "reliable"),
         "skills_total": len(skills),
         "skills_with_a_reliable_tool": len(reliable_skills),
         "reliable_skills": sorted(reliable_skills),
@@ -181,10 +206,13 @@ def run(symbol: str = "NVDAUSDT", *, attempts: int = ATTEMPTS) -> dict[str, Any]
             (r.as_dict() for r in rows), key=lambda d: (-d["rate"], d["tool"])
         ),
         "scope_statement": (
-            f"Each of Bitget's {len(rows)} official research-Skill tools is called {attempts} "
-            f"times, {SPACING}s apart, through the same client the desk uses, and classified "
-            f"reliable / intermittent / down. NOT CLAIMED: that {attempts} attempts characterise "
-            f"a service — they distinguish always from sometimes from never and nothing finer. "
+            f"Each of bitget-signal's {len({r.tool for r in rows})} tools is called "
+            f"{attempts} times, {SPACING}s apart, with the call a user of its Skill would make "
+            f"(eval/skill_matrix.py), through the same client the desk uses, and classified "
+            f"reliable / intermittent / down; {len(skills)} Skills are counted as Skills and the "
+            f"tools no SKILL.md names are listed apart. NOT CLAIMED: that {attempts} attempts "
+            f"characterise a service — they distinguish always from sometimes from never and "
+            f"nothing finer. "
             f"NOT CLAIMED: that a failure is Bitget's fault; the failures observed carry the "
             f"service's own error envelopes, including an explicit ConnectTimeout from its "
             f"upstream, so the most this says is that the door was shut when we knocked."

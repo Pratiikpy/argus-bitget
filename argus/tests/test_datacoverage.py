@@ -35,10 +35,16 @@ class TestEveryEntryWasActuallyCalled:
         assert states <= {"ok", "empty", "error", "needs_params"}
         assert sum(report["by_health"].values()) == report["entries_probed"]
 
-    def test_the_equity_surface_largely_answers(self, report: dict) -> None:
-        """The finding worth publishing: the anchor data for tokenized equities is available
-        keyless, and nearly all of it returns."""
-        assert report["equity_answering"] >= report["equity_entries"] - 3
+    def test_a_surface_that_does_not_answer_says_why(self, report: dict) -> None:
+        """How much of the equity surface answers is a fact about the service on the day, not a
+        property of this code: 21 of 22 answered on 2026-09-25, none since its upstream began
+        returning 503. So the test pins what must hold either way: the count is dated, and every
+        entry that failed carries the service's own reason."""
+        assert report["checked_at"]
+        assert 0 <= report["equity_answering"] <= report["equity_entries"]
+        for probe in report["probes"]:
+            if probe["health"] == "error":
+                assert probe["detail"], "a failed entry must say how it failed"
 
     def test_it_probed_a_real_rtoken(self, report: dict) -> None:
         assert report["probe_symbol"] == PROBE_SYMBOL
@@ -51,8 +57,11 @@ class TestEmptyIsNotCollapsedIntoBroken:
         rows for this symbol is a fact about coverage; one that refuses is a fact about the
         service. Merging them would let either be reported as the other."""
         health = report["by_health"]
-        assert "empty" in health or "ok" in health
         assert not (set(health) - {"ok", "empty", "error", "needs_params"})
+        for probe in report["probes"]:
+            # A refusal from the service is never filed as "no rows for this symbol".
+            if probe["health"] == "empty":
+                assert "service reported failure" not in (probe.get("detail") or "")
 
     def test_needs_params_is_not_reported_as_a_service_failure(self, report: dict) -> None:
         """A probe that calls a tool wrongly measures the probe. Those are labelled as ours."""

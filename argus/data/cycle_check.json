@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-09-25T20:27:34.962588+00:00",
-  "log": "cycle_2026-09-26_0100.log",
-  "sound": true,
-  "saw_price_discovery": true,
+  "generated_at": "2026-09-26T16:15:39.937001+00:00",
+  "log": "cycle_2026-09-26_2100.log",
+  "sound": false,
+  "saw_price_discovery": false,
   "proposed_exposure": 0,
-  "falsifier_fired": true,
+  "falsifier_fired": false,
   "checks": [
     {
       "check": "exit_code",
@@ -13,28 +13,28 @@
     },
     {
       "check": "symbols_decided",
-      "status": "PASS",
-      "detail": "12 of 12 symbols produced a decision"
+      "status": "FAIL",
+      "detail": "11 of 12 symbols produced a decision"
     },
     {
       "check": "ran_to_completion",
-      "status": "PASS",
-      "detail": "the cycle reached every symbol it was given"
+      "status": "FAIL",
+      "detail": "stopped after 11 of 12 symbol(s): 12838 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
     },
     {
       "check": "token_budget",
       "status": "PASS",
-      "detail": "319,314 of 330,000 spent (97%)"
+      "detail": "317,162 of 330,000 spent (96%)"
     },
     {
       "check": "cumulative_tokens",
       "status": "PASS",
-      "detail": "14,327,662 token(s) across 50 recorded cycle(s), 286,553 per cycle \u2014 roughly 1,146,213/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
+      "detail": "14,965,038 token(s) across 52 recorded cycle(s), 287,789 per cycle \u2014 roughly 1,151,157/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
     },
     {
       "check": "budget_not_exhausted",
-      "status": "PASS",
-      "detail": "the guard did not fire"
+      "status": "FAIL",
+      "detail": "the budget ended the cycle before the guard had to \u2014 stopped after 11 of 12 symbol(s): 12838 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
     },
     {
       "check": "chain_intact",
@@ -44,12 +44,12 @@
     {
       "check": "leans_recorded",
       "status": "PASS",
-      "detail": "12 of 12 row(s) carry a lean and a lean_confidence"
+      "detail": "11 of 11 row(s) carry a lean and a lean_confidence"
     },
     {
       "check": "leans_gradeable",
       "status": "PASS",
-      "detail": "12 of 12 decision(s) state a direction (7 up, 5 down, 0 none)"
+      "detail": "11 of 11 decision(s) state a direction (8 up, 3 down, 0 none)"
     },
     {
       "check": "verdicts_parsed",
@@ -59,8 +59,8 @@
     {
       "check": "session",
       "status": "PASS",
-      "detail": "session phase(s) seen: rth  <-- price discovery"
+      "detail": "session phase(s) seen: weekend  (anchor market shut)"
     }
   ],
-  "verdict": "11/11 checks passed. **FALSIFIER FIRED**: this cycle had price discovery and the desk still proposed no exposure on any symbol. eval/autopsy.py named exactly this as the observation that moves the cause of the abstentions from the sampling to the desk. Its conclusion is now refuted and must be rewritten, not defended"
+  "verdict": "8/11 checks passed. FAILED \u2014 symbols_decided: 11 of 12 symbols produced a decision; ran_to_completion: stopped after 11 of 12 symbol(s): 12838 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.; budget_not_exhausted: the budget ended the cycle before the guard had to \u2014 stopped after 11 of 12 symbol(s): 12838 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.. The cycle ran with the anchor market shut, so it says nothing about whether this desk trades"
 }

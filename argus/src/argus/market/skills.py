@@ -198,9 +198,12 @@ def _classify(payload: Any, status: str) -> tuple[Health, str]:
     return Health.OK, status
 
 
-_HOLLOW_KEYS = frozenset({"url", "note", "source", "feed", "symbol", "timeframe", "period"})
-"""Keys that describe the request rather than answer it. A payload made only of these carries
-nothing about the market."""
+_HOLLOW_KEYS = frozenset({"url", "note", "source", "feed", "symbol", "timeframe", "period",
+                          "platform", "provider"})
+"""Keys that describe the request, or which backend was tried, rather than answer it. A payload
+made only of these carries nothing about the market. ``platform`` and ``provider`` added
+2026-09-26: ``social_trending`` answered ``{"platform": "xueqiu", "provider": "all_failed",
+"items": []}`` on every platform and was counted reliable, three attempts of three."""
 
 
 def hollow(payload: Any) -> bool:

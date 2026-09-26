@@ -484,7 +484,10 @@ def factor_returns(factor_closes: Mapping[str, Closes]
 
 def fit_holding(closes: Closes, factor_closes: Mapping[str, Closes], *,
                 window: int = WINDOW_DAYS) -> Fit | None:
-    """One holding's loadings on the last ``window`` dates it shares with every factor."""
+    """One holding's loadings on the last ``window`` dates it shares with every factor, or None
+    when a factor series is missing: a four-factor fit on three factors is a different model."""
+    if any(k not in factor_closes for k in FACTOR_SERIES):
+        return None
     spy, iwm, mtum, btc = (factor_closes[k] for k in ("SPY", "IWM", "MTUM", "BTC"))
     days = sorted(set(closes) & set(spy) & set(iwm) & set(mtum) & set(btc))[-(window + 1):]
     if len(days) - 1 < MIN_OBS:
@@ -519,9 +522,20 @@ def _bitget_daily(symbol: str) -> dict[date, float]:
         hit = _BITGET_CACHE.get(symbol)
         if hit and now - hit[0] < CACHE_TTL_S:
             return hit[1]
+    from argus.market.history import HistoryError
+
     # the recent endpoint returns about 90 daily bars; a year of them needs the paged history
-    bars = fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=400), interval="1D",
-                        candle_type=CandleType.MARKET, pause=0.05)
+    for attempt in range(RATE_LIMIT_RETRIES + 1):
+        try:
+            bars = fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=400),
+                                interval="1D", candle_type=CandleType.MARKET, pause=0.05)
+            break
+        except HistoryError as exc:
+            # Bitget answers 429 to a burst (seen 2026-09-26 while seven engines fetched at
+            # once); a short wait clears it, anything else is not ours to retry.
+            if "429" not in str(exc) or attempt == RATE_LIMIT_RETRIES:
+                raise
+            time.sleep(1.0 * (attempt + 1))
     out = {(b.ts + timedelta(days=1)).date(): float(b.close) for b in bars if float(b.close) > 0}
     if len(out) < 30:
         raise RuntimeError(f"only {len(out)} daily bars for {symbol}")
@@ -548,6 +562,12 @@ def closes_for(symbol: str, rows: Mapping[str, Any] | None = None) -> tuple[dict
         except Exception:
             pass  # a listing younger than a year: the perpetual's own candles below
     return _bitget_daily(symbol), f"{symbol} daily candles (Bitget, 16:00 UTC close)"
+
+
+RATE_LIMIT_RETRIES = 2
+"""Retries of a Bitget candle page that answered 429, one and then two seconds apart."""
+
+FACTOR_SERIES = ("SPY", "IWM", "MTUM", "BTC")
 
 
 def factor_closes() -> dict[str, dict[date, float]]:
@@ -664,7 +684,12 @@ def fetch_inputs(symbols: Sequence[str], rows: Mapping[str, Any] | None = None) 
                 out[symbol], origins[symbol] = series, origin
             except Exception as exc:
                 missing[symbol] = type(exc).__name__
-        factors = factors_future.result(timeout=max(0.1, deadline - time.monotonic()))
+        try:
+            factors = factors_future.result(timeout=max(0.1, deadline - time.monotonic()))
+        except Exception as exc:
+            # The sectors need no prices; only the factor half is lost, and the answer says so.
+            factors = {}
+            missing["factors"] = type(exc).__name__
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
     return Inputs(out, factors, origins, missing)
@@ -736,9 +761,28 @@ def exposures_answer(
     factor_changes = sorted(((f, load_a[f] - load_b[f]) for f in FACTORS),
                             key=lambda kv: -abs(kv[1])) if after is not None else []
 
+    # With no fitted holding the loadings are empty sums, and "market beta 0.00" would be a zero
+    # nobody measured (seen 2026-09-26 when the BTC factor series answered 429). The sectors
+    # need no prices, so they are still answered; the factor half says why it is absent.
+    fitted_any = any(f is not None for f in fits.values())
+    no_factors = ("the factor series (SPY, IWM, MTUM and BTC daily closes) could not be read "
+                  f"just now ({inputs.missing['factors']})" if "factors" in inputs.missing
+                  else "no holding had enough daily closes to fit")
+
     # the lead
     top_b = next(iter(sec_b.items()), ("nothing", 0.0))
-    if after is not None and changes:
+    if not fitted_any:
+        if after is not None and changes:
+            bucket = changes[0][0]
+            lead = (f"Actionable: {trade_words} moves {bucket} from "
+                    f"{_pct(sec_b.get(bucket, 0.0))} to {_pct(sec_a.get(bucket, 0.0))} of the "
+                    f"book — the biggest sector change; the factor loadings are not stated this "
+                    f"time because {no_factors}.")
+        else:
+            lead = (f"Actionable: your book is {_pct(top_b[1])} {top_b[0]}"
+                    + (f" across {eff_sec_b:.1f} effective sectors" if len(sec_b) > 1 else "")
+                    + f"; its factor loadings are not stated this time because {no_factors}.")
+    elif after is not None and changes:
         bucket = changes[0][0]
         factor, fdelta = factor_changes[0]
         direction = "more" if (eff_a or 0) > eff_b else "less"
@@ -779,7 +823,9 @@ def exposures_answer(
                                             for k, v in industries.items()) + ".")
 
     # factors
-    for factor in FACTORS:
+    if not fitted_any:
+        lines.append(f"Factor loadings: not computed — {no_factors}. Ask again in a minute.")
+    for factor in FACTORS if fitted_any else ():
         t_bits = [f"{_t(s)} t {_tstat(fit.t_stats[factor])}" for s in names
                   if (fit := fits.get(s)) is not None]
         lines.append(f"{FACTOR_WORDS[factor]}: "
@@ -860,7 +906,7 @@ def exposures_answer(
         f"Data: sectors from data/sector_map.json (Yahoo quoteSummary, frozen {map_date}); "
         f"factor returns from SPY, IWM and MTUM daily closes (Yahoo) and BTCUSDT daily candles "
         f"(Bitget, 16:00 UTC close, four hours before the US close); holdings from "
-        + "; ".join(origins) + ".")
+        + ("; ".join(origins) if origins else "no series that could be read") + ".")
     lines.append("Method: one least-squares regression per holding of its daily returns on SPY, "
                  "IWM minus SPY, MTUM minus SPY and BTC together; the book's loading is the "
                  "weight-sum of its "

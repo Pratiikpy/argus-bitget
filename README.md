@@ -83,12 +83,12 @@ deflation gate, and the console says so.
 Every capability is graded against the specialist that leads its sub-theme, by a register that
 opens the evidence rather than trusting a filename (`python -m argus.eval.standing`), and may claim
 OWNED only after that rival has been run on the same input and beaten.
-**6 of 43 capabilities are OWNED, 12 are TIED, 25 are IMPLEMENTED, and 0 are LOST.** OWNED needs
+**6 of 44 capabilities are OWNED, 12 are TIED, 25 are IMPLEMENTED, and 1 is LOST (crowd sentiment classification, to RoB-RT on TweetEval: 0.544 against 0.729 macro-recall on the same 12,284 tweets).** OWNED needs
 all thirteen conditions: the rival's best implementation read and reproduced, a same-input
 comparison with costs, out-of-sample, ablation, an adversarial test, documented failure cases and
 reproducibility.
 
-The register got stricter on 2026-09-26 and the count fell from 20 to 8. A proof that rests on a
+The register got stricter on 2026-09-25 and 26, and the OWNED count fell from 20 to 8, then to 6. A proof that rests on a
 population figure must now survive a per-group check — by symbol and by half of the sample — and 12
 capabilities went back to IMPLEMENTED: five because their headline was carried by one symbol or
 flipped between halves, seven because their proof is a designed case set the new check cannot
@@ -96,7 +96,7 @@ grade, which needs its own construction test before it can count again. Each row
 back (`data/standing.json`). One more went to TIED the same day: breadth rotation had beaten
 pytaa, which silently drops weight, but a general-purpose validator (pandera with pydantic)
 configured to the same contract handles the same 36 cases, so a margin over the specialist was
-not a margin over the best tool for the job.
+not a margin over the best tool for the job. A sixth, rToken factor divergence against Alphalens, went to IMPLEMENTED when its statement was rewritten from the computed intervals, which include zero.
 
 Losses are published the moment they are found. Two were found and closed on 2026-09-24: Bitget's
 own 60-second TWAP beat the schedule the console printed (6.9 against 12.2bps on a $100k order),
@@ -131,8 +131,8 @@ The full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.v
 |---|---|---|
 | Public market API (v3) | Candles, tickers, 50-level books, funding — every price and cost in the console | Answering, checked live on `/status` |
 | Order-book websocket (`books5`, trades) | Execution replay and the order-splitting comparison | Recorded locally, RFC 6455 client |
-| `bitget-mcp-server` | US fundamentals, 13F holders, analyst estimates, earnings calendar, the stock behind each rToken | 37 of 67 catalog entries answered |
-| `bitget-signal` Skills | Technicals (MACD corrected against Bitget's own candles), sentiment, macro, news, market intel | Bitget's server answered 6 of 19; ARGUS read the other 13 from the sources those Skills name — 19 of 19, all 5 Skills |
+| `bitget-mcp-server` | US fundamentals, 13F holders, analyst estimates, earnings calendar, the stock behind each rToken | 37 of 67 catalog entries answered on 25 Sep; none since its upstream began answering 503 (checked 26 Sep, `data/data_coverage.json`) |
+| `bitget-signal` Skills | The console asks the Skill first for technicals (MACD corrected against Bitget's own candles), crypto sentiment and the rates curve, and checks BTC against `crypto_derivatives` | 2 of bitget-signal's 19 tools answered all three attempts on 2026-09-26 (crypto_derivatives, technical_analysis), from 1 of its 5 Skills (technical-analysis) plus 1 tool no SKILL.md names; when a Skill is silent the answer names the public source it read instead |
 
 When a Skill's hosted server fails, ARGUS reads the source that Skill names (alternative.me,
 Binance futures data, FRED, Yahoo, DeFiLlama, CoinGecko, the RSS feeds). Every such answer says
@@ -158,7 +158,7 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 9,175 tests collected
+pytest -q                       # 9,255 tests collected
 ```
 
 Nothing above needs a credential. The full run took 1h16m from a fresh GitHub clone on
@@ -180,8 +180,8 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **9,175 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 475 source files** |
+| Tests | **9,255 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 476 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes**, resolved by import at runtime, not claimed in prose |
@@ -219,8 +219,8 @@ a test that reaches the network shows itself.
 
 ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · AI Trading Desk）。用自然语言提问，
 七个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
-从不编写数字。43 项能力逐一与各子赛道领先的专业系统在相同输入上对比：7 项领先（OWNED）、12 项
-持平、24 项已实现、0 项落后，所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
+从不编写数字。44 项能力中 42 项已与各子赛道领先的专业系统在相同输入上对比：6 项领先（OWNED）、12 项
+持平、25 项已实现、1 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
 （t2-sentiment-agent，独立的代码库、交易日志与演示），不属于本仓库。
 
 ---

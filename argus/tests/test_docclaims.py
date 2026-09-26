@@ -388,3 +388,20 @@ class TestLaggingIsNamedNotHiddenBehindOK:
         report = audit()
         assert report.count("LAGGING") >= 0
         assert not report.stale, [f"{f.doc}:{f.line} {f.claim}" for f in report.stale]
+
+
+def test_no_withdrawn_phrasing_comes_back() -> None:
+    """A sentence withdrawn because it was wrong has no artefact to disagree with, so it is named
+    in RETIRED_PHRASES and must not reappear in a document or a test's docstring."""
+    from argus.eval.docclaims import retired_phrases
+
+    assert retired_phrases() == []
+
+
+def test_the_retired_phrase_check_finds_one(tmp_path: Path) -> None:
+    from argus.eval.docclaims import retired_phrases
+
+    doc = tmp_path / "doc.md"
+    doc.write_text("ARGUS read the rest, so all 19 are covered.\n", encoding="utf-8")
+    (found,) = retired_phrases([doc])
+    assert found.startswith("doc.md:1")

@@ -35,14 +35,14 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
-from argus.market.bitget_mcp import BitgetDataService
+from argus.market.bitget_mcp import shared_service
 
 SOURCE = "Bitget's data service, bitget-mcp-server"
 
 
 def _safe(entry: str, **params: Any) -> list[dict[str, Any]]:
     try:
-        return BitgetDataService().results(entry, **params)
+        return shared_service().results(entry, **params)
     except Exception:
         return []
 

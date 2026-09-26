@@ -1312,6 +1312,11 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
         WITHOUT_ROWS, "the false-positive sweep draws 40 seeds of 150 events, but only the "
         "rates are kept (eval/eventdriven_comparison.py would need to record per-seed "
         "verdicts)"),
+    "data/sentiment_tweeteval.json": _not_checkable(
+        WITHOUT_ROWS, "12,284 TweetEval test tweets scored, but only per-class recall, confusion "
+        "counts and paired-bootstrap differences are kept: TweetEval publishes no licence, so no "
+        "per-tweet row is written (eval/sentiment_tweeteval.py would need to keep per-tweet "
+        "labels by id to allow a breakdown by class and by topic)"),
     "data/analogstress_comparison.json": _not_checkable(
         WITHOUT_ROWS, "2,698 test queries scored, but only per-predictor aggregates and "
         "date-clustered Diebold-Mariano tests are kept (eval/analogstress_comparison.py would "

@@ -6,9 +6,9 @@ code, same endpoint, incompatible descriptions of one service. Track 3 scores "d
 Skill integration count **and effectiveness**", so which snapshot gets quoted decides the claim,
 and that is exactly the situation in which a claim should not be made.
 
-Repeating the call settles it. The measured answer turned out to be *better* than either snapshot:
-9 of 19 tools answer 3 for 3, and 3 of the 5 Skills have a reliable tool — not the 6 and 1 a single
-sweep reported.
+Repeating the call settles it: each tool is called several times, spaced apart, and classified
+reliable, intermittent or down. How many tools answer on a given day is in the artefact, dated;
+these tests pin the properties that make that count honest, not the count.
 """
 
 from __future__ import annotations
@@ -119,14 +119,20 @@ class TestTheLiveMeasurement:
         classifier counts as empty and this module, reading the status alone, counted as an
         answer (fixed 2026-09-26). Classified the same way, the repeated calls agree with the
         single sweep: the same tools answer every time, and no tool answers only sometimes."""
-        reliable = {(r["tool"], r["action"]) for r in report["results"]
-                    if r["verdict"] == "reliable"}
-        assert reliable
-        assert all(tool == "technical_analysis" for tool, _ in reliable)
-        assert report["by_verdict"].get("intermittent", 0) == 0
+        reliable = {r["tool"] for r in report["results"] if r["verdict"] == "reliable"}
+        assert reliable == set(report["reliable_tools"])
+        assert all(r["answered"] == r["attempts"] for r in report["results"]
+                   if r["verdict"] == "reliable")
 
     def test_it_says_how_many_skills_have_a_reliable_tool(self, report: dict) -> None:
-        assert 1 <= report["skills_with_a_reliable_tool"] <= report["skills_total"]
+        assert 0 <= report["skills_with_a_reliable_tool"] <= report["skills_total"] == 5
+
+    def test_nineteen_means_nineteen_tools(self, report: dict) -> None:
+        """"19 tools" once described 19 calls to 12 tools (judge audit, 2026-09-26)."""
+        tools = {r["tool"] for r in report["results"]}
+        assert report["tools"] == len(tools) == 19
+        assert report["calls_per_attempt"] == 19
+        assert set(report["server_only_tools"]) <= tools
 
     def test_the_scope_statement_refuses_to_blame_the_vendor(self, report: dict) -> None:
         """The failures carry Bitget's own error envelopes, including an explicit ConnectTimeout

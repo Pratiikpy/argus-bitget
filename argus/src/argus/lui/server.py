@@ -65,6 +65,8 @@ HOST = "127.0.0.1"
 PORT = 8765
 
 FAVICON = design.favicon()
+OG_PNG = Path(__file__).with_name("og.png")
+"""The link-preview card, `design.OG_IMAGE`."""
 """An inline SVG, not a bundled file. Every route in this server is one string in one module —
 adding a binary asset and a route to serve it would be the first exception to that, for a mark a
 judge never consciously looks at. Its absence was not silent, though: an unstyled 404 for
@@ -72,18 +74,21 @@ judge never consciously looks at. Its absence was not silent, though: an unstyle
 a first-time judge would (2026-09-22) rather than by reading the code and assuming it was fine."""
 
 PAGE = """<!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" href="__FAVICON__">__FONTS__
-<title>ARGUS desk console</title>
+<html lang="en"><head>__HEAD__
 <style>__TOKENS__
   body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,sans-serif; }
   .wrap { max-width:900px; margin:0 auto; padding:28px 18px 64px; }
   h1 { font-size:20px; margin:0 0 4px; letter-spacing:-0.01em }
   .sub { color:var(--dim); font-size:13px; margin:0 0 20px }
   .bar { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap }
-  input[type=text] { flex:1 1 320px; min-width:0; padding:11px 13px; border:1px solid var(--line);
-    border-radius:8px; background:var(--panel); color:var(--ink); font-size:15px }
+  input[type=text], textarea#q { flex:1 1 320px; min-width:0; padding:11px 13px;
+    border:1px solid var(--line); border-radius:8px; background:var(--panel); color:var(--ink);
+    font-size:15px }
+  textarea#q { font:15px/1.4 system-ui,sans-serif; resize:none; overflow-y:auto; max-height:320px;
+    box-sizing:border-box }
+  .deep { margin-top:10px }
+  .deep button { padding:0; border:0; background:none; color:var(--accent); font-size:13.5px;
+    font-weight:600; cursor:pointer; text-decoration:underline; text-underline-offset:3px }
   button { padding:11px 18px; border:1px solid var(--accent); background:var(--accent); color:#fff;
     border-radius:8px; font-size:15px; cursor:pointer }
   button:disabled { opacity:.55; cursor:default }
@@ -113,7 +118,8 @@ PAGE = """<!doctype html>
   .book .saved { font-size:12px; color:var(--ok) }
   .group { font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim);
     margin:0 0 6px }
-  .line.act { font-weight:600; color:var(--accent) }
+  .line.act { font-weight:600; color:var(--ink); border-left:2px solid var(--ink);
+    padding-left:8px }
   .line.hedge { font-weight:600 }
   .line.fine { color:var(--dim); font-size:13px }
   .pv { display:inline-block; min-width:4.6em; margin-right:.5em; padding:0 .35em;
@@ -154,8 +160,8 @@ question and never writes a number. No source, no answer: you get a refusal and 
 <a href="/materials">Every deliverable on one page &rarr;</a></p>
 
 <form class="bar" id="f">
-  <input type="text" id="q" autocomplete="off"
-    placeholder="I hold 50% NVDA, 50% AAPL — what does adding 20% TSLA do to my risk?">
+  <textarea id="q" rows="1" autocomplete="off" aria-label="your question"
+    placeholder="I hold 50% NVDA, 50% AAPL — what does adding 20% TSLA do to my risk?"></textarea>
   <button id="go">Ask</button>
 </form>
 <div class="book">
@@ -181,17 +187,33 @@ question and never writes a number. No source, no answer: you get a refusal and 
 // Research first: Track 3 judges a question-to-insight workbench, and these are the questions its
 // Open Theme names — trade impact on a book, stress, comparison, execution — then the Bitget
 // Skills and data server by name: technicals, the earnings calendar, and past analogues.
+// A pasted table of fills is a question too (`lui/journal.py` reads it); this chip puts an
+// example in the box so a trader sees the shape, and the box keeps its line breaks.
+const REVIEW_CHIP = "review my trades (paste a table of fills)";
+const REVIEW_EXAMPLE = ["review my trades", "time,symbol,side,price,qty",
+  "2026-09-22 14:05,NVDAUSDT,buy,176.40,20", "2026-09-23 15:10,NVDAUSDT,sell,181.20,20",
+  "2026-09-24 14:30,TSLAUSDT,buy,262.10,10", "2026-09-25 16:45,TSLAUSDT,sell,255.30,10"]
+  .join("\\n");
 const RESEARCH = ["I hold 50% NVDA, 50% AAPL — what does adding 20% TSLA do to my risk?",
   "what if the Nasdaq drops 10%? I hold 40% MSFT, 30% META, 30% GOOGL",
   "is TSLA riskier than NVDA", "should I buy MSTR", "where is NVDA trading right now",
   "how should I split a $50k order in NVDA", "is TSLA overbought",
   "when does NVDA report earnings", "what did NVDA's latest 10-Q say drove data center revenue",
-  "has COIN been here before", "compare gold and bitcoin"];
+  "has COIN been here before", "compare gold and bitcoin", REVIEW_CHIP];
 const SUGGEST = ["why did you do nothing all weekend","what is the sharpe","show me decision 25",
   "what did the risk layer block","what evidence backed that","is the log tamper-evident",
   "are you well calibrated","what bad decision patterns do you have","what is my position",
   "sell half of that"];
 const out = document.getElementById('out'), qEl = document.getElementById('q');
+// The box grows with what is typed or pasted; Enter asks, Shift+Enter starts a new line, and an
+// input method still composing (Chinese, Japanese) keeps its Enter.
+const grow = () => { qEl.style.height = 'auto'; qEl.style.height = qEl.scrollHeight + 2 + 'px'; };
+qEl.addEventListener('input', grow);
+qEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+    e.preventDefault(); document.getElementById('f').requestSubmit();
+  }
+});
 const bookEl = document.getElementById('book'), savedEl = document.getElementById('saved');
 let turns = [], first = true;
 // Our own visits are marked so the usage count (`lui/usage.py`) is of other people: opening the
@@ -204,9 +226,10 @@ try {
 } catch (e) {}
 // Questions, books and memory go in a POST body: a query string is written to the host's access
 // log, and what a visitor types is theirs.
-const post = (path, fields) => fetch(path, {method: 'POST',
+const post = (path, fields, signal) => fetch(path, {method: 'POST', signal,
   headers: {'Content-Type': 'application/x-www-form-urlencoded'},
   body: new URLSearchParams({...fields, internal})});
+const ASK_LIMIT_MS = 90000;
 
 // The book is the visitor's own and stays in their browser; it is sent with each question and
 // never stored on the server.
@@ -240,6 +263,9 @@ for (const [id, list] of [['chips-research', RESEARCH], ['chips', SUGGEST]]) {
   el.innerHTML = list.map(s => `<span class="chip">${esc0(s)}</span>`).join('');
   el.addEventListener('click', e => {
     if (!e.target.classList.contains('chip')) return;
+    if (e.target.textContent === REVIEW_CHIP) {
+      qEl.value = REVIEW_EXAMPLE; grow(); qEl.focus(); return;
+    }
     qEl.value = e.target.textContent; document.getElementById('f').requestSubmit();
   });
 }
@@ -279,15 +305,18 @@ fetch('status').then(r => r.json()).then(s => {
 }).catch(() => {});
 
 const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const escA = s => esc(s).replace(/"/g, '&quot;');
 
 document.getElementById('f').addEventListener('submit', async ev => {
   ev.preventDefault();
   const text = qEl.value.trim(); if (!text) return;
-  qEl.value = ''; document.getElementById('go').disabled = true;
+  qEl.value = ''; grow(); document.getElementById('go').disabled = true;
   if (first) { out.innerHTML = ''; first = false; }
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), ASK_LIMIT_MS);
   try {
     const r = await post('ask', {q: text, turns: JSON.stringify(turns),
-      book: bookEl.value.trim(), memory: JSON.stringify(memory)});
+      book: bookEl.value.trim(), memory: JSON.stringify(memory)}, ctl.signal);
+    if (!r.ok) throw new Error(`http ${r.status}`);
     const a = await r.json();
     turns = a.turns || turns;
     if (a.memory) { try { memory = JSON.parse(a.memory); } catch (e) {} saveMemory(); }
@@ -308,6 +337,10 @@ document.getElementById('f').addEventListener('submit', async ev => {
           ` source${a.sources.length === 1 ? '' : 's'}</span>` +
           a.sources.map(s => `&nbsp;&nbsp;<b>${esc(s.kind)}</b>:${esc(s.ref)}` +
             (s.detail ? ' — ' + esc(s.detail) : '')).join('<br>') + `</div>` : ''}
+        ${a.research_task ? `<form class="deep" method="post" action="/research">` +
+          `<input type="hidden" name="q" value="${escA(text)}">` +
+          `<input type="hidden" name="book" value="${escA(bookEl.value.trim())}">` +
+          `<button>Run the full eight-engine research task on this &rarr;</button></form>` : ''}
         ${a.answer_id ? `<div class="fb" data-id="${esc(a.answer_id)}">` +
           `<span>Did this answer your question?</span><button type="button" data-u="1">Yes` +
           `</button><button type="button" data-u="0">No</button></div>` : ''}
@@ -330,11 +363,20 @@ document.getElementById('f').addEventListener('submit', async ev => {
         }).catch(() => {});
     }
   } catch (e) {
+    // Said plainly, and the question is put back so it is not lost: a raw exception ("Failed to
+    // fetch", "Unexpected token <") told the reader nothing they could act on.
+    const why = e.name === 'AbortError'
+      ? `The desk did not answer within ${ASK_LIMIT_MS / 1000} seconds, so the request was stopped.`
+      : String(e.message).startsWith('http ')
+        ? `The desk hit an error answering this (${esc(e.message.toUpperCase())}).`
+        : 'The console could not reach the desk: the connection dropped or the server is down.';
     out.insertAdjacentHTML('afterbegin',
       `<div class="card refused"><div class="q">${esc(text)}</div>
-       <div class="line">The console could not reach the desk: ${esc(e.message)}</div></div>`);
+       <div class="line">${why} Your question is back in the box — ask again, or ask something
+       narrower.</div></div>`);
+    if (!qEl.value) { qEl.value = text; grow(); }
   } finally {
-    document.getElementById('go').disabled = false; qEl.focus();
+    clearTimeout(timer); document.getElementById('go').disabled = false; qEl.focus();
   }
 });
 // "Did this answer your question?" — one click per answer, counted anonymously (`lui/usage.py`).
@@ -354,7 +396,11 @@ if (asked.get('q')) { qEl.value = asked.get('q').slice(0, 500);
   document.getElementById('f').requestSubmit(); }
 qEl.focus();
 </script>__FOOT__</body></html>"""
-for _token, _value in (("__FAVICON__", FAVICON), ("__TOKENS__", design.TOKENS_CSS),
+for _token, _value in (("__HEAD__", design.head(
+                            "ARGUS — ask the desk",
+                            "A research workbench for Bitget: ask about stocks, ETFs, gold or "
+                            "crypto and every number comes with its source.")),
+                       ("__FAVICON__", FAVICON), ("__TOKENS__", design.TOKENS_CSS),
                        ("__BASE__", design.BASE_CSS), ("__NAV__", design.nav("/")),
                        ("__FOOT__", design.footer()), ("__FONTS__", design.FONTS)):
     PAGE = PAGE.replace(_token, _value)
@@ -1094,6 +1140,10 @@ def _research_payload(
     payload["classified_by"] = classified_by
     payload["matched"] = result.question.matched
     payload["turns"] = [*prior, text][-12:]
+    # An add to a book is exactly the question the eight-engine task answers in full; the console
+    # offers it under the answer (`lui/task.py`), carrying the question and the saved book.
+    payload["research_task"] = (not result.refused and request.kind is ResearchKind.IMPACT
+                                and bool(request.symbols))
     return payload
 
 
@@ -1578,6 +1628,43 @@ class Handler(BaseHTTPRequestHandler):
         result = translate.translate(lines, lang, _model_for(visitor))
         self._send(json.dumps(result, ensure_ascii=False).encode(), "application/json")
 
+    def _research_route(self, params: dict[str, list[str]]) -> None:
+        """**Track 3's required demo: one complete research task, question to actionable
+        insight.** A typed question (``q``) is read by the console's own reader with the trader's
+        saved book (``book``) and no model call, and the page says what it read; without one, the
+        name, size and book fields run as given. Eight engines answer in parallel. ``format=json``
+        returns the same run."""
+        from argus.lui.task import (
+            DEFAULT_BOOK,
+            DEFAULT_NAME,
+            DEFAULT_SIZE_PCT,
+            read_question,
+            render_task,
+            research_task,
+            unread_task,
+        )
+        from argus.lui.task import as_dict as task_as_dict
+
+        asked = repair_mojibake((params.get("q") or [""])[0]).strip()[:500]
+        saved = repair_mojibake((params.get("book") or [""])[0])[:300]
+        if asked:
+            reading = read_question(asked, saved)
+            task = (unread_task(asked, reading) if isinstance(reading, str)
+                    else research_task(reading=reading, asked=asked))
+        else:
+            name = repair_mojibake((params.get("name") or [DEFAULT_NAME])[0]).strip()[:24]
+            try:
+                size = float((params.get("size") or [str(DEFAULT_SIZE_PCT)])[0].strip("% "))
+            except ValueError:
+                size = DEFAULT_SIZE_PCT
+            task = research_task(name or DEFAULT_NAME, size,
+                                 saved if "book" in params else DEFAULT_BOOK)
+        if (params.get("format") or [""])[0] == "json":
+            self._send(json.dumps(task_as_dict(task), ensure_ascii=False).encode(),
+                       "application/json")
+            return
+        self._send(render_task(task, FAVICON).encode(), "text/html; charset=utf-8")
+
     def do_POST(self) -> None:
         """``/mcp``, the Model Context Protocol (`lui/mcp_server.py`); ``/telegram``, the bot's
         webhook (`lui/telegram_bot.py`, rejected without Telegram's secret header); and the page's
@@ -1586,6 +1673,20 @@ class Handler(BaseHTTPRequestHandler):
         from urllib.parse import urlparse
 
         path = urlparse(self.path).path.rstrip("/")
+        if path == "/research":
+            # The task's own form posts here, so a trader's book and question stay out of the URL
+            # and the access log; a GET with the same fields still works for a shared link.
+            length = min(int(self.headers.get("Content-Length") or 0), 64_000)
+            try:
+                fields = parse_qs(urlparse(self.path).query)  # ?format=json on the action URL
+                fields.update(parse_qs(self.rfile.read(length).decode("utf-8"),
+                                       keep_blank_values=True))
+                self._research_route(fields)
+            except Exception as exc:
+                self._send(json.dumps({"error": type(exc).__name__,
+                                       "detail": str(exc)[:200]}).encode(),
+                           "application/json", 500)
+            return
         if path in ("/ask", "/translate", "/feedback"):
             length = min(int(self.headers.get("Content-Length") or 0), 64_000)
             try:
@@ -1605,8 +1706,8 @@ class Handler(BaseHTTPRequestHandler):
             self._send(body, "application/json", status)
             return
         if path != "/mcp":
-            self._send(b'{"error": "POST is accepted only at /mcp, /telegram, /ask, /translate '
-                       b'and /feedback"}', "application/json", 405)
+            self._send(b'{"error": "POST is accepted only at /mcp, /telegram, /ask, /translate, '
+                       b'/feedback and /research"}', "application/json", 405)
             return
         from argus.lui.mcp_server import handle_body
 
@@ -1738,45 +1839,64 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(render_proof(wins, counts).encode(), "text/html; charset=utf-8")
                 return
             if path == "/research":
-                # **Track 3's required demo: one complete research task, question to actionable
-                # insight.** This used to render a chain recorded on 2026-09-14 — a fixed
-                # question, raw data structures, and a verdict its own allocation step
-                # contradicted. It now runs the task on request: seven engines in parallel, no
-                # model call, about three seconds, with the name, size and book taken from the
-                # URL so a judge can ask their own version. `?format=json` returns the same run.
-                from argus.lui.task import (
-                    DEFAULT_BOOK,
-                    DEFAULT_NAME,
-                    DEFAULT_SIZE_PCT,
-                    render_task,
-                    research_task,
-                )
-                from argus.lui.task import as_dict as task_as_dict
-
-                params = parse_qs(route.query)
-                name = repair_mojibake((params.get("name") or [DEFAULT_NAME])[0]).strip()[:24]
-                book_text = repair_mojibake((params.get("book") or [DEFAULT_BOOK])[0])[:300]
-                try:
-                    size = float((params.get("size") or [str(DEFAULT_SIZE_PCT)])[0].strip("% "))
-                except ValueError:
-                    size = DEFAULT_SIZE_PCT
-                task = research_task(name or DEFAULT_NAME, size, book_text)
-                if (params.get("format") or [""])[0] == "json":
-                    self._send(json.dumps(task_as_dict(task), ensure_ascii=False).encode(),
-                               "application/json")
-                    return
-                self._send(render_task(task, FAVICON).encode(), "text/html; charset=utf-8")
+                self._research_route(parse_qs(route.query))
+                return
+            if path == "/og.png":
+                self._send(OG_PNG.read_bytes(), "image/png")
                 return
             if path in ("/ask", "/translate", "/feedback"):
                 self._answer_route(path, parse_qs(route.query))
                 return
+            if self._wants_html():
+                self._send(error_page(404, path).encode(), "text/html; charset=utf-8", 404)
+                return
             self._send(b'{"error":"not found"}', "application/json", 404)
         except Exception as exc:  # a demo that 500s silently is worse than one that says why
+            if self._wants_html():
+                self._send(error_page(500, path, type(exc).__name__).encode(),
+                           "text/html; charset=utf-8", 500)
+                return
             self._send(json.dumps({"error": type(exc).__name__, "detail": str(exc)[:200]}).encode(),
                        "application/json", 500)
 
+    def _wants_html(self) -> bool:
+        """A browser asks for text/html; an API client, curl or the MCP client does not, and keeps
+        getting JSON it can parse."""
+        return "text/html" in (self.headers.get("Accept") or "")
+
     def log_message(self, fmt: str, *args: Any) -> None:
         """Quiet by default; the console is the output, not the access log."""
+
+
+def error_page(status: int, path: str, failure: str = "") -> str:
+    """The page a browser gets for a path that does not exist or a page that failed to build.
+
+    Until 2026-09-26 both were bare JSON (``{"error":"not found"}``) with no navigation, the one
+    screen a judge could reach that looked unfinished (judge audit). The JSON is kept for clients
+    that do not ask for HTML."""
+    import html as _html
+
+    shown = _html.escape(path[:120])
+    if status == 404:
+        title = "No page here"
+        lead = (f"There is no page at <code>{shown}</code>. Every page ARGUS serves is in the bar "
+                f"above; the three most people want are below.")
+    else:
+        title = "This page failed to build"
+        lead = (f"<code>{shown}</code> failed while it was being built ({_html.escape(failure)}). "
+                f"The console and the other pages still work; asking again usually does.")
+    return f"""<!doctype html><html lang="en"><head>{design.head(f"ARGUS — {title}", title)}
+<style>{design.TOKENS_CSS}{design.BASE_CSS}
+ .wrap {{ max-width:720px; margin:0 auto; padding:48px 18px 80px }}
+ .code {{ font:600 13px var(--mono); color:var(--dim); letter-spacing:.08em }}
+ h1 {{ font-size:26px; margin:6px 0 10px }}
+ .go {{ display:flex; gap:12px 24px; flex-wrap:wrap; margin-top:22px; font-weight:500 }}
+ .go a {{ color:var(--ink); border-bottom:1px solid var(--line); text-decoration:none }}
+</style></head><body>{design.nav("")}<div class="wrap">
+<p class="code">{status}</p><h1>{title}</h1><p>{lead}</p>
+<p class="go"><a href="/">Ask the desk &rarr;</a><a href="/research">Run a research task &rarr;</a>
+<a href="/materials">Every deliverable on one page &rarr;</a></p>
+</div>{design.footer()}</body></html>"""
 
 
 def serve(host: str = HOST, port: int = PORT) -> None:

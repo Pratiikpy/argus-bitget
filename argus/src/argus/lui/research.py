@@ -45,7 +45,7 @@ import re
 import threading
 import time
 from collections.abc import Mapping, Sequence
-from concurrent.futures import as_completed
+from concurrent.futures import Future, as_completed
 from dataclasses import dataclass, field, replace
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
@@ -77,6 +77,9 @@ from argus.lui.question import (
     Tense,
     resolve_symbol,
 )
+from argus.lui.skillroute import Routed
+from argus.lui.skillroute import route as skill_route
+from argus.market.skills import Health
 from argus.truth import coverage
 from argus.truth.coverage import ContextPool
 
@@ -289,7 +292,10 @@ class ResearchRequest:
 
 _WORDISH = r"[A-Za-z][A-Za-z0-9]{1,15}"
 _PCT = r"(\d+(?:\.\d+)?)\s*(?:%|percent\b|pct\b)"
-_PAIR_PCT_FIRST = re.compile(rf"{_PCT}\s*(?:of\s+|in\s+|into\s+)?(?:my\s+)?({_WORDISH})", re.I)
+_PAIR_PCT_FIRST = re.compile(
+    rf"{_PCT}\s*(?:more\s+(?!than\b))?(?:of\s+|in\s+|into\s+)?(?:my\s+)?({_WORDISH})", re.I)
+"""A weight before its name: "40% NVDA", "20% in gold", and "10% more NVDA", an add to a name
+already held, which read as no size at all until 2026-09-26 and was assessed at the 20% default."""
 _PAIR_NAME_FIRST = re.compile(
     rf"({_WORDISH})(?:\s+(?:etf|stock|stocks|shares?|position|token|perps?|spot|coins?))?"
     rf"\s*(?:at|=|:|-)?\s*{_PCT}", re.I)
@@ -4599,6 +4605,14 @@ def _book_rate_lines(book: Mapping[str, float], dollar_first: bool) -> tuple[lis
     return lines, head, {"per_symbol": per, "book_pct_per_10bp": rate, "covered": covered}
 
 
+def _fred_is_the_mirror(ident: str, args: dict[str, Any]
+                        ) -> tuple[Health, str, Any, str, bool]:
+    """The mirror for bitget-signal's rates_yields in the macro answer: FRED, fetched by the
+    answer itself, so the route only records which of the two the figures stand on."""
+    del ident, args
+    return Health.OK, "read by the macro answer", None, "FRED (St. Louis Fed)", True
+
+
 def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
            raw_text: str = "") -> tuple[list[str], list[Source], dict[str, Any]]:
     """Rates, the Fed, inflation and the dollar from FRED, and how ``symbol`` (QQQ when none) — or
@@ -4606,9 +4620,13 @@ def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
     from argus.market.evidence import RSS_FEEDS, RssSource
 
     target = symbol or BENCHMARK
-    with ContextPool(max_workers=len(FRED_SERIES) + 2) as pool:
+    with ContextPool(max_workers=len(FRED_SERIES) + 3) as pool:
         jobs = {sid: pool.submit(_fred, sid) for sid in FRED_SERIES}
         fed_job = pool.submit(lambda: RssSource().headlines("fed", RSS_FEEDS["fed"][0]))
+        # bitget-signal's macro-analyst Skill is asked for the curve first; its tool names FRED,
+        # which is read beside it, so the receipt says which of the two the figures came from.
+        curve_job = pool.submit(skill_route, "rates_yields", "yield_curve", None, wait=4.0,
+                                mirror_call=_fred_is_the_mirror)
         series = {}
         for sid, job in jobs.items():
             try:
@@ -4729,6 +4747,19 @@ def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
     macro_sources = [Source(kind="venue", ref="FRED (St. Louis Fed) + Bitget TLTUSDT/EURUSDUSDT",
                             detail="FRED series DGS10, DGS2, DFF, T10YIE, DTWEXBGS; Bitget hourly "
                                    "candles; Federal Reserve press feed, live")]
+    try:
+        curve = curve_job.result(timeout=8.0)
+    except Exception:
+        curve = None
+    if curve is not None and curve.via == "skill":
+        macro_sources.append(curve.source())
+        lines.append("bitget-signal's macro-analyst Skill answered the yield curve as well "
+                     "(rates_yields); the figures above are FRED's, the source that tool names.")
+    elif curve is not None:
+        macro_sources[0] = Source(kind="venue", ref=macro_sources[0].ref,
+                                  detail=macro_sources[0].detail + "; FRED is the source "
+                                  "bitget-signal's rates_yields names, read because the Skill "
+                                  + curve.skill_said)
     if brief:
         macro_sources.append(Source(kind="venue", ref="bitget-mcp-server news_label_search",
                                     detail="Bitget UEX Daily, the latest US-stock brief"))
@@ -5121,6 +5152,55 @@ def _crowd_lines(symbol: str) -> list[str]:
         _notes_path().parent / "social_pulse.json"))
 
 
+BASIS_AGREE_BPS = 50.0
+"""A spot reading from the Skill further than this from Bitget's perpetual is called a
+disagreement: BTC's perpetual basis on Bitget is normally a few basis points."""
+
+
+def _skill_btc_line(job: Any, perp: Any) -> tuple[str, Source] | None:
+    """One line checking bitget-signal's crypto_derivatives BTC/USDT reading against Bitget's own
+    perpetual ticker, or None when the Skill did not answer in time (it has no mirror, and a
+    missing cross-check is not worth a line)."""
+    if job is None or perp is None:
+        return None
+    try:
+        routed = job.result(timeout=6.0)
+        payload = routed.payload if routed.via == "skill" else None
+        spot = float(payload["last"]) if isinstance(payload, dict) else 0.0
+        change = payload.get("change_pct") if isinstance(payload, dict) else None
+        last = float(perp.last)
+    except Exception:
+        return None
+    if spot <= 0 or last <= 0:
+        return None
+    basis = (last / spot - 1.0) * 1e4
+    verdict = ("the Skill and Bitget's own ticker agree" if abs(basis) <= BASIS_AGREE_BPS
+               else "a gap that size is not a basis — one of the two readings is stale")
+    line = (f"Cross-check: bitget-signal's crypto_derivatives reads BTC/USDT spot on Bitget at "
+            f"{spot:,.0f}" + (f" ({float(change):+.2f}% over 24h)" if change is not None else "")
+            + f"; the perpetual trades at {last:,.0f}, a {basis:+.1f}bp basis — {verdict}.")
+    return line, routed.source()
+
+
+def _skill_fear_greed(payload: Any) -> dict[str, Any] | None:
+    """The index value and its label from bitget-signal's sentiment_index, whichever of the shapes
+    its upstream uses ("value"/"value_classification", "classification", or a ``data`` list), or
+    None when neither is there — a reading this cannot parse is not presented as one."""
+    node = payload
+    if isinstance(node, dict) and isinstance(node.get("data"), list) and node["data"]:
+        node = node["data"][0]
+    if isinstance(node, dict) and isinstance(node.get("current"), dict):
+        node = node["current"]
+    if not isinstance(node, dict):
+        return None
+    try:
+        value = int(float(node["value"]))
+    except (KeyError, TypeError, ValueError):
+        return None
+    label = str(node.get("value_classification") or node.get("classification") or "")
+    return {"value": value, "value_classification": label}
+
+
 def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict[str, Any]]:
     """Whether the talk about a name is information or repetition, and how it is positioned.
 
@@ -5136,8 +5216,24 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
     from argus.market.bitget import fetch_tickers
     from argus.market.stories import group
 
-    def fear_greed() -> list[dict[str, Any]]:
-        # Bitget's own service first; alternative.me, the source its Skill wraps, behind it.
+    def alternative_week(ident: str, args: dict[str, Any]
+                         ) -> tuple[Health, str, Any, str, bool]:
+        # The mirror for bitget-signal's sentiment_index: alternative.me, the upstream the tool's
+        # own description names, read for its last eight days so the answer keeps its week.
+        del ident, args
+        upstream = "alternative.me Fear & Greed"
+        try:
+            req = urllib.request.Request("https://api.alternative.me/fng/?limit=8",
+                                         headers={"User-Agent": "argus-research/1.0"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                week = list(_json.loads(resp.read().decode("utf-8")).get("data") or [])
+        except Exception as exc:
+            return Health.UNAVAILABLE, type(exc).__name__, None, upstream, True
+        return (Health.OK if week else Health.EMPTY), "ok", week, upstream, True
+
+    def fear_greed() -> tuple[list[dict[str, Any]], Routed | None]:
+        # Bitget's data service first; then bitget-signal's sentiment Skill; then alternative.me,
+        # the source that Skill names, labelled as such (lui/skillroute.py).
         try:
             from argus.market.bitget_positioning import crypto_mood
 
@@ -5146,16 +5242,21 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
             mood = None
         if mood is not None:
             value, label, week = mood
-            return [{"value": v, "value_classification": label if i == 0 else "",
-                     "via": "bitget"} for i, v in enumerate(week)] or [
-                {"value": value, "value_classification": label, "via": "bitget"}]
-        try:
-            req = urllib.request.Request("https://api.alternative.me/fng/?limit=8",
-                                         headers={"User-Agent": "argus-research/1.0"})
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                return list(_json.loads(resp.read().decode("utf-8")).get("data") or [])
-        except Exception:
-            return []
+            return ([{"value": v, "value_classification": label if i == 0 else "",
+                      "via": "bitget"} for i, v in enumerate(week)] or [
+                {"value": value, "value_classification": label, "via": "bitget"}]), None
+        routed = skill_route("sentiment_index", "current", mirror_call=alternative_week)
+        if routed.via == "skill":
+            reading = _skill_fear_greed(routed.payload)
+            if reading is not None:
+                return [{**reading, "via": "bitget-signal"}], routed
+            # The Skill answered in a shape this does not read: take the mirror, and say so.
+            health, _, week, upstream, same = alternative_week("", {})
+            routed = Routed(routed.tool, routed.action, routed.skill, Health.EMPTY,
+                            "answered in an unrecognised shape", "mirror" if week else "none",
+                            week, upstream, same, routed.asked_at)
+            return (list(week or []) if health is Health.OK else []), routed
+        return (list(routed.payload or []) if routed.via == "mirror" else []), routed
 
     from argus.market import bitget_positioning
 
@@ -5163,15 +5264,21 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
         symbol in TRADED_SYMBOLS or _is_equity(symbol))
     crypto_side = symbol is None or symbol in CRYPTO_LINKED or not named
     base = "ETH" if symbol == "ETHUSDT" else "BTC"
-    with ContextPool(max_workers=4) as pool:
+    with ContextPool(max_workers=5) as pool:
         index_job = pool.submit(fear_greed)
+        # bitget-signal's crypto_derivatives answers in under a second (data/skill_matrix.json,
+        # 2026-09-26), so the BTC side of the answer reads it and checks it against Bitget's own
+        # ticker, the way the RSI is checked against Bitget's candles.
+        skill_btc_job = (pool.submit(skill_route, "crypto_derivatives", "ticker_24h",
+                                     {"symbol": "BTC/USDT", "exchange": "bitget"}, wait=4.0)
+                         if crypto_side else None)
         news_job = pool.submit(_headlines_naming, symbol) if named and symbol else None
         mood_job = pool.submit(bitget_positioning.stock_mood) if (named or symbol is None) \
             else None
         crowd_job = (pool.submit(bitget_positioning.positioning, base)
                      if crypto_side and (symbol in (None, "BTCUSDT", "ETHUSDT")
                                          or symbol in CRYPTO_LINKED) else None)
-        rows = index_job.result()
+        rows, index_route = index_job.result()
         try:
             headlines, names = news_job.result() if news_job is not None else ([], set())
         except Exception:
@@ -5233,6 +5340,7 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
               f"ranged {min(week)} to {max(week)}."] if rows else [])
     own: str | None = None
     crowd = ""
+    skill_sources: list[Source] = []
     try:
         tickers = fetch_tickers()
         if symbol is not None and symbol in tickers:
@@ -5248,6 +5356,10 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
                          + (f", {change:+.2f}% over 24h" if change is not None else "") + ".")
             if meaning:
                 lines.append(meaning)
+        cross = _skill_btc_line(skill_btc_job, tickers.get("BTCUSDT"))
+        if cross is not None:
+            lines.append(cross[0])
+            skill_sources.append(cross[1])
         for sym in ("BTCUSDT", "ETHUSDT"):
             if sym == symbol:
                 continue
@@ -5263,16 +5375,19 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
                "stretched toward greed — the side of the index where crypto has historically "
                "been more exposed to pullbacks" if now_value >= 70 else
                "stretched toward fear" if now_value <= 30 else "in its middle range")
-    index_source = (Source(kind="venue", ref="bitget-mcp-server crypto fear & greed + Bitget "
-                                             "funding",
-                           detail="crypto fear & greed from Bitget's data service and Bitget "
-                                  "funding rates, live")
-                    if rows and rows[0].get("via") == "bitget" else
-                    Source(kind="venue", ref="alternative.me Fear & Greed + Bitget funding",
-                           detail="alternative.me fear & greed (the source Bitget's sentiment "
-                                  "Skill wraps; Bitget's data service did not answer) and Bitget "
-                                  "funding rates, live"))
-    sources = [index_source]
+    if rows and rows[0].get("via") == "bitget":
+        sources = [Source(kind="venue", ref="bitget-mcp-server crypto fear & greed + Bitget "
+                                           "funding",
+                          detail="crypto fear & greed from Bitget's data service and Bitget "
+                                 "funding rates, live")]
+    else:
+        # Which of bitget-signal's Skill or the source it names gave the index, and why.
+        sources = ([index_route.source()] if index_route is not None and index_route.answered
+                   else [])
+        sources.append(Source(kind="venue", ref="Bitget funding",
+                              detail="funding rates, live; Bitget's data service did not answer "
+                                     "the index"))
+    sources.extend(skill_sources)
     if named and symbol:
         ticker = _t(symbol)
         if symbol not in CRYPTO_LINKED:
@@ -6082,6 +6197,112 @@ def _hedge_line(book_beta: float | None, r_squared: float | None = None) -> str 
         + (f", QQQ explains {r_squared:.0%} of its moves" if r_squared is not None else "")
         + "); it does nothing for single-name news risk."
     )
+
+
+EXPOSURE_WAIT_S = 20.0
+"""How long an IMPACT answer waits for the exposures beside it before answering without them."""
+
+
+def _exposure_future(add: str, before: Mapping[str, float],
+                     request: ResearchRequest) -> Future[tuple[list[str], list[Any],
+                                                              dict[str, Any]]] | None:
+    """The exposures engine on the book and the add, started on its own thread; None when there
+    is no book whose mix could move (a lone position, or one name beside cash)."""
+    if not before or (request.cash and set(before) <= {add}):
+        return None
+    from argus.lui.exposures import exposures_answer
+
+    held = before.get(add, 0.0)
+    final = (request.target if request.target is not None
+             else held * (1.0 - request.size) + request.size)  # desk.portfolio.rebalance
+    pool = ContextPool(max_workers=1)  # carries the caller's context (offline mode, coverage)
+    future = pool.submit(exposures_answer, dict(before), {add: final})
+    pool.shutdown(wait=False)
+    return future
+
+
+def _exposure_lines(future: Future[tuple[list[str], list[Any], dict[str, Any]]] | None
+                    ) -> tuple[list[str], list[Source]]:
+    """Two lines from the exposures engine's figures: the sector weights that move, and the factor
+    loadings before and after. Written from its data, not its prose; nothing when it did not
+    answer in time, because the risk answer above stands without it."""
+    if future is None:
+        return [], []
+    try:
+        _, _, data = future.result(timeout=EXPOSURE_WAIT_S)
+    except Exception:
+        return [], []
+    lines: list[str] = []
+    before, after = data.get("sectors_before") or {}, data.get("sectors_after") or {}
+    moves = sorted(((b, before.get(b, 0.0), after.get(b, 0.0)) for b in {*before, *after}),
+                   key=lambda m: -abs(m[2] - m[1]))
+    shown = [f"{b} {w0:.0%} → {w1:.0%}" for b, w0, w1 in moves if abs(w1 - w0) >= 0.005][:4]
+    if shown:
+        lines.append("Sectors after the trade (Yahoo's classification, GICS names): "
+                     + ", ".join(shown) + ".")
+    load_b, load_a = data.get("loadings_before") or {}, data.get("loadings_after") or {}
+    cover = float(data.get("coverage_after") or 0.0)
+    if load_b and load_a and cover > 0:
+        parts = [f"{f} {load_b[f]:.2f} → {load_a[f]:.2f}" for f in ("market", "size",
+                                                                      "momentum", "crypto")
+                 if f in load_b and f in load_a]
+        lines.append("Factor loadings before → after (daily regression on SPY, IWM minus SPY, "
+                     "MTUM minus SPY and BTC): " + ", ".join(parts)
+                     + (f"; covers {cover:.0%} of the book" if cover < 0.995 else "")
+                     + ". Ask \"what are my exposures\" for the t-statistics.")
+    elif data:
+        lines.append("Factor loadings: not computed this time — the daily closes they need could "
+                     "not be read.")
+    source = Source(kind="computation", ref="argus.lui.exposures",
+                    detail="sector look-through (data/sector_map.json) and 4-factor OLS on "
+                           "daily closes")
+    return lines, ([source] if lines else [])
+
+
+def impact_sizing(report: CopilotReport, request: ResearchRequest,
+                  columns: Mapping[str, Sequence[float]]) -> dict[str, Any]:
+    """The sizing figures the IMPACT answer states, as data: what a composer needs to write one
+    verdict without reading prose back (`lui/task.conclusion`).
+
+    ``ceiling`` is the largest add that keeps the name inside the risk budget
+    (:func:`max_size_within_budget`, the same call the Actionable line makes); ``trim_to`` is the
+    weight an already-held name over budget would be cut to; ``crowded`` is the holding that
+    carries the largest share of risk after the trade, with the weight that brings it back inside
+    the budget when it is over. None where the answer has no such figure (no book, or a book of
+    one name beside cash)."""
+    add = report.symbol
+    impact = report.impact
+    standalone = not request.book
+    alone = bool(request.cash) and set(request.book) <= {add}
+    out: dict[str, Any] = {
+        "symbol": add, "proposed": request.size, "budget": request.budget,
+        "budget_stated": request.budget_stated, "standalone": standalone, "alone": alone,
+        "held": request.book.get(add, 0.0), "final": report.weights_after.get(add, request.size),
+        "share_after": impact.risk_share_after, "share_before": impact.risk_share_before,
+        "ceiling": None, "trim_to": None, "crowded": None,
+        "worst_24h_pct": report.worst.move_pct,
+    }
+    if standalone or alone:
+        return out
+    out["ceiling"] = max_size_within_budget(add=add, before=request.book, columns=columns,
+                                            budget=request.budget,
+                                            as_target=request.target is not None)
+    if out["ceiling"] is None and out["held"]:
+        out["trim_to"] = max_size_within_budget(add=add, before=request.book, columns=columns,
+                                                budget=request.budget, as_target=True)
+    risk = report.risk_after
+    if risk is not None and risk.volatility > 0 and risk.contributions:
+        top = max(risk.contributions, key=lambda c: c.contribution)
+        share = top.contribution / risk.volatility
+        crowded: dict[str, Any] = {"symbol": top.symbol, "weight": top.weight, "share": share,
+                                   "trim_to": None}
+        if share > request.budget and top.symbol != add:
+            after = {s: w for s, w in report.weights_after.items() if w > 0}
+            crowded["trim_to"] = max_size_within_budget(add=top.symbol, before=after,
+                                                        columns=columns, budget=request.budget,
+                                                        as_target=True)
+        out["crowded"] = crowded
+    return out
 
 
 def _impact_lines(report: CopilotReport, request: ResearchRequest,
@@ -7323,13 +7544,13 @@ def _premium_line(symbol: str, rtoken_last: Decimal,
     clock: while the anchor is shut the stock's price is its last close, so the gap is partly the
     overnight move the rToken has priced and the stock has not."""
     from argus.market import universe
-    from argus.market.bitget_mcp import BitgetDataService
+    from argus.market.bitget_mcp import shared_service
 
     if symbol not in TRADED_SYMBOLS and not universe.is_equity(symbol):
         return None
     last = _shut_close(symbol) if not anchor_open else None
     if last is None:
-        last = _stock_last(symbol, BitgetDataService)
+        last = _stock_last(symbol, shared_service)
     if last is None:
         return None
     premium = (float(rtoken_last) / last - 1.0) * 10_000
@@ -7653,10 +7874,10 @@ def _valuation_compare(symbols: tuple[str, ...]) -> list[str]:
     """Two or more names side by side on the same valuation measures, from the same source and
     date. "Is NVDA expensive versus MSFT on valuation" returned two separate fundamentals dumps
     and never compared them (a critic's probe, 2026-09-24)."""
-    from argus.market.bitget_mcp import BitgetDataService
+    from argus.market.bitget_mcp import shared_service
 
     def latest(symbol: str) -> dict[str, Any] | None:
-        rows = BitgetDataService().results("equity_fundamental_ratios", symbol=_t(symbol))
+        rows = shared_service().results("equity_fundamental_ratios", symbol=_t(symbol))
         return max(rows, key=lambda r: str(r.get("period_ending") or "")) if rows else None
 
     with ContextPool(max_workers=len(symbols)) as pool:
@@ -8045,7 +8266,7 @@ def _fundamentals(symbol: str, raw_text: str = "") -> tuple[list[str], list[Sour
     from datetime import date
 
     from argus.market import universe
-    from argus.market.bitget_mcp import BitgetDataService
+    from argus.market.bitget_mcp import shared_service
 
     ticker = _t(symbol)
     listed = universe.contracts()
@@ -8071,10 +8292,10 @@ def _fundamentals(symbol: str, raw_text: str = "") -> tuple[list[str], list[Sour
     # threads would interleave requests on it (the fault found in the Skill client, see
     # `argus.market.evidence`).
     def ask(method: str) -> Any:
-        return getattr(BitgetDataService(), method)(ticker)
+        return getattr(shared_service(), method)(ticker)
 
     def entry(entry_id: str) -> Any:
-        return BitgetDataService().results(entry_id, symbol=ticker)
+        return shared_service().results(entry_id, symbol=ticker)
 
     with ContextPool(max_workers=8) as pool:
         pending = {name: pool.submit(ask, name) for name in
@@ -9719,11 +9940,17 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 before, target, resize_line = resized
                 request = replace(request, book=before, size=target, size_stated=True,
                                   target=target)
+            # Sector and factor exposure before and after, fetched beside the copilot so it
+            # adds no wait (Yahoo daily closes; about four seconds cold, cached after).
+            exposure_future = _exposure_future(add, before, request)
             report = copilot(add=add, before=before, size=request.size or DEFAULT_SIZE,
                              raw=data.raw, benchmark=BENCHMARK, is_open=is_open,
                              target=request.target)
             columns = _open_columns(data.raw, is_open)
             lines = _impact_lines(report, request, columns)
+            exposure_lines, exposure_sources = _exposure_lines(exposure_future)
+            lines.extend(exposure_lines)
+            sources.extend(exposure_sources)
             if resized is not None:
                 lines.insert(0, resize_line)
             if _VAR.search(raw_text):
@@ -9731,6 +9958,7 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 lines[1:1] = var_lines
                 sources.extend(var_sources)
             payload["report"] = report.as_dict()
+            payload["sizing"] = impact_sizing(report, request, columns)
             sources.append(Source(kind="computation", ref="argus.desk.portfolio.copilot",
                                   detail="session beta, Euler risk decomposition, beta stress, "
                                          "realised worst 24h window"))

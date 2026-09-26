@@ -4165,6 +4165,108 @@ REGISTER: tuple[Capability, ...] = (
         ),
     ),
     Capability(
+        name="Crowd sentiment classification, vs. RoB-RT on TweetEval",
+        subtheme="t2-sentiment",
+        module=(
+            "argus/market/social_pulse.py,argus/market/abuse.py,"
+            "argus/eval/sentiment_tweeteval.py"
+        ),
+        # Registered 2026-09-26. The loss was measured on 2026-09-25 and shown on /wrong, but no
+        # row graded it, so the register's headline read "0 LOST" beside a loss a judge could
+        # click on (judge audit, 2026-09-26). It is graded here on the benchmark it lost, with the
+        # conditions the evaluation actually meets and none it does not: there is no trading cost
+        # in a classification benchmark, no adversarial set, and a specialist is plainly superior.
+        state=State.LOST,
+        baseline=(
+            "RoB-RT (TweetEval, Barbieri et al. 2020), its published test predictions re-scored "
+            "on the same tweets; finBERT and VADER beside it"
+        ),
+        proofs=(
+            Proof(
+                condition="best_implementation_studied",
+                how=(
+                    "TweetEval's paper (arXiv:2010.12421v2, Table 3) and repository leaderboard: "
+                    "SVM, FastText, BLSTM, three RoBERTa variants, BERTweet and TimeLMs-2021"
+                ),
+                artefact="data/sentiment_tweeteval.json",
+            ),
+            Proof(
+                condition="best_method_studied",
+                how=(
+                    "macro-averaged recall, TweetEval's and SemEval-2017 Task 4's own metric, "
+                    "because accuracy on this imbalanced set rewards an always-neutral scorer"
+                ),
+                artefact="data/sentiment_tweeteval.json",
+            ),
+            Proof(
+                condition="baseline_reproduced",
+                how=(
+                    "RoB-RT's own test predictions re-scored through this module's metric: 0.729, "
+                    "against Table 3's 72.6 and the README's 72.8"
+                ),
+                artefact="data/sentiment_tweeteval.json",
+                test="test_sentiment_tweeteval.py",
+            ),
+            Proof(
+                condition="implementation_complete",
+                how="the crowd read (`market/social_pulse.pulse`) run end to end on every tweet",
+                artefact="data/sentiment_tweeteval.json",
+            ),
+            Proof(
+                condition="same_input_comparison",
+                how="all 12,284 TweetEval sentiment test tweets, every scorer on the same items",
+                artefact="data/sentiment_tweeteval.json",
+            ),
+            Proof(
+                condition="statistically_valid_evaluation",
+                how=(
+                    "paired bootstrap of macro-recall differences on the same tweets: RoB-RT "
+                    "minus ARGUS +0.185, the 95% interval excluding zero"
+                ),
+                artefact="data/sentiment_tweeteval.json",
+            ),
+            Proof(
+                condition="out_of_sample_test",
+                how=(
+                    "the abuse screen's configuration was fixed on TweetEval's validation splits "
+                    "and the test splits were read once afterwards"
+                ),
+                artefact="data/sentiment_tweeteval.json",
+            ),
+            Proof(
+                condition="ablation",
+                how=(
+                    "the same tweets run with the abuse screen off: VADER alone, 0.570, so the "
+                    "screen costs 0.026 of macro-recall"
+                ),
+                artefact="data/sentiment_tweeteval.json",
+            ),
+            Proof(
+                condition="reproducibility_proven",
+                how=(
+                    "every input file pinned by its upstream git blob hash; one command re-runs "
+                    "it with no model call (python -m argus.eval.sentiment_tweeteval)"
+                ),
+                artefact="data/sentiment_tweeteval.json",
+                test="test_sentiment_tweeteval.py",
+            ),
+        ),
+        blockers=(
+            "LOST to RoB-RT by 0.185 of macro-recall on the same 12,284 test tweets: ARGUS's crowd "
+            "read scores 0.544 (95% CI 0.535 to 0.553) against RoB-RT's 0.729, and trails every "
+            "published TweetEval baseline, the weakest of them BLSTM at 0.583.",
+            "It beats finBERT, the Market sentiment capability's named baseline, by 0.148 (95% CI "
+            "0.138 to 0.159): finBERT, trained on financial news, reads tweets worse than a "
+            "lexicon.",
+            "What would close it: a tweet-domain transformer (RoB-RT or TimeLMs) in the runtime, "
+            "which adds torch to the console; the LLM analyst was not scored (Qwen budget zero).",
+        ),
+        note=(
+            "The classification race ARGUS's sentiment analyst had disclaimed, run so the "
+            "disclaimed axis is a number: it is lost, and it is kept in the register."
+        ),
+    ),
+    Capability(
         name="Self-evolving review rules",
         subtheme="t3-review",
         module=(

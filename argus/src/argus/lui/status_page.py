@@ -81,9 +81,9 @@ def _candles() -> str:
 
 
 def _mcp_quote() -> str:
-    from argus.market.bitget_mcp import BitgetDataService
+    from argus.market.bitget_mcp import shared_service
 
-    quote = BitgetDataService().quote("NVDA")
+    quote = shared_service().quote("NVDA")
     price = quote.get("price") or quote.get("close") or quote.get("last")
     return f"US equity quote for NVDA{f': {price}' if price else ''}"
 
@@ -139,9 +139,12 @@ def sweep_lines(data: Path) -> list[tuple[str, str]]:
     out: list[tuple[str, str]] = []
     skills = _load(data, "bitget_skills_health.json")
     if skills:
-        out.append(("bitget-signal, every tool",
-                    f"{skills.get('tools_answered')} of {skills.get('tools_probed')} tools "
-                    f"returned data; {len(skills.get('skills_reached') or [])} of "
+        # Counted in calls, with the tools they reach: the desk's set asks six actions of one
+        # tool, and "19 tools" once described 19 calls to 12 (judge audit, 2026-09-26).
+        tools = len({str(r.get("tool")) for r in skills.get("results") or []})
+        out.append(("bitget-signal, the desk's calls",
+                    f"{skills.get('tools_answered')} of {skills.get('tools_probed')} calls "
+                    f"({tools} tools) returned data; {len(skills.get('skills_reached') or [])} of "
                     f"{len(skills.get('skills_available') or [])} Skills returned data from at "
                     f"least one tool — swept {str(skills.get('checked_at', ''))[:10]}"))
     understanding = _load(data, "lui_final_heldout_report.json")
@@ -173,21 +176,21 @@ def sweep_lines(data: Path) -> list[tuple[str, str]]:
         substitutes = (mirror.get("answered_by_mirror", 0)
                        - mirror.get("answered_by_mirror_same_upstream", 0))
         out.append(("bitget-signal, covered",
-                    f"Bitget's server answered {mirror.get('answered_by_bitget')} of "
-                    f"{mirror.get('tools_probed')}; ARGUS read "
+                    f"of the desk's {mirror.get('tools_probed')} calls, Bitget's server answered "
+                    f"{mirror.get('answered_by_bitget')}; ARGUS read "
                     f"{mirror.get('answered_by_mirror')} more straight from the sources those "
                     f"Skills name ({mirror.get('answered_by_mirror_same_upstream')} the same "
                     f"source, "
-                    f"{substitutes} a named substitute) — {mirror.get('answered_total')} of "
-                    f"{mirror.get('tools_probed')} answered, "
-                    f"{len(mirror.get('skills_answered_in_total') or [])} of 5 Skills — swept "
-                    f"{str(mirror.get('checked_at', ''))[:10]}"))
+                    f"{substitutes} a named substitute), labelled as that source, never as the "
+                    f"Skill — swept {str(mirror.get('checked_at', ''))[:10]}"))
     reliability = _load(data, "skill_reliability.json")
     if reliability:
         verdicts = reliability.get("by_verdict") or {}
+        named = ", ".join(reliability.get("reliable_tools") or [])
         out.append(("bitget-signal, reliability",
-                    f"{verdicts.get('reliable', 0)} tools answered all "
-                    f"{reliability.get('attempts_per_tool')} attempts; "
+                    f"{verdicts.get('reliable', 0)} of {reliability.get('tools')} tools answered "
+                    f"all {reliability.get('attempts_per_tool')} attempts"
+                    + (f" ({named})" if named else "") + "; "
                     f"{reliability.get('skills_with_a_reliable_tool')} of "
                     f"{reliability.get('skills_total')} Skills have a reliable tool — "
                     + (f"swept {str(reliability['checked_at'])[:10]}"
@@ -248,10 +251,11 @@ def render(status: dict[str, Any], checks: list[Check], checked_at: float,
         due = datetime.fromisoformat(due).strftime("%d %b %H:%M UTC")
     except ValueError:
         due = due or "on schedule"
-    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">{design.FONTS}
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" href="{favicon}">
-<title>ARGUS — status</title>
+    del favicon  # the head carries the mark itself (design.head)
+    head = design.head("ARGUS — status",
+                       "What the desk can see right now: every data source it reads, checked "
+                       "live and dated.", "/status")
+    return f"""<!doctype html><html lang="en"><head>{head}
 <style>{design.TOKENS_CSS}
  body {{ margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,sans-serif }}
  .wrap {{ max-width:900px; margin:0 auto; padding:28px 18px 64px }}

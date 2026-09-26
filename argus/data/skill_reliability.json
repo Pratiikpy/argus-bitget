@@ -1,18 +1,39 @@
 {
-  "checked_at": "2026-09-26T10:22:14.317071+00:00",
+  "checked_at": "2026-09-26T17:03:29.923454+00:00",
   "symbol": "NVDAUSDT",
   "attempts_per_tool": 3,
   "tools": 19,
+  "calls_per_attempt": 19,
   "by_verdict": {
-    "reliable": 6,
-    "down": 13
+    "reliable": 2,
+    "down": 17
   },
+  "server_only_tools": [
+    "backtest",
+    "crypto_derivatives",
+    "crypto_price"
+  ],
+  "reliable_tools": [
+    "crypto_derivatives",
+    "technical_analysis"
+  ],
   "skills_total": 5,
   "skills_with_a_reliable_tool": 1,
   "reliable_skills": [
     "technical-analysis"
   ],
   "results": [
+    {
+      "skill": "server-only (no SKILL.md names it)",
+      "tool": "crypto_derivatives",
+      "action": "ticker_24h",
+      "attempts": 3,
+      "answered": 3,
+      "rate": 1.0,
+      "verdict": "reliable",
+      "median_latency_s": 0.5,
+      "failures": []
+    },
     {
       "skill": "technical-analysis",
       "tool": "technical_analysis",
@@ -25,59 +46,34 @@
       "failures": []
     },
     {
-      "skill": "technical-analysis",
-      "tool": "technical_analysis",
-      "action": "macd",
+      "skill": "server-only (no SKILL.md names it)",
+      "tool": "backtest",
+      "action": "run",
       "attempts": 3,
-      "answered": 3,
-      "rate": 1.0,
-      "verdict": "reliable",
-      "median_latency_s": 0.4,
-      "failures": []
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 0.3,
+      "failures": [
+        "bitget:backtest: reachable, returned no data (upstream refused the request: the JSON object must be ",
+        "bitget:backtest: reachable, returned no data (upstream refused the request: the JSON object must be ",
+        "bitget:backtest: reachable, returned no data (upstream refused the request: the JSON object must be "
+      ]
     },
     {
-      "skill": "technical-analysis",
-      "tool": "technical_analysis",
-      "action": "atr",
+      "skill": "macro-analyst",
+      "tool": "cn_market",
+      "action": "index",
       "attempts": 3,
-      "answered": 3,
-      "rate": 1.0,
-      "verdict": "reliable",
-      "median_latency_s": 0.6,
-      "failures": []
-    },
-    {
-      "skill": "technical-analysis",
-      "tool": "technical_analysis",
-      "action": "bollinger",
-      "attempts": 3,
-      "answered": 3,
-      "rate": 1.0,
-      "verdict": "reliable",
-      "median_latency_s": 0.4,
-      "failures": []
-    },
-    {
-      "skill": "technical-analysis",
-      "tool": "technical_analysis",
-      "action": "support_resistance",
-      "attempts": 3,
-      "answered": 3,
-      "rate": 1.0,
-      "verdict": "reliable",
-      "median_latency_s": 0.4,
-      "failures": []
-    },
-    {
-      "skill": "technical-analysis",
-      "tool": "technical_analysis",
-      "action": "ma",
-      "attempts": 3,
-      "answered": 3,
-      "rate": 1.0,
-      "verdict": "reliable",
-      "median_latency_s": 0.4,
-      "failures": []
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 45.3,
+      "failures": [
+        "bitget:cn_market: unavailable (TimeoutError)",
+        "bitget:cn_market: unavailable (TimeoutError)",
+        "bitget:cn_market: unavailable (TimeoutError)"
+      ]
     },
     {
       "skill": "macro-analyst",
@@ -87,7 +83,7 @@
       "answered": 0,
       "rate": 0.0,
       "verdict": "down",
-      "median_latency_s": 40.3,
+      "median_latency_s": 40.4,
       "failures": [
         "bitget:cross_asset: tool reported an error (Error executing tool cross_asset: )",
         "bitget:cross_asset: tool reported an error (Error executing tool cross_asset: )",
@@ -102,11 +98,26 @@
       "answered": 0,
       "rate": 0.0,
       "verdict": "down",
-      "median_latency_s": 30.3,
+      "median_latency_s": 30.4,
       "failures": [
         "bitget:crypto_market: tool reported an error (Error executing tool crypto_market: ConnectTimeout('')",
         "bitget:crypto_market: tool reported an error (Error executing tool crypto_market: ConnectTimeout('')",
         "bitget:crypto_market: tool reported an error (Error executing tool crypto_market: ConnectTimeout('')"
+      ]
+    },
+    {
+      "skill": "server-only (no SKILL.md names it)",
+      "tool": "crypto_price",
+      "action": "price",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 45.3,
+      "failures": [
+        "bitget:crypto_price: unavailable (TimeoutError)",
+        "bitget:crypto_price: unavailable (TimeoutError)",
+        "bitget:crypto_price: unavailable (TimeoutError)"
       ]
     },
     {
@@ -117,7 +128,7 @@
       "answered": 0,
       "rate": 0.0,
       "verdict": "down",
-      "median_latency_s": 20.3,
+      "median_latency_s": 20.4,
       "failures": [
         "bitget:defi_analytics: ok; upstream returned only an error envelope",
         "bitget:defi_analytics: ok; upstream returned only an error envelope",
@@ -132,7 +143,7 @@
       "answered": 0,
       "rate": 0.0,
       "verdict": "down",
-      "median_latency_s": 15.3,
+      "median_latency_s": 15.4,
       "failures": [
         "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope",
         "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope",
@@ -140,33 +151,18 @@
       ]
     },
     {
-      "skill": "sentiment-analyst",
-      "tool": "derivatives_sentiment",
-      "action": "open_interest",
+      "skill": "market-intel",
+      "tool": "dex_market",
+      "action": "trending",
       "attempts": 3,
       "answered": 0,
       "rate": 0.0,
       "verdict": "down",
-      "median_latency_s": 15.5,
+      "median_latency_s": 15.4,
       "failures": [
-        "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope",
-        "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope",
-        "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope"
-      ]
-    },
-    {
-      "skill": "sentiment-analyst",
-      "tool": "derivatives_sentiment",
-      "action": "taker_ratio",
-      "attempts": 3,
-      "answered": 0,
-      "rate": 0.0,
-      "verdict": "down",
-      "median_latency_s": 15.3,
-      "failures": [
-        "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope",
-        "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope",
-        "bitget:derivatives_sentiment: reachable, returned no data; upstream returned only an error envelope"
+        "bitget:dex_market: ok; upstream returned only an error envelope",
+        "bitget:dex_market: ok; upstream returned only an error envelope",
+        "bitget:dex_market: ok; upstream returned only an error envelope"
       ]
     },
     {
@@ -186,13 +182,28 @@
     },
     {
       "skill": "macro-analyst",
+      "tool": "global_data",
+      "action": "forex",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 20.4,
+      "failures": [
+        "bitget:global_data: ok; answered with a hollow payload (every leg error or zero)",
+        "bitget:global_data: ok; answered with a hollow payload (every leg error or zero)",
+        "bitget:global_data: ok; answered with a hollow payload (every leg error or zero)"
+      ]
+    },
+    {
+      "skill": "macro-analyst",
       "tool": "macro_indicators",
       "action": "latest_release",
       "attempts": 3,
       "answered": 0,
       "rate": 0.0,
       "verdict": "down",
-      "median_latency_s": 20.4,
+      "median_latency_s": 20.3,
       "failures": [
         "bitget:macro_indicators: reachable, returned no data; upstream returned only an error envelope",
         "bitget:macro_indicators: reachable, returned no data; upstream returned only an error envelope",
@@ -207,7 +218,7 @@
       "answered": 0,
       "rate": 0.0,
       "verdict": "down",
-      "median_latency_s": 15.3,
+      "median_latency_s": 15.4,
       "failures": [
         "bitget:network_status: ok; upstream returned only an error envelope",
         "bitget:network_status: ok; upstream returned only an error envelope",
@@ -252,11 +263,26 @@
       "answered": 0,
       "rate": 0.0,
       "verdict": "down",
-      "median_latency_s": 30.4,
+      "median_latency_s": 30.5,
       "failures": [
         "bitget:sentiment_index: reachable, returned no data; upstream returned only an error envelope",
         "bitget:sentiment_index: reachable, returned no data; upstream returned only an error envelope",
         "bitget:sentiment_index: reachable, returned no data; upstream returned only an error envelope"
+      ]
+    },
+    {
+      "skill": "news-briefing",
+      "tool": "social_trending",
+      "action": "trending",
+      "attempts": 3,
+      "answered": 0,
+      "rate": 0.0,
+      "verdict": "down",
+      "median_latency_s": 30.4,
+      "failures": [
+        "bitget:social_trending: ok; answered with a hollow payload (every leg error or zero)",
+        "bitget:social_trending: ok; answered with a hollow payload (every leg error or zero)",
+        "bitget:social_trending: ok; answered with a hollow payload (every leg error or zero)"
       ]
     },
     {
@@ -275,5 +301,5 @@
       ]
     }
   ],
-  "scope_statement": "Each of Bitget's 19 official research-Skill tools is called 3 times, 2.0s apart, through the same client the desk uses, and classified reliable / intermittent / down. NOT CLAIMED: that 3 attempts characterise a service \u2014 they distinguish always from sometimes from never and nothing finer. NOT CLAIMED: that a failure is Bitget's fault; the failures observed carry the service's own error envelopes, including an explicit ConnectTimeout from its upstream, so the most this says is that the door was shut when we knocked."
+  "scope_statement": "Each of bitget-signal's 19 tools is called 3 times, 2.0s apart, with the call a user of its Skill would make (eval/skill_matrix.py), through the same client the desk uses, and classified reliable / intermittent / down; 5 Skills are counted as Skills and the tools no SKILL.md names are listed apart. NOT CLAIMED: that 3 attempts characterise a service \u2014 they distinguish always from sometimes from never and nothing finer. NOT CLAIMED: that a failure is Bitget's fault; the failures observed carry the service's own error envelopes, including an explicit ConnectTimeout from its upstream, so the most this says is that the door was shut when we knocked."
 }

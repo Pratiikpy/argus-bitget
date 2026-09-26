@@ -1,6 +1,8 @@
 # ARGUS
 
-**An evidence-driven autonomous trading desk for 24/7 tokenized equity markets.**
+**The engine room of ARGUS, this team's Track 3 research workbench:** the desk, the risk layer,
+the register and the evaluations every console answer is computed from. The team's Track 2 entry
+is a separate project (t2-sentiment-agent); nothing here is part of it.
 
 **ARGUS refuses trades that cannot pay for themselves, and writes down why before the
 outcome exists.**
@@ -9,7 +11,7 @@ outcome exists.**
   from randomly shuffled data** — none clears a single gate, and all eight lose money after the
   12bps round trip.
   Published, not buried (`data/overfit_gates.json`).
-- Every decision is hash-chained **before** its outcome exists, and **271 claims across the
+- Every decision is hash-chained **before** its outcome exists, and **281 claims across the
   twelve Bitget stock perpetuals** are pre-registered and anchored to Bitcoin before they can be checked
   (`data/register.jsonl`). Built on Bitget's public market data and Qwen through the hackathon
   endpoint.
@@ -20,37 +22,15 @@ been *no* **every time it has been asked** — and the interesting output is not
 record that says why.
 
 **The obvious rebuttal is that it never got the chance, and the record refutes it.** 349 of those
-707 decisions were taken in a tradeable session with the anchor market open, and **344 of them
+730 decisions were taken in a tradeable session with the anchor market open, and **344 of them
 carried a directional lean** — the desk said which way it thought the instrument would go, hashed
 that call before the outcome existed, and still opened nothing. An earlier version of
 `eval/autopsy.py` explained the abstention as a sampling artefact, that the desk kept being asked
 while the market was shut. That explanation shipped with a falsifier, and on the grown ledger the
 falsifier **fired and killed it** (`data/abstention_autopsy.json`).
 
-> ### ⚠️ Correction, 2026-09-20 — two "trades" in this ledger were never taken
->
-> Earlier today this README claimed the desk had broken its refusal streak with two profitable
-> trades (COINUSDT and MSTRUSDT, +14.99 net). **That claim was false and is withdrawn.**
->
-> `paper/runner.py` selected the intent to record as
-> `llm_revised_intent or llm_original_intent`. That fallback bypasses the risk layer, and it is
-> reached precisely when the desk chooses *not* to re-put a decision to the model — which is most
-> decisions. For ledger seq 264 and 265 the Constitution refused the position
-> (`quantity_after: 0`, `binding_constraint: no_exposure`) and `agents/desk.py` wrote
-> *"no order: final verdict human_review with quantity 0"* — while the ledger stored
-> `verdict: trade, quantity: 1` and the settlement pass later booked P&L against positions that
-> were never opened.
->
-> **The rows are still in the ledger and have not been edited.** The chain guarantees a record was
-> not altered; it does not guarantee the record was right, and quietly deleting the two rows that
-> made the numbers look good is exactly the behaviour this project exists to refuse. They are
-> marked as void in `paper/corrections.py`, with the evidence, and every figure derived from the
-> ledger now excludes them.
->
-> Found by an adversarial pre-submission audit reading `eval/decisioncard.py --seq 264`, which
-> printed all four contradictory facts on one page — the artefact did its job. No test caught it:
-> every test fed that path an intent the Constitution had already allowed, so the divergent branch
-> was never exercised. `tests/test_governed_intent.py` now exercises it directly.
+A correction to this ledger (two recorded "trades" that were never taken, withdrawn on 2026-09-20)
+is at [Corrections](#corrections) below and on `/wrong`.
 
 Design: [`../ARGUS-ARCHITECTURE.md`](../ARGUS-ARCHITECTURE.md) ·
 Product requirements: [`../ARGUS-MASTER-PRD.md`](../ARGUS-MASTER-PRD.md)
@@ -66,9 +46,9 @@ Product requirements: [`../ARGUS-MASTER-PRD.md`](../ARGUS-MASTER-PRD.md)
 ## Status, measured on 2026-09-22
 
 ```
-9,175 tests collected   ruff clean   mypy --strict clean on 475 source files
+9,255 tests collected   ruff clean   mypy --strict clean on 476 source files
 152/152 modules importable           18/18 sub-themes resolve to a symbol and a test file
-707 decisions in the paper ledger (as of 2026-09-22)  chain verifies, head anchor agrees, no truncation
+730 decisions in the paper ledger (as of 2026-09-22)  chain verifies, head anchor agrees, no truncation
 0 settled trades (2 rows VOID — see the correction above)      100.0% abstention rate
 ```
 
@@ -90,7 +70,7 @@ prose is a claim and an import that resolves is evidence.
 **The desk, end to end, against the live model** — needs `BITGET_QWEN_API_KEY` in the environment:
 
 ```bash
-set -a && . ../.secrets/qwen.env && set +a
+export BITGET_QWEN_API_KEY=...   # your own key; only the Qwen-backed paths need it
 python -m argus.paper.runner --once --symbols NVDAUSDT,TSLAUSDT
 ```
 
@@ -176,7 +156,7 @@ that was read. None of them is claimed as *proven better* — see "The honest pa
 | **A directional view stated while refusing to trade** | `eval/shadow.py`, `agents/meta_pm.py` | Declining to trade says the edge does not clear the hurdle, not that there is no view. The desk states a `lean` on every refusal, hashed with the decision, graded against the move that followed. It exists because the `side` field was measured and found to be `BUY` in all 53 settled rows — right 3.8% of the time against a 3.8% base rate. |
 | **Refusal measured as a result, not excused as an absence** | `eval/refusal.py` | The obvious attack on this project is one sentence: *Hundreds of decisions, zero trades — it has demonstrated nothing.* That attack is answerable, and the answer is a measurement rather than an argument. Every refusal carries a stated direction, hashed with the decision before the outcome exists, so the counterfactual is not reconstructed afterwards — it was committed to. Grading those against the move that followed: at the ~2h horizon **206 of 347 directional calls went the right way, 58.5%, 95% interval 50.3–66.4%**, bootstrapped over the 26 decision cycles the calls came from. It barely excludes a coin flip and does **not** beat the naive call — saying "up" every time scored 53.3%, and the lean beat it in 11 cycles and lost in 9 — while the overnight horizon at 48.3% (42 of 87) does not exclude a coin. So the lean has not shown it knows more than the tape's direction; the earlier per-call Wilson interval (52.7–64.0%) overstated it and is corrected on `/wrong`. The decisive number is the second one: **the median decision forgave -4.5bps of net edge, after the 12bps round trip.** The typical refusal was not caution costing money; it was the trade being unprofitable. That is the whole thesis measured on our own record rather than asserted — and it is the number that makes an empty ledger a finding instead of a gap (`data/refusal_alpha.json`). |
 | **The leakage gate, enforced rather than published** | `eval/leakage.py:check_window`, `eval/shadow.py` | Measuring contamination and then not acting on it is half a control. `check_window(start, end)` reads the stored measurement and answers CONTAMINATED / CLEAN / **UNMEASURED** — and the third is the one that matters: a missing report, or a report whose sensitivity control failed, is never allowed to read as clean, because an instrument that cannot fire certifies nothing. `eval/shadow.py` now carries the decision dates of every graded call, bounds the window it grades, and prints the status beside its own verdict. Live, the shadow record reports **CONTAMINATED** — the model recalls facts published in the period it grades. The note is attached to the verdict rather than used to suppress it: the instrument measures recall of *fundamentals* and the record grades *price direction*, so overlap is the precondition for leakage, not proof of it. |
-| **A register of claims committed before their outcomes** | `register/claims.py`, `register/resolve.py` | Every claim made about a market is made into a void: a call is posted, a backtest reports a Sharpe, an agent opens a position with a thesis, and none of it is mechanically connected to what happened next. **271 falsifiable claims about all twelve stock perpetuals are now committed, hash-chained, and anchored to Bitcoin through four independent calendars** — head `41f21e5d743cbb46`, proofs in `data/anchors/`. **38 of the 68 proofs carry a Bitcoin block-header attestation** (blocks 966,822–967,736); the other 18 were submitted recently and still read as calendar-pending, because a Bitcoin attestation takes hours to exist and a proof that says *pending* is the honest state until it does. Every file is a standard detached OpenTimestamps proof — `ots verify` reads them without our cooperation, and `python -m argus.register.anchorcheck` prints the tally above. A claim whose resolution predicate cannot execute against a named point-in-time source is **refused at registration**, which is what makes this a register rather than a comment section. The resolver checks the horizon *before* it fetches a price, so there is no code path where it has seen the answer and then decided not to use it; a source that will not answer yields UNRESOLVABLE, never FALSE. Scoring is Brier, not hit rate — the same accuracy stated loudly scores worse than stated honestly — and **The Wall** publishes every claim we get wrong, most confident first. The confidences are set by a written rule, not chosen: volatility claims at 0.60 because `risk/session_risk.py` measured the reopen jump, and direction claims at exactly **0.50**, because every retrieval we built measured that we have no directional edge on these instruments and claiming one would be the dishonesty this register exists to price (`data/register.jsonl`, `data/register_scoreboard.json`). |
+| **A register of claims committed before their outcomes** | `register/claims.py`, `register/resolve.py` | Every claim made about a market is made into a void: a call is posted, a backtest reports a Sharpe, an agent opens a position with a thesis, and none of it is mechanically connected to what happened next. **281 falsifiable claims about all twelve stock perpetuals are now committed, hash-chained, and anchored to Bitcoin through four independent calendars** — head `41f21e5d743cbb46`, proofs in `data/anchors/`. **38 of the 68 proofs carry a Bitcoin block-header attestation** (blocks 966,822–967,736); the other 18 were submitted recently and still read as calendar-pending, because a Bitcoin attestation takes hours to exist and a proof that says *pending* is the honest state until it does. Every file is a standard detached OpenTimestamps proof — `ots verify` reads them without our cooperation, and `python -m argus.register.anchorcheck` prints the tally above. A claim whose resolution predicate cannot execute against a named point-in-time source is **refused at registration**, which is what makes this a register rather than a comment section. The resolver checks the horizon *before* it fetches a price, so there is no code path where it has seen the answer and then decided not to use it; a source that will not answer yields UNRESOLVABLE, never FALSE. Scoring is Brier, not hit rate — the same accuracy stated loudly scores worse than stated honestly — and **The Wall** publishes every claim we get wrong, most confident first. The confidences are set by a written rule, not chosen: volatility claims at 0.60 because `risk/session_risk.py` measured the reopen jump, and direction claims at exactly **0.50**, because every retrieval we built measured that we have no directional edge on these instruments and claiming one would be the dishonesty this register exists to price (`data/register.jsonl`, `data/register_scoreboard.json`). |
 | **Memorisation leakage measured — and the control that caught two harness bugs** | `eval/leakage.py` | Every historical evaluation here asks a model about a period that already happened, and none could say whether it had simply **read the answer**. barj28's instrument (DOI 10.5281/zenodo.20844335) was read and its probe copied exactly — multiplicative distractors, wide `{0.5,0.7,1.4,2.0}` and tight `{0.85,0.93,1.08,1.18}`, deterministic per-fact shuffle. The facts are ours: 42 probes built from what companies actually filed with the SEC, bucketed by **filing date**, because a model can only learn a number after it is published. **Live: 32/42 tight probes correct (76%) against 20% chance, p<0.0001, above chance in every period counted including filings from August 2026** — the model recalls these numbers to within ±18%, and no upper boundary was located. So any evaluation over a window in that range is contaminated. **The sensitivity control is why that number is trustworthy**: its first run scored 2/12 with the answer printed in the prompt, which is impossible — the parser was reading the model's chain of thought instead of its answer; a second run caught a literal backspace byte where the regex needed `\b`. Both bugs were invisible in the probe results alone, because a broken instrument and an honest null look identical. Control now 12/12 (`data/leakage.json`, `research/architecture/37-memorisation-leakage.md`). |
 | **Untrusted evidence quarantined before the model reads it** | `agents/quarantine.py` | Every headline, filing and footnote the desk reasons over is written by somebody else, and `agents/analysts.py` interpolated it straight into the prompt. ARGUS had three checks on that text — grounding, claim support, an adversary — and **all three assume it is wrong; none assumed it is hostile.** AgentDojo's four defences were read and taken selectively: spotlighting with delimiters (arXiv 2403.14720) plus the standing system instruction, and its **replace-don't-drop discipline** (`pi_detector.py:48-51`) — a hostile item keeps its id, source and timestamp and loses only its claim, so no downstream count silently shrinks. Its 440MB transformer detector was not taken; ours is six structural patterns that report **the span that fired**, because a record saying "quarantined" without saying what it saw cannot be audited. **Calibrated against 49 evidence items fetched live from our own feed: 0 false positives, 0 misses on 9 attacks** — and that corpus caught a real one, a rule that fired on "analysts please note the long-term outlook". The corpus is committed so a future rule that starts redacting real headlines fails in the suite. The screening note reaches the decision record on every cycle, including when nothing fired (`research/architecture/36-prompt-injection-quarantine.md`). |
 | **Regime detection that sees shape, not just amplitude** | `desk/regime.py` | The incumbent (`strategies/track1_suite.py:206-215`) is one threshold: fast volatility under slow volatility means quiet regime. It cannot see a rally becoming a drawdown at the same volatility. FLUSS (Gharghabi et al., ICDM 2017) can, and it falls out of machinery we already had — extend `desk/shapematch.py`'s distance to every window's nearest neighbour and a regime boundary is where few of those arcs cross. Pure Python, no numpy or scipy: 1,079 bars in 10 seconds. Both reference implementations were read and the module follows each where it is better — matrixprofile's analytic parabola for the idealised curve (deterministic, scipy-free) and stumpy's five-times-wider head/tail correction (the narrow one mistakes edges for boundaries). **Live on NVDAUSDT: a +14.0% rally, a -6.4% drawdown and a +2.4% recovery — at 8.6, 10.5 and 9.3bps a bar.** The loudest stretch is 1.2x the quietest, and the incumbent rule does not flip at either boundary; the report re-runs that rule and says so itself. It labels nothing and predicts nothing — a homogeneous series is reported as one regime rather than forced into three (`data/regimes.json`, `research/architecture/35-regime-segmentation-fluss.md`). |
@@ -233,7 +213,7 @@ that was read. None of them is claimed as *proven better* — see "The honest pa
 
 ## The honest part
 
-- **Zero positions have settled.** All 707 ledger entries are refusals, and 481 have settled as
+- **Zero positions have settled.** All 730 ledger entries are refusals, and 481 have settled as
   abstentions. Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they record fills
   the risk layer had refused, and are excluded everywhere (see the correction at the top of this
   file and `paper/corrections.py`). Track 2's quantitative half — Sharpe, max drawdown, win rate —
@@ -244,7 +224,7 @@ that was read. None of them is claimed as *proven better* — see "The honest pa
   right 3.8% of the time against a base rate of up-moves of exactly 3.8% — a schema being filled in,
   not a view. So the desk now states a **lean** on every decision including the ones it refuses,
   covered by the chain through the intent hash and graded against the move that followed
-  (`eval/shadow.py`). **540 decisions carry a lean** in the shadow record, UP and DOWN at differing
+  (`eval/shadow.py`). **563 decisions carry a lean** in the shadow record, UP and DOWN at differing
   confidences where `side` never varied, and they are now graded: 169 of 289 settled directional calls were right at the ~2h
   horizon (`data/refusal_alpha.json`, above).
 - The abstentions are correct rather than broken: the log begins on a weekend with the anchor market
@@ -276,11 +256,9 @@ that was read. None of them is claimed as *proven better* — see "The honest pa
   from here, so the hosted server is failing to reach sources that are up. `market/skill_mirror.py`
   reads them itself — alternative.me, Binance futures data, FRED, Yahoo, the RSS feeds, DeFiLlama,
   CoinGecko — plus two named substitutes where the Skill's upstream needs a key (earnings: Nasdaq
-  for Finnhub) or is not named (gas: a public Ethereum RPC). Measured 2026-09-25: **Bitget's
-  server answered 6 of 19, the mirror 13 more (11 from the same source), 19 of 19 in total and
-  all 5 Skills** (`data/skill_mirror.json`). Every mirrored claim says which source answered; the
-  two counts are never merged into one.
-- **6 of 43 capabilities are OWNED; one more reaches twelve of thirteen and stops there for a
+  for Finnhub) or is not named (gas: a public Ethereum RPC). Of the desk's 19 calls on 2026-09-26, Bitget's server answered 6 and ARGUS read 13 more from the sources those Skills name (11 the same source, 2 a named substitute), each labelled as that source, never as the Skill (`data/skill_mirror.json`).
+  Measured tool by tool: 2 of bitget-signal's 19 tools answered all three attempts on 2026-09-26 (crypto_derivatives, technical_analysis), from 1 of its 5 Skills (technical-analysis) plus 1 tool no SKILL.md names (`data/skill_reliability.json`).
+- **6 of 44 capabilities are OWNED; one more reaches twelve of thirteen and stops there for a
   reason that is named, not argued away.** OWNED means demonstrated superiority through a run
   experiment against a named baseline, and it is a conjunction of thirteen conditions rather than
   a score — see `eval/standing.py`'s own register for the current, falsifiable count (`audit()`
@@ -451,7 +429,7 @@ Several test modules are regression fixtures for defects found in **this** syste
 silently ceasing to be reported.
 
 
-**What the register says about itself, after it started checking.** ARGUS keeps a capability standing register with four states and thirteen conditions for OWNED. Until 2026-09-20 its audit checked that a file existed and that a test function's name appeared inside it — so *"same-input comparison run"*, *"out-of-sample test"* and *"ablation"* were each satisfied by a filename, and 23 of 24 entries carried the top grade. It now opens the artefacts. **6 of 43 capabilities are OWNED, 12 are TIED, 25 are IMPLEMENTED, and 0 are LOST.** Two losses were found and closed on 2026-09-24. Bitget's own 60-second TWAP beat the hourly schedule the console printed (6.9 against 12.2bps on a $100k order, on a full-depth replay); the console now sends one-minute children and ties it. And the S2 entry Ballast hedges an rToken holder's nights with the same company's perpetual (99.7% of the variance removed) while ARGUS, which modelled only the perpetuals, offered an index hedge (10.1%). ARGUS now reads the spot rTokens and offers the same hedge, tested on held-out nights — a tie, since both fit the same slope. On 2026-09-24 a review of the right rivals for every Track 2 and Track 3 sub-theme withdrew seven OWNED grades that had been won against a rival that does not lead the sub-theme (an event-significance method, a same-instrument router, an archived agent, a closed-form optimum against its own objective), and split sentiment and factor discovery into the narrow thing proven and the sub-theme itself; each carries its reason on `/proof` and `/wrong`. Seven were demoted the first time the artefact-opening audit ran (2026-09-20), and every one has since been re-earned by making its artefact carry the evidence rather than by editing its state, because they claimed a condition their own artefact recorded nothing about. By 2026-09-20 three capabilities were genuinely LOST to a named specialist; within 48 hours every one moved to TIED, and none of the three ties is a rounded-up loss — each is published with the losing half still named as a loss where one exists. Portfolio allocation moved first: Riskfolio-Lib's real NCO beat ARGUS's HRP decisively on a 24-window walk-forward (p=3.6e-05), so ARGUS's own NCO was built from Riskfolio's real source — real Ward linkage, a real active-set minimum-variance solver, the real two-difference gap statistic for cluster count — verified to reproduce Riskfolio's real NCO to 1.3e-05 on the same book, then wired into the SAME live walk-forward test and re-run fresh: 8.203bps both, ratio 1.0000. A tie, not a win, and published as exactly that. LUI intent routing moved next: dev-half CV across 10 fold-split seeds found a linear-SVM classifier head beats the multinomial logistic head this shipped with on every seed (mean 76.71% vs 72.28%), so the model was rebuilt, its abstention threshold re-derived by the same rule that set the original, and re-measured exactly once on the same sealed corpus the old model was scored on. Rasa's DIET classifier is still numerically ahead on raw accuracy (81.91% vs 77.82% at that point), but the gap was no longer statistically significant (McNemar p=0.0576, down from a clearly significant p=0.0014 before the rebuild) — not proven equal, a real but fragile tie. A second rebuild the same day (a RIVAL LENS pass) tested a lever the first rebuild's own root-cause note had named and left untried: the out-of-scope training negatives were skewed 60 Chinese to 40 English, opposite the roughly-balanced in-scope pool. Dev-CV confirmed the mechanism directly (held-out Chinese in-scope rows wrongly refused as out-of-scope, 14.2% to 8.4%, McNemar p<0.0001) before touching production code; rebalancing the negatives took sealed accuracy to 79.52% and widened the margin against Rasa to a comfortable p=0.2649 — still a tie, no longer a fragile one. ARGUS's separate, significant win on out-of-scope refusal got stronger in the first rebuild and held steady through the second (92.86% vs Rasa's 42.86%, p=0.0156, was p=0.03125). Regime-boundary detection moved last, the same day it was sharpened: FLUSS, ARGUS's original segmenter, still loses to ruptures decisively (F1 0.443 vs 0.975, p=1.5e-25) — unchanged, and stated as a loss, not softened. What moved the *capability* is a second, different ARGUS tool: `ruptures/detection/dynp.py` and `costs/costl2.py` (BSD-2-Clause) were read in full to understand *why* FLUSS loses, and an exact L2 dynamic-program segmenter (`desk/regime.py::exact_partition`) was built, verified to reproduce ruptures' own real `Dynp` exactly on 120/120 trials and to match `KernelCPD`'s rbf-kernel result — the actual rival — on 10/10, then wired into the identical 100-trial synthetic ground truth that measured FLUSS's loss: 1 win, 0 losses, 99 ties, mean F1 0.98 against ruptures' 0.975 — nominally ahead, not significantly so on one discordant trial, reported as a tie. Three of the thirteen conditions — whether the *best* implementation and the *best* method were studied, and whether a specialist still beats us — are judgements about a field rather than properties of a file, so they are reported as **attested** and name where somebody looked, instead of being dressed up as machine-checked (`python -m argus.eval.standing`).
+**What the register says about itself, after it started checking.** ARGUS keeps a capability standing register with four states and thirteen conditions for OWNED. Until 2026-09-20 its audit checked that a file existed and that a test function's name appeared inside it — so *"same-input comparison run"*, *"out-of-sample test"* and *"ablation"* were each satisfied by a filename, and 23 of 24 entries carried the top grade. It now opens the artefacts. **6 of 44 capabilities are OWNED, 12 are TIED, 25 are IMPLEMENTED, and 1 is LOST (crowd sentiment classification, to RoB-RT on TweetEval: 0.544 against 0.729 macro-recall on the same 12,284 tweets).** Two losses were found and closed on 2026-09-24. Bitget's own 60-second TWAP beat the hourly schedule the console printed (6.9 against 12.2bps on a $100k order, on a full-depth replay); the console now sends one-minute children and ties it. And the S2 entry Ballast hedges an rToken holder's nights with the same company's perpetual (99.7% of the variance removed) while ARGUS, which modelled only the perpetuals, offered an index hedge (10.1%). ARGUS now reads the spot rTokens and offers the same hedge, tested on held-out nights — a tie, since both fit the same slope. On 2026-09-24 a review of the right rivals for every Track 2 and Track 3 sub-theme withdrew seven OWNED grades that had been won against a rival that does not lead the sub-theme (an event-significance method, a same-instrument router, an archived agent, a closed-form optimum against its own objective), and split sentiment and factor discovery into the narrow thing proven and the sub-theme itself; each carries its reason on `/proof` and `/wrong`. Seven were demoted the first time the artefact-opening audit ran (2026-09-20), and every one has since been re-earned by making its artefact carry the evidence rather than by editing its state, because they claimed a condition their own artefact recorded nothing about. By 2026-09-20 three capabilities were genuinely LOST to a named specialist; within 48 hours every one moved to TIED, and none of the three ties is a rounded-up loss — each is published with the losing half still named as a loss where one exists. Portfolio allocation moved first: Riskfolio-Lib's real NCO beat ARGUS's HRP decisively on a 24-window walk-forward (p=3.6e-05), so ARGUS's own NCO was built from Riskfolio's real source — real Ward linkage, a real active-set minimum-variance solver, the real two-difference gap statistic for cluster count — verified to reproduce Riskfolio's real NCO to 1.3e-05 on the same book, then wired into the SAME live walk-forward test and re-run fresh: 8.203bps both, ratio 1.0000. A tie, not a win, and published as exactly that. LUI intent routing moved next: dev-half CV across 10 fold-split seeds found a linear-SVM classifier head beats the multinomial logistic head this shipped with on every seed (mean 76.71% vs 72.28%), so the model was rebuilt, its abstention threshold re-derived by the same rule that set the original, and re-measured exactly once on the same sealed corpus the old model was scored on. Rasa's DIET classifier is still numerically ahead on raw accuracy (81.91% vs 77.82% at that point), but the gap was no longer statistically significant (McNemar p=0.0576, down from a clearly significant p=0.0014 before the rebuild) — not proven equal, a real but fragile tie. A second rebuild the same day (a RIVAL LENS pass) tested a lever the first rebuild's own root-cause note had named and left untried: the out-of-scope training negatives were skewed 60 Chinese to 40 English, opposite the roughly-balanced in-scope pool. Dev-CV confirmed the mechanism directly (held-out Chinese in-scope rows wrongly refused as out-of-scope, 14.2% to 8.4%, McNemar p<0.0001) before touching production code; rebalancing the negatives took sealed accuracy to 79.52% and widened the margin against Rasa to a comfortable p=0.2649 — still a tie, no longer a fragile one. ARGUS's separate, significant win on out-of-scope refusal got stronger in the first rebuild and held steady through the second (92.86% vs Rasa's 42.86%, p=0.0156, was p=0.03125). Regime-boundary detection moved last, the same day it was sharpened: FLUSS, ARGUS's original segmenter, still loses to ruptures decisively (F1 0.443 vs 0.975, p=1.5e-25) — unchanged, and stated as a loss, not softened. What moved the *capability* is a second, different ARGUS tool: `ruptures/detection/dynp.py` and `costs/costl2.py` (BSD-2-Clause) were read in full to understand *why* FLUSS loses, and an exact L2 dynamic-program segmenter (`desk/regime.py::exact_partition`) was built, verified to reproduce ruptures' own real `Dynp` exactly on 120/120 trials and to match `KernelCPD`'s rbf-kernel result — the actual rival — on 10/10, then wired into the identical 100-trial synthetic ground truth that measured FLUSS's loss: 1 win, 0 losses, 99 ties, mean F1 0.98 against ruptures' 0.975 — nominally ahead, not significantly so on one discordant trial, reported as a tie. Three of the thirteen conditions — whether the *best* implementation and the *best* method were studied, and whether a specialist still beats us — are judgements about a field rather than properties of a file, so they are reported as **attested** and name where somebody looked, instead of being dressed up as machine-checked (`python -m argus.eval.standing`).
 
 ---
 
@@ -461,3 +439,30 @@ MIT. **Nothing under GPL, LGPL, PolyForm Noncommercial, or an absent licence is 
 here.** Every vendored file carries a header naming its upstream source, commit and licence,
 and is pinned by a SHA256 of the extracted region — so what was taken, and from where, is
 checkable from the file itself rather than from a list somebody has to keep current.
+
+## Corrections
+
+> ### ⚠️ Correction, 2026-09-20 — two "trades" in this ledger were never taken
+>
+> Earlier today this README claimed the desk had broken its refusal streak with two profitable
+> trades (COINUSDT and MSTRUSDT, +14.99 net). **That claim was false and is withdrawn.**
+>
+> `paper/runner.py` selected the intent to record as
+> `llm_revised_intent or llm_original_intent`. That fallback bypasses the risk layer, and it is
+> reached precisely when the desk chooses *not* to re-put a decision to the model — which is most
+> decisions. For ledger seq 264 and 265 the Constitution refused the position
+> (`quantity_after: 0`, `binding_constraint: no_exposure`) and `agents/desk.py` wrote
+> *"no order: final verdict human_review with quantity 0"* — while the ledger stored
+> `verdict: trade, quantity: 1` and the settlement pass later booked P&L against positions that
+> were never opened.
+>
+> **The rows are still in the ledger and have not been edited.** The chain guarantees a record was
+> not altered; it does not guarantee the record was right, and quietly deleting the two rows that
+> made the numbers look good is exactly the behaviour this project exists to refuse. They are
+> marked as void in `paper/corrections.py`, with the evidence, and every figure derived from the
+> ledger now excludes them.
+>
+> Found by an adversarial pre-submission audit reading `eval/decisioncard.py --seq 264`, which
+> printed all four contradictory facts on one page — the artefact did its job. No test caught it:
+> every test fed that path an intent the Constitution had already allowed, so the divergent branch
+> was never exercised. `tests/test_governed_intent.py` now exercises it directly.

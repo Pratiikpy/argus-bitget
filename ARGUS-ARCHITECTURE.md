@@ -28,20 +28,20 @@ This document supersedes the 2026-09-12 build specification. That was a plan; th
 ## 0. The shape
 
 ```text
-                              ONE ENGINE
+                       ONE RESEARCH WORKBENCH (the Track 3 entry)
    Truth · Evidence · Intelligence · Risk · Execution · Record · Evaluation
                                   │
         ┌─────────────────────────┼─────────────────────────┐
         │                         │                         │
-   ALPHA FACTORY           TRADING GOVERNOR            RESEARCH OS
-     (Track 1)                (Track 2)                 (Track 3)
-   scored 100%              scored 50/50              scored by judges
-   quantitatively           quant / judge             human decides
+    THE CONSOLE              THE PAPER DESK             THE REGISTER
+   question → answer      decisions hashed before     claims anchored
+   with a receipt         their outcome (evidence)    before they resolve
 ```
 
-The engine is shared; the products are not. Track 1 submits a strategy whose Sharpe must survive
-costs. Track 2 submits an agent whose decisions must be provably its own. Track 3 submits a
-workspace whose every number must be traceable in one click.
+One engine, one entry. The console is what a trader uses; the paper desk and the register are
+where its evidence comes from, and neither is filed as an entry of its own. The team's Track 2
+entry is a separate project (t2-sentiment-agent) with its own repository; the factor research
+that would have been a Track 1 entry is kept as research (ARGUS-EXPLAINED.md, Part C).
 
 ---
 
@@ -167,7 +167,7 @@ window it was built to be watched during. `horizon_coverage()` measures exactly 
 **0 resolving inside the window, 0 still pending when it opens**; the cadence fixes it, and a test
 pins the failure shape so it cannot return unnoticed.
 
-**Live:** 271 claims across the twelve stock perpetuals (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — the head at the moment of that anchoring, so that proof covers the first 36 claims and not the 120 registered since; each scheduled cycle appends and re-anchors, and 38 of the 60 proofs carry a Bitcoin block-header attestation (`python -m argus.register.anchorcheck`). Anchored to
+**Live:** 281 claims across the twelve stock perpetuals (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — the head at the moment of that anchoring, so that proof covers the first 36 claims and not the 120 registered since; each scheduled cycle appends and re-anchors, and 38 of the 60 proofs carry a Bitcoin block-header attestation (`python -m argus.register.anchorcheck`). Anchored to
 `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The resolver runs on
 every scheduled cycle.
@@ -397,8 +397,8 @@ The largest package in the system, deliberately.
 
 **The capability ladder** is enforced in code: LOST → TIED → IMPLEMENTED → OWNED, with OWNED requiring
 thirteen conditions including a reproduced baseline, same-input comparison, out-of-sample test,
-ablation and adversarial test. Live (`data/standing.json`): **6 of 43 capabilities are OWNED**,
-8 TIED, 10 IMPLEMENTED, 0 LOST — re-derived by `python -m argus.eval.standing` from the artefacts.
+ablation and adversarial test. Live (`data/standing.json`): **6 of 44 capabilities are OWNED**,
+12 TIED, 25 IMPLEMENTED, 1 LOST — re-derived by `python -m argus.eval.standing` from the artefacts.
 
 ---
 

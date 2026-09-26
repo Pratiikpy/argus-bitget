@@ -1,13 +1,15 @@
 # ARGUS, explained in plain English — the whole product
 
-ARGUS is one product, built as a single system. It is entered in Track 3; its Track 2 half is built,
-running and shown here, and not filed while the desk has no settled trades — the reason is in Part B.
+ARGUS is this team's **Track 3 entry (AI Trading Desk)**: a research workbench where the trader decides
+and the AI researches. The team's Track 2 entry is a separate project, [t2-sentiment-agent](https://github.com/Pratiikpy/t2-sentiment-agent),
+with its own repository, ledger and demo; nothing in this document is part of it.
 
-- **Part A is Track 3, AI Trading Desk** — the human decides, the AI researches. Judged 100% by
-  people.
-- **Part B is Track 2, Agentic Trading** — the AI decides, the risk layer binds. Judged 50% by
-  numbers and 50% by people.
-- **Part C is Track 1, Alpha Factory** — parked by decision, but the machinery is built and the
+- **Part A is the research workbench** — the Track 3 entry. Judged 100% by people.
+- **Part B is the paper desk inside the workbench** — not an entry. It is the machinery the
+  answers draw on (analysts, risk layer, hash-chained ledger), described because its record is
+  evidence the workbench cites. It was written while the desk was considered for Track 2 and was
+  never filed there; that history is kept, not rewritten.
+- **Part C is the factor research** — the Alpha Factory machinery, not an entry: it is built and the
   results are in, and they are published here in full because they mostly say no.
 - **Part D is the complete architecture** — all 147 modules across 20 packages named and placed,
   the seven layers and the rules that enforce them, one real decision walked end to end, every
@@ -18,8 +20,8 @@ running and shown here, and not filed while the desk has no settled trades — t
   conditions and names the one it cannot meet; and funding carry, the first proposal in this
   system's history to get past the exposure gate and be refused by a gate that actually ran.
 
-The evidence, the analysts, the checks, the engine, the risk layer and the ledger are shared. The
-difference between the tracks is who has the final word.
+The evidence, the analysts, the checks, the engine, the risk layer and the ledger are shared by
+every part; the workbench's console never places an order.
 
 This is written the way a judge reads: what the track asks for, what we actually built, how it
 works, what you can run yourself, and — just as important — what it refuses to do and what it
@@ -140,7 +142,7 @@ We catalogued **all 19 tools**. We call them and sort the result into states tha
 with each other: answered, empty, the tool reported an error, timed out, or unreachable. On
 2026-09-13, 6 of 19 answered and 13 timed out at their upstream data providers.
 
-On 2026-09-21 the same sweep reported **6 answering and 13 timing out**, where the day before it had reported 6 answering, 10 *empty* and 3 *tool errors* — same code, same endpoint, two incompatible descriptions of one service. So the sweep was repeated rather than re-quoted: `eval/skillreliability.py` calls every tool three times, spaced apart, and classifies each as reliable / intermittent / down. **6 of 19 answer three times out of three, all six of them technical analysis, so 1 of the 5 Skills has a reliable tool** — the same six the single sweep found. (A first run reported 9 and 3 Skills: it counted three tools that return only an upstream error envelope as answers, and was corrected on 26 Sep 2026.) There is no intermittent tool: each is consistently up or consistently down, so both snapshots were describing the same thirteen dead tools with different error text.
+On 2026-09-21 the same sweep reported **6 answering and 13 timing out**, where the day before it had reported 6 answering, 10 *empty* and 3 *tool errors* — same code, same endpoint, two incompatible descriptions of one service. So the sweep was repeated rather than re-quoted: `eval/skillreliability.py` calls every tool three times, spaced apart, and classifies each as reliable / intermittent / down. Those sweeps counted calls, not tools: 19 calls, six of them actions of one tool (`technical_analysis`), reaching 12 of the 19 tools, and seven tools were never asked. Since 26 Sep 2026 it calls each of the 19 tools once per attempt: **2 of bitget-signal's 19 tools answered all three attempts on 2026-09-26 (crypto_derivatives, technical_analysis), from 1 of its 5 Skills (technical-analysis) plus 1 tool no SKILL.md names**. (A first run reported 9 answering calls and 3 Skills: it counted three calls that return only an upstream error envelope as answers, and was corrected the same day.)
 
 We could have wired in all 19 and let the dead ones return nothing. The feature list would look
 three times longer and the product would behave identically. We chose to measure and publish the
@@ -627,8 +629,8 @@ A judge should not have to discover these.
   to it — rather than the earlier and false "no hedge placeable".
 - **No usage data.** This has not been put in front of traders yet. The plan is ten supervised
   sessions measuring whether the risk-share figure changes the ticket.
-- **Superiority is claimed only where a named competitor was run on the same input.** 7 of 43
-  capabilities are OWNED under that rule; the rest are TIED or IMPLEMENTED and are called that, and
+- **Superiority is claimed only where a named competitor was run on the same input.** 6 of 44
+  capabilities are OWNED under that rule; the rest are TIED, IMPLEMENTED or LOST and are called that, and
   every comparison we lost is published on `/wrong`. On 2026-09-24 seven earlier OWNED grades were
   withdrawn because the rival they beat does not lead its sub-theme; they stay IMPLEMENTED until
   the systems that do lead it are run on the same input.
@@ -658,7 +660,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 9,175 tests
+pytest                    # 9,255 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -681,7 +683,13 @@ same place it would have put the number.
 ---
 ---
 
-# PART B — Track 2, Agentic Trading
+# PART B — The paper desk inside the research workbench (not an entry)
+
+> This part describes the autonomous paper desk that runs inside ARGUS and feeds its evidence.
+> It was written while the desk was considered for Track 2. It was not filed there: this team's
+> Track 2 entry is the separate t2-sentiment-agent project. The text below keeps the Track 2
+> framing it was written in, because rewriting a record after the fact is what this project
+> refuses to do.
 
 Everything above was Track 3, where a human decides. This part is Track 2, where the **AI decides**.
 They are the same product. The same evidence, the same analysts, the same risk layer and the same
@@ -1139,7 +1147,7 @@ why.
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 707 decisions on record. Every one of them is a refusal, and 661 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 730 decisions on record. Every one of them is a refusal, and 682 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
 zero trades, those three numbers **do not exist**. Not "are zero" — do not exist. Half of the track
@@ -1370,8 +1378,8 @@ in the same place we would have written a Sharpe ratio.
 
 # PART C — Track 1, Alpha Factory
 
-**First, the honest framing.** Track 1 was parked by a deliberate decision early on: the two
-submissions go to Tracks 2 and 3. But the product touches Track 1 anyway, because the machinery that
+**First, the honest framing.** Track 1 was parked by a deliberate decision early on: this team's
+entries are this workbench (Track 3) and a separate Track 2 project. But the product touches Track 1 anyway, because the machinery that
 scores Track 2 and the research that feeds Track 3 are the same machinery Track 1 is judged on. So
 this part describes what exists, what it found, and — because Track 1 is scored purely on numbers —
 exactly what those numbers say, including the ones that say no.
@@ -1707,7 +1715,7 @@ takes, and every artefact the system writes.
 |---|---|
 | Source modules | **327** files across **21 packages**, 130,470 lines |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **224 files**, **9,175 tests collected** |
+| Test files / tests | **224 files**, **9,255 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **327 source files** |
 | Artefacts written | **162** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
@@ -1817,7 +1825,7 @@ allocation → beta → portfolio → diversification → stress → cost), `por
 `resolve` — the auto-resolver and the scoreboard, structurally unable to answer early.
 `open_register` — commits a batch and submits its head to four Bitcoin calendars.
 
-Live: **271 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
+Live: **281 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
 2026-09-14. The resolver runs on every scheduled cycle.
 
 ### `eval/` — thirty-three ways to be wrong in public (33 modules)
@@ -1953,10 +1961,10 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 327 files, 21 packages, 130,470 lines; `mypy --strict` clean on 475 source files |
+| Source modules | 327 files, 21 packages, 130,470 lines; `mypy --strict` clean on 476 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 9,175 tests collected, `ruff` clean |
+| Tests | 9,255 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 66, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
@@ -1985,10 +1993,11 @@ source is a build failure, not a typo.
 That last row is the one to read twice. An *owned* capability needs a reproduced baseline, a
 same-input comparison, an out-of-sample test, an ablation and an adversarial test — thirteen
 conditions in all, enforced in code by `argus/eval/standing.py`, which raises at import if anything
-claims OWNED without them. It read zero when this table was first written; today 7 of 43
-capabilities are OWNED, 12 are TIED, 25 are IMPLEMENTED and none is LOST. It read 20 until the
-per-group check of 2026-09-25 withdrew twelve, and 8 until a general-purpose validator tied
-breadth rotation on 2026-09-26. Five ties were losses first:
+claims OWNED without them. It read zero when this table was first written; today 6 of 44
+capabilities are OWNED, 12 are TIED, 25 are IMPLEMENTED and 1 is LOST. It read 20 until the
+per-group check of 2026-09-25 withdrew twelve, 8 until a general-purpose validator tied
+breadth rotation on 2026-09-26, and 7 until rToken factor divergence was re-graded IMPLEMENTED
+the same day. Five ties were losses first:
 the three from before 2026-09-22, order splitting against Bitget's own TWAP, and the rToken
 overnight hedge, lost to the S2 entry Ballast and
 rebuilt to parity on 2026-09-24. It read 27 of 31 until 2026-09-24, when a review of the right rivals per sub-theme withdrew
@@ -2243,7 +2252,7 @@ could attack today.
     graded on, so its measured accuracy cannot yet be compared against the 55% bar.
 37. **Two settled outcomes.** Calibration on the desk's own judgement cannot be computed yet; the
     49,140 figure is the policy layer, labelled as such, and the two must never be added together.
-38. **37 of 43 capabilities are not OWNED.** 12 are TIED against the named rival and 25 are
+38. **38 of 44 capabilities are not OWNED.** 1 is LOST, 12 are TIED against the named rival and 25 are
     IMPLEMENTED; each says what it is missing.
 39. **Four of five official Bitget Skills carry no data.** Measured to be their backend rather than
     our integration — but a judge sees a thin panel either way.

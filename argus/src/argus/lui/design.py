@@ -173,15 +173,27 @@ def footer() -> str:
             'public news.</span></footer>')
 
 
-def head(title: str, description: str) -> str:
+PUBLIC_URL = "https://deploy-topaz-seven-64.vercel.app"
+"""Where the console is hosted: a link preview needs an absolute image URL and page URL."""
+
+OG_IMAGE = f"{PUBLIC_URL}/og.png"
+"""The 1200x630 preview card (`lui/og.png`, the mark and the console's promise), served at
+``/og.png``. The handbook makes an X post mandatory, and a link without an image previews as a
+bare line of text."""
+
+
+def head(title: str, description: str, path: str = "/") -> str:
     """Everything a page's ``<head>`` shares: viewport, favicon, fonts, and the link-preview
-    cards a pasted URL renders as."""
+    card a pasted URL renders as (title, description, image and URL)."""
     return (f'<meta charset="utf-8"><meta name="viewport" content="width=device-width,'
             f'initial-scale=1"><title>{title}</title><meta name="description" '
             f'content="{description}"><meta property="og:title" content="{title}">'
             f'<meta property="og:description" content="{description}"><meta property="og:type" '
-            f'content="website"><meta name="twitter:card" content="summary">'
-            f'<link rel="icon" href="{favicon()}">{FONTS}')
+            f'content="website"><meta property="og:url" content="{PUBLIC_URL}{path}">'
+            f'<meta property="og:image" content="{OG_IMAGE}"><meta property="og:image:width" '
+            f'content="1200"><meta property="og:image:height" content="630">'
+            f'<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" '
+            f'content="{OG_IMAGE}"><link rel="icon" href="{favicon()}">{FONTS}')
 
 
 __all__ = ["BASE_CSS", "FONTS", "LINKS", "PALETTE", "TOKENS_CSS", "favicon", "footer", "head",

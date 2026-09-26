@@ -3,8 +3,8 @@
 
 **Status:** The original build specification, written 2026-09-12, with the measurements and
 retractions recorded since. **Read the plan sections as history, not as the entry:** they name
-Agentic Trading (Track 2) as the primary submission; the entry actually filed is **Track 3 (AI
-Trading Desk) only**, and the README explains why Track 2 was withheld.
+Agentic Trading (Track 2) as the primary submission; this repository is the team's **Track 3 (AI
+Trading Desk)** entry, and its Track 2 entry is a separate project (t2-sentiment-agent).
 **Owner:** github.com/Pratiikpy
 **Written:** 2026-09-12
 

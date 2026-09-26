@@ -948,3 +948,24 @@ class TestTheEvaluatorSpineFindingsAreApplied:
     def test_the_qwen_proposer_is_recorded_as_beating_neither_baseline(self) -> None:
         text = " ".join(self._row("Self-evolving review rules").blockers)
         assert "the model beat neither" in text
+
+
+def test_the_four_states_cover_the_register_and_the_documents_quote_all_four() -> None:
+    """Every capability is in exactly one state, and every document that quotes the states is
+    checked for all four: the Chinese summary once said 7/12/24 and "0 LOST" sat beside a loss on
+    /wrong while only the OWNED figure was gated (judge audit, 2026-09-26)."""
+    from argus.eval.docclaims import CLAIMS, standing_states
+
+    states = standing_states()
+    assert sum(states) == len(standing.REGISTER)
+    names = {claim.name for claim in CLAIMS}
+    assert {"standing_owned", "standing_tied", "standing_implemented", "standing_lost",
+            "standing_states", "standing_states_zh", "standing_tied_implemented_lost"} <= names
+
+
+def test_the_tweeteval_loss_is_a_graded_row() -> None:
+    (row,) = [c for c in standing.REGISTER if "TweetEval" in c.name]
+    assert row.state is standing.State.LOST
+    assert row.subtheme == "t2-sentiment"
+    assert "no_specialist_capability_superior" not in row.conditions_met
+    assert "costs_included" not in row.conditions_met

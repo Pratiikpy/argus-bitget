@@ -1,4 +1,5 @@
 {
+  "checked_at": "2026-09-26T15:37:18.199384+00:00",
   "service": "bitget-mcp-server 4.0.5",
   "probe_symbol": "NVDAUSDT",
   "underlying": "NVDA",
@@ -11,232 +12,230 @@
   },
   "entries_probed": 67,
   "by_health": {
-    "ok": 37,
-    "empty": 19,
-    "error": 9,
+    "error": 65,
     "needs_params": 2
   },
-  "answering": 37,
-  "answering_rate": 0.5522,
+  "answering": 0,
+  "answering_rate": 0.0,
   "equity_entries": 22,
-  "equity_answering": 21,
+  "equity_answering": 0,
   "probes": [
     {
       "entry_id": "crypto_market",
       "category": "crypto",
-      "health": "ok",
-      "rows": 10,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_market: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 Service "
     },
     {
       "entry_id": "crypto_coin_info",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_coin_info: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 Servi"
     },
     {
       "entry_id": "crypto_spot_kline",
       "category": "crypto",
-      "health": "ok",
-      "rows": 91,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_spot_kline: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 Serv"
     },
     {
       "entry_id": "crypto_spot_ticker",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_spot_ticker: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 Ser"
     },
     {
       "entry_id": "crypto_spot_order_book",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_spot_order_book: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503"
     },
     {
       "entry_id": "crypto_spot_trades",
       "category": "crypto",
-      "health": "ok",
-      "rows": 100,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_spot_trades: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 Ser"
     },
     {
       "entry_id": "crypto_spot_taker_volume",
       "category": "crypto",
       "health": "error",
       "rows": 0,
-      "detail": "crypto_spot_taker_volume: service reported failure: {'success': False, 'status_code': 400, 'data': {'detail': 'Gateway API error -> HTTP 400 -> {\"code\":400,\"message\":\"Parameter [exchange] is required\""
+      "detail": "crypto_spot_taker_volume: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>5"
     },
     {
       "entry_id": "crypto_spot_big_trades",
       "category": "crypto",
       "health": "error",
       "rows": 0,
-      "detail": "crypto_spot_big_trades: service reported failure: {'success': False, 'status_code': 400, 'data': {'detail': 'Gateway API error -> HTTP 400 -> {\"code\":400,\"message\":\"Parameter [exchange] is required\",\""
+      "detail": "crypto_spot_big_trades: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503"
     },
     {
       "entry_id": "crypto_futures_mark_price",
       "category": "crypto",
-      "health": "ok",
-      "rows": 1,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_futures_mark_price: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>"
     },
     {
       "entry_id": "crypto_futures_kline",
       "category": "crypto",
-      "health": "ok",
-      "rows": 91,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_futures_kline: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 S"
     },
     {
       "entry_id": "crypto_futures_ticker",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_futures_ticker: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 "
     },
     {
       "entry_id": "crypto_futures_order_book",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_futures_order_book: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>"
     },
     {
       "entry_id": "crypto_futures_trades",
       "category": "crypto",
-      "health": "ok",
-      "rows": 100,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_futures_trades: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 "
     },
     {
       "entry_id": "crypto_futures_funding_rate",
       "category": "crypto",
-      "health": "ok",
-      "rows": 543,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_futures_funding_rate: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h"
     },
     {
       "entry_id": "crypto_futures_open_interest",
       "category": "crypto",
-      "health": "ok",
-      "rows": 1,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_futures_open_interest: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><"
     },
     {
       "entry_id": "crypto_futures_open_interest_history",
       "category": "crypto",
-      "health": "ok",
-      "rows": 30,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_futures_open_interest_history: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<"
     },
     {
       "entry_id": "crypto_futures_long_short_ratio",
       "category": "crypto",
-      "health": "ok",
-      "rows": 30,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_futures_long_short_ratio: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<cente"
     },
     {
       "entry_id": "crypto_futures_long_short_top_account_ratio",
       "category": "crypto",
-      "health": "ok",
-      "rows": 30,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_futures_long_short_top_account_ratio: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<bod"
     },
     {
       "entry_id": "crypto_futures_long_short_top_position_ratio",
       "category": "crypto",
-      "health": "ok",
-      "rows": 30,
-      "detail": "args={'symbol': 'BTCUSDT'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_futures_long_short_top_position_ratio: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<bo"
     },
     {
       "entry_id": "crypto_futures_taker_volume",
       "category": "crypto",
       "health": "error",
       "rows": 0,
-      "detail": "crypto_futures_taker_volume: service reported failure: {'success': False, 'status_code': 400, 'data': {'detail': 'Gateway API error -> HTTP 400 -> {\"code\":400,\"message\":\"Parameter [exchange] is requir"
+      "detail": "crypto_futures_taker_volume: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h"
     },
     {
       "entry_id": "crypto_futures_liquidations",
       "category": "crypto",
       "health": "error",
       "rows": 0,
-      "detail": "crypto_futures_liquidations: service reported failure: {'success': False, 'status_code': 422, 'data': {'detail': 'exchange is required when symbol is provided for liquidations'}, 'error': None}"
+      "detail": "crypto_futures_liquidations: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h"
     },
     {
       "entry_id": "crypto_futures_big_trades",
       "category": "crypto",
       "health": "error",
       "rows": 0,
-      "detail": "crypto_futures_big_trades: service reported failure: {'success': False, 'status_code': 400, 'data': {'detail': 'Gateway API error -> HTTP 400 -> {\"code\":400,\"message\":\"Parameter [exchange] is required"
+      "detail": "crypto_futures_big_trades: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>"
     },
     {
       "entry_id": "crypto_onchain_fund_flow",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_onchain_fund_flow: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>5"
     },
     {
       "entry_id": "crypto_onchain_trading_signal",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_onchain_trading_signal: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center>"
     },
     {
       "entry_id": "crypto_onchain_exchange_flows",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_onchain_exchange_flows: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center>"
     },
     {
       "entry_id": "crypto_onchain_stablecoin_flow",
       "category": "crypto",
       "health": "error",
       "rows": 0,
-      "detail": "crypto_onchain_stablecoin_flow: service reported failure: {'success': False, 'status_code': 400, 'data': {'detail': 'Gateway API error -> HTTP 400 -> {\"code\":400,\"message\":\"Parameter [symbol] is requi"
+      "detail": "crypto_onchain_stablecoin_flow: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center"
     },
     {
       "entry_id": "crypto_onchain_token_unlock_event",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_onchain_token_unlock_event: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<cen"
     },
     {
       "entry_id": "crypto_institutional_company_flow",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_institutional_company_flow: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<cen"
     },
     {
       "entry_id": "crypto_etf_flows",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_etf_flows: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 Servi"
     },
     {
       "entry_id": "crypto_institutional_mining_company_flow",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_institutional_mining_company_flow: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\"
     },
     {
       "entry_id": "crypto_institutional_country_flow",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_institutional_country_flow: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<cen"
     },
     {
       "entry_id": "crypto_indicators_technical_indicators",
@@ -248,226 +247,226 @@
     {
       "entry_id": "crypto_hyperliquid_position_distribution_by_balance_tag",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_hyperliquid_position_distribution_by_balance_tag: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></h"
     },
     {
       "entry_id": "crypto_hyperliquid_position_distribution_by_pnl_tag",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_hyperliquid_position_distribution_by_pnl_tag: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>"
     },
     {
       "entry_id": "crypto_hyperliquid_position_distribution_by_position_tag",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_hyperliquid_position_distribution_by_position_tag: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></"
     },
     {
       "entry_id": "crypto_indicators_hyperliquid_whale_sentiment",
       "category": "crypto",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'BTCUSDT'}"
+      "detail": "crypto_indicators_hyperliquid_whale_sentiment: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<b"
     },
     {
       "entry_id": "crypto_hyperliquid_whale_alert",
       "category": "crypto",
       "health": "error",
       "rows": 0,
-      "detail": "crypto_hyperliquid_whale_alert: service reported failure: {'success': False, 'status_code': 404, 'data': {'detail': 'Not Found'}, 'error': None}"
+      "detail": "crypto_hyperliquid_whale_alert: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center"
     },
     {
       "entry_id": "crypto_spot_big_trades_window",
       "category": "crypto",
       "health": "error",
       "rows": 0,
-      "detail": "crypto_spot_big_trades_window: service reported failure: {'success': False, 'status_code': 400, 'data': {'detail': 'Gateway API error -> HTTP 400 -> {\"code\":400,\"message\":\"Parameter [exchange] is requ"
+      "detail": "crypto_spot_big_trades_window: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center>"
     },
     {
       "entry_id": "crypto_futures_big_trades_window",
       "category": "crypto",
       "health": "error",
       "rows": 0,
-      "detail": "crypto_futures_big_trades_window: service reported failure: {'success': False, 'status_code': 400, 'data': {'detail': 'Gateway API error -> HTTP 400 -> {\"code\":400,\"message\":\"Parameter [exchange] is r"
+      "detail": "crypto_futures_big_trades_window: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<cent"
     },
     {
       "entry_id": "equity_price_quote",
       "category": "equity",
-      "health": "ok",
-      "rows": 1,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_price_quote: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 Ser"
     },
     {
       "entry_id": "equity_price_historical",
       "category": "equity",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'NVDA'}"
+      "detail": "equity_price_historical: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>50"
     },
     {
       "entry_id": "equity_profile",
       "category": "equity",
-      "health": "ok",
-      "rows": 1,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_profile: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 Service"
     },
     {
       "entry_id": "equity_fundamental_management",
       "category": "equity",
-      "health": "ok",
-      "rows": 29,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_fundamental_management: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center>"
     },
     {
       "entry_id": "equity_calendar",
       "category": "equity",
-      "health": "ok",
-      "rows": 82,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_calendar: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 Servic"
     },
     {
       "entry_id": "equity_fundamental_balance",
       "category": "equity",
-      "health": "ok",
-      "rows": 50,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_fundamental_balance: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1"
     },
     {
       "entry_id": "equity_fundamental_income",
       "category": "equity",
-      "health": "ok",
-      "rows": 50,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_fundamental_income: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>"
     },
     {
       "entry_id": "equity_fundamental_cash",
       "category": "equity",
-      "health": "ok",
-      "rows": 50,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_fundamental_cash: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>50"
     },
     {
       "entry_id": "equity_fundamental_metrics",
       "category": "equity",
-      "health": "ok",
-      "rows": 100,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_fundamental_metrics: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1"
     },
     {
       "entry_id": "equity_fundamental_ratios",
       "category": "equity",
-      "health": "ok",
-      "rows": 50,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_fundamental_ratios: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>"
     },
     {
       "entry_id": "equity_fundamental_dividends",
       "category": "equity",
-      "health": "ok",
-      "rows": 62,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_fundamental_dividends: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><"
     },
     {
       "entry_id": "equity_ownership_insider_trading",
       "category": "equity",
-      "health": "ok",
-      "rows": 50,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_ownership_insider_trading: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<cent"
     },
     {
       "entry_id": "equity_ownership_major_holders",
       "category": "equity",
-      "health": "ok",
-      "rows": 52,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_ownership_major_holders: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center"
     },
     {
       "entry_id": "equity_ownership_form_13f",
       "category": "equity",
-      "health": "ok",
-      "rows": 1,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_ownership_form_13f: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>"
     },
     {
       "entry_id": "equity_ownership_inst_position_detail",
       "category": "equity",
-      "health": "ok",
-      "rows": 38,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_ownership_inst_position_detail: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n"
     },
     {
       "entry_id": "equity_ownership_inst_position_summary",
       "category": "equity",
-      "health": "ok",
-      "rows": 100,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_ownership_inst_position_summary: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\"
     },
     {
       "entry_id": "equity_estimates_price_target",
       "category": "equity",
-      "health": "ok",
-      "rows": 972,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_estimates_price_target: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center>"
     },
     {
       "entry_id": "equity_estimates_forward_pe",
       "category": "equity",
-      "health": "ok",
-      "rows": 1,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_estimates_forward_pe: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h"
     },
     {
       "entry_id": "equity_estimates_forward_eps",
       "category": "equity",
-      "health": "ok",
-      "rows": 1172,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_estimates_forward_eps: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><"
     },
     {
       "entry_id": "equity_estimates_forward_ebitda",
       "category": "equity",
-      "health": "ok",
-      "rows": 1172,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_estimates_forward_ebitda: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<cente"
     },
     {
       "entry_id": "equity_estimates_forward_sales",
       "category": "equity",
-      "health": "ok",
-      "rows": 279,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_estimates_forward_sales: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center"
     },
     {
       "entry_id": "equity_estimates_consensus",
       "category": "equity",
-      "health": "ok",
-      "rows": 112,
-      "detail": "args={'symbol': 'NVDA'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "equity_estimates_consensus: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1"
     },
     {
       "entry_id": "etf_info",
       "category": "etf",
-      "health": "ok",
-      "rows": 1,
-      "detail": "args={'symbol': 'QQQ'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "etf_info: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 Service Tempo"
     },
     {
       "entry_id": "etf_holdings",
       "category": "etf",
-      "health": "empty",
+      "health": "error",
       "rows": 0,
-      "detail": "answered with no rows; args={'symbol': 'QQQ'}"
+      "detail": "etf_holdings: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 Service T"
     },
     {
       "entry_id": "etf_price_performance",
       "category": "etf",
-      "health": "ok",
-      "rows": 19,
-      "detail": "args={'symbol': 'QQQ'}"
+      "health": "error",
+      "rows": 0,
+      "detail": "etf_price_performance: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h1>503 "
     },
     {
       "entry_id": "news_label_search",
@@ -479,16 +478,16 @@
     {
       "entry_id": "crypto_sentiment_crypto_fear_greed",
       "category": "sentiment",
-      "health": "ok",
-      "rows": 30,
-      "detail": "args={}"
+      "health": "error",
+      "rows": 0,
+      "detail": "crypto_sentiment_crypto_fear_greed: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<ce"
     },
     {
       "entry_id": "sentiment_market_fear_greed",
       "category": "sentiment",
-      "health": "ok",
-      "rows": 1,
-      "detail": "args={}"
+      "health": "error",
+      "rows": 0,
+      "detail": "sentiment_market_fear_greed: service reported failure: {'success': False, 'status_code': 503, 'data': '<html>\\r\\n<head><title>503 Service Temporarily Unavailable</title></head>\\r\\n<body>\\r\\n<center><h"
     }
   ],
   "scope_statement": "Every catalog entry Bitget's own MCP data service publishes is called once, with an argument shape chosen per category and retried when the server rejects it, and the result is classified ok / empty / error / needs_params. NOT CLAIMED: that an empty result means the endpoint is broken \u2014 it means it had nothing for this symbol, which is a fact about coverage. NOT CLAIMED: that one symbol characterises an endpoint; these are single probes, and a wider sweep would move the empty count. The service needs no API key, which is why this is reproducible by a reader."

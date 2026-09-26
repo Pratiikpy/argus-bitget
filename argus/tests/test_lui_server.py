@@ -101,8 +101,14 @@ class TestTheDemoStarts:
         # the page must be one of these; anything else fails.
         import re
 
+        # **And the page's own public address, added 2026-09-26 with the link-preview card.**
+        # og:url and og:image name the hosted console and its /og.png so a pasted link renders a
+        # card; a crawler reads them, the page itself never fetches them.
+        from argus.lui.design import PUBLIC_URL
+
         allowed = ("https://fonts.googleapis.com", "https://fonts.gstatic.com",
-                   "https://github.com/Pratiikpy/argus-bitget", "http://www.w3.org/2000/svg")
+                   "https://github.com/Pratiikpy/argus-bitget", "http://www.w3.org/2000/svg",
+                   PUBLIC_URL)
         urls = re.findall(r"https?://[^\s'\"<>)]+", PAGE)
         offenders = [u for u in urls if not u.startswith(allowed) and "127.0.0.1" not in u]
         assert not offenders, f"page references an external origin: {offenders[:3]}"
@@ -300,12 +306,12 @@ class TestTheResearchTaskIsReachable:
         assert "text/html" in headers.get("Content-Type", "")
         assert "should I add 15% TSLA?" in body
         assert "What to do" in body
-        assert body.count("<article") == 7
+        assert body.count("<article") == 8
 
     def test_every_step_names_its_engine_and_answers(self, base_url: str) -> None:
         _, body, _ = _get(base_url + "/research?format=json")
         payload = json.loads(body)
-        assert len(payload["steps"]) == 7
+        assert len(payload["steps"]) == 8
         for step in payload["steps"]:
             assert step["engine"] and step["lines"], step
 

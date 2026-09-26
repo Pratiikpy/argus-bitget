@@ -45,7 +45,9 @@ reaches for the network is a rule that can fail open.
 
 from __future__ import annotations
 
+import atexit
 import json
+import threading
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
@@ -138,6 +140,16 @@ class BitgetDataService:
         except RpcError as exc:  # an injected client may raise the base type
             raise BitgetMcpError(exc.kind, str(exc), http_status=exc.http_status) from exc
         self.server = self.negotiation.server
+
+    def close(self) -> None:
+        """End this service's MCP session (``JsonRpcClient.close``)."""
+        self.client.close()
+
+    def __enter__(self) -> BitgetDataService:
+        return self
+
+    def __exit__(self, *_exc: object) -> None:
+        self.close()
 
     def _call(self, tool: str, arguments: Mapping[str, Any]) -> dict[str, Any]:
         """One ``tools/call``, returning the raw result. A protocol failure raises typed; a tool
@@ -262,6 +274,44 @@ underweight, sell and underperform are sell. An unlisted value is left out of th
 than guessed."""
 
 
+_SHARED: BitgetDataService | None = None
+_SHARED_FACTORY: object | None = None
+_SHARED_LOCK = threading.Lock()
+
+
+def shared_service() -> BitgetDataService:
+    """One session per process, opened on first use and ended when the process exits.
+
+    Every console answer used to build its own ``BitgetDataService()`` — one ``initialize`` and one
+    server-side session per call, several per answer, none ever ended — until the server refused
+    new sessions with "Too many open sessions" (2026-09-26). A session may carry any number of
+    concurrent requests, so the research engines share this one. If the server has dropped it,
+    the client's own 404 handling opens a new one on the next call."""
+    global _SHARED, _SHARED_FACTORY
+    stale: BitgetDataService | None = None
+    with _SHARED_LOCK:
+        # Rebuilt when the class it came from has been replaced (a test's fake, a reload).
+        if _SHARED is None or _SHARED_FACTORY is not BitgetDataService:
+            stale = _SHARED
+            _SHARED = BitgetDataService()
+            _SHARED_FACTORY = BitgetDataService
+            if callable(getattr(_SHARED, "close", None)):
+                atexit.register(_SHARED.close)
+        service = _SHARED
+    if stale is not None and hasattr(stale, "close"):
+        stale.close()
+    return service
+
+
+def reset_shared_service() -> None:
+    """End and forget the shared session: the next :func:`shared_service` opens a fresh one."""
+    global _SHARED, _SHARED_FACTORY
+    with _SHARED_LOCK:
+        service, _SHARED, _SHARED_FACTORY = _SHARED, None, None
+    if service is not None and hasattr(service, "close"):
+        service.close()
+
+
 def underlying_of(rtoken: str) -> str:
     """``NVDAUSDT`` -> ``NVDA``. The rToken symbol carries its anchor's ticker as a prefix.
 
@@ -276,6 +326,7 @@ def main() -> int:  # pragma: no cover - CLI
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     service = BitgetDataService()
+    atexit.register(service.close)
     print(f"connected to {service.server} at {ENDPOINT} — no API key")
     total = 0
     for category in service.categories():
@@ -293,5 +344,12 @@ if __name__ == "__main__":  # pragma: no cover
 
 __all__ = [
     "ANSWER_ENTRIES",
-    "ENDPOINT", "BitgetDataService", "BitgetMcpError", "Entry", "main", "underlying_of",
+    "ENDPOINT",
+    "BitgetDataService",
+    "BitgetMcpError",
+    "Entry",
+    "main",
+    "reset_shared_service",
+    "shared_service",
+    "underlying_of",
 ]

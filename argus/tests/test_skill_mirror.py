@@ -159,6 +159,8 @@ def test_status_page_states_both_counts(tmp_path: Any) -> None:
         '"skills_answered_in_total": ["a", "b", "c", "d", "e"]}', encoding="utf-8")
     lines = dict(status_page.sweep_lines(tmp_path))
     text = lines["bitget-signal, covered"]
-    assert "Bitget's server answered 6 of 19" in text
+    assert "of the desk's 19 calls, Bitget's server answered 6" in text
     assert "11 the same source, 2 a named substitute" in text
-    assert "19 of 19 answered, 5 of 5 Skills" in text
+    # Bitget's answers and ARGUS's own reads are never summed into one Skill count.
+    assert "labelled as that source, never as the Skill" in text
+    assert "of 5 Skills" not in text

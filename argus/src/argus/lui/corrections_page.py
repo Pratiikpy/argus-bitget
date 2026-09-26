@@ -287,10 +287,16 @@ def collect(data_dir: Path) -> list[Correction]:
         out.extend(register_losses(standing))
         out.extend(register_regrades(standing))
 
-    # 11. Sentiment classification, lost to every published baseline.
-    tweeteval = _read(data_dir, "sentiment_tweeteval.json")
+    # 11. Sentiment classification, lost to every published baseline. Since 2026-09-26 the
+    #     register grades it (a LOST row), so it is already listed with the register's losses
+    #     above; the benchmark's own entry is shown only when the register does not carry it.
+    graded = standing is not None and any(
+        "TweetEval" in str(c.get("name", "")) for c in standing.get("capabilities", []))
+    tweeteval = None if graded else _read(data_dir, "sentiment_tweeteval.json")
     verdict = None if tweeteval is None else (tweeteval.get("sentiment") or {}).get("verdict")
-    if tweeteval is None or not verdict:
+    if graded:
+        pass
+    elif tweeteval is None or not verdict:
         out.append(missing("sentiment_tweeteval.json", "The sentiment benchmark"))
     else:
         scorers = tweeteval["sentiment"].get("scorers", {})
@@ -392,10 +398,10 @@ def render(corrections: list[Correction]) -> str:
         f"<code>{esc(c.artefact)}</code></article>"
         for c in corrections
     )
-    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">{design.FONTS}
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" href="{FAVICON}">
-<title>ARGUS — what we got wrong</title>
+    head = design.head("ARGUS — what we got wrong",
+                       "Every loss, bug and withdrawn claim, with its number and the artefact "
+                       "behind it.", "/wrong")
+    return f"""<!doctype html><html lang="en"><head>{head}
 <style>{design.TOKENS_CSS}
  body {{ margin:0; background:var(--bg); color:var(--ink);
    font:15px/1.6 system-ui,sans-serif }}
@@ -406,7 +412,7 @@ def render(corrections: list[Correction]) -> str:
    border-radius:10px; padding:16px 18px; margin-bottom:14px }}
  .c.bug {{ border-left-color:var(--bad) }}
  .c.loss {{ border-left-color:var(--warn) }}
- .c.withdrawn {{ border-left-color:var(--accent) }}
+ .c.withdrawn {{ border-left-color:var(--graphite) }}  /* Proof indigo is for what is verified */
  .c.open {{ border-left-color:var(--dim) }}
  .k {{ font:10.5px var(--mono); text-transform:uppercase; letter-spacing:.1em;
    color:var(--dim); display:block; margin-bottom:6px }}

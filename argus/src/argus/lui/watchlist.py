@@ -410,10 +410,10 @@ class Report:
 def earnings_date(ticker: str, today: date) -> Report | None:
     """The next report on or after ``today``: Bitget's data service first, Yahoo's calendar second
     — the two sources `lui/research._fundamentals` reads, in its order."""
-    from argus.market.bitget_mcp import BitgetDataService
+    from argus.market.bitget_mcp import shared_service
 
     try:
-        row = BitgetDataService().next_earnings(ticker)
+        row = shared_service().next_earnings(ticker)
     except Exception:
         row = {}
     stamp = str(row.get("report_date") or "")[:10]

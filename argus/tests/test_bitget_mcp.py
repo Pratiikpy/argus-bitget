@@ -127,3 +127,39 @@ class TestTheTrapsThatCostAnAfternoon:
         assert underlying_of("NVDAUSDT") == "NVDA"
         assert underlying_of("tslausdt") == "TSLA"
         assert underlying_of("QQQUSDT") == "QQQ"
+
+
+class TestOneSessionPerProcess:
+    """Every answer used to open its own session and never end it (2026-09-26)."""
+
+    def test_the_shared_service_is_opened_once_and_reused(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from argus.market import bitget_mcp
+
+        made: list[object] = []
+
+        class Fake:
+            def __init__(self) -> None:
+                made.append(self)
+                self.closed = False
+
+            def close(self) -> None:
+                self.closed = True
+
+        bitget_mcp.reset_shared_service()
+        monkeypatch.setattr(bitget_mcp, "BitgetDataService", Fake)
+        first = bitget_mcp.shared_service()
+        assert bitget_mcp.shared_service() is first
+        assert len(made) == 1
+
+        class Other(Fake):
+            pass
+
+        monkeypatch.setattr(bitget_mcp, "BitgetDataService", Other)
+        second = bitget_mcp.shared_service()
+        assert isinstance(second, Other)
+        assert first.closed  # type: ignore[attr-defined]
+        bitget_mcp.reset_shared_service()
+        assert second.closed  # type: ignore[attr-defined]
+

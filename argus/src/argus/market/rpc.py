@@ -623,6 +623,33 @@ class JsonRpcClient:
                     wait = min(max(wait, exc.retry_after), self.max_retry_after)
                 self.sleep(wait)
 
+    def close(self, *, timeout: float = 5.0) -> None:
+        """End the session: an HTTP DELETE carrying ``Mcp-Session-Id``, as the Streamable-HTTP
+        transport specifies for a client that no longer needs it (a server may answer 405 when
+        it does not allow clients to end sessions; that is not an error here).
+
+        Added 2026-09-26. No client in this project ever ended a session, and ``bitget-mcp-server``
+        began refusing new ones with JSON-RPC -32603 "Too many open sessions" (argus/data/
+        skill_runs/sweep_2026-09-26_*.log). Best effort: a failure to close is never raised,
+        because the work the session served is already done."""
+        with self._lock:
+            session, self.session, self.negotiation = self.session, None, None
+        if not session:
+            return
+        headers = {**self.headers, "Mcp-Session-Id": session}
+        request = urllib.request.Request(self.url, headers=headers, method="DELETE")
+        try:
+            with urllib.request.urlopen(request, timeout=timeout):
+                pass
+        except Exception:
+            pass
+
+    def __enter__(self) -> JsonRpcClient:
+        return self
+
+    def __exit__(self, *_exc: object) -> None:
+        self.close()
+
     # --- the protocol ---
 
     def _discover(self, timeout: float) -> str:

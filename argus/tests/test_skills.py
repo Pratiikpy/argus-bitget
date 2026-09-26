@@ -144,6 +144,12 @@ class TestHealthIsNeverAmbiguous:
         assert not hollow([{"error": ""}, {"value": 1}])
         assert hollow(0) and hollow(False) and not hollow(1) and not hollow("x")
 
+    def test_a_backend_that_failed_everywhere_is_empty_not_an_answer(self) -> None:
+        """social_trending answered this on every platform on 2026-09-26 and was counted
+        reliable: the request echo and the failure marker are not market information."""
+        assert hollow({"platform": "xueqiu", "provider": "all_failed", "items": []})
+        assert not hollow({"platform": "xueqiu", "provider": "a", "items": [{"title": "BTC"}]})
+
     def test_only_ok_counts_as_answered(self) -> None:
         assert Health.OK.answered
         for state in (Health.EMPTY, Health.TIMEOUT, Health.TOOL_ERROR, Health.UNAVAILABLE):

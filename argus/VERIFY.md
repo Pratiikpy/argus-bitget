@@ -4,7 +4,7 @@ Every "ARGUS beats X" claim in this repository is checked against that rival's o
 source code — never asserted, never simulated. `eval/standing.py` enforces 13 conditions before any
 claim can be marked OWNED, the binding one being: *the named baseline was actually reproduced and the
 comparison actually run.* This file exists because that machinery being self-administered is itself
-a real, named weakness (see `Activity/11_CAPABILITY_LEDGER.md`) — the fix is not to assert harder, it
+a real, named weakness (see the register, `data/standing.json`) — the fix is not to assert harder, it
 is to make re-running the comparison yourself take one command.
 
 No API key is required for anything below. All three pull real, live, public market data. Two of the
@@ -18,7 +18,7 @@ independent adversarial re-check of this exact page, the day it was written).
 ```
 git clone https://github.com/Pratiikpy/argus-bitget.git
 cd argus-bitget/argus
-python -m venv .venv          # then activate it: .venv\Scriptsctivate (Windows) or source .venv/bin/activate
+python -m venv .venv          # then activate it: .venv\Scripts\activate (Windows) or source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
@@ -106,9 +106,9 @@ Qwen API key to re-run live — left out of this page rather than promised and t
 output is committed at `data/sentiment_comparison.json` if you want to read the last real run instead
 of reproducing it.
 
-The full 20-row rival ledger — 11 wins, 1 honestly-reported loss, 2 ties, 1 tie-with-partial-win, 3
-splits — is `Activity/11_CAPABILITY_LEDGER.md`. This page is three of those twenty, chosen because
-they need nothing from us to re-run.
+The full register — every capability with its named rival, its state and the artefact behind it —
+is `data/standing.json`, rendered on `/proof`, with every loss on `/wrong`. This page is three of
+those comparisons, chosen because they need nothing from us to re-run.
 
 ## Found something wrong?
 

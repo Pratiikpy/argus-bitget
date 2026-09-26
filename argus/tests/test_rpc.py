@@ -76,6 +76,12 @@ class Server:
         }
 
     def __call__(self, request: Any, *args: Any, **kwargs: Any) -> Any:
+        if request.get_method() == "DELETE":
+            self.seen.append(({"method": "DELETE"}, dict(request.header_items())))
+            reply = self.handlers.get("DELETE", lambda b: b"")({})
+            if isinstance(reply, Exception):
+                raise reply
+            return _Reply(reply)
         body = json.loads(request.data.decode())
         self.seen.append((body, dict(request.header_items())))
         reply = self.handlers[body["method"]](body)
@@ -472,3 +478,35 @@ def test_coverage_does_not_hang_on_a_pinging_stream(monkeypatch: pytest.MonkeyPa
         client.call_tool("cn_market", {"action": "index"})
     assert record.why == {"bitget-signal cn_market": "timed out"}
     assert record.kinds == {"bitget-signal cn_market": "timeout"}
+
+
+class TestTheSessionIsEnded:
+    """No client ended its sessions until bitget-mcp-server refused new ones with "Too many open
+    sessions" (2026-09-26)."""
+
+    def test_close_sends_delete_with_the_session_id(self, server: Server) -> None:
+        client, _ = _client()
+        client.initialize()
+        client.close()
+        method, headers = server.seen[-1]
+        assert method["method"] == "DELETE"
+        assert {k.lower(): v for k, v in headers.items()}["mcp-session-id"] == "s1"
+        assert client.session is None
+
+    def test_close_without_a_session_sends_nothing(self, server: Server) -> None:
+        client, _ = _client()
+        client.close()
+        assert server.seen == []
+
+    def test_a_server_that_refuses_the_delete_is_not_an_error(self, server: Server) -> None:
+        server.handlers["DELETE"] = lambda b: _http_error(405)
+        client, _ = _client()
+        client.initialize()
+        client.close()
+        assert client.session is None
+
+    def test_the_context_manager_closes(self, server: Server) -> None:
+        with _client()[0] as client:
+            client.initialize()
+        assert server.methods()[-1] == "DELETE"
+
