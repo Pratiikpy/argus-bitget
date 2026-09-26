@@ -361,6 +361,141 @@ class TestTemporalResolution:
         assert a is not None and b is not None
         assert a.start != b.start
 
+    @pytest.mark.parametrize(
+        ("text", "label"),
+        [
+            ("今天做了什么决定", "today"),
+            ("昨日有没有盈利", "yesterday"),
+            ("隔夜发生了什么", "overnight"),
+            ("为什么整个周末都没有交易", "the weekend"),
+            ("為什麼整個週末都沒有交易", "the weekend"),
+            ("上周末为什么没交易", "last weekend"),
+            ("本周的决策", "this week"),
+            ("這週的決策", "this week"),
+            ("上周的决策", "last week"),
+            ("上週的決策", "last week"),
+            ("到目前为止表现如何", "all time"),
+        ],
+    )
+    def test_chinese_time_words_name_the_same_windows(self, text: str, label: str) -> None:
+        window = resolve_window(text, now=NOW)
+        assert window is not None
+        assert window.label == label
+
+    def test_this_weekend_in_english_is_not_this_week(self) -> None:
+        window = resolve_window("why nothing this weekend", now=NOW)
+        assert window is not None
+        assert window.label == "the weekend"
+
+    def test_last_weekend_asked_on_a_weekend_is_the_one_before(self) -> None:
+        saturday = datetime(2026, 9, 26, 1, 0, tzinfo=UTC)
+        current = resolve_window("why nothing this weekend", now=saturday)
+        previous = resolve_window("why nothing last weekend", now=saturday)
+        assert current is not None
+        assert previous is not None
+        assert current.start == datetime(2026, 9, 26, tzinfo=UTC)
+        assert previous.start == datetime(2026, 9, 19, tzinfo=UTC)
+        on_monday = resolve_window("why nothing last weekend", now=NOW)
+        assert on_monday is not None
+        assert on_monday.start == datetime(2026, 9, 12, tzinfo=UTC)
+
+
+SATURDAY_EARLY = datetime(2026, 9, 26, 1, 0, tzinfo=UTC)
+"""An hour into a weekend: the moment the public CI asked "all weekend" and got a refusal."""
+
+
+class TestTheWeekendAskedAbout:
+    """ "The weekend" is the current one; when nothing is recorded in it yet, the answer is about
+    the latest weekend that has a record, and its first line says so."""
+
+    def _ask(self, ledger: PaperLedger, text: str) -> tuple[bool, list[str]]:
+        reply = answer(ledger, classify(text, now=SATURDAY_EARLY))
+        return reply.refused, reply.lines
+
+    def test_an_empty_current_weekend_answers_for_the_last_recorded_one(
+        self, tmp_path: Path
+    ) -> None:
+        saturday = datetime(2026, 9, 19, 12, 0, tzinfo=UTC)
+        ledger = _ledger([_entry(1, decided=saturday), _entry(2, decided=saturday)], tmp_path)
+        refused, lines = self._ask(ledger, "why did you do nothing all weekend")
+        assert not refused
+        assert lines[0] == (
+            "Assumed: the weekend of 2026-09-19 to 2026-09-20, the latest weekend with a record; "
+            "nothing is recorded for the weekend that began 2026-09-26."
+        )
+        assert lines[1].startswith("2 abstention(s) in the weekend of 2026-09-19 to 2026-09-20")
+
+    def test_the_chinese_answer_names_the_weekend_in_chinese(self, tmp_path: Path) -> None:
+        saturday = datetime(2026, 9, 19, 12, 0, tzinfo=UTC)
+        ledger = _ledger([_entry(1, decided=saturday)], tmp_path)
+        refused, lines = self._ask(ledger, "为什么整个周末都没有交易")
+        assert not refused
+        assert lines[0].startswith("假设\uff1a按 2026-09-19 至 2026-09-20 周末 回答")
+        assert "\uff082026-09-19 至 2026-09-20 周末\uff09" in lines[1]
+        assert "weekend of" not in lines[1]
+
+    def test_a_weekend_with_any_decision_is_never_moved(self, tmp_path: Path) -> None:
+        ledger = _ledger(
+            [
+                _entry(1, decided=datetime(2026, 9, 19, 12, 0, tzinfo=UTC)),
+                _entry(2, symbol="TSLAUSDT", decided=SATURDAY_EARLY - timedelta(minutes=30)),
+            ],
+            tmp_path,
+        )
+        refused, lines = self._ask(ledger, "why did you do nothing on NVDA all weekend")
+        assert refused, "the current weekend has a record, so NVDA's empty window is refused"
+        assert not lines[0].startswith("Assumed:")
+
+    def test_an_empty_today_answers_for_the_last_day_with_a_record(self, tmp_path: Path) -> None:
+        thursday = datetime(2026, 9, 24, 15, 0, tzinfo=UTC)
+        ledger = _ledger([_entry(1, decided=thursday, phase="rth")], tmp_path)
+        refused, lines = self._ask(ledger, "why no trades today")
+        assert not refused
+        assert lines[0] == (
+            "Assumed: 2026-09-24, the latest day with a record; nothing is recorded for today "
+            "(2026-09-26)."
+        )
+        assert lines[1].startswith("1 abstention(s) in 2026-09-24")
+
+    def test_an_empty_week_answers_for_the_last_week_with_a_record(self, tmp_path: Path) -> None:
+        ledger = _ledger([_entry(1, decided=datetime(2026, 9, 9, 15, 0, tzinfo=UTC))], tmp_path)
+        refused, lines = self._ask(ledger, "why nothing this week")
+        assert not refused
+        assert lines[0] == (
+            "Assumed: the week of 2026-09-07 to 2026-09-13, the latest week with a record; "
+            "nothing is recorded for this week (from 2026-09-21)."
+        )
+
+    def test_nothing_within_the_lookback_is_refused_not_invented(self, tmp_path: Path) -> None:
+        long_ago = datetime(2026, 6, 6, 12, 0, tzinfo=UTC)
+        ledger = _ledger([_entry(1, decided=long_ago)], tmp_path)
+        refused, lines = self._ask(ledger, "why did you do nothing all weekend")
+        assert refused
+        assert lines[0] == "No abstentions in the weekend."
+
+
+class TestAskingForTheListByWindow:
+    """Found while testing the weekend fix (2026-09-26): a plural object and "last week" broke
+    the plainest request for the record."""
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "list decisions this week",
+            "list decisions last week",
+            "list all decisions",
+            "show me the decisions from last week",
+        ],
+    )
+    def test_the_list_is_asked_for(self, text: str) -> None:
+        assert classify(text, now=SATURDAY_EARLY).intent is Intent.DECISION_LIST
+
+    @pytest.mark.parametrize(
+        "text", ["NVDA last", "what is the last price of NVDA", "how did NVDA move last week"]
+    )
+    def test_last_is_still_a_price_word(self, text: str) -> None:
+        assert classify(text, now=SATURDAY_EARLY).intent is Intent.MARKET
+
 
 class TestSymbolExtraction:
     def test_company_names_resolve_to_the_traded_symbol(self) -> None:

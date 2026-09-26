@@ -351,14 +351,21 @@ class Question:
 # --- temporal -------------------------------------------------------------------------------
 
 _TEMPORAL: tuple[tuple[str, str], ...] = (
-    (r"\btoday\b", "today"),
-    (r"\byesterday\b", "yesterday"),
-    (r"\bovernight\b", "overnight"),
-    (r"\bthis (?:week|session)\b", "this week"),
-    (r"\blast week\b", "last week"),
-    (r"\bthe weekend\b|\bover the weekend\b|\ball weekend\b", "weekend"),
-    (r"\bso far\b|\bto date\b|\bever\b|\ball time\b", "all time"),
+    (r"\btoday\b|今天|今日", "today"),
+    (r"\byesterday\b|昨天|昨日", "yesterday"),
+    (r"\bovernight\b|隔夜|昨晚|昨夜", "overnight"),
+    # The weekends come before the weeks: 上周末 ("last weekend") also contains 上周 ("last week"),
+    # and the previous weekend before the current one, which 周末 alone would also match.
+    (r"\blast weekend\b|\bprevious weekend\b|上周末|上週末|上个周末|上個週末", "last weekend"),
+    (r"\bthe weekend\b|\bover the weekend\b|\ball weekend\b|\bthis weekend\b|周末|週末",
+     "weekend"),
+    (r"\bthis (?:week|session)\b|本周|这周|這週|本週|这个星期|這個星期", "this week"),
+    (r"\blast week\b|上周|上週|上个星期|上個星期", "last week"),
+    (r"\bso far\b|\bto date\b|\bever\b|\ball time\b|至今|迄今|到目前为止|到目前為止", "all time"),
 )
+"""English and Chinese, simplified and traditional. A question asked in Chinese was answered over
+the whole record whatever window it named, because only the English words were read (2026-09-26,
+"为什么整个周末都没有交易")."""
 
 _FUTURE = re.compile(
     r"\b(?:will|going to|by (?:close|eod|friday|monday)|tomorrow|next (?:week|session)|"
@@ -400,13 +407,15 @@ def resolve_window(text: str, *, now: datetime) -> Window | None:
                 datetime.combine(end, datetime.min.time(), tzinfo=UTC),
                 "last week",
             )
-        if label == "weekend":
+        if label in ("weekend", "last weekend"):
             back = (today.weekday() + 2) % 7
             sat = today - timedelta(days=back)
+            if label == "last weekend" and back <= 1:
+                sat -= timedelta(days=7)  # asked on a weekend, "last weekend" is the one before
             return Window(
                 datetime.combine(sat, datetime.min.time(), tzinfo=UTC),
                 datetime.combine(sat + timedelta(days=2), datetime.min.time(), tzinfo=UTC),
-                "the weekend",
+                "the weekend" if label == "weekend" else "last weekend",
             )
         if label == "all time":
             return Window(datetime(2000, 1, 1, tzinfo=UTC), now, "all time")
@@ -756,8 +765,11 @@ _PATTERNS: tuple[tuple[str, Intent], ...] = (
      r"(?:open|close|bell|market\s+opens?|market\s+closes?)|"
      r"when does?\s+(?:the\s+)?(?:market|session)\s+(?:open|close))\b",
      Intent.SESSION),
+    # The object may be plural: "list decisions this week" matched nothing at all, and "list
+    # decisions last week" fell through to the price catch-all on "last".
     (r"\b(?:what did|what have|which|list|show me|decisions?)\b.*"
-     r"\b(?:decide|decision|do|trade|buy|bought|sell|sold|open|close)\b", Intent.DECISION_LIST),
+     r"\b(?:decide|decisions?|do|trades?|buy|bought|sell|sold|open|close)\b",
+     Intent.DECISION_LIST),
     # A recap asks for the decisions in a window, which is what DECISION_LIST answers. Last of the
     # specific patterns, so "what happened to the Sharpe" still reads as performance.
     (r"\b(?:what happened|summar\w+|recap|rundown|catch me up|what'?s new)\b",
@@ -837,7 +849,10 @@ _PATTERNS: tuple[tuple[str, Intent], ...] = (
      r"\bhas\s+the\s+bell\s+(?:gone|rung)\b",
      Intent.SESSION),
 
-    (r"\b(?:trading at|price|quote|last|move|up|down|change)\b", Intent.MARKET),
+    # "last" is a price word ("last trade", "NVDA last"), not a date: "last week" and its kin name
+    # a window, which `resolve_window` reads.
+    (r"\b(?:trading at|price|quote|move|up|down|change|"
+     r"last(?!\s+(?:week|weekend|month|night|session|time|year)s?\b))\b", Intent.MARKET),
 )
 
 # --- Chinese ------------------------------------------------------------------------------------

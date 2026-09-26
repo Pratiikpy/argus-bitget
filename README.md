@@ -82,10 +82,11 @@ deflation gate, and the console says so.
 
 Every capability is graded against the specialist that leads its sub-theme, by a register that
 opens the evidence rather than trusting a filename (`python -m argus.eval.standing`), and may claim
-OWNED only after that rival has been run on the same input and beaten. **7 of 43 capabilities
-are OWNED, 12 are TIED, 24 are IMPLEMENTED, and 0 are LOST.** OWNED needs all thirteen conditions:
-the rival's best implementation read and reproduced, a same-input comparison with costs,
-out-of-sample, ablation, an adversarial test, documented failure cases and reproducibility.
+OWNED only after that rival has been run on the same input and beaten.
+**7 of 43 capabilities are OWNED, 12 are TIED, 24 are IMPLEMENTED, and 0 are LOST.** OWNED needs
+all thirteen conditions: the rival's best implementation read and reproduced, a same-input
+comparison with costs, out-of-sample, ablation, an adversarial test, documented failure cases and
+reproducibility.
 
 The register got stricter on 2026-09-26 and the count fell from 20 to 8. A proof that rests on a
 population figure must now survive a per-group check — by symbol and by half of the sample — and 12
@@ -157,7 +158,7 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 6,700 tests collected
+pytest -q                       # 9,110 tests collected
 ```
 
 Nothing above needs a credential. The full run took 1h16m from a fresh GitHub clone on
@@ -179,7 +180,7 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **6,700 tests collected** — `pytest -q` |
+| Tests | **9,110 tests collected** — `pytest -q` |
 | Types | **`mypy --strict` clean on 469 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |

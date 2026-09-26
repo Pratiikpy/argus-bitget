@@ -97,7 +97,7 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"^I did not recognise\b|^Missing:|\bholds no\b[^.;]{0,40}\bfigure\b|"
         r"\bhas not verified\b|\bcould not be measured\b|\bwas not (?:read|measured|fetched)\b",
         re.I)),
-    ("assumed", re.compile(r"^Assumed:|\bno\s+\w+\s+was\s+(?:stated|given)\b|"
+    ("assumed", re.compile(r"^Assumed:|^假设\uff1a|\bno\s+\w+\s+was\s+(?:stated|given)\b|"
                            r"\bis\s+assessed\s+at\b|\bwere\s+scaled\s+to\s+100%|"
                            r"^Sized on a \$[\d,]+ book\b", re.I)),
     # the trader's own words, kept by `lui/memory.py` and shown where they shaped the answer

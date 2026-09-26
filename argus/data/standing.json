@@ -4221,12 +4221,12 @@
     {
       "capability": "Typed factor grammar with no execution surface",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "the groupwise audit predates the current data/grammar_comparison.json; re-run python -m argus.eval.groupwise_audit"
+      "detail": "the groupwise audit flags data/grammar_comparison.json :: rank on real market series: ARGUS vs qlib [single_group:symbol=NVDAUSDT]"
     },
     {
       "capability": "Typed factor grammar with no execution surface",
       "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "the groupwise audit predates the current data/grammar_comparison.json; re-run python -m argus.eval.groupwise_audit"
+      "detail": "the groupwise audit flags data/grammar_comparison.json :: rank on real market series: ARGUS vs qlib [single_group:symbol=NVDAUSDT]"
     },
     {
       "capability": "Factor-discovery safety: no execution surface and trial-corrected selection, vs. RD-Agent",

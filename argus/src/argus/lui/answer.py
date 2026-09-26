@@ -30,14 +30,14 @@ from __future__ import annotations
 
 import os
 import re
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass, field, replace
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 from argus.eval.performance import evaluate_ledger
-from argus.lui.phrasebook import t
-from argus.lui.question import TRADED_SYMBOLS, Intent, Question
+from argus.lui.phrasebook import WINDOW_IN_ZH, WINDOW_LABELS_ZH, Language, t
+from argus.lui.question import TRADED_SYMBOLS, Intent, Question, Window
 from argus.paper.ledger import Entry, PaperLedger
 from argus.truth.trace import all_but, emit, only, traced
 
@@ -100,6 +100,94 @@ def _in_window(entry: Entry, question: Question) -> bool:
     if question.window is None:
         return True
     return question.window.contains(datetime.fromisoformat(entry.decided_at))
+
+
+_PERIODS: dict[str, tuple[str, int, int]] = {
+    "today": ("day", 1, 60),
+    "yesterday": ("day", 1, 60),
+    "the weekend": ("weekend", 7, 8),
+    "last weekend": ("weekend", 7, 8),
+    "this week": ("week", 7, 8),
+    "last week": ("week", 7, 8),
+}
+"""The windows that may move to an earlier period with a record: the unit, its length in days, and
+how many periods back the search reaches before the question is refused instead."""
+
+
+def _span(start: datetime, end: datetime, language: Language) -> str:
+    """A whole-day range as the reader sees it: its first and last day."""
+    return t("window.span", language, start=f"{start:%Y-%m-%d}",
+             end=f"{end - timedelta(days=1):%Y-%m-%d}")
+
+
+def _period_named(unit: str, start: datetime, end: datetime, language: Language) -> str:
+    if unit == "day":
+        return f"{start:%Y-%m-%d}"
+    return t(f"window.{unit}_of", language, span=_span(start, end, language))
+
+
+def _latest_recorded_period(
+    ledger: PaperLedger, question: Question
+) -> tuple[Question, str] | None:
+    """A named period with no decision in it, moved to the latest earlier one that has a decision.
+
+    The parser reads "today", "the weekend" or "this week" as the current period
+    (`lui/question.py`). Asked on a Saturday morning, "why did you do nothing all weekend" named a
+    weekend an hour old with nothing in it, and the desk refused a question about the weekend the
+    asker plainly meant (the public CI, 2026-09-26 00:58 UTC); "why has the system not traded once
+    today" was refused the same way once Chinese time words were read. The parser has no ledger,
+    so the answer layer decides: when no decision at all falls in the named period, it answers for
+    the latest earlier period of the same kind that has one, and its first line says which one it
+    used and why. A period with any decision is never moved, whatever symbol was asked about, and
+    nothing within :data:`_PERIODS`' reach is refused as before rather than stretched further.
+    """
+    window = question.window
+    period = _PERIODS.get(window.label) if window is not None else None
+    if window is None or period is None:
+        return None
+    stamps = [datetime.fromisoformat(e.decided_at) for e in ledger.entries]
+    if any(window.contains(s) for s in stamps):
+        return None
+    unit, days, reach = period
+    start = window.start
+    end = start + timedelta(days=days if unit != "weekend" else 2)
+    lang = question.language
+    for back in range(1, reach + 1):
+        shift = timedelta(days=days * back)
+        earlier = Window(start - shift, end - shift - timedelta(microseconds=1), "")
+        if not any(earlier.contains(s) for s in stamps):
+            continue
+        whole_end = end - shift
+        label = _period_named(unit, earlier.start, whole_end, Language.EN)
+        moved = replace(question, window=replace(earlier, label=label))
+        line = t(
+            "window.moved", lang,
+            used=_period_named(unit, earlier.start, whole_end, lang),
+            unit=t(f"window.unit.{unit}", lang),
+            asked=t(f"window.asked.{window.label.replace(' ', '_')}", lang,
+                    date=f"{start:%Y-%m-%d}", span=_span(start, end, lang)),
+        )
+        return moved, line
+    return None
+
+
+def _window_phrase(question: Question) -> str:
+    """The window a header counts over, in the answer's language. The English label was pasted
+    into Chinese headers until 2026-09-26."""
+    window = question.window
+    if window is None:
+        return ""
+    lang = question.language
+    if lang is not Language.ZH:
+        return f" in {window.label}"
+    for unit in ("weekend", "week"):
+        if window.label.startswith(f"the {unit} of "):
+            whole_end = window.end + timedelta(microseconds=1)
+            label = _period_named(unit, window.start, whole_end, lang)
+            break
+    else:
+        label = WINDOW_LABELS_ZH.get(window.label, window.label)
+    return WINDOW_IN_ZH.format(label=label)
 
 
 def _matching(ledger: PaperLedger, question: Question) -> list[Entry]:
@@ -370,7 +458,7 @@ def answer_abstention_why(ledger: PaperLedger, question: Question) -> Answer:
     lines = [
         t("abst.header", lang,
           count=len(rows),
-          window=(f" in {question.window.label}" if question.window else ""),
+          window=_window_phrase(question),
           symbols=len(symbols), phases="/".join(phases)),
         t("abst.explain", lang),
     ]
@@ -417,7 +505,7 @@ def answer_decision_list(ledger: PaperLedger, question: Question) -> Answer:
     lang = question.language
     lines = [
         t("list.header", lang, count=len(rows),
-          window=(f" in {question.window.label}" if question.window else ""),
+          window=_window_phrase(question),
           breakdown=", ".join(f"{n} {v}" for v, n in sorted(verdicts.items()))),
     ]
     if voided:
@@ -845,6 +933,9 @@ def answer(ledger: PaperLedger, question: Question) -> Answer:
             f"costs.",
             suggestion="The record answers what the desk decided and why.",
         )
+    moved = _latest_recorded_period(ledger, question)
+    if moved is not None:
+        question = moved[0]
     handler = _ANSWERERS.get(question.intent)
     if handler is None:
         return _refuse(
@@ -861,7 +952,10 @@ def answer(ledger: PaperLedger, question: Question) -> Answer:
                 "layer did."
             ),
         )
-    return handler(ledger, question)
+    result = handler(ledger, question)
+    if moved is not None and not result.refused:
+        result.lines.insert(0, moved[1])
+    return result
 
 
 __all__ = ["Answer", "Source", "answer"]

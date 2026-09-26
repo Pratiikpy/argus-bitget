@@ -117,6 +117,7 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
+    { name = "arch" },
     { name = "cvxportfolio" },
     { name = "exchange-calendars" },
     { name = "filelock" },
@@ -142,6 +143,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "arch", marker = "extra == 'dev'", specifier = ">=8.0" },
     { name = "cvxportfolio", marker = "extra == 'dev'", specifier = ">=1.5" },
     { name = "exchange-calendars", marker = "extra == 'dev'", specifier = ">=4.5" },
     { name = "filelock", marker = "extra == 'dev'", specifier = ">=3.20" },

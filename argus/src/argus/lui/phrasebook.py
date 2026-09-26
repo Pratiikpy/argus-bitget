@@ -163,6 +163,44 @@ PHRASES: dict[str, dict[Language, str]] = {
             "目前没有任何一条已结算，因此都尚未评分。反事实结果在结算时附加，而不是现在断言。"
         ),
     },
+    # --- windows -----------------------------------------------------------------------------
+    "window.moved": {
+        Language.EN: (
+            "Assumed: {used}, the latest {unit} with a record; nothing is recorded for {asked}."
+        ),
+        Language.ZH: "假设：按 {used} 回答，这是最近一个有记录的{unit}；{asked}没有任何记录。",
+    },
+    "window.unit.day": {Language.EN: "day", Language.ZH: "日子"},
+    "window.unit.weekend": {Language.EN: "weekend", Language.ZH: "周末"},
+    "window.unit.week": {Language.EN: "week", Language.ZH: "一周"},
+    "window.asked.today": {Language.EN: "today ({date})", Language.ZH: "今天（{date}）"},
+    "window.asked.yesterday": {
+        Language.EN: "yesterday ({date})", Language.ZH: "昨天（{date}）",
+    },
+    "window.asked.the_weekend": {
+        Language.EN: "the weekend that began {date}", Language.ZH: "{date} 开始的周末",
+    },
+    "window.asked.last_weekend": {
+        Language.EN: "last weekend ({span})", Language.ZH: "上周末（{span}）",
+    },
+    "window.asked.this_week": {
+        Language.EN: "this week (from {date})", Language.ZH: "本周（{date} 起）",
+    },
+    "window.asked.last_week": {
+        Language.EN: "last week ({span})", Language.ZH: "上周（{span}）",
+    },
+    "window.week_of": {
+        Language.EN: "the week of {span}",
+        Language.ZH: "{span} 这一周",
+    },
+    "window.span": {
+        Language.EN: "{start} to {end}",
+        Language.ZH: "{start} 至 {end}",
+    },
+    "window.weekend_of": {
+        Language.EN: "the weekend of {span}",
+        Language.ZH: "{span} 周末",
+    },
     # --- decision list -----------------------------------------------------------------------
     "list.header": {
         Language.EN: "{count} decision(s){window}: {breakdown}",
@@ -374,6 +412,24 @@ PHRASES: dict[str, dict[Language, str]] = {
 }
 
 
+WINDOW_LABELS_ZH: dict[str, str] = {
+    "today": "今天",
+    "yesterday": "昨天",
+    "overnight": "隔夜",
+    "this week": "本周",
+    "last week": "上周",
+    "the weekend": "周末",
+    "last weekend": "上周末",
+    "all time": "全部记录",
+}
+"""The windows `lui/question.py` resolves, named in Chinese for a Chinese answer's header."""
+
+WINDOW_IN_ZH = "（{label}）"
+"""How a Chinese header names its window: in full-width brackets after the count. Punctuation,
+not a phrase, so it is kept out of :data:`PHRASES`, whose rule is that every Chinese entry is
+written in Chinese."""
+
+
 def t(key: str, language: Language = Language.EN, /, **kwargs: Any) -> str:
     """Render one phrase. Raises on an unknown key or a missing field rather than degrading.
 
@@ -404,4 +460,12 @@ def language_of(text: str) -> Language:
     return Language.ZH if has_chinese(text) else Language.EN
 
 
-__all__ = ["PHRASES", "Language", "PhraseError", "language_of", "t"]
+__all__ = [
+    "PHRASES",
+    "WINDOW_IN_ZH",
+    "WINDOW_LABELS_ZH",
+    "Language",
+    "PhraseError",
+    "language_of",
+    "t",
+]
