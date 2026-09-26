@@ -5190,7 +5190,7 @@ REGISTER: tuple[Capability, ...] = (
     Capability(
         name="LUI intent routing, measured against Rasa's real DIET classifier",
         subtheme="t3-lui",
-        module="argus/lui/ngram.py",
+        module="argus/lui/ngram.py,argus/eval/lui_rematch.py,argus/eval/lui_rematch_inputs.py",
         state=State.TIED,
         baseline="RasaHQ/rasa 3.6.21 (Apache-2.0), DIET classifier, default pipeline config",
         proofs=(
@@ -5319,6 +5319,19 @@ REGISTER: tuple[Capability, ...] = (
             "the official MCP SDK 2.2.0 server, on the same corpus and oracle, answered 57 "
             "cleanly and let 96 calls reach an engine. An authored corpus, not traffic, and the "
             "server is not the router this row measures",
+            "Rematch run 2026-09-26 (eval/lui_rematch.py, data/lui_rematch.json; Rasa 3.6.21 "
+            "trained on the same 314 rows, five seeds of its shipped default pipeline and four of "
+            "the 2026-09-21 one, each run checked against its own digest and the frozen inputs). "
+            "Held out (578 rows): ARGUS 463, Rasa 462-483 (mean 477.2), a paired difference of "
+            "-2.5 points with a 95% interval of -5.1 to +0.2: a tie, leaning Rasa. Sealed (293): "
+            "233 against a mean of 235.4, a tie. Out of scope: ARGUS declines 519 of 672 MASSIVE "
+            "utterances against Rasa's 307 (+31.6 points), and ties on CLINC150 (669 against 682 "
+            "of 963) and on 120 hard negatives. Perturbed held-out rows: ARGUS better on "
+            "full-width (+61 points), Traditional Chinese (+17.6) and polite wrapping (+5.7); "
+            "Rasa better with the punctuation removed (-5.0) and with two typos (-3.7). ARGUS "
+            "answers in 0.33 ms (median) against 8.6 ms, from a 1.6 MB model loaded in 0.03 s "
+            "against 46 MB in 11.7 s. Rasa's seed-1 repeat reproduced its predictions but read "
+            "Rasa's training cache, so a cold retrain is not shown to reproduce them.",
         ),
         note="**2026-09-22, two rebuilds this date.** First, the classifier head: dev-half "
              "5-fold CV (10 fold-split seeds) found `LinearSVC(C=5.0, class_weight='balanced')` "

@@ -1,0 +1,1352 @@
+{
+  "generated_at": "2026-09-26T00:06:15+00:00",
+  "inputs_digests": {
+    "training": "796bd24cc59fd1e45e9bbd8cf1f13514a86050b39be9ebcf61427b52c76272bf",
+    "sealed": "f597c6c02e23bb2c97c83b18a13ed6c5ea41b2838830760227527c9b47c578b6",
+    "oos_probes_14": "82ccbfa80d8d2564e6df10c8549756287a26212392314fe443c6861e6d26f2ce",
+    "massive_oos": "b074933082c3175db430d80bba52226d16034fc6e120e2aa778f13d31f48df34",
+    "clinc_oos": "02e4954a397119a70542e4cced2a6636f0e1101bf617c6ebdad31cf04893bfaf",
+    "hard_negatives": "58eaf7ad6f6b616b8a548e56cf377a16c1610adfda5c4187e77890b93e3e43a8",
+    "perturbations": "5b74230c8d0676b08f3f4d4b5ba3793098e4e6a8e7459f7023da82167ba0475c",
+    "confirmation_base": "70aec92d904ebc93a6c22f1b95614d0143a742f3cd2fa38ec3d36cb56d46f429",
+    "confirmation_perturbations": "e353489c47a76b6897343324117fc496930834f5b8215712b742e26fa5343c52"
+  },
+  "code_digests": {
+    "lui/ngram.py": "07d0ec59f806c63c41bd5d43eb4933e7b3b7813e635ea12cf92c0de6cd30e555",
+    "lui/question.py": "e3fdf0a7432925e99407e5ce906a2dfc979a6d33a6401eeb2cb4e607e602591e",
+    "lui/server.py": "79ae0907f22c902dad7bd50f6a98780f015580774ce9e89ae76b9b29bbdffedf",
+    "lui_ngram_model.json": "2f80d5b1a6805cf76729d605767e9e257678eeae3752450d8e139141c84bec85"
+  },
+  "rasa": {
+    "version": "3.6.21",
+    "python": "3.10.20",
+    "runs": [
+      {
+        "run": "legacy_20260921_s1",
+        "config": "legacy_20260921",
+        "seed": 1,
+        "repeat": false,
+        "wall_seconds": 140.584,
+        "predictions_digest": "6dfd498398517d0b5b6aaee71caa54cee00f7caa51ed88ea001b3aa5775e4356"
+      },
+      {
+        "run": "legacy_20260921_s2",
+        "config": "legacy_20260921",
+        "seed": 2,
+        "repeat": false,
+        "wall_seconds": 134.015,
+        "predictions_digest": "aac107ca65f291b513bab00df73be2d811012793e9fbd1d4f3f8d16521726793"
+      },
+      {
+        "run": "legacy_20260921_s3",
+        "config": "legacy_20260921",
+        "seed": 3,
+        "repeat": false,
+        "wall_seconds": 138.764,
+        "predictions_digest": "4b09849927d79f1960be2e0e4a87d84949c8641957f3ba5cd263c9a96a6c2d57"
+      },
+      {
+        "run": "legacy_20260921_s4",
+        "config": "legacy_20260921",
+        "seed": 4,
+        "repeat": false,
+        "wall_seconds": 140.082,
+        "predictions_digest": "b8ae286aa3057b6b920ba9d2f237bec92ea389f9f2d2ecfdf4e384c71cb021cf"
+      },
+      {
+        "run": "rasa_default_s1",
+        "config": "rasa_default",
+        "seed": 1,
+        "repeat": false,
+        "wall_seconds": 248.002,
+        "predictions_digest": "2fcc26ca5f9d02eb38a396bf6b259e500209125df1fca04a8c8bd3e66dbb67fc"
+      },
+      {
+        "run": "rasa_default_s1_repeat",
+        "config": "rasa_default",
+        "seed": 1,
+        "repeat": true,
+        "wall_seconds": 90.346,
+        "predictions_digest": "2fcc26ca5f9d02eb38a396bf6b259e500209125df1fca04a8c8bd3e66dbb67fc"
+      },
+      {
+        "run": "rasa_default_s2",
+        "config": "rasa_default",
+        "seed": 2,
+        "repeat": false,
+        "wall_seconds": 200.294,
+        "predictions_digest": "f9b4cd34a06707f5f8aa266e88be2954f2dcde0e111156fd6a59143367c97c90"
+      },
+      {
+        "run": "rasa_default_s3",
+        "config": "rasa_default",
+        "seed": 3,
+        "repeat": false,
+        "wall_seconds": 187.03,
+        "predictions_digest": "13e7030d5f08fd667b1d4ec46aed411b0b0826cb6c1b647d113378b24b38354f"
+      },
+      {
+        "run": "rasa_default_s4",
+        "config": "rasa_default",
+        "seed": 4,
+        "repeat": false,
+        "wall_seconds": 181.773,
+        "predictions_digest": "081768b6c691703f39d5474f88c552e71110267ef86508059708b62e645046db"
+      },
+      {
+        "run": "rasa_default_s5",
+        "config": "rasa_default",
+        "seed": 5,
+        "repeat": false,
+        "wall_seconds": 188.584,
+        "predictions_digest": "f6ae5b3c035021068cc5cbdd9f94b4c725d12dd9001bc8878e24ed75128c7544"
+      }
+    ]
+  },
+  "scores": {
+    "sealed": {
+      "rows": 293,
+      "argus_cascade": 233,
+      "argus_console": 126,
+      "argus_ngram": 238,
+      "argus_cascade_before_fixes": 233,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          230,
+          235,
+          235,
+          243
+        ],
+        "mean": 235.8,
+        "min": 230,
+        "max": 243
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          124,
+          130,
+          129,
+          130
+        ],
+        "mean": 128.2,
+        "min": 124,
+        "max": 130
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          228,
+          233,
+          232,
+          245,
+          239
+        ],
+        "mean": 235.4,
+        "min": 228,
+        "max": 245
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          124,
+          129,
+          127,
+          131,
+          130
+        ],
+        "mean": 128.2,
+        "min": 124,
+        "max": 131
+      }
+    },
+    "held_out": {
+      "rows": 578,
+      "argus_cascade": 463,
+      "argus_console": 293,
+      "argus_ngram": 481,
+      "argus_cascade_before_fixes": 463,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          469,
+          487,
+          484,
+          486
+        ],
+        "mean": 481.5,
+        "min": 469,
+        "max": 487
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          300,
+          312,
+          311,
+          310
+        ],
+        "mean": 308.2,
+        "min": 300,
+        "max": 312
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          462,
+          482,
+          480,
+          479,
+          483
+        ],
+        "mean": 477.2,
+        "min": 462,
+        "max": 483
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          297,
+          311,
+          309,
+          307,
+          306
+        ],
+        "mean": 306.0,
+        "min": 297,
+        "max": 311
+      }
+    },
+    "oos_probes_14": {
+      "rows": 14,
+      "argus_cascade": 13,
+      "argus_console": 14,
+      "argus_ngram": 13,
+      "argus_cascade_before_fixes": 13,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          12,
+          6,
+          9,
+          8
+        ],
+        "mean": 8.8,
+        "min": 6,
+        "max": 12
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          14,
+          13,
+          13,
+          13
+        ],
+        "mean": 13.2,
+        "min": 13,
+        "max": 14
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          11,
+          6,
+          9,
+          8,
+          8
+        ],
+        "mean": 8.4,
+        "min": 6,
+        "max": 11
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          13,
+          13,
+          13,
+          13,
+          13
+        ],
+        "mean": 13.0,
+        "min": 13,
+        "max": 13
+      }
+    },
+    "massive_oos": {
+      "rows": 672,
+      "argus_cascade": 519,
+      "argus_console": 656,
+      "argus_ngram": 534,
+      "argus_cascade_before_fixes": 533,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          374,
+          287,
+          267,
+          204
+        ],
+        "mean": 283.0,
+        "min": 204,
+        "max": 374
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          663,
+          661,
+          658,
+          657
+        ],
+        "mean": 659.8,
+        "min": 657,
+        "max": 663
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          412,
+          324,
+          310,
+          246,
+          243
+        ],
+        "mean": 307.0,
+        "min": 243,
+        "max": 412
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          663,
+          656,
+          657,
+          657,
+          655
+        ],
+        "mean": 657.6,
+        "min": 655,
+        "max": 663
+      }
+    },
+    "clinc_oos": {
+      "rows": 963,
+      "argus_cascade": 669,
+      "argus_console": 878,
+      "argus_ngram": 754,
+      "argus_cascade_before_fixes": 669,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          757,
+          675,
+          671,
+          656
+        ],
+        "mean": 689.8,
+        "min": 656,
+        "max": 757
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          917,
+          903,
+          900,
+          902
+        ],
+        "mean": 905.5,
+        "min": 900,
+        "max": 917
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          760,
+          676,
+          682,
+          655,
+          638
+        ],
+        "mean": 682.2,
+        "min": 638,
+        "max": 760
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          918,
+          901,
+          903,
+          905,
+          902
+        ],
+        "mean": 905.8,
+        "min": 901,
+        "max": 918
+      }
+    },
+    "hard_negatives": {
+      "rows": 120,
+      "argus_cascade": 64,
+      "argus_console": 64,
+      "argus_ngram": 64,
+      "argus_cascade_before_fixes": 64,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          77,
+          58,
+          55,
+          56
+        ],
+        "mean": 61.5,
+        "min": 55,
+        "max": 77
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          77,
+          58,
+          55,
+          56
+        ],
+        "mean": 61.5,
+        "min": 55,
+        "max": 77
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          76,
+          63,
+          65,
+          60,
+          58
+        ],
+        "mean": 64.4,
+        "min": 58,
+        "max": 76
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          76,
+          63,
+          65,
+          60,
+          58
+        ],
+        "mean": 64.4,
+        "min": 58,
+        "max": 76
+      }
+    },
+    "perturbed:typo1": {
+      "rows": 289,
+      "argus_cascade": 225,
+      "argus_console": 92,
+      "argus_ngram": 229,
+      "argus_cascade_before_fixes": 225,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          223,
+          233,
+          219,
+          237
+        ],
+        "mean": 228.0,
+        "min": 219,
+        "max": 237
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          92,
+          99,
+          93,
+          97
+        ],
+        "mean": 95.2,
+        "min": 92,
+        "max": 99
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          218,
+          230,
+          220,
+          240,
+          230
+        ],
+        "mean": 227.6,
+        "min": 218,
+        "max": 240
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          89,
+          95,
+          93,
+          99,
+          96
+        ],
+        "mean": 94.4,
+        "min": 89,
+        "max": 99
+      }
+    },
+    "perturbed:typo2": {
+      "rows": 272,
+      "argus_cascade": 204,
+      "argus_console": 62,
+      "argus_ngram": 207,
+      "argus_cascade_before_fixes": 204,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          204,
+          213,
+          201,
+          214
+        ],
+        "mean": 208.0,
+        "min": 201,
+        "max": 214
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          65,
+          68,
+          65,
+          69
+        ],
+        "mean": 66.8,
+        "min": 65,
+        "max": 69
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          203,
+          206,
+          204,
+          215,
+          211
+        ],
+        "mean": 207.8,
+        "min": 203,
+        "max": 215
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          63,
+          67,
+          62,
+          71,
+          67
+        ],
+        "mean": 66.0,
+        "min": 62,
+        "max": 71
+      }
+    },
+    "perturbed:upper": {
+      "rows": 105,
+      "argus_cascade": 76,
+      "argus_console": 59,
+      "argus_ngram": 80,
+      "argus_cascade_before_fixes": 1,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          75,
+          77,
+          79,
+          80
+        ],
+        "mean": 77.8,
+        "min": 75,
+        "max": 80
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          56,
+          60,
+          60,
+          60
+        ],
+        "mean": 59.0,
+        "min": 56,
+        "max": 60
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          71,
+          76,
+          76,
+          75,
+          80
+        ],
+        "mean": 75.6,
+        "min": 71,
+        "max": 80
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          53,
+          60,
+          60,
+          57,
+          61
+        ],
+        "mean": 58.2,
+        "min": 53,
+        "max": 61
+      }
+    },
+    "perturbed:no_punctuation": {
+      "rows": 293,
+      "argus_cascade": 231,
+      "argus_console": 124,
+      "argus_ngram": 239,
+      "argus_cascade_before_fixes": 231,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          237,
+          236,
+          238,
+          244
+        ],
+        "mean": 238.8,
+        "min": 236,
+        "max": 244
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          127,
+          129,
+          129,
+          131
+        ],
+        "mean": 129.0,
+        "min": 127,
+        "max": 131
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          238,
+          235,
+          236,
+          244,
+          236
+        ],
+        "mean": 237.8,
+        "min": 235,
+        "max": 244
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          128,
+          128,
+          129,
+          131,
+          126
+        ],
+        "mean": 128.4,
+        "min": 126,
+        "max": 131
+      }
+    },
+    "perturbed:fullwidth": {
+      "rows": 122,
+      "argus_cascade": 88,
+      "argus_console": 4,
+      "argus_ngram": 94,
+      "argus_cascade_before_fixes": 15,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          18,
+          29,
+          30,
+          30
+        ],
+        "mean": 26.8,
+        "min": 18,
+        "max": 30
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          3,
+          4,
+          4,
+          4
+        ],
+        "mean": 3.8,
+        "min": 3,
+        "max": 4
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          11,
+          30,
+          30,
+          26,
+          29
+        ],
+        "mean": 25.2,
+        "min": 11,
+        "max": 30
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          2,
+          4,
+          4,
+          4,
+          4
+        ],
+        "mean": 3.6,
+        "min": 2,
+        "max": 4
+      }
+    },
+    "perturbed:polite_wrap": {
+      "rows": 293,
+      "argus_cascade": 222,
+      "argus_console": 123,
+      "argus_ngram": 210,
+      "argus_cascade_before_fixes": 222,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          191,
+          201,
+          203,
+          214
+        ],
+        "mean": 202.2,
+        "min": 191,
+        "max": 214
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          111,
+          115,
+          115,
+          121
+        ],
+        "mean": 115.5,
+        "min": 111,
+        "max": 121
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          182,
+          194,
+          194,
+          202,
+          201
+        ],
+        "mean": 194.6,
+        "min": 182,
+        "max": 202
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          108,
+          112,
+          112,
+          118,
+          112
+        ],
+        "mean": 112.4,
+        "min": 108,
+        "max": 118
+      }
+    },
+    "perturbed:traditional": {
+      "rows": 187,
+      "argus_cascade": 156,
+      "argus_console": 27,
+      "argus_ngram": 157,
+      "argus_cascade_before_fixes": 117,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          111,
+          118,
+          115,
+          121
+        ],
+        "mean": 116.2,
+        "min": 111,
+        "max": 121
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          21,
+          22,
+          21,
+          21
+        ],
+        "mean": 21.2,
+        "min": 21,
+        "max": 22
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          105,
+          111,
+          115,
+          127,
+          123
+        ],
+        "mean": 116.2,
+        "min": 105,
+        "max": 127
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          21,
+          21,
+          21,
+          21,
+          20
+        ],
+        "mean": 20.8,
+        "min": 20,
+        "max": 21
+      }
+    },
+    "confirmation:typo1": {
+      "rows": 571,
+      "argus_cascade": 445,
+      "argus_console": 235,
+      "argus_ngram": 464,
+      "argus_cascade_before_fixes": 445,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          447,
+          470,
+          463,
+          470
+        ],
+        "mean": 462.5,
+        "min": 447,
+        "max": 470
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          239,
+          250,
+          249,
+          252
+        ],
+        "mean": 247.5,
+        "min": 239,
+        "max": 252
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          442,
+          462,
+          457,
+          465,
+          470
+        ],
+        "mean": 459.2,
+        "min": 442,
+        "max": 470
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          239,
+          248,
+          246,
+          252,
+          250
+        ],
+        "mean": 247.0,
+        "min": 239,
+        "max": 252
+      }
+    },
+    "confirmation:typo2": {
+      "rows": 554,
+      "argus_cascade": 422,
+      "argus_console": 198,
+      "argus_ngram": 440,
+      "argus_cascade_before_fixes": 422,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          437,
+          450,
+          455,
+          454
+        ],
+        "mean": 449.0,
+        "min": 437,
+        "max": 455
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          211,
+          219,
+          221,
+          219
+        ],
+        "mean": 217.5,
+        "min": 211,
+        "max": 221
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          425,
+          446,
+          450,
+          442,
+          450
+        ],
+        "mean": 442.6,
+        "min": 425,
+        "max": 450
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          208,
+          218,
+          217,
+          216,
+          218
+        ],
+        "mean": 215.4,
+        "min": 208,
+        "max": 218
+      }
+    },
+    "confirmation:upper": {
+      "rows": 237,
+      "argus_cascade": 179,
+      "argus_console": 151,
+      "argus_ngram": 199,
+      "argus_cascade_before_fixes": 5,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          187,
+          195,
+          196,
+          195
+        ],
+        "mean": 193.2,
+        "min": 187,
+        "max": 196
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          160,
+          166,
+          168,
+          166
+        ],
+        "mean": 165.0,
+        "min": 160,
+        "max": 168
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          180,
+          188,
+          185,
+          189,
+          188
+        ],
+        "mean": 186.0,
+        "min": 180,
+        "max": 189
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          156,
+          162,
+          161,
+          164,
+          162
+        ],
+        "mean": 161.0,
+        "min": 156,
+        "max": 164
+      }
+    },
+    "confirmation:no_punctuation": {
+      "rows": 578,
+      "argus_cascade": 450,
+      "argus_console": 283,
+      "argus_ngram": 478,
+      "argus_cascade_before_fixes": 450,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          469,
+          484,
+          481,
+          487
+        ],
+        "mean": 480.2,
+        "min": 469,
+        "max": 487
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          294,
+          306,
+          305,
+          309
+        ],
+        "mean": 303.5,
+        "min": 294,
+        "max": 309
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          463,
+          484,
+          478,
+          485,
+          484
+        ],
+        "mean": 478.8,
+        "min": 463,
+        "max": 485
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          290,
+          308,
+          303,
+          307,
+          302
+        ],
+        "mean": 302.0,
+        "min": 290,
+        "max": 308
+      }
+    },
+    "confirmation:fullwidth": {
+      "rows": 250,
+      "argus_cascade": 183,
+      "argus_console": 4,
+      "argus_ngram": 203,
+      "argus_cascade_before_fixes": 10,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          12,
+          45,
+          41,
+          43
+        ],
+        "mean": 35.2,
+        "min": 12,
+        "max": 45
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          3,
+          4,
+          3,
+          4
+        ],
+        "mean": 3.5,
+        "min": 3,
+        "max": 4
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          8,
+          45,
+          36,
+          16,
+          47
+        ],
+        "mean": 30.4,
+        "min": 8,
+        "max": 47
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          3,
+          4,
+          4,
+          4,
+          5
+        ],
+        "mean": 4.0,
+        "min": 3,
+        "max": 5
+      }
+    },
+    "confirmation:polite_wrap": {
+      "rows": 578,
+      "argus_cascade": 431,
+      "argus_console": 280,
+      "argus_ngram": 434,
+      "argus_cascade_before_fixes": 431,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          385,
+          414,
+          413,
+          421
+        ],
+        "mean": 408.2,
+        "min": 385,
+        "max": 421
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          264,
+          280,
+          272,
+          285
+        ],
+        "mean": 275.2,
+        "min": 264,
+        "max": 285
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          377,
+          404,
+          400,
+          403,
+          405
+        ],
+        "mean": 397.8,
+        "min": 377,
+        "max": 405
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          265,
+          278,
+          270,
+          279,
+          273
+        ],
+        "mean": 273.0,
+        "min": 265,
+        "max": 279
+      }
+    },
+    "confirmation:traditional": {
+      "rows": 341,
+      "argus_cascade": 284,
+      "argus_console": 61,
+      "argus_ngram": 282,
+      "argus_cascade_before_fixes": 224,
+      "rasa_legacy_20260921": {
+        "seeds": [
+          206,
+          233,
+          234,
+          235
+        ],
+        "mean": 227.0,
+        "min": 206,
+        "max": 235
+      },
+      "rasa_legacy_20260921_gated": {
+        "seeds": [
+          45,
+          52,
+          53,
+          49
+        ],
+        "mean": 49.8,
+        "min": 45,
+        "max": 53
+      },
+      "rasa_rasa_default": {
+        "seeds": [
+          192,
+          223,
+          225,
+          234,
+          246
+        ],
+        "mean": 224.0,
+        "min": 192,
+        "max": 246
+      },
+      "rasa_rasa_default_gated": {
+        "seeds": [
+          47,
+          54,
+          51,
+          48,
+          53
+        ],
+        "mean": 50.6,
+        "min": 47,
+        "max": 54
+      }
+    }
+  },
+  "paired_cascade_vs_rasa_default": {
+    "sealed": {
+      "argus_minus_rasa_accuracy": -0.0082,
+      "ci95": [
+        -0.0444,
+        0.0259
+      ],
+      "verdict": "tie"
+    },
+    "held_out": {
+      "argus_minus_rasa_accuracy": -0.0246,
+      "ci95": [
+        -0.0512,
+        0.0017
+      ],
+      "verdict": "tie"
+    },
+    "oos_probes_14": {
+      "argus_minus_rasa_accuracy": 0.3286,
+      "ci95": [
+        0.1429,
+        0.5429
+      ],
+      "verdict": "argus_better"
+    },
+    "massive_oos": {
+      "argus_minus_rasa_accuracy": 0.3155,
+      "ci95": [
+        0.2798,
+        0.3527
+      ],
+      "verdict": "argus_better"
+    },
+    "clinc_oos": {
+      "argus_minus_rasa_accuracy": -0.0137,
+      "ci95": [
+        -0.0399,
+        0.0131
+      ],
+      "verdict": "tie"
+    },
+    "hard_negatives": {
+      "argus_minus_rasa_accuracy": -0.0033,
+      "ci95": [
+        -0.0417,
+        0.0383
+      ],
+      "verdict": "tie"
+    },
+    "perturbed:typo1": {
+      "argus_minus_rasa_accuracy": -0.009,
+      "ci95": [
+        -0.0415,
+        0.0242
+      ],
+      "verdict": "tie"
+    },
+    "perturbed:typo2": {
+      "argus_minus_rasa_accuracy": -0.014,
+      "ci95": [
+        -0.0493,
+        0.0221
+      ],
+      "verdict": "tie"
+    },
+    "perturbed:upper": {
+      "argus_minus_rasa_accuracy": 0.0038,
+      "ci95": [
+        -0.0648,
+        0.0705
+      ],
+      "verdict": "tie"
+    },
+    "perturbed:no_punctuation": {
+      "argus_minus_rasa_accuracy": -0.0232,
+      "ci95": [
+        -0.058,
+        0.0123
+      ],
+      "verdict": "tie"
+    },
+    "perturbed:fullwidth": {
+      "argus_minus_rasa_accuracy": 0.5148,
+      "ci95": [
+        0.4098,
+        0.6164
+      ],
+      "verdict": "argus_better"
+    },
+    "perturbed:polite_wrap": {
+      "argus_minus_rasa_accuracy": 0.0935,
+      "ci95": [
+        0.0512,
+        0.1338
+      ],
+      "verdict": "argus_better"
+    },
+    "perturbed:traditional": {
+      "argus_minus_rasa_accuracy": 0.2128,
+      "ci95": [
+        0.1519,
+        0.2706
+      ],
+      "verdict": "argus_better"
+    },
+    "confirmation:typo1": {
+      "argus_minus_rasa_accuracy": -0.0249,
+      "ci95": [
+        -0.0532,
+        0.0028
+      ],
+      "verdict": "tie"
+    },
+    "confirmation:typo2": {
+      "argus_minus_rasa_accuracy": -0.0372,
+      "ci95": [
+        -0.0614,
+        -0.0137
+      ],
+      "verdict": "rasa_better"
+    },
+    "confirmation:upper": {
+      "argus_minus_rasa_accuracy": -0.0295,
+      "ci95": [
+        -0.0827,
+        0.0236
+      ],
+      "verdict": "tie"
+    },
+    "confirmation:no_punctuation": {
+      "argus_minus_rasa_accuracy": -0.0498,
+      "ci95": [
+        -0.0761,
+        -0.0246
+      ],
+      "verdict": "rasa_better"
+    },
+    "confirmation:fullwidth": {
+      "argus_minus_rasa_accuracy": 0.6104,
+      "ci95": [
+        0.544,
+        0.6768
+      ],
+      "verdict": "argus_better"
+    },
+    "confirmation:polite_wrap": {
+      "argus_minus_rasa_accuracy": 0.0574,
+      "ci95": [
+        0.0277,
+        0.0858
+      ],
+      "verdict": "argus_better"
+    },
+    "confirmation:traditional": {
+      "argus_minus_rasa_accuracy": 0.176,
+      "ci95": [
+        0.1326,
+        0.2176
+      ],
+      "verdict": "argus_better"
+    }
+  },
+  "costs": {
+    "argus": {
+      "latency_ms_median": 0.328,
+      "latency_ms_p95": 0.836,
+      "model_bytes": 1583303,
+      "model_load_seconds": 0.03,
+      "predictions_timed": 7291
+    },
+    "rasa_default": {
+      "train_seconds": 96.934,
+      "model_load_seconds": 11.653,
+      "import_seconds": 14.295,
+      "latency_ms_median": 8.558,
+      "latency_ms_p95": 15.332,
+      "model_archive_bytes": 46084204.0
+    }
+  },
+  "reproducibility": {
+    "argus_recomputed_identically": true,
+    "rasa_repeat_identical": true,
+    "rasa_repeat_note": "the seed-1 repeat trained in 90.346 s against 248.002 s: Rasa's cache served it, so identical predictions show determinism given the cache, not a cold retrain"
+  }
+}
