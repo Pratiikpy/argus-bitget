@@ -154,33 +154,44 @@ def run_point_in_time_comparison() -> dict[str, Any]:
 
 
 def run_failure_cases() -> dict[str, Any]:
-    """Real, measured behaviour of ARGUS's real gate at the exact boundary — found by running
-    it, not assumed. `facts()` compares `filed <= as_of.date()`, so the filed day itself is
-    inclusive; the sharp edge is the day BEFORE it, which must not see the fact at all."""
+    """Real, measured behaviour of ARGUS's real gate at the exact boundary, found by running it.
+
+    The boundary is the second EDGAR accepted the filing, read from the filer's own submissions
+    index, not the filing's date (changed 2026-09-26). Until then this checked midnight UTC of
+    the filed day, and asserted the filing was visible there: that was the leak, since a 10-Q
+    dated the 26th is accepted that evening. The three cutoffs now are midnight of the filed
+    day and one hour either side of acceptance; only the last may see the filing."""
     edgar = EdgarSource()
     fundamentals = FundamentalsSource(edgar=edgar)
     facts, _ = fundamentals.facts("NVDA", concept="eps_diluted", as_of=AT)
     if not facts:
         return {"error": "no NVDA facts available"}
     latest = max(facts, key=lambda f: f.filed)
-    on_filed_day = datetime.combine(latest.filed, datetime.min.time(), tzinfo=UTC)
-    day_before = on_filed_day - timedelta(days=1)
+    cik = edgar.cik_for("NVDA")
+    index = fundamentals._acceptance(cik) if cik is not None else None
+    accepted = index.lookup(latest.accn) if index is not None else None
+    if accepted is None:
+        return {"error": f"no acceptance time in EDGAR's index for {latest.accn or 'the filing'}"}
+    midnight = datetime.combine(latest.filed, datetime.min.time(), tzinfo=UTC)
+    hour_before = accepted - timedelta(hours=1)
+    hour_after = accepted + timedelta(hours=1)
 
-    facts_on_filed_day, _ = fundamentals.facts(
-        "NVDA", concept="eps_diluted", as_of=on_filed_day,
-    )
-    facts_day_before, _ = fundamentals.facts(
-        "NVDA", concept="eps_diluted", as_of=day_before,
-    )
-    visible_on_filed_day = any(f.filed == latest.filed for f in facts_on_filed_day)
-    withheld_the_day_before = not any(f.filed == latest.filed for f in facts_day_before)
+    def sees(as_of: datetime) -> bool:
+        shown, _ = fundamentals.facts("NVDA", concept="eps_diluted", as_of=as_of)
+        return any(f.accn == latest.accn for f in shown)
+
+    at_midnight, before, after = sees(midnight), sees(hour_before), sees(hour_after)
     return {
         "latest_real_filed_date": latest.filed.isoformat(),
-        "cutoff_on_filed_day": on_filed_day.isoformat(),
-        "cutoff_day_before": day_before.isoformat(),
-        "visible_on_filed_day": visible_on_filed_day,
-        "withheld_the_day_before": withheld_the_day_before,
-        "boundary_is_sharp": visible_on_filed_day and withheld_the_day_before,
+        "accession": latest.accn,
+        "accepted_at": accepted.isoformat(),
+        "cutoff_midnight_of_filed_day": midnight.isoformat(),
+        "cutoff_hour_before_acceptance": hour_before.isoformat(),
+        "cutoff_hour_after_acceptance": hour_after.isoformat(),
+        "withheld_at_midnight_of_filed_day": not at_midnight,
+        "withheld_an_hour_before_acceptance": not before,
+        "visible_an_hour_after_acceptance": after,
+        "boundary_is_sharp": (not at_midnight) and (not before) and after,
     }
 
 
@@ -278,7 +289,7 @@ def render(report: dict[str, Any]) -> str:
     )
     failures = report.get("failure_cases", {})
     if "boundary_is_sharp" in failures:
-        lines.append(f"  boundary is sharp (day-of visible, day-before withheld): "
+        lines.append(f"  boundary is sharp (withheld until EDGAR accepts, visible after): "
                       f"{failures['boundary_is_sharp']}")
     lines.append(f"  reproducible: {report['reproducibility']['identical']}")
     return "\n".join(lines)

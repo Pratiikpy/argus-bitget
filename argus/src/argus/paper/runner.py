@@ -179,7 +179,8 @@ def _is_flag(note: str) -> bool:
 
 
 def _write_notes(
-    seq: int, symbol: str, at: datetime, notes: list[str], sources: tuple[str, ...] = ()
+    seq: int, symbol: str, at: datetime, notes: list[str], sources: tuple[str, ...] = (),
+    evidence: tuple[str, ...] = (),
 ) -> None:
     """Append one decision's check output. Best effort: a notes failure must not lose a decision.
 
@@ -202,6 +203,9 @@ def _write_notes(
                 "notes": notes,
                 "flags": [n for n in notes if _is_flag(n)],
                 "sources": list(sources),
+                # The evidence lines themselves, from 2026-09-26; rows before carry none, and
+                # that absence means "not recorded", not "no evidence".
+                "evidence": list(evidence),
             }) + "\n")
     except OSError as exc:  # pragma: no cover - disk failure
         print(f"could not write desk notes for seq {seq}: {exc}", file=sys.stderr)
@@ -691,7 +695,7 @@ def _record_run(
     _write_notes(
         entry.seq, symbol, now,
         [*run.notes, *extra_notes, ruling.render(), *mode_notes, venue_note, fill.render()],
-        run.evidence_sources,
+        run.evidence_sources, run.evidence,
     )
     _write_risk_record(entry.seq, symbol, now, run)
     # The causal chain, persisted at decision time so it can be graded later. `paper/chains.py`

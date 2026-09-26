@@ -323,7 +323,9 @@ class TestTheLiveRegisterIsHonest:
         — WorldQuant's real, published Alpha#101 formula #23, run via ARGUS's own grammar on real
         MARKET and real INDEX candles for the full real rToken universe, scored by Alphalens-
         reloaded's real, vendored Information Coefficient. The decisive finding surfaced in the
-        real ABLATION, not the base case: stripping Alpha 23's own real conditional gate
+        real ABLATION, not the base case (withdrawn 2026-09-26: the artefact's own intervals
+        include zero on both arms, so what follows was never true of the published run):
+        stripping Alpha 23's own real conditional gate
         (`mean(high,20) < high`) reveals the bare, unconditional `delta(high,2)` carries a real,
         bootstrap-confirmed market-vs-index divergence whose 95% CI excludes zero, while the
         real, published, GATED formula erases it into noise — confirmed by both ARGUS's own
@@ -489,6 +491,8 @@ class TestTheLiveRegisterIsHonest:
         # 2026-09-26: breadth rotation to TIED. A general validator (pandera with pydantic)
         # configured to the same contract handles the same 36 cases it does
         # (data/general_rotation_comparison.json); beating pytaa was beating a weaker rival.
+        # 2026-09-26: rToken factor divergence to IMPLEMENTED. Its ablation proof said the ungated
+        # divergence's CI excludes zero; its own artefact has it at [-0.0387, +0.0304].
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
             "Cross-sectional factor evaluation",
@@ -497,7 +501,6 @@ class TestTheLiveRegisterIsHonest:
             "Per-profile mandate that changes the verdict",
             "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
             "Risk layer proved by domain sweep",
-            "rToken factor divergence vs. Alphalens' real Information Coefficient",
         }
         for cap in audit().owned:
             assert cap.conditions_missing == (), cap.name

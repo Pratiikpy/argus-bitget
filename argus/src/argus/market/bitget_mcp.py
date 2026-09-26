@@ -74,6 +74,30 @@ PROTOCOL_VERSION = LATEST_SUPPORTED
 :attr:`BitgetDataService.negotiation`."""
 TIMEOUT = 45.0
 
+ANSWER_ENTRIES: tuple[str, ...] = (
+    "crypto_futures_liquidations",
+    "crypto_futures_long_short_ratio",
+    "crypto_futures_long_short_top_position_ratio",
+    "crypto_indicators_hyperliquid_whale_sentiment",
+    "crypto_institutional_company_flow",
+    "crypto_sentiment_crypto_fear_greed",
+    "equity_calendar",
+    "equity_estimates_consensus",
+    "equity_estimates_price_target",
+    "equity_fundamental_dividends",
+    "equity_fundamental_ratios",
+    "equity_ownership_form_13f",
+    "equity_ownership_inst_position_summary",
+    "equity_ownership_insider_trading",
+    "equity_price_quote",
+    "news_label_search",
+    "sentiment_market_fear_greed",
+)
+"""The catalog entries the console's answers read. /status printed how many of the 67 answer and
+never how many the answers use, so "37 of 67" and "62 answer with the right arguments" stood side
+by side with no way to tell which mattered (readiness backlog L47).
+`tests/test_bitget_mcp_entries.py` keeps this list equal to the entries named in the source."""
+
 
 class BitgetMcpError(RpcError):
     """The service could not be reached or refused a call. Raised rather than returning empty.
@@ -268,5 +292,6 @@ if __name__ == "__main__":  # pragma: no cover
 
 
 __all__ = [
+    "ANSWER_ENTRIES",
     "ENDPOINT", "BitgetDataService", "BitgetMcpError", "Entry", "main", "underlying_of",
 ]

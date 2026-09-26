@@ -141,6 +141,11 @@ class DeskRun:
 
     order: Order | None = None
     notes: list[str] = field(default_factory=list)
+    evidence: tuple[str, ...] = ()
+    """The evidence lines the decision-maker was shown, exactly as its frame carried them (id,
+    source, credibility, when it became available, the claim). The ledger commits to them only
+    through ``market_state_hash``; kept here so the runner can write them beside the entry and a
+    reader can see what the decision rested on (readiness backlog L43)."""
     evidence_sources: tuple[str, ...] = ()
     """Every distinct `Evidence.source` that survived quarantine and reached this decision.
 
@@ -1344,7 +1349,7 @@ class TradingDesk:
             symbol=symbol, as_of=session.as_of, panel=c.panel,
             proof=proof, ruling=ruling, ruled_intent=attacked,
             ablated_rulings=ablated_rulings, order=order, notes=notes,
-            evidence_sources=c.evidence_sources,
+            evidence=tuple(c.frame.evidence), evidence_sources=c.evidence_sources,
             causal_chain=c.causal_chain, earnings_read=c.earnings_read, debate=c.debate,
         )
 

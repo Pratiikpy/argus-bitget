@@ -48,11 +48,12 @@ import statistics
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 from argus.eval.artefact import write
-from argus.market.skills import DEFAULT_TIMEOUT, PROBES, Probe
+from argus.market.skills import DEFAULT_TIMEOUT, PROBES, Health, Probe, _classify
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "skill_reliability.json"
 
@@ -128,10 +129,7 @@ def measure(
             row = results[(probe.tool, probe.action)]
             started = time.time()
             try:
-                # The payload is deliberately discarded: `status` already carries
-                # `market/skills.py`'s own classification of those same bytes, and re-deriving a
-                # verdict here would be a second opinion about one call.
-                _payload, status = client.call(
+                payload, status = client.call(
                     probe.tool, probe.for_symbol(symbol), timeout=timeout
                 )
             except Exception as exc:
@@ -140,13 +138,15 @@ def measure(
                 continue
             row.attempts += 1
             row.latencies.append(time.time() - started)
-            # `status` carries the classification `market/skills.py` already makes; "ok" is the
-            # only one that means data came back. Re-deriving it here would be a second opinion
-            # about the same bytes.
-            if status.endswith(": ok"):
+            # Classified by `market/skills.py`'s own rule, on the payload as well as the status.
+            # Reading the status alone counted a call that returned only an upstream error
+            # envelope ("...: ok" with {"error": ""}) as answered: on 2026-09-26 that made three
+            # tools "reliable" that the health sweep, minutes earlier, correctly found empty.
+            health, detail = _classify(payload, status)
+            if health is Health.OK:
                 row.answered += 1
             else:
-                row.failures.append(status[:100])
+                row.failures.append(detail[:100])
         if attempt + 1 < attempts:
             time.sleep(SPACING)
     return list(results.values())
@@ -167,6 +167,9 @@ def run(symbol: str = "NVDAUSDT", *, attempts: int = ATTEMPTS) -> dict[str, Any]
         if any(r.verdict == "reliable" for r in rows if r.skill == skill)
     }
     return {
+        # When the sweep ran (added 2026-09-26): /status set this beside another sweep taken hours
+        # apart, and without a date the two read as one contradictory measurement.
+        "checked_at": datetime.now(UTC).isoformat(),
         "symbol": symbol,
         "attempts_per_tool": attempts,
         "tools": len(rows),

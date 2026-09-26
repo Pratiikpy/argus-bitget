@@ -30,6 +30,7 @@ import argparse
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -125,6 +126,7 @@ def run(categories: Sequence[str] | None = None) -> dict[str, Any]:
     equity = [p for p in probes if p.category == "equity"]
 
     return {
+        "checked_at": datetime.now(UTC).isoformat(),
         "service": service.server,
         "probe_symbol": PROBE_SYMBOL,
         "underlying": underlying_of(PROBE_SYMBOL),

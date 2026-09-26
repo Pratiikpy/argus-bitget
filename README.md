@@ -83,7 +83,7 @@ deflation gate, and the console says so.
 Every capability is graded against the specialist that leads its sub-theme, by a register that
 opens the evidence rather than trusting a filename (`python -m argus.eval.standing`), and may claim
 OWNED only after that rival has been run on the same input and beaten.
-**7 of 43 capabilities are OWNED, 12 are TIED, 24 are IMPLEMENTED, and 0 are LOST.** OWNED needs
+**6 of 43 capabilities are OWNED, 12 are TIED, 25 are IMPLEMENTED, and 0 are LOST.** OWNED needs
 all thirteen conditions: the rival's best implementation read and reproduced, a same-input
 comparison with costs, out-of-sample, ablation, an adversarial test, documented failure cases and
 reproducibility.
@@ -158,7 +158,7 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 9,143 tests collected
+pytest -q                       # 9,175 tests collected
 ```
 
 Nothing above needs a credential. The full run took 1h16m from a fresh GitHub clone on
@@ -180,8 +180,8 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **9,143 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 473 source files** |
+| Tests | **9,175 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 475 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes**, resolved by import at runtime, not claimed in prose |

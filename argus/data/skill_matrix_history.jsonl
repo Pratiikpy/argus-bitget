@@ -2,3 +2,4 @@
 {"at":"2026-09-25T15:30:32.914055+00:00","calls":86,"answered":3,"by_server":{"bitget-signal":{"calls":19,"answered":3,"upstream_5xx":0},"bitget-mcp-server":{"calls":67,"answered":0,"upstream_5xx":67}}}
 {"at":"2026-09-25T19:08:56.263474+00:00","calls":86,"answered":3,"by_server":{"bitget-signal":{"calls":19,"answered":3,"upstream_5xx":0},"bitget-mcp-server":{"calls":67,"answered":0,"upstream_5xx":67}}}
 {"at":"2026-09-25T22:09:00.427052+00:00","calls":86,"answered":3,"by_server":{"bitget-signal":{"calls":19,"answered":3,"upstream_5xx":0},"bitget-mcp-server":{"calls":67,"answered":0,"upstream_5xx":67}}}
+{"at":"2026-09-26T10:09:10.103968+00:00","calls":86,"answered":3,"by_server":{"bitget-signal":{"calls":19,"answered":3,"upstream_5xx":0},"bitget-mcp-server":{"calls":67,"answered":0,"upstream_5xx":67}}}

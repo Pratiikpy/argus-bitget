@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-26T04:26:40+00:00",
+  "generated_at": "2026-09-26T05:58:53+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
@@ -49,6 +49,7 @@
     "data/overfit_gates.json",
     "data/overnight_comparison.json",
     "data/paper_ledger.jsonl",
+    "data/pit_rivals.json",
     "data/profile_divergence.json",
     "data/protocol_commitments.jsonl",
     "data/queue_proof.json",
@@ -73,9 +74,9 @@
     "data/xa_arena.json"
   ],
   "counts": {
-    "checked": 48,
+    "checked": 52,
     "designed_cases": 24,
-    "aggregate_without_rows": 18,
+    "aggregate_without_rows": 15,
     "no_rows": 4
   },
   "flagged": [
@@ -162,6 +163,17 @@
       ],
       "readings": [
         "the whole headline is one symbol (NVDAUSDT)"
+      ]
+    },
+    {
+      "artefact": "data/lui_rematch.json",
+      "headline": "ARGUS's cascade vs Rasa's default pipeline, out of scope",
+      "role": "argus_vs_rival",
+      "flags": [
+        "carried_by_one_group:suite=massive_oos"
+      ],
+      "readings": [
+        "massive_oos carries the headline: without it the other 2 suite group(s) total -13.6, which does not point the same way"
       ]
     },
     {
@@ -369,6 +381,17 @@
       ],
       "readings": [
         "the whole headline is one symbol (NVDAUSDT)"
+      ]
+    },
+    {
+      "artefact": "data/lui_rematch.json",
+      "headline": "ARGUS's cascade vs Rasa's default pipeline, out of scope",
+      "role": "argus_vs_rival",
+      "flags": [
+        "carried_by_one_group:suite=massive_oos"
+      ],
+      "readings": [
+        "massive_oos carries the headline: without it the other 2 suite group(s) total -13.6, which does not point the same way"
       ]
     },
     {
@@ -638,7 +661,7 @@
     },
     "data/allocation_comparison.json": {
       "status": "aggregate_without_rows",
-      "reason": "nine walk-forward windows reduced to windows-beating counts (eval/allocation_comparison.py would need to record per-window out-of-sample volatility per method)",
+      "reason": "nine live-fetched walk-forward windows reduced to per-allocator means and windows-beating counts; the harness records per-window volatilities from 2026-09-26 (oos_vol_bps_per_window), but this artefact predates that and its candles were fetched live, so it cannot be regenerated. The capability's OOS and significance proofs cite data/nco_bakeoff.json, which has the rows",
       "sha256": "3646139f11df3677cf46dea37dbde80d42edef198fe18adeedfdc5c53ff38a4e",
       "flagged": false,
       "headlines": []
@@ -2816,11 +2839,348 @@
       ]
     },
     "data/copilot_stress.json": {
-      "status": "aggregate_without_rows",
-      "reason": "7,800 book-days scored; only the first 200 rows are kept as a sample, which is one event day (eval/copilot_stress.py would need to record per-day mean errors per arm)",
-      "sha256": "d93ed61b0b7ce2008618065058a5225927ec812ea10f177c86305ddb67cf7d52",
+      "status": "checked",
+      "reason": "one row per QQQUSDT down day, each a mean over 200 books",
+      "sha256": "5a5289dd201c7d15e54690ad8838917bd26bbfef1c3f9212bbdc787c03a6ff1a",
       "flagged": false,
-      "headlines": []
+      "headlines": [
+        {
+          "name": "stress-move error: ARGUS's open-hours beta vs skfolio_vine",
+          "headline": "per down day: rival's mean absolute error minus ARGUS's, in pp",
+          "orientation": "positive = ARGUS's stress sentence was closer",
+          "items": 39,
+          "micro_mean": 0.082929,
+          "total": 3.234233,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "severity",
+              "groups": 2,
+              "micro_mean": 0.082929,
+              "macro_mean": 0.090992,
+              "direction": 1,
+              "largest_contributor": "down_1_to_2pct",
+              "largest_share_of_total": 0.8096,
+              "total_without_largest": 0.615838,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.5,
+                ">3": 0.5
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single severity carries the headline: without the largest contributor (down_1_to_2pct, 81.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "down_1_to_2pct",
+                  "rows": 33,
+                  "weight": 33.0,
+                  "total": 2.618395,
+                  "mean": 0.079345,
+                  "share_of_total": 0.8096,
+                  "opposing": 11
+                },
+                {
+                  "group": "down_2pct",
+                  "rows": 6,
+                  "weight": 6.0,
+                  "total": 0.615838,
+                  "mean": 0.10264,
+                  "share_of_total": 0.1904,
+                  "opposing": 3
+                }
+              ]
+            },
+            {
+              "key": "month",
+              "groups": 8,
+              "micro_mean": 0.082929,
+              "macro_mean": 0.073644,
+              "direction": 1,
+              "largest_contributor": "2026-06",
+              "largest_share_of_total": 0.5426,
+              "total_without_largest": 1.479266,
+              "loss_histogram": {
+                "0": 0.125,
+                "1": 0.375,
+                "2": 0.125,
+                "3": 0.375,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single month carries the headline: without the largest contributor (2026-06, 54.3% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "2026-06",
+                  "rows": 7,
+                  "weight": 7.0,
+                  "total": 1.754967,
+                  "mean": 0.25071,
+                  "share_of_total": 0.5426,
+                  "opposing": 3
+                },
+                {
+                  "group": "2026-07",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": 1.312259,
+                  "mean": 0.131226,
+                  "share_of_total": 0.4057,
+                  "opposing": 2
+                },
+                {
+                  "group": "2026-05",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 0.315722,
+                  "mean": 0.157861,
+                  "share_of_total": 0.0976,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-01",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.223835,
+                  "mean": 0.074612,
+                  "share_of_total": 0.0692,
+                  "opposing": 1
+                },
+                {
+                  "group": "2026-08",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.222775,
+                  "mean": 0.074258,
+                  "share_of_total": 0.0689,
+                  "opposing": 1
+                },
+                {
+                  "group": "2026-09",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.018288,
+                  "mean": 0.006096,
+                  "share_of_total": 0.0057,
+                  "opposing": 1
+                },
+                {
+                  "group": "2026-02",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": -0.100138,
+                  "mean": -0.020028,
+                  "share_of_total": -0.031,
+                  "opposing": 3
+                },
+                {
+                  "group": "2026-03",
+                  "rows": 6,
+                  "weight": 6.0,
+                  "total": -0.513475,
+                  "mean": -0.085579,
+                  "share_of_total": -0.1588,
+                  "opposing": 3
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "2026-06-16",
+            "first_items": 19,
+            "second_items": 20,
+            "first_mean": 0.017886,
+            "second_mean": 0.14472,
+            "full_mean": 0.082929,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 0.017886, second 0.14472, full 0.082929"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the preregistered primary and its Entropy Pooling sibling",
+          "source": "per_day",
+          "split_ran": true,
+          "favours": "argus"
+        },
+        {
+          "name": "stress-move error: ARGUS's open-hours beta vs skfolio_ep",
+          "headline": "per down day: rival's mean absolute error minus ARGUS's, in pp",
+          "orientation": "positive = ARGUS's stress sentence was closer",
+          "items": 38,
+          "micro_mean": 0.046676,
+          "total": 1.773673,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "severity",
+              "groups": 2,
+              "micro_mean": 0.046676,
+              "macro_mean": 0.031425,
+              "direction": 1,
+              "largest_contributor": "down_1_to_2pct",
+              "largest_share_of_total": 0.9698,
+              "total_without_largest": 0.053633,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.5,
+                ">3": 0.5
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single severity carries the headline: without the largest contributor (down_1_to_2pct, 97.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "down_1_to_2pct",
+                  "rows": 33,
+                  "weight": 33.0,
+                  "total": 1.72004,
+                  "mean": 0.052122,
+                  "share_of_total": 0.9698,
+                  "opposing": 10
+                },
+                {
+                  "group": "down_2pct",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.053633,
+                  "mean": 0.010727,
+                  "share_of_total": 0.0302,
+                  "opposing": 3
+                }
+              ]
+            },
+            {
+              "key": "month",
+              "groups": 8,
+              "micro_mean": 0.046676,
+              "macro_mean": 0.050461,
+              "direction": 1,
+              "largest_contributor": "2026-07",
+              "largest_share_of_total": 0.3711,
+              "total_without_largest": 1.115514,
+              "loss_histogram": {
+                "0": 0.125,
+                "1": 0.375,
+                "2": 0.25,
+                "3": 0.25,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single month carries the headline: without the largest contributor (2026-07, 37.1% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "2026-07",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": 0.658159,
+                  "mean": 0.065816,
+                  "share_of_total": 0.3711,
+                  "opposing": 3
+                },
+                {
+                  "group": "2026-06",
+                  "rows": 6,
+                  "weight": 6.0,
+                  "total": 0.47364,
+                  "mean": 0.07894,
+                  "share_of_total": 0.267,
+                  "opposing": 2
+                },
+                {
+                  "group": "2026-01",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.380843,
+                  "mean": 0.126948,
+                  "share_of_total": 0.2147,
+                  "opposing": 1
+                },
+                {
+                  "group": "2026-05",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 0.243844,
+                  "mean": 0.121922,
+                  "share_of_total": 0.1375,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-02",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.100854,
+                  "mean": 0.020171,
+                  "share_of_total": 0.0569,
+                  "opposing": 2
+                },
+                {
+                  "group": "2026-08",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.072519,
+                  "mean": 0.024173,
+                  "share_of_total": 0.0409,
+                  "opposing": 1
+                },
+                {
+                  "group": "2026-09",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.049524,
+                  "mean": -0.016508,
+                  "share_of_total": -0.0279,
+                  "opposing": 1
+                },
+                {
+                  "group": "2026-03",
+                  "rows": 6,
+                  "weight": 6.0,
+                  "total": -0.106662,
+                  "mean": -0.017777,
+                  "share_of_total": -0.0601,
+                  "opposing": 3
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "2026-06-23",
+            "first_items": 19,
+            "second_items": 19,
+            "first_mean": 0.030852,
+            "second_mean": 0.062499,
+            "full_mean": 0.046676,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 0.030852, second 0.062499, full 0.046676"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the preregistered primary and its Entropy Pooling sibling",
+          "source": "per_day",
+          "split_ran": true,
+          "favours": "argus"
+        }
+      ]
     },
     "data/crosssection_comparison.json": {
       "status": "designed_cases",
@@ -7582,18 +7942,514 @@
       "headlines": []
     },
     "data/lui_comparison.json": {
-      "status": "aggregate_without_rows",
-      "reason": "293 sealed prompts reduced to McNemar counts; ARGUS's per-prompt routes are not kept beside Rasa's vendored predictions",
+      "status": "checked",
+      "reason": "one row per sealed question, regenerated from the deployed cascade and Rasa's vendored predictions, parity-checked against the published counts",
       "sha256": "8e13c86c915d4231f84f16614611b148df8c113c3d8973f64978a7f8e452b862",
       "flagged": false,
-      "headlines": []
+      "headlines": [
+        {
+          "name": "sealed intent routing: ARGUS's cascade vs Rasa's DIET",
+          "headline": "(ARGUS right) - (Rasa right) per sealed question",
+          "orientation": "positive = ARGUS right where Rasa was not",
+          "items": 293,
+          "micro_mean": -0.023891,
+          "total": -7.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "lang",
+              "groups": 2,
+              "micro_mean": -0.023891,
+              "macro_mean": -0.027026,
+              "direction": -1,
+              "largest_contributor": "en",
+              "largest_share_of_total": 0.5714,
+              "total_without_largest": -3.0,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 1.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single lang carries the headline: without the largest contributor (en, 57.1% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "en",
+                  "rows": 105,
+                  "weight": 105.0,
+                  "total": -4.0,
+                  "mean": -0.038095,
+                  "share_of_total": 0.5714,
+                  "opposing": 5
+                },
+                {
+                  "group": "zh",
+                  "rows": 188,
+                  "weight": 188.0,
+                  "total": -3.0,
+                  "mean": -0.015957,
+                  "share_of_total": 0.4286,
+                  "opposing": 6
+                }
+              ]
+            },
+            {
+              "key": "intent",
+              "groups": 8,
+              "micro_mean": -0.023891,
+              "macro_mean": -0.025045,
+              "direction": -1,
+              "largest_contributor": "performance",
+              "largest_share_of_total": 0.5714,
+              "total_without_largest": -3.0,
+              "loss_histogram": {
+                "0": 0.25,
+                "1": 0.25,
+                "2": 0.375,
+                "3": 0.125,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single intent carries the headline: without the largest contributor (performance, 57.1% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "performance",
+                  "rows": 39,
+                  "weight": 39.0,
+                  "total": -4.0,
+                  "mean": -0.102564,
+                  "share_of_total": 0.5714,
+                  "opposing": 2
+                },
+                {
+                  "group": "decision_why",
+                  "rows": 27,
+                  "weight": 27.0,
+                  "total": -2.0,
+                  "mean": -0.074074,
+                  "share_of_total": 0.2857,
+                  "opposing": 1
+                },
+                {
+                  "group": "position",
+                  "rows": 40,
+                  "weight": 40.0,
+                  "total": -2.0,
+                  "mean": -0.05,
+                  "share_of_total": 0.2857,
+                  "opposing": 0
+                },
+                {
+                  "group": "decision_list",
+                  "rows": 40,
+                  "weight": 40.0,
+                  "total": -1.0,
+                  "mean": -0.025,
+                  "share_of_total": 0.1429,
+                  "opposing": 2
+                },
+                {
+                  "group": "abstention_why",
+                  "rows": 44,
+                  "weight": 44.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 1
+                },
+                {
+                  "group": "evidence",
+                  "rows": 29,
+                  "weight": 29.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 2
+                },
+                {
+                  "group": "session",
+                  "rows": 35,
+                  "weight": 35.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "calibration",
+                  "rows": 39,
+                  "weight": 39.0,
+                  "total": 2.0,
+                  "mean": 0.051282,
+                  "share_of_total": -0.2857,
+                  "opposing": 3
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the preregistered sealed comparison",
+          "source": "sealed_rows()",
+          "split_ran": false,
+          "favours": "rival"
+        }
+      ]
     },
     "data/lui_rematch.json": {
-      "status": "aggregate_without_rows",
-      "reason": "per-question router predictions are recomputed from the live router and not kept (Rasa's are in data/lui_rematch_rasa_predictions.json); eval/lui_rematch.py would need to record ARGUS's per-question labels",
-      "sha256": "471bcd47a7a7cc1be9855c1fef531fd91f8966db57130cdef131e68db6e3d529",
-      "flagged": false,
-      "headlines": []
+      "status": "checked",
+      "reason": "one paired row per question in every suite",
+      "sha256": "ee168867b367f8871174bbbef21de9616d1909483167dc9080c9725ec6a8e93b",
+      "flagged": true,
+      "headlines": [
+        {
+          "name": "ARGUS's cascade vs Rasa's default pipeline, held out",
+          "headline": "per row: (ARGUS right) - (Rasa right, mean over five seeds)",
+          "orientation": "positive = ARGUS right where Rasa was not",
+          "items": 578,
+          "micro_mean": -0.022837,
+          "total": -13.2,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "lang",
+              "groups": 2,
+              "micro_mean": -0.022837,
+              "macro_mean": -0.026915,
+              "direction": -1,
+              "largest_contributor": "en",
+              "largest_share_of_total": 0.8788,
+              "total_without_largest": -1.6,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 1.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single lang carries the headline: without the largest contributor (en, 87.9% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "en",
+                  "rows": 236,
+                  "weight": 236.0,
+                  "total": -11.6,
+                  "mean": -0.049153,
+                  "share_of_total": 0.8788,
+                  "opposing": 29
+                },
+                {
+                  "group": "zh",
+                  "rows": 342,
+                  "weight": 342.0,
+                  "total": -1.6,
+                  "mean": -0.004678,
+                  "share_of_total": 0.1212,
+                  "opposing": 33
+                }
+              ]
+            },
+            {
+              "key": "intent",
+              "groups": 8,
+              "micro_mean": -0.022837,
+              "macro_mean": -0.020393,
+              "direction": -1,
+              "largest_contributor": "performance",
+              "largest_share_of_total": 0.5909,
+              "total_without_largest": -5.4,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.125,
+                ">3": 0.875
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single intent carries the headline: without the largest contributor (performance, 59.1% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "performance",
+                  "rows": 80,
+                  "weight": 80.0,
+                  "total": -7.8,
+                  "mean": -0.0975,
+                  "share_of_total": 0.5909,
+                  "opposing": 8
+                },
+                {
+                  "group": "calibration",
+                  "rows": 80,
+                  "weight": 80.0,
+                  "total": -7.2,
+                  "mean": -0.09,
+                  "share_of_total": 0.5455,
+                  "opposing": 3
+                },
+                {
+                  "group": "position",
+                  "rows": 80,
+                  "weight": 80.0,
+                  "total": -4.8,
+                  "mean": -0.06,
+                  "share_of_total": 0.3636,
+                  "opposing": 4
+                },
+                {
+                  "group": "evidence",
+                  "rows": 53,
+                  "weight": 53.0,
+                  "total": -1.6,
+                  "mean": -0.030189,
+                  "share_of_total": 0.1212,
+                  "opposing": 4
+                },
+                {
+                  "group": "session",
+                  "rows": 79,
+                  "weight": 79.0,
+                  "total": -0.2,
+                  "mean": -0.002532,
+                  "share_of_total": 0.0152,
+                  "opposing": 9
+                },
+                {
+                  "group": "decision_why",
+                  "rows": 50,
+                  "weight": 50.0,
+                  "total": 1.4,
+                  "mean": 0.028,
+                  "share_of_total": -0.1061,
+                  "opposing": 8
+                },
+                {
+                  "group": "abstention_why",
+                  "rows": 76,
+                  "weight": 76.0,
+                  "total": 2.4,
+                  "mean": 0.031579,
+                  "share_of_total": -0.1818,
+                  "opposing": 16
+                },
+                {
+                  "group": "decision_list",
+                  "rows": 80,
+                  "weight": 80.0,
+                  "total": 4.6,
+                  "mean": 0.0575,
+                  "share_of_total": -0.3485,
+                  "opposing": 10
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the rematch's paired comparison",
+          "source": "paired_rows",
+          "split_ran": false,
+          "favours": "rival"
+        },
+        {
+          "name": "ARGUS's cascade vs Rasa's default pipeline, out of scope",
+          "headline": "per row: (ARGUS right) - (Rasa right, mean over five seeds)",
+          "orientation": "positive = ARGUS right where Rasa was not",
+          "items": 1755,
+          "micro_mean": 0.112479,
+          "total": 197.4,
+          "broken_down": true,
+          "flags": [
+            "carried_by_one_group:suite=massive_oos"
+          ],
+          "flagged": true,
+          "tables": [
+            {
+              "key": "suite",
+              "groups": 3,
+              "micro_mean": 0.112479,
+              "macro_mean": 0.098983,
+              "direction": 1,
+              "largest_contributor": "massive_oos",
+              "largest_share_of_total": 1.0689,
+              "total_without_largest": -13.6,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 1.0
+              },
+              "carried_by_one_group": true,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "massive_oos carries the headline: without it the other 2 suite group(s) total -13.6, which does not point the same way",
+              "per_group": [
+                {
+                  "group": "massive_oos",
+                  "rows": 672,
+                  "weight": 672.0,
+                  "total": 211.0,
+                  "mean": 0.313988,
+                  "share_of_total": 1.0689,
+                  "opposing": 62
+                },
+                {
+                  "group": "hard_negatives",
+                  "rows": 120,
+                  "weight": 120.0,
+                  "total": -0.4,
+                  "mean": -0.003333,
+                  "share_of_total": -0.002,
+                  "opposing": 19
+                },
+                {
+                  "group": "clinc_oos",
+                  "rows": 963,
+                  "weight": 963.0,
+                  "total": -13.2,
+                  "mean": -0.013707,
+                  "share_of_total": -0.0669,
+                  "opposing": 169
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the rematch's paired comparison",
+          "source": "paired_rows",
+          "split_ran": false,
+          "favours": "argus"
+        },
+        {
+          "name": "ARGUS's cascade vs Rasa's default pipeline, perturbed held-out",
+          "headline": "per row: (ARGUS right) - (Rasa right, mean over five seeds)",
+          "orientation": "positive = ARGUS right where Rasa was not",
+          "items": 3109,
+          "micro_mean": 0.057639,
+          "total": 179.2,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "perturbation",
+              "groups": 7,
+              "micro_mean": 0.057639,
+              "macro_mean": 0.102008,
+              "direction": 1,
+              "largest_contributor": "fullwidth",
+              "largest_share_of_total": 0.8571,
+              "total_without_largest": 25.6,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 1.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single perturbation carries the headline: without the largest contributor (fullwidth, 85.7% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "fullwidth",
+                  "rows": 250,
+                  "weight": 250.0,
+                  "total": 153.6,
+                  "mean": 0.6144,
+                  "share_of_total": 0.8571,
+                  "opposing": 20
+                },
+                {
+                  "group": "traditional",
+                  "rows": 341,
+                  "weight": 341.0,
+                  "total": 60.0,
+                  "mean": 0.175953,
+                  "share_of_total": 0.3348,
+                  "opposing": 20
+                },
+                {
+                  "group": "polite_wrap",
+                  "rows": 578,
+                  "weight": 578.0,
+                  "total": 34.2,
+                  "mean": 0.05917,
+                  "share_of_total": 0.1908,
+                  "opposing": 59
+                },
+                {
+                  "group": "upper",
+                  "rows": 237,
+                  "weight": 237.0,
+                  "total": -6.0,
+                  "mean": -0.025316,
+                  "share_of_total": -0.0335,
+                  "opposing": 31
+                },
+                {
+                  "group": "typo1",
+                  "rows": 571,
+                  "weight": 571.0,
+                  "total": -14.2,
+                  "mean": -0.024869,
+                  "share_of_total": -0.0792,
+                  "opposing": 70
+                },
+                {
+                  "group": "typo2",
+                  "rows": 554,
+                  "weight": 554.0,
+                  "total": -20.6,
+                  "mean": -0.037184,
+                  "share_of_total": -0.115,
+                  "opposing": 65
+                },
+                {
+                  "group": "no_punctuation",
+                  "rows": 578,
+                  "weight": 578.0,
+                  "total": -27.8,
+                  "mean": -0.048097,
+                  "share_of_total": -0.1551,
+                  "opposing": 68
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the rematch's paired comparison",
+          "source": "paired_rows",
+          "split_ran": false,
+          "favours": "argus"
+        }
+      ]
     },
     "data/lui_rematch_inputs.json": {
       "status": "no_rows",
@@ -11401,6 +12257,1280 @@
           "source": "cells",
           "split_ran": false,
           "favours": "neither"
+        }
+      ]
+    },
+    "data/pit_rivals.json": {
+      "status": "checked",
+      "reason": "one row per question: ten tickers' filings since 2017, one hour before and after each acceptance",
+      "sha256": "9f381803d26d298325242bd5d21b51c5c19cc2f808cc08ce1c916feb22740eea",
+      "flagged": false,
+      "headlines": [
+        {
+          "name": "ARGUS's latest-quarter revenue against SEC's acceptance record",
+          "headline": "(ARGUS right) - 1 per question",
+          "orientation": "0 = right, -1 = wrong",
+          "items": 619,
+          "micro_mean": 0.0,
+          "total": 0.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "ticker",
+              "groups": 10,
+              "micro_mean": 0.0,
+              "macro_mean": 0.0,
+              "direction": 0,
+              "largest_contributor": null,
+              "largest_share_of_total": null,
+              "total_without_largest": null,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "the headline has no direction, so no group can carry it",
+              "per_group": [
+                {
+                  "group": "AAPL",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMD",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 33,
+                  "weight": 33.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTR",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "side",
+              "groups": 2,
+              "micro_mean": 0.0,
+              "macro_mean": 0.0,
+              "direction": 0,
+              "largest_contributor": null,
+              "largest_share_of_total": null,
+              "total_without_largest": null,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "the headline has no direction, so no group can carry it",
+              "per_group": [
+                {
+                  "group": "after",
+                  "rows": 310,
+                  "weight": 310.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                },
+                {
+                  "group": "before",
+                  "rows": 309,
+                  "weight": 309.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": null,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "2021-07-28T23:13:08+00:00",
+            "first_items": 309,
+            "second_items": 310,
+            "first_mean": 0.0,
+            "second_mean": 0.0,
+            "full_mean": 0.0,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 0.0, second 0.0, full 0.0"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_result",
+          "role_reason": "the gate's own answer on every question",
+          "source": "rows_argus",
+          "split_ran": true,
+          "favours": "neither"
+        },
+        {
+          "name": "ARGUS vs vibe_trading_pit on the same questions",
+          "headline": "(ARGUS right) - (rival right) per question",
+          "orientation": "positive = ARGUS right where the rival was not",
+          "items": 619,
+          "micro_mean": 0.44588,
+          "total": 276.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "ticker",
+              "groups": 10,
+              "micro_mean": 0.44588,
+              "macro_mean": 0.44413,
+              "direction": 1,
+              "largest_contributor": "AMD",
+              "largest_share_of_total": 0.1232,
+              "total_without_largest": 242.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single ticker carries the headline: without the largest contributor (AMD, 12.3% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "AMD",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 34.0,
+                  "mean": 0.515152,
+                  "share_of_total": 0.1232,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTR",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 34.0,
+                  "mean": 0.5,
+                  "share_of_total": 0.1232,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 33.0,
+                  "mean": 0.5,
+                  "share_of_total": 0.1196,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 33.0,
+                  "mean": 0.5,
+                  "share_of_total": 0.1196,
+                  "opposing": 0
+                },
+                {
+                  "group": "AAPL",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 31.0,
+                  "mean": 0.455882,
+                  "share_of_total": 0.1123,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 30.0,
+                  "mean": 0.441176,
+                  "share_of_total": 0.1087,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 25.0,
+                  "mean": 0.367647,
+                  "share_of_total": 0.0906,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": 21.0,
+                  "mean": 0.362069,
+                  "share_of_total": 0.0761,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": 20.0,
+                  "mean": 0.344828,
+                  "share_of_total": 0.0725,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 33,
+                  "weight": 33.0,
+                  "total": 15.0,
+                  "mean": 0.454545,
+                  "share_of_total": 0.0543,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "side",
+              "groups": 2,
+              "micro_mean": 0.44588,
+              "macro_mean": 0.446336,
+              "direction": 1,
+              "largest_contributor": "before",
+              "largest_share_of_total": 0.8152,
+              "total_without_largest": 51.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single side carries the headline: without the largest contributor (before, 81.5% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "before",
+                  "rows": 309,
+                  "weight": 309.0,
+                  "total": 225.0,
+                  "mean": 0.728155,
+                  "share_of_total": 0.8152,
+                  "opposing": 0
+                },
+                {
+                  "group": "after",
+                  "rows": 310,
+                  "weight": 310.0,
+                  "total": 51.0,
+                  "mean": 0.164516,
+                  "share_of_total": 0.1848,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "2021-07-28T23:13:08+00:00",
+            "first_items": 309,
+            "second_items": 310,
+            "first_mean": 0.430421,
+            "second_mean": 0.46129,
+            "full_mean": 0.44588,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 0.430421, second 0.46129, full 0.44588"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the rival scored from its own output on the same questions",
+          "source": "rows_rivals.vibe_trading_pit",
+          "split_ran": true,
+          "favours": "argus"
+        },
+        {
+          "name": "ARGUS vs vibe_trading_research on the same questions",
+          "headline": "(ARGUS right) - (rival right) per question",
+          "orientation": "positive = ARGUS right where the rival was not",
+          "items": 619,
+          "micro_mean": 0.98546,
+          "total": 610.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "ticker",
+              "groups": 10,
+              "micro_mean": 0.98546,
+              "macro_mean": 0.984609,
+              "direction": 1,
+              "largest_contributor": "AAPL",
+              "largest_share_of_total": 0.1098,
+              "total_without_largest": 543.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single ticker carries the headline: without the largest contributor (AAPL, 11.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "AAPL",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.1098,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.1098,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTR",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.1098,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.1098,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 66.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.1082,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMD",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 65.0,
+                  "mean": 0.984848,
+                  "share_of_total": 0.1066,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 65.0,
+                  "mean": 0.984848,
+                  "share_of_total": 0.1066,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": 57.0,
+                  "mean": 0.982759,
+                  "share_of_total": 0.0934,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": 57.0,
+                  "mean": 0.982759,
+                  "share_of_total": 0.0934,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 33,
+                  "weight": 33.0,
+                  "total": 32.0,
+                  "mean": 0.969697,
+                  "share_of_total": 0.0525,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "side",
+              "groups": 2,
+              "micro_mean": 0.98546,
+              "macro_mean": 0.985484,
+              "direction": 1,
+              "largest_contributor": "before",
+              "largest_share_of_total": 0.5066,
+              "total_without_largest": 301.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single side carries the headline: without the largest contributor (before, 50.7% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "before",
+                  "rows": 309,
+                  "weight": 309.0,
+                  "total": 309.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.5066,
+                  "opposing": 0
+                },
+                {
+                  "group": "after",
+                  "rows": 310,
+                  "weight": 310.0,
+                  "total": 301.0,
+                  "mean": 0.970968,
+                  "share_of_total": 0.4934,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "2021-07-28T23:13:08+00:00",
+            "first_items": 309,
+            "second_items": 310,
+            "first_mean": 1.0,
+            "second_mean": 0.970968,
+            "full_mean": 0.98546,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 1.0, second 0.970968, full 0.98546"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the rival scored from its own output on the same questions",
+          "source": "rows_rivals.vibe_trading_research",
+          "split_ran": true,
+          "favours": "argus"
+        },
+        {
+          "name": "ARGUS vs openbb_pit on the same questions",
+          "headline": "(ARGUS right) - (rival right) per question",
+          "orientation": "positive = ARGUS right where the rival was not",
+          "items": 493,
+          "micro_mean": 0.985801,
+          "total": 486.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "ticker",
+              "groups": 8,
+              "micro_mean": 0.985801,
+              "macro_mean": 0.984754,
+              "direction": 1,
+              "largest_contributor": "AAPL",
+              "largest_share_of_total": 0.1379,
+              "total_without_largest": 419.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single ticker carries the headline: without the largest contributor (AAPL, 13.8% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "AAPL",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.1379,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.1379,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.1379,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 66.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.1358,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMD",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 65.0,
+                  "mean": 0.984848,
+                  "share_of_total": 0.1337,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 65.0,
+                  "mean": 0.984848,
+                  "share_of_total": 0.1337,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": 57.0,
+                  "mean": 0.982759,
+                  "share_of_total": 0.1173,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 33,
+                  "weight": 33.0,
+                  "total": 32.0,
+                  "mean": 0.969697,
+                  "share_of_total": 0.0658,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "side",
+              "groups": 2,
+              "micro_mean": 0.985801,
+              "macro_mean": 0.98583,
+              "direction": 1,
+              "largest_contributor": "before",
+              "largest_share_of_total": 0.5062,
+              "total_without_largest": 240.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single side carries the headline: without the largest contributor (before, 50.6% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "before",
+                  "rows": 246,
+                  "weight": 246.0,
+                  "total": 246.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.5062,
+                  "opposing": 0
+                },
+                {
+                  "group": "after",
+                  "rows": 247,
+                  "weight": 247.0,
+                  "total": 240.0,
+                  "mean": 0.97166,
+                  "share_of_total": 0.4938,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "2021-07-29T01:13:08+00:00",
+            "first_items": 246,
+            "second_items": 247,
+            "first_mean": 1.0,
+            "second_mean": 0.97166,
+            "full_mean": 0.985801,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 1.0, second 0.97166, full 0.985801"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the rival scored from its own output on the same questions",
+          "source": "rows_rivals.openbb_pit",
+          "split_ran": true,
+          "favours": "argus"
+        },
+        {
+          "name": "ARGUS vs openbb_default on the same questions",
+          "headline": "(ARGUS right) - (rival right) per question",
+          "orientation": "positive = ARGUS right where the rival was not",
+          "items": 493,
+          "micro_mean": 0.985801,
+          "total": 486.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "ticker",
+              "groups": 8,
+              "micro_mean": 0.985801,
+              "macro_mean": 0.984754,
+              "direction": 1,
+              "largest_contributor": "AAPL",
+              "largest_share_of_total": 0.1379,
+              "total_without_largest": 419.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single ticker carries the headline: without the largest contributor (AAPL, 13.8% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "AAPL",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.1379,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.1379,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.1379,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 66.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.1358,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMD",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 65.0,
+                  "mean": 0.984848,
+                  "share_of_total": 0.1337,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 65.0,
+                  "mean": 0.984848,
+                  "share_of_total": 0.1337,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": 57.0,
+                  "mean": 0.982759,
+                  "share_of_total": 0.1173,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 33,
+                  "weight": 33.0,
+                  "total": 32.0,
+                  "mean": 0.969697,
+                  "share_of_total": 0.0658,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "side",
+              "groups": 2,
+              "micro_mean": 0.985801,
+              "macro_mean": 0.98583,
+              "direction": 1,
+              "largest_contributor": "before",
+              "largest_share_of_total": 0.5062,
+              "total_without_largest": 240.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single side carries the headline: without the largest contributor (before, 50.6% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "before",
+                  "rows": 246,
+                  "weight": 246.0,
+                  "total": 246.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.5062,
+                  "opposing": 0
+                },
+                {
+                  "group": "after",
+                  "rows": 247,
+                  "weight": 247.0,
+                  "total": 240.0,
+                  "mean": 0.97166,
+                  "share_of_total": 0.4938,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "2021-07-29T01:13:08+00:00",
+            "first_items": 246,
+            "second_items": 247,
+            "first_mean": 1.0,
+            "second_mean": 0.97166,
+            "full_mean": 0.985801,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 1.0, second 0.97166, full 0.985801"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the rival scored from its own output on the same questions",
+          "source": "rows_rivals.openbb_default",
+          "split_ran": true,
+          "favours": "argus"
+        },
+        {
+          "name": "ARGUS vs langalpha_yfinance on the same questions",
+          "headline": "(ARGUS right) - (rival right) per question",
+          "orientation": "positive = ARGUS right where the rival was not",
+          "items": 619,
+          "micro_mean": 0.983845,
+          "total": 609.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "ticker",
+              "groups": 10,
+              "micro_mean": 0.983845,
+              "macro_mean": 0.983138,
+              "direction": 1,
+              "largest_contributor": "AAPL",
+              "largest_share_of_total": 0.11,
+              "total_without_largest": 542.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single ticker carries the headline: without the largest contributor (AAPL, 11.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "AAPL",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.11,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTR",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.11,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.11,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 66.0,
+                  "mean": 0.970588,
+                  "share_of_total": 0.1084,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 66.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.1084,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMD",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 65.0,
+                  "mean": 0.984848,
+                  "share_of_total": 0.1067,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 65.0,
+                  "mean": 0.984848,
+                  "share_of_total": 0.1067,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": 57.0,
+                  "mean": 0.982759,
+                  "share_of_total": 0.0936,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": 57.0,
+                  "mean": 0.982759,
+                  "share_of_total": 0.0936,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 33,
+                  "weight": 33.0,
+                  "total": 32.0,
+                  "mean": 0.969697,
+                  "share_of_total": 0.0525,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "side",
+              "groups": 2,
+              "micro_mean": 0.983845,
+              "macro_mean": 0.983866,
+              "direction": 1,
+              "largest_contributor": "before",
+              "largest_share_of_total": 0.5057,
+              "total_without_largest": 301.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single side carries the headline: without the largest contributor (before, 50.6% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "before",
+                  "rows": 309,
+                  "weight": 309.0,
+                  "total": 308.0,
+                  "mean": 0.996764,
+                  "share_of_total": 0.5057,
+                  "opposing": 0
+                },
+                {
+                  "group": "after",
+                  "rows": 310,
+                  "weight": 310.0,
+                  "total": 301.0,
+                  "mean": 0.970968,
+                  "share_of_total": 0.4943,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "2021-07-28T23:13:08+00:00",
+            "first_items": 309,
+            "second_items": 310,
+            "first_mean": 1.0,
+            "second_mean": 0.967742,
+            "full_mean": 0.983845,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 1.0, second 0.967742, full 0.983845"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the rival scored from its own output on the same questions",
+          "source": "rows_rivals.langalpha_yfinance",
+          "split_ran": true,
+          "favours": "argus"
+        },
+        {
+          "name": "ARGUS vs openalice_yfinance on the same questions",
+          "headline": "(ARGUS right) - (rival right) per question",
+          "orientation": "positive = ARGUS right where the rival was not",
+          "items": 619,
+          "micro_mean": 0.983845,
+          "total": 609.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "ticker",
+              "groups": 10,
+              "micro_mean": 0.983845,
+              "macro_mean": 0.983138,
+              "direction": 1,
+              "largest_contributor": "AAPL",
+              "largest_share_of_total": 0.11,
+              "total_without_largest": 542.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single ticker carries the headline: without the largest contributor (AAPL, 11.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "AAPL",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.11,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTR",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.11,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 67.0,
+                  "mean": 0.985294,
+                  "share_of_total": 0.11,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 68,
+                  "weight": 68.0,
+                  "total": 66.0,
+                  "mean": 0.970588,
+                  "share_of_total": 0.1084,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 66.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.1084,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMD",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 65.0,
+                  "mean": 0.984848,
+                  "share_of_total": 0.1067,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 66,
+                  "weight": 66.0,
+                  "total": 65.0,
+                  "mean": 0.984848,
+                  "share_of_total": 0.1067,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": 57.0,
+                  "mean": 0.982759,
+                  "share_of_total": 0.0936,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": 57.0,
+                  "mean": 0.982759,
+                  "share_of_total": 0.0936,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 33,
+                  "weight": 33.0,
+                  "total": 32.0,
+                  "mean": 0.969697,
+                  "share_of_total": 0.0525,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "side",
+              "groups": 2,
+              "micro_mean": 0.983845,
+              "macro_mean": 0.983866,
+              "direction": 1,
+              "largest_contributor": "before",
+              "largest_share_of_total": 0.5057,
+              "total_without_largest": 301.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single side carries the headline: without the largest contributor (before, 50.6% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "before",
+                  "rows": 309,
+                  "weight": 309.0,
+                  "total": 308.0,
+                  "mean": 0.996764,
+                  "share_of_total": 0.5057,
+                  "opposing": 0
+                },
+                {
+                  "group": "after",
+                  "rows": 310,
+                  "weight": 310.0,
+                  "total": 301.0,
+                  "mean": 0.970968,
+                  "share_of_total": 0.4943,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "2021-07-28T23:13:08+00:00",
+            "first_items": 309,
+            "second_items": 310,
+            "first_mean": 1.0,
+            "second_mean": 0.967742,
+            "full_mean": 0.983845,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 1.0, second 0.967742, full 0.983845"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the rival scored from its own output on the same questions",
+          "source": "rows_rivals.openalice_yfinance",
+          "split_ran": true,
+          "favours": "argus"
         }
       ]
     },

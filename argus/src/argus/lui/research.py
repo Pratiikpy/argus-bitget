@@ -47,7 +47,7 @@ import time
 from collections.abc import Mapping, Sequence
 from concurrent.futures import as_completed
 from dataclasses import dataclass, field, replace
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from enum import StrEnum
 from pathlib import Path
@@ -3634,8 +3634,17 @@ def load(symbols: Sequence[str], *, days: int = LOOKBACK_DAYS) -> MarketData:
     mixed in one answer.
     """
     wanted = tuple(sorted({*symbols, BENCHMARK}))
+    anchored = tuple(sorted({*wanted, CRYPTO_ANCHOR})) if CRYPTO_LINKED & set(symbols) else wanted
     try:
-        raw = _fetch_live(wanted, days)
+        try:
+            raw = _fetch_live(anchored, days)
+            wanted = anchored
+        except Exception:
+            if anchored == wanted:
+                raise
+            # BTC is context for a crypto-linked name, not what was asked: without it the answer
+            # loses one line, not the whole risk view.
+            raw = _fetch_live(wanted, days)
         data = MarketData(
             raw=raw, live=True,
             provenance=f"live Bitget hourly candles, last {days} days, fetched just now",
@@ -3872,6 +3881,38 @@ def _moments(values: Sequence[float]) -> tuple[float, float] | None:
     skew = g1 * math.sqrt(n * (n - 1)) / (n - 2)
     kurt = ((n + 1) * g2 + 6.0) * (n - 1) / ((n - 2) * (n - 3))
     return skew, kurt
+
+
+CRYPTO_ANCHOR = "BTCUSDT"
+CRYPTO_LINKED = frozenset({"MSTRUSDT", "COINUSDT", "HOODUSDT"})
+"""Stocks whose price is mostly a claim on crypto: Strategy holds bitcoin, Coinbase and Robinhood
+earn on crypto volume. "Should I buy MSTR" was benchmarked to QQQ alone, although MSTR's hourly
+correlation with BTC was +0.81 (readiness backlog L42)."""
+
+
+def _crypto_anchor_line(symbol: str, raw: Mapping[str, Mapping[datetime, float]],
+                        columns: Mapping[str, Sequence[float]]) -> str | None:
+    """BTC beta and correlation over every hour, beside how much QQQ explains in open hours.
+
+    Both trade around the clock on Bitget, so every aligned hour counts; QQQ's figure is the
+    open-session one the rest of the answer uses. Says which of the two prices the name."""
+    if symbol not in CRYPTO_LINKED or CRYPTO_ANCHOR not in raw:
+        return None
+    _stamps, both = align({k: v for k, v in raw.items() if k in (symbol, CRYPTO_ANCHOR)})
+    b = beta(both.get(symbol, []), both.get(CRYPTO_ANCHOR, []))
+    rho = correlation(both.get(symbol, []), both.get(CRYPTO_ANCHOR, []))
+    if b is None or rho is None:
+        return None
+    qqq = correlation(columns.get(symbol, []), columns.get(BENCHMARK, []))
+    verdict = ""
+    if qqq is not None:
+        verdict = (f"; QQQ explains {qqq * qqq:.0%} in open hours, so BTC, not QQQ, is the "
+                   f"market that prices it and the hedge to size" if rho * rho > qqq * qqq else
+                   f"; QQQ explains {qqq * qqq:.0%} in open hours, so the equity market prices it "
+                   f"more than BTC does")
+    return (f"{_t(symbol)} against bitcoin: {b:.2f}x BTC's hourly move across all "
+            f"{len(both.get(symbol, []))} aligned hours, correlation {rho:+.2f} (R² "
+            f"{rho * rho:.0%}){verdict}.")
 
 
 def _distribution_line(symbol: str, raw: Mapping[str, Mapping[datetime, float]],
@@ -7657,6 +7698,17 @@ _HYPE = re.compile(r"\b(?:hype\w*|buzz\w*|rumou?rs?|pump(?:ed|ing)?|shill\w*|"
 reading them as news would return headlines without the repetition discount."""
 
 
+_SHOULD_I_TRADE = re.compile(
+    r"\b(?:should|shall|would|do)\s+(?:i|we)\s+(?:buy|sell|add|short|long|go\s+(?:long|short)|"
+    r"get\s+into|take\s+a\s+position\s+in)\b", re.I)
+_HOW_TO_EXECUTE = re.compile(
+    r"\b(?:split|slices?|twap|vwap|execut\w*|fills?|order\s+book|depth|how\s+(?:to|should\s+i)\s+"
+    r"(?:buy|sell|enter|exit|work|place))\b", re.I)
+""""Should I buy MSTR" asks whether the trade is a good one for the trader; "how should I buy
+$200k of MSTR" asks how to execute it. The kind model read the first as execution at 0.16
+confidence and the answer was an order-slicing plan with no risk view (2026-09-26)."""
+
+
 def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
     """Whether the deterministic reading of ``text`` should stand over the model's.
 
@@ -7666,6 +7718,9 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
     if request is None:
         return False
     if request.kind in (ResearchKind.EXECUTION, ResearchKind.HEDGE, ResearchKind.EVENT):
+        return True
+    if (request.kind is ResearchKind.IMPACT and _SHOULD_I_TRADE.search(text)
+            and not _HOW_TO_EXECUTE.search(text)):
         return True
     if request.kind is ResearchKind.IMPACT and (request.target is not None
                                                 or request.resize_by is not None):
@@ -7803,11 +7858,14 @@ def _line_item_lines(ticker: str, raw_text: str) -> tuple[list[str], list[Source
     concept, label = next(((c, name) for c, name, pattern in _LINE_ITEMS
                            if pattern.search(raw_text)), ("revenue", "revenue"))
     as_of = _as_of(raw_text)
+    source = FundamentalsSource()
     try:
-        facts, status = FundamentalsSource().facts(ticker, concept=concept,
-                                                   as_of=as_of or datetime.now(UTC))
+        facts, status = source.facts(ticker, concept=concept, as_of=as_of or datetime.now(UTC))
     except Exception:
         return [], []
+    derived = _derived_q4(source, ticker, concept, as_of or datetime.now(UTC),
+                          {f.end for f in facts}) if facts else []
+    facts = [*facts, *derived]
     if not facts:
         return ([f"{ticker}'s {label} is not in its XBRL filings on SEC EDGAR under the standard "
                  f"US-GAAP tags" + (f" as of {as_of:%d %b %Y}" if as_of else "") + "."], [])
@@ -7825,8 +7883,11 @@ def _line_item_lines(ticker: str, raw_text: str) -> tuple[list[str], list[Source
     prior = facts[-2] if len(facts) > 1 else None
     year_ago = next((f for f in reversed(facts[:-1])
                      if 350 <= (latest.end - f.end).days <= 380), None)
+    how = (f"derived: the annual report less the year's three quarterly reports, all public by "
+           f"{latest.filed:%d %b %Y}" if "derived" in latest.form
+           else f"filed {latest.filed:%d %b %Y} on a {latest.form}")
     lead = (f"Actionable: {ticker}'s {label} for the quarter ending {latest.end:%d %b %Y} was "
-            f"{money(latest.value)} (filed {latest.filed:%d %b %Y} on a {latest.form})")
+            f"{money(latest.value)} ({how})")
     moves = []
     if prior is not None:
         moves.append(f"{change(latest.value, prior.value)} on the quarter before")
@@ -7842,11 +7903,17 @@ def _line_item_lines(ticker: str, raw_text: str) -> tuple[list[str], list[Source
             f"{f.end:%b %Y} {money(f.value)}" for f in reversed(trail))
             + (" — a fiscal fourth quarter is filed only inside the annual report, so it has no "
                "quarterly row of its own and is not listed" if gap else "") + ".")
+    if derived:
+        lines.append(f"Fiscal fourth quarters ({len(derived)}) are derived: each annual report "
+                     f"less the year's three quarterly reports, dated when the last of the four "
+                     f"was public.")
     if as_of is not None:
         withheld = sum(int(m.group(1)) for note in status
-                       if (m := re.search(r"(\d+) fact\(s\) filed after as_of withheld", note)))
-        lines.append(f"Point in time: answered as of {as_of:%d %b %Y} — only filings made by then "
-                     f"are read" + (f"; {withheld} later filing(s) of this line were withheld"
+                       if (m := re.search(r"(\d+) fact\(s\) (?:accepted|filed) after as_of "
+                                          r"withheld", note)))
+        lines.append(f"Point in time: answered as of {as_of:%d %b %Y} — only filings EDGAR had "
+                     f"accepted by then are read"
+                     + (f"; {withheld} later filing(s) of this line were withheld"
                                     if withheld else "") + ".")
     repeats = sum(int(m.group(1)) for note in status
                   if (m := re.search(r"(\d+) restated value", note)))
@@ -7859,6 +7926,31 @@ def _line_item_lines(ticker: str, raw_text: str) -> tuple[list[str], list[Source
                      f"annual rows filed under the same period labels were excluded.")
     return lines, [Source(kind="venue", ref="SEC EDGAR XBRL companyconcept",
                           detail=f"{ticker} {concept}, {latest.tag}")]
+
+
+def _derived_q4(source: Any, ticker: str, concept: str, as_of: datetime,
+                have: set[date]) -> list[Any]:
+    """Fiscal fourth quarters as annual less the three quarters, point in time.
+
+    A company files its fourth quarter only inside the 10-K, so the quarterly rows skip it and
+    "net income as of 1 March 2026" answered with the October quarter although the year's 10-K
+    was public (readiness backlog L38). `market/pit.py` derives the quarter from the four filings
+    and dates it by the latest of them; only additive lines qualify, since per-share figures do
+    not sum across quarters."""
+    from argus.market.fundamentals import Fact
+    from argus.market.pit import ADDITIVE_CONCEPTS, PitFundamentals
+
+    if concept not in ADDITIVE_CONCEPTS:
+        return []
+    try:
+        rows, _ = PitFundamentals(fetch_json=source._get).facts(
+            ticker, concept=concept, as_of=as_of, derive_q4=True)
+    except Exception:
+        return []
+    return [Fact(concept=concept, tag=r.tag, value=r.value, unit=r.unit, start=r.start,
+                 end=r.end, filed=r.filed, form=r.form, fiscal_year=r.fiscal_year,
+                 fiscal_period="Q4", frame=None, accn=r.accn)
+            for r in rows if r.basis == "derived" and r.end not in have]
 
 
 def _release_lines(ticker: str) -> list[str]:
@@ -8964,7 +9056,6 @@ def _earnings_night_lines(symbol: str, weight: float | None) -> list[str]:
     on EDGAR (acceptance time) against the stock's split-adjusted daily prices (Yahoo). A release
     accepted before the 09:30 New York open moves that session; one after, the next. The perp keeps
     trading through the night, so a position held into the release carries the same gap."""
-    from datetime import date
     from zoneinfo import ZoneInfo
 
     from argus.market import equity_history
@@ -9643,6 +9734,11 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             sources.append(Source(kind="computation", ref="argus.desk.portfolio.copilot",
                                   detail="session beta, Euler risk decomposition, beta stress, "
                                          "realised worst 24h window"))
+            anchor = _crypto_anchor_line(add, data.raw, columns)
+            if anchor is not None:
+                lines.insert(min(2, len(lines)), anchor)
+                sources.append(Source(kind="computation", ref="argus.desk.portfolio.beta",
+                                      detail=f"{add} against {CRYPTO_ANCHOR}, every aligned hour"))
             if not before:
                 profile = _distribution_line(add, data.raw, columns)
                 if profile is not None:

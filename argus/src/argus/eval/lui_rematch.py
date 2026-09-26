@@ -348,6 +348,7 @@ def report(path: Path = REPORT_PATH) -> dict[str, Any]:
     suites = _suites(inputs)
     scores: dict[str, Any] = {}
     paired: dict[str, Any] = {}
+    paired_rows: dict[str, list[float]] = {}
     for name, rows in suites.items():
         n = len(rows)
         entry: dict[str, Any] = {"rows": n}
@@ -371,6 +372,7 @@ def report(path: Path = REPORT_PATH) -> dict[str, Any]:
             diffs = [float(_right(argus[t]["cascade"], e))
                      - sum(_right(arm[t], e) for arm in default) / len(default)
                      for t, e in rows]
+            paired_rows[name] = [round(d, 4) for d in diffs]
             mean, lo, hi = _bootstrap(diffs)
             verdict = ("argus_better" if lo > 0 else "rasa_better" if hi < 0 else "tie")
             paired[name] = {"argus_minus_rasa_accuracy": round(mean, 4),
@@ -395,6 +397,9 @@ def report(path: Path = REPORT_PATH) -> dict[str, Any]:
                                              "predictions_digest")} for r in rasa["runs"]]},
         "scores": scores,
         "paired_cascade_vs_rasa_default": paired,
+        # Each row's paired difference, in suite order (added 2026-09-26), so the groupwise audit
+        # can break the headline down instead of trusting the bootstrap's mean.
+        "paired_rows": paired_rows,
         "costs": {
             "argus": {"latency_ms_median": round(median(latencies), 3),
                       "latency_ms_p95": round(latencies_sorted[int(0.95 * len(latencies)) - 1], 3),

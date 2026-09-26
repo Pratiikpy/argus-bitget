@@ -66,11 +66,12 @@ SUBTHEMES: dict[str, tuple[str, str]] = {
 """The register's sub-theme codes, named as `BITGET_AI_BASE_CAMP_S2_HANDBOOK_EN.md` names them
 (Chapter IV's three sub-theme tables and each track's judging focus)."""
 
-TRACK_ORDER = ("Track 2", "Track 3", "Track 1")
+TRACK_ORDER = ("Track 3", "Track 2", "Track 1")
+"""ARGUS is entered in Track 3, so its sub-themes lead (readiness backlog L61)."""
 TRACK_NOTE = {
-    "Track 2": "Agentic Trading: the LLM decides and the agent trades. Judged half on paper "
-               "Sharpe, drawdown and win rate, half on explainability, architecture and the risk "
-               "layer.",
+    "Track 2": "Not entered with ARGUS: these are the desk's own engines — the decision-maker, "
+               "the risk layer, the explanations — measured against Track 2's sub-themes because "
+               "the workbench stands on them.",
     "Track 3": "AI Trading Desk: a research workbench for a human trader, judged on feature "
                "depth, research "
                "quality, LUI fluency and a personalised thesis.",

@@ -95,17 +95,26 @@ class TestPointInTimeComparison:
 
 
 class TestFailureCases:
-    def test_the_boundary_is_sharp(self, failures: dict) -> None:
-        assert failures["visible_on_filed_day"]
-        assert failures["withheld_the_day_before"]
+    def test_the_boundary_is_the_acceptance_second(self, failures: dict) -> None:
+        assert failures["withheld_an_hour_before_acceptance"]
+        assert failures["visible_an_hour_after_acceptance"]
         assert failures["boundary_is_sharp"]
 
-    def test_the_cutoffs_are_exactly_one_day_apart(self, failures: dict) -> None:
+    def test_midnight_of_the_filed_day_does_not_see_an_evening_filing(self, failures: dict
+                                                                        ) -> None:
         from datetime import datetime
 
-        on_day = datetime.fromisoformat(failures["cutoff_on_filed_day"])
-        before = datetime.fromisoformat(failures["cutoff_day_before"])
-        assert (on_day - before).days == 1
+        accepted = datetime.fromisoformat(failures["accepted_at"])
+        midnight = datetime.fromisoformat(failures["cutoff_midnight_of_filed_day"])
+        assert accepted > midnight
+        assert failures["withheld_at_midnight_of_filed_day"]
+
+    def test_the_cutoffs_are_two_hours_apart(self, failures: dict) -> None:
+        from datetime import datetime
+
+        after = datetime.fromisoformat(failures["cutoff_hour_after_acceptance"])
+        before = datetime.fromisoformat(failures["cutoff_hour_before_acceptance"])
+        assert (after - before).total_seconds() == 7200
 
 
 class TestCosts:

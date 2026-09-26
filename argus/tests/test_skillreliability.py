@@ -41,7 +41,9 @@ class _Client:
     def call(self, tool: str, args: dict, *, timeout: int = 45) -> tuple[object, str]:
         status = self._statuses[min(self.calls, len(self._statuses) - 1)]
         self.calls += 1
-        return {}, status
+        # A real payload with an "ok" status, and nothing with any other: the classifier reads
+        # both, and an "ok" around an empty payload is not an answer.
+        return ({"rsi": 48.2} if status.endswith(": ok") else {}), status
 
 
 class TestTheThreeVerdictsAreDistinguishable:
@@ -109,15 +111,22 @@ class TestTheLiveMeasurement:
         assert report["attempts_per_tool"] >= 2
         assert all(r["attempts"] == report["attempts_per_tool"] for r in report["results"])
 
-    def test_more_tools_are_reliable_than_a_single_sweep_reported(self, report: dict) -> None:
-        """A single sweep said 6 answering. Repeating found 9 that answer every time — so the
-        snapshot understated the service, and quoting it would have been wrong in our own
-        disfavour."""
-        reliable = report["by_verdict"].get("reliable", 0)
-        assert reliable >= 7
+    def test_repeating_agrees_with_a_single_sweep_once_empty_envelopes_are_not_answers(
+        self, report: dict
+    ) -> None:
+        """This test used to pin "repeating found 9 reliable against the sweep's 6". Three of the
+        nine returned only an upstream error envelope under an "ok" status, which the health
+        classifier counts as empty and this module, reading the status alone, counted as an
+        answer (fixed 2026-09-26). Classified the same way, the repeated calls agree with the
+        single sweep: the same tools answer every time, and no tool answers only sometimes."""
+        reliable = {(r["tool"], r["action"]) for r in report["results"]
+                    if r["verdict"] == "reliable"}
+        assert reliable
+        assert all(tool == "technical_analysis" for tool, _ in reliable)
+        assert report["by_verdict"].get("intermittent", 0) == 0
 
-    def test_at_least_three_skills_have_a_reliable_tool(self, report: dict) -> None:
-        assert report["skills_with_a_reliable_tool"] >= 3
+    def test_it_says_how_many_skills_have_a_reliable_tool(self, report: dict) -> None:
+        assert 1 <= report["skills_with_a_reliable_tool"] <= report["skills_total"]
 
     def test_the_scope_statement_refuses_to_blame_the_vendor(self, report: dict) -> None:
         """The failures carry Bitget's own error envelopes, including an explicit ConnectTimeout
@@ -125,3 +134,17 @@ class TestTheLiveMeasurement:
         scope = report["scope_statement"]
         assert "NOT CLAIMED" in scope
         assert "the door was shut when we knocked" in scope
+
+
+def test_an_ok_status_around_an_error_envelope_is_not_an_answer() -> None:
+    from argus.market.skills import Probe
+
+    class Envelope:
+        def call(self, tool: str, args: dict, *, timeout: int = 45) -> tuple[object, str]:
+            return {"error": "", "url": "https://upstream"}, "bitget:defi_analytics: ok"
+
+    probes = (Probe(skill="s", tool="t", action="a", args={}, yields="y"),)
+    rows = measure(Envelope(), attempts=2, probes=probes)
+    assert rows[0].answered == 0
+    assert "error envelope" in rows[0].failures[0]
+

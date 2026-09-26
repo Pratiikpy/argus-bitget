@@ -2839,7 +2839,7 @@ REGISTER: tuple[Capability, ...] = (
             "argus/research/factor_divergence.py,argus/eval/factor_divergence_comparison.py,"
             "argus/eval/baselines/alphalens_ic.py,argus/eval/baselines/alphalens_ic_loader.py"
         ),
-        state=State.OWNED,
+        state=State.IMPLEMENTED,
         baseline=(
             "Alphalens-reloaded's real Spearman-rank Information Coefficient "
             "(factor_information_coefficient) and its own real, naive default significance test "
@@ -2941,16 +2941,12 @@ REGISTER: tuple[Capability, ...] = (
             Proof(
                 condition="ablation",
                 how=(
-                    "the decisive real finding in this capability: stripping Alpha 23's own real "
-                    "conditional gate (mean(high,20) < high) and re-running the identical real "
-                    "market-vs-index comparison on the bare, unconditional delta(high,2) finds a "
-                    "real divergence whose 95% bootstrap CI EXCLUDES zero (the native INDEX "
-                    "reference's own reversal signal measurably outperforming the rToken's own "
-                    "MARKET series) -- while the real, published, GATED Alpha 23 erases this "
-                    "into statistical noise, confirmed by both the real bootstrap and Alphalens' "
-                    "own real naive test agreeing the gated difference is not significant. The "
-                    "gate is exactly what is carrying the null result, isolated by running the "
-                    "ablation rather than assumed"
+                    "the gate stripped from Alpha 23 and the identical market-vs-index comparison "
+                    "re-run on the bare delta(high,2): on the published run neither the gated "
+                    "(95% bootstrap CI [-0.0354, +0.0345]) nor the ungated ([-0.0387, +0.0304]) "
+                    "difference excludes zero. Until 2026-09-26 this proof said the ungated CI "
+                    "excluded zero, contradicting the artefact it cited; the module's scope "
+                    "statement is now written from the computed intervals"
                 ),
                 test="test_factor_divergence_comparison.py::TestAblation",
             ),
@@ -3017,6 +3013,13 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-26 from OWNED to IMPLEMENTED: the grade rested on the ablation's "
+            "ungated market-vs-index divergence excluding zero, and the published artefact's "
+            "own interval is [-0.0387, +0.0304] (excludes_zero false; the gated one [-0.0354, "
+            "+0.0345]). No divergence is established on this run, so there is no demonstrated "
+            "superiority over Alphalens: both score the identical IC, and the paired bootstrap "
+            "against the naive per-side test is a method difference, not a measured win. "
+            "OWNED needs a divergence that survives the paired test, re-run and grouped by symbol.",
             "Alpha 23 is one real, published factor among WorldQuant's full 101 -- the real "
             "divergence finding is specific to this formula's own unconditional component and "
             "is not claimed to generalise to every factor the sub-theme's 'traditional factors' "
@@ -3875,15 +3878,17 @@ REGISTER: tuple[Capability, ...] = (
                 condition="failure_cases_documented",
                 how=(
                     "every tool that does not answer is named, with the service's own error text "
-                    "attached: 10 of 19 are recorded down across three separated attempts, "
+                    "attached: 13 of 19 are recorded down across three separated attempts, "
                     "carrying envelopes like `Error executing tool cross_asset` and an explicit "
                     "upstream ConnectTimeout. Repointed from the single-sweep artefact on "
                     "2026-09-21: that file recorded 6 ok / 10 empty / 3 tool_error one day and 6 "
                     "ok / 13 timeout the next, from the same code against the same endpoint, so "
                     "it could not distinguish a dead tool from an unlucky call. Repeating the "
-                    "measurement showed 9 of 19 answer three for three — the snapshot was "
-                    "understating the integration — and produced a failure set that is stable "
-                    "rather than whichever error happened to occur. The feed-list comparison's "
+                    "measurement produced a failure set that is stable rather than whichever "
+                    "error happened to occur: 6 of 19 answer three for three, all of them "
+                    "technical analysis. (An earlier run read 9, counting three tools that return "
+                    "only an upstream error envelope as answers; the classifier was corrected "
+                    "2026-09-26.) The feed-list comparison's "
                     "SCOPE_STATEMENT still states what is NOT claimed: not that TradingAgents' "
                     "raise-on-core-failure design is a defect, only that ARGUS's own design "
                     "cannot be aborted by one live source the same way"
@@ -4985,11 +4990,13 @@ REGISTER: tuple[Capability, ...] = (
             ),
             Proof(
                 condition="out_of_sample_test",
-                how="walk-forward realised OOS volatility over non-overlapping held-out "
-                    "windows, real, live-fetched: ARGUS's own NCO and Riskfolio's real NCO both "
-                    "8.203bps mean realised OOS volatility, ratio 1.0000 — not a replay of the "
-                    "earlier LOST measurement, fresh data for this run",
-                artefact="data/allocation_comparison.json",
+                how="the bake-off's held-out half: each family picked its configuration on "
+                    "the selection windows, then all picks were scored on 20 held-out windows "
+                    "none of them saw (ARGUS's pick beats Riskfolio's single-linkage NCO, ties "
+                    "the rest). The earlier live walk-forward (data/allocation_comparison.json: "
+                    "ARGUS's NCO and Riskfolio's both 8.203bps, ratio 1.0000) kept only "
+                    "per-allocator means, so it is not the evidence cited here",
+                artefact="data/nco_bakeoff.json",
             ),
             Proof(
                 condition="failure_cases_documented",
@@ -5360,16 +5367,18 @@ REGISTER: tuple[Capability, ...] = (
             "Rematch run 2026-09-26 (eval/lui_rematch.py, data/lui_rematch.json; Rasa 3.6.21 "
             "trained on the same 314 rows, five seeds of its shipped default pipeline and four of "
             "the 2026-09-21 one, each run checked against its own digest and the frozen inputs). "
-            "Held out (578 rows): ARGUS 463, Rasa 462-483 (mean 477.2), a paired difference of "
-            "-2.5 points with a 95% interval of -5.1 to +0.2: a tie, leaning Rasa. Sealed (293): "
-            "233 against a mean of 235.4, a tie. Out of scope: ARGUS declines 519 of 672 MASSIVE "
-            "utterances against Rasa's 307 (+31.6 points), and ties on CLINC150 (669 against 682 "
+            "Held out (578 rows): ARGUS 464, Rasa 462-483 (mean 477.2), a paired difference of "
+            "-2.3 points with a 95% interval of -4.9 to +0.4: a tie, leaning Rasa. Sealed (293): "
+            "233 against a mean of 235.4, a tie. Out of scope: ARGUS declines 518 of 672 MASSIVE "
+            "utterances against Rasa's 307 (+31.4 points), and ties on CLINC150 (669 against 682 "
             "of 963) and on 120 hard negatives. Perturbed held-out rows: ARGUS better on "
-            "full-width (+61 points), Traditional Chinese (+17.6) and polite wrapping (+5.7); "
-            "Rasa better with the punctuation removed (-5.0) and with two typos (-3.7). ARGUS "
-            "answers in 0.33 ms (median) against 8.6 ms, from a 1.6 MB model loaded in 0.03 s "
+            "full-width (+61 points), Traditional Chinese (+17.6) and polite wrapping (+5.9); "
+            "Rasa better with the punctuation removed (-4.8) and with two typos (-3.7). ARGUS "
+            "answers in 0.42 ms (median) against 8.6 ms, from a 1.6 MB model loaded in 0.03 s "
             "against 46 MB in 11.7 s. Rasa's seed-1 repeat reproduced its predictions but read "
-            "Rasa's training cache, so a cold retrain is not shown to reproduce them.",
+            "Rasa's training cache, so a cold retrain is not shown to reproduce them. Figures "
+            "regenerated the same day after the record-routing and domain-gate changes; the "
+            "wider domain gate costs the console 2 MASSIVE and 4 CLINC declines.",
         ),
         note="**2026-09-22, two rebuilds this date.** First, the classifier head: dev-half "
              "5-fold CV (10 fold-split seeds) found `LinearSVC(C=5.0, class_weight='balanced')` "
@@ -5809,13 +5818,14 @@ REGISTER: tuple[Capability, ...] = (
             Proof(
                 condition="statistically_valid_evaluation",
                 how=(
-                    "not a single hand-picked case: a far-past cutoff (2015), a same-day cutoff, "
-                    "and a day-before cutoff all checked against the same real NVDA EPS series, "
-                    "with the far-past case showing materially fewer facts visible (26 vs 67) as "
-                    "an independent confirmation the gate is genuinely filtering, not a no-op"
+                    "619 questions (ten tickers' 10-Q/10-K filings since 2017, one hour before "
+                    "and after each acceptance), every rival paired with ARGUS question by "
+                    "question: exact McNemar p below 1e-80 against each of the six rival arms, "
+                    "no question any rival answered that ARGUS missed; ARGUS right-rate Wilson "
+                    "95% interval 0.994-1.0; groupwise by ticker and side"
                 ),
-                test="test_workbench_comparison.py::TestPointInTimeComparison::"
-                "test_the_far_past_cutoff_sees_materially_fewer_facts",
+                artefact="data/pit_rivals.json",
+                test="test_pit.py::TestTheCommittedRun",
             ),
             Proof(
                 condition="costs_included",
@@ -5829,38 +5839,46 @@ REGISTER: tuple[Capability, ...] = (
             Proof(
                 condition="out_of_sample_test",
                 how=(
-                    "run on real, live, current-day SEC XBRL data never used to design the "
-                    "comparison's mechanism — NVDA's most recent real filing as of the day this "
-                    "ran, not a fixed historical snapshot"
+                    "the gate was built on one filing (NVDA's 10-Q accepted 2026-08-26 20:36 "
+                    "UTC); held out, the nine tickers never looked at while building it: 553/553 "
+                    "right, 0 leaks, and every rival arm still loses paired (held_out in "
+                    "data/pit_rivals.json)"
                 ),
-                test="test_workbench_comparison.py::TestPointInTimeComparison",
+                artefact="data/pit_rivals.json",
+                test="test_pit.py::TestTheCommittedRun",
             ),
             Proof(
                 condition="ablation",
                 how=(
-                    "isolates the exact mechanism: the real filing's own filed-date is the "
-                    "load-bearing boundary — moving the cutoff back exactly one day (2026-08-25 "
-                    "vs 2026-08-26) is the difference between the fact being visible and being "
-                    "withheld entirely, on the same real fact"
+                    "isolates the exact mechanism: ARGUS's resolver re-run with each rival's gate "
+                    "and supersede rule on the same 619 questions (mechanism_ablation in "
+                    "data/pit_rivals.json) — the filed-date gate alone leaks on 199 and hides 51 "
+                    "filings dated the next business day; keep-first alone serves the stale "
+                    "value on restated quarters. The acceptance second is the load-bearing "
+                    "boundary: NVDA's 10-Q dated 2026-08-26, accepted 20:36 UTC, is withheld at "
+                    "midnight and at 19:36 and visible at 21:36"
                 ),
                 test="test_workbench_comparison.py::TestFailureCases::"
-                "test_the_boundary_is_sharp",
+                "test_the_boundary_is_the_acceptance_second",
             ),
             Proof(
                 condition="adversarial_test",
                 how=(
-                    "the real gate's edge-case behaviour tested directly at the sharpest possible "
-                    "boundary: the exact day of filing versus the day immediately before it, on "
-                    "the same real fact, not a synthetic gap of weeks or months"
+                    "the gate tested at the sharpest boundary there is: one hour either side of "
+                    "the second EDGAR accepted a real filing, plus midnight of its filed day — "
+                    "the cutoff a filed-date gate gets wrong; and 29 restated quarters asked an "
+                    "hour after the restatement, where a keep-first rival serves the old number"
                 ),
-                test="test_workbench_comparison.py::TestFailureCases",
+                test="test_pit.py",
             ),
             Proof(
                 condition="failure_cases_documented",
                 how=(
-                    "real, measured behaviour of the real gate found by running it: visible on "
-                    "the exact filed day, withheld the day before — both directions checked, "
-                    "neither assumed"
+                    "found by running it, 2026-09-26: the gate this row first shipped compared "
+                    "filed dates, so it showed an evening 10-Q from midnight of its filed day — "
+                    "the test asserted that leak as correct. Replaced with the acceptance-second "
+                    "gate (market/pit.py); rows EDGAR's index cannot date are bounded to 22:00 "
+                    "New York on their filed day, erring late, and say so in the status"
                 ),
                 test="test_workbench_comparison.py::TestFailureCases",
             ),
@@ -5884,10 +5902,17 @@ REGISTER: tuple[Capability, ...] = (
         ),
         blockers=(
             "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: openbb-agents is an archived 2024 "
-            "repository; the current OpenBB stack (ODP, openbb-mcp-server, Agent Rita), "
-            "TraderAlice/OpenAlice, HKUDS/Vibe-Trading, ginlix-ai/LangAlpha and the S2 entry "
-            "Abd00lmalik/Lumen-Terminal have not been run on the same input "
-            "(rival review of 2026-09-24). OWNED returns only when they are.",
+            "repository. Run on the same 619 questions since (2026-09-26, eval/pit_rivals.py, "
+            "data/pit_rivals.json, each scored from its own output): OpenBB's ODP "
+            "(openbb_core, 7/493 right), HKUDS/Vibe-Trading's point-in-time series (343/619, "
+            "236 leaks) and research tool (9/619), ginlix-ai/LangAlpha (10/619) and "
+            "TraderAlice/OpenAlice (10/619); ARGUS 619/619, 0 leaks. The S2 entry "
+            "Abd00lmalik/Lumen-Terminal cannot be asked: its only fundamentals path returns a "
+            "trailing-twelve-month total with no period. Not run end to end: openbb-mcp-server "
+            "(it serves ODP's own FastAPI routes as MCP tools, openbb_mcp_server/app/app.py:348, "
+            "so its numbers are the ODP output scored above) and Agent Rita (no fetcher of its "
+            "own; it reads OpenBB Workspace widgets and needs a Workspace account). OWNED "
+            "returns only when both are run.",
             "OpenBB genuinely wins on raw data-source breadth (32 real providers, 21 keyless, "
             "vs ARGUS's 12 live-verified) — closing that gap is a separate, already-named, "
             "unimplemented improvement (BLS employment data, Fama-French factors, CFTC "

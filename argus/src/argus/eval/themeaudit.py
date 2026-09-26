@@ -542,7 +542,7 @@ def t3_personal_workbench() -> Finding:
         # OpenBB's real agent (openbb-agents, read not vendored — no LICENSE file) has no
         # representation of point-in-time correctness anywhere in its real source, grepped
         # exhaustively; ARGUS's real as_of gating is verified here at the sharpest possible real
-        # boundary — the exact filed day versus the day immediately before it.
+        # boundary — one hour either side of the second EDGAR accepted the filing.
         rival = (
             f" · measured against OpenBB's real agent and data platform: OpenBB wins on raw "
             f"source breadth ({breadth['openbb_total_providers']} real providers vs ARGUS's "
@@ -550,9 +550,9 @@ def t3_personal_workbench() -> Finding:
             f"{read['total_hits']} point-in-time reference(s) across "
             f"{len(read['terms_searched'])} terms grepped — zero representation of the property "
             f"a workbench with a clear thesis needs to backtest without look-ahead; ARGUS's real "
-            f"as_of gate is verified sharp on the same real fact: visible on the exact filed day "
-            f"({failures['visible_on_filed_day']}), withheld the day before "
-            f"({failures['withheld_the_day_before']})"
+            f"as_of gate is verified sharp on the same real filing: withheld an hour before "
+            f"EDGAR accepted it ({failures.get('withheld_an_hour_before_acceptance')}), visible "
+            f"an hour after ({failures.get('visible_an_hour_after_acceptance')})"
         )
     return Finding(
         RUNS,

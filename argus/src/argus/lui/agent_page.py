@@ -50,7 +50,7 @@ def fetch_json(name: str) -> Mapping[str, Any] | None:
     return value
 
 
-def _num(value: Any, fmt: str, missing: str = "undefined") -> str:
+def _num(value: Any, fmt: str, missing: str = "n/a") -> str:
     if value is None:
         return missing
     try:
@@ -60,11 +60,16 @@ def _num(value: Any, fmt: str, missing: str = "undefined") -> str:
 
 
 def _metrics(metrics: Mapping[str, Any], envelope: Mapping[str, Any]) -> str:
+    # A ratio over closed trades has no value before the first one closes; the page printed
+    # "undefined", which reads as a bug rather than as the fact (readiness backlog L43).
+    closed = metrics.get("n_closed_trades", 0)
+    per_trade = f"n/a — {closed} closed trades" if not closed else "n/a"
     rows = (
-        ("Sharpe (annualised)", _num(metrics.get("sharpe_ann"), ".2f"), envelope.get("sharpe_ann")),
+        ("Sharpe (annualised)", _num(metrics.get("sharpe_ann"), ".2f", per_trade),
+         envelope.get("sharpe_ann")),
         ("Max drawdown", _num(metrics.get("max_drawdown"), ".2%"),
          envelope.get("max_drawdown_pct")),
-        ("Win rate", _num(metrics.get("win_rate"), ".0%"), envelope.get("win_rate")),
+        ("Win rate", _num(metrics.get("win_rate"), ".0%", per_trade), envelope.get("win_rate")),
         ("Closed trades", str(metrics.get("n_closed_trades", 0)), envelope.get("closed_trades")),
         ("Return", _num(metrics.get("total_return"), "+.2%"),
          envelope.get("return_on_equity_bps")),

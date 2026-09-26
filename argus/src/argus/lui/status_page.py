@@ -189,14 +189,27 @@ def sweep_lines(data: Path) -> list[tuple[str, str]]:
                     f"{verdicts.get('reliable', 0)} tools answered all "
                     f"{reliability.get('attempts_per_tool')} attempts; "
                     f"{reliability.get('skills_with_a_reliable_tool')} of "
-                    f"{reliability.get('skills_total')} Skills have a reliable tool"))
+                    f"{reliability.get('skills_total')} Skills have a reliable tool — "
+                    + (f"swept {str(reliability['checked_at'])[:10]}"
+                       if reliability.get("checked_at") else "sweep date not recorded")))
     coverage = _load(data, "data_coverage.json")
     if coverage:
+        from argus.market.bitget_mcp import ANSWER_ENTRIES
+
+        healthy = {str(p.get("entry_id")) for p in coverage.get("probes") or []
+                   if p.get("health") == "ok"}
+        out.append(("bitget-mcp-server, used by answers",
+                    f"{len(ANSWER_ENTRIES)} of {coverage.get('entries_probed')} catalog entries "
+                    f"are read by the console's answers; "
+                    f"{sum(1 for e in ANSWER_ENTRIES if e in healthy)} of those answered in the "
+                    f"sweep below"))
         rate = coverage.get("answering_rate")
         out.append(("bitget-mcp-server, every entry",
                     f"{coverage.get('answering')} of {coverage.get('entries_probed')} catalog "
                     f"entries answered"
-                    + (f" ({float(rate):.0%})" if isinstance(rate, (int, float)) else "")))
+                    + (f" ({float(rate):.0%})" if isinstance(rate, (int, float)) else "")
+                    + (f" — swept {str(coverage['checked_at'])[:10]}"
+                       if coverage.get("checked_at") else " — sweep date not recorded")))
     macd = _load(data, "skill_macd_check.json")
     if macd:
         checked = int(macd.get("swapped") or 0) + int(macd.get("straight") or 0)

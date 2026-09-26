@@ -13,39 +13,39 @@
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "9,143"
+        "9,175"
       ],
       "live": [
-        9143
+        9175
       ],
       "status": "OK",
-      "excerpt": "9,143 tests collected"
+      "excerpt": "9,175 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 161,
       "quoted": [
-        "9,143"
+        "9,175"
       ],
       "live": [
-        9143
+        9175
       ],
       "status": "OK",
-      "excerpt": "9,143 tests collected"
+      "excerpt": "9,175 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 183,
       "quoted": [
-        "9,143"
+        "9,175"
       ],
       "live": [
-        9143
+        9175
       ],
       "status": "OK",
-      "excerpt": "9,143 tests collected"
+      "excerpt": "9,175 tests collected"
     },
     {
       "claim": "tests_passing",
@@ -53,7 +53,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        9143
+        9175
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -63,65 +63,65 @@
       "doc": "explained",
       "line": 661,
       "quoted": [
-        "9,143"
+        "9,175"
       ],
       "live": [
-        9143
+        9175
       ],
       "status": "OK",
-      "excerpt": "9,143 tests"
+      "excerpt": "9,175 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1710,
       "quoted": [
-        "9,143"
+        "9,175"
       ],
       "live": [
-        9143
+        9175
       ],
       "status": "OK",
-      "excerpt": "9,143 tests collected"
+      "excerpt": "9,175 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1959,
       "quoted": [
-        "9,143"
+        "9,175"
       ],
       "live": [
-        9143
+        9175
       ],
       "status": "OK",
-      "excerpt": "9,143 tests collected"
+      "excerpt": "9,175 tests collected"
     },
     {
       "claim": "source_files",
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "473"
+        "475"
       ],
       "live": [
-        473
+        475
       ],
       "status": "OK",
-      "excerpt": "strict clean on 473 source files"
+      "excerpt": "strict clean on 475 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 184,
       "quoted": [
-        "473"
+        "475"
       ],
       "live": [
-        473
+        475
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 473 source files"
+      "excerpt": "strict` clean on 475 source files"
     },
     {
       "claim": "source_files",
@@ -129,7 +129,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        473
+        475
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -139,13 +139,13 @@
       "doc": "explained",
       "line": 1956,
       "quoted": [
-        "473"
+        "475"
       ],
       "live": [
-        473
+        475
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 473 source files"
+      "excerpt": "strict` clean on 475 source files"
     },
     {
       "claim": "register_claims",
@@ -308,45 +308,45 @@
       "doc": "readme",
       "line": 283,
       "quoted": [
-        "7",
+        "6",
         "43"
       ],
       "live": [
-        7,
+        6,
         43
       ],
       "status": "OK",
-      "excerpt": "7 of 43 capabilities are OWNED"
+      "excerpt": "6 of 43 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
       "doc": "readme",
       "line": 454,
       "quoted": [
-        "7",
+        "6",
         "43"
       ],
       "live": [
-        7,
+        6,
         43
       ],
       "status": "OK",
-      "excerpt": "7 of 43 capabilities are OWNED"
+      "excerpt": "6 of 43 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
       "doc": "public-readme",
       "line": 86,
       "quoted": [
-        "7",
+        "6",
         "43"
       ],
       "live": [
-        7,
+        6,
         43
       ],
       "status": "OK",
-      "excerpt": "7 of 43 capabilities are OWNED"
+      "excerpt": "6 of 43 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -354,7 +354,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        7,
+        6,
         43
       ],
       "status": "ABSENT",
@@ -366,7 +366,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        7,
+        6,
         43
       ],
       "status": "ABSENT",
@@ -377,15 +377,15 @@
       "doc": "architecture",
       "line": 400,
       "quoted": [
-        "7",
+        "6",
         "43"
       ],
       "live": [
-        7,
+        6,
         43
       ],
       "status": "OK",
-      "excerpt": "7 of 43 capabilities are OWNED"
+      "excerpt": "6 of 43 capabilities are OWNED"
     },
     {
       "claim": "standing_tied",
@@ -466,26 +466,26 @@
       "doc": "readme",
       "line": 454,
       "quoted": [
-        "24"
+        "25"
       ],
       "live": [
-        24
+        25
       ],
       "status": "OK",
-      "excerpt": "24 are IMPLEMENTED"
+      "excerpt": "25 are IMPLEMENTED"
     },
     {
       "claim": "standing_implemented",
       "doc": "public-readme",
       "line": 86,
       "quoted": [
-        "24"
+        "25"
       ],
       "live": [
-        24
+        25
       ],
       "status": "OK",
-      "excerpt": "24 are IMPLEMENTED"
+      "excerpt": "25 are IMPLEMENTED"
     },
     {
       "claim": "standing_implemented",
@@ -493,7 +493,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        24
+        25
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -503,26 +503,26 @@
       "doc": "explained",
       "line": 1989,
       "quoted": [
-        "24"
+        "25"
       ],
       "live": [
-        24
+        25
       ],
       "status": "OK",
-      "excerpt": "24 are IMPLEMENTED"
+      "excerpt": "25 are IMPLEMENTED"
     },
     {
       "claim": "standing_implemented",
       "doc": "explained",
       "line": 2246,
       "quoted": [
-        "24"
+        "25"
       ],
       "live": [
-        24
+        25
       ],
       "status": "OK",
-      "excerpt": "24 are IMPLEMENTED"
+      "excerpt": "25 are IMPLEMENTED"
     },
     {
       "claim": "standing_implemented",
@@ -530,7 +530,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        24
+        25
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -586,7 +586,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        9,
+        6,
         19
       ],
       "status": "ABSENT",

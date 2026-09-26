@@ -581,6 +581,9 @@ def run_oos_variance(
             "sign_test_p": (
                 None if label == "argus_hrp" else _two_sided_binomial_p(beats, beats + losses)
             ),
+            # Per held-out window, in origin order (added 2026-09-26): the unit the sign test is
+            # over, kept so the groupwise audit can break a result down by window.
+            "oos_vol_bps_per_window": [v * 10_000 for v in values],
         }
 
     # Holm-Bonferroni across every comparison against ARGUS. Ten baselines are tested on the same

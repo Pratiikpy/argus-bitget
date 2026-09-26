@@ -652,7 +652,10 @@ STILL_IN_IT = (
     r"\bare\s+we\s+still\s+in\s+(?:the|that|our)\s+(?:\w+\s+)?(?:trade|position)\b|"
     # "why are we flat" asks why the desk stood aside; the stand-aside patterns answer it
     r"(?<!why )(?<!y )\bare\s+we\s+(?:currently\s+|still\s+|now\s+)?(?:long|short|flat)\b|"
-    r"\b(?:the|our)\s+book\s+look\w*\b|\bwhat'?s\s+on\s+(?:the|our)\s+book\b|"
+    # "what's the book look like" asks what is held; "how's the book looking" asks how it is
+    # doing, and the sealed LUI set labels it performance (regression caught 2026-09-26)
+    r"\bwhat(?:'?s|\s+does)\s+(?:the|our)\s+(?:\w+\s+)?book\s+look\w*\b|"
+    r"\bwhat'?s\s+on\s+(?:the|our)\s+book\b|"
     r"\b(?:our|the\s+desk'?s)\s+(?:current\s+)?exposure\b")
 RECORD_IDIOMS: tuple[tuple[str, Intent], ...] = (
     (STAND_ASIDE_IDIOMS, Intent.ABSTENTION_WHY),
@@ -1047,6 +1050,12 @@ _SEQ = re.compile(
     r"\b(?:seq|sequence|decisions?|decided\s+on|deciding\s+on|entry|row|#)\s*#?\s*(-?\d{1,6})\b",
     re.I,
 )
+_SEQ_ZH = re.compile(
+    r"(?:决策|序号|条目|记录)\s*[#＃]?\s*(\d{1,6})(?!\d)"
+    r"|第\s*(\d{1,6})\s*(?:号|条|个|笔)?\s*(?:决策|记录|条目)"
+)
+"""The same names in Chinese: "决策25", "序号 25", "第25号决策". Without it a Chinese question
+naming a decision was answered with the latest one (2026-09-26)."""
 r"""How a decision is named. The verb forms matter: LUI-BENCH asked "what did it read before
 deciding on 12", which names row 12 as plainly as "decision 12" does — and the noun-only pattern
 missed it, so the question reached EVIDENCE and was then downgraded to AMBIGUOUS by the
@@ -1165,8 +1174,9 @@ def classify(
             matched=_ORDER_VERB.pattern,
         )
 
-    seq_match = _SEQ.search(raw)
-    seq = int(seq_match.group(1)) if seq_match else None
+    seq_match = _SEQ.search(raw) or _SEQ_ZH.search(raw)
+    seq = (int(next(g for g in seq_match.groups() if g is not None))
+           if seq_match else None)
 
     intent = Intent.UNKNOWN
     matched = ""
@@ -1202,6 +1212,9 @@ def classify(
         and _VAGUE_REFERENCE.search(raw)
         and not symbols
         and seq is None
+        # "what made us take that shot last week" is scoped by its window: the reference binds
+        # to the decisions inside it and nothing dangles (sealed-set regression, 2026-09-26)
+        and window is None
     ):
         # A reference binds to whatever the conversation last talked about. A named decision is a
         # tighter binding than a symbol — "that" after "decision 25" means row 25, not merely the

@@ -140,7 +140,7 @@ We catalogued **all 19 tools**. We call them and sort the result into states tha
 with each other: answered, empty, the tool reported an error, timed out, or unreachable. On
 2026-09-13, 6 of 19 answered and 13 timed out at their upstream data providers.
 
-On 2026-09-21 the same sweep reported **6 answering and 13 timing out**, where the day before it had reported 6 answering, 10 *empty* and 3 *tool errors* — same code, same endpoint, two incompatible descriptions of one service. So the sweep was repeated rather than re-quoted: `eval/skillreliability.py` calls every tool three times, spaced apart, and classifies each as reliable / intermittent / down. **9 of 19 answer three times out of three, and 3 of the 5 Skills have a reliable tool** — the single snapshot was understating the integration, in our own disfavour. There is no intermittent tool: each is consistently up or consistently down, so both snapshots were describing the same ten dead tools with different error text.
+On 2026-09-21 the same sweep reported **6 answering and 13 timing out**, where the day before it had reported 6 answering, 10 *empty* and 3 *tool errors* — same code, same endpoint, two incompatible descriptions of one service. So the sweep was repeated rather than re-quoted: `eval/skillreliability.py` calls every tool three times, spaced apart, and classifies each as reliable / intermittent / down. **6 of 19 answer three times out of three, all six of them technical analysis, so 1 of the 5 Skills has a reliable tool** — the same six the single sweep found. (A first run reported 9 and 3 Skills: it counted three tools that return only an upstream error envelope as answers, and was corrected on 26 Sep 2026.) There is no intermittent tool: each is consistently up or consistently down, so both snapshots were describing the same thirteen dead tools with different error text.
 
 We could have wired in all 19 and let the dead ones return nothing. The feature list would look
 three times longer and the product would behave identically. We chose to measure and publish the
@@ -658,7 +658,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 9,143 tests
+pytest                    # 9,175 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1707,7 +1707,7 @@ takes, and every artefact the system writes.
 |---|---|
 | Source modules | **327** files across **21 packages**, 130,470 lines |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **224 files**, **9,143 tests collected** |
+| Test files / tests | **224 files**, **9,175 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **327 source files** |
 | Artefacts written | **162** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
@@ -1953,10 +1953,10 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 327 files, 21 packages, 130,470 lines; `mypy --strict` clean on 473 source files |
+| Source modules | 327 files, 21 packages, 130,470 lines; `mypy --strict` clean on 475 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 9,143 tests collected, `ruff` clean |
+| Tests | 9,175 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 66, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
@@ -1986,7 +1986,7 @@ That last row is the one to read twice. An *owned* capability needs a reproduced
 same-input comparison, an out-of-sample test, an ablation and an adversarial test — thirteen
 conditions in all, enforced in code by `argus/eval/standing.py`, which raises at import if anything
 claims OWNED without them. It read zero when this table was first written; today 7 of 43
-capabilities are OWNED, 12 are TIED, 24 are IMPLEMENTED and none is LOST. It read 20 until the
+capabilities are OWNED, 12 are TIED, 25 are IMPLEMENTED and none is LOST. It read 20 until the
 per-group check of 2026-09-25 withdrew twelve, and 8 until a general-purpose validator tied
 breadth rotation on 2026-09-26. Five ties were losses first:
 the three from before 2026-09-22, order splitting against Bitget's own TWAP, and the rToken
@@ -2243,8 +2243,8 @@ could attack today.
     graded on, so its measured accuracy cannot yet be compared against the 55% bar.
 37. **Two settled outcomes.** Calibration on the desk's own judgement cannot be computed yet; the
     49,140 figure is the policy layer, labelled as such, and the two must never be added together.
-38. **36 of 43 capabilities are not OWNED.** 12 are TIED against the named rival and 24 are
-    IMPLEMENTED, one of them a single condition short; each says what it is missing.
+38. **37 of 43 capabilities are not OWNED.** 12 are TIED against the named rival and 25 are
+    IMPLEMENTED; each says what it is missing.
 39. **Four of five official Bitget Skills carry no data.** Measured to be their backend rather than
     our integration — but a judge sees a thin panel either way.
 40. **No live fills.** Execution realism is argued from the venue's published rules, not measured

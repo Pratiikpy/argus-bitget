@@ -28,6 +28,7 @@ answerer's declaration. Outside a recording the decorator only reads one context
 
 from __future__ import annotations
 
+import json
 import os
 import re
 from dataclasses import dataclass, field, replace
@@ -350,7 +351,14 @@ def answer_decision_why(ledger: PaperLedger, question: Question) -> Answer:
     ]
     if entry.invalidation:
         lines.append(t("why.invalidation", lang, conditions="; ".join(entry.invalidation)))
-    if entry.is_settled:
+    if entry.is_settled and entry.net_pnl is None:
+        # No position was taken, so there is no P&L and no direction to grade: "net None,
+        # direction wrong" was printed for every stand-aside (readiness backlog L43). What the
+        # record does hold is how far the price moved over the window it would have been held.
+        move = entry.counterfactual_move_bps
+        lines.append(t("why.settled_flat", lang, at=entry.settled_at,
+                       move="n/a" if move is None else f"{float(move):+.0f}"))
+    elif entry.is_settled:
         direction = t(
             "why.direction_correct" if entry.direction_correct else "why.direction_wrong", lang
         )
@@ -654,6 +662,7 @@ def answer_evidence(ledger: PaperLedger, question: Question) -> Answer:
     lines = [
         t("ev.header", lang, seq=entry.seq, symbol=entry.symbol, at=entry.decided_at),
         t("ev.thesis", lang, thesis=entry.thesis),
+        *_evidence_lines(entry.seq, lang),
         t("ev.hash", lang, hash=entry.market_state_hash[:16]),
         t("ev.feed", lang),
     ]
@@ -680,6 +689,43 @@ def _risk_records_path() -> Path:
     from argus.paper.runner import RISK_PATH
 
     return RISK_PATH
+
+
+EVIDENCE_SHOWN = 8
+"""How many evidence lines an answer quotes before saying how many more there were."""
+
+
+def _evidence_lines(seq: int, lang: Language) -> list[str]:
+    """What the decision was actually shown, from its notes row (readiness backlog L43).
+
+    The answer used to describe the mechanism that gathers evidence and never any evidence. Rows
+    from 26 Sep 2026 carry the frame's evidence lines; older rows carry only which sources reached
+    the decision, and the oldest carry no notes row at all. Each case says which it is."""
+    try:
+        text = _notes_path().read_text(encoding="utf-8")
+    except OSError:
+        return [t("ev.unrecorded", lang)]
+    row: dict[str, Any] | None = None
+    for line in text.splitlines():
+        try:
+            candidate = json.loads(line)
+        except ValueError:
+            continue
+        if candidate.get("seq") == seq:
+            row = candidate
+    if row is None:
+        return [t("ev.unrecorded", lang)]
+    items = [str(e) for e in row.get("evidence") or []]
+    if items:
+        lines = [t("ev.items", lang, n=len(items))]
+        lines += [f"  {item[:280]}" for item in items[:EVIDENCE_SHOWN]]
+        if len(items) > EVIDENCE_SHOWN:
+            lines.append(t("ev.more", lang, n=len(items) - EVIDENCE_SHOWN))
+        return lines
+    sources = [str(s) for s in row.get("sources") or []]
+    if sources:
+        return [t("ev.sources_only", lang, sources=", ".join(sources))]
+    return [t("ev.unrecorded", lang)]
 
 
 def _notes_path() -> Path:

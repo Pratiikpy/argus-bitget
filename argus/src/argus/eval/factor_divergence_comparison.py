@@ -523,23 +523,16 @@ def run_reproducibility_check() -> dict[str, Any]:
     }
 
 
-SCOPE_STATEMENT = (
+SCOPE_HEAD = (
     "WorldQuant's real, published Alpha#101 formula #23 (delta(high,2) if mean(high,20) < high "
     "else 0), evaluated via ARGUS's own real grammar engine and scored with Alphalens' real, "
     "vendored Spearman-rank Information Coefficient, is run on the SAME real, live 90-day Bitget "
     "window for the full real rToken universe -- once on the rToken's own MARKET candles, once "
     "on Bitget's real INDEX candles (its published native-stock reference). "
-    "Claimed, and this is the decisive real finding: the real ablation (run_ablation) shows the "
-    "UNCONDITIONAL raw component underlying Alpha 23 (delta(high,2), no gate) has a real, "
-    "bootstrap-confirmed market-vs-index IC divergence whose 95% CI excludes zero -- the native "
-    "INDEX reference's own reversal signal measurably outperforms the rToken's own MARKET series "
-    "-- while Alpha 23's own real, published conditional gate (mean(high,20) < high) erases this "
-    "into statistical noise (the gated comparison's CI includes zero, confirmed by BOTH ARGUS's "
-    "own dependency-aware bootstrap AND Alphalens' own real, naive, default significance test, "
-    "which agree here). This is a genuine, run, evidenced instance of Track 1's 'rToken Factor "
-    "Strategies' claim that traditional factors behave differently under rToken's structure -- "
-    "for the raw momentum component, not for WorldQuant's own specific gated formula. A real, "
-    "secondary observation: Alphalens' own naive per-side test calls the INDEX side's IC "
+)
+
+SCOPE_TAIL = (
+    "A real, secondary observation: Alphalens' own naive per-side test calls the INDEX side's IC "
     "'significant' at 5% (p=0.036) while the MARKET side narrowly misses (p=0.061) -- a real, "
     "borderline split that would tempt a naive reading into overclaiming a divergence the "
     "properly-corrected PAIRED comparison does not support; reported to show the trap, not to "
@@ -555,21 +548,60 @@ SCOPE_STATEMENT = (
 )
 
 
+def _ci(block: dict[str, Any]) -> str:
+    d = block["ic_difference"]
+    return f"[{float(d['ci_low']):+.4f}, {float(d['ci_high']):+.4f}]"
+
+
+def scope_statement(ablation: dict[str, Any]) -> str:
+    """The claim, read from the intervals this run computed.
+
+    Until 2026-09-26 the claim was a fixed string saying the ungated divergence's CI "excludes
+    zero"; the artefact it was published with had that interval at [-0.0387, +0.0304], and the
+    register graded the row OWNED on the sentence (readiness backlog L29). The sentence now
+    follows the numbers."""
+    ungated, gated = ablation["ungated_high_delta"], ablation["gated_alpha23"]
+    u_sig = bool(ungated["ic_difference"]["excludes_zero"])
+    g_sig = bool(gated["ic_difference"]["excludes_zero"])
+    if u_sig and not g_sig:
+        finding = (
+            "Claimed: the ablation shows the unconditional component under Alpha 23 "
+            f"(delta(high,2), no gate) has a market-vs-index IC divergence whose 95% bootstrap CI "
+            f"{_ci(ungated)} excludes zero, while Alpha 23's published gate (mean(high,20) < "
+            f"high) erases it (gated CI {_ci(gated)}). ")
+    elif u_sig or g_sig:
+        which = "the ungated" if u_sig else "the gated"
+        finding = (f"Claimed: only {which} comparison's CI excludes zero (ungated {_ci(ungated)}, "
+                   f"gated {_ci(gated)}). ")
+    else:
+        finding = (
+            "NOT claimed: a market-vs-index divergence. Neither the gated Alpha 23 comparison "
+            f"(95% bootstrap CI {_ci(gated)}) nor the ungated delta(high,2) one ({_ci(ungated)}) "
+            "excludes zero on this run, so no divergence between the rToken's MARKET series and "
+            "its INDEX reference is established. What stands is the method comparison: ARGUS's "
+            "dependency-aware paired bootstrap against Alphalens' naive per-side t-test. ")
+    return SCOPE_HEAD + finding + SCOPE_TAIL
+
+
+SCOPE_STATEMENT = SCOPE_HEAD + SCOPE_TAIL
+"""The fixed parts, for importers; the published statement is :func:`scope_statement`."""
+
+
 def main() -> int:  # pragma: no cover - CLI
     import sys
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-    report = {
+    report: dict[str, Any] = {
         "base_case": run_base_case(),
         "oos_check": run_oos_check(),
         "ablation": run_ablation(),
         "failure_cases": run_failure_cases(),
         "costs": measure_costs(),
         "reproducibility": run_reproducibility_check(),
-        "scope_statement": SCOPE_STATEMENT,
     }
+    report["scope_statement"] = scope_statement(report["ablation"])
     print(render(report))
     out = Path(__file__).resolve().parents[3] / "data" / "factor_divergence_comparison.json"
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -622,4 +654,5 @@ __all__ = [
     "run_failure_cases",
     "run_oos_check",
     "run_reproducibility_check",
+    "scope_statement",
 ]

@@ -1,6 +1,6 @@
 {
   "symbol": "NVDAUSDT",
-  "checked_at": "2026-09-24T18:35:12.415071+00:00",
+  "checked_at": "2026-09-26T07:51:08.157482+00:00",
   "tools_probed": 19,
   "answered_by_bitget": 6,
   "answered_by_mirror": 13,
@@ -28,7 +28,7 @@
       "same_upstream": true,
       "detail": "bitget:technical_analysis: ok",
       "latency_ms": 0,
-      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"rsi\": 47.25, \"period\": 14, \"signal\": \"neutral\"}"
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"rsi\": 48.23, \"period\": 14, \"signal\": \"neutral\"}"
     },
     {
       "skill": "technical-analysis",
@@ -41,7 +41,7 @@
       "same_upstream": true,
       "detail": "bitget:technical_analysis: ok",
       "latency_ms": 0,
-      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"macd\": 0.204651, \"signal\": -0.745576, \"histogram\": 0.950227, \"cross\": \"golden_cross\"}"
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"macd\": 0.097462, \"signal\": -0.179342, \"histogram\": 0.276805, \"cross\": \"golden_cross\"}"
     },
     {
       "skill": "technical-analysis",
@@ -54,7 +54,7 @@
       "same_upstream": true,
       "detail": "bitget:technical_analysis: ok",
       "latency_ms": 0,
-      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"atr\": 1.7306, \"atr_pct\": 0.77, \"suggested_stop\": 221.5341, \"period\": 14}"
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"atr\": 1.5092, \"atr_pct\": 0.67, \"suggested_stop\": 222.3362, \"period\": 14}"
     },
     {
       "skill": "technical-analysis",
@@ -67,7 +67,7 @@
       "same_upstream": true,
       "detail": "bitget:technical_analysis: ok",
       "latency_ms": 0,
-      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"upper\": 221.6012, \"middle\": 226.235, \"lower\": 230.8688, \"bandwidth\": -0.041, \"pct_b\": 0.7271, \"position\": \"above_upper\"}"
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"upper\": 222.818, \"middle\": 224.6779, \"lower\": 226.5378, \"bandwidth\": -0.0166, \"pct_b\": 0.5209, \"position\": \"above_upper\"}"
     },
     {
       "skill": "technical-analysis",
@@ -80,7 +80,7 @@
       "same_upstream": true,
       "detail": "bitget:technical_analysis: ok",
       "latency_ms": 0,
-      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"supports\": [], \"resistances\": [], \"current_price\": 224.13}"
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"supports\": [], \"resistances\": [226.19], \"current_price\": 224.6}"
     },
     {
       "skill": "technical-analysis",
@@ -93,7 +93,7 @@
       "same_upstream": true,
       "detail": "bitget:technical_analysis: ok",
       "latency_ms": 0,
-      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"price\": 224.13, \"ma7\": 224.3471, \"ma25\": 225.7716, \"ma99\": 220.6785, \"trend\": \"mixed\"}"
+      "sample": "{\"symbol\": \"NVDAUSDT\", \"timeframe\": \"4h\", \"price\": 224.6, \"ma7\": 225.23, \"ma25\": 225.8576, \"ma99\": 220.5765, \"trend\": \"mixed\"}"
     },
     {
       "skill": "sentiment-analyst",
@@ -105,8 +105,8 @@
       "upstream": "alternative.me Fear & Greed",
       "same_upstream": true,
       "detail": "alternative.me Fear & Greed: ok",
-      "latency_ms": 903,
-      "sample": "{\"value\": 71, \"classification\": \"Greed\", \"as_of\": \"2026-09-24T00:00:00+00:00\", \"prior_value\": 71}"
+      "latency_ms": 1570,
+      "sample": "{\"value\": 74, \"classification\": \"Greed\", \"as_of\": \"2026-09-26T00:00:00+00:00\", \"prior_value\": 71}"
     },
     {
       "skill": "sentiment-analyst",
@@ -118,8 +118,8 @@
       "upstream": "Binance futures data",
       "same_upstream": true,
       "detail": "Binance futures data: ok",
-      "latency_ms": 357,
-      "sample": "{\"symbol\": \"BTCUSDT\", \"long_short_ratio\": 1.2701, \"long_account\": 0.5595, \"short_account\": 0.4405, \"as_of\": \"2026-09-24T16:00:00+00:00\"}"
+      "latency_ms": 395,
+      "sample": "{\"symbol\": \"BTCUSDT\", \"long_short_ratio\": 1.3036, \"long_account\": 0.5659, \"short_account\": 0.4341, \"as_of\": \"2026-09-26T04:00:00+00:00\"}"
     },
     {
       "skill": "sentiment-analyst",
@@ -131,8 +131,8 @@
       "upstream": "Binance futures data",
       "same_upstream": true,
       "detail": "Binance futures data: ok",
-      "latency_ms": 325,
-      "sample": "{\"symbol\": \"BTCUSDT\", \"open_interest\": 95653.023, \"open_interest_usd\": 8041980082.2135, \"change_one_period_pct\": -0.798, \"as_of\": \"2026-09-24T18:00:00+00:00\"}"
+      "latency_ms": 346,
+      "sample": "{\"symbol\": \"BTCUSDT\", \"open_interest\": 94933.395, \"open_interest_usd\": 7961237918.1135, \"change_one_period_pct\": -0.085, \"as_of\": \"2026-09-26T07:00:00+00:00\"}"
     },
     {
       "skill": "sentiment-analyst",
@@ -144,8 +144,8 @@
       "upstream": "Binance futures data",
       "same_upstream": true,
       "detail": "Binance futures data: ok",
-      "latency_ms": 335,
-      "sample": "{\"buy_sell_ratio\": 1.0728, \"buy_volume\": 24068.25, \"sell_volume\": 22435.635, \"as_of\": \"2026-09-24T12:00:00+00:00\"}"
+      "latency_ms": 336,
+      "sample": "{\"buy_sell_ratio\": 0.897, \"buy_volume\": 3116.723, \"sell_volume\": 3474.596, \"as_of\": \"2026-09-26T00:00:00+00:00\"}"
     },
     {
       "skill": "macro-analyst",
@@ -157,7 +157,7 @@
       "upstream": "FRED",
       "same_upstream": true,
       "detail": "FRED: ok",
-      "latency_ms": 167,
+      "latency_ms": 416,
       "sample": "{\"indicator\": \"cpi\", \"series\": \"CPIAUCSL\", \"label\": \"Consumer Price Index, all urban consumers\", \"period\": \"2026-08-01\", \"value\": 334.131, \"prior\": 332.813, \"yoy_pct\": 3.35}"
     },
     {
@@ -170,8 +170,8 @@
       "upstream": "FRED",
       "same_upstream": true,
       "detail": "FRED: ok",
-      "latency_ms": 871,
-      "sample": "{\"yield_curve\": {\"t3m\": 4.16, \"t1y\": 4.43, \"t2y\": 4.71, \"t5y\": 4.83, \"t10y\": 4.96, \"t30y\": 5.29}, \"spread_10y2y\": 0.25, \"inverted\": false, \"as_of\": \"2026-09-22\"}"
+      "latency_ms": 3606,
+      "sample": "{\"yield_curve\": {\"t3m\": 4.24, \"t1y\": 4.51, \"t2y\": 4.87, \"t5y\": 5.03, \"t10y\": 5.18, \"t30y\": 5.47}, \"spread_10y2y\": 0.31, \"inverted\": false, \"as_of\": \"2026-09-24\"}"
     },
     {
       "skill": "macro-analyst",
@@ -183,8 +183,8 @@
       "upstream": "Yahoo Finance",
       "same_upstream": true,
       "detail": "Yahoo Finance: ok",
-      "latency_ms": 3120,
-      "sample": "{\"base\": \"BTC-USD\", \"correlations\": {\"gold\": {\"symbol\": \"GC=F\", \"full_period\": 0.232, \"rolling_30d\": 0.673, \"sessions\": 252}, \"dxy\": {\"symbol\": \"DX-Y.NYB\", \"full_period\": -0.175, \"rolling_30d\": -0.454, \"sessions\": 251}, \"ndx\": {\"symbol\": \"^NDX\", \"full_period\": 0.461, \"rolling_30d\": 0.384, \"sessions\": 251}, \"spx\": {\"symbol\": \"^GSPC\", \"full_period\": 0.492, \"rolling_30d\": 0.439, \"sessions\": 251}, \"t1"
+      "latency_ms": 3006,
+      "sample": "{\"base\": \"BTC-USD\", \"correlations\": {\"gold\": {\"symbol\": \"GC=F\", \"full_period\": 0.232, \"rolling_30d\": 0.66, \"sessions\": 251}, \"dxy\": {\"symbol\": \"DX-Y.NYB\", \"full_period\": -0.163, \"rolling_30d\": -0.417, \"sessions\": 251}, \"ndx\": {\"symbol\": \"^NDX\", \"full_period\": 0.461, \"rolling_30d\": 0.417, \"sessions\": 251}, \"spx\": {\"symbol\": \"^GSPC\", \"full_period\": 0.49, \"rolling_30d\": 0.444, \"sessions\": 251}, \"t10y"
     },
     {
       "skill": "macro-analyst",
@@ -196,8 +196,8 @@
       "upstream": "Yahoo Finance",
       "same_upstream": true,
       "detail": "Yahoo Finance: ok",
-      "latency_ms": 406,
-      "sample": "{\"symbol\": \"NVDA\", \"price\": 224.1199951171875, \"as_of\": \"2026-09-24\", \"prior_close\": 225.50999450683594, \"change_pct\": -0.616}"
+      "latency_ms": 275,
+      "sample": "{\"symbol\": \"NVDA\", \"price\": 225.07000732421875, \"as_of\": \"2026-09-25\", \"prior_close\": 224.5800018310547, \"change_pct\": 0.218}"
     },
     {
       "skill": "news-briefing",
@@ -209,8 +209,8 @@
       "upstream": "RSS: CoinDesk, Cointelegraph, CNBC, Decrypt",
       "same_upstream": true,
       "detail": "RSS: CoinDesk, Cointelegraph, CNBC, Decrypt: ok",
-      "latency_ms": 1597,
-      "sample": "{\"items\": [{\"feed\": \"coindesk\", \"title\": \"Crypto casino Duelbits goes offline after $7 million hot wallet hack\", \"link\": \"https://www.coindesk.com/business/2026/09/24/crypto-casino-duelbits-goes-offline-after-usd7m-hot-wallet-hack\", \"published\": \"Thu, 24 Sep 2026 15:48:20 +0000\"}, {\"feed\": \"coindesk\", \"title\": \"Bitcoin\\u2019s bear markets are getting milder. Bull markets may be next\", \"link\": \"htt"
+      "latency_ms": 1561,
+      "sample": "{\"items\": [{\"feed\": \"coindesk\", \"title\": \"Solana\\u2019s 150-millisecond settlement upgrade reaches second public test network\", \"link\": \"https://www.coindesk.com/tech/2026/09/26/solana-s-150-millisecond-settlement-upgrade-reaches-second-public-test-network\", \"published\": \"Sat, 26 Sep 2026 05:00:00 +0000\"}, {\"feed\": \"coindesk\", \"title\": \"XRP Ledger\\u2019s Batch upgrade slips to Oct. 9 after validat"
     },
     {
       "skill": "news-briefing",
@@ -222,8 +222,8 @@
       "upstream": "Nasdaq earnings calendar (Skill uses Finnhub, keyed)",
       "same_upstream": false,
       "detail": "Nasdaq earnings calendar (Skill uses Finnhub, keyed): ok",
-      "latency_ms": 777,
-      "sample": "{\"window_days\": 5, \"reports\": [{\"date\": \"2026-09-24\", \"symbol\": \"COST\", \"name\": \"Costco Wholesale Corporation\", \"time\": \"time-after-hours\", \"eps_forecast\": \"$6.48\"}, {\"date\": \"2026-09-24\", \"symbol\": \"VFS\", \"name\": \"VinFast Auto Ltd.\", \"time\": \"time-not-supplied\", \"eps_forecast\": \"\"}, {\"date\": \"2026-09-24\", \"symbol\": \"HUBG\", \"name\": \"Hub Group, Inc.\", \"time\": \"time-not-supplied\", \"eps_forecast\": \"$"
+      "latency_ms": 2171,
+      "sample": "{\"window_days\": 5, \"reports\": [{\"date\": \"2026-09-28\", \"symbol\": \"JEF\", \"name\": \"Jefferies Financial Group Inc.\", \"time\": \"time-after-hours\", \"eps_forecast\": \"$1.04\"}, {\"date\": \"2026-09-28\", \"symbol\": \"GRFS\", \"name\": \"Grifols, S.A.\", \"time\": \"time-not-supplied\", \"eps_forecast\": \"$0.27\"}, {\"date\": \"2026-09-28\", \"symbol\": \"MTN\", \"name\": \"Vail Resorts, Inc.\", \"time\": \"time-after-hours\", \"eps_forecast\""
     },
     {
       "skill": "market-intel",
@@ -235,8 +235,8 @@
       "upstream": "DeFiLlama",
       "same_upstream": true,
       "detail": "DeFiLlama: ok",
-      "latency_ms": 3482,
-      "sample": "{\"protocols\": [{\"name\": \"Lido\", \"category\": \"Liquid Staking\", \"tvl_usd\": 26363880015, \"change_1d_pct\": 1.058324027480495}, {\"name\": \"Aave V3\", \"category\": \"Lending\", \"tvl_usd\": 18308897625, \"change_1d_pct\": 0.3904989020209655}, {\"name\": \"SSV Network\", \"category\": \"Staking Pool\", \"tvl_usd\": 14126804914, \"change_1d_pct\": 1.2663578396677053}, {\"name\": \"Morpho Blue\", \"category\": \"Lending\", \"tvl_usd\": "
+      "latency_ms": 3630,
+      "sample": "{\"protocols\": [{\"name\": \"Lido\", \"category\": \"Liquid Staking\", \"tvl_usd\": 26389877491, \"change_1d_pct\": 0.47058002748015326}, {\"name\": \"Aave V3\", \"category\": \"Lending\", \"tvl_usd\": 18138550227, \"change_1d_pct\": -0.514536331172792}, {\"name\": \"SSV Network\", \"category\": \"Staking Pool\", \"tvl_usd\": 14087188935, \"change_1d_pct\": 0.25365046895453247}, {\"name\": \"Morpho Blue\", \"category\": \"Lending\", \"tvl_usd"
     },
     {
       "skill": "market-intel",
@@ -248,8 +248,8 @@
       "upstream": "public Ethereum RPC (eth_feeHistory)",
       "same_upstream": false,
       "detail": "public Ethereum RPC (eth_feeHistory): ok",
-      "latency_ms": 411,
-      "sample": "{\"base_fee_gwei\": 1.383, \"priority_fee_gwei\": {\"low\": 0.0, \"median\": 0.5, \"high\": 1.648}, \"gas_used_ratio\": [0.473, 0.911, 0.569, 0.487, 0.443]}"
+      "latency_ms": 456,
+      "sample": "{\"base_fee_gwei\": 0.053, \"priority_fee_gwei\": {\"low\": 0.0, \"median\": 0.063, \"high\": 1.08}, \"gas_used_ratio\": [0.504, 0.481, 0.432, 0.365, 0.274]}"
     },
     {
       "skill": "market-intel",
@@ -261,8 +261,8 @@
       "upstream": "CoinGecko",
       "same_upstream": true,
       "detail": "CoinGecko: ok",
-      "latency_ms": 269,
-      "sample": "{\"trending\": [{\"id\": \"astronaut-2\", \"symbol\": \"ASTRO\", \"name\": \"astronaut\", \"market_cap_rank\": 491}, {\"id\": \"ondo-finance\", \"symbol\": \"ONDO\", \"name\": \"Ondo\", \"market_cap_rank\": 42}, {\"id\": \"near\", \"symbol\": \"NEAR\", \"name\": \"NEAR Protocol\", \"market_cap_rank\": 22}, {\"id\": \"pudgy-penguins\", \"symbol\": \"PENGU\", \"name\": \"Pudgy Penguins\", \"market_cap_rank\": 98}, {\"id\": \"edel\", \"symbol\": \"EDEL\", \"name\": \""
+      "latency_ms": 262,
+      "sample": "{\"trending\": [{\"id\": \"pudgy-penguins\", \"symbol\": \"PENGU\", \"name\": \"Pudgy Penguins\", \"market_cap_rank\": 99}, {\"id\": \"pha\", \"symbol\": \"PHA\", \"name\": \"PHALA\", \"market_cap_rank\": 409}, {\"id\": \"ethena\", \"symbol\": \"ENA\", \"name\": \"Ethena\", \"market_cap_rank\": 39}, {\"id\": \"ondo-finance\", \"symbol\": \"ONDO\", \"name\": \"Ondo\", \"market_cap_rank\": 40}, {\"id\": \"near\", \"symbol\": \"NEAR\", \"name\": \"NEAR Protocol\", \"mar"
     }
   ]
 }

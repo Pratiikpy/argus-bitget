@@ -137,42 +137,38 @@ class SealedComparison:
         }
 
 
-def run_sealed_comparison() -> SealedComparison:
-    """ARGUS scored live through the real console function; Rasa read from the vendored,
-    byte-identical reference — see the module docstring for why the two sides are treated
-    differently."""
+def sealed_rows() -> list[dict[str, Any]]:
+    """Every sealed question with both systems' outcome: ARGUS scored live through the real
+    console function, Rasa read from the vendored, byte-identical reference (see the module
+    docstring for why the two sides are treated differently)."""
     from argus.eval.ngrambench import _rows
     from argus.lui.ngram import classify_with_fallback
 
-    rows = _rows("sealed")
     rasa = _load_rasa_reference()
     rasa_by_ask = {p["ask"]: p for p in rasa["sealed_predictions"]}
-
-    argus_correct = argus_answered = 0
-    rasa_correct = rasa_answered = 0
-    argus_only = rasa_only = 0
-    for row in rows:
+    out = []
+    for row in _rows("sealed"):
         ask, expect = row["ask"], row["expect"]
         reached, source = classify_with_fallback(ask, now=AT)
-        a_ok = source != "declined" and str(reached) == expect
-        if source != "declined":
-            argus_answered += 1
-            if a_ok:
-                argus_correct += 1
-
         rp = rasa_by_ask.get(ask)
         if rp is None:
             raise LuiComparisonError(f"vendored Rasa reference is missing a sealed row: {ask!r}")
-        r_ok = rp["got"] == expect
-        if rp["got"] is not None:
-            rasa_answered += 1
-            if r_ok:
-                rasa_correct += 1
+        out.append({"ask": ask, "expect": expect, "lang": row.get("lang", ""),
+                    "argus_answered": source != "declined",
+                    "argus_ok": source != "declined" and str(reached) == expect,
+                    "rasa_answered": rp["got"] is not None, "rasa_ok": rp["got"] == expect})
+    return out
 
-        if a_ok and not r_ok:
-            argus_only += 1
-        elif r_ok and not a_ok:
-            rasa_only += 1
+
+def run_sealed_comparison() -> SealedComparison:
+    """The sealed split, both systems, reduced to accuracy and McNemar's discordant pairs."""
+    rows = sealed_rows()
+    argus_correct = sum(r["argus_ok"] for r in rows)
+    argus_answered = sum(r["argus_answered"] for r in rows)
+    rasa_correct = sum(r["rasa_ok"] for r in rows)
+    rasa_answered = sum(r["rasa_answered"] for r in rows)
+    argus_only = sum(r["argus_ok"] and not r["rasa_ok"] for r in rows)
+    rasa_only = sum(r["rasa_ok"] and not r["argus_ok"] for r in rows)
 
     return SealedComparison(
         argus_correct=argus_correct, argus_answered=argus_answered, argus_total=len(rows),

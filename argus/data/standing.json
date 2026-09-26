@@ -1432,7 +1432,7 @@
       "name": "rToken factor divergence vs. Alphalens' real Information Coefficient",
       "subtheme": "t1-rtokenfactor",
       "module": "argus/research/factor_divergence.py,argus/eval/factor_divergence_comparison.py,argus/eval/baselines/alphalens_ic.py,argus/eval/baselines/alphalens_ic_loader.py",
-      "state": "owned",
+      "state": "implemented",
       "baseline": "Alphalens-reloaded's real Spearman-rank Information Coefficient (factor_information_coefficient) and its own real, naive default significance test (plot_information_table, scipy.stats.ttest_1samp)",
       "conditions_met": [
         "best_implementation_studied",
@@ -1501,7 +1501,7 @@
         },
         {
           "condition": "ablation",
-          "how": "the decisive real finding in this capability: stripping Alpha 23's own real conditional gate (mean(high,20) < high) and re-running the identical real market-vs-index comparison on the bare, unconditional delta(high,2) finds a real divergence whose 95% bootstrap CI EXCLUDES zero (the native INDEX reference's own reversal signal measurably outperforming the rToken's own MARKET series) -- while the real, published, GATED Alpha 23 erases this into statistical noise, confirmed by both the real bootstrap and Alphalens' own real naive test agreeing the gated difference is not significant. The gate is exactly what is carrying the null result, isolated by running the ablation rather than assumed",
+          "how": "the gate stripped from Alpha 23 and the identical market-vs-index comparison re-run on the bare delta(high,2): on the published run neither the gated (95% bootstrap CI [-0.0354, +0.0345]) nor the ungated ([-0.0387, +0.0304]) difference excludes zero. Until 2026-09-26 this proof said the ungated CI excluded zero, contradicting the artefact it cited; the module's scope statement is now written from the computed intervals",
           "artefact": "",
           "test": "test_factor_divergence_comparison.py::TestAblation"
         },
@@ -1531,6 +1531,7 @@
         }
       ],
       "blockers": [
+        "RE-GRADED 2026-09-26 from OWNED to IMPLEMENTED: the grade rested on the ablation's ungated market-vs-index divergence excluding zero, and the published artefact's own interval is [-0.0387, +0.0304] (excludes_zero false; the gated one [-0.0354, +0.0345]). No divergence is established on this run, so there is no demonstrated superiority over Alphalens: both score the identical IC, and the paired bootstrap against the naive per-side test is a method difference, not a measured win. OWNED needs a divergence that survives the paired test, re-run and grouped by symbol.",
         "Alpha 23 is one real, published factor among WorldQuant's full 101 -- the real divergence finding is specific to this formula's own unconditional component and is not claimed to generalise to every factor the sub-theme's 'traditional factors' language could cover. The real OOS check's two 30-day halves fall just under the real bootstrap's own 30-observation minimum, so out-of-sample agreement rests on real point estimates without their own confidence intervals this run"
       ],
       "note": "",
@@ -2696,8 +2697,8 @@
         },
         {
           "condition": "out_of_sample_test",
-          "how": "walk-forward realised OOS volatility over non-overlapping held-out windows, real, live-fetched: ARGUS's own NCO and Riskfolio's real NCO both 8.203bps mean realised OOS volatility, ratio 1.0000 \u2014 not a replay of the earlier LOST measurement, fresh data for this run",
-          "artefact": "data/allocation_comparison.json",
+          "how": "the bake-off's held-out half: each family picked its configuration on the selection windows, then all picks were scored on 20 held-out windows none of them saw (ARGUS's pick beats Riskfolio's single-linkage NCO, ties the rest). The earlier live walk-forward (data/allocation_comparison.json: ARGUS's NCO and Riskfolio's both 8.203bps, ratio 1.0000) kept only per-allocator means, so it is not the evidence cited here",
+          "artefact": "data/nco_bakeoff.json",
           "test": ""
         },
         {
@@ -2861,7 +2862,7 @@
         "adversarial_test and out_of_sample_test are not proven: single seed, one training run per Rasa config, no variance estimate for either system. The 14-probe out-of-scope set is too small to carry the safety claim alone \u2014 Wilson CIs are wide ([0.69, 0.99] vs [0.21, 0.67]) even where the paired test is significant; a held-out set of 200-500 probes is the obvious next build and was not done here. Separately: LinearSVC's liblinear solver is not deterministic without a fixed random_state on this small, wide problem (314 rows after rebalancing, ~13k features) \u2014 checked directly, 5 unseeded fits produced 5 different weight hashes \u2014 so `argus.eval.ngramtrain.fit` pins `random_state=20260921` and the sealed numbers above are for that exact, reproducible artefact, not for 'whichever fit came out best'.",
         "Root cause, read from the confusion rather than assumed, and now genuinely closed rather than merely sharpened: the 2026-09-22 RIVAL LENS pass tested (not assumed) the class-imbalance hypothesis this entry previously left untried. Dev-CV only, no sealed spend for the test itself: downsampling the 60 Chinese out-of-scope negatives to 40 (matching English, `training_rows()`'s existing 40 EN) cut the rate at which held-out Chinese in-scope questions are wrongly refused as out-of-scope from 14.2% to 8.4% (66/465 to 39/465 across 5-seed x 5-fold CV), paired McNemar b=28 (current wrong, balanced right) vs c=1 (reverse), p<0.0001, with no cost to overall CV accuracy (78.5% to 78.7%). Implemented as `ngramtrain.balance_oos_by_language` (seed `OOS_BALANCE_SEED=20260922`, its own seed independent of the pool-split and fit seeds), retrained, and re-scored against sealed once \u2014 the legitimate one-read-per-rebuild this project's own established pattern allows (data/oblique_sealed.json's docstring: 'read exactly once' per model, not per session; the SVM head-swap earlier already used this same pattern once). Result: sealed accuracy rose 77.82% to 79.52% and the McNemar margin against Rasa widened from borderline (p=0.0576) to comfortable (p=0.2649). Still not a win \u2014 Rasa's point estimate remains higher \u2014 but the untried lever this entry named is untried no longer, and it worked. The other named lever (a separate binary OOS gate ahead of intent routing) remains untried and is the next one to reach for if a future session wants to move this from TIED to a real win.",
         "the console's MCP surface, 2026-09-25 (data/mcp_fuzz.json, data/mcp_sdk_comparison.json): the hand-rolled lui/mcp_server.py answered all 145 cases of an authored wire-fuzz corpus cleanly - no unstructured exception, no schema-invalid argument reaching an engine - against 46 before that day's hardening; the official MCP SDK 2.2.0 server, on the same corpus and oracle, answered 57 cleanly and let 96 calls reach an engine. An authored corpus, not traffic, and the server is not the router this row measures",
-        "Rematch run 2026-09-26 (eval/lui_rematch.py, data/lui_rematch.json; Rasa 3.6.21 trained on the same 314 rows, five seeds of its shipped default pipeline and four of the 2026-09-21 one, each run checked against its own digest and the frozen inputs). Held out (578 rows): ARGUS 463, Rasa 462-483 (mean 477.2), a paired difference of -2.5 points with a 95% interval of -5.1 to +0.2: a tie, leaning Rasa. Sealed (293): 233 against a mean of 235.4, a tie. Out of scope: ARGUS declines 519 of 672 MASSIVE utterances against Rasa's 307 (+31.6 points), and ties on CLINC150 (669 against 682 of 963) and on 120 hard negatives. Perturbed held-out rows: ARGUS better on full-width (+61 points), Traditional Chinese (+17.6) and polite wrapping (+5.7); Rasa better with the punctuation removed (-5.0) and with two typos (-3.7). ARGUS answers in 0.33 ms (median) against 8.6 ms, from a 1.6 MB model loaded in 0.03 s against 46 MB in 11.7 s. Rasa's seed-1 repeat reproduced its predictions but read Rasa's training cache, so a cold retrain is not shown to reproduce them."
+        "Rematch run 2026-09-26 (eval/lui_rematch.py, data/lui_rematch.json; Rasa 3.6.21 trained on the same 314 rows, five seeds of its shipped default pipeline and four of the 2026-09-21 one, each run checked against its own digest and the frozen inputs). Held out (578 rows): ARGUS 464, Rasa 462-483 (mean 477.2), a paired difference of -2.3 points with a 95% interval of -4.9 to +0.4: a tie, leaning Rasa. Sealed (293): 233 against a mean of 235.4, a tie. Out of scope: ARGUS declines 518 of 672 MASSIVE utterances against Rasa's 307 (+31.4 points), and ties on CLINC150 (669 against 682 of 963) and on 120 hard negatives. Perturbed held-out rows: ARGUS better on full-width (+61 points), Traditional Chinese (+17.6) and polite wrapping (+5.9); Rasa better with the punctuation removed (-4.8) and with two typos (-3.7). ARGUS answers in 0.42 ms (median) against 8.6 ms, from a 1.6 MB model loaded in 0.03 s against 46 MB in 11.7 s. Rasa's seed-1 repeat reproduced its predictions but read Rasa's training cache, so a cold retrain is not shown to reproduce them. Figures regenerated the same day after the record-routing and domain-gate changes; the wider domain gate costs the console 2 MASSIVE and 4 CLINC declines."
       ],
       "note": "**2026-09-22, two rebuilds this date.** First, the classifier head: dev-half 5-fold CV (10 fold-split seeds) found `LinearSVC(C=5.0, class_weight='balanced')` beats the multinomial logistic head this shipped with on every seed (mean 76.71% vs 72.28%); a calibrated variant (`CalibratedClassifierCV`) also won but less (75.36%) and needs k-fold machinery the plain margin does not. `lui/ngram.py`'s pure-Python scorer needed zero code changes \u2014 it was already generic linear-scores-then-softmax. The abstention threshold was re-derived by the same rule that set the old 0.20 (lowest threshold beating the pattern layer on both axes in out-of-fold CV), landing at 0.15. Word-level TF-IDF features stacked onto the character n-grams were tried and hurt (73.35% to 66.77%/66.16% on dev CV) \u2014 a real, tested, negative finding, not silently dropped. Second, same date, the RIVAL LENS pass: out-of-scope training-set language balance (see the blockers entry above for the full evidence) \u2014 the first rebuild's own root-cause note had named this lever and left it untried; this pass tried it, on dev-CV evidence only, then spent the one legitimate sealed-read to confirm 77.82% to 79.52% for real. Latency and deployability were measured once, before either rebuild (ARGUS ~66x faster median response, ~375x faster cold start, a stdlib-only bundle vs Rasa's 1.9GB TensorFlow venv needing Python<=3.10), reported as an unreproduced finding from the agent that ran the original comparison rather than re-measured inside eval/lui_comparison.py, so no Proof above cites them.",
       "measured_outcomes": []
@@ -3141,9 +3142,9 @@
         },
         {
           "condition": "statistically_valid_evaluation",
-          "how": "not a single hand-picked case: a far-past cutoff (2015), a same-day cutoff, and a day-before cutoff all checked against the same real NVDA EPS series, with the far-past case showing materially fewer facts visible (26 vs 67) as an independent confirmation the gate is genuinely filtering, not a no-op",
-          "artefact": "",
-          "test": "test_workbench_comparison.py::TestPointInTimeComparison::test_the_far_past_cutoff_sees_materially_fewer_facts"
+          "how": "619 questions (ten tickers' 10-Q/10-K filings since 2017, one hour before and after each acceptance), every rival paired with ARGUS question by question: exact McNemar p below 1e-80 against each of the six rival arms, no question any rival answered that ARGUS missed; ARGUS right-rate Wilson 95% interval 0.994-1.0; groupwise by ticker and side",
+          "artefact": "data/pit_rivals.json",
+          "test": "test_pit.py::TestTheCommittedRun"
         },
         {
           "condition": "costs_included",
@@ -3153,25 +3154,25 @@
         },
         {
           "condition": "out_of_sample_test",
-          "how": "run on real, live, current-day SEC XBRL data never used to design the comparison's mechanism \u2014 NVDA's most recent real filing as of the day this ran, not a fixed historical snapshot",
-          "artefact": "",
-          "test": "test_workbench_comparison.py::TestPointInTimeComparison"
+          "how": "the gate was built on one filing (NVDA's 10-Q accepted 2026-08-26 20:36 UTC); held out, the nine tickers never looked at while building it: 553/553 right, 0 leaks, and every rival arm still loses paired (held_out in data/pit_rivals.json)",
+          "artefact": "data/pit_rivals.json",
+          "test": "test_pit.py::TestTheCommittedRun"
         },
         {
           "condition": "ablation",
-          "how": "isolates the exact mechanism: the real filing's own filed-date is the load-bearing boundary \u2014 moving the cutoff back exactly one day (2026-08-25 vs 2026-08-26) is the difference between the fact being visible and being withheld entirely, on the same real fact",
+          "how": "isolates the exact mechanism: ARGUS's resolver re-run with each rival's gate and supersede rule on the same 619 questions (mechanism_ablation in data/pit_rivals.json) \u2014 the filed-date gate alone leaks on 199 and hides 51 filings dated the next business day; keep-first alone serves the stale value on restated quarters. The acceptance second is the load-bearing boundary: NVDA's 10-Q dated 2026-08-26, accepted 20:36 UTC, is withheld at midnight and at 19:36 and visible at 21:36",
           "artefact": "",
-          "test": "test_workbench_comparison.py::TestFailureCases::test_the_boundary_is_sharp"
+          "test": "test_workbench_comparison.py::TestFailureCases::test_the_boundary_is_the_acceptance_second"
         },
         {
           "condition": "adversarial_test",
-          "how": "the real gate's edge-case behaviour tested directly at the sharpest possible boundary: the exact day of filing versus the day immediately before it, on the same real fact, not a synthetic gap of weeks or months",
+          "how": "the gate tested at the sharpest boundary there is: one hour either side of the second EDGAR accepted a real filing, plus midnight of its filed day \u2014 the cutoff a filed-date gate gets wrong; and 29 restated quarters asked an hour after the restatement, where a keep-first rival serves the old number",
           "artefact": "",
-          "test": "test_workbench_comparison.py::TestFailureCases"
+          "test": "test_pit.py"
         },
         {
           "condition": "failure_cases_documented",
-          "how": "real, measured behaviour of the real gate found by running it: visible on the exact filed day, withheld the day before \u2014 both directions checked, neither assumed",
+          "how": "found by running it, 2026-09-26: the gate this row first shipped compared filed dates, so it showed an evening 10-Q from midnight of its filed day \u2014 the test asserted that leak as correct. Replaced with the acceptance-second gate (market/pit.py); rows EDGAR's index cannot date are bounded to 22:00 New York on their filed day, erring late, and say so in the status",
           "artefact": "",
           "test": "test_workbench_comparison.py::TestFailureCases"
         },
@@ -3189,7 +3190,7 @@
         }
       ],
       "blockers": [
-        "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: openbb-agents is an archived 2024 repository; the current OpenBB stack (ODP, openbb-mcp-server, Agent Rita), TraderAlice/OpenAlice, HKUDS/Vibe-Trading, ginlix-ai/LangAlpha and the S2 entry Abd00lmalik/Lumen-Terminal have not been run on the same input (rival review of 2026-09-24). OWNED returns only when they are.",
+        "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: openbb-agents is an archived 2024 repository. Run on the same 619 questions since (2026-09-26, eval/pit_rivals.py, data/pit_rivals.json, each scored from its own output): OpenBB's ODP (openbb_core, 7/493 right), HKUDS/Vibe-Trading's point-in-time series (343/619, 236 leaks) and research tool (9/619), ginlix-ai/LangAlpha (10/619) and TraderAlice/OpenAlice (10/619); ARGUS 619/619, 0 leaks. The S2 entry Abd00lmalik/Lumen-Terminal cannot be asked: its only fundamentals path returns a trailing-twelve-month total with no period. Not run end to end: openbb-mcp-server (it serves ODP's own FastAPI routes as MCP tools, openbb_mcp_server/app/app.py:348, so its numbers are the ODP output scored above) and Agent Rita (no fetcher of its own; it reads OpenBB Workspace widgets and needs a Workspace account). OWNED returns only when both are run.",
         "OpenBB genuinely wins on raw data-source breadth (32 real providers, 21 keyless, vs ARGUS's 12 live-verified) \u2014 closing that gap is a separate, already-named, unimplemented improvement (BLS employment data, Fama-French factors, CFTC positioning \u2014 research/audit/a2-openbb.md's own prior recommendation), not addressed by this capability. Neither OpenBB repository was run end to end (the Platform's real fetchers mostly need paid API keys this project does not have, and the Agents repo needs an OpenAI key for its LLM calls) \u2014 this comparison instead reads both real repos' source directly, which is sufficient to establish the structural absence of point-in-time gating without needing either live run"
       ],
       "note": "",
@@ -4192,8 +4193,8 @@
   "by_state": {
     "lost": 0,
     "tied": 12,
-    "implemented": 24,
-    "owned": 7
+    "implemented": 25,
+    "owned": 6
   },
   "findings": [
     {
@@ -4257,6 +4258,16 @@
       "detail": "no groupwise check has run on its artefacts: data/afterhours_comparison.json: only context headlines were checked"
     },
     {
+      "capability": "rToken factor divergence vs. Alphalens' real Information Coefficient",
+      "problem": "statistically_valid_evaluation is claimed but not evidenced",
+      "detail": "the groupwise audit predates the current data/factor_divergence_comparison.json; re-run python -m argus.eval.groupwise_audit"
+    },
+    {
+      "capability": "rToken factor divergence vs. Alphalens' real Information Coefficient",
+      "problem": "out_of_sample_test is claimed but not evidenced",
+      "detail": "the groupwise audit predates the current data/factor_divergence_comparison.json; re-run python -m argus.eval.groupwise_audit"
+    },
+    {
       "capability": "Episodic memory across decisions",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
       "detail": "no groupwise check has run on its artefacts: data/recall_comparison.json: designed_cases - three designed boundary cases for the point-in-time guard"
@@ -4314,7 +4325,7 @@
     {
       "capability": "Portfolio allocation, measured against Riskfolio-Lib's NCO",
       "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/allocation_comparison.json: aggregate_without_rows - nine walk-forward windows reduced to windows-beating counts (eval/allocation_comparison.py would need to record per-window out-of-sample volatility per method)"
+      "detail": "the groupwise audit flags data/nco_bakeoff.json :: held-out volatility: ARGUS's pick vs skfolio_nco[cv=ignore] [carried_by_one_group:holdout_half=second, flips_across_halves:chronological halves]"
     },
     {
       "capability": "Regime-boundary detection, measured against stumpy FLUSS and ruptures",
@@ -4329,17 +4340,7 @@
     {
       "capability": "LUI intent routing, measured against Rasa's real DIET classifier",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/lui_comparison.json: aggregate_without_rows - 293 sealed prompts reduced to McNemar counts; ARGUS's per-prompt routes are not kept beside Rasa's vendored predictions"
-    },
-    {
-      "capability": "Point-in-time correctness vs. OpenBB's real, ungated live-API agent",
-      "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/workbench_comparison.json: designed_cases - a source-breadth count and one point-in-time boundary on one fact"
-    },
-    {
-      "capability": "Point-in-time correctness vs. OpenBB's real, ungated live-API agent",
-      "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/workbench_comparison.json: designed_cases - a source-breadth count and one point-in-time boundary on one fact"
+      "detail": "the per-item headline favours the rival: data/lui_comparison.json :: sealed intent routing: ARGUS's cascade vs Rasa's DIET"
     },
     {
       "capability": "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel",
@@ -4360,16 +4361,6 @@
       "capability": "Analogue stress bands vs. AnalogDesk (S2) on its own pre-registered test",
       "problem": "out_of_sample_test is claimed but not evidenced",
       "detail": "no groupwise check has run on its artefacts: data/analogstress_comparison.json: aggregate_without_rows - 2,698 test queries scored, but only per-predictor aggregates and date-clustered Diebold-Mariano tests are kept (eval/analogstress_comparison.py would need to record per-query Winkler scores with name and date)"
-    },
-    {
-      "capability": "Portfolio stress: the book's move when QQQ falls, vs. skfolio's vine copula and Entropy Pooling",
-      "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/copilot_stress.json: aggregate_without_rows - 7,800 book-days scored; only the first 200 rows are kept as a sample, which is one event day (eval/copilot_stress.py would need to record per-day mean errors per arm)"
-    },
-    {
-      "capability": "Portfolio stress: the book's move when QQQ falls, vs. skfolio's vine copula and Entropy Pooling",
-      "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/copilot_stress.json: aggregate_without_rows - 7,800 book-days scored; only the first 200 rows are kept as a sample, which is one event day (eval/copilot_stress.py would need to record per-day mean errors per arm)"
     }
   ],
   "clean": false,
@@ -4388,7 +4379,13 @@
     "reproducibility_proven",
     "no_specialist_capability_superior"
   ],
-  "transitions_this_write": [],
+  "transitions_this_write": [
+    {
+      "capability": "rToken factor divergence vs. Alphalens' real Information Coefficient",
+      "from": "owned",
+      "to": "implemented"
+    }
+  ],
   "transition_log": [
     {
       "capability": "Deliberation priced as a trading cost",
@@ -4467,6 +4464,12 @@
       "from": "owned",
       "to": "tied",
       "at": "2026-09-25T22:14:02+00:00"
+    },
+    {
+      "capability": "rToken factor divergence vs. Alphalens' real Information Coefficient",
+      "from": "owned",
+      "to": "implemented",
+      "at": "2026-09-26T09:24:05+00:00"
     }
   ]
 }

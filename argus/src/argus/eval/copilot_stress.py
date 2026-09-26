@@ -213,6 +213,17 @@ def _per_day(rows: Sequence[dict[str, Any]], arms: Sequence[str]) -> dict[str, d
     return {d: {a: statistics.fmean(v) for a, v in s.items()} for d, s in per_day.items()}
 
 
+def _per_day_each(rows: Sequence[dict[str, Any]], arms: Sequence[str]
+                  ) -> dict[str, dict[str, float]]:
+    """Each arm's mean absolute error per day over the books it answered; an arm that answered no
+    book on a day is absent from that day."""
+    out: dict[str, dict[str, float]] = {}
+    for a in arms:
+        for day, m in _per_day(rows, [a]).items():
+            out.setdefault(day, {})[a] = m[a]
+    return out
+
+
 def score(rows: Sequence[dict[str, Any]], arms: Sequence[str]) -> dict[str, Any]:
     out: dict[str, Any] = {}
     for label, threshold in (("down_1pct", DOWN_DAY), ("down_2pct", SEVERE_DAY)):
@@ -350,6 +361,7 @@ def main() -> int:  # pragma: no cover - CLI
                          "pred": pred, "q10": q10 if len(q10) == 3 else None})
     arms = PREREG["arms"]
     scored = score(rows, arms)
+    shock_by_day = {r["day"]: r["shock"] for r in rows}
     report = {
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "prereg": PREREG, "prereg_sha256": prereg_hash(),
@@ -374,6 +386,11 @@ def main() -> int:  # pragma: no cover - CLI
             "ARGUS states a point, so its tail is not scored; skfolio's quantile is",
         ],
         "rows_sample": rows[:BOOKS],
+        # One row per event day and arm (added 2026-09-26): the unit the primary Wilcoxon test is
+        # over, so the groupwise audit can break the result down by day and by shock size.
+        "per_day": [{"day": day, "shock": shock_by_day[day],
+                     "mae_pp": {a: round(m[a], 6) for a in m}}
+                    for day, m in sorted(_per_day_each(rows, arms).items())],
     }
     REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8")
     print(report["verdict"])

@@ -22,6 +22,10 @@ $log = "$root\argus\data\paper_runs\cycle_$stamp.log"
 # carries the entire cycle output. Every run after that "fix" was still UTF-16. Add-Content with an
 # explicit encoding is used throughout instead, and there is no Tee.
 "=== ARGUS paper cycle $stamp ===" | Out-File $log -Encoding utf8
+# Disk free on every cycle, flagged under 5 GB: on 25 Sep 2026 the disk reached 0 bytes and every
+# writer on it failed. The cycle appends to data/ each run.
+$freeGB = [math]::Round((Get-PSDrive -Name ($root.Substring(0,1))).Free / 1GB, 1)
+"disk_free_gb=$freeGB" + $(if ($freeGB -lt 5) { " DISK LOW" } else { "" }) | Add-Content -Path $log -Encoding utf8
 
 # Refresh the hedge-effectiveness measurement BEFORE the cycle reads it. `risk/effectiveness.py`
 # treats a measurement older than 36 hours as absent, and the runner then prices the hedge with the

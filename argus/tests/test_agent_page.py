@@ -37,7 +37,8 @@ def test_renders_the_record_metrics_envelope_and_decisions() -> None:
     assert "The agent that trades." in html
     assert "41 events" in html and "genesis ebbf607a8fe1" in html
     assert "-0.42%" in html and "50%" in html and "+0.13%" in html
-    assert "undefined" in html  # a null Sharpe is printed as undefined, never as zero
+    assert "undefined" not in html
+    assert "n/a" in html  # a null Sharpe is printed as n/a with its reason, never as zero
     assert "median -2.3, p05 -20.2, p95 +16.8" in html
     assert "kernel changed it" in html and "bound by gross_cap" in html
     assert "proposed 30%, approved 20%" in html

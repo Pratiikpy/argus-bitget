@@ -106,6 +106,12 @@ PHRASES: dict[str, dict[Language, str]] = {
         Language.EN: "Settled {at}: net {net}, direction {direction}.",
         Language.ZH: "已于 {at} 结算：净额 {net}，方向{direction}。",
     },
+    "why.settled_flat": {
+        Language.EN: "Settled {at}: no position, so no P&L; the price moved {move} bps over the "
+                     "window it would have been held.",
+        Language.ZH: "已于 {at} 结算：未持仓，因此没有盈亏；"
+                     "在本应持有的时段内价格变动 {move} 个基点。",
+    },
     "why.direction_correct": {Language.EN: "correct", Language.ZH: "正确"},
     "why.direction_wrong": {Language.EN: "wrong", Language.ZH: "错误"},
     "why.unsettled": {
@@ -364,6 +370,31 @@ PHRASES: dict[str, dict[Language, str]] = {
     "ev.thesis": {
         Language.EN: "Thesis as written: {thesis}",
         Language.ZH: "当时写下的论点：{thesis}",
+    },
+    "ev.items": {
+        Language.EN: "What it was shown ({n} evidence items, as the decision-maker received them):",
+        Language.ZH: "它当时看到的内容（{n} 条证据，与决策者收到的原文一致）：",
+    },
+    "ev.more": {
+        Language.EN: "…and {n} more in the decision's notes.",
+        Language.ZH: "……以及决策记录中的另外 {n} 条。",
+    },
+    "ev.sources_only": {
+        Language.EN: (
+            "Sources that reached it: {sources}. The items themselves were not written down for "
+            "decisions before 26 Sep 2026; they are committed only through the hash below."
+        ),
+        Language.ZH: (
+            "到达该决策的来源：{sources}。2026 年 9 月 26 日之前的决策没有逐条保存证据原文，"
+            "只能通过下方的哈希加以核验。"
+        ),
+    },
+    "ev.unrecorded": {
+        Language.EN: (
+            "No notes were written for this decision, so the items it saw are committed only "
+            "through the hash below and cannot be listed."
+        ),
+        Language.ZH: "该决策没有写下记录，因此它看到的条目只能通过下方的哈希核验，无法逐条列出。",
     },
     "ev.hash": {
         Language.EN: (

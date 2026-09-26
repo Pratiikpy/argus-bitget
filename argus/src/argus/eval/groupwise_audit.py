@@ -1059,6 +1059,117 @@ def _general_sue(path: str) -> Entry:
                   source="alignment.anchor_detail"),))
 
 
+def _copilot_stress(path: str) -> Entry:
+    from argus.eval.copilot_stress import DOWN_DAY, SEVERE_DAY
+
+    blob = _load(path)
+    days = [d for d in blob["per_day"] if _f(d["shock"]) <= DOWN_DAY]
+    headlines = []
+    for rival, role in (("skfolio_vine", VS_RIVAL), ("skfolio_ep", VS_RIVAL)):
+        both = [d for d in days if "argus_beta" in d["mae_pp"] and rival in d["mae_pp"]]
+        items = [Item(value=_f(d["mae_pp"][rival]) - _f(d["mae_pp"]["argus_beta"]),
+                      groups={"severity": "down_2pct" if _f(d["shock"]) <= SEVERE_DAY
+                              else "down_1_to_2pct", "month": str(d["day"])[:7]},
+                      order=str(d["day"])) for d in both]
+        published = blob["down_1pct"]["comparisons"][f"argus_beta vs {rival}"]
+        mean = -sum(i.value for i in items) / len(items)
+        if len(items) != published["days"] or abs(mean - published["mean_difference_pp"]) > 1e-3:
+            raise AuditError(f"{path}: per-day rows for {rival} do not reproduce the published "
+                             f"comparison ({len(items)} days, {mean:.4f} pp)")
+        headlines.append(_headline(
+            f"stress-move error: ARGUS's open-hours beta vs {rival}", items,
+            ("severity", "month"),
+            headline="per down day: rival's mean absolute error minus ARGUS's, in pp",
+            orientation="positive = ARGUS's stress sentence was closer", role=role,
+            role_reason="the preregistered primary and its Entropy Pooling sibling",
+            source="per_day"))
+    return Entry(path, CHECKED, "one row per QQQUSDT down day, each a mean over 200 books",
+                 tuple(headlines))
+
+
+def _lui_comparison(path: str) -> Entry:
+    from argus.eval.lui_comparison import sealed_rows
+
+    published = _load(path)["sealed_comparison"]
+    rows = sealed_rows()
+    got = (sum(r["argus_ok"] for r in rows), sum(r["rasa_ok"] for r in rows),
+           sum(r["argus_ok"] and not r["rasa_ok"] for r in rows),
+           sum(r["rasa_ok"] and not r["argus_ok"] for r in rows))
+    want = (published["argus_correct"], published["rasa_correct"],
+            published["argus_only_correct"], published["rasa_only_correct"])
+    if got != want:
+        raise AuditError(f"{path}: the live cascade's sealed rows {got} do not reproduce the "
+                         f"published counts {want}")
+    items = [Item(value=float(r["argus_ok"]) - float(r["rasa_ok"]),
+                  groups={"lang": str(r["lang"]), "intent": str(r["expect"])})
+             for r in rows]
+    return Entry(path, CHECKED, "one row per sealed question, regenerated from the deployed "
+                 "cascade and Rasa's vendored predictions, parity-checked against the published "
+                 "counts", (
+        _headline("sealed intent routing: ARGUS's cascade vs Rasa's DIET", items,
+                  ("lang", "intent"),
+                  headline="(ARGUS right) - (Rasa right) per sealed question",
+                  orientation="positive = ARGUS right where Rasa was not", role=VS_RIVAL,
+                  role_reason="the preregistered sealed comparison", source="sealed_rows()"),))
+
+
+def _lui_rematch(path: str) -> Entry:
+    from argus.eval.lui_rematch_inputs import load
+
+    blob = _load(path)
+    rows = blob["paired_rows"]
+    base = load()["confirmation_base"]
+    if len(base) != len(rows["held_out"]):
+        raise AuditError(f"{path}: {len(rows['held_out'])} held-out rows against "
+                         f"{len(base)} inputs")
+    # The rows are questions, not a time series: there is no chronological half to split on, so
+    # no item carries an order.
+    held = [Item(value=_f(v), groups={"lang": str(r["lang"]), "intent": str(r["expect"])})
+            for v, r in zip(rows["held_out"], base, strict=True)]
+    outside = [Item(value=_f(v), groups={"suite": suite})
+               for suite in ("massive_oos", "clinc_oos", "hard_negatives") for v in rows[suite]]
+    perturbed = [Item(value=_f(v), groups={"perturbation": suite.split(":", 1)[1]})
+                 for suite in rows if suite.startswith("confirmation:") for v in rows[suite]]
+    common = {"headline": "per row: (ARGUS right) - (Rasa right, mean over five seeds)",
+              "orientation": "positive = ARGUS right where Rasa was not", "role": VS_RIVAL,
+              "role_reason": "the rematch's paired comparison", "source": "paired_rows"}
+    return Entry(path, CHECKED, "one paired row per question in every suite", (
+        _headline("ARGUS's cascade vs Rasa's default pipeline, held out", held,
+                  ("lang", "intent"), **common),
+        _headline("ARGUS's cascade vs Rasa's default pipeline, out of scope", outside,
+                  ("suite",), **common),
+        _headline("ARGUS's cascade vs Rasa's default pipeline, perturbed held-out", perturbed,
+                  ("perturbation",), **common),
+    ))
+
+
+def _pit_rivals(path: str) -> Entry:
+    blob = _load(path)
+    mine = {(r["accn"], r["side"]): 1.0 if r["right"] else 0.0 for r in blob["rows_argus"]}
+    headlines = [_headline(
+        "ARGUS's latest-quarter revenue against SEC's acceptance record",
+        [Item(value=mine[(r["accn"], r["side"])] - 1.0,
+              groups={"ticker": str(r["ticker"]), "side": str(r["side"])},
+              order=str(r["as_of"])) for r in blob["rows_argus"]],
+        ("ticker", "side"),
+        headline="(ARGUS right) - 1 per question", orientation="0 = right, -1 = wrong",
+        role=RESULT, role_reason="the gate's own answer on every question", source="rows_argus")]
+    for rival, rows in blob["rows_rivals"].items():
+        items = [Item(value=mine[(r["accn"], r["side"])]
+                      - (1.0 if r["outcome"] == "right" else 0.0),
+                      groups={"ticker": str(r["ticker"]), "side": str(r["side"])},
+                      order=str(r["as_of"]))
+                 for r in rows if (r["accn"], r["side"]) in mine]
+        headlines.append(_headline(
+            f"ARGUS vs {rival} on the same questions", items, ("ticker", "side"),
+            headline="(ARGUS right) - (rival right) per question",
+            orientation="positive = ARGUS right where the rival was not", role=VS_RIVAL,
+            role_reason="the rival scored from its own output on the same questions",
+            source=f"rows_rivals.{rival}"))
+    return Entry(path, CHECKED, "one row per question: ten tickers' filings since 2017, one "
+                 "hour before and after each acceptance", tuple(headlines))
+
+
 # ---------------------------------------------------------------------------------------------
 # Artefacts with no population to break down, with the reason read from each
 
@@ -1101,6 +1212,8 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
     "data/cointegration.json": _cointegration_study,
     # cited from 2026-09-26
     "data/nco_bakeoff.json": _nco_bakeoff,
+    "data/pit_rivals.json": _pit_rivals,
+    "data/lui_comparison.json": _lui_comparison,
     "data/financebench_xbrl.json": _financebench,
     "data/general_arb_comparison.json": _general_arb,
     "data/eventdriven_agents.json": _eventdriven_agents,
@@ -1120,10 +1233,7 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
     "data/xa_arena.json": _not_checkable(
         WITHOUT_ROWS, "hourly net asset values reduced to per-period scores per arm; "
         "eval/xa_arena.py would need to record each arm's hourly return path"),
-    "data/lui_rematch.json": _not_checkable(
-        WITHOUT_ROWS, "per-question router predictions are recomputed from the live router and "
-        "not kept (Rasa's are in data/lui_rematch_rasa_predictions.json); eval/lui_rematch.py "
-        "would need to record ARGUS's per-question labels"),
+    "data/lui_rematch.json": _lui_rematch,
     "data/general_grammar_comparison.json": _not_checkable(
         DESIGNED, "15 designed ill-typed expressions, 39 operator checks on one symbol's series "
         "and eight designed factors: properties of the grammar on chosen inputs"),
@@ -1206,17 +1316,13 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
         WITHOUT_ROWS, "2,698 test queries scored, but only per-predictor aggregates and "
         "date-clustered Diebold-Mariano tests are kept (eval/analogstress_comparison.py would "
         "need to record per-query Winkler scores with name and date)"),
-    "data/copilot_stress.json": _not_checkable(
-        WITHOUT_ROWS, "7,800 book-days scored; only the first 200 rows are kept as a sample, "
-        "which is one event day (eval/copilot_stress.py would need to record per-day mean "
-        "errors per arm)"),
+    "data/copilot_stress.json": _copilot_stress,
     "data/allocation_comparison.json": _not_checkable(
-        WITHOUT_ROWS, "nine walk-forward windows reduced to windows-beating counts "
-        "(eval/allocation_comparison.py would need to record per-window out-of-sample "
-        "volatility per method)"),
-    "data/lui_comparison.json": _not_checkable(
-        WITHOUT_ROWS, "293 sealed prompts reduced to McNemar counts; ARGUS's per-prompt routes "
-        "are not kept beside Rasa's vendored predictions"),
+        WITHOUT_ROWS, "nine live-fetched walk-forward windows reduced to per-allocator means and "
+        "windows-beating counts; the harness records per-window volatilities from 2026-09-26 "
+        "(oos_vol_bps_per_window), but this artefact predates that and its candles were fetched "
+        "live, so it cannot be regenerated. The capability's OOS and significance proofs cite "
+        "data/nco_bakeoff.json, which has the rows"),
     "data/review_report.json": _not_checkable(
         WITHOUT_ROWS, "each rule's precision is kept as an aggregate; which decisions it fired "
         "on is not"),

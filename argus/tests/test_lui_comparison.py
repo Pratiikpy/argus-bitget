@@ -73,6 +73,17 @@ class TestSealedComparison:
         assert 0.0 <= result.argus_accuracy <= 1.0
         assert 0.0 <= result.rasa_accuracy <= 1.0
 
+    def test_the_deployed_cascade_still_scores_what_the_artefact_publishes(self) -> None:
+        # A routing change elsewhere silently cost two sealed answers on 2026-09-26 ("how's the
+        # book looking" moved to position; "that shot ... last week" became ambiguous) while the
+        # published figure stayed 233. The artefact is the claim, so the live cascade must match it.
+        import json
+        from pathlib import Path
+
+        published = json.loads((Path(__file__).resolve().parents[1] / "data" /
+                                 "lui_comparison.json").read_text(encoding="utf-8"))
+        assert run_sealed_comparison().as_dict() == published["sealed_comparison"]
+
     def test_a_missing_reference_row_is_refused_not_silently_skipped(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:

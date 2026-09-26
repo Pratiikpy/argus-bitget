@@ -17,9 +17,13 @@ independent adversarial re-check of this exact page, the day it was written).
 
 ```
 git clone https://github.com/Pratiikpy/argus-bitget.git
-cd argus-bitget
+cd argus-bitget/argus
+python -m venv .venv          # then activate it: .venv\Scriptsctivate (Windows) or source .venv/bin/activate
 pip install -e ".[dev]"
 ```
+
+The package lives in `argus/`; the repository root has no `pyproject.toml`, so every command below
+runs from `argus-bitget/argus`.
 
 ## 1. Portfolio allocation vs Riskfolio-Lib's real NCO (≈2 minutes)
 

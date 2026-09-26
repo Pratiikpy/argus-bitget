@@ -38,7 +38,7 @@ import json
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from argus.market.evidence import _UA, EdgarSource
@@ -88,6 +88,8 @@ class Fact:
     fiscal_year: int | None
     fiscal_period: str | None
     frame: str | None
+    accn: str = ""
+    """The accession the row was reported in: what EDGAR's acceptance instant is looked up by."""
 
     @property
     def duration_days(self) -> int | None:
@@ -189,6 +191,7 @@ def parse_concept(payload: dict[str, Any], *, concept: str) -> list[Fact]:
                     fiscal_year=row.get("fy"),
                     fiscal_period=row.get("fp"),
                     frame=row.get("frame"),
+                    accn=str(row.get("accn") or ""),
                 )
             )
     return out
@@ -277,6 +280,10 @@ def _sue_evidence(ticker: str, eps_facts: list[Fact]) -> tuple[list[Evidence], l
     ], [f"xbrl:{ticker}: SUE {sue.sue:+.2f} from {sue.quarters_used} quarter(s)"]
 
 
+LIVE_WINDOW = timedelta(minutes=5)
+"""A cutoff this close to the fetch is a live question: every row just fetched is public."""
+
+
 class FundamentalsSource:
     """SEC XBRL company concepts, keyless."""
 
@@ -285,6 +292,19 @@ class FundamentalsSource:
     def __init__(self, *, user_agent: str = _UA, edgar: EdgarSource | None = None) -> None:
         self._ua = user_agent
         self._edgar = edgar or EdgarSource(user_agent=user_agent)
+        self._pit: Any = None
+
+    def _acceptance(self, cik: int) -> Any:
+        """The filer's accession -> acceptance-instant index (`market/pit.py`), or None when EDGAR's
+        submissions index cannot be read; the caller then bounds each row conservatively."""
+        from argus.market.pit import PitFundamentals
+
+        if self._pit is None:
+            self._pit = PitFundamentals(fetch_json=self._get, user_agent=self._ua)
+        try:
+            return self._pit.acceptance_index(cik)
+        except Exception:
+            return None
 
     def _get(self, url: str) -> dict[str, Any]:
         request = urllib.request.Request(
@@ -326,6 +346,14 @@ class FundamentalsSource:
         if cik is None:
             return [], [f"xbrl:{ticker}: no CIK on EDGAR"]
 
+        # **Every tag is read and the periods are merged, the first tag in `CONCEPTS` winning a
+        # period both report** (2026-09-26). The first version returned the first tag with any
+        # rows at all, so a filer that changed tags was answered from the dead one: AAPL's
+        # `Revenues` stops in September 2018 (ASC 606 moved it to the contract-with-customer
+        # tag), and "what was AAPL's revenue last quarter" came back with a 2018 quarter.
+        # `market/pit.py` resolves across alias tags per period the same way.
+        merged: dict[tuple[str, str], Fact] = {}
+        used: list[str] = []
         for tag in tags:
             try:
                 payload = self._get(self.CONCEPT_URL.format(cik=cik, tag=tag))
@@ -339,13 +367,34 @@ class FundamentalsSource:
                 continue
 
             facts = parse_concept(payload, concept=concept)
-            cutoff = as_of.date()
-            visible = [f for f in facts if f.filed <= cutoff]
+            # Gated to the second EDGAR accepted each filing, not to its date (2026-09-26). A
+            # filed-date gate shows a 10-Q from the start of the day it is dated, hours before it
+            # was public: on ten tickers' filings since 2017 that leaked on 199 of 619 questions
+            # asked an hour before acceptance, and hid 51 filings dated the next business day
+            # (eval/pit_rivals.py, data/pit_rivals.json). A cutoff in the past reads the filer's
+            # acceptance index; a live one needs none, because a row in the response just fetched
+            # was public when it was fetched.
+            from argus.market.pit import availability
+
+            fetched_at = datetime.now(UTC)
+            index = self._acceptance(cik) if as_of < fetched_at - LIVE_WINDOW else None
+            visible = [f for f in facts
+                       if availability(f.accn or None, f.filed, index,
+                                       observed_at=fetched_at)[0] <= as_of]
             if len(visible) < len(facts):
                 status.append(
-                    f"xbrl:{ticker}:{tag}: {len(facts) - len(visible)} fact(s) filed after as_of "
-                    f"withheld"
+                    f"xbrl:{ticker}:{tag}: {len(facts) - len(visible)} fact(s) accepted after "
+                    f"as_of withheld"
                 )
+            if as_of < fetched_at - LIVE_WINDOW:
+                unresolved = sum(1 for f in facts
+                                 if index is None or not f.accn or index.lookup(f.accn) is None)
+                if unresolved:
+                    status.append(
+                        f"xbrl:{ticker}:{tag}: {unresolved} row(s) have no acceptance time in "
+                        f"EDGAR's index; they are bounded to 22:00 New York time on their filing "
+                        f"date, which can only err late"
+                    )
 
             if quarterly_only:
                 before = len(visible)
@@ -364,9 +413,17 @@ class FundamentalsSource:
                     f"xbrl:{ticker}:{tag}: {superseded} restated value(s) superseded by a later "
                     f"filing"
                 )
-            status.append(f"xbrl:{ticker}: {concept} from {tag}, {len(resolved)} period(s)")
-            return resolved, status
+            fresh = [f for f in resolved if f.period_key not in merged]
+            for f in fresh:
+                merged[f.period_key] = f
+            if fresh:
+                used.append(f"{tag} ({len(fresh)})")
 
+        if merged:
+            out = sorted(merged.values(), key=lambda f: f.end, reverse=True)
+            status.append(f"xbrl:{ticker}: {concept} from {', '.join(used)}, "
+                          f"{len(out)} period(s)")
+            return out, status
         status.append(f"xbrl:{ticker}: no us-gaap tag for {concept} among {', '.join(tags)}")
         return [], status
 
