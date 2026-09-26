@@ -25,9 +25,9 @@ action at step N has an unmet precondition: ..."):
 **Independence is the whole point, so it is enforced, not promised.**
 
 * No import from `execution/guard.py`, `risk/circuit.py`, `risk/sizing.py`,
-  `risk/session_risk.py` or `risk/modes.py`. The certifier reads a ruling's public fields through
-  the ``observe_*`` functions and never calls a gate. ``tests/test_risk_certify.py`` asserts the
-  import list, so a later convenience import cannot quietly make the check circular.
+  `risk/session_risk.py` or `execution/modes.py`. The certifier reads a ruling's public fields
+  through the ``observe_*`` functions and never calls a gate. ``tests/test_risk_certify.py``
+  asserts the import list, so a later convenience import cannot quietly make the check circular.
 * **Different arithmetic.** The guard computes in :class:`~decimal.Decimal` contexts; this computes
   in :class:`~fractions.Fraction`, which is exact by construction. Steps are truncated with
   ``int()`` on a rational, not ``to_integral_value``. The two agreeing is evidence; the day they
@@ -1021,7 +1021,7 @@ def certify_mode(
     demands: Sequence[tuple[str, str | None]], *, verdict: str, venue: str, open_positions: int,
     effective: str, binding: str, admitted: bool,
 ) -> Certificate:
-    """Certify one risk-mode resolution and admission (:mod:`argus.risk.modes`)."""
+    """Certify one risk-mode resolution and admission (:mod:`argus.execution.modes`)."""
     violations: list[str] = []
     layers = [layer for layer, _ in demands]
     if tuple(layers) != LAYER_ORDER:
@@ -1067,7 +1067,7 @@ def certify_layers(
     observed: Sequence[tuple[str, str | None]], *, operator: str | None, rules_loaded: bool,
     activation: str, live_enabled: bool,
 ) -> Certificate:
-    """Certify the demand each layer derived from what it read (:mod:`argus.risk.modes`)."""
+    """Certify the demand each layer derived from what it read (:mod:`argus.execution.modes`)."""
     wanted = expect_demands(operator=operator, rules_loaded=rules_loaded, activation=activation,
                             live_enabled=live_enabled)
     violations = [

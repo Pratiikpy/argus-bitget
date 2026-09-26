@@ -75,6 +75,7 @@ class TestAblatedRoleStaysInSyncWithTheRealPrompt:
             build_ablated_analyst_role()
 
 
+@pytest.mark.network
 class TestFinbertNaiveAggregateOnRealModel:
     def test_dominant_label_is_the_first_posts_real_label(self, finbert: Any) -> None:
         _symbol, claim = NARRATIVES[0]
@@ -101,6 +102,7 @@ class TestFinbertNaiveAggregateOnRealModel:
         assert all("label" in r and "score" in r for r in agg.per_post)
 
 
+@pytest.mark.network
 class TestCosts:
     def test_finbert_latency_is_measured_and_positive(self, finbert: Any) -> None:
         ms = measure_finbert_cost(finbert, n=5)
@@ -120,6 +122,7 @@ _ACTIONABLE = {"signal": "bullish", "confidence": 0.9, "magnitude_bps": 50}
 _NOT_ACTIONABLE = {"signal": "insufficient_evidence", "confidence": 0.1, "magnitude_bps": 0}
 
 
+@pytest.mark.network
 class TestNarrativeResultLogic:
     """Exercises the comparison/aggregation logic with a real finBERT aggregate paired against
     FAKE (hand-constructed) AnalystViews — proving the decision logic is correct without needing

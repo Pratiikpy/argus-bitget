@@ -6,7 +6,7 @@ on the strength of its mechanism. This module measures each against the record t
 and writes ``data/decision_primitives.json`` — ties, losses and "cannot be measured on this record"
 included, each with the reason.
 
-* **Partially supported** (`agents/grounding.py`, `agents/claims.py`, after Self-RAG). Replays the
+* **Partially supported** (`truth/grounding.py`, `agents/claims.py`, after Self-RAG). Replays the
   grounding verdict of every decision in ``data/desk_notes.jsonl``: how many binary failures are
   partial at thesis level (some figures traced, some did not — exact, from the counts the desk
   recorded), how many unresolved figures are near misses of a value the desk demonstrably had (a
@@ -63,7 +63,18 @@ from pathlib import Path
 from typing import Any
 
 from argus.agents import claims as claims_mod
-from argus.agents.grounding import (
+from argus.agents.meta_pm import SYSTEM_PROMPT, W_SUPPORT, MetaPM, given_values_with_units
+from argus.agents.rubric import NAMES as RUBRIC_AXES
+from argus.agents.rubric import agreement, meets_bar, parse_pair_note
+from argus.decision.verdicts import DEFAULT_AGREEMENT, direction_of, m_of_k
+from argus.desk.review import LOW_INDEPENDENCE, NARROW_SOURCES, panel_stats
+from argus.eval.shadow import DEAD_ZONE_BPS, move_of
+from argus.llm.cache import PromptCache
+from argus.llm.idmap import IdMap
+from argus.llm.ledger import CostLedger
+from argus.llm.qwen import Completion, Thinking
+from argus.truth.artefact import write as write_artefact
+from argus.truth.grounding import (
     NEAR_MISS_UNITS,
     PARTIAL_TOLERANCE,
     TOLERANCE,
@@ -77,17 +88,6 @@ from argus.agents.grounding import (
     extract,
     nearest,
 )
-from argus.agents.meta_pm import SYSTEM_PROMPT, W_SUPPORT, MetaPM, given_values_with_units
-from argus.agents.rubric import NAMES as RUBRIC_AXES
-from argus.agents.rubric import agreement, meets_bar, parse_pair_note
-from argus.decision.verdicts import DEFAULT_AGREEMENT, direction_of, m_of_k
-from argus.desk.review import LOW_INDEPENDENCE, NARROW_SOURCES, panel_stats
-from argus.eval.artefact import write as write_artefact
-from argus.eval.shadow import DEAD_ZONE_BPS, move_of
-from argus.llm.cache import PromptCache
-from argus.llm.idmap import IdMap
-from argus.llm.ledger import CostLedger
-from argus.llm.qwen import Completion, Thinking
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 NOTES_PATH = DATA / "desk_notes.jsonl"
@@ -236,7 +236,7 @@ def reconstructed_known(row: dict[str, Any], entry: Any,
     miss found against this subset is a lower bound on near misses, never an estimate of them.
 
     Each value carries the unit the desk declared for it — the fact's name suffix, or the unit the
-    evidence claim was written in — because `agents/grounding.py` measures a near miss only between
+    evidence claim was written in — because `truth/grounding.py` measures a near miss only between
     a figure and a value in the same unit. Unit-less facts carry ``None``.
     """
     known: list[tuple[str, float, str | None]] = [("round_trip_bps", 12.0, "bps")]

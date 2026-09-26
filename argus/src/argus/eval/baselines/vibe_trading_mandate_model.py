@@ -7,7 +7,7 @@
 #          term that the notice be included in every copy.
 #
 # Used by argus.eval.mandate_comparison to run Vibe-Trading's REAL mandate data model
-# against the same scenarios ARGUS's own argus.agents.mandate.Mandate sees, rather than
+# against the same scenarios ARGUS's own argus.desk.mandate.Mandate sees, rather than
 # comparing against a paraphrase of it (project Standing Rule #3). `loader.py` in this
 # package makes this file importable as `src.live.mandate.model` (the name the sibling
 # vendored `vibe_trading_enforcement.py` imports it as) via a sys.modules shim, so this

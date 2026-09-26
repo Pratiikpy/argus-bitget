@@ -1,6 +1,6 @@
 """Entity grounding — every instrument a thesis names must appear in the evidence it cites.
 
-`agents/grounding.py` already enforces this for **numbers**: a figure in a thesis resolves to the
+`truth/grounding.py` already enforces this for **numbers**: a figure in a thesis resolves to the
 fact that produced it, or it is reported as unattributable. This module is the missing sibling for
 **instruments**. A model writing about NVDA can name TSLA in the same sentence, and until now
 nothing checked whether TSLA appeared anywhere in what the model was actually reading.
@@ -40,7 +40,7 @@ from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from argus.lui.question import TRADED_SYMBOLS
+from argus.market.bitget import RTOKEN_SYMBOLS as TRADED_SYMBOLS
 
 _TICKER_PATTERN = re.compile(r"(?<![A-Za-z0-9])([A-Z]{2,6}(?:USDT)?)(?![A-Za-z0-9])")
 """Instrument-shaped tokens, bounded by explicit lookarounds rather than ``\\b``.

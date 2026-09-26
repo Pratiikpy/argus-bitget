@@ -18,6 +18,7 @@ large sweep is self-defeating, which is the correct incentive.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from datetime import datetime
 from decimal import Decimal
 
 from argus.backtest.engine import Bar
@@ -118,7 +119,9 @@ def bars_from_candles(candles: list[dict[str, object]]) -> list[Bar]:
     for c in candles:
         ts = c["ts"]
         close = c["close"]
-        if isinstance(ts, str) or not hasattr(ts, "tzinfo"):
+        # A timestamp without a timezone is skipped too: a naive datetime has a `tzinfo`
+        # attribute (it is None), and the session clock rejects it (tests, 2026-09-27).
+        if not isinstance(ts, datetime) or ts.tzinfo is None:
             continue
-        out.append(Bar(ts=ts, close=Decimal(str(close))))  # type: ignore[arg-type]
+        out.append(Bar(ts=ts, close=Decimal(str(close))))
     return out

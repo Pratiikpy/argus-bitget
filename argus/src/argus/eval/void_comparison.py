@@ -56,9 +56,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from argus.eval import artefact
 from argus.eval.compare import ComparisonReport, finalise, legacy_outcome, paired_bootstrap
 from argus.eval.evaluators import Evaluator, statistic
+from argus.truth import artefact
 
 ROOT = Path(__file__).resolve().parents[3]
 NOCTURNE = ROOT.parent / "research" / "repos-rivals" / "nocturne"

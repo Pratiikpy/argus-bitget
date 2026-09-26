@@ -16,11 +16,11 @@ are started with the caller's context, which is what :class:`ContextPool` does; 
 ``ThreadPoolExecutor`` would silently drop their calls and the count would look better than it is.
 
 **Why a source did not answer is typed, not guessed (2026-09-25).** A failure is named with the
-shared taxonomy in :mod:`argus.market.rpc` — an MCP reply is read as JSON-RPC rather than scanned
-for ``"success":false`` in its bytes, so a tool's own refusal (SEP-1303 ``isError``), an upstream
-503 carried inside a 200, and a protocol error are told apart, and a network failure says "timed
-out" or "unreachable" instead of an exception class name. :attr:`Record.kinds` keeps the machine
-kind beside the readable reason; ``as_dict`` publishes both.
+shared taxonomy in :mod:`argus.truth.failures` — an MCP reply is read as JSON-RPC rather than
+scanned for ``"success":false`` in its bytes, so a tool's own refusal (SEP-1303 ``isError``), an
+upstream 503 carried inside a 200, and a protocol error are told apart, and a network failure says
+"timed out" or "unreachable" instead of an exception class name. :attr:`Record.kinds` keeps the
+machine kind beside the readable reason; ``as_dict`` publishes both.
 
 What is not counted: data read from files (the frozen history, a dated snapshot), and calls made by
 subprocesses (the X and Reddit readers run on a schedule, not inside an answer). The line says
@@ -41,7 +41,7 @@ from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import urlparse
 
-from argus.market.rpc import LABELS, classify_exception, classify_http, reply_failure
+from argus.truth.failures import LABELS, classify_exception, classify_http, reply_failure
 
 
 @dataclass
@@ -51,7 +51,7 @@ class Record:
     answered: dict[str, bool] = field(default_factory=dict)
     why: dict[str, str] = field(default_factory=dict)
     kinds: dict[str, str] = field(default_factory=dict)
-    """The :class:`~argus.market.rpc.ErrorKind` of each source's first failure."""
+    """The :class:`~argus.truth.failures.ErrorKind` of each source's first failure."""
     lock: threading.Lock = field(default_factory=threading.Lock)
 
     def note(self, source: str, ok: bool, why: str = "", kind: str = "") -> None:
@@ -209,8 +209,8 @@ def _observed(url: Any, *args: Any, **kwargs: Any) -> Any:
         # bitget-mcp-server's own upstream failure arrives as a tool result that reads
         # {"success": false, "status_code": 503}, JSON escaped inside the text content; it was
         # counted as answered while the service was down (answer audit, round 3). The reply is
-        # parsed as JSON-RPC (`market/rpc.py:reply_failure`) rather than scanned as bytes, so that
-        # 503 is named an upstream 5xx and a refused argument is named the tool's own error.
+        # parsed as JSON-RPC (`truth/failures.py:reply_failure`) rather than scanned as bytes, so
+        # that 503 is named an upstream 5xx and a refused argument is named the tool's own error.
         #
         # The body is teed, not read here in full: bitget-signal holds a slow tool's stream open
         # with a ping every 15 s, so reading to EOF inside this wrapper would hang the answer

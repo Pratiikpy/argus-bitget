@@ -151,7 +151,7 @@ class TestTheContractsCanBeBroken:
             ),
             "llm/qwen.py": "class QwenClient:\n    pass\n",
         })
-        assert not contract_violations(build(root))
+        assert not [v for v in contract_violations(build(root)) if "model-free" in v.contract]
 
     def test_a_producer_importing_its_consumer_is_caught(self, tmp_path: Path) -> None:
         """The exact defect this module found: market reaching into agents for a type."""
@@ -160,8 +160,42 @@ class TestTheContractsCanBeBroken:
             "agents/analysts.py": "class Evidence:\n    pass\n",
         })
         found = contract_violations(build(root))
-        assert any("producer must not import its consumer" in v.contract for v in found)
+        assert any("own layer or below" in v.contract for v in found)
         assert any("filings.py" in v.where or "market.filings" in v.where for v in found)
+
+    def test_a_deferred_upward_import_breaks_the_layer_order(self, tmp_path: Path) -> None:
+        """Audit, 2026-09-26: 33 of the 41 upward imports were inside functions, and the contracts
+        before this one only read module-level edges. A deferred import is still a dependency."""
+        root = _package(tmp_path, {
+            "truth/trace.py": "def show():\n    from argus.lui.research import clean\n",
+            "lui/research.py": "def clean():\n    pass\n",
+        })
+        found = [v for v in contract_violations(build(root)) if "layer" in v.contract]
+        assert len(found) == 1 and found[0].detail.endswith(", deferred")
+
+    def test_main_is_the_one_place_that_may_wire_any_layer(self, tmp_path: Path) -> None:
+        """A command-line entry point is a composition root. Inside a top-level ``main()`` the
+        import is exempt; the same import one function over is not."""
+        root = _package(tmp_path, {
+            "risk/modes.py": (
+                "def main():\n    from argus.paper.ledger import L\n\n"
+                "def helper():\n    from argus.paper.ledger import L\n"
+            ),
+            "paper/ledger.py": "L = 1\n",
+        })
+        found = [v for v in contract_violations(build(root)) if "layer" in v.contract]
+        assert [v.where for v in found] == ["argus.risk.modes:5"]
+
+    def test_a_package_without_a_layer_is_a_violation(self, tmp_path: Path) -> None:
+        root = _package(tmp_path, {"newthing/core.py": "x = 1\n"})
+        found = contract_violations(build(root))
+        assert [v.contract for v in found] == ["every package has a layer"]
+
+    def test_the_real_tree_keeps_the_layer_order(self) -> None:
+        """The published rule, checked on the source that ships: no module imports from a layer
+        above its own, at module level or inside a function, outside ``main()``."""
+        found = [v for v in contract_violations(build()) if "layer" in v.contract]
+        assert not found, [v.detail for v in found]
 
     def test_every_violation_is_reported_not_just_the_first(self, tmp_path: Path) -> None:
         root = _package(tmp_path, {

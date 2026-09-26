@@ -10,6 +10,7 @@ from typing import ClassVar
 
 import pytest
 
+from argus.decision.verdicts import PositionSide
 from argus.desk.book import (
     Book,
     HedgeLink,
@@ -17,7 +18,6 @@ from argus.desk.book import (
     OpenOrderReservation,
     Position,
     PositionError,
-    PositionSide,
     ReconciliationStatus,
     VenueMarginSnapshot,
     order_reservation,

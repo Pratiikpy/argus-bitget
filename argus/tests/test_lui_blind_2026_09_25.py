@@ -7,6 +7,7 @@ refused, most Chinese phrasings refused, every stress on anything but the Nasdaq
 chit-chat ("who won the lakers game") answered with a desk decision. Each class is tested here by
 its mechanism, not by the corpus rows, so the corpus can still be used as a measurement.
 """
+# ruff: noqa: RUF001 - real Chinese questions, full-width punctuation included
 
 from __future__ import annotations
 
@@ -30,6 +31,9 @@ def frozen_data(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(history, "fetch", _fail)
     monkeypatch.setattr(universe, "_fetch_live", _fail)
     monkeypatch.setattr(universe, "_CACHE", None)
+    # No live price either: an amount in shares or coins is left unpriced unless a test pins
+    # prices itself (TestHoldingsStatedAsAmounts does).
+    monkeypatch.setattr(research, "_last_price", lambda symbol: None)
 
 
 def _kind(text: str) -> str | None:
@@ -145,6 +149,35 @@ class TestEnglishPhrasings:
     def test_an_order_on_an_unknown_ticker_is_still_not_research(self) -> None:
         assert _detect("Execute a purchase of 5,000 shares of ZYXQ on my behalf at market "
                        "open.") is None
+
+
+class TestChinesePercentHoldings:
+    """Percentages beside Chinese names were not read at all until 2026-09-27: the question the
+    console's own chip suggests in English, asked in Chinese, came back with no book."""
+
+    @pytest.mark.parametrize("asked", [
+        "我持有50%英伟达和50%苹果，加仓20%特斯拉会怎样影响风险",
+        "我持有英伟达50%和苹果50%，加仓特斯拉20%风险会怎样",
+    ])
+    def test_the_book_and_the_add_are_read_in_either_order(self, asked: str) -> None:
+        request = _detect(asked)
+        assert request is not None and request.kind is ResearchKind.IMPACT
+        assert request.symbols[0] == "TSLAUSDT"
+        assert request.book == pytest.approx({"NVDAUSDT": 0.5, "AAPLUSDT": 0.5})
+        assert request.size == pytest.approx(0.2)
+
+    def test_a_three_name_book_separated_by_the_chinese_comma(self) -> None:
+        request = _detect("我持有40%英伟达、30%微软、30%苹果，再买入15%特斯拉合适吗")
+        assert request is not None and request.kind is ResearchKind.IMPACT
+        assert request.book == pytest.approx(
+            {"NVDAUSDT": 0.4, "MSFTUSDT": 0.3, "AAPLUSDT": 0.3})
+        assert request.size == pytest.approx(0.15)
+
+    def test_a_figure_belongs_to_the_name_it_touches(self) -> None:
+        """"英伟达50%和苹果50%": the first 50% is NVIDIA's, never read as a weight on 苹果 across
+        the 和 between them."""
+        request = _detect("我持有英伟达50%和苹果50%，加仓特斯拉20%风险会怎样")
+        assert request is not None and set(request.book) == {"NVDAUSDT", "AAPLUSDT"}
 
 
 class TestHoldingsStatedAsAmounts:

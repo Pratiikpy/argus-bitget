@@ -10,15 +10,15 @@ from decimal import Decimal
 
 import pytest
 
-from argus.agents.desk import ConstitutionPolicy
-from argus.decision.verdicts import Intent, Side, Verdict
-from argus.desk.book import Book, HedgeLink, Lot, PositionSide
+from argus.decision.verdicts import Intent, PositionSide, Side, Verdict
+from argus.desk.book import Book, HedgeLink, Lot
 from argus.eval.gate_ablation import (
     DIMENSIONS,
     ablated_variants,
     population_rct,
     report_from_records,
 )
+from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface
 from argus.truth.clocks import SessionPhase, SessionState
 

@@ -139,11 +139,11 @@ def _unscheduled_closures() -> frozenset[date]:
     days of mourning, 2025-01-09 among them. A calendar by rule alone calls those days open —
     found by the minute-by-minute check against LEAN in ``tests/test_session_schedule.py``.
     An unreadable file degrades to the rules, never to "every day is open"."""
-    try:
-        from argus.eval.baselines.lean_market_holidays_loader import load_usa_equity_holidays
+    from argus.truth.clocks import HolidayCalendarError, us_equity_holidays
 
-        return load_usa_equity_holidays()
-    except Exception:
+    try:
+        return us_equity_holidays()
+    except HolidayCalendarError:
         return frozenset()
 
 

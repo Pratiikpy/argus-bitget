@@ -16,8 +16,8 @@ from typing import Any
 import pytest
 
 from argus.eval import perturbations as pt
-from argus.eval.artefact import is_strict, write
 from argus.llm.qwen import QwenClient
+from argus.truth.artefact import is_strict, write
 
 AS_OF = datetime(2026, 9, 25, 14, 0, tzinfo=UTC)
 

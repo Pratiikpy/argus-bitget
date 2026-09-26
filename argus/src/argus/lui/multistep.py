@@ -164,7 +164,7 @@ def answer(question: str, found: list[Part], run: Any) -> tuple[list[str], list[
 
     budget = found[:MAX_PARTS]
     # A context-carrying pool: a plain ThreadPoolExecutor starts each part with an empty context,
-    # so the parts' source counts (`truth/coverage.py`) and their step trace (`truth/trace.py`)
+    # so the parts' source counts (`truth/coverage.py`) and their step trace (`lui/trace.py`)
     # were silently dropped from multi-part answers.
     with ContextPool(max_workers=len(budget)) as pool:
         results = list(pool.map(lambda p: run(p.text, p.request), budget))

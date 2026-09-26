@@ -84,7 +84,7 @@ from typing import Any
 
 import numpy as np
 
-from argus.eval import artefact
+from argus.truth import artefact
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 STRESS_REPORT = DATA / "research_depth_stress.json"

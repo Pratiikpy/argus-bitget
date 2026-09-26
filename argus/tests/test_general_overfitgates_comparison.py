@@ -19,9 +19,9 @@ import pytest
 
 from argus.backtest.metrics import MetricError
 from argus.desk import review as desk_review
-from argus.eval import artefact
 from argus.eval import general_overfitgates_comparison as gog
 from argus.eval.dsr_comparison import DsrCase
+from argus.truth import artefact
 
 
 @pytest.fixture(scope="module")

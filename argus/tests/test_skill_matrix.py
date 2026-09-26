@@ -12,9 +12,9 @@ from pathlib import Path
 from typing import Any
 
 from argus.eval import skill_matrix as sm
-from argus.eval.artefact import is_strict, write
 from argus.market.rpc import ErrorKind, Outcome, RpcError, ToolResult
 from argus.market.skills import SKILLS
+from argus.truth.artefact import is_strict, write
 
 
 def _text(payload: Any, *, is_error: bool = False) -> ToolResult:

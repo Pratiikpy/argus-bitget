@@ -72,6 +72,7 @@ class TestBaselineRead:
         assert baseline["real_constant_latency_constructor_has_exactly_two_params"]
 
 
+@pytest.mark.network
 class TestSameInputComparison:
     def test_every_configured_budget_was_priced(self, same_input: dict) -> None:
         assert len(same_input["results"]) == len(THINKING_BUDGETS_MS)
@@ -118,6 +119,7 @@ class TestReproducibility:
         assert reproducibility["identical"]
 
 
+@pytest.mark.network
 class TestMain:
     def test_render_produces_readable_text(
         self, baseline: dict, same_input: dict, ablation: dict, reproducibility: dict,

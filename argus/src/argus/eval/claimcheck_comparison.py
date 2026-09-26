@@ -50,8 +50,8 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Self
 
-from argus.eval import artefact
 from argus.eval.compare import ComparisonReport, finalise, sign_test, sign_test_outcome
+from argus.truth import artefact
 
 DATA = Path(__file__).resolve().parents[3] / "data" / "h2h_mirrorline"
 REPORT = Path(__file__).resolve().parents[3] / "data" / "claimcheck_comparison.json"

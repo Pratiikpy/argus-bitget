@@ -33,13 +33,12 @@ from enum import StrEnum
 from typing import Any
 
 from argus.lui.normalise import fold
+from argus.market.bitget import RTOKEN_SYMBOLS
 
 # Instruments ARGUS actually decides on. A question about anything else is refused by name rather
-# than answered from the model's memory of what gold did.
-TRADED_SYMBOLS: tuple[str, ...] = (
-    "NVDAUSDT", "TSLAUSDT", "AAPLUSDT", "MSFTUSDT", "METAUSDT", "GOOGLUSDT",
-    "AMZNUSDT", "COINUSDT", "MSTRUSDT", "QQQUSDT", "TQQQUSDT", "SQQQUSDT",
-)
+# than answered from the model's memory of what gold did. The venue layer's own list: this was a
+# second copy of the same twelve names, and lower layers imported it from here, upward.
+TRADED_SYMBOLS: tuple[str, ...] = RTOKEN_SYMBOLS
 
 _TICKER_TO_SYMBOL: dict[str, str] = {s.removesuffix("USDT"): s for s in TRADED_SYMBOLS}
 _TICKER_TO_SYMBOL.update({"GOOG": "GOOGLUSDT", "GOOGLE": "GOOGLUSDT", "ALPHABET": "GOOGLUSDT"})
@@ -742,7 +741,7 @@ _PATTERNS: tuple[tuple[str, Intent], ...] = (
      r"(?:worst|best)\s+(?:trade|decision|day))\b",
      Intent.PERFORMANCE),
     # **Idioms for "how did we do" that share no vocabulary with it.** Added 2026-09-21 because the
-    # *deployed* console ships no model weights, so these patterns — not `lui/semantic.py` — are
+    # *deployed* console ships no model weights, so these patterns — not `llm/semantic.py` — are
     # what a judge actually meets. It answered "unknown" to all three of "so what is the damage",
     # "are we in the red or the black" and "where do we stand".
     #
@@ -848,7 +847,7 @@ _PATTERNS: tuple[tuple[str, Intent], ...] = (
 
     # --- Oblique phrasings, added 2026-09-21 ---------------------------------------------------
     #
-    # **These exist because the deployed console ships no model weights.** `lui/semantic.py` routes
+    # **These exist because the deployed console ships no model weights.** `llm/semantic.py` routes
     # 52.4% of held-out phrasings correctly, and none of it reaches a judge: the hosted bundle
     # carries no token table, so the patterns in this file are the entire console a reader meets.
     # Asked the eight questions below in a trader's own voice, that console answered "unknown" to

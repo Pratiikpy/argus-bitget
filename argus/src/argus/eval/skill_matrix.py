@@ -61,7 +61,6 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Protocol
 
-from argus.eval.artefact import write
 from argus.market.rpc import (
     LABELS,
     ErrorKind,
@@ -71,6 +70,7 @@ from argus.market.rpc import (
     outcome_of,
 )
 from argus.market.skills import hollow
+from argus.truth.artefact import write
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "skill_matrix.json"
 HISTORY_PATH = REPORT_PATH.with_name("skill_matrix_history.jsonl")

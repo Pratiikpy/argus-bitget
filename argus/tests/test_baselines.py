@@ -506,7 +506,8 @@ class TestVendoredFilesHaveNotDrifted:
 
     def test_lean_market_holidays_usa_body_matches_the_pinned_hash(self) -> None:
         got = hashlib.sha256(
-            (_BASELINES_DIR / "lean_market_holidays_usa.json").read_bytes()
+            # moved with the clock that uses it, unchanged byte for byte
+            (_BASELINES_DIR.parents[1] / "truth" / "data" / "us_equity_holidays.json").read_bytes()
         ).hexdigest()
         assert got == _LEAN_MARKET_HOLIDAYS_USA_SHA256
 

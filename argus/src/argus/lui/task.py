@@ -32,7 +32,7 @@ from __future__ import annotations
 
 import html
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Any
@@ -40,6 +40,8 @@ from urllib.parse import urlencode
 
 from argus.lui import design
 from argus.lui.research import (
+    ANALOGUE_DAYS,
+    LOOKBACK_DAYS,
     ResearchKind,
     ResearchRequest,
     detect,
@@ -62,16 +64,29 @@ IMPACT_TITLE = "What the trade does to your book"
 EXPOSURE_TITLE = "Sector and factor exposure, before and after"
 EXECUTION_TITLE = "How to execute the size"
 
+STEP_DEADLINE_S = 60.0
+"""How long the task waits for its slowest engine. The engines run side by side and usually
+finish in a few seconds; one that hangs on an upstream used to hold the whole page with it
+(audit, 2026-09-26). A step still running at the deadline is shown as not answering, and the
+rest of the task is served."""
+
+# Each label names where the step's figures come from, in words a trader reads; the cards used to
+# show module paths ("lui.research", "desk.portfolio.copilot") and an "89 days" that no longer
+# matched the analogue engine's window (audit, 2026-09-26).
 STEPS: tuple[tuple[str, ResearchKind | None, str], ...] = (
-    ("Where it trades and what a trade costs", ResearchKind.QUOTE, "lui.research (Bitget ticker)"),
+    ("Where it trades and what a trade costs", ResearchKind.QUOTE,
+     "Bitget live ticker, funding and the stock's close"),
     ("The technical picture", ResearchKind.TECHNICALS, "bitget-signal, checked against Bitget 4h"),
-    ("News, filings and today's move", ResearchKind.NEWS, "RSS + Yahoo + SEC EDGAR, beta split"),
+    ("News, filings and today's move", ResearchKind.NEWS,
+     "news feeds and SEC EDGAR; the move split by beta"),
     ("Earnings, analysts and the surprise", ResearchKind.FUNDAMENTALS,
-     "bitget-mcp-server + SEC XBRL (SUE)"),
-    ("Has it been here before?", ResearchKind.ANALOGUE, "desk.analogue over 89 days"),
-    (IMPACT_TITLE, ResearchKind.IMPACT, "desk.portfolio.copilot"),
-    (EXPOSURE_TITLE, None, "lui.exposures (Yahoo classification, GICS names; 4-factor OLS)"),
-    (EXECUTION_TITLE, ResearchKind.EXECUTION, "desk.workbench + live order book"),
+     "bitget-mcp-server and SEC XBRL filings"),
+    ("Has it been here before?", ResearchKind.ANALOGUE,
+     f"similar past hours in up to {ANALOGUE_DAYS} days of Bitget candles"),
+    (IMPACT_TITLE, ResearchKind.IMPACT,
+     f"your book's risk on {LOOKBACK_DAYS} days of hourly returns"),
+    (EXPOSURE_TITLE, None, "Yahoo sector classification and a four-factor regression"),
+    (EXECUTION_TITLE, ResearchKind.EXECUTION, "Bitget live order book"),
 )
 """The steps in the order they are shown. ``None`` is the exposures engine, which answers a book
 rather than a research request (`lui/exposures.exposures_answer`)."""
@@ -317,13 +332,26 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
                     seconds=time.perf_counter() - began, chart=chart,
                     data=data if not refused else {})
 
-    with ThreadPoolExecutor(max_workers=len(STEPS) + 1) as pool:
+    # Not a `with` block: leaving one waits for every thread, which is exactly the hang the
+    # deadline exists to cut. A step still running is abandoned; its thread ends on its own.
+    pool = ThreadPoolExecutor(max_workers=len(STEPS) + 1)
+    try:
         path = pool.submit(_price_path, symbol)
-        steps = list(pool.map(one, STEPS))
+        futures = [pool.submit(one, step) for step in STEPS]
+        pending: list[Future[Any]] = [*futures, path]
+        done, _ = wait(pending, timeout=STEP_DEADLINE_S)
+        steps = [future.result() if future in done else Step(
+                     title=title, engine=engine, refused=True, seconds=STEP_DEADLINE_S,
+                     lines=[f"This step did not answer within {STEP_DEADLINE_S:.0f} seconds, so "
+                            f"the task went on without it."])
+                 for (title, _, engine), future in zip(STEPS, futures, strict=True)]
         try:
-            steps[0].chart = price_chart(path.result(), symbol.removesuffix("USDT"))
+            steps[0].chart = (price_chart(path.result(), symbol.removesuffix("USDT"))
+                              if path in done else "")
         except Exception:
             steps[0].chart = ""  # the quote step stands without its chart
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
     return Task(question=question, name=symbol.removesuffix("USDT"), size_pct=size * 100,
                 book=book, steps=steps, seconds=time.perf_counter() - started, asked=asked,
                 reading=reading)
@@ -419,7 +447,7 @@ def verdict(task: Task) -> Verdict | None:
 def unread_task(asked: str, reason: str) -> Task:
     """The page for a question that could not be read: the reason, and the form to try again."""
     return Task(question=asked, name="", size_pct=0.0, book={}, seconds=0.0, asked=asked,
-                steps=[Step(title="What I could not read", engine="lui.research reader",
+                steps=[Step(title="What I could not read", engine="the question reader",
                             lines=[reason], refused=True)])
 
 
@@ -581,6 +609,8 @@ def render_task(task: Task, favicon: str) -> str:
    outline-offset:2px }}
  form button {{ padding:9px 16px; border:1px solid var(--accent); background:var(--accent);
    color:var(--on-accent); border-radius:8px; font-size:14px; cursor:pointer }}
+ form button:disabled {{ opacity:.7; cursor:progress }}
+ .running {{ margin:8px 0 0; font-size:13.5px; color:var(--dim) }}
  .q {{ font-size:17px; font-weight:600; margin:0 0 12px }}
  .concl {{ background:var(--panel); border:1px solid var(--accent); border-radius:10px;
    padding:14px 18px; margin:0 0 20px }}
@@ -608,7 +638,7 @@ def render_task(task: Task, favicon: str) -> str:
  .chart figcaption {{ font-size:12px; color:var(--dim); margin-top:4px }}
  .chart .path {{ fill:none; stroke:var(--accent); stroke-width:1.6 }}
  .chart .area {{ fill:var(--accent); opacity:.09 }} .chart .dot {{ fill:var(--accent) }}
- .chart .lbl, .chart .val {{ font:12px system-ui,sans-serif; fill:var(--dim) }}
+ .chart .lbl, .chart .val {{ font:12px var(--sans); fill:var(--dim) }}
  .chart .lbl {{ fill:var(--ink); font-weight:600 }}
  .chart rect.w, .key.w {{ fill:var(--line); background:var(--line) }}
  .chart rect.r, .key.r {{ fill:var(--accent); background:var(--accent) }}
@@ -617,14 +647,15 @@ def render_task(task: Task, favicon: str) -> str:
 {design.BASE_CSS}</style></head><body>{design.nav('/research')}<div class="wrap">
 <h1>One research task, question to actionable insight — run live</h1>
 <p class="sub">Ask it the way you would ask a colleague. Eight engines answer in parallel, each
-the same engine the <a href="/">console</a> uses, every figure from live Bitget, SEC, FRED or news
-data and every line naming its source. The conclusion is each engine's own actionable line —
+the same engine the <a href="/">console</a> uses, every figure from live Bitget, SEC, Yahoo or
+news data and every line naming its source. The conclusion is each engine's own actionable line —
 nothing on this page is written by a language model, and your question is read without one.</p>
 <form method="post" action="/research">
  <div class="ask">
   <textarea name="q" rows="2" aria-label="your question">{esc(asked)}</textarea>
   <button>Run</button>
  </div>
+ <p class="running" role="status" aria-live="polite" hidden></p>
  <details><summary>Or set the name, size and book yourself</summary>
   <div class="edit">
    <label>Name<input class="name" name="name" value="{esc(task.name)}"></label>
@@ -641,7 +672,34 @@ nothing on this page is written by a language model, and your question is read w
 {''.join(cards)}
 <p class="sub">Ran in {task.seconds:.1f}s. Execution is sized on a ${DEFAULT_BOOK_VALUE:,.0f} book.
 This is analysis, not advice — you make the call. <a href="{esc(json_link)}">JSON</a></p>
-</div>{design.footer()}</body></html>"""
+</div>{design.footer()}
+<script>
+// The page is one blocking POST: the engines run before a byte comes back, so without this the
+// Run button looked dead for as long as the slowest engine took (audit, 2026-09-26).
+(() => {{
+  const form = document.querySelector('form'), box = form.querySelector('textarea');
+  const run = form.querySelector('button'), note = form.querySelector('.running');
+  let timer = 0;
+  form.addEventListener('submit', () => {{
+    const started = Date.now();
+    run.disabled = true; run.textContent = 'Running';
+    note.hidden = false;
+    const tick = () => {{ note.textContent = 'Eight engines are reading live data: '
+      + Math.round((Date.now() - started) / 1000) + ' s'; }};
+    tick(); timer = setInterval(tick, 1000);
+  }});
+  // Enter asks and Shift+Enter starts a new line, as in the console; never mid-composition.
+  box.addEventListener('keydown', (e) => {{
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && box.value.trim()) {{
+      e.preventDefault(); form.requestSubmit();
+    }}
+  }});
+  // Coming back with the browser's Back button restores this page from its cache as it was.
+  addEventListener('pageshow', () => {{
+    clearInterval(timer); run.disabled = false; run.textContent = 'Run'; note.hidden = true;
+  }});
+}})();
+</script></body></html>"""
 
 
 def as_dict(task: Task) -> dict[str, Any]:

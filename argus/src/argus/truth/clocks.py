@@ -16,9 +16,12 @@ at 3am on a Sunday.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from enum import StrEnum
+from functools import cache
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ET = ZoneInfo("America/New_York")
@@ -105,16 +108,40 @@ def _next_business_day(d: date) -> date:
     return nxt
 
 
+HOLIDAYS_PATH = Path(__file__).resolve().parent / "data" / "us_equity_holidays.json"
+"""US equity market holidays, 1998-2028: the "holidays" array of the "Equity-usa-[*]" entry of
+QuantConnect/Lean's market-hours database (Data/market-hours/market-hours-database.json, commit
+23b735d99a357807dc0df9f4c51d30f05fe0d277), copied verbatim. Apache License 2.0, Copyright 2014
+QuantConnect Corporation."""
+
+
+class HolidayCalendarError(RuntimeError):
+    """The holiday calendar could not be read. Raised rather than defaulting to "no holidays",
+    which would call a closed market open."""
+
+
+@cache
+def us_equity_holidays() -> frozenset[date]:
+    """The US equity market holidays every :class:`DualClock` uses unless a test injects its own."""
+    try:
+        raw = json.loads(HOLIDAYS_PATH.read_text(encoding="utf-8"))
+        return frozenset(datetime.strptime(s, "%m/%d/%Y").date() for s in raw)
+    except (OSError, ValueError) as exc:
+        raise HolidayCalendarError(f"could not read {HOLIDAYS_PATH}: {exc}") from exc
+
+
 class DualClock:
     """Resolves an instant against both clocks at once.
 
-    Holidays are injected rather than hardcoded so that a test can construct a specific market
-    condition without depending on the real calendar — and so that a missing holiday file degrades
-    to "we do not know", never to "assume open".
+    The US equity holiday calendar is loaded by default (:func:`us_equity_holidays`). Until
+    2026-09-26 the default was an empty set, so every clock built without an argument — the live
+    paper cycle's among them — called Thanksgiving a regular session; only one caller of about
+    twenty-five injected the calendar (judge audit). ``holidays`` remains for a test that builds a
+    specific market condition; a calendar that cannot be read raises instead of assuming open.
     """
 
     def __init__(self, holidays: frozenset[date] | None = None) -> None:
-        self._holidays = holidays or frozenset()
+        self._holidays = us_equity_holidays() if holidays is None else holidays
 
     def phase(self, instant: datetime) -> SessionPhase:
         if instant.tzinfo is None:

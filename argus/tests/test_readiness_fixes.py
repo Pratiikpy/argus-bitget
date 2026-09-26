@@ -99,10 +99,12 @@ def test_an_as_of_answer_keeps_nothing_it_could_not_have_known() -> None:
     assert answer.lines[-1].startswith("Data:")
 
 
+@pytest.mark.network
 def test_a_hedge_leg_without_history_does_not_sink_the_answer(
         monkeypatch: pytest.MonkeyPatch) -> None:
-    """Offline, SMH is not in the frozen history; the hedge plan answers with the legs it can
-    measure instead of raising out of the console (trace audit, 2026-09-26)."""
+    """With SMH's history unreadable, the hedge plan answers with the legs it can measure
+    instead of raising out of the console (trace audit, 2026-09-26). The legs it does measure
+    are priced on live order books, so this reaches the venue."""
     from decimal import Decimal
 
     from argus.desk.portfolio import PortfolioError
@@ -119,6 +121,38 @@ def test_a_hedge_leg_without_history_does_not_sink_the_answer(
     lines, _sources, _data = research._hedge_plan({"AAPLUSDT": 1.0}, Decimal(10_000),
                                                   "best way to hedge a long AAPL book")
     assert lines and not any("SMH" in line and "beta" in line for line in lines)
+
+
+def test_a_ticker_outage_does_not_raise_out_of_the_hedge_plan(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """The bulk ticker call sat outside the per-leg guard, so one 429 from Bitget raised out of
+    every hedge question (found running the suite with the network blocked, 2026-09-27). Now each
+    leg is reported as not answering and the caller refuses honestly."""
+    from decimal import Decimal
+    from types import SimpleNamespace
+
+    from argus.lui import research
+    from argus.market import bitget, depth
+
+    hours = range(200)
+    wiggle = [0.001 * ((h * 7) % 11 - 5) for h in hours]
+    series = {h: w for h, w in zip(hours, wiggle, strict=True)}
+
+    def load(symbols: Sequence[str], **kwargs: Any) -> Any:
+        return SimpleNamespace(raw={s: dict(series) for s in symbols})
+
+    def refuse(*args: Any, **kwargs: Any) -> Any:
+        raise bitget.BitgetError("transport failure for /api/v2/mix/market/tickers: 429")
+
+    def no_book(*args: Any, **kwargs: Any) -> Any:
+        raise depth.DepthError("no book")
+
+    monkeypatch.setattr(research, "load", load)
+    monkeypatch.setattr(research, "_is_equity", lambda symbol: True)  # reads the live list
+    monkeypatch.setattr(bitget, "fetch_tickers", refuse)
+    monkeypatch.setattr(depth, "fetch_orderbook", no_book)
+    assert research._hedge_plan({"AAPLUSDT": 1.0}, Decimal(10_000),
+                                "best way to hedge a long AAPL book") == ([], [], {})
 
 
 @pytest.mark.parametrize(("module", "attr", "by"), [

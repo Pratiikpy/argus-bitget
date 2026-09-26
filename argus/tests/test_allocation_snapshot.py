@@ -15,7 +15,7 @@ from pathlib import Path
 import pytest
 
 from argus.eval.allocation_snapshot import SNAPSHOT_PATH, SnapshotError, digest, load_snapshot
-from argus.eval.artefact import write
+from argus.truth.artefact import write
 
 STAMPS = ["2026-03-31T08:00:00+00:00", "2026-03-31T09:00:00+00:00", "2026-03-31T10:00:00+00:00"]
 COLUMNS = {"QQQUSDT": [0.001, -0.002, 0.0005], "AAPLUSDT": [0.0, 0.003, -0.001]}

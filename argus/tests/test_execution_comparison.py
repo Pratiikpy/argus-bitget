@@ -62,6 +62,7 @@ def live_base_case() -> dict:
     return run_base_case()
 
 
+@pytest.mark.network
 class TestTheLiveRunIsWellFormed:
     def test_live_legs_are_measured_and_both_systems_answer(self, live_base_case: dict) -> None:
         assert live_base_case["real_crypto_sor_pick_at_entry"] in ("NVDAUSDT", "BTCUSDT")
@@ -120,6 +121,7 @@ class TestDivergenceSweep:
         assert len(picks) > 1
 
 
+@pytest.mark.network
 class TestLegPairSweep:
     def test_all_configured_pairs_were_checked(self, pairs: dict) -> None:
         assert pairs["n_pairs"] == len(LEG_PAIRS)
@@ -153,6 +155,7 @@ class TestFailureCases:
         assert not case["real_raised"]
 
 
+@pytest.mark.network
 class TestCosts:
     def test_the_subprocess_is_measurably_slower_than_pure_python(self, costs: dict) -> None:
         assert costs["crypto_sor_subprocess_seconds_per_call"] > 0
@@ -161,11 +164,13 @@ class TestCosts:
         assert costs["argus_faster_by_factor"] > 1
 
 
+@pytest.mark.network
 class TestReproducibility:
     def test_repeated_subprocess_runs_agree(self, reproducibility: dict) -> None:
         assert reproducibility["identical"]
 
 
+@pytest.mark.network
 class TestMain:
     def test_render_produces_readable_text(
         self, base_case: dict, sweep: dict, pairs: dict, failures: dict, costs: dict,

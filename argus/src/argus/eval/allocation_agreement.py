@@ -51,7 +51,7 @@ from argus.eval.allocation_comparison import (
     convex_first_step,
     load_returns,
 )
-from argus.eval.artefact import write
+from argus.truth.artefact import write
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "allocation_agreement.json"
 

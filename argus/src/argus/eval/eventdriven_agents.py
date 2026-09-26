@@ -706,7 +706,7 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - CLI
     the clone commands) and writes ``data/eventdriven_agents.json``. No model is called."""
     import argparse
 
-    from argus.eval.artefact import write as write_artefact
+    from argus.truth.artefact import write as write_artefact
 
     argparse.ArgumentParser(description="slimon's own events, gated four ways, traded").parse_args(
         argv)

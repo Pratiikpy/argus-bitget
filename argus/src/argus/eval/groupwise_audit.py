@@ -60,8 +60,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from argus.eval import artefact
 from argus.eval.groupwise import GroupwiseReport, Item, audit, halves_from
+from argus.truth import artefact
 
 PACKAGE = Path(__file__).resolve().parents[3]
 DATA = PACKAGE / "data"

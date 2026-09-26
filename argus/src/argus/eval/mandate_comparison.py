@@ -6,7 +6,7 @@ file (in full — all 797 lines, this module's docstring cites exact ranges belo
 ``best_method_studied``; this module is ``baseline_reproduced`` and ``same_input_comparison``: it
 runs Vibe-Trading's own ``check_mandate()``, vendored byte-verified in ``eval/baselines/`` (see that
 package's docstring), against the same constructed scenarios ARGUS's own
-:func:`argus.agents.mandate.Mandate.out_of_mandate` sees.
+:func:`argus.desk.mandate.Mandate.out_of_mandate` sees.
 
 **The two systems check different things, and this module says so rather than hiding it.**
 Vibe-Trading's gate (``check_mandate``, ``enforcement.py:455-617``) enforces, in a fixed fail-fast
@@ -22,9 +22,9 @@ concurrent-position cap — have no Vibe-Trading equivalent at all.
 ``no_specialist_capability_superior`` at the bottom of this module states the scope this is honestly
 claimed over, not "ARGUS wins everything a pre-trade gate could check" — portfolio-wide leverage and
 gross exposure are a *different* ARGUS capability's job
-(``agents.desk.ConstitutionPolicy.max_gross_exposure_notional`` / ``max_signed_exposure_notional`` —
-the class at ``agents/desk.py:865``, its ``rule()`` method that enforces the exposure ceiling at
-``agents/desk.py:1042`` — checked directly before this claim was written), not this one's.
+(``risk.constitution.ConstitutionPolicy.max_gross_exposure_notional`` /
+``max_signed_exposure_notional`` — the class in ``risk/constitution.py``, whose ``rule()`` method
+enforces the exposure ceiling — checked directly before this claim was written), not this one's.
 
 Also see ``research/architecture/personalisation-audit.md`` for the corrected record of two
 FABRICATED citations this project previously carried about Vibe-Trading (a mandate-injection
@@ -40,7 +40,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
-from argus.agents.mandate import Mandate
+from argus.desk.mandate import Mandate
 from argus.desk.workbench import TraderProfile
 from argus.eval.baselines.loader import BaselineLoadError, VibeTradingSymbols, load_baseline
 
@@ -676,8 +676,8 @@ class BlindSpotCosts:
 
     Not a defect in either system — vibe-trading was never built to know about a trader's holding
     horizon, and ARGUS's Mandate was deliberately not built to police leverage (that is
-    ``agents.desk.ConstitutionPolicy``'s job). The point of measuring it is that "structural blind
-    spot" is currently an assertion; this is what makes it a number — the ``costs_included``
+    ``risk.constitution.ConstitutionPolicy``'s job). The point of measuring it is that "structural
+    blind spot" is currently an assertion; this is what makes it a number — the ``costs_included``
     condition asks for a real cost, and for a compliance gate the real cost of an unrepresented
     dimension is exactly how often it would have silently let something through.
     """
@@ -718,7 +718,7 @@ def blind_spot_costs(results: tuple[ComparisonResult, ...]) -> BlindSpotCosts:
 # =============================================================================================
 
 SCOPE_STATEMENT = """\
-Claimed: within the scope `agents.mandate.Mandate` actually covers — per-trader personalisation \
+Claimed: within the scope `desk.mandate.Mandate` actually covers — per-trader personalisation \
 that changes a decision (holding horizon, position size as a percentage of THIS trader's capital, \
 a hard per-symbol exclusion list, hedge-availability refusal, a confidence floor, a concurrent-\
 position cap) AND reaches the reasoning layer before a thesis is written (`agents/desk.py`'s \
@@ -731,10 +731,10 @@ architecture/personalisation-audit.md`'s correction notice for what was checked.
 
 NOT claimed: that ARGUS's Mandate is a complete pre-trade risk gate. Vibe-Trading's leverage, \
 total-exposure, daily-trade-count, instrument/asset-class allowlist and funding-ceiling checks \
-have no ARGUS equivalent INSIDE `agents.mandate.Mandate` — by design, not oversight: \
-portfolio-wide leverage and gross/signed exposure are `agents.desk.ConstitutionPolicy`'s job \
-(`max_gross_exposure_notional` / `max_signed_exposure_notional`, `agents/desk.py:865`, gate \
-logic in `rule()` at `agents/desk.py:1042`), a separate, already-built ARGUS capability this \
+have no ARGUS equivalent INSIDE `desk.mandate.Mandate` — by design, not oversight: \
+portfolio-wide leverage and gross/signed exposure are `risk.constitution.ConstitutionPolicy`'s job \
+(`max_gross_exposure_notional` / `max_signed_exposure_notional`, `risk/constitution.py`, gate \
+logic in its `rule()`), a separate, already-built ARGUS capability this \
 module does not re-litigate. Whether splitting \
 "whose trade is this" from "how much risk can the book carry" across two modules is better \
 architecture than Vibe-Trading's one bundled gate is a real, currently open question — not decided \

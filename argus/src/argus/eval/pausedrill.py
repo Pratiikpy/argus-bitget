@@ -52,7 +52,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from argus.agents.desk import ConstitutionPolicy, DeskRun, TradingDesk, resume_signature
+from argus.agents.desk import DeskRun, TradingDesk, resume_signature
 from argus.decision.pause import (
     HumanAction,
     HumanResponse,
@@ -60,8 +60,9 @@ from argus.decision.pause import (
     state_hash,
     summarise,
 )
-from argus.eval.artefact import write
+from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface
+from argus.truth.artefact import write
 from argus.truth.clocks import SessionPhase, SessionState
 from argus.truth.evidence import Evidence
 

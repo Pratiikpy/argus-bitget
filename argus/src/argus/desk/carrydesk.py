@@ -42,7 +42,7 @@ from argus.decision.verdicts import (
     Side,
     Verdict,
 )
-from argus.eval.autopsy import CHAIN, FIRED, PASSED, UNREACHED
+from argus.risk.gatechain import CHAIN, FIRED, PASSED, UNREACHED
 from argus.truth.clocks import SessionState
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "carry_desk.json"
@@ -240,7 +240,7 @@ def assess(
     notional: Decimal = DEFAULT_NOTIONAL, policy: Any | None = None,
 ) -> dict[str, Any]:
     """Run a carry basket through the real Constitution and report what each gate did."""
-    from argus.agents.desk import ConstitutionPolicy
+    from argus.risk.constitution import ConstitutionPolicy
     from argus.risk.hedgeability import HedgeabilitySurface
 
     rules = policy or ConstitutionPolicy()

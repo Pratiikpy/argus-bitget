@@ -1,16 +1,16 @@
 {
-  "as_of": "2026-09-26T16:15:41.338628+00:00",
-  "refusals": 728,
-  "refusals_with_a_gradeable_claim": 356,
+  "as_of": "2026-09-26T20:17:51.047118+00:00",
+  "refusals": 748,
+  "refusals_with_a_gradeable_claim": 376,
   "hours_tolerance": 1.5,
   "round_trip_bps": 12.0,
   "base_clearance_about_2h": {
-    "cleared": 261,
-    "marks": 349
+    "cleared": 268,
+    "marks": 382
   },
   "by_claim": {
     "session_closed": {
-      "consistent": 293,
+      "consistent": 312,
       "contradicted": 0,
       "ungradeable": 0
     },
@@ -20,12 +20,12 @@
       "ungradeable": 0
     },
     "hours_to_discovery": {
-      "consistent": 286,
+      "consistent": 303,
       "contradicted": 0,
       "ungradeable": 0
     },
     "no_hedge": {
-      "consistent": 168,
+      "consistent": 183,
       "contradicted": 0,
       "ungradeable": 52
     },
@@ -35,9 +35,9 @@
       "ungradeable": 0
     },
     "moves_enough": {
-      "consistent": 43,
-      "contradicted": 11,
-      "ungradeable": 32
+      "consistent": 46,
+      "contradicted": 18,
+      "ungradeable": 28
     },
     "move_too_small": {
       "consistent": 0,
@@ -48,10 +48,10 @@
   "forward_against_base": {
     "move_too_small": null,
     "moves_enough": {
-      "borne_out": 43,
-      "graded": 54,
-      "base_rate": 0.7479,
-      "p_one_sided": 0.2586
+      "borne_out": 46,
+      "graded": 64,
+      "base_rate": 0.7016,
+      "p_one_sided": 0.4422
     }
   },
   "forward_claims": [
@@ -146,8 +146,64 @@
       "stated": "\u2026he median move was 67.7bps; the binding constraint has been direction, not size, and today's directional signal is mild bullish without a c\u2026",
       "recorded": "next move -5.8bps over 2.08h against a 12bps round trip (refusal_marks.jsonl)",
       "verdict": "contradicted"
+    },
+    {
+      "seq": 710,
+      "symbol": "AAPLUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026consecutive weekend passes where the binding constraint was direction, not size \u2014 and the evidence here does not resolve that constraint wi\u2026",
+      "recorded": "next move -4.4bps over 3.47h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 727,
+      "symbol": "COINUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026were direction calls we could not make \u2014 the constraint was direction, not size, and that constraint persists today.",
+      "recorded": "next move -4.1bps over 1.98h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 729,
+      "symbol": "QQQUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026in absolute terms, meaning the binding constraint has been direction, not size \u2014 and direction remains unresolvable here.",
+      "recorded": "next move -0.1bps over 1.98h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 730,
+      "symbol": "TQQQUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026dictable ex ante, confirming that the binding constraint is direction, not size.",
+      "recorded": "next move -6.3bps over 1.98h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 733,
+      "symbol": "AAPLUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026market moved enough to pay), but the binding constraint was direction, not size \u2014 and I still cannot call direction with sufficient confide\u2026",
+      "recorded": "next move +1.2bps over 2.02h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 735,
+      "symbol": "METAUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026nce in a stale weekend tape where the binding constraint is direction, not size.",
+      "recorded": "next move +3.6bps over 2.02h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 740,
+      "symbol": "QQQUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026moves exceeding the hurdle \u2014 but the binding constraint was direction, not size, and nothing in today's evidence resolves that direction be\u2026",
+      "recorded": "next move -3.5bps over 2.02h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
     }
   ],
-  "verdict": "728 refusal(s) on record; 356 carried at least one reason the record can check. Of 750 decision-time reason(s) graded, 750 agreed with the record and 0 contradicted it. `moves_enough` claims were borne out by the next ~2h move 43 of 54 time(s) (80%), against 75% for every ~2h refusal mark (one-sided exact binomial p = 0.26); no evidence the stated reason says more than the base rate does.",
+  "verdict": "748 refusal(s) on record; 376 carried at least one reason the record can check. Of 801 decision-time reason(s) graded, 801 agreed with the record and 0 contradicted it. `moves_enough` claims were borne out by the next ~2h move 46 of 64 time(s) (72%), against 70% for every ~2h refusal mark (one-sided exact binomial p = 0.44); no evidence the stated reason says more than the base rate does.",
   "method": "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set beside the record: session_phase and hours_to_discovery from the ledger, the desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims about the size of the coming move. Question and binary verdict from VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, MIT); graded here by the record, not by a model."
 }

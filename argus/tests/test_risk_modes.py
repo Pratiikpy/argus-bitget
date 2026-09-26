@@ -10,10 +10,11 @@ from pathlib import Path
 import pytest
 
 from argus.eval import risk_shadow
+from argus.execution import modes
 from argus.execution.guard import GUARD_GATES, Denial, GateVerdict, Guard, Instrument
-from argus.risk import certify, modes
+from argus.execution.modes import Demand, Layer, ModeError, ModeNotifier, RiskMode
+from argus.risk import certify
 from argus.risk.circuit import BookState
-from argus.risk.modes import Demand, Layer, ModeError, ModeNotifier, RiskMode
 
 NVDA = Instrument.from_payload(risk_shadow.variant_row("nvda"))
 CALM = BookState(equity=Decimal("100000"), peak_equity=Decimal("100000"),

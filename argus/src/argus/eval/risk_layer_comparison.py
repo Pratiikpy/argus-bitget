@@ -111,7 +111,6 @@ from typing import Any
 from argus.backtest.engine import Bar, SyntheticTrade, extract_trades, run
 from argus.backtest.metrics import HOURLY_PER_YEAR, MetricError
 from argus.cost.model import CostModel
-from argus.eval import artefact
 from argus.eval.freqtrade_baseline import (
     freqtrade_cooldown_period,
     freqtrade_low_profit_pairs,
@@ -130,6 +129,7 @@ from argus.risk.circuit import (
 )
 from argus.strategies.session_alpha import VARIANTS
 from argus.strategies.track1_suite import TRACK1_VARIANTS
+from argus.truth import artefact
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 REPORT_PATH = DATA / "risk_layer_comparison.json"
@@ -1011,8 +1011,8 @@ def adversarial_scenarios() -> dict[str, Any]:
       at the FIRST trade's close, ARGUS reads `active` (a single -1.1% trade does not touch the
       2% ladder threshold) while freqtrade's `LowProfitPairs` and `CooldownPeriod` already lock
       the symbol — the exact per-symbol, any-loss capability gap `eval/freqtrade_baseline.py`
-      found and `agents.desk.ConstitutionPolicy`'s `per_symbol_underperformance` gate (built the
-      same day) exists to close. This module compares `risk/circuit.py`'s whole-book breaker
+      found and `risk.constitution.ConstitutionPolicy`'s `per_symbol_underperformance` gate (built
+      the same day) exists to close. This module compares `risk/circuit.py`'s whole-book breaker
       only, not the Constitution's gate 12 — the gap this scenario shows is already closed one
       layer up, not still open.
     """
@@ -1164,7 +1164,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"ARGUS dominates every swept threshold: {dominates}")
     print(f"verdict: {measurement['verdict']}")
     if args.save:
-        # `argus.eval.artefact.write` (strict JSON: non-finite floats -> null, key path recorded)
+        # `argus.truth.artefact.write` (strict JSON: non-finite floats -> null, key path recorded)
         # rather than raw `json.dumps` — this module's own values are already pre-stringified
         # where they're Decimal (`equity_share_per_symbol`, `cost_bps_applied_per_trade`), so no
         # `default=str` fallback is needed; kept parity with `allocation_comparison.py`'s and

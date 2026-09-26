@@ -434,12 +434,13 @@ def run(
     failure as the scheduled cycle that died mid-run, and the stop is reported in the result rather
     than discovered afterwards.
     """
-    from argus.agents.desk import ConstitutionPolicy, TradingDesk
+    from argus.agents.desk import TradingDesk
     from argus.backtest.engine import Bar
     from argus.cost.model import CostModel
     from argus.llm.qwen import QwenClient, QwenError, Thinking, TokenBudget
     from argus.market.evidence import underlying_ticker
     from argus.market.history import CandleType, fetch_range
+    from argus.risk.constitution import ConstitutionPolicy
     from argus.risk.hedgeability import HedgeabilitySurface, open_market_candidate
     from argus.truth.clocks import DualClock
 

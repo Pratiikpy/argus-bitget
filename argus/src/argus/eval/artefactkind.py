@@ -36,7 +36,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from argus.eval.artefact import write
+from argus.truth.artefact import write
 
 ARGUS = Path(__file__).resolve().parents[3]
 SRC = ARGUS / "src" / "argus"

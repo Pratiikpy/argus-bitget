@@ -212,7 +212,8 @@ def study(
     already classifies for had never once fired in a real run — real market holidays were
     silently absorbed into whichever other phase the day's hours happened to match (see
     `eval/afterhours_comparison.py` for the real, measured consequence and a real holiday
-    calendar to pass here). Omitting it keeps this function's exact prior behaviour.
+    calendar to pass here). Since 2026-09-26, omitting it means the real US equity calendar,
+    because that is `DualClock`'s default; pass ``frozenset()`` for the old no-holiday reading.
     """
     all_sessions, failures = raw_sessions(symbols, days=days, holidays=holidays)
 

@@ -266,10 +266,12 @@ class TestTheLiveAudit:
     def live(self) -> Audit:
         return audit()
 
+    @pytest.mark.network
     def test_every_probe_returns_a_known_status(self, live: Audit) -> None:
         for result in live.results:
             assert result.finding.status in {RUNS, WEAK, ABSENT, UNDEFINED}, result.probe.key
 
+    @pytest.mark.network
     def test_no_probe_crashes_on_its_own_api(self, live: Audit) -> None:
         """An ABSENT caused by `probe raised TypeError` is a bug in this file, not a finding about
         ARGUS — six of them were, on the first run, and each was a wrong keyword or module path."""
@@ -278,10 +280,12 @@ class TestTheLiveAudit:
         ]
         assert not broken, f"probes calling the wrong API: {broken}"
 
+    @pytest.mark.network
     def test_every_finding_carries_evidence(self, live: Audit) -> None:
         for result in live.results:
             assert len(result.finding.evidence) > 40, result.probe.key
 
+    @pytest.mark.network
     def test_the_verdict_names_whatever_fell_short(self, live: Audit) -> None:
         for result in live.weakest:
             assert result.probe.key in live.verdict

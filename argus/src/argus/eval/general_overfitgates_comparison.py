@@ -1553,7 +1553,7 @@ def render(report: dict[str, Any]) -> str:
 
 
 if __name__ == "__main__":
-    from argus.eval.artefact import write as write_artefact
+    from argus.truth.artefact import write as write_artefact
 
     result = main()
     print(render(result))

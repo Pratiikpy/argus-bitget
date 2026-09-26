@@ -81,7 +81,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from argus.lui.answer import Source
-from argus.truth.trace import every, traced
+from argus.lui.trace import every, traced
 
 NEW_YORK = ZoneInfo("America/New_York")
 
@@ -1394,7 +1394,7 @@ def review_trades(text: str, *, now: datetime | None = None,
         sources.append(Source("computation", "argus.desk.odds:directional_odds",
                               f"{BAND} of same-length windows before each entry"))
     if holidays is not None and any(c.closures is not None for c in checks):
-        sources.append(Source("computation", "lean_market_holidays_usa.json",
+        sources.append(Source("computation", "truth/data/us_equity_holidays.json",
                               "QuantConnect Lean US equity holidays, via truth/clocks.py"))
     data_parts = ["your own entry and exit prices"]
     if histories:

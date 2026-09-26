@@ -26,74 +26,16 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Any
 
+from argus.risk.calibration import (
+    Prediction,
+    brier_score,
+    expected_calibration_error,
+)
+
 # =============================================================================================
 # 1 — Probabilistic calibration
 # =============================================================================================
-
-@dataclass(frozen=True, slots=True)
-class Prediction:
-    """A stated confidence and what actually happened."""
-
-    confidence: float
-    correct: bool
-
-
-def brier_score(predictions: list[Prediction]) -> float:
-    """Mean squared error of stated probabilities. Lower is better; 0.25 is a coin flip.
-
-    Exhaustively grepped across the four evaluation repos in the corpus: **neither ECE nor Brier
-    appears anywhere.** Abstention calibration exists in places; probability calibration does not.
-    """
-    if not predictions:
-        raise ValueError("Brier score needs at least one prediction")
-    return sum((p.confidence - (1.0 if p.correct else 0.0)) ** 2 for p in predictions) / len(
-        predictions
-    )
-
-
-def expected_calibration_error(predictions: list[Prediction], *, bins: int = 10) -> float:
-    """ECE — the gap between stated confidence and realised frequency, weighted by bin size.
-
-    The number that makes "90% confident" mean something. If a model's 90%-confidence calls land
-    60% of the time, sizing on that confidence is a mistake, and this is what surfaces it.
-    """
-    if not predictions:
-        raise ValueError("ECE needs at least one prediction")
-
-    buckets: dict[int, list[Prediction]] = {}
-    for p in predictions:
-        idx = min(bins - 1, int(p.confidence * bins))
-        buckets.setdefault(idx, []).append(p)
-
-    total = len(predictions)
-    error = 0.0
-    for group in buckets.values():
-        avg_conf = sum(p.confidence for p in group) / len(group)
-        accuracy = sum(1 for p in group if p.correct) / len(group)
-        error += (len(group) / total) * abs(avg_conf - accuracy)
-    return error
-
-
-def reliability_curve(
-    predictions: list[Prediction], *, bins: int = 10
-) -> list[dict[str, float | int]]:
-    """Per-bin stated confidence versus realised accuracy. The plot behind the ECE number."""
-    buckets: dict[int, list[Prediction]] = {}
-    for p in predictions:
-        idx = min(bins - 1, int(p.confidence * bins))
-        buckets.setdefault(idx, []).append(p)
-
-    return [
-        {
-            "bin": i,
-            "range_low": round(i / bins, 2),
-            "range_high": round((i + 1) / bins, 2),
-            "n": len(buckets[i]),
-            "stated": round(sum(p.confidence for p in buckets[i]) / len(buckets[i]), 3),
-            "realised": round(sum(1 for p in buckets[i] if p.correct) / len(buckets[i]), 3),
-        }
-        for i in sorted(buckets)
-    ]
+# Measured in `risk/calibration.py`, where the risk layer that sizes on it can reach it.
 
 
 # =============================================================================================

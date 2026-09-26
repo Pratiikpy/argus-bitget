@@ -111,6 +111,14 @@ def synthetic_groundtruth() -> dict[str, Any]:
     return run_synthetic_groundtruth(noise_levels=(1.0, 2.0), seeds=tuple(range(5)))
 
 
+@pytest.fixture(scope="module")
+def published_sweep() -> dict[str, Any]:
+    """The full published sweep, computed once for the five tests that pin its verdicts. Each used
+    to call it itself — about two minutes apiece, the five slowest calls in the suite (2026-09-27).
+    Seeded and deterministic, so one computation is the same evidence five times over."""
+    return run_synthetic_groundtruth()
+
+
 class TestUniverse:
     def test_the_comparison_covers_the_whole_rtoken_universe_not_one_symbol(
         self, base_case: dict[str, Any]
@@ -748,18 +756,22 @@ class TestFinding8SyntheticGroundtruth:
         assert vs_stumpy["argus_wins"] + vs_stumpy["stumpy_wins"] + vs_stumpy["ties"] == n
         assert vs_ruptures["argus_wins"] + vs_ruptures["ruptures_wins"] + vs_ruptures["ties"] == n
 
-    def test_ruptures_wins_the_synthetic_groundtruth_test_on_the_published_record(self) -> None:
+    def test_ruptures_wins_the_synthetic_groundtruth_test_on_the_published_record(
+        self, published_sweep: dict[str, Any],
+    ) -> None:
         """Pinned in the LOSING direction, per this module's own falsifiability promise: if
         ARGUS's mean F1 ever equals or beats ruptures' on the full published sweep, that is exactly
         the event `eval/regime_comparison.py`'s own docstring names as changing the verdict, and it
         should surface here as a failure rather than silently in a JSON file nobody reads."""
-        full = run_synthetic_groundtruth()
+        full = published_sweep
         assert full["overall"]["ruptures_mean_f1"] > full["overall"]["argus_mean_f1"]
 
-    def test_argus_beats_stumpy_on_the_published_record(self) -> None:
+    def test_argus_beats_stumpy_on_the_published_record(
+        self, published_sweep: dict[str, Any],
+    ) -> None:
         """The one genuine win Finding 8 found. Pinned so a future change that quietly erodes it
         (e.g. reverting Finding 4's parabola IAC) is caught rather than assumed still true."""
-        full = run_synthetic_groundtruth()
+        full = published_sweep
         assert full["overall"]["argus_mean_f1"] > full["overall"]["stumpy_mean_f1"]
         assert full["argus_vs_stumpy"]["sign_test_p"] is not None
         assert full["argus_vs_stumpy"]["sign_test_p"] < 0.01
@@ -770,28 +782,34 @@ class TestArgusDynpTiesRuptures:
     separately from FLUSS's own, unchanged loss above. This capability moved LOST -> TIED because
     of this class's findings, not because FLUSS improved."""
 
-    def test_dynp_never_loses_to_ruptures_on_the_published_record(self) -> None:
+    def test_dynp_never_loses_to_ruptures_on_the_published_record(
+        self, published_sweep: dict[str, Any],
+    ) -> None:
         """Pinned in the direction that matters for TIED: zero losses is the claim, not a specific
         win count. A future run reporting even one ruptures-only-win keeps the tie; any material
         erosion (dynp losing MORE than it wins) would call the TIED verdict into question."""
-        full = run_synthetic_groundtruth()
+        full = published_sweep
         vs_ruptures = full["argus_dynp_vs_ruptures"]
         assert vs_ruptures["ruptures_wins"] == 0
         assert vs_ruptures["argus_dynp_wins"] + vs_ruptures["ties"] == full["n_trials"]
 
-    def test_dynp_mean_f1_is_at_least_ruptures_own(self) -> None:
+    def test_dynp_mean_f1_is_at_least_ruptures_own(
+        self, published_sweep: dict[str, Any],
+    ) -> None:
         """Not claimed as a significant win (one discordant trial cannot support that) — only that
         the nominal aggregate never falls BEHIND ruptures, which is the weaker, honest claim this
         register's own TIED state makes."""
-        full = run_synthetic_groundtruth()
+        full = published_sweep
         assert full["overall"]["argus_dynp_mean_f1"] >= full["overall"]["ruptures_mean_f1"]
 
-    def test_the_sign_test_cannot_reject_no_difference(self) -> None:
+    def test_the_sign_test_cannot_reject_no_difference(
+        self, published_sweep: dict[str, Any],
+    ) -> None:
         """The load-bearing reason this is reported as TIED and not OWNED: with at most a handful
         of discordant trials, p is far from significant. If a future rebuild made this
         significant, standing.py's proof text (which explicitly cites p=1.0 today) would need a
         real rewrite, not a silent number bump -- this test exists so that rewrite is forced."""
-        full = run_synthetic_groundtruth()
+        full = published_sweep
         p = full["argus_dynp_vs_ruptures"]["sign_test_p"]
         assert p is None or p > 0.05
 

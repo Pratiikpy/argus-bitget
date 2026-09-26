@@ -86,8 +86,8 @@ from argus.desk.stress import (
     split_evidence_line,
     unused_evidence,
 )
-from argus.eval.artefact import write as write_artefact
 from argus.llm.qwen import Completion, QwenClient, QwenError, Thinking, TokenBudget, Usage
+from argus.truth.artefact import write as write_artefact
 from argus.truth.clocks import DualClock
 from argus.truth.evidence import Evidence
 

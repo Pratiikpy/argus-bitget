@@ -24,7 +24,6 @@ from datetime import UTC, datetime
 from typing import Any
 
 from argus.desk.feed_sanity import SanityReport, screen_claims
-from argus.eval.artefact import write
 from argus.eval.feedbugged import (
     BUG_KINDS,
     REPORT_PATH,
@@ -33,6 +32,7 @@ from argus.eval.feedbugged import (
     precision_recall_fscore,
 )
 from argus.eval.perturbations import DATA, Snapshot, load_snapshots, split_evidence
+from argus.truth.artefact import write
 
 OUT_PATH = DATA / "feed_sanity_gate.json"
 

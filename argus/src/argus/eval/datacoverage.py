@@ -34,8 +34,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from argus.eval.artefact import write
 from argus.market.bitget_mcp import BitgetDataService, BitgetMcpError, underlying_of
+from argus.truth.artefact import write
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "data_coverage.json"
 

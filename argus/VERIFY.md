@@ -67,15 +67,19 @@ installed invocation of freqtrade itself** — see the correction at the top of 
   threshold cannot be anything but 1.0. freqtrade was never capable of losing that specific number to
   begin with. Precision is the metric that actually discriminates.
 - A low correlation figure (freqtrade's own proxy vs. the real drawdown ground truth) prints too,
-  currently 0.2333.
+  currently 0.2257.
 
 **Fixed 2026-09-23 — the numbers above are now pinned, not a snapshot.** This command used to pull
 a live, rolling 90-day market-data window every run, so the precise figures shifted call to call
 (three independent runs on 2026-09-23 alone gave three different ARGUS precision figures: 59.2%,
 100%, 66.7%). It now reads `data/risk_layer_candles_fixture.json` — real Bitget history, fetched
 once on 2026-09-23 and frozen — by default, the same fix already applied to #1 above. Run it twice
-in a row; the precision (59.14%), recall (1.0) and correlation (0.2333) printed will be identical
-both times. To check the qualitative result still holds on fresh data, run
+in a row; the precision (56.32%), recall (1.0) and correlation (0.2257) printed will be identical
+both times. **Changed 2026-09-27, on the same frozen data:** they were 59.14% and 0.2333 until the
+session clock learned US market holidays (`truth/clocks.py`). Four of the 318 checkpoints fell on
+a market holiday that the old clock called a trading session; with them classified correctly the
+comparison runs on 314, and every figure above is the corrected one. ARGUS still dominates
+freqtrade at every swept threshold. To check the qualitative result still holds on fresh data, run
 `python -m argus.eval.risk_layer_comparison --live` instead — that re-fetches a new rolling window
 and should still show ARGUS dominating on precision with correlation in the same weak range, just
 not the identical decimal.

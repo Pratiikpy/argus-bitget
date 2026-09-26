@@ -520,3 +520,10 @@ def _replace_verdict(
         invalidation=intent.invalidation,
         required_hedge=intent.required_hedge,
     )
+
+
+class PositionSide(StrEnum):
+    """One venue position record's side. Bitget hedge mode holds both per symbol at once."""
+
+    LONG = "long"
+    SHORT = "short"

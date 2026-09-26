@@ -65,7 +65,6 @@ from math import sqrt
 from pathlib import Path
 from typing import Any
 
-from argus.eval.artefact import write as write_artefact
 from argus.eval.baselines.vibe_trading_eventstudy_loader import (
     BALLAST_COMMIT,
     VIBE_COMMIT,
@@ -82,6 +81,7 @@ from argus.research.eventstudy import (
     returns_from,
     study,
 )
+from argus.truth.artefact import write as write_artefact
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 SNAPSHOT_HOURLY = DATA / "eventdriven_rivals_hourly.json.gz"

@@ -19,14 +19,6 @@ import pytest
 from argus.agents import meta_pm as meta_pm_mod
 from argus.agents import rubric
 from argus.agents.claims import check as check_claims
-from argus.agents.grounding import (
-    PARTIAL_TOLERANCE,
-    Support,
-    check,
-    combine,
-    extract,
-    fact_unit,
-)
 from argus.agents.meta_pm import (
     REFLECTION_PROMPT,
     SYSTEM_PROMPT,
@@ -54,6 +46,14 @@ from argus.llm.ledger import CostLedger, Outcome
 from argus.llm.qwen import Completion, QwenClient, Thinking, Usage
 from argus.paper.runner import _FLAG_MARKERS
 from argus.truth.clocks import ET, DualClock
+from argus.truth.grounding import (
+    PARTIAL_TOLERANCE,
+    Support,
+    check,
+    combine,
+    extract,
+    fact_unit,
+)
 
 
 def _flags(line: str) -> list[str]:

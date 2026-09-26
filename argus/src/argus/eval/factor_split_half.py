@@ -218,7 +218,7 @@ def summarise(libraries: list[dict[str, Any]]) -> dict[str, Any]:
 def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - network
     import time
 
-    from argus.eval.artefact import write
+    from argus.truth.artefact import write
 
     symbols = tuple(argv) if argv else SYMBOLS
     libraries: list[dict[str, Any]] = []

@@ -27,10 +27,12 @@ jobs:
   verify:
     name: lint · types · tests · documentation gate
     runs-on: ubuntu-latest
+    # The suite takes about an hour; a job still running at twice that is stuck, not slow.
+    timeout-minutes: 120
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
           cache: pip
@@ -68,13 +70,16 @@ jobs:
       - name: Surface agreement
         run: python -m argus.eval.surfaces
 
-      # The offline suite. `-m "not live"` is not used because the markers do not partition that
-      # way; instead the network-bound comparison files are ignored here and named explicitly in `live`.
+      # The offline suite, with every outbound connection refused (tests/conftest.py). Until
+      # 2026-09-27 this step ignored two comparison files and let the rest reach the network; runs
+      # with the network blocked found 238 tests in 28 files that still did, many of them skipping
+      # quietly after the refusal. Those carry `@pytest.mark.network` and run in `live`; anything
+      # unmarked that attempts a connection now fails here, whatever it does with the error.
+      # `-rs` prints why each skipped test skipped, and `--durations` names the slowest.
       - name: Tests
-        run: >-
-          python -m pytest -q -p no:randomly
-          --ignore=tests/test_eventdriven_comparison.py
-          --ignore=tests/test_factor_divergence_comparison.py
+        env:
+          ARGUS_BLOCK_NETWORK: "1"
+        run: python -m pytest -q -p no:randomly -m "not network" -rs --durations=25
 
       # Last, because it is the one that catches the others lying. Exits non-zero if any number
       # quoted in the READMEs, the submission draft or ARGUS-EXPLAINED has drifted from the
@@ -86,16 +91,14 @@ jobs:
     name: live venue checks (advisory)
     runs-on: ubuntu-latest
     continue-on-error: true
+    timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
           cache: pip
       - name: Install
         run: pip install -e ".[dev]"
-      - name: Network-bound comparisons
-        run: >-
-          python -m pytest -q -p no:randomly
-          tests/test_eventdriven_comparison.py
-          tests/test_factor_divergence_comparison.py
+      - name: Network-bound tests
+        run: python -m pytest -q -p no:randomly -m network

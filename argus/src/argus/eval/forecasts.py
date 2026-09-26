@@ -46,7 +46,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from argus.eval.observatory import (
+from argus.risk.calibration import (
     Prediction,
     brier_score,
     expected_calibration_error,

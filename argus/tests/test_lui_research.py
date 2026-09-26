@@ -41,6 +41,48 @@ def frozen_data(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(universe, "_CACHE", None)
     # SEC filings are a live source too; tests that need an earnings surprise supply one.
     monkeypatch.setattr(research, "_earnings_surprise", lambda ticker: None)
+    # Three more live sources the answers reach, found by running this file with the network
+    # blocked (2026-09-27). The exposures engine runs beside every add question on its own thread,
+    # so a Yahoo read from one test was still in flight during the next one.
+    from argus.lui import exposures
+
+    monkeypatch.setattr(exposures, "_yahoo_daily", _fail)
+    monkeypatch.setattr(exposures, "_bitget_daily", _fail)
+    # Yahoo's consensus and key statistics, read beside the MCP facts in fundamentals answers.
+    monkeypatch.setattr(research, "_yahoo_summary", _fail)
+    # bitget-mcp-server: no session is opened; TestFundamentals installs its own fake service.
+    monkeypatch.setattr(bitget_mcp, "BitgetDataService", _NoService)
+    monkeypatch.setattr(bitget_mcp, "_SHARED", None)
+    monkeypatch.setattr(bitget_mcp, "_SHARED_FACTORY", None)
+    # bitget-signal: the Skill is not asked, so each answer takes its documented mirror path.
+    monkeypatch.setattr(research, "skill_route", _mirror_only)
+    # ...and the breaker that marks it down starts empty and is not carried to the next file.
+    from argus.lui import skillroute
+
+    monkeypatch.setattr(skillroute, "_DOWN", {})
+
+
+class _NoService:
+    """bitget-mcp-server, unreachable: every call fails the way a refused connection does."""
+
+    def close(self) -> None:
+        return None
+
+    def __getattr__(self, name: str) -> Any:
+        def unavailable(*args: Any, **kwargs: Any) -> Any:
+            raise bitget_mcp.BitgetMcpError(f"{name}: not reachable in this test")
+
+        return unavailable
+
+
+def _mirror_only(tool: str, action: str, args: Any = None, **kwargs: Any) -> Any:
+    from argus.lui import skillroute
+
+    def no_skill(*a: Any, **k: Any) -> Any:
+        raise RuntimeError("the Skill is not asked in this test")
+
+    kwargs.pop("skill_call", None)
+    return skillroute.route(tool, action, args, skill_call=no_skill, **kwargs)
 
 
 class TestDetectFindsResearchQuestions:
@@ -610,10 +652,10 @@ class TestTheEarningsSurpriseIsShownWhenFiled:
         _service(monkeypatch, report=_days_from_today(30), scraped="2018-10-25", holders=3)
         line = ("Earnings surprise: the quarter ending 2026-07-26 was a large beat — SUE +2.84")
         monkeypatch.setattr(research, "_earnings_surprise", lambda ticker: (
-            line, research.Source(kind="computation", ref="argus.research.sue via SEC XBRL")))
+            line, research.Source(kind="computation", ref="argus.market.sue via SEC XBRL")))
         lines, sources = research._fundamentals("NVDAUSDT")
         assert line in lines
-        assert any(s.ref == "argus.research.sue via SEC XBRL" for s in sources)
+        assert any(s.ref == "argus.market.sue via SEC XBRL" for s in sources)
 
     def test_a_commodity_never_asks_the_sec(self, monkeypatch: pytest.MonkeyPatch) -> None:
         def boom(ticker: str) -> None:

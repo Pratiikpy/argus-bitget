@@ -31,7 +31,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from argus.eval.artefact import write
+from argus.truth.artefact import write
 
 SNAPSHOT_PATH = Path(__file__).resolve().parents[3] / "data" / "allocation_returns_snapshot.json"
 

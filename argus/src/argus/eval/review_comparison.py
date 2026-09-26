@@ -372,11 +372,11 @@ NOT claimed: that TradingAgents' unconditional reuse is a design mistake in the 
 itself — a system whose memory feeds a model that reasons over the prose (and can itself discount \
 a reflection it judges unreliable) is a different premise from ARGUS's constitution-gated \
 decision loop, where a model's own real-time judgment is deliberately NOT the backstop \
-(`agents/desk.py`'s Constitution is). Also not claimed: that ARGUS's checklist currently contains \
-any earned rules — it does not (`data/review_report.json`: none of the five standing rules has \
-earned ACTIVE on the real record, disclosed as a standing blocker). What is claimed is narrower \
-and fully run-verified: the MACHINERY that would refuse a bad rule by name exists, works exactly \
-as designed on six real transitions, and has no equivalent in the named baseline.
+(`risk/constitution.py`'s Constitution is). Also not claimed: that ARGUS's checklist currently \
+contains any earned rules — it does not (`data/review_report.json`: none of the five standing \
+rules has earned ACTIVE on the real record, disclosed as a standing blocker). What is claimed is \
+narrower and fully run-verified: the MACHINERY that would refuse a bad rule by name exists, works \
+exactly as designed on six real transitions, and has no equivalent in the named baseline.
 """
 
 

@@ -1,19 +1,10 @@
 {
-  "generated_at": "2026-09-20T07:34:20.477071+00:00",
-  "modules": 266,
-  "internal_imports": 705,
+  "generated_at": "2026-09-26T21:18:53.047836+00:00",
+  "modules": 485,
+  "internal_imports": 1680,
   "sound": true,
   "violations": [],
   "cycles": [
-    {
-      "members": [
-        "argus.eval.autopsy",
-        "argus.eval.gate_ablation",
-        "argus.paper.protocol",
-        "argus.paper.runner"
-      ],
-      "import_time": false
-    },
     {
       "members": [
         "argus.eval.collect",
@@ -23,8 +14,21 @@
     },
     {
       "members": [
-        "argus.eval.performance",
-        "argus.paper.ledger"
+        "argus.execution.modes",
+        "argus.paper.protocol",
+        "argus.paper.runner"
+      ],
+      "import_time": false
+    },
+    {
+      "members": [
+        "argus.lui",
+        "argus.lui.answer",
+        "argus.lui.corrections_page",
+        "argus.lui.exposures",
+        "argus.lui.research",
+        "argus.lui.skillroute",
+        "argus.lui.trace"
       ],
       "import_time": false
     },
@@ -32,6 +36,20 @@
       "members": [
         "argus.lui.phrasebook",
         "argus.lui.question"
+      ],
+      "import_time": false
+    },
+    {
+      "members": [
+        "argus.lui.server",
+        "argus.lui.telegram_bot"
+      ],
+      "import_time": false
+    },
+    {
+      "members": [
+        "argus.market.fundamentals",
+        "argus.market.pit"
       ],
       "import_time": false
     },
@@ -47,115 +65,115 @@
   "packages": [
     {
       "package": "agents",
-      "modules": 16,
-      "afferent": 18,
-      "efferent": 8,
-      "instability": 0.308
+      "modules": 17,
+      "afferent": 19,
+      "efferent": 9,
+      "instability": 0.321
     },
     {
       "package": "backtest",
-      "modules": 5,
-      "afferent": 24,
+      "modules": 7,
+      "afferent": 35,
       "efferent": 2,
-      "instability": 0.077
+      "instability": 0.054
     },
     {
       "package": "cost",
       "modules": 2,
-      "afferent": 26,
+      "afferent": 30,
       "efferent": 0,
       "instability": 0.0
     },
     {
       "package": "decision",
-      "modules": 3,
-      "afferent": 13,
-      "efferent": 0,
-      "instability": 0.0
+      "modules": 5,
+      "afferent": 26,
+      "efferent": 1,
+      "instability": 0.037
     },
     {
       "package": "demo",
       "modules": 4,
       "afferent": 1,
-      "efferent": 8,
-      "instability": 0.889
+      "efferent": 9,
+      "instability": 0.9
     },
     {
       "package": "desk",
-      "modules": 18,
-      "afferent": 16,
-      "efferent": 11,
-      "instability": 0.407
+      "modules": 28,
+      "afferent": 45,
+      "efferent": 12,
+      "instability": 0.211
     },
     {
       "package": "eval",
-      "modules": 122,
-      "afferent": 9,
-      "efferent": 16,
-      "instability": 0.64
+      "modules": 245,
+      "afferent": 8,
+      "efferent": 17,
+      "instability": 0.68
     },
     {
       "package": "execution",
-      "modules": 12,
-      "afferent": 12,
-      "efferent": 7,
-      "instability": 0.368
+      "modules": 17,
+      "afferent": 25,
+      "efferent": 6,
+      "instability": 0.194
     },
     {
       "package": "llm",
-      "modules": 4,
-      "afferent": 14,
+      "modules": 8,
+      "afferent": 30,
       "efferent": 0,
       "instability": 0.0
     },
     {
       "package": "lui",
-      "modules": 8,
-      "afferent": 3,
-      "efferent": 3,
-      "instability": 0.5
+      "modules": 34,
+      "afferent": 27,
+      "efferent": 10,
+      "instability": 0.27
     },
     {
       "package": "market",
-      "modules": 16,
-      "afferent": 55,
-      "efferent": 2,
-      "instability": 0.035
+      "modules": 38,
+      "afferent": 113,
+      "efferent": 3,
+      "instability": 0.026
     },
     {
       "package": "paper",
-      "modules": 10,
-      "afferent": 25,
+      "modules": 12,
+      "afferent": 40,
       "efferent": 10,
-      "instability": 0.286
+      "instability": 0.2
     },
     {
       "package": "proof",
       "modules": 2,
-      "afferent": 2,
+      "afferent": 4,
       "efferent": 1,
-      "instability": 0.333
+      "instability": 0.2
     },
     {
       "package": "register",
-      "modules": 5,
+      "modules": 6,
       "afferent": 0,
       "efferent": 2,
       "instability": 1.0
     },
     {
       "package": "research",
-      "modules": 20,
-      "afferent": 14,
-      "efferent": 8,
-      "instability": 0.364
+      "modules": 28,
+      "afferent": 24,
+      "efferent": 9,
+      "instability": 0.273
     },
     {
       "package": "risk",
-      "modules": 6,
-      "afferent": 12,
-      "efferent": 4,
-      "instability": 0.25
+      "modules": 10,
+      "afferent": 28,
+      "efferent": 3,
+      "instability": 0.097
     },
     {
       "package": "sim",
@@ -174,17 +192,24 @@
     {
       "package": "strategies",
       "modules": 3,
-      "afferent": 2,
+      "afferent": 4,
       "efferent": 2,
-      "instability": 0.5
+      "instability": 0.333
     },
     {
       "package": "truth",
-      "modules": 4,
-      "afferent": 46,
+      "modules": 10,
+      "afferent": 141,
       "efferent": 0,
       "instability": 0.0
+    },
+    {
+      "package": "vendor",
+      "modules": 3,
+      "afferent": 0,
+      "efferent": 0,
+      "instability": null
     }
   ],
-  "verdict": "266 modules, 705 internal imports. every declared contract holds: the deterministic core reaches no model-facing module at any depth, and no producer imports its consumer. 5 dependency cycle(s), each broken at load by a deferred import in one direction \u2014 real coupling, safe ordering, and reported rather than scored as clean."
+  "verdict": "485 modules, 1680 internal imports. every declared contract holds: the deterministic core reaches no model-facing module at any depth, every package has a layer, and no module imports from a layer above its own, deferred imports included, outside a main() entry point. 7 dependency cycle(s), each broken at load by a deferred import in one direction \u2014 real coupling, safe ordering, and reported rather than scored as clean."
 }

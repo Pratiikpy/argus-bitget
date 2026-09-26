@@ -15,7 +15,6 @@ from pathlib import Path
 
 import pytest
 
-from argus.eval import artefact
 from argus.eval import general_abstention_comparison as module
 from argus.eval.abstention_coverage import Extraction, LeanCall, score
 from argus.eval.baselines import selective_rivals_runner as runner
@@ -42,6 +41,7 @@ from argus.eval.general_abstention_comparison import (
     run,
 )
 from argus.paper.ledger import PaperLedger
+from argus.truth import artefact
 
 
 def _calls(n: int = 90) -> tuple[LeanCall, ...]:

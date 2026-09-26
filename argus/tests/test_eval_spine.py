@@ -179,7 +179,7 @@ def _legacy(name: str) -> dict[str, Any]:
 
 
 def _rescored(module: types.ModuleType) -> dict[str, Any]:
-    with mock.patch("argus.eval.artefact.write"):
+    with mock.patch("argus.truth.artefact.write"):
         blob: dict[str, Any] = json.loads(json.dumps(module.score()))
     return blob
 

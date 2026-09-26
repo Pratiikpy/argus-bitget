@@ -89,10 +89,10 @@ from typing import Any
 
 from argus.agents.delay_cost import bar_delay_cost_bps, empirical_delay_cost_bps
 from argus.agents.meta_pm import DEPTH_MULTIPLIER, THINKING_MS, deliberation_cost_bps
-from argus.eval import artefact
 from argus.eval.baselines.latencybench_reimpl import linear_decay_price
 from argus.execution.latency import thinking_budget_cost_bps
 from argus.llm.qwen import Thinking
+from argus.truth import artefact
 from argus.truth.clocks import DualClock, SessionPhase
 
 PACKAGE = Path(__file__).resolve().parents[3]

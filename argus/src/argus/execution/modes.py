@@ -50,7 +50,7 @@ position.
 verdicts, venues and open positions, and breaks this module on purpose to confirm the certifier
 notices.
 
-    python -m argus.risk.modes            # the stack as the next paper cycle would see it
+    python -m argus.execution.modes            # the stack as the next paper cycle would see it
 """
 
 from __future__ import annotations

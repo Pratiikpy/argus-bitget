@@ -16,7 +16,7 @@ from decimal import Decimal
 
 import pytest
 
-from argus.agents.mandate import HORIZON_SLACK, Mandate, frame_for, order_evidence
+from argus.desk.mandate import HORIZON_SLACK, Mandate, frame_for, order_evidence
 from argus.desk.workbench import TraderProfile
 from argus.truth.evidence import Evidence
 

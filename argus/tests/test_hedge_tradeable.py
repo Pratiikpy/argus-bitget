@@ -331,6 +331,7 @@ def rows(panel: Panel, costs: CostModel, baseline: object) -> list:
     return run_pair_table(panel, costs)
 
 
+@pytest.mark.network
 class TestPanel:
     def test_every_instrument_is_aligned_on_the_same_timestamps(self, panel: Panel) -> None:
         assert len(panel.timestamps) > MIN_PAIRS * 2
@@ -353,6 +354,7 @@ class TestPanel:
         assert spot_idx == hedge_idx
 
 
+@pytest.mark.network
 class TestCostsAreReal:
     def test_the_taker_fee_comes_from_the_venue_for_every_instrument(
         self, costs: CostModel
@@ -369,6 +371,7 @@ class TestCostsAreReal:
         assert real < assumed
 
 
+@pytest.mark.network
 class TestPairTable:
     def test_every_tradeable_pair_in_every_measured_phase_was_scored(self, rows: list) -> None:
         assert len(rows) > 100
@@ -410,6 +413,7 @@ class TestPairTable:
         json.dumps([row.as_dict() for row in rows])
 
 
+@pytest.mark.network
 class TestTheAnswer:
     def test_the_weekend_is_the_hard_phase(self, rows: list) -> None:
         summary = summarise(rows)
@@ -463,6 +467,7 @@ def tautology(baseline: object) -> dict:
     return run_tautology_check()
 
 
+@pytest.mark.network
 class TestTautologyAndBaselineNative:
     def test_the_anchor_index_pair_is_marked_untradeable(self, tautology: dict) -> None:
         got = tautology
@@ -494,6 +499,7 @@ class TestTautologyAndBaselineNative:
         assert all(row["cost_pct"] == 0.006 for row in got["baseline_menu"])
 
 
+@pytest.mark.network
 class TestAblations:
     def test_the_stability_test_rejects_pairs_a_fisher_bound_alone_would_pass(
         self, rows: list
@@ -545,6 +551,7 @@ class TestAblations:
             assert row["r_squared"] < 0.1
 
 
+@pytest.mark.network
 class TestGapLeakInOurOwnModule:
     def test_bucketing_prices_by_phase_changes_the_answer(self, panel: Panel) -> None:
         got = run_gap_leak(panel)
@@ -578,6 +585,7 @@ class TestGapLeakInOurOwnModule:
         assert leaky.observations > len(spot_changes)
 
 
+@pytest.mark.network
 class TestReproducibility:
     def test_the_same_panel_scores_identically_twice(
         self, panel: Panel, costs: CostModel, baseline: object

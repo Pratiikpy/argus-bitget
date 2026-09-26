@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pytest
 
+from argus.eval.performance import ledger_performance
 from argus.paper.ledger import GENESIS, Entry, LedgerError, PaperLedger
 
 T0 = datetime(2026, 3, 9, 14, 0, tzinfo=UTC)
@@ -147,7 +148,7 @@ class TestCosts:
         led = _ledger(tmp_path)
         _record(led, qty="10", price="220")
         led.settle(1, exit_price=Decimal("220.10"))
-        assert led.performance()["cost_flipped_the_sign"] is True
+        assert ledger_performance(led)["cost_flipped_the_sign"] is True
 
 
 class TestAbstentions:
@@ -162,12 +163,12 @@ class TestAbstentions:
             session_phase="weekend", hours_to_discovery=30.5, decided_at=T0,
         )
         _record(led, n=1)
-        perf = led.performance()
+        perf = ledger_performance(led)
         assert perf["abstentions"] == 1
         assert perf["decisions"] == 2
 
     def test_an_empty_ledger_says_so_rather_than_reporting_zeroes(self, tmp_path: Path) -> None:
-        assert "nothing to report" in _ledger(tmp_path).performance()["note"]
+        assert "nothing to report" in ledger_performance(_ledger(tmp_path))["note"]
 
 
 class TestAbstentionsAreGradeable:

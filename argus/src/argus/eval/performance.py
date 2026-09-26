@@ -374,6 +374,70 @@ def evaluate_ledger(
     )
 
 
+def ledger_performance(ledger: PaperLedger) -> dict[str, Any]:
+    """What the log actually says. Net of costs, abstentions counted separately.
+
+    Was ``PaperLedger.performance()`` until 2026-09-27: the record's own class called into
+    this evaluation module to grade itself, an upward import the layer rule forbids. The
+    grading lives here, beside the metrics it reports.
+
+    **Voided rows are excluded** — see `paper/corrections.py`. Two rows on the live record
+    booked P&L against positions the Constitution had refused (a `paper/runner.py` defect
+    fixed 2026-09-20). They stay in the chain unedited; every figure here excludes them, and
+    the correction is reported alongside rather than silently applied.
+    """
+    from argus.paper.corrections import VOIDED, render
+
+    # Sharpe, max drawdown and win rate — with the REASON each is undefined rather than a
+    # zero — live in `eval/performance.py`, and this method never surfaced them, so the README
+    # pointed a reader at a command that could not answer what it promised. One definition,
+    # reported here.
+    graded = evaluate_ledger(ledger).as_dict()
+    metrics = {
+        "sharpe": graded["sharpe"],
+        "max_drawdown_pct": graded["max_drawdown_pct"],
+        "win_rate_pct": graded["win_rate_pct"],
+        "undefined": graded["undefined"],
+    }
+
+    settled = [
+        e for e in ledger.entries
+        if e.is_settled and not e.is_abstention and not is_voided(e.seq)
+    ]
+    abstentions = [e for e in ledger.entries if e.is_abstention]
+    correction = {"correction": render(), "voided_rows": len(VOIDED)} if VOIDED else {}
+
+    if not settled:
+        return {
+            "decisions": len(ledger.entries),
+            "abstentions": len(abstentions),
+            "settled_trades": 0,
+            "note": "no settled trades yet — nothing to report",
+            **metrics,
+            **correction,
+        }
+
+    nets = [Decimal(e.net_pnl or "0") for e in settled]
+    grosses = [Decimal(e.gross_pnl or "0") for e in settled]
+
+    return {
+        "decisions": len(ledger.entries),
+        "abstentions": len(abstentions),
+        "abstention_rate_pct": round(100 * len(abstentions) / len(ledger.entries), 1),
+        "settled_trades": len(settled),
+        "gross_pnl": str(sum(grosses)),
+        "net_pnl": str(sum(nets)),
+        "cost_drag": str(sum(grosses) - sum(nets)),
+        "cost_flipped_the_sign": sum(grosses) > 0 >= sum(nets),
+        # `win_rate_pct` deliberately comes from `metrics`, not from `wins / len(settled)`
+        # recomputed here — one definition, and `eval/performance.py`'s is the one that knows
+        # when the count is too small to mean anything.
+        "chain": ledger.verify(),
+        **metrics,
+        **correction,
+    }
+
+
 __all__ = [
     "MIN_DAYS_FOR_SHARPE",
     "MIN_TRADES_TO_REPORT",
@@ -383,4 +447,5 @@ __all__ = [
     "SymbolContribution",
     "daily_series",
     "evaluate_ledger",
+    "ledger_performance",
 ]

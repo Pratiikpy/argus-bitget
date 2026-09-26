@@ -52,14 +52,17 @@ def reproducibility() -> dict:
 
 
 class TestBaseCase:
+    @pytest.mark.network
     def test_most_real_symbols_are_usable_on_both_real_sides(self, base_case: dict) -> None:
         assert base_case["n_symbols_market"] >= 8
         assert base_case["n_symbols_index"] >= 8
 
+    @pytest.mark.network
     def test_real_ic_readings_exist_on_both_real_sides(self, base_case: dict) -> None:
         assert base_case["n_market_ic_readings"] > 0
         assert base_case["n_index_ic_readings"] > 0
 
+    @pytest.mark.network
     def test_the_ic_difference_is_a_real_bootstrap_interval_not_a_bare_point_estimate(
         self, base_case: dict
     ) -> None:
@@ -72,6 +75,7 @@ class TestBaseCase:
             assert diff["ci_high"] is not None
             assert diff["ci_low"] <= diff["mean"] <= diff["ci_high"]
 
+    @pytest.mark.network
     def test_the_naive_significance_test_ran_on_the_same_real_data(
         self, base_case: dict
     ) -> None:
@@ -82,21 +86,25 @@ class TestBaseCase:
 
 
 class TestOosCheck:
+    @pytest.mark.network
     def test_both_real_windows_produced_a_reading(self, oos: dict) -> None:
         first_mean = oos["first_window"]["ic_difference"]["mean"]
         second_mean = oos["second_window"]["ic_difference"]["mean"]
         assert first_mean is not None
         assert second_mean is not None
 
+    @pytest.mark.network
     def test_sign_agreement_is_reported_not_assumed(self, oos: dict) -> None:
         assert isinstance(oos["sign_agrees"], bool)
 
 
 class TestAblation:
+    @pytest.mark.network
     def test_the_gated_and_ungated_variants_both_ran_on_real_data(self, ablation: dict) -> None:
         assert ablation["gated_alpha23"]["ic_difference"]["mean"] is not None
         assert ablation["ungated_high_delta"]["ic_difference"]["mean"] is not None
 
+    @pytest.mark.network
     def test_whether_the_gate_changes_the_sign_is_reported(self, ablation: dict) -> None:
         assert isinstance(ablation["gate_changes_the_sign"], bool)
 
@@ -114,12 +122,14 @@ class TestFailureCases:
         assert failures["empty_panel_produces_empty_ic"]
 
 
+@pytest.mark.network
 class TestCosts:
     def test_both_real_sides_measured_a_positive_cost(self, costs: dict) -> None:
         assert costs["argus_grammar_seconds_per_symbol"] > 0
         assert costs["alphalens_ic_seconds_per_call"] > 0
 
 
+@pytest.mark.network
 class TestReproducibility:
     def test_repeated_computation_on_the_same_fetched_data_agrees(
         self, reproducibility: dict
@@ -127,6 +137,7 @@ class TestReproducibility:
         assert reproducibility["identical"]
 
 
+@pytest.mark.network
 class TestMain:
     def test_render_produces_readable_text(
         self,

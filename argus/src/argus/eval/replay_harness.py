@@ -101,8 +101,8 @@ from functools import partial
 from pathlib import Path
 from typing import Any
 
-from argus.eval.artefact import write
 from argus.eval.trace_audit import offline
+from argus.truth.artefact import write
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 REPORT_PATH = DATA / "replay_harness.json"

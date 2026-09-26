@@ -570,7 +570,7 @@ def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI
     if args.child:
         _child(args.child, args.mode, args.target, Path(args.out), profiled=args.profile)
         return 0
-    from argus.eval import artefact
+    from argus.truth import artefact
 
     report = run_all(args.only or None, workers=args.workers)
     artefact.write(REPORT_PATH, report)

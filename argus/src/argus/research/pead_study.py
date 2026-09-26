@@ -5,7 +5,7 @@ on. `eval/hurdle.py` proved the desk's abstention is not fee-driven — break-ev
 accuracy is 55%, not the near-100% a fee explanation would need. `research/overfitting_study.py`
 then swept 25 systematic session-based variants across all 12 symbols, 300 trials, and found
 **0 of 12 survive deflated Sharpe**: no systematic session-boundary signal on this venue is
-distinguishable from noise once the trial count is priced in. And `research/sue.py`, while
+distinguishable from noise once the trial count is priced in. And `market/sue.py`, while
 verifying the Standardized Unexpected Earnings computation to floating-point identity against
 QuantConnect's own reference, explicitly declined to test it as a signal: *"no return or edge
 claim is made for SUE as a trading signal here."* This module is that untested claim, run for the
@@ -69,7 +69,7 @@ from argus.cost.model import FUNDING_INTERVAL_HOURS, CostModel
 from argus.market.bitget import ANCHOR_OF, fetch_rtokens
 from argus.market.fundamentals import FundamentalsSource
 from argus.market.history import Candle, fetch_range
-from argus.research.sue import MIN_QUARTERS, SueError, read_dated, yoy_window
+from argus.market.sue import MIN_QUARTERS, SueError, read_dated, yoy_window
 
 STUDY_PATH = Path(__file__).resolve().parents[3] / "data" / "pead_study.json"
 
@@ -158,7 +158,7 @@ def _fetch_sue_events(
     """Every real, PIT-computable SUE reading for these anchors, as of ``as_of``.
 
     ``anchors`` is ``(rtoken_symbol, ticker)`` pairs. Returns ``(events, skipped)`` — the same
-    never-silently-drop discipline as :func:`argus.research.sue.rank_universe`. Walking the full
+    never-silently-drop discipline as :func:`argus.market.sue.rank_universe`. Walking the full
     fetched history rather than only the most recent window is deliberate: EDGAR often carries a
     decade or more of quarterly EPS for these anchors, and letting each event's own filing date
     decide whether it falls inside the tradeable price history (:func:`_entry_index`) is simpler
@@ -528,7 +528,7 @@ def _verdict(
 def main() -> int:  # pragma: no cover - CLI
     import sys
 
-    from argus.eval.artefact import write as write_artefact
+    from argus.truth.artefact import write as write_artefact
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")

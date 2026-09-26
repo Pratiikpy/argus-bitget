@@ -68,6 +68,7 @@ def costs() -> dict:
     return measure_costs(repeats=3, n_events=120)
 
 
+@pytest.mark.network
 class TestBaseRateCase:
     def test_the_real_base_rate_departs_from_fifty_percent(self, base_case: dict) -> None:
         """Not guaranteed to be exactly this value forever — it is measured live — but on a real
@@ -89,6 +90,7 @@ class TestBaseRateCase:
         assert base_case["argus"]["statistics"]
 
 
+@pytest.mark.network
 class TestFalsePositiveSweep:
     def test_whale_signals_false_positive_rate_exceeds_nominal(self, sweep: dict) -> None:
         """The fixed-null test on genuinely uninformed placebo draws should reject far more often
@@ -111,6 +113,7 @@ class TestFalsePositiveSweep:
         )
 
 
+@pytest.mark.network
 class TestNullAblation:
     def test_the_true_rate_beats_the_fixed_null_materially(self, ablation: dict) -> None:
         """The robust, directional claim: re-testing the SAME real hit counts against whale-
@@ -149,6 +152,7 @@ class TestFailureCases:
         assert not case["real_raised"]
 
 
+@pytest.mark.network
 class TestCosts:
     def test_costs_are_measured_on_both_real_sides(self, costs: dict) -> None:
         assert costs["whale_signals_seconds_per_call"] > 0
@@ -156,12 +160,14 @@ class TestCosts:
         assert costs["argus_slower_by_factor"] is not None
 
 
+@pytest.mark.network
 class TestReproducibility:
     def test_repeated_runs_are_identical(self) -> None:
         report = run_reproducibility_check()
         assert report["identical"]
 
 
+@pytest.mark.network
 class TestMain:
     def test_render_produces_readable_text(
         self, base_case: dict, sweep: dict, ablation: dict, failures: dict, costs: dict,

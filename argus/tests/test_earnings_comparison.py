@@ -52,6 +52,7 @@ def reproducibility() -> dict:
     return run_reproducibility_check()
 
 
+@pytest.mark.network
 class TestBaselineReproduced:
     def test_most_or_all_real_anchors_have_enough_history(self, baseline: dict) -> None:
         assert len(baseline["symbols_checked"]) >= len(ANCHORS) - 1
@@ -82,6 +83,7 @@ class TestSilentFailureCases:
         assert silent_failures["all_flat_eps"]["argus_refused"]
 
 
+@pytest.mark.network
 class TestRankingCase:
     def test_the_real_ranking_puts_the_constructed_artifact_first(self, ranking: dict) -> None:
         assert ranking["real_top_is_the_constructed_artifact"]
@@ -116,11 +118,13 @@ class TestCosts:
         assert costs["argus_faster_by_factor"] is not None
 
 
+@pytest.mark.network
 class TestReproducibility:
     def test_repeated_real_fetches_agree(self, reproducibility: dict) -> None:
         assert reproducibility["identical"]
 
 
+@pytest.mark.network
 class TestMain:
     def test_render_produces_readable_text(
         self, baseline: dict, silent_failures: dict, ranking: dict, failures: dict,

@@ -25,12 +25,7 @@ import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from argus.agents.desk import (
-    ConstitutionPolicy,
-    DeskContinuation,
-    TradingDesk,
-    resume_signature,
-)
+from argus.agents.desk import DeskContinuation, TradingDesk, resume_signature
 from argus.decision.escalation import (
     Escalation,
     EscalationError,
@@ -67,6 +62,7 @@ from argus.eval.pausedrill import (
     run_paused_half,
 )
 from argus.proof.autonomy import hash_intent
+from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface
 from argus.truth.clocks import SessionPhase, SessionState
 from argus.truth.evidence import Evidence

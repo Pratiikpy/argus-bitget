@@ -14,10 +14,10 @@ from typing import Any
 
 import pytest
 
-from argus.eval import artefact
 from argus.eval import general_grammar_comparison as ggc
 from argus.research.grammar import EXPANDED, ORIGINAL_EIGHT
 from argus.research.grammar_text import parse
+from argus.truth import artefact
 
 
 @pytest.fixture(scope="module")

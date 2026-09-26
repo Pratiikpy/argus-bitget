@@ -200,6 +200,7 @@ class TestRetailFlowIsTracked:
         assert got.prints_seen == 0
 
 
+@pytest.mark.network
 class TestTheLiveFeed:
     def test_the_public_fills_endpoint_answers(self) -> None:
         from argus.market.bitget import BitgetError

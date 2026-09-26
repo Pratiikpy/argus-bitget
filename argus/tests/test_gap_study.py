@@ -73,6 +73,7 @@ def _recent_weekday(days_back: int) -> date:
     return d
 
 
+@pytest.mark.network
 class TestRealHolidayCalendarThreading:
     """`study()`/`raw_sessions()` never accepted a `holidays` argument until 2026-09-16 — see
     both functions' own docstrings for the real, previously-dead `SessionPhase.HOLIDAY` branch
@@ -87,8 +88,10 @@ class TestRealHolidayCalendarThreading:
 
     SYMBOL = ("NVDAUSDT",)
 
-    def test_raw_sessions_never_classifies_a_holiday_when_none_is_given(self) -> None:
-        sessions, failures = raw_sessions(self.SYMBOL, days=14)
+    def test_raw_sessions_never_classifies_a_holiday_given_an_empty_calendar(self) -> None:
+        # Omitting `holidays` now means the real calendar (DualClock's default), which would make
+        # this depend on whether a holiday fell in the last 14 days.
+        sessions, failures = raw_sessions(self.SYMBOL, days=14, holidays=frozenset())
         assert not failures, failures
         assert not any(s.phase is SessionPhase.HOLIDAY for s in sessions)
 
@@ -108,8 +111,8 @@ class TestRealHolidayCalendarThreading:
         assert "holiday" in result["by_phase"]
         assert result["by_phase"]["holiday"]["sessions"] >= 1
 
-    def test_study_with_no_holidays_keeps_its_old_behaviour(self) -> None:
-        result = study(self.SYMBOL, days=14)
+    def test_study_with_an_empty_calendar_keeps_its_old_behaviour(self) -> None:
+        result = study(self.SYMBOL, days=14, holidays=frozenset())
         assert "holiday" not in result["by_phase"]
 
 

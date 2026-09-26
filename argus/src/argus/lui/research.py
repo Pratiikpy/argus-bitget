@@ -296,6 +296,14 @@ _PAIR_PCT_FIRST = re.compile(
     rf"{_PCT}\s*(?:more\s+(?!than\b))?(?:of\s+|in\s+|into\s+)?(?:my\s+)?({_WORDISH})", re.I)
 """A weight before its name: "40% NVDA", "20% in gold", and "10% more NVDA", an add to a name
 already held, which read as no size at all until 2026-09-26 and was assessed at the 20% default."""
+_ZH_RUN = r"[\u4e00-\u9fff]{2,8}"
+_PAIR_PCT_FIRST_ZH = re.compile(rf"{_PCT}\s*(?:的)?({_ZH_RUN})")
+_PAIR_NAME_FIRST_ZH = re.compile(rf"({_ZH_RUN})\s*(?:占|仓位|持仓)?\s*{_PCT}")
+"""A weight beside a Chinese name, "50%英伟达" or "英伟达50%". Chinese has no spaces, so the run
+of characters beside the figure is wider than the name ("50%英伟达和50%苹果" gives 英伟达和); the
+name is the longest leading (or, name first, trailing) part of it that resolves. Every percentage
+stated in Chinese was unread until 2026-09-27: "我持有50%英伟达和50%苹果" read as no book at
+all, while the same holdings as share counts were read."""
 _PAIR_NAME_FIRST = re.compile(
     rf"({_WORDISH})(?:\s+(?:etf|stock|stocks|shares?|position|token|perps?|spot|coins?))?"
     rf"\s*(?:at|=|:|-)?\s*{_PCT}", re.I)
@@ -1251,6 +1259,8 @@ def _pairs(text: str) -> list[tuple[int, str, float]]:
         nonlocal named
         hit = _resolve(name, trust_case=trust)
         symbol = None if hit is None else hit[0]
+        if symbol is None and re.search(r"[一-鿿]", name):
+            symbol = _resolve_any(name)  # a Chinese name ("英伟达"), resolved by its alias
         if symbol is None and name.islower():
             # "spy etf 30%": a lowercase ticker is not trusted on its own, but when the reader of
             # names already took it as one (a market cue beside it), its weight is kept too.
@@ -1278,6 +1288,22 @@ def _pairs(text: str) -> list[tuple[int, str, float]]:
         keep(match.span(), match.group(2), float(match.group(1)) / 100.0)
     for match in _PAIR_NAME_FIRST.finditer(text):
         keep(match.span(), match.group(1), float(match.group(2)) / 100.0)
+    # The alias must touch the figure: "50%苹果" is a pair, "50%和苹果" is not (the 50% there
+    # belongs to the name before it, "英伟达50%和苹果50%").
+    from argus.market.universe import CJK_ALIASES
+
+    for match in _PAIR_PCT_FIRST_ZH.finditer(text):
+        run = match.group(2)
+        alias = max((a for a in CJK_ALIASES if run.startswith(a)), key=len, default=None)
+        if alias is not None:
+            keep((match.start(), match.start(2) + len(alias)), alias,
+                 float(match.group(1)) / 100.0)
+    for match in _PAIR_NAME_FIRST_ZH.finditer(text):
+        run = match.group(1)
+        alias = max((a for a in CJK_ALIASES if run.endswith(a)), key=len, default=None)
+        if alias is not None:
+            keep((match.end(1) - len(alias), match.end()), alias,
+                 float(match.group(2)) / 100.0)
     named_spans = [pos for pos, _, _ in found]
     for pos, symbol, weight in _group_pairs(text):
         # A group's members sit at its own position; only a weight already read there by name
@@ -1766,11 +1792,10 @@ def _unit_notional(raw: str, symbol: str) -> tuple[Decimal, str] | None:
         amount = _number(own.group(1)) if own else None
     if not amount or amount <= 0:
         return None
-    try:
-        from argus.market.bitget import fetch_tickers
-
-        last = float(fetch_tickers()[symbol].last)
-    except Exception:
+    # The one live-price function (`_last_price`), so every reading of an amount uses the same
+    # price source and the offline suite can pin it in one place.
+    last = _last_price(symbol)
+    if last is None:
         return None
     notional = Decimal(str(round(amount * last, 2)))
     return notional, (f"{amount:,.10g} {base} read as ${notional:,.0f} at Bitget's live last price "
@@ -6019,7 +6044,7 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
     visible rather than decided silently."""
     from argus.cost.model import CostModel
     from argus.desk.execution import HedgeLegQuote
-    from argus.market.bitget import fetch_tickers
+    from argus.market.bitget import BitgetError, fetch_tickers
     from argus.market.depth import fetch_orderbook
 
     crypto = [s for s in book if not _is_equity(s) and s not in TRADED_SYMBOLS]
@@ -6055,7 +6080,12 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
                      f"({', '.join(_t(c) for c in HEDGE_CANDIDATES_EQUITY)} tried), so no hedge "
                      f"ratio is given rather than one measured on nothing."], [], {})
     held = set.intersection(*(set(series.get(s, {})) for s in book))
-    tickers = fetch_tickers()
+    try:
+        tickers = fetch_tickers()
+    except BitgetError:
+        # A 429 or an outage on the one bulk call used to raise out of the console; with no
+        # tickers every leg is reported as not answering, and the caller refuses honestly.
+        tickers = {}
     rows: list[dict[str, Any]] = []
     unmeasured: dict[str, str] = {}
     for leg in candidates:
@@ -7832,15 +7862,15 @@ def _earnings_surprise(ticker: str) -> tuple[str, Source] | None:
     """The last quarter's earnings surprise from the company's own SEC filings, as SUE.
 
     Standardized Unexpected Earnings — the year-over-year EPS change over the company's own
-    trailing volatility of that change — is the formula `research/sue.py` reproduces to
+    trailing volatility of that change — is the formula `market/sue.py` reproduces to
     floating-point identity against QuantConnect's reference, on point-in-time, restatement-aware
     XBRL facts (`market/fundamentals.py`). The desk already reads it; this puts it in front of the
     trader who asks about earnings. No return-predictiveness is claimed: the desk's own PEAD study
     (`research/pead_study.py`) is what would license that, and the sentence stays descriptive.
     """
     from argus.market.fundamentals import FundamentalsSource
-    from argus.research.sue import MIN_QUARTERS
-    from argus.research.sue import read as sue_read
+    from argus.market.sue import MIN_QUARTERS
+    from argus.market.sue import read as sue_read
 
     facts, _ = FundamentalsSource().facts(ticker, concept="eps_diluted", as_of=datetime.now(UTC))
     if len(facts) < MIN_QUARTERS:
@@ -7857,7 +7887,7 @@ def _earnings_surprise(ticker: str) -> tuple[str, Source] | None:
         + (" Not the latest quarter: a fiscal fourth quarter is reported only inside the annual "
            "10-K, which carries no separate quarterly figure, so this is the one before it."
            if (datetime.now(UTC).date() - window[0].end).days > STALE_QUARTER_DAYS else ""),
-        Source(kind="computation", ref="argus.research.sue via SEC XBRL",
+        Source(kind="computation", ref="argus.market.sue via SEC XBRL",
                detail=f"{ticker} eps_diluted, {sue.quarters_used} quarters"),
     )
 
@@ -8775,7 +8805,7 @@ def _odds_lines(request: ResearchRequest,
         if moves:
             above = side == "long"
             hit = sum(1 for m in moves if (m >= need if above else m <= need)) / len(moves)
-            from argus.desk.odds import wilson
+            from argus.risk.calibration import wilson
 
             n_eff = len(moves) / h
             low_w, high_w = wilson(hit * n_eff, n_eff)

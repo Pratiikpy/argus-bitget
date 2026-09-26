@@ -47,10 +47,10 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from argus.agents.desk import ConstitutionPolicy
 from argus.decision.verdicts import Intent, Side, Verdict
-from argus.eval.artefact import write
+from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface, HedgeCandidate
+from argus.truth.artefact import write
 from argus.truth.clocks import SessionPhase, SessionState
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "rogue_value.json"

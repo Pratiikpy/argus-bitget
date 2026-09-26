@@ -57,6 +57,15 @@ class _Run:
         self.causal_chain = chain
 
 
+@pytest.fixture(autouse=True)
+def _quoted_exit_cost(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Settlement prices the exit on the live order book when it can; these tests grade chains,
+    so the exit is charged at the quote and the venue is never read."""
+    from argus.market import depth
+
+    monkeypatch.setattr(depth, "measured_spread_bps", lambda *a, **k: None)
+
+
 def _ledger(tmp_path: Path) -> PaperLedger:
     return PaperLedger(path=tmp_path / "ledger.jsonl")
 

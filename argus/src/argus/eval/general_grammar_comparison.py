@@ -58,7 +58,6 @@ from pathlib import Path
 from typing import Any
 
 from argus.backtest.engine import Bar
-from argus.eval import artefact
 from argus.research.grammar import (
     EXPANDED,
     MAX_COST,
@@ -74,6 +73,7 @@ from argus.research.grammar import (
 )
 from argus.research.grammar_series import evaluate_series, series_cost
 from argus.research.grammar_text import normal_form, parse
+from argus.truth import artefact
 
 _ROOT = Path(__file__).resolve().parents[3]
 DATA = _ROOT / "data"

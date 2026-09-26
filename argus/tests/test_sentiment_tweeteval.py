@@ -14,9 +14,9 @@ from typing import Any
 import pytest
 
 from argus.eval import sentiment_tweeteval as st
-from argus.eval.artefact import is_strict
 from argus.market import social_pulse
 from argus.market.abuse import DEFAULT_SCREEN
+from argus.truth.artefact import is_strict
 
 NOW = datetime(2026, 9, 25, 12, tzinfo=UTC)
 NAMES = {0: "negative", 1: "neutral", 2: "positive"}

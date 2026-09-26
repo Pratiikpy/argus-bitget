@@ -16,10 +16,10 @@ outcome and is rendered as one. The judge questions this is built against includ
 *supposed* to be refused — an instrument the venue does not carry, a reference with nothing to bind
 to, a statistic the sample cannot support. Answering those anyway is the failure being tested for.
 
-**Each answerer says what its lines are, where it is defined** (`truth/trace.py`, 2026-09-25).
+**Each answerer says what its lines are, where it is defined** (`lui/trace.py`, 2026-09-25).
 `lui/provenance.py` reads a label off a finished line's wording, and a quoted thesis that happens
 to open "RSI(14)" reads there as a live quote. The answerers below are declared with
-:func:`~argus.truth.trace.traced`: a decision's own row, quoted, is ``desk``; the graded refusal
+:func:`~argus.lui.trace.traced`: a decision's own row, quoted, is ``desk``; the graded refusal
 leans are a ``record``; the one line of each that explains a method rather than stating what the
 record holds (why an abstention is a decision, why two clocks matter, how the evidence gate works)
 declares nothing and keeps its wording-based label. A refused answer is never covered by its
@@ -39,27 +39,9 @@ from typing import Any
 from argus.eval.performance import evaluate_ledger
 from argus.lui.phrasebook import WINDOW_IN_ZH, WINDOW_LABELS_ZH, Language, t
 from argus.lui.question import TRADED_SYMBOLS, Intent, Question, Window
+from argus.lui.trace import all_but, emit, only, traced
 from argus.paper.ledger import Entry, PaperLedger
-from argus.truth.trace import all_but, emit, only, traced
-
-
-@dataclass(frozen=True)
-class Source:
-    """Where a fact came from. Enough for a reader to go and check it."""
-
-    kind: str
-    """``ledger`` | ``computation`` | ``evidence`` | ``venue``."""
-
-    ref: str
-    """A ledger seq, an evidence id, a module path, or a URL."""
-
-    detail: str = ""
-
-    def as_dict(self) -> dict[str, str]:
-        return {"kind": self.kind, "ref": self.ref, "detail": self.detail}
-
-    def __str__(self) -> str:
-        return f"{self.kind}:{self.ref}" + (f" ({self.detail})" if self.detail else "")
+from argus.truth.source import Source
 
 
 @dataclass
@@ -299,7 +281,7 @@ def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
         lines.insert(0, f"Track record: {len(ledger.entries)} decisions on the ledger and no "
                         f"trade settled — every decision so far is a refusal, so there is no "
                         f"Sharpe, drawdown or win rate to report.")
-    # Labelled where they are made (`truth/trace.emit`): a figure the record cannot support is
+    # Labelled where they are made (`lui/trace.emit`): a figure the record cannot support is
     # ``missing``; what the ledger's own rows add up to is ``desk``, the label the reviewed wording
     # rules give "Net PnL" and "Track record" lines. The graded leans below carry their own.
     emit(undefined, "missing")

@@ -45,7 +45,7 @@ from argus.desk.review import (
     defects_from_risk,
     evaluate,
 )
-from argus.eval.artefact import write
+from argus.truth.artefact import write
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 REPORT_PATH = DATA / "review_oos.json"

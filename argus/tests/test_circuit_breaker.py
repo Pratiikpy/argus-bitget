@@ -32,7 +32,7 @@ from argus.agents.circuit import (
     trips_per_100,
 )
 from argus.agents.debate import Ending
-from argus.agents.desk import ConstitutionPolicy, TradingDesk
+from argus.agents.desk import TradingDesk
 from argus.desk.feed_sanity import (
     check_claim,
     check_panel_line,
@@ -40,6 +40,7 @@ from argus.desk.feed_sanity import (
     screen_claims,
     screen_evidence,
 )
+from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface
 from argus.truth.clocks import SessionPhase, SessionState
 from argus.truth.evidence import Evidence

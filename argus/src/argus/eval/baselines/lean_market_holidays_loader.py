@@ -1,5 +1,6 @@
-"""Load the real, vendored `lean_market_holidays_usa.json` — the real US equity market holiday
-dates from QuantConnect/Lean's own real market-hours database.
+"""Load the vendored US equity market holiday calendar (`truth/data/us_equity_holidays.json`,
+until 2026-09-26 `eval/baselines/lean_market_holidays_usa.json`) — the holiday dates from
+QuantConnect/Lean's own market-hours database.
 
 Source:  https://github.com/QuantConnect/Lean
 Path:    Data/market-hours/market-hours-database.json, the "holidays" array of the real
@@ -13,13 +14,13 @@ Licence: Apache License 2.0 (Copyright 2014 QuantConnect Corporation) — the re
 
 This is real, verbatim DATA, not code — every date string here is copied unchanged from the
 real file, re-serialised as a clean, chronologically-sorted JSON array (the original entry mixes
-insertion order across markets/decades). `argus.research.gap_study.study()` had never been given
-a real holiday calendar at all: it calls `truth.clocks.DualClock()` with no `holidays` argument,
-so `DualClock`'s own real, deliberate default (`frozenset()` — "a missing holiday file degrades
-to 'we do not know', never to 'assume open'", per that module's own docstring) meant the
-`SessionPhase.HOLIDAY` branch its own `_closed_sessions()` already classifies for has never once
-fired in a real run. `argus.eval.afterhours_comparison` wires this real calendar in and reports
-what changes.
+insertion order across markets/decades). When this loader was written, `argus.research.gap_study
+.study()` had never been given a real holiday calendar: it called `truth.clocks.DualClock()` with
+no `holidays` argument, and `DualClock`'s default was then `frozenset()`, so the
+`SessionPhase.HOLIDAY` branch its own `_closed_sessions()` classifies for had never fired in a
+real run. `argus.eval.afterhours_comparison` wired this calendar in and reported what changed.
+Since 2026-09-26 the same dates, byte for byte, live at `truth/data/us_equity_holidays.json` and
+are every `DualClock`'s default; this loader reads them there.
 """
 
 from __future__ import annotations
@@ -38,7 +39,9 @@ class LeanMarketHolidaysLoadError(RuntimeError):
 def load_usa_equity_holidays() -> frozenset[date]:
     """The real 293 US equity market holiday dates (1998-2028), as a `frozenset[date]` ready to
     pass straight to `truth.clocks.DualClock(holidays=...)`."""
-    path = _BASELINES_DIR / "lean_market_holidays_usa.json"
+    # The calendar now lives with the clock that uses it (truth/data), so truth does not
+    # import from eval; this loader reads the same file.
+    path = _BASELINES_DIR.parents[1] / "truth" / "data" / "us_equity_holidays.json"
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:

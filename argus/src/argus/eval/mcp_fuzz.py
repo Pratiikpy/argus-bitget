@@ -46,7 +46,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from argus.eval import artefact
+from argus.truth import artefact
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "mcp_fuzz.json"
 
@@ -101,6 +101,8 @@ def _matches(value: Any, kind: str) -> bool:
         return isinstance(value, str)
     if kind == "number":
         return isinstance(value, (int, float)) and not isinstance(value, bool)
+    if kind == "integer":
+        return isinstance(value, int) and not isinstance(value, bool)
     if kind == "array":
         return isinstance(value, list)
     if kind == "object":
@@ -229,9 +231,9 @@ def corpus(tools: tuple[Mapping[str, Any], ...]) -> list[Case]:
 def schema_violations(schema: Mapping[str, Any], value: Any, path: str = "$") -> list[str]:
     """The subset of JSON Schema the ARGUS tools declare, checked independently of the server.
 
-    ``type`` (object / string / number / array), ``properties``, ``required``, ``items`` and
-    ``additionalProperties`` as a schema. Numbers must also be finite: JSON has no NaN, so a
-    non-finite number reaching an engine only got there through Python's lenient parser.
+    ``type`` (object / string / number / integer / array), ``properties``, ``required``,
+    ``items`` and ``additionalProperties`` as a schema. Numbers must also be finite: JSON has no
+    NaN, so a non-finite number reaching an engine only got there through Python's lenient parser.
     """
     kind = schema.get("type")
     if kind is not None and not _matches(value, str(kind)):

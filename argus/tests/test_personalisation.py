@@ -18,7 +18,8 @@ from decimal import Decimal
 
 import pytest
 
-from argus.desk.book import Book, Lot, PositionSide
+from argus.decision.verdicts import PositionSide
+from argus.desk.book import Book, Lot
 from argus.desk.personalisation import (
     Outcome,
     Proposal,
@@ -203,7 +204,7 @@ class TestTheRecordIsUsable:
 
 
 class TestTheMandateBindsInTheLiveDesk:
-    """`agents/mandate.py` and `TraderProfile` existed and were wired to nothing.
+    """`desk/mandate.py` and `TraderProfile` existed and were wired to nothing.
 
     Track 3 scores "personalised thesis", so a profile that cannot change a live decision is a
     claim rather than a feature. These check the limits actually differ and that the narrowing is
@@ -211,13 +212,13 @@ class TestTheMandateBindsInTheLiveDesk:
     """
 
     def test_two_profiles_place_different_ceilings_on_the_same_capital(self) -> None:
-        from argus.agents.mandate import Mandate
+        from argus.desk.mandate import Mandate
 
         ceilings = {p.name: Mandate(profile=p).max_position_notional for p in standard_profiles()}
         assert len(set(ceilings.values())) == 2
 
     def test_the_same_notional_breaches_one_mandate_and_not_the_other(self) -> None:
-        from argus.agents.mandate import Mandate
+        from argus.desk.mandate import Mandate
 
         conservative, aggressive = standard_profiles()
         notional = Decimal("20000")

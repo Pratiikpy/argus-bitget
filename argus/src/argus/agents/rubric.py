@@ -73,7 +73,7 @@ DIMENSIONS: tuple[Dimension, ...] = (
             "how much of your thesis rests on figures you were given, quoted as given — 1 if every "
             "figure appears in the frame exactly, 0 if the thesis rests on numbers you estimated"
         ),
-        measured_by="the grounding checker's support score (agents/grounding.py)",
+        measured_by="the grounding checker's support score (truth/grounding.py)",
     ),
     Dimension(
         name="evidence_breadth",

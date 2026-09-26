@@ -1,4 +1,4 @@
-"""Tests for `argus.research.sue` — checked against QuantConnect's real, vendored SUE factor.
+"""Tests for `argus.market.sue` — checked against QuantConnect's real, vendored SUE factor.
 
 No live network calls here — all cases use constructed quarterly EPS. The live-data comparison
 (real SEC EDGAR EPS, real vendored QuantConnect code, run side by side) is
@@ -12,7 +12,7 @@ from statistics import pstdev
 
 import pytest
 
-from argus.research.sue import (
+from argus.market.sue import (
     LAG_QUARTERS,
     MAX_DELTA_SPAN_DAYS,
     MIN_QUARTERS,

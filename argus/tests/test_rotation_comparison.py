@@ -52,6 +52,7 @@ def costs() -> dict:
     return measure_costs(repeats=20)
 
 
+@pytest.mark.network
 class TestBaselineReproduced:
     def test_every_design_symbol_with_history_agrees(self, baseline: dict) -> None:
         assert baseline["results"], "no symbols were checked — did the real fetch fail entirely?"
@@ -73,11 +74,13 @@ class TestBaselineReproduced:
 
 
 class TestOOSWiderUniverse:
+    @pytest.mark.network
     def test_the_wider_real_universe_also_agrees(self, oos: dict) -> None:
         if oos["n_checked"] == 0:
             pytest.skip("no held-out symbols returned real history this run")
         assert oos["all_agree"], oos["results"]
 
+    @pytest.mark.network
     def test_the_held_out_set_excludes_the_design_symbols(self, oos: dict) -> None:
         assert not set(oos["held_out_symbols"]) & set(DESIGN_SYMBOLS)
 
@@ -150,6 +153,7 @@ class TestBoundaryCheck:
         assert exact["agree"]
 
 
+@pytest.mark.network
 class TestCosts:
     def test_costs_are_measured_on_both_real_sides(self, costs: dict) -> None:
         assert costs["real_pandas_signal_seconds_per_call"] > 0
@@ -158,12 +162,14 @@ class TestCosts:
         assert costs["argus_faster_by_factor"] > 1
 
 
+@pytest.mark.network
 class TestReproducibility:
     def test_repeated_runs_are_identical(self) -> None:
         report = run_reproducibility_check()
         assert report["identical"]
 
 
+@pytest.mark.network
 class TestMain:
     def test_main_runs_end_to_end_and_render_produces_readable_text(
         self, baseline: dict, oos: dict, failures: dict, boundary: dict, costs: dict,

@@ -190,6 +190,7 @@ class TestAgainstTheModelledImpact:
         assert "modelled_impact_bps" not in rows[0]
 
 
+@pytest.mark.network
 class TestTheLiveVenue:
     def test_a_real_book_prices_a_real_size(self) -> None:
         from argus.market.bitget import BitgetError

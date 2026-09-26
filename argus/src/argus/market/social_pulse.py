@@ -21,7 +21,7 @@ repeat of the same line (`data/sentiment_comparison.json`) — exactly what a co
 exploits. That left it scoring the trivial-classifier floor on TweetEval (macro-recall 1/3,
 ``data/sentiment_tweeteval.json``) while VADER alone scored 0.570. So every post that survives
 the abuse screen now carries a VADER compound score (Hutto & Gilbert, ICWSM 2014, run unmodified
-from the MIT copy vendored at `argus/vendor/vader` through `eval/baselines/vader_loader.py`;
+from the MIT copy vendored at `argus/vendor/vader` through `market/vader.py`;
 notice in ``licenses/vaderSentiment-MIT.txt``), classed with the authors' own thresholds —
 positive at ``compound >= 0.05``, negative at ``<= -0.05``, neutral between (paper §4, p. 9:
 "classification thresholds set at -0.05 and +0.05"; the inclusive boundaries are
@@ -65,7 +65,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from argus.eval.baselines import vader_loader
+from argus.market import vader
 from argus.market.abuse import DEFAULT_SCREEN, REASON_TERM, Verdict, handle_is_abusive
 from argus.market.abuse import screen as abuse_screen
 from argus.truth.novelty import (
@@ -102,8 +102,8 @@ Tone = Callable[[str], float]
 """A polarity scorer: text to a compound score in [-1, 1]. VADER's in production."""
 
 TONES = ("positive", "neutral", "negative")
-TONE_SCORER = (f"VADER compound (Hutto & Gilbert, ICWSM 2014), >= {vader_loader.POSITIVE_AT} "
-               f"positive, <= {vader_loader.NEGATIVE_AT} negative (paper §4; README.rst:241-245)")
+TONE_SCORER = (f"VADER compound (Hutto & Gilbert, ICWSM 2014), >= {vader.POSITIVE_AT} "
+               f"positive, <= {vader.NEGATIVE_AT} negative (paper §4; README.rst:241-245)")
 TONE_WEIGHTING = ("a coordinated story counts once however many accounts pushed it; one account "
                   "repeating a story counts once; every other account counts once")
 
@@ -113,11 +113,11 @@ _VADER: Tone | None = None
 def vader_tone() -> Tone:
     """VADER's compound score, from the vendored copy, loaded once per process.
 
-    Raises `vader_loader.VaderLoadError` when it cannot be loaded; :func:`pulse` reports that
+    Raises `vader.VaderLoadError` when it cannot be loaded; :func:`pulse` reports that
     as an unscored tone rather than inventing one."""
     global _VADER
     if _VADER is None:
-        analyzer = vader_loader.load_analyzer()
+        analyzer = vader.load_analyzer()
 
         def compound(text: str) -> float:
             return float(analyzer.polarity_scores(text)["compound"])
@@ -162,7 +162,7 @@ def _tone(kept: Sequence[Post], report: NoveltyReport,
     if scorer is None:
         try:
             scorer = vader_tone()
-        except vader_loader.VaderLoadError as exc:
+        except vader.VaderLoadError as exc:
             return {"status": f"not scored: {exc}", "scorer": TONE_SCORER}, []
     weights = voice_weights(report)
     counts = dict.fromkeys(TONES, 0)
@@ -171,7 +171,7 @@ def _tone(kept: Sequence[Post], report: NoveltyReport,
     per_post = []
     for post in kept:
         compound = scorer(post.claim)
-        label = vader_loader.label(compound)
+        label = vader.label(compound)
         weight = weights.get(post.id, 1.0)
         counts[label] += 1
         weighted[label] += weight
@@ -446,7 +446,7 @@ def tone_line(ticker: str, row: dict[str, Any]) -> str | None:
 def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI, live network
     import argparse
 
-    from argus.lui.question import TRADED_SYMBOLS
+    from argus.market.bitget import RTOKEN_SYMBOLS as TRADED_SYMBOLS
 
     parser = argparse.ArgumentParser(description="Sweep X and Reddit for the traded names.")
     parser.add_argument("--out", type=Path, default=PULSE_PATH)

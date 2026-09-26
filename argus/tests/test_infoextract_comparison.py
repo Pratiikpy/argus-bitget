@@ -73,6 +73,7 @@ class TestBaselineReproduced:
         assert baseline["inContext"]["confidently_wrong_rate"] >= 0.3
 
 
+@pytest.mark.network
 class TestDesignedCases:
     def test_every_configured_case_was_attempted(self, cases: dict) -> None:
         assert cases["n_cases"] == len(DESIGNED_CASES)
@@ -92,6 +93,7 @@ class TestDesignedCases:
                 assert case["form"]
 
 
+@pytest.mark.network
 class TestAblation:
     def test_the_naive_fetch_is_genuinely_ambiguous(self, ablation: dict) -> None:
         assert ablation["naive_no_filter_n_matches"] == 2
@@ -109,6 +111,7 @@ class TestAblation:
         assert ablation["argus_quarterly_only_value"] == -120929000.0
 
 
+@pytest.mark.network
 class TestFailureCases:
     def test_an_unknown_ticker_reports_why_rather_than_raising(self, failures: dict) -> None:
         case = failures["unknown_ticker"]
@@ -122,16 +125,19 @@ class TestFailureCases:
         assert case["n_facts_visible_at_2020"] > 0
 
 
+@pytest.mark.network
 class TestCosts:
     def test_the_real_fetch_is_measured_and_positive(self, costs: dict) -> None:
         assert costs["argus_live_xbrl_fetch_seconds_per_call"] > 0
 
 
+@pytest.mark.network
 class TestReproducibility:
     def test_repeated_fetches_agree(self, reproducibility: dict) -> None:
         assert reproducibility["identical"]
 
 
+@pytest.mark.network
 class TestMain:
     def test_render_produces_readable_text(
         self, baseline: dict, cases: dict, ablation: dict, reproducibility: dict,

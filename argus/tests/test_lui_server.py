@@ -130,11 +130,30 @@ class TestTheDemoStarts:
 
 class TestTheAskEndpoint:
     def test_a_real_question_answers_with_sources(self, base_url: str) -> None:
-        payload = _ask(base_url, "why did you do nothing all weekend")
+        # A question with no time word, so the answer does not depend on today's date. It asked
+        # "why did you do nothing all weekend" until 2026-09-27; that answer moves back at most
+        # eight weekends to find a decision, so it failed CI on a Saturday morning and would have
+        # failed on every clone once the shipped record was two months old (audit, 2026-09-26).
+        payload = _ask(base_url, "how many decisions are on record")
         assert payload["refused"] is False
         assert payload["lines"]
         assert payload["sources"], "an assertion with no source is a defect"
         assert payload["elapsed_ms"] <= payload["budget_ms"]
+
+    def test_a_weekend_question_is_answered_against_the_record_not_the_calendar(self) -> None:
+        """The same weekend question, with the clock set an hour after the shipped record's newest
+        decision: it answers whatever day the suite runs on."""
+        from datetime import timedelta
+
+        from argus.lui.server import _ledger_path
+        from argus.paper.ledger import PaperLedger
+
+        newest = max(datetime.fromisoformat(e.decided_at)
+                     for e in PaperLedger(path=_ledger_path()).entries)
+        payload = handle_ask("why did you do nothing all weekend", [],
+                             now=newest + timedelta(hours=1))
+        assert payload["refused"] is False, payload
+        assert payload["sources"]
 
     def test_a_refusal_is_carried_as_a_refusal_not_an_error(self, base_url: str) -> None:
         payload = _ask(base_url, "what is XYZQ trading at")
@@ -244,6 +263,52 @@ class TestTheSurfaceIsReadOnly:
         assert is_error and "does not place" in text
 
 
+
+def _post(base_url: str, path: str, body: bytes,
+          headers: dict[str, str]) -> tuple[int, dict[str, Any]]:
+    """A POST with the headers exactly as given: urllib would fix a bad Content-Length itself."""
+    import http.client
+    from urllib.parse import urlparse
+
+    where = urlparse(base_url)
+    conn = http.client.HTTPConnection(where.hostname, where.port, timeout=10)
+    try:
+        conn.putrequest("POST", path)
+        for name, value in headers.items():
+            conn.putheader(name, value)
+        conn.endheaders(body)
+        response = conn.getresponse()
+        return response.status, json.loads(response.read() or b"{}")
+    finally:
+        conn.close()
+
+
+class TestAPostBodyIsReadWhateverItsShape:
+    """Found testing the hosted entry point (2026-09-27): a JSON body at /ask answered "empty
+    question", and a Content-Length that was not a number dropped the connection unanswered."""
+
+    def test_a_json_question_is_answered_like_a_form(self, base_url: str) -> None:
+        body = json.dumps({"q": "sell half of that", "turns": []}).encode()
+        status, payload = _post(base_url, "/ask", body, {
+            "Content-Type": "application/json", "Content-Length": str(len(body))})
+        assert status == 200
+        assert payload["intent"] == "order" and payload["refused"] is True
+
+    @pytest.mark.parametrize("body", [b"[1, 2]", b"{not json", b'"q"'])
+    def test_a_json_body_that_is_not_an_object_is_a_400_that_says_so(
+            self, base_url: str, body: bytes) -> None:
+        status, payload = _post(base_url, "/ask", body, {
+            "Content-Type": "application/json", "Content-Length": str(len(body))})
+        assert status == 400 and "JSON body must be an object" in payload["error"]
+
+    @pytest.mark.parametrize("length", ["abc", "-5"])
+    @pytest.mark.parametrize("path", ["/ask", "/research", "/mcp", "/telegram"])
+    def test_a_bad_content_length_is_a_400_on_every_post_route(
+            self, base_url: str, path: str, length: str) -> None:
+        status, payload = _post(base_url, path, b"q=x", {
+            "Content-Type": "application/x-www-form-urlencoded", "Content-Length": length})
+        assert status == 400 and "Content-Length" in payload["error"]
+
 class TestThePageHoldsUpAtPhoneWidthAndInBothThemes:
     """Verified in a real browser on 2026-09-12 and pinned here so it cannot regress.
 
@@ -299,6 +364,7 @@ class TestTheResearchTaskIsReachable:
     handbook line asks for — the whole flow, an actionable end, and reachable by a judge.
     """
 
+    @pytest.mark.network
     def test_the_page_runs_the_whole_chain(self, base_url: str) -> None:
         status, raw, headers = _get(base_url + "/research")
         body = raw.decode("utf-8")
@@ -308,6 +374,7 @@ class TestTheResearchTaskIsReachable:
         assert "What to do" in body
         assert body.count("<article") == 8
 
+    @pytest.mark.network
     def test_every_step_names_its_engine_and_answers(self, base_url: str) -> None:
         _, body, _ = _get(base_url + "/research?format=json")
         payload = json.loads(body)
@@ -315,6 +382,7 @@ class TestTheResearchTaskIsReachable:
         for step in payload["steps"]:
             assert step["engine"] and step["lines"], step
 
+    @pytest.mark.network
     def test_it_ends_in_something_to_act_on(self, base_url: str) -> None:
         """The conclusion leads with what was asked: how much of the name the book can carry."""
         _, body, _ = _get(base_url + "/research?format=json")
@@ -322,6 +390,7 @@ class TestTheResearchTaskIsReachable:
         assert conclusion, "a research task with no actionable end is not the task asked for"
         assert conclusion[0]["step"] == "What the trade does to your book"
 
+    @pytest.mark.network
     def test_the_name_size_and_book_come_from_the_url(self, base_url: str) -> None:
         _, body, _ = _get(base_url + "/research?format=json&name=gold&size=10&book=50%25%20SPY"
                                      "%2C%2050%25%20QQQ")
@@ -330,6 +399,7 @@ class TestTheResearchTaskIsReachable:
         assert payload["size_pct"] == 10
         assert set(payload["book"]) == {"SPYUSDT", "QQQUSDT"}
 
+    @pytest.mark.network
     def test_nonsense_parameters_still_answer(self, base_url: str) -> None:
         status, body, _ = _get(base_url + "/research?format=json&size=lots&name=")
         assert status == 200

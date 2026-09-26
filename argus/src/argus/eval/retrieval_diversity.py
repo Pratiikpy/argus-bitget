@@ -315,7 +315,7 @@ def evaluate(grid: dict[str, Any], retrieved: dict[tuple[str, int], dict[str, Re
 
 
 def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - CLI, runs the rival
-    from argus.eval.artefact import write
+    from argus.truth.artefact import write
 
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--grid", type=Path, help="a grid exported by analogdesk_export.mjs")

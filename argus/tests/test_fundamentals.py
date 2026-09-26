@@ -28,7 +28,7 @@ from argus.market.fundamentals import (
     latest_per_period,
     parse_concept,
 )
-from argus.research.sue import MIN_QUARTERS
+from argus.market.sue import MIN_QUARTERS
 from argus.truth.evidence import Evidence
 
 AS_OF = datetime(2026, 9, 12, 12, 0, tzinfo=UTC)
@@ -383,7 +383,7 @@ class TestSueEvidenceIsYearOverYearByDate:
         return [f for f in facts if f.end.month != 1][: len(values)]
 
     def test_the_reading_uses_only_genuine_year_over_year_pairs(self) -> None:
-        from argus.research.sue import read, read_dated, yoy_window
+        from argus.market.sue import read, read_dated, yoy_window
 
         values = [3.1, 2.2, 2.9, 2.0, 1.4, 2.5, 1.9, 1.0, 2.1, 1.6, 0.9, 1.7, 1.2, 0.8, 1.1]
         facts = self._q4_missing(values)

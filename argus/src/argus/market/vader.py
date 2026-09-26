@@ -1,4 +1,9 @@
-"""Run VADER from the local clone of ``cjhutto/vaderSentiment``, unmodified, as a baseline.
+"""VADER, unmodified, from the copy vendored in ``argus/vendor/vader`` or a clone.
+
+Moved from `eval/baselines/vader_loader.py` on 2026-09-27: it began as a baseline for the
+TweetEval comparison and became production code when the crowd read started scoring tone with
+it on every sweep (`market/social_pulse.py`), which then imported it upward from the
+evaluation layer. The comparison still uses it, from here.
 
 VADER (Hutto & Gilbert, ICWSM 2014) is the lexicon-and-rules scorer written for social-media text,
 and the one a reader who knows the field expects beside finBERT on a tweet benchmark: finBERT was
@@ -27,7 +32,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Protocol, cast
 
-_DEFAULT_CLONE = Path(__file__).resolve().parents[2] / "vendor" / "vader"
+_DEFAULT_CLONE = Path(__file__).resolve().parents[1] / "vendor" / "vader"
 """VADER vendored verbatim at ``READ_AT_COMMIT`` under its MIT licence
 (``vendor/vader/LICENSE.txt``, 2026-09-26), because the crowd read now scores tone with it on every
 sweep (`market/social_pulse.py`) and a public clone of ARGUS must run without the research

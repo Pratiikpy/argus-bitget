@@ -1,6 +1,6 @@
 """Claim grounding — catching a thesis that contradicts its own evidence.
 
-:mod:`argus.agents.grounding` checks the *figures* in a thesis. This checks the *claims*, and it
+:mod:`argus.truth.grounding` checks the *figures* in a thesis. This checks the *claims*, and it
 exists because of one real decision.
 
 **Ledger seq 41, 2026-09-12.** The desk was shown two insider sales and wrote:
@@ -56,7 +56,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-from argus.agents.grounding import Support, combine
+from argus.truth.grounding import Support, combine
 
 NEGATION_WINDOW = 40
 """Characters before a phrase searched for a negation. "not pre-arranged" is the opposite claim."""

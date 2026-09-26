@@ -88,12 +88,7 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import Any
 
-
-class PositionSide(StrEnum):
-    """One venue position record's side. Bitget hedge mode holds both per symbol at once."""
-
-    LONG = "long"
-    SHORT = "short"
+from argus.decision.verdicts import PositionSide
 
 
 class PositionError(RuntimeError):
@@ -350,8 +345,8 @@ class VenueMarginSnapshot:
     those and does not map them at all (checked: no other reference in the file). Treated here as
     strong analogy — same field-naming family, sitting beside ``mmr``/``imr`` which are also
     fraction-styled — **not** as the same rigor as a direct non-zero example.
-    `agents.desk.ConstitutionPolicy`'s ``margin_usage`` gate is built on this evidence and states
-    the same caveat rather than repeating it as settled fact.
+    `risk.constitution.ConstitutionPolicy`'s ``margin_usage`` gate is built on this evidence and
+    states the same caveat rather than repeating it as settled fact.
     """
 
     position_mgn_ratio: Decimal
@@ -550,7 +545,7 @@ class Book:
 
         Deliberately reads **all** of ``self.positions`` for this symbol, not
         :meth:`open_positions` — a symbol that lost money and was fully closed out is exactly the
-        case a per-symbol underperformance gate (`agents.desk.ConstitutionPolicy`'s
+        case a per-symbol underperformance gate (`risk.constitution.ConstitutionPolicy`'s
         ``per_symbol_underperformance``, the ARGUS-native counterpart to freqtrade's
         ``LowProfitPairs``, `eval.freqtrade_baseline.freqtrade_low_profit_pairs`) needs to see;
         excluding flat positions would hide the very losses the gate exists to catch. Hedge mode
@@ -571,7 +566,7 @@ class Book:
     def total_gross_notional(self) -> Decimal:
         """Sum of ``quantity * entry_price`` across every open position, direction ignored.
 
-        The figure `agents.desk.ConstitutionPolicy`'s ``gross_exposure`` gate compares against
+        The figure `risk.constitution.ConstitutionPolicy`'s ``gross_exposure`` gate compares against
         a flat cap — unlike :meth:`weights`, this deliberately does not net a hedge-mode long and
         short against each other, for the same reason :meth:`gross_weights` does not: both legs
         carry real margin and real liquidation risk regardless of whether they cancel in net terms.
@@ -646,7 +641,7 @@ class Book:
     def hedge_cluster(self, symbol: str, side: PositionSide) -> set[tuple[str, PositionSide]]:
         """Every position transitively linked to this one.
 
-        Originally built for reporting only; `agents.desk.ConstitutionPolicy.rule`'s
+        Originally built for reporting only; `risk.constitution.ConstitutionPolicy.rule`'s
         ``hedge_integrity`` gate (added 2026-09-15) is now a real consumer — it refuses an
         automatic reduction of a position while this cluster still contains another open one.
         The links themselves stay informational (see :class:`HedgeLink`'s docstring: no universal

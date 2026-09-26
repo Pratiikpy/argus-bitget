@@ -97,10 +97,10 @@ from random import Random
 from typing import Any
 
 from argus.agents.meta_pm import MarketFrame, MetaPM, deliberation_cost_bps
-from argus.eval.artefact import write
 from argus.llm.base import ChatModel
 from argus.llm.qwen import Completion, QwenClient, QwenError, Thinking, TokenBudget
 from argus.proof.autonomy import AutonomyProof
+from argus.truth.artefact import write
 from argus.truth.clocks import SessionPhase, SessionState
 
 DATA = Path(__file__).resolve().parents[3] / "data"

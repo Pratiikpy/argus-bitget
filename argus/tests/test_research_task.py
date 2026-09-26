@@ -248,6 +248,54 @@ def _post(url: str, fields: dict[str, str]) -> tuple[int, str]:
         return response.status, response.read().decode("utf-8")
 
 
+
+class TestOneEngineCannotTakeTheTaskDown:
+    """Each engine is independent: one failing or hanging costs its own step, never the page."""
+
+    def test_an_engine_that_raises_loses_its_step_and_the_rest_answer(
+        self, engines: list[ResearchRequest], monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        answer = task_mod.run
+
+        def run(question: str, request: ResearchRequest, ledger: Any = None) -> Any:
+            if request.kind is ResearchKind.NEWS:
+                raise TimeoutError("the news feed did not answer")
+            return answer(question, request, ledger)
+
+        monkeypatch.setattr(task_mod, "run", run)
+        reading = read_question(ASKED)
+        assert isinstance(reading, Reading)
+        task = research_task(reading=reading, asked=ASKED)
+        news = next(s for s in task.steps if s.title == "News, filings and today's move")
+        assert news.refused and "could not run just now (TimeoutError)" in news.lines[0]
+        others = [s for s in task.steps if s is not news]
+        assert len(others) == 7 and not any(s.refused for s in others)
+        assert len(task.conclusion) == 7
+
+    def test_an_engine_that_hangs_is_cut_off_at_the_deadline(
+        self, engines: list[ResearchRequest], monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        release = threading.Event()
+        answer = task_mod.run
+
+        def run(question: str, request: ResearchRequest, ledger: Any = None) -> Any:
+            if request.kind is ResearchKind.ANALOGUE:
+                release.wait(30)
+            return answer(question, request, ledger)
+
+        monkeypatch.setattr(task_mod, "run", run)
+        monkeypatch.setattr(task_mod, "STEP_DEADLINE_S", 0.5)
+        reading = read_question(ASKED)
+        assert isinstance(reading, Reading)
+        try:
+            task = research_task(reading=reading, asked=ASKED)
+        finally:
+            release.set()
+        assert task.seconds < 5, "the page waited for the hung engine"
+        stuck = next(s for s in task.steps if s.title == "Has it been here before?")
+        assert stuck.refused and "did not answer within" in stuck.lines[0]
+        assert sum(not s.refused for s in task.steps) == 7
+
 class TestThePageTakesAQuestion:
     def test_a_posted_question_runs_the_task_and_shows_what_was_read(self, base_url: str) -> None:
         status, body = _post(f"{base_url}/research", {"q": ASKED, "book": ""})

@@ -86,9 +86,9 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from argus.eval.artefact import write
 from argus.llm.qwen import Completion, QwenError, Thinking, Usage, extract_json_object
 from argus.research import document_qa as dq
+from argus.truth.artefact import write
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 CORPUS = DATA / "document_qa_corpus"

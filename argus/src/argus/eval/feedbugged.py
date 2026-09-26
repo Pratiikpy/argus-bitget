@@ -63,7 +63,6 @@ from pathlib import Path
 from random import Random
 from typing import Any
 
-from argus.eval.artefact import write
 from argus.eval.perturbations import (
     DATA,
     LEAN,
@@ -81,6 +80,7 @@ from argus.eval.perturbations import (
     verdict,
     worst_case,
 )
+from argus.truth.artefact import write
 
 REPORT_PATH = DATA / "feedbugged.json"
 

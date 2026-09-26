@@ -316,6 +316,24 @@ def source_files() -> int:
     return sum(1 for _ in SRC.rglob("*.py"))
 
 
+def memory_effect() -> tuple[Number, Number]:
+    """Two-session memory tasks, and how many answers the remembered facts changed.
+
+    From `eval/memory_eval.py`'s artefact. The front page quoted both, and neither was under this
+    gate until the 2026-09-26 audit found the evaluator had no tests and the figure no check."""
+    effect = json.loads((DATA / "memory_eval.json").read_text(encoding="utf-8"))["effect"]
+    return int(effect["tasks"]), int(effect["changed_by_memory"])
+
+
+def multistep_split() -> tuple[Number, Number, Number, Number]:
+    """Multi-part questions split correctly out of those asked, then single questions split
+    wrongly out of those asked (`eval/multistep_eval.py`)."""
+    blob = json.loads((DATA / "multistep_eval.json").read_text(encoding="utf-8"))
+    multi, single = blob["multi"], blob["single"]
+    return (int(multi["split_correctly"]), int(multi["questions"]), int(single["split"]),
+            int(single["single_questions"]))
+
+
 def register_claims() -> int:
     """Claims committed to the public register.
 
@@ -402,9 +420,11 @@ def settled_trades() -> int:
     self-checking documents reported a clean bill over a figure that contradicted the correction
     printed above it. A claim the checker cannot see is a claim nobody is checking.
     """
+    from argus.eval.performance import ledger_performance
     from argus.paper.ledger import PaperLedger
 
-    return int(PaperLedger(path=DATA / "paper_ledger.jsonl").performance()["settled_trades"])
+    ledger = PaperLedger(path=DATA / "paper_ledger.jsonl")
+    return int(ledger_performance(ledger)["settled_trades"])
 
 
 def _ngram_report() -> dict[str, Any]:
@@ -680,6 +700,14 @@ CLAIMS: tuple[Claim, ...] = (
           tests_collected, ("readme", "public-readme", "submission", "explained"), mode="at_least"),
     Claim("source_files", r"strict\W{0,3}clean (?:on|across) (?P<q>\d+) (?:source )?files",
           source_files, ("readme", "public-readme", "submission", "explained")),
+    # Registered 2026-09-27 with tests for both evaluators (audit finding 137).
+    Claim("memory_effect",
+          r"Measured on (?P<q1>\d+) two-session tasks: (?P<q2>\d+) answers changed by memory",
+          memory_effect, ("public-readme",)),
+    Claim("multistep_split",
+          r"multi-part questions (?P<q1>\d+)/(?P<q2>\d+)\s+split correctly,\s+"
+          r"(?P<q3>\d+) of (?P<q4>\d+) single",
+          multistep_split, ("submission",)),
     # `falsifiable claims about` was added after README:163 was found quoting 36 against a live 156
     # — the sentence had drifted by 120 claims and matched no pattern, so the gate never saw it.
     Claim("register_claims",

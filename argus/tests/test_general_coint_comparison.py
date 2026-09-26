@@ -16,7 +16,6 @@ from typing import Any
 
 import pytest
 
-from argus.eval.artefact import is_strict
 from argus.eval.general_coint_comparison import (
     ARTEFACT_PATH,
     CONFIRMED,
@@ -36,6 +35,7 @@ from argus.eval.general_coint_comparison import (
     rival_pvalues,
     score_pipeline,
 )
+from argus.truth.artefact import is_strict
 
 
 class TestUniverses:

@@ -144,6 +144,7 @@ class TestErrorPaths:
         assert status == ["reddit: 1 posts"]
 
 
+@pytest.mark.network
 @pytest.mark.skipif(shutil.which("rdt") is None, reason="rdt-cli not installed here")
 class TestRealLiveCli:
     """The one real, live check — confirms the actual CLI still works, still returns real,

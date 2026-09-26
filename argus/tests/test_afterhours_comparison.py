@@ -40,17 +40,20 @@ def reproducibility() -> dict:
 
 
 class TestBaseCase:
+    @pytest.mark.network
     def test_the_holiday_phase_was_dead_before_the_real_calendar_was_wired_in(
         self, base_case: dict
     ) -> None:
         assert not base_case["without_holiday_calendar_has_holiday_phase"]
 
+    @pytest.mark.network
     def test_the_real_calendar_unlocks_real_holiday_sessions(self, base_case: dict) -> None:
         if base_case["real_holiday_sessions_found"] == 0:
             pytest.skip("no real holiday fell inside the live trailing window this run")
         assert base_case["with_holiday_calendar_has_holiday_phase"]
         assert base_case["with_holiday_calendar_by_phase_holiday"] is not None
 
+    @pytest.mark.network
     def test_the_blind_long_backtest_ran_on_every_real_holiday_session(
         self, base_case: dict
     ) -> None:
@@ -61,6 +64,7 @@ class TestBaseCase:
         for session in backtest["sessions"]:
             assert session["real_decision_went_long"]
 
+    @pytest.mark.network
     def test_the_real_win_rate_is_reported_not_assumed(self, base_case: dict) -> None:
         backtest = base_case["blind_long_backtest"]
         if backtest["n_sessions"] == 0:
@@ -88,6 +92,7 @@ class TestCosts:
         assert costs["argus_property_seconds_per_call"] > 0
 
 
+@pytest.mark.network
 class TestReproducibility:
     def test_repeated_computation_on_the_same_fetched_data_agrees(
         self, reproducibility: dict
@@ -95,6 +100,7 @@ class TestReproducibility:
         assert reproducibility["identical"]
 
 
+@pytest.mark.network
 class TestMain:
     def test_render_produces_readable_text(
         self, base_case: dict, failures: dict, costs: dict, reproducibility: dict,

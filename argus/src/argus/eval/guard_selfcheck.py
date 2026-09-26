@@ -36,7 +36,6 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from argus.eval import artefact
 from argus.execution.guard import (
     GuardError,
     Instrument,
@@ -44,6 +43,7 @@ from argus.execution.guard import (
     validate,
     would_pass,
 )
+from argus.truth import artefact
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "guard_selfcheck.json"
 

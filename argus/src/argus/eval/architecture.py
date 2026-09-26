@@ -17,8 +17,14 @@ the import graph**, and a fact can be checked:
 2. **The deterministic core.** ARGUS's central claim is that the model interprets numbers and never
    produces them. That is checkable: no module under `truth`, `cost`, `risk`, `decision` or
    `backtest` may import `argus.llm` or `argus.agents`, directly or transitively.
-3. **Producers must not import consumers.** `market` gathers facts; `agents` reads them. A
-   dependency the other way inverts the layering.
+3. **The layer order, for every import.** :data:`LAYERS` ranks each package; a module imports only
+   from its own layer or below — module-level and deferred imports alike, because a deferred import
+   is still a dependency even when it does not load at import time. `market` importing `agents`
+   (a producer importing its consumer) is one case of it. The published rule said this from the
+   start and nothing checked it: the 2026-09-26 audit found 41 upward imports, 33 of them deferred,
+   which the previous contracts could not see. The one exemption is lexical and named: an import
+   inside a module's top-level ``main()`` is the program's composition root, where a command-line
+   entry point wires the layers together, and may reach any layer.
 4. **Authorisation chokepoints.** The number of places that *raise* rather than warn when an order
    arrives without the hash of the verdict that approved it.
 5. **Instability**, in Robert Martin's sense: ``I = Ce / (Ca + Ce)``. A package everything depends
@@ -69,8 +75,25 @@ absolutely.
 MODEL_FACING = ("argus.llm", "argus.agents")
 """What the deterministic core may not import at any depth."""
 
-PRODUCER_BEFORE_CONSUMER = (("market", "argus.agents"),)
-"""(package, forbidden prefix) — a producer importing its consumer has inverted the layering."""
+LAYERS: dict[str, int] = {
+    "vendor": 0,
+    "truth": 1,
+    "cost": 2, "decision": 2, "risk": 2, "proof": 2,
+    "market": 3, "llm": 3,
+    "execution": 4, "sim": 4, "backtest": 4,
+    "desk": 5, "research": 5, "strategies": 5,
+    "agents": 6, "paper": 6, "register": 6,
+    "demo": 7, "lui": 7, "eval": 7, "status": 7,
+}
+"""Each package's layer; a module may import only from its own layer or below.
+
+1 time and what was knowable · 2 vocabulary and limits · 3 everything that fetches, the model
+client included · 4 orders, simulation, engine · 5 tools and studies · 6 the agents, the record,
+the public commitments · 7 human surfaces, and the judges of everything below. `vendor` holds
+third-party copies loaded by file path and may import nothing of ARGUS; `status` is the top-level
+status command. A package missing from this map is itself a violation, so a new one cannot arrive
+without a place.
+"""
 
 
 class ArchitectureError(RuntimeError):
@@ -85,11 +108,13 @@ class Edge:
     target: str
     line: int
     module_level: bool
+    in_main: bool = False
+    """Inside the module's top-level ``main()``: the composition root, exempt from layer order."""
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "from": self.source, "to": self.target, "line": self.line,
-            "module_level": self.module_level,
+            "module_level": self.module_level, "in_main": self.in_main,
         }
 
 
@@ -203,6 +228,9 @@ def build(root: Path = SOURCE) -> Graph:
     for name, path in names.items():
         tree = ast.parse(path.read_text(encoding="utf-8"))
         top = {id(node) for node in tree.body}
+        in_main = {id(inner) for node in tree.body
+                   if isinstance(node, ast.FunctionDef) and node.name == "main"
+                   for inner in ast.walk(node)}
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 targets = [a.name for a in node.names]
@@ -222,7 +250,8 @@ def build(root: Path = SOURCE) -> Graph:
                 while target and target not in names:
                     target = target.rsplit(".", 1)[0] if "." in target else ""
                 if target and target != name:
-                    edges.append(Edge(name, target, node.lineno, id(node) in top))
+                    edges.append(Edge(name, target, node.lineno, id(node) in top,
+                                      id(node) in in_main))
     return Graph(modules=tuple(names), edges=tuple(edges))
 
 
@@ -289,12 +318,35 @@ def cycles(graph: Graph) -> tuple[Cycle, ...]:
     return tuple(sorted(out, key=lambda c: (not c.import_time, c.members)))
 
 
+def _package(module: str) -> str:
+    parts = module.split(".")
+    return parts[1] if len(parts) > 1 else ""
+
+
 def contract_violations(graph: Graph) -> tuple[Violation, ...]:
     """Check every declared contract and report all breaches, never only the first."""
     out: list[Violation] = []
+    for package in sorted({_package(m) for m in graph.modules} - {""}):
+        if package not in LAYERS:
+            out.append(Violation(
+                contract="every package has a layer",
+                detail=f"argus.{package} is not in LAYERS",
+                where=f"argus.{package}",
+            ))
+    for edge in graph.edges:
+        source, target = _package(edge.source), _package(edge.target)
+        if edge.in_main or source not in LAYERS or target not in LAYERS:
+            continue
+        if LAYERS[target] > LAYERS[source]:
+            out.append(Violation(
+                contract="a module imports only from its own layer or below",
+                detail=(f"{edge.source} (layer {LAYERS[source]}) imports {edge.target} "
+                        f"(layer {LAYERS[target]})"
+                        + ("" if edge.module_level else ", deferred")),
+                where=f"{edge.source}:{edge.line}",
+            ))
     for module in graph.modules:
-        parts = module.split(".")
-        package = parts[1] if len(parts) > 1 else ""
+        package = _package(module)
         if package in DETERMINISTIC:
             for target in sorted(graph.reachable(module)):
                 if target.startswith(MODEL_FACING):
@@ -304,15 +356,6 @@ def contract_violations(graph: Graph) -> tuple[Violation, ...]:
                         where=module,
                     ))
                     break
-        for producer, forbidden in PRODUCER_BEFORE_CONSUMER:
-            if package == producer:
-                for edge in graph.edges:
-                    if edge.source == module and edge.target.startswith(forbidden):
-                        out.append(Violation(
-                            contract="a producer must not import its consumer",
-                            detail=f"{module} imports {edge.target}",
-                            where=f"{module}:{edge.line}",
-                        ))
     return tuple(out)
 
 
@@ -388,7 +431,8 @@ class Report:
         else:
             parts.append(
                 "every declared contract holds: the deterministic core reaches no model-facing "
-                "module at any depth, and no producer imports its consumer"
+                "module at any depth, every package has a layer, and no module imports from a "
+                "layer above its own, deferred imports included, outside a main() entry point"
             )
         if self.import_time_cycles:
             parts.append(

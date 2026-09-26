@@ -96,6 +96,9 @@ def test_the_webhook_needs_configuration_and_the_secret(monkeypatch: pytest.Monk
     assert tg.handle_webhook(b"{}", None)[0] == 403
     assert tg.handle_webhook(b"not json", "right")[0] == 400
     sent: list[tuple[int, str]] = []
+    # The book is recalled from and pinned to the chat through the same transport; neither
+    # reaches Telegram here.
+    monkeypatch.setattr(tg, "_call", lambda token, method, params, **_: None)
     monkeypatch.setattr(tg, "send", lambda token, chat, text: sent.append((chat, text)))
     status, body = tg.handle_webhook(json.dumps(_msg("/help")).encode(), "right")
     assert status == 200 and json.loads(body)["send_failures"] == 0 and sent[0][0] == 42

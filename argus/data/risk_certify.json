@@ -2315,7 +2315,7 @@
     ]
   },
   "not_covered": [
-    "the Constitution's own rules (agents/desk.py) \u2014 swept by eval/riskproof.py; here only its recorded input and output are certified, as step 1 of the chain",
+    "the Constitution's own rules (risk/constitution.py) \u2014 swept by eval/riskproof.py; here only its recorded input and output are certified, as step 1 of the chain",
     "the measured inputs sizing and the throttle report (calibration error, path volatility) are taken as given, not re-derived",
     "Decimal exponents beyond the default context's Emax (|exponent| > 999999) are not probed"
   ]

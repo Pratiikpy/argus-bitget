@@ -427,9 +427,10 @@ def run_scenario(  # pragma: no cover - drives the live model and venue
     *, symbol: str = "NVDAUSDT", send: bool = False
 ) -> Flow:
     """Drive the real desk through the scenario, and carry any approved order to the demo venue."""
-    from argus.agents.desk import ConstitutionPolicy, TradingDesk
+    from argus.agents.desk import TradingDesk
     from argus.cost.model import CostModel
     from argus.llm.qwen import QwenClient, Thinking, TokenBudget
+    from argus.risk.constitution import ConstitutionPolicy
     from argus.risk.hedgeability import HedgeabilitySurface
     from argus.truth.clocks import DualClock
 

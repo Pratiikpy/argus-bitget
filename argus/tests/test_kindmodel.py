@@ -108,15 +108,25 @@ def test_the_threshold_rule_prefers_abstaining_to_confident_errors() -> None:
     assert threshold > 0.2 and stats["wrong"] == 0
 
 
+def _no_venue(*args: Any, **kwargs: Any) -> Any:
+    from argus.market.bitget import BitgetError
+
+    raise BitgetError("the venue is not read in this test")
+
+
 def test_a_failing_language_model_falls_back_to_the_kind_model(
         monkeypatch: pytest.MonkeyPatch) -> None:
     from argus.lui import server
+    from argus.market import bitget, depth
 
     class _Broken:
         def complete_json(self, *args: Any, **kwargs: Any) -> Any:
             raise TimeoutError("rate limited")
 
     monkeypatch.setattr(server, "_model_for", lambda visitor: _Broken())
+    # The routing is under test, not the execution plan it reaches: its live reads are refused.
+    monkeypatch.setattr(bitget, "fetch_tickers", _no_venue)
+    monkeypatch.setattr(depth, "fetch_orderbook", _no_venue)
     payload = server.handle_ask("how should I split a $200k NVDA buy to keep slippage down", [],
                                 visitor="t")
     assert payload["intent"] == "research"

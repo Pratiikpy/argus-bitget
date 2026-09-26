@@ -53,7 +53,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from argus.eval import artefact
 from argus.lui.research import (
     ResearchKind,
     ResearchRequest,
@@ -61,6 +60,7 @@ from argus.lui.research import (
     plan_with_model,
     worth_asking_the_model,
 )
+from argus.truth import artefact
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 CORPORA = (DATA / "research_bench_corpus_a.json", DATA / "research_bench_corpus_b.json",

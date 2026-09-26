@@ -278,6 +278,31 @@ def collect(data_dir: Path) -> list[Correction]:
         artefact="data/theme_audit.json", kind="bug",
     ))
 
+    # 9b. The session clock called market holidays trading sessions. The figures are read from
+    #     the regenerated artefact; the earlier ones are the published values it replaced.
+    risk_layer = _read(data_dir, "risk_layer_comparison.json")
+    architecture = (risk_layer or {}).get("measurement_architecture") or {}
+    precision = (architecture.get("argus_real_point") or {}).get("precision")
+    checkpoints = architecture.get("n_checkpoints")
+    if risk_layer is None or precision is None or checkpoints is None:
+        out.append(missing("risk_layer_comparison.json", "The risk-layer comparison"))
+    else:
+        out.append(Correction(
+            headline="The session clock called US market holidays trading sessions",
+            detail=(
+                "Every clock built without an argument had an empty holiday calendar, so "
+                "Thanksgiving read as a regular session everywhere the desk asked what the market "
+                "was doing, the live paper cycle included; one caller in about twenty-five passed "
+                "the calendar in. Found by a judge audit on 2026-09-26; the calendar is now the "
+                "default (`truth/clocks.py`). Correcting it moved a published figure: the "
+                "risk-layer comparison, on the same frozen data, loses the checkpoints that fell "
+                f"on holidays and now reads {float(precision):.2%} precision over "
+                f"{int(checkpoints)} checkpoints, against the 59.14% over 318 it published. The "
+                "verdict holds: ARGUS still dominates freqtrade at every threshold."
+            ),
+            artefact="data/risk_layer_comparison.json", kind="bug",
+        ))
+
     # 10. Every comparison the register records losing, one entry per capability, and every
     #     OWNED grade it withdrew, grouped by the review that withdrew it. Read from the register's
     #     own text at request time, so a loss or a re-grade appears here the moment it is recorded.
@@ -363,6 +388,17 @@ def register_losses(standing: dict[str, Any]) -> list[Correction]:
     return out
 
 
+def _artefact(path: str) -> str:
+    """The artefact as a link to the file in the public repository, as /proof shows it; a plain
+    name when it is not a file path. It was dead text until 2026-09-27 (audit)."""
+    from argus.lui.proof_page import REPOSITORY
+
+    shown = html.escape(path)
+    if re.fullmatch(r"[\w./-]+\.(json|jsonl|md|py|csv|txt)", path):
+        return f"<a href='{REPOSITORY}{shown}'><code>{shown}</code></a>"
+    return f"<code>{shown}</code>"
+
+
 def register_regrades(standing: dict[str, Any]) -> list[Correction]:
     """The OWNED grades the register withdrew, one entry per review that withdrew them."""
     by_date: dict[str, list[str]] = {}
@@ -395,7 +431,7 @@ def render(corrections: list[Correction]) -> str:
         f"<article class='c {esc(c.kind)}'>"
         f"<span class='k'>{esc(label.get(c.kind, c.kind))}</span>"
         f"<h2>{esc(c.headline)}</h2><p>{esc(c.detail)}</p>"
-        f"<code>{esc(c.artefact)}</code></article>"
+        f"{_artefact(c.artefact)}</article>"
         for c in corrections
     )
     head = design.head("ARGUS — what we got wrong",

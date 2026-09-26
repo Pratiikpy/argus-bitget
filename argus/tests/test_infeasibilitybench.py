@@ -25,7 +25,6 @@ from typing import Any
 
 import pytest
 
-from argus.eval import artefact
 from argus.eval.infeasibilitybench import (
     CAUSE_TEXT,
     CHIPS,
@@ -57,6 +56,7 @@ from argus.eval.infeasibilitybench import (
     verdict,
     verify,
 )
+from argus.truth import artefact
 
 NOW = datetime(2026, 9, 25, 15, 0, tzinfo=UTC)
 LEDGER = LedgerFacts(first_decided=datetime(2026, 9, 12, 9, 30, tzinfo=UTC),

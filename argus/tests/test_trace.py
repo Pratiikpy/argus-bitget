@@ -13,9 +13,9 @@ from typing import Any
 
 import pytest
 
+from argus.lui import trace
 from argus.lui.provenance import LABELS
-from argus.truth import trace
-from argus.truth.trace import (
+from argus.lui.trace import (
     SourceRead,
     attach,
     carry,

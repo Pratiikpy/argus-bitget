@@ -256,13 +256,14 @@ def defects_from_outcomes(entries: Sequence[Any]) -> list[Defect]:
 def defects_from_leans(entries: Sequence[Any]) -> list[Defect]:
     """Settled decisions whose lean the market then contradicted.
 
-    Reuses `eval/shadow.py`'s own grading rather than restating it: the move comes from
-    :func:`argus.eval.shadow.move_of` (counterfactual move for an abstention, exit against entry for
-    a fill) and a move inside :data:`argus.eval.shadow.DEAD_ZONE_BPS` is not a direction, so it is
-    neither a defect nor a clean call. A lean of ``none`` is an answer, not a wrong one, and an
-    unsettled decision has no outcome — both are skipped. Settlement seals are not decisions.
+    Reuses the shadow record's own grading rather than restating it: the move comes from
+    :func:`argus.decision.outcome.move_of` (counterfactual move for an abstention, exit against
+    entry for a fill) and a move inside :data:`argus.decision.outcome.DEAD_ZONE_BPS` is not a
+    direction, so it is neither a defect nor a clean call. A lean of ``none`` is an answer, not a
+    wrong one, and an unsettled decision has no outcome — both are skipped. Settlement seals are
+    not decisions.
     """
-    from argus.eval.shadow import DEAD_ZONE_BPS, move_of
+    from argus.decision.outcome import DEAD_ZONE_BPS, move_of
 
     out: list[Defect] = []
     for entry in entries:
@@ -291,7 +292,7 @@ def lean_settled(entries: Sequence[Any]) -> set[int]:
     wrong about direction; counting it as clean would dilute every LEAN rule's base rate with
     decisions that could never have carried the defect.
     """
-    from argus.eval.shadow import DEAD_ZONE_BPS, move_of
+    from argus.decision.outcome import DEAD_ZONE_BPS, move_of
 
     graded: set[int] = set()
     for entry in entries:

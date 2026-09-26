@@ -124,7 +124,7 @@ PAGE = """<!doctype html>
   .line.fine { color:var(--dim); font-size:13px }
   .pv { display:inline-block; min-width:4.6em; margin-right:.5em; padding:0 .35em;
         border-radius:3px;
-        font:600 10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.04em;
+        font:600 10px/1.6 var(--mono); letter-spacing:.04em;
         text-transform:uppercase; vertical-align:1px; text-align:center;
         color:var(--dim); border:1px solid color-mix(in srgb, var(--dim) 45%, transparent) }
   .pv-live { color:var(--accent); border-color:color-mix(in srgb, var(--accent) 55%, transparent) }
@@ -176,7 +176,8 @@ question and never writes a number. No source, no answer: you get a refusal and 
 <div class="chips" id="chips-research"></div>
 <p class="group">The desk's own record</p>
 <div class="chips" id="chips"></div>
-<div id="out"><p class="empty">Ask something, or pick one of the suggestions above.</p></div>
+<div id="out" role="log" aria-live="polite" aria-label="Answers">
+<p class="empty">Ask something, or pick one of the suggestions above.</p></div>
 </div><script>
 // "sell half of that" is deliberately a question the console REFUSES — an order — so a visitor who
 // only clicks chips still meets a refusal rather than only the happy path. (A second chip, "what
@@ -199,7 +200,12 @@ const RESEARCH = ["I hold 50% NVDA, 50% AAPL — what does adding 20% TSLA do to
   "is TSLA riskier than NVDA", "should I buy MSTR", "where is NVDA trading right now",
   "how should I split a $50k order in NVDA", "is TSLA overbought",
   "when does NVDA report earnings", "what did NVDA's latest 10-Q say drove data center revenue",
-  "has COIN been here before", "compare gold and bitcoin", REVIEW_CHIP];
+  "has COIN been here before", "compare gold and bitcoin", REVIEW_CHIP,
+  // The newest engines, reachable from the first screen (audit, 2026-09-26).
+  "what are my sector and factor exposures? I hold 40% NVDA, 30% MSFT, 30% AAPL",
+  "what should I keep an eye on this week? I hold 50% NVDA, 50% BTC",
+  "where is NVDA trading and when does it report earnings",
+  "I can't lose more than 10% and I'm a swing trader", "英伟达什么时候发布财报"];
 const SUGGEST = ["why did you do nothing all weekend","what is the sharpe","show me decision 25",
   "what did the risk layer block","what evidence backed that","is the log tamper-evident",
   "are you well calibrated","what bad decision patterns do you have","what is my position",
@@ -249,7 +255,8 @@ function saveMemory() {
   try { localStorage.setItem('argus.memory', JSON.stringify(memory)); } catch (e) {}
   memEl.hidden = !memory.length;
   memEl.innerHTML = memory.length ? '<span>Remembered:</span>' + memory.map((f, i) =>
-    `<span class="fact">${esc0(f.text)}<button data-i="${i}" title="forget this">&times;</button>` +
+    `<span class="fact">${esc0(f.text)}<button data-i="${i}" title="forget this" ` +
+      `aria-label="forget: ${esc0(f.text).replace(/"/g, '&quot;')}">&times;</button>` +
     `</span>`).join('') : '';
 }
 memEl.addEventListener('click', e => {
@@ -320,14 +327,13 @@ document.getElementById('f').addEventListener('submit', async ev => {
     const a = await r.json();
     turns = a.turns || turns;
     if (a.memory) { try { memory = JSON.parse(a.memory); } catch (e) {} saveMemory(); }
-    const over = a.elapsed_ms > a.budget_ms;
+    // Plain elapsed time. The per-intent budget is an engineering target, and stamping a correct
+    // answer "OVER BUDGET" in the warning colour read as a failure (audit, 2026-09-26).
     out.insertAdjacentHTML('afterbegin', `
       <div class="card ${a.refused ? 'refused' : ''}">
         <div class="q">${esc(text)}</div>
         <div class="meta">
-          <span class="tag">${esc(a.intent)}</span>
-          <span class="tag ${over ? 'over' : ''}">${a.elapsed_ms.toFixed(0)}ms /
-            ${a.budget_ms}ms${over ? ' OVER BUDGET' : ''}</span>
+          <span class="tag">answered in ${(a.elapsed_ms / 1000).toFixed(1)} s</span>
           ${a.refused ? '<span class="tag over">refused</span>' : ''}
         </div>
         <div class="lines">${a.lines.map((l, i) =>
@@ -356,7 +362,9 @@ document.getElementById('f').addEventListener('submit', async ev => {
           if (!t || !t.lines) return;
           // Each translated line keeps the styling of the English line it came from.
           const note = t.note ? [t.note] : a.lines.slice(0, a.translate.skip);
-          card.querySelector('.lines').innerHTML =
+          const lines = card.querySelector('.lines');
+          lines.lang = a.translate.lang;
+          lines.innerHTML =
             note.map(l => `<div class="line fine">${esc(l)}</div>`).join('') +
             t.lines.map((l, i) => `<div class="${lineClass(body[i])}">` +
               `${pv((a.line_labels || [])[a.translate.skip + i])}${esc(l)}</div>`).join('');
@@ -1255,7 +1263,7 @@ def _traced() -> bool:
     if os.environ.get("ARGUS_TRACE", "1") == "0":
         return False
     if not _TRACE_READY:
-        from argus.truth import trace
+        from argus.lui import trace
 
         trace.instrument()
         _TRACE_READY = True
@@ -1586,11 +1594,11 @@ class Handler(BaseHTTPRequestHandler):
             memory_text = first("memory")[:12000]
             if _traced():
                 # Where each line comes from — live, computed, record, desk, assumed, missing —
-                # decided by the engine step that produced it (`truth/trace.py`); a line no step
+                # decided by the engine step that produced it (`lui/trace.py`); a line no step
                 # declares keeps the wording label (`lui/provenance.py`). Measured on the 680
                 # held-out questions: 83.6% of lines labelled against 75.8% by wording alone, and
                 # the two agree on all 601 lines both label.
-                from argus.truth import trace
+                from argus.lui import trace
 
                 payload = trace.answered(
                     text, lambda: handle_ask(text, prior, visitor=visitor, book=book,
@@ -1665,6 +1673,44 @@ class Handler(BaseHTTPRequestHandler):
             return
         self._send(render_task(task, FAVICON).encode(), "text/html; charset=utf-8")
 
+    def _body(self) -> bytes | None:
+        """The request body, at most 64 KB, or ``None`` once a 400 has been sent.
+
+        Every POST route read ``int(Content-Length)`` bare: a header that was not a number raised
+        before any route's own error handling, so the client got a dropped connection instead of
+        an answer, and a negative one read until the client hung up (found testing the hosted
+        entry point, 2026-09-27)."""
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            length = -1
+        if length < 0:
+            self._send(b'{"error": "Content-Length must be a non-negative number"}',
+                       "application/json", 400)
+            return None
+        return self.rfile.read(min(length, 64_000))
+
+    def _fields(self, body: bytes) -> dict[str, list[str]] | None:
+        """A POST body as form fields, whether it was sent as a form or as a JSON object, or
+        ``None`` once a 400 has been sent.
+
+        A JSON body used to be parsed as a form, so ``{"q": "..."}`` answered "empty question".
+        A value that is not a string (``turns`` sent as a list) is passed on as its JSON text,
+        which is what the form carries for it."""
+        text = body.decode("utf-8", errors="replace")
+        kind = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+        if kind != "application/json":
+            return parse_qs(text, keep_blank_values=True)
+        try:
+            blob = json.loads(text or "{}")
+        except ValueError:
+            blob = None
+        if not isinstance(blob, dict):
+            self._send(b'{"error": "a JSON body must be an object, with the question as q"}',
+                       "application/json", 400)
+            return None
+        return {str(k): [v if isinstance(v, str) else json.dumps(v)] for k, v in blob.items()}
+
     def do_POST(self) -> None:
         """``/mcp``, the Model Context Protocol (`lui/mcp_server.py`); ``/telegram``, the bot's
         webhook (`lui/telegram_bot.py`, rejected without Telegram's secret header); and the page's
@@ -1676,11 +1722,15 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/research":
             # The task's own form posts here, so a trader's book and question stay out of the URL
             # and the access log; a GET with the same fields still works for a shared link.
-            length = min(int(self.headers.get("Content-Length") or 0), 64_000)
+            body = self._body()
+            if body is None:
+                return
             try:
                 fields = parse_qs(urlparse(self.path).query)  # ?format=json on the action URL
-                fields.update(parse_qs(self.rfile.read(length).decode("utf-8"),
-                                       keep_blank_values=True))
+                form = self._fields(body)
+                if form is None:
+                    return
+                fields.update(form)
                 self._research_route(fields)
             except Exception as exc:
                 self._send(json.dumps({"error": type(exc).__name__,
@@ -1688,10 +1738,14 @@ class Handler(BaseHTTPRequestHandler):
                            "application/json", 500)
             return
         if path in ("/ask", "/translate", "/feedback"):
-            length = min(int(self.headers.get("Content-Length") or 0), 64_000)
+            body = self._body()
+            if body is None:
+                return
             try:
-                self._answer_route(path, parse_qs(self.rfile.read(length).decode("utf-8"),
-                                                  keep_blank_values=True))
+                form = self._fields(body)
+                if form is None:
+                    return
+                self._answer_route(path, form)
             except Exception as exc:  # the same honest 500 the GET routes give
                 self._send(json.dumps({"error": type(exc).__name__,
                                        "detail": str(exc)[:200]}).encode(),
@@ -1700,9 +1754,11 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/telegram":
             from argus.lui.telegram_bot import handle_webhook
 
-            length = min(int(self.headers.get("Content-Length") or 0), 64_000)
+            raw = self._body()
+            if raw is None:
+                return
             status, body = handle_webhook(
-                self.rfile.read(length), self.headers.get("X-Telegram-Bot-Api-Secret-Token"))
+                raw, self.headers.get("X-Telegram-Bot-Api-Secret-Token"))
             self._send(body, "application/json", status)
             return
         if path != "/mcp":
@@ -1721,8 +1777,10 @@ class Handler(BaseHTTPRequestHandler):
             self._send(b'{"jsonrpc": "2.0", "id": null, "error": {"code": -32600, '
                        b'"message": "Origin not allowed"}}', "application/json", 403)
             return
-        length = min(int(self.headers.get("Content-Length") or 0), 64_000)
-        status, body = handle_body(self.rfile.read(length))
+        raw = self._body()
+        if raw is None:
+            return
+        status, body = handle_body(raw)
         self._send(body, "application/json", status)
 
     def do_GET(self) -> None:
@@ -1734,7 +1792,12 @@ class Handler(BaseHTTPRequestHandler):
                 return
             if path == "/mcp":
                 # The MCP spec lets a server that offers no server-sent stream answer GET with 405;
-                # the body says how to use the endpoint, for a person who opens it in a browser.
+                # the body says how to use the endpoint. A browser gets that as a page (/materials
+                # links here, and a judge who followed it met a JSON error, audit 2026-09-26).
+                if self._wants_html():
+                    self._send(mcp_page(self.headers.get("Host") or "").encode(),
+                               "text/html; charset=utf-8", 405)
+                    return
                 self._send(json.dumps({
                     "endpoint": "ARGUS research desk — Model Context Protocol (Streamable HTTP)",
                     "use": "POST JSON-RPC 2.0 here: initialize, tools/list, tools/call",
@@ -1866,6 +1929,39 @@ class Handler(BaseHTTPRequestHandler):
 
     def log_message(self, fmt: str, *args: Any) -> None:
         """Quiet by default; the console is the output, not the access log."""
+
+
+def mcp_page(host: str) -> str:
+    """What /mcp is, for a person who opened it in a browser: the tools and how to connect."""
+    import html as _html
+
+    from argus.lui.mcp_server import TOOLS
+
+    base = f"https://{host}" if host and not host.startswith(("127.", "localhost")) else (
+        f"http://{host}" if host else design.PUBLIC_URL)
+    endpoint = _html.escape(f"{base}/mcp")
+    tools = "".join(f"<li><code>{_html.escape(str(t['name']))}</code> — "
+                    f"{_html.escape(str(t['description']).split('. ')[0])}.</li>" for t in TOOLS)
+    title = "ARGUS over the Model Context Protocol"
+    return f"""<!doctype html><html lang="en"><head>{design.head("ARGUS — MCP", title, "/mcp")}
+<style>{design.TOKENS_CSS}{design.BASE_CSS}
+ .wrap {{ max-width:760px; margin:0 auto; padding:48px 18px 80px }}
+ h1 {{ font-size:26px; margin:6px 0 10px }}
+ pre {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
+   padding:12px 14px; font:12.5px/1.6 var(--mono); overflow-x:auto }}
+ li {{ margin:6px 0 }}
+</style></head><body>{design.nav("")}<div class="wrap">
+<h1>{title}</h1>
+<p>This address is the desk's MCP endpoint (Streamable HTTP, JSON-RPC 2.0 over POST). A browser
+cannot use it; an MCP client can. Point one at <code>{endpoint}</code> — no key is needed — and it
+can call:</p>
+<ul>{tools}</ul>
+<p>Or from a terminal:</p>
+<pre>curl -s {endpoint} -H 'Content-Type: application/json' \\
+  -d '{{"jsonrpc":"2.0","id":1,"method":"tools/list"}}'</pre>
+<p>Every tool answers read-only; an order sent through it is refused like anywhere else.
+The same answers are on the <a href="/">console</a>.</p>
+</div>{design.footer()}</body></html>"""
 
 
 def error_page(status: int, path: str, failure: str = "") -> str:

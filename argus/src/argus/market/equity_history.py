@@ -227,7 +227,7 @@ def matched_record(days: list[Day], gaps: list[Gap], *, side: str) -> Matched | 
     """Weekends that began in the same state as the latest day, and whether they behaved
     differently from all weekends: the share that opened more than 1% against ``side``, with a
     Wilson interval, against the unconditional share. None when there is no state to read."""
-    from argus.desk.odds import wilson
+    from argus.risk.calibration import wilson
 
     states = _states(days)
     if not days or days[-1].day not in states:

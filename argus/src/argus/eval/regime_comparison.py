@@ -239,10 +239,10 @@ from argus.desk.regime import (
 # against the rule it claims to reimplement IS this module's Finding 1, and a fourth copy of the
 # arithmetic would audit the copy rather than the original.
 from argus.desk.regime import _threshold_flips as regime_proxy_flips
-from argus.eval.artefact import sanitise
 from argus.market.bitget import RTOKEN_SYMBOLS
 from argus.market.history import CandleType, fetch_range
 from argus.strategies.track1_suite import rotation_regime_switch
+from argus.truth.artefact import sanitise
 
 
 class RegimeComparisonError(RuntimeError):
@@ -1787,7 +1787,7 @@ def main() -> int:  # pragma: no cover - CLI
     # scalar (an int64 from ruptures/stumpy, most likely) would otherwise raise inside plain
     # json.dumps; sanitise()+allow_nan=False second turns the one genuinely undefined value in
     # this report (an arc-curve correlation on a half series) into null instead of a bare NaN --
-    # the exact defect `eval/artefact.py` exists to prevent, that this module's own artefact kept
+    # the exact defect `truth/artefact.py` exists to prevent, that this module's own artefact kept
     # regenerating with because it was never actually wired to use that module, only named in its
     # docstring as one of the three originally fixed. Found by test_regime_groundtruth_audit.py's
     # own regression pin going red again after this file's CLI was re-run for unrelated text

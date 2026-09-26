@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import pytest
 
-from argus.agents.grounding import TOLERANCE, check, extract
+from argus.truth.grounding import TOLERANCE, check, extract
 
 FACTS = {
     "hurdle_bps": 18.80,

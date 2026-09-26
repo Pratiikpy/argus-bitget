@@ -19,7 +19,6 @@ from pathlib import Path
 
 import pytest
 
-from argus.eval.observatory import Prediction
 from argus.eval.selfaudit import (
     Severity,
     audit,
@@ -29,6 +28,7 @@ from argus.eval.selfaudit import (
     check_sharpe_collapse,
 )
 from argus.paper.ledger import Entry, PaperLedger
+from argus.risk.calibration import Prediction
 from argus.risk.sizing import (
     FIXED_FRACTION,
     MAX_FRACTION,

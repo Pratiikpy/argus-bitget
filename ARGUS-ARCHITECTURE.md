@@ -8,12 +8,12 @@ that produced them.
 
 | | |
 |---|---|
-| Source | **327 source files**, 21 packages, 130,470 lines (measured 2026-09-24) |
+| Source | **482 source files**, 20 packages, 220,595 lines (measured 2026-09-27) |
 | Registered and importable at runtime | **152/152** (`python -m argus.status`) |
-| Tests | **224 files, 6,700 tests collected**; a fresh GitHub clone of the earlier 6,542-test tree ran 6,457 passed, 85 skipped, 0 failed |
-| Static analysis | `ruff` clean; `mypy --strict` clean on 327 source files |
-| Artefacts | **162** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
-| External systems torn down at code level | **56 code-level teardowns** under `research/architecture/`, each citing `file:line` |
+| Tests | **350 files, 9,358 tests collected**; CI runs the 9,120 that need no network with every outbound connection refused, and the 238 that read a live venue, feed or model in a separate advisory job |
+| Static analysis | `ruff` clean; `mypy --strict` clean on the 479 files it checks (the three vendored files are excluded) |
+| Artefacts | **669** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
+| External systems torn down at code level | **57 code-level teardowns** under `research/architecture/`, each citing `file:line` |
 | Runtime dependencies | **two** — `pydantic`, `python-dateutil` |
 
 That last row is the constraint that shaped everything else. Every statistic here — OLS, augmented
@@ -47,29 +47,45 @@ that would have been a Track 1 entry is kept as research (ARGUS-EXPLAINED.md, Pa
 
 ## 1. The layer rule, and the code that enforces it
 
-Seven layers. Each may import only from those below.
+Seven layers, and the vendored copies beneath them. A module imports only from its own layer or
+below — at module level or inside a function.
 
 ```
-  7  demo, lui, eval            human surfaces, and the judges of everything below
-  6  agents, paper, register    the model, the Constitution, the record, the public commitments
-  5  desk, research, strategies tools and studies
-  4  execution, sim, backtest   orders, simulation, engine
-  3  market                     everything that fetches
-  2  cost, decision, risk       vocabulary and limits
-  1  truth                      time, and what was knowable
+  7  demo, lui, eval, status       human surfaces, and the judges of everything below
+  6  agents, paper, register       the agents, the record, the public commitments
+  5  desk, research, strategies    tools and studies
+  4  execution, sim, backtest      orders, simulation, engine
+  3  market, llm                   everything that fetches, the model client included
+  2  cost, decision, risk, proof   vocabulary, limits, and the Constitution
+  1  truth                         time, what was knowable, and where a fact came from
+  0  vendor                        third-party copies loaded by path; imports nothing of ARGUS
 ```
 
-`eval/architecture.py` builds the graph with `ast`, computes transitive reachability, and fails on
-violation. Three contracts:
+`eval/architecture.py` builds the import graph with `ast` and checks it on every run of the suite:
 
-| contract | rule | where |
-|---|---|---|
-| **Deterministic core** | `truth`, `cost`, `risk`, `decision`, `backtest` may never reach `argus.llm` or `argus.agents`, **at any depth** | `architecture.py:60,69` |
-| **Producer before consumer** | `market` may not import `agents` | `architecture.py:73` |
-| **Cycles** | permitted only when broken at load by a deferred import in one direction | `architecture.py:102` |
+| contract | rule |
+|---|---|
+| **Layer order** | every import, deferred ones included, points to its own layer or lower; `LAYERS` names each package's layer, and a package missing from it is itself a violation |
+| **Composition root** | the one exemption, lexical and named: an import inside a module's top-level `main()`, where a command-line entry point wires the layers together |
+| **Deterministic core** | `truth`, `cost`, `risk`, `decision`, `backtest` never load `argus.llm` or `argus.agents`, **at any depth** |
+| **Cycles** | permitted only when broken at load by a deferred import in one direction |
 
-**Instability** is Martin's `I = Ce / (Ca + Ce)`, computed per package. `truth` sits at 0.00 (39
-modules depend on it, it depends on nothing) — which is what a foundation should look like.
+`tests/test_architecture.py::test_the_real_tree_keeps_the_layer_order` runs it on the source that
+ships, and further tests prove each contract can fail.
+
+**The rule was published before it was enforced, and it was false.** Until 2026-09-27 the checker
+covered the deterministic core and one producer–consumer pair, at module level only. An audit found
+41 imports pointing up the order, 33 of them inside functions where the checker could not see them:
+the truth layer's trace reaching into the console, the risk layer's sizing importing the evaluation
+harness, the Constitution living inside the agent it judges. Each was fixed by moving the shared
+piece to the layer it belongs in, never by exempting it — the gate chain and the Constitution to
+`risk`; the failure taxonomy, the strict artefact writer, a fact's `Source` and figure grounding to
+`truth`; calibration to `risk`; the mandate to `desk`; SUE to `market`, beside the filings it reads;
+the console trace to `lui`. Only imports inside a `main()` still cross upward, and they are named.
+
+**Instability** is Martin's `I = Ce / (Ca + Ce)`, computed per package in `data/architecture.json`.
+`truth` sits at 0.00 — 141 modules outside it depend on it, and it depends on nothing — which is what
+a foundation should look like.
 
 ### A blind spot in our own checker, found and closed
 
@@ -167,7 +183,7 @@ window it was built to be watched during. `horizon_coverage()` measures exactly 
 **0 resolving inside the window, 0 still pending when it opens**; the cadence fixes it, and a test
 pins the failure shape so it cannot return unnoticed.
 
-**Live:** 281 claims across the twelve stock perpetuals (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — the head at the moment of that anchoring, so that proof covers the first 36 claims and not the 120 registered since; each scheduled cycle appends and re-anchors, and 38 of the 60 proofs carry a Bitcoin block-header attestation (`python -m argus.register.anchorcheck`). Anchored to
+**Live:** 291 claims across the twelve stock perpetuals (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — the head at the moment of that anchoring, so that proof covers the first 36 claims and not the 120 registered since; each scheduled cycle appends and re-anchors, and 38 of the 60 proofs carry a Bitcoin block-header attestation (`python -m argus.register.anchorcheck`). Anchored to
 `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The resolver runs on
 every scheduled cycle.
@@ -181,23 +197,35 @@ this register exists to price.
 
 ## 4. The Constitution — the gate chain in source order
 
-`agents/desk.py:ConstitutionPolicy.rule()`. Each gate may only narrow; the first that binds returns.
+`risk/constitution.py:ConstitutionPolicy.rule()`, in the order `risk/gatechain.py:CHAIN` records.
+Each gate may only narrow. The three **terminal** gates end the evaluation when they fire; every
+**ceiling** gate after them always runs, and the tightest ceiling sets the size — so a ceiling is
+never skipped because another happened to bind first.
 
-| # | gate | binds when |
-|---|---|---|
-| 1 | `no_exposure` | the verdict carries no quantity |
-| 2 | `min_confidence` | stated confidence below the floor |
-| 3 | `oracle_stale` | NAV stale **while the anchor is shut** |
-| 4 | `unhedgeable_gap` | no hedge placeable and size above the unhedged cap |
-| 5 | `risk_budget` | the position exceeds the book's risk budget — calibration-gated fraction x the breaker's drawdown ladder |
-| 6 | `session_volatility` | measured path volatility above the regular-hours baseline |
-| 7 | `max_position` | size above the absolute cap |
+| # | gate | kind | binds when |
+|---|---|---|---|
+| 1 | `no_exposure` | terminal | the verdict carries no quantity |
+| 2 | `min_confidence` | terminal | stated confidence below the 0.55 floor |
+| 3 | `oracle_stale` | terminal | NAV stale **while the anchor is shut** |
+| 4 | `unhedgeable_gap` | ceiling | no hedge placeable and size above the unhedged cap |
+| 5 | `gross_exposure` | ceiling | whole-book gross notional above its cap |
+| 6 | `signed_exposure` | ceiling | whole-book net directional notional above its cap |
+| 7 | `hedge_integrity` | ceiling | a reduction would leave a linked hedge's partner exposed |
+| 8 | `margin_usage` | ceiling | the venue-reported margin ratio at or above the cap |
+| 9 | `factor_exposure` | ceiling | measured exposure to a named factor above its cap |
+| 10 | `scenario_loss` | ceiling | the worst modelled benchmark shock already past the loss floor |
+| 11 | `liquidation_cost` | ceiling | the worst position's forced-exit slippage at or above the cap |
+| 12 | `per_symbol_underperformance` | ceiling | one symbol's windowed realised P&L below its floor (narrows that symbol only) |
+| 13 | `risk_budget` | ceiling | the position exceeds the book's risk budget — calibration-gated fraction x the breaker's drawdown ladder |
+| 14 | `session_volatility` | ceiling | measured path volatility above the regular-hours baseline |
+| 15 | `max_position` | ceiling | size above the absolute cap |
 
-The ordering is load-bearing. Gate 5 reacts to **our** drawdown, gate 6 to **the market's** clock —
-separate arguments rather than one multiplier, because a single number could not be attributed. Gate
-7 is an absolute ceiling and must bind **last**, so it is never diluted by a multiplier.
+`risk_budget` reacts to **our** drawdown and `session_volatility` to **the market's** clock —
+separate gates rather than one multiplier, because a single number could not be attributed.
+`max_position` is an absolute ceiling, so no multiplier ever dilutes it.
 
-**Gate 5 was added on 2026-09-14 to close a gap between two modules that both already existed.**
+**`risk_budget` was added on 2026-09-14 to close a gap between two modules that both already
+existed.**
 `risk/circuit.py` (the breaker) and `risk/sizing.py` (Kelly, gated on calibration) were complete and
 tested, and **neither was ever called on a live decision**: `sizing.size()` had no caller anywhere in
 `src/argus`, and `sizing.py:149` documented `risk_multiplier` as coming from `circuit.risk_multiplier`
@@ -213,16 +241,18 @@ The budget is `equity x fraction`, where `fraction` comes from `sizing.size()`:
 | calibrated: >= 20 graded, ECE <= 0.15 | half-Kelly on stated confidence, capped at 25% | up to 25,000 |
 | drawdown >= 4% / 6% / 10% | x0.75 / x0.5 / **x0** of the above | tightens, then halts |
 
-**Live today that is a 10x tightening.** The record holds 183 decisions, 69 settled, and **zero**
-gradeable outcomes — no settled trade, no settled lean — so the calibration gate refuses and the cap
-is 5% of the book. Before gate 5 the only size limit was the flat 50,000 notional of gate 7. An
+**When it was added that was a 10x tightening.** On 2026-09-14 the record held 183 decisions, 69
+settled, and **zero** gradeable outcomes — no settled trade, no settled lean — so the calibration
+gate refused and the cap was 5% of the book. Before it, the only size limit was the flat 50,000
+notional of `max_position`. An
 unproven desk is now sized as an unproven desk, and **proving calibration is the only thing that
 lifts it**: `test_risk_budget_gate.py` pins that twenty well-calibrated outcomes earn more size and
 that a lower stated confidence earns less, so the gate cannot degenerate into a constant.
 
-The session throttle is deliberately passed to `size()` as 1 and applied by gate 6 instead. Folding
-it in would charge the market's clock twice and make the binding constraint unattributable: gate 5
-reacts to **our** drawdown and our proven calibration, gate 6 to **the market's** clock.
+The session throttle is deliberately passed to `size()` as 1 and applied by `session_volatility`
+instead. Folding it in would charge the market's clock twice and make the binding constraint
+unattributable: `risk_budget` reacts to **our** drawdown and our proven calibration,
+`session_volatility` to **the market's** clock.
 
 `book_state` is injected exactly as `session_risk` is; absent, the gate does not fire. It returned
 `None` on an empty ledger for one revision, which was over-cautious and wrong in the dangerous
@@ -236,7 +266,7 @@ each gate's hits before considering the next, so every gate is reported as FIRED
 be safe, and reporting it as "passed" would be a claim nobody earned.
 
 **The chain is now known to be reachable, and that is new.** Across all 170 recorded decisions gate
-1 returned every time — `no exposure proposed; nothing to narrow` — so gates 2 to 6 had never
+1 returned every time — `no exposure proposed; nothing to narrow` — so no later gate had ever
 executed and a chain that is never entered cannot be said to work. The cause was never the risk
 layer: every directional study here measured no edge, so the desk correctly proposed nothing.
 
@@ -248,7 +278,7 @@ forecast our own measurements refuse. Live, on the surviving basket from `resear
 |---|---|---|
 | 1 `no_exposure` | **PASSED** | first time on record — the proposal carries a quantity |
 | 2 `min_confidence` | **FIRED** | stated confidence 0.371 is below the 0.55 floor |
-| 3–7 | UNREACHED | the chain short-circuits at 2, and they are reported as unreached |
+| 3–15 | UNREACHED | gate 2 is terminal, so the chain ends there and they are reported as unreached |
 
 This is an assessment against the real `ConstitutionPolicy`, **not a ledger entry**: the trade was
 refused, so nothing was booked and the ledger still holds zero settled positions.
@@ -307,7 +337,7 @@ Four measurements run **before** each cycle and write files the cycle then reads
 |---|---|---|---|
 | `market/markout.py` | `markout.json` | cost-model maker decision (advisory) | per-run |
 | `market/depth.py` | `depth.json` | the executable spread charged on **both legs** of every fill | per-run |
-| `risk/session_risk.py` | `session_risk.json` | Constitution gate 5 | **36h → absent** |
+| `risk/session_risk.py` | `session_risk.json` | the Constitution's `session_volatility` gate | **36h → absent** |
 | `risk/effectiveness.py` | `hedge_effectiveness.json` | the hedge surface's three factors | **36h → absent** |
 | `eval/leakage.py` | `leakage.json` | `eval/shadow.py` via `check_window()` | control must pass, else **UNMEASURED** |
 
@@ -374,9 +404,11 @@ a **median 70% of itself per minute**, nothing like the large, slow levels the e
 
 ---
 
-## 8. The evaluation layer — 35 modules whose job is to find us wrong
+## 8. The evaluation layer — the modules whose job is to find us wrong
 
-The largest package in the system, deliberately.
+The largest package in the system, deliberately: 243 modules in `argus/eval/`, 71 of them the
+vendored or reimplemented rival baselines under `eval/baselines/` that the comparisons run on
+the same inputs (counted 2026-09-27). The ones that judge the system itself:
 
 | module | what it can prove false |
 |---|---|

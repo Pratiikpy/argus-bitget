@@ -1,6 +1,6 @@
 """The entity gate: an instrument a thesis names must appear in the evidence it cites.
 
-`agents/grounding.py` enforces this for numbers. This is the same property for instruments, and
+`truth/grounding.py` enforces this for numbers. This is the same property for instruments, and
 the tests below are shaped around the three ways a gate like this is normally useless:
 
 * it passes a substring (``COIN`` inside ``BITCOIN``),

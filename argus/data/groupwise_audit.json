@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-26T16:01:50+00:00",
+  "generated_at": "2026-09-26T21:51:25+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
@@ -211,9 +211,9 @@
         "flips_across_halves:chronological halves"
       ],
       "readings": [
-        "COINUSDT carries the headline: without it the other 11 symbol group(s) total -7115.6159, which does not point the same way",
+        "COINUSDT carries the headline: without it the other 11 symbol group(s) total -6820.0383, which does not point the same way",
         "rth carries the headline: without it the other 2 phase group(s) total -6782.6216, which does not point the same way",
-        "chronological halves: the halves disagree \u2014 first 43.790828, second -37.617199 (full 3.007778)"
+        "chronological halves: the halves disagree \u2014 first 43.752783, second -36.505594 (full 3.623595)"
       ]
     },
     {
@@ -297,17 +297,6 @@
       ],
       "readings": [
         "bitget-signal carries the headline: without it the other 1 server group(s) total 0.0, which does not point the same way"
-      ]
-    },
-    {
-      "artefact": "data/skill_reliability.json",
-      "headline": "Bitget Skill tools that answer",
-      "role": "context",
-      "flags": [
-        "carried_by_one_group:skill=technical-analysis"
-      ],
-      "readings": [
-        "technical-analysis carries the headline: without it the other 4 skill group(s) total 0.0, which does not point the same way"
       ]
     },
     {
@@ -501,7 +490,7 @@
     "data/afterhours_comparison.json": {
       "status": "checked",
       "reason": "one row per real holiday session",
-      "sha256": "5c88c0adaf4699a3f3dff158e75861555bfffe6f159c9785a0d808eda36fd653",
+      "sha256": "566db3e8a932e7a4b52190331dac6dc7771d38cffda067d4cb1ebfd71fb96a23",
       "flagged": true,
       "headlines": [
         {
@@ -3688,7 +3677,7 @@
     "data/desk_notes.jsonl": {
       "status": "no_rows",
       "reason": "free-text notes per live cycle; the feedlist harness reduces them to one distinct-source count and no per-cycle value is recorded",
-      "sha256": "ab27923b16a744dda109fbd0e3ede3a7593071def51db91353eb83f5f26fbdcd",
+      "sha256": "944aeb3d810d075dafdceaaad8fe1289d715e2ddf7fe82cbaf2e7f2b39438332",
       "flagged": false,
       "headlines": []
     },
@@ -3799,7 +3788,7 @@
     "data/earnings_comparison.json": {
       "status": "checked",
       "reason": "one row per real anchor",
-      "sha256": "5a08f611d2bc4a107e5663ed9c2ee239656ed4bb492ad0ccddaa0a8d0bf72a84",
+      "sha256": "02aeec51be56121bc6c3ea46b2cae675facaf5e6d001ed1abaaf8e0b53c6de7e",
       "flagged": false,
       "headlines": [
         {
@@ -8473,7 +8462,7 @@
     "data/mandate_comparison.json": {
       "status": "designed_cases",
       "reason": "eleven designed boundary scenarios and a 19,440-scenario grid reduced to counts",
-      "sha256": "c262ad3c4c0e662d990b2c603f4d8bb9352532e191e3d6d94197ae9cb8a4e425",
+      "sha256": "e47e4667e7994cdc74633886011de6249c4c60609042919cc1ce59f92b1c8720",
       "flagged": false,
       "headlines": []
     },
@@ -11705,16 +11694,16 @@
     "data/paper_ledger.jsonl": {
       "status": "checked",
       "reason": "one row per graded abstention on the live paper ledger",
-      "sha256": "28ab09738078cf9c7e7a29ce65fc9505de302533fef7e49e778a0dc23f716a3a",
+      "sha256": "7e59e98d0b510913237e29137c7cb3fc2c58a2d0253ff3803ccc61cc35e49c65",
       "flagged": true,
       "headlines": [
         {
           "name": "value of standing aside",
           "headline": "abstention value, bps net of the fee never paid (observatory.AbstentionOutcome.value_bps via scorecard.score_ledger)",
           "orientation": "positive = the abstention avoided a loss",
-          "items": 515,
-          "micro_mean": 3.007778,
-          "total": 1549.0055,
+          "items": 538,
+          "micro_mean": 3.623595,
+          "total": 1949.4939,
           "broken_down": true,
           "flags": [
             "carried_by_one_group:symbol=COINUSDT",
@@ -11726,12 +11715,12 @@
             {
               "key": "symbol",
               "groups": 12,
-              "micro_mean": 3.007778,
-              "macro_mean": 1.539455,
+              "micro_mean": 3.623595,
+              "macro_mean": 2.364991,
               "direction": 1,
               "largest_contributor": "COINUSDT",
-              "largest_share_of_total": 5.5937,
-              "total_without_largest": -7115.6159,
+              "largest_share_of_total": 4.4984,
+              "total_without_largest": -6820.0383,
               "loss_histogram": {
                 "0": 0.0,
                 "1": 0.0,
@@ -11742,114 +11731,114 @@
               "carried_by_one_group": true,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "COINUSDT carries the headline: without it the other 11 symbol group(s) total -7115.6159, which does not point the same way",
+              "reading": "COINUSDT carries the headline: without it the other 11 symbol group(s) total -6820.0383, which does not point the same way",
               "per_group": [
                 {
                   "group": "COINUSDT",
-                  "rows": 43,
-                  "weight": 43.0,
-                  "total": 8664.6214,
-                  "mean": 201.502823,
-                  "share_of_total": 5.5937,
+                  "rows": 45,
+                  "weight": 45.0,
+                  "total": 8769.5322,
+                  "mean": 194.878493,
+                  "share_of_total": 4.4984,
                   "opposing": 17
                 },
                 {
                   "group": "TSLAUSDT",
-                  "rows": 47,
-                  "weight": 47.0,
-                  "total": 1715.2657,
-                  "mean": 36.495015,
-                  "share_of_total": 1.1073,
-                  "opposing": 18
+                  "rows": 49,
+                  "weight": 49.0,
+                  "total": 1728.3252,
+                  "mean": 35.271943,
+                  "share_of_total": 0.8866,
+                  "opposing": 19
                 },
                 {
                   "group": "MSFTUSDT",
-                  "rows": 46,
-                  "weight": 46.0,
-                  "total": 1498.1312,
-                  "mean": 32.56807,
-                  "share_of_total": 0.9672,
-                  "opposing": 13
+                  "rows": 48,
+                  "weight": 48.0,
+                  "total": 1447.7591,
+                  "mean": 30.161648,
+                  "share_of_total": 0.7426,
+                  "opposing": 15
                 },
                 {
                   "group": "AMZNUSDT",
-                  "rows": 45,
-                  "weight": 45.0,
-                  "total": 745.7727,
-                  "mean": 16.572727,
-                  "share_of_total": 0.4815,
+                  "rows": 47,
+                  "weight": 47.0,
+                  "total": 823.2787,
+                  "mean": 17.516568,
+                  "share_of_total": 0.4223,
                   "opposing": 24
                 },
                 {
                   "group": "GOOGLUSDT",
-                  "rows": 45,
-                  "weight": 45.0,
-                  "total": 700.0709,
-                  "mean": 15.557131,
-                  "share_of_total": 0.4519,
+                  "rows": 47,
+                  "weight": 47.0,
+                  "total": 770.7579,
+                  "mean": 16.399104,
+                  "share_of_total": 0.3954,
                   "opposing": 22
                 },
                 {
-                  "group": "SQQQUSDT",
-                  "rows": 29,
-                  "weight": 29.0,
-                  "total": 420.271,
-                  "mean": 14.492103,
-                  "share_of_total": 0.2713,
-                  "opposing": 14
-                },
-                {
                   "group": "AAPLUSDT",
-                  "rows": 47,
-                  "weight": 47.0,
-                  "total": 406.7017,
-                  "mean": 8.653228,
-                  "share_of_total": 0.2626,
+                  "rows": 49,
+                  "weight": 49.0,
+                  "total": 453.5762,
+                  "mean": 9.256657,
+                  "share_of_total": 0.2327,
                   "opposing": 20
                 },
                 {
+                  "group": "SQQQUSDT",
+                  "rows": 30,
+                  "weight": 30.0,
+                  "total": 444.0948,
+                  "mean": 14.80316,
+                  "share_of_total": 0.2278,
+                  "opposing": 14
+                },
+                {
                   "group": "NVDAUSDT",
-                  "rows": 48,
-                  "weight": 48.0,
-                  "total": -847.1062,
-                  "mean": -17.648046,
-                  "share_of_total": -0.5469,
-                  "opposing": 27
+                  "rows": 50,
+                  "weight": 50.0,
+                  "total": -834.2856,
+                  "mean": -16.685712,
+                  "share_of_total": -0.4279,
+                  "opposing": 28
                 },
                 {
                   "group": "QQQUSDT",
-                  "rows": 40,
-                  "weight": 40.0,
-                  "total": -875.2652,
-                  "mean": -21.88163,
-                  "share_of_total": -0.565,
+                  "rows": 42,
+                  "weight": 42.0,
+                  "total": -845.4969,
+                  "mean": -20.130879,
+                  "share_of_total": -0.4337,
                   "opposing": 21
                 },
                 {
                   "group": "METAUSDT",
-                  "rows": 47,
-                  "weight": 47.0,
-                  "total": -3058.4308,
-                  "mean": -65.072996,
-                  "share_of_total": -1.9744,
-                  "opposing": 25
+                  "rows": 49,
+                  "weight": 49.0,
+                  "total": -3126.4652,
+                  "mean": -63.805412,
+                  "share_of_total": -1.6037,
+                  "opposing": 27
                 },
                 {
                   "group": "MSTRUSDT",
-                  "rows": 43,
-                  "weight": 43.0,
-                  "total": -3892.8601,
-                  "mean": -90.53163,
-                  "share_of_total": -2.5131,
-                  "opposing": 22
+                  "rows": 45,
+                  "weight": 45.0,
+                  "total": -3813.8203,
+                  "mean": -84.751562,
+                  "share_of_total": -1.9563,
+                  "opposing": 23
                 },
                 {
                   "group": "TQQQUSDT",
-                  "rows": 35,
-                  "weight": 35.0,
-                  "total": -3928.1668,
-                  "mean": -112.233337,
-                  "share_of_total": -2.5359,
+                  "rows": 37,
+                  "weight": 37.0,
+                  "total": -3867.7622,
+                  "mean": -104.534114,
+                  "share_of_total": -1.984,
                   "opposing": 19
                 }
               ]
@@ -11857,11 +11846,11 @@
             {
               "key": "phase",
               "groups": 3,
-              "micro_mean": 3.007778,
-              "macro_mean": 28.134469,
+              "micro_mean": 3.623595,
+              "macro_mean": 28.070346,
               "direction": 1,
               "largest_contributor": "rth",
-              "largest_share_of_total": 5.3787,
+              "largest_share_of_total": 4.4792,
               "total_without_largest": -6782.6216,
               "loss_histogram": {
                 "0": 0.3333,
@@ -11877,12 +11866,12 @@
               "per_group": [
                 {
                   "group": "rth",
-                  "rows": 398,
-                  "weight": 398.0,
-                  "total": 8331.6271,
-                  "mean": 20.933736,
-                  "share_of_total": 5.3787,
-                  "opposing": 193
+                  "rows": 421,
+                  "weight": 421.0,
+                  "total": 8732.1155,
+                  "mean": 20.741367,
+                  "share_of_total": 4.4792,
+                  "opposing": 200
                 },
                 {
                   "group": "extended",
@@ -11890,7 +11879,7 @@
                   "weight": 1.0,
                   "total": 123.0009,
                   "mean": 123.0009,
-                  "share_of_total": 0.0794,
+                  "share_of_total": 0.0631,
                   "opposing": 0
                 },
                 {
@@ -11899,7 +11888,7 @@
                   "weight": 116.0,
                   "total": -6905.6225,
                   "mean": -59.531228,
-                  "share_of_total": -4.4581,
+                  "share_of_total": -3.5423,
                   "opposing": 49
                 }
               ]
@@ -11907,15 +11896,15 @@
           ],
           "split_half": {
             "label": "chronological halves",
-            "cut": "2026-09-19T17:41:06.717355+00:00",
-            "first_items": 257,
-            "second_items": 258,
-            "first_mean": 43.790828,
-            "second_mean": -37.617199,
-            "full_mean": 3.007778,
+            "cut": "2026-09-19T19:40:45.261574+00:00",
+            "first_items": 269,
+            "second_items": 269,
+            "first_mean": 43.752783,
+            "second_mean": -36.505594,
+            "full_mean": 3.623595,
             "flips_across_halves": true,
             "contradicts_full_sample": false,
-            "reading": "chronological halves: the halves disagree \u2014 first 43.790828, second -37.617199 (full 3.007778)"
+            "reading": "chronological halves: the halves disagree \u2014 first 43.752783, second -36.505594 (full 3.623595)"
           },
           "split_half_note": "",
           "notes": [],
@@ -13947,7 +13936,7 @@
     "data/refusal_alpha.json": {
       "status": "aggregate_without_rows",
       "reason": "per-horizon aggregates bootstrapped over decision cycles; per-mark rows are not kept",
-      "sha256": "aa23aceb60bb40cb0e6d35ecafa2cd1f5d4b53e14a65288b18fb5f602d760492",
+      "sha256": "6e9ac6f36d7c1e47c95b9853ce5a6cc71310d7452e4da5476f5f6056c1d14ba0",
       "flagged": false,
       "headlines": []
     },
@@ -14131,7 +14120,7 @@
     "data/review_comparison.json": {
       "status": "designed_cases",
       "reason": "seven designed lifecycle fixtures and four threshold ablations",
-      "sha256": "98561b92cdec73e2152819306380e22c614f08bd3c0290a1de1cb3ff23db40e2",
+      "sha256": "549f62761bdf9ceb9c8485a5f991e217f85cbffbca640d2f82fb439447b9f2eb",
       "flagged": false,
       "headlines": []
     },
@@ -14249,16 +14238,16 @@
     "data/risk_layer_comparison.json": {
       "status": "checked",
       "reason": "per-checkpoint rows regenerated from the frozen candle fixture",
-      "sha256": "c20603009721f9868e560e3f6e535a00ffb90933655bb8e8a76bd52d0ab9d97d",
+      "sha256": "8f5718918ee894505390410e428054b094fdde950282b8f61c268ed3b9ece343",
       "flagged": false,
       "headlines": [
         {
           "name": "drawdown lock: ARGUS vs freqtrade at its best full-recall threshold",
           "headline": "lock called correctly against the shared ground truth (true drawdown >= 0.02)",
-          "orientation": "ARGUS correct - freqtrade (MaxDrawdown >= 0.04) correct per checkpoint: positive = ARGUS. Both have full recall, so this difference counts exactly the false locks separating the two published precisions",
-          "items": 318,
-          "micro_mean": 0.694969,
-          "total": 221.0,
+          "orientation": "ARGUS correct - freqtrade (MaxDrawdown >= 0.1) correct per checkpoint: positive = ARGUS. Both have full recall, so this difference counts exactly the false locks separating the two published precisions",
+          "items": 314,
+          "micro_mean": 0.640127,
+          "total": 201.0,
           "broken_down": true,
           "flags": [],
           "flagged": false,
@@ -14266,15 +14255,15 @@
             {
               "key": "symbol",
               "groups": 7,
-              "micro_mean": 0.694969,
-              "macro_mean": 0.712108,
+              "micro_mean": 0.640127,
+              "macro_mean": 0.676756,
               "direction": 1,
               "largest_contributor": "COINUSDT",
-              "largest_share_of_total": 0.2081,
-              "total_without_largest": 175.0,
+              "largest_share_of_total": 0.204,
+              "total_without_largest": 160.0,
               "loss_histogram": {
-                "0": 0.8571,
-                "1": 0.1429,
+                "0": 0.7143,
+                "1": 0.2857,
                 "2": 0.0,
                 "3": 0.0,
                 ">3": 0.0
@@ -14282,52 +14271,61 @@
               "carried_by_one_group": false,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "no single symbol carries the headline: without the largest contributor (COINUSDT, 20.8% of the total) the rest still point the same way",
+              "reading": "no single symbol carries the headline: without the largest contributor (COINUSDT, 20.4% of the total) the rest still point the same way",
               "per_group": [
                 {
                   "group": "COINUSDT",
-                  "rows": 65,
-                  "weight": 65.0,
-                  "total": 46.0,
-                  "mean": 0.707692,
-                  "share_of_total": 0.2081,
+                  "rows": 63,
+                  "weight": 63.0,
+                  "total": 41.0,
+                  "mean": 0.650794,
+                  "share_of_total": 0.204,
                   "opposing": 0
                 },
                 {
                   "group": "AAPLUSDT",
-                  "rows": 64,
-                  "weight": 64.0,
-                  "total": 44.0,
-                  "mean": 0.6875,
-                  "share_of_total": 0.1991,
-                  "opposing": 0
-                },
-                {
-                  "group": "SQQQUSDT",
-                  "rows": 53,
-                  "weight": 53.0,
-                  "total": 35.0,
-                  "mean": 0.660377,
-                  "share_of_total": 0.1584,
+                  "rows": 62,
+                  "weight": 62.0,
+                  "total": 39.0,
+                  "mean": 0.629032,
+                  "share_of_total": 0.194,
                   "opposing": 0
                 },
                 {
                   "group": "GOOGLUSDT",
                   "rows": 49,
                   "weight": 49.0,
-                  "total": 34.0,
-                  "mean": 0.693878,
-                  "share_of_total": 0.1538,
+                  "total": 32.0,
+                  "mean": 0.653061,
+                  "share_of_total": 0.1592,
                   "opposing": 0
+                },
+                {
+                  "group": "SQQQUSDT",
+                  "rows": 53,
+                  "weight": 53.0,
+                  "total": 29.0,
+                  "mean": 0.54717,
+                  "share_of_total": 0.1443,
+                  "opposing": 1
                 },
                 {
                   "group": "QQQUSDT",
                   "rows": 48,
                   "weight": 48.0,
-                  "total": 31.0,
-                  "mean": 0.645833,
-                  "share_of_total": 0.1403,
+                  "total": 27.0,
+                  "mean": 0.5625,
+                  "share_of_total": 0.1343,
                   "opposing": 1
+                },
+                {
+                  "group": "NVDAUSDT",
+                  "rows": 19,
+                  "weight": 19.0,
+                  "total": 17.0,
+                  "mean": 0.894737,
+                  "share_of_total": 0.0846,
+                  "opposing": 0
                 },
                 {
                   "group": "MSFTUSDT",
@@ -14335,16 +14333,7 @@
                   "weight": 20.0,
                   "total": 16.0,
                   "mean": 0.8,
-                  "share_of_total": 0.0724,
-                  "opposing": 0
-                },
-                {
-                  "group": "NVDAUSDT",
-                  "rows": 19,
-                  "weight": 19.0,
-                  "total": 15.0,
-                  "mean": 0.789474,
-                  "share_of_total": 0.0679,
+                  "share_of_total": 0.0796,
                   "opposing": 0
                 }
               ]
@@ -14353,14 +14342,14 @@
           "split_half": {
             "label": "the harness's own in-sample / out-of-sample boundary",
             "cut": "",
-            "first_items": 193,
-            "second_items": 125,
-            "first_mean": 0.642487,
-            "second_mean": 0.776,
-            "full_mean": 0.694969,
+            "first_items": 191,
+            "second_items": 123,
+            "first_mean": 0.670157,
+            "second_mean": 0.593496,
+            "full_mean": 0.640127,
             "flips_across_halves": false,
             "contradicts_full_sample": false,
-            "reading": "the harness's own in-sample / out-of-sample boundary: both halves point the same way as the full sample \u2014 first 0.642487, second 0.776, full 0.694969"
+            "reading": "the harness's own in-sample / out-of-sample boundary: both halves point the same way as the full sample \u2014 first 0.670157, second 0.593496, full 0.640127"
           },
           "split_half_note": "halves as the artefact recorded them",
           "notes": [],
@@ -15299,7 +15288,7 @@
     "data/skill_matrix.json": {
       "status": "checked",
       "reason": "one row per tool",
-      "sha256": "6a7607dfc2bff46f6f3e84b7b880f15553856228b3b6746a3a68cb04540f4696",
+      "sha256": "880a6a6766cdd0366c69a98230a33f7ed4ff5c7af9d3dcea08e87e1f72d8a893",
       "flagged": true,
       "headlines": [
         {
@@ -15307,8 +15296,8 @@
           "headline": "answer rate per tool",
           "orientation": "rate",
           "items": 86,
-          "micro_mean": 0.034884,
-          "total": 3.0,
+          "micro_mean": 0.023256,
+          "total": 2.0,
           "broken_down": true,
           "flags": [
             "carried_by_one_group:server=bitget-signal"
@@ -15318,8 +15307,8 @@
             {
               "key": "server",
               "groups": 2,
-              "micro_mean": 0.034884,
-              "macro_mean": 0.078947,
+              "micro_mean": 0.023256,
+              "macro_mean": 0.052632,
               "direction": 1,
               "largest_contributor": "bitget-signal",
               "largest_share_of_total": 1.0,
@@ -15340,8 +15329,8 @@
                   "group": "bitget-signal",
                   "rows": 19,
                   "weight": 19.0,
-                  "total": 3.0,
-                  "mean": 0.157895,
+                  "total": 2.0,
+                  "mean": 0.105263,
                   "share_of_total": 1.0,
                   "opposing": 0
                 },
@@ -15359,12 +15348,12 @@
             {
               "key": "skill",
               "groups": 11,
-              "micro_mean": 0.034884,
-              "macro_mean": 0.151515,
+              "micro_mean": 0.023256,
+              "macro_mean": 0.121212,
               "direction": 1,
-              "largest_contributor": "news-briefing",
-              "largest_share_of_total": 0.3333,
-              "total_without_largest": 2.0,
+              "largest_contributor": "server-only (no SKILL.md names it)",
+              "largest_share_of_total": 0.5,
+              "total_without_largest": 1.0,
               "loss_histogram": {
                 "0": 1.0,
                 "1": 0.0,
@@ -15375,24 +15364,15 @@
               "carried_by_one_group": false,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "no single skill carries the headline: without the largest contributor (news-briefing, 33.3% of the total) the rest still point the same way",
+              "reading": "no single skill carries the headline: without the largest contributor (server-only (no SKILL.md names it), 50.0% of the total) the rest still point the same way",
               "per_group": [
-                {
-                  "group": "news-briefing",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": 1.0,
-                  "mean": 0.333333,
-                  "share_of_total": 0.3333,
-                  "opposing": 0
-                },
                 {
                   "group": "server-only (no SKILL.md names it)",
                   "rows": 3,
                   "weight": 3.0,
                   "total": 1.0,
                   "mean": 0.333333,
-                  "share_of_total": 0.3333,
+                  "share_of_total": 0.5,
                   "opposing": 0
                 },
                 {
@@ -15401,7 +15381,7 @@
                   "weight": 1.0,
                   "total": 1.0,
                   "mean": 1.0,
-                  "share_of_total": 0.3333,
+                  "share_of_total": 0.5,
                   "opposing": 0
                 },
                 {
@@ -15468,6 +15448,15 @@
                   "opposing": 0
                 },
                 {
+                  "group": "news-briefing",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
                   "group": "sentiment-analyst",
                   "rows": 2,
                   "weight": 2.0,
@@ -15493,31 +15482,29 @@
     "data/skill_reliability.json": {
       "status": "checked",
       "reason": "one row per Bitget Skill tool",
-      "sha256": "c79ace953e9c94a3b7ac66d853fc41f9912fbc2202d272ab89ac6a6d1ddf2fdd",
-      "flagged": true,
+      "sha256": "5ff800a5f3b5520688a53bf37cc0654220e12d74473813fdda8ed654637d3a24",
+      "flagged": false,
       "headlines": [
         {
           "name": "Bitget Skill tools that answer",
           "headline": "share of attempts answered",
           "orientation": "answer rate",
           "items": 19,
-          "micro_mean": 0.315789,
-          "total": 18.0,
+          "micro_mean": 0.105263,
+          "total": 6.0,
           "broken_down": true,
-          "flags": [
-            "carried_by_one_group:skill=technical-analysis"
-          ],
-          "flagged": true,
+          "flags": [],
+          "flagged": false,
           "tables": [
             {
               "key": "skill",
-              "groups": 5,
-              "micro_mean": 0.315789,
-              "macro_mean": 0.2,
+              "groups": 6,
+              "micro_mean": 0.105263,
+              "macro_mean": 0.222222,
               "direction": 1,
-              "largest_contributor": "technical-analysis",
-              "largest_share_of_total": 1.0,
-              "total_without_largest": 0.0,
+              "largest_contributor": "server-only (no SKILL.md names it)",
+              "largest_share_of_total": 0.5,
+              "total_without_largest": 3.0,
               "loss_histogram": {
                 "0": 1.0,
                 "1": 0.0,
@@ -15525,22 +15512,40 @@
                 "3": 0.0,
                 ">3": 0.0
               },
-              "carried_by_one_group": true,
+              "carried_by_one_group": false,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "technical-analysis carries the headline: without it the other 4 skill group(s) total 0.0, which does not point the same way",
+              "reading": "no single skill carries the headline: without the largest contributor (server-only (no SKILL.md names it), 50.0% of the total) the rest still point the same way",
               "per_group": [
                 {
+                  "group": "server-only (no SKILL.md names it)",
+                  "rows": 3,
+                  "weight": 9.0,
+                  "total": 3.0,
+                  "mean": 0.333333,
+                  "share_of_total": 0.5,
+                  "opposing": 0
+                },
+                {
                   "group": "technical-analysis",
-                  "rows": 6,
-                  "weight": 18.0,
-                  "total": 18.0,
+                  "rows": 1,
+                  "weight": 3.0,
+                  "total": 3.0,
                   "mean": 1.0,
-                  "share_of_total": 1.0,
+                  "share_of_total": 0.5,
                   "opposing": 0
                 },
                 {
                   "group": "macro-analyst",
+                  "rows": 6,
+                  "weight": 18.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "market-intel",
                   "rows": 4,
                   "weight": 12.0,
                   "total": 0.0,
@@ -15549,7 +15554,7 @@
                   "opposing": 0
                 },
                 {
-                  "group": "market-intel",
+                  "group": "news-briefing",
                   "rows": 3,
                   "weight": 9.0,
                   "total": 0.0,
@@ -15558,18 +15563,9 @@
                   "opposing": 0
                 },
                 {
-                  "group": "news-briefing",
+                  "group": "sentiment-analyst",
                   "rows": 2,
                   "weight": 6.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "share_of_total": 0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "sentiment-analyst",
-                  "rows": 4,
-                  "weight": 12.0,
                   "total": 0.0,
                   "mean": 0.0,
                   "share_of_total": 0.0,

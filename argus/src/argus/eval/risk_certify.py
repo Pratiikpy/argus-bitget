@@ -48,7 +48,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from argus.eval import artefact, risk_shadow
+from argus.eval import risk_shadow
 from argus.eval.risk_shadow import (
     BASELINES,
     CURRENT_CIRCUIT,
@@ -63,6 +63,7 @@ from argus.eval.risk_shadow import (
     run_guard,
 )
 from argus.risk import certify as c
+from argus.truth import artefact
 
 ROOT = risk_shadow.ROOT
 REPORT_PATH = ROOT / "data" / "risk_certify.json"
@@ -72,7 +73,7 @@ SOURCES = {
     "circuit": CURRENT_CIRCUIT,
     "sizing": SRC / "risk" / "sizing.py",
     "session_risk": SRC / "risk" / "session_risk.py",
-    "modes": SRC / "risk" / "modes.py",
+    "modes": SRC / "execution" / "modes.py",
 }
 EXAMPLES = 8
 """Certificates kept per stream and outcome. Counts are always complete; examples are a sample."""
@@ -236,7 +237,7 @@ def circuit_cases(module: types.ModuleType) -> Iterator[tuple[str, c.Certificate
 def sizing_cases(module: types.ModuleType) -> Iterator[tuple[str, c.Certificate]]:
     """Graded-sample sizes and calibration errors either side of both gates, crossed with Kelly
     inputs and multipliers, including the ones the sizing layer must refuse."""
-    from argus.eval.observatory import Prediction, expected_calibration_error
+    from argus.risk.calibration import Prediction, expected_calibration_error
 
     for graded, accuracy in itertools.product((0, 19, 20, 21), ("0.6", "0.4", "0.3")):
         right = int(Decimal(graded) * Decimal(accuracy))
@@ -756,8 +757,8 @@ def run(*, path: Path = REPORT_PATH, refresh: bool = False) -> dict[str, Any]:
         "modes": tally(mode_cases(real["modes"].module, current.module)),
         "mutation": mutation_report(intents, specs, current.module),
         "not_covered": [
-            "the Constitution's own rules (agents/desk.py) — swept by eval/riskproof.py; here "
-            "only its recorded input and output are certified, as step 1 of the chain",
+            "the Constitution's own rules (risk/constitution.py) — swept by eval/riskproof.py; "
+            "here only its recorded input and output are certified, as step 1 of the chain",
             "the measured inputs sizing and the throttle report (calibration error, path "
             "volatility) are taken as given, not re-derived",
             "Decimal exponents beyond the default context's Emax (|exponent| > 999999) are not "

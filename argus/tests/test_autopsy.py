@@ -113,7 +113,7 @@ class TestReachabilityIsComputedNotDeclared:
         the funnel silently attributes hits to the wrong gate."""
         import inspect
 
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         source = inspect.getsource(ConstitutionPolicy.rule)
         # **Every gate, gate 1 included.** It used to be excluded from this loop because it returned
@@ -140,7 +140,7 @@ class TestReachabilityIsComputedNotDeclared:
         """
         import inspect
 
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         source = inspect.getsource(ConstitutionPolicy.rule)
         terminal = [g.name for g in CHAIN if g.terminal]
@@ -163,7 +163,7 @@ class TestReachabilityIsComputedNotDeclared:
         """
         import inspect
 
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         source = inspect.getsource(ConstitutionPolicy.rule)
         terminal = [g for g in CHAIN if g.terminal]

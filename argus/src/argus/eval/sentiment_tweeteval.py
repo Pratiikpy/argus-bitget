@@ -44,7 +44,7 @@ the abusive class) and the share of clean posts withheld by mistake.
 - *finBERT* (``ProsusAI/finbert``, the "Market sentiment" capability's named baseline), from the
   local Hugging Face cache through `eval/baselines/finbert_loader.py`, offline, every test tweet.
 - *VADER* (``cjhutto/vaderSentiment``, MIT), the social-media lexicon scorer, from the local clone
-  through `eval/baselines/vader_loader.py`, with its README's ±0.05 thresholds.
+  through `market/vader.py`, with its README's ±0.05 thresholds.
 - *The majority class*, computed, and *the paper's baselines*, cited from Table 3 (test block) —
   SVM, FastText, BLSTM and three RoBERTa variants — with BERTweet and TimeLMs-2021 from the
   repository README's leaderboard. Where the README disagrees with the paper (RoBERTa-Retrained
@@ -595,15 +595,15 @@ def finbert_predictions(split: Split, *, batch_size: int = 32, check_batching: i
 
 
 def vader_predictions(split: Split) -> tuple[list[int], dict[str, Any]]:
-    from argus.eval.baselines import vader_loader
+    from argus.market import vader
 
-    analyzer = vader_loader.load_analyzer()
+    analyzer = vader.load_analyzer()
     by_name = {name: c for c, name in split.names.items()}
     started = time.perf_counter()
-    labels = [by_name[vader_loader.label(float(analyzer.polarity_scores(text)["compound"]))]
+    labels = [by_name[vader.label(float(analyzer.polarity_scores(text)["compound"]))]
               for text in split.texts]
     elapsed = time.perf_counter() - started
-    return labels, {**vader_loader.provenance(), "seconds": elapsed,
+    return labels, {**vader.provenance(), "seconds": elapsed,
                     "ms_per_tweet": elapsed / len(split.texts) * 1000}
 
 
@@ -973,7 +973,7 @@ def abuse_verdict(test: dict[str, Any], pipeline: dict[str, Any],
 def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - long local run
     import argparse
 
-    from argus.eval.artefact import write
+    from argus.truth.artefact import write
 
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0] if __doc__ else None)
     parser.add_argument("--tweeteval", type=Path, default=None)

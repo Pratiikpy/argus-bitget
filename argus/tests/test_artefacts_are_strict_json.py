@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-from argus.eval.artefact import dumps, is_strict, sanitise, write
+from argus.truth.artefact import dumps, is_strict, sanitise, write
 
 DATA = Path(__file__).resolve().parents[1] / "data"
 
@@ -35,7 +35,7 @@ class TestTheCommittedCorpus:
         assert not offenders, (
             "these artefacts contain NaN or Infinity and cannot be read outside Python: "
             + ", ".join(offenders)
-            + " — write them through argus.eval.artefact.write"
+            + " — write them through argus.truth.artefact.write"
         )
 
     def test_there_is_a_corpus_to_check(self) -> None:

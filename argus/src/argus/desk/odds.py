@@ -27,21 +27,11 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
-WILSON_Z = 1.96
+from argus.risk.calibration import wilson
+
 MIN_INDEPENDENT = 8
 """Below this many independent windows the record is called thin, the same floor the analogue
 answer uses (`lui/research.MIN_INDEPENDENT_EPISODES`)."""
-
-
-def wilson(successes: float, n: float, z: float = WILSON_Z) -> tuple[float, float]:
-    """Wilson score interval for a proportion; accepts a fractional effective count."""
-    if n <= 0:
-        return (0.0, 1.0)
-    p = successes / n
-    denom = 1 + z * z / n
-    centre = (p + z * z / (2 * n)) / denom
-    half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / denom
-    return (max(0.0, centre - half), min(1.0, centre + half))
 
 
 def _quantile(values: list[float], q: float) -> float:

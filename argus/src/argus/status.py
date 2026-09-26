@@ -30,7 +30,7 @@ MODULES = (
     "argus.market.volatility", "argus.market.microstructure", "argus.market.instruments",
     "argus.risk.hedgeability", "argus.risk.circuit", "argus.risk.sizing", "argus.llm.qwen",
     "argus.llm.provider", "argus.agents.meta_pm", "argus.agents.analysts", "argus.agents.desk",
-    "argus.agents.conflict", "argus.agents.grounding", "argus.agents.mandate",
+    "argus.agents.conflict", "argus.truth.grounding", "argus.desk.mandate",
     "argus.agents.recall", "argus.truth.novelty",
     "argus.agents.claims", "argus.agents.selection", "argus.agents.adversary",
     "argus.agents.debate",

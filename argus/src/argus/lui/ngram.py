@@ -6,7 +6,7 @@ On 2026-09-21 that layer was measured against a corpus written by `openai/gpt-os
 that has never seen this repository — and scored **23.5%**, against 100% on the cases the patterns
 were widened for. A +76% gap: the patterns memorise and do not generalise.
 
-`lui/semantic.py` was the intended fix and does not fix it. On the same corpus it also scores
+`llm/semantic.py` was the intended fix and does not fix it. On the same corpus it also scores
 **23.5%**, and leave-one-out cross-validation puts cosine similarity for its correct answers at
 0.20-0.75 against 0.00-0.80 for its wrong ones — **completely overlapping, so no abstention
 threshold separates them.** It would also cost 13.4 MB of token table in a bundle that currently

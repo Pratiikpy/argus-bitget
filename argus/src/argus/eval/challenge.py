@@ -265,8 +265,12 @@ def delay_the_network() -> ChallengeResult:
 
 
 def move_the_market_open() -> ChallengeResult:
-    """Declare a holiday. Does session state recompute rather than assume 09:30 ET?"""
-    day = datetime(2026, 7, 3, 12, 0, tzinfo=ET)
+    """Declare a holiday. Does session state recompute rather than assume 09:30 ET?
+
+    The day is an ordinary Wednesday. It was 3 July 2026, which is itself a market holiday
+    (Independence Day observed), and once the clock knew the real calendar both sides of the
+    control were already closed."""
+    day = datetime(2026, 7, 8, 12, 0, tzinfo=ET)
     normal = DualClock().state(day)
     holiday = DualClock(holidays=frozenset({day.date()})).state(day)
     return ChallengeResult(

@@ -62,8 +62,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from argus.eval.artefact import write
 from argus.eval.lui_rematch_inputs import INPUTS_PATH, digest, load
+from argus.truth.artefact import write
 
 PACKAGE = Path(__file__).resolve().parents[3]
 DATA = PACKAGE / "data"

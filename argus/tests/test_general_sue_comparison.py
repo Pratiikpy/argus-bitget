@@ -14,7 +14,6 @@ from decimal import Decimal
 
 import pytest
 
-from argus.eval import artefact
 from argus.eval.general_sue_comparison import (
     DEGENERACY_METHODS,
     SCOPE_STATEMENT,
@@ -40,6 +39,7 @@ from argus.eval.general_sue_comparison import (
     step_windows,
     unit_sweep,
 )
+from argus.truth import artefact
 
 NVDA_SHAPED = ["2.46", "1.91", "1.5", "0.89", "0.81", "0.78", "0.61", "0.52", "0.4", "0.35",
                "0.27", "0.18", "0.15", "0.09", "0.11", "0.07"]
@@ -210,6 +210,7 @@ def live() -> dict:
             "report": compute(anchors, frames, names)}
 
 
+@pytest.mark.network
 class TestLiveAlignment:
     def test_the_old_positional_lag_was_not_year_over_year_for_any_anchor(self, live: dict) -> None:
         row = live["report"]["alignment"]["anchors"]["argus_positional_before"]
@@ -241,6 +242,7 @@ class TestLiveAlignment:
         assert agreement["pandas_non_finite_argus_refused"] == agreement["pandas_non_finite"]
 
 
+@pytest.mark.network
 class TestLiveDegeneracy:
     def test_real_degenerate_filers_exist_and_argus_refuses_every_one(self, live: dict) -> None:
         deg = live["report"]["degeneracy"]
@@ -260,6 +262,7 @@ class TestLiveDegeneracy:
             assert steps[rival]["correct_refusal"] < total, rival
 
 
+@pytest.mark.network
 class TestLiveRanking:
     def test_positional_ranking_is_scrambled_and_dated_matches_exact(self, live: dict) -> None:
         ranking = live["report"]["ranking"]
@@ -269,6 +272,7 @@ class TestLiveRanking:
         assert ranking["argus_positional_before"]["top_50_non_year_over_year"] > 25
 
 
+@pytest.mark.network
 class TestLiveReproducibility:
     def test_the_deterministic_step_is_byte_identical_on_the_same_inputs(
         self, live: dict

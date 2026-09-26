@@ -59,8 +59,8 @@ from pathlib import Path
 from typing import Any
 
 from argus.desk import rotation as after
-from argus.eval import artefact
 from argus.eval.baselines import argus_rotation_pre_contract as before
+from argus.truth import artefact
 
 ROOT = Path(__file__).resolve().parents[3]
 DATA = ROOT / "data"

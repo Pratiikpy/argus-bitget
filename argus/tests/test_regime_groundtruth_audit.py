@@ -308,7 +308,7 @@ class TestArtefactIntegrity:
         correctly reported it as a house pattern shared with several other `data/*.json` rather
         than a defect of the module it was auditing, and correctly declined to patch it from here.
 
-        It was then patched from the right place: `eval/artefact.py` writes with `allow_nan=False`
+        It was then patched from the right place: `truth/artefact.py` writes with `allow_nan=False`
         so a non-finite value raises instead of shipping, the undefined correlation is `null` —
         which is what this project's own convention already says an absent measurement should be —
         and `tests/test_artefacts_are_strict_json.py` sweeps every `.json` and `.jsonl` under

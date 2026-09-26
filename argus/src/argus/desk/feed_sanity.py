@@ -76,12 +76,32 @@ import re
 from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from decimal import Decimal, InvalidOperation
-from typing import TYPE_CHECKING, Any
+from typing import Any, Protocol, TypeVar
 
 from argus.truth.evidence import Evidence
 
-if TYPE_CHECKING:
-    from argus.agents.analysts import AnalystView
+
+class PanelView(Protocol):
+    """What the screen reads from one analyst's view; `agents/analysts.AnalystView` is one.
+
+    A protocol rather than an import (2026-09-27): the desk layer screens what the agents
+    produce, and naming their class here made it depend on the layer above it."""
+
+    @property
+    def analyst(self) -> str: ...
+    @property
+    def signal(self) -> str: ...
+    @property
+    def magnitude_bps(self) -> int: ...
+    @property
+    def confidence(self) -> float: ...
+    @property
+    def reasoning(self) -> str: ...
+    @property
+    def counter_case(self) -> str: ...
+
+
+V = TypeVar("V", bound=PanelView)
 
 RULES: tuple[str, ...] = (
     "non_numeric", "price_mismatch", "implausible_change", "negative_spread",
@@ -454,7 +474,7 @@ def screen_evidence(
     return screened, report
 
 
-def view_line(view: AnalystView) -> str:
+def view_line(view: PanelView) -> str:
     """An analyst view's text as the frame renders it (`agents/desk.py`), plus its counter-case."""
     return (
         f"[panel] {view.analyst}: {view.signal} {view.magnitude_bps}bps "
@@ -463,11 +483,11 @@ def view_line(view: AnalystView) -> str:
 
 
 def screen_views(
-    views: Sequence[AnalystView], *, move_24h: Decimal | None
-) -> tuple[list[AnalystView], SanityReport]:
+    views: Sequence[V], *, move_24h: Decimal | None
+) -> tuple[list[V], SanityReport]:
     """Drop every analyst view whose line fails a panel rule, before consensus is taken."""
     findings: list[Finding] = []
-    kept: list[AnalystView] = []
+    kept: list[V] = []
     for view in views:
         got = check_panel_line(f"panel:{view.analyst}", view_line(view), move_24h=move_24h)
         findings.extend(got)
@@ -483,6 +503,7 @@ __all__ = [
     "RULES",
     "VIX_TOLERANCE_BPS",
     "Finding",
+    "PanelView",
     "SanityReport",
     "check_claim",
     "check_panel_line",

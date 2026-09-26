@@ -13,7 +13,8 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
-from argus.agents.desk import ConstitutionPolicy, TradingDesk
+from argus.agents.desk import TradingDesk
+from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface
 from argus.truth.clocks import SessionPhase, SessionState
 from argus.truth.evidence import Evidence

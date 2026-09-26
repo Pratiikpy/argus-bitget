@@ -11,7 +11,7 @@
 # `baseline_reproduced` / `same_input_comparison` evidence for
 # "Per-profile mandate that changes the verdict" in eval/standing.py — not a paraphrase
 # of their design, their actual code, on the same constructed scenarios ARGUS's own
-# argus.agents.mandate.Mandate.out_of_mandate() sees (project Standing Rule #3).
+# argus.desk.mandate.Mandate.out_of_mandate() sees (project Standing Rule #3).
 #
 # Two functions in this file (`avg_daily_dollar_volume`, `market_cap_usd`, reached only
 # through `_check_universe_floors` when a mandate sets `min_market_cap_usd` /

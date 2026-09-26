@@ -1,6 +1,6 @@
 """How much of an answer's per-line provenance the live trace decides, against the wording rules.
 
-`lui/provenance.py` labels a line from its wording after the answer is written. `truth/trace.py`
+`lui/provenance.py` labels a line from its wording after the answer is written. `lui/trace.py`
 records, while the answer is being built, which step made each line, what it read and when — and
 takes the label from that step where the step declares one. This module measures the difference
 on the same answers, rather than asserting that one is better:
@@ -22,7 +22,7 @@ on the same answers, rather than asserting that one is better:
 **How the console runs here.** Offline: every outbound socket is refused (an ``OSError``, so the
 console's own degrade paths run, as they would with the venue down), no model key is present, and
 the console's trained kind model reads each question as it does on a deployment with no key. The
-recorder is wired through a monkeypatched wrapper (:func:`argus.truth.trace.instrumented`), and
+recorder is wired through a monkeypatched wrapper (:func:`argus.lui.trace.instrumented`), and
 `lui/multistep.py`'s plain thread pool is swapped for `truth/coverage.ContextPool` for the run —
 the one-line change the integration asks of that module. Nothing here edits the console.
 
@@ -53,7 +53,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from argus.eval.artefact import write
+from argus.truth.artefact import write
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 REPORT_PATH = DATA / "trace_audit.json"
@@ -136,7 +136,7 @@ def _console_wired() -> Iterator[None]:
     """The recorder wired into the console for the duration: every engine a step. The multi-part
     answer's pool carries the trace into its workers itself (`lui/multistep.py` uses
     `truth.coverage.ContextPool` since 2026-09-26; this used to patch it in)."""
-    from argus.truth import trace
+    from argus.lui import trace
 
     with trace.instrumented():
         yield
@@ -149,9 +149,9 @@ def _data_state() -> dict[str, tuple[int, int]]:
 
 def audit(limit: int | None = None) -> dict[str, Any]:
     """Answer every corpus question offline, traced, and compare the two labellings."""
+    from argus.lui import trace
     from argus.lui.provenance import label as by_wording
     from argus.lui.server import handle_ask
-    from argus.truth import trace
 
     rows = _corpus()[:limit] if limit else _corpus()
     before = _data_state()
@@ -269,8 +269,8 @@ def audit(limit: int | None = None) -> dict[str, Any]:
 
 def overhead(stride: int = OVERHEAD_STRIDE) -> dict[str, Any]:
     """Seconds per answer, the same questions answered with the recorder wired in and without."""
+    from argus.lui import trace
     from argus.lui.server import handle_ask
-    from argus.truth import trace
 
     subset = _corpus()[::stride]
     timings: dict[str, float] = {}

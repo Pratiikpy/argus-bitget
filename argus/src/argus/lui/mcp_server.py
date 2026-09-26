@@ -53,8 +53,9 @@ So this layer stays, and takes from the SDK what made it better, with citations:
 and adds what neither had: **arguments are validated against each tool's own published
 ``inputSchema``** before any engine runs, and a violation is returned as a tool execution error
 (``isError: true``) naming the field — the 2025-11-25 specification's rule (SEP-1303), so an agent
-can correct itself. The schemas themselves are unchanged. After hardening the same corpus is 145
-of 145 clean (`data/mcp_fuzz.json`).
+can correct itself. The schemas themselves are unchanged. After hardening the same corpus was 145
+of 145 clean; it is built from the tools' own schemas, so it grew with the four tools added on
+2026-09-27 to 195 cases, all clean (`data/mcp_fuzz.json`).
 
     POST /mcp   {"jsonrpc": "2.0", "id": 1, "method": "tools/list"}
 """
@@ -64,7 +65,7 @@ from __future__ import annotations
 import json
 import math
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
 PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")
@@ -137,6 +138,53 @@ TOOLS: tuple[dict[str, Any], ...] = (
                        "against, and whether it is OWNED, TIED, IMPLEMENTED or LOST.",
         "inputSchema": {"type": "object", "properties": {}},
     },
+    # The four below reach the console's newest engines directly, not through question parsing
+    # (audit, 2026-09-26: an MCP client could not reach any of them).
+    {
+        "name": "argus_research_task",
+        "description": "One complete research task for adding a name to a book: eight engines "
+                       "(price and cost, technicals, news and filings, earnings, past analogues, "
+                       "the book's risk, sector and factor exposure, execution) and one verdict "
+                       "composed from their figures — add, add smaller, or do not add.",
+        "inputSchema": {"type": "object", "properties": {
+            "question": {"type": "string", "description": (
+                "The question as a trader asks it, e.g. 'I hold 40% NVDA, 30% MSFT, 30% AAPL — "
+                "should I add 15% TSLA?'")},
+            "book": {"type": "string", "description": (
+                "Optional holdings, used when the question names none.")}},
+            "required": ["question"]},
+    },
+    {
+        "name": "argus_week_ahead",
+        "description": "What to watch in the coming days for a book: scheduled US macro releases, "
+                       "each holding's earnings date, this week's 8-K filings, and the days the "
+                       "stock market is shut while the perpetuals keep trading.",
+        "inputSchema": {"type": "object", "properties": {
+            "book": {"type": "string",
+                     "description": "Holdings, e.g. '40% NVDA, 60% BTC'. Optional."},
+            "days": {"type": "integer", "description": "The window, 1 to 14 days; default 7."}}},
+    },
+    {
+        "name": "argus_exposures",
+        "description": "A book's sector weights and its loadings on four factors (market, size, "
+                       "momentum, bitcoin), before and after an optional added position.",
+        "inputSchema": {"type": "object", "properties": {
+            "book": {"type": "string", "description": "Holdings, e.g. '50% NVDA, 50% AAPL'."},
+            "add": {"type": "string",
+                    "description": "Optional position to add, e.g. 'TSLA 15%'."}},
+            "required": ["book"]},
+    },
+    {
+        "name": "argus_review_trades",
+        "description": "Review the trader's own trades: each one checked against the price path "
+                       "and the earnings calendar, the patterns across them, and a checklist to "
+                       "run before the next entry.",
+        "inputSchema": {"type": "object", "properties": {
+            "fills": {"type": "string", "description": (
+                "The trades, pasted as a table of fills (date, symbol, side, quantity, price) or "
+                "written out, e.g. 'bought 10 NVDA at 180 on 2 Sep, sold at 172 on 9 Sep'.")}},
+            "required": ["fills"]},
+    },
 )
 
 
@@ -195,6 +243,9 @@ def schema_errors(schema: Mapping[str, Any], value: Any, path: str = "") -> list
             return [f"{where} must be a number, not {type(value).__name__}"]
         if not math.isfinite(value):
             return [f"{where} must be a finite number"]
+    if kind == "integer" and (isinstance(value, bool) or not isinstance(value, int)):
+        # JSON Schema's whole number; 5.0 and true are refused (added with `argus_week_ahead`).
+        return [f"{where} must be a whole number, not {type(value).__name__}"]
     if kind == "array":
         if not isinstance(value, list):
             return [f"{where} must be an array, not {type(value).__name__}"]
@@ -328,7 +379,73 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         rows = [f"{c['state'].upper():12} {c['subtheme']:22} {c['name']} — vs {c['baseline'][:90]}"
                 for c in data.get("capabilities", [])]
         return "\n".join([f"States: {data.get('by_state')}", *rows]), False
+    if name == "argus_research_task":
+        return _research_task(str(args.get("question") or ""), str(args.get("book") or ""))
+    if name == "argus_week_ahead":
+        from argus.lui.watchlist import watchlist
+
+        days = args.get("days")
+        if days is not None and not (isinstance(days, int) and 1 <= days <= 14):
+            raise ToolError("days must be a whole number from 1 to 14")
+        lines, sources, _ = watchlist("what should I watch this week",
+                                      str(args.get("book") or "")[:300], days=days)
+        return _engine_text(lines, sources), False
+    if name == "argus_exposures":
+        from argus.lui.exposures import answer as exposures
+
+        holdings = str(args.get("book") or "").strip()
+        if not holdings:
+            raise ToolError("book is required, e.g. '50% NVDA, 50% AAPL'")
+        add = str(args.get("add") or "").strip()
+        asked = "what are my sector and factor exposures" + (f" if I add {add}" if add else "")
+        found = exposures(asked, holdings[:300])
+        if found is None:  # pragma: no cover - the question above always asks for exposures
+            raise ToolError("the exposures engine did not recognise the request")
+        return _engine_text(found.lines, found.sources), found.refused
+    if name == "argus_review_trades":
+        from argus.lui.journal import review_trades
+
+        fills = str(args.get("fills") or "").strip()
+        if not fills:
+            raise ToolError("fills is required")
+        reviewed = review_trades(fills[:20000])
+        if reviewed is None:
+            raise ToolError("no trades could be read from fills; paste a table with date, "
+                            "symbol, side, quantity and price, or write them out")
+        lines, sources, _ = reviewed
+        return _engine_text(lines, sources), False
     raise ToolError(f"unknown tool {name!r}")
+
+
+def _engine_text(lines: Sequence[str], sources: Sequence[Any]) -> str:
+    """An engine's lines and sources, formatted as `argus_ask` formats a console answer."""
+    return _answer_text({"lines": list(lines),
+                         "sources": [s.as_dict() if hasattr(s, "as_dict") else s
+                                     for s in sources]})
+
+
+def _research_task(question: str, book: str) -> tuple[str, bool]:
+    """The research task as text: what was read, the verdict, each engine's action, each step."""
+    from argus.lui.task import read_question, research_task
+
+    question = question.strip()
+    if not question:
+        raise ToolError("question is required")
+    reading = read_question(question[:500], book[:300])
+    if isinstance(reading, str):
+        return reading, True
+    task = research_task(reading=reading, asked=question[:500])
+    out = [f"Read as: {reading.summary}", *(f"  ({n})" for n in reading.notes)]
+    if task.verdict is not None:
+        out += ["", f"Verdict: {task.verdict.call}", *task.verdict.lines]
+    if task.conclusion:
+        out += ["", "What to do, engine by engine:",
+                *(f"- {title}: {action}" for title, action in task.conclusion)]
+    for step in task.steps:
+        state = "not applicable" if not step.applicable else (
+            "did not answer" if step.refused else f"{step.seconds:.1f}s")
+        out += ["", f"{step.title} ({step.engine}; {state})", *step.lines[:6]]
+    return "\n".join(out), False
 
 
 def _result(message_id: Any, result: Any) -> dict[str, Any]:

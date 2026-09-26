@@ -42,7 +42,7 @@ from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from argus.market.evidence import _UA, EdgarSource
-from argus.research.sue import MIN_QUARTERS, SueError, read_dated, yoy_window
+from argus.market.sue import MIN_QUARTERS, SueError, read_dated, yoy_window
 from argus.truth.evidence import Evidence
 
 TIMEOUT = 15

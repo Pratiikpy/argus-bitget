@@ -204,8 +204,8 @@ def review(
     is the desk's own hurdle about its own edge, and applying it to somebody else's thesis would be
     substituting our judgement for theirs. The structural gates are what this service is for.
     """
-    from argus.agents.desk import ConstitutionPolicy
-    from argus.eval.autopsy import CHAIN
+    from argus.risk.constitution import ConstitutionPolicy
+    from argus.risk.gatechain import CHAIN
     from argus.risk.hedgeability import HedgeabilitySurface
     from argus.truth.clocks import DualClock, SessionState
 

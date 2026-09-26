@@ -43,7 +43,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from argus.eval import artefact
+from argus.truth import artefact
 
 DATA = Path(__file__).resolve().parents[3] / "data" / "h2h_rook"
 BARS = DATA / "bars"

@@ -113,15 +113,22 @@ def live_checks(*, force: bool = False) -> tuple[list[Check], float]:
     if not force and _CACHE.get("at") and now - float(_CACHE["at"]) < CACHE_SECONDS:
         return list(_CACHE["checks"]), float(_CACHE["at"])
     results: list[Check] = []
-    with ThreadPoolExecutor(max_workers=len(CHECKS)) as pool:
+    # Not a `with` block: leaving one waits for every probe, so one hung upstream held the page past
+    # its own timeout (audit, 2026-09-26). One deadline for all of them, and a probe still running
+    # at it is reported as not answering and abandoned.
+    pool = ThreadPoolExecutor(max_workers=len(CHECKS))
+    deadline = time.monotonic() + PROBE_TIMEOUT_S
+    try:
         jobs = [(s, w, pool.submit(_timed, s, w, fn)) for s, w, fn in CHECKS]
         for surface, what, job in jobs:
             try:
-                results.append(job.result(timeout=PROBE_TIMEOUT_S))
+                results.append(job.result(timeout=max(0.0, deadline - time.monotonic())))
             except FutureTimeout:
                 results.append(Check(surface, what, False,
                                      f"no answer within {PROBE_TIMEOUT_S:.0f}s",
                                      PROBE_TIMEOUT_S * 1000))
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
     _CACHE.update(at=now, checks=results)
     return results, now
 
@@ -234,10 +241,14 @@ def render(status: dict[str, Any], checks: list[Check], checked_at: float,
     esc = html.escape
     live = sum(1 for c in checks if c.ok)
     rows = "".join(
-        f"<tr><td>{esc(c.surface)}</td><td>{esc(c.what)}</td>"
-        f"<td class='{'ok' if c.ok else 'bad'}'>{'answered' if c.ok else 'no answer'}</td>"
-        f"<td>{esc(c.detail)}</td><td class='n'>{c.ms:,.0f} ms</td></tr>" for c in checks)
-    sweep_rows = "".join(f"<tr><td>{esc(a)}</td><td>{esc(b)}</td></tr>" for a, b in sweeps)
+        f"<tr><td data-label='Surface'>{esc(c.surface)}</td>"
+        f"<td data-label='Checked'>{esc(c.what)}</td>"
+        f"<td data-label='Result' class='{'ok' if c.ok else 'bad'}'>"
+        f"{'answered' if c.ok else 'no answer'}</td>"
+        f"<td data-label='Detail'>{esc(c.detail)}</td>"
+        f"<td data-label='Time' class='n'>{c.ms:,.0f} ms</td></tr>" for c in checks)
+    sweep_rows = "".join(f"<tr><td data-label='Sweep'>{esc(a)}</td>"
+                         f"<td data-label='Result'>{esc(b)}</td></tr>" for a, b in sweeps)
     age = status.get("age_hours")
     stale = status.get("stale")
     checked = time.strftime("%d %b %Y %H:%M UTC", time.gmtime(checked_at))
@@ -270,14 +281,18 @@ def render(status: dict[str, Any], checks: list[Check], checked_at: float,
    border-radius:10px }}
  table {{ border-collapse:collapse; width:100%; font-size:13.5px }}
  td {{ padding:8px 10px; border-top:1px solid var(--line); vertical-align:top }}
- tr:first-child td {{ border-top:0 }}
+ th {{ padding:6px 10px; text-align:left; font:600 11px/1.3 var(--mono); letter-spacing:.08em;
+   text-transform:uppercase; color:var(--dim); border-bottom:1px solid var(--line) }}
+ tbody tr:first-child td {{ border-top:0 }}
  .ok {{ color:var(--good); font-weight:600 }} .bad {{ color:var(--bad); font-weight:600 }}
  .n {{ font-family:var(--mono); color:var(--dim); white-space:nowrap; text-align:right }}
  a {{ color:var(--accent) }}
  @media (max-width:640px) {{
    table, tbody, tr, td {{ display:block; width:100% }}
+   thead {{ position:absolute; left:-9999px }}
    tr {{ border-top:1px solid var(--line); padding:8px 0 }} tr:first-child {{ border-top:0 }}
    td {{ border:0; padding:2px 12px }} .n {{ text-align:left }}
+   td::before {{ content:attr(data-label) " · "; color:var(--dim); font:11px var(--mono) }}
  }}
 {design.BASE_CSS}</style></head><body>{design.nav('/status')}<div class="wrap">
 <h1>Status — the record and its sources</h1>
@@ -292,9 +307,12 @@ sweeps say when they ran. <a href="/">Console</a> · <a href="/research">Researc
  <div class="card"><b>{live} of {len(checks)}</b><span>Bitget surfaces answering now</span></div>
 </div>
 <h2>Checked now</h2>
-<div class="tbl"><table>{rows}</table></div>
+<div class="tbl"><table><thead><tr><th scope="col">Surface</th><th scope="col">Checked</th>
+<th scope="col">Result</th><th scope="col">Detail</th><th scope="col">Time</th></tr></thead>
+<tbody>{rows}</tbody></table></div>
 <h2>Last full sweep</h2>
-<div class="tbl"><table>{sweep_rows}</table></div>
+<div class="tbl"><table><thead><tr><th scope="col">Sweep</th><th scope="col">Result</th></tr>
+</thead><tbody>{sweep_rows}</tbody></table></div>
 <p class="sub" style="margin-top:14px">The desk decides four times a day during US market hours;
 the next cycle is due {esc(due)}.</p>
 </div>{design.footer()}</body></html>"""

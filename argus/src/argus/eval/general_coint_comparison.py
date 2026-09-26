@@ -708,7 +708,7 @@ def load_snapshot(path: Path = SNAPSHOT_PATH) -> tuple[dict[str, list[float]], d
 def freeze_snapshot(raw: Mapping[str, Sequence[tuple[str, float]]], meta: Mapping[str, Any],
                     path: Path = SNAPSHOT_PATH) -> dict[str, Any]:
     """Write fetched ``(timestamp, close)`` rows as one timestamp axis plus aligned closes."""
-    from argus.eval.artefact import sanitise
+    from argus.truth.artefact import sanitise
 
     common = set.intersection(*(set(t for t, _ in rows) for rows in raw.values()))
     stamps = sorted(common)
@@ -887,7 +887,7 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - CLI
     import argparse
     import sys
 
-    from argus.eval.artefact import write
+    from argus.truth.artefact import write
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")

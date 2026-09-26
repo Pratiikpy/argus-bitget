@@ -11,13 +11,15 @@ from argus.eval.observatory import (
     ContributionLedger,
     ModelScorecard,
     PitProbe,
-    Prediction,
     ReplayResult,
     abstention_quality,
-    brier_score,
-    expected_calibration_error,
     leaderboard,
     pit_integrity,
+)
+from argus.risk.calibration import (
+    Prediction,
+    brier_score,
+    expected_calibration_error,
     reliability_curve,
 )
 

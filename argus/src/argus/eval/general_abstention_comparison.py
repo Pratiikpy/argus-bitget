@@ -84,7 +84,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-from argus.eval import artefact
 from argus.eval.abstention_coverage import (
     Extraction,
     LeanCall,
@@ -98,6 +97,7 @@ from argus.eval.abstention_coverage import (
     working_point,
 )
 from argus.eval.observatory import AbstentionOutcome, abstention_quality
+from argus.truth import artefact
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 REPORT_PATH = DATA / "general_abstention_comparison.json"

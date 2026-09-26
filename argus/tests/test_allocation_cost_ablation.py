@@ -64,6 +64,7 @@ def capped(columns: dict[str, list[float]]) -> dict[str, Any]:
     )
 
 
+@pytest.mark.network
 class TestTheBaselineActuallyRan:
     """The defect this whole line of work exists to correct is a baseline that was cloned and
     never run. An ablation that degraded to "Riskfolio would not import, so nothing changed"
@@ -109,6 +110,7 @@ class TestTheBaselineActuallyRan:
         assert capped["parity_twin_null_control"]["behaves_as_a_null"] is None
 
 
+@pytest.mark.network
 class TestTheWeightCapIsReal:
     """`w_max` had to be checked, not assumed: Riskfolio applies it in a post-model fitting loop
     (`HCPortfolio.py:1119-1140`), and a cap that were silently dropped for NCO would turn the
@@ -154,6 +156,7 @@ class TestTheWeightCapIsReal:
         assert bound > free
 
 
+@pytest.mark.network
 class TestTheFeeIsArgusOwnFee:
     """The cost model is `desk/allocation.py:441-451`'s, not a number invented for this test."""
 
@@ -191,6 +194,7 @@ class TestTheFeeIsArgusOwnFee:
                 == pytest.approx(argus["mean_cost_bps"] / argus["mean_turnover"], rel=1e-9))
 
 
+@pytest.mark.network
 class TestNothingSeesTheFuture:
     """Leverage is the one place a lookahead could enter, so it is the one place checked hardest."""
 
@@ -223,6 +227,7 @@ class TestNothingSeesTheFuture:
         )
 
 
+@pytest.mark.network
 class TestTheVerdictMatchesItsNumbers:
     def test_the_booleans_agree_with_the_means_they_summarise(
         self, uncapped: dict[str, Any],
@@ -287,6 +292,7 @@ class TestTheVerdictMatchesItsNumbers:
         assert verdict["published_verdict_survives_every_ablation"] is False
 
 
+@pytest.mark.network
 class TestTheUniverseAblation:
     def test_it_really_removes_the_inverse_pair(
         self, columns: dict[str, list[float]],
@@ -337,6 +343,7 @@ class TestTheArithmeticItself:
 
 
 class TestReporting:
+    @pytest.mark.network
     def test_render_names_both_runs_the_universes_and_the_verdict(
         self, uncapped: dict[str, Any], capped: dict[str, Any],
     ) -> None:
@@ -370,6 +377,7 @@ class TestReporting:
         assert "Riskfolio-Lib 7.3.0" in SCOPE_STATEMENT
 
 
+@pytest.mark.network
 def test_the_module_reads_the_same_universe_the_comparison_did(
     columns: Mapping[str, Sequence[float]],
 ) -> None:

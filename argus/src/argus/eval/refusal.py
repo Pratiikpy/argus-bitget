@@ -107,8 +107,8 @@ from math import comb, sqrt
 from pathlib import Path
 from typing import Any
 
-from argus.eval import artefact
 from argus.paper.marks import Mark, read_marks
+from argus.truth import artefact
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 REPORT_PATH = DATA / "refusal_alpha.json"

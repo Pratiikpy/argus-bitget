@@ -15,10 +15,10 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from decimal import Decimal
 
-from argus.agents.desk import ConstitutionPolicy
 from argus.decision.verdicts import ConstitutionVerdict, Intent, Side, Verdict
-from argus.eval.observatory import Prediction
+from argus.risk.calibration import Prediction
 from argus.risk.circuit import BookState
+from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface
 from argus.risk.sizing import FIXED_FRACTION, MAX_FRACTION, MIN_GRADED
 from argus.truth.clocks import DualClock

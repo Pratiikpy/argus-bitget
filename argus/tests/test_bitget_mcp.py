@@ -55,6 +55,7 @@ def service() -> BitgetDataService:
 
 
 class TestTheServiceIsReachableWithoutACredential:
+    @pytest.mark.network
     def test_it_connects_with_no_api_key(self, service: BitgetDataService) -> None:
         """The whole reason this is worth integrating: a judge can reproduce it."""
         assert "bitget-mcp-server" in service.server
@@ -62,6 +63,7 @@ class TestTheServiceIsReachableWithoutACredential:
     def test_the_endpoint_is_the_published_one(self) -> None:
         assert ENDPOINT == "https://agent.bitget.com/mcp"
 
+    @pytest.mark.network
     def test_the_catalog_is_larger_than_the_skills_surface(
         self, service: BitgetDataService
     ) -> None:
@@ -70,6 +72,7 @@ class TestTheServiceIsReachableWithoutACredential:
         catalog = service.categories()
         assert sum(int(c.get("entry_count", 0)) for c in catalog) > 50
 
+    @pytest.mark.network
     def test_the_equity_category_carries_the_anchor_data(
         self, service: BitgetDataService
     ) -> None:
@@ -84,6 +87,7 @@ class TestTheServiceIsReachableWithoutACredential:
         assert "equity_ownership_form_13f" in ids
 
 
+@pytest.mark.network
 class TestTheAnchorFactsComeBack:
     def test_a_live_quote_on_the_underlying(self, service: BitgetDataService) -> None:
         """The basis every hedge and arbitrage claim rests on is rToken minus *this*."""
@@ -115,6 +119,7 @@ class TestTheTrapsThatCostAnAfternoon:
 
         assert _HEADERS.get("User-Agent")
 
+    @pytest.mark.network
     def test_a_bad_entry_id_raises_rather_than_returning_empty(
         self, service: BitgetDataService
     ) -> None:

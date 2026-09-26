@@ -18,7 +18,7 @@
 # any fact the desk was actually given, and confirms the real, unmodified Pydantic validator
 # accepts it without complaint — `_coerce_optional_float` only normalises STRING FORMAT
 # (placeholder text, percentages, currency symbols), never the VALUE, so a well-formed but
-# fabricated number passes untouched. `argus.agents.grounding.check` is run on the same
+# fabricated number passes untouched. `argus.truth.grounding.check` is run on the same
 # constructed figure and is confirmed to flag it as unresolved.
 #
 # Apache License

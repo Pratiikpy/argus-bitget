@@ -7,10 +7,11 @@ from typing import Any
 
 import pytest
 
-from argus.desk.odds import directional_odds, wilson
+from argus.desk.odds import directional_odds
 from argus.lui import research
 from argus.lui.research import ResearchKind, _detect, _horizon, pattern_reading_wins
 from argus.market import history, universe
+from argus.risk.calibration import wilson
 
 START = datetime(2025, 1, 3, 16, tzinfo=UTC)  # a Friday
 

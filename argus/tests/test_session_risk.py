@@ -205,8 +205,8 @@ class TestTheConstitutionGate:
     """The wiring: a measured throttle that narrows a real intent, in the live rulebook."""
 
     def _ruling(self, horizon: int, quantity: str = "10000") -> object:
-        from argus.agents.desk import ConstitutionPolicy
         from argus.decision.verdicts import Intent, Side, Verdict
+        from argus.risk.constitution import ConstitutionPolicy
         from argus.risk.hedgeability import HedgeabilitySurface, open_market_candidate
 
         policy = ConstitutionPolicy(session_risk=_profile(), session_horizon_bars=horizon)
@@ -239,7 +239,7 @@ class TestTheConstitutionGate:
         assert ruling.resulting_intent.quantity <= Decimal("10000")  # type: ignore[attr-defined]
 
     def test_an_unmeasured_policy_leaves_the_gate_inert(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         assert ConstitutionPolicy().session_risk is None
 

@@ -1,4 +1,4 @@
-"""Same-input comparison: `argus.agents.grounding.check` vs TradingAgents' real, unmodified
+"""Same-input comparison: `argus.truth.grounding.check` vs TradingAgents' real, unmodified
 `TraderProposal` — the T2 judging criterion "decision explainability" put to a concrete test:
 when a trading decision states a number, does anything check it came from somewhere real?
 
@@ -43,9 +43,9 @@ import time
 from pathlib import Path
 from typing import Any
 
-from argus.agents.grounding import check as grounding_check
 from argus.eval.baselines.tradingagents_trader_loader import load_trader_module
 from argus.market.bitget import fetch_tickers
+from argus.truth.grounding import check as grounding_check
 
 REAL_SYMBOLS: tuple[str, ...] = ("NVDAUSDT", "AAPLUSDT", "MSFTUSDT")
 
@@ -153,7 +153,7 @@ def run_ablation() -> dict[str, Any]:
     """Isolates the exact mechanism `grounding.check` relies on: a figure just inside
     `TOLERANCE` (a model's honest paraphrase, e.g. "189.5" for a computed 189.4991) resolves; the
     same figure moved just past `TOLERANCE` does not, on the same real fact."""
-    from argus.agents.grounding import TOLERANCE
+    from argus.truth.grounding import TOLERANCE
 
     real_value = 189.4991
     facts = {"current_price": real_value}

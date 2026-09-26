@@ -41,8 +41,8 @@ from argus.agents.circuit import (
     call_with_retry,
     trips_per_100,
 )
-from argus.eval.artefact import write
 from argus.eval.perturbations import DATA
+from argus.truth.artefact import write
 
 LEDGER = DATA / "paper_ledger.jsonl"
 OUT_PATH = DATA / "circuit_replay.json"

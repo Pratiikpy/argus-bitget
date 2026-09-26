@@ -37,9 +37,9 @@ from enum import StrEnum
 from typing import Any, TypeVar
 
 from argus.backtest.metrics import MetricError, max_drawdown, sharpe
-from argus.eval.observatory import Prediction, expected_calibration_error
 from argus.eval.performance import PERIODS_PER_YEAR, daily_series
 from argus.paper.ledger import Entry, PaperLedger
+from argus.risk.calibration import Prediction, expected_calibration_error
 
 IN_SAMPLE_FRACTION = 0.7
 MIN_PERIODS_PER_SIDE = 8

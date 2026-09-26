@@ -24,9 +24,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from argus.eval import artefact
 from argus.eval import infeasibilitybench as ib
 from argus.lui import honesty
+from argus.truth import artefact
 
 ROOT = Path(__file__).resolve().parents[3]
 OUT = ROOT / "data" / "honesty_eval.json"

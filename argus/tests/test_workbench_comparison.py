@@ -85,6 +85,7 @@ class TestOpenbbSourceRead:
         assert openbb_read["hits"] == {}
 
 
+@pytest.mark.network
 class TestPointInTimeComparison:
     def test_the_far_past_cutoff_sees_materially_fewer_facts(self, pit: dict) -> None:
         assert pit["far_past_sees_materially_fewer_facts_than_now"]
@@ -94,6 +95,7 @@ class TestPointInTimeComparison:
         assert pit["all_far_past_facts_filed_before_cutoff"]
 
 
+@pytest.mark.network
 class TestFailureCases:
     def test_the_boundary_is_the_acceptance_second(self, failures: dict) -> None:
         assert failures["withheld_an_hour_before_acceptance"]
@@ -117,6 +119,7 @@ class TestFailureCases:
         assert (after - before).total_seconds() == 7200
 
 
+@pytest.mark.network
 class TestCosts:
     def test_the_real_fetch_is_measured_and_positive(self, costs: dict) -> None:
         assert costs["argus_as_of_gated_fetch_seconds_per_call"] > 0
@@ -126,11 +129,13 @@ class TestCosts:
         assert not costs["openbb_agent_keyless"]
 
 
+@pytest.mark.network
 class TestReproducibility:
     def test_repeated_fetches_agree(self, reproducibility: dict) -> None:
         assert reproducibility["identical"]
 
 
+@pytest.mark.network
 class TestMain:
     def test_render_produces_readable_text(
         self, breadth: dict, openbb_read: dict, pit: dict, failures: dict,

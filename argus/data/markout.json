@@ -1,41 +1,41 @@
 {
   "symbol": "MSTRUSDT",
   "phase": "weekend",
-  "started_at": "2026-09-26T15:30:04.249098+00:00",
+  "started_at": "2026-09-26T19:30:06.980455+00:00",
   "window_seconds": 90,
   "samples": 68,
-  "prints_seen": 38,
-  "rpi_share": 0.0526,
+  "prints_seen": 45,
+  "rpi_share": 0.0444,
   "maker_bps": 2.0,
   "markouts": [
     {
       "horizon_seconds": 5,
-      "prints": 37,
-      "median_bps": -0.6246,
-      "mean_bps": -0.1181,
-      "worst_bps": -2.5001
+      "prints": 45,
+      "median_bps": -3.7609,
+      "mean_bps": -2.8415,
+      "worst_bps": -3.7609
     },
     {
       "horizon_seconds": 15,
-      "prints": 33,
-      "median_bps": -1.2492,
-      "mean_bps": -0.8897,
-      "worst_bps": -5.6269
+      "prints": 42,
+      "median_bps": -1.8805,
+      "mean_bps": -1.6715,
+      "worst_bps": -1.8805
     },
     {
       "horizon_seconds": 30,
-      "prints": 17,
-      "median_bps": -0.0,
-      "mean_bps": 0.2205,
-      "worst_bps": -5.6269
+      "prints": 42,
+      "median_bps": -1.8805,
+      "mean_bps": -1.3134,
+      "worst_bps": -1.8805
     },
     {
       "horizon_seconds": 60,
-      "prints": 17,
-      "median_bps": -4.374,
-      "mean_bps": -1.5436,
-      "worst_bps": -7.5026
+      "prints": 40,
+      "median_bps": -0.6268,
+      "mean_bps": -0.5015,
+      "worst_bps": -0.6268
     }
   ],
-  "verdict": "Resting on MSTRUSDT (weekend) cost a median 1.25bps of adverse selection over 15s across 33 print(s), worst 5.63bps. That is inside the 2bps maker fee it would save, so the blanket refusal to credit maker treatment is now costing measurable edge and deserves a number rather than a rule"
+  "verdict": "Resting on MSTRUSDT (weekend) cost a median 0.63bps of adverse selection over 60s across 40 print(s), worst 0.63bps. That is inside the 2bps maker fee it would save, so the blanket refusal to credit maker treatment is now costing measurable edge and deserves a number rather than a rule"
 }

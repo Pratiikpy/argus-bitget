@@ -144,9 +144,14 @@ def relevant(events: list[dict[str, Any]], terms: tuple[str, ...], *,
     return found
 
 
-def markets_for(symbol: str, *, search: Any = _search, now: datetime | None = None,
+def markets_for(symbol: str, *, search: Any = None, now: datetime | None = None,
                 floor: float = VOLUME_FLOOR) -> list[Market]:
-    """The liquid open markets about the name behind a Bitget symbol."""
+    """The liquid open markets about the name behind a Bitget symbol.
+
+    ``search`` defaults to :func:`_search`, looked up when called: as a default argument it was
+    bound when the module loaded, so replacing ``_search`` (the offline test suite does) never
+    reached this function and every research answer still called Polymarket."""
+    search = search or _search
     base = symbol.removesuffix("USDT")
     base = base.removesuffix("STOCK") if base.endswith("STOCK") else base
     terms = SEARCH_TERMS.get(base, (base.lower(),))
@@ -156,7 +161,7 @@ def markets_for(symbol: str, *, search: Any = _search, now: datetime | None = No
     return relevant(events, terms, now=now, floor=floor)
 
 
-def lines_for(symbol: str, *, search: Any = _search, now: datetime | None = None,
+def lines_for(symbol: str, *, search: Any = None, now: datetime | None = None,
               name: str | None = None) -> list[str]:
     """Up to three lines naming what the busiest relevant markets price, or nothing."""
     try:

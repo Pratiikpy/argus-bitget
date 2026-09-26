@@ -301,10 +301,11 @@ def replay(
 
 def scenario_run(index: int) -> Any:  # pragma: no cover - drives the live model
     """One desk pass over the Sleeping-Anchor state, with a fresh uncached client each time."""
-    from argus.agents.desk import ConstitutionPolicy, TradingDesk
+    from argus.agents.desk import TradingDesk
     from argus.cost.model import CostModel
     from argus.demo.flow import sleeping_anchor_frame
     from argus.llm.qwen import QwenClient, Thinking, TokenBudget
+    from argus.risk.constitution import ConstitutionPolicy
     from argus.risk.hedgeability import HedgeabilitySurface
     from argus.truth.clocks import DualClock
 

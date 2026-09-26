@@ -908,7 +908,7 @@ def research_lines(
     grew from. Returns empty lines (and says why in the payload) when no tree can be grown, so the
     one-pass answer stands alone rather than failing.
     """
-    from argus.lui.answer import Source
+    from argus.truth.source import Source
 
     stated = shock_pct if shock_pct not in (None, 0) else -10.0
     try:

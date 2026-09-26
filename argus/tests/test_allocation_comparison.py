@@ -80,6 +80,7 @@ def sweep(columns: dict[str, list[float]]) -> dict[str, Any]:
     return run_rebalance_sweep(columns)
 
 
+@pytest.mark.network
 class TestTheBaselinesActuallyRan:
     """The failure this module exists to correct was a baseline that was cloned and never run.
     A comparison that silently degrades to "the library would not import, so ARGUS wins by
@@ -118,6 +119,7 @@ class TestTheBaselinesActuallyRan:
         assert min(after.values()) >= -1e-6
 
 
+@pytest.mark.network
 class TestParity:
     def test_both_sides_see_the_same_covariance(self, parity: dict[str, Any]) -> None:
         # Not a formality: if the two libraries disagreed about the covariance, every weight
@@ -143,6 +145,7 @@ class TestParity:
         assert sum(weights.values()) == pytest.approx(1.0, abs=1e-5)
 
 
+@pytest.mark.network
 class TestOutOfSampleVariance:
     def test_the_walk_forward_produced_several_held_out_windows(
         self, oos: dict[str, Any]
@@ -224,6 +227,7 @@ class TestOutOfSampleVariance:
         assert set(oos["baselines_significant_after_holm"]) <= set(tested)
 
 
+@pytest.mark.network
 class TestConvexRebalance:
     def test_every_sharpe_in_the_band_was_solved(self, convex: dict[str, Any]) -> None:
         assert len(convex["rows"]) == len(SHARPE_BAND)
@@ -257,6 +261,7 @@ class TestConvexRebalance:
         assert convex["argus_vol_after_bps"] < convex["argus_vol_before_bps"]
 
 
+@pytest.mark.network
 class TestSharpeSensitivity:
     def test_the_whole_band_is_reported(self, band: dict[str, Any]) -> None:
         assert [r["assumed_sharpe_annual"] for r in band["rows"]] == list(SHARPE_BAND)
@@ -278,6 +283,7 @@ class TestSharpeSensitivity:
         assert band["flip_check"]["worth_doing_just_above_flip"] is True
 
 
+@pytest.mark.network
 class TestRebalanceSweep:
     def test_the_sweep_covers_books_and_dates(self, sweep: dict[str, Any]) -> None:
         assert sweep["n_origins"] >= 4
@@ -305,6 +311,7 @@ class TestRebalanceSweep:
         assert sweep["docstring_claim_holds"] == (share > 0.5)
 
 
+@pytest.mark.network
 class TestSupportingEvidence:
     def test_degenerate_inputs_are_refused_rather_than_answered(
         self, columns: dict[str, list[float]]
@@ -334,6 +341,7 @@ class TestSupportingEvidence:
         assert run_reproducibility_check(columns)["identical"] is True
 
 
+@pytest.mark.network
 class TestAdversarialCovariance:
     """Near-singular covariance vs ARGUS's real `nco_weights` and Riskfolio's real NCO -- the
     adversarial input `TestSupportingEvidence` above never reaches, because HRP (what those tests
@@ -405,6 +413,7 @@ class TestAdversarialCovariance:
 
 
 class TestReport:
+    @pytest.mark.network
     def test_render_names_every_section_and_both_baselines(
         self, parity: dict[str, Any], oos: dict[str, Any], convex: dict[str, Any],
         band: dict[str, Any], sweep: dict[str, Any],
@@ -419,6 +428,7 @@ class TestReport:
         ):
             assert fragment in text
 
+    @pytest.mark.network
     def test_render_survives_a_report_without_the_dense_run(
         self, parity: dict[str, Any], oos: dict[str, Any], convex: dict[str, Any],
         band: dict[str, Any], sweep: dict[str, Any],
@@ -491,6 +501,7 @@ class TestHelpers:
 
         assert _implied_risk_aversion(0.002, 0.002, 1.0) == float("inf")
 
+    @pytest.mark.network
     def test_hrp_on_the_live_covariance_is_a_valid_allocation(
         self, columns: dict[str, list[float]]
     ) -> None:

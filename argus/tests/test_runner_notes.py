@@ -23,9 +23,9 @@ import pytest
 from argus.agents.analysts import AnalystView
 from argus.agents.claims import check as check_claims
 from argus.agents.conflict import report as conflict_report
-from argus.agents.grounding import check as check_grounding
 from argus.paper import runner
 from argus.paper.runner import _is_flag, _write_notes
+from argus.truth.grounding import check as check_grounding
 
 AT = datetime(2026, 9, 12, 18, 0, tzinfo=UTC)
 

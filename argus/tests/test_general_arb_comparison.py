@@ -18,7 +18,6 @@ import pytest
 
 from argus.eval import general_arb_comparison as module
 from argus.eval.arbitrage_comparison import run_swept_cases
-from argus.eval.artefact import SCRATCH_DIR
 from argus.eval.general_arb_comparison import (
     ARTEFACT_PATH,
     BOOKS_PATH,
@@ -33,6 +32,7 @@ from argus.eval.general_arb_comparison import (
 )
 from argus.market.depth import Level, OrderBook
 from argus.research.executable_arb import leg_optimum
+from argus.truth.artefact import SCRATCH_DIR
 
 
 @pytest.fixture(scope="module")

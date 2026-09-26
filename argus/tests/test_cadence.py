@@ -132,6 +132,7 @@ class TestCoverageIsMeasured:
         assert "frozen" not in got["verdict"]
 
 
+@pytest.mark.network
 class TestTheBatchIsWellFormed:
     def test_every_claim_would_pass_registration(self) -> None:
         batch = build_cadence_batch(now=NOW, symbols=("NVDAUSDT",), index=0)

@@ -60,9 +60,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from argus.eval.artefact import write
 from argus.eval.obliquebench import FRESH, HELDOUT, TUNED, Case
-from argus.lui.semantic import ABSTAIN_THRESHOLD, SemanticRouter, available
+from argus.llm.semantic import ABSTAIN_THRESHOLD, SemanticRouter, available
+from argus.truth.artefact import write
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "lui_router.json"
 

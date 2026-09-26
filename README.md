@@ -158,7 +158,7 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 9,255 tests collected
+pytest -q                       # 9,379 tests collected
 ```
 
 Nothing above needs a credential. The full run took 1h16m from a fresh GitHub clone on
@@ -180,8 +180,8 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **9,255 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 476 source files** |
+| Tests | **9,379 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 482 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes**, resolved by import at runtime, not claimed in prose |
@@ -203,9 +203,9 @@ a test that reaches the network shows itself.
 
 - **ARGUS's own paper desk has no settled trades.** Every decision on its ledger is a refusal, so
   its Sharpe, drawdown and win rate are undefined and printed as such. Each refusal carried a
-  direction, hashed before the outcome existed: at about two hours, **206 of 347 directional calls
+  direction, hashed before the outcome existed: at about two hours, **224 of 380 directional calls
   were right**, which barely clears a coin flip and does not beat calling "up" every time. The
-  median refusal **forgave -4.5bps of net edge** after the 12bps round trip — the trades it passed
+  median refusal **forgave -6.9bps of net edge** after the 12bps round trip — the trades it passed
   on were mostly unprofitable. This workbench does not trade; trading is the separate Track 2
   project's job.
 - **No certified alpha.** 0 of 8 factors and 0 of 12 strategies cleared the deflation gate.

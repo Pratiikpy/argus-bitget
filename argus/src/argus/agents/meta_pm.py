@@ -104,9 +104,6 @@ from decimal import Decimal
 from typing import Any
 
 from argus.agents import rubric as rubric_mod
-from argus.agents.grounding import GroundingReport
-from argus.agents.grounding import check as check_grounding
-from argus.agents.grounding import extract as extract_figures
 from argus.decision.verdicts import (
     ConstitutionRuling,
     Intent,
@@ -119,6 +116,9 @@ from argus.llm.idmap import IdMap
 from argus.llm.qwen import Thinking
 from argus.proof.autonomy import AutonomyProof, hash_state
 from argus.truth.clocks import SessionPhase, SessionState
+from argus.truth.grounding import GroundingReport
+from argus.truth.grounding import check as check_grounding
+from argus.truth.grounding import extract as extract_figures
 
 # Measured Qwen wall-clock at each thinking budget, from our own bake-off. These are the numbers
 # `deliberation_cost_bps` charges against; they are stated here rather than buried so a change in
@@ -314,7 +314,7 @@ class MarketFrame:
     *personalised thesis*, which is what this track scores. A constraint applied afterwards is
     invisible in the sentence a judge reads.
 
-    It stays a constraint, not a suggestion: `agents/mandate.py` still enforces every limit in code
+    It stays a constraint, not a suggestion: `desk/mandate.py` still enforces every limit in code
     after the fact, so a model that ignores this block is still bound. Telling it first means the
     reasoning is about the right question; checking it after means the answer is still correct."""
 
@@ -481,7 +481,7 @@ def given_values_with_units(
     """:func:`given_values`, plus the unit each evidence value was written in, in the same order.
 
     The units only decide which values a near miss may be measured against
-    (`agents/grounding.py`, ``NEAR_MISS_UNITS``); resolution never reads them.
+    (`truth/grounding.py`, ``NEAR_MISS_UNITS``); resolution never reads them.
     """
     facts: dict[str, float] = {
         "round_trip_bps": float(frame.round_trip_bps),
@@ -579,7 +579,7 @@ def check_response(response: dict[str, Any], frame: MarketFrame) -> ThesisCheck:
     * ``side_contradicts_lean`` — the answer opens exposure on one side while its own lean points
       the other way: two fields of one answer asserting opposite directions.
     * ``ungrounded_figure`` — a number in the thesis resolves to nothing the model was given
-      (:func:`given_values`, checked by `agents/grounding.py` at its own 2% tolerance).
+      (:func:`given_values`, checked by `truth/grounding.py` at its own 2% tolerance).
     * ``no_counter_case`` — the prompt requires the strongest argument against the decision, and
       this answer gave none.
 

@@ -678,7 +678,7 @@ def assess(
 # Departures, each deliberate:
 #
 # * **The gate is relative, not 0.25.** STORM's constant is calibrated to its own dense sentence
-#   encoder. The encoder here is the repository's static `potion-base-8M` table (`lui/semantic.py`),
+#   encoder. The encoder here is the repository's static `potion-base-8M` table (`llm/semantic.py`),
 #   whose cosines between clearly related financial sentences measured 0.14-0.25 on 2026-09-25, so
 #   0.25 would gate out nearly everything. An unused item passes when it is at least as close to the
 #   claim as the least-close item the thesis *did* rely on — "as on-topic as something you used" —
@@ -689,7 +689,7 @@ def assess(
 #   and an item close to those has been answered, if implicitly.
 # * **"Cited" is established, not declared.** A desk thesis carries no citation markers, so an item
 #   counts as cited when the thesis names its evidence id or when a figure in the thesis resolves to
-#   a figure that item carried (`agents/grounding.py`, the same resolver the desk uses).
+#   a figure that item carried (`truth/grounding.py`, the same resolver the desk uses).
 # * **The question is templated, not generated.** STORM spends an LLM call to phrase it. The item is
 #   the finding; the phrasing adds a call and a chance to misstate the item.
 #
@@ -745,7 +745,7 @@ def default_encoder() -> tuple[Encoder, str]:
     Returns the encoder and its name, so a report can say which one produced its ranking.
     """
     try:
-        from argus.lui.semantic import MODEL_ID, _load, available
+        from argus.llm.semantic import MODEL_ID, _load, available
 
         if available():
             model = _load(MODEL_ID)
@@ -778,7 +778,7 @@ def split_evidence_line(line: str, *, index: int = 0) -> tuple[str, str]:
 
 def cited_evidence(thesis: str, evidence: Sequence[tuple[str, str]]) -> set[str]:
     """Ids of the evidence items a thesis relied on: named by id, or quoted by figure."""
-    from argus.agents.grounding import check, extract
+    from argus.truth.grounding import check, extract
 
     named = {eid for eid, _ in evidence if eid and eid in thesis}
     values = [(eid, f.value) for eid, text in evidence for f in extract(text)]

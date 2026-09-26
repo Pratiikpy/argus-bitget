@@ -49,13 +49,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from argus.eval import artefact
 from argus.market.statement_facts import (
     CompanyFactsSource,
     ConceptSource,
     FaceStatementSource,
 )
 from argus.research.filing_qa import CompanyResolver, FilingQA
+from argus.truth import artefact
 
 PACKAGE = Path(__file__).resolve().parents[3]
 ROOT = PACKAGE.parent

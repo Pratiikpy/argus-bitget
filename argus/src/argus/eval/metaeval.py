@@ -319,7 +319,7 @@ def run(labels_dir: Path = LABELS) -> dict[str, Any]:
 
 
 def main() -> int:  # pragma: no cover - CLI
-    from argus.eval import artefact
+    from argus.truth import artefact
 
     write_labels(router_labels_from_bench(), LABELS / "lui_router.jsonl")
     report = run()

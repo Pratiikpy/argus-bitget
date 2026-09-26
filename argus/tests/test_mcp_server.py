@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -49,7 +50,8 @@ def test_every_tool_has_a_schema() -> None:
     tools = _rpc("tools/list")["result"]["tools"]
     assert {t["name"] for t in tools} == {
         "argus_ask", "argus_quote", "argus_portfolio_impact", "argus_stress",
-        "argus_execution_plan", "argus_scoreboard"}
+        "argus_execution_plan", "argus_scoreboard", "argus_research_task", "argus_week_ahead",
+        "argus_exposures", "argus_review_trades"}
     for tool in tools:
         assert tool["inputSchema"]["type"] == "object" and tool["description"]
 
@@ -210,3 +212,82 @@ def test_argus_ask_carries_memory_and_the_labelled_lines(
     assert text.startswith("[assumed] Assumed: 20%.\nData: Bitget.")
     assert "Memory (pass back as `memory` next time): [\"loss limit 5%\"]" in text
     assert seen["memory"] == '["loss limit 5%"]' and seen["visitor"] == "mcp"
+
+
+class TestTheNewestEnginesAreReachable:
+    """Audit, 2026-09-26: the research task, the week ahead, exposures and trade review had no MCP
+    tool. Each is called here with its engine replaced, so what is pinned is the dispatch and the
+    text a client receives, not the market that day."""
+
+    def test_the_research_task_returns_the_reading_the_verdict_and_every_step(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui import task
+
+        def run(question: str, request: Any, ledger: Any = None) -> Any:
+            kind = request.kind.value
+            return SimpleNamespace(lines=[f"{kind} reading", f"Actionable: act on {kind}"],
+                                   refused=False, data={})
+
+        monkeypatch.setattr(task, "run", run)
+        monkeypatch.setattr(task, "_price_path", lambda symbol: [])
+        from argus.lui import exposures
+        monkeypatch.setattr(exposures, "exposures_answer",
+                            lambda before, after: (["exposure reading"], [], {}))
+        text, error = mcp.call_tool("argus_research_task", {
+            "question": "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?"})
+        assert not error
+        assert text.startswith("Read as: add 15% TSLA to 40% NVDA / 30% MSFT / 30% AAPL")
+        assert "What to do, engine by engine:" in text
+        assert text.count("\n\n") >= 8  # one block per step
+
+    def test_a_question_the_task_cannot_read_says_why(self) -> None:
+        text, error = mcp.call_tool("argus_research_task", {"question": "hello"})
+        assert error and text
+
+    def test_the_week_ahead_passes_the_book_and_the_window(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui import watchlist
+        from argus.truth.source import Source
+
+        seen: dict[str, Any] = {}
+
+        def fake(question: str, book_text: str = "", **kwargs: Any) -> Any:
+            seen.update(book=book_text, days=kwargs.get("days"))
+            return ["Actionable: CPI on Tuesday"], [Source("evidence", "bls.gov")], {}
+
+        monkeypatch.setattr(watchlist, "watchlist", fake)
+        text, error = mcp.call_tool("argus_week_ahead", {"book": "50% NVDA, 50% BTC", "days": 5})
+        assert not error and "CPI on Tuesday" in text and "bls.gov" in text
+        assert seen == {"book": "50% NVDA, 50% BTC", "days": 5}
+        with pytest.raises(mcp.ToolError, match="days"):
+            mcp.call_tool("argus_week_ahead", {"days": 40})
+
+    def test_exposures_need_a_book(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui import exposures
+
+        asked: list[str] = []
+
+        def fake(raw_text: str, book_text: str = "", **kwargs: Any) -> Any:
+            asked.append(raw_text)
+            return SimpleNamespace(lines=["Actionable: tech is 80% of the book"], sources=[],
+                                   refused=False)
+
+        monkeypatch.setattr(exposures, "answer", fake)
+        text, _ = mcp.call_tool("argus_exposures",
+                                {"book": "80% NVDA, 20% AAPL", "add": "TSLA 10%"})
+        assert "tech is 80%" in text and asked == [
+            "what are my sector and factor exposures if I add TSLA 10%"]
+        with pytest.raises(mcp.ToolError, match="book is required"):
+            mcp.call_tool("argus_exposures", {})
+
+    def test_trade_review_refuses_text_with_no_trades_in_it(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui import journal
+
+        monkeypatch.setattr(journal, "review_trades", lambda text, **k: None)
+        with pytest.raises(mcp.ToolError, match="no trades could be read"):
+            mcp.call_tool("argus_review_trades", {"fills": "just some words"})
+        monkeypatch.setattr(journal, "review_trades",
+                            lambda text, **k: (["2 trades reviewed"], [], {}))
+        text, error = mcp.call_tool("argus_review_trades", {"fills": "2026-09-02,NVDA,buy,10,180"})
+        assert not error and text == "2 trades reviewed"

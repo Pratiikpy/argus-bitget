@@ -278,8 +278,8 @@ class TestAResizedOrderIsStillCheckedByEveryOtherGate:
 
     @staticmethod
     def _policy_in_deep_drawdown() -> object:
-        from argus.agents.desk import ConstitutionPolicy
         from argus.risk.circuit import BookState
+        from argus.risk.constitution import ConstitutionPolicy
 
         return ConstitutionPolicy(
             # A unit price, so quantity and notional coincide and the dollar-denominated gates
@@ -341,7 +341,7 @@ class TestAResizedOrderIsStillCheckedByEveryOtherGate:
 
     def test_an_order_under_every_ceiling_is_still_allowed(self) -> None:
         """The fix must not turn a healthy desk into one that refuses everything."""
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._weekend_no_hedge()
         ruling = ConstitutionPolicy().rule(_intent("1000"), session=session, hedges=hedges)
@@ -353,8 +353,9 @@ class TestHedgeIntegrity:
     """"Smaller quantity is not safer" in its sharpest form — reducing a hedge leg while its
     partner stays open can raise portfolio risk even though every other gate reads it as strictly
     safer. `Verdict.REDUCE` plus `intent.side` disambiguate which position is being reduced (a
-    SELL reduces a LONG, a BUY reduces a SHORT) with no change to `Intent` — see `agents/desk.py`'s
-    gate comment for why that mapping is a Constitution-level fact, not the venue's `tradeSide`."""
+    SELL reduces a LONG, a BUY reduces a SHORT) with no change to `Intent` — see
+    `risk/constitution.py`'s gate comment for why that mapping is a Constitution-level fact, not
+    the venue's `tradeSide`."""
 
     @staticmethod
     def _fresh_session_and_available_hedges() -> tuple[object, object]:
@@ -386,7 +387,8 @@ class TestHedgeIntegrity:
     def _book_with_open_hedge_pair() -> object:
         from datetime import UTC, datetime
 
-        from argus.desk.book import Book, HedgeLink, Lot, PositionSide
+        from argus.decision.verdicts import PositionSide
+        from argus.desk.book import Book, HedgeLink, Lot
 
         book = Book()
         book.apply_fill(
@@ -408,7 +410,7 @@ class TestHedgeIntegrity:
         return book
 
     def test_fires_when_reducing_a_hedge_linked_open_position(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(book=self._book_with_open_hedge_pair())
@@ -417,14 +419,14 @@ class TestHedgeIntegrity:
         assert ruling.resulting_intent.quantity == Decimal("0")
 
     def test_does_not_fire_without_a_book(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         ruling = ConstitutionPolicy().rule(self._reduce_intent(), session=session, hedges=hedges)
         assert ruling.binding_constraint != "hedge_integrity"
 
     def test_does_not_fire_for_an_opening_verdict_on_the_same_symbol(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(book=self._book_with_open_hedge_pair())
@@ -436,8 +438,9 @@ class TestHedgeIntegrity:
         assert ruling.binding_constraint != "hedge_integrity"
 
     def test_does_not_fire_once_the_hedge_partner_is_closed(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
-        from argus.desk.book import Lot, PositionSide
+        from argus.decision.verdicts import PositionSide
+        from argus.desk.book import Lot
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         book = self._book_with_open_hedge_pair()
@@ -455,8 +458,9 @@ class TestHedgeIntegrity:
     def test_does_not_fire_with_no_hedge_link_recorded(self) -> None:
         from datetime import UTC, datetime
 
-        from argus.agents.desk import ConstitutionPolicy
-        from argus.desk.book import Book, Lot, PositionSide
+        from argus.decision.verdicts import PositionSide
+        from argus.desk.book import Book, Lot
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         book = Book()
@@ -472,7 +476,7 @@ class TestHedgeIntegrity:
 
     def test_reducing_the_unlinked_side_is_unaffected(self) -> None:
         """A BUY on NVDAUSDT would reduce a SHORT there, not the hedge-linked LONG."""
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(book=self._book_with_open_hedge_pair())
@@ -483,7 +487,7 @@ class TestHedgeIntegrity:
 
 
 class TestMarginUsage:
-    """A binary block, not a headroom — see `agents/desk.py`'s gate comment for why a partial
+    """A binary block, not a headroom — see `risk/constitution.py`'s gate comment for why a partial
     number cannot honestly be computed against Bitget's proprietary cross-margin engine."""
 
     @staticmethod
@@ -527,7 +531,7 @@ class TestMarginUsage:
         return book
 
     def test_fires_at_the_policy_cap(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(book=self._book_with_margin("0.5"))
@@ -536,7 +540,7 @@ class TestMarginUsage:
         assert ruling.resulting_intent.quantity == Decimal("0")
 
     def test_fires_above_the_policy_cap(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(book=self._book_with_margin("0.9"))
@@ -544,7 +548,7 @@ class TestMarginUsage:
         assert ruling.binding_constraint == "margin_usage"
 
     def test_does_not_fire_below_the_policy_cap(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(book=self._book_with_margin("0.1"))
@@ -554,8 +558,8 @@ class TestMarginUsage:
     def test_does_not_fire_without_a_margin_snapshot(self) -> None:
         """A book that exists but has never fetched a margin snapshot must not read as zero
         usage — `None` means unmeasured, not safe."""
-        from argus.agents.desk import ConstitutionPolicy
         from argus.desk.book import Book
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(book=Book())
@@ -563,7 +567,7 @@ class TestMarginUsage:
         assert ruling.binding_constraint != "margin_usage"
 
     def test_does_not_fire_without_a_book(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         ruling = ConstitutionPolicy().rule(self._open_intent(), session=session, hedges=hedges)
@@ -601,8 +605,8 @@ class TestFactorExposure:
         )
 
     def test_fires_when_a_named_factor_is_at_or_above_its_cap(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
         from argus.desk.portfolio import FactorExposure
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(
@@ -614,8 +618,8 @@ class TestFactorExposure:
         assert ruling.resulting_intent.quantity == Decimal("0")
 
     def test_negative_exposure_is_checked_by_magnitude(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
         from argus.desk.portfolio import FactorExposure
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(
@@ -626,8 +630,8 @@ class TestFactorExposure:
         assert ruling.binding_constraint == "factor_exposure"
 
     def test_does_not_fire_below_the_cap(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
         from argus.desk.portfolio import FactorExposure
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(
@@ -638,8 +642,8 @@ class TestFactorExposure:
         assert ruling.binding_constraint != "factor_exposure"
 
     def test_a_factor_with_no_configured_limit_is_uncapped_not_zero_capped(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
         from argus.desk.portfolio import FactorExposure
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(
@@ -650,7 +654,7 @@ class TestFactorExposure:
         assert ruling.binding_constraint != "factor_exposure"
 
     def test_does_not_fire_without_precomputed_exposures(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         ruling = ConstitutionPolicy().rule(self._open_intent(), session=session, hedges=hedges)
@@ -687,8 +691,8 @@ class TestScenarioLoss:
         )
 
     def test_fires_when_the_worst_shock_is_past_the_floor(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
         from argus.desk.portfolio import StressOutcome
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(
@@ -703,8 +707,8 @@ class TestScenarioLoss:
         assert ruling.resulting_intent.quantity == Decimal("0")
 
     def test_does_not_fire_when_every_shock_is_inside_the_floor(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
         from argus.desk.portfolio import StressOutcome
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(
@@ -717,8 +721,8 @@ class TestScenarioLoss:
         assert ruling.binding_constraint != "scenario_loss"
 
     def test_unavailable_shocks_are_excluded_not_treated_as_zero(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
         from argus.desk.portfolio import StressOutcome
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(
@@ -732,8 +736,8 @@ class TestScenarioLoss:
         assert ruling.binding_constraint != "scenario_loss"
 
     def test_does_not_fire_without_a_configured_floor(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
         from argus.desk.portfolio import StressOutcome
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(
@@ -787,7 +791,7 @@ class TestLiquidationCost:
         )
 
     def test_fires_at_or_above_the_cap(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(
@@ -799,7 +803,7 @@ class TestLiquidationCost:
         assert ruling.resulting_intent.quantity == Decimal("0")
 
     def test_the_worst_symbol_across_the_book_is_the_one_that_binds(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(
@@ -812,7 +816,7 @@ class TestLiquidationCost:
         assert ruling.binding_constraint == "liquidation_cost"
 
     def test_does_not_fire_below_the_cap(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(
@@ -823,7 +827,7 @@ class TestLiquidationCost:
         assert ruling.binding_constraint != "liquidation_cost"
 
     def test_does_not_fire_without_a_configured_cap(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(
@@ -833,7 +837,7 @@ class TestLiquidationCost:
         assert ruling.binding_constraint != "liquidation_cost"
 
     def test_does_not_fire_without_estimates(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(max_liquidation_cost_bps=Decimal("500"))
@@ -841,7 +845,7 @@ class TestLiquidationCost:
         assert ruling.binding_constraint != "liquidation_cost"
 
     def test_an_empty_estimates_mapping_does_not_fire(self) -> None:
-        from argus.agents.desk import ConstitutionPolicy
+        from argus.risk.constitution import ConstitutionPolicy
 
         session, hedges = self._fresh_session_and_available_hedges()
         policy = ConstitutionPolicy(

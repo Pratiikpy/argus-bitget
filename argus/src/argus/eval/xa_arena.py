@@ -68,8 +68,8 @@ from argus.desk.crossasset import (
     route,
     settlements_between,
 )
-from argus.eval import artefact
 from argus.eval.xa_tape import HOUR_MS, Tape, load, tape_digest
+from argus.truth import artefact
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "xa_arena.json"
 RUNNER_DIR = Path(__file__).resolve().parent / "baselines" / "xa_rivals"

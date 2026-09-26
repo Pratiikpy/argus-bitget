@@ -64,7 +64,12 @@ def main() -> int:
         _, factors = ex.factor_returns(sub)
         y = [closes[b] / closes[a] - 1.0 for a, b in itertools.pairwise(days)]
         fitted = ex.ols(y, [factors[k] for k in ex.FACTORS])
-        assert fitted is not None
+        if fitted is None:
+            # Too few shared days to fit four factors: recorded for this symbol, as a missing
+            # series is, instead of an assertion ending the whole report (tests, 2026-09-27).
+            results[symbol] = {"error": f"{len(y)} daily returns, too few to fit "
+                                        f"{len(ex.FACTORS)} factors"}
+            continue
         coef, ses, r2 = fitted
         x = pd.DataFrame({k: factors[k] for k in ex.FACTORS})
         frame = pd.DataFrame({symbol: y})

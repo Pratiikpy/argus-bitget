@@ -13,9 +13,9 @@ import pytest
 
 from argus.decision.verdicts import Verdict
 from argus.eval import risk_certify, risk_shadow
-from argus.execution import guard
+from argus.execution import guard, modes
 from argus.risk import certify as c
-from argus.risk import circuit, modes
+from argus.risk import circuit
 
 CERTIFY_SOURCE = Path(c.__file__)
 PRE_S20 = risk_shadow.BASELINES / "guard_2026-09-25_pre_s20.py.txt"

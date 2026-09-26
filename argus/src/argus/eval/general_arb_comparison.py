@@ -66,12 +66,12 @@ from pathlib import Path
 from typing import Any
 
 from argus.eval.arbitrage_comparison import _depths_for_spread_bps, real_basis
-from argus.eval.artefact import write as write_artefact
 from argus.eval.baselines.maxme_arbitrer_loader import load_arbitrer_module
 from argus.market.depth import DepthError, Level, OrderBook
 from argus.market.history import BasisPoint
 from argus.research.arbitrage_study import ROUND_TRIP_BPS, Decomposition, decompose
 from argus.research.executable_arb import best_arbitrage, leg_optimum
+from argus.truth.artefact import write as write_artefact
 from argus.truth.clocks import DualClock
 
 DATA = Path(__file__).resolve().parents[3] / "data"

@@ -2459,7 +2459,7 @@ REGISTER: tuple[Capability, ...] = (
         name="Refusal-first earnings surprise ranking vs. a silently-exploding factor",
         subtheme="t2-earnings",
         module=(
-            "argus/research/sue.py,argus/eval/earnings_comparison.py,"
+            "argus/market/sue.py,argus/eval/earnings_comparison.py,"
             "argus/eval/baselines/quantconnect_sue.py,"
             "argus/eval/baselines/quantconnect_sue_loader.py,"
             "argus/market/fundamentals.py,"
@@ -2490,7 +2490,7 @@ REGISTER: tuple[Capability, ...] = (
                     "variance tolerance (float-noise-safe, not a bare equality check) that "
                     "refuses instead of returning inf/nan"
                 ),
-                artefact="src/argus/research/sue.py",
+                artefact="src/argus/market/sue.py",
             ),
             Proof(
                 condition="baseline_reproduced",
@@ -2642,7 +2642,7 @@ REGISTER: tuple[Capability, ...] = (
             "argus/research/gap_study.py,argus/eval/afterhours_comparison.py,"
             "argus/eval/baselines/quantconnect_preholiday_decision.py,"
             "argus/eval/baselines/quantconnect_preholiday_loader.py,"
-            "argus/eval/baselines/lean_market_holidays_usa.json,"
+            "argus/truth/data/us_equity_holidays.json,"
             "argus/eval/baselines/lean_market_holidays_loader.py"
         ),
         # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
@@ -3032,7 +3032,7 @@ REGISTER: tuple[Capability, ...] = (
         name="Per-profile mandate that changes the verdict",
         subtheme="t3-personalisation",
         module=(
-            "argus/agents/mandate.py,argus/desk/workbench.py,argus/desk/personalisation.py,"
+            "argus/desk/mandate.py,argus/desk/workbench.py,argus/desk/personalisation.py,"
             "argus/agents/desk.py,argus/agents/meta_pm.py,argus/eval/mandate_comparison.py,"
             "argus/eval/baselines/loader.py,argus/eval/baselines/vibe_trading_enforcement.py,"
             "argus/eval/baselines/vibe_trading_mandate_model.py"
@@ -3226,8 +3226,9 @@ REGISTER: tuple[Capability, ...] = (
                     "check_mandate() structurally cannot represent 5 of ARGUS's 6 dimensions. "
                     "NOT claimed: that Mandate is a complete risk gate — vibe-trading's "
                     "leverage/exposure/daily-count checks have no Mandate equivalent BY DESIGN "
-                    "(agents.desk.ConstitutionPolicy's job — class at agents/desk.py:753, its "
-                    "rule() gate logic at agents/desk.py:958, both confirmed before this claim "
+                    "(risk.constitution.ConstitutionPolicy's job — class in "
+                    "risk/constitution.py, its rule() gate logic in the same file, both confirmed "
+                    "before this claim "
                     "was written — a separate already-registered capability), "
                     "not an unaddressed gap. Also excluded from this claim: the CFA IPS "
                     "standard, which the register's own baseline field already scopes this "
@@ -3451,7 +3452,7 @@ REGISTER: tuple[Capability, ...] = (
         module=(
             "argus/eval/riskproof.py,argus/eval/freqtrade_baseline.py,"
             "argus/eval/risk_layer_comparison.py,argus/eval/gate_ablation.py,"
-            "argus/agents/desk.py,argus/desk/book.py,argus/risk/circuit.py"
+            "argus/risk/constitution.py,argus/desk/book.py,argus/risk/circuit.py"
         ),
         # Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts instead
         # of checking that files existed: failure_cases_documented was claimed here and the
@@ -5507,7 +5508,7 @@ REGISTER: tuple[Capability, ...] = (
         name="Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal",
         subtheme="t2-explainability",
         module=(
-            "argus/agents/grounding.py,argus/eval/explainability_comparison.py,"
+            "argus/truth/grounding.py,argus/eval/explainability_comparison.py,"
             "argus/eval/baselines/tradingagents_trader.py,"
             "argus/eval/baselines/tradingagents_trader_loader.py"
         ),
@@ -5539,7 +5540,7 @@ REGISTER: tuple[Capability, ...] = (
                     "in a thesis against the facts the desk actually had, already existing and "
                     "already tested (test_grounding.py), reused here rather than reimplemented"
                 ),
-                artefact="src/argus/agents/grounding.py",
+                artefact="src/argus/truth/grounding.py",
             ),
             Proof(
                 condition="baseline_reproduced",

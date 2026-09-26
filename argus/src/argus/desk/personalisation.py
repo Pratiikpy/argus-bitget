@@ -5,7 +5,7 @@
     The proof that personalisation is real is that two profiles get **different verdicts on
     identical market state**.
 
-Nothing demonstrated it. The profile was a dataclass with two presets, `argus.agents.mandate` built
+Nothing demonstrated it. The profile was a dataclass with two presets, `argus.desk.mandate` built
 limits from it, and neither was wired into the desk's decision path — so "personalised thesis", a
 named Track 3 judging criterion, rested on an assertion in a comment.
 
@@ -32,9 +32,9 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-from argus.agents.mandate import HORIZON_SLACK, Mandate
+from argus.desk.mandate import HORIZON_SLACK, Mandate
 from argus.desk.workbench import TraderProfile
-from argus.eval.artefact import write
+from argus.truth.artefact import write
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "personalisation.json"
 """Where the demonstration lands. See :func:`main` for why it exists at all."""
@@ -107,13 +107,13 @@ def judge(profile: TraderProfile, proposal: Proposal, *, book: Any = None) -> Ve
     The order of the checks is the order of severity, and it matters. A horizon breach is a
     **refusal** rather than a resize: a thesis that needs a month to play out does not become
     suitable for a two-day trader by halving the size, it becomes a smaller bet on the wrong
-    horizon. `argus.agents.mandate` states the same thing — "this is a different trader's trade,
+    horizon. `argus.desk.mandate` states the same thing — "this is a different trader's trade,
     not a smaller version of this one" — and this is where it binds.
 
     ``book`` (:class:`argus.desk.book.Book`, or ``None``) is new 2026-09-15, the day Foundation 3
     (a real portfolio) shipped. **`TraderProfile.max_concurrent_positions`'s own docstring has said
     "a cap the book must respect" since before any book existed to respect it** — and
-    `agents.mandate.Mandate.out_of_mandate` has accepted an `open_positions` count from the start,
+    `desk.mandate.Mandate.out_of_mandate` has accepted an `open_positions` count from the start,
     correctly, but nothing in this proof-of-personalisation path ever supplied one, so the cap was
     declared, documented and never once enforced here. Same class of defect this module already
     found and fixed once for `excluded_symbols` (`eval/standing.py`'s register entry for this

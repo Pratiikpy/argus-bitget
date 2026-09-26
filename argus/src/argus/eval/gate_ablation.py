@@ -43,93 +43,20 @@ a decision this desk would have taken had that one protection not been there.
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
-from argus.agents.desk import ConstitutionPolicy
 from argus.decision.verdicts import ConstitutionRuling, Intent
-from argus.desk.book import Book
 from argus.eval.ablation import Change, DeterministicResult, deterministic
+from argus.risk.constitution import (
+    DIMENSIONS,
+    ConstitutionPolicy,
+    ablated_variants,
+)
 from argus.risk.hedgeability import HedgeabilitySurface
 from argus.truth.clocks import SessionState
-
-DIMENSIONS: tuple[str, ...] = (
-    "order_size",
-    "gross_exposure",
-    "signed_exposure",
-    "hedge_integrity",
-    "margin_usage",
-    "factor_exposure",
-    "scenario_loss",
-    "liquidation_cost",
-    "per_symbol_underperformance",
-)
-"""Foundation 5's eight safety dimensions, plus the ninth (`per_symbol_underperformance`, added
-2026-09-15 alongside `desk.book.Book.symbol_realized_pnl_since`) — the ARGUS-native counterpart to
-freqtrade's ``LowProfitPairs`` — in the order named in the product plan / added to the chain."""
-
-_HUGE = Decimal("1e30")
-"""Effectively-infinite ceiling for ablating a notional/ratio cap. Not ``Decimal("Infinity")``:
-some downstream arithmetic (``f"{x:.1f}"`` formatting in the gate's own reason strings) raises on
-a literal infinity, and a cap ten orders of magnitude above anything `QUANTITIES` sweeps is
-functionally unreachable without that fragility."""
-
-
-def _book_without_hedge_links(book: Any) -> Any:
-    """A copy of ``book`` with every :class:`~argus.desk.book.HedgeLink` removed, everything else
-    (positions, balances, reservations, the margin snapshot) identical.
-
-    `Book` is not a frozen dataclass, so `dataclasses.replace` does not apply — its state is
-    plain mutable attributes, copied here rather than constructed through fills a second time,
-    which would risk the copy silently drifting from the original as `Position.apply_fill`'s
-    logic evolves.
-    """
-    clone = Book()
-    clone.positions = dict(book.positions)
-    clone.balances = dict(book.balances)
-    clone.reservations = dict(book.reservations)
-    clone.margin = book.margin
-    clone.hedge_links = []
-    return clone
-
-
-def _ablate(dimension: str, baseline: ConstitutionPolicy) -> ConstitutionPolicy:
-    """One policy identical to ``baseline`` except that ``dimension`` cannot bind.
-
-    Raises on an unknown dimension rather than silently returning ``baseline`` unchanged — a typo
-    here would otherwise report a gate as "inert" because it was never actually ablated, the exact
-    false negative this module exists to prevent.
-    """
-    if dimension == "order_size":
-        return replace(baseline, max_position_notional=_HUGE)
-    if dimension == "gross_exposure":
-        return replace(baseline, max_gross_exposure_notional=_HUGE)
-    if dimension == "signed_exposure":
-        return replace(baseline, max_signed_exposure_notional=_HUGE)
-    if dimension == "hedge_integrity":
-        book = baseline.book
-        return replace(baseline, book=None if book is None else _book_without_hedge_links(book))
-    if dimension == "margin_usage":
-        return replace(baseline, max_margin_usage_ratio=_HUGE)
-    if dimension == "factor_exposure":
-        return replace(baseline, factor_exposure_limits={})
-    if dimension == "scenario_loss":
-        return replace(baseline, max_scenario_loss_pct=None)
-    if dimension == "liquidation_cost":
-        return replace(baseline, max_liquidation_cost_bps=None)
-    if dimension == "per_symbol_underperformance":
-        return replace(baseline, min_symbol_realized_pnl=None)
-    raise ValueError(f"unknown dimension {dimension!r}; known: {', '.join(DIMENSIONS)}")
-
-
-def ablated_variants(
-    baseline: ConstitutionPolicy, *, dimensions: Sequence[str] = DIMENSIONS,
-) -> dict[str, ConstitutionPolicy]:
-    """One gate-ablated variant per dimension, keyed by name — the ``ablated_constitutions``
-    argument :meth:`agents.desk.TradingDesk.run` expects."""
-    return {dimension: _ablate(dimension, baseline) for dimension in dimensions}
 
 
 @dataclass(frozen=True, slots=True)

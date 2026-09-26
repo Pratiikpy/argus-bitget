@@ -31,7 +31,7 @@ label** rather than a guess, and the share left unlabelled is measured and publi
 Meta lines — "Data:", "Sources reached", "Quoted", "Caveat:" — describe provenance themselves and
 are left unlabelled on purpose.
 
-**These rules are the fallback, not the record** (2026-09-26). `truth/trace.py` records, while an
+**These rules are the fallback, not the record** (2026-09-26). `lui/trace.py` records, while an
 answer is built, which step made each line, what it read and when; where that step declares what
 its lines are, or a refusal followed a failed read, the label comes from the step
 (``origin: "trace"``) and these rules are not consulted. A line no step speaks for keeps the label
@@ -210,7 +210,7 @@ def labels(lines: Sequence[str]) -> list[str | None]:
 
 def payload_labels(payload: Mapping[str, Any]) -> list[str | None]:
     """The labels an answer carries, one per line: the ones attached with its trace
-    (`truth/trace.attach`) when there is one per line, else these wording rules.
+    (`lui/trace.attach`) when there is one per line, else these wording rules.
 
     The one call for a surface that shows an answer (the MCP server, the Telegram bot), so a line
     labelled by the step that made it is not relabelled from its wording on the way out."""

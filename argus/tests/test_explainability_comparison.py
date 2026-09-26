@@ -69,6 +69,7 @@ class TestBaselineReproduced:
         assert "999999.0" in baseline["real_rendered"]
 
 
+@pytest.mark.network
 class TestSameInputComparison:
     def test_every_configured_symbol_and_factor_was_checked(self, same_input: dict) -> None:
         assert same_input["n_cases"] == len(REAL_SYMBOLS) * len(HALLUCINATION_FACTORS)
@@ -89,6 +90,7 @@ class TestSameInputComparison:
             assert case["real_current_price"] > 0
 
 
+@pytest.mark.network
 class TestPositiveControl:
     def test_the_real_current_price_resolves_for_every_symbol(self, control: dict) -> None:
         assert control["all_real_figures_resolve"]
@@ -128,6 +130,7 @@ class TestReproducibility:
         assert reproducibility["identical"]
 
 
+@pytest.mark.network
 class TestMain:
     def test_render_produces_readable_text(
         self, same_input: dict, control: dict, costs: dict, reproducibility: dict,

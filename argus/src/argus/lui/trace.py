@@ -128,7 +128,7 @@ class SourceRead:
 
     ok: bool
     why: str = ""
-    """Why it failed, in `market/rpc.py`'s taxonomy ("unreachable", "timed out", "HTTP 503")."""
+    """Why it failed, in `truth/failures.py`'s taxonomy ("unreachable", "timed out", "HTTP 503")."""
 
     def as_dict(self) -> dict[str, Any]:
         return {"source": self.name, "at": self.at, "ok": self.ok, "why": self.why}
@@ -782,7 +782,7 @@ def install() -> None:
             try:
                 response = below(url, *args, **kwargs)
             except Exception as exc:
-                from argus.market.rpc import classify_exception
+                from argus.truth.failures import classify_exception
 
                 why = (f"HTTP {exc.code}" if isinstance(exc, urllib.error.HTTPError)
                        else classify_exception(exc).label)

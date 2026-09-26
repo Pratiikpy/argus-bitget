@@ -53,7 +53,6 @@ from datetime import UTC, datetime
 from random import Random
 from typing import Any
 
-from argus.eval.artefact import write
 from argus.eval.perturbations import (
     DATA,
     LEAN,
@@ -71,6 +70,7 @@ from argus.eval.perturbations import (
 )
 from argus.market.evidence import underlying_ticker
 from argus.market.instruments import REGISTRY
+from argus.truth.artefact import write
 
 REPORT_PATH = DATA / "vocab_stress.json"
 

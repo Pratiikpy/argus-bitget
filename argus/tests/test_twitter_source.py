@@ -131,6 +131,7 @@ class TestErrorPaths:
         assert status == ["twitter: 1 tweets"]
 
 
+@pytest.mark.network
 @pytest.mark.skipif(shutil.which("twitter") is None, reason="twitter-cli not installed here")
 class TestRealLiveCli:
     """The one real, live check — confirms the actual CLI still works, still returns real,

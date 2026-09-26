@@ -241,10 +241,10 @@ def test_an_old_snapshot_without_tone_adds_no_tone_line() -> None:
 
 def test_without_vader_the_tone_is_reported_unscored_not_invented(
         monkeypatch: pytest.MonkeyPatch) -> None:
-    from argus.eval.baselines import vader_loader
+    from argus.market import vader
 
     def missing() -> sp.Tone:
-        raise vader_loader.VaderLoadError("no VADER clone at /nowhere")
+        raise vader.VaderLoadError("no VADER clone at /nowhere")
 
     monkeypatch.setattr(sp, "vader_tone", missing)
     row = sp.pulse("NVDAUSDT", [_post(1, "@a", BULL, 5)], [], NOW)
@@ -265,11 +265,11 @@ def test_the_existing_fields_are_unchanged() -> None:
 
 
 def test_the_real_vader_scores_the_crowd() -> None:
-    from argus.eval.baselines import vader_loader
+    from argus.market import vader
 
     try:
         sp.vader_tone()
-    except vader_loader.VaderLoadError:
+    except vader.VaderLoadError:
         pytest.skip("VADER clone not on this machine")
     posts = [_post(1, "@a", "Great quarter, strong guidance, love this stock", 5),
              _post(2, "@b", "Terrible quarter, awful guidance, hate this stock", 6)]

@@ -67,7 +67,6 @@ from pathlib import Path
 from typing import Any
 
 from argus.decision.verdicts import ConstitutionVerdict, Intent, Side, Verdict, apply_constraint
-from argus.eval.artefact import write
 from argus.execution.batch import BatchResponse, ItemStatus, write_batch
 from argus.execution.bitget_client import (
     LIVE_PRODUCT_TYPE,
@@ -86,6 +85,7 @@ from argus.execution.grounded_ids import ShownList, UnshownId, show_orders
 from argus.execution.orders import Order, OrderBook, OrderState
 from argus.paper.ledger import GENESIS, Entry, PaperLedger, SettleRequest
 from argus.paper.venue import LedgerVenue, confirm_recorded, paper_order_id, read_rows
+from argus.truth.artefact import write
 
 ARGUS = Path(__file__).resolve().parents[3]
 DATA = ARGUS / "data"

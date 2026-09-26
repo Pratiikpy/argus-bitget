@@ -28,7 +28,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
-from argus.eval.observatory import Prediction, expected_calibration_error
+from argus.risk.calibration import Prediction, expected_calibration_error
 
 KELLY_FRACTION = Decimal("0.5")
 """Half-Kelly. Full Kelly is growth-optimal only if the edge estimate is exact, and it never is."""

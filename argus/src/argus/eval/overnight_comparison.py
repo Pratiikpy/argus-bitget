@@ -68,8 +68,8 @@ from statistics import mean
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from argus.eval import artefact
 from argus.eval.compare import ComparisonReport, finalise, legacy_outcome, paired_bootstrap
+from argus.truth import artefact
 
 ROOT = Path(__file__).resolve().parents[3]
 DATA = ROOT / "data" / "h2h_gloaming"

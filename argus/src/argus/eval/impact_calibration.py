@@ -73,26 +73,44 @@ def points(depth: dict[str, Any], adv: dict[str, float],
     return out
 
 
-def fit(rows: list[SweepPoint]) -> dict[str, float]:
-    """``b`` by least squares through the origin, its R-squared, and the free exponent."""
+def fit(rows: list[SweepPoint]) -> dict[str, float | None]:
+    """``b`` by least squares through the origin, its R-squared, and the free exponent.
+
+    A figure the sweeps cannot define is ``None`` rather than an exception (tests, 2026-09-27):
+    with no sweeps nothing is defined; ``b`` needs a sweep with a non-zero predictor; and the free
+    exponent needs sweeps that walked the book (a walk of zero has no logarithm) at two or more
+    participations, because a line through one point has no slope."""
+    if not rows:
+        return dict.fromkeys(("b", "r_squared", "free_exponent", "median_sigma_daily_bps",
+                              "median_walk_bps", "median_old_model_bps"))
     xs = [r.sigma_daily_bps * math.sqrt(r.participation) for r in rows]
     ys = [r.walk_bps for r in rows]
-    b = sum(x * y for x, y in zip(xs, ys, strict=True)) / sum(x * x for x in xs)
-    mean = statistics.fmean(ys)
-    residual = sum((y - b * x) ** 2 for x, y in zip(xs, ys, strict=True))
-    total = sum((y - mean) ** 2 for y in ys)
+    scale = sum(x * x for x in xs)
+    b = sum(x * y for x, y in zip(xs, ys, strict=True)) / scale if scale else None
+    r_squared: float | None = None
+    if b is not None:
+        mean = statistics.fmean(ys)
+        residual = sum((y - b * x) ** 2 for x, y in zip(xs, ys, strict=True))
+        total = sum((y - mean) ** 2 for y in ys)
+        r_squared = 1 - residual / total if total else 0.0
     logs = [(math.log(r.participation), math.log(r.walk_bps / r.sigma_daily_bps))
             for r in rows if r.walk_bps > 0]
-    mx = statistics.fmean(x for x, _ in logs)
-    my = statistics.fmean(y for _, y in logs)
-    slope = (sum((x - mx) * (y - my) for x, y in logs)
-             / sum((x - mx) ** 2 for x, _ in logs))
-    return {"b": b, "r_squared": 1 - residual / total if total else 0.0,
-            "free_exponent": slope,
+    slope: float | None = None
+    if logs:
+        mx = statistics.fmean(x for x, _ in logs)
+        my = statistics.fmean(y for _, y in logs)
+        spread = sum((x - mx) ** 2 for x, _ in logs)
+        if spread:
+            slope = sum((x - mx) * (y - my) for x, y in logs) / spread
+    return {"b": b, "r_squared": r_squared, "free_exponent": slope,
             "median_sigma_daily_bps": statistics.median(r.sigma_daily_bps for r in rows),
             "median_walk_bps": statistics.median(ys),
             "median_old_model_bps": statistics.median(10 * r.participation ** 1.5
                                                       for r in rows)}
+
+
+def _shown(value: float | None, spec: str) -> str:
+    return "undefined" if value is None else format(value, spec)
 
 
 def measure() -> dict[str, Any]:  # pragma: no cover - live
@@ -125,11 +143,12 @@ def measure() -> dict[str, Any]:  # pragma: no cover - live
 def main() -> int:  # pragma: no cover - CLI
     report = measure()
     REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8")
-    print(f"{report['points']} sweeps: b = {report['b']:.3f}, R^2 = {report['r_squared']:.2f}, "
-          f"free exponent {report['free_exponent']:.2f}, median sigma "
-          f"{report['median_sigma_daily_bps']:.0f}bps/day; measured walk median "
-          f"{report['median_walk_bps']:.2f}bps against the old model's "
-          f"{report['median_old_model_bps']:.4f}bps")
+    print(f"{report['points']} sweeps: b = {_shown(report['b'], '.3f')}, "
+          f"R^2 = {_shown(report['r_squared'], '.2f')}, "
+          f"free exponent {_shown(report['free_exponent'], '.2f')}, median sigma "
+          f"{_shown(report['median_sigma_daily_bps'], '.0f')}bps/day; measured walk median "
+          f"{_shown(report['median_walk_bps'], '.2f')}bps against the old model's "
+          f"{_shown(report['median_old_model_bps'], '.4f')}bps")
     print(f"written to {REPORT_PATH}")
     return 0
 

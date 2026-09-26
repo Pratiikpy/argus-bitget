@@ -15,7 +15,7 @@ from __future__ import annotations
 import pytest
 
 from argus.eval.obliquebench import HELDOUT, TUNED
-from argus.lui.semantic import ABSTAIN_THRESHOLD, Routed, SemanticRouter, available
+from argus.llm.semantic import ABSTAIN_THRESHOLD, Routed, SemanticRouter, available
 
 pytestmark = pytest.mark.skipif(not available(), reason="model2vec is not installed")
 
@@ -32,6 +32,7 @@ def router() -> SemanticRouter:
     return SemanticRouter([(c.ask, str(c.expect)) for c in TUNED])
 
 
+@pytest.mark.network
 class TestItRoutesOnMeaning:
     def test_it_beats_the_pattern_layer_on_unseen_phrasings(self, router: SemanticRouter) -> None:
         """The measurement that justifies the module existing at all. 9.5% is the incumbent."""
@@ -65,6 +66,7 @@ class TestItRoutesOnMeaning:
             socket.socket = real  # type: ignore[misc]
 
 
+@pytest.mark.network
 class TestItRefusesWhatItDoesNotUnderstand:
     def test_out_of_scope_questions_are_declined(self, router: SemanticRouter) -> None:
         """**The hard half.** CLINC150's own finding is that BERT reaches ~97% in-scope accuracy
@@ -97,6 +99,7 @@ class TestItRefusesWhatItDoesNotUnderstand:
 
 
 class TestTheThresholdIsAReportedChoice:
+    @pytest.mark.network
     def test_lowering_it_buys_accuracy_and_costs_refusal(self) -> None:
         """The trade-off is real and is published in both directions. A module that shipped only
         the answer-everything number would be choosing the flattering row."""

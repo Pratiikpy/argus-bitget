@@ -27,7 +27,7 @@ under sequential string handles instead of their UUIDs, ``uuid_mapping[str(idx)]
   Guessing the nearest shown id would turn a hallucination into a citation.
 * **Handles carry a prefix** (``E0``, ``E1`` …). mem0 can use bare integers because they sit in a
   JSON field; ARGUS handles also appear in prose, where a bare "3" is indistinguishable from a
-  figure — and `agents/grounding.py` would count it as one. A digit preceded by a letter is not
+  figure — and `truth/grounding.py` would count it as one. A digit preceded by a letter is not
   extracted as a figure there (its lookbehind refuses a word character), so a handle can never be
   mistaken for a claim about the market.
 * **An identity mode** for ids that are already short (ledger seqs): no renaming, the same refusal

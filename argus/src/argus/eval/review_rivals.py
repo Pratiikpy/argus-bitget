@@ -91,7 +91,7 @@ from argus.desk.rule_lifecycle import (
     grade,
     parameters,
 )
-from argus.eval.artefact import write
+from argus.truth.artefact import write
 
 PACKAGE = Path(__file__).resolve().parents[3]
 ROOT = PACKAGE.parent

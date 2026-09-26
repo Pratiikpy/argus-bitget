@@ -19,7 +19,6 @@ from pathlib import Path
 
 import pytest
 
-from argus.eval import artefact
 from argus.eval.refusal import (
     CONSISTENT,
     CONTRADICTED,
@@ -39,6 +38,7 @@ from argus.eval.refusal import (
     wilson,
 )
 from argus.paper.marks import Mark
+from argus.truth import artefact
 
 AT = datetime(2026, 9, 15, 13, 30, tzinfo=UTC)
 

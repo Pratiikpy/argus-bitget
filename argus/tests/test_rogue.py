@@ -21,9 +21,9 @@ from decimal import Decimal
 
 import pytest
 
-from argus.agents.desk import ConstitutionPolicy
 from argus.decision.verdicts import Intent, Side, Verdict
 from argus.eval.rogue import ROGUES, STARTING_EQUITY, Rogue, _ungoverned
+from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface, HedgeCandidate
 from argus.truth.clocks import SessionPhase, SessionState
 

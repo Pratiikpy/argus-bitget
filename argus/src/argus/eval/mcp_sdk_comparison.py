@@ -41,7 +41,8 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from argus.eval import artefact, mcp_fuzz
+from argus.eval import mcp_fuzz
+from argus.truth import artefact
 
 REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "mcp_sdk_comparison.json"
 

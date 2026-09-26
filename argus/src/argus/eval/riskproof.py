@@ -46,7 +46,6 @@ from itertools import product
 from pathlib import Path
 from typing import Any
 
-from argus.agents.desk import ConstitutionPolicy
 from argus.decision.verdicts import (
     ConstitutionRuling,
     ConstitutionVerdict,
@@ -55,6 +54,7 @@ from argus.decision.verdicts import (
     Side,
     Verdict,
 )
+from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface, HedgeCandidate
 from argus.truth.clocks import SessionPhase, SessionState
 
@@ -619,7 +619,8 @@ def _policy_for(base: ConstitutionPolicy, state: State) -> ConstitutionPolicy:
     2026-09-15, for ``gross_exposure``) has no live injection site yet to match, because nothing in
     the desk constructs a `desk.book.Book` from real fills yet either — see `Activity/PROGRESS.md`.
     """
-    from argus.desk.book import Book, HedgeLink, Lot, PositionSide, VenueMarginSnapshot
+    from argus.decision.verdicts import PositionSide
+    from argus.desk.book import Book, HedgeLink, Lot, VenueMarginSnapshot
     from argus.desk.portfolio import FactorExposure, StressOutcome
     from argus.market.depth import Sweep
     from argus.risk.circuit import BookState
@@ -846,7 +847,7 @@ def _applicable(policy: ConstitutionPolicy, state: State, intent: Intent) -> set
             could.add("signed_exposure")
 
         if intent.verdict is Verdict.REDUCE:
-            from argus.desk.book import PositionSide
+            from argus.decision.verdicts import PositionSide
 
             being_reduced = (
                 intent.symbol, PositionSide.LONG if intent.side is Side.SELL

@@ -12,7 +12,6 @@ from decimal import Decimal
 
 import pytest
 
-from argus.agents.desk import ConstitutionPolicy
 from argus.decision.verdicts import (
     ConstitutionRuling,
     ConstitutionVerdict,
@@ -30,6 +29,7 @@ from argus.eval.riskproof import (
     states,
     sweep,
 )
+from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface
 from argus.truth.clocks import SessionPhase, SessionState
 

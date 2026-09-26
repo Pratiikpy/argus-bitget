@@ -125,6 +125,9 @@ BASE_CSS = """
     color:var(--dim); font:12px/1.7 var(--mono); display:flex; gap:18px; flex-wrap:wrap;
     justify-content:space-between; max-width:1080px; margin-left:auto; margin-right:auto }
   .foot a { color:var(--dim) }
+  .skip { position:absolute; left:-9999px; top:8px; z-index:50; padding:8px 12px;
+    background:var(--ink); color:var(--paper); border-radius:8px; font:600 13px/1 var(--sans) }
+  .skip:focus { left:16px }
 """
 
 LINKS: tuple[tuple[str, str], ...] = (
@@ -133,7 +136,7 @@ LINKS: tuple[tuple[str, str], ...] = (
     ("/proof", "What we beat"),
     ("/wrong", "What we got wrong"),
     ("/status", "Status"),
-    ("/brand", "Brand"),
+    ("/materials", "Materials"),
 )
 """The console's own pages. The Track 2 agent's record (/agent) is not among them: the handbook
 requires each entry to be an independent project (Basic Competition Rules, rule 2), and a tab for
@@ -158,19 +161,25 @@ def favicon() -> str:
 
 
 def nav(active: str = "/") -> str:
-    """The top bar every page opens with. ``active`` is the current path."""
-    on = ' class="on"'
+    """The top bar every page opens with. ``active`` is the current path.
+
+    A keyboard or screen-reader visitor lands on a skip link first, and the current page is
+    announced as such rather than marked only by colour (accessibility audit, 2026-09-26). The
+    skip target sits directly after the bar, so every page gets it without naming its own main."""
+    on = ' class="on" aria-current="page"'
     links = "".join(f'<a href="{href}"{on if href == active else ""}>{label}</a>'
                     for href, label in LINKS)
-    return (f'<nav class="nav" aria-label="Primary"><a class="brand" href="/" aria-label="ARGUS '
+    return (f'<a class="skip" href="#main">Skip to content</a>'
+            f'<nav class="nav" aria-label="Primary"><a class="brand" href="/" aria-label="ARGUS '
             f'home">{mark_svg(22)}<span>ARGUS</span></a><div class="links">{links}'
-            f'<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a></div></nav>')
+            f'<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a></div></nav>'
+            f'<span id="main" tabindex="-1"></span>')
 
 
 def footer() -> str:
     return ('<footer class="foot"><span>ARGUS · every figure computed, every source named, every '
             'loss published.</span><span>Analysis, not advice. Data: Bitget, SEC EDGAR, FRED, '
-            'public news.</span></footer>')
+            'public news. <a href="/brand">Brand</a></span></footer>')
 
 
 PUBLIC_URL = "https://deploy-topaz-seven-64.vercel.app"

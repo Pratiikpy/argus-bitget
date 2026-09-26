@@ -96,8 +96,8 @@ from typing import Any
 
 from argus.llm.base import ChatModel
 from argus.llm.qwen import Thinking
-from argus.lui.answer import Source
 from argus.market.evidence import EdgarSource
+from argus.truth.source import Source
 
 # --- fetching ---------------------------------------------------------------------------------
 

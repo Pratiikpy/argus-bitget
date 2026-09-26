@@ -39,14 +39,13 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
-from argus.agents.desk import ConstitutionPolicy, DeskRun, TradingDesk
+from argus.agents.desk import DeskRun, TradingDesk
 from argus.cost.model import CostModel
 from argus.decision.pause import AlreadyResolved, PauseError, PauseExpired, PauseStore
 from argus.decision.verdicts import Intent, Verdict
-from argus.eval.autopsy import RECORD_SCHEMA
-from argus.eval.gate_ablation import ablated_variants
 from argus.execution.guard import Guard, GuardError
 from argus.execution.guard import fetch_instruments as fetch_specs
+from argus.execution.modes import ModeStack, admit, check_order, persisted_notice, stack_for_cycle
 from argus.llm.qwen import QwenClient, QwenError, Thinking, TokenBudget
 from argus.market.bitget import RTOKEN_SYMBOLS, Ticker, fetch_rtokens
 from argus.market.estimates import EstimatesSource
@@ -96,13 +95,14 @@ from argus.paper.venue import (
     position_or_none,
 )
 from argus.risk.circuit import BookState
+from argus.risk.constitution import ConstitutionPolicy, ablated_variants
 from argus.risk.effectiveness import lookup
+from argus.risk.gatechain import RECORD_SCHEMA
 from argus.risk.hedgeability import (
     HedgeabilitySurface,
     open_market_candidate,
     shut_market_candidate,
 )
-from argus.risk.modes import ModeStack, admit, check_order, persisted_notice, stack_for_cycle
 from argus.risk.session_risk import lookup as session_lookup
 from argus.truth.clocks import DualClock, SessionState
 from argus.truth.evidence import Evidence
@@ -135,8 +135,8 @@ checker is supposed to be independent of."""
 _FLAG_MARKERS = (
     "is contradicted by",                # agents/claims.py Contradiction.render
     "defect in the reasoning",           # agents/claims.py ClaimReport.render
-    "do not resolve to anything",        # agents/grounding.py GroundingReport.render
-    "unsupported fact",                  # agents/grounding.py, second line of the same failure
+    "do not resolve to anything",        # truth/grounding.py GroundingReport.render
+    "unsupported fact",                  # truth/grounding.py, second line of the same failure
     "[conflict:",                        # agents/conflict.py Conflict.render, a real disagreement
     "disagreement(s) unresolved",        # agents/conflict.py ConflictReport.render
     "contradicts itself",                # agents/desk.py, a self-contradictory earnings print
@@ -262,7 +262,7 @@ def _graded_predictions(ledger: PaperLedger) -> list[object]:
     are kept in one list because the calibration question is the same for both: when this desk says
     0.7, does it happen 70% of the time?
     """
-    from argus.eval.observatory import Prediction
+    from argus.risk.calibration import Prediction
 
     out: list[object] = []
     for entry in ledger.entries:
@@ -622,7 +622,7 @@ def _record_run(
     venue_verdict = ruling.verdict
     mode_notes: list[str] = []
     if mode_stack is not None:
-        # The named risk mode the cycle runs under (`risk/modes.py`: normal, reduce-only,
+        # The named risk mode the cycle runs under (`execution/modes.py`: normal, reduce-only,
         # halted, paper), with the layer that set it. Checked before the venue gates and, like
         # them, able only to refuse; a refusal spends no rate-window slot.
         mode_notes.append(f"[mode] {mode_stack.headline()}")
@@ -760,7 +760,7 @@ def pause_root(ledger_path: Path) -> Path:
 def notice_path(ledger_path: Path) -> Path:
     """Where the mode-change notice state for ``ledger_path`` lives: beside the ledger, as its
     pause store does (:func:`pause_root`). For the live ledger this is
-    ``data/risk_mode_notice.json`` (`risk/modes.NOTICE_STATE`); a replay on a ledger of its own
+    ``data/risk_mode_notice.json`` (`execution/modes.NOTICE_STATE`); a replay on a ledger of its own
     keeps its own. Found on
     2026-09-26 by the same check: the public CI's replay wrote ``risk_mode_notice.json.tmp`` under
     ``data/``."""
@@ -955,7 +955,7 @@ def run_once(
         guard = loaded
         guard_note = f"[guard] venue rules loaded for {len(loaded.instruments)} instrument(s)"
     # The named risk mode this cycle runs under, built once from what the cycle already knows: the
-    # venue rules loaded or not, and the book the circuit breaker judges (`risk/modes.py`). The
+    # venue rules loaded or not, and the book the circuit breaker judges (`execution/modes.py`). The
     # change notice is written only when the mode differs from the last cycle's.
     cycle_book = _book_state(ledger)
     mode_stack = stack_for_cycle(rules_loaded=guard is not None, rules_detail=guard_note,
@@ -1354,7 +1354,9 @@ def main() -> int:
 
     if args.verify or args.report:
         ledger = PaperLedger(path=LEDGER_PATH)
-        payload = ledger.verify() if args.verify else ledger.performance()
+        from argus.eval.performance import ledger_performance
+
+        payload = ledger.verify() if args.verify else ledger_performance(ledger)
         print(json.dumps(payload, indent=2, default=str))
         return 0
 

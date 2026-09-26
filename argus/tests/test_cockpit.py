@@ -125,7 +125,9 @@ class TestTheCommittedPageAgreesWithTheArtefacts:
 
         if not LEDGER_PATH.exists():
             pytest.skip("no live ledger")
-        settled = PaperLedger(path=LEDGER_PATH).performance().get("settled_trades", 0)
+        from argus.eval.performance import ledger_performance
+
+        settled = ledger_performance(PaperLedger(path=LEDGER_PATH)).get("settled_trades", 0)
         if not settled:
             assert UNAVAILABLE in committed
 

@@ -1,7 +1,7 @@
 """Convert risk records from schema 1 to schema 2 — and refuse to guess where it cannot tell.
 
 **Why a migration exists at all.** Schema 1 wrote ``binding_constraint: "none"`` for two different
-outcomes of :meth:`argus.agents.desk.ConstitutionPolicy.rule`:
+outcomes of :meth:`argus.risk.constitution.ConstitutionPolicy.rule`:
 
 * **gate 1 returned** — the intent carried no quantity, so there was nothing to narrow, and
 * **the terminal all-clear** — the intent reached and passed all seven gates.
@@ -38,7 +38,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
-from argus.eval.autopsy import RECORD_SCHEMA
+from argus.risk.gatechain import RECORD_SCHEMA
 
 DEFAULT_PATH = Path(__file__).resolve().parents[3] / "data" / "risk_records.jsonl"
 

@@ -2,9 +2,11 @@
 
 Wires a real US equity market holiday calendar (`eval/baselines/lean_market_holidays_loader.py`,
 verbatim data from QuantConnect/Lean's own real market-hours database) into ARGUS's real
-`research.gap_study.study()` for the first time — that function has always constructed
-`DualClock()` with no holidays, so the `SessionPhase.HOLIDAY` branch its own `_closed_sessions()`
-already classifies for had never once fired in a real run. Runs QuantConnect's real Pre-Holiday
+`research.gap_study.study()` for the first time — until 2026-09-26 that function constructed
+`DualClock()` with no holidays and the clock's default was empty, so the
+`SessionPhase.HOLIDAY` branch its own `_closed_sessions()` classifies for had never fired in
+a real run. (The calendar is now every `DualClock`'s default; the arm without one below asks
+for an empty calendar explicitly.) Runs QuantConnect's real Pre-Holiday
 Effect decision snippet (`eval/baselines/quantconnect_preholiday_decision.py`, the real,
 published "go long whenever a holiday is within two days, unconditionally" logic) against the
 SAME real closed-session data this now unlocks.
@@ -174,7 +176,8 @@ def run_base_case() -> dict[str, Any]:
     holidays = load_usa_equity_holidays()
     points_by_symbol, failures = _fetch_basis_by_symbol()
 
-    without_sessions = _classify(points_by_symbol, None)
+    # The arm without a calendar is now asked for explicitly: DualClock() loads the real one.
+    without_sessions = _classify(points_by_symbol, frozenset())
     without_has_holiday = any(s.phase is SessionPhase.HOLIDAY for s in without_sessions)
 
     sessions = _classify(points_by_symbol, holidays)
@@ -246,9 +249,10 @@ def run_reproducibility_check() -> dict[str, Any]:
 
 
 SCOPE_STATEMENT = (
-    "argus.research.gap_study.study() has never been given a real holiday calendar: it "
-    "constructs DualClock() with no holidays argument, so the SessionPhase.HOLIDAY branch its "
-    "own _closed_sessions() already classifies for had never once fired in a real run — real "
+    "Until 2026-09-26 argus.research.gap_study.study() was never given a real holiday "
+    "calendar: it constructed DualClock() with no holidays argument, whose default was then "
+    "empty, so the SessionPhase.HOLIDAY branch its own _closed_sessions() classifies for had "
+    "never fired in a real run — real "
     "market holidays were silently absorbed into whichever other phase the day's hours happened "
     "to match. Wiring in a real US equity holiday calendar (QuantConnect/Lean's own real "
     "market-hours database) unlocks real holiday-session measurement for the first time and "

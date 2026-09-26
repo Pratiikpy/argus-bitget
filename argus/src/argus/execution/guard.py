@@ -126,7 +126,7 @@ class Denial(StrEnum):
     it, because the band lookup read ``side == "buy"`` and treated everything else as a sale."""
 
     RISK_MODE = "risk_mode"
-    """Refused by the desk's active risk mode (:mod:`argus.risk.modes`), before any venue rule.
+    """Refused by the desk's active risk mode (:mod:`argus.execution.modes`), before any venue rule.
 
     Not raised by :func:`validate` itself: the mode gate sits in front of the venue gates and
     composes its refusal into the same :class:`Ruling` shape so one trace covers the whole path."""

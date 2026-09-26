@@ -1,6 +1,6 @@
 """General-purpose rivals for the SUE capability, run on the same real SEC EPS.
 
-`research/sue.py` does three things that are not specific to trading at all, and each has a
+`market/sue.py` does three things that are not specific to trading at all, and each has a
 general-purpose tool that is far more widely used than any finance repository:
 
 1. **Lagged differencing on a gappy quarterly series** — "this quarter minus the same quarter a
@@ -56,10 +56,9 @@ from typing import Any
 
 import numpy as np
 
-from argus.eval import artefact
 from argus.market.evidence import _UA
 from argus.market.fundamentals import FundamentalsSource
-from argus.research.sue import (
+from argus.market.sue import (
     MAX_DELTA_SPAN_DAYS,
     MIN_QUARTERS,
     N_DELTAS,
@@ -69,6 +68,7 @@ from argus.research.sue import (
     standardise,
     yoy_window,
 )
+from argus.truth import artefact
 
 ARTEFACT = Path(__file__).resolve().parents[3] / "data" / "general_sue_comparison.json"
 

@@ -225,7 +225,7 @@ def freqtrade_low_profit_pairs(
 
     This is genuinely **per-symbol**, unlike every other gate Foundation 5 built earlier today:
     a book with five symbols, four profitable and one badly losing, locks only the losing one —
-    the four keep trading. Nothing in `agents.desk.ConstitutionPolicy` can do that yet; wiring
+    the four keep trading. Nothing in `risk.constitution.ConstitutionPolicy` can do that yet; wiring
     this into the live Constitution as a ninth dimension is the next step, not done here.
     """
     for_symbol = [t for t in trades if t.symbol == symbol]
@@ -291,8 +291,8 @@ def freqtrade_cooldown_period(
     a recent trade exists) and a separate registry (``PairLocks``) tracks whether ``until`` has
     actually passed. This function answers the single question every other port in this module
     answers — "would the symbol read as locked as of ``now``" — matching how
-    ``agents.desk.ConstitutionPolicy.rule`` itself works: one pure query per decision, no external
-    registry the caller must also maintain between calls.
+    ``risk.constitution.ConstitutionPolicy.rule`` itself works: one pure query per decision, no
+    external registry the caller must also maintain between calls.
     """
     window_start = now - timedelta(minutes=lookback_minutes)
     in_window = [

@@ -1,4 +1,4 @@
-"""Same-input comparison: `argus.research.sue` vs QuantConnect's real, vendored SUE factor.
+"""Same-input comparison: `argus.market.sue` vs QuantConnect's real, vendored SUE factor.
 
 Runs QuantConnect's real, unmodified Standardized Unexpected Earnings computation
 (`eval/baselines/quantconnect_sue.py`, the real `FineSelectionAndSueSorting` core from
@@ -6,7 +6,7 @@ QuantConnect/Tutorials) and ARGUS's real `research.sue` on the same real quarter
 live from SEC EDGAR's XBRL API (`market/fundamentals.py`, already built, already point-in-time
 and restatement-aware) for the nine real rToken anchor companies.
 
-**The central, measured finding.** `argus.research.sue.sue_from_quarters` reproduces the real
+**The central, measured finding.** `argus.market.sue.sue_from_quarters` reproduces the real
 vendored formula to floating-point identity on real EPS for every anchor tested — this is not a
 design claim, it is measured on live-fetched data every time this module runs
 (``run_baseline_reproduced_cases``). The real vendored formula's denominator — the standard
@@ -18,7 +18,7 @@ real, silent ``nan`` — both with nothing louder than a `RuntimeWarning: divide
 `invalid value encountered`. ``run_ranking_case`` shows the consequence: mixed into a real
 cross-sectional ranking alongside the nine real anchors, the real vendored code's own
 `sorted(sue_by_symbol.items(), ...)` puts the constructed `inf` case at the very top,
-unconditionally ahead of every genuine real surprise, while `argus.research.sue.rank_universe`
+unconditionally ahead of every genuine real surprise, while `argus.market.sue.rank_universe`
 excludes it and reports why.
 
 SCOPE, stated explicitly:
@@ -49,7 +49,7 @@ from typing import Any
 
 from argus.eval.baselines.quantconnect_sue_loader import load_sue_module
 from argus.market.fundamentals import FundamentalsSource
-from argus.research.sue import MIN_QUARTERS, SueError, rank_universe, read
+from argus.market.sue import MIN_QUARTERS, SueError, rank_universe, read
 
 ANCHORS: tuple[str, ...] = (
     "NVDA", "TSLA", "AAPL", "MSFT", "META", "GOOGL", "AMZN", "COIN", "MSTR",
@@ -319,13 +319,13 @@ def run_reproducibility_check() -> dict[str, Any]:
 
 
 SCOPE_STATEMENT = (
-    "argus.research.sue reproduces QuantConnect's real, vendored Standardized Unexpected "
+    "argus.market.sue reproduces QuantConnect's real, vendored Standardized Unexpected "
     "Earnings formula to floating-point identity on real, live SEC EDGAR quarterly EPS for "
     "every real rToken anchor tested. The real vendored formula's denominator has no guard: a "
     "constructed-but-plausible linearly-growing EPS path produces a real, silent inf (with only "
     "a RuntimeWarning), an all-flat path a real, silent nan, and mixed into a real cross-"
     "sectional ranking alongside every real anchor, the real code's own sorted() puts the "
-    "constructed inf case first unconditionally. argus.research.sue refuses in every one of "
+    "constructed inf case first unconditionally. argus.market.sue refuses in every one of "
     "these cases instead, and crashes with the same typed SueError (not a bare IndexError) on "
     "insufficient history where the real reference raises an untyped IndexError. NOT claimed "
     "the SUE factor has validated forecasting value as a trading signal — this measures the "

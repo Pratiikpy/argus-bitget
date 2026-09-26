@@ -66,7 +66,7 @@ from collections.abc import Callable, Iterable, Sequence
 from pathlib import Path
 from typing import Any
 
-from argus.eval.artefact import write
+from argus.truth.artefact import write
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 INPUTS_PATH = DATA / "lui_rematch_inputs.json"

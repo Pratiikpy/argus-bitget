@@ -91,7 +91,7 @@ from argus.desk.allocation import (
 )
 from argus.desk.nco_ensemble import NCOConfig, ensemble_nco_weights, estimate, sample_covariance
 from argus.eval.allocation_snapshot import load_snapshot
-from argus.eval.artefact import write
+from argus.truth.artefact import write
 
 DATA = Path(__file__).resolve().parents[3] / "data"
 REPORT_PATH = DATA / "nco_bakeoff.json"
