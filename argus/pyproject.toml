@@ -73,6 +73,11 @@ dev = [
     # vendor" reasoning as stumpy/finBERT above), the reference ARGUS's own real `adf()` already
     # reproduces to 1e-9 per `tests/test_cointegration.py`.
     "statsmodels>=0.15",
+    # Needed for `eval/general_coint_comparison.py`: the published `arch` package (Kevin
+    # Sheppard's, NCSA licence), whose own `engle_granger` and `phillips_ouliaris` are the
+    # general-purpose cointegration tests ARGUS's screen is scored against. Imported at call time,
+    # never by argus's own src/ code path, like statsmodels above.
+    "arch>=8.0",
     # Needed for `eval/regime_comparison.py`: the real, published `ruptures` PyPI package
     # (`deepcharles/ruptures`, BSD-2-Clause, cloned at `research/repos/ruptures` and never run
     # until that module existed), its own real `Pelt`/`KernelCPD` public API run directly — same

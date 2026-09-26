@@ -88,26 +88,26 @@
       "doc": "readme",
       "line": 69,
       "quoted": [
-        "467"
+        "468"
       ],
       "live": [
-        467
+        468
       ],
       "status": "OK",
-      "excerpt": "strict clean on 467 source files"
+      "excerpt": "strict clean on 468 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 183,
       "quoted": [
-        "467"
+        "468"
       ],
       "live": [
-        467
+        468
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 467 source files"
+      "excerpt": "strict` clean on 468 source files"
     },
     {
       "claim": "source_files",
@@ -115,7 +115,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        467
+        468
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -125,13 +125,13 @@
       "doc": "explained",
       "line": 1956,
       "quoted": [
-        "467"
+        "468"
       ],
       "live": [
-        467
+        468
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 467 source files"
+      "excerpt": "strict` clean on 468 source files"
     },
     {
       "claim": "register_claims",

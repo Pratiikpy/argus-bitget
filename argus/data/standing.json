@@ -663,7 +663,7 @@
     {
       "name": "Cross-market cointegration with corrected multiple testing",
       "subtheme": "t1-crossmarket",
-      "module": "argus/research/cointegration.py,argus/backtest/validation.py,argus/eval/cointegration_comparison.py,argus/eval/baselines/lean_pairs_ranking.py,argus/eval/baselines/lean_pairs_ranking_loader.py",
+      "module": "argus/research/cointegration.py,argus/backtest/validation.py,argus/eval/cointegration_comparison.py,argus/eval/baselines/lean_pairs_ranking.py,argus/eval/baselines/lean_pairs_ranking_loader.py,argus/eval/general_coint_comparison.py",
       "state": "implemented",
       "baseline": "statsmodels adfuller; QuantConnect/Lean pearsonr pair ranking; FinceptTerminal",
       "conditions_met": [
@@ -764,7 +764,8 @@
       ],
       "blockers": [
         "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate (data/groupwise_audit.json): the statistical proof reads data/cointegration_comparison.json, a synthetic 190-pair noise panel and designed ADF cases reduced to counts. The out-of-sample proof passes: data/cointegration.json's 66 real pairs are broken down pair by pair and none survives the correction. The same study shows, as context, why the correction matters: the naive in-sample excess over the 5% expected by chance rests on one pair (NVDAUSDT/QQQUSDT) and turns negative out of sample. Route back: cite that real 66-pair scan as the statistical evidence; it already passes the gate.",
-        "The multiple-testing demonstration constructs genuinely-independent random-walk pairs rather than measuring the false-positive rate on ARGUS's own real rToken universe \u2014 research/cointegration.py's own real scan() already carries this correction into production, but the specific 7-of-190 count above is a controlled demonstration, not a live-universe measurement"
+        "The multiple-testing demonstration constructs genuinely-independent random-walk pairs rather than measuring the false-positive rate on ARGUS's own real rToken universe \u2014 research/cointegration.py's own real scan() already carries this correction into production, but the specific 7-of-190 count above is a controlled demonstration, not a live-universe measurement",
+        "General-purpose rivals run 2026-09-26 (eval/general_coint_comparison.py, data/general_coint_comparison.json): 160 simulated universes (60 null, 60 with planted cointegration, 40 with broken relationships) and the real 12-rToken universe, scored against arch's Engle-Granger and Phillips-Ouliaris, statsmodels' coint and five multiple-testing corrections from statsmodels and SciPy, on the same selection slice. LOSS for the screen: survivors_fdr, ARGUS's Benjamini-Hochberg screen, does not hold its target on planted universes (false-discovery rate 18.9% at q 10%), while 128 general pipelines do. What the desk acts on is the out-of-sample-confirmed set (PairResult.tradeable), which does hold it (4.2%) at power 0.274; the best general pipeline, arch's Phillips-Ouliaris with the same correction and the same out-of-sample gate, holds it at 6.1% with power 0.333 (0.021 +/- 0.026 above the screen's power), a difference not tested against the confirmed set. On the real universe every pipeline finds the same one or two pairs (NVDAUSDT with QQQUSDT and SQQQUSDT)."
       ],
       "note": "",
       "measured_outcomes": []
@@ -4239,7 +4240,7 @@
     {
       "capability": "Cross-market cointegration with corrected multiple testing",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/cointegration_comparison.json: designed_cases - three designed ADF series, two self-inclusion cases and a synthetic 190-pair noise panel reduced to counts"
+      "detail": "no groupwise check has run on its artefacts: data/cointegration_comparison.json: designed_cases - three designed ADF series, two self-inclusion cases and a synthetic 190-pair noise panel reduced to counts; data/general_coint_comparison.json: not in the audit"
     },
     {
       "capability": "Net executable arbitrage vs. a fee-blind detector",

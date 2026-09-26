@@ -1534,7 +1534,8 @@ REGISTER: tuple[Capability, ...] = (
             "argus/research/cointegration.py,argus/backtest/validation.py,"
             "argus/eval/cointegration_comparison.py,"
             "argus/eval/baselines/lean_pairs_ranking.py,"
-            "argus/eval/baselines/lean_pairs_ranking_loader.py"
+            "argus/eval/baselines/lean_pairs_ranking_loader.py,"
+            "argus/eval/general_coint_comparison.py"
         ),
         # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
         # proof now needs a groupwise check on the capability's own artefact, and this
@@ -1690,6 +1691,20 @@ REGISTER: tuple[Capability, ...] = (
             "universe — research/cointegration.py's own real scan() already carries this "
             "correction into production, but the specific 7-of-190 count above is a controlled "
             "demonstration, not a live-universe measurement",
+            "General-purpose rivals run 2026-09-26 (eval/general_coint_comparison.py, "
+            "data/general_coint_comparison.json): 160 simulated universes (60 null, 60 with "
+            "planted cointegration, 40 with broken relationships) and the real 12-rToken "
+            "universe, scored against arch's Engle-Granger and Phillips-Ouliaris, statsmodels' "
+            "coint and five multiple-testing corrections from statsmodels and SciPy, on the same "
+            "selection slice. LOSS for the screen: survivors_fdr, ARGUS's Benjamini-Hochberg "
+            "screen, does not hold its target on planted universes (false-discovery rate 18.9% at "
+            "q 10%), while 128 general pipelines do. What the desk acts on is the "
+            "out-of-sample-confirmed set (PairResult.tradeable), which does hold it (4.2%) at "
+            "power 0.274; the best general pipeline, arch's Phillips-Ouliaris with the same "
+            "correction and the same out-of-sample gate, holds it at 6.1% with power 0.333 (0.021 "
+            "+/- 0.026 above the screen's power), a difference not tested against the confirmed "
+            "set. On the real universe every pipeline finds the same one or two pairs (NVDAUSDT "
+            "with QQQUSDT and SQQQUSDT).",
         ),
     ),
     Capability(
