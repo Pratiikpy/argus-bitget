@@ -47,7 +47,8 @@ from argus.decision.verdicts import Intent, Verdict
 from argus.execution.guard import Guard, GuardError
 from argus.execution.guard import fetch_instruments as fetch_specs
 from argus.execution.modes import ModeStack, admit, check_order, persisted_notice, stack_for_cycle
-from argus.llm.qwen import QwenClient, QwenError, Thinking, TokenBudget
+from argus.llm.provider import seat
+from argus.llm.qwen import QwenError, Thinking
 from argus.market.bitget import RTOKEN_SYMBOLS, Ticker, fetch_rtokens
 from argus.market.estimates import EstimatesSource
 from argus.market.evidence import (
@@ -967,7 +968,7 @@ def run_once(
     mode_notice = persisted_notice(mode_stack, notice_path(ledger_path))
     open_positions = cycle_book.open_positions if isinstance(cycle_book, BookState) else 0
 
-    client = QwenClient(budget=TokenBudget(limit=budget))
+    client = seat(budget_limit=budget)
     # Routine cycles at LOW: the priced hurdle drops from ~27bps to ~19bps off-hours, which
     # is the difference between a desk that can trade and one that abstains forever.
     desk = TradingDesk(client, pm_thinking=Thinking.LOW)

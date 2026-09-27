@@ -32,13 +32,12 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import urllib.error
-import urllib.request
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Any
 
+from argus.truth import http
 from argus.truth.evidence import Evidence
 
 CURVE_URL = (
@@ -190,13 +189,10 @@ def parse(xml: str) -> list[Curve]:
 def fetch(*, year: int | None = None, timeout: int = 30) -> list[Curve]:
     """Read one calendar year of daily curves from the Treasury."""
     target = year or datetime.now(UTC).year
-    request = urllib.request.Request(
-        CURVE_URL.format(year=target), headers={"User-Agent": USER_AGENT}
-    )
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            body = response.read().decode("utf-8", "replace")
-    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        body = http.fetch_text(CURVE_URL.format(year=target), timeout=timeout,
+                               headers={"User-Agent": USER_AGENT})
+    except http.RpcError as exc:
         raise MacroError(f"could not read the Treasury yield curve: {exc}") from exc
     curves = parse(body)
     if not curves:
@@ -296,11 +292,9 @@ class FearGreed:
 
 def fetch_fear_greed(*, timeout: int = 20) -> FearGreed:
     """Read the index. Raises rather than returning a neutral 50 on failure."""
-    request = urllib.request.Request(FNG_URL, headers={"User-Agent": USER_AGENT})
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            payload = json.loads(response.read().decode())
-    except (urllib.error.URLError, TimeoutError, OSError, json.JSONDecodeError) as exc:
+        payload = http.fetch_json(FNG_URL, timeout=timeout, headers={"User-Agent": USER_AGENT})
+    except http.RpcError as exc:
         raise MacroError(f"could not read the Fear & Greed index: {exc}") from exc
     rows = payload.get("data") or []
     if not rows:

@@ -430,6 +430,7 @@ def _replay_world(market: Market, instant: datetime, seat: Seat, work: Path,
                   instruments: Mapping[str, Any],
                   sabotage: Callable[..., Any] | None = None) -> Iterator[None]:
     """The runner's inputs for one cycle, replayed; its outputs, redirected into ``work``."""
+    from argus.llm.qwen import TokenBudget
     from argus.market.evidence import Gathered
     from argus.market.macro import MacroError
     from argus.market.microstructure import MicrostructureError
@@ -451,7 +452,7 @@ def _replay_world(market: Market, instant: datetime, seat: Seat, work: Path,
     values: dict[str, Any] = {
         "datetime": _clock(instant),
         "fetch_rtokens": lambda: market.tickers(instant),
-        "QwenClient": budgeted,
+        "seat": lambda *, budget_limit: budgeted(budget=TokenBudget(limit=budget_limit)),
         "gather": lambda symbol, **_: Gathered(evidence=[], status=[
             "filings, headlines and social feeds: not read in a replay"]),
         "EstimatesSource": Estimates,

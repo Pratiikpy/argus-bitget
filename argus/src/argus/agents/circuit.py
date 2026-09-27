@@ -78,6 +78,8 @@ from enum import StrEnum
 from random import Random
 from typing import Any, Generic, TypeVar
 
+from argus.truth.failures import ErrorKind, RpcError
+
 T = TypeVar("T")
 
 # --- the retry policy --------------------------------------------------------------------------
@@ -111,6 +113,11 @@ def classify(exc: BaseException) -> FaultKind:
     """Map an exception to a :class:`FaultKind`. LangGraph ``default_retry_on``, typed."""
     if isinstance(exc, TimeoutError):
         return FaultKind.TIMEOUT
+    if isinstance(exc, RpcError):
+        # a read through `truth/http.py`, typed where it failed
+        if exc.kind is ErrorKind.TIMEOUT:
+            return FaultKind.TIMEOUT
+        return FaultKind.TRANSIENT if exc.retryable else FaultKind.PERMANENT
     status = getattr(exc, "status_code", None) or getattr(exc, "code", None)
     if isinstance(status, int):
         if status in _TRANSIENT_STATUS:

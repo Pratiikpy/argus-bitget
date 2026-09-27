@@ -780,7 +780,7 @@ def answer_review(ledger: PaperLedger, question: Question) -> Answer:
     if "wrong" in question.raw.lower():
         # "What did you get wrong?" is answered first from the corrections page: the bugs, the
         # withdrawn claims and the lost comparisons, each read from its own artefact.
-        from argus.lui.corrections_page import collect
+        from argus.lui.corrections import collect
 
         wrong = collect(notes_path.parent)
     flagged = len({d.seq for d in report.defects})

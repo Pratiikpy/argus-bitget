@@ -34,7 +34,6 @@ arrives on the socket.
 from __future__ import annotations
 
 import re
-import urllib.request
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -42,6 +41,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from argus.market.evidence import FEED_USER_AGENT, EdgarSource
+from argus.truth import http
 from argus.truth.evidence import Evidence
 
 MAX_DOCUMENT_BYTES = 2_000_000
@@ -336,12 +336,8 @@ class InsiderSource:
         self._edgar = edgar or EdgarSource(user_agent=user_agent)
 
     def _fetch(self, url: str) -> str:
-        request = urllib.request.Request(
-            url, headers={"User-Agent": self._ua, "Accept": "*/*"}
-        )
-        with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
-            body: bytes = response.read(MAX_DOCUMENT_BYTES)
-        return body.decode("utf-8", errors="replace")
+        return http.fetch_text(url, timeout=TIMEOUT, max_bytes=MAX_DOCUMENT_BYTES,
+                               headers={"User-Agent": self._ua, "Accept": "*/*"})
 
     def _document_url(self, cik: int, accession: str) -> str | None:
         """Find the raw XML in the accession directory.

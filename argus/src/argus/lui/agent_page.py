@@ -13,15 +13,13 @@ reads cannot. When the record cannot be fetched the page says so and shows nothi
 
 from __future__ import annotations
 
-import json
 import time
-import urllib.error
-import urllib.request
 from collections.abc import Callable, Mapping
 from html import escape
 from typing import Any
 
 from argus.lui import design
+from argus.truth import http
 
 RECORD = "https://t2-sentiment-agent-live.vercel.app"
 REPO = "https://github.com/Pratiikpy/t2-sentiment-agent"
@@ -38,11 +36,9 @@ def fetch_json(name: str) -> Mapping[str, Any] | None:
     hit = _CACHE.get(name)
     if hit is not None and time.monotonic() - hit[0] < CACHE_SECONDS:
         return hit[1]
-    request = urllib.request.Request(f"{RECORD}/{name}", headers={"User-Agent": "ARGUS console"})
     try:
-        with urllib.request.urlopen(request, timeout=8) as response:
-            loaded = json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, TimeoutError, OSError, ValueError):
+        loaded = http.fetch_json(f"{RECORD}/{name}", timeout=8)
+    except http.RpcError:
         loaded = None
     value = loaded if isinstance(loaded, dict) else None
     if value is not None:

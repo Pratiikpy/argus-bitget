@@ -37,7 +37,6 @@ from __future__ import annotations
 
 import json
 import re
-import urllib.request
 from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
@@ -54,6 +53,7 @@ from argus.research.eventstudy import (
     build_window,
     study,
 )
+from argus.truth import http
 from argus.truth.paths import DATA_DIR
 
 DATA = DATA_DIR
@@ -101,9 +101,9 @@ class Reaction:
 
 
 def _get(url: str, timeout: float = 30.0) -> str:
-    request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (argus-research)"})
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        return str(response.read().decode("utf-8", errors="replace"))
+    # the BLS archive refuses a client that does not look like a browser
+    return http.fetch_text(url, timeout=timeout,
+                           headers={"User-Agent": "Mozilla/5.0 (argus-research)"})
 
 
 def parse_cpi_archive(text: str) -> list[date]:

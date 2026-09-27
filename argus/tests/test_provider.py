@@ -237,3 +237,38 @@ class TestBuildFallback:
         client = build_fallback(Mode.TESTING)
         assert client._timeout <= 120.0
         assert client._max_retries <= 3
+
+
+class TestEverySeatSwapsOnOneLine:
+    """`provider.seat` is what the desk, the console's readers, the adversary and the replay build
+    their model from (audit 164); before, six modules built Qwen's client by hand."""
+
+    def test_unset_is_qwen_and_the_line_swaps_it(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.llm import provider
+
+        monkeypatch.delenv(provider.SEAT_ENV, raising=False)
+        monkeypatch.setenv("BITGET_QWEN_API_KEY", "test-key")
+        monkeypatch.setenv("OG_QWEN_API_KEY", "test-key")
+        monkeypatch.setenv("BITGET_QWEN_BASE_URL", "http://127.0.0.1:9/v1")
+        monkeypatch.setenv("OG_QWEN_BASE_URL", "http://127.0.0.1:9/v1")
+        assert type(provider.seat(budget_limit=10)).__name__ == "QwenClient"
+        monkeypatch.setenv(provider.SEAT_ENV, "og_qwen")
+        assert type(provider.seat(budget_limit=10)).__name__ == "OgQwenClient"
+
+    def test_an_unknown_name_is_refused_with_the_choices(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.llm import provider
+
+        monkeypatch.setenv(provider.SEAT_ENV, "gpt")
+        with pytest.raises(ValueError, match="og_qwen"):
+            provider.seat(budget_limit=10)
+
+    def test_no_product_module_builds_the_client_itself(self) -> None:
+        import re
+        from pathlib import Path
+
+        src = Path(__file__).resolve().parents[1] / "src" / "argus"
+        direct = [p.relative_to(src).as_posix() for p in sorted(src.rglob("*.py"))
+                  if not p.relative_to(src).as_posix().startswith(("eval/", "llm/"))
+                  and re.search(r"\bQwenClient\(", p.read_text(encoding="utf-8"))]
+        assert direct == []

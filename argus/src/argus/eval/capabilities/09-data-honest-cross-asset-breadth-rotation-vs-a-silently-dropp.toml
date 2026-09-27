@@ -2,6 +2,7 @@ name = "Data-honest cross-asset breadth rotation vs. a silently-dropping referen
 subtheme = "t1-rotation"
 modules = [
     "argus/desk/rotation.py",
+    "argus/lui/rotation.py",
     "argus/eval/rotation_comparison.py",
     "argus/eval/baselines/pytaa_vigilant_allocation.py",
     "argus/eval/baselines/pytaa_vigilant_allocation_loader.py",

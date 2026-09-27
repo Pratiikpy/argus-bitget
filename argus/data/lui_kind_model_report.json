@@ -1,20 +1,25 @@
 {
-  "training_rows": 2960,
+  "training_rows": 3510,
   "per_label": {
-    "compare": 187,
+    "analogue": 100,
+    "book": 100,
+    "compare": 197,
+    "construct": 100,
     "event": 187,
     "execution": 187,
     "fundamentals": 187,
     "hedge": 186,
-    "impact": 188,
+    "impact": 198,
+    "leverage": 100,
     "macro": 186,
     "news": 187,
-    "quote": 187,
+    "quote": 197,
     "record": 276,
     "refuse": 441,
     "sentiment": 186,
-    "stress": 188,
-    "technicals": 187
+    "stress": 198,
+    "technicals": 197,
+    "venue": 100
   },
   "grid": [
     {
@@ -23,7 +28,7 @@
         4
       ],
       "C": 1.0,
-      "cv_accuracy": 0.9081
+      "cv_accuracy": 0.9094
     },
     {
       "ngrams": [
@@ -31,7 +36,7 @@
         4
       ],
       "C": 2.0,
-      "cv_accuracy": 0.9111
+      "cv_accuracy": 0.9125
     },
     {
       "ngrams": [
@@ -39,7 +44,7 @@
         4
       ],
       "C": 5.0,
-      "cv_accuracy": 0.9115
+      "cv_accuracy": 0.916
     },
     {
       "ngrams": [
@@ -47,7 +52,7 @@
         4
       ],
       "C": 10.0,
-      "cv_accuracy": 0.9111
+      "cv_accuracy": 0.9142
     },
     {
       "ngrams": [
@@ -55,7 +60,7 @@
         5
       ],
       "C": 1.0,
-      "cv_accuracy": 0.9101
+      "cv_accuracy": 0.9077
     },
     {
       "ngrams": [
@@ -63,7 +68,7 @@
         5
       ],
       "C": 2.0,
-      "cv_accuracy": 0.9118
+      "cv_accuracy": 0.91
     },
     {
       "ngrams": [
@@ -71,7 +76,7 @@
         5
       ],
       "C": 5.0,
-      "cv_accuracy": 0.9115
+      "cv_accuracy": 0.9114
     },
     {
       "ngrams": [
@@ -79,24 +84,24 @@
         5
       ],
       "C": 10.0,
-      "cv_accuracy": 0.9101
+      "cv_accuracy": 0.9117
     }
   ],
   "chosen": {
     "ngrams": [
       1,
-      5
+      4
     ],
-    "C": 2.0,
-    "cv_accuracy": 0.9118243243243244
+    "C": 5.0,
+    "cv_accuracy": 0.915954415954416
   },
   "threshold": {
-    "threshold": 0.12,
-    "answered": 2666,
-    "correct": 2558,
-    "wrong": 108,
-    "coverage": 0.9006756756756756,
-    "accuracy_answered": 0.959489872468117
+    "threshold": 0.1,
+    "answered": 3163,
+    "correct": 3040,
+    "wrong": 123,
+    "coverage": 0.9011396011396011,
+    "accuracy_answered": 0.9611128675308251
   },
   "error_cost": 3.0
 }

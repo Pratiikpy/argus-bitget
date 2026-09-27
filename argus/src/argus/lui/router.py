@@ -369,9 +369,9 @@ def build_router(budget_tokens: int = 20_000) -> Router | None:
     whole surface would be a worse feature than no routing at all.
     """
     try:
-        from argus.llm.qwen import QwenClient, TokenBudget
+        from argus.llm.provider import seat
 
-        return QwenClient(budget=TokenBudget(limit=budget_tokens))
+        return seat(budget_limit=budget_tokens)
     except Exception:  # missing key, bad URL, anything
         return None
 

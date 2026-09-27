@@ -50,7 +50,7 @@ def _register_line(counts: dict[str, int]) -> str:
 
 def collect(data_dir: Path, base: str = "") -> list[Item]:
     """Every deliverable, with the live figures that describe it."""
-    from argus.lui.corrections_page import collect as collect_wrong
+    from argus.lui.corrections import collect as collect_wrong
     from argus.lui.proof_page import collect as collect_wins
 
     _, counts = collect_wins(data_dir)

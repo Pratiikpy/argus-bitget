@@ -64,6 +64,7 @@ from argus.market.statement_facts import (
     Line,
     Unresolved,
 )
+from argus.truth import http
 
 TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 ENTITY_SEARCH_URL = "https://efts.sec.gov/LATEST/search-index?keysTyped={q}"
@@ -512,11 +513,8 @@ class CompanyResolver:
         self.requests = 0
 
     def _get(self, url: str) -> Any:
-        req = urllib.request.Request(url, headers={"User-Agent": self._ua,
-                                                   "Accept": "application/json"})
         self.requests += 1
-        with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
-            return json.loads(resp.read().decode())
+        return http.fetch_json(url, timeout=TIMEOUT, headers={"User-Agent": self._ua})
 
     def _load(self) -> None:
         if self._titles is not None:
@@ -562,7 +560,7 @@ class CompanyResolver:
             return []
         try:
             data = self._get(ENTITY_SEARCH_URL.format(q=urllib.parse.quote(key)))
-        except (urllib.error.URLError, TimeoutError, OSError, ValueError):
+        except (http.RpcError, OSError, ValueError):
             return []
         hits = [(int(h["_id"]), str(h["_source"].get("entity", "")))
                 for h in (data.get("hits") or {}).get("hits", [])[:5]]

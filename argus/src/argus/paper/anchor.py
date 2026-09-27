@@ -41,13 +41,12 @@ from __future__ import annotations
 
 import binascii
 import json
-import urllib.error
-import urllib.request
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from argus.truth import http
 from argus.truth.paths import DATA_DIR
 
 ANCHOR_DIR = DATA_DIR / "anchors"
@@ -160,17 +159,10 @@ class Anchor:
 
 
 def _submit(calendar: str, digest: bytes, *, timeout: int) -> bytes:
-    request = urllib.request.Request(
-        f"{calendar}/digest",
-        data=digest,
-        headers={
-            "User-Agent": USER_AGENT,
-            "Content-Type": "application/octet-stream",
-            "Accept": "application/vnd.opentimestamps.v1",
-        },
-    )
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        return bytes(response.read())
+    return http.fetch(f"{calendar}/digest", data=digest, method="POST", timeout=timeout,
+                      headers={"User-Agent": USER_AGENT,
+                               "Content-Type": "application/octet-stream",
+                               "Accept": "application/vnd.opentimestamps.v1"})
 
 
 def anchor(
@@ -198,8 +190,8 @@ def anchor(
     for calendar in calendars:
         try:
             proof = _submit(calendar, raw, timeout=timeout)
-        except (urllib.error.URLError, TimeoutError, OSError) as exc:
-            failures.append(f"{calendar}: {type(exc).__name__}")
+        except (http.RpcError, OSError) as exc:
+            failures.append(f"{calendar}: {http.reason_of(exc)}")
             continue
         if not proof:
             failures.append(f"{calendar}: empty proof")

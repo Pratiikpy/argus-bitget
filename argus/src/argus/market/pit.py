@@ -60,7 +60,6 @@ ODP's standardized statement reports NVDA's Q4 FY2025 diluted EPS as **-4.49** (
 
 from __future__ import annotations
 
-import json
 import threading
 import time as _time
 import urllib.error
@@ -73,6 +72,7 @@ from zoneinfo import ZoneInfo
 
 from argus.market.evidence import FEED_USER_AGENT
 from argus.market.fundamentals import ANNUAL_DAYS, CONCEPTS, QUARTER_DAYS
+from argus.truth import http
 
 EASTERN = ZoneInfo("America/New_York")
 EDGAR_CLOSE = time(22, 0)
@@ -411,11 +411,7 @@ class PitFundamentals:
         self._lock = threading.Lock()
 
     def _http_json(self, url: str) -> Any:
-        request = urllib.request.Request(
-            url, headers={"User-Agent": self._ua, "Accept": "application/json"}
-        )
-        with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
-            return json.loads(response.read().decode())
+        return http.fetch_json(url, timeout=TIMEOUT, headers={"User-Agent": self._ua})
 
     def cik_for(self, ticker: str) -> int | None:
         if self._ciks is None:
@@ -450,21 +446,22 @@ class PitFundamentals:
         status: list[str] = []
         try:
             index: AcceptanceIndex | None = self.acceptance_index(cik)
-        except (urllib.error.URLError, TimeoutError, OSError, ValueError, KeyError) as exc:
+        except (http.RpcError, urllib.error.URLError, TimeoutError, OSError, ValueError,
+                KeyError) as exc:
             index = None
-            status.append(f"pit:{ticker}: acceptance index unavailable ({type(exc).__name__}); "
+            status.append(f"pit:{ticker}: acceptance index unavailable ({http.reason_of(exc)}); "
                           f"falling back to the 22:00 ET filing-day bound")
         observed_at = self._clock()
         out: list[PitFact] = []
         for rank, tag in enumerate(tags):
             try:
                 payload = self._fetch(self.CONCEPT_URL.format(cik=cik, tag=tag))
-            except urllib.error.HTTPError as exc:
-                if exc.code != 404:
-                    status.append(f"pit:{ticker}:{tag}: HTTP {exc.code}")
-                continue
-            except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
-                status.append(f"pit:{ticker}:{tag}: unavailable ({type(exc).__name__})")
+            except (http.RpcError, urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+                code = http.status_of(exc)
+                if code is None:
+                    status.append(f"pit:{ticker}:{tag}: unavailable ({http.reason_of(exc)})")
+                elif code != 404:
+                    status.append(f"pit:{ticker}:{tag}: HTTP {code}")
                 continue
             if not isinstance(payload, dict) or not payload.get("units"):
                 continue

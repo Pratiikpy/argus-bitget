@@ -88,6 +88,7 @@ from argus.lui.research.fundamentals import raw_number, yahoo_summary
 from argus.lui.research.kinds import bare_symbol
 from argus.lui.research.parse import holding_pairs, is_us_equity, strip_budget
 from argus.lui.research.session import dual_clock
+from argus.truth import http
 from argus.truth.paths import DATA_DIR
 
 DATA = DATA_DIR
@@ -135,11 +136,9 @@ _MONTHS = {m: i for i, m in enumerate(
 
 
 def _get(url: str, timeout: float = 25.0) -> str:
-    import urllib.request
-
-    request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (argus-research)"})
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        return str(response.read().decode("utf-8-sig", errors="replace"))
+    # the calendar pages refuse a client that does not look like a browser
+    return http.fetch_text(url, encoding="utf-8-sig", timeout=timeout,
+                           headers={"User-Agent": "Mozilla/5.0 (argus-research)"})
 
 
 def _flat(markup: str) -> str:

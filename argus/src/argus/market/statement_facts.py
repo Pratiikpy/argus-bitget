@@ -68,6 +68,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from argus.market.evidence import FEED_USER_AGENT
+from argus.truth import http
 
 TIMEOUT = 60
 
@@ -633,14 +634,10 @@ class CompanyFactsSource:
         return None if self._snapshot_dir is None else self._snapshot_dir / f"CIK{cik:010d}.json"
 
     def _fetch(self, cik: int) -> dict[str, Any]:
-        request = urllib.request.Request(
-            COMPANYFACTS_URL.format(cik=cik),
-            headers={"User-Agent": self._ua, "Accept": "application/json"},
-        )
         self.requests += 1
-        with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
-            body: bytes = response.read()
-        loaded: dict[str, Any] = json.loads(body.decode())
+        loaded: dict[str, Any] = http.fetch_json(COMPANYFACTS_URL.format(cik=cik),
+                                                 timeout=TIMEOUT,
+                                                 headers={"User-Agent": self._ua})
         return loaded
 
     def get(self, cik: int) -> CompanyFacts:
@@ -655,11 +652,12 @@ class CompanyFactsSource:
                 raise Unresolved(f"CIK {cik}: offline and no snapshot at {path}")
             try:
                 payload = compact(self._fetch(cik))
-            except urllib.error.HTTPError as exc:
-                raise Unresolved(f"CIK {cik}: SEC companyfacts HTTP {exc.code}") from None
-            except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+            except (http.RpcError, urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+                code = http.status_of(exc)
+                if code is not None:
+                    raise Unresolved(f"CIK {cik}: SEC companyfacts HTTP {code}") from None
                 raise Unresolved(
-                    f"CIK {cik}: SEC companyfacts unavailable ({type(exc).__name__})"
+                    f"CIK {cik}: SEC companyfacts unavailable ({http.reason_of(exc)})"
                 ) from None
             if path is not None:
                 path.parent.mkdir(parents=True, exist_ok=True)
@@ -758,11 +756,8 @@ class FaceStatementSource:
         self.requests = 0
 
     def _get(self, url: str) -> str:
-        req = urllib.request.Request(url, headers={"User-Agent": self._ua})
         self.requests += 1
-        with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
-            body: bytes = resp.read()
-        return body.decode("utf-8", "replace")
+        return http.fetch_text(url, timeout=TIMEOUT, headers={"User-Agent": self._ua})
 
     def rows(self, cik: int, accn: str) -> list[FaceRow]:
         if accn in self._cache:
@@ -799,7 +794,7 @@ class FaceStatementSource:
                 for prefix, concept, label in re.findall(
                         r"defref_([a-z][a-z0-9\-]*)_(\w+)'[^>]*>(.*?)</a>", html_text, re.S):
                     out.append(FaceRow(short, prefix, concept, _clean_label(label)))
-        except (urllib.error.URLError, TimeoutError, OSError, ValueError):
+        except (http.RpcError, urllib.error.URLError, TimeoutError, OSError, ValueError):
             out = []
         self._cache[accn] = out
         if path is not None:
@@ -840,17 +835,14 @@ class ConceptSource:
         if path is not None and path.exists():
             payload = json.loads(path.read_text(encoding="utf-8"))
         elif not self._offline:
-            req = urllib.request.Request(CONCEPT_URL.format(cik=cik, tag=tag),
-                                         headers={"User-Agent": self._ua,
-                                                  "Accept": "application/json"})
             self.requests += 1
             try:
-                with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
-                    raw = json.loads(resp.read().decode())
+                raw = http.fetch_json(CONCEPT_URL.format(cik=cik, tag=tag), timeout=TIMEOUT,
+                                      headers={"User-Agent": self._ua})
                 fields = ("start", "end", "val", "accn", "fy", "fp", "form", "filed")
                 payload = {"units": {u: [{k: r.get(k) for k in fields if k in r} for r in rows]
                                      for u, rows in (raw.get("units") or {}).items()}}
-            except (urllib.error.URLError, TimeoutError, OSError, ValueError):
+            except (http.RpcError, urllib.error.URLError, TimeoutError, OSError, ValueError):
                 payload = None
             if payload is not None and path is not None:
                 path.parent.mkdir(parents=True, exist_ok=True)

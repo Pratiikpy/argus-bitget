@@ -64,14 +64,13 @@ from __future__ import annotations
 import argparse
 import json
 import time
-import urllib.error
-import urllib.parse
-import urllib.request
 from collections import deque
 from dataclasses import dataclass, field, replace
 from decimal import ROUND_DOWN, Decimal, getcontext, localcontext
 from enum import StrEnum
 from typing import Any
+
+from argus.truth import http
 
 INSTRUMENTS_URL = "https://api.bitget.com/api/v3/market/instruments"
 PRODUCT_TYPE = "USDT-FUTURES"
@@ -819,12 +818,9 @@ def fetch_instruments(
     params = {"category": product_type}
     if symbol:
         params["symbol"] = symbol
-    url = f"{INSTRUMENTS_URL}?{urllib.parse.urlencode(params)}"
-    request = urllib.request.Request(url, headers={"User-Agent": "argus/0.1"})
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            payload = json.loads(response.read().decode())
-    except (urllib.error.URLError, TimeoutError, OSError, json.JSONDecodeError) as exc:
+        payload = http.fetch_json(INSTRUMENTS_URL, params=params, timeout=timeout)
+    except http.RpcError as exc:
         raise GuardError(f"could not read instrument specifications: {exc}") from exc
 
     if str(payload.get("code")) != "00000":

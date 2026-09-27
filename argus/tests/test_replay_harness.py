@@ -60,7 +60,7 @@ def test_teacher_forcing_passes_every_check_on_the_real_runner(
         market: Market, instruments: dict[str, Any], teacher: dict[str, Decision]) -> None:
     from argus.paper import runner
 
-    patched = ("fetch_rtokens", "QwenClient", "_settle_due", "datetime", "RISK_PATH")
+    patched = ("fetch_rtokens", "seat", "_settle_due", "datetime", "RISK_PATH")
     real = [getattr(runner, name) for name in patched]
     run = replay("teacher", teacher, market, instruments)
     checks = validate(run, market, oracle_run=True)

@@ -152,3 +152,20 @@ def test_the_models_probability_reaches_the_plan_on_the_plans_scale() -> None:
     high = LocalPlanner(_Fixed("quote", 0.95)).complete_json(
         [{"role": "user", "content": "where is NVDA trading"}])
     assert floor <= low["confidence"] < high["confidence"] < 1.0
+
+
+def test_the_shipped_model_can_choose_every_research_kind() -> None:
+    """Audit finding 159: venue, construct, leverage, book and analogue had no training questions,
+    so the model could never pick them. Measured 2026-09-27 on a held-out set by a writer who never
+    saw this repository: 96 of 120 (book weakest, 16 of 24); the older held-out set stayed at 219
+    of 240. The floor below guards the new kinds against a silent regression."""
+    import json
+
+    from argus.eval.kindtrain import LABELS, NEW_KINDS_HELDOUT
+
+    model = KindModel.load()
+    assert {kind.value for kind in ResearchKind} <= set(LABELS)
+    rows = [json.loads(line) for line in NEW_KINDS_HELDOUT.read_text(encoding="utf-8").splitlines()
+            if line.strip()]
+    correct = sum(model.predict(row["text"])[0] == row["label"] for row in rows)
+    assert correct / len(rows) >= 0.75

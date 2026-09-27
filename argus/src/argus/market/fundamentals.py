@@ -34,15 +34,14 @@ quarter has read the future. This is the same gate ``market/evidence.py`` applie
 
 from __future__ import annotations
 
-import json
 import urllib.error
-import urllib.request
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from argus.market.evidence import FEED_USER_AGENT, EdgarSource
 from argus.market.sue import MIN_QUARTERS, SueError, read_dated, yoy_window
+from argus.truth import http
 from argus.truth.evidence import Evidence
 
 TIMEOUT = 15
@@ -308,12 +307,8 @@ class FundamentalsSource:
             return None
 
     def _get(self, url: str) -> dict[str, Any]:
-        request = urllib.request.Request(
-            url, headers={"User-Agent": self._ua, "Accept": "application/json"}
-        )
-        with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
-            body: bytes = response.read()
-        loaded: dict[str, Any] = json.loads(body.decode())
+        loaded: dict[str, Any] = http.fetch_json(url, timeout=TIMEOUT,
+                                                 headers={"User-Agent": self._ua})
         return loaded
 
     def facts(
@@ -358,13 +353,13 @@ class FundamentalsSource:
         for tag in tags:
             try:
                 payload = self._get(self.CONCEPT_URL.format(cik=cik, tag=tag))
-            except urllib.error.HTTPError as exc:
-                if exc.code == 404:
+            except (http.RpcError, urllib.error.URLError, TimeoutError, OSError,
+                    ValueError) as exc:
+                code = http.status_of(exc)
+                if code == 404:
                     continue  # this issuer reports the concept under a different tag
-                status.append(f"xbrl:{ticker}:{tag}: HTTP {exc.code}")
-                continue
-            except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
-                status.append(f"xbrl:{ticker}:{tag}: unavailable ({type(exc).__name__})")
+                status.append(f"xbrl:{ticker}:{tag}: HTTP {code}" if code is not None
+                              else f"xbrl:{ticker}:{tag}: unavailable ({http.reason_of(exc)})")
                 continue
 
             facts = parse_concept(payload, concept=concept)

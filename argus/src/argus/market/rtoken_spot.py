@@ -46,14 +46,14 @@ import json
 import math
 import re
 import time
-import urllib.error
-import urllib.request
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from datetime import time as clock_time
 from typing import Any
 from zoneinfo import ZoneInfo
+
+from argus.truth import http
 
 BASE = "https://api.bitget.com"
 NEW_YORK = ZoneInfo("America/New_York")
@@ -213,20 +213,19 @@ def _get(path: str, retries: int = 4) -> Any:  # pragma: no cover - network
     last: Exception | None = None
     for attempt in range(retries):
         try:
-            with urllib.request.urlopen(f"{BASE}{path}", timeout=30) as resp:
-                payload = json.load(resp)
-        except urllib.error.HTTPError as exc:
-            if exc.code != 429:
+            payload = http.fetch_json(f"{BASE}{path}", timeout=30)
+        except http.HttpError as exc:
+            if exc.http_status != 429:
                 try:
-                    body = json.loads(exc.read().decode("utf-8", "replace"))
+                    body = json.loads(exc.body.decode("utf-8", "replace"))
                     message = f"{body.get('code')}: {body.get('msg')}"
                 except ValueError:
-                    message = f"HTTP {exc.code}"
+                    message = f"HTTP {exc.http_status}"
                 raise SpotError(f"Bitget refused the request ({message})") from exc
             last = exc
             time.sleep(2.0 * (attempt + 1))
             continue
-        except (OSError, ValueError) as exc:
+        except http.RpcError as exc:  # timeout, refused connection, a body that is not JSON
             last = exc
             time.sleep(1.5 ** attempt)
             continue

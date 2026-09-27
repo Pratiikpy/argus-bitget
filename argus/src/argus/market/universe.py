@@ -38,6 +38,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
+from argus.truth import http
 from argus.truth.paths import DATA_DIR
 
 CONTRACTS_URL = ("https://api.bitget.com/api/v2/mix/market/contracts"
@@ -217,9 +218,7 @@ def _parse(rows: list[dict[str, object]]) -> dict[str, Contract]:
 
 
 def _fetch_live() -> dict[str, Contract]:
-    req = urllib.request.Request(CONTRACTS_URL, headers={"Accept": "application/json"})
-    with urllib.request.urlopen(req, timeout=FETCH_TIMEOUT_S) as resp:
-        payload = json.loads(resp.read().decode("utf-8"))
+    payload = http.fetch_json(CONTRACTS_URL, timeout=FETCH_TIMEOUT_S)
     if payload.get("code") not in ("00000", 0, None):
         raise RuntimeError(f"contracts code {payload.get('code')}: {payload.get('msg')}")
     contracts = _parse(payload.get("data") or [])

@@ -49,8 +49,6 @@ import json
 import os
 import re
 import subprocess
-import urllib.error
-import urllib.request
 import xml.etree.ElementTree as ET
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
@@ -60,6 +58,7 @@ from enum import StrEnum
 from typing import Any
 
 from argus.market.rpc import LABELS, ErrorKind, JsonRpcClient, RpcError, ToolResult, payload_failure
+from argus.truth import http
 from argus.truth.evidence import Evidence
 
 # The SEC requires a User-Agent that identifies the requester and rejects anonymous clients (403).
@@ -324,10 +323,7 @@ class EdgarSource:
         self._ciks: dict[str, int] | None = None
 
     def _get(self, url: str) -> Any:
-        headers = {"User-Agent": self._ua, "Accept": "application/json"}
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=_TIMEOUT) as r:
-            return json.loads(r.read().decode())
+        return http.fetch_json(url, timeout=_TIMEOUT, headers={"User-Agent": self._ua})
 
     def cik_for(self, ticker: str) -> int | None:
         if self._ciks is None:
@@ -444,9 +440,7 @@ class RssSource:
         self._ua = user_agent
 
     def _fetch(self, url: str) -> bytes:
-        req = urllib.request.Request(url, headers={"User-Agent": self._ua})
-        with urllib.request.urlopen(req, timeout=_TIMEOUT) as r:
-            return bytes(r.read())
+        return http.fetch(url, timeout=_TIMEOUT, headers={"User-Agent": self._ua})
 
     def headlines(self, key: str, url: str) -> list[Headline]:
         root = ET.fromstring(self._fetch(url))
@@ -489,8 +483,8 @@ class RssSource:
         for key, (url, source) in feeds.items():
             try:
                 hs = self.headlines(key, url)
-            except (urllib.error.URLError, ET.ParseError, TimeoutError, OSError) as exc:
-                status.append(f"{key}: unavailable ({type(exc).__name__})")
+            except (http.RpcError, ET.ParseError, OSError) as exc:
+                status.append(f"{key}: unavailable ({http.reason_of(exc)})")
                 continue
             kept = 0
             for h in hs:
@@ -876,8 +870,8 @@ def gather(
         got = edgar.evidence(symbol, as_of=as_of, lookback=filing_lookback)
         evidence.extend(got)
         status.append(f"edgar: {len(got)} filings")
-    except (urllib.error.URLError, TimeoutError, OSError, json.JSONDecodeError, KeyError) as exc:
-        status.append(f"edgar: unavailable ({type(exc).__name__})")
+    except (http.RpcError, OSError, json.JSONDecodeError, KeyError) as exc:
+        status.append(f"edgar: unavailable ({http.reason_of(exc)})")
 
     got, st = rss.evidence(symbol, as_of=as_of, lookback=lookback, keywords=keywords)
     evidence.extend(got)
@@ -926,9 +920,8 @@ def gather(
             )
             evidence.extend(got)
             status.extend(st)
-        except (urllib.error.URLError, TimeoutError, OSError,
-                json.JSONDecodeError, KeyError) as exc:
-            status.append(f"insider: unavailable ({type(exc).__name__})")
+        except (http.RpcError, OSError, json.JSONDecodeError, KeyError) as exc:
+            status.append(f"insider: unavailable ({http.reason_of(exc)})")
 
     # Reported financials, when a source is supplied. Opt-in for the same reason as the insider
     # feed: one request per concept, and a gather that reaches the network because a caller forgot
@@ -938,9 +931,8 @@ def gather(
             got, st = fundamentals.evidence(underlying_ticker(symbol), as_of=as_of)
             evidence.extend(got)
             status.extend(st)
-        except (urllib.error.URLError, TimeoutError, OSError,
-                json.JSONDecodeError, KeyError) as exc:
-            status.append(f"xbrl: unavailable ({type(exc).__name__})")
+        except (http.RpcError, OSError, json.JSONDecodeError, KeyError) as exc:
+            status.append(f"xbrl: unavailable ({http.reason_of(exc)})")
 
     # The gate. Sources apply it too, but this is the line a test can point at.
     leaked = [e for e in evidence if e.available_at > as_of]

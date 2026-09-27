@@ -32,14 +32,13 @@ live before a line of this was written.
 
 from __future__ import annotations
 
-import urllib.error
-import urllib.request
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from enum import StrEnum
 from typing import Any
 
+from argus.truth import http
 from argus.truth.evidence import Evidence
 
 SHORT_VOLUME_URL = "https://cdn.finra.org/equity/regsho/daily/CNMSshvol{stamp}.txt"
@@ -200,11 +199,9 @@ class Halt:
 
 
 def _get(url: str, *, timeout: int) -> bytes:
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            return bytes(response.read())
-    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        return http.fetch(url, timeout=timeout, headers={"User-Agent": USER_AGENT})
+    except http.RpcError as exc:
         raise MicrostructureError(f"could not read {url}: {exc}") from exc
 
 

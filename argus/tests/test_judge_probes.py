@@ -23,7 +23,7 @@ from argus.lui.research import (
 )
 from argus.lui.server import _language_note
 from argus.lui.status_page import Check, render, sweep_lines
-from argus.lui.task import price_chart, risk_chart
+from argus.lui.task_page import price_chart, risk_chart
 
 
 @pytest.mark.parametrize(

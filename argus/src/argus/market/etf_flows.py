@@ -24,14 +24,12 @@ from __future__ import annotations
 
 import json
 import statistics
-import urllib.error
-import urllib.parse
-import urllib.request
 from collections.abc import Callable, Mapping
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from argus.truth import http
 from argus.truth.paths import DATA_DIR
 
 DATA = DATA_DIR
@@ -66,13 +64,10 @@ def _key() -> tuple[str, str]:
 
 def get_live(path: str, query: Mapping[str, Any] | None = None) -> Any:
     key, base = _key()
-    url = base.rstrip("/") + path + ("?" + urllib.parse.urlencode(query) if query else "")
-    request = urllib.request.Request(url, headers={"x-soso-api-key": key,
-                                                   "User-Agent": "ARGUS research desk"})
     try:
-        with urllib.request.urlopen(request, timeout=30) as response:
-            payload = json.loads(response.read())
-    except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+        payload = http.fetch_json(base.rstrip("/") + path, params=query, timeout=30,
+                                  headers={"x-soso-api-key": key})
+    except http.RpcError as exc:
         raise FlowError(f"SoSoValue {path} unreachable: {exc}") from exc
     if not isinstance(payload, dict) or payload.get("code") != 0:
         raise FlowError(f"SoSoValue {path} answered {str(payload)[:120]}")

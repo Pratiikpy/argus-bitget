@@ -103,7 +103,6 @@ import re
 import sys
 import threading
 import time
-import urllib.request
 from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
@@ -112,6 +111,7 @@ from pathlib import Path
 from typing import Any
 
 from argus.lui.answer import Answer, Source
+from argus.truth import http
 from argus.truth.bounded import BoundedDict
 from argus.truth.paths import DATA_DIR
 
@@ -375,9 +375,7 @@ def row_from_summary(summary: Mapping[str, Any], *, ticker: str,
 
 
 def _bitget_lasts() -> dict[str, float]:
-    request = urllib.request.Request(TICKERS_URL, headers={"Accept": "application/json"})
-    with urllib.request.urlopen(request, timeout=10) as response:
-        payload = json.loads(response.read().decode("utf-8"))
+    payload = http.fetch_json(TICKERS_URL, timeout=10)
     out: dict[str, float] = {}
     for item in payload.get("data") or []:
         try:

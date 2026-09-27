@@ -34,6 +34,7 @@ from argus.lui.skillroute import Routed
 from argus.lui.skillroute import route as skill_route
 from argus.lui.trace import trace_module
 from argus.market.skills import Health
+from argus.truth import http
 from argus.truth.coverage import ContextPool
 
 
@@ -46,8 +47,6 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
     greed index and its week, with BTC and ETH funding as positioning. The Market Sentiment
     capability is OWNED for the integrity layer — "five accounts repeating one article is one
     source" — and until 2026-09-24 the console showed none of it (a judge audit's finding)."""
-    import json as _json
-    import urllib.request
 
     from argus.market.bitget import fetch_tickers
     from argus.market.stories import group
@@ -59,10 +58,8 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
         del ident, args
         upstream = "alternative.me Fear & Greed"
         try:
-            req = urllib.request.Request("https://api.alternative.me/fng/?limit=8",
-                                         headers={"User-Agent": "argus-research/1.0"})
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                week = list(_json.loads(resp.read().decode("utf-8")).get("data") or [])
+            week = list(http.fetch_json("https://api.alternative.me/fng/?limit=8",
+                                        timeout=10).get("data") or [])
         except Exception as exc:
             return Health.UNAVAILABLE, type(exc).__name__, None, upstream, True
         return (Health.OK if week else Health.EMPTY), "ok", week, upstream, True

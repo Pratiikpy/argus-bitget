@@ -37,6 +37,8 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
+from argus.truth import http
+
 _LOG = logging.getLogger(__name__)
 
 API = "https://api.telegram.org/bot{token}/{method}"
@@ -304,11 +306,9 @@ def follow_up(token: str, chat_id: int, message_id: int | None) -> None:
 # --- Telegram transport -------------------------------------------------------------------------
 
 def _call(token: str, method: str, params: dict[str, Any], *, timeout: float = 70.0) -> Any:
-    request = urllib.request.Request(
-        API.format(token=token, method=method), data=json.dumps(params).encode(),
-        headers={"Content-Type": "application/json"}, method="POST")
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        payload = json.load(response)
+    payload = http.fetch_json(API.format(token=token, method=method),
+                              data=json.dumps(params).encode(), method="POST", timeout=timeout,
+                              headers={"Content-Type": "application/json"})
     if not payload.get("ok"):
         raise RuntimeError(f"Telegram {method} failed: {payload.get('description')}")
     return payload.get("result")

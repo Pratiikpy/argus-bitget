@@ -151,6 +151,30 @@ def build(provider: Provider, *, budget_limit: int = 200_000, **kwargs: Any) -> 
     raise ValueError(f"unknown provider: {provider}")
 
 
+SEAT_ENV = "ARGUS_LLM_PROVIDER"
+"""The one line that swaps the model: ``ARGUS_LLM_PROVIDER=og_qwen`` (or ``deepseek_nim``) puts a
+different provider in every seat the product has — the desk, the console's question reader, the
+filing reader, the adversary and the replay. Unset, it is Qwen on the Bitget hackathon key."""
+
+
+def seat(*, budget_limit: int, **kwargs: Any) -> QwenClient:
+    """The model for one of the product's seats, from :data:`SEAT_ENV`.
+
+    Until 2026-09-27 six product modules built ``QwenClient`` directly, so this module's
+    "swapping the model is a one-line change" was true only for the evaluation harness (audit
+    finding 164). All three providers share Qwen's OpenAI-compatible client, which is why the
+    return type is that client rather than the narrower :class:`ChatModel`."""
+    name = os.environ.get(SEAT_ENV, Provider.QWEN.value).strip().lower()
+    try:
+        provider = Provider(name)
+    except ValueError:
+        raise ValueError(f"{SEAT_ENV}={name!r} names no provider "
+                         f"(one of {', '.join(p.value for p in Provider)})") from None
+    client = build(provider, budget_limit=budget_limit, **kwargs)
+    assert isinstance(client, QwenClient)
+    return client
+
+
 def available() -> tuple[Provider, ...]:
     """Providers whose credentials are actually present.
 

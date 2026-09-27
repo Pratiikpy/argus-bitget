@@ -20,7 +20,6 @@ premise of this system — and it is now checkable rather than asserted.
 
 from __future__ import annotations
 
-import json
 import logging
 import urllib.error
 import urllib.parse
@@ -29,6 +28,8 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
+
+from argus.truth import http
 
 _LOG = logging.getLogger(__name__)
 
@@ -111,13 +112,11 @@ def public_get(path: str, params: dict[str, str] | None = None, *, timeout: floa
         url = f"{url}?{urllib.parse.urlencode(params)}"
     # Deliberately no paptrading header: rest-client.ts:274-280 records that public endpoints
     # 404 when it is present.
-    req = urllib.request.Request(url, headers={"Accept": "application/json"}, method="GET")
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            payload = json.loads(resp.read().decode())
-    except urllib.error.HTTPError as exc:
-        raise BitgetError(f"HTTP {exc.code} for {path}") from None
-    except (urllib.error.URLError, TimeoutError) as exc:
+        payload = http.fetch_json(url, timeout=timeout)
+    except http.RpcError as exc:
+        if exc.http_status is not None:
+            raise BitgetError(f"HTTP {exc.http_status} for {path}") from None
         raise BitgetError(f"transport failure for {path}: {exc}") from None
 
     if payload.get("code") not in ("00000", 0, None):

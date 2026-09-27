@@ -1,0 +1,200 @@
+{"text": "Does Bitget list a tokenized version of NVDA, and what's the funding rate for holding it overnight?", "label": "venue", "lang": "en"}
+{"text": "What's the premium between Bitget's TSLA token and the actual TSLA share price right now?", "label": "venue", "lang": "en"}
+{"text": "If I hold Bitget's AAPL token through earnings, do I pay funding the same way as a perp?", "label": "venue", "lang": "en"}
+{"text": "Is it cheaper to hold MSTR exposure via Bitget's tokenized stock or just buy the share on a broker?", "label": "venue", "lang": "en"}
+{"text": "What are the trading fees on Bitget's COIN tokenized stock versus its BTC perp?", "label": "venue", "lang": "en"}
+{"text": "Does Bitget's tokenized GOOGL track the stock 1:1 after a stock split, or does the token get adjusted separately?", "label": "venue", "lang": "en"}
+{"text": "Can I get dividends from Bitget's tokenized AMZN, or does the token holder get nothing?", "label": "venue", "lang": "en"}
+{"text": "What's the minimum position size to open Bitget's tokenized META stock?", "label": "venue", "lang": "en"}
+{"text": "How does Bitget settle the tokenized SPY product on weekends when US markets are closed?", "label": "venue", "lang": "en"}
+{"text": "Is Bitget's tokenized stock offering available for AMD, or only mega-caps?", "label": "venue", "lang": "en"}
+{"text": "现在在Bitget上持有代币化的TSLA股票,资金费率是多少?", "label": "venue", "lang": "zh"}
+{"text": "Bitget代币化的NVDA和真实股票之间的溢价现在是多少?", "label": "venue", "lang": "zh"}
+{"text": "持有Bitget的代币化苹果股票过夜,要不要付资金费用?", "label": "venue", "lang": "zh"}
+{"text": "用Bitget代币化股票买入特斯拉敞口,比直接开美股账户划算吗?", "label": "venue", "lang": "zh"}
+{"text": "Bitget有没有上线代币化的Coinbase股票(COIN)?", "label": "venue", "lang": "zh"}
+{"text": "What happens to my Bitget tokenized MSTR position if the real MSTR stock halts trading?", "label": "venue", "lang": "en"}
+{"text": "Does Bitget charge a separate borrow fee for holding tokenized stocks long-term compared to crypto perps?", "label": "venue", "lang": "en"}
+{"text": "Is there a difference in maker/taker fees between Bitget's tokenized NFLX and its native perpetual contracts?", "label": "venue", "lang": "en"}
+{"text": "Which US stocks does Bitget currently offer as tokenized products?", "label": "venue", "lang": "en"}
+{"text": "If Bitget's tokenized TSLA trades at a premium to the real share, is there an arbitrage I can capture, or does Bitget prevent that?", "label": "venue", "lang": "en"}
+{"text": "Do I need a KYC tier upgrade to trade Bitget's tokenized stock products, same as for perps?", "label": "venue", "lang": "en"}
+{"text": "What's the round-the-clock funding schedule on Bitget's tokenized AAPL when NASDAQ itself is closed?", "label": "venue", "lang": "en"}
+{"text": "Should I just buy real TSLA shares instead of Bitget's tokenized version if I want to hold for a year?", "label": "venue", "lang": "en"}
+{"text": "Does Bitget's tokenized stock come with shareholder voting rights, or is it purely synthetic exposure?", "label": "venue", "lang": "en"}
+{"text": "What's the listing history — when did Bitget add tokenized MSTR to its platform?", "label": "venue", "lang": "en"}
+{"text": "Is Bitget's tokenized SPY product a perpetual, or does it expire?", "label": "venue", "lang": "en"}
+{"text": "为什么Bitget代币化股票的价格和纳斯达克实际收盘价不一样?", "label": "venue", "lang": "zh"}
+{"text": "在Bitget上用代币化股票做多META,和直接开美股杠杆账户,哪个手续费更低?", "label": "venue", "lang": "zh"}
+{"text": "Does Bitget require extra margin to hold tokenized stock positions overnight versus during market hours?", "label": "venue", "lang": "en"}
+{"text": "What's the total cost of carry if I hold Bitget's tokenized COIN token for one month versus owning COIN stock outright?", "label": "venue", "lang": "en"}
+{"text": "Build me a basket of AI infrastructure plays — NVDA, SMCI, AMD, and a couple of crypto AI tokens — sized for a $50k account.", "label": "construct", "lang": "en"}
+{"text": "Put together a portfolio of Bitget tokenized stocks that tracks the 'Magnificent Seven' theme.", "label": "construct", "lang": "en"}
+{"text": "I want a new equal-weight crypto basket of the top 5 Layer-1 tokens by market cap — construct it.", "label": "construct", "lang": "en"}
+{"text": "Design a barbell portfolio: half in BTC and ETH, half in high-beta altcoins like SOL and AVAX.", "label": "construct", "lang": "en"}
+{"text": "Create a dividend-free growth basket using Bitget's tokenized TSLA, NVDA, and PLTR.", "label": "construct", "lang": "en"}
+{"text": "Build a stablecoin-yield-plus-BTC core portfolio from scratch for someone who wants low volatility.", "label": "construct", "lang": "en"}
+{"text": "Construct a momentum basket of the five best-performing perps on Bitget over the last 30 days.", "label": "construct", "lang": "en"}
+{"text": "I want to start a new thematic portfolio around tokenized real-world assets — pick the names and weight them.", "label": "construct", "lang": "en"}
+{"text": "Put together a hedged portfolio: long ETH perp, short a basket of correlated altcoins.", "label": "construct", "lang": "en"}
+{"text": "Build me a 'picks and shovels' AI basket — data center plays, GPU makers, and power names — as a brand new book.", "label": "construct", "lang": "en"}
+{"text": "帮我从零构建一个新的组合,包含BTC、ETH和三个热门Layer2代币,等权重分配。", "label": "construct", "lang": "zh"}
+{"text": "设计一个新的篮子,围绕人工智能主题,包含英伟达代币化股票和几个AI概念币。", "label": "construct", "lang": "zh"}
+{"text": "从头搭建一个防御性组合:一半稳定币,一半BTC,新开一个账户来跑。", "label": "construct", "lang": "zh"}
+{"text": "Construct a rotation basket that holds the top 3 memecoins by volume each week — set up the initial weights.", "label": "construct", "lang": "en"}
+{"text": "Build a new cross-asset portfolio: 30% tokenized SPY, 30% BTC, 40% cash-equivalent stablecoin yield.", "label": "construct", "lang": "en"}
+{"text": "I have $20k in fresh capital — construct a diversified crypto-plus-tokenized-stock portfolio from scratch.", "label": "construct", "lang": "en"}
+{"text": "Put together a basket of RWA tokenization plays — think ONDO, tokenized treasuries, and Bitget's stock tokens.", "label": "construct", "lang": "en"}
+{"text": "Design a new pairs-trading book: pick 4 correlated pairs across crypto and tokenized equities and size each leg.", "label": "construct", "lang": "en"}
+{"text": "Build a starter portfolio for someone new to crypto — three names, conservative weights, explain the picks.", "label": "construct", "lang": "en"}
+{"text": "Construct a basket that expresses a 'Fed cutting rates' thesis using crypto and tokenized growth stocks.", "label": "construct", "lang": "en"}
+{"text": "I want a brand new options-free income portfolio using perp funding-rate carry — build the basket.", "label": "construct", "lang": "en"}
+{"text": "Assemble a new high-conviction portfolio of 5 altcoins under $1B market cap with equal dollar weights.", "label": "construct", "lang": "en"}
+{"text": "Set up a fresh core-satellite portfolio: BTC/ETH as core, a satellite sleeve of DeFi tokens.", "label": "construct", "lang": "en"}
+{"text": "Build a brand new basket tracking the 'AI agents' narrative — pick the tokens and the tokenized stocks together.", "label": "construct", "lang": "en"}
+{"text": "从零开始给我搭建一个组合,主题是稳定币和黄金代币化资产的对冲组合。", "label": "construct", "lang": "zh"}
+{"text": "Construct a new leveraged basket of the three most volatile perps on Bitget, sized for a small speculative sleeve.", "label": "construct", "lang": "en"}
+{"text": "I'm starting fresh — build me a 10-asset crypto index-style portfolio weighted by market cap.", "label": "construct", "lang": "en"}
+{"text": "Put together a new short-volatility basket using stablecoin yield plus a small BTC hedge.", "label": "construct", "lang": "en"}
+{"text": "Design a brand-new thematic basket around tokenized US tech stocks available on Bitget, five names, equal weight.", "label": "construct", "lang": "en"}
+{"text": "Build me a new multi-asset starter book combining two tokenized stocks and three crypto majors.", "label": "construct", "lang": "en"}
+{"text": "If I open a 20x long on SOL, how far away is my liquidation price from here?", "label": "leverage", "lang": "en"}
+{"text": "How often has BTC moved 8% in a single day in the last two years — that's roughly my liquidation distance at 12x.", "label": "leverage", "lang": "en"}
+{"text": "What's the maximum leverage I can safely use on an ETH perp without getting liquidated on a normal daily swing?", "label": "leverage", "lang": "en"}
+{"text": "At 25x leverage on DOGE, what funding rate am I effectively paying per day?", "label": "leverage", "lang": "en"}
+{"text": "How many standard deviations away is my liquidation price if I go 15x long on AVAX right now?", "label": "leverage", "lang": "en"}
+{"text": "Has XRP ever moved far enough in one day to wipe out a 30x leveraged position?", "label": "leverage", "lang": "en"}
+{"text": "What leverage on a BTC perp keeps my liquidation price outside the typical weekly trading range?", "label": "leverage", "lang": "en"}
+{"text": "If I use 10x on a tokenized TSLA perp, how far is the stock's normal daily move from triggering liquidation?", "label": "leverage", "lang": "en"}
+{"text": "How often in the past year has ETH swung enough intraday to liquidate a 20x short?", "label": "leverage", "lang": "en"}
+{"text": "What's the safest leverage cap on SUI given how often it's had 15%+ candles this month?", "label": "leverage", "lang": "en"}
+{"text": "如果我在BTC上开50倍杠杆,现在的爆仓价格离现价有多远?", "label": "leverage", "lang": "zh"}
+{"text": "以20倍杠杆做多ETH,按照过去一年的波动率,多久会被强平一次?", "label": "leverage", "lang": "zh"}
+{"text": "SOL在过去三个月里,单日涨跌幅超过10%的次数有多少?这决定我能上多少倍杠杆。", "label": "leverage", "lang": "zh"}
+{"text": "在10倍杠杆下持有BTC永续合约,每天的资金费率大概会吃掉多少收益?", "label": "leverage", "lang": "zh"}
+{"text": "What's the historical frequency of a 5%+ daily move in NVDA's tokenized stock — I'm sizing leverage around that.", "label": "leverage", "lang": "en"}
+{"text": "If I go 40x on a memecoin like PEPE, how close is liquidation to a totally normal 5% wick?", "label": "leverage", "lang": "en"}
+{"text": "How much leverage can I run on an AVAX perp before a routine overnight move takes me out?", "label": "leverage", "lang": "en"}
+{"text": "At what leverage does BTC's average daily range start to threaten my liquidation price?", "label": "leverage", "lang": "en"}
+{"text": "What's the max leverage I should use on LINK given its 90-day realized volatility?", "label": "leverage", "lang": "en"}
+{"text": "If my liquidation is 6% away on a 15x ETH long, how often historically has ETH moved 6% against a position in a day?", "label": "leverage", "lang": "en"}
+{"text": "How does funding cost scale if I move from 5x to 30x leverage on the same BTC notional?", "label": "leverage", "lang": "en"}
+{"text": "What leverage on SOL keeps my liquidation distance wider than its worst single-day drop this year?", "label": "leverage", "lang": "en"}
+{"text": "杠杆开到30倍做空DOGE,按照它的历史波动,多大概率会被强制平仓?", "label": "leverage", "lang": "zh"}
+{"text": "现在给ETH永续合约上15倍杠杆,清算价格距离现价的百分比是多少?", "label": "leverage", "lang": "zh"}
+{"text": "How many times in the last 6 months has BNB had a daily range wide enough to liquidate an 18x position?", "label": "leverage", "lang": "en"}
+{"text": "What's a reasonable leverage ceiling for a MATIC perp trade given how often it gaps on news?", "label": "leverage", "lang": "en"}
+{"text": "If I hold a 12x leveraged short on BTC through a weekend, how does the funding rate compound compared to 3x?", "label": "leverage", "lang": "en"}
+{"text": "How far is my liquidation on a 22x AAVE long, and has AAVE ever dropped that much in a day before?", "label": "leverage", "lang": "en"}
+{"text": "What leverage level on a tokenized COIN stock perp would survive its biggest one-day drop in the past year?", "label": "leverage", "lang": "en"}
+{"text": "At 8x on ETH, is my liquidation distance wider or narrower than ETH's typical monthly drawdown?", "label": "leverage", "lang": "en"}
+{"text": "Look at my current positions — what's the biggest concentration risk in my book right now?", "label": "book", "lang": "en"}
+{"text": "What was the worst single day my existing portfolio has had this year?", "label": "book", "lang": "en"}
+{"text": "Given what I'm already holding, which position should I trim first to cut risk?", "label": "book", "lang": "en"}
+{"text": "How concentrated is my book in crypto versus tokenized stocks as it stands today?", "label": "book", "lang": "en"}
+{"text": "What's the current risk profile of my open positions — any single name too big?", "label": "book", "lang": "en"}
+{"text": "Looking at my existing holdings, what's my largest unrealized loss right now?", "label": "book", "lang": "en"}
+{"text": "Of everything I currently hold, which position is contributing the most volatility to my book?", "label": "book", "lang": "en"}
+{"text": "What's my current portfolio's correlation risk — am I basically holding the same bet five times?", "label": "book", "lang": "en"}
+{"text": "Review my open book — is there anything here that should be cut for being too large a share of total capital?", "label": "book", "lang": "en"}
+{"text": "What does my existing position sizing look like — am I overweight any single sector right now?", "label": "book", "lang": "en"}
+{"text": "看看我现在持有的仓位,集中度风险最大的是哪个?", "label": "book", "lang": "zh"}
+{"text": "我这个账户今年最差的一天亏了多少?", "label": "book", "lang": "zh"}
+{"text": "根据我现在的持仓,哪个仓位应该先减掉来降低风险?", "label": "book", "lang": "zh"}
+{"text": "我目前的组合里,加密货币和代币化股票的比例是怎样的?", "label": "book", "lang": "zh"}
+{"text": "Take stock of what I already own — is any single position over 40% of my total book?", "label": "book", "lang": "en"}
+{"text": "What's the drawdown my current holdings have already experienced peak to trough?", "label": "book", "lang": "en"}
+{"text": "In my existing portfolio, which name has the worst risk-adjusted contribution right now?", "label": "book", "lang": "en"}
+{"text": "How diversified is my book as it stands — count the effective number of independent bets.", "label": "book", "lang": "en"}
+{"text": "What's the current unrealized P&L breakdown across everything I'm holding?", "label": "book", "lang": "en"}
+{"text": "Given my current positions, what's the single biggest source of drawdown risk sitting in the book today?", "label": "book", "lang": "en"}
+{"text": "Which of my open positions has been the most volatile over the last month, based on what I already hold?", "label": "book", "lang": "en"}
+{"text": "My book right now — what's the total notional exposure and how much of it is in one asset?", "label": "book", "lang": "en"}
+{"text": "What would you flag as overexposed in my current holdings without me adding anything new?", "label": "book", "lang": "en"}
+{"text": "看一下我现有的持仓组合,有没有哪个仓位占比过高需要减仓?", "label": "book", "lang": "zh"}
+{"text": "我现在的仓位里,风险贡献最大的是哪一个资产?", "label": "book", "lang": "zh"}
+{"text": "Assess my current book's concentration — how much of my capital sits in just BTC and ETH combined right now?", "label": "book", "lang": "en"}
+{"text": "What's the historical worst drawdown of the exact mix of assets I'm currently holding?", "label": "book", "lang": "en"}
+{"text": "Of my current open trades, which one should come off the book first if I need to de-risk?", "label": "book", "lang": "en"}
+{"text": "How much of my existing portfolio's risk comes from a single tokenized stock position I'm already holding?", "label": "book", "lang": "en"}
+{"text": "Just looking at what's already in my account — what's the risk concentration by sector right now?", "label": "book", "lang": "en"}
+{"text": "Has BTC ever consolidated this tightly for three weeks before a Fed decision, and what happened after?", "label": "analogue", "lang": "en"}
+{"text": "Is this ETH setup similar to the pattern before the 2021 run — low volatility, rising open interest?", "label": "analogue", "lang": "en"}
+{"text": "Has there been a precedent for a stock's tokenized version decoupling from its share price like TSLA is now, and what followed?", "label": "analogue", "lang": "en"}
+{"text": "Has SOL ever had this exact combination of funding rate flip plus exchange outflow before — what happened next?", "label": "analogue", "lang": "en"}
+{"text": "Is what's happening with NVDA right now similar to any past pre-earnings run-up, and how did those resolve?", "label": "analogue", "lang": "en"}
+{"text": "Has crypto ever seen a setup like this — BTC dominance falling while altcoin volume spikes — and what came after historically?", "label": "analogue", "lang": "en"}
+{"text": "Has this kind of low-volume summer chop in ETH happened before, and what broke the range last time?", "label": "analogue", "lang": "en"}
+{"text": "Is this the same pattern as the pre-halving accumulation phase in past cycles?", "label": "analogue", "lang": "en"}
+{"text": "Has DOGE ever rallied this hard on social volume alone before, without a fundamental catalyst — what happened after those spikes?", "label": "analogue", "lang": "en"}
+{"text": "Has there been a historical precedent for a Bitget tokenized stock trading at this large a premium before it converged?", "label": "analogue", "lang": "en"}
+{"text": "这种BTC横盘三周后突然放量的走势,历史上出现过吗?后来发生了什么?", "label": "analogue", "lang": "zh"}
+{"text": "现在ETH的这种低波动+持仓量上升的组合,和2021年那次启动前的情况像吗?", "label": "analogue", "lang": "zh"}
+{"text": "历史上有没有出现过这样的情形:比特币主导率下跌,山寨币交易量暴增,后来市场怎么走的?", "label": "analogue", "lang": "zh"}
+{"text": "这次SOL在利好消息前的横盘蓄势,跟去年那次拉升前的情况相似吗?", "label": "analogue", "lang": "zh"}
+{"text": "Has this setup — a coin getting delisting rumors followed by a sharp bounce — played out before, and what usually follows?", "label": "analogue", "lang": "en"}
+{"text": "Is the current stablecoin depeg scare similar to any past de-peg event, and how did those typically resolve?", "label": "analogue", "lang": "en"}
+{"text": "Has a US rate-cut announcement ever coincided with this kind of crypto positioning before, and what happened in the following weeks?", "label": "analogue", "lang": "en"}
+{"text": "Has AVAX shown this exact 'low liquidity breakout then retest' pattern before — what came next historically?", "label": "analogue", "lang": "en"}
+{"text": "Is this current altcoin season setup comparable to early 2021 or more like the 2023 fakeout — and how did each resolve?", "label": "analogue", "lang": "en"}
+{"text": "Has a tokenized stock premium collapse like what's happening with MSTR happened before on this platform or elsewhere?", "label": "analogue", "lang": "en"}
+{"text": "Has BTC ever bottomed after this specific combination — funding deeply negative plus a spike in exchange reserves?", "label": "analogue", "lang": "en"}
+{"text": "Is the current setup in LINK similar to a prior accumulation phase before a major protocol announcement?", "label": "analogue", "lang": "en"}
+{"text": "Has this kind of pre-CPI positioning in crypto happened before, and what typically follows the data release?", "label": "analogue", "lang": "en"}
+{"text": "历史上有没有出现过山寨币在缺乏基本面消息的情况下,单靠社交媒体热度暴涨的情况?后来怎么样了?", "label": "analogue", "lang": "zh"}
+{"text": "这次美元指数走弱同时比特币走强的组合,历史上是不是也发生过?后续走势如何?", "label": "analogue", "lang": "zh"}
+{"text": "Has this exact setup — new all-time high followed immediately by a sharp single-day reversal — happened with BTC before?", "label": "analogue", "lang": "en"}
+{"text": "Is what NVDA is doing now comparable to any prior semiconductor cycle top, based on historical analogues?", "label": "analogue", "lang": "en"}
+{"text": "Has a coin ever recovered this fast after an exchange hack scare, and is there a historical precedent for how the recovery played out?", "label": "analogue", "lang": "en"}
+{"text": "Has this kind of quiet accumulation before a major protocol upgrade happened before in ETH's history, and what followed the upgrade?", "label": "analogue", "lang": "en"}
+{"text": "Is the current setup — leverage ratios spiking while price stays flat — similar to any past pre-liquidation-cascade pattern?", "label": "analogue", "lang": "en"}
+{"text": "What's TSLA trading at right now?", "label": "quote", "lang": "en"}
+{"text": "Give me the current bid-ask spread on the BTC perp.", "label": "quote", "lang": "en"}
+{"text": "What's the round-trip cost — fees plus spread — to buy and sell one ETH perp contract right now?", "label": "quote", "lang": "en"}
+{"text": "What's NVDA's current price?", "label": "quote", "lang": "en"}
+{"text": "现在BTC的价格是多少?", "label": "quote", "lang": "zh"}
+{"text": "What's the live spread on Bitget's SOL/USDT pair?", "label": "quote", "lang": "en"}
+{"text": "Quote me AAPL's current price and today's percentage change.", "label": "quote", "lang": "en"}
+{"text": "What's the current ask price on the DOGE perp?", "label": "quote", "lang": "en"}
+{"text": "现在ETH永续合约的买卖价差是多少?", "label": "quote", "lang": "zh"}
+{"text": "What's the spot price of XRP right now, and what's the taker fee to buy it?", "label": "quote", "lang": "en"}
+{"text": "Compare NVDA and AMD on revenue growth and current valuation.", "label": "compare", "lang": "en"}
+{"text": "Which is a better hold right now, BTC or ETH?", "label": "compare", "lang": "en"}
+{"text": "Side by side: SOL versus AVAX on transaction throughput and current momentum.", "label": "compare", "lang": "en"}
+{"text": "Compare Bitget's tokenized TSLA against its tokenized NVDA on recent volatility.", "label": "compare", "lang": "en"}
+{"text": "把DOGE和SHIB放在一起比较一下,哪个近期表现更强?", "label": "compare", "lang": "zh"}
+{"text": "How does COIN's tokenized stock compare to MSTR's on correlation to BTC?", "label": "compare", "lang": "en"}
+{"text": "Compare funding rates right now between the ETH perp and the SOL perp.", "label": "compare", "lang": "en"}
+{"text": "Which has better risk-adjusted returns over the last 90 days, LINK or UNI?", "label": "compare", "lang": "en"}
+{"text": "TSLA和NVDA现在哪个的动量更强?", "label": "compare", "lang": "zh"}
+{"text": "Compare AAVE and COMP on TVL and fee revenue this quarter.", "label": "compare", "lang": "en"}
+{"text": "If I add a 2x long BTC position to my current book, how does my overall risk change?", "label": "impact", "lang": "en"}
+{"text": "What happens to my portfolio's volatility if I add $5,000 of SOL to what I already hold?", "label": "impact", "lang": "en"}
+{"text": "If I remove my ETH position from the book, how does my concentration risk change?", "label": "impact", "lang": "en"}
+{"text": "What's the effect on my book's correlation if I size up my existing AVAX trade by 50%?", "label": "impact", "lang": "en"}
+{"text": "如果我在现有组合里加一笔BTC多头,整体风险会怎么变化?", "label": "impact", "lang": "zh"}
+{"text": "If I trim my NVDA tokenized stock position by half, how does my portfolio's drawdown risk shift?", "label": "impact", "lang": "en"}
+{"text": "What happens to my overall Sharpe ratio if I add a small DOGE position to the current book?", "label": "impact", "lang": "en"}
+{"text": "If I add a short ETH hedge against my existing long book, how much does that reduce my net exposure?", "label": "impact", "lang": "en"}
+{"text": "如果把我持有的SOL仓位加倍,组合的波动率会上升多少?", "label": "impact", "lang": "zh"}
+{"text": "What's the marginal impact on my portfolio's beta if I add a tokenized SPY position right now?", "label": "impact", "lang": "en"}
+{"text": "If the Nasdaq drops 10% tomorrow, what happens to my current portfolio?", "label": "stress", "lang": "en"}
+{"text": "What happens to my book if Bitcoin crashes 30% in a week?", "label": "stress", "lang": "en"}
+{"text": "Simulate a 2022-style crypto winter scenario against my current holdings.", "label": "stress", "lang": "en"}
+{"text": "If the Fed surprises with a 100bp hike, how does my portfolio react?", "label": "stress", "lang": "en"}
+{"text": "如果纳斯达克明天暴跌10%,我现在的组合会受到什么影响?", "label": "stress", "lang": "zh"}
+{"text": "What's my portfolio's expected loss if there's a broad market sell-off like March 2020?", "label": "stress", "lang": "en"}
+{"text": "If BTC dominance spikes and altcoins get liquidated across the board, what happens to my book?", "label": "stress", "lang": "en"}
+{"text": "如果比特币一周内暴跌30%,我的账户会亏多少?", "label": "stress", "lang": "zh"}
+{"text": "Stress-test my portfolio against a scenario where the S&P 500 drops 15% and crypto follows it down.", "label": "stress", "lang": "en"}
+{"text": "What happens to my current holdings if there's a sudden USDT depeg event across the whole market?", "label": "stress", "lang": "en"}
+{"text": "What's BTC's RSI on the daily chart right now?", "label": "technicals", "lang": "en"}
+{"text": "Is ETH showing a MACD bullish crossover on the 4-hour chart?", "label": "technicals", "lang": "en"}
+{"text": "Where's the nearest support level for SOL right now?", "label": "technicals", "lang": "en"}
+{"text": "Is NVDA overbought on the weekly RSI?", "label": "technicals", "lang": "en"}
+{"text": "现在BTC日线的RSI是多少?", "label": "technicals", "lang": "zh"}
+{"text": "What's the key resistance level for DOGE on the daily chart?", "label": "technicals", "lang": "en"}
+{"text": "Is AVAX's MACD showing bearish divergence right now?", "label": "technicals", "lang": "en"}
+{"text": "ETH现在是不是处于超买状态,看4小时图的RSI?", "label": "technicals", "lang": "zh"}
+{"text": "What's the 50-day moving average for TSLA right now?", "label": "technicals", "lang": "en"}
+{"text": "Is XRP testing a major support zone on the weekly chart?", "label": "technicals", "lang": "en"}

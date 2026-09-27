@@ -431,7 +431,8 @@ def run_scenario(  # pragma: no cover - drives the live model and venue
     """Drive the real desk through the scenario, and carry any approved order to the demo venue."""
     from argus.agents.desk import TradingDesk
     from argus.cost.model import CostModel
-    from argus.llm.qwen import QwenClient, Thinking, TokenBudget
+    from argus.llm.provider import seat
+    from argus.llm.qwen import Thinking
     from argus.risk.constitution import ConstitutionPolicy
     from argus.risk.hedgeability import HedgeabilitySurface
     from argus.truth.clocks import DualClock
@@ -440,7 +441,7 @@ def run_scenario(  # pragma: no cover - drives the live model and venue
     trace_id = f"flow-scenario-{as_of.strftime('%Y%m%dT%H%M%S')}"
     session = DualClock().state(as_of, nav_age_seconds=40_000)
     desk = TradingDesk(
-        QwenClient(budget=TokenBudget(limit=80_000)),
+        seat(budget_limit=80_000),
         pm_thinking=Thinking.LOW, cost=CostModel.bitget_perp(),
     )
     run = desk.run(

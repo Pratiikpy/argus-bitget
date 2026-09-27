@@ -26,7 +26,6 @@ The documented range limit is **90 days**, so :func:`fetch_range` pages backward
 
 from __future__ import annotations
 
-import json
 import time
 import urllib.error
 import urllib.parse
@@ -36,6 +35,8 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from enum import StrEnum
 from typing import Any
+
+from argus.truth import http
 
 BASE_URL = "https://api.bitget.com"
 HISTORY_PATH = "/api/v3/market/history-candles"
@@ -169,14 +170,11 @@ def _px(value: Any, *, field: str, symbol: str) -> Decimal:
 def _get(params: dict[str, str], *, timeout: float = 30.0,
          path: str = HISTORY_PATH) -> list[list[str]]:
     url = f"{BASE_URL}{path}?{urllib.parse.urlencode(params)}"
-    req = urllib.request.Request(url, headers={"Accept": "application/json"}, method="GET")
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            payload = json.loads(resp.read().decode())
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode(errors="replace")[:200]
-        raise HistoryError(f"HTTP {exc.code} for history-candles: {detail}") from None
-    except (urllib.error.URLError, TimeoutError) as exc:
+        payload = http.fetch_json(url, timeout=timeout)
+    except http.RpcError as exc:
+        if exc.http_status is not None:
+            raise HistoryError(f"{exc} (history-candles)") from None
         raise HistoryError(f"transport failure: {exc}") from None
 
     if payload.get("code") not in ("00000", 0, None):

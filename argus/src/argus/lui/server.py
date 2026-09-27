@@ -664,6 +664,16 @@ def _answer(
         return engine_payload(*onchain.tvl(text), by="defi-tvl")
     if onchain.asks_for_gas(text):
         return engine_payload(*onchain.gas(text), by="eth-gas")
+    from argus.lui import rotation as rotation_answer
+
+    if rotation_answer.asks_for_rotation(text):
+        # risk on or off across stocks, crypto and gold: `desk/rotation.py`, reached (audit 164)
+        return engine_payload(*rotation_answer.answer(text, book), by="rotation")
+    from argus.lui import crossasset as cross_asset
+
+    if cross_asset.asks_for_cross_asset(text, book):
+        # a book holding rToken spot and crypto asks whether to hedge: `desk/crossasset.py`
+        return engine_payload(*cross_asset.answer(text, book), by="cross-asset")
     if asks_for_watchlist(text):
         return engine_payload(*watchlist(text, book, now=clock), by="watchlist")
     exposed = exposures_mod.answer(text, book)
@@ -1104,9 +1114,9 @@ def _filing_model() -> Any:
     if not _DOC_MODEL_BUILT:
         _DOC_MODEL_BUILT = True
         try:
-            from argus.llm.qwen import QwenClient, TokenBudget
+            from argus.llm.provider import seat
 
-            _DOC_MODEL = QwenClient(budget=TokenBudget(limit=120_000))
+            _DOC_MODEL = seat(budget_limit=120_000)
         except Exception:
             _DOC_MODEL = None
     return _DOC_MODEL
@@ -1476,11 +1486,11 @@ class Handler(BaseHTTPRequestHandler):
             DEFAULT_NAME,
             DEFAULT_SIZE_PCT,
             read_question,
-            render_task,
             research_task,
             unread_task,
         )
         from argus.lui.task import as_dict as task_as_dict
+        from argus.lui.task_page import render_task
 
         asked = repair_mojibake((params.get("q") or [""])[0]).strip()[:500]
         saved = repair_mojibake((params.get("book") or [""])[0])[:300]
@@ -1679,7 +1689,7 @@ class Handler(BaseHTTPRequestHandler):
                 # Assembled at request time from those artefacts rather than written down once,
                 # because a hand-written description of a measurement drifts the first time the
                 # measurement changes.
-                from argus.lui.corrections_page import collect
+                from argus.lui.corrections import collect
                 from argus.lui.corrections_page import render as render_wrong
 
                 found = collect(_ledger_path().parent)

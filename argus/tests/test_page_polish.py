@@ -15,7 +15,7 @@ from urllib.request import Request, urlopen
 import pytest
 
 from argus.lui import corrections_page, design, status_page
-from argus.lui.corrections_page import Correction
+from argus.lui.corrections import Correction
 from argus.lui.server import PAGE, Handler, mcp_page
 
 
@@ -138,7 +138,8 @@ class TestTheResearchPage:
     def test_the_weight_bars_are_visible_against_the_page(self) -> None:
         """Finding 71: the money bars were drawn in the hairline colour, about 1.2:1 on white;
         a chart's marks need 3:1 (WCAG 1.4.11). They take the secondary text colour now."""
-        from argus.lui.task import render_task, unread_task
+        from argus.lui.task import unread_task
+        from argus.lui.task_page import render_task
 
         page = render_task(unread_task("?", "no question"), "")
         assert ".chart rect.w, .key.w { fill:var(--dim); background:var(--dim) }" in page
@@ -235,7 +236,8 @@ class TestTheResearchFormSendsTheSavedBook:
         assert seen["saved"] == ""
 
     def test_the_page_fills_both_fields_from_this_browser(self) -> None:
-        from argus.lui.task import render_task, unread_task
+        from argus.lui.task import unread_task
+        from argus.lui.task_page import render_task
 
         page = render_task(unread_task("?", "no question"), "")
         assert '<input type="hidden" name="saved"><input type="hidden" name="memory">' in page

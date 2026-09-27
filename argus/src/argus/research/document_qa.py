@@ -87,7 +87,6 @@ import hashlib
 import html
 import math
 import re
-import urllib.request
 from collections import Counter
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
@@ -96,12 +95,12 @@ from typing import Any
 
 from argus.llm.base import ChatModel
 from argus.llm.qwen import Thinking
-from argus.market.evidence import EdgarSource
+from argus.market.evidence import FEED_USER_AGENT, EdgarSource
+from argus.truth import http
 from argus.truth.source import Source
 
 # --- fetching ---------------------------------------------------------------------------------
 
-_UA = "ARGUS research desk research@argus-desk.example"
 """The SEC blocks anonymous clients; the same descriptive agent `market/earnings_release.py`
 uses."""
 _TIMEOUT = 30.0
@@ -173,9 +172,8 @@ def html_to_text(document: str) -> str:
 
 def _fetch(url: str) -> str:
     # Fixed https host (sec.gov); the path comes from EDGAR's own index, not from a user.
-    request = urllib.request.Request(url, headers={"User-Agent": _UA, "Accept": "*/*"})
-    with urllib.request.urlopen(request, timeout=_TIMEOUT) as response:
-        return str(response.read(_MAX_BYTES).decode("utf-8", errors="replace"))
+    return http.fetch_text(url, timeout=_TIMEOUT, max_bytes=_MAX_BYTES,
+                           headers={"User-Agent": FEED_USER_AGENT, "Accept": "*/*"})
 
 
 class EdgarDocuments:
@@ -188,7 +186,7 @@ class EdgarDocuments:
     """
 
     def __init__(self, edgar: EdgarSource | None = None) -> None:
-        self._edgar = edgar or EdgarSource(user_agent=_UA)
+        self._edgar = edgar or EdgarSource(user_agent=FEED_USER_AGENT)
 
     def _exhibit(self, cik: int, accession: str, prefix: str) -> str | None:
         folder = accession.replace("-", "")

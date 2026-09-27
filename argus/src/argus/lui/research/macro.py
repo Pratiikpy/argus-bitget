@@ -32,6 +32,7 @@ from argus.lui.skillroute import Routed
 from argus.lui.skillroute import route as skill_route
 from argus.lui.trace import trace_module
 from argus.market.skills import Health
+from argus.truth import http
 from argus.truth.coverage import ContextPool
 from argus.truth.paths import DATA_DIR
 
@@ -58,14 +59,10 @@ _FRED_USED_SNAPSHOT: dict[str, str] = {}
 
 
 def _fred_live(series: str, days: int) -> list[tuple[str, float]]:
-    import urllib.request
     from datetime import timedelta as _td
 
     start = (datetime.now(UTC) - _td(days=days)).date().isoformat()
-    req = urllib.request.Request(FRED_CSV.format(series=series, start=start),
-                                 headers={"User-Agent": "argus-research/1.0"})
-    with urllib.request.urlopen(req, timeout=FRED_TIMEOUT_S) as resp:
-        text = resp.read().decode("utf-8")
+    text = http.fetch_text(FRED_CSV.format(series=series, start=start), timeout=FRED_TIMEOUT_S)
     rows: list[tuple[str, float]] = []
     for line in text.splitlines()[1:]:
         day, _, value = line.partition(",")

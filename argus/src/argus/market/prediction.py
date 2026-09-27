@@ -29,11 +29,11 @@ import json
 import re
 import threading
 import time
-import urllib.parse
-import urllib.request
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from typing import Any
+
+from argus.truth import http
 
 GAMMA = "https://gamma-api.polymarket.com"
 VOLUME_FLOOR = 10_000.0
@@ -88,15 +88,13 @@ def _search(term: str, *, timeout: float = 10.0) -> list[dict[str, Any]]:
         hit = _cache.get(term)
         if hit and now - hit[0] < CACHE_SECONDS:
             return hit[1]
-    url = f"{GAMMA}/public-search?" + urllib.parse.urlencode({"q": term, "limit_per_type": 8})
-    request = urllib.request.Request(url, headers={"Accept": "application/json",
-                                                   "User-Agent": "argus-research/1.0"})
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            events = (json.load(response) or {}).get("events") or []
-    except Exception as exc:
+        found = http.fetch_json(f"{GAMMA}/public-search", timeout=timeout,
+                                params={"q": term, "limit_per_type": 8})
+        events = (found or {}).get("events") or []
+    except http.RpcError as exc:
         raise PredictionError(
-            f"Polymarket search for {term!r} failed: {type(exc).__name__}") from exc
+            f"Polymarket search for {term!r} failed: {http.reason_of(exc)}") from exc
     with _lock:
         _cache[term] = (now, events)
     return events

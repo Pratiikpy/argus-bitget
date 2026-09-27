@@ -21,16 +21,15 @@ from __future__ import annotations
 
 import bisect
 import itertools
-import json
 import math
 import threading
 import time
-import urllib.request
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from typing import Any
 
+from argus.truth import http
 from argus.truth.bounded import BoundedDict
 
 CHART = ("https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
@@ -67,12 +66,11 @@ _lock = threading.Lock()
 
 
 def _fetch(ticker: str, *, timeout: float = 20.0) -> dict[str, Any]:
-    request = urllib.request.Request(CHART.format(ticker=ticker),
-                                     headers={"User-Agent": "Mozilla/5.0 argus-research"})
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            payload: dict[str, Any] = json.load(response)
-    except Exception as exc:
+        payload: dict[str, Any] = http.fetch_json(
+            CHART.format(ticker=ticker), timeout=timeout,
+            headers={"User-Agent": "Mozilla/5.0 argus-research"})
+    except http.RpcError as exc:
         raise HistoryError(f"Yahoo daily history for {ticker} did not arrive: "
                            f"{type(exc).__name__}") from exc
     return payload

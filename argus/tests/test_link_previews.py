@@ -15,7 +15,7 @@ from urllib.request import urlopen
 
 import pytest
 
-from argus.lui import corrections_page, design, proof_page, server, status_page, task
+from argus.lui import corrections_page, design, proof_page, server, status_page, task_page
 from argus.lui.server import PAGE, Handler
 
 
@@ -55,7 +55,7 @@ def test_the_console_page_carries_it() -> None:
 
 @pytest.mark.parametrize(
     "render",
-    [task.render_task, proof_page.render, status_page.render, corrections_page.render],
+    [task_page.render_task, proof_page.render, status_page.render, corrections_page.render],
 )
 def test_every_page_builds_its_head_with_the_shared_one(render: object) -> None:
     source = inspect.getsource(render)  # type: ignore[arg-type]

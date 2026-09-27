@@ -33,8 +33,6 @@ from __future__ import annotations
 import csv
 import io
 import json
-import urllib.error
-import urllib.request
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from enum import StrEnum
@@ -42,6 +40,7 @@ from math import sqrt
 from pathlib import Path
 from typing import Any
 
+from argus.truth import http
 from argus.truth.evidence import Evidence
 from argus.truth.paths import DATA_DIR
 
@@ -188,11 +187,9 @@ class Reading:
 
 
 def _get(url: str, *, timeout: int) -> bytes:
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            return bytes(response.read())
-    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        return http.fetch(url, timeout=timeout, headers={"User-Agent": USER_AGENT})
+    except http.RpcError as exc:
         raise VolatilityError(f"could not read {url}: {exc}") from exc
 
 

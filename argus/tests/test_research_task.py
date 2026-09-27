@@ -444,7 +444,9 @@ class TestTheVerdictIsComposedFromTheFigures:
         reading = read_question(ASKED)
         assert isinstance(reading, Reading)
         done = research_task(reading=reading, asked=ASKED)
-        page = task_mod.render_task(done, "")
+        from argus.lui.task_page import render_task
+
+        page = render_task(done, "")
         assert page.index("<h2>Conclusion</h2>") < page.index("What to do, engine by engine")
         assert "Add, at 15%" in page
         assert as_dict(done)["verdict"]["call"] == "Add, at 15%"

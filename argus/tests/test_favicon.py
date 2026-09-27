@@ -20,7 +20,8 @@ import pytest
 from argus.lui.corrections_page import FAVICON as WRONG_PAGE_FAVICON
 from argus.lui.corrections_page import render as render_wrong
 from argus.lui.server import FAVICON, PAGE, Handler
-from argus.lui.task import Step, Task, render_task
+from argus.lui.task import Step, Task
+from argus.lui.task_page import render_task
 
 
 @pytest.fixture(scope="module")

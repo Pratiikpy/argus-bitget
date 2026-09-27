@@ -20,13 +20,13 @@ from __future__ import annotations
 
 import json
 import re
-import urllib.request
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from argus.truth import http
 from argus.truth.paths import DATA_DIR
 
 DATA = DATA_DIR
@@ -48,9 +48,9 @@ class Event:
 
 
 def _get(url: str, timeout: float = 20.0) -> str:
-    request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (argus-research)"})
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        return str(response.read().decode("utf-8", errors="replace"))
+    # the BLS and Federal Reserve pages refuse a client that does not look like a browser
+    return http.fetch_text(url, timeout=timeout,
+                           headers={"User-Agent": "Mozilla/5.0 (argus-research)"})
 
 
 def parse_cpi(text: str) -> list[date]:

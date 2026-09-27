@@ -297,9 +297,9 @@ def challenge(
 def build_critic(budget_tokens: int = 30_000) -> Critic | None:
     """A model for the adversary, or ``None`` when one cannot be made. Never raises."""
     try:
-        from argus.llm.qwen import QwenClient, TokenBudget
+        from argus.llm.provider import seat
 
-        return QwenClient(budget=TokenBudget(limit=budget_tokens))
+        return seat(budget_limit=budget_tokens)
     except Exception:  # missing key, bad URL, anything
         return None
 

@@ -13,15 +13,19 @@ docstring carries the CV evidence for the head and the n-gram range), so the std
 classes: the thirteen research kinds and record, plus ``refuse`` — CLINC150's out-of-scope-as-a-
 class scheme, for the same reason the intent model uses it.
 
-**The data, and what is never read.** Training rows are ``data/lui_kind_train_{A..E}.jsonl``
-(five writers who were forbidden to read this repository: English/Chinese; ten other languages;
-confusable boundaries; record/refuse-heavy; twelve more languages) plus the 2026-09-25 dev corpus,
+**The data, and what is never read.** Training rows are ``data/lui_kind_train_{A..H}.jsonl``
+(writers who were forbidden to read this repository: English/Chinese; ten other languages;
+confusable boundaries; record/refuse-heavy; twelve more languages; and, from 2026-09-27, three
+writers for venue, construct, leverage, book and analogue) plus the 2026-09-25 dev corpus,
 which already informed the patterns and so cannot be a test.
 
 **Held-out sets, stated honestly.** ``data/lui_heldout_corpus_2026-09-25.jsonl`` was never trained
 on; it was scored once (model alone: 88.5%) and has since been used to fix the console's plumbing
 around the model, so it is now a development set. The final figure is
-``data/lui_final_heldout_2026-09-25.jsonl``, written by a third blind writer and scored once.
+``data/lui_final_heldout_2026-09-25.jsonl``, written by a third blind writer and scored once;
+after the 2026-09-27 retraining on nineteen labels it was scored again and read the same 219 of
+240. The five new kinds are scored on :data:`NEW_KINDS_HELDOUT` (96 of 120 on 2026-09-27; book was
+the weakest at 16 of 24).
 
 **Choosing the knobs.** ``C`` and the n-gram range by stratified 5-fold CV on the training rows.
 The abstention threshold by a rule fixed before the sweep: maximise ``correct - 3 x wrong`` over
@@ -45,17 +49,25 @@ from typing import Any
 from argus.truth.paths import DATA_DIR
 
 DATA = DATA_DIR
-TRAIN_FILES = (*(DATA / f"lui_kind_train_{k}.jsonl" for k in "ABCDE"),
+TRAIN_FILES = (*(DATA / f"lui_kind_train_{k}.jsonl" for k in "ABCDEFGH"),
                DATA / "lui_blind_corpus_2026-09-25.jsonl",
                # Scored once as held-out (88.5%), then used to fix the plumbing: now training data.
                DATA / "lui_heldout_corpus_2026-09-25.jsonl")
 FINAL_HELDOUT = DATA / "lui_final_heldout_2026-09-25.jsonl"
+NEW_KINDS_HELDOUT = DATA / "lui_kind_heldout_new_kinds_2026-09-27.jsonl"
+"""Venue, construct, leverage, book and analogue, written by a fourth blind writer on 2026-09-27
+and never trained on: the five kinds the model could not choose until then (audit finding 159)."""
 HELDOUT = DATA / "lui_heldout_corpus_2026-09-25.jsonl"
 MODEL_PATH = DATA / "lui_kind_model.json"
 REPORT_PATH = DATA / "lui_kind_model_report.json"
 
 LABELS = ("impact", "stress", "compare", "execution", "quote", "technicals", "fundamentals",
-          "event", "hedge", "macro", "sentiment", "news", "record", "refuse")
+          "event", "hedge", "macro", "sentiment", "news", "venue", "construct", "leverage",
+          "book", "analogue", "record", "refuse")
+"""Every research kind, ``record`` and ``refuse``. Venue, construct, leverage, book and analogue
+joined on 2026-09-27 with training files F (English and Chinese), G (ten more languages) and H
+(the boundaries with their confusable neighbours), each by a writer who never read this
+repository (audit finding 159)."""
 SEED = 20260925
 C_GRID = (1.0, 2.0, 5.0, 10.0)
 NGRAM_GRID = ((1, 4), (1, 5))
@@ -217,7 +229,7 @@ def heldout(path: Path = FINAL_HELDOUT) -> dict[str, Any]:
     by_lang: dict[str, list[int]] = {}
     for row in rows:
         label, _confidence = model.predict(str(row["text"]))
-        hit = label == row["expected"]
+        hit = label == (row.get("expected") or row.get("label"))
         answered += label is not None
         correct += hit
         tally = by_lang.setdefault(str(row.get("lang", "?")), [0, 0])

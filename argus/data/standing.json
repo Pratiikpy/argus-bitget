@@ -885,7 +885,7 @@
     {
       "name": "Data-honest cross-asset breadth rotation vs. a silently-dropping reference",
       "subtheme": "t1-rotation",
-      "module": "argus/desk/rotation.py,argus/eval/rotation_comparison.py,argus/eval/baselines/pytaa_vigilant_allocation.py,argus/eval/baselines/pytaa_vigilant_allocation_loader.py,argus/eval/baselines/pytaa_signal.py,argus/eval/baselines/pytaa_signal_loader.py,argus/eval/general_rotation_comparison.py,argus/eval/baselines/argus_rotation_pre_contract.py",
+      "module": "argus/desk/rotation.py,argus/lui/rotation.py,argus/eval/rotation_comparison.py,argus/eval/baselines/pytaa_vigilant_allocation.py,argus/eval/baselines/pytaa_vigilant_allocation_loader.py,argus/eval/baselines/pytaa_signal.py,argus/eval/baselines/pytaa_signal_loader.py,argus/eval/general_rotation_comparison.py,argus/eval/baselines/argus_rotation_pre_contract.py",
       "state": "tied",
       "baseline": "pytaa real VAA breadth rule (vigilant_allocation) + Signal.momentum_score",
       "conditions_met": [

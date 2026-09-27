@@ -30,15 +30,12 @@ engine's own bottom line, in the order a trader would act on them.
 
 from __future__ import annotations
 
-import html
 import time
 from concurrent.futures import Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Any
-from urllib.parse import urlencode
 
-from argus.lui import design
 from argus.lui.answer import LEAD
 from argus.lui.research import (
     ANALOGUE_DAYS,
@@ -219,8 +216,8 @@ class Step:
     refused: bool = False
     applicable: bool = True
     seconds: float = 0.0
-    chart: str = ""
-    """An inline SVG drawn from the same numbers the lines state, or empty."""
+    path: tuple[tuple[Any, float], ...] = ()
+    """The price path the quote step's chart is drawn from (`lui/task_page.py`), or empty."""
     data: dict[str, Any] = field(default_factory=dict)
     """The engine's figures as data (``Answer.data``), which the verdict is composed from."""
 
@@ -325,7 +322,6 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
             return Step(title=title, engine=engine, applicable=False,
                         lines=[f"{symbol.removesuffix('USDT')} is not a company's shares, so there "
                                f"is no earnings calendar, analyst target or 13F filing to read."])
-        chart = ""
         data: dict[str, Any] = {}
         used: list[str] = []
         try:
@@ -341,12 +337,10 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
                           len(lines))
                 lines[at:at] = extra
             refused = answer.refused
-            if kind is ResearchKind.IMPACT and not refused:
-                chart = risk_chart(answer.data.get("report") or {})
         except Exception as exc:  # one engine failing must not take the task down
             lines, refused = [f"This step could not run just now ({type(exc).__name__})."], True
         return Step(title=title, engine=engine, lines=lines, refused=refused,
-                    seconds=time.perf_counter() - began, chart=chart,
+                    seconds=time.perf_counter() - began,
                     data=data if not refused else {})
 
     # Not a `with` block: leaving one waits for every thread, which is exactly the hang the
@@ -363,10 +357,9 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
                             f"the task went on without it."])
                  for (title, _, engine), future in zip(STEPS, futures, strict=True)]
         try:
-            steps[0].chart = (price_chart(path.result(), symbol.removesuffix("USDT"))
-                              if path in done else "")
+            steps[0].path = tuple(path.result()) if path in done else ()
         except Exception:
-            steps[0].chart = ""  # the quote step stands without its chart
+            steps[0].path = ()  # the quote step stands without its chart
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
     return Task(question=question, name=symbol.removesuffix("USDT"), size_pct=size * 100,
@@ -520,232 +513,6 @@ def _price_path(symbol: str) -> list[tuple[Any, float]]:
     return [(b.ts, float(b.close)) for b in bars]
 
 
-def price_chart(points: list[tuple[Any, float]], name: str) -> str:
-    """The name's last thirty days as a line with its range and last close marked."""
-    if len(points) < 2:
-        return ""
-    width, height, pad = 640.0, 150.0, 6.0
-    closes = [c for _, c in points]
-    low, high = min(closes), max(closes)
-    span = (high - low) or 1.0
-
-    def x(i: int) -> float:
-        return pad + (width - 2 * pad) * i / (len(points) - 1)
-
-    def y(value: float) -> float:
-        return pad + (height - 2 * pad) * (1 - (value - low) / span)
-
-    line = " ".join(f"{x(i):.1f},{y(c):.1f}" for i, c in enumerate(closes))
-    area = f"{x(0):.1f},{height - pad:.1f} {line} {x(len(closes) - 1):.1f},{height - pad:.1f}"
-    first, last = points[0][0], points[-1][0]
-    change = closes[-1] / closes[0] - 1
-    label = (f"{name}, 4-hour closes {first:%d %b} to {last:%d %b}: {closes[0]:,.2f} to "
-             f"{closes[-1]:,.2f} ({change:+.1%}); range {low:,.2f} to {high:,.2f}")
-    return (
-        f"<figure class='chart'><svg viewBox='0 0 {width:.0f} {height:.0f}' role='img' "
-        f"aria-label='{html.escape(label)}' preserveAspectRatio='none'>"
-        f"<polygon class='area' points='{area}'/>"
-        f"<polyline class='path' points='{line}'/>"
-        f"<circle class='dot' cx='{x(len(closes) - 1):.1f}' cy='{y(closes[-1]):.1f}' r='3.5'/>"
-        f"</svg><figcaption>{html.escape(label)}</figcaption></figure>"
-    )
-
-
-def risk_chart(report: dict[str, Any]) -> str:
-    """Each holding's share of the money beside its share of the risk, after the trade."""
-    risk = report.get("risk_after") or {}
-    vol = float(risk.get("volatility") or 0.0)
-    rows = risk.get("contributions") or []
-    if vol <= 0 or not rows:
-        return ""
-    data = sorted(((str(r["symbol"]).removesuffix("USDT"), float(r["weight"]),
-                    float(r["contribution"]) / vol) for r in rows), key=lambda r: -r[2])
-    top = max(max(w, abs(k)) for _, w, k in data) or 1.0
-    row_h, label_w, width = 30, 70, 640
-    height = row_h * len(data) + 8
-    bar_w = width - label_w - 60
-    parts = []
-    for i, (name, weight, share) in enumerate(data):
-        y0 = 4 + i * row_h
-        parts.append(
-            f"<text class='lbl' x='0' y='{y0 + 16}'>{html.escape(name)}</text>"
-            f"<rect class='w' x='{label_w}' y='{y0 + 3}' width='{bar_w * weight / top:.1f}' "
-            f"height='9' rx='2'/>"
-            f"<rect class='r' x='{label_w}' y='{y0 + 14}' width='{bar_w * max(share, 0) / top:.1f}'"
-            f" height='9' rx='2'/>"
-            f"<text class='val' x='{label_w + bar_w * max(weight, share, 0) / top + 6:.1f}' "
-            f"y='{y0 + 17}'>{weight:.0%} / {share:.0%}</text>")
-    summary = "; ".join(f"{n} {w:.0%} of the money, {k:.0%} of the risk" for n, w, k in data)
-    return (
-        f"<figure class='chart'><svg viewBox='0 0 {width} {height}' role='img' "
-        f"aria-label='{html.escape(summary)}'>{''.join(parts)}</svg>"
-        f"<figcaption><span class='key w'></span>share of the money "
-        f"<span class='key r'></span>share of the risk, after the trade</figcaption></figure>"
-    )
-
-
-def _line_class(line: str) -> str:
-    if bool(LEAD.match(line)):
-        return "act"
-    return "fine" if line.startswith(("Data:", "Assumed:")) else "l"
-
-
-def render_task(task: Task, favicon: str) -> str:
-    """The task as a page: the question, the conclusion, then every step with its engine."""
-    esc = html.escape
-    conclusion = "".join(
-        f"<li><b>{esc(title.rstrip('?'))}:</b> {esc(text[:1].upper() + text[1:])}</li>"
-        for title, text in task.conclusion) or (
-        "<li>Nothing to act on: " + esc(task.steps[0].lines[0] if task.steps and task.steps[0].lines
-                                         else "no engine answered") + "</li>")
-    cards = []
-    for n, step in enumerate(task.steps, 1):
-        body = "".join(f"<p class='{_line_class(line)}'>{esc(line)}</p>" for line in step.lines)
-        classes = "s" + (" r" if step.refused else "") + ("" if step.applicable else " na")
-        cards.append(
-            f"<article class='{classes}'><div class='h'><span class='n'>{n}"
-            f"</span><h2>{esc(step.title)}</h2><span class='e'>{esc(step.engine)} · "
-            f"{step.seconds:.1f}s</span></div>{step.chart}{body}</article>")
-    book_text = ", ".join(f"{w:.0%} {s.removesuffix('USDT')}" for s, w in task.book.items())
-    asked = task.asked or task.question
-    call = task.verdict
-    called = "" if call is None else (
-        f"<section class='verdict'><h2>Conclusion</h2><p class='call'>{esc(call.call)}</p>"
-        + "".join(f"<p>{esc(line)}</p>" for line in call.lines) + "</section>")
-    json_link = ("/research?" + urlencode({"q": task.asked, "format": "json"})
-                 if task.asked else "/research?format=json")
-    read = ""
-    if task.reading is not None:
-        notes = "".join(f"<li>{esc(n)}</li>" for n in task.reading.notes)
-        read = (f"<p class='read'><b>Read as:</b> {esc(task.reading.summary)}</p>"
-                + (f"<ul class='notes'>{notes}</ul>" if notes else ""))
-    del favicon  # the head carries the mark itself (design.head)
-    head = design.head("ARGUS — one research task, live",
-                       "Ask a question about adding a name to your book; eight engines answer "
-                       "from live data and the page ends in one verdict.", "/research")
-    return f"""<!doctype html><html lang="en"><head>{head}
-<style>{design.TOKENS_CSS}
- body {{ margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,sans-serif }}
- .sub {{ margin:0 0 18px }}
- form {{ margin:0 0 20px }}
- .ask {{ display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start }}
- form textarea, form input {{ padding:9px 11px; border:1px solid var(--line); border-radius:8px;
-   background:var(--panel); color:var(--ink); font:15px/1.45 system-ui,sans-serif }}
- form textarea {{ flex:1 1 320px; min-width:0; resize:vertical; min-height:44px;
-   box-sizing:border-box }}
- details {{ margin-top:8px; font-size:13.5px; color:var(--dim) }}
- details summary {{ cursor:pointer }}
- .edit {{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px }}
- .edit label {{ display:flex; flex-direction:column; gap:3px; font-size:12px }}
- form .name {{ width:110px }} form .size {{ width:90px }}
- .edit .wide {{ flex:1 1 260px }} form .book {{ width:100%; box-sizing:border-box }}
- .read {{ margin:0 0 4px }} .notes {{ margin:0 0 14px; padding-left:20px; color:var(--dim);
-   font-size:13px }}
- form input:focus-visible, form textarea:focus-visible, form button:focus-visible {{
-   outline:2px solid var(--accent);
-   outline-offset:2px }}
- form button {{ padding:9px 16px; border:1px solid var(--accent); background:var(--accent);
-   color:var(--on-accent); border-radius:8px; font-size:14px; cursor:pointer }}
- form button:disabled {{ opacity:.7; cursor:progress }}
- .running {{ margin:8px 0 0; font-size:13.5px; color:var(--dim) }}
- .q {{ font-size:17px; font-weight:600; margin:0 0 12px }}
- .concl {{ background:var(--panel); border:1px solid var(--accent); border-radius:10px;
-   padding:14px 18px; margin:0 0 20px }}
- .concl h2 {{ font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--accent);
-   margin:0 0 8px }}
- .concl ol {{ margin:0; padding-left:20px }} .concl li {{ margin:4px 0 }}
- .verdict {{ background:var(--panel); border:2px solid var(--accent); border-radius:10px;
-   padding:14px 18px; margin:0 0 14px }}
- .verdict h2 {{ font-size:13px; text-transform:uppercase; letter-spacing:.08em;
-   color:var(--accent); margin:0 0 6px }}
- .verdict .call {{ font-size:19px; font-weight:700; margin:0 0 6px }}
- .verdict p {{ margin:4px 0 }}
- .s {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
-   padding:14px 16px; margin-bottom:12px }}
- .s.r {{ border-left:3px solid var(--warn) }}
- .s.na {{ color:var(--dim) }}
- .h {{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; margin-bottom:6px }}
- .n {{ font:12px var(--mono); color:var(--dim) }}
- .h h2 {{ font-size:15.5px; margin:0 }}
- .e {{ font:11.5px var(--mono); color:var(--dim); margin-left:auto }}
- .s p {{ margin:4px 0; overflow-wrap:anywhere }}
- .act {{ font-weight:600; color:var(--accent) }} .fine {{ color:var(--dim); font-size:13px }}
- a {{ color:var(--accent) }}
- .chart {{ margin:6px 0 10px }} .chart svg {{ width:100%; height:auto; display:block }}
- .chart figcaption {{ font-size:12px; color:var(--dim); margin-top:4px }}
- .chart .path {{ fill:none; stroke:var(--accent); stroke-width:1.6 }}
- .chart .area {{ fill:var(--accent); opacity:.09 }} .chart .dot {{ fill:var(--accent) }}
- .chart .lbl, .chart .val {{ font:12px var(--sans); fill:var(--dim) }}
- .chart .lbl {{ fill:var(--ink); font-weight:600 }}
- .chart rect.w, .key.w {{ fill:var(--dim); background:var(--dim) }}
- .chart rect.r, .key.r {{ fill:var(--accent); background:var(--accent) }}
- .key {{ display:inline-block; width:10px; height:10px; border-radius:2px; margin:0 5px 0 10px;
-   vertical-align:-1px }}
-{design.BASE_CSS}</style></head><body>{design.nav('/research')}<div class="wrap">
-<h1>One research task, question to actionable insight — run live</h1>
-<p class="sub">Ask it the way you would ask a colleague. Eight engines answer in parallel, each
-the same engine the <a href="/">console</a> uses, every figure from live Bitget, SEC, Yahoo or
-news data and every line naming its source. It ends in one verdict and each engine's bottom line —
-nothing on this page is written by a language model, and your question is read without one.</p>
-<form method="post" action="/research">
- <input type="hidden" name="saved"><input type="hidden" name="memory">
- <div class="ask">
-  <textarea name="q" rows="2" aria-label="your question">{esc(asked)}</textarea>
-  <button>Run</button>
- </div>
- <p class="running" role="status" aria-live="polite" hidden></p>
- <details><summary>Or set the name, size and book yourself</summary>
-  <div class="edit">
-   <label>Name<input class="name" name="name" value="{esc(task.name)}"></label>
-   <label>Size, %<input class="size" name="size" value="{task.size_pct:g}"></label>
-   <label class="wide">Your book<input class="book" name="book" value="{esc(book_text)}"></label>
-  </div>
-  <p class="fine">A question in the box above wins; clear it to run these fields.</p>
- </details>
-</form>
-<p class="q">{esc(task.question)}</p>
-{read}
-{called}<section class="concl"><h2>What to do, engine by engine</h2><ol>{conclusion}</ol>
-</section>
-{''.join(cards)}
-<p class="sub">Ran in {task.seconds:.1f}s. Execution is sized on a ${DEFAULT_BOOK_VALUE:,.0f} book.
-This is analysis, not advice — you make the call. <a href="{esc(json_link)}">JSON</a></p>
-</div>{design.footer()}
-<script>
-// The page is one blocking POST: the engines run before a byte comes back, so without this the
-// Run button looked dead for as long as the slowest engine took (audit, 2026-09-26).
-(() => {{
-  const form = document.querySelector('form'), box = form.querySelector('textarea');
-  // The trader's saved book and memory, kept by the console in this browser, travel with the
-  // question; the server keeps neither.
-  try {{
-    form.elements.saved.value = localStorage.getItem('argus.book') || '';
-    form.elements.memory.value = localStorage.getItem('argus.memory') || '';
-  }} catch (e) {{}}
-  const run = form.querySelector('button'), note = form.querySelector('.running');
-  let timer = 0;
-  form.addEventListener('submit', () => {{
-    const started = Date.now();
-    run.disabled = true; run.textContent = 'Running';
-    note.hidden = false;
-    const tick = () => {{ note.textContent = 'Eight engines are reading live data: '
-      + Math.round((Date.now() - started) / 1000) + ' s'; }};
-    tick(); timer = setInterval(tick, 1000);
-  }});
-  // Enter asks and Shift+Enter starts a new line, as in the console; never mid-composition.
-  box.addEventListener('keydown', (e) => {{
-    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && box.value.trim()) {{
-      e.preventDefault(); form.requestSubmit();
-    }}
-  }});
-  // Coming back with the browser's Back button restores this page from its cache as it was.
-  addEventListener('pageshow', () => {{
-    clearInterval(timer); run.disabled = false; run.textContent = 'Run'; note.hidden = true;
-  }});
-}})();
-</script></body></html>"""
-
-
 def as_dict(task: Task) -> dict[str, Any]:
     return {
         "question": task.question, "name": task.name, "size_pct": task.size_pct,
@@ -762,5 +529,5 @@ def as_dict(task: Task) -> dict[str, Any]:
 
 
 __all__ = ["DEFAULT_BOOK", "DEFAULT_NAME", "DEFAULT_SIZE_PCT", "UNSTATED_SIZE_PCT", "Reading",
-           "Step", "Task", "as_dict", "read_question", "render_task", "research_task",
+           "Step", "Task", "as_dict", "read_question", "research_task",
            "unread_task"]

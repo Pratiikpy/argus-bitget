@@ -60,13 +60,12 @@ from __future__ import annotations
 
 import json
 import random
-import urllib.error
-import urllib.request
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from statistics import median
 from typing import Any
 
+from argus.truth import http
 from argus.truth.paths import DATA_DIR
 
 REPORT_PATH = DATA_DIR / "carry_study.json"
@@ -152,14 +151,11 @@ def fetch_funding(symbol: str, *, pages: int = 3, timeout: float = 25.0) -> list
     """Every settlement the venue will serve, oldest last. Raises rather than returning a guess."""
     out: list[Settlement] = []
     for cursor in range(1, pages + 1):
-        url = (
-            f"{ENDPOINT}?category=USDT-FUTURES&symbol={symbol}"
-            f"&limit={MAX_LIMIT}&cursor={cursor}"
-        )
+        params = {"category": "USDT-FUTURES", "symbol": symbol, "limit": MAX_LIMIT,
+                  "cursor": cursor}
         try:
-            with urllib.request.urlopen(url, timeout=timeout) as response:
-                payload = json.load(response)
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+            payload = http.fetch_json(ENDPOINT, params=params, timeout=timeout)
+        except http.RpcError as exc:
             raise CarryUnavailable(f"{symbol}: {exc}") from exc
         if payload.get("code") != "00000":
             raise CarryUnavailable(f"{symbol}: {payload.get('code')} {payload.get('msg')}")

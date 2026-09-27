@@ -23,14 +23,13 @@ from __future__ import annotations
 
 import html
 import re
-import urllib.request
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
-from argus.market.evidence import EdgarSource
+from argus.market.evidence import FEED_USER_AGENT, EdgarSource
+from argus.truth import http
 
-_UA = "ARGUS research desk research@argus-desk.example"
 _TIMEOUT = 30.0
 ARCHIVE = "https://www.sec.gov/Archives/edgar/data/{cik}/{folder}/"
 _BILLION = re.compile(r"\$\s?([\d,]+(?:\.\d+)?)\s*(billion|million)", re.I)
@@ -52,9 +51,8 @@ class Release:
 
 
 def _fetch(url: str) -> str:
-    request = urllib.request.Request(url, headers={"User-Agent": _UA, "Accept": "*/*"})
-    with urllib.request.urlopen(request, timeout=_TIMEOUT) as response:
-        return str(response.read(4_000_000).decode("utf-8", errors="replace"))
+    return http.fetch_text(url, timeout=_TIMEOUT, max_bytes=4_000_000,
+                           headers={"User-Agent": FEED_USER_AGENT, "Accept": "*/*"})
 
 
 def clean(document: str) -> str:
@@ -118,7 +116,7 @@ class EarningsReleaseSource:
     """Finds and reads a company's recent earnings releases on EDGAR."""
 
     def __init__(self, edgar: EdgarSource | None = None) -> None:
-        self._edgar = edgar or EdgarSource(user_agent=_UA)
+        self._edgar = edgar or EdgarSource(user_agent=FEED_USER_AGENT)
 
     def _exhibit_url(self, cik: int, accession: str) -> str | None:
         folder = accession.replace("-", "")

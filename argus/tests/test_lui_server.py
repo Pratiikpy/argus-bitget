@@ -483,7 +483,7 @@ class TestTheLossesPage:
 
     def test_a_missing_artefact_is_listed_not_dropped(self, tmp_path) -> None:
         """The one failure mode this page must not have."""
-        from argus.lui.corrections_page import collect
+        from argus.lui.corrections import collect
 
         found = collect(tmp_path)
         assert found, "an empty data directory must still produce entries"
@@ -501,7 +501,7 @@ class TestTheLossesPage:
         vanished from "cannot claim OWNED" instead of being the clearest possible example of it —
         on the one page whose entire purpose is not rounding up. Found 2026-09-22 driving the
         deployed page as a real user: it read "7 of 28" while the live register was "6 of 31"."""
-        from argus.lui.corrections_page import collect
+        from argus.lui.corrections import collect
 
         (tmp_path / "standing.json").write_text(
             json.dumps({

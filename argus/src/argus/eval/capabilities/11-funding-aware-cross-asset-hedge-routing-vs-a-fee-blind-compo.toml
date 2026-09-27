@@ -1,6 +1,8 @@
 name = "Funding-aware cross-asset hedge routing vs. a fee-blind composite router"
 subtheme = "t2-crossexecution"
 modules = [
+    "argus/lui/crossasset.py",
+    "argus/market/crossasset_feed.py",
     "argus/desk/execution.py",
     "argus/eval/execution_comparison.py",
     "argus/eval/baselines/crypto_sor_shim/src/lib/CompositeOrderBook.ts",

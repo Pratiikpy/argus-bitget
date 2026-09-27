@@ -9,6 +9,7 @@ against a series whose answer can be worked out by hand.
 
 from __future__ import annotations
 
+import urllib.request
 from datetime import UTC, datetime, timedelta
 
 import pytest
@@ -248,13 +249,8 @@ class TestTheVenueIsNotGuessed:
         import io as _io
         import json as _json
 
-        class _Fake:
-            def __enter__(self):
-                return _io.StringIO(_json.dumps({"code": "40020", "msg": "Parameter limit error"}))
-
-            def __exit__(self, *a):
-                return False
-
-        monkeypatch.setattr(carry.urllib.request, "urlopen", lambda *a, **k: _Fake())
+        body = _json.dumps({"code": "40020", "msg": "Parameter limit error"}).encode()
+        # the venue is read through truth/http.py, which calls urllib.request.urlopen
+        monkeypatch.setattr(urllib.request, "urlopen", lambda *a, **k: _io.BytesIO(body))
         with pytest.raises(CarryUnavailable, match="40020"):
             carry.fetch_funding("NVDAUSDT")

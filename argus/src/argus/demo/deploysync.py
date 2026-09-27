@@ -103,6 +103,8 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "weekend_calls.jsonl",
     # Read by execution answers: bgc's own dry-run, confirming the Agent Hub preview.
     "agenthub_preview.json",
+    # Read by cross-asset hedge answers (`lui/crossasset.py`, `market/crossasset_feed.py`).
+    "crossasset_snapshot.json",
 )
 """Artefacts the hosted console's own pages read at request time.
 

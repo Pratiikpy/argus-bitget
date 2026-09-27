@@ -1,7 +1,8 @@
 """The research-kind model at runtime, and a planner that lets it stand in for the language model.
 
 `eval/kindtrain.py` fits a character n-gram linear model over the research kinds it has training
-questions for, ``record`` and ``refuse`` (fourteen labels in the shipped file), and exports it as
+questions for, ``record`` and ``refuse`` (nineteen labels in the shipped file: every research
+kind since 2026-09-27), and exports it as
 JSON. Scoring reuses
 `lui/ngram.NgramClassifier` (stdlib only), so the deployed bundle gains no dependency.
 
@@ -28,7 +29,7 @@ RECORD = "record"
 
 
 class KindModel:
-    """Predicts one of the fourteen labels, or None below the fitted threshold."""
+    """Predicts one of the nineteen labels, or None below the fitted threshold."""
 
     def __init__(self, classifier: NgramClassifier) -> None:
         self._clf = classifier

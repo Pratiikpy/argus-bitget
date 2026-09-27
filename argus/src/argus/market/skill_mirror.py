@@ -55,6 +55,7 @@ from pathlib import Path
 from typing import Any
 
 from argus.market.skills import PROBES, Health, Probe, SkillReport, hollow
+from argus.truth import http
 from argus.truth.evidence import Evidence
 from argus.truth.paths import DATA_DIR
 
@@ -71,14 +72,12 @@ class MirrorError(RuntimeError):
 
 def _get(url: str, *, timeout: int = TIMEOUT, data: bytes | None = None,
          headers: Mapping[str, str] | None = None) -> bytes:
-    request = urllib.request.Request(
-        url, data=data, headers={"User-Agent": USER_AGENT, **(headers or {})})
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            return bytes(response.read())
-    except urllib.error.HTTPError as exc:
-        raise MirrorError(f"{url.split('?')[0]} answered HTTP {exc.code}") from exc
-    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        return http.fetch(url, timeout=timeout, data=data,
+                          headers={"User-Agent": USER_AGENT, **(headers or {})})
+    except http.RpcError as exc:
+        if exc.http_status is not None:
+            raise MirrorError(f"{url.split('?')[0]} answered HTTP {exc.http_status}") from exc
         raise MirrorError(f"{url.split('?')[0]} unreachable: {exc}") from exc
 
 

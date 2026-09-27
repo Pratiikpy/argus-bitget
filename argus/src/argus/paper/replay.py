@@ -438,7 +438,8 @@ def run(
     from argus.agents.desk import TradingDesk
     from argus.backtest.engine import Bar
     from argus.cost.model import CostModel
-    from argus.llm.qwen import QwenClient, QwenError, Thinking, TokenBudget
+    from argus.llm.provider import seat
+    from argus.llm.qwen import QwenError, Thinking
     from argus.market.evidence import underlying_ticker
     from argus.market.history import CandleType, fetch_range
     from argus.risk.constitution import ConstitutionPolicy
@@ -448,7 +449,7 @@ def run(
     clock = DualClock()
     cost = CostModel.bitget_perp()
     round_trip = float(cost.round_trip_bps())
-    client = QwenClient(budget=TokenBudget(limit=budget_per_decision * max_decisions))
+    client = seat(budget_limit=budget_per_decision * max_decisions)
     desk = TradingDesk(client, pm_thinking=Thinking.LOW)
 
     outcomes: list[Outcome] = []
