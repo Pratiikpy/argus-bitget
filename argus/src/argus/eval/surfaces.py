@@ -28,8 +28,10 @@ you get three surfaces disagreeing instead of two.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 from argus.truth.artefact import write
@@ -241,6 +243,19 @@ def render(report: dict[str, Any]) -> list[str]:
     return lines
 
 
+def unchanged(report: dict[str, Any], path: Path = REPORT_PATH) -> bool:
+    """Does the committed report already say this, timestamp aside? CI regenerates it and then
+    refuses any committed file that changed (`.github/workflows/ci.yml`); a new ``generated_at``
+    on identical readings would fail that on every run while telling a reader nothing."""
+    try:
+        before = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    strip = {"generated_at"}
+    return ({k: v for k, v in before.items() if k not in strip}
+            == {k: v for k, v in json.loads(json.dumps(report)).items() if k not in strip})
+
+
 def main() -> int:  # pragma: no cover - CLI
     import sys
 
@@ -249,8 +264,11 @@ def main() -> int:  # pragma: no cover - CLI
     report = run()
     for line in render(report):
         print(line)
-    write(REPORT_PATH, report)
-    print(f"\nwritten to {REPORT_PATH}")
+    if unchanged(report):
+        print(f"\n{REPORT_PATH} already records these readings; left as it is")
+    else:
+        write(REPORT_PATH, report)
+        print(f"\nwritten to {REPORT_PATH}")
     return 0 if report["clean"] else 1
 
 

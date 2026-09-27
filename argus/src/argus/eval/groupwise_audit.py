@@ -51,7 +51,6 @@ No model is called; nothing here spends Qwen. TweetEval and other unlicensed dat
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import re
 from collections.abc import Callable, Iterable, Sequence
@@ -62,6 +61,7 @@ from typing import Any
 
 from argus.eval.groupwise import GroupwiseReport, Item, audit, halves_from
 from argus.truth import artefact
+from argus.truth.paths import portable_digest
 
 PACKAGE = Path(__file__).resolve().parents[3]
 DATA = PACKAGE / "data"
@@ -143,8 +143,9 @@ class Entry:
             "status": self.status, "reason": self.reason,
             # The file as audited. `standing.groupwise_verdict` compares it with the file as it
             # is, so an artefact regenerated after this audit is not vouched for by it.
-            "sha256": hashlib.sha256(target.read_bytes()).hexdigest() if target.exists()
-            else None,
+            # Path-neutral (`truth/paths.portable_digest`): publishing rewrites absolute paths
+            # inside an artefact, and the public copy must hash the same.
+            "sha256": portable_digest(target) if target.exists() else None,
             "flagged": any(h.report.flagged for h in self.headlines),
             "headlines": [h.as_dict() for h in self.headlines],
         }

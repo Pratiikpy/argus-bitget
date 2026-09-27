@@ -1215,7 +1215,7 @@
       "name": "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
       "subtheme": "t2-earnings",
       "module": "argus/market/sue.py,argus/eval/earnings_comparison.py,argus/eval/baselines/quantconnect_sue.py,argus/eval/baselines/quantconnect_sue_loader.py,argus/market/fundamentals.py,argus/eval/general_sue_comparison.py",
-      "state": "owned",
+      "state": "implemented",
       "baseline": "QuantConnect/Tutorials real SUE factor (FineSelectionAndSueSorting)",
       "conditions_met": [
         "best_implementation_studied",
@@ -1314,6 +1314,7 @@
         }
       ],
       "blockers": [
+        "\n        RE-GRADED 2026-09-28 from OWNED to IMPLEMENTED (tracker 195). The register now reads \n        the bootstrap interval the groupwise audit puts on each headline, and this capability's \n        own claim against the general tool (data/general_sue_comparison.json: dated alignment \n        answers where pandas' lenient period index refuses) is +0.22 per anchor with a 95% \n        interval of [0.0, 0.56] over 9 real filers: ARGUS answers on 2, ties on 7, loses on none. \n        An exact sign test on 2 wins and 0 losses gives p = 0.5. The mechanism is real and ahead; \n        the sample does not establish it. Route back: extend the alignment comparison to enough \n        filers that the interval clears zero, or show it does not.\n    ",
         "The real reference's exact `months_count`/`months_eps_change` defaults are not published in the tutorial page's own inline code (only the surrounding prose states a '36-month warm-up' and 'four quarters ago') \u2014 read from the real code's own slicing structure rather than a literal Initialize() block, and real quarterly EPS is reshaped into the monthly-cadence-with-repeats form the real RollingWindow expects rather than fed directly. The nine-anchor universe is ARGUS's own tradable set, not a broad-market cross-sectional universe of the kind SUE was originally published against",
         "General-purpose rivals run 2026-09-26 (data/general_sue_comparison.json): pandas beat the ARGUS of before 2026-09-25 on quarter pairing, since fixed and matched. On degenerate scale ARGUS refuses 15 of 15 constant-step windows at real EPS levels, against SciPy 7, sklearn's VarianceThreshold 6 and StandardScaler 0, which return finite SUEs of 3.2e7 to 9.0e15. On the 68 real degenerate SEC filers VarianceThreshold, SciPy and ARGUS all refuse every one, so the margin over general tools rests on constructed windows."
       ],
@@ -4282,8 +4283,8 @@
   "by_state": {
     "lost": 1,
     "tied": 13,
-    "implemented": 27,
-    "owned": 3
+    "implemented": 28,
+    "owned": 2
   },
   "findings": [
     {
@@ -4335,6 +4336,16 @@
       "capability": "Cross-market cointegration with corrected multiple testing",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
       "detail": "no groupwise check has run on its artefacts: data/cointegration_comparison.json: designed_cases - three designed ADF series, two self-inclusion cases and a synthetic 190-pair noise panel reduced to counts; data/general_coint_comparison.json: aggregate_without_rows - 160 simulated universes reduced to FDR, FWER and power per pipeline; eval/general_coint_comparison.py would need to record each universe's discoveries"
+    },
+    {
+      "capability": "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
+      "problem": "statistically_valid_evaluation is claimed but not evidenced",
+      "detail": "the headline's 95% interval includes zero, so the claim cannot be told apart from no effect: data/general_sue_comparison.json :: SUE: dated alignment answers where pandas' lenient period index refuses [0.0, 0.555556]"
+    },
+    {
+      "capability": "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
+      "problem": "out_of_sample_test is claimed but not evidenced",
+      "detail": "the headline's 95% interval includes zero, so the claim cannot be told apart from no effect: data/general_sue_comparison.json :: SUE: dated alignment answers where pandas' lenient period index refuses [0.0, 0.555556]"
     },
     {
       "capability": "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
@@ -4475,6 +4486,26 @@
       "capability": "Analogue stress bands vs. AnalogDesk (S2) on its own pre-registered test",
       "problem": "out_of_sample_test is claimed but not evidenced",
       "detail": "no groupwise check has run on its artefacts: data/analogstress_comparison.json: aggregate_without_rows - 2,698 test queries scored, but only per-predictor aggregates and date-clustered Diebold-Mariano tests are kept (eval/analogstress_comparison.py would need to record per-query Winkler scores with name and date)"
+    },
+    {
+      "capability": "Portfolio copilot: post-trade beta and co-movement vs. weekend-copilot (S2)",
+      "problem": "statistically_valid_evaluation is claimed but not evidenced",
+      "detail": "the headline's 95% interval includes zero, so the claim cannot be told apart from no effect: data/copilot_rivals.json :: post-trade beta: ARGUS vs beta = 1 [-0.004493, 0.12182]"
+    },
+    {
+      "capability": "Portfolio copilot: post-trade beta and co-movement vs. weekend-copilot (S2)",
+      "problem": "out_of_sample_test is claimed but not evidenced",
+      "detail": "the headline's 95% interval includes zero, so the claim cannot be told apart from no effect: data/copilot_rivals.json :: post-trade beta: ARGUS vs beta = 1 [-0.004493, 0.12182]"
+    },
+    {
+      "capability": "Portfolio stress: the book's move when QQQ falls, vs. skfolio's vine copula and Entropy Pooling",
+      "problem": "statistically_valid_evaluation is claimed but not evidenced",
+      "detail": "the headline's 95% interval includes zero, so the claim cannot be told apart from no effect: data/copilot_stress.json :: stress-move error: ARGUS's open-hours beta vs skfolio_vine [-0.015459, 0.190153]; data/copilot_stress.json :: stress-move error: ARGUS's open-hours beta vs skfolio_ep [-0.014131, 0.111361]"
+    },
+    {
+      "capability": "Portfolio stress: the book's move when QQQ falls, vs. skfolio's vine copula and Entropy Pooling",
+      "problem": "out_of_sample_test is claimed but not evidenced",
+      "detail": "the headline's 95% interval includes zero, so the claim cannot be told apart from no effect: data/copilot_stress.json :: stress-move error: ARGUS's open-hours beta vs skfolio_vine [-0.015459, 0.190153]; data/copilot_stress.json :: stress-move error: ARGUS's open-hours beta vs skfolio_ep [-0.014131, 0.111361]"
     }
   ],
   "clean": false,
@@ -4602,6 +4633,12 @@
       "from": "owned",
       "to": "implemented",
       "at": "2026-09-27T12:39:51+00:00"
+    },
+    {
+      "capability": "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
+      "from": "owned",
+      "to": "implemented",
+      "at": "2026-09-27T21:52:12+00:00"
     }
   ]
 }

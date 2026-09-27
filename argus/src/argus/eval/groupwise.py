@@ -60,6 +60,7 @@ produced it.
 from __future__ import annotations
 
 import math
+import random
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
@@ -133,11 +134,17 @@ class GroupRow:
     mean: float
     share_of_total: float | None
     opposing: int
+    mean_se: float | None = None
+    """Standard error of the group's weighted mean, ``sd / sqrt(effective n)`` with Kish's effective
+    size; ``None`` under two rows. Alphalens reports the same per-quantile error
+    (``performance.py:510-527``); it treats rows as independent, and so does this — the headline
+    interval below is where dependence is handled."""
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "group": self.group, "rows": self.rows, "weight": round(self.weight, 6),
             "total": _round(self.total), "mean": _round(self.mean),
+            "mean_se": None if self.mean_se is None else _round(self.mean_se),
             "share_of_total": None if self.share_of_total is None else round(
                 self.share_of_total, 4),
             "opposing": self.opposing,
@@ -225,6 +232,10 @@ class GroupwiseReport:
     split: SplitHalf | None
     split_note: str
     notes: tuple[str, ...] = field(default_factory=tuple)
+    interval: Interval | None = None
+    """A 95% bootstrap interval on ``micro_mean`` (:func:`headline_interval`). Reported, not a
+    flag: whether an interval spanning zero should demote a capability is a change to the register's
+    rules, decided on its own, not slipped in with the measurement."""
 
     @property
     def flags(self) -> tuple[str, ...]:
@@ -260,7 +271,105 @@ class GroupwiseReport:
             "tables": [t.as_dict() for t in self.tables],
             "split_half": self.split.as_dict() if self.split is not None else None,
             "split_half_note": self.split_note, "notes": list(self.notes),
+            "interval": self.interval.as_dict() if self.interval is not None else None,
         }
+
+
+MIN_INTERVAL_UNITS = 8
+"""Fewest resampling units (dates, or rows without dates) before an interval is reported."""
+RESAMPLES = 2000
+
+
+@dataclass(frozen=True, slots=True)
+class Interval:
+    """A percentile bootstrap interval on the weighted headline mean, and how it was drawn."""
+
+    low: float
+    high: float
+    method: str
+    units: int
+    block_length: float
+
+    @property
+    def spans_zero(self) -> bool:
+        return self.low <= 0.0 <= self.high
+
+    def as_dict(self) -> dict[str, Any]:
+        return {"low": _round(self.low), "high": _round(self.high), "method": self.method,
+                "units": self.units, "block_length": round(self.block_length, 3),
+                "spans_zero": self.spans_zero, "resamples": RESAMPLES}
+
+
+def headline_interval(items: Sequence[Item], *, seed: int = 0) -> Interval | None:
+    """A 95% interval on the weighted headline mean that respects how the rows were produced.
+
+    Fairlearn's bootstrap (``metrics/_bootstrap.py:44-130``) and Alphalens' t-test
+    (``plotting.py:180-196``) both treat rows as independent draws
+    (research/harvest/21-fairlearn.md), which a time series of trades is not: a whole day's
+    cross-section moves together, and one day leans on the last. So when every row carries an
+    ``order`` (a date or a sequence), the rows are first pooled into one unit per order value —
+    keeping each date's cross-section whole — and those units are resampled with the stationary
+    bootstrap (Politis and Romano 1994, `backtest/dependence.stationary_bootstrap_indices`) at
+    the Politis-White block length (`backtest/dependence.optimal_block_length`, the ``arch``
+    transcription), falling back to ``sqrt(n)`` below 30 units. Rows without an order are
+    resampled one by one. ``None`` below :data:`MIN_INTERVAL_UNITS` units: an interval from a
+    handful of draws is decoration."""
+    from argus.backtest.dependence import (
+        optimal_block_length,
+        stationary_bootstrap_indices,
+        suggested_block_length,
+    )
+    from argus.backtest.metrics import MetricError
+
+    if items and all(i.order is not None for i in items):
+        pooled: dict[str, list[float]] = {}
+        for item in items:
+            cell = pooled.setdefault(str(item.order), [0.0, 0.0])
+            cell[0] += item.value * item.weight
+            cell[1] += item.weight
+        units = [(t, w) for _, (t, w) in sorted(pooled.items()) if w > 0]
+        method = "stationary bootstrap over order values"
+    else:
+        units = [(i.value * i.weight, i.weight) for i in items if i.weight > 0]
+        method = "bootstrap over rows (no order recorded)"
+    n = len(units)
+    if n < MIN_INTERVAL_UNITS:
+        return None
+    if method.startswith("stationary"):
+        means = [t / w for t, w in units]
+        try:
+            block = optimal_block_length(means)[0]
+        except MetricError:
+            block = suggested_block_length(n)
+        block = max(1.0, block)
+    else:
+        block = 1.0
+    rng = random.Random(seed)
+    draws: list[float] = []
+    for _ in range(RESAMPLES):
+        picked = stationary_bootstrap_indices(n, block_length=block, rng=rng)
+        total = sum(units[k][0] for k in picked)
+        weight = sum(units[k][1] for k in picked)
+        if weight > 0:
+            draws.append(total / weight)
+    draws.sort()
+    low = draws[int(0.025 * (len(draws) - 1))]
+    high = draws[math.ceil(0.975 * (len(draws) - 1))]
+    return Interval(low=low, high=high, method=method, units=n, block_length=block)
+
+
+def _group_se(members: Sequence[Item]) -> float | None:
+    """``sd / sqrt(n_eff)`` of a weighted mean, Kish's ``n_eff = (sum w)^2 / sum w^2``."""
+    weights = [i.weight for i in members if i.weight > 0]
+    if len(weights) < 2:
+        return None
+    total_w = sum(weights)
+    mean = sum(i.value * i.weight for i in members) / total_w
+    variance = sum(i.weight * (i.value - mean) ** 2 for i in members if i.weight > 0) / total_w
+    n_eff = total_w ** 2 / sum(w * w for w in weights)
+    if n_eff <= 1:
+        return None
+    return math.sqrt(variance * n_eff / (n_eff - 1)) / math.sqrt(n_eff)
 
 
 def _round(value: float) -> float:
@@ -308,7 +417,7 @@ def breakdown(items: Sequence[Item], key: str) -> GroupTable:
             group=name, rows=len(members), weight=g_weight, total=g_total,
             mean=g_total / g_weight if g_weight else math.nan,
             share_of_total=(g_total / total) if direction != 0 else None,
-            opposing=opposing))
+            opposing=opposing, mean_se=_group_se(members)))
     rows.sort(key=lambda r: (-(r.total * direction) if direction else -abs(r.total), r.group))
     macro = sum(r.mean for r in rows) / len(rows)
 
@@ -454,7 +563,7 @@ def audit(name: str, items: Sequence[Item], keys: Sequence[str], *, headline: st
     return GroupwiseReport(
         name=name, headline=headline, orientation=orientation, items=len(items),
         micro_mean=total / weight, total=total, tables=tables, split=split, split_note=note,
-        notes=tuple(notes))
+        notes=tuple(notes), interval=headline_interval(items))
 
 
 __all__ = [
@@ -465,10 +574,12 @@ __all__ = [
     "GroupTable",
     "GroupwiseError",
     "GroupwiseReport",
+    "Interval",
     "Item",
     "SplitHalf",
     "audit",
     "breakdown",
     "halves_from",
+    "headline_interval",
     "split_half",
 ]

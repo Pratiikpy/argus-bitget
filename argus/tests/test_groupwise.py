@@ -9,6 +9,7 @@ named flag; the honest versions of the same numbers must not.
 from __future__ import annotations
 
 import json
+from typing import Any
 
 import pytest
 
@@ -174,3 +175,63 @@ class TestTheAuditArtefact:
             for h in e.get("headlines", []) if h.get("flags"))
         listed = sorted((f["artefact"], f["headline"]) for f in blob["flagged"])
         assert listed == from_entries
+
+
+class TestTheHeadlineInterval:
+    """A 95% interval on the headline that keeps each date's cross-section whole and respects
+    serial dependence (research/harvest/21-fairlearn.md)."""
+
+    @staticmethod
+    def _rows(n_dates: int, per_date: int, mean: float, noise: float, seed: int = 1) -> list[Any]:
+        import random
+
+        from argus.eval.groupwise import Item
+
+        rng = random.Random(seed)
+        return [Item(value=mean + rng.gauss(0, noise), groups={"symbol": f"S{k}"},
+                     order=f"2026-{d // 28 + 1:02d}-{d % 28 + 1:02d}")
+                for d in range(n_dates) for k in range(per_date)]
+
+    def test_a_clear_effect_excludes_zero_and_a_null_does_not(self) -> None:
+        from argus.eval.groupwise import headline_interval
+
+        clear = headline_interval(self._rows(40, 4, mean=1.0, noise=0.5))
+        null = headline_interval(self._rows(40, 4, mean=0.0, noise=0.5))
+        assert clear is not None and not clear.spans_zero and clear.low < 1.0 < clear.high
+        assert null is not None and null.spans_zero
+        assert clear.method.startswith("stationary") and clear.units == 40
+
+    def test_dates_are_the_unit_not_rows(self) -> None:
+        """Forty rows on one date are one draw: the interval is refused, not narrowed by rows."""
+        from argus.eval.groupwise import headline_interval
+
+        assert headline_interval(self._rows(1, 40, mean=1.0, noise=0.5)) is None
+
+    def test_rows_without_an_order_are_resampled_one_by_one(self) -> None:
+        from argus.eval.groupwise import Item, headline_interval
+
+        rows = [Item(value=float(v), groups={"k": "a"}) for v in range(20)]
+        interval = headline_interval(rows)
+        assert interval is not None and interval.method.startswith("bootstrap over rows")
+        assert interval.block_length == 1.0 and interval.low < 9.5 < interval.high
+
+    def test_too_few_units_give_no_interval(self) -> None:
+        from argus.eval.groupwise import headline_interval
+
+        assert headline_interval(self._rows(5, 3, mean=1.0, noise=0.1)) is None
+
+    def test_the_report_carries_it_and_the_group_rows_carry_an_error(self) -> None:
+        from argus.eval.groupwise import audit
+
+        report = audit("t", self._rows(40, 4, mean=1.0, noise=0.5), ["symbol"],
+                       headline="h", orientation="higher is better")
+        blob = report.as_dict()
+        assert blob["interval"]["spans_zero"] is False and blob["interval"]["resamples"] == 2000
+        assert all(row["mean_se"] is not None for row in blob["tables"][0]["per_group"])
+        assert not any("interval" in flag for flag in report.flags)  # reported, not a new flag
+
+    def test_it_is_reproducible(self) -> None:
+        from argus.eval.groupwise import headline_interval
+
+        rows = self._rows(40, 4, mean=0.3, noise=1.0)
+        assert headline_interval(rows) == headline_interval(rows)

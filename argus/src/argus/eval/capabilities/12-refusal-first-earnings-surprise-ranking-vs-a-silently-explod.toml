@@ -8,9 +8,10 @@ modules = [
     "argus/market/fundamentals.py",
     "argus/eval/general_sue_comparison.py",
 ]
-state = "owned"
+state = "implemented"
 baseline = "QuantConnect/Tutorials real SUE factor (FineSelectionAndSueSorting)"
 blockers = [
+    """\n        RE-GRADED 2026-09-28 from OWNED to IMPLEMENTED (tracker 195). The register now reads \n        the bootstrap interval the groupwise audit puts on each headline, and this capability's \n        own claim against the general tool (data/general_sue_comparison.json: dated alignment \n        answers where pandas' lenient period index refuses) is +0.22 per anchor with a 95% \n        interval of [0.0, 0.56] over 9 real filers: ARGUS answers on 2, ties on 7, loses on none. \n        An exact sign test on 2 wins and 0 losses gives p = 0.5. The mechanism is real and ahead; \n        the sample does not establish it. Route back: extend the alignment comparison to enough \n        filers that the interval clears zero, or show it does not.\n    """,
     """\
         The real reference's exact `months_count`/`months_eps_change` defaults are not published \
         in the tutorial page's own inline code (only the surrounding prose states a '36-month \

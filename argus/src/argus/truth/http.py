@@ -11,8 +11,19 @@ Every read here goes through ``urllib.request.urlopen``, looked up at call time,
 it. A failure of any kind — an HTTP status, a timeout, a refused connection, a body that is not the
 JSON asked for — is raised as :class:`~argus.truth.failures.RpcError` with its
 :class:`~argus.truth.failures.ErrorKind`, the status and a body excerpt when there was one, so a
-caller wraps it in its own error type once and the reason survives. Nothing here retries: whether
-a read is worth repeating is the caller's decision, and ``RpcError.retryable`` answers it.
+caller wraps it in its own error type once and the reason survives.
+
+**A read is tried twice when a second try can help (2026-09-28).** This module used to leave
+retrying to the caller, and exactly one caller of about thirty (`agents/desk.py`, through
+`agents/circuit.call_with_retry`) did, so a rate limit or a dropped connection on any market,
+filing or macro read ended that answer (research/harvest/44-httpx.md, against ccxt's ``fetch2``
+and Ritik200238/nightwatch's ``HttpClient.get``, which retry inside the one method every read
+goes through). Now a GET — no body — that fails as a rate limit, a transport error or a 5xx is
+tried once more: after the server's own ``Retry-After`` when it gave one of at most
+:data:`MAX_RETRY_WAIT` seconds (a longer one is not waited on), else after
+:data:`RETRY_DELAY`. A timeout is not retried: it has already spent the caller's whole budget, and a
+second one would double it on the console's request path. A write, or any call with a body, is
+never retried here: whether repeating it is safe is the caller's decision. ``retries=0`` opts out.
 
 **Five readers keep their own transport, each for a reason this module cannot serve**
 (:data:`OWN_TRANSPORT`, pinned by `tests/test_http.py`): the MCP client reads a server-sent
@@ -27,13 +38,25 @@ evaluation harnesses under `eval/` are not product code and are not held to this
 from __future__ import annotations
 
 import json
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from collections.abc import Mapping
 from typing import Any
 
-from argus.truth.failures import RpcError, classify_exception, classify_http
+from argus.truth.failures import ErrorKind, RpcError, classify_exception, classify_http
+
+READ_RETRIES = 1
+"""Extra tries a failed GET gets by default."""
+RETRY_DELAY = 0.5
+"""Seconds before a retry when the server named no wait."""
+MAX_RETRY_WAIT = 5.0
+"""The longest ``Retry-After`` honoured; a server asking for more is answered with the failure."""
+RETRY_KINDS = frozenset({ErrorKind.RATE_LIMIT, ErrorKind.TRANSPORT, ErrorKind.UPSTREAM_5XX})
+"""`truth/failures.RETRYABLE` less ``TIMEOUT``: see the module note."""
+
+_sleep = time.sleep
 
 OWN_TRANSPORT = frozenset({"market/rpc.py", "llm/qwen.py", "execution/bitget_client.py",
                            "execution/latency_probe.py", "market/estimates.py"})
@@ -78,9 +101,33 @@ def url_with(url: str, params: Mapping[str, Any] | None) -> str:
 def fetch(url: str, *, params: Mapping[str, Any] | None = None,
           headers: Mapping[str, str] | None = None, timeout: float,
           data: bytes | None = None, method: str | None = None,
-          max_bytes: int | None = None) -> bytes:
+          max_bytes: int | None = None, retries: int | None = None) -> bytes:
     """The body of ``url`` (at most ``max_bytes`` of it, when given). Raises :class:`RpcError`
-    for every way the read can fail."""
+    for every way the read can fail, after the retry the module note describes; ``retries`` sets
+    how many extra tries a GET gets (a call with a body always gets none)."""
+    is_read = data is None and (method or "GET").upper() == "GET"
+    extra = (READ_RETRIES if retries is None else max(0, retries)) if is_read else 0
+    for attempt in range(extra + 1):
+        try:
+            return _fetch_once(url, params=params, headers=headers, timeout=timeout, data=data,
+                               method=method, max_bytes=max_bytes)
+        except RpcError as exc:
+            wait = RETRY_DELAY
+            if exc.retry_after is not None:
+                try:
+                    wait = float(exc.retry_after)
+                except (TypeError, ValueError):
+                    wait = RETRY_DELAY
+            if attempt == extra or exc.kind not in RETRY_KINDS or wait > MAX_RETRY_WAIT:
+                exc.attempts = attempt + 1
+                raise
+            _sleep(max(0.0, wait))
+    raise AssertionError("unreachable")  # pragma: no cover - the loop returns or raises
+
+
+def _fetch_once(url: str, *, params: Mapping[str, Any] | None,
+                headers: Mapping[str, str] | None, timeout: float, data: bytes | None,
+                method: str | None, max_bytes: int | None) -> bytes:
     merged = {"User-Agent": USER_AGENT, **(headers or {})}
     request = urllib.request.Request(url_with(url, params), headers=merged, data=data,
                                      method=method)

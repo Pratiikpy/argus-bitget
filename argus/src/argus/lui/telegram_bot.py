@@ -343,6 +343,13 @@ def follow_up(token: str, chat_id: int, message_id: int | None) -> None:
     if pending is None:
         return
     payload, question, book = pending
+    # A translation takes 9 to 32 seconds; "typing…" says the desk is still working rather than
+    # finished (one chat action, which Telegram shows for up to five seconds or until the next
+    # message — the policy chatgpt-telegram-bot uses, research/harvest/49-telegram-deep.md, 5).
+    try:
+        _call(token, "sendChatAction", {"chat_id": chat_id, "action": "typing"}, timeout=10.0)
+    except Exception as exc:
+        _LOG.info("typing indicator not sent (%s)", type(exc).__name__)
     text = _translated(payload, question, book, f"tg-{chat_id}")
     if text is None:
         return
@@ -359,10 +366,44 @@ def follow_up(token: str, chat_id: int, message_id: int | None) -> None:
 
 # --- Telegram transport -------------------------------------------------------------------------
 
+MAX_RETRY_AFTER = 30.0
+"""The longest flood-control wait honoured inline. Telegram's 429 names the seconds to wait
+(``parameters.retry_after``); a wait longer than this is a sign to stop, not to block a sweep."""
+
+_sleep = time.sleep
+
+
+def _retry_after(exc: BaseException) -> float | None:
+    """The wait a Telegram 429 asked for, from its JSON body (where the Bot API puts it) or the
+    ``Retry-After`` header; ``None`` for any other failure."""
+    if http.status_of(exc) != 429:
+        return None
+    try:
+        body = json.loads(getattr(exc, "body", b"") or b"{}")
+        seconds = float((body.get("parameters") or {})["retry_after"])
+    except (ValueError, TypeError, AttributeError, KeyError):
+        seconds = float(getattr(exc, "retry_after", None) or 1.0)
+    return seconds
+
+
 def _call(token: str, method: str, params: dict[str, Any], *, timeout: float = 70.0) -> Any:
-    payload = http.fetch_json(API.format(token=token, method=method),
-                              data=json.dumps(params).encode(), method="POST", timeout=timeout,
-                              headers={"Content-Type": "application/json"})
+    """One Bot API call. A 429 is waited out once, for the time Telegram named, and retried: a
+    watch sweep fires alerts in a burst, and before this a flood-control refusal dropped the alert
+    for good (research/harvest/49-telegram-deep.md, decision 2, after Vibe-Trading's
+    ``_call_with_retry``, MIT, ``agent/src/channels/telegram.py:856-880``)."""
+    def once() -> Any:
+        return http.fetch_json(API.format(token=token, method=method),
+                               data=json.dumps(params).encode(), method="POST", timeout=timeout,
+                               headers={"Content-Type": "application/json"})
+
+    try:
+        payload = once()
+    except Exception as exc:
+        wait = _retry_after(exc)
+        if wait is None or wait > MAX_RETRY_AFTER:
+            raise
+        _sleep(wait)
+        payload = once()
     if not payload.get("ok"):
         raise RuntimeError(f"Telegram {method} failed: {payload.get('description')}")
     return payload.get("result")
@@ -459,13 +500,56 @@ def handle_webhook(body: bytes, secret_header: str | None, *,
     return 200, json.dumps({"ok": True, "send_failures": failures}).encode()
 
 
+def announce_pauses(token: str, pauses: Any, approvals: Any) -> list[str]:
+    """Send each newly held decision to every reviewer, with its three buttons
+    (`lui/pause_bot.py`)."""
+    from argus.lui.pause_bot import announce
+
+    def post(chat_id: int, text: str, markup: dict[str, Any]) -> None:
+        _call(token, "sendMessage", {"chat_id": chat_id, "text": text, "parse_mode": "HTML",
+                                     "reply_markup": markup}, timeout=30.0)
+
+    return announce(pauses, approvals, post)
+
+
+def answer_pause_tap(token: str, update: dict[str, Any], pauses: Any, approvals: Any) -> bool:
+    """Record one button tap through the pause store, tell the tapper, and rewrite the message to
+    show what was recorded. ``False`` when the update was not a pause button."""
+    from argus.lui.pause_bot import handle_callback
+
+    outcome = handle_callback(update, pauses, approvals)
+    if outcome is None:
+        return False
+    try:
+        _call(token, "answerCallbackQuery", {"callback_query_id": outcome.callback_id,
+                                             "text": outcome.toast[:200]}, timeout=10.0)
+        if outcome.chat_id is not None and outcome.message_id is not None and outcome.text:
+            _call(token, "editMessageText", {"chat_id": outcome.chat_id,
+                                             "message_id": outcome.message_id,
+                                             "text": outcome.text, "parse_mode": "HTML"},
+                  timeout=10.0)
+    except Exception as exc:
+        # The answer is already recorded (or refused) in the store; only the chat is behind.
+        _LOG.warning("pause tap reply failed (%s)", type(exc).__name__)
+    return True
+
+
 def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - network loop
     """Long polling: no public URL, one process, chat state kept in the file store so a restart
     resumes every conversation. Deletes any registered webhook first, because Telegram refuses
-    getUpdates while one is set."""
-    from argus.lui.chat_store import from_env
-    from argus.lui.watch import SWEEP_SECONDS, WatchStore
+    getUpdates while one is set.
 
+    With Telegram approvals configured (`lui/pause_bot.py`), it also sends every decision the desk
+    holds for a human to the registered reviewers and records their taps. A half-configured setup,
+    or one without ``ARGUS_PAUSE_REVIEWERS``, refuses to start rather than run open."""
+    from argus.decision.pause import PauseStore
+    from argus.lui.chat_store import from_env
+    from argus.lui.pause_bot import Approvals
+    from argus.lui.watch import SWEEP_SECONDS, WatchStore
+    from argus.paper.runner import LEDGER_PATH, pause_root
+
+    approvals = Approvals.from_env()  # raises ApprovalConfigError before anything connects
+    pauses = PauseStore(pause_root(LEDGER_PATH)) if approvals else None
     _call(token, "deleteWebhook", {"drop_pending_updates": False})
     states: dict[int, ChatState] = {}
     store = WatchStore()
@@ -476,15 +560,20 @@ def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - 
         if time.monotonic() - swept >= SWEEP_SECONDS:
             swept = time.monotonic()
             _sweep_watches(token, store)
+        if approvals and pauses:
+            announce_pauses(token, pauses, approvals)
         try:
-            updates = _call(token, "getUpdates", {"offset": offset, "timeout": 50,
-                                                  "allowed_updates": ["message"]})
+            updates = _call(token, "getUpdates", {
+                "offset": offset, "timeout": 50,
+                "allowed_updates": ["message", "callback_query"] if approvals else ["message"]})
         except Exception as exc:
             _LOG.warning("getUpdates failed (%s); retrying in 5s", type(exc).__name__)
             time.sleep(5)
             continue
         for update in updates:
             offset = max(offset, int(update["update_id"]) + 1)
+            if approvals and pauses and answer_pause_tap(token, update, pauses, approvals):
+                continue
             last: dict[int, int | None] = {}
             chat = ((update.get("message") or {}).get("chat") or {}).get("id")
             if isinstance(chat, int):

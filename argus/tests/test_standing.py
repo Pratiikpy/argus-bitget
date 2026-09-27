@@ -500,10 +500,11 @@ class TestTheLiveRegisterIsHonest:
         # 2026-09-27: sentiment integrity to IMPLEMENTED (audit finding 89). Its 30 manipulation
         # and 12 truth cases are designed, not a sample of live posts, so the groupwise check
         # classes them DESIGNED and cannot stand in for a population result.
+        # 2026-09-28: earnings surprise ranking to IMPLEMENTED (tracker 195). Its own headline
+        # against pandas is 2 wins, 7 ties, 0 losses over 9 filers; the 95% interval includes zero.
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
             "Per-profile mandate that changes the verdict",
-            "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
             "Risk layer proved by domain sweep",
         }
         for cap in audit().owned:
@@ -985,3 +986,39 @@ def test_the_tweeteval_loss_is_a_graded_row() -> None:
     assert row.subtheme == "t2-sentiment"
     assert "no_specialist_capability_superior" not in row.conditions_met
     assert "costs_included" not in row.conditions_met
+
+
+class TestAnIntervalThatIncludesZeroIsNotAValidEvaluation:
+    """Tracker 195: a claim whose own headline interval includes zero has not been shown."""
+
+    @staticmethod
+    def _audit(interval: dict[str, object] | None) -> dict[str, object]:
+        head = {"name": "h", "role": "argus_vs_rival", "flags": [], "favours": "argus",
+                "interval": interval}
+        return {"artefacts": {"data/x.json": {"status": "checked", "sha256": None,
+                                              "headlines": [head]}}}
+
+    def _verdict(self, interval: dict[str, object] | None,
+                 monkeypatch: pytest.MonkeyPatch) -> tuple[bool, str]:
+        import argus.eval.standing as standing
+
+        monkeypatch.setattr(standing, "proof_scope", lambda cap, proof: ("data/x.json",))
+        cap = standing.REGISTER[0]
+        return standing.groupwise_verdict(cap, cap.proofs[0], self._audit(interval))
+
+    def test_an_interval_spanning_zero_fails(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        ok, why = self._verdict({"low": -0.1, "high": 0.4, "spans_zero": True}, monkeypatch)
+        assert not ok and "includes zero" in why and "[-0.1, 0.4]" in why
+
+    def test_an_interval_clear_of_zero_passes(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        ok, _ = self._verdict({"low": 0.1, "high": 0.4, "spans_zero": False}, monkeypatch)
+        assert ok
+
+    def test_a_degenerate_interval_is_not_held_against_the_claim(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        ok, _ = self._verdict({"low": 0.0, "high": 0.0, "spans_zero": True}, monkeypatch)
+        assert ok
+
+    def test_no_interval_is_judged_as_before(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        ok, _ = self._verdict(None, monkeypatch)
+        assert ok

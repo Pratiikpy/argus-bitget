@@ -120,6 +120,16 @@ jobs:
       - name: Documentation gate
         run: uv run --frozen python -m argus.eval.docclaims --tests
 
+      # The gates above regenerate committed artefacts (the register, the anchor report). If any of
+      # them now differs from what was committed, the published file was not the one the code
+      # produces — the drift `data/standing.json` showed on 2026-09-20, and the anchor report and a
+      # path-dependent hash showed on 2026-09-28. Tracked files only: coverage and caches are not.
+      # After Freqtrade's "Check for repository changes" step (GPL-3.0; the idea, not its YAML).
+      - name: The checks changed nothing that was committed
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: git diff --stat --exit-code
+
   live:
     name: live venue checks (advisory)
     runs-on: ubuntu-latest

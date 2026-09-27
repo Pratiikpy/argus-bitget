@@ -92,6 +92,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
+from argus.truth.paths import portable_digest
+
 PACKAGE = Path(__file__).resolve().parents[3]       # .../bitget/argus
 ROOT = PACKAGE.parent                                # the workspace directory above argus/
 DATA = PACKAGE / "data"
@@ -748,8 +750,10 @@ def load_groupwise(path: Path = GROUPWISE_PATH) -> dict[str, Any] | None:
 
 
 def _sha256(path: Path) -> str | None:
+    """The artefact's digest with this checkout's root removed (`truth/paths.portable_digest`), so
+    the workspace and the public repository agree on it."""
     try:
-        return hashlib.sha256(path.read_bytes()).hexdigest()
+        return portable_digest(path)
     except OSError:
         return None
 
@@ -760,7 +764,14 @@ def groupwise_verdict(capability: Capability, proof: Proof,
 
     Reads :func:`proof_scope`. Passes only when at least one headline in scope is the capability's
     own claim (:data:`GATING_ROLES`) and was checked on the artefact as it is now, and no such
-    headline carries a flag or favours the rival. Every way of failing names the artefact.
+    headline carries a flag, favours the rival, or has a 95% interval that includes zero. Every way
+    of failing names the artefact.
+
+    **The interval rule (2026-09-28, tracker 195).** The audit now puts a bootstrap interval on each
+    headline (`eval/groupwise.headline_interval`), and 25 of 59 included zero. A claim whose own
+    headline cannot be told apart from no effect has not had a statistically valid evaluation,
+    however it reads. A degenerate interval (every draw the same value, as when every trial scored
+    zero) says nothing about uncertainty and is not held against the claim.
     """
     if groupwise is None:
         return False, ("no groupwise check has run: data/groupwise_audit.json is missing or "
@@ -774,6 +785,7 @@ def groupwise_verdict(capability: Capability, proof: Proof,
     rival: list[str] = []
     stale: list[str] = []
     missing: list[str] = []
+    uncertain: list[str] = []
     for ref in scope:
         entry = entries.get(ref)
         if entry is None:
@@ -797,6 +809,9 @@ def groupwise_verdict(capability: Capability, proof: Proof,
                 flagged.append(f"{label} [{', '.join(h['flags'])}]")
             if h.get("favours") == "rival":
                 rival.append(label)
+            interval = h.get("interval") or {}
+            if interval.get("spans_zero") and interval.get("low") != interval.get("high"):
+                uncertain.append(f"{label} [{interval.get('low')}, {interval.get('high')}]")
     if stale:
         return False, (f"the groupwise audit predates the current {', '.join(stale)}; re-run "
                        f"python -m argus.eval.groupwise_audit")
@@ -804,6 +819,9 @@ def groupwise_verdict(capability: Capability, proof: Proof,
         return False, "the groupwise audit flags " + "; ".join(flagged)
     if rival:
         return False, "the per-item headline favours the rival: " + "; ".join(rival)
+    if uncertain:
+        return False, ("the headline's 95% interval includes zero, so the claim cannot be told "
+                       "apart from no effect: " + "; ".join(uncertain))
     if not checked:
         return False, "no groupwise check has run on its artefacts: " + "; ".join(missing)
     more = f" (+{len(checked) - 1} more)" if len(checked) > 1 else ""

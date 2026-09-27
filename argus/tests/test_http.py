@@ -129,3 +129,89 @@ def test_the_bitget_host_is_named_once() -> None:
                and path.name != "endpoints.py"
                and '"https://api.bitget.com' in path.read_text(encoding="utf-8")]
     assert literal == []
+
+
+def _flaky(monkeypatch: pytest.MonkeyPatch, failures: list[BaseException],
+           body: bytes = b'{"ok": 1}') -> list[Any]:
+    """``urlopen`` that raises each of ``failures`` in turn, then serves ``body``."""
+    calls: list[Any] = []
+
+    def urlopen(request: urllib.request.Request, timeout: float) -> _Response:
+        calls.append(request)
+        if len(calls) <= len(failures):
+            raise failures[len(calls) - 1]
+        return _Response(body)
+
+    monkeypatch.setattr(urllib.request, "urlopen", urlopen)
+    return calls
+
+
+def _status(code: int, retry_after: str | None = None) -> urllib.error.HTTPError:
+    headers = Message()
+    if retry_after is not None:
+        headers["Retry-After"] = retry_after
+    return urllib.error.HTTPError("u", code, "x", headers, io.BytesIO(b""))
+
+
+@pytest.fixture
+def waits(monkeypatch: pytest.MonkeyPatch) -> list[float]:
+    slept: list[float] = []
+    monkeypatch.setattr(http, "_sleep", slept.append)
+    return slept
+
+
+@pytest.mark.parametrize("failure", [_status(503), _status(429), ConnectionResetError("reset")])
+def test_a_read_that_can_recover_is_tried_again(monkeypatch: pytest.MonkeyPatch,
+                                                waits: list[float],
+                                                failure: BaseException) -> None:
+    calls = _flaky(monkeypatch, [failure])
+    assert http.fetch_json("https://x.test", timeout=1) == {"ok": 1}
+    assert len(calls) == 2 and waits == [http.RETRY_DELAY]
+
+
+def test_the_servers_own_wait_is_honoured(monkeypatch: pytest.MonkeyPatch,
+                                          waits: list[float]) -> None:
+    _flaky(monkeypatch, [_status(429, "2")])
+    http.fetch("https://x.test", timeout=1)
+    assert waits == [2.0]
+
+
+def test_a_long_wait_is_not_slept(monkeypatch: pytest.MonkeyPatch, waits: list[float]) -> None:
+    calls = _flaky(monkeypatch, [_status(429, "60")])
+    with pytest.raises(http.RpcError) as caught:
+        http.fetch("https://x.test", timeout=1)
+    assert len(calls) == 1 and waits == [] and caught.value.attempts == 1
+
+
+def test_a_second_failure_is_raised_with_its_attempts(monkeypatch: pytest.MonkeyPatch,
+                                                      waits: list[float]) -> None:
+    calls = _flaky(monkeypatch, [_status(502), _status(502)])
+    with pytest.raises(http.RpcError) as caught:
+        http.fetch("https://x.test", timeout=1)
+    assert len(calls) == 2 and caught.value.attempts == 2
+    assert caught.value.kind is ErrorKind.UPSTREAM_5XX
+
+
+@pytest.mark.parametrize("failure", [urllib.error.URLError(TimeoutError("slow")), _status(404),
+                                     _status(400)])
+def test_a_timeout_or_a_client_error_is_not_retried(monkeypatch: pytest.MonkeyPatch,
+                                                    waits: list[float],
+                                                    failure: BaseException) -> None:
+    calls = _flaky(monkeypatch, [failure])
+    with pytest.raises(http.RpcError):
+        http.fetch("https://x.test", timeout=1)
+    assert len(calls) == 1 and waits == []
+
+
+def test_a_write_is_never_retried(monkeypatch: pytest.MonkeyPatch, waits: list[float]) -> None:
+    calls = _flaky(monkeypatch, [_status(503)])
+    with pytest.raises(http.RpcError):
+        http.fetch("https://x.test", timeout=1, data=b"{}", method="POST")
+    assert len(calls) == 1
+
+
+def test_a_caller_can_opt_out(monkeypatch: pytest.MonkeyPatch, waits: list[float]) -> None:
+    calls = _flaky(monkeypatch, [_status(503)])
+    with pytest.raises(http.RpcError):
+        http.fetch("https://x.test", timeout=1, retries=0)
+    assert len(calls) == 1
