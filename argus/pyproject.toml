@@ -33,7 +33,12 @@ dependencies = [
 argus-bot = "argus.lui.selfhost:main"
 
 [project.optional-dependencies]
+# The Telegram webhook's encrypted chat store (`lui/chat_store.py`, AES-256-GCM). Optional: only a
+# deployment that configures an Upstash store needs it, and without it that store is refused rather
+# than run unencrypted.
+chat-store = ["cryptography>=43"]
 dev = [
+    "cryptography>=43",
     "pytest>=8.2",
     "pytest-cov>=5.0",
     "pytest-timeout>=2.4",

@@ -1171,6 +1171,9 @@ def run_once(
         "ran_at": now.isoformat(),
         "decisions_written": written,
         "settled_this_cycle": settled,
+        # The self-review this cycle triggered, if any (`desk/postmortem.py`): why it ran, what the
+        # gate autopsy and the root-cause diagnosis found, and any adopted remedy that failed.
+        "postmortem": _postmortem(ledger, ledger_path, store, now),
         # Reported, not merely written. The marks are the only observation at a horizon short
         # enough to be independent, so a cycle that took none is a cycle that added nothing to the
         # refusal record — and that has to be visible in the summary rather than inferred later
@@ -1193,6 +1196,31 @@ def run_once(
         # Rows whose ledger record, book position and Constitution ruling did not all agree.
         "fill_alarms": [row["seq"] for row in written if row.get("fill_alarm")],
     }
+
+
+def _postmortem(ledger: PaperLedger, ledger_path: Path, store: PauseStore,
+                now: datetime) -> dict[str, object] | None:
+    """Run `desk/postmortem.after_cycle` on the book as the cycle leaves it. The breaker state is
+    assessed on the realised book after this cycle's settlements, the same book the next cycle's
+    risk layer will judge; an unreadable book is HALTED, as `risk/circuit.py` treats it."""
+    from argus.desk.postmortem import after_cycle
+    from argus.risk.circuit import assess
+
+    book = current_book_state(ledger)
+    activation = str(assess(book)[0]) if isinstance(book, BookState) else "halted"
+    records: list[dict[str, object]] = []
+    risk_path = ledger_path.with_name(RISK_PATH.name)
+    if risk_path.exists():
+        for line in risk_path.read_text(encoding="utf-8").splitlines():
+            try:
+                records.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    try:
+        return after_cycle(ledger.entries, records, root=ledger_path.parent,
+                           activation=activation, escalations=len(store.request_ids()), at=now)
+    except Exception as exc:
+        return {"failed": f"{type(exc).__name__}: {exc}"}
 
 
 def _marking_governs_from() -> int:

@@ -550,6 +550,17 @@ def restricted_loads(payload: bytes) -> Any:
 # --- the store -----------------------------------------------------------------------------------
 
 
+REVIEWERS_ENV = "ARGUS_PAUSE_REVIEWERS"
+"""Comma-separated reviewer names a paused decision may be answered by. Unset: any named reviewer
+is accepted and recorded, as before; set: every other name is refused and the refusal logged."""
+
+
+def reviewer_allowlist() -> frozenset[str] | None:
+    raw = os.environ.get(REVIEWERS_ENV, "")
+    names = frozenset(n.strip() for n in raw.split(",") if n.strip())
+    return names or None
+
+
 def _atomic_write(path: Path, text: str) -> None:
     """Write-then-rename: a kill mid-write leaves the old file or the new one, never half of one."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -741,6 +752,26 @@ class PauseStore:
                 f"was priced at {request.as_of.isoformat()} and is no longer the market"
             )
         check_response(request, response)
+        allowed = reviewer_allowlist()
+        if allowed is not None and response.reviewer.strip() not in allowed:
+            self.append_event("answer_refused", at=now, request_id=request.request_id,
+                              decision_id=request.decision_id, reviewer=response.reviewer,
+                              reason="reviewer not on the allowlist")
+            raise ResponseMismatch(
+                f"{response.reviewer!r} is not a reviewer this desk accepts ({REVIEWERS_ENV})"
+            )
+        # First answer wins. The status check above and the write below are not one step, so two
+        # answers arriving together could both pass the check; the claim file is created
+        # exclusively (O_EXCL), which the filesystem grants to exactly one of them.
+        claim = self._dir(request.request_id) / "response.claim"
+        try:
+            fd = os.open(claim, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            raise AlreadyResolved(
+                f"{request.request_id} was answered by another reviewer a moment ago"
+            ) from None
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(response.reviewer)
         _atomic_write(
             self._dir(request.request_id) / "response.json",
             json.dumps(response.as_dict(), indent=2),

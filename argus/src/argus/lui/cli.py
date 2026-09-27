@@ -15,10 +15,20 @@ Rendering rules, from ``research/subthemes/_CENSUS-lui.md``:
 - sources are printed under every answer, never folded into the prose;
 - the latency budget for the question class is shown next to the time actually taken, so a slow
   answer is visibly slow rather than quietly slow.
+
+**For programs as well as people** (Command Line Interface Guidelines, clig.dev,
+``content/_index.md:555`` and ``:568``; research/harvest/51-cli-guidelines.md). ``--json`` prints
+one JSON object per question — the answer's ``as_dict()`` with the time taken and its budget — so
+an agent reads fields rather than scraping prose; Bitget's own ``bgc`` makes the same choice,
+printing JSON by default (``agent-cli/src/index.ts:236-239``). ``-q`` prints the answer's lines and
+nothing else, for scripts that only want the words. Exit status is the same in every mode: 0
+answered, 1 refused, 2 a usage error, so a caller can branch on it without parsing anything.
 """
 
 from __future__ import annotations
 
+import argparse
+import json
 import sys
 import time
 from dataclasses import replace
@@ -88,20 +98,65 @@ def ask(ledger: PaperLedger, text: str, *, conversation: Conversation,
     return result, (time.perf_counter() - started) * 1000
 
 
+def as_json(result: Answer, *, elapsed_ms: float) -> str:
+    """One answer as a single line of JSON: everything :meth:`Answer.as_dict` carries, plus the
+    timing a person sees in the header."""
+    budget = BUDGET_MS[result.question.speed]
+    return json.dumps({**result.as_dict(), "elapsed_ms": round(elapsed_ms, 1),
+                       "budget_ms": budget, "over_budget": elapsed_ms > budget},
+                      ensure_ascii=False, default=str)
+
+
+def _emit(result: Answer, elapsed: float, *, mode: str) -> None:
+    if mode == "json":
+        print(as_json(result, elapsed_ms=elapsed))
+    elif mode == "quiet":
+        print("\n".join(result.lines))
+    else:
+        print(render(result, elapsed_ms=elapsed))
+
+
+def parser() -> argparse.ArgumentParser:
+    cli = argparse.ArgumentParser(
+        prog="python -m argus.lui",
+        description="Ask ARGUS a research question or about its own record. With a question, "
+                    "answer it and exit; without one, start an interactive session.",
+        epilog="exit status: 0 answered, 1 refused, 2 usage error")
+    out = cli.add_mutually_exclusive_group()
+    out.add_argument("--json", action="store_true",
+                     help="print each answer as one line of JSON, for programs")
+    out.add_argument("-q", "--quiet", action="store_true",
+                     help="print only the answer's lines: no header, no sources")
+    cli.add_argument("question", nargs="*", help="the question, in words")
+    return cli
+
+
 def main(argv: list[str] | None = None) -> int:
     from argus.paper.runner import LEDGER_PATH
 
-    args = list(argv if argv is not None else sys.argv[1:])
+    options = parser().parse_args(argv if argv is not None else sys.argv[1:])
+    mode = "json" if options.json else "quiet" if options.quiet else "human"
     ledger = PaperLedger(path=LEDGER_PATH)
     conversation = Conversation()
     # Built once for the session. Returns None without credentials, and the console then answers
     # from patterns alone rather than failing to start.
     router = build_router()
 
-    if args:
-        result, elapsed = ask(ledger, " ".join(args), conversation=conversation, router=router)
-        print(render(result, elapsed_ms=elapsed))
+    if options.question:
+        result, elapsed = ask(ledger, " ".join(options.question), conversation=conversation,
+                              router=router)
+        _emit(result, elapsed, mode=mode)
         return 0 if not result.refused else 1
+
+    if mode != "human":
+        # A session reads questions line by line and answers each in the chosen form; the
+        # banner and the prompt are for a person and are left out.
+        for line in sys.stdin:
+            text = line.strip()
+            if text:
+                result, elapsed = ask(ledger, text, conversation=conversation, router=router)
+                _emit(result, elapsed, mode=mode)
+        return 0
 
     print(BANNER)
     print(f"ledger: {len(ledger.entries)} decision(s), chain "
@@ -122,7 +177,7 @@ def main(argv: list[str] | None = None) -> int:
         print()
 
 
-__all__ = ["BUDGET_MS", "ask", "main", "render"]
+__all__ = ["BUDGET_MS", "as_json", "ask", "main", "parser", "render"]
 
 
 if __name__ == "__main__":

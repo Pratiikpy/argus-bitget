@@ -293,8 +293,38 @@ def autopsy_panel() -> Panel:
                    f"phases: {coverage.get('by_phase')}"),
             Metric("stated confidence, median", _num(blob.get("confidence_median"), places=2),
                    "data/abstention_autopsy.json"),
+            Metric("written", blob.get("generated_at"), "data/abstention_autopsy.json",
+                   "why: " + "; ".join(blob.get("triggered_by") or ["run by hand"])),
         ),
         verdict=str(blob.get("falsifier", "")),
+    )
+
+
+def diagnosis_panel() -> Panel:
+    """What the desk's own record says it keeps getting wrong, and whether the fix held
+    (`desk/postmortem.py`, `desk/rootcause.py`)."""
+    blob = _load("diagnosis.json")
+    if blob is None:
+        return _absent("What the record says to change", "track 2 · explainability",
+                       "diagnosis.json")
+    remedies = _load("remedies.json") or {}
+    adopted = [r for r in remedies.values() if isinstance(r, dict) and r.get("adopted_at")]
+    relapsed = [r for r in adopted if r.get("fired_after_adoption")]
+    causes = [str(d.get("cause")) for d in blob.get("diagnoses", [])]
+    return Panel(
+        title="What the record says to change", subtheme="track 2 · explainability",
+        metrics=(
+            Metric("graded decisions", str(blob.get("sample")), "data/diagnosis.json"),
+            Metric("causes found", str(len(causes)), "data/diagnosis.json", ", ".join(causes)),
+            Metric("remedies adopted", str(len(adopted)), "data/remedies.json"),
+            Metric("adopted remedies that failed", str(len(relapsed)), "data/remedies.json",
+                   "the same diagnosis fired again after the fix"),
+            Metric("written", blob.get("generated_at"), "data/diagnosis.json",
+                   "why: " + "; ".join(blob.get("triggered_by") or ["run by hand"])),
+        ),
+        verdict=(str(blob.get("refused")) if blob.get("refused") else
+                 "; ".join(f"{d.get('cause')}: {d.get('remedy')}" for d in blob["diagnoses"])
+                 or "no dominant cause: the losses look like variance"),
     )
 
 
@@ -600,7 +630,7 @@ def claims_panel() -> Panel:
 
 
 PANELS: tuple[Callable[[], Panel], ...] = (
-    ledger_panel, performance_panel, flow_panel, autopsy_panel, risk_panel,
+    ledger_panel, performance_panel, flow_panel, autopsy_panel, diagnosis_panel, risk_panel,
     shadow_panel,
     refusal_panel, themes_panel, research_panel, sources_panel, track1_panel,
     hurdle_panel,

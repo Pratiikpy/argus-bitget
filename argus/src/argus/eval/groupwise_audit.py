@@ -507,21 +507,43 @@ def _grammar(path: str) -> Entry:
 
 
 def _sentiment(path: str) -> Entry:
-    rows = _load(path)["narratives"]
+    blob = _load(path)
+    rows = blob["narratives"]
 
-    def symbol(text: str) -> str:
-        found = re.search(r"\b([A-Z]{2,}USDT)\b", text)
+    def symbol(row: dict[str, Any]) -> str:
+        if row.get("symbol"):
+            return str(row["symbol"])
+        found = re.search(r"\b([A-Z]{2,}USDT)\b", str(row["narrative"]))
         return found.group(1) if found else "?"
 
-    items = [Item(value=float(bool(r["argus_discounts_coordination"]))
-                  - float(not r["finbert_signal_scales_with_repetition"]),
-                  groups={"symbol": symbol(str(r["narrative"]))}) for r in rows]
-    return Entry(path, CHECKED, "one row per coordinated-posting narrative", (
-        _headline("coordinated posting: ARGUS vs finBERT", items, ("symbol",),
-                  headline="narratives on which repetition alone did not move the reader",
-                  orientation="ARGUS resisted - finBERT resisted: positive = ARGUS",
-                  role=VS_RIVAL, role_reason="the adversarial comparison",
-                  source="narratives"),))
+    def resisted(row: dict[str, Any]) -> bool:
+        diverse = row.get("argus_discounts_diverse")
+        return bool(row["argus_discounts_coordination"]) and diverse is not False
+
+    def pushed(row: dict[str, Any]) -> bool:
+        side = row.get("finbert_pushed_by_diverse")
+        return bool(row["finbert_signal_scales_with_repetition"] if side is None else side)
+
+    items = [Item(value=float(resisted(r)) - float(not pushed(r)),
+                  groups={"symbol": symbol(r), "side": str(r.get("direction") or "?")})
+             for r in rows]
+    truth = [Item(value=float(bool(t["argus_correct_side"]))
+                  - float(bool(t["finbert_correct_side"])),
+                  groups={"symbol": str(t["symbol"]), "side": str(t["direction"])})
+             for t in blob.get("truth_cases", [])]
+    reports = [_headline("coordinated posting: ARGUS vs finBERT", items, ("symbol", "side"),
+                         headline="narratives on which repetition alone did not move the reader",
+                         orientation="ARGUS resisted - finBERT resisted: positive = ARGUS",
+                         role=VS_RIVAL, role_reason="the adversarial comparison",
+                         source="narratives")]
+    if truth:
+        reports.append(_headline("corroborated events: ARGUS vs finBERT", truth, ("side",),
+                                 headline="true events read on the correct side",
+                                 orientation="ARGUS correct - finBERT correct: positive = ARGUS",
+                                 role=VS_RIVAL, role_reason="the refusal-is-not-blanket control",
+                                 source="truth_cases"))
+    return Entry(path, DESIGNED, f"{len(rows)} designed coordinated-posting narratives and "
+                 f"{len(truth)} designed corroborated events", tuple(reports))
 
 
 def _profile_divergence(path: str) -> Entry:

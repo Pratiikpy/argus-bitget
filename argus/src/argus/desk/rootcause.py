@@ -157,7 +157,8 @@ def _sizing_not_thesis(autopsies: Sequence[Autopsy]) -> Diagnosis | None:
     share = len(magnitude) / len(failures)
     if share < MAGNITUDE_SHARE:
         return None
-    mean_error = sum(a.magnitude_error_bps for a in magnitude) / len(magnitude)
+    # A "magnitude" failure always named a size (`Autopsy.failure_mode`), so every error is set.
+    mean_error = sum(a.magnitude_error_bps or 0 for a in magnitude) / len(magnitude)
     return Diagnosis(
         cause="sizing, not thesis",
         severity="primary" if share > 0.6 else "contributing",

@@ -74,6 +74,7 @@ from argus.llm.cache import PromptCache
 from argus.llm.idmap import IdMap
 from argus.llm.ledger import CostLedger
 from argus.llm.qwen import Completion, Thinking
+from argus.risk.calibration import wilson as interval
 from argus.truth.artefact import write as write_artefact
 from argus.truth.grounding import (
     NEAR_MISS_UNITS,
@@ -160,11 +161,8 @@ def wilson(hits: int, n: int, z: float = 1.96) -> tuple[float, float] | None:
     """Wilson score interval for a proportion; ``None`` with no trials."""
     if n == 0:
         return None
-    p = hits / n
-    denom = 1 + z * z / n
-    centre = (p + z * z / (2 * n)) / denom
-    half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / denom
-    return round(max(0.0, centre - half), 4), round(min(1.0, centre + half), 4)
+    low, high = interval(hits, n, z)  # risk/calibration.wilson: one implementation
+    return round(low, 4), round(high, 4)
 
 
 def fisher_two_sided(a: int, b: int, c: int, d: int) -> float:

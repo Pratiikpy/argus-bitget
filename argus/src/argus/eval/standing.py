@@ -1005,8 +1005,66 @@ def write_report(path: Path = REPORT_PATH, *, report: Report | None = None) -> R
     return report
 
 
+ANCHOR_RECORD = DATA / "standing_anchor.json"
+"""Every digest of the register submitted to OpenTimestamps, newest last."""
+
+
+def register_digest(report: Report) -> str:
+    """SHA-256 of the register as `data/standing.json` publishes it, minus the transition fields
+    :func:`write_report` adds: canonical JSON (sorted keys, no whitespace) of ``report.as_dict()``.
+    Anyone holding the published file can recompute it by dropping ``transitions_this_write`` and
+    ``transition_log`` and hashing the rest the same way."""
+    canonical = json.dumps(report.as_dict(), sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def anchor_register(report: Report, *, path: Path = ANCHOR_RECORD,
+                    submit: Any = None, now: datetime | None = None) -> dict[str, Any]:
+    """Commit the register's digest to Bitcoin through OpenTimestamps, once per distinct register.
+
+    **Why.** A capability's state is a claim about when it was earned, and a file on our own disk
+    cannot prove it said OWNED before the comparison that would have refuted it. SLSA and in-toto
+    solve the same problem for build provenance with signatures; a Bitcoin timestamp needs no key
+    and proves existence before a block anyone can check (research/harvest/20-slsa.md). The client
+    is the project's own `paper/anchor.py`, which the register cadence already uses
+    (`register/cadence.py`), so no second anchoring path exists.
+
+    Submitted only when the digest differs from the last one anchored, so an unchanged register
+    costs nothing; a submission every calendar refused is recorded and retried on the next call.
+    """
+    digest = register_digest(report)
+    history: list[dict[str, Any]] = []
+    if path.exists():
+        try:
+            loaded = json.loads(path.read_text(encoding="utf-8"))
+            history = loaded if isinstance(loaded, list) else []
+        except json.JSONDecodeError:
+            history = []
+    anchored = [row for row in history if row.get("anchored")]
+    if anchored and anchored[-1].get("digest") == digest:
+        return anchored[-1]
+    if submit is None:
+        from argus.paper.anchor import anchor as submit
+    proof = submit(digest, subject="ARGUS capability register (data/standing.json)")
+    row = {
+        "digest": digest,
+        "at": (now or datetime.now(UTC)).isoformat(timespec="seconds"),
+        "anchored": bool(proof.anchored),
+        "calendars": [r.calendar for r in proof.receipts],
+        "failures": list(proof.failures),
+        "by_state": dict(report.by_state),
+        "verify": "drop transitions_this_write and transition_log from data/standing.json, hash "
+                  "the rest as canonical JSON (sorted keys, no whitespace) with SHA-256, and check "
+                  "the .ots proofs in data/anchors/ with the OpenTimestamps client",
+    }
+    history.append(row)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(history, indent=2) + "\n", encoding="utf-8")
+    return row
+
+
 def main() -> int:  # pragma: no cover - CLI
-    """Regenerate `data/standing.json`.
+    """Regenerate `data/standing.json`; ``--anchor`` also timestamps it (:func:`anchor_register`).
 
     `write_report` existed and **nothing called it**, so the artefact drifted from the code it
     describes: on 2026-09-15 the file said 13 capabilities / 10 implemented while `audit()` computed
@@ -1019,6 +1077,11 @@ def main() -> int:  # pragma: no cover - CLI
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     report = write_report()
     print(summary(report))
+    if "--anchor" in sys.argv[1:]:
+        row = anchor_register(report)
+        print(f"register digest {row['digest'][:16]}: "
+              + (f"anchored on {len(row['calendars'])} calendar(s) at {row['at']}"
+                 if row["anchored"] else f"not anchored ({'; '.join(row['failures'])})"))
     unproven = [v for v in report.verifications if v.status == "UNPROVEN"]
     if unproven:
         print("")

@@ -8,9 +8,11 @@ research; this module only carries text in and out.
 
 What a chat keeps: its last twelve questions, so "and what about TSLA?" resolves the way it does in
 the browser, and a saved book (``/book 40% NVDA, 30% MSFT, 30% AAPL``) so portfolio questions need
-not repeat it. Both live in the process's memory. Under long polling that is one process and it
-holds; behind the webhook on a serverless host each warm instance holds its own, so a cold start
-forgets them — the reply says so when a book-dependent question arrives without one.
+not repeat it. Both, with what the chat told the desk and its hourly allowance, are kept by
+`lui/chat_store.py`, loaded before each update and saved after it: a file per chat under the
+always-on bot, an encrypted Upstash record behind the webhook when one is configured. Without one,
+each serverless instance holds its own and a cold start forgets them; the saved book survives even
+then, pinned in the chat itself (``recall_book``).
 
 Security: the webhook is accepted only with Telegram's ``X-Telegram-Bot-Api-Secret-Token`` header
 matching ``TELEGRAM_WEBHOOK_SECRET`` (compared in constant time), set when the webhook is
@@ -34,7 +36,7 @@ import time
 import urllib.parse
 import urllib.request
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from argus.truth import http
@@ -73,9 +75,61 @@ class ChatState:
     book: str = ""
     asked_at: list[float] = field(default_factory=list)
     memory: str = ""
-    """What this chat told the desk (`lui/memory.py`), kept by this process. Behind the webhook
-    each serverless instance keeps its own, so a fact may need saying again after a cold start;
-    the web console keeps it in the browser and has no such gap."""
+    """What this chat told the desk (`lui/memory.py`). Kept by the chat store when there is one;
+    otherwise by the process, so behind a webhook with no store a fact may need saying again after
+    a cold start."""
+
+    @classmethod
+    def from_record(cls, record: dict[str, Any]) -> ChatState:
+        """A state read back from a store, each field coerced and bounded as ``handle_update``
+        writes it, so a damaged record cannot smuggle in more than a chat could have said."""
+        def strings(value: Any) -> list[str]:
+            return [str(v)[:500] for v in value] if isinstance(value, list) else []
+
+        def floats(value: Any) -> list[float]:
+            out = []
+            for v in value if isinstance(value, list) else []:
+                try:
+                    out.append(float(v))
+                except (TypeError, ValueError):
+                    continue
+            return out
+
+        return cls(turns=strings(record.get("turns"))[-MAX_TURNS:],
+                   book=str(record.get("book") or "")[:300],
+                   asked_at=floats(record.get("asked_at"))[-HOURLY_LIMIT:],
+                   memory=str(record.get("memory") or ""))
+
+
+def hydrate(states: dict[int, ChatState], chat_id: int, store: Any) -> None:
+    """Replace this process's copy of a chat with the store's, which another instance may have
+    written since. A chat the store does not hold is dropped here too (another instance may have
+    cleared it); a store that cannot be read leaves the local copy alone."""
+    if store is None:
+        return
+    try:
+        record = store.load(chat_id)
+    except Exception as exc:
+        _LOG.warning("chat state unreadable (%s); using this process's copy", type(exc).__name__)
+        return
+    if record is None:
+        states.pop(chat_id, None)
+    else:
+        states[chat_id] = ChatState.from_record(record)
+
+
+def persist(states: dict[int, ChatState], chat_id: int, store: Any) -> None:
+    """Write a chat back after an update; a chat with nothing in it is deleted, not stored."""
+    if store is None:
+        return
+    state = states.get(chat_id)
+    try:
+        if state is None or state == ChatState():
+            store.delete(chat_id)
+        else:
+            store.save(chat_id, asdict(state))
+    except Exception as exc:
+        _LOG.warning("chat state not saved (%s)", type(exc).__name__)
 
 
 Ask = Callable[..., dict[str, Any]]
@@ -322,6 +376,16 @@ def send(token: str, chat_id: int, text: str) -> int | None:
 
 
 _WEBHOOK_STATES: dict[int, ChatState] = {}
+_WEBHOOK_STORE: list[Any] = []
+"""The webhook's chat store, looked up once per instance (``chat_store.from_env``)."""
+
+
+def _webhook_store() -> Any:
+    if not _WEBHOOK_STORE:
+        from argus.lui.chat_store import from_env
+
+        _WEBHOOK_STORE.append(from_env(remote=True))
+    return _WEBHOOK_STORE[0]
 
 SAVED_PREFIX = "Saved your book: "
 
@@ -374,9 +438,14 @@ def handle_webhook(body: bytes, secret_header: str | None, *,
     failures = 0
     last: dict[int, int | None] = {}
     chat = ((update.get("message") or {}).get("chat") or {}).get("id")
+    store = _webhook_store()
     if isinstance(chat, int):
+        hydrate(_WEBHOOK_STATES, chat, store)
         recall_book(token, chat, _WEBHOOK_STATES)
-    for chat_id, text in handle_update(update, _WEBHOOK_STATES, ask=ask):
+    replies = handle_update(update, _WEBHOOK_STATES, ask=ask)
+    if isinstance(chat, int):
+        persist(_WEBHOOK_STATES, chat, store)
+    for chat_id, text in replies:
         try:
             last[chat_id] = send(token, chat_id, text)
             remember_book(token, chat_id, last[chat_id], text)
@@ -391,13 +460,16 @@ def handle_webhook(body: bytes, secret_header: str | None, *,
 
 
 def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - network loop
-    """Long polling: no public URL, one process, chat state held for its lifetime. Deletes any
-    registered webhook first, because Telegram refuses getUpdates while one is set."""
+    """Long polling: no public URL, one process, chat state kept in the file store so a restart
+    resumes every conversation. Deletes any registered webhook first, because Telegram refuses
+    getUpdates while one is set."""
+    from argus.lui.chat_store import from_env
     from argus.lui.watch import SWEEP_SECONDS, WatchStore
 
     _call(token, "deleteWebhook", {"drop_pending_updates": False})
     states: dict[int, ChatState] = {}
     store = WatchStore()
+    chats = from_env(remote=False)
     swept = 0.0
     offset = 0
     while True:
@@ -416,8 +488,12 @@ def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - 
             last: dict[int, int | None] = {}
             chat = ((update.get("message") or {}).get("chat") or {}).get("id")
             if isinstance(chat, int):
+                hydrate(states, chat, chats)
                 recall_book(token, chat, states)
-            for chat_id, text in handle_update(update, states, ask=ask, watches=store):
+            replies = handle_update(update, states, ask=ask, watches=store)
+            if isinstance(chat, int):
+                persist(states, chat, chats)
+            for chat_id, text in replies:
                 try:
                     last[chat_id] = send(token, chat_id, text)
                     remember_book(token, chat_id, last[chat_id], text)

@@ -156,14 +156,18 @@ def grant_live_consent(
     source = os.environ if env is None else env
     supplied = (token if token is not None else source.get(CONSENT_ENV, "")).strip()
     if not supplied:
+        # The refusal names where the phrase comes from, never the phrase itself. The phrase is
+        # not a secret (consent_phrase builds it openly from the run id); the gate exists so that
+        # a person decides, and a refusal that printed the phrase would let whatever reads the
+        # error, an automated agent included, paste it back and retry without anyone deciding.
         raise ConsentRefused(
-            f"real-money orders need an explicit consent for this run and none was given. To "
-            f"consent, set {CONSENT_ENV} to exactly: {expected}"
+            f"real-money orders need an explicit consent for this run and none was given. A "
+            f"person consents by setting {CONSENT_ENV} to argus.execution.consent."
+            f"consent_phrase({run_id!r})"
         )
     if not hmac.compare_digest(supplied.encode(), expected.encode()):
         raise ConsentRefused(
-            f"the consent supplied does not name run {run_id}; a token consents to one run only. "
-            f"The phrase for this run is: {expected}"
+            f"the consent supplied does not name run {run_id}; a token consents to one run only"
         )
     ledger = SPENT_PATH if spent_path is None else spent_path
     if run_id in _spent(ledger):

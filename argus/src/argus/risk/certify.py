@@ -64,6 +64,7 @@ from datetime import timedelta
 from decimal import Decimal, localcontext
 from enum import StrEnum
 from fractions import Fraction
+from itertools import pairwise
 from typing import Any
 
 # --- the certificate ------------------------------------------------------------------------------
@@ -873,11 +874,22 @@ SIZING_TOLERANCE = Fraction(1, 10**24)
 within this of the exact value is the same instruction. Ten orders of magnitude below a
 basis point."""
 
+MIN_FOR_RECALIBRATION = 40
+FOLDS = 5
+RECALIBRATED_TOLERANCE = Fraction(1, 10**9)
+"""The recalibration map is evaluated in binary floating point before Kelly reads it as a decimal,
+so a recalibrated stake is compared to the exact one within this, as the throttle's ratio is."""
+
 SIZING_SPEC: tuple[GateSpec, ...] = (
     GateSpec("calibration_sample", (), f"at least {MIN_GRADED} graded outcomes",
              "otherwise size at the fixed fraction"),
     GateSpec("calibration_error", (), f"expected calibration error at most {show(MAX_ECE)}",
-             "otherwise size at the fixed fraction"),
+             f"otherwise recalibrate, given {MIN_FOR_RECALIBRATION} graded outcomes"),
+    GateSpec("recalibration", (),
+             f"at least {MIN_FOR_RECALIBRATION} graded outcomes, and the isotonic map's "
+             f"{FOLDS}-fold held-out calibration error at most {show(MAX_ECE)}",
+             "otherwise size at the fixed fraction; if it holds, Kelly reads the mapped "
+             "probability"),
     GateSpec("kelly_floor", (), "none", "a negative Kelly stake is zero, never a reversal"),
     GateSpec("kelly_share", (), "none", f"the Kelly stake is scaled by {show(KELLY_SHARE)}"),
     GateSpec("position_cap", (), "none", f"no fraction above {show(MAX_FRACTION)}"),
@@ -887,16 +899,88 @@ SIZING_SPEC: tuple[GateSpec, ...] = (
 )
 
 
+def _ece(pairs: Sequence[tuple[Fraction, bool]], bins: int = 10) -> Fraction:
+    """Expected calibration error in exact arithmetic: bin by stated probability, weight each
+    bin's |mean stated - hit rate| by its share."""
+    groups: dict[int, list[tuple[Fraction, bool]]] = {}
+    for stated, hit in pairs:
+        groups.setdefault(min(bins - 1, int(stated * bins)), []).append((stated, hit))
+    total = Fraction(len(pairs))
+    return sum((Fraction(len(g)) / total
+                * abs(sum((x for x, _ in g), Fraction(0)) / len(g)
+                      - Fraction(sum(1 for _, h in g if h), len(g)))
+                for g in groups.values()), Fraction(0))
+
+
+def _isotonic(pairs: Sequence[tuple[Fraction, bool]]) -> list[tuple[Fraction, Fraction]]:
+    """The least-squares non-decreasing fit of hit rate on stated probability, as the points
+    ``(stated, fitted)`` at each pooled block's two ends. Written from the definition, not from
+    `risk/calibration.isotonic`: repeatedly merge any adjacent pair whose rates decrease."""
+    cells: dict[Fraction, list[int]] = {}
+    for stated, hit in pairs:
+        cell = cells.setdefault(stated, [0, 0])
+        cell[0] += int(hit)
+        cell[1] += 1
+    blocks: list[tuple[Fraction, Fraction, int, int]] = [
+        (x, x, h, n) for x, (h, n) in sorted(cells.items())]
+    merged = True
+    while merged:
+        merged = False
+        for i in range(len(blocks) - 1):
+            a, b = blocks[i], blocks[i + 1]
+            if Fraction(a[2], a[3]) > Fraction(b[2], b[3]):
+                blocks[i:i + 2] = [(a[0], b[1], a[2] + b[2], a[3] + b[3])]
+                merged = True
+                break
+    points: list[tuple[Fraction, Fraction]] = []
+    for low, high, hits, count in blocks:
+        points.append((low, Fraction(hits, count)))
+        if high != low:
+            points.append((high, Fraction(hits, count)))
+    return points
+
+
+def _mapped(points: Sequence[tuple[Fraction, Fraction]], x: Fraction) -> Fraction:
+    """Linear interpolation between the fitted points, flat outside them."""
+    if x <= points[0][0]:
+        return points[0][1]
+    for (x0, y0), (x1, y1) in pairwise(points):
+        if x0 <= x <= x1:
+            return y1 if x1 == x0 else y0 + (x - x0) / (x1 - x0) * (y1 - y0)
+    return points[-1][1]
+
+
+def _held_out(pairs: Sequence[tuple[Fraction, bool]]) -> Fraction:
+    """Each of ``FOLDS`` contiguous blocks mapped by a fit on the rest, then scored together."""
+    n = len(pairs)
+    cuts = [round(Fraction(i * n, FOLDS)) for i in range(FOLDS + 1)]
+    scored: list[tuple[Fraction, bool]] = []
+    for lo, hi in pairwise(cuts):
+        fit = _isotonic([*pairs[:lo], *pairs[hi:]])
+        scored.extend((_mapped(fit, x), h) for x, h in pairs[lo:hi])
+    return _ece(scored)
+
+
 def certify_sizing(
     *, win_probability: float, payoff: Decimal, graded: int, ece: float | None,
     risk_multiplier: Decimal, session_multiplier: Decimal, sizing: Any | None,
-    refused: str | None = None,
+    refused: str | None = None, predictions: Sequence[Any] = (),
 ) -> Certificate:
     """Certify one :func:`argus.risk.sizing.size` result. ``ece`` is the measured calibration
-    error the gate reported — a measurement, not a gate, so it is an input here."""
+    error the gate reported — a measurement, not a gate, so it is an input here. ``predictions``
+    are the graded outcomes themselves, needed to re-derive the recalibration independently."""
     rm, sm = exact(risk_multiplier), exact(session_multiplier)
     passes = graded >= MIN_GRADED and ece is not None and Fraction(str(ece)) <= MAX_ECE
+    pairs = [(Fraction(str(x.confidence)), bool(x.correct)) for x in predictions]
+    recalibrated = False
+    held: Fraction | None = None
     p = Fraction(str(win_probability))
+    if not passes and graded >= MIN_FOR_RECALIBRATION and len(pairs) == graded:
+        held = _held_out(pairs)
+        if held <= MAX_ECE:
+            passes = recalibrated = True
+            if 0 <= p <= 1:
+                p = _mapped(_isotonic(pairs), p)
     b = exact(payoff) or Fraction(0)
     refusal: tuple[str, str] | None = None
     if rm is None or sm is None or rm < 0 or sm < 0 or sm > 1:
@@ -918,26 +1002,32 @@ def certify_sizing(
     raw = Fraction(0) if b <= 0 else max(Fraction(0), (p * b - (1 - p)) / b)
     fraction = (min(MAX_FRACTION, raw * KELLY_SHARE * rm * sm) if passes
                 else min(MAX_FRACTION, FIXED_FRACTION * rm * sm))
-    expected = f"{'half-Kelly' if passes else 'fixed'} fraction {show(fraction)}"
+    tolerance = RECALIBRATED_TOLERANCE if recalibrated else SIZING_TOLERANCE
+    basis = " on recalibrated confidence" if recalibrated else ""
+    expected = f"{'half-Kelly' if passes else 'fixed'}{basis} fraction {show(fraction)}"
     seen_passed = bool(sizing.gate.passed)
     seen_fraction = exact(sizing.fraction)
     observed = f"{'half-Kelly' if seen_passed else 'fixed'} fraction {show(seen_fraction)}"
     violations: list[str] = []
     if seen_passed != passes:
         why = (f"{graded} graded outcome(s), {MIN_GRADED} needed" if graded < MIN_GRADED
-               else f"calibration error {ece} against a ceiling of {show(MAX_ECE)}")
+               else f"calibration error {ece} against a ceiling of {show(MAX_ECE)}"
+               + ("" if held is None else f", held out after recalibration {show(held)}"))
         violations.append(f"calibration gate {'passed' if seen_passed else 'failed'}; the "
                           f"specification {'passes' if passes else 'fails'} it ({why})")
     if int(sizing.gate.graded) != graded:
         violations.append(f"gate reports {sizing.gate.graded} graded outcome(s), not {graded}")
-    if seen_fraction is None or abs(seen_fraction - fraction) > SIZING_TOLERANCE:
+    if seen_fraction is None or abs(seen_fraction - fraction) > tolerance:
         violations.append(f"fraction {show(seen_fraction)}; the specification gives "
                           f"{show(fraction)}")
     if seen_fraction is not None and not 0 <= seen_fraction <= MAX_FRACTION:
         violations.append(f"fraction {show(seen_fraction)} is outside 0 to {show(MAX_FRACTION)}")
     first = None if passes else (f"calibration_sample: {graded} of {MIN_GRADED} graded outcomes"
                                  if graded < MIN_GRADED
-                                 else f"calibration_error: {ece} above {show(MAX_ECE)}")
+                                 else f"calibration_error: {ece} above {show(MAX_ECE)}"
+                                 if held is None
+                                 else f"recalibration: held-out {show(held)} above "
+                                      f"{show(MAX_ECE)}")
     return _conclude("position sizing", expected, observed, first, violations)
 
 

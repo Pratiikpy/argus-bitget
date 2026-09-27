@@ -6,6 +6,9 @@ modules = [
     "argus/eval/sentiment_comparison.py",
     "argus/eval/baselines/finbert_loader.py",
 ]
+# 2026-09-27: expanded from 2 narratives to 30 manipulation narratives (both sides, two
+# attacks each) plus 12 corroborated true events; the reproducibility claim was a cache hit
+# and was re-run uncached (audit finding 89). The proofs below describe the new run.
 # Restored to OWNED 2026-09-22. Was demoted on 2026-09-20 when `verify()` began opening
 # artefacts instead of checking that files existed: adversarial_test and out_of_sample_test
 # were both claimed here while the artefact recorded nothing about either — the underlying
@@ -18,7 +21,11 @@ modules = [
 # run reconfirms the original finding on both narratives: finBERT's naive aggregate scales
 # with repetition every time, ARGUS's real analyst never does, reproducibility holds
 # (signal_stable=True across a genuine re-sample). All 13 conditions now verify.
-state = "owned"
+# Lowered to IMPLEMENTED 2026-09-27 (audit finding 89). The 30+12 cases are designed, not a
+# sample of live posts, so the groupwise check classes them designed_cases and cannot stand
+# behind statistically_valid_evaluation or out_of_sample_test. The result is strong and
+# published; OWNED needs the coordination defence measured on a sample of real posts.
+state = "implemented"
 baseline = "ProsusAI/finBERT for classification; BloombergGPT and FinMA for the published bar"
 blockers = [
     """\
@@ -102,28 +109,35 @@ test = "test_sentiment_comparison.py::TestNarrativeResultLogic"
 [[proofs]]
 condition = "statistically_valid_evaluation"
 how = """\
-    every narrative tested shows the same pattern on real finBERT output (matching_count \
-    scales with repetition every time) and the real ARGUS analyst never once lets repetition \
-    alone flip a non-actionable read to actionable, across every narrative run — not a single \
-    convenient case"""
+    30 designed manipulation narratives (18 bullish, 12 bearish, 16 symbols) and 12 \
+    corroborated true events (6 each side), eval/sentiment_cases.py: the real analyst was never \
+    moved to an actionable trade by repetition, 30 of 30 on template mutations and 30 of 30 on \
+    persona-diverse retellings (it leaned to the rumour's side, non-actionably, on 2 of 30); it \
+    took the correct side on 12 of 12 true events, actionable on 11. finBERT's naive aggregate \
+    was pushed toward the rumour's side on 22 of 30 (template) and 24 of 30 (diverse) \
+    narratives, and read 11 of 12 true events correctly. Designed cases, not a sample of live \
+    posts: groupwise_audit classes the rows DESIGNED
+"""
 artefact = "data/sentiment_comparison.json"
 
 [[proofs]]
 condition = "costs_included"
 how = """\
-    finBERT's real local CPU latency measured directly (~30ms/post); ARGUS's real Qwen call \
-    count and wall-clock measured directly — the genuine cost asymmetry (free vs. real \
-    hackathon-budget dollars) is why this comparison runs a small designed set rather than a \
-    large statistical sweep on the ARGUS side, stated as a deliberate scope choice, not hidden"""
+    finBERT's local CPU latency measured directly (~33 ms/post); ARGUS: 141 real Qwen calls, \
+    231,491 tokens and 53 minutes of wall time for the 30+12 run and its uncached \
+    reproducibility check, recorded in the artefact's costs block
+"""
 artefact = "data/sentiment_comparison.json"
 
 [[proofs]]
 condition = "out_of_sample_test"
 how = """\
-    the reproducibility check re-runs the identical real scenario on a fresh Qwen call rather \
-    than replaying a cached response, confirming the signal is stable under genuine \
-    re-sampling, not just self-consistent within one call — a real, live CLI run, not a unit \
-    test (real LLM cost)"""
+    the reproducibility check re-asks the analyst on 5 diverse-attack narratives through an \
+    UNCACHED client and compares with the run's own answers: 5 of 5 signals stable. Corrected \
+    2026-09-27: every earlier reproduction, the original two-narrative one included, ran on the \
+    caching client and was a cache hit, so it proved nothing; the check now refuses a caching \
+    client
+"""
 artefact = "data/sentiment_comparison.json"
 
 [[proofs]]
@@ -142,18 +156,16 @@ test = "test_sentiment_comparison.py::TestNarrativeResultLogic"
 [[proofs]]
 condition = "adversarial_test"
 how = """\
-    the coordinated-posting manipulation scenario itself IS the adversarial test — N \
-    near-identical unsourced posts, symbol-matched, run against both real systems; finBERT's \
-    naive aggregate scales with repetition on every narrative, ARGUS's real categorical \
-    judgment never flips to actionable on repetition alone on any narrative tested. Precise, \
-    not overclaimed, after an independent adversarial re-check (2026-09-23): CONFIDENCE is not \
-    immune — it moved from 0.05 to 0.85 on the tested narrative, a real, large move the second \
-    ablation below already disclosed — only the categorical signal held. The tested attack is \
-    also the easier case: N near-identical template mutations of one sentence, no \
-    source/account field to dedup against, checked on 2 narratives. A harder attack — \
-    textually diverse paraphrases from distinct personas, the way a real coordinated campaign \
-    would actually read — was not tested and is named here as the honest limit of this \
-    condition, not quietly left for a reader to assume was covered"""
+    two attacks on every narrative: five template mutations of one sentence, and five \
+    retellings by five distinct personas in five registers with no source added (the harder \
+    attack the 2026-09-23 re-check named as untested). Neither flipped the analyst to an \
+    actionable trade on any of 30 narratives. Precise, not overclaimed: CONFIDENCE is not immune \
+    (0.15 to 0.85 on insufficient_evidence reads), the signal leaned toward the rumour, below \
+    the actionable bar, on 2 of 30 diverse attacks (AAPL and HOOD, both bearish), and the bare \
+    classifier (the coarse ablation) leaned harder than the real analyst on 29 of 30. The \
+    retellings share persona templates across narratives; LLM-generated paraphrase campaigns are \
+    still untested
+"""
 artefact = "data/sentiment_comparison.json"
 
 [[proofs]]
@@ -168,14 +180,11 @@ artefact = "../research/architecture/sentiment-audit.md"
 [[proofs]]
 condition = "reproducibility_proven"
 how = """\
-    finBERT's real classification is deterministic in eval mode (confirmed by running it \
-    twice); ARGUS's real LLM call is not byte-deterministic, so reproducibility here means the \
-    SIGNAL, not the exact confidence, is stable across a genuine re-run — verified by actually \
-    calling the real analyst twice on the identical (coordinated) scenario, not assumed: same \
-    signal, confidence 0.85 both times (`out_of_sample_holdout_reproducibility` in the \
-    artefact; this line previously said 0.15, transcribed wrong against its own cited evidence \
-    and never caught until an independent adversarial re-check actually opened the artefact, \
-    2026-09-23 — corrected here)"""
+    finBERT is deterministic in eval mode. ARGUS's call is not byte-deterministic, so \
+    reproducibility means the SIGNAL holds: 5 of 5 stable on a genuinely uncached re-ask \
+    (`reproducibility.uncached` true in the artefact). The earlier claim of 'same signal, \
+    confidence 0.85 both times' was a cache hit and is withdrawn
+"""
 artefact = "data/sentiment_comparison.json"
 
 [[proofs]]

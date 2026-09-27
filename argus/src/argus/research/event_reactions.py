@@ -2,10 +2,16 @@
 
 "How does NVDA react to CPI?" is the Event-Driven Agent sub-theme's question in one line, and the
 console could not answer it: `research/eventstudy.py` — the MacKinlay pipeline with the Patell,
-BMP, Corrado and generalised-sign tests and the Kolari-Pynnonen clustering correction, OWNED
-against whale-signals' fixed-null test — had only ever been run inside its comparison. This module
-runs it on the three scheduled event types that move tokenised US equities, for every traded name,
-and writes one artefact the console reads.
+BMP, Corrado and generalised-sign tests and the Kolari-Pynnonen clustering correction, measured
+against whale-signals' fixed-null test — had only ever been run inside its comparison. State is
+`implemented`, not `OWNED`: the capability's own toml
+(`eval/capabilities/10-clustering-corrected-base-rate-honest-event-significance-vs.toml`) was
+re-graded down from OWNED on 2026-09-24 because the Event-Driven Agent sub-theme asks for a full
+event -> decision -> trade comparison, not significance methodology alone; most of the named
+rivals were run 2026-09-26 (TIES Vibe-Trading and whale-signals, beats Ballast) but the
+`chain_falsifiers` fix in `agents/analysts.py` still needs re-measuring on freshly recorded chains
+before this can be re-graded. This module runs it on the three scheduled event types that move
+tokenised US equities, for every traded name, and writes one artefact the console reads.
 
 **Event times come from the issuers, not from a vendor calendar.**
 

@@ -62,6 +62,7 @@ from argus.market.pit import (
     parse_acceptance,
     resolve,
 )
+from argus.risk.calibration import wilson as interval
 
 PACKAGE = Path(__file__).resolve().parents[3]
 WORKSPACE = PACKAGE.parent
@@ -366,10 +367,8 @@ def wilson(right: int, n: int, z: float = 1.959964) -> tuple[float, float]:
     """Wilson score interval for a proportion."""
     if n == 0:
         return (0.0, 1.0)
-    phat = right / n
-    centre = (phat + z * z / (2 * n)) / (1 + z * z / n)
-    half = z * math.sqrt(phat * (1 - phat) / n + z * z / (4 * n * n)) / (1 + z * z / n)
-    return (round(centre - half, 4), round(centre + half, 4))
+    low, high = interval(right, n, z)  # risk/calibration.wilson: one implementation
+    return (round(low, 4), round(high, 4))
 
 
 DESIGN_TICKER = "NVDA"

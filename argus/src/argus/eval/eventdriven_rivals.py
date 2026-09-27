@@ -81,6 +81,7 @@ from argus.research.eventstudy import (
     returns_from,
     study,
 )
+from argus.risk.calibration import wilson as interval
 from argus.truth.artefact import write as write_artefact
 from argus.truth.paths import DATA_DIR
 
@@ -421,12 +422,8 @@ answer."""
 
 
 def wilson(k: int, n: int, z: float = 1.959964) -> tuple[float, float]:
-    if n == 0:
-        return (0.0, 1.0)
-    p = k / n
-    centre = (p + z * z / (2 * n)) / (1 + z * z / n)
-    half = z * sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / (1 + z * z / n)
-    return (max(0.0, centre - half), min(1.0, centre + half))
+    """`risk/calibration.wilson` at this module's z: one implementation."""
+    return interval(k, n, z)
 
 
 def rejection_table(draws: Sequence[dict[str, float]]) -> dict[str, dict[str, Any]]:

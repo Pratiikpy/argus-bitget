@@ -103,11 +103,12 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
-from math import comb, sqrt
+from math import comb
 from pathlib import Path
 from typing import Any
 
 from argus.paper.marks import Mark, read_marks
+from argus.risk.calibration import wilson as interval
 from argus.truth import artefact
 from argus.truth.paths import DATA_DIR
 
@@ -177,11 +178,7 @@ def wilson(hits: int, n: int, *, z: float = 1.96) -> tuple[float, float] | None:
     """
     if n <= 0:
         return None
-    phat = hits / n
-    denom = 1.0 + z * z / n
-    centre = (phat + z * z / (2 * n)) / denom
-    margin = z * sqrt(phat * (1 - phat) / n + z * z / (4 * n * n)) / denom
-    return max(0.0, centre - margin), min(1.0, centre + margin)
+    return interval(hits, n, z)  # risk/calibration.wilson: one implementation
 
 
 def cluster_interval(cycles: list[tuple[int, int]], *, resamples: int = BOOTSTRAP_RESAMPLES,

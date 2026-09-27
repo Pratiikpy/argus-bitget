@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-27T00:14:00+00:00",
+  "generated_at": "2026-09-27T12:39:24+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
@@ -75,8 +75,8 @@
     "data/xa_arena.json"
   ],
   "counts": {
-    "checked": 51,
-    "designed_cases": 25,
+    "checked": 50,
+    "designed_cases": 26,
     "aggregate_without_rows": 16,
     "no_rows": 4
   },
@@ -276,6 +276,17 @@
       ]
     },
     {
+      "artefact": "data/sentiment_comparison.json",
+      "headline": "corroborated events: ARGUS vs finBERT",
+      "role": "argus_vs_rival",
+      "flags": [
+        "carried_by_one_group:side=bullish"
+      ],
+      "readings": [
+        "bullish carries the headline: without it the other 1 side group(s) total 0.0, which does not point the same way"
+      ]
+    },
+    {
       "artefact": "data/shadow_record.json",
       "headline": "the desk's directional leans against break-even",
       "role": "context",
@@ -439,6 +450,17 @@
       ],
       "readings": [
         "4.0 carries the headline: without it the other 3 noise group(s) total 0.0, which does not point the same way"
+      ]
+    },
+    {
+      "artefact": "data/sentiment_comparison.json",
+      "headline": "corroborated events: ARGUS vs finBERT",
+      "role": "argus_vs_rival",
+      "flags": [
+        "carried_by_one_group:side=bullish"
+      ],
+      "readings": [
+        "bullish carries the headline: without it the other 1 side group(s) total 0.0, which does not point the same way"
       ]
     },
     {
@@ -851,7 +873,7 @@
     "data/claimcheck_comparison.json": {
       "status": "checked",
       "reason": "one row per graded claim",
-      "sha256": "7916120b712fe39f2ac74759319aa216164deef15c879d182926fc91166ecd76",
+      "sha256": "af686199213b8736bb1a65c895a03033638ecd7bb516fa37d65c3deff51d9598",
       "flagged": false,
       "headlines": [
         {
@@ -8388,7 +8410,7 @@
     "data/mandate_comparison.json": {
       "status": "designed_cases",
       "reason": "eleven designed boundary scenarios and a 19,440-scenario grid reduced to counts",
-      "sha256": "e47e4667e7994cdc74633886011de6249c4c60609042919cc1ce59f92b1c8720",
+      "sha256": "66b2d66cdb9b42c51a2cdd36d5bd57aa297542916f0ff7e286684458ab702104",
       "flagged": false,
       "headlines": []
     },
@@ -9278,7 +9300,7 @@
     "data/overnight_comparison.json": {
       "status": "checked",
       "reason": "per-night rows regenerated from the saved inputs",
-      "sha256": "d5c8143af4e7b2995c55559e32f6c82b73b4b9300ffa88f5c256779eae3477c1",
+      "sha256": "7d6c8445c0b3eb0087396fbe466b36da1e458734f0c944d80bdb0a365b159b2b",
       "flagged": false,
       "headlines": [
         {
@@ -14954,31 +14976,31 @@
       ]
     },
     "data/sentiment_comparison.json": {
-      "status": "checked",
-      "reason": "one row per coordinated-posting narrative",
-      "sha256": "8601812d9779875697e14ea3f4cf79ca4e4534a994240ddcd7027c6d5495c788",
-      "flagged": false,
+      "status": "designed_cases",
+      "reason": "30 designed coordinated-posting narratives and 12 designed corroborated events",
+      "sha256": "f5eb3a12d93f590bb7053123bb8b8fb24d7a0f7980ab9a9a081df12782a6a50a",
+      "flagged": true,
       "headlines": [
         {
           "name": "coordinated posting: ARGUS vs finBERT",
           "headline": "narratives on which repetition alone did not move the reader",
           "orientation": "ARGUS resisted - finBERT resisted: positive = ARGUS",
-          "items": 2,
-          "micro_mean": 1.0,
-          "total": 2.0,
+          "items": 30,
+          "micro_mean": 0.8,
+          "total": 24.0,
           "broken_down": true,
           "flags": [],
           "flagged": false,
           "tables": [
             {
               "key": "symbol",
-              "groups": 2,
-              "micro_mean": 1.0,
-              "macro_mean": 1.0,
+              "groups": 16,
+              "micro_mean": 0.8,
+              "macro_mean": 0.760417,
               "direction": 1,
               "largest_contributor": "COINUSDT",
-              "largest_share_of_total": 0.5,
-              "total_without_largest": 1.0,
+              "largest_share_of_total": 0.125,
+              "total_without_largest": 21.0,
               "loss_histogram": {
                 "0": 1.0,
                 "1": 0.0,
@@ -14989,23 +15011,190 @@
               "carried_by_one_group": false,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "no single symbol carries the headline: without the largest contributor (COINUSDT, 50.0% of the total) the rest still point the same way",
+              "reading": "no single symbol carries the headline: without the largest contributor (COINUSDT, 12.5% of the total) the rest still point the same way",
               "per_group": [
                 {
                   "group": "COINUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 3.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.125,
+                  "opposing": 0
+                },
+                {
+                  "group": "AAPLUSDT",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZNUSDT",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "BTCUSDT",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "CRCLUSDT",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "ETHUSDT",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "METAUSDT",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDAUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 2.0,
+                  "mean": 0.666667,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLAUSDT",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "HOODUSDT",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 1.0,
+                  "mean": 0.5,
+                  "share_of_total": 0.0417,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFTUSDT",
                   "rows": 1,
                   "weight": 1.0,
                   "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0417,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTRUSDT",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 1.0,
+                  "mean": 0.5,
+                  "share_of_total": 0.0417,
+                  "opposing": 0
+                },
+                {
+                  "group": "SNDKUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "share_of_total": 0.0417,
+                  "opposing": 0
+                },
+                {
+                  "group": "SPYUSDT",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 1.0,
+                  "mean": 0.5,
+                  "share_of_total": 0.0417,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGLUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "QQQUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "side",
+              "groups": 2,
+              "micro_mean": 0.8,
+              "macro_mean": 0.833333,
+              "direction": 1,
+              "largest_contributor": "bearish",
+              "largest_share_of_total": 0.5,
+              "total_without_largest": 12.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single side carries the headline: without the largest contributor (bearish, 50.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "bearish",
+                  "rows": 12,
+                  "weight": 12.0,
+                  "total": 12.0,
                   "mean": 1.0,
                   "share_of_total": 0.5,
                   "opposing": 0
                 },
                 {
-                  "group": "NVDAUSDT",
-                  "rows": 1,
-                  "weight": 1.0,
-                  "total": 1.0,
-                  "mean": 1.0,
+                  "group": "bullish",
+                  "rows": 18,
+                  "weight": 18.0,
+                  "total": 12.0,
+                  "mean": 0.666667,
                   "share_of_total": 0.5,
                   "opposing": 0
                 }
@@ -15018,6 +15207,70 @@
           "role": "argus_vs_rival",
           "role_reason": "the adversarial comparison",
           "source": "narratives",
+          "split_ran": false,
+          "favours": "argus"
+        },
+        {
+          "name": "corroborated events: ARGUS vs finBERT",
+          "headline": "true events read on the correct side",
+          "orientation": "ARGUS correct - finBERT correct: positive = ARGUS",
+          "items": 12,
+          "micro_mean": 0.083333,
+          "total": 1.0,
+          "broken_down": true,
+          "flags": [
+            "carried_by_one_group:side=bullish"
+          ],
+          "flagged": true,
+          "tables": [
+            {
+              "key": "side",
+              "groups": 2,
+              "micro_mean": 0.083333,
+              "macro_mean": 0.083333,
+              "direction": 1,
+              "largest_contributor": "bullish",
+              "largest_share_of_total": 1.0,
+              "total_without_largest": 0.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": true,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "bullish carries the headline: without it the other 1 side group(s) total 0.0, which does not point the same way",
+              "per_group": [
+                {
+                  "group": "bullish",
+                  "rows": 6,
+                  "weight": 6.0,
+                  "total": 1.0,
+                  "mean": 0.166667,
+                  "share_of_total": 1.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "bearish",
+                  "rows": 6,
+                  "weight": 6.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "role": "argus_vs_rival",
+          "role_reason": "the refusal-is-not-blanket control",
+          "source": "truth_cases",
           "split_ran": false,
           "favours": "argus"
         }
@@ -15214,7 +15467,7 @@
     "data/skill_matrix.json": {
       "status": "checked",
       "reason": "one row per tool",
-      "sha256": "1842c10649b4ec49baab107fb501f32067df3077624cb52b050ca182c40643af",
+      "sha256": "23fa332130882974d5b0920bbb32e44598e945e640902f19b488792baca154dc",
       "flagged": true,
       "headlines": [
         {
@@ -16237,7 +16490,7 @@
     "data/void_comparison.json": {
       "status": "checked",
       "reason": "per-row walk-forward regenerated from nocturne's clone",
-      "sha256": "19d214f5e861d506ea83d51e687f3ea3ea816d97ca6af1eb0d7a497d3396d717",
+      "sha256": "56c4adef19bdd01a5ea1d06453bb2f24f148a09c6bb149c94022ec2dda95fe81",
       "flagged": true,
       "headlines": [
         {

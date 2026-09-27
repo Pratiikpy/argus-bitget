@@ -8,6 +8,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from itertools import pairwise
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -235,3 +236,69 @@ class TestReconstructionAgainstRealSources:
         shorts = [e for e in rebuilt if "short volume" in e.claim]
         for item in shorts:
             assert item.available_at.date() < at.date()
+
+
+class TestTheReplayLedgerIsAChain:
+    """`data/replay_ledger.jsonl` is tamper-evident and records what each decision saw
+    (research/harvest/32-langgraph-checkpoint.md)."""
+
+    @staticmethod
+    def _result(n: int) -> Any:
+        from argus.paper.replay import Outcome, ReplayResult
+
+        at = datetime(2026, 9, 21, 15, tzinfo=UTC)
+        return ReplayResult(outcomes=tuple(
+            Outcome(symbol="NVDAUSDT", at=at, verdict="no_trade", side="BUY",
+                    quantity=Decimal("0"), confidence=0.5, thesis=f"t{i}", evidence_count=1,
+                    realised_bps=1.0, cost_bps=12.0, frame_hash="f" * 64)
+            for i in range(n)), instants=n)
+
+    def test_written_rows_verify_and_carry_the_frame_hash(self, tmp_path: Path) -> None:
+        from argus.paper.replay import load, verify, write
+
+        path = tmp_path / "replay.jsonl"
+        write(self._result(2), path=path)
+        write(self._result(1), path=path)
+        assert verify(path) == {"rows": 3, "chained": 3, "unchained_legacy": 0, "intact": True,
+                                "broken_at": None}
+        assert all(row["frame_hash"] == "f" * 64 for row in load(path))
+
+    @pytest.mark.parametrize("attack", ["edit", "delete", "insert"])
+    def test_a_changed_line_is_named(self, tmp_path: Path, attack: str) -> None:
+        from argus.paper.replay import verify, write
+
+        path = tmp_path / "replay.jsonl"
+        write(self._result(3), path=path)
+        lines = path.read_text(encoding="utf-8").splitlines()
+        if attack == "edit":
+            lines[1] = lines[1].replace('"realised_bps": 1.0', '"realised_bps": 99.0')
+        elif attack == "delete":
+            del lines[1]
+        else:
+            lines.insert(1, lines[0])
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        report = verify(path)
+        assert not report["intact"] and report["broken_at"] == 2
+
+    def test_legacy_rows_are_counted_not_trusted(self, tmp_path: Path) -> None:
+        from argus.paper.replay import verify, write
+
+        path = tmp_path / "replay.jsonl"
+        path.write_text('{"kind": "replay", "symbol": "NVDAUSDT"}\n', encoding="utf-8")
+        write(self._result(1), path=path)
+        report = verify(path)
+        assert report["intact"] and report["unchained_legacy"] == 1 and report["chained"] == 1
+
+    def test_the_frame_hash_changes_with_what_the_desk_saw(self) -> None:
+        from argus.paper.replay import Frame
+        from argus.truth.evidence import Evidence
+
+        at = datetime(2026, 9, 21, 15, tzinfo=UTC)
+
+        def frame(claim: str) -> Frame:
+            return Frame(symbol="NVDAUSDT", at=at, price=Decimal("180"), absent=(),
+                         evidence=(Evidence(id="e1", claim=claim, source="news",
+                                            available_at=at),))
+
+        assert frame("up").content_hash() == frame("up").content_hash()
+        assert frame("up").content_hash() != frame("down").content_hash()

@@ -865,3 +865,14 @@ class TestTheReplayOfRecordedRuns:
 
 def test_status_reading_holds_no_state_for_absence() -> None:
     assert StatusReading(state=None, filled=Decimal("0")).state is None
+
+
+def test_a_refusal_never_prints_the_consent_phrase(tmp_path: Path) -> None:
+    """The phrase is derivable, but a refusal that printed it would let an automated caller paste
+    it back and retry with no person deciding (research/harvest/28-langgraph-hitl.md, audit)."""
+    phrase = consent_phrase("run-9")
+    spent = tmp_path / "spent.jsonl"
+    for token in ("", consent_phrase("run-8")):
+        with pytest.raises(ConsentRefused) as refused:
+            grant_live_consent("run-9", token=token, env={}, spent_path=spent)
+        assert phrase not in str(refused.value)

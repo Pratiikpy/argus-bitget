@@ -197,3 +197,23 @@ def test_an_as_of_date_is_read_in_the_ways_people_write_it() -> None:
         when = research.fundamentals._as_of(f"NVDA revenue {text}")
         assert when is not None and (when.year, when.month, when.day) == (2026, 3, 1), text
     assert research.fundamentals._as_of("NVDA revenue last quarter") is None
+
+
+def test_a_measured_comparison_shows_its_own_uncertainty(tmp_path: Path) -> None:
+    """Each recorded head-to-head is shown with its sample and the interval the harness computed;
+    one with no test says so (research/harvest/52-arena-rank.md)."""
+    row = {"question": "the overnight gap", "rival": "gloaming", "metric": "MAE, bps",
+           "outcome": "argus_better", "argus_score": 30.36, "rival_score": 81.28, "n": 113,
+           "unit": "night", "ci95": [-60.72, -42.77], "p_value": None,
+           "every_group": "argus_better_on_every_group", "valid": True}
+    untested = {**row, "ci95": None, "p_value": None, "every_group": None}
+    register = {"capabilities": [{"name": "gap", "state": "tied", "subtheme": next(iter(SUBTHEMES)),
+                                  "proofs": [],
+                                  "measured_outcomes": [row, untested]}],
+                "by_state": {"tied": 1}}
+    (tmp_path / "standing.json").write_text(json.dumps(register), encoding="utf-8")
+    wins, counts = collect(tmp_path)
+    page = render(wins, counts)
+    assert "ARGUS better</b> vs gloaming" in page and "113 nights" in page
+    assert "95% interval of the difference [-60.72, -42.77]" in page
+    assert "better in every group" in page and "no significance test recorded" in page

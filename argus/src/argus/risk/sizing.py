@@ -19,6 +19,17 @@ safety property.
 ARGUS already measures expected calibration error in :mod:`argus.eval.observatory`, so the gate is
 a read rather than new machinery. What is new is the refusal: below the floor, or on too small a
 sample, sizing falls back to the fixed fraction and says why.
+
+**A miscalibrated confidence is fixed before it is refused (2026-09-28).** The gate's own docstring
+said too few outcomes is a wait and a poor calibration error is a fix, and both then took the same
+fixed fraction: a well-populated record whose 0.8s land 55% of the time was treated as if it held
+nothing (research/harvest/23-uncertainty-toolbox.md). Now, with at least
+:data:`MIN_FOR_RECALIBRATION` graded outcomes, the record is mapped onto its own hit rates by
+isotonic regression (`risk/calibration.isotonic`, the method uncertainty-toolbox's ``iso_recal`` and
+netcal's ``IsotonicRegression`` apply), and the map is used only if it holds out of sample: its
+:func:`~argus.risk.calibration.held_out_ece` over :data:`FOLDS` contiguous folds must clear
+:data:`MAX_ECE` like any calibrated confidence. Kelly then sizes on the recalibrated probability, so
+a desk whose 0.8s win 55% is sized as a 55% bet — often to nothing, which is the point.
 """
 
 from __future__ import annotations
@@ -28,7 +39,13 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
-from argus.risk.calibration import Prediction, expected_calibration_error
+from argus.risk.calibration import (
+    Prediction,
+    Recalibration,
+    expected_calibration_error,
+    held_out_ece,
+    isotonic,
+)
 
 KELLY_FRACTION = Decimal("0.5")
 """Half-Kelly. Full Kelly is growth-optimal only if the edge estimate is exact, and it never is."""
@@ -46,6 +63,12 @@ MIN_GRADED = 20
 """Calibration on fewer graded outcomes is noise; the scorecard uses 5 to *report* a number, which
 is a lower bar than betting size on it."""
 
+MIN_FOR_RECALIBRATION = 40
+"""Fitting a map is a larger claim than measuring one error, so the fix needs twice the sample the
+measurement does; with five folds each held-out block then has at least eight outcomes."""
+
+FOLDS = 5
+
 
 @dataclass(frozen=True)
 class CalibrationGate:
@@ -55,6 +78,9 @@ class CalibrationGate:
     reason: str
     ece: float | None
     graded: int
+    recalibration: Recalibration | None = None
+    """Set when the stated confidence failed and its recalibrated form passed held out."""
+    held_out_ece: float | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -62,6 +88,8 @@ class CalibrationGate:
             "reason": self.reason,
             "ece": None if self.ece is None else round(self.ece, 4),
             "graded_outcomes": self.graded,
+            "held_out_ece": None if self.held_out_ece is None else round(self.held_out_ece, 4),
+            "recalibration": None if self.recalibration is None else self.recalibration.as_dict(),
         }
 
 
@@ -83,14 +111,42 @@ def calibration_gate(predictions: Sequence[Prediction]) -> CalibrationGate:
         )
     ece = expected_calibration_error(list(predictions))
     if ece > MAX_ECE:
+        if len(predictions) < MIN_FOR_RECALIBRATION:
+            return CalibrationGate(
+                passed=False,
+                reason=(
+                    f"expected calibration error {ece:.3f} exceeds {MAX_ECE}; sizing on this "
+                    f"confidence would lever a bias rather than express an edge, and "
+                    f"{len(predictions)} outcome(s) are too few to recalibrate it "
+                    f"({MIN_FOR_RECALIBRATION} needed)"
+                ),
+                ece=ece,
+                graded=len(predictions),
+            )
+        held = held_out_ece(list(predictions), folds=FOLDS)
+        if held > MAX_ECE:
+            return CalibrationGate(
+                passed=False,
+                reason=(
+                    f"expected calibration error {ece:.3f} exceeds {MAX_ECE}; sizing on this "
+                    f"confidence would lever a bias rather than express an edge, and "
+                    f"recalibrating it does not hold out of sample (held-out {held:.3f} over "
+                    f"{FOLDS} folds)"
+                ),
+                ece=ece,
+                graded=len(predictions),
+                held_out_ece=held,
+            )
         return CalibrationGate(
-            passed=False,
+            passed=True,
             reason=(
-                f"expected calibration error {ece:.3f} exceeds {MAX_ECE}; sizing on this "
-                f"confidence would lever a bias rather than express an edge"
+                f"stated confidence miscalibrated (error {ece:.3f}); recalibrated on its own "
+                f"{len(predictions)} graded outcomes, held-out error {held:.3f} over {FOLDS} folds"
             ),
             ece=ece,
             graded=len(predictions),
+            recalibration=isotonic(list(predictions)),
+            held_out_ece=held,
         )
     return CalibrationGate(
         passed=True,
@@ -175,12 +231,21 @@ def size(
             gate=gate,
         )
 
-    raw = kelly_fraction(win_probability, payoff)
+    probability = win_probability
+    used = "calibrated confidence"
+    if gate.recalibration is not None:
+        if payoff > 0 and not 0 <= win_probability <= 1:
+            # Refused before the map, which would otherwise clip any number into a probability;
+            # on no payoff Kelly stakes nothing whatever the probability, as `kelly_fraction` does.
+            raise ValueError(f"win probability {win_probability} is not a probability")
+        probability = gate.recalibration(win_probability)
+        used = f"recalibrated confidence, stated {win_probability:.2f} -> {probability:.2f}"
+    raw = kelly_fraction(probability, payoff)
     staked = raw * KELLY_FRACTION * applied
     return Sizing(
         fraction=min(MAX_FRACTION, staked),
         basis=(
-            f"half-Kelly on calibrated confidence ({gate.reason})"
+            f"half-Kelly on {used} ({gate.reason})"
             + (f"; session throttle x{session_multiplier}" if session_multiplier < 1 else "")
         ),
         gate=gate,
@@ -190,9 +255,11 @@ def size(
 
 __all__ = [
     "FIXED_FRACTION",
+    "FOLDS",
     "KELLY_FRACTION",
     "MAX_ECE",
     "MAX_FRACTION",
+    "MIN_FOR_RECALIBRATION",
     "MIN_GRADED",
     "CalibrationGate",
     "Sizing",

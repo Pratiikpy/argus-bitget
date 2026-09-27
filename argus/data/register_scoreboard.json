@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-09-26T20:17:46.066950+00:00",
-  "registered": 291,
-  "resolved": 144,
-  "pending": 145,
+  "generated_at": "2026-09-27T20:14:25.302264+00:00",
+  "registered": 311,
+  "resolved": 156,
+  "pending": 153,
   "unresolvable": 2,
   "claimants": [
     {
       "claimant": "argus",
-      "resolved": 144,
-      "correct": 102,
-      "hit_rate": 0.7083,
-      "brier": 0.21819,
-      "mean_confidence": 0.5847
+      "resolved": 156,
+      "correct": 107,
+      "hit_rate": 0.6859,
+      "brier": 0.22269,
+      "mean_confidence": 0.5859
     }
   ],
   "wall": [
@@ -302,6 +302,69 @@
       "observed_shown": "|95.29| = 95.29",
       "resolved_at": "2026-09-26T20:17:42.608750+00:00",
       "hash": "b3b129f1e6ae21a50ec02c48c394780a809f3a3e3a870d02f2852022086cdda8"
+    },
+    {
+      "claim": "\u2717 COINUSDT abs_move_above_bps 376.66 by 2026-09-27T14:16 (p=0.60) [f7988365dfd0]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "237.2442372442372442372442372",
+      "observed_shown": "|237.24| = 237.24",
+      "resolved_at": "2026-09-27T14:22:05.459296+00:00",
+      "hash": "f7988365dfd065185c1d91629b1ba6ae56222f634a76be168285ce5ab78f5134"
+    },
+    {
+      "claim": "\u2717 GOOGLUSDT abs_move_above_bps 47.22 by 2026-09-26T20:27 (p=0.60) [12b67a4abbf3]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "-21.76752285589899869394862865",
+      "observed_shown": "|-21.77| = 21.77",
+      "resolved_at": "2026-09-27T14:22:05.459296+00:00",
+      "hash": "12b67a4abbf3a66e4998697f642a7b2a7b1f21cac0edc2cb095b0bd64f60de89"
+    },
+    {
+      "claim": "\u2717 MSTRUSDT abs_move_above_bps 479.76 by 2026-09-27T16:11 (p=0.60) [4a38f22e472b]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "260.3105906313645621181262729",
+      "observed_shown": "|260.31| = 260.31",
+      "resolved_at": "2026-09-27T16:23:22.882598+00:00",
+      "hash": "4a38f22e472b7e9de9740f43a19e45b81fca2e86b0590175ea96e18296bcdfd8"
+    },
+    {
+      "claim": "\u2717 NVDAUSDT abs_move_above_bps 74.02 by 2026-09-27T16:17 (p=0.60) [6dce38e7ab9f]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "21.37037531721650861493254975",
+      "observed_shown": "|21.37| = 21.37",
+      "resolved_at": "2026-09-27T16:23:22.882598+00:00",
+      "hash": "6dce38e7ab9fe80fbd099109ac313158886bea910df3a45487589a06879694cd"
+    },
+    {
+      "claim": "\u2717 AMZNUSDT abs_move_above_bps 33.92 by 2026-09-27T14:49 (p=0.60) [67db9cc8820b]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "-6.404098623118796029458853666",
+      "observed_shown": "|-6.40| = 6.40",
+      "resolved_at": "2026-09-27T16:23:22.882598+00:00",
+      "hash": "67db9cc8820ba8c3ebab56b490c56a0167bd186e99a10ea46733ba44f9f1abea"
+    },
+    {
+      "claim": "\u2717 COINUSDT abs_move_above_bps 101.87 by 2026-09-27T16:15 (p=0.60) [e19386d81e15]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "7.125044531528322052012825080",
+      "observed_shown": "|7.13| = 7.13",
+      "resolved_at": "2026-09-27T16:23:22.882598+00:00",
+      "hash": "e19386d81e151cc56e4fcdd17cc641ad2b67de54c175b02e09ced128b5767aa1"
+    },
+    {
+      "claim": "\u2717 MSTRUSDT abs_move_above_bps 166.32 by 2026-09-27T18:15 (p=0.60) [f7005be82c1e]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "156.0639298025697273581949232",
+      "observed_shown": "|156.06| = 156.06",
+      "resolved_at": "2026-09-27T20:14:20.318676+00:00",
+      "hash": "f7005be82c1eb0dc2d35ceb9a60aef5cf17e715d9c2a4816f914e494a881afa4"
     },
     {
       "claim": "\u2717 NVDAUSDT return_over_below_bps 0 by 2026-09-15T09:21 (p=0.50) [7ffe510f62d0]",

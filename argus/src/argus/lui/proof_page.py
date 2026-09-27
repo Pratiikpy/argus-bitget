@@ -144,6 +144,10 @@ class Win:
     proofs: tuple[tuple[str, str], ...]
     note: str
     blockers: tuple[str, ...] = ()
+    measured: tuple[dict[str, Any], ...] = ()
+    """The register's ``measured_outcomes`` (`eval/compare.py`): each same-input comparison with
+    its sample size and the interval or test the harness computed. Shown as recorded, never
+    recomputed here."""
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -208,6 +212,7 @@ def collect(data_dir: Path) -> tuple[list[Win], dict[str, int]]:
             proofs=tuple((p["condition"], p["how"]) for p in proofs),
             note=cap.get("note", ""),
             blockers=tuple(str(b) for b in cap.get("blockers", [])),
+            measured=tuple(o for o in cap.get("measured_outcomes", []) if isinstance(o, dict)),
         ))
     return wins, dict(report.get("by_state", {}))
 
@@ -215,6 +220,35 @@ def collect(data_dir: Path) -> tuple[list[Win], dict[str, int]]:
 def _console_link(question: str, book: str) -> str:
     params = {"q": question, **({"book": book} if book else {})}
     return "/?" + urlencode(params)
+
+
+_VERDICT = {"argus_better": "ARGUS better", "rival_better": "rival better", "level": "level"}
+
+
+def _measured(row: dict[str, Any]) -> str:
+    """One recorded comparison in a sentence: who won, the two scores, the sample, and the
+    uncertainty the harness computed — a 95% interval of the difference, else its p-value, else
+    "no test", which is said rather than left out.
+
+    Why here and not on the headline (research/harvest/52-arena-rank.md): the headline counts the
+    whole register, a census with no sampling error to state; these rows are repeated trials, where
+    an interval says how much the sample can establish."""
+    esc = html.escape
+    ci = row.get("ci95")
+    if isinstance(ci, list) and len(ci) == 2:
+        basis = f"95% interval of the difference [{ci[0]}, {ci[1]}]"
+    elif row.get("p_value") is not None:
+        basis = f"p = {row['p_value']}"
+    else:
+        basis = "no significance test recorded"
+    every = {"argus_better_on_every_group": "; better in every group",
+             "level_on_every_group": "; level in every group"}.get(str(row.get("every_group")), "")
+    invalid = "" if row.get("valid", True) else " <b>(invalid, not counted)</b>"
+    return (f"<li><b>{esc(_VERDICT.get(str(row.get('outcome')), str(row.get('outcome'))))}"
+            f"</b>{invalid} vs {esc(str(row.get('rival')))} on {esc(str(row.get('question')))}: "
+            f"{esc(str(row.get('argus_score')))} against {esc(str(row.get('rival_score')))} "
+            f"({esc(str(row.get('metric')))}), {esc(str(row.get('n')))} "
+            f"{esc(str(row.get('unit')))}s, {esc(basis)}{esc(every)}</li>")
 
 
 def _card(win: Win) -> str:
@@ -238,6 +272,9 @@ def _card(win: Win) -> str:
     note = f"<p class='note'>{esc(win.note)}</p>" if win.note else ""
     tested = (f"<p><span class='lbl'>Same-input test</span>{esc(win.tested)}</p>"
               if win.tested else "")
+    if win.measured:
+        tested += ("<p><span class='lbl'>Measured</span></p><ul class='measured'>"
+                   + "".join(_measured(row) for row in win.measured) + "</ul>")
     if win.state != "owned" and win.blockers:
         reason = win.blockers[0]
         if len(reason) > 900:

@@ -680,7 +680,7 @@ A judge should not have to discover these.
   to it — rather than the earlier and false "no hedge placeable".
 - **No usage data.** This has not been put in front of traders yet. The plan is ten supervised
   sessions measuring whether the risk-share figure changes the ticket.
-- **Superiority is claimed only where a named competitor was run on the same input.** 4 of 44
+- **Superiority is claimed only where a named competitor was run on the same input.** 3 of 44
   capabilities are OWNED under that rule; the rest are TIED, IMPLEMENTED or LOST and are called that, and
   every comparison we lost is published on `/wrong`. On 2026-09-24 seven earlier OWNED grades were
   withdrawn because the rival they beat does not lead its sub-theme; they stay IMPLEMENTED until
@@ -711,7 +711,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 9,572 tests
+pytest                    # 9,697 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1198,7 +1198,7 @@ why.
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 750 decisions on record. Every one of them is a refusal, and 705 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 796 decisions on record. Every one of them is a refusal, and 738 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
 zero trades, those three numbers **do not exist**. Not "are zero" — do not exist. Half of the track
@@ -1379,7 +1379,7 @@ route to it — is now what the layer sees.
 - **One model, no ensemble, no adversarial overturn.**
 - **"Owned" is a conjunction, not a score.** An owned capability needs a reproduced baseline, a
   same-input comparison, an out-of-sample test, an ablation and an adversarial test, among thirteen
-  conditions. On 2026-09-12 zero met that bar; the register now reads 4 of 44 capabilities are
+  conditions. On 2026-09-12 zero met that bar; the register now reads 3 of 44 capabilities are
   OWNED, each re-derived from its artefacts by `eval/standing.py`, never from prose.
 
 ---
@@ -1764,11 +1764,11 @@ takes, and every artefact the system writes.
 
 | | |
 |---|---|
-| Source modules | **523** files across **20 packages** (2026-09-27) |
+| Source modules | **527** files across **20 packages** (2026-09-27) |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **353 files**, **9,572 tests collected** |
-| Type and lint | `ruff` clean, `mypy --strict` clean on **520 source files** |
-| Artefacts written | **693** files under `argus/data/` |
+| Test files / tests | **353 files**, **9,697 tests collected** |
+| Type and lint | `ruff` clean, `mypy --strict` clean on **524 source files** |
+| Artefacts written | **710** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
 
@@ -2008,7 +2008,7 @@ Also in this package, each described by the first sentence of its own docstring:
 `resolve` — the auto-resolver and the scoreboard, structurally unable to answer early.
 `open_register` — commits a batch and submits its head to four Bitcoin calendars.
 
-Live: **291 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
+Live: **311 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
 2026-09-14. The resolver runs on every scheduled cycle.
 
 Also in this package, each described by the first sentence of its own docstring:
@@ -2412,12 +2412,12 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 523 files, 20 packages; `mypy --strict` clean on 520 source files |
+| Source modules | 527 files, 20 packages; `mypy --strict` clean on 524 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 9,572 tests collected, `ruff` clean |
+| Tests | 9,697 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
-| Artefacts on disk | 693 files under `argus/data/`, every one produced by running something |
+| Artefacts on disk | 710 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
 | Competitor entries read at source | 5, each cloned and verified or refuted |
 | Live data sources reaching a decision | 15 |
@@ -2444,8 +2444,8 @@ source is a build failure, not a typo.
 That last row is the one to read twice. An *owned* capability needs a reproduced baseline, a
 same-input comparison, an out-of-sample test, an ablation and an adversarial test — thirteen
 conditions in all, enforced in code by `argus/eval/standing.py`, which raises at import if anything
-claims OWNED without them. It read zero when this table was first written; today 4 of 44
-capabilities are OWNED, 13 are TIED, 26 are IMPLEMENTED and 1 is LOST. It read 20 until the
+claims OWNED without them. It read zero when this table was first written; today 3 of 44
+capabilities are OWNED, 13 are TIED, 27 are IMPLEMENTED and 1 is LOST. It read 20 until the
 per-group check of 2026-09-25 withdrew twelve, 8 until a general-purpose validator tied
 breadth rotation on 2026-09-26, and 7 until rToken factor divergence was re-graded IMPLEMENTED
 the same day. Five ties were losses first:
@@ -2703,7 +2703,7 @@ could attack today.
     graded on, so its measured accuracy cannot yet be compared against the 55% bar.
 37. **Two settled outcomes.** Calibration on the desk's own judgement cannot be computed yet; the
     49,140 figure is the policy layer, labelled as such, and the two must never be added together.
-38. **40 of 44 capabilities are not OWNED.** 1 is LOST, 13 are TIED against the named rival and 26 are
+38. **41 of 44 capabilities are not OWNED.** 1 is LOST, 13 are TIED against the named rival and 27 are
     IMPLEMENTED; each says what it is missing.
 39. **Four of five official Bitget Skills carry no data.** Measured to be their backend rather than
     our integration — but a judge sees a thin panel either way.
@@ -3015,7 +3015,7 @@ and anchored. That opening head is `bc36478291a06bc3`, submitted to four indepen
 calendars: `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The `.ots` proofs
 are in `argus/data/anchors/`, and anyone can verify them with the reference OpenTimestamps client
-without our cooperation. **76 of the 76 carry a Bitcoin block-header attestation** (blocks
+without our cooperation. **76 of the 84 carry a Bitcoin block-header attestation** (blocks
 966,822–967,736); the other 18 are still calendar-pending, which is what a proof honestly
 says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-counts both.
 

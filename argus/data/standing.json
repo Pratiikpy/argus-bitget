@@ -1104,7 +1104,7 @@
     {
       "name": "Funding-aware cross-asset hedge routing vs. a fee-blind composite router",
       "subtheme": "t2-crossexecution",
-      "module": "argus/desk/execution.py,argus/eval/execution_comparison.py,argus/eval/baselines/crypto_sor_shim/src/lib/CompositeOrderBook.ts,argus/eval/baselines/crypto_sor_shim/src/lib/common.ts,argus/eval/baselines/crypto_sor_loader.py,argus/desk/crossasset.py,argus/eval/xa_arena.py,argus/eval/xa_tape.py",
+      "module": "argus/lui/crossasset.py,argus/market/crossasset_feed.py,argus/desk/execution.py,argus/eval/execution_comparison.py,argus/eval/baselines/crypto_sor_shim/src/lib/CompositeOrderBook.ts,argus/eval/baselines/crypto_sor_shim/src/lib/common.ts,argus/eval/baselines/crypto_sor_loader.py,argus/desk/crossasset.py,argus/eval/xa_arena.py,argus/eval/xa_tape.py",
       "state": "implemented",
       "baseline": "crypto_sor real composite order-book router (CompositeOrderBook.newOrder)",
       "conditions_met": [
@@ -2094,7 +2094,7 @@
       "name": "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
       "subtheme": "t2-sentiment",
       "module": "argus/agents/analysts.py,argus/market/macro.py,argus/eval/sentiment_comparison.py,argus/eval/baselines/finbert_loader.py",
-      "state": "owned",
+      "state": "implemented",
       "baseline": "ProsusAI/finBERT for classification; BloombergGPT and FinMA for the published bar",
       "conditions_met": [
         "best_implementation_studied",
@@ -2145,19 +2145,19 @@
         },
         {
           "condition": "statistically_valid_evaluation",
-          "how": "every narrative tested shows the same pattern on real finBERT output (matching_count scales with repetition every time) and the real ARGUS analyst never once lets repetition alone flip a non-actionable read to actionable, across every narrative run \u2014 not a single convenient case",
+          "how": "30 designed manipulation narratives (18 bullish, 12 bearish, 16 symbols) and 12 corroborated true events (6 each side), eval/sentiment_cases.py: the real analyst was never moved to an actionable trade by repetition, 30 of 30 on template mutations and 30 of 30 on persona-diverse retellings (it leaned to the rumour's side, non-actionably, on 2 of 30); it took the correct side on 12 of 12 true events, actionable on 11. finBERT's naive aggregate was pushed toward the rumour's side on 22 of 30 (template) and 24 of 30 (diverse) narratives, and read 11 of 12 true events correctly. Designed cases, not a sample of live posts: groupwise_audit classes the rows DESIGNED\n",
           "artefact": "data/sentiment_comparison.json",
           "test": ""
         },
         {
           "condition": "costs_included",
-          "how": "finBERT's real local CPU latency measured directly (~30ms/post); ARGUS's real Qwen call count and wall-clock measured directly \u2014 the genuine cost asymmetry (free vs. real hackathon-budget dollars) is why this comparison runs a small designed set rather than a large statistical sweep on the ARGUS side, stated as a deliberate scope choice, not hidden",
+          "how": "finBERT's local CPU latency measured directly (~33 ms/post); ARGUS: 141 real Qwen calls, 231,491 tokens and 53 minutes of wall time for the 30+12 run and its uncached reproducibility check, recorded in the artefact's costs block\n",
           "artefact": "data/sentiment_comparison.json",
           "test": ""
         },
         {
           "condition": "out_of_sample_test",
-          "how": "the reproducibility check re-runs the identical real scenario on a fresh Qwen call rather than replaying a cached response, confirming the signal is stable under genuine re-sampling, not just self-consistent within one call \u2014 a real, live CLI run, not a unit test (real LLM cost)",
+          "how": "the reproducibility check re-asks the analyst on 5 diverse-attack narratives through an UNCACHED client and compares with the run's own answers: 5 of 5 signals stable. Corrected 2026-09-27: every earlier reproduction, the original two-narrative one included, ran on the caching client and was a cache hit, so it proved nothing; the check now refuses a caching client\n",
           "artefact": "data/sentiment_comparison.json",
           "test": ""
         },
@@ -2169,7 +2169,7 @@
         },
         {
           "condition": "adversarial_test",
-          "how": "the coordinated-posting manipulation scenario itself IS the adversarial test \u2014 N near-identical unsourced posts, symbol-matched, run against both real systems; finBERT's naive aggregate scales with repetition on every narrative, ARGUS's real categorical judgment never flips to actionable on repetition alone on any narrative tested. Precise, not overclaimed, after an independent adversarial re-check (2026-09-23): CONFIDENCE is not immune \u2014 it moved from 0.05 to 0.85 on the tested narrative, a real, large move the second ablation below already disclosed \u2014 only the categorical signal held. The tested attack is also the easier case: N near-identical template mutations of one sentence, no source/account field to dedup against, checked on 2 narratives. A harder attack \u2014 textually diverse paraphrases from distinct personas, the way a real coordinated campaign would actually read \u2014 was not tested and is named here as the honest limit of this condition, not quietly left for a reader to assume was covered",
+          "how": "two attacks on every narrative: five template mutations of one sentence, and five retellings by five distinct personas in five registers with no source added (the harder attack the 2026-09-23 re-check named as untested). Neither flipped the analyst to an actionable trade on any of 30 narratives. Precise, not overclaimed: CONFIDENCE is not immune (0.15 to 0.85 on insufficient_evidence reads), the signal leaned toward the rumour, below the actionable bar, on 2 of 30 diverse attacks (AAPL and HOOD, both bearish), and the bare classifier (the coarse ablation) leaned harder than the real analyst on 29 of 30. The retellings share persona templates across narratives; LLM-generated paraphrase campaigns are still untested\n",
           "artefact": "data/sentiment_comparison.json",
           "test": ""
         },
@@ -2181,7 +2181,7 @@
         },
         {
           "condition": "reproducibility_proven",
-          "how": "finBERT's real classification is deterministic in eval mode (confirmed by running it twice); ARGUS's real LLM call is not byte-deterministic, so reproducibility here means the SIGNAL, not the exact confidence, is stable across a genuine re-run \u2014 verified by actually calling the real analyst twice on the identical (coordinated) scenario, not assumed: same signal, confidence 0.85 both times (`out_of_sample_holdout_reproducibility` in the artefact; this line previously said 0.15, transcribed wrong against its own cited evidence and never caught until an independent adversarial re-check actually opened the artefact, 2026-09-23 \u2014 corrected here)",
+          "how": "finBERT is deterministic in eval mode. ARGUS's call is not byte-deterministic, so reproducibility means the SIGNAL holds: 5 of 5 stable on a genuinely uncached re-ask (`reproducibility.uncached` true in the artefact). The earlier claim of 'same signal, confidence 0.85 both times' was a cache hit and is withdrawn\n",
           "artefact": "data/sentiment_comparison.json",
           "test": ""
         },
@@ -4282,8 +4282,8 @@
   "by_state": {
     "lost": 1,
     "tied": 13,
-    "implemented": 26,
-    "owned": 4
+    "implemented": 27,
+    "owned": 3
   },
   "findings": [
     {
@@ -4380,6 +4380,16 @@
       "capability": "Perception layer: what the desk can see",
       "problem": "out_of_sample_test is claimed but not evidenced",
       "detail": "no groupwise check has run on its artefacts: data/desk_notes.jsonl: no_rows - free-text notes per live cycle; the feedlist harness reduces them to one distinct-source count and no per-cycle value is recorded; data/feedlist_comparison.json: designed_cases - designed vendor-failure scenarios over the rival's own category list; data/skill_reliability.json: only context headlines were checked"
+    },
+    {
+      "capability": "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
+      "problem": "statistically_valid_evaluation is claimed but not evidenced",
+      "detail": "no groupwise check has run on its artefacts: data/sentiment_comparison.json: designed_cases - 30 designed coordinated-posting narratives and 12 designed corroborated events"
+    },
+    {
+      "capability": "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
+      "problem": "out_of_sample_test is claimed but not evidenced",
+      "detail": "no groupwise check has run on its artefacts: data/sentiment_comparison.json: designed_cases - 30 designed coordinated-posting narratives and 12 designed corroborated events"
     },
     {
       "capability": "Crowd sentiment classification, vs. RoB-RT on TweetEval",
@@ -4586,6 +4596,12 @@
       "from": "owned",
       "to": "implemented",
       "at": "2026-09-27T00:14:01+00:00"
+    },
+    {
+      "capability": "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
+      "from": "owned",
+      "to": "implemented",
+      "at": "2026-09-27T12:39:51+00:00"
     }
   ]
 }

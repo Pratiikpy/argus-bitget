@@ -24,12 +24,13 @@ import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
-from math import comb, sqrt
+from math import comb
 from typing import Any
 
 from argus.market.bitget import RTOKEN_SYMBOLS
 from argus.market.history import fetch_basis
 from argus.research.gap_study import ClosedSession, _closed_sessions
+from argus.risk.calibration import wilson
 from argus.truth.clocks import DualClock, SessionPhase
 from argus.truth.paths import DATA_DIR
 
@@ -58,11 +59,7 @@ def wilson_interval(successes: int, trials: int, z: float = 1.96) -> tuple[float
     """
     if trials == 0:
         return (0.0, 1.0)
-    phat = successes / trials
-    denom = 1 + z * z / trials
-    centre = (phat + z * z / (2 * trials)) / denom
-    margin = z * sqrt(phat * (1 - phat) / trials + z * z / (4 * trials * trials)) / denom
-    return (max(0.0, centre - margin), min(1.0, centre + margin))
+    return wilson(successes, trials, z)  # risk/calibration.wilson: one implementation
 
 
 @dataclass(frozen=True, slots=True)

@@ -410,6 +410,32 @@ class TestDeskPauses:
         with pytest.raises(AlreadyResolved):
             desk.resume(store, rid, now=AT + timedelta(minutes=6))
 
+    def test_two_answers_racing_past_the_status_check_admit_one(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Both answers read "paused" before either writes (the check-then-act race the audit of
+        research/harvest/28-langgraph-hitl.md found); the exclusive claim admits the first only."""
+        store, run = _paused(tmp_path, HALTED_REJECT)
+        rid = run.pause.request_id
+        monkeypatch.setattr(type(store), "status", lambda self, request_id: "paused")
+        store.answer(_response(HumanAction.REJECT, request_id=rid), now=AT + timedelta(minutes=2))
+        with pytest.raises(AlreadyResolved, match="another reviewer"):
+            store.answer(_response(HumanAction.APPROVE, request_id=rid),
+                         now=AT + timedelta(minutes=2))
+
+    def test_a_reviewer_off_the_allowlist_is_refused_and_logged(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        store, run = _paused(tmp_path, HALTED_REJECT)
+        rid = run.pause.request_id
+        monkeypatch.setenv("ARGUS_PAUSE_REVIEWERS", "someone-else")
+        with pytest.raises(ResponseMismatch, match="not a reviewer this desk accepts"):
+            store.answer(_response(HumanAction.REJECT, request_id=rid),
+                         now=AT + timedelta(minutes=2))
+        assert store.status(rid) == "paused"
+        assert any(e.get("kind") == "answer_refused" or e.get("event") == "answer_refused"
+                   for e in store.events())
+
     def test_an_answer_after_the_window_is_refused_and_recorded(self, tmp_path: Path) -> None:
         store, run = _paused(tmp_path)
         rid = run.pause.request_id

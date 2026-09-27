@@ -239,15 +239,27 @@ def sizing_cases(module: types.ModuleType) -> Iterator[tuple[str, c.Certificate]
     inputs and multipliers, including the ones the sizing layer must refuse."""
     from argus.risk.calibration import Prediction, expected_calibration_error
 
-    for graded, accuracy in itertools.product((0, 19, 20, 21), ("0.6", "0.4", "0.3")):
+    # 40 and 60 reach the recalibration (`risk/sizing.MIN_FOR_RECALIBRATION`), 39 just misses it.
+    # Interleaved outcomes give the held-out folds a stationary record, so the map holds; the
+    # front-loaded ones put every hit in the first folds, so it cannot, and sizing must fall back.
+    # The two confidence levels make the fitted map more than a constant.
+    samples = [(g, a, "interleaved") for g, a in itertools.product(
+        (0, 19, 20, 21, 39, 40, 60), ("0.6", "0.4", "0.3"))]
+    samples += [(g, a, "front-loaded") for g, a in itertools.product((40, 60), ("0.4", "0.3"))]
+    for graded, accuracy, order in samples:
         right = int(Decimal(graded) * Decimal(accuracy))
-        predictions = [Prediction(confidence=0.6, correct=i < right) for i in range(graded)]
+        if order == "front-loaded":
+            hits = set(range(right))
+        else:
+            hits = {round(i * graded / right) for i in range(right)} if right else set()
+        predictions = [Prediction(confidence=0.6 if i % 2 else 0.8, correct=i in hits)
+                       for i in range(graded)]
         ece = expected_calibration_error(predictions) if predictions else None
         for p, payoff, rm, sm in itertools.product(
             (0.3, 0.5, 0.55, 0.7, 0.9, 1.0, 1.2), ("0", "0.5", "1", "2", "3"),
             ("0", "0.5", "0.75", "1"), ("0.25", "0.5", "1", "1.5", "-0.1"),
         ):
-            label = (f"graded {graded} accuracy {accuracy} p {p} payoff {payoff} "
+            label = (f"graded {graded} {order} accuracy {accuracy} p {p} payoff {payoff} "
                      f"multipliers {rm}x{sm}")
             try:
                 sizing = module.size(
@@ -263,7 +275,7 @@ def sizing_cases(module: types.ModuleType) -> Iterator[tuple[str, c.Certificate]
             yield label, c.certify_sizing(
                 win_probability=p, payoff=Decimal(payoff), graded=graded, ece=ece,
                 risk_multiplier=Decimal(rm), session_multiplier=Decimal(sm), sizing=sizing,
-                refused=refused,
+                refused=refused, predictions=predictions,
             )
 
 

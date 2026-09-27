@@ -421,6 +421,8 @@ class BitgetTradingClient:
         order = authorised.order
         if not isinstance(order, Order):  # pragma: no cover - structural guard
             raise BitgetOrderError(f"an Authorised must carry an Order, not {type(order).__name__}")
+        # Edited since the ruling? Refused before the payload is built (`Authorised.verify`).
+        authorised.verify()
         if self.trades_real_money:
             # The consent gate (`execution/consent.py`). Checked before the payload is even built,
             # so a refused real-money order never reaches the signing path.

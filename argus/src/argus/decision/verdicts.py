@@ -248,6 +248,12 @@ traceback, or arrived at by accident; a private object cannot be obtained withou
 reference to it, and the only code holding one is :meth:`ConstitutionRuling.authorise`."""
 
 
+def _content(order: Submittable) -> tuple[str, str, Decimal]:
+    """What an authorisation binds: symbol, side and quantity, as :meth:`ConstitutionRuling.
+    authorise` compares them."""
+    return (order.symbol, order.side.strip().lower(), order.quantity)
+
+
 class Authorised:
     """An order the Constitution actually approved. Unconstructable by hand.
 
@@ -277,9 +283,20 @@ class Authorised:
     it is handed that object, and an executor that accepts nothing else. What is added here is the
     content binding above, and the fact that the same property is asserted inside the whole-domain
     sweep rather than only in unit tests.
+
+    **And the binding holds until the send, not only at the mint (2026-09-28).** ``Order`` is
+    mutable — it carries its own state history — so an order could be authorised and then edited:
+    ``authorised.order.quantity = ...`` between the ruling and the venue, and nothing checked again.
+    OpenTofu closes the same gap for infrastructure: ``tofu apply plan.tfplan`` executes exactly the
+    saved plan and refuses when the state it was computed against has changed
+    (``internal/backend/local/backend_local.go:380-396``, MPL-2.0, pattern only;
+    research/harvest/29-opentofu-plan.md). Here the symbol, side and quantity are pinned when the
+    capability is minted, :meth:`verify` re-checks them, and both doors to a venue —
+    ``OrderBook.submit`` and ``BitgetTradingClient.place_order`` — call it before anything leaves.
+    ``order`` and ``ruling`` are read-only, so the capability cannot be re-pointed at another order.
     """
 
-    __slots__ = ("order", "ruling")
+    __slots__ = ("_order", "_pinned", "_ruling")
 
     def __init__(self, order: Submittable, ruling: ConstitutionRuling, *, _token: object) -> None:
         if _token is not _AUTHORISATION:
@@ -287,8 +304,27 @@ class Authorised:
                 "an Authorised order cannot be constructed directly; it is minted only by "
                 "ConstitutionRuling.authorise(), which is the whole point of the type"
             )
-        self.order = order
-        self.ruling = ruling
+        self._order = order
+        self._ruling = ruling
+        self._pinned = _content(order)
+
+    @property
+    def order(self) -> Submittable:
+        return self._order
+
+    @property
+    def ruling(self) -> ConstitutionRuling:
+        return self._ruling
+
+    def verify(self) -> None:
+        """Raise unless the order still says what the Constitution approved."""
+        now = _content(self._order)
+        if now != self._pinned:
+            raise ConstitutionViolation(
+                f"{self._pinned[0]}: the order changed after it was authorised "
+                f"(approved {self._pinned[1]} {self._pinned[2]}, now {now[1]} {now[2]} on "
+                f"{now[0]}); send what was reviewed or rule on it again"
+            )
 
     def __repr__(self) -> str:
         return (

@@ -269,3 +269,38 @@ def _sentinel() -> object:
     from argus.decision.verdicts import _AUTHORISATION
 
     return _AUTHORISATION
+
+
+class TestTheOrderCannotChangeAfterTheRuling:
+    """What was reviewed is what is sent: an authorised order edited before the send is refused at
+    both doors to a venue (research/harvest/29-opentofu-plan.md, OpenTofu's saved-plan apply)."""
+
+    @pytest.mark.parametrize(("field", "value"), [
+        ("quantity", Decimal("11")),
+        ("side", "BUY"),
+        ("symbol", "TSLAUSDT"),
+    ])
+    def test_an_edit_after_authorisation_is_refused_at_submit(self, field: str,
+                                                              value: object) -> None:
+        order = _order()
+        authorised = _ruling(_intent()).authorise(order)
+        setattr(order, field, value)
+        with pytest.raises(ConstitutionViolation, match="changed after it was authorised"):
+            OrderBook().submit(authorised, at=NOW)
+
+    def test_an_unedited_order_still_submits(self) -> None:
+        submitted = OrderBook().submit(_ruling(_intent()).authorise(_order()), at=NOW)
+        assert submitted.state is OrderState.SUBMITTED
+
+    def test_a_case_only_side_difference_is_not_an_edit(self) -> None:
+        order = _order(side="SELL")
+        authorised = _ruling(_intent()).authorise(order)
+        order.side = "sell"
+        OrderBook().submit(authorised, at=NOW)
+
+    def test_the_capability_cannot_be_repointed(self) -> None:
+        authorised = _ruling(_intent()).authorise(_order())
+        with pytest.raises(AttributeError):
+            authorised.order = _order(quantity="99")
+        with pytest.raises(AttributeError):
+            authorised.ruling = _ruling(_intent(quantity="99"))

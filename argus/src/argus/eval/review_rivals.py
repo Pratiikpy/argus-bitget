@@ -63,7 +63,6 @@ import bisect
 import contextlib
 import hashlib
 import json
-import math
 import random
 import subprocess
 import sys
@@ -91,6 +90,7 @@ from argus.desk.rule_lifecycle import (
     grade,
     parameters,
 )
+from argus.risk.calibration import wilson as interval
 from argus.truth.artefact import write
 
 PACKAGE = Path(__file__).resolve().parents[3]
@@ -827,11 +827,8 @@ def synthetic_stream(
 def _wilson(k: int, n: int) -> list[float] | None:
     if n == 0:
         return None
-    z = 1.959964
-    p = k / n
-    centre = (p + z * z / (2 * n)) / (1 + z * z / n)
-    half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / (1 + z * z / n)
-    return [round(centre - half, 4), round(centre + half, 4)]
+    low, high = interval(k, n, 1.959964)  # risk/calibration.wilson: one implementation
+    return [round(low, 4), round(high, 4)]
 
 
 def _rate(k: int, n: int) -> dict[str, Any]:

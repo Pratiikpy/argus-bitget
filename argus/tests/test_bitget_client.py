@@ -218,6 +218,19 @@ class TestOrderGuards:
         with pytest.raises(BitgetOrderError, match="requires a price"):
             client.place_order(self._authorised(order), order_type="limit")
 
+    def test_an_order_edited_after_its_ruling_never_reaches_the_venue(self, client,
+                                                                     monkeypatch) -> None:
+        """`Authorised.verify` at the last door: the size grew after the Constitution ruled, so
+        the send is refused before a payload is built or a request made."""
+        from argus.decision.verdicts import ConstitutionViolation
+
+        order = Order("c-3", "NVDAUSDT", "SELL", Decimal("1"), "hash-ok")
+        authorised = self._authorised(order)
+        order.quantity = Decimal("5")
+        monkeypatch.setattr(client, "_request", lambda *a, **k: pytest.fail("request was made"))
+        with pytest.raises(ConstitutionViolation, match="changed after it was authorised"):
+            client.place_order(authorised)
+
 
 class TestCredentialDetection:
     def test_detects_absence(self, monkeypatch) -> None:

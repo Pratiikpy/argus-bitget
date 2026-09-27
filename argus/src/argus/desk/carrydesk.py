@@ -29,7 +29,6 @@ exactly the failure the floor is there to catch, arriving through the front door
 from __future__ import annotations
 
 import json
-import math
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -41,6 +40,7 @@ from argus.decision.verdicts import (
     Side,
     Verdict,
 )
+from argus.risk.calibration import wilson
 from argus.risk.gatechain import CHAIN, FIRED, PASSED, UNREACHED
 from argus.truth.clocks import SessionState
 from argus.truth.paths import DATA_DIR
@@ -62,15 +62,14 @@ def wilson_lower(successes: float, trials: float, *, z: float = WILSON_Z) -> flo
     small ``n`` and near the ends — at six trials it can and does produce bounds outside [0, 1],
     which would be a confidence the schema rejects rather than a conservative one. Wilson stays in
     range by construction and is the standard recommendation for exactly this regime.
+
+    The interval itself is `risk/calibration.wilson`, the one implementation
+    (research/harvest/52-arena-rank.md); a success count outside ``[0, trials]`` is clipped to it
+    first, as before.
     """
     if trials <= 0:
         return 0.0
-    p = max(0.0, min(1.0, successes / trials))
-    z2 = z * z
-    denominator = 1.0 + z2 / trials
-    centre = (p + z2 / (2 * trials)) / denominator
-    spread = (z / denominator) * math.sqrt(p * (1 - p) / trials + z2 / (4 * trials * trials))
-    return max(0.0, centre - spread)
+    return wilson(max(0.0, min(float(trials), successes)), trials, z)[0]
 
 
 @dataclass(frozen=True, slots=True)

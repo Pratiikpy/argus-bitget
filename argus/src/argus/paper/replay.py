@@ -27,7 +27,17 @@ abstention, not away from it. A replay that trades is evidence; a replay that ab
 evidence than a live abstention would be, and :class:`ReplayResult` says so in the artefact.
 
 **It is written to its own ledger and its own chain.** `data/replay_ledger.jsonl`, never the live
-one. A replayed decision and a live decision are different objects: one was made against a full
+one. *(Until 2026-09-28 "its own chain" was not true: the file was plain appended JSON, so a row
+could be edited or removed without trace, and nothing recorded what inputs a replayed decision saw
+(research/harvest/32-langgraph-checkpoint.md, against Ritik200238/nightwatch, whose replay stores
+a SHA-256 of each snapshot). Now each row carries* ``frame_hash`` *— SHA-256 of the full
+reconstructed frame, every evidence item with its availability time — and* ``prev_hash`` */*
+``row_hash`` *: the hash of the raw line before it and of the row itself, so :func:`verify` names
+the first line that was changed, dropped or inserted — except rows cut from the end, which only
+an externally anchored head could reveal. The 30 rows written before then carry no hash and are
+reported as unchained, not silently accepted.)*
+
+A replayed decision and a live decision are different objects: one was made against a full
 evidence panel in real time, the other against a reconstructed and thinner one. Mixing them would
 inflate the live record with decisions that were never live, which is the single most tempting
 dishonesty available here and the reason for the separate file.
@@ -40,6 +50,7 @@ construction has to be airtight, and why :func:`frame_at` refuses any bar at or 
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections.abc import Sequence
 from dataclasses import dataclass, field
@@ -72,6 +83,18 @@ class Frame:
     evidence: tuple[Evidence, ...]
     absent: tuple[str, ...]
     """Sources that exist live and cannot be reconstructed. Named, never omitted."""
+
+    def content_hash(self) -> str:
+        """SHA-256 of everything the desk was shown, in canonical JSON — the replay's inputs,
+        committed, so a later reader can tell whether a rerun saw the same frame."""
+        payload = {
+            "symbol": self.symbol, "at": self.at.isoformat(), "price": str(self.price),
+            "evidence": [{"id": e.id, "claim": e.claim, "source": e.source,
+                          "available_at": e.available_at.isoformat(),
+                          "credibility": e.credibility} for e in self.evidence],
+            "absent": list(self.absent),
+        }
+        return _sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")))
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -159,6 +182,8 @@ class Outcome:
     evidence_count: int
     realised_bps: float
     cost_bps: float
+    frame_hash: str = ""
+    """:meth:`Frame.content_hash` of the frame this decision was made on."""
 
     @property
     def opened(self) -> bool:
@@ -183,6 +208,7 @@ class Outcome:
             "thesis": self.thesis[:400], "evidence_count": self.evidence_count,
             "realised_bps": round(self.realised_bps, 3),
             "opened": self.opened, "net_bps": round(self.net_bps, 3),
+            "frame_hash": self.frame_hash,
         }
 
 
@@ -264,12 +290,65 @@ class ReplayResult:
         }
 
 
+GENESIS = "0" * 64
+"""The ``prev_hash`` of a first line."""
+
+
+def _sha256(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _row_hash(row: dict[str, Any]) -> str:
+    body = {k: v for k, v in row.items() if k != "row_hash"}
+    return _sha256(json.dumps(body, sort_keys=True, separators=(",", ":")))
+
+
 def write(result: ReplayResult, *, path: Path = REPLAY_PATH) -> None:
-    """Append every replayed outcome to the replay ledger."""
+    """Append every replayed outcome to the replay ledger, each row chained to the line before."""
     path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [x for x in path.read_text(encoding="utf-8").splitlines() if x.strip()] \
+        if path.exists() else []
+    prev = _sha256(lines[-1]) if lines else GENESIS
     with path.open("a", encoding="utf-8") as handle:
         for outcome in result.outcomes:
-            handle.write(json.dumps({"kind": "replay", **outcome.as_dict()}) + "\n")
+            row: dict[str, Any] = {"kind": "replay", **outcome.as_dict(), "prev_hash": prev}
+            row["row_hash"] = _row_hash(row)
+            line = json.dumps(row)
+            handle.write(line + "\n")
+            prev = _sha256(line)
+
+
+def verify(path: Path = REPLAY_PATH) -> dict[str, Any]:
+    """Walk the chain: every hashed row must name the hash of the raw line before it and hash to
+    its own ``row_hash``. Rows from before the chain existed are counted, not trusted."""
+    if not path.exists():
+        return {"rows": 0, "chained": 0, "unchained_legacy": 0, "intact": True, "broken_at": None}
+    lines = [x for x in path.read_text(encoding="utf-8").splitlines() if x.strip()]
+    chained = legacy = 0
+    for number, line in enumerate(lines, 1):
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            return {"rows": len(lines), "chained": chained, "unchained_legacy": legacy,
+                    "intact": False, "broken_at": number, "why": "not JSON"}
+        if "row_hash" not in row:
+            if chained:
+                return {"rows": len(lines), "chained": chained, "unchained_legacy": legacy,
+                        "intact": False, "broken_at": number,
+                        "why": "an unhashed row after the chain began"}
+            legacy += 1
+            continue
+        expected_prev = _sha256(lines[number - 2]) if number > 1 else GENESIS
+        if row.get("prev_hash") != expected_prev:
+            return {"rows": len(lines), "chained": chained, "unchained_legacy": legacy,
+                    "intact": False, "broken_at": number,
+                    "why": "prev_hash does not match the line before"}
+        if _row_hash(row) != row["row_hash"]:
+            return {"rows": len(lines), "chained": chained, "unchained_legacy": legacy,
+                    "intact": False, "broken_at": number, "why": "row_hash does not match"}
+        chained += 1
+    return {"rows": len(lines), "chained": chained, "unchained_legacy": legacy, "intact": True,
+            "broken_at": None}
 
 
 def load(path: Path = REPLAY_PATH) -> list[dict[str, Any]]:
@@ -503,7 +582,7 @@ def run(
                 symbol=symbol, at=at, verdict=str(final.verdict), side=str(final.side),
                 quantity=final.quantity, confidence=final.stated_confidence,
                 thesis=str(final.thesis), evidence_count=len(frame.evidence),
-                realised_bps=move, cost_bps=round_trip,
+                realised_bps=move, cost_bps=round_trip, frame_hash=frame.content_hash(),
             ))
         if stopped:
             break

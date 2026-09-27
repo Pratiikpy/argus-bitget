@@ -497,9 +497,11 @@ class TestTheLiveRegisterIsHonest:
         # divergence's CI excludes zero; its own artefact has it at [-0.0387, +0.0304].
         # 2026-09-27: cross-sectional factor evaluation to TIED. Its only edge over qlib is a
         # single-instrument group, which the shared-timestamp panel never produces.
+        # 2026-09-27: sentiment integrity to IMPLEMENTED (audit finding 89). Its 30 manipulation
+        # and 12 truth cases are designed, not a sample of live posts, so the groupwise check
+        # classes them DESIGNED and cannot stand in for a population result.
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
-            "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
             "Per-profile mandate that changes the verdict",
             "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
             "Risk layer proved by domain sweep",

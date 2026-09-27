@@ -152,7 +152,12 @@ class Autopsy:
     thesis: str
     predicted_direction: str
     realised_direction: str
-    predicted_magnitude_bps: int
+    predicted_magnitude_bps: int | None
+    """How far the decision said the price would move, or ``None`` when it named no size.
+
+    **``None``, not ``0``** — the same correction `agents/causality.CausalChain` made: the paper
+    ledger records a direction and a confidence, never a size, and grading an invented zero against
+    the realised move would convict every right-direction trade of a sizing error it never made."""
     realised_magnitude_bps: int
     stated_confidence: float
     evidence_ignored: tuple[str, ...] = ()
@@ -162,13 +167,17 @@ class Autopsy:
         return self.predicted_direction == self.realised_direction
 
     @property
-    def magnitude_error_bps(self) -> int:
+    def magnitude_error_bps(self) -> int | None:
+        if self.predicted_magnitude_bps is None:
+            return None
         return abs(self.predicted_magnitude_bps - self.realised_magnitude_bps)
 
     @property
     def failure_mode(self) -> str:
-        """Which part was wrong — the four are different lessons and must not be merged."""
-        if self.direction_correct and self.magnitude_error_bps < 20:
+        """Which part was wrong — the four are different lessons and must not be merged. A
+        right-direction call that named no size is ``correct``: there is no size claim to fail."""
+        error = self.magnitude_error_bps
+        if self.direction_correct and (error is None or error < 20):
             return "correct"
         if self.direction_correct:
             return "magnitude"      # right idea, wrong size — a sizing problem
