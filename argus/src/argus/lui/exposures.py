@@ -713,7 +713,7 @@ def exposures_answer(
 ) -> tuple[list[str], list[Source], dict[str, Any]]:
     """Sector weights and factor loadings of ``book``, and of the book after ``proposed`` (each
     name to its stated target weight, the rest pro rata), with the biggest change, concentration
-    and one ``Actionable:`` lead. Returns (lines, sources, data) like every research engine.
+    and one ``Bottom line:`` lead. Returns (lines, sources, data) like every research engine.
 
     ``book`` maps Bitget symbols to weights summing to one; ``proposed`` maps symbols to target
     weights in [0, 1]."""
@@ -774,19 +774,19 @@ def exposures_answer(
     if not fitted_any:
         if after is not None and changes:
             bucket = changes[0][0]
-            lead = (f"Actionable: {trade_words} moves {bucket} from "
+            lead = (f"Bottom line: {trade_words} moves {bucket} from "
                     f"{_pct(sec_b.get(bucket, 0.0))} to {_pct(sec_a.get(bucket, 0.0))} of the "
                     f"book — the biggest sector change; the factor loadings are not stated this "
                     f"time because {no_factors}.")
         else:
-            lead = (f"Actionable: your book is {_pct(top_b[1])} {top_b[0]}"
+            lead = (f"Bottom line: your book is {_pct(top_b[1])} {top_b[0]}"
                     + (f" across {eff_sec_b:.1f} effective sectors" if len(sec_b) > 1 else "")
                     + f"; its factor loadings are not stated this time because {no_factors}.")
     elif after is not None and changes:
         bucket = changes[0][0]
         factor, fdelta = factor_changes[0]
         direction = "more" if (eff_a or 0) > eff_b else "less"
-        lead = (f"Actionable: {trade_words} moves {bucket} from {_pct(sec_b.get(bucket, 0.0))} to "
+        lead = (f"Bottom line: {trade_words} moves {bucket} from {_pct(sec_b.get(bucket, 0.0))} to "
                 f"{_pct(sec_a.get(bucket, 0.0))} of the book — the biggest sector change — and "
                 f"market beta from {load_b['market']:.2f} to {load_a['market']:.2f}; the largest "
                 f"factor change is {factor} ({_signed(fdelta)}), and the book becomes {direction} "
@@ -797,7 +797,7 @@ def exposures_answer(
                      f"that is more than you mean to hold in one sector.")
     else:
         tilt = max(("size", "momentum", "crypto"), key=lambda f: abs(load_b[f]))
-        lead = (f"Actionable: your book is {_pct(top_b[1])} {top_b[0]}"
+        lead = (f"Bottom line: your book is {_pct(top_b[1])} {top_b[0]}"
                 + (f" across {eff_sec_b:.1f} effective sectors" if len(sec_b) > 1 else "")
                 + f"; its market beta is {load_b['market']:.2f} to the S&P 500 and its largest "
                   f"style tilt is {tilt} at {_signed(load_b[tilt])}.")
@@ -1051,7 +1051,7 @@ def answer(raw_text: str, book_text: str = "", *,
         notes.append("no book was stated or saved, so the named contract is read on its own")
     if not book:
         return Answer(question=question, lines=[
-            "Actionable: tell me what you hold to read its exposures — for example \"40% MSFT, "
+            "Bottom line: tell me what you hold to read its exposures — for example \"40% MSFT, "
             "30% META, 30% GOOGL: what are my sector and factor exposures if I add 20% NVDA?\" — "
             "or save it once in My book.",
         ], sources=[Source(kind="computation", ref="argus.lui.exposures",

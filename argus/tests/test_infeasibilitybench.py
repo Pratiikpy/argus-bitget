@@ -560,7 +560,7 @@ class TestTheGraderRevisionsHold:
         assert got.prose_decline == "Not enough graded outcomes to state"
         earnings = Infeasible("f", "AAPL after its next earnings", Cause.FUTURE_PRICE)
         note = "以下为英文回答：研究引擎的输出目前只有英文。"  # noqa: RUF001 - the console's own words
-        behind_a_note = reply(note, "Actionable: not enough clean events to measure AAPL's "
+        behind_a_note = reply(note, "Bottom line: not enough clean events to measure AAPL's "
                                     "reaction yet — a figure from fewer than five would look "
                                     "like evidence")
         got = grade_infeasible(earnings, behind_a_note, probe=never_down)

@@ -287,7 +287,7 @@ def test_the_answer_before_and_after_a_trade() -> None:
     book = {"MSFTUSDT": 0.4, "METAUSDT": 0.3, "GOOGLUSDT": 0.3}
     lines, sources, data = ex.exposures_answer(book, {"NVDAUSDT": 0.2}, inputs=_inputs(),
                                                rows=ROWS)
-    assert lines[0].startswith("Actionable: adding 20% NVDA moves ")
+    assert lines[0].startswith("Bottom line: adding 20% NVDA moves ")
     assert data["sectors_before"] == pytest.approx({"Communication Services": 0.6,
                                                     "Information Technology": 0.4})
     assert data["sectors_after"] == pytest.approx({"Communication Services": 0.48,
@@ -310,7 +310,7 @@ def test_the_answer_before_and_after_a_trade() -> None:
 def test_the_answer_without_a_trade_names_the_largest_sector() -> None:
     book = {"MSFTUSDT": 0.4, "METAUSDT": 0.3, "GOOGLUSDT": 0.3}
     lines, _, data = ex.exposures_answer(book, inputs=_inputs(), rows=ROWS)
-    assert lines[0].startswith("Actionable: your book is 60% Communication Services")
+    assert lines[0].startswith("Bottom line: your book is 60% Communication Services")
     assert data["sectors_after"] is None and data["loadings_after"] is None
 
 
@@ -342,5 +342,5 @@ def test_parse_uses_the_saved_book_and_defaults_the_size() -> None:
 
 def test_answer_asks_for_a_book_when_there_is_none() -> None:
     result = ex.answer("what are my sector exposures?")
-    assert result is not None and result.lines[0].startswith("Actionable: tell me what you hold")
+    assert result is not None and result.lines[0].startswith("Bottom line: tell me what you hold")
     assert ex.answer("is NVDA overbought?") is None

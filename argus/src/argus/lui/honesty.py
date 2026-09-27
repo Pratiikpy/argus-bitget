@@ -278,7 +278,7 @@ def _future_lines(text: str, names: Sequence[str]) -> list[str]:
     name = _short(names[0]) if names else "it"
     example = _short(names[0]) if names else "NVDA"
     return [
-        f"Actionable: no one can know that — a future price cannot be known, and this console "
+        f"Bottom line: no one can know that — a future price cannot be known, and this console "
         f"does not forecast prices, so there is no figure for {name} at that date.",
         f"What it can give is the historical range: ask \"what are the odds {example} is up "
         f"this week\" for how often it has risen over such a stretch and how far it usually "
@@ -334,7 +334,7 @@ holdings ("what did Berkshire buy last quarter") are public and do not match."""
 
 def _private_lines() -> list[str]:
     return [
-        "Actionable: this console cannot see your Bitget account — it holds no key to anyone's "
+        "Bottom line: this console cannot see your Bitget account — it holds no key to anyone's "
         "account, so nothing was read: no balance, margin, orders, fills or P&L.",
         "What it can do: state your book in My book (\"I hold 60% NVDA, 40% AAPL\") and it "
         "answers risk, stress and hedging for it; or paste your trades (date, symbol, side, "
@@ -350,7 +350,7 @@ def _others_lines(text: str, names: Sequence[str]) -> list[str]:
     subject = f"{who}'s live positions are" if who else "Other traders' positions are"
     symbol = _short(names[0]) if names else "NVDA"
     return [
-        f"Actionable: {subject} not public — no one outside the account can see them, and this "
+        f"Bottom line: {subject} not public — no one outside the account can see them, and this "
         f"console has no access to anyone's account.",
         f"What is public: 13F filings (quarterly, filed up to 45 days after the quarter ends) "
         f"for a named manager's US holdings, and Bitget's aggregate long/short split, which "
@@ -496,7 +496,7 @@ def _desk_days_asked(text: str) -> float | None:
 def _desk_before_lines(span: Span, ledger: tuple[datetime, datetime, int]) -> list[str]:
     first, last, count = ledger
     return [
-        f"Actionable: the desk's record starts on {first.day} {first:%b %Y} — its first decision "
+        f"Bottom line: the desk's record starts on {first.day} {first:%b %Y} — its first decision "
         f"— so there are no decisions, calls or P&L before that, and none for {span.label}.",
         f"What it holds: {count} decisions from {first:%Y-%m-%d} to {last:%Y-%m-%d}; ask "
         f"\"what did the desk decide on {first:%Y-%m-%d}\" or \"show me the latest decisions\".",
@@ -509,7 +509,7 @@ def _desk_horizon_lines(days: float, ledger: tuple[datetime, datetime, int]) -> 
     span_days = (last - first).total_seconds() / 86400.0
     asked = f"{days / 365.25:.0f} years" if days >= 365 else f"{days / 30.44:.0f} months"
     return [
-        f"Actionable: the desk's record spans only {span_days:.0f} days — it starts on "
+        f"Bottom line: the desk's record spans only {span_days:.0f} days — it starts on "
         f"{first:%Y-%m-%d} — so {asked} of it do not exist yet, and neither does any comparison "
         f"across them.",
         f"What it holds: {count} decisions over those {span_days:.0f} days; ask \"what is the "
@@ -599,7 +599,7 @@ def _past_price_lines(symbol: str, span: Span, text: str, today: date) -> tuple[
         series = _series(symbol, perp=True)
         if series is None:
             return BEFORE_DATA, [
-                f"Actionable: a price for {span.label} needs {symbol}'s daily history on Bitget, "
+                f"Bottom line: a price for {span.label} needs {symbol}'s daily history on Bitget, "
                 f"and it did not arrive — so no figure is given rather than today's quote in its "
                 f"place.",
                 f"Ask again shortly, or ask \"where is {name} trading right now\" for today's.",
@@ -610,7 +610,7 @@ def _past_price_lines(symbol: str, span: Span, text: str, today: date) -> tuple[
             cause = BEFORE_DATA
             what = "funding rate" if funding else "price"
             lines.append(
-                f"Actionable: Bitget's {symbol} history starts on {first.day} {first:%b %Y} — its "
+                f"Bottom line: Bitget's {symbol} history starts on {first.day} {first:%b %Y} — its "
                 f"first daily bar — so the perpetual did not exist in {span.label} and there is "
                 f"no {what} for it then.")
         else:
@@ -624,17 +624,17 @@ def _past_price_lines(symbol: str, span: Span, text: str, today: date) -> tuple[
             if span.end < first:
                 cause = BEFORE_DATA if cause != PAST_PRICE or not lines else cause
                 lines.append(
-                    f"{'' if lines else 'Actionable: '}{_yahoo_ticker(symbol)} was not yet "
+                    f"{'' if lines else 'Bottom line: '}{_yahoo_ticker(symbol)} was not yet "
                     f"listed in {span.label} — its daily history starts on "
                     f"{first.day} {first:%b %Y}, so it has no {span.label} price.")
             else:
-                lead = "" if lines else "Actionable: "
+                lead = "" if lines else "Bottom line: "
                 described = _describe(stock, span, f"{_yahoo_ticker(symbol)} (the stock)",
                                       funding=False)
                 lines.extend([lead + described[0], *described[1:]] if described else [])
         elif not lines:
             return BEFORE_DATA, [
-                f"Actionable: a price for {span.label} needs {name}'s daily history, and it did "
+                f"Bottom line: a price for {span.label} needs {name}'s daily history, and it did "
                 f"not arrive — so no figure is given rather than today's quote in its place.",
                 f"Ask again shortly, or ask \"where is {name} trading right now\" for today's.",
             ]
@@ -771,7 +771,7 @@ def _horizon_lines(symbol: str, years: float, text: str) -> tuple[str, list[str]
         series = _series(symbol, perp=True)
         if series is None:
             return HORIZON, [
-                f"Actionable: {years:g} years of {symbol} funding need the perpetual's history, "
+                f"Bottom line: {years:g} years of {symbol} funding need the perpetual's history, "
                 f"and Bitget's daily candles did not arrive — so nothing is computed.",
                 f"Ask \"what's the funding on {name}\" for the current rate.",
             ]
@@ -779,11 +779,11 @@ def _horizon_lines(symbol: str, years: float, text: str) -> tuple[str, list[str]
         have = _years(first, series.closes[-1][0])
         if have >= years:
             return LONG_HORIZON, [
-                f"Actionable: {symbol} has traded on Bitget since {first:%Y-%m-%d}, so {years:g} "
+                f"Bottom line: {symbol} has traded on Bitget since {first:%Y-%m-%d}, so {years:g} "
                 f"years exist, but this console reads only the current funding rate, not its "
                 f"history.", f"Data: {series.source}."]
         return HORIZON, [
-            f"Actionable: the {symbol} perpetual has only existed since {first:%Y-%m-%d} — its "
+            f"Bottom line: the {symbol} perpetual has only existed since {first:%Y-%m-%d} — its "
             f"history starts there, {have:.1f} years ago — so a {asked} funding history does "
             f"not exist.",
             f"Ask \"what's the funding on {name}\" for the current rate and what it costs to "
@@ -791,7 +791,7 @@ def _horizon_lines(symbol: str, years: float, text: str) -> tuple[str, list[str]
     series = _series(symbol, perp=False)
     if series is None:
         return HORIZON, [
-            f"Actionable: a {asked} figure for {name} needs its full daily history, and the read "
+            f"Bottom line: a {asked} figure for {name} needs its full daily history, and the read "
             f"did not arrive — so nothing is computed rather than a shorter window passed off as "
             f"{years:g} years.",
             f"Ask again shortly, or ask \"how risky is {name}\" for its recent risk profile.",
@@ -804,14 +804,14 @@ def _horizon_lines(symbol: str, years: float, text: str) -> tuple[str, list[str]
     if have >= years:
         s = statistics_over(series, years=years, against=against)
         return LONG_HORIZON, [
-            f"Actionable: {name} over the last {years:g} years ({s['start']} to {s['end']}): "
+            f"Bottom line: {name} over the last {years:g} years ({s['start']} to {s['end']}): "
             f"{_stat_sentence(stat, s, benchmark)}.",
             "Data: " + "; ".join(data) + ".",
         ]
     s = statistics_over(series, years=None, against=against)
     source = "Bitget's daily history" if series.per_year == 365 else "its daily history"
     return HORIZON, [
-        f"Actionable: {name} has only traded since {first:%Y-%m-%d} in the data — {source} starts "
+        f"Bottom line: {name} has only traded since {first:%Y-%m-%d} in the data — {source} starts "
         f"there, {have:.1f} years ago — so a {asked} figure does not exist.",
         f"Over the {have:.1f} years that do exist ({s['start']} to {s['end']}): "
         f"{_stat_sentence(stat, s, benchmark)}.",
@@ -940,7 +940,7 @@ def _unlisted_lines(name: str, tickers: Sequence[str], status: str) -> tuple[str
     said = " or ".join(tickers)
     example = next((s for s in ("JPMUSDT", "GSUSDT", "XOMUSDT", "NVDAUSDT") if s in registry),
                    "NVDAUSDT")
-    lead = (f"Actionable: {name} is not listed on Bitget — no perpetual and no spot or rToken "
+    lead = (f"Bottom line: {name} is not listed on Bitget — no perpetual and no spot or rToken "
             f"market under {said} among the {checked} checked — so there is no Bitget data to "
             f"answer from.")
     lines = [lead]
@@ -1006,14 +1006,14 @@ def _ambiguous_lines(found: str) -> list[str]:
     if "|" in found:
         word, hits = found.split("|", 1)
         options = hits.replace(",", ", ")
-        return [f"Actionable: which one? \"{word}\" could mean more than one listed name — "
+        return [f"Bottom line: which one? \"{word}\" could mean more than one listed name — "
                 f"{options} — so nothing was looked up.",
                 f"Name the ticker: e.g. \"how is {hits.split(',')[0]} doing today\"."]
     if found == "zh":
-        return ["Actionable: 哪一个？问题里没有点名任何标的，也没有之前的问题可以指代 — "
+        return ["Bottom line: 哪一个？问题里没有点名任何标的，也没有之前的问题可以指代 — "
                 "which one: no instrument was named and there is no earlier question to refer to.",
                 "请带上代码或名称，例如：\"英伟达技术面怎么样\" 或 \"is NVDA overbought\"。"]
-    return [f"Actionable: which one? \"{found}\" names no instrument, and there is no earlier "
+    return [f"Bottom line: which one? \"{found}\" names no instrument, and there is no earlier "
             f"question for it to refer to — so nothing was looked up.",
             "Name the ticker — e.g. \"how risky is NVDA?\" — or ask about two by name: \"is TSLA "
             "riskier than NVDA\"."]
@@ -1088,7 +1088,7 @@ def honest_answer(text: str, *, prior: list[str], book: str,
                   today: date | None = None) -> tuple[str, list[str]] | None:
     """``(cause, lines)`` for a question no console can answer as asked, else None.
 
-    Lines are in the console's style: an ``Actionable:`` lead stating the true reason plainly,
+    Lines are in the console's style: an ``Bottom line:`` lead stating the true reason plainly,
     then what the console can do instead, then a ``Data:`` line when anything was read. Only the
     past-price and N-year builders read data, with :data:`READ_TIMEOUT_S`, and both fall back to
     the plain reason when the read fails. An order is not answered here — :func:`order_prefix`

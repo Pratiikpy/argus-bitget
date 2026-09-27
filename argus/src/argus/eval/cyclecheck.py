@@ -140,6 +140,16 @@ class CycleReport:
         }
 
 
+def read_log(path: Path) -> str:
+    """A cycle log's text, whichever encoding wrote it: the older logs are UTF-16 with a byte-order
+    mark (PowerShell's redirection), the newer UTF-8. Read as UTF-8, a UTF-16 log decoded to
+    noise, so the cumulative token and unreported-call totals skipped every one of them."""
+    raw = path.read_bytes()
+    if raw[:2] in (b"\xff\xfe", b"\xfe\xff"):
+        return raw.decode("utf-16", errors="replace")
+    return raw.decode("utf-8-sig", errors="replace")
+
+
 def latest_log(directory: Path = RUNS_DIR) -> Path:
     logs = sorted(directory.glob("cycle_*.log"))
     if not logs:
@@ -265,8 +275,7 @@ def cumulative_tokens(directory: Path = RUNS_DIR) -> tuple[int, int]:
     total = 0
     seen = 0
     for path in sorted(directory.glob("cycle_*.log")):
-        match = re.search(r'"tokens_spent":\s*(\d+)', path.read_text(
-            encoding="utf-8", errors="replace"))
+        match = re.search(r'"tokens_spent":\s*(\d+)', read_log(path))
         if match:
             total += int(match.group(1))
             seen += 1
@@ -288,7 +297,7 @@ def check(
     """
     if not log.exists():
         raise CycleCheckError(f"{log} does not exist")
-    text = log.read_text(encoding="utf-8", errors="replace")
+    text = read_log(log)
     checks: list[Check] = []
 
     # **Anchored to the start of a line, and it must be.** The unanchored `exit=(-?\d+)` matched
@@ -350,7 +359,7 @@ def check(
         int(m.group(1))
         for path in sorted(RUNS_DIR.glob("cycle_*.log"))
         for m in re.finditer(
-            r'"unreported_calls":\s*(\d+)', path.read_text(encoding="utf-8", errors="replace")
+            r'"unreported_calls":\s*(\d+)', read_log(path)
         )
     ) if RUNS_DIR.exists() else 0
     if cycles:

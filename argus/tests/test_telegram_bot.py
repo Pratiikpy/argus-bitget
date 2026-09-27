@@ -16,7 +16,7 @@ class FakeDesk:
 
     def __call__(self, text: str, prior: list[str], *, visitor: str, book: str) -> dict[str, Any]:
         self.calls.append({"text": text, "prior": prior, "visitor": visitor, "book": book})
-        return {"lines": ["Actionable: NVDA <is> fine & well.", "Second line."],
+        return {"lines": ["Bottom line: NVDA <is> fine & well.", "Second line."],
                 "sources": [{"ref": "bitget tickers"}, {"ref": "bitget tickers"},
                             {"ref": "SEC EDGAR"}]}
 
@@ -29,7 +29,7 @@ def test_a_question_is_answered_through_the_console_with_its_sources_and_a_link(
     desk, states = FakeDesk(), {}
     [(chat, text)] = tg.handle_update(_msg("is NVDA overbought?"), states, ask=desk)
     assert chat == 42 and desk.calls[0]["visitor"] == "tg-42"
-    assert text.startswith("<b>Actionable:</b> NVDA &lt;is&gt; fine &amp; well.")
+    assert text.startswith("<b>Bottom line:</b> NVDA &lt;is&gt; fine &amp; well.")
     assert "<i>Sources: <code>bitget tickers</code>, <code>SEC EDGAR</code>.</i>" in text
     assert "?q=is+NVDA+overbought%3F" in text
 

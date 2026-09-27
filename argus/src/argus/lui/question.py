@@ -216,7 +216,12 @@ _ORDER_VERB = re.compile(
     r"^\s*(?:(?:ok(?:ay)?|yeah|yes|yep|sure|alright|right|cool|fine|great|then|now|so|and|just|"
     r"please|go\s+ahead\s+and|let'?s|lets)[\s,!.]+)*(?:go\s+)?"
     r"(?:buy|sell|short|long|close|open|cancel|reduce|add|trim|"
-    r"rebalance|hedge|exit|flatten|undo|place|submit)\b"
+    r"rebalance|hedge|exit|flatten|undo|place|submit|"
+    # "execute a buy order for 10000 shares of AAPL immediately" was worked as an execution plan
+    # (2026-09-27, `eval/kind_routing.py`). Only with an order or trade as its object: "execute"
+    # alone also opens questions about execution quality.
+    r"execute\s+(?:(?:a|an|the|my|this|that)\s+)?(?:(?:buy|sell|market|limit|stop)\s+)?"
+    r"(?:orders?|trades?))\b"
     # "open interest on ETH", "long short ratio for DOGE", "short interest" and "short squeeze"
     # name a market measure, not an instruction; they were refused as orders (2026-09-25 audit).
     r"(?!\s*(?:interest|[/-]?\s*short\s+ratio|[/-]\s*short\b|short\s+(?:ratio|interest)|"
@@ -263,7 +268,11 @@ that question" (2026-09-25 audit, round 2) — the console never trades, but a r
 _PLAN_REQUEST = re.compile(
     r"^\s*(?:(?:pls|please|ok(?:ay)?|now)[\s,]+)*(?:rebalance|re-?weight)\b[^?.]{0,40}\b(?:to|for|"
     r"into|toward)\s+(?:an?\s+)?(?:equal[\s-](?:risk|weight)\w*|risk[\s-]parity|my\s+risk\s+budget|"
-    r"the\s+risk\s+budget)", re.I)
+    r"the\s+risk\s+budget)"
+    # A hedge named against a risk asks for the hedge: "hedge my whole book against a market
+    # crash" was refused as an order while the hedge engine states exactly that plan
+    # (2026-09-27, `eval/kind_routing.py`).
+    r"|^\s*(?:(?:pls|please|ok(?:ay)?|now)[\s,]+)*hedge\b[^?.]{0,60}?\bagainst\s+\w", re.I)
 """A request for the rebalanced weights, not an order: "rebalance this to equal risk pls" was
 refused as a trade instruction while the book engine computes exactly those weights (answer audit,
 round 3). The console still places nothing; it states the weights."""
@@ -455,6 +464,10 @@ _COIN_THE_WORD = re.compile(
     r"\b(?:this|that|these|a|an|the|which|what|any|every|each|some|one|good|bad|best|new|small|"
     r"meme|alt|stable|shit|privacy|gaming|ai|my|your|our|their|his|her|another|other|favorite|"
     r"favourite|next|single|native|base|utility|governance|crypto)\s+coin\b", re.I)
+_NAMED_COIN = re.compile(r"\b[A-Z][A-Z0-9]{1,11}\s+coin\b")
+"""A coin named by its ticker ("what's the price of QWXZ coin") uses "coin" as the word. Case
+matters: the ticker is written in capitals, the word after it is not. Read as Coinbase, that
+question was quoted COIN stock (2026-09-27, `eval/kind_routing.py`)."""
 
 
 def coin_as_ticker(text: str) -> str:
@@ -465,7 +478,7 @@ def coin_as_ticker(text: str) -> str:
     questions that did mean it ("macd on coin", "coin quote plus round trip cost", "对比一下coin和
     mstr"). The word is the word after a determiner or a kind ("this coin", "a meme coin", "which
     coin"); anywhere else a lowercase "coin" in a trading question is the ticker."""
-    if _COIN_THE_WORD.search(text):
+    if _COIN_THE_WORD.search(text) or _NAMED_COIN.search(text):
         return text
     return re.sub(r"(?<![A-Za-z])coin(?![A-Za-z])", "COIN", text)
 

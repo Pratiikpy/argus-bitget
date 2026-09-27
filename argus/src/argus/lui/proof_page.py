@@ -293,12 +293,10 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
     return f"""<!doctype html><html lang="en"><head>{head}
 <style>{design.TOKENS_CSS}
  body {{ margin:0; background:var(--bg); color:var(--ink); font:15px/1.6 system-ui,sans-serif }}
- .wrap {{ max-width:820px; margin:0 auto; padding:30px 18px 70px }}
- h1 {{ font-size:22px; margin:0 0 6px; letter-spacing:-.015em; text-wrap:balance }}
  h2 {{ font-size:18px; margin:34px 0 4px }}
  h3.theme {{ font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim);
    margin:22px 0 8px; font-weight:600 }}
- .sub {{ color:var(--dim); font-size:13.5px; margin:0 0 14px; max-width:68ch }}
+ .sub {{ margin:0 0 14px }}
  .w {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
    padding:14px 16px; margin-bottom:12px }}
  .w h3 {{ font-size:15.5px; margin:6px 0 8px; line-height:1.35 }}

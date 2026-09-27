@@ -93,6 +93,7 @@ def _translated(payload: dict[str, Any], question: str, book: str, visitor: str)
     if not offer:
         return None
     from argus.lui import translate
+    from argus.lui.answer import LEAD
     from argus.lui.server import _model_for
 
     lines = [str(line) for line in payload.get("lines") or []]
@@ -102,7 +103,7 @@ def _translated(payload: dict[str, Any], question: str, book: str, visitor: str)
         return None
     head = [done["note"]] if done.get("note") else lines[:skip]
     lead = {len(head) + i for i, line in enumerate(lines[skip:])
-            if line.startswith("Actionable:")}
+            if bool(LEAD.match(line))}
     from argus.lui.provenance import labels as provenance_labels
 
     tags = [None] * len(head) + provenance_labels(lines[skip:])
@@ -147,10 +148,11 @@ def format_answer(payload: dict[str, Any], question: str, book: str,
     body = []
     for index, line in enumerate(lines):
         text = html.escape(line, quote=False)
-        if text.startswith("Actionable:"):
-            text = "<b>Actionable:</b>" + text[len("Actionable:"):]
+        label, colon, rest = text.partition(":")
+        if colon and label in ("Actionable", "Bottom line"):
+            text = "<b>Bottom line:</b>" + rest
         elif lead and index in lead:
-            # A translated lead line no longer starts with "Actionable:"; it stays bold.
+            # A translated lead line no longer starts with "Bottom line:"; it stays bold.
             text = f"<b>{text}</b>"
         if tags[index]:
             text += f" <i>· {tags[index]}</i>"

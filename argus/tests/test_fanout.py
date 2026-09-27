@@ -93,7 +93,7 @@ def test_each_researcher_reads_its_own_topic_never_the_question() -> None:
 
 def test_compression_keeps_the_lead_and_one_figure_line_verbatim() -> None:
     answer = _answer("q", _request(K.TECHNICALS, "NVDAUSDT"), [
-        "Actionable: momentum turning down.", "RSI(14, 4h) 45.9 — neutral.",
+        "Bottom line: momentum turning down.", "RSI(14, 4h) 45.9 — neutral.",
         "MACD histogram -0.12.", "Assumed: 30 days.", "Sources reached: 4 of 4 answered.",
         "Data: bitget-signal."])
     lines, why = fanout.compress(answer)
@@ -101,18 +101,18 @@ def test_compression_keeps_the_lead_and_one_figure_line_verbatim() -> None:
 
 
 def test_a_long_lead_is_kept_whole_and_alone() -> None:
-    lead = "Actionable: " + "a very long lead that says 1.5% " * 20
+    lead = "Bottom line: " + "a very long lead that says 1.5% " * 20
     lines, _ = fanout.compress(_answer("q", _request(K.NEWS, "NVDAUSDT"),
                                        [lead, "second line 2.0%"]))
-    assert lines == [lead.removeprefix("Actionable: ")[:1].upper()
-                     + lead.removeprefix("Actionable: ")[1:]]
+    assert lines == [lead.removeprefix("Bottom line: ")[:1].upper()
+                     + lead.removeprefix("Bottom line: ")[1:]]
 
 
 def test_verbatim_violations_catch_a_changed_number() -> None:
     finding = fanout.Finding(unit=fanout.plan_units(_request(K.NEWS, "NVDAUSDT"),
                                                     classify=_classify)[0],
                              answered=True, lines=["RSI 45.9 and MACD -0.12"],
-                             full=["Actionable: RSI 45.9.", "MACD -0.12 today."])
+                             full=["Bottom line: RSI 45.9.", "MACD -0.12 today."])
     assert fanout.verbatim_violations(finding) == []
     finding.lines = ["RSI 46.9 and MACD -0.12"]
     assert fanout.verbatim_violations(finding) == ["46.9"]
@@ -136,7 +136,7 @@ def _runner(*, fail: str = "", refuse: str = "", slow: str = "", seen: list[str]
         if kind == refuse:
             return _answer(text, request, ["no data"], refused=True, reason="the Skill was dark")
         own = Source(kind="computation", ref=f"argus.{kind}", detail=kind)
-        return _answer(text, request, [f"Actionable: {kind} lead 1.25%.", f"{kind} detail 7.",
+        return _answer(text, request, [f"Bottom line: {kind} lead 1.25%.", f"{kind} detail 7.",
                                        "Sources reached: 2 of 2 answered.",
                                        f"Data: {kind} data."],
                        [shared, own], reached=(f"{kind} feed", "Bitget candles"))
@@ -150,7 +150,7 @@ def test_the_merged_answer_keeps_the_question_first_and_cites_each_finding() -> 
     merged = fanout.fan_out(question, _request(K.NEWS, "NVDAUSDT"), run=_runner(seen=seen),
                             classify=_classify)
     assert merged is not None and not merged.refused
-    assert merged.lines[0] == "Actionable: news lead 1.25%."  # the question's own lead leads
+    assert merged.lines[0] == "Bottom line: news lead 1.25%."  # the question's own lead leads
     assert merged.lines[-1] == "Data: news data."  # and its Data line still ends the answer
     assert question in seen and len(seen) == 4  # the primary read the question; units, topics
     finding = next(line for line in merged.lines if line.startswith("Technicals (NVDA):"))

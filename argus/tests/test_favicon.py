@@ -61,7 +61,7 @@ class TestEveryPageTemplateCarriesIt:
 
     def test_the_research_task_page(self) -> None:
         task = Task(question="q", name="TSLA", size_pct=15, book={},
-                    steps=[Step(title="t", engine="e", lines=["Actionable: x"])], seconds=0.1)
+                    steps=[Step(title="t", engine="e", lines=["Bottom line: x"])], seconds=0.1)
         assert f'href="{FAVICON}"' in render_task(task, FAVICON)
 
     def test_the_wrong_page(self) -> None:

@@ -1217,12 +1217,12 @@ def summary_lines(checks: Sequence[Check], patterns: Sequence[Pattern]) -> list[
     out: list[str] = []
     if patterns:
         top = patterns[0]
-        out.append(f"Actionable: the habit most worth fixing is {top.name} — {len(top.members)} "
+        out.append(f"Bottom line: the habit most worth fixing is {top.name} — {len(top.members)} "
                    f"of {top.of} trades, costing {top.cost:.1f} percentage points of summed trade "
                    f"return. {top.check}")
     else:
         worst = min(range(len(rets)), key=lambda i: rets[i])
-        out.append(f"Actionable: none of the checked habits shows up in these {len(rets)} trades; "
+        out.append(f"Bottom line: none of the checked habits shows up in these {len(rets)} trades; "
                    f"the largest loss was {_short(checks[worst].trade.symbol)} "
                    f"{_pct(rets[worst])}, so review that one entry and exit by hand.")
     total = sum(rets)

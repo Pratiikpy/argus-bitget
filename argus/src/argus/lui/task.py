@@ -25,7 +25,7 @@ question:
 The page ends in one verdict — add, add smaller, or do not add — composed by :func:`verdict` from
 the figures the engines computed (the IMPACT engine's size ceiling and risk shares, the
 execution engine's slices and cost), never from their prose and never by a model. Below it, each
-engine's own actionable line, in the order a trader would act on them.
+engine's own bottom line, in the order a trader would act on them.
 """
 
 from __future__ import annotations
@@ -39,6 +39,7 @@ from typing import Any
 from urllib.parse import urlencode
 
 from argus.lui import design
+from argus.lui.answer import LEAD
 from argus.lui.research import (
     ANALOGUE_DAYS,
     LOOKBACK_DAYS,
@@ -226,7 +227,7 @@ class Step:
     @property
     def actionable(self) -> str | None:
         for line in self.lines:
-            if line.startswith("Actionable"):
+            if bool(LEAD.match(line)):
                 return line.split(":", 1)[1].strip()
         return None
 
@@ -250,7 +251,7 @@ class Task:
 
     @property
     def conclusion(self) -> list[tuple[str, str]]:
-        """Each engine's actionable line, the book's answer first."""
+        """Each engine's bottom line, the book's answer first."""
         by_title = {s.title: s for s in self.steps}
         out = []
         for title in CONCLUSION_ORDER:
@@ -262,9 +263,17 @@ class Task:
 
 def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
                   book_text: str = DEFAULT_BOOK, *, ledger: Any = None,
-                  reading: Reading | None = None, asked: str = "") -> Task:
+                  reading: Reading | None = None, asked: str = "", memory: str = "") -> Task:
     """Run every step for ``name`` at ``size_pct`` of a book described by ``book_text``, or for
-    what a typed question was read as (``reading``, from :func:`read_question`)."""
+    what a typed question was read as (``reading``, from :func:`read_question`).
+
+    ``memory`` is what the trader told the console before (`lui/memory.py`, kept in their
+    browser): a risk budget, a loss limit, a style, an account size. Each step applies it exactly
+    as the console does and says so on a ``Remembered:`` line, so the verdict is sized on the
+    trader's own budget and checked against their own mandate (audit finding 55)."""
+    from argus.lui import memory as mem
+
+    facts = mem.parse(memory)
     started = time.perf_counter()
     cash = 0.0
     if reading is not None:
@@ -318,11 +327,19 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
                                f"is no earnings calendar, analyst target or 13F filing to read."])
         chart = ""
         data: dict[str, Any] = {}
+        used: list[str] = []
         try:
+            if facts:
+                request, used = mem.apply(request, facts, question)
             answer = run(question, request, ledger=ledger if kind is ResearchKind.IMPACT else None)
             data = dict(answer.data or {})
             # Every console answer ends with the analysis-not-advice line; the page says it once.
             lines = [line.replace(_DISCLAIMER, "").rstrip() for line in answer.lines]
+            extra = [*used, *mem.after(lines, request, facts)] if facts else []
+            if extra:
+                at = next((i for i, line in enumerate(lines) if line.startswith("Data:")),
+                          len(lines))
+                lines[at:at] = extra
             refused = answer.refused
             if kind is ResearchKind.IMPACT and not refused:
                 chart = risk_chart(answer.data.get("report") or {})
@@ -433,10 +450,18 @@ def verdict(task: Task) -> Verdict | None:
                 if execution is not None else None)
     if slices and call != "Do not add" and not sizing.get("standalone"):
         parts = [f"{float(s['fraction']):.0%} {s['style']}" for s in slices]
-        cost = plan.get("expected_cost_bps")
+        # The live book's figure, the one the execution step states; the plan's own estimate
+        # prices impact at a default volatility and read 12.8 bps beside a book that said 8.4
+        # (2026-09-27, `eval/research_task_record.py`). The estimate stays the fallback.
+        sliced, single = plan.get("sliced_bps"), plan.get("single_order_bps")
+        cost = sliced if sliced is not None else plan.get("expected_cost_bps")
+        where = " on the live book" if sliced is not None else ""
+        versus = (f" (one market order: {float(single):.1f} bps)"
+                  if sliced is not None and single is not None and len(parts) > 1 else "")
         lines.append("Fill it as " + (" then ".join(parts) if len(parts) > 1 else parts[0])
-                     + (f", about {float(cost):.1f} bps all in" if cost is not None else "")
                      + (f" for ${float(notional):,.0f}" if notional else "")
+                     + (f", about {float(cost):.1f} bps all in{where}{versus}"
+                        if cost is not None else "")
                      + (f"; at the {float(ceiling):.0%} ceiling that order is "
                         f"${float(notional) * float(ceiling) / proposed:,.0f}."
                         if notional and ceiling is not None and proposed > float(ceiling) + 1e-9
@@ -546,7 +571,7 @@ def risk_chart(report: dict[str, Any]) -> str:
 
 
 def _line_class(line: str) -> str:
-    if line.startswith("Actionable"):
+    if bool(LEAD.match(line)):
         return "act"
     return "fine" if line.startswith(("Data:", "Assumed:")) else "l"
 
@@ -587,9 +612,7 @@ def render_task(task: Task, favicon: str) -> str:
     return f"""<!doctype html><html lang="en"><head>{head}
 <style>{design.TOKENS_CSS}
  body {{ margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,sans-serif }}
- .wrap {{ max-width:860px; margin:0 auto; padding:28px 18px 70px }}
- h1 {{ font-size:21px; margin:0 0 6px; letter-spacing:-.01em }}
- .sub {{ color:var(--dim); font-size:13.5px; margin:0 0 18px; max-width:70ch }}
+ .sub {{ margin:0 0 18px }}
  form {{ margin:0 0 20px }}
  .ask {{ display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start }}
  form textarea, form input {{ padding:9px 11px; border:1px solid var(--line); border-radius:8px;
@@ -640,7 +663,7 @@ def render_task(task: Task, favicon: str) -> str:
  .chart .area {{ fill:var(--accent); opacity:.09 }} .chart .dot {{ fill:var(--accent) }}
  .chart .lbl, .chart .val {{ font:12px var(--sans); fill:var(--dim) }}
  .chart .lbl {{ fill:var(--ink); font-weight:600 }}
- .chart rect.w, .key.w {{ fill:var(--line); background:var(--line) }}
+ .chart rect.w, .key.w {{ fill:var(--dim); background:var(--dim) }}
  .chart rect.r, .key.r {{ fill:var(--accent); background:var(--accent) }}
  .key {{ display:inline-block; width:10px; height:10px; border-radius:2px; margin:0 5px 0 10px;
    vertical-align:-1px }}
@@ -648,9 +671,10 @@ def render_task(task: Task, favicon: str) -> str:
 <h1>One research task, question to actionable insight — run live</h1>
 <p class="sub">Ask it the way you would ask a colleague. Eight engines answer in parallel, each
 the same engine the <a href="/">console</a> uses, every figure from live Bitget, SEC, Yahoo or
-news data and every line naming its source. The conclusion is each engine's own actionable line —
+news data and every line naming its source. It ends in one verdict and each engine's bottom line —
 nothing on this page is written by a language model, and your question is read without one.</p>
 <form method="post" action="/research">
+ <input type="hidden" name="saved"><input type="hidden" name="memory">
  <div class="ask">
   <textarea name="q" rows="2" aria-label="your question">{esc(asked)}</textarea>
   <button>Run</button>
@@ -678,6 +702,12 @@ This is analysis, not advice — you make the call. <a href="{esc(json_link)}">J
 // Run button looked dead for as long as the slowest engine took (audit, 2026-09-26).
 (() => {{
   const form = document.querySelector('form'), box = form.querySelector('textarea');
+  // The trader's saved book and memory, kept by the console in this browser, travel with the
+  // question; the server keeps neither.
+  try {{
+    form.elements.saved.value = localStorage.getItem('argus.book') || '';
+    form.elements.memory.value = localStorage.getItem('argus.memory') || '';
+  }} catch (e) {{}}
   const run = form.querySelector('button'), note = form.querySelector('.running');
   let timer = 0;
   form.addEventListener('submit', () => {{

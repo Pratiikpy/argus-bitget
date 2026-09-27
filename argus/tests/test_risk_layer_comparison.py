@@ -624,3 +624,29 @@ class TestFrozenFixtureFixesTheRunToRunDrift:
         assert "NVDAUSDT" in fixture["symbols_failed"]
         with pytest.raises(RiskLayerComparisonError, match="NVDAUSDT"):
             _frozen_bars("NVDAUSDT", fixture_path=fixture_path)
+
+
+class TestTheRegisterQuotesTheArtefact:
+    """The OWNED row's proof text carried 0.2998 / 21.99% / 63.27% for a week after the artefact
+    it cites had moved to other figures (audit finding 90): pinned so the two cannot drift."""
+
+    def test_the_proof_figures_are_the_artefacts(self) -> None:
+        import json
+        from pathlib import Path
+
+        from argus.eval.standing import REGISTER
+
+        blob = json.loads((Path(__file__).resolve().parents[1] / "data"
+                           / "risk_layer_comparison.json").read_text(encoding="utf-8"))
+        measured = blob["measurement_architecture"]
+        row = next(c for c in REGISTER if c.name == "Risk layer proved by domain sweep")
+        text = " ".join(p.how for p in row.proofs)
+        assert f"only {measured['freqtrade_proxy_vs_truth_correlation']:.4f}" in text
+        best = measured["freqtrade_best_precision_at_full_recall"]
+        assert f"at full recall is {best:.2%}" in text
+        assert f"scores {measured['argus_real_point']['precision']:.2%} precision" in text
+        assert f"{blob['real_symbols']['checkpoints_total']} real trade checkpoints" in text
+        assert f"{blob['combined_book']['checkpoints_total']} on the combined book" in text
+        compared = blob["real_symbols"]["symbols_compared"]
+        failed = len(blob["real_symbols"]["symbols_failed"])
+        assert f"the {compared} of {compared + failed} contracts" in text

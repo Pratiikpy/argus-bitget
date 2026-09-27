@@ -34,7 +34,7 @@ from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 from argus.lui import design
-from argus.lui.answer import Answer, answer
+from argus.lui.answer import Answer, answer, unlead
 from argus.lui.cli import BUDGET_MS
 from argus.lui.kindmodel import LocalPlanner, kind_model
 from argus.lui.ngram import reclassify
@@ -77,9 +77,7 @@ PAGE = """<!doctype html>
 <html lang="en"><head>__HEAD__
 <style>__TOKENS__
   body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,sans-serif; }
-  .wrap { max-width:900px; margin:0 auto; padding:28px 18px 64px; }
-  h1 { font-size:20px; margin:0 0 4px; letter-spacing:-0.01em }
-  .sub { color:var(--dim); font-size:13px; margin:0 0 20px }
+  .sub { margin:0 0 20px }
   .bar { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap }
   input[type=text], textarea#q { flex:1 1 320px; min-width:0; padding:11px 13px;
     border:1px solid var(--line); border-radius:8px; background:var(--panel); color:var(--ink);
@@ -89,14 +87,13 @@ PAGE = """<!doctype html>
   .deep { margin-top:10px }
   .deep button { padding:0; border:0; background:none; color:var(--accent); font-size:13.5px;
     font-weight:600; cursor:pointer; text-decoration:underline; text-underline-offset:3px }
-  button { padding:11px 18px; border:1px solid var(--accent); background:var(--accent); color:#fff;
-    border-radius:8px; font-size:15px; cursor:pointer }
+  button { padding:11px 18px; font-size:15px; cursor:pointer }
   button:disabled { opacity:.55; cursor:default }
   .chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:22px }
   .chip { border:1px solid var(--line); background:var(--panel); color:var(--dim);
     border-radius:999px; padding:5px 11px; font-size:12.5px; cursor:pointer }
   .chip:hover { color:var(--ink); border-color:var(--accent) }
-  .card { background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  .card { background:var(--panel); border:1px solid var(--line);
     padding:14px 16px; margin-bottom:12px }
   .q { font-weight:600; margin-bottom:8px }
   .meta { font:11.5px/1.4 var(--mono); color:var(--dim); margin-bottom:9px;
@@ -288,7 +285,7 @@ const PV = {
   memory: 'something you told the console earlier, kept in this browser',
   missing: 'could not be read or checked'};
 const pv = t => t ? `<span class="pv pv-${t}" title="${PV[t]}">${t}</span>` : '';
-const lineClass = l => l.startsWith('Actionable:') ? 'line act'
+const lineClass = l => /^(Actionable|Bottom line)(?: \([^)]*\))?:/.test(l) ? 'line act'
   : l.startsWith('Hedge:') ? 'line hedge'
   : (l.startsWith('Assumed:') || l.startsWith('Data:')) ? 'line fine' : 'line';
 
@@ -516,10 +513,10 @@ def _compare_last_two_books(text: str, prior: list[str], book: str, ledger: Any,
         return None
     verdict = ("less risky" if after < before else "riskier" if after > before
                else "about as risky")
-    lead = (f"Actionable: {verdict} — the book now runs about {after:.0f}% volatility a year "
+    lead = (f"Bottom line: {verdict} — the book now runs about {after:.0f}% volatility a year "
             f"against {before:.0f}% before ({after - before:+.0f} points), on the same engine and "
             f"the same hours. The new book's full read follows.")
-    lines = [lead, *(re.sub(r"^Actionable:\s*(\w)", lambda m: m.group(1).upper(), x)
+    lines = [lead, *(unlead(x)
                      for x in second.get("lines") or [])]
     second["lines"] = lines
     second["turns"] = [*prior, text][-12:]
@@ -671,7 +668,7 @@ def _answer(
 
         holiday = holiday_line(text, clock)
         if holiday is not None:
-            lines = [holiday, *(line.replace("Actionable: ", "", 1) for line in lines)]
+            lines = [holiday, *(line.replace("Bottom line: ", "", 1) for line in lines)]
         claimed = _SESSION_CLAIM.search(text) if not text.rstrip().endswith("?") else None
         if claimed is not None:
             lines = [_session_claim_line(claimed), *lines]
@@ -1333,7 +1330,7 @@ def _xbrl_answer(text: str, clock: datetime, conversation: Any, started: float,
         return None, found.reason
     metric = found.metric.replace("_", " ")
     years = "-".join(f"FY{y}" for y in found.fiscal_years)
-    lines = [f"Actionable: {found.company} — {metric}, {years}: {found.text}, computed from the "
+    lines = [f"Bottom line: {found.company} — {metric}, {years}: {found.text}, computed from the "
              f"company's own filed XBRL; no model wrote the figure.",
              f"Formula: {found.formula}"]
     anchor = next((s.removeprefix("anchor: ") for s in found.steps if s.startswith("anchor: ")),
@@ -1655,10 +1652,16 @@ class Handler(BaseHTTPRequestHandler):
 
         asked = repair_mojibake((params.get("q") or [""])[0]).strip()[:500]
         saved = repair_mojibake((params.get("book") or [""])[0])[:300]
+        memory = (params.get("memory") or [""])[0][:8000]
         if asked:
+            # The page's own form sends the trader's saved book and memory from this browser as
+            # `saved` and `memory`; its visible book field belongs to the manual run below. Reading
+            # that field here called the page's example book "your saved book" (2026-09-27).
+            if "saved" in params:
+                saved = repair_mojibake(params["saved"][0])[:300]
             reading = read_question(asked, saved)
             task = (unread_task(asked, reading) if isinstance(reading, str)
-                    else research_task(reading=reading, asked=asked))
+                    else research_task(reading=reading, asked=asked, memory=memory))
         else:
             name = repair_mojibake((params.get("name") or [DEFAULT_NAME])[0]).strip()[:24]
             try:

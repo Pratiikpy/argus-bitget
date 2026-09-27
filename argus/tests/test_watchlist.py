@@ -178,7 +178,7 @@ def test_a_measured_earnings_event_leads_the_book(tmp_path: Path) -> None:
         "what should I watch this week?", "60% NVDA, 30% TSLA, 10% BTC", now=NOW,
         calendar_path=calendar, reactions_path=reactions, earnings_lookup=_earnings,
         filings_lookup=_filings)
-    assert lines[0].startswith("Actionable: the biggest event for this book")
+    assert lines[0].startswith("Bottom line: the biggest event for this book")
     assert "TSLA reports" in lines[0]  # 0.30 x (3.22 - 1) = 0.67 beats CPI's 0.6x0.3+0.3x0.2
     assert data["ranked"][:2] == ["TSLA earnings", "CPI, September 2026"]
     text = "\n".join(lines)
@@ -223,4 +223,4 @@ def test_missing_calendar_is_said_not_estimated(tmp_path: Path) -> None:
         filings_lookup=_filings)
     assert any("could not be read" in line for line in lines)
     assert data["events"] == []
-    assert lines[0].startswith("Actionable: nothing on the official US macro calendar")
+    assert lines[0].startswith("Bottom line: nothing on the official US macro calendar")

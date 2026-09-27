@@ -95,6 +95,8 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "overnight_comparison.json",
     # Read by execution questions: one-minute against hourly children on a full-depth replay.
     "execution_arena.json",
+    # The kept research task, whose real receipt /brand shows (`eval/research_task_record.py`).
+    "research_task_example.json",
 )
 """Artefacts the hosted console's own pages read at request time.
 

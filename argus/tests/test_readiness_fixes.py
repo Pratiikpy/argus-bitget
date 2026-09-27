@@ -82,7 +82,7 @@ def test_an_as_of_answer_keeps_nothing_it_could_not_have_known() -> None:
     from argus.lui.research import _point_in_time
 
     answer = _answer([
-        "Actionable: NVDA's net income for the quarter ending 26 Oct 2025 was $31.91bn.",
+        "Bottom line: NVDA's net income for the quarter ending 26 Oct 2025 was $31.91bn.",
         "NVDA reports in 53 day(s), on 17 Nov — no earnings gap inside 7 days.",
         "Next report: 2026-11-17 — 53 day(s) away.",
         "Analyst price targets (59 analysts, Yahoo Finance): mean $327.70.",
@@ -169,14 +169,14 @@ def test_the_trader_book_questions_reach_their_engines(
 
     target = importlib.import_module(module)
     if by == "journal":
-        monkeypatch.setattr(target, attr, lambda text, now=None: (["Actionable: journal"], [], {}))
+        monkeypatch.setattr(target, attr, lambda text, now=None: (["Bottom line: journal"], [], {}))
     elif by == "watchlist":
         monkeypatch.setattr(target, attr, lambda text: True)
         monkeypatch.setattr(target, "watchlist",
-                            lambda text, book="", now=None: (["Actionable: watch"], [], {}))
+                            lambda text, book="", now=None: (["Bottom line: watch"], [], {}))
     else:
         monkeypatch.setattr(target, attr, lambda text, book="": Answer(
             question=classify(text, now=datetime(2026, 9, 25, tzinfo=UTC)),
-            lines=["Actionable: exposures"]))
+            lines=["Bottom line: exposures"]))
     payload = server.handle_ask("what should I look at for my book", [], visitor="t")
     assert payload["classified_by"] == by

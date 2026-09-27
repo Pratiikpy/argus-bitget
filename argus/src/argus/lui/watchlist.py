@@ -685,12 +685,12 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
         else:
             why = "every event in the window was measured as no larger than an ordinary day"
         whose = "for this book" if book else "on the US calendar"
-        lead = f"Actionable: the biggest event {whose} in {span} is {what} — {why}"
+        lead = f"Bottom line: the biggest event {whose} in {span} is {what} — {why}"
         if book and top.kind != "EARNINGS":
             lead += f"; it touches the whole book ({_who(top.touched)})"
         lines.insert(0, lead + ". Size for the move, not a direction.")
     else:
-        lines.insert(0, "Actionable: nothing on the official US macro calendar"
+        lines.insert(0, "Bottom line: nothing on the official US macro calendar"
                         + (" or your holdings' earnings calendars" if tickers else "")
                         + f" falls in {span} — the scheduled risk this week is only what the "
                           f"market does on its own"

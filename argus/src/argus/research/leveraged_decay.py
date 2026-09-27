@@ -98,14 +98,14 @@ def lines(result: Decay) -> list[str]:
     if (result.median_shortfall is not None and result.best_shortfall is not None
             and result.worst_shortfall is not None):
         out.append(
-            f"Actionable: over {period} in which {result.index} went sideways (ended within "
+            f"Bottom line: over {period} in which {result.index} went sideways (ended within "
             f"±{FLAT_BAND:.0%}), {result.fund} fell short of {result.multiple:+g}x the index's "
             f"move by a median {-result.median_shortfall:.1%} — from {-result.best_shortfall:.1%}"
             f" to {-result.worst_shortfall:.1%} across {result.windows} overlapping windows of "
             f"its own history. That is the decay a holder actually took, fees and financing "
             f"included.")
     out.append(
-        f"{'Actionable: ' if not out else ''}At {result.index}'s last {VOL_DAYS} days of "
+        f"{'Bottom line: ' if not out else ''}At {result.index}'s last {VOL_DAYS} days of "
         f"volatility ({result.daily_vol:.2%} a day), a fund reset to {result.multiple:+g}x daily "
         f"loses about {-result.formula:.1%} over {period} of a flat index from compounding alone, "
         f"before fees — (L²-L)/2 x variance x days, Avellaneda & Zhang (2010).")

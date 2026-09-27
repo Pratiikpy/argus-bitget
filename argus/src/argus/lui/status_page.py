@@ -269,11 +269,10 @@ def render(status: dict[str, Any], checks: list[Check], checked_at: float,
     return f"""<!doctype html><html lang="en"><head>{head}
 <style>{design.TOKENS_CSS}
  body {{ margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,sans-serif }}
- .wrap {{ max-width:900px; margin:0 auto; padding:28px 18px 64px }}
- h1 {{ font-size:21px; margin:0 0 6px }} h2 {{ font-size:15px; margin:26px 0 8px }}
- .sub {{ color:var(--dim); font-size:13.5px; margin:0 0 16px; max-width:72ch }}
+ h2 {{ font-size:15px; margin:26px 0 8px }}
+ .sub {{ margin:0 0 16px }}
  .cards {{ display:flex; gap:10px; flex-wrap:wrap }}
- .card {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
+ .card {{ background:var(--panel); border:1px solid var(--line);
    padding:12px 14px; flex:1 1 150px }}
  .card b {{ display:block; font-size:20px; font-variant-numeric:tabular-nums }}
  .card span {{ color:var(--dim); font-size:12.5px }}

@@ -334,6 +334,38 @@ def multistep_split() -> tuple[Number, Number, Number, Number]:
             int(single["single_questions"]))
 
 
+def kind_routing() -> tuple[Number, ...]:
+    """Questions routed to the right engine on the three blind sets, in the draft's order
+    (`eval/kind_routing.py`). Quoted by the submission with no evaluator behind it until
+    2026-09-27 (audit finding 99)."""
+    blob = json.loads((DATA / "lui_kind_routing.json").read_text(encoding="utf-8"))
+    return tuple(int(blob[name][field]) for name in ("final", "heldout", "blind")
+                 for field in ("correct", "rows"))
+
+
+def _task_headline() -> dict[str, float]:
+    from argus.eval.research_task_record import REPORT_PATH, headline
+
+    return headline(json.loads(REPORT_PATH.read_text(encoding="utf-8")))
+
+
+def task_sizing() -> tuple[Number, ...]:
+    """The worked research task's size ceiling, risk budget, proposed size and risk share
+    (`eval/research_task_record.py`; audit finding 99)."""
+    h = _task_headline()
+    return h["ceiling"], h["budget"], h["proposed"], h["share_after"]
+
+
+def task_crowding() -> tuple[Number, ...]:
+    h = _task_headline()
+    return h["crowded_share"], h["crowded_weight"]
+
+
+def task_fill_cost() -> tuple[Number, ...]:
+    h = _task_headline()
+    return h["sliced_bps"], h["single_order_bps"]
+
+
 def register_claims() -> int:
     """Claims committed to the public register.
 
@@ -708,6 +740,21 @@ CLAIMS: tuple[Claim, ...] = (
           r"multi-part questions (?P<q1>\d+)/(?P<q2>\d+)\s+split correctly,\s+"
           r"(?P<q3>\d+) of (?P<q4>\d+) single",
           multistep_split, ("submission",)),
+    Claim("kind_routing",
+          r"questions reach the right engine (?P<q1>\d+)/(?P<q2>\d+),\s+(?P<q3>\d+)/(?P<q4>\d+)"
+          r"\s+and\s+(?P<q5>\d+)/(?P<q6>\d+)",
+          kind_routing, ("submission",)),
+    Claim("task_sizing",
+          r"up to (?P<q1>\d+)% keeps TSLA under (?P<q2>\d+)% of book risk; at\s+(?P<q3>\d+)% it "
+          r"carries (?P<q4>\d+)%",
+          task_sizing, ("submission",)),
+    Claim("task_crowding",
+          r"NVDA\s+still carries (?P<q1>\d+)% of the risk on (?P<q2>\d+)% of the weight",
+          task_crowding, ("submission",)),
+    Claim("task_fill_cost",
+          r"costs about (?P<q1>\d+\.\d) bps all in on\s+the live book, against "
+          r"(?P<q2>\d+\.\d) bps for one market order",
+          task_fill_cost, ("submission",)),
     # `falsifiable claims about` was added after README:163 was found quoting 36 against a live 156
     # — the sentence had drifted by 120 claims and matched no pattern, so the gate never saw it.
     Claim("register_claims",

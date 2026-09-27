@@ -1368,7 +1368,11 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/crosssection_comparison.py,argus/eval/baselines/qlib_loader.py,"
             "argus/eval/baselines/qlib_cs_processor.py"
         ),
-        state=State.OWNED,
+        # TIED since 2026-09-27 (audit finding 96). The advantage over qlib was one input: a
+        # ranking group of a single instrument. build_panel aligns on the timestamps every symbol
+        # shares, so in ARGUS's own study every hour holds the whole universe and that input
+        # never arises; on everything that does arise the two rank identically.
+        state=State.TIED,
         baseline=(
             "microsoft/qlib, which groups a (datetime, instrument) frame by datetime and ranks "
             "within each group"
@@ -1505,14 +1509,23 @@ REGISTER: tuple[Capability, ...] = (
                     "that the single-name divergence has material impact on ARGUS's own real "
                     "decisions today - RTOKEN_SYMBOLS is a fixed 12-name universe and how often "
                     "a real trading day's data actually shrinks a group to one instrument was "
-                    "not separately measured against live data here - NOT VERIFIED, stated "
-                    "plainly rather than assumed favourable"
+                    "measured on 2026-09-27: never. build_panel keeps only the timestamps every "
+                    "symbol shares, so each of the study's 2,159 real hours ranks all 12 "
+                    "names (data/crosssection_study.json, panel.dropped all 0) - the "
+                    "single-instrument case where the two differ never reaches a real decision, "
+                    "which is why this row is TIED rather than OWNED"
                 ),
                 artefact="src/argus/eval/crosssection_comparison.py",
                 test="test_crosssection_comparison.py::TestScopeStatement",
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-27 from OWNED to TIED: the two agree exactly on every group of "
+            "two or more, and the one input where ARGUS is safer (a single-instrument group, "
+            "which qlib ranks 1.73) "
+            "cannot occur in ARGUS's own decisions because the panel is aligned on shared "
+            "timestamps. Route back: a real workload where groups shrink - a universe with "
+            "staggered listings or halts - measured against qlib's handling of it",
             "Measured and negative. 8 factors over 10 trading rules is 80 trials, run at every "
             "phase of each rebalance cycle for 1,336 backtests: 31 rules are positive before "
             "cost, 4 after, 0 survive either Deflated Sharpe gate, and NOT ONE produces net "
@@ -3510,7 +3523,11 @@ REGISTER: tuple[Capability, ...] = (
             ),
             Proof(
                 condition="statistically_valid_evaluation",
-                how="323 real trade checkpoints (per-symbol) + 320 (combined book), not one",
+                how=(
+                    "314 real trade checkpoints per symbol and 314 on the combined book, over "
+                    "the 7 of 12 contracts whose strategy runs traded (the other 5 produced no "
+                    "return variance and are listed in the artefact's symbols_failed)"
+                ),
                 artefact="data/risk_layer_comparison.json",
             ),
             Proof(
@@ -3565,19 +3582,21 @@ REGISTER: tuple[Capability, ...] = (
                     "the 'conservative by design' framing that kept this condition open through "
                     "2026-09-15 (over-triggering could be a deliberate margin, not a defect) is "
                     "ruled out, not merely disfavoured, by a measurement-architecture analysis "
-                    "run 2026-09-16 on a fresh live 320-checkpoint pull: ARGUS's own ladder "
+                    "(first run 2026-09-16 on a live pull; re-run 2026-09-26 on the frozen 90-day "
+                    "sample, 314 checkpoints, after the session clock learned US holidays): "
+                    "ARGUS's own ladder "
                     "thresholds directly on the SAME peak-to-trough equity quantity "
                     "true_drawdown_pct IS (verified empirically by "
                     "argus_measures_ground_truth_directly, not assumed from reading the source), "
                     "while freqtrade's MaxDrawdown estimates it from a windowed sum of closed "
                     "trades' cumulative returns — a real, measured proxy whose Pearson "
-                    "correlation with the ground truth is only 0.2998 (WEAK, stable across two "
-                    "independent live pulls). A threshold moves WHERE on a fixed-quality signal "
+                    "correlation with the ground truth is only 0.2257 (WEAK; 0.2998 on the "
+                    "2026-09-16 pull). A threshold moves WHERE on a fixed-quality signal "
                     "the line is drawn; it cannot improve the signal's own correlation with the "
                     "truth. Swept freqtrade's real max_allowed_drawdown across ten values "
-                    "(0.5% to 20%): its best achievable precision at full recall is 21.99% — "
+                    "(0.5% to 20%): its best achievable precision at full recall is 17.01% — "
                     "ARGUS's real, already-computed decision (not a synthetic best case) scores "
-                    "63.27% precision at the identical 100% recall, Pareto-dominating EVERY one "
+                    "56.32% precision at the identical 100% recall, Pareto-dominating EVERY one "
                     "of freqtrade's ten swept thresholds simultaneously on both precision and "
                     "recall (argus_dominates_every_swept_threshold: True). No threshold freqtrade "
                     "could choose reaches what ARGUS already achieves, because the gap is in the "
@@ -5512,7 +5531,7 @@ REGISTER: tuple[Capability, ...] = (
             "argus/eval/baselines/tradingagents_trader.py,"
             "argus/eval/baselines/tradingagents_trader_loader.py"
         ),
-        state=State.OWNED,
+        state=State.IMPLEMENTED,
         baseline=(
             "TradingAgents' real, unmodified TraderProposal (agents/schemas.py) — the "
             "structured-output type its real Trader agent fills to produce every transaction "
@@ -5650,6 +5669,16 @@ REGISTER: tuple[Capability, ...] = (
             ),
         ),
         blockers=(
+            "RE-GRADED 2026-09-27 from OWNED to IMPLEMENTED by the groupwise gate "
+            "(data/groupwise_audit.json): its statistical and out-of-sample evidence is "
+            "data/explainability_comparison.json, twelve fabrications the author chose - four "
+            "magnitudes on three live prices - so the check catches what it was built to catch "
+            "by construction, and the gate had filed the set as a population (audit finding "
+            "95). A general validator was never run either: a pydantic band check on the two "
+            "price fields would plausibly catch the same twelve. Route back: run grounding.check, "
+            "TraderProposal and a pydantic band validator over the desk's real decisions (the "
+            "paper ledger's theses), label a sample by hand, and score catches and false "
+            "alarms by symbol and by half.",
             "TradingAgents' full multi-agent pipeline was not run end to end (would require an "
             "LLM call this project has no credentials for against their preferred provider) — "
             "this comparison instead runs the real, unmodified structured-output type its Trader "

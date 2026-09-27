@@ -447,3 +447,16 @@ class TestTheDrainOnTheKeyIsTracked:
         got = check(_log(tmp_path))
         found = next(c for c in got.checks if c.name == "cumulative_tokens")
         assert found.status in (PASS, UNKNOWN), "there is no honest threshold to FAIL against"
+
+
+def test_a_utf16_log_is_counted_not_skipped(tmp_path: Path) -> None:
+    """The older cycle logs are UTF-16 with a byte-order mark (PowerShell's redirection); read as
+    UTF-8 they decoded to noise and the cumulative totals skipped them (2026-09-27)."""
+    from argus.eval.cyclecheck import cumulative_tokens, read_log
+
+    (tmp_path / "cycle_2026-09-12_2212.log").write_bytes(
+        '=== ARGUS ===\n{"tokens_spent": 1200}\n'.encode("utf-16"))
+    (tmp_path / "cycle_2026-09-20_0100.log").write_text('{"tokens_spent": 300}\n',
+                                                        encoding="utf-8")
+    assert cumulative_tokens(tmp_path) == (1500, 2)
+    assert '"tokens_spent": 1200' in read_log(tmp_path / "cycle_2026-09-12_2212.log")

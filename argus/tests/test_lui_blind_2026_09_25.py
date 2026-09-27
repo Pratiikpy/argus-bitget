@@ -127,7 +127,7 @@ class TestAShockOnANamedInstrument:
         assert moves and all(line.startswith("If MSTR moves") for line in moves)
         assert any(line.startswith("Hedge:") and "MSTR" in line for line in answer.lines)
         # The trim-or-hedge line is phrased against the shocked name, not QQQ.
-        assert any(line.startswith("Actionable:") and "QQQ" not in line for line in answer.lines)
+        assert any(line.startswith("Bottom line:") and "QQQ" not in line for line in answer.lines)
 
 
 class TestEnglishPhrasings:
@@ -272,16 +272,16 @@ class TestTheJudgePass:
         assert _PRICE_FORECAST.search("what will BTC be next Friday")
 
     @pytest.mark.parametrize(("question", "rsi", "start"), [
-        ("is TSLA overbought", "63.4", "Actionable: No — TSLA is not overbought"),
-        ("is TSLA overbought", "74.0", "Actionable: Yes — TSLA is overbought"),
-        ("英伟达超卖了吗", "25.0", "Actionable: Yes — NVDA is oversold"),
+        ("is TSLA overbought", "63.4", "Bottom line: No — TSLA is not overbought"),
+        ("is TSLA overbought", "74.0", "Bottom line: Yes — TSLA is overbought"),
+        ("英伟达超卖了吗", "25.0", "Bottom line: Yes — NVDA is oversold"),
     ])
     def test_the_overbought_question_gets_a_yes_or_no(self, question: str, rsi: str,
                                                       start: str) -> None:
         from argus.lui.research import _answer_the_state_asked
 
         symbol = "NVDAUSDT" if "英伟达" in question else "TSLAUSDT"
-        lines = ["Actionable: momentum turning down.", f"RSI(14, 4h) {rsi} — neutral."]
+        lines = ["Bottom line: momentum turning down.", f"RSI(14, 4h) {rsi} — neutral."]
         out = _answer_the_state_asked(question, symbol, lines)
         assert out[0].startswith(start) and "momentum turning down" in out[0]
         assert len(out) == 2

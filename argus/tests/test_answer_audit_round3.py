@@ -154,7 +154,7 @@ def test_the_liquidity_profile() -> None:
     p = profile("NVDAUSDT", bars)
     assert p is not None and max(p.by_hour, key=lambda h: p.by_hour[h]) == 14
     text = lines(p, "NVDA", True)
-    assert text[0].startswith("Actionable: NVDA trades most in 14:00")
+    assert text[0].startswith("Bottom line: NVDA trades most in 14:00")
     assert "liquidity does dry up" in text[1]
 
 

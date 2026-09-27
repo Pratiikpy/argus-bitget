@@ -37,7 +37,7 @@ router made rather than asking a model to narrate one.
 
 1. *The producer.* The step that first returned the line (earliest to finish) produced it; a step
    that returns a line it was given as an argument is passing it through (the evals postprocessor
-   rule). Lines are compared after the console's own display transforms — the "Actionable:" lead
+   rule). Lines are compared after the console's own display transforms — the "Bottom line:" lead
    prefix, a multi-part answer's "1." numbering, and `research._clean`'s contract-suffix stripping —
    because the console applies those after the line is made.
 2. *The producer's declaration.* An engine declares what its lines are (:data:`DECLARED`, or the
@@ -799,7 +799,7 @@ def install() -> None:
 
 # --- per-line labels ------------------------------------------------------------------------------
 
-_LEAD = re.compile(r"^Actionable(?: \(\w+\))?:\s*")
+_LEAD = re.compile(r"^(?:Actionable|Bottom line)(?: \(\w+\))?:\s*")
 _NUMBERED = re.compile(r"^\d{1,2}\.\s+")
 _CLEAN: Callable[[str], str] | None = None
 """`research._clean`, read once. It is a display transform and is never wrapped (NOT_ENGINES)."""
@@ -808,7 +808,7 @@ _CLEAN: Callable[[str], str] | None = None
 def display(line: str) -> str:
     """A line as the console finally shows it, for matching a produced line to a shown one.
 
-    The console applies three transforms after a line is made: a lead is prefixed "Actionable:"
+    The console applies three transforms after a line is made: a lead is prefixed "Bottom line:"
     (or stripped when another lead takes the place), a multi-part answer numbers its leads, and
     `research._clean` strips contract suffixes ("NVDAUSDT" → "NVDA") and sentence-cases. The same
     transforms are applied to both sides, using the console's own ``_clean``."""

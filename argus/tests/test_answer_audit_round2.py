@@ -114,7 +114,7 @@ def test_daily_technicals_compute_average_rsi_and_the_last_cross(
     closes = [100 - i * 0.2 for i in range(150)] + [70 + i * 0.5 for i in range(150)]
     monkeypatch.setattr(research, "_daily_closes", lambda symbol: (closes, "test closes"))
     lines, _ = research._daily_technicals("SPYUSDT", "is SPY in a death cross?")
-    assert lines[0].startswith("Actionable: No — SPY is in golden-cross territory.")
+    assert lines[0].startswith("Bottom line: No — SPY is in golden-cross territory.")
     assert "golden cross" in lines[0] and "trading day(s) ago" in lines[0]
     assert any(line.startswith("RSI(14, 1D)") for line in lines)
     average = next(line for line in lines if "200-day simple moving average" in line)
@@ -236,16 +236,16 @@ def test_a_ticker_list_is_not_shouting() -> None:
 # --- provenance labels on the new lines ---
 
 @pytest.mark.parametrize(("line", "expected"), [
-    ("Actionable: NVDA last 226.3 USDT on Bitget (+1.28% over 24h)", "live"),
-    ("Actionable: BTC funding is +0.0046% per 8h settlement.", "live"),
-    ("Actionable: US spot ETH ETFs, 24 Sep: net +$66m (creations less redemptions)", "live"),
-    ("Actionable: the data source holds no revenue figure for NVDA.", "missing"),
+    ("Bottom line: NVDA last 226.3 USDT on Bitget (+1.28% over 24h)", "live"),
+    ("Bottom line: BTC funding is +0.0046% per 8h settlement.", "live"),
+    ("Bottom line: US spot ETH ETFs, 24 Sep: net +$66m (creations less redemptions)", "live"),
+    ("Bottom line: the data source holds no revenue figure for NVDA.", "missing"),
     ("Missing: the 200-day average needs 200 daily closes.", "missing"),
     ("Whether an rToken pays dividends is set by Bitget's terms, which this desk has not "
      "verified.", "missing"),
     ("Liquidation price: a 10x long opened at the last price is liquidated near 77,008",
      "computed"),
-    ("Actionable: over 21 trading days in which QQQ went sideways, TQQQ fell short across 1213 "
+    ("Bottom line: over 21 trading days in which QQQ went sideways, TQQQ fell short across 1213 "
      "overlapping windows of its own history.", "record"),
     ("Computed by ARGUS from Bitget daily candles, 499 days.", None),
     ("Size NVDA so that its worst observed 24 hours (-4.4%) is a loss you would accept",
@@ -257,5 +257,5 @@ def test_new_lines_carry_their_provenance(line: str, expected: str | None) -> No
 
 def test_a_lead_with_one_gap_is_still_computed() -> None:
     # seen on the live page: the named-hedge answer was chipped MISSING for its TLT clause
-    assert label("Actionable: Of the hedges you named, XAU (short $25,700) removes about 11% of "
+    assert label("Bottom line: Of the hedges you named, XAU (short $25,700) removes about 11% of "
                  "the book's variance; TLT could not be measured (only 95 hours).") == "computed"

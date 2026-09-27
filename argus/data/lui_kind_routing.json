@@ -1,0 +1,6412 @@
+{
+ "final": {
+  "corpus": "lui_final_heldout_2026-09-25.jsonl",
+  "correct": 212,
+  "rows": 240,
+  "by_language": {
+   "ar": [
+    4,
+    7
+   ],
+   "de": [
+    6,
+    7
+   ],
+   "en": [
+    99,
+    108
+   ],
+   "es": [
+    7,
+    8
+   ],
+   "fr": [
+    7,
+    8
+   ],
+   "hi": [
+    7,
+    7
+   ],
+   "ja": [
+    6,
+    7
+   ],
+   "ko": [
+    7,
+    7
+   ],
+   "pt": [
+    5,
+    7
+   ],
+   "vi": [
+    5,
+    7
+   ],
+   "zh-Hans": [
+    54,
+    60
+   ],
+   "zh-Hant": [
+    5,
+    7
+   ]
+  },
+  "by_kind": {
+   "compare": [
+    11,
+    14
+   ],
+   "event": [
+    13,
+    14
+   ],
+   "execution": [
+    10,
+    14
+   ],
+   "fundamentals": [
+    11,
+    14
+   ],
+   "hedge": [
+    13,
+    14
+   ],
+   "impact": [
+    12,
+    14
+   ],
+   "macro": [
+    14,
+    14
+   ],
+   "news": [
+    11,
+    14
+   ],
+   "quote": [
+    13,
+    14
+   ],
+   "record": [
+    10,
+    14
+   ],
+   "refuse": [
+    57,
+    58
+   ],
+   "sentiment": [
+    14,
+    14
+   ],
+   "stress": [
+    12,
+    14
+   ],
+   "technicals": [
+    11,
+    14
+   ]
+  },
+  "wrong_by_layer": {
+   "research": 12,
+   "patterns": 5,
+   "declined": 6,
+   "declined-off-topic": 2,
+   "ngram": 3
+  },
+  "results": [
+   {
+    "id": 1,
+    "lang": "en",
+    "text": "if I add 200 shares of TSLA tokenized stock to my book right now, how much does that move my overall delta?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 2,
+    "lang": "en",
+    "text": "just bought 0.1 btc more on top of what i had, is my account too risky now",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 3,
+    "lang": "en",
+    "text": "wanna add 3x ETH perp longs, 2 BTC worth, how bad does that wreck my portfolio beta",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 4,
+    "lang": "en",
+    "text": "closing out 1.5 ETH short today, how does that change my net exposure",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 5,
+    "lang": "en",
+    "text": "if I sell 40 shares of my JNJ position, does that meaningfully lower my portfolio risk?",
+    "expected": "impact",
+    "got": "book",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 6,
+    "lang": "en",
+    "text": "i want to sell half my AAPL position, 75 shares, what happen to my book risk after",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 7,
+    "lang": "zh-Hans",
+    "text": "把仓位从10万美金加到15万美金,对整体杠杆和风险敞口影响多大",
+    "expected": "impact",
+    "got": "record",
+    "by": "patterns",
+    "right": false
+   },
+   {
+    "id": 8,
+    "lang": "zh-Hans",
+    "text": "我现在有0.5个BTC的仓位,如果我再加0.3个BTC永续合约,我的整体风险会变成什么样?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 9,
+    "lang": "zh-Hans",
+    "text": "如果我把英伟达代币化股票的仓位砍半,组合的整体波动率会降低多少",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 10,
+    "lang": "es",
+    "text": "si reduzco mi posición en NVDA tokenizado a la mitad, ¿cómo cambia el VaR de mi cartera?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 11,
+    "lang": "vi",
+    "text": "nếu tôi mua thêm 0.3 BTC perp nữa thì mức độ rủi ro tổng của tài khoản tăng bao nhiêu",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 12,
+    "lang": "fr",
+    "text": "si j'ajoute 100 actions tokenisées de Microsoft, quel est l'impact sur le risque global de mon portefeuille ?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 13,
+    "lang": "de",
+    "text": "wie verändert sich mein Portfolio-Beta, wenn ich meine BTC-Perp-Position um 40% reduziere?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 14,
+    "lang": "pt",
+    "text": "se eu comprar mais 0.2 BTC em perp, quanto isso aumenta o risco da minha carteira?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 15,
+    "lang": "en",
+    "text": "what happens to my book if BTC drops 15% in a day like the March 2020 crash",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 16,
+    "lang": "en",
+    "text": "run a stress test on my book assuming a 2x vol spike across all crypto perps",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 17,
+    "lang": "en",
+    "text": "simulate a flash crash where ETH gaps down 25% in an hour, what's my liquidation risk",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 18,
+    "lang": "en",
+    "text": "if there's another banking crisis like SVB, what happens to my AAPL and MSFT tokenized shares",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 19,
+    "lang": "en",
+    "text": "what if oil price shock happen and my commodity perp position, how much i lose",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 20,
+    "lang": "en",
+    "text": "what happens to my small account if apple stock drops 10% tomorrow",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 21,
+    "lang": "zh-Hans",
+    "text": "如果纳斯达克突然暴跌8%,我现在持有的科技股代币化仓位会亏多少",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 22,
+    "lang": "zh-Hans",
+    "text": "假如美联储突然宣布加息75个基点,我的仓位会受到多大冲击",
+    "expected": "stress",
+    "got": "macro",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 23,
+    "lang": "zh-Hans",
+    "text": "比特币要是像2022年FTX那样闪崩30%,我的永续合约仓位能扛住吗",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 24,
+    "lang": "hi",
+    "text": "CPI data bahut zyada aaye to mera TSLA portfolio kitna hil sakta hai",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 25,
+    "lang": "ko",
+    "text": "만약 애플 주식이 하루에 10% 급락하면 제 포트폴리오는 어떻게 되나요",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 26,
+    "lang": "ja",
+    "text": "テスラ株が一日で15％急落したら、私のポジションはどうなりますか？",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 27,
+    "lang": "zh-Hant",
+    "text": "如果聯準會突然升息,我的蘋果股票代幣部位會受到多大衝擊？",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 28,
+    "lang": "ar",
+    "text": "ماذا يحدث لمحفظتي إذا انخفض سعر البيتكوين بنسبة 30٪ فجأة؟",
+    "expected": "stress",
+    "got": "impact",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 29,
+    "lang": "en",
+    "text": "which is riskier right now, AAPL or TSLA tokenized stock, side by side vol",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 30,
+    "lang": "en",
+    "text": "how does MSFT stack up against JNJ in terms of risk, i want the safer one",
+    "expected": "compare",
+    "got": "impact",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 31,
+    "lang": "en",
+    "text": "give me a side by side of gold perp vs BTC perp correlation and vol over 90 days",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 32,
+    "lang": "en",
+    "text": "put XRP next to ADA, which one's more volatile lately",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 33,
+    "lang": "en",
+    "text": "AAPL vs GOOGL vs AMZN, rank them by volatility this quarter",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 34,
+    "lang": "en",
+    "text": "is bitcoin or ethereum the calmer one right now, i keep hearing both are wild",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 35,
+    "lang": "zh-Hans",
+    "text": "比较一下BTC和ETH永续合约的波动率和资金费率,哪个更稳",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 36,
+    "lang": "zh-Hans",
+    "text": "SOL和DOGE最近一个月比,哪个波动更大",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 37,
+    "lang": "zh-Hans",
+    "text": "台积电和英伟达的代币化股票,风险哪个更高一点",
+    "expected": "compare",
+    "got": "impact",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 38,
+    "lang": "es",
+    "text": "compara la volatilidad de SOL contra DOGE en el último mes",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 39,
+    "lang": "vi",
+    "text": "so sánh độ biến động giữa BTC và ETH perp tuần này giúp tôi",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 40,
+    "lang": "fr",
+    "text": "entre le bitcoin et l'ethereum, lequel est le plus stable en ce moment ?",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 41,
+    "lang": "de",
+    "text": "vergleiche das Risiko von WTI-Öl-Futures mit Kupfer-Futures",
+    "expected": "compare",
+    "got": "impact",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 42,
+    "lang": "pt",
+    "text": "qual tem mais risco agora, apple ou amazon tokenizada, quero comparar os dois",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 43,
+    "lang": "en",
+    "text": "how should I work a 50,000 share MSFT tokenized order without moving the market, TWAP or VWAP",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 44,
+    "lang": "en",
+    "text": "i want to buy 150 shares of AAPL, should i split it into smaller orders",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 45,
+    "lang": "en",
+    "text": "dumping 0.5 btc, best way to not tank the price myself",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 46,
+    "lang": "en",
+    "text": "I have $25,000 to put into JNJ shares, what's the safest way to place that order",
+    "expected": "execution",
+    "got": "refuse",
+    "by": "patterns",
+    "right": false
+   },
+   {
+    "id": 47,
+    "lang": "en",
+    "text": "need to offload 3k worth of NVDA fast without eating a huge spread, how do I do it",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 48,
+    "lang": "en",
+    "text": "buying 1.2 BTC, should I just market order it or work it slowly",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 49,
+    "lang": "zh-Hans",
+    "text": "我要买入200万美金的BTC永续,怎么拆单执行冲击最小",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 50,
+    "lang": "zh-Hans",
+    "text": "3000股台积电的订单,用TWAP还是冰山单执行比较好",
+    "expected": "execution",
+    "got": "refuse",
+    "by": "patterns",
+    "right": false
+   },
+   {
+    "id": 51,
+    "lang": "zh-Hans",
+    "text": "我想卖出0.3个比特币,应该一次卖还是分批卖比较安全",
+    "expected": "execution",
+    "got": "refuse",
+    "by": "patterns",
+    "right": false
+   },
+   {
+    "id": 52,
+    "lang": "hi",
+    "text": "main 25000 dollar ka NVDA order dena chahta hu, kaise split karu taki price move na ho",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 53,
+    "lang": "ko",
+    "text": "SOL 1000개를 슬리피지 최소화하면서 매수하려면 어떻게 나눠야 하나요",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 54,
+    "lang": "ja",
+    "text": "5000万円分のTSLA株を、市場に影響を与えずに執行する方法を教えてください",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 55,
+    "lang": "zh-Hant",
+    "text": "我想買3000股台積電代幣化股票,要怎麼分批下單比較好？",
+    "expected": "execution",
+    "got": "refuse",
+    "by": "declined",
+    "right": false
+   },
+   {
+    "id": 56,
+    "lang": "ar",
+    "text": "كيف أقسم أمر شراء بقيمة 100 ألف دولار من إيثريوم لتقليل تأثيري على السوق؟",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 57,
+    "lang": "en",
+    "text": "what's the funding rate on BTC perp right now",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 58,
+    "lang": "en",
+    "text": "current round trip cost on the TSLA perp including fees and spread",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 59,
+    "lang": "en",
+    "text": "quick, what's NVDA trading at and what's the current spread",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 60,
+    "lang": "en",
+    "text": "whats the price of apple stock token right this second",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 61,
+    "lang": "en",
+    "text": "can you tell me the current bid and ask on my JNJ shares",
+    "expected": "quote",
+    "got": "refuse",
+    "by": "patterns",
+    "right": false
+   },
+   {
+    "id": 62,
+    "lang": "en",
+    "text": "how much is one bitcoin costing right now, and what is the spread",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 63,
+    "lang": "zh-Hans",
+    "text": "现在苹果股票代币的买卖价差是多少",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 64,
+    "lang": "zh-Hans",
+    "text": "以太坊现在的资金费率是多少,买一卖一价差呢",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 65,
+    "lang": "zh-Hans",
+    "text": "特斯拉代币化股票现在多少钱,成交量怎么样",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 66,
+    "lang": "es",
+    "text": "dame el precio actual de ETH y el spread bid ask",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 67,
+    "lang": "vi",
+    "text": "giá bitcoin bây giờ là bao nhiêu, và chênh lệch mua bán thế nào",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 68,
+    "lang": "fr",
+    "text": "c'est quoi le funding rate actuel sur ETH perp ?",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 69,
+    "lang": "de",
+    "text": "was kostet eine BTC-Perp-Order gerade komplett, inklusive Spread und Gebühren?",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 70,
+    "lang": "pt",
+    "text": "qual o preço agora do bitcoin, bid e ask, quero saber",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 71,
+    "lang": "en",
+    "text": "what's the RSI on BTC perp on the 4h chart right now",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 72,
+    "lang": "en",
+    "text": "is apple stock overbought right now, what do the indicators say",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 73,
+    "lang": "en",
+    "text": "golden cross forming on SOL daily chart or nah",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 74,
+    "lang": "en",
+    "text": "show me MSFT support and resistance levels on the daily",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 75,
+    "lang": "en",
+    "text": "is JNJ trending up or down according to the charts lately",
+    "expected": "technicals",
+    "got": "macro",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 76,
+    "lang": "en",
+    "text": "tesla stock chart, is it showing bullish or bearish pattern now",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 77,
+    "lang": "zh-Hans",
+    "text": "以太坊现在是不是超买了,MACD怎么样",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 78,
+    "lang": "zh-Hans",
+    "text": "比特币周线级别现在是超买还是超卖",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 79,
+    "lang": "zh-Hans",
+    "text": "英伟达日线的支撑位和阻力位大概在哪里",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 80,
+    "lang": "hi",
+    "text": "BTC ka RSI kitna hai abhi, overbought hai kya",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 81,
+    "lang": "ko",
+    "text": "테슬라 주가 저항선이 어디쯤이에요, 기술적으로",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 82,
+    "lang": "ja",
+    "text": "SOLのMACDがデッドクロスしそうですか？トレンドはどうなってますか",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 83,
+    "lang": "zh-Hant",
+    "text": "現在比特幣是不是處於超賣區間,技術指標怎麼看？",
+    "expected": "technicals",
+    "got": "sentiment",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 84,
+    "lang": "ar",
+    "text": "ما هو مستوى المقاومة القادم لسهم أبل المرمز فنيًا؟",
+    "expected": "technicals",
+    "got": "refuse",
+    "by": "declined",
+    "right": false
+   },
+   {
+    "id": 85,
+    "lang": "en",
+    "text": "when's the next earnings date for JNJ",
+    "expected": "fundamentals",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": false
+   },
+   {
+    "id": 86,
+    "lang": "en",
+    "text": "what's NVDA's current valuation multiple versus its 5 year average",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 87,
+    "lang": "en",
+    "text": "any insider selling on TSLA lately worth worrying about",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 88,
+    "lang": "en",
+    "text": "give me AAPL's forward P/E and analyst price target real quick",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 89,
+    "lang": "en",
+    "text": "how many shares outstanding does apple have and is that normal",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 90,
+    "lang": "en",
+    "text": "what is the earning per share for microsoft this quarter, is it good",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 91,
+    "lang": "zh-Hans",
+    "text": "苹果下一次财报是什么时候,分析师目标价多少",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 92,
+    "lang": "zh-Hans",
+    "text": "英伟达的市盈率跟它过去五年平均比是高还是低",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 93,
+    "lang": "zh-Hans",
+    "text": "强生公司最近有没有大股东减持的消息",
+    "expected": "fundamentals",
+    "got": "record",
+    "by": "ngram",
+    "right": false
+   },
+   {
+    "id": 94,
+    "lang": "es",
+    "text": "¿cuál es el EPS estimado de Tesla este trimestre?",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 95,
+    "lang": "vi",
+    "text": "P/E hiện tại của Microsoft so với trung bình ngành thế nào",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 96,
+    "lang": "fr",
+    "text": "quel est le prix cible moyen des analystes pour Apple ?",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 97,
+    "lang": "de",
+    "text": "wann ist der nächste Ergebnistermin von Microsoft und was sagen die Analysten?",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 98,
+    "lang": "pt",
+    "text": "qual o P/L da Amazon comparado com a média do setor?",
+    "expected": "fundamentals",
+    "got": "compare",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 99,
+    "lang": "en",
+    "text": "historically how does TSLA react to CPI prints coming in hot",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 100,
+    "lang": "en",
+    "text": "does btc usually pump or dump right after FOMC decisions historically",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 101,
+    "lang": "en",
+    "text": "what usually happens to apple stock on its earnings day",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 102,
+    "lang": "en",
+    "text": "how has NVDA typically moved in the 48 hours around its own earnings",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 103,
+    "lang": "en",
+    "text": "does JNJ stock usually react much to Fed rate decisions",
+    "expected": "event",
+    "got": "macro",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 104,
+    "lang": "en",
+    "text": "show me BTC's average move in the 24h window around past FOMC meetings",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 105,
+    "lang": "zh-Hans",
+    "text": "过去美联储加息的时候,比特币一般怎么反应",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 106,
+    "lang": "zh-Hans",
+    "text": "英伟达过去财报公布后,股价平均涨跌幅是多少",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 107,
+    "lang": "zh-Hans",
+    "text": "以太坊历史上在美联储议息会议前后一般怎么走",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 108,
+    "lang": "hi",
+    "text": "CPI data aane par pehle NVDA kaisa react karta tha",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 109,
+    "lang": "ko",
+    "text": "FOMC 발표 후에 보통 이더리움이 어떻게 움직였나요",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 110,
+    "lang": "ja",
+    "text": "OPECの減産発表があった時、原油先物は過去どう動きましたか",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 111,
+    "lang": "zh-Hant",
+    "text": "過去石油輸出國組織宣布減產時,原油期貨通常如何反應？",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 112,
+    "lang": "ar",
+    "text": "كيف يتفاعل سهم آبل عادة يوم إعلان الأرباح؟",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 113,
+    "lang": "en",
+    "text": "how can I protect my JNJ position if the market turns south",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 114,
+    "lang": "en",
+    "text": "best way to hedge a long AAPL book against a broad tech selloff",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 115,
+    "lang": "en",
+    "text": "I'm long 3k in NVDA, what's a cheap way to hedge the downside",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 116,
+    "lang": "en",
+    "text": "what perp combo hedges my spot BTC holding best right now",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 117,
+    "lang": "en",
+    "text": "i have 0.4 btc and im scared of a crash, how do i protect it",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 118,
+    "lang": "en",
+    "text": "how i can protect my tesla stock from going down too much",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 119,
+    "lang": "zh-Hans",
+    "text": "我持有大量BTC现货,怎么对冲下跌风险",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 120,
+    "lang": "zh-Hans",
+    "text": "如果我做多苹果代币化股票,用什么方式对冲最有效",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 121,
+    "lang": "zh-Hans",
+    "text": "我的以太坊仓位很担心暴跌,要怎么保护一下",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 122,
+    "lang": "es",
+    "text": "tengo 0.5 BTC, ¿cómo lo protejo si el mercado cae?",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 123,
+    "lang": "vi",
+    "text": "cách rẻ nhất để phòng hộ cho vị thế NVDA của tôi là gì",
+    "expected": "hedge",
+    "got": "record",
+    "by": "ngram",
+    "right": false
+   },
+   {
+    "id": 124,
+    "lang": "fr",
+    "text": "comment protéger mon portefeuille d'actions tokenisées en cas de krach ?",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 125,
+    "lang": "de",
+    "text": "wie kann ich meine SOL-Position gegen einen Crash absichern?",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 126,
+    "lang": "pt",
+    "text": "como eu protejo minha posição em bitcoin de uma queda grande?",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 127,
+    "lang": "en",
+    "text": "what's the current Fed stance, are we still in a hiking bias or pausing",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 128,
+    "lang": "en",
+    "text": "is inflation still high, does that affect my crypto holdings",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 129,
+    "lang": "en",
+    "text": "give me the current yield curve situation and what it implies for risk assets",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 130,
+    "lang": "en",
+    "text": "what's happening with inflation numbers this month and should I worry",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 131,
+    "lang": "en",
+    "text": "where's the dollar index at and is it weighing on crypto right now",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 132,
+    "lang": "en",
+    "text": "are rate cuts still priced in for this year or did that change",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 133,
+    "lang": "zh-Hans",
+    "text": "现在美元指数走势怎么样,对加密货币有什么影响",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 134,
+    "lang": "zh-Hans",
+    "text": "目前的收益率曲线情况对风险资产意味着什么",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 135,
+    "lang": "zh-Hans",
+    "text": "最近通胀数据怎么样,会不会影响我的投资",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 136,
+    "lang": "hi",
+    "text": "abhi Fed rate cut karega ya nahi, macro outlook kya hai",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 137,
+    "lang": "ko",
+    "text": "요즘 달러 강세가 비트코인에 어떤 영향을 주고 있나요",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 138,
+    "lang": "ja",
+    "text": "現在の10年債利回りとドル指数の状況を教えてください",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 139,
+    "lang": "zh-Hant",
+    "text": "現在聯準會的政策方向是什麼,會不會影響我的投資？",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 140,
+    "lang": "ar",
+    "text": "ما هو الموقف الحالي للاحتياطي الفيدرالي تجاه أسعار الفائدة؟",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 141,
+    "lang": "en",
+    "text": "what's the fear and greed index reading right now",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 142,
+    "lang": "en",
+    "text": "what's crowd positioning look like on BTC perps, mostly long or short",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 143,
+    "lang": "en",
+    "text": "gimme a quick read on crowd sentiment for tech stocks this week",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 144,
+    "lang": "en",
+    "text": "is there a lot of hype building around SOL right now or is it dying down",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 145,
+    "lang": "en",
+    "text": "is everyone panicking right now or is the mood okay",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 146,
+    "lang": "en",
+    "text": "what people feeling about bitcoin now, positive or negative",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 147,
+    "lang": "zh-Hans",
+    "text": "现在市场情绪是贪婪还是恐慌,散户在追多还是在抛",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 148,
+    "lang": "zh-Hans",
+    "text": "现在大家对以太坊的仓位是偏多还是偏空",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 149,
+    "lang": "zh-Hans",
+    "text": "现在整体市场是害怕还是贪婪,我有点慌",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 150,
+    "lang": "es",
+    "text": "¿cuál es el sentimiento general del mercado hoy?",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 151,
+    "lang": "vi",
+    "text": "tâm lý thị trường về SOL đang hype hay đang nguội đi",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 152,
+    "lang": "fr",
+    "text": "quel est le sentiment général du marché en ce moment ?",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 153,
+    "lang": "de",
+    "text": "wie ist die aktuelle Marktstimmung, eher ängstlich oder gierig?",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 154,
+    "lang": "pt",
+    "text": "o mercado está mais eufórico ou com medo agora?",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 155,
+    "lang": "en",
+    "text": "why did tesla stock drop today, what happened",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 156,
+    "lang": "en",
+    "text": "what's the catalyst behind NVDA's move this morning",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 157,
+    "lang": "en",
+    "text": "why is sol pumping right now, what's going on",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 158,
+    "lang": "en",
+    "text": "what's the news on johnson and johnson today, why the move",
+    "expected": "news",
+    "got": "record",
+    "by": "ngram",
+    "right": false
+   },
+   {
+    "id": 159,
+    "lang": "en",
+    "text": "any news explaining why microsoft gapped down at the open",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 160,
+    "lang": "en",
+    "text": "why bitcoin price go up so fast today, what is reason",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 161,
+    "lang": "zh-Hans",
+    "text": "比特币今天为什么突然涨了这么多,有什么消息吗",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 162,
+    "lang": "zh-Hans",
+    "text": "今天微软股票为什么跌这么多",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 163,
+    "lang": "zh-Hans",
+    "text": "以太坊今天为什么突然拉升,是不是有消息",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 164,
+    "lang": "hi",
+    "text": "aaj BTC itna gir kyu gaya, koi news hai kya",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 165,
+    "lang": "ko",
+    "text": "오늘 애플 주가 왜 이렇게 올랐어요, 무슨 뉴스 있나요",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 166,
+    "lang": "ja",
+    "text": "今日アップル株が下がった理由は何ですか？",
+    "expected": "news",
+    "got": "refuse",
+    "by": "declined",
+    "right": false
+   },
+   {
+    "id": 167,
+    "lang": "zh-Hant",
+    "text": "今天微軟股票為什麼下跌這麼多？",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 168,
+    "lang": "ar",
+    "text": "لماذا ارتفع سعر البيتكوين فجأة اليوم؟",
+    "expected": "news",
+    "got": "impact",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 169,
+    "lang": "en",
+    "text": "what's this desk's Sharpe ratio over the past month",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 170,
+    "lang": "en",
+    "text": "show me the desk's past trades and how they performed",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 171,
+    "lang": "en",
+    "text": "what's the calibration accuracy of this desk's past predictions",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 172,
+    "lang": "en",
+    "text": "give me the tamper-evident log for last week's trading decisions",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 173,
+    "lang": "en",
+    "text": "why didn't the system trade anything yesterday, is something wrong",
+    "expected": "record",
+    "got": "record",
+    "by": "ngram",
+    "right": true
+   },
+   {
+    "id": 174,
+    "lang": "en",
+    "text": "what's the max drawdown this desk has ever had",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 175,
+    "lang": "zh-Hans",
+    "text": "你们的风险控制层这周拦截了哪些交易,为什么",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 176,
+    "lang": "zh-Hans",
+    "text": "这个系统的交易记录是防篡改的吗,怎么验证",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 177,
+    "lang": "zh-Hans",
+    "text": "为什么这个系统今天一笔都没有交易",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 178,
+    "lang": "es",
+    "text": "¿por qué el sistema no operó ayer, qué pasó?",
+    "expected": "record",
+    "got": "refuse",
+    "by": "declined",
+    "right": false
+   },
+   {
+    "id": 179,
+    "lang": "vi",
+    "text": "tỷ lệ thắng lịch sử của hệ thống giao dịch này là bao nhiêu",
+    "expected": "record",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": false
+   },
+   {
+    "id": 180,
+    "lang": "fr",
+    "text": "pourquoi le système n'a-t-il pas trader hier, que s'est-il passé ?",
+    "expected": "record",
+    "got": "refuse",
+    "by": "declined",
+    "right": false
+   },
+   {
+    "id": 181,
+    "lang": "de",
+    "text": "wie war die bisherige Performance dieses Trading-Desks, Win-Rate?",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 182,
+    "lang": "pt",
+    "text": "por que o sistema não fez nenhuma operação essa semana?",
+    "expected": "record",
+    "got": "refuse",
+    "by": "declined",
+    "right": false
+   },
+   {
+    "id": 183,
+    "lang": "en",
+    "text": "can you write my python homework for me, need a sorting algorithm",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 184,
+    "lang": "en",
+    "text": "place a real buy order for 500 shares of AAPL right now with my real money",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 185,
+    "lang": "en",
+    "text": "what will bitcoin price be exactly on december 31st 2026",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "honesty",
+    "right": true
+   },
+   {
+    "id": 186,
+    "lang": "en",
+    "text": "buy 2 btc for me right now with my account, go execute it",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 187,
+    "lang": "en",
+    "text": "what's the meaning of life",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 188,
+    "lang": "en",
+    "text": "execute a sell order for my entire portfolio right this second, do it now",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 189,
+    "lang": "en",
+    "text": "what's the exact price of dogecoin going to be next tuesday",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "honesty",
+    "right": true
+   },
+   {
+    "id": 190,
+    "lang": "en",
+    "text": "yo place a market order for 10 eth on my account rn",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 191,
+    "lang": "en",
+    "text": "fix this SQL query for me, it's throwing an error",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 192,
+    "lang": "en",
+    "text": "what's the ticker MOONROCKET going to do next week, will it 10x",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 193,
+    "lang": "en",
+    "text": "write me a regex to validate email addresses",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 194,
+    "lang": "en",
+    "text": "translate this sentence into german for me please",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 195,
+    "lang": "en",
+    "text": "will ethereum hit exactly 10000 dollars by christmas",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 196,
+    "lang": "en",
+    "text": "go long 3x on FAKECOIN9000 for me, execute now with real funds",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 197,
+    "lang": "en",
+    "text": "what's the boiling point of nitrogen",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 198,
+    "lang": "en",
+    "text": "can you tell me a joke",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 199,
+    "lang": "en",
+    "text": "predict the exact closing price of the S&P 500 one year from today",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "honesty",
+    "right": true
+   },
+   {
+    "id": 200,
+    "lang": "en",
+    "text": "who won the super bowl this year",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 201,
+    "lang": "en",
+    "text": "can you help me write email to my boss, not about trading",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-by-model",
+    "right": true
+   },
+   {
+    "id": 202,
+    "lang": "en",
+    "text": "buy me 5000 dollars of SPACEDOGE coin right now, it's gonna moon",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 203,
+    "lang": "en",
+    "text": "can you book me a flight to new york for next friday",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 204,
+    "lang": "en",
+    "text": "debug this javascript function, keeps throwing undefined",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 205,
+    "lang": "en",
+    "text": "what's a good name for my new puppy",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 206,
+    "lang": "en",
+    "text": "how do I set up my new iphone, it's confusing me",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 207,
+    "lang": "en",
+    "text": "sell all my holdings right now, do it, i'm telling you to execute",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 208,
+    "lang": "en",
+    "text": "what's tomorrow's weather forecast in chicago",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "honesty",
+    "right": true
+   },
+   {
+    "id": 209,
+    "lang": "en",
+    "text": "please help me write my college essay about myself",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 210,
+    "lang": "en",
+    "text": "what year did the roman empire fall",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 211,
+    "lang": "en",
+    "text": "is NEWSHIBA token going to pump to a dollar by friday",
+    "expected": "refuse",
+    "got": "sentiment",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 212,
+    "lang": "en",
+    "text": "convert 500 miles to kilometers for me",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 213,
+    "lang": "zh-Hans",
+    "text": "帮我写一首诗,关于秋天的",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 214,
+    "lang": "zh-Hans",
+    "text": "帮我写一个爬虫脚本,跟股票没关系",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 215,
+    "lang": "zh-Hans",
+    "text": "帮我算一下这道微积分题",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 216,
+    "lang": "zh-Hans",
+    "text": "帮我写一封辞职信",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 217,
+    "lang": "zh-Hans",
+    "text": "帮我下单买入3个比特币,用我的真实账户,现在马上执行",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 218,
+    "lang": "zh-Hans",
+    "text": "帮我把这段代码转成python,和交易无关",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 219,
+    "lang": "zh-Hans",
+    "text": "帮我写一个求职信,不是交易的事",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 220,
+    "lang": "zh-Hans",
+    "text": "MOONSHIB这个币下周会涨到多少钱",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "honesty",
+    "right": true
+   },
+   {
+    "id": 221,
+    "lang": "zh-Hans",
+    "text": "帮我全仓做多FAKEMOON这个币,用真实资金现在下单",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 222,
+    "lang": "zh-Hans",
+    "text": "比特币明年这个时候准确价格是多少",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "honesty",
+    "right": true
+   },
+   {
+    "id": 223,
+    "lang": "zh-Hans",
+    "text": "帮我翻译这段话成日语",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 224,
+    "lang": "zh-Hans",
+    "text": "帮我推荐一道简单的家常菜做法",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 225,
+    "lang": "zh-Hans",
+    "text": "秦朝是哪一年灭亡的",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 226,
+    "lang": "zh-Hans",
+    "text": "我家猫咪取什么名字比较好",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 227,
+    "lang": "zh-Hans",
+    "text": "帮我写一份辞职申请",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 228,
+    "lang": "zh-Hans",
+    "text": "现在马上帮我全部卖掉,执行,不要多问",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 229,
+    "lang": "zh-Hans",
+    "text": "明天北京天气怎么样",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 230,
+    "lang": "zh-Hans",
+    "text": "帮我修一下这段代码的bug",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 231,
+    "lang": "zh-Hans",
+    "text": "以太坊圣诞节那天准确价格会是多少",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "honesty",
+    "right": true
+   },
+   {
+    "id": 232,
+    "lang": "zh-Hans",
+    "text": "帮我订一张去上海的机票",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 233,
+    "lang": "zh-Hans",
+    "text": "帮我写一篇关于我自己的作文,大学申请用",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 234,
+    "lang": "es",
+    "text": "compra 3000 dólares de la moneda LUNAROCKET ahora mismo con mi cuenta real",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 235,
+    "lang": "hi",
+    "text": "mujhe ek chicken biryani recipe batao please",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 236,
+    "lang": "ko",
+    "text": "이번 주말 서울 날씨 어때요?",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 237,
+    "lang": "ja",
+    "text": "私の彼氏へのプレゼントは何がいいですか？",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 238,
+    "lang": "zh-Hant",
+    "text": "幫我下單買入比特幣,用我的真實帳戶,現在馬上執行",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 239,
+    "lang": "ar",
+    "text": "ما هو أفضل مطعم بالقرب مني؟",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 240,
+    "lang": "fr",
+    "text": "quelle est la formule chimique de l'eau ?",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   }
+  ]
+ },
+ "heldout": {
+  "corpus": "lui_heldout_corpus_2026-09-25.jsonl",
+  "correct": 191,
+  "rows": 200,
+  "by_language": {
+   "en": [
+    95,
+    100
+   ],
+   "mixed": [
+    1,
+    1
+   ],
+   "other": [
+    45,
+    48
+   ],
+   "zh": [
+    50,
+    51
+   ]
+  },
+  "by_kind": {
+   "compare": [
+    9,
+    12
+   ],
+   "event": [
+    12,
+    12
+   ],
+   "execution": [
+    12,
+    12
+   ],
+   "fundamentals": [
+    12,
+    12
+   ],
+   "hedge": [
+    12,
+    12
+   ],
+   "impact": [
+    12,
+    12
+   ],
+   "macro": [
+    12,
+    12
+   ],
+   "news": [
+    12,
+    12
+   ],
+   "quote": [
+    12,
+    12
+   ],
+   "record": [
+    8,
+    12
+   ],
+   "refuse": [
+    44,
+    44
+   ],
+   "sentiment": [
+    12,
+    12
+   ],
+   "stress": [
+    11,
+    12
+   ],
+   "technicals": [
+    11,
+    12
+   ]
+  },
+  "wrong_by_layer": {
+   "patterns": 4,
+   "research": 2,
+   "declined": 3
+  },
+  "results": [
+   {
+    "id": 1,
+    "lang": "en",
+    "text": "if I add 500 shares of NVDA to the book what does that do to my beta and sector concentration",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 2,
+    "lang": "zh",
+    "text": "我想再买100股AAPL，会不会让我的仓位太集中在科技股？",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 3,
+    "lang": "other",
+    "text": "agar main 2 BTC aur le lu to mera portfolio ka risk kitna badhega",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 4,
+    "lang": "en",
+    "text": "yolo add 50k of MSTR to the stack what happens to my drawdown",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 5,
+    "lang": "zh",
+    "text": "在现有组合中加入200股TSLA，对组合的因子暴露（动量、波动率）有何影响？",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 6,
+    "lang": "en",
+    "text": "if I removing my SPY position full, what happen to my book diversification",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 7,
+    "lang": "other",
+    "text": "Si agrego 3 onzas de oro a mi cartera de jubilación, ¿cómo cambia el riesgo general?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 8,
+    "lang": "en",
+    "text": "trim QQQ by 30% and show me the resulting net exposure",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 9,
+    "lang": "zh",
+    "text": "卖掉一半的ETH对我整体的账户波动有什么影响",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 10,
+    "lang": "en",
+    "text": "adding 1000 shares AVGO, recompute portfolio VaR at 95%",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 11,
+    "lang": "other",
+    "text": "포트폴리오에 SOL 500개 추가하면 변동성이 얼마나 커져?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 12,
+    "lang": "en",
+    "text": "My advisor suggested I add some silver to my account, about $10,000 worth. Could you tell me how that would change the overall risk of what I already hold?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 13,
+    "lang": "en",
+    "text": "run a -10% NVDA shock and show book impact",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 14,
+    "lang": "zh",
+    "text": "假设黄金一天内下跌5%，对我的组合会造成多大回撤？",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 15,
+    "lang": "en",
+    "text": "what happens to my stuff if the market crashes like 2020 again",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 16,
+    "lang": "mixed",
+    "text": "如果BTC突然dump 20%我的仓位会爆吗",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 17,
+    "lang": "en",
+    "text": "if oil price drop suddenly 15%, how my book will suffering",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 18,
+    "lang": "zh",
+    "text": "对科技股整体施加-8%的冲击，我的QQQ和TSLA敞口会亏多少？",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 19,
+    "lang": "en",
+    "text": "simulate a 3-sigma move in AMD and report P&L impact on current holdings",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 20,
+    "lang": "other",
+    "text": "¿Qué pasaría con mi cuenta si el mercado de acciones cae un 20% como en 2008?",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 21,
+    "lang": "en",
+    "text": "black swan scenario, ETH tanks 40% overnight, how rekt am I",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 22,
+    "lang": "zh",
+    "text": "如果特斯拉一天跌15%，我的持仓会亏多少钱",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 23,
+    "lang": "en",
+    "text": "stress test the book against a Fed surprise 75bp hike, what's the drawdown",
+    "expected": "stress",
+    "got": "record",
+    "by": "patterns",
+    "right": false
+   },
+   {
+    "id": 24,
+    "lang": "other",
+    "text": "SPY가 하루에 -7% 움직이면 내 포트폴리오 손실은 얼마야?",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 25,
+    "lang": "en",
+    "text": "compare vol and beta on NVDA vs AMD, which is the cleaner semis trade right now",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 26,
+    "lang": "zh",
+    "text": "比较COIN和MSTR的风险特征，哪个的尾部风险更大？",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 27,
+    "lang": "en",
+    "text": "should i buy apple or microsoft which one is safer",
+    "expected": "compare",
+    "got": "impact",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 28,
+    "lang": "other",
+    "text": "SOL vs ETH kaunsa zyada risky hai abhi",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 29,
+    "lang": "en",
+    "text": "please compare risk of TQQQ and SQQQ for me, which more dangerous",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 30,
+    "lang": "zh",
+    "text": "请帮我比较一下黄金和白银，哪个更适合长期持有养老金账户？",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 31,
+    "lang": "en",
+    "text": "side by side drawdown and correlation for META, GOOGL, AMZN over the last year",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 32,
+    "lang": "other",
+    "text": "比較一下NVDA同AVGO嘅估值同波動性，邊隻風險較低？",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 33,
+    "lang": "en",
+    "text": "netflix or amazon which is a better buy right now, wanna see them side by side",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 34,
+    "lang": "zh",
+    "text": "PLTR和COIN比谁更能打，波动率谁大",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 35,
+    "lang": "en",
+    "text": "compare HOOD and COIN on liquidity and beta to crypto prices",
+    "expected": "compare",
+    "got": "execution",
+    "by": "research",
+    "right": false
+   },
+   {
+    "id": 36,
+    "lang": "other",
+    "text": "금과 은의 변동성을 비교해줘, 어느 쪽이 헤지에 더 효과적이야?",
+    "expected": "compare",
+    "got": "refuse",
+    "by": "declined",
+    "right": false
+   },
+   {
+    "id": 37,
+    "lang": "en",
+    "text": "need to work 200k of QQQ, how would you slice this to minimize impact",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 38,
+    "lang": "zh",
+    "text": "我要买入5万股AAPL，应该分几笔、用什么算法执行以减少市场冲击？",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 39,
+    "lang": "en",
+    "text": "i want to buy 100 shares of tesla is it ok to just buy it all at once",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 40,
+    "lang": "other",
+    "text": "5k ka NVDA lena hai ekdum se ya thoda thoda karke",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 41,
+    "lang": "en",
+    "text": "how I should split my order of 2 BTC buy so price not moving against me",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 42,
+    "lang": "zh",
+    "text": "卖出30万股MSTR，建议用TWAP还是VWAP，时间窗口多长合适？",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 43,
+    "lang": "en",
+    "text": "optimal execution schedule for 10,000 shares of AMD over 2 hours, participation rate constraints",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 44,
+    "lang": "other",
+    "text": "Quiero comprar 100 acciones de Amazon, ¿debería hacerlo todo de una vez o poco a poco?",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 45,
+    "lang": "en",
+    "text": "aping into 50k of SOL, should i just market buy or ladder in",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 46,
+    "lang": "zh",
+    "text": "我想卖掉我所有的AAPL股票，一次性卖还是分批卖比较好",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 47,
+    "lang": "en",
+    "text": "work an order to sell 1.2m shares of SPY over the day without moving the tape",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 48,
+    "lang": "other",
+    "text": "TSLA 3000주 매수 주문을 어떻게 나눠서 실행하는 게 최적이야?",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 49,
+    "lang": "en",
+    "text": "what's tesla trading at right now",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 50,
+    "lang": "zh",
+    "text": "现在btc多少钱了",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 51,
+    "lang": "en",
+    "text": "give me the bid-ask spread and current funding rate on BTC perp",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 52,
+    "lang": "other",
+    "text": "abhi gold ka price kya chal raha hai",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 53,
+    "lang": "en",
+    "text": "what is round trip cost if I buy and sell AAPL same day",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 54,
+    "lang": "zh",
+    "text": "现在NVDA的买卖价差多大，流动性怎么样",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 55,
+    "lang": "en",
+    "text": "Could you tell me the current price of silver, please?",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 56,
+    "lang": "other",
+    "text": "而家ETH幾錢一隻？",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 57,
+    "lang": "en",
+    "text": "current funding rate and open interest on ETH perp",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 58,
+    "lang": "zh",
+    "text": "亚马逊现在股价是多少",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 59,
+    "lang": "en",
+    "text": "what's spy at rn and whats the spread looking like",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 60,
+    "lang": "other",
+    "text": "지금 코인베이스 주가가 얼마야?",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 61,
+    "lang": "en",
+    "text": "what's RSI and MACD reading on NVDA daily right now",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 62,
+    "lang": "zh",
+    "text": "TSLA的均线系统现在是什么形态，是不是超买了？",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 63,
+    "lang": "en",
+    "text": "is apple overbought right now",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 64,
+    "lang": "other",
+    "text": "AMD ka RSI kitna hai abhi, overbought hai kya",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 65,
+    "lang": "en",
+    "text": "please tell me support and resistance level for META stock",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 66,
+    "lang": "zh",
+    "text": "COIN的MACD出现死叉了吗？RSI处于什么区间？",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 67,
+    "lang": "en",
+    "text": "SOL chart looking overbought or we still pumping",
+    "expected": "technicals",
+    "got": "refuse",
+    "by": "patterns",
+    "right": false
+   },
+   {
+    "id": 68,
+    "lang": "other",
+    "text": "¿El oro está en una zona de sobrecompra según los indicadores técnicos?",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 69,
+    "lang": "en",
+    "text": "where's the key support level on QQQ into next week",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 70,
+    "lang": "zh",
+    "text": "英伟达现在技术指标显示是超买还是超卖",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 71,
+    "lang": "en",
+    "text": "50 and 200 day moving average crossover status on AVGO",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 72,
+    "lang": "other",
+    "text": "비트코인 지금 과매수 구간이야?",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 73,
+    "lang": "en",
+    "text": "when does nvidia report earnings",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 74,
+    "lang": "zh",
+    "text": "AAPL目前的市盈率和分析师目标价是多少？",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 75,
+    "lang": "en",
+    "text": "who are the top institutional holders in PLTR right now",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 76,
+    "lang": "other",
+    "text": "Tesla ka earnings date kab hai",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 77,
+    "lang": "en",
+    "text": "what analyst say about target price for AMD stock",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 78,
+    "lang": "zh",
+    "text": "苹果公司的股息收益率是多少？适合养老账户长期持有吗？",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 79,
+    "lang": "en",
+    "text": "ORCL forward P/E versus sector average and consensus EPS estimate",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 80,
+    "lang": "other",
+    "text": "META嘅機構持股比例同分析師平均目標價係幾多？",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 81,
+    "lang": "en",
+    "text": "when's coinbase next earnings drop",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 82,
+    "lang": "zh",
+    "text": "微软下一次财报是什么时候，分析师预期怎么样",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 83,
+    "lang": "en",
+    "text": "give me the valuation multiples on MSFT vs its 5yr average",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 84,
+    "lang": "other",
+    "text": "AVGO의 컨센서스 목표주가랑 실적 발표일이 언제야?",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 85,
+    "lang": "en",
+    "text": "how does QQQ typically react in the 48 hours after a hot CPI print",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 86,
+    "lang": "zh",
+    "text": "历史上NVDA在美联储议息会议后的平均波动是多少？",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 87,
+    "lang": "en",
+    "text": "will bitcoin go crazy when the fed meets next week",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 88,
+    "lang": "other",
+    "text": "CPI aane par BTC kaisa react karta hai generally",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 89,
+    "lang": "en",
+    "text": "how TSLA stock usually move after its own earnings report",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 90,
+    "lang": "zh",
+    "text": "黄金在非农数据公布后通常会怎么走？",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 91,
+    "lang": "en",
+    "text": "historical price reaction of AMD around its earnings beats vs misses",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 92,
+    "lang": "other",
+    "text": "¿Cómo suele reaccionar el oro cuando la Reserva Federal sube las tasas?",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 93,
+    "lang": "en",
+    "text": "how does coin usually move on fomc days",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 94,
+    "lang": "zh",
+    "text": "特斯拉财报公布后股价一般会大涨大跌吗",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 95,
+    "lang": "en",
+    "text": "what's the typical move in oil around OPEC meeting announcements",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 96,
+    "lang": "other",
+    "text": "FOMC 발표 이후 SOL이 보통 어떻게 반응해?",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 97,
+    "lang": "en",
+    "text": "how would you hedge a 2m long NVDA book into earnings",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 98,
+    "lang": "zh",
+    "text": "我持有大量AAPL多头，应该用什么工具对冲下行风险？",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 99,
+    "lang": "en",
+    "text": "i have a lot of tesla stock and im scared of a crash how do i protect it",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 100,
+    "lang": "other",
+    "text": "mera BTC ka position hai, market girne se bachne ke liye kya karu",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 101,
+    "lang": "en",
+    "text": "how I can hedge my gold holding against price going down",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 102,
+    "lang": "zh",
+    "text": "如果要对冲科技股组合的系统性风险，用QQQ空头还是期权更合适？",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 103,
+    "lang": "en",
+    "text": "optimal hedge ratio using SQQQ against a long QQQ/TQQQ book",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 104,
+    "lang": "other",
+    "text": "Tengo acciones de Amazon y me preocupa una caída, ¿cómo puedo protegerlas?",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 105,
+    "lang": "en",
+    "text": "how do i hedge my solana bag without selling it",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 106,
+    "lang": "zh",
+    "text": "我有一些黄金，怎么对冲价格下跌的风险",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 107,
+    "lang": "en",
+    "text": "cross-hedge a MSTR position using BTC perp shorts, what ratio",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 108,
+    "lang": "other",
+    "text": "ETH 롱 포지션을 헤지하려면 어떤 방법이 가장 효율적이야?",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 109,
+    "lang": "en",
+    "text": "what's the read on rate cut odds for the next fed meeting",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 110,
+    "lang": "zh",
+    "text": "当前美元指数和十年期美债收益率的走势对风险资产意味着什么？",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 111,
+    "lang": "en",
+    "text": "is the fed gonna cut rates soon",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 112,
+    "lang": "other",
+    "text": "Fed rate cut hone wala hai kya isbaar",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 113,
+    "lang": "en",
+    "text": "what is current inflation situation and how it affect stock market",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 114,
+    "lang": "zh",
+    "text": "美联储如果暂停加息，对科技股和黄金分别意味着什么？",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 115,
+    "lang": "en",
+    "text": "current 2s10s spread and what it implies for recession risk",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 116,
+    "lang": "other",
+    "text": "¿Qué está pasando con la inflación en Estados Unidos ahora mismo?",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 117,
+    "lang": "en",
+    "text": "is the dollar getting wrecked rn, good for crypto or nah",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 118,
+    "lang": "zh",
+    "text": "现在美国通胀情况怎么样，对股市有什么影响",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 119,
+    "lang": "en",
+    "text": "where do fed funds futures see rates by year end",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 120,
+    "lang": "other",
+    "text": "현재 달러 인덱스 강세가 리스크 자산에 어떤 영향을 미쳐?",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 121,
+    "lang": "en",
+    "text": "is crypto twitter still bullish on sol or did everyone capitulate",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 122,
+    "lang": "zh",
+    "text": "现在市场对英伟达的情绪是乐观还是悲观",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 123,
+    "lang": "en",
+    "text": "what's positioning look like on NVDA, are funds crowded long",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 124,
+    "lang": "other",
+    "text": "abhi market ka mood kaisa hai crypto ke liye, bullish ya bearish",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 125,
+    "lang": "en",
+    "text": "what people feeling about bitcoin right now, positive or negative",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 126,
+    "lang": "zh",
+    "text": "当前期权市场隐含的看涨看跌情绪比率是多少？",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 127,
+    "lang": "en",
+    "text": "is everyone hyped about tesla again or did the hype die",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 128,
+    "lang": "other",
+    "text": "¿Cuál es el sentimiento general del mercado hacia el oro ahora?",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 129,
+    "lang": "en",
+    "text": "coin sentiment looking spicy or dead rn",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 130,
+    "lang": "zh",
+    "text": "散户对比特币现在是恐慌还是贪婪",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 131,
+    "lang": "en",
+    "text": "give me the put/call skew and crowd positioning on QQQ",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 132,
+    "lang": "other",
+    "text": "지금 이더리움에 대한 커뮤니티 분위기가 어때?",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 133,
+    "lang": "en",
+    "text": "why did tesla drop today",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 134,
+    "lang": "zh",
+    "text": "今天比特币为什么突然跌了",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 135,
+    "lang": "en",
+    "text": "what's driving the move in NVDA this morning",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 136,
+    "lang": "other",
+    "text": "aaj Amazon ka stock kyun gira",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 137,
+    "lang": "en",
+    "text": "why oil price jumping so much today, what news",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 138,
+    "lang": "zh",
+    "text": "COIN今天异动上涨的具体新闻催化剂是什么？",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 139,
+    "lang": "en",
+    "text": "why is sol pumping right now what happened",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 140,
+    "lang": "other",
+    "text": "¿Por qué subió tanto el precio del oro hoy?",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 141,
+    "lang": "en",
+    "text": "whats going on with meta stock today it's all over the news",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 142,
+    "lang": "zh",
+    "text": "今天苹果股票为什么大跌",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 143,
+    "lang": "en",
+    "text": "what's the catalyst behind AMD's move today",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 144,
+    "lang": "other",
+    "text": "오늘 비트코인이 왜 이렇게 올랐어?",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 145,
+    "lang": "en",
+    "text": "why didn't the desk take that NVDA signal yesterday",
+    "expected": "record",
+    "got": "record",
+    "by": "ngram",
+    "right": true
+   },
+   {
+    "id": 146,
+    "lang": "zh",
+    "text": "上周为什么风险层拦截了那笔BTC交易？",
+    "expected": "record",
+    "got": "refuse",
+    "by": "patterns",
+    "right": false
+   },
+   {
+    "id": 147,
+    "lang": "en",
+    "text": "did you guys actually trade anything this week",
+    "expected": "record",
+    "got": "record",
+    "by": "ngram",
+    "right": true
+   },
+   {
+    "id": 148,
+    "lang": "other",
+    "text": "pichle hafte kitna profit hua tha desk ka",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 149,
+    "lang": "en",
+    "text": "why the system not trade even when signal was strong last time",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 150,
+    "lang": "zh",
+    "text": "我们的决策日志是防篡改的吗？能给我证明吗？",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 151,
+    "lang": "en",
+    "text": "show me the sharpe and drawdown of the desk's paper trades this week",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 152,
+    "lang": "other",
+    "text": "¿Qué decisiones tomó el sistema la semana pasada y por qué?",
+    "expected": "record",
+    "got": "refuse",
+    "by": "declined",
+    "right": false
+   },
+   {
+    "id": 153,
+    "lang": "en",
+    "text": "why'd the risk layer block my mstr trade last night",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 154,
+    "lang": "zh",
+    "text": "为什么这周没有交易任何东西",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 155,
+    "lang": "en",
+    "text": "what was the rationale logged for skipping the SPY entry on Tuesday",
+    "expected": "record",
+    "got": "refuse",
+    "by": "patterns",
+    "right": false
+   },
+   {
+    "id": 156,
+    "lang": "other",
+    "text": "지난 결정 로그가 변조되지 않았다는 걸 어떻게 증명할 수 있어?",
+    "expected": "record",
+    "got": "refuse",
+    "by": "declined",
+    "right": false
+   },
+   {
+    "id": 157,
+    "lang": "en",
+    "text": "hey how's your day going",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 158,
+    "lang": "zh",
+    "text": "今天天气怎么样",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 159,
+    "lang": "en",
+    "text": "can you help me write python code to sort a list",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 160,
+    "lang": "other",
+    "text": "mujhe college assignment ke liye ek essay likh do",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 161,
+    "lang": "en",
+    "text": "yo what's the capital of france",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 162,
+    "lang": "zh",
+    "text": "帮我写一首关于爱情的诗",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 163,
+    "lang": "en",
+    "text": "just go ahead and buy 500 shares of NVDA for me right now",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 164,
+    "lang": "zh",
+    "text": "请直接帮我卖出我所有的黄金",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 165,
+    "lang": "en",
+    "text": "where will bitcoin be next week",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "honesty",
+    "right": true
+   },
+   {
+    "id": 166,
+    "lang": "other",
+    "text": "¿Dónde estará el precio de Tesla el próximo mes?",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 167,
+    "lang": "en",
+    "text": "what's the current price of ZYXQ coin",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 168,
+    "lang": "zh",
+    "text": "帮我查一下XYZCOIN这个币的价格",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 169,
+    "lang": "en",
+    "text": "can you fix bug in my javascript function please",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 170,
+    "lang": "other",
+    "text": "오늘 저녁 뭐 먹을까?",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 171,
+    "lang": "en",
+    "text": "lol tell me a joke about wall street",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 172,
+    "lang": "zh",
+    "text": "你觉得我应该辞职去炒股吗",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 173,
+    "lang": "en",
+    "text": "execute a buy order for 10000 shares of AAPL immediately",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 174,
+    "lang": "other",
+    "text": "mera liye trade kar do abhi NVDA mein 5k ka",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 175,
+    "lang": "en",
+    "text": "What's a good recipe for banana bread?",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 176,
+    "lang": "zh",
+    "text": "帮我解一道微积分题目",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 177,
+    "lang": "en",
+    "text": "will apple stock hit $500 by december",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "honesty",
+    "right": true
+   },
+   {
+    "id": 178,
+    "lang": "other",
+    "text": "¿Puedes hacer la compra de oro por mí directamente?",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 179,
+    "lang": "en",
+    "text": "what's the price prediction for sol end of year",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "honesty",
+    "right": true
+   },
+   {
+    "id": 180,
+    "lang": "zh",
+    "text": "帮我调试一下这个SQL查询语句",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 181,
+    "lang": "en",
+    "text": "can you tell me how photosynthesis works",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 182,
+    "lang": "other",
+    "text": "내일 나스닥 지수가 몇 포인트일지 정확히 맞춰줄 수 있어?",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "honesty",
+    "right": true
+   },
+   {
+    "id": 183,
+    "lang": "en",
+    "text": "place the trade, don't just tell me the analysis",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 184,
+    "lang": "zh",
+    "text": "帮我写一个React组件",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 185,
+    "lang": "en",
+    "text": "is FAKECOIN a good buy",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 186,
+    "lang": "other",
+    "text": "GHOSTSTOCK ka price kya hai",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 187,
+    "lang": "en",
+    "text": "what's your favorite movie",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 188,
+    "lang": "zh",
+    "text": "给我讲个笑话呗",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 189,
+    "lang": "en",
+    "text": "please write my homework essay about world war 2",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 190,
+    "lang": "other",
+    "text": "¿Cuál será el precio exacto de ETH en 3 meses?",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 191,
+    "lang": "en",
+    "text": "buy 2 BTC on my account right now, execute it",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 192,
+    "lang": "zh",
+    "text": "帮我直接下单卖出所有TSLA持仓",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 193,
+    "lang": "en",
+    "text": "How do I set up a Gmail account?",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 194,
+    "lang": "other",
+    "text": "내 대신 주식 좀 사줘",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 195,
+    "lang": "en",
+    "text": "what will gold price be exactly one year from now",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "honesty",
+    "right": true
+   },
+   {
+    "id": 196,
+    "lang": "zh",
+    "text": "QUANTUMCOIN这个币怎么样",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 197,
+    "lang": "en",
+    "text": "sell my whole book, just do it, no questions",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 198,
+    "lang": "other",
+    "text": "aaj IPL ka match kaun jeetega",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 199,
+    "lang": "en",
+    "text": "can you translate this sentence to french for me",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 200,
+    "lang": "zh",
+    "text": "帮我把这段话翻译成英文",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   }
+  ]
+ },
+ "blind": {
+  "corpus": "lui_blind_corpus_2026-09-25.jsonl",
+  "correct": 240,
+  "rows": 240,
+  "by_language": {
+   "en": [
+    172,
+    172
+   ],
+   "mixed": [
+    17,
+    17
+   ],
+   "zh": [
+    51,
+    51
+   ]
+  },
+  "by_kind": {
+   "compare": [
+    15,
+    15
+   ],
+   "event": [
+    15,
+    15
+   ],
+   "execution": [
+    15,
+    15
+   ],
+   "fundamentals": [
+    15,
+    15
+   ],
+   "hedge": [
+    15,
+    15
+   ],
+   "impact": [
+    15,
+    15
+   ],
+   "macro": [
+    15,
+    15
+   ],
+   "news": [
+    15,
+    15
+   ],
+   "quote": [
+    15,
+    15
+   ],
+   "record": [
+    15,
+    15
+   ],
+   "refuse": [
+    45,
+    45
+   ],
+   "sentiment": [
+    15,
+    15
+   ],
+   "stress": [
+    15,
+    15
+   ],
+   "technicals": [
+    15,
+    15
+   ]
+  },
+  "wrong_by_layer": {},
+  "results": [
+   {
+    "id": 1,
+    "lang": "zh",
+    "text": "我持有200股苹果和50股特斯拉,现在加仓英伟达合适吗?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 2,
+    "lang": "en",
+    "text": "already got a full COIN bag, is adding more MSTR going to blow up my correlation",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 3,
+    "lang": "en",
+    "text": "holding spy etf 30% of book, thinking of adding qqq too, too much overlap?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 4,
+    "lang": "mixed",
+    "text": "我现在有100股英伟达和50股特斯拉,加仓Meta会不会让组合风险太集中?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 5,
+    "lang": "en",
+    "text": "if I sell half my TSLA and put it into GOOGL what happens to my book",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 6,
+    "lang": "en",
+    "text": "portfolio is nvda 40%, msft 20%, cash rest — want to add 5k of coin, bad idea?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 7,
+    "lang": "en",
+    "text": "swapping some SPY for QQQ, portfolio impact?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 8,
+    "lang": "mixed",
+    "text": "手上有2 BTC和一些ETH,想加$50,000的AAPL,对整体有什么影响",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 9,
+    "lang": "en",
+    "text": "got aapl msft googl amzn — the big 4 basically — should I add meta or is that redundant",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 10,
+    "lang": "en",
+    "text": "I want to trim mstr and rotate into gold, how does that change my risk",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 11,
+    "lang": "en",
+    "text": "thinking of dropping my oil position entirely and doubling tsla, sanity check?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 12,
+    "lang": "en",
+    "text": "currently 60% crypto (btc+eth), 40% tech stocks — adding coin on top, too much?",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 13,
+    "lang": "mixed",
+    "text": "加仓100股AMZN对我现有持仓(70%QQQ, 30%ETH)有什么影响",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 14,
+    "lang": "en",
+    "text": "removing my gold hedge and adding more nvda — good or bad move for the book",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 15,
+    "lang": "en",
+    "text": "I hold a chunky COIN position already, if i add mstr does that just double my crypto beta",
+    "expected": "impact",
+    "got": "impact",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 16,
+    "lang": "zh",
+    "text": "如果标普明天跌5%,我的账户会亏多少",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 17,
+    "lang": "en",
+    "text": "if btc dumps 15% overnight what's the damage to my portfolio",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 18,
+    "lang": "en",
+    "text": "qqq -10% scenario, how bad is my drawdown",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 19,
+    "lang": "zh",
+    "text": "假如原油一天跌15%,我的账户受多大影响",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 20,
+    "lang": "en",
+    "text": "stress test my positions against a 2008-style crash",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 21,
+    "lang": "en",
+    "text": "what if nasdaq tanks 12% like march 2020, what happens to my nvda+coin heavy book",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 22,
+    "lang": "en",
+    "text": "gold spikes 10% (flight to safety) — what does that do to my equity longs",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 23,
+    "lang": "en",
+    "text": "oil -20% shock, how does that hit my book",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 24,
+    "lang": "en",
+    "text": "worst case if fed surprises hawkish and spy sells off 7%",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 25,
+    "lang": "zh",
+    "text": "假如比特币一天内跌20%,我这个仓位会怎样",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 26,
+    "lang": "en",
+    "text": "run a -6% spy stress on my current positions pls",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 27,
+    "lang": "en",
+    "text": "if eth drops 25% what's my max drawdown look like",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 28,
+    "lang": "en",
+    "text": "suppose mstr craters 30% in a day, how much of my book gets wiped",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 29,
+    "lang": "en",
+    "text": "stress my book against a 3% overnight gap down in aapl and msft together",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 30,
+    "lang": "zh",
+    "text": "假设纳指暴跌10%,我的组合大概会跌多少",
+    "expected": "stress",
+    "got": "stress",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 31,
+    "lang": "zh",
+    "text": "英伟达和特斯拉比,哪个波动更大",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 32,
+    "lang": "en",
+    "text": "compare risk on coin and mstr, which is the wilder ride",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 33,
+    "lang": "en",
+    "text": "googl vs meta — better risk adjusted right now?",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 34,
+    "lang": "en",
+    "text": "aapl vs msft, which is safer to hold overnight",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 35,
+    "lang": "zh",
+    "text": "比较一下亚马逊和谷歌,哪个风险更大",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 36,
+    "lang": "en",
+    "text": "spy vs qqq — which has more drawdown risk in a selloff",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 37,
+    "lang": "en",
+    "text": "btc vs eth vol comparison this month",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 38,
+    "lang": "en",
+    "text": "is amzn riskier than googl right now",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 39,
+    "lang": "en",
+    "text": "gold vs oil, which is more correlated to my equity book",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 40,
+    "lang": "mixed",
+    "text": "对比一下coin和mstr的波动性,哪个更疯",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 41,
+    "lang": "en",
+    "text": "comparing tsla msft and nvda risk side by side",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 42,
+    "lang": "en",
+    "text": "which is riskier to hold into earnings, meta or amzn",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 43,
+    "lang": "en",
+    "text": "mstr vs btc directly — is mstr just leveraged btc at this point",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 44,
+    "lang": "en",
+    "text": "spy vs gold as a risk comparison for the next month",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 45,
+    "lang": "mixed",
+    "text": "苹果和微软比,哪个的beta更低",
+    "expected": "compare",
+    "got": "compare",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 46,
+    "lang": "zh",
+    "text": "我想买5000美元的英伟达,应该怎么拆单避免冲击价格",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 47,
+    "lang": "en",
+    "text": "want to buy $50,000 of aapl, how do I execute without slippage",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 48,
+    "lang": "en",
+    "text": "100 shares tsla, best way to work this order",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 49,
+    "lang": "mixed",
+    "text": "我要买2个BTC,应该怎么拆单执行",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 50,
+    "lang": "en",
+    "text": "need to sell my whole coin position, 3000 shares, how do i do it cleanly",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 51,
+    "lang": "en",
+    "text": "how do I scale into a 20k qqq position",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 52,
+    "lang": "en",
+    "text": "want to dca into eth with 10k over the week, how should I split it",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 53,
+    "lang": "mixed",
+    "text": "想买$100,000的spy,应该怎么分批下单",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 54,
+    "lang": "en",
+    "text": "sell 500 shares mstr without tanking the price, how",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 55,
+    "lang": "en",
+    "text": "buying gold exposure with 15k, twap or just market it",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 56,
+    "lang": "en",
+    "text": "how should I break up a large googl order into smaller clips",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 57,
+    "lang": "en",
+    "text": "execute a 30k oil position entry, chunks or all at once",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 58,
+    "lang": "mixed",
+    "text": "我想卖出全部amzn持仓(约80股),怎么执行比较好",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 59,
+    "lang": "en",
+    "text": "want to add 5 btc, best execution approach given current liquidity",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 60,
+    "lang": "en",
+    "text": "splitting a 200 share msft order into smaller lots, how many clips",
+    "expected": "execution",
+    "got": "execution",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 61,
+    "lang": "zh",
+    "text": "英伟达现在多少钱",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 62,
+    "lang": "en",
+    "text": "what's aapl trading at",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 63,
+    "lang": "en",
+    "text": "btc quote",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 64,
+    "lang": "mixed",
+    "text": "现在eth多少钱",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 65,
+    "lang": "en",
+    "text": "where's gold trading",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 66,
+    "lang": "en",
+    "text": "spy live price",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 67,
+    "lang": "en",
+    "text": "coin quote plus round trip cost",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 68,
+    "lang": "en",
+    "text": "what's the round trip cost on mstr right now",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 69,
+    "lang": "en",
+    "text": "tsla price and spread?",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 70,
+    "lang": "zh",
+    "text": "现在原油多少钱一桶",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 71,
+    "lang": "en",
+    "text": "qqq bid ask",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 72,
+    "lang": "en",
+    "text": "give me meta's live quote",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 73,
+    "lang": "en",
+    "text": "amzn price check",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 74,
+    "lang": "mixed",
+    "text": "现在googl报价多少",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 75,
+    "lang": "en",
+    "text": "eth round trip cost if I buy and sell right now",
+    "expected": "quote",
+    "got": "quote",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 76,
+    "lang": "mixed",
+    "text": "英伟达的RSI现在是多少",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 77,
+    "lang": "en",
+    "text": "is tsla overbought",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 78,
+    "lang": "en",
+    "text": "macd on coin, bullish or bearish crossover",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 79,
+    "lang": "mixed",
+    "text": "苹果的RSI现在多少",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 80,
+    "lang": "en",
+    "text": "what's support and resistance on spy",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 81,
+    "lang": "en",
+    "text": "is btc oversold on the daily",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 82,
+    "lang": "en",
+    "text": "qqq macd signal",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 83,
+    "lang": "en",
+    "text": "mstr technicals looking stretched?",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 84,
+    "lang": "zh",
+    "text": "特斯拉现在是不是超买了",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 85,
+    "lang": "en",
+    "text": "eth support levels",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 86,
+    "lang": "en",
+    "text": "googl rsi + macd combined read",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 87,
+    "lang": "en",
+    "text": "gold technicals, is it overbought",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 88,
+    "lang": "en",
+    "text": "amzn resistance level above current price?",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 89,
+    "lang": "zh",
+    "text": "黄金的支撑位在哪",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 90,
+    "lang": "en",
+    "text": "oil rsi reading right now",
+    "expected": "technicals",
+    "got": "technicals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 91,
+    "lang": "zh",
+    "text": "英伟达的下次财报是什么时候",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 92,
+    "lang": "en",
+    "text": "aapl analyst price targets",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 93,
+    "lang": "en",
+    "text": "who are tsla's top holders",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 94,
+    "lang": "zh",
+    "text": "特斯拉的估值现在贵不贵",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 95,
+    "lang": "en",
+    "text": "msft pe ratio vs history",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 96,
+    "lang": "en",
+    "text": "when does coin report earnings",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 97,
+    "lang": "en",
+    "text": "meta valuation, is it expensive here",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 98,
+    "lang": "en",
+    "text": "googl analyst targets, bull vs bear",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 99,
+    "lang": "zh",
+    "text": "亚马逊下次财报是什么时候",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 100,
+    "lang": "en",
+    "text": "mstr fundamentals, does it even matter given the btc holdings",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 101,
+    "lang": "en",
+    "text": "amzn institutional holders list",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 102,
+    "lang": "en",
+    "text": "spy's underlying constituents pe",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 103,
+    "lang": "en",
+    "text": "qqq weighted avg valuation?",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 104,
+    "lang": "zh",
+    "text": "微软的机构持仓情况怎么样",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 105,
+    "lang": "en",
+    "text": "aapl next earnings date and consensus eps",
+    "expected": "fundamentals",
+    "got": "fundamentals",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 106,
+    "lang": "mixed",
+    "text": "英伟达在CPI公布当天通常怎么波动",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 107,
+    "lang": "en",
+    "text": "what happens to tsla on fed days",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 108,
+    "lang": "en",
+    "text": "coin's typical earnings day move?",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 109,
+    "lang": "zh",
+    "text": "英伟达财报当天通常波动多大",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 110,
+    "lang": "en",
+    "text": "how did spy react to the last cpi print",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 111,
+    "lang": "en",
+    "text": "btc reaction to fomc historically",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 112,
+    "lang": "en",
+    "text": "meta earnings day average move",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 113,
+    "lang": "en",
+    "text": "how does gold react when fed cuts rates",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 114,
+    "lang": "zh",
+    "text": "加息对特斯拉这种股票通常影响多大",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 115,
+    "lang": "en",
+    "text": "msft reaction to a hot cpi number",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 116,
+    "lang": "en",
+    "text": "oil's typical move on a big opec decision day",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 117,
+    "lang": "en",
+    "text": "aapl earnings day historical move size",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 118,
+    "lang": "en",
+    "text": "amzn's reaction pattern to fed rate decisions",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 119,
+    "lang": "zh",
+    "text": "比特币在美联储议息会议时通常怎么走",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 120,
+    "lang": "en",
+    "text": "how does qqq typically behave the week of cpi",
+    "expected": "event",
+    "got": "event",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 121,
+    "lang": "zh",
+    "text": "我的仓位英伟达占比很高,应该怎么对冲",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 122,
+    "lang": "en",
+    "text": "want to hedge overnight risk on my coin rtoken holding",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 123,
+    "lang": "en",
+    "text": "best way to hedge a big tsla position going into earnings",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 124,
+    "lang": "zh",
+    "text": "我想对冲一下我的比特币仓位,怎么做",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 125,
+    "lang": "en",
+    "text": "hedge my whole book against a market crash",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 126,
+    "lang": "en",
+    "text": "protect my mstr position from a btc drawdown",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 127,
+    "lang": "en",
+    "text": "how to hedge overnight risk holding qqq rtoken",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 128,
+    "lang": "en",
+    "text": "gold as a hedge for my tech-heavy book, does it work",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 129,
+    "lang": "mixed",
+    "text": "持有大量AAPL,想找个对冲方案",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 130,
+    "lang": "en",
+    "text": "hedge amzn earnings risk without selling the position",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 131,
+    "lang": "en",
+    "text": "using oil to hedge inflation risk in my book, good idea?",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 132,
+    "lang": "en",
+    "text": "what's the cheapest way to hedge my spy exposure this week",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 133,
+    "lang": "mixed",
+    "text": "我持有eth的rToken过夜,想对冲一下风险",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 134,
+    "lang": "en",
+    "text": "hedge my googl position against a rate hike",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 135,
+    "lang": "en",
+    "text": "protective hedge for meta going into cpi week",
+    "expected": "hedge",
+    "got": "hedge",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 136,
+    "lang": "zh",
+    "text": "美联储这周有什么动作",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 137,
+    "lang": "en",
+    "text": "how are rates looking right now",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 138,
+    "lang": "en",
+    "text": "dollar strength, what's DXY doing",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 139,
+    "lang": "zh",
+    "text": "美联储最近的政策方向是什么",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 140,
+    "lang": "en",
+    "text": "macro backdrop for risk assets right now",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 141,
+    "lang": "en",
+    "text": "is the fed cutting or holding next meeting",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 142,
+    "lang": "en",
+    "text": "how's the yield curve looking",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 143,
+    "lang": "zh",
+    "text": "现在美元指数怎么样",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 144,
+    "lang": "en",
+    "text": "overall macro picture — rates, inflation, dollar",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 145,
+    "lang": "en",
+    "text": "what's driving the macro narrative this week",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 146,
+    "lang": "zh",
+    "text": "加息还是降息,现在市场预期是什么",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 147,
+    "lang": "en",
+    "text": "how does the current rate environment affect risk assets",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 148,
+    "lang": "en",
+    "text": "dollar strength effect on crypto lately",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 149,
+    "lang": "en",
+    "text": "macro conditions for tech stocks this quarter?",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 150,
+    "lang": "zh",
+    "text": "现在的宏观环境对科技股有利吗",
+    "expected": "macro",
+    "got": "macro",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 151,
+    "lang": "zh",
+    "text": "特斯拉的热度是真的还是散户炒作",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 152,
+    "lang": "en",
+    "text": "coin sentiment right now, bullish or overhyped",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 153,
+    "lang": "en",
+    "text": "is nvda overhyped at these levels",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 154,
+    "lang": "zh",
+    "text": "现在市场对特斯拉的情绪是什么样",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 155,
+    "lang": "en",
+    "text": "mstr sentiment — is the btc treasury story still working",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 156,
+    "lang": "en",
+    "text": "is the ai trade in nvda getting overheated sentiment-wise",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 157,
+    "lang": "en",
+    "text": "meta sentiment check, is the hype justified",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 158,
+    "lang": "en",
+    "text": "btc sentiment index right now",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 159,
+    "lang": "en",
+    "text": "is tsla cooked",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 160,
+    "lang": "zh",
+    "text": "大家现在对比特币是看多还是看空",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 161,
+    "lang": "en",
+    "text": "sentiment on googl after the ai announcements",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 162,
+    "lang": "en",
+    "text": "is the amzn rally just hype or is it real",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 163,
+    "lang": "en",
+    "text": "gold sentiment, is safe haven demand genuine right now",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 164,
+    "lang": "zh",
+    "text": "市场对英伟达的情绪是不是太乐观了",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 165,
+    "lang": "en",
+    "text": "coin hype real or bubble",
+    "expected": "sentiment",
+    "got": "sentiment",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 166,
+    "lang": "zh",
+    "text": "英伟达今天为什么大跌",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 167,
+    "lang": "en",
+    "text": "what's going on with tsla, why's it down",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 168,
+    "lang": "en",
+    "text": "why is coin pumping right now",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 169,
+    "lang": "zh",
+    "text": "今天特斯拉为什么大涨",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 170,
+    "lang": "en",
+    "text": "any news on mstr today",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 171,
+    "lang": "en",
+    "text": "why did meta drop this morning",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 172,
+    "lang": "en",
+    "text": "what happened to btc overnight",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 173,
+    "lang": "zh",
+    "text": "今天英伟达为什么跌了",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 174,
+    "lang": "en",
+    "text": "why is gold spiking today",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 175,
+    "lang": "en",
+    "text": "what's the news on amzn today",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 176,
+    "lang": "en",
+    "text": "oil news today, why the move",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 177,
+    "lang": "en",
+    "text": "why did googl gap up",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 178,
+    "lang": "zh",
+    "text": "今天以太坊为什么波动这么大",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 179,
+    "lang": "en",
+    "text": "spy news catalyst today",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 180,
+    "lang": "en",
+    "text": "msft news, why's it moving",
+    "expected": "news",
+    "got": "news",
+    "by": "research",
+    "right": true
+   },
+   {
+    "id": 181,
+    "lang": "zh",
+    "text": "这个系统自己的夏普比率是多少",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 182,
+    "lang": "en",
+    "text": "show me the desk's past decisions",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 183,
+    "lang": "en",
+    "text": "what has the risk layer blocked recently",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 184,
+    "lang": "zh",
+    "text": "系统自己的交易记录表现怎么样",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 185,
+    "lang": "en",
+    "text": "is the desk's log tamper-evident",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 186,
+    "lang": "en",
+    "text": "what's the max drawdown on the desk's own trades",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 187,
+    "lang": "en",
+    "text": "how calibrated is the desk's confidence vs actual outcomes",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 188,
+    "lang": "zh",
+    "text": "风险层最近拦截了哪些交易",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 189,
+    "lang": "en",
+    "text": "show me the desk's win rate",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 190,
+    "lang": "en",
+    "text": "what decisions has the desk made this week",
+    "expected": "record",
+    "got": "record",
+    "by": "ngram",
+    "right": true
+   },
+   {
+    "id": 191,
+    "lang": "en",
+    "text": "is the trading log verifiable / hash-committed",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 192,
+    "lang": "mixed",
+    "text": "这个系统自己的sharpe和回撤是多少",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 193,
+    "lang": "en",
+    "text": "what's the desk's track record on nvda calls specifically",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 194,
+    "lang": "en",
+    "text": "how does the desk's calibration look, overconfident or accurate",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 195,
+    "lang": "zh",
+    "text": "系统的决策日志能不能防篡改",
+    "expected": "record",
+    "got": "record",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 196,
+    "lang": "zh",
+    "text": "明天纽约天气怎么样",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 197,
+    "lang": "en",
+    "text": "can you help me debug this python function, it keeps throwing a typeerror",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 198,
+    "lang": "en",
+    "text": "who won the lakers game last night",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 199,
+    "lang": "zh",
+    "text": "我应该和男朋友分手吗",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 200,
+    "lang": "en",
+    "text": "buy 1 btc for me right now with real money, execute it",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 201,
+    "lang": "en",
+    "text": "what's pltr trading at",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 202,
+    "lang": "en",
+    "text": "recommend a good hotel in tokyo for a week in october",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 203,
+    "lang": "zh",
+    "text": "帮我写一段python爬虫代码",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 204,
+    "lang": "en",
+    "text": "help me write a sql query to join these two tables",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 205,
+    "lang": "en",
+    "text": "what's amd's rsi looking like these days",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 206,
+    "lang": "zh",
+    "text": "我家wifi老是断线,怎么修",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 207,
+    "lang": "en",
+    "text": "write me a poem about the ocean",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 208,
+    "lang": "en",
+    "text": "should i propose to my girlfriend this weekend",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 209,
+    "lang": "zh",
+    "text": "法国的首都是哪里",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 210,
+    "lang": "en",
+    "text": "who's going to win the super bowl this year",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 211,
+    "lang": "en",
+    "text": "place a live order for 500 shares of nvda on my real account right now, execute it",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 212,
+    "lang": "en",
+    "text": "give me legal advice on breaking my apartment lease",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 213,
+    "lang": "zh",
+    "text": "帮我查一下台积电现在多少钱",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 214,
+    "lang": "en",
+    "text": "help me plan a birthday party for my kid, any ideas",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 215,
+    "lang": "en",
+    "text": "translate 'good morning, how are you' into spanish",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 216,
+    "lang": "zh",
+    "text": "帮我看看这段代码报错是什么问题",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 217,
+    "lang": "en",
+    "text": "what's a good recipe for pasta carbonara",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 218,
+    "lang": "en",
+    "text": "fantasy football lineup advice for this week",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 219,
+    "lang": "mixed",
+    "text": "PLTR现在能买吗,帮我实盘下单买入",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 220,
+    "lang": "en",
+    "text": "should I take this new job offer, the pay is a bit lower",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 221,
+    "lang": "en",
+    "text": "what movie should I watch tonight",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 222,
+    "lang": "zh",
+    "text": "帮我写一首关于大海的诗",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 223,
+    "lang": "en",
+    "text": "how do I fix a leaking kitchen faucet",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 224,
+    "lang": "en",
+    "text": "what's rivian's technical setup look like",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 225,
+    "lang": "zh",
+    "text": "昨晚的篮球比赛谁赢了",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 226,
+    "lang": "en",
+    "text": "should I get a dog or a cat, I live in an apartment",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 227,
+    "lang": "en",
+    "text": "buy palantir for me, real trade, execute it now with my funds",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 228,
+    "lang": "zh",
+    "text": "帮我规划一下去意大利十天的旅行行程",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 229,
+    "lang": "en",
+    "text": "who's the best nba player of all time",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 230,
+    "lang": "en",
+    "text": "help me with my resume, can you review it for a swe role",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 231,
+    "lang": "zh",
+    "text": "帮我用真实资金买两个以太坊,现在就下单",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   },
+   {
+    "id": 232,
+    "lang": "en",
+    "text": "recommend a good workout routine for beginners",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 233,
+    "lang": "en",
+    "text": "diagnose my knee pain, it's been hurting for a week",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 234,
+    "lang": "zh",
+    "text": "我该买房还是继续租房比较好",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 235,
+    "lang": "en",
+    "text": "write a react component for a login form",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 236,
+    "lang": "en",
+    "text": "what's the score of the world cup match today",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 237,
+    "lang": "zh",
+    "text": "15乘以37等于多少",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 238,
+    "lang": "en",
+    "text": "is sofi a buy right now",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined",
+    "right": true
+   },
+   {
+    "id": 239,
+    "lang": "en",
+    "text": "explain quantum computing to me like i'm five",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "declined-off-topic",
+    "right": true
+   },
+   {
+    "id": 240,
+    "lang": "en",
+    "text": "buy 2 eth with my real funds, place the order now for real",
+    "expected": "refuse",
+    "got": "refuse",
+    "by": "patterns",
+    "right": true
+   }
+  ]
+ }
+}

@@ -225,7 +225,7 @@ class TestTheNewestEnginesAreReachable:
 
         def run(question: str, request: Any, ledger: Any = None) -> Any:
             kind = request.kind.value
-            return SimpleNamespace(lines=[f"{kind} reading", f"Actionable: act on {kind}"],
+            return SimpleNamespace(lines=[f"{kind} reading", f"Bottom line: act on {kind}"],
                                    refused=False, data={})
 
         monkeypatch.setattr(task, "run", run)
@@ -253,7 +253,7 @@ class TestTheNewestEnginesAreReachable:
 
         def fake(question: str, book_text: str = "", **kwargs: Any) -> Any:
             seen.update(book=book_text, days=kwargs.get("days"))
-            return ["Actionable: CPI on Tuesday"], [Source("evidence", "bls.gov")], {}
+            return ["Bottom line: CPI on Tuesday"], [Source("evidence", "bls.gov")], {}
 
         monkeypatch.setattr(watchlist, "watchlist", fake)
         text, error = mcp.call_tool("argus_week_ahead", {"book": "50% NVDA, 50% BTC", "days": 5})
@@ -269,7 +269,7 @@ class TestTheNewestEnginesAreReachable:
 
         def fake(raw_text: str, book_text: str = "", **kwargs: Any) -> Any:
             asked.append(raw_text)
-            return SimpleNamespace(lines=["Actionable: tech is 80% of the book"], sources=[],
+            return SimpleNamespace(lines=["Bottom line: tech is 80% of the book"], sources=[],
                                    refused=False)
 
         monkeypatch.setattr(exposures, "answer", fake)

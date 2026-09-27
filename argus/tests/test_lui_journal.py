@@ -186,7 +186,7 @@ def test_review_computes_checks_and_leads_with_a_counted_habit() -> None:
     out = review_trades(text, now=NOW, history=_history, releases=_releases)
     assert out is not None
     lines, sources, data = out
-    assert lines[0].startswith("Actionable: the habit most worth fixing is ")
+    assert lines[0].startswith("Bottom line: the habit most worth fixing is ")
     assert " of " in lines[0]
     assert lines[1].startswith("Too few trades to call any of this a statistic")
     first = data["journal"]["trades"][0]

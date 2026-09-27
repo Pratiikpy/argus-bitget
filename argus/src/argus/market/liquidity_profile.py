@@ -67,7 +67,7 @@ def lines(p: Profile, name: str, equity: bool) -> list[str]:
     best = ranked[:3]
     worst = ranked[-3:]
     ratio = p.weekend_median / p.weekday_median if p.weekday_median else 0.0
-    lead = (f"Actionable: {name} trades most in {', '.join(f'{h:02d}:00' for h, _ in best)} UTC "
+    lead = (f"Bottom line: {name} trades most in {', '.join(f'{h:02d}:00' for h, _ in best)} UTC "
             f"(a median ${best[0][1]:,.0f} an hour at the busiest) and least in "
             f"{', '.join(f'{h:02d}:00' for h, _ in worst)} UTC (${worst[-1][1]:,.0f}) — "
             f"a large order costs least when split across the busy hours.")

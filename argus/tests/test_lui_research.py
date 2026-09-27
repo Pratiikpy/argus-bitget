@@ -175,7 +175,7 @@ class TestRunAnswersFromTheEngines:
         assert req is not None
         answer = run("q", req)
         assert not answer.refused and answer.is_grounded
-        assert any(line.startswith("Actionable:") for line in answer.lines)
+        assert any(line.startswith("Bottom line:") for line in answer.lines)
         assert any(line.startswith("Hedge:") for line in answer.lines)
         report = answer.data["report"]
         assert report["impact"]["risk_share_after"] is not None
@@ -368,7 +368,7 @@ class TestTechnicals:
             self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(research, "_skill_calls", _skills(rsi=75.0, hist=0.5))
         answer = run("q", ResearchRequest(kind=ResearchKind.TECHNICALS, symbols=("NVDAUSDT",)))
-        assert answer.lines[0].startswith("Actionable:") and "overbought" in answer.lines[0]
+        assert answer.lines[0].startswith("Bottom line:") and "overbought" in answer.lines[0]
         assert "within 1% of resistance" in answer.lines[0]
         assert any(line.startswith("Caveat:") for line in answer.lines)
         assert "bitget-signal" in answer.lines[-1] and "24h ticker" not in answer.lines[-1]
@@ -424,13 +424,13 @@ class TestFundamentals:
     def test_a_near_report_leads_the_answer(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _service(monkeypatch, report=_days_from_today(3), scraped="2018-10-25", holders=3)
         lines, _ = research._fundamentals("NVDAUSDT")
-        assert lines[0].startswith("Actionable: NVDA reports in 3 day(s)")
+        assert lines[0].startswith("Bottom line: NVDA reports in 3 day(s)")
 
     def test_a_past_report_gives_an_estimate_labelled_as_one(
             self, monkeypatch: pytest.MonkeyPatch) -> None:
         _service(monkeypatch, report=_days_from_today(-40), scraped="2018-10-25", holders=3)
         lines, _ = research._fundamentals("NVDAUSDT")
-        assert lines[0].startswith("Actionable:") and "an estimate, not a date" in lines[0]
+        assert lines[0].startswith("Bottom line:") and "an estimate, not a date" in lines[0]
 
     def test_one_13f_record_is_not_dressed_up_as_a_table(
             self, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -449,13 +449,13 @@ class TestAnalogues:
     def test_a_failed_live_fetch_is_answered_frozen_and_says_so(self) -> None:
         answer = run("q", ResearchRequest(kind=ResearchKind.ANALOGUE, symbols=("COINUSDT",)))
         assert not answer.refused
-        assert answer.lines[0].startswith("Actionable:")
+        assert answer.lines[0].startswith("Bottom line:")
         assert "frozen" in answer.lines[-1]
 
     def test_a_thin_sample_is_called_thin(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(research, "MIN_INDEPENDENT_EPISODES", 10**6)
         answer = run("q", ResearchRequest(kind=ResearchKind.ANALOGUE, symbols=("COINUSDT",)))
-        assert answer.lines[0].startswith("Actionable: treat this as thin")
+        assert answer.lines[0].startswith("Bottom line: treat this as thin")
         assert not any(line.startswith("Spread of outcomes") for line in answer.lines)
 
     @staticmethod
@@ -528,7 +528,7 @@ class TestEveryBitgetContract:
 
     def test_a_commodity_has_no_earnings_and_says_so(self) -> None:
         lines, _ = research._fundamentals("CLUSDT")
-        assert lines[0].startswith("Actionable: CL is a commodity")
+        assert lines[0].startswith("Bottom line: CL is a commodity")
 
     def test_crypto_has_no_filings_and_says_so(self) -> None:
         lines, _ = research._fundamentals("BTCUSDT")
@@ -607,7 +607,7 @@ class TestComputedTechnicals:
             self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(history, "fetch", lambda *a, **k: self._bars(200))
         lines, sources = research._technicals_computed("SP500USDT")
-        assert lines[0].startswith("Actionable: RSI is overbought")
+        assert lines[0].startswith("Bottom line: RSI is overbought")
         assert sources[0].kind == "computation"
         assert not any(line.startswith("Short history") for line in lines)
 
@@ -692,7 +692,7 @@ class TestASingleNamesProfile:
 
     def test_a_standalone_question_leads_with_a_sizing_rule_and_shows_the_shape(self) -> None:
         answer = run("q", ResearchRequest(kind=ResearchKind.IMPACT, symbols=("MSTRUSDT",)))
-        assert answer.lines[0].startswith("Actionable: size MSTR")
+        assert answer.lines[0].startswith("Bottom line: size MSTR")
         assert any(line.startswith("Return shape") and "kurtosis" in line and "R²" in line
                    for line in answer.lines)
 
@@ -783,7 +783,7 @@ class TestTheBookAsHeld:
                                           symbols=("NVDAUSDT", "MSFTUSDT", "AAPLUSDT"),
                                           book={"NVDAUSDT": 0.5, "MSFTUSDT": 0.3,
                                                 "AAPLUSDT": 0.2}))
-        assert answer.lines[0].startswith("Actionable: the risk is concentrated in NVDA")
+        assert answer.lines[0].startswith("Bottom line: the risk is concentrated in NVDA")
         assert "equal-risk rebalance" in answer.lines[0] and "fully invested" in answer.lines[0]
         assert any(line.startswith("Where the risk sits") for line in answer.lines)
 
@@ -939,10 +939,40 @@ class TestExecutionReadsTheBook:
                               adv_notional=Decimal("6000000"))
         lines = research._depth_lines("PLTRUSDT", Decimal("2000000"), Decimal("6000000"), plan,
                                       "sell $2m of PLTR")
-        assert lines[0].startswith("Actionable: in one market order this costs at least")
+        assert lines[0].startswith("Bottom line: in one market order this costs at least")
         assert any("sell side" in line for line in lines)
         assert any("larger than the visible book" in line for line in lines)
         assert any(line.startswith("Schedule:") and "days" in line for line in lines)
+        measured: dict[str, float] = {}
+        research._depth_lines("PLTRUSDT", Decimal("2000000"), Decimal("6000000"), plan,
+                              "sell $2m of PLTR", measured=measured)
+        assert measured == {}  # a floor is not a cost, so nothing is handed to the verdict
+
+    def test_the_figures_the_lines_state_are_handed_to_the_verdict(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from datetime import UTC, datetime
+        from decimal import Decimal
+
+        from argus.desk.workbench import plan_execution
+        from argus.market import depth
+        asks = tuple(depth.Level(Decimal(100 + i), Decimal(100)) for i in range(1, 51))
+        bids = tuple(depth.Level(Decimal(100 - i), Decimal(100)) for i in range(1, 51))
+        book = depth.OrderBook(symbol="TSLAUSDT", fetched_at=datetime.now(UTC), bids=bids,
+                               asks=asks)
+        monkeypatch.setattr(depth, "fetch_orderbook", lambda *a, **k: book)
+        plan = plan_execution(symbol="TSLAUSDT", notional=Decimal("15000"),
+                              adv_notional=Decimal("1500000"), anchor_asleep=True)
+        measured: dict[str, float] = {}
+        lines = research._depth_lines("TSLAUSDT", Decimal("15000"), Decimal("1500000"), plan,
+                                      "buy $15k of TSLA", measured=measured)
+        whole = book.sweep(Decimal("15000"), direction="BUY")
+        fee = float(plan.slices[0].expected_cost_bps)
+        assert measured["single_order_bps"] == pytest.approx(fee + float(whole.slippage_bps))
+        parts = [float(s.fraction) * (float(s.expected_cost_bps) + float(
+            book.sweep(Decimal("15000") * s.fraction, direction="BUY").slippage_bps))
+            for s in plan.slices]
+        assert measured["sliced_bps"] == pytest.approx(sum(parts))
+        assert f"{float(whole.slippage_bps):.1f}bps of slippage" in " ".join(lines)
 
 
 class TestMacroAndSentiment:
@@ -956,7 +986,7 @@ class TestMacroAndSentiment:
         monkeypatch.setattr(evidence.RssSource, "headlines", lambda self, k, u: [])
         lines, _, readings = research._macro(None)
         joined = " ".join(lines)
-        assert lines[0].startswith("Actionable: the 10-year is 4.90%")
+        assert lines[0].startswith("Bottom line: the 10-year is 4.90%")
         assert "rates have been driving it" in lines[0]
         assert "10-year minus 2-year is +20bp" in joined
         assert readings["DGS10"]["value"] == pytest.approx(4.9)
@@ -1015,13 +1045,13 @@ class TestSecondRoundOfJudgeQuestions:
         assert req is not None and "SPYUSDT" in req.symbols and "XAUUSDT" in req.symbols
 
     def test_the_line_that_answers_the_question_leads(self) -> None:
-        lines = ["Actionable: NVDA's next report date is not published yet.",
+        lines = ["Bottom line: NVDA's next report date is not published yet.",
                  "Institutional holders: the source returned one 13F record.",
                  "Analyst price targets, last 90 days (21 firms): median 330."]
         led = research._lead_with_what_was_asked(lines, "what are analysts' price targets")
-        assert led[0].startswith("Actionable: analyst price targets")
+        assert led[0].startswith("Bottom line: analyst price targets")
         led = research._lead_with_what_was_asked(lines, "which 13F funds own NVDA")
-        assert led[0].startswith("Actionable: institutional holders")
+        assert led[0].startswith("Bottom line: institutional holders")
         assert research._lead_with_what_was_asked(lines, "when does NVDA report") == lines
 
     def test_fred_falls_back_to_the_dated_snapshot(self, monkeypatch: pytest.MonkeyPatch,
@@ -1083,3 +1113,49 @@ class TestFredBacksOff:
         research._fred("DGS2", days=10_000)
         assert calls == ["DGS10"]
         research._FRED_USED_SNAPSHOT.clear()
+
+
+class TestTheLongRunAnalogue:
+    """Audit finding 61: the analogue read ninety days of hourly bars and one horizon. Daily
+    closes reach back years; the answer now reads 1, 5 and 20 days ahead against every day's
+    base rate, and says whether the state changes the odds at all."""
+
+    @staticmethod
+    def _closes(pattern: Any) -> Any:
+        from datetime import date, timedelta
+
+        start = date(2019, 1, 1)
+        level, out = 100.0, {}
+        for i in range(1800):
+            level *= 1.0 + pattern(i)
+            out[start + timedelta(days=i)] = level
+        return lambda symbol, rows=None: (out, "TEST daily closes (Yahoo)")
+
+    def test_noise_is_called_a_base_rate_not_a_signal(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        import random
+
+        from argus.lui import exposures
+
+        rng = random.Random(7)
+        monkeypatch.setattr(exposures, "closes_for",
+                            self._closes(lambda i: rng.gauss(0.0005, 0.02)))
+        lines, sources, data = research._long_run("NVDAUSDT")
+        assert lines[0].startswith("Over 5 years of daily closes: NVDA is ")
+        assert [r["days"] for r in data["horizons"]] == [1, 5, 20]
+        assert "does not measurably change the odds" in lines[-1]
+        assert sources and "episodes collapsed" in sources[0].detail
+
+    def test_a_state_that_always_reverses_is_said_to_change_the_odds(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui import exposures
+
+        # A 40-day cycle: twenty falling days, then twenty rising ones. Today ends a falling
+        # stretch, and every past state like it was followed by a rise.
+        monkeypatch.setattr(exposures, "closes_for",
+                            self._closes(lambda i: -0.01 if (i // 20) % 2 == 0 else 0.011))
+        lines, _, _ = research._long_run("NVDAUSDT")
+        assert "changes the odds at" in lines[-1]
+
+    def test_no_daily_history_adds_nothing(self) -> None:
+        assert research._long_run("NVDAUSDT") == ([], [], {})

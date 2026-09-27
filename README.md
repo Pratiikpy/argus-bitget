@@ -83,12 +83,12 @@ deflation gate, and the console says so.
 Every capability is graded against the specialist that leads its sub-theme, by a register that
 opens the evidence rather than trusting a filename (`python -m argus.eval.standing`), and may claim
 OWNED only after that rival has been run on the same input and beaten.
-**6 of 44 capabilities are OWNED, 12 are TIED, 25 are IMPLEMENTED, and 1 is LOST (crowd sentiment classification, to RoB-RT on TweetEval: 0.544 against 0.729 macro-recall on the same 12,284 tweets).** OWNED needs
+**4 of 44 capabilities are OWNED, 13 are TIED, 26 are IMPLEMENTED, and 1 is LOST (crowd sentiment classification, to RoB-RT on TweetEval: 0.544 against 0.729 macro-recall on the same 12,284 tweets).** OWNED needs
 all thirteen conditions: the rival's best implementation read and reproduced, a same-input
 comparison with costs, out-of-sample, ablation, an adversarial test, documented failure cases and
 reproducibility.
 
-The register got stricter on 2026-09-25 and 26, and the OWNED count fell from 20 to 8, then to 6. A proof that rests on a
+The register got stricter on 2026-09-25, 26 and 27, and the OWNED count fell from 20 to 8, then to 6, then to 4. A proof that rests on a
 population figure must now survive a per-group check — by symbol and by half of the sample — and 12
 capabilities went back to IMPLEMENTED: five because their headline was carried by one symbol or
 flipped between halves, seven because their proof is a designed case set the new check cannot
@@ -96,7 +96,7 @@ grade, which needs its own construction test before it can count again. Each row
 back (`data/standing.json`). One more went to TIED the same day: breadth rotation had beaten
 pytaa, which silently drops weight, but a general-purpose validator (pandera with pydantic)
 configured to the same contract handles the same 36 cases, so a margin over the specialist was
-not a margin over the best tool for the job. A sixth, rToken factor divergence against Alphalens, went to IMPLEMENTED when its statement was rewritten from the computed intervals, which include zero.
+not a margin over the best tool for the job. A sixth, rToken factor divergence against Alphalens, went to IMPLEMENTED when its statement was rewritten from the computed intervals, which include zero. On 2026-09-27 cross-sectional ranking went to TIED with qlib: the two rank identically, and the one input where ARGUS was safer, a single-instrument group, never reaches a decision, because every hour of the panel holds all 12 names. Numeric decision grounding went back to IMPLEMENTED the same day: its twelve cases were fabrications the author chose, which the gate had filed as a population, and a general pydantic range check was never run against them.
 
 Losses are published the moment they are found. Two were found and closed on 2026-09-24: Bitget's
 own 60-second TWAP beat the schedule the console printed (6.9 against 12.2bps on a $100k order),
@@ -158,7 +158,7 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 9,381 tests collected
+pytest -q                       # 9,419 tests collected
 ```
 
 Nothing above needs a credential. The full run took 1h16m from a fresh GitHub clone on
@@ -180,12 +180,12 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **9,381 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 482 source files** |
+| Tests | **9,419 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 484 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
-| Sub-themes | **18/18 sub-themes**, resolved by import at runtime, not claimed in prose |
-| Understanding | 240 questions in 12 languages, written by an agent that never saw this repository, scored without reading its misses: the console, with no language model, read **52.1% → 81.7%** of them correctly after 2026-09-25 (85.0% with a saved book; on the live site Qwen reads first and this is the fallback); the trained question classifier alone reads 91.3%; with Qwen reading first the console reads 85.0% — `data/lui_final_heldout_report.json` |
+| Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 4 of 44 capabilities are OWNED against a named rival, and `/proof` says which |
+| Understanding | **81.7%** of 240 questions in 12 languages, written blind by an agent that never saw this repository and scored once, were read correctly by the console with no language model (52.1% before the 2026-09-25 fixes); with Qwen reading first, as on the live site, 85.0% — `data/lui_final_heldout_report.json`. Which engine each question reaches is re-scored on every change by `eval/kind_routing.py` |
 | Quoted figures | Every figure these documents quote is re-checked against its artefact by `python -m argus.eval.docclaims --tests`, which fails if one has drifted |
 
 ## What the code will not let happen
@@ -219,8 +219,8 @@ a test that reaches the network shows itself.
 
 ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · AI Trading Desk）。用自然语言提问，
 七个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
-从不编写数字。44 项能力中 42 项已与各子赛道领先的专业系统在相同输入上对比：6 项领先（OWNED）、12 项
-持平、25 项已实现、1 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
+从不编写数字。44 项能力中 42 项已与各子赛道领先的专业系统在相同输入上对比：4 项领先（OWNED）、13 项
+持平、26 项已实现、1 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
 （t2-sentiment-agent，独立的代码库、交易日志与演示），不属于本仓库。
 
 ---

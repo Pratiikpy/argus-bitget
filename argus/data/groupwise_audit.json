@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-26T21:51:25+00:00",
+  "generated_at": "2026-09-27T00:14:00+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
@@ -75,8 +75,8 @@
     "data/xa_arena.json"
   ],
   "counts": {
-    "checked": 52,
-    "designed_cases": 24,
+    "checked": 51,
+    "designed_cases": 25,
     "aggregate_without_rows": 16,
     "no_rows": 4
   },
@@ -3186,7 +3186,7 @@
     "data/crosssection_comparison.json": {
       "status": "designed_cases",
       "reason": "seven designed panels and 54 swept panels reduced to one all-agree flag",
-      "sha256": "bea57641a0a492b1a65c7fba80f68a117f1f3fd71bb6e306b10f2ddc03c4db05",
+      "sha256": "786b8fa80bbe7edf5b327e3029ec8e80812415119303368c73ba6757a5908fe8",
       "flagged": false,
       "headlines": []
     },
@@ -4803,85 +4803,11 @@
       ]
     },
     "data/explainability_comparison.json": {
-      "status": "checked",
-      "reason": "one row per fabricated figure on a live price",
+      "status": "designed_cases",
+      "reason": "twelve fabricated prices the author chose (four magnitudes on three live prices): a demonstration that the check catches what it is built to catch, not a measurement over the desk's decisions",
       "sha256": "8233378e9ec9317522f8ee0a4ab44d8416b7f6b64e775032a1625a1054f292a8",
       "flagged": false,
-      "headlines": [
-        {
-          "name": "fabricated entry price caught: ARGUS vs TraderProposal",
-          "headline": "fabrications caught",
-          "orientation": "ARGUS caught - TradingAgents caught: positive = ARGUS",
-          "items": 12,
-          "micro_mean": 1.0,
-          "total": 12.0,
-          "broken_down": true,
-          "flags": [],
-          "flagged": false,
-          "tables": [
-            {
-              "key": "symbol",
-              "groups": 3,
-              "micro_mean": 1.0,
-              "macro_mean": 1.0,
-              "direction": 1,
-              "largest_contributor": "AAPLUSDT",
-              "largest_share_of_total": 0.3333,
-              "total_without_largest": 8.0,
-              "loss_histogram": {
-                "0": 1.0,
-                "1": 0.0,
-                "2": 0.0,
-                "3": 0.0,
-                ">3": 0.0
-              },
-              "carried_by_one_group": false,
-              "single_group": false,
-              "macro_disagrees": false,
-              "reading": "no single symbol carries the headline: without the largest contributor (AAPLUSDT, 33.3% of the total) the rest still point the same way",
-              "per_group": [
-                {
-                  "group": "AAPLUSDT",
-                  "rows": 4,
-                  "weight": 4.0,
-                  "total": 4.0,
-                  "mean": 1.0,
-                  "share_of_total": 0.3333,
-                  "opposing": 0
-                },
-                {
-                  "group": "MSFTUSDT",
-                  "rows": 4,
-                  "weight": 4.0,
-                  "total": 4.0,
-                  "mean": 1.0,
-                  "share_of_total": 0.3333,
-                  "opposing": 0
-                },
-                {
-                  "group": "NVDAUSDT",
-                  "rows": 4,
-                  "weight": 4.0,
-                  "total": 4.0,
-                  "mean": 1.0,
-                  "share_of_total": 0.3333,
-                  "opposing": 0
-                }
-              ]
-            }
-          ],
-          "split_half": null,
-          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
-          "notes": [
-            "four fabrication magnitudes per symbol are designed, so magnitude is not declared as a population key"
-          ],
-          "role": "argus_vs_rival",
-          "role_reason": "the same-input comparison",
-          "source": "same_input_comparison.cases",
-          "split_ran": false,
-          "favours": "argus"
-        }
-      ]
+      "headlines": []
     },
     "data/factor_divergence_comparison.json": {
       "status": "checked",
@@ -8469,7 +8395,7 @@
     "data/mcp_fuzz.json": {
       "status": "designed_cases",
       "reason": "an authored 145-case fuzz corpus in five families",
-      "sha256": "c5c47f8763cb5b5d567e0851dec90eafe053cebb0f78c434f1bb6374391222ef",
+      "sha256": "342bc9594d0027251d166bfce71df20928a80669639e791bc4c8fbe3f5718917",
       "flagged": false,
       "headlines": []
     },
@@ -15288,7 +15214,7 @@
     "data/skill_matrix.json": {
       "status": "checked",
       "reason": "one row per tool",
-      "sha256": "880a6a6766cdd0366c69a98230a33f7ed4ff5c7af9d3dcea08e87e1f72d8a893",
+      "sha256": "1842c10649b4ec49baab107fb501f32067df3077624cb52b050ca182c40643af",
       "flagged": true,
       "headlines": [
         {

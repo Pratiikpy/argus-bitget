@@ -50,10 +50,10 @@ class FakeModel:
 
 
 def test_a_line_whose_figures_move_keeps_its_english() -> None:
-    src = ["Actionable: a round trip costs 12.4bps.", "Funding: flat."]
+    src = ["Bottom line: a round trip costs 12.4bps.", "Funding: flat."]
     model = FakeModel(["可操作提示：往返成本约 12.5bps。", "资金费率：持平。"])
     out = tr.translate(src, "zh", model)
-    assert out["lines"] == ["Actionable: a round trip costs 12.4bps.", "资金费率：持平。"]
+    assert out["lines"] == ["Bottom line: a round trip costs 12.4bps.", "资金费率：持平。"]
     assert out["kept_english"] == [0] and out["note"].startswith("以下由 Qwen 翻译成中文")
 
 

@@ -172,7 +172,7 @@ def answer_lines(ticker: str, source: EarningsReleaseSource | None = None) -> li
     latest = found[0]
     prior = found[1] if len(found) > 1 else None
     lines: list[str] = []
-    lead = (f"Actionable: no call transcript is read here — {ticker}'s own earnings release "
+    lead = (f"Bottom line: no call transcript is read here — {ticker}'s own earnings release "
             f"(8-K exhibit 99.1, filed {latest.filed:%d %b %Y})")
     if latest.revenue is not None:
         lead += f" reports revenue of {_money(latest.revenue)}"

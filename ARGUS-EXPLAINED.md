@@ -11,7 +11,7 @@ with its own repository, ledger and demo; nothing in this document is part of it
   never filed there; that history is kept, not rewritten.
 - **Part C is the factor research** — the Alpha Factory machinery, not an entry: it is built and the
   results are in, and they are published here in full because they mostly say no.
-- **Part D is the complete architecture** — all 147 modules across 20 packages named and placed,
+- **Part D is the complete architecture** — every package and module named and placed,
   the seven layers and the rules that enforce them, one real decision walked end to end, every
   artefact and who reads it, and what runs on its own.
 - **Part E is the Register** — the one part of this product whose value comes from elapsed time
@@ -25,10 +25,56 @@ every part; the workbench's console never places an order.
 
 This is written the way a judge reads: what the track asks for, what we actually built, how it
 works, what you can run yourself, and — just as important — what it refuses to do and what it
-cannot do yet. It is deliberately long. Nothing is summarised.
+cannot do yet. It is deliberately long; every part is linked below.
 
 Every number here was measured by running something, and the file that produced it is named next to
 it. Where we found our own mistakes, they are in here too.
+
+**Contents**
+
+- **[PART A — Track 3, AI Trading Desk](#part-a--track-3-ai-trading-desk)**
+  - [Part 1 — What Track 3 asks for](#part-1--what-track-3-asks-for)
+  - [Part 2 — The positioning, step by step](#part-2--the-positioning-step-by-step)
+  - [Part 3 — The six sub-themes, one by one](#part-3--the-six-sub-themes-one-by-one)
+  - [Part 4 — The four judging criteria](#part-4--the-four-judging-criteria)
+  - [Part 5 — What we cannot do, said plainly](#part-5--what-we-cannot-do-said-plainly)
+  - [Part 6 — The five commands that show the whole track](#part-6--the-five-commands-that-show-the-whole-track)
+  - [Part 7 — The one-paragraph version](#part-7--the-one-paragraph-version)
+- **[PART B — The paper desk inside the research workbench (not an entry)](#part-b--the-paper-desk-inside-the-research-workbench-not-an-entry)**
+  - [Part 8 — What Track 2 asks for](#part-8--what-track-2-asks-for)
+  - [Part 9 — The positioning, step by step](#part-9--the-positioning-step-by-step)
+  - [Part 10 — The six Track 2 sub-themes, one by one](#part-10--the-six-track-2-sub-themes-one-by-one)
+  - [Part 11 — The quantitative half, brutally](#part-11--the-quantitative-half-brutally)
+  - [Part 12 — The judging focus, one by one](#part-12--the-judging-focus-one-by-one)
+  - [Part 13 — What we cannot do on Track 2, said plainly](#part-13--what-we-cannot-do-on-track-2-said-plainly)
+  - [Part 14 — The commands that show Track 2](#part-14--the-commands-that-show-track-2)
+  - [Part 15 — Both tracks in one paragraph](#part-15--both-tracks-in-one-paragraph)
+- **[PART C — Track 1, Alpha Factory](#part-c--track-1-alpha-factory)**
+  - [Part 16 — What Track 1 asks for](#part-16--what-track-1-asks-for)
+  - [Part 17 — The backtest engine: what it refuses to let you do](#part-17--the-backtest-engine-what-it-refuses-to-let-you-do)
+  - [Part 18 — The six Track 1 sub-themes, one by one](#part-18--the-six-track-1-sub-themes-one-by-one)
+  - [Part 19 — The Track 1 result, in full and without softening](#part-19--the-track-1-result-in-full-and-without-softening)
+- **[PART D — One product: the complete architecture](#part-d--one-product-the-complete-architecture)**
+  - [Part 20 — The seventeen packages, every module named](#part-20--the-seventeen-packages-every-module-named)
+  - [Part 21 — The seven layers, and the rule that holds them](#part-21--the-seven-layers-and-the-rule-that-holds-them)
+  - [Part 22 — One decision, end to end](#part-22--one-decision-end-to-end)
+  - [Part 23 — What the system writes, and who reads it](#part-23--what-the-system-writes-and-who-reads-it)
+  - [Part 24 — What runs on its own](#part-24--what-runs-on-its-own)
+  - [Part 25 — The numbers, all in one place](#part-25--the-numbers-all-in-one-place)
+  - [Part 26 — What we checked the competition and found](#part-26--what-we-checked-the-competition-and-found)
+  - [Part 27 — Everything, ranked from strongest to weakest](#part-27--everything-ranked-from-strongest-to-weakest)
+  - [Part 28 — The strengthening pass: ten capabilities, and what each one found](#part-28--the-strengthening-pass-ten-capabilities-and-what-each-one-found)
+  - [Part 29 — What the external audit changed, and what it did not](#part-29--what-the-external-audit-changed-and-what-it-did-not)
+- **[PART E — The Register](#part-e--the-register)**
+  - [Part 30 — The one thing that cannot be caught up on](#part-30--the-one-thing-that-cannot-be-caught-up-on)
+  - [Part 31 — What was committed, and what it refuses to do](#part-31--what-was-committed-and-what-it-refuses-to-do)
+  - [Part 32 — The defect in its own opening, found the same day](#part-32--the-defect-in-its-own-opening-found-the-same-day)
+  - [Part 33 — Scored by calibration, and the Wall](#part-33--scored-by-calibration-and-the-wall)
+  - [Part 34 — What this is not, yet](#part-34--what-this-is-not-yet)
+- **[PART F — The ladder, and the first gate that ever ran](#part-f--the-ladder-and-the-first-gate-that-ever-ran)**
+  - [Part 35 — Twelve of thirteen: the queue model's case for OWNED](#part-35--twelve-of-thirteen-the-queue-models-case-for-owned)
+  - [Part 36 — Funding carry, and the first proposal that ever reached gate two](#part-36--funding-carry-and-the-first-proposal-that-ever-reached-gate-two)
+  - [Part 37 — The five things a stranger should understand after reading this](#part-37--the-five-things-a-stranger-should-understand-after-reading-this)
 
 ---
 ---
@@ -660,7 +706,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 9,381 tests
+pytest                    # 9,419 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1715,7 +1761,7 @@ takes, and every artefact the system writes.
 |---|---|
 | Source modules | **327** files across **21 packages**, 130,470 lines |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **224 files**, **9,381 tests collected** |
+| Test files / tests | **224 files**, **9,419 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **327 source files** |
 | Artefacts written | **162** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
@@ -1961,10 +2007,10 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 327 files, 21 packages, 130,470 lines; `mypy --strict` clean on 482 source files |
+| Source modules | 327 files, 21 packages, 130,470 lines; `mypy --strict` clean on 484 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 9,381 tests collected, `ruff` clean |
+| Tests | 9,419 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 66, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
@@ -1994,7 +2040,7 @@ That last row is the one to read twice. An *owned* capability needs a reproduced
 same-input comparison, an out-of-sample test, an ablation and an adversarial test — thirteen
 conditions in all, enforced in code by `argus/eval/standing.py`, which raises at import if anything
 claims OWNED without them. It read zero when this table was first written; today 6 of 44
-capabilities are OWNED, 12 are TIED, 25 are IMPLEMENTED and 1 is LOST. It read 20 until the
+capabilities are OWNED, 13 are TIED, 26 are IMPLEMENTED and 1 is LOST. It read 20 until the
 per-group check of 2026-09-25 withdrew twelve, 8 until a general-purpose validator tied
 breadth rotation on 2026-09-26, and 7 until rToken factor divergence was re-graded IMPLEMENTED
 the same day. Five ties were losses first:
@@ -2252,7 +2298,7 @@ could attack today.
     graded on, so its measured accuracy cannot yet be compared against the 55% bar.
 37. **Two settled outcomes.** Calibration on the desk's own judgement cannot be computed yet; the
     49,140 figure is the policy layer, labelled as such, and the two must never be added together.
-38. **38 of 44 capabilities are not OWNED.** 1 is LOST, 12 are TIED against the named rival and 25 are
+38. **40 of 44 capabilities are not OWNED.** 1 is LOST, 13 are TIED against the named rival and 26 are
     IMPLEMENTED; each says what it is missing.
 39. **Four of five official Bitget Skills carry no data.** Measured to be their backend rather than
     our integration — but a judge sees a thin panel either way.
@@ -2542,7 +2588,7 @@ than an implied promise that it nearly is:
 
 ---
 
-## Part 31 — The one thing that cannot be caught up on
+## Part 30 — The one thing that cannot be caught up on
 
 Everything else in this document can be out-built. A team with more hours can copy any module here,
 and a bigger team can copy all of them — a system has to be published to be judged, which means
@@ -2557,7 +2603,7 @@ than closing.
 That distinction — *build can be compressed, elapsed time cannot* — is why this part exists and why
 it was opened before it was finished.
 
-## Part 32 — What was committed, and what it refuses to do
+## Part 31 — What was committed, and what it refuses to do
 
 On **14 September 2026** the register was opened with a first batch of 36 claims, hash-chained
 and anchored. That opening head is `bc36478291a06bc3`, submitted to four independent Bitcoin
@@ -2607,7 +2653,7 @@ score as chance — and if they come back consistently above or below it, that i
 - **It cannot be edited.** Append-only, hash-chained. A resolution is a *new line*, never a rewrite.
   Editing or deleting any claim breaks the chain, and a test proves it does.
 
-## Part 33 — The defect in its own opening, found the same day
+## Part 32 — The defect in its own opening, found the same day
 
 The founding batch was committed at a single 24-hour horizon. Every one of the 36 claims resolved
 the next morning — and the handbook puts judge review at **22 September to 7 October**.
@@ -2626,7 +2672,7 @@ month from now and not only for somebody watching this week.
 `horizon_coverage()` exists to keep asking the question, and a test pins the exact shape of the
 original failure — a batch that all resolves early — so it cannot come back unnoticed.
 
-## Part 34 — Scored by calibration, and the Wall
+## Part 33 — Scored by calibration, and the Wall
 
 Ranking is by **Brier score**, not hit rate. Hit rate is what every leaderboard in this field shows,
 and it is improved simply by only making easy claims. Brier charges for confidence: the same accuracy
@@ -2644,7 +2690,7 @@ published on resolution. Publishing your own failures before anyone forces you t
 credibility that cannot be manufactured afterwards — the timestamps would be wrong and everyone can
 see it.
 
-## Part 35 — What this is not, yet
+## Part 34 — What this is not, yet
 
 Stated plainly, because the gap between what is running and what was designed is where an
 over-claim would live:
@@ -2670,7 +2716,7 @@ was not running yesterday.
 
 ---
 
-## Part 36 — Twelve of thirteen: the queue model's case for OWNED
+## Part 35 — Twelve of thirteen: the queue model's case for OWNED
 
 Four states exist in this project, and using a stronger word than the evidence supports is the exact
 failure the register was built to prevent: **LOST**, **TIED**, **IMPLEMENTED**, **OWNED**. OWNED needs
@@ -2773,7 +2819,7 @@ A queue experiment run only on the assumed numbers would be an experiment about 
 exist here. The tape can only be grown by waiting, which is the same property that makes the
 Register worth having — and it is now part of `run_paper_cycle.ps1`.
 
-## Part 37 — Funding carry, and the first proposal that ever reached gate two
+## Part 36 — Funding carry, and the first proposal that ever reached gate two
 
 `eval/autopsy.py` established the problem this part solves. The Constitution is an ordered chain of
 six gates, and across all 170 recorded decisions the **first** one returned every single time:
@@ -2865,7 +2911,7 @@ UNREACHED stays a fact about this proposal rather than about the code.
 ---
 ---
 
-## Part 38 — The five things a stranger should understand after reading this
+## Part 37 — The five things a stranger should understand after reading this
 
 1. **It is one system.** Three tracks are three doors. The clocks, the cost model, the evidence, the
    engine, the risk layer and the ledger are shared, and nothing was built twice.

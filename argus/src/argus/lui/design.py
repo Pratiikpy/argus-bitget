@@ -4,6 +4,9 @@ Every page of the console used to carry its own palette — five copies of one b
 little each time a page was written. This module is the single source: a page includes
 :data:`TOKENS_CSS` where its own ``:root`` block used to be, appends :data:`BASE_CSS` after its own
 rules, and opens its body with :func:`nav`. The brand page (``/brand``) renders the system itself.
+Appended last, BASE wins a tie, so a page never restates a value BASE sets: five pages carried
+widths, heading sizes and a button colour that never applied (audit, 2026-09-26), and
+`tests/test_page_polish.py` now fails on one.
 
 **The system** (modelled on the owner's own Blank brand kit, brand.myblank.app, and given its own
 mark and accent so it is ARGUS's, not Blank's):

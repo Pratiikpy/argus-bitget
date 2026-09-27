@@ -32,6 +32,7 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
+from argus.lui.answer import LEAD
 from argus.truth.coverage import ContextPool
 
 MAX_PARTS = 4
@@ -174,18 +175,18 @@ def answer(question: str, found: list[Part], run: Any) -> tuple[list[str], list[
     sources: list[Any] = []
     for number, (part, result) in enumerate(zip(budget, results, strict=True), start=1):
         lines = [str(line) for line in result.lines]
-        lead = next((line for line in lines if line.startswith("Actionable")), lines[0] if lines
+        lead = next((line for line in lines if bool(LEAD.match(line))), lines[0] if lines
                     else "no answer")
-        lead = re.sub(r"^Actionable(?: \(\w+\))?:\s*", "", lead)
+        lead = LEAD.sub("", lead, count=1)
         leads.append(f"{number}. {lead[:1].upper()}{lead[1:]}")
         carried = (f" (read as {_t(part.inherited)})" if part.inherited.endswith("USDT") else
                    f" (read with {part.inherited})" if part.inherited else "")
         body.append(f"Part {number} — “{part.text}”{carried}:")
         # one bold lead per answer: a part's own lead is already listed above, so it is plain here
-        body.extend(re.sub(r"^Actionable(?: \(\w+\))?:\s*", "", line) for line in lines
+        body.extend(LEAD.sub("", line, count=1) for line in lines
                     if not line.startswith("Data:"))
         sources.extend(result.sources)
-    head = (f"Actionable: your question has {len(budget)} parts, each answered by its own "
+    head = (f"Bottom line: your question has {len(budget)} parts, each answered by its own "
             f"engine below" + (f"; {unread} could not be answered and say why" if unread else "")
             + ":")
     tail = []

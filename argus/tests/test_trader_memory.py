@@ -83,7 +83,7 @@ def test_apply_fills_what_the_question_left_out_and_says_so() -> None:
 def test_after_sets_a_loss_limit_against_the_loss_found() -> None:
     facts = mem.extract("I can't lose more than 10%", NOW)
     request = ResearchRequest(kind=ResearchKind.STRESS, symbols=("NVDAUSDT",))
-    lines = ["Actionable: If QQQ moves -10%: your book moves about -12.40%, hardest hit NVDA."]
+    lines = ["Bottom line: If QQQ moves -10%: your book moves about -12.40%, hardest hit NVDA."]
     extra = mem.after(lines, request, facts)
     assert extra and "past that limit" in extra[0] and "-12.4%" in extra[0]
     inside = mem.after(["If QQQ moves -5%: your book moves about -6.00%"], request, facts)
@@ -101,7 +101,7 @@ def test_the_server_acknowledges_a_statement_and_returns_the_memory(
     monkeypatch.setattr(server, "_answer", declined)
     payload = server.handle_ask("I can't lose more than 10% of my account", [], memory="")
     assert payload["classified_by"] == "memory" and not payload["refused"]
-    assert payload["lines"][0].startswith("Actionable: noted")
+    assert payload["lines"][0].startswith("Bottom line: noted")
     stored = mem.parse(payload["memory"])
     assert stored and stored[0].kind == "max_loss"
     again = server.handle_ask("my risk budget is 20%", [], memory=payload["memory"])
@@ -122,3 +122,44 @@ def test_memory_is_scoped_to_the_request(monkeypatch: pytest.MonkeyPatch) -> Non
     server.handle_ask("hello", [], memory="")
     assert seen[0] and seen[1] == ()
     assert server._MEMORY.get() == ()
+
+
+class TestARememberedMandateReachesTheCheck:
+    """Audit finding 55: "I'm conservative", said once, never reached the mandate check; the next
+    "should I add 15% TSLA?" was answered as it was for anyone."""
+
+    def _impact(self) -> ResearchRequest:
+        return ResearchRequest(kind=ResearchKind.IMPACT, symbols=("TSLAUSDT",),
+                               book={"NVDAUSDT": 1.0}, size=0.15, size_stated=True)
+
+    def test_a_remembered_style_becomes_the_mandate_and_is_said(self) -> None:
+        facts = mem.extract("I'm conservative", NOW) + mem.extract("my account is 50k", NOW)
+        request, used = mem.apply(self._impact(), facts, "should I add 15% TSLA?")
+        assert request.mandate_text == "I'm conservative"
+        assert str(request.mandate_capital) == "50000"
+        assert any("mandate below is checked against it" in line for line in used)
+        assert any("sizes on your $50,000" in line for line in used)
+
+    def test_the_question_own_mandate_wins_and_memory_stays_out(self) -> None:
+        facts = mem.extract("I'm conservative", NOW)
+        request, used = mem.apply(self._impact(), facts,
+                                  "I'm an aggressive trader, should I add 15% TSLA?")
+        assert request.mandate_text == "" and not any("mandate" in line for line in used)
+
+    def test_a_style_that_is_not_a_mandate_changes_nothing(self) -> None:
+        facts = mem.extract("I mostly trade earnings", NOW)
+        request, used = mem.apply(self._impact(), facts, "should I add 15% TSLA?")
+        assert request.mandate_text == "" and used == []
+
+    def test_the_mandate_check_reads_the_remembered_words(self) -> None:
+        from datetime import timedelta
+
+        from argus.lui.research import _mandate_lines
+
+        start = datetime(2026, 9, 1, tzinfo=UTC)
+        series = {"TSLAUSDT": {start + timedelta(hours=i): (-0.004 if i % 2 else 0.003)
+                               for i in range(200)}}
+        assert _mandate_lines("TSLAUSDT", 0.15, series, "should I add 15% TSLA?") == []
+        lines = _mandate_lines("TSLAUSDT", 0.15, series, "should I add 15% TSLA?",
+                               "I'm conservative", None)
+        assert lines and "conservative" in " ".join(lines)

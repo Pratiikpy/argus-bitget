@@ -114,7 +114,7 @@ _IN_UNIT: contextvars.ContextVar[bool] = contextvars.ContextVar("argus_fanout_un
                                                                default=False)
 """Set inside a unit's worker, so a runner that itself calls :func:`fan_out` cannot recurse."""
 
-_LEAD = re.compile(r"^Actionable(?: \([^)]*\))?:\s*")
+_LEAD = re.compile(r"^(?:Actionable|Bottom line)(?: \([^)]*\))?:\s*")
 _SKIP = ("Data:", "Sources reached:", "Assumed:")
 _NUMBER = re.compile(r"[-+]?\$?\d[\d,]*(?:\.\d+)?%?")
 
@@ -418,7 +418,7 @@ class Finding:
 def compress(answer: Any) -> tuple[list[str], str]:
     """The lead line and, if both fit :data:`FINDING_CHARS`, the next line carrying a figure.
 
-    Lines are selected whole and never edited except for dropping the ``Actionable:`` prefix, which
+    Lines are selected whole and never edited except for dropping the ``Bottom line:`` prefix, which
     marks the lead of an answer and would claim the lead of the merged one. Bookkeeping lines
     (``Data:``, ``Sources reached:``, ``Assumed:``) are left to the merged answer's own.
     Returns the lines and a reason when there is nothing to keep."""

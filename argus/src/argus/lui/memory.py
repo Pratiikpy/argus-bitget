@@ -248,7 +248,36 @@ def apply(request: Any, facts: list[Fact], question: str) -> tuple[Any, list[str
 
         request = replace(request, notional=Decimal(capital.value))
         used.append(remembered_line(capital, f"sized on your ${float(capital.value):,.0f}"))
+    if request.kind is ResearchKind.IMPACT:
+        request, mandate_used = _apply_mandate(request, facts, question)
+        used.extend(mandate_used)
     return request, used
+
+
+def _apply_mandate(request: Any, facts: list[Fact], question: str) -> tuple[Any, list[str]]:
+    """A remembered style or loss limit, handed to the mandate check when this question states no
+    mandate of its own; a remembered account size, sized against. Until 2026-09-27 a trader who
+    had said "I'm conservative" got the same answer to "should I add 15% TSLA?" as anyone else
+    (audit finding 55): the mandate check read the current question only."""
+    from dataclasses import replace
+    from decimal import Decimal
+
+    from argus.lui.research import stated_profile
+
+    if stated_profile(question) is not None:
+        return request, []
+    said = [f for f in (get(facts, "style"), get(facts, "max_loss")) if f is not None]
+    words = ". ".join(f.text for f in said)
+    if not said or stated_profile(words) is None:
+        return request, []
+    used = [remembered_line(f, "your mandate below is checked against it") for f in said]
+    capital = get(facts, "capital")
+    amount = None
+    if capital is not None:
+        amount = Decimal(capital.value)
+        used.append(remembered_line(capital, f"the mandate sizes on your "
+                                              f"${float(capital.value):,.0f}"))
+    return replace(request, mandate_text=words, mandate_capital=amount), used
 
 
 def after(lines: list[str], request: Any, facts: list[Fact],
@@ -299,7 +328,7 @@ def _span(hours: int) -> str:
 def acknowledgement(new: list[Fact]) -> list[str]:
     """The reply to a message that only tells the console something about the trader."""
     said = "; ".join(f"“{f.text}”" for f in new)
-    return [f"Actionable: noted — {said}. It is kept in this browser only and shapes every later "
+    return [f"Bottom line: noted — {said}. It is kept in this browser only and shapes every later "
             f"answer it applies to, each time with a Remembered: line saying so; forget it from "
             f"the list under your book."]
 

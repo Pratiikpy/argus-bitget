@@ -348,6 +348,8 @@ _REGRADE_REASONS = {
     "2026-09-25": "a per-group check, by symbol and by half of the sample, could not confirm the "
                   "proof",
     "2026-09-26": "a general-purpose tool configured to the same job matched them",
+    "2026-09-27": "one won only on an input that never reaches a real decision, and one "
+                  "rested on cases its author designed",
 }
 
 
@@ -443,9 +445,7 @@ def render(corrections: list[Correction]) -> str:
 <style>{design.TOKENS_CSS}
  body {{ margin:0; background:var(--bg); color:var(--ink);
    font:15px/1.6 system-ui,sans-serif }}
- .wrap {{ max-width:760px; margin:0 auto; padding:30px 18px 70px }}
- h1 {{ font-size:22px; margin:0 0 6px; letter-spacing:-.015em }}
- .sub {{ color:var(--dim); font-size:13.5px; margin:0 0 24px; max-width:62ch }}
+ .sub {{ margin:0 0 24px }}
  .c {{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--dim);
    border-radius:10px; padding:16px 18px; margin-bottom:14px }}
  .c.bug {{ border-left-color:var(--bad) }}

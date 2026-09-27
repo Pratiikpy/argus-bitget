@@ -110,7 +110,7 @@ def overnight_hedge(spot: str, perp: str, spot_nights: Mapping[date, float],
 def render(h: OvernightHedge, ticker: str) -> list[str]:
     side = "Short" if h.ratio < 0 else "Buy"
     lines = [
-        f"Actionable: to carry {h.spot} through the hours the US market is shut, "
+        f"Bottom line: to carry {h.spot} through the hours the US market is shut, "
         f"{side.lower()} {abs(h.ratio):.2f} {h.perp} (Bitget's {ticker} stock perpetual) for "
         f"every 1 of {h.spot} you hold — the same company, so it moves with your token when "
         f"nothing else does.",

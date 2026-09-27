@@ -96,7 +96,7 @@ def test_the_same_name_hedge_is_sized_and_tested_out_of_sample() -> None:
     assert h.held_out_variance_removed > 0.99
     assert h.cost_bp_per_night == pytest.approx(12.0, abs=0.3)
     lines = render(h, "X")
-    assert lines[0].startswith("Actionable: to carry RXUSDT") and "short 1.00 XUSDT" in lines[0]
+    assert lines[0].startswith("Bottom line: to carry RXUSDT") and "short 1.00 XUSDT" in lines[0]
     assert any("Tested on nights it had not seen" in line for line in lines)
 
 

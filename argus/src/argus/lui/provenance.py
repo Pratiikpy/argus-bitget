@@ -79,7 +79,8 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
                             r"If the )|\bis \d+% of the book but \d+% of its loss\b")),
     # A measured record over past sweeps or past releases (`eval/skill_matrix.py`, the "into
     # earnings" history): counted from what already happened, not read now.
-    ("record", re.compile(r"^(?:Actionable: )?across \d+ sweep|^bitget-mcp-server: every call|"
+    ("record", re.compile(r"^(?:(?:Actionable|Bottom line): )?across \d+ sweep|"
+                          r"^bitget-mcp-server: every call|"
                           r"^bitget-signal's news|^Answering with data in the latest sweep|"
                           r"^Why the rest did not, by kind|^Into earnings: |"
                           r"^The most recent one, ", re.I)),
@@ -101,7 +102,8 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
                            r"\bis\s+assessed\s+at\b|\bwere\s+scaled\s+to\s+100%|"
                            r"^Sized on a \$[\d,]+ book\b", re.I)),
     # the trader's own words, kept by `lui/memory.py` and shown where they shaped the answer
-    ("memory", re.compile(r"^Remembered:|^Your thesis on\b|^(?:Actionable: )?noted —", re.I)),
+    ("memory", re.compile(r"^Remembered:|^Your thesis on\b|"
+                          r"^(?:(?:Actionable|Bottom line): )?noted —", re.I)),
     ("live", re.compile(r"^Crypto fear & greed:", re.I)),
     # a FRED series served from the snapshot shipped with the console is a past reading
     ("record", re.compile(r"\(the shipped reading\)|last reading shipped with the console", re.I)),
@@ -109,7 +111,8 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     # "Implied open: ... missed by 30bps" is the figure first and its record second.
     ("computed", re.compile(
         # A lead that is a live reading promoted to the top stays live.
-        r"^Actionable:(?!\s+(?:Open interest:|Crypto fear))|^Your premise\b|^Implied open:|"
+        r"^(?:Actionable|Bottom line):(?!\s+(?:Open interest:|Crypto fear))|^Your premise\b|"
+        r"^Implied open:|"
         r"^Versus the stock:|\bexplains [+-]\d|"
         r"^A \$[\d,]+ order is\b|^Order book \(|^Earnings surprise:", re.I)),
     ("desk", re.compile(
@@ -138,7 +141,8 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"\bdeepest fall from a high\b",
         re.I)),
     ("live", re.compile(
-        r"\blast [\d,.]+ USDT on Bitget\b|^(?:Actionable: )?Open interest:|\bheld open\b|"
+        r"\blast [\d,.]+ USDT on Bitget\b|^(?:(?:Actionable|Bottom line): )?Open interest:|"
+        r"\bheld open\b|"
         r"^Funding(?: is|:)|"
         r"\bfunding (?:is )?[+-]?\d|^\d+h ago —|^Prediction market\b|\bfear & greed\b|"
         r"\b(?:Treasury|fed funds|breakeven|dollar index)\b.*\bon \d{4}-\d\d-\d\d\b|"
@@ -155,7 +159,8 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"^Listed now:|\bright now\b[^.]{0,60}\ba year\b|^Quarters before it:|"
         r"\bspot (?:BTC|ETH) ETFs?\b|^RSI\(14, 1D\)", re.I)),
     ("computed", re.compile(
-        r"^Actionable:|^Your premise\b|^Implied open:|^Versus the stock:|\bbeta\b|^Hedge:|"
+        r"^(?:Actionable|Bottom line):|^Your premise\b|^Implied open:|^Versus the stock:|"
+        r"\bbeta\b|^Hedge:|"
         r"^If \w+ (?:falls|moves|rises)\b|\bvalue at risk\b|\bexpected shortfall\b|"
         r"\bof (?:your )?(?:total |book )?risk\b|^After the trade:|^Risk spread\b|"
         r"\bcorrelated\b|\bmove together\b|^Resizing\b|^Adding\b|^Plan:|^Slice \d|^Schedule\b|"
@@ -180,10 +185,10 @@ def label(line: str) -> str | None:
     text = line.strip()
     if not text or _META.search(text):
         return None
-    lead = re.match(r"^Actionable(?: \(\w+\))?:\s*(.+)$", text)
+    lead = re.match(r"^(?:Actionable|Bottom line)(?: \(\w+\))?:\s*(.+)$", text)
     if lead is not None:
         # A lead is labelled by what it is, not by being first: a live reading promoted to the
-        # top ("Actionable: NVDA last 226.3 USDT on Bitget") stays live, a record stays a record,
+        # top ("Bottom line: NVDA last 226.3 USDT on Bitget") stays live, a record stays a record,
         # and a lead that says a figure is missing is missing. Anything else a lead says is the
         # answer's conclusion, computed for it.
         rest = lead.group(1)[0].upper() + lead.group(1)[1:]

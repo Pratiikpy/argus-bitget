@@ -429,8 +429,8 @@ the same inputs (counted 2026-09-27). The ones that judge the system itself:
 
 **The capability ladder** is enforced in code: LOST → TIED → IMPLEMENTED → OWNED, with OWNED requiring
 thirteen conditions including a reproduced baseline, same-input comparison, out-of-sample test,
-ablation and adversarial test. Live (`data/standing.json`): **6 of 44 capabilities are OWNED**,
-12 TIED, 25 IMPLEMENTED, 1 LOST — re-derived by `python -m argus.eval.standing` from the artefacts.
+ablation and adversarial test. Live (`data/standing.json`): **4 of 44 capabilities are OWNED**,
+13 TIED, 26 IMPLEMENTED, 1 LOST — re-derived by `python -m argus.eval.standing` from the artefacts.
 
 ---
 

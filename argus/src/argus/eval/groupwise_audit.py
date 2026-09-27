@@ -467,17 +467,14 @@ def _earnings(path: str) -> Entry:
 
 
 def _explainability(path: str) -> Entry:
-    cases = _load(path)["same_input_comparison"]["cases"]
-    items = [Item(value=float(bool(c["argus_grounding_flags_it"]))
-                  - float(bool(c["tradingagents_real_validator_raised"])),
-                  groups={"symbol": str(c["symbol"])}) for c in cases]
-    return Entry(path, CHECKED, "one row per fabricated figure on a live price", (
-        _headline("fabricated entry price caught: ARGUS vs TraderProposal", items, ("symbol",),
-                  headline="fabrications caught", orientation="ARGUS caught - TradingAgents "
-                  "caught: positive = ARGUS", role=VS_RIVAL, role_reason="the same-input "
-                  "comparison", source="same_input_comparison.cases",
-                  notes=("four fabrication magnitudes per symbol are designed, so magnitude is "
-                         "not declared as a population key",)),))
+    """Designed cases, not a population. Filed as checked until 2026-09-27 (audit finding 95):
+    every row is a fabrication the author chose, at one of four magnitudes, so "ARGUS catches it"
+    holds by construction and a breakdown by symbol only repeats that three times."""
+    del path  # the reason does not depend on the rows
+    return Entry("data/explainability_comparison.json", DESIGNED,
+                 "twelve fabricated prices the author chose (four magnitudes on three live "
+                 "prices): a demonstration that the check catches what it is built to catch, "
+                 "not a measurement over the desk's decisions")
 
 
 def _infoextract(path: str) -> Entry:

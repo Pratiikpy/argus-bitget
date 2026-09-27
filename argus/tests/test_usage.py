@@ -40,7 +40,7 @@ def test_client_class(agent: str, kind: str) -> None:
 def test_the_ask_event_carries_the_outcome_and_never_the_words(
         capsys: pytest.CaptureFixture[str]) -> None:
     payload = {"classified_by": "research", "intent": "research", "refused": False,
-               "elapsed_ms": 812.4, "lines": ["Actionable: my secret NVDA thesis", "b"],
+               "elapsed_ms": 812.4, "lines": ["Bottom line: my secret NVDA thesis", "b"],
                "line_labels": ["computed", "missing"], "sources": [{}], "remembered": []}
     usage.ask_event(payload, answer="a" * 12, visitor="v" * 12, client="browser",
                     internal=False)

@@ -7,6 +7,8 @@ the pages' CSS is built from, so what the kit shows is what the console is.
 
 from __future__ import annotations
 
+import json
+from datetime import datetime
 from html import escape
 
 from argus.lui import design
@@ -38,12 +40,38 @@ def _swatches() -> str:
 
 
 def _receipt() -> str:
-    return ('<div class="rc"><span class="kicker">argus · receipt · sample</span>'
-            '<strong>VERIFIED</strong>'
-            '<dl><dt>Question</dt><dd>should I add 20% TSLA?</dd><dt>Engine</dt>'
-            '<dd>desk.portfolio.copilot</dd><dt>Source</dt><dd>Bitget hourly candles, 30 d</dd>'
-            '<dt>Rival</dt><dd>weekend-copilot (S2): tied</dd><dt>Ledger</dt>'
-            '<dd>seq 412 · 9f2c…a71e</dd></dl></div>')
+    """A receipt from a real run, not a drawing of one.
+
+    Until 2026-09-27 this was a sample with an engine path, a rival and a ledger hash no console
+    answer carries (audit finding 78). It now shows the kept research task
+    (`eval/research_task_record.py`): the question, the verdict, the engine and data line of the
+    step that sized it, and the file every figure can be checked in."""
+    try:
+        from argus.eval.research_task_record import REPORT_PATH, headline
+        from argus.lui.task import IMPACT_TITLE
+
+        blob = json.loads(REPORT_PATH.read_text(encoding="utf-8"))
+        step = next(s for s in blob["task"]["steps"] if s["title"] == IMPACT_TITLE)
+        h = headline(blob)
+    except (ImportError, OSError, ValueError, KeyError, StopIteration):
+        return ('<div class="rc"><span class="kicker">argus · receipt</span>'
+                '<p>The kept research task is not in this build, so no receipt is shown rather '
+                'than a made-up one.</p></div>')
+    data = next((line.removeprefix("Data:").strip() for line in step["lines"]
+                 if line.startswith("Data:")), "")
+    at = datetime.fromisoformat(blob["measured_at"]).strftime("%d %b %H:%M UTC")
+    rows = (
+        ("Question", blob["task"]["question"]),
+        ("Engine", step["engine"]),
+        ("Data", data),
+        ("Figures", f"{h['share_after']:.0f}% of the book's risk; {h['ceiling']:.0f}% the most "
+                    f"inside a {h['budget']:.0f}% budget"),
+        ("File", "data/research_task_example.json"),
+    )
+    cells = "".join(f"<dt>{escape(k)}</dt><dd>{escape(v)}</dd>" for k, v in rows)
+    return (f'<div class="rc"><span class="kicker">argus · receipt · run of {escape(at)}</span>'
+            f'<strong>{escape(str(blob["task"]["verdict"]["call"]))}</strong>'
+            f'<dl>{cells}</dl></div>')
 
 
 def render() -> str:
@@ -140,8 +168,8 @@ p = 0.012 · seq 412 · 9f2c…a71e</div></div>
 
 <section class="sec"><div class="meta">04 / Receipt</div><div>
 <h2>Every answer ends in a receipt.</h2>
-<p>Where each figure came from, which engine computed it, which rival it was measured against —
-the console's promise, drawn.</p>
+<p>Where each figure came from and which engine computed it. This one is a real run of the research
+task, kept in the repository so every figure can be checked.</p>
 {_receipt()}
 </div></section>
 

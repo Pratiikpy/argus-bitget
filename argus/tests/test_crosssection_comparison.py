@@ -126,3 +126,19 @@ class TestMain:
         text = render(report)
         assert "CROSS-SECTION COMPARISON" in text
         assert "single-name distortion" in text
+
+
+def test_the_tie_rests_on_the_studys_real_panel() -> None:
+    """The scope says a group never shrinks to one on the real workload; the study's own panel
+    must show every hour holding the whole universe (audit finding 96)."""
+    import json
+    from pathlib import Path
+
+    from argus.eval.crosssection_comparison import scope_statement
+
+    panel = json.loads((Path(__file__).resolve().parents[1] / "data" / "crosssection_study.json")
+                       .read_text(encoding="utf-8"))["panel"]
+    assert not any(panel["dropped"].values())
+    text = scope_statement(54)
+    assert f"each of the {panel['length']:,} real hours" in text
+    assert f"ranks all {len(panel['symbols'])} names" in text

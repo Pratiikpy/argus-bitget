@@ -66,13 +66,13 @@ def test_the_answer_leads_with_every_part_and_keeps_one_bold_lead() -> None:
     assert found is not None
 
     def run(text: str, request: Any) -> _Result:
-        return _Result(lines=[f"Actionable: {request.kind.value} for {text}", "detail",
+        return _Result(lines=[f"Bottom line: {request.kind.value} for {text}", "detail",
                               "Data: somewhere."])
 
     lines, _, unread = multistep.answer("q", found, run)
-    assert lines[0].startswith("Actionable: your question has 2 parts") and unread == 0
+    assert lines[0].startswith("Bottom line: your question has 2 parts") and unread == 0
     assert lines[1].startswith("1. Quote") and lines[2].startswith("2. Fundamentals")
-    assert sum(line.startswith("Actionable") for line in lines) == 1
+    assert sum(line.startswith("Bottom line") for line in lines) == 1
     assert lines[-1].startswith("Data:")
 
 
@@ -81,7 +81,7 @@ def test_a_fifth_part_is_named_not_dropped() -> None:
         "kind": ResearchKind.QUOTE})()) for i in range(6)]
 
     def run(text: str, request: Any) -> _Result:
-        return _Result(lines=["Actionable: x"])
+        return _Result(lines=["Bottom line: x"])
 
     lines, _, _ = multistep.answer("q", found, run)
     assert any(line.startswith("Assumed: only the first 4 parts") and "part 5" in line

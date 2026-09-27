@@ -172,13 +172,13 @@ def test_the_hurdle_is_explained_from_the_code_that_sets_it() -> None:
 # --- the fundamentals answer leads with what was asked ---
 
 def test_the_fundamentals_lead_follows_the_question() -> None:
-    lines = ["Actionable: AAPL's next report date is not published yet.",
+    lines = ["Bottom line: AAPL's next report date is not published yet.",
              "Valuation on 2026-09-24: P/E (trailing 12m) 38.1, dividend yield 0.31%.",
              "Institutions: 6,493 holders own 76.6% of the shares (as of 2026-09-23)."]
     assert research._fundamentals_focus(lines, "what's the dividend yield on AAPL", "AAPL")[0] \
-        .startswith("Actionable: Valuation on")
+        .startswith("Bottom line: Valuation on")
     assert research._fundamentals_focus(lines, "who owns AAPL", "AAPL")[0] \
-        .startswith("Actionable: Institutions:")
+        .startswith("Bottom line: Institutions:")
     assert research._fundamentals_focus(lines, "AAPL earnings", "AAPL") == lines
     missing: Any = research._fundamentals_focus(lines[:1], "AAPL dividend", "AAPL")
     assert "holds no dividend figure" in missing[0]

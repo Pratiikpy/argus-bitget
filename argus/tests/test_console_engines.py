@@ -101,7 +101,7 @@ def test_a_bigger_move_without_a_direction_says_size_not_direction(
     monkeypatch.setenv("ARGUS_DATA_DIR", str(tmp_path))
     monkeypatch.setattr(research, "_event_lines", lambda *a, **k: ([], None))
     lines, sources = research._event_reaction("NVDAUSDT", "how does NVDA react to CPI")
-    assert lines[0].startswith("Actionable: expect a bigger move than usual, not a direction")
+    assert lines[0].startswith("Bottom line: expect a bigger move than usual, not a direction")
     assert "1.6x its ordinary 24 hours" in lines[0]
     assert "no reliable direction" in lines[1]
     assert sources and sources[0].ref == "argus.research.event_reactions"
@@ -234,7 +234,7 @@ def _falling(symbol: str, drop: float) -> dict[str, dict[datetime, float]]:
 def test_two_mandates_disagree_on_the_identical_trade() -> None:
     raw = _falling("COINUSDT", -0.10)
     lines = research._mandate_lines("COINUSDT", 0.10, raw, "I'm an aggressive trader")
-    assert lines[0].startswith("Actionable: for your mandate (aggressive event trader")
+    assert lines[0].startswith("Bottom line: for your mandate (aggressive event trader")
     assert "yes to a 10% ($10,000) COIN position" in lines[0]
     assert lines[1].startswith("The same trade under a conservative income mandate: no")
     assert "the mandate, not the model, decides" in lines[1]

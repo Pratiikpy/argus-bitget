@@ -58,7 +58,7 @@ class TestRegradeWithHonestyData:
             if text == "ask1":
                 return None
             if text == "ask2":
-                return "future_price", ["Actionable: honesty says no."]
+                return "future_price", ["Bottom line: honesty says no."]
             raise AssertionError(f"unexpected honest_answer call: {text}")
 
         def fake_order_prefix(text: str) -> str | None:
@@ -220,7 +220,7 @@ class TestRun:
 
         def fake_honest_answer(text: str, *, prior: list[str], book: str,
                                today: Any = None) -> tuple[str, list[str]] | None:
-            return None if text == "ask1" else ("future_price", ["Actionable: honesty says no."])
+            return None if text == "ask1" else ("future_price", ["Bottom line: honesty says no."])
 
         def fake_detect(text: str, *, prior: list[str], book: str, today: Any = None) -> Any:
             return None if text == "ask1" else SimpleNamespace(cause="future_price")

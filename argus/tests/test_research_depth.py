@@ -64,7 +64,7 @@ def test_the_one_pass_answer_is_checked_and_a_mis_weighted_window_is_explained()
     # the STRESS branch's copilot call: before = the book less its first name, size = its weight
     used = rebalance({"AAPLUSDT": 0.4}, "NVDAUSDT", 0.6)
     as_used = worst_window(weights=used, columns=columns).move_pct or 0.0
-    lines = [f"Actionable: If QQQ moves -10%: your book moves about {move:+.2f}% (market).",
+    lines = [f"Bottom line: If QQQ moves -10%: your book moves about {move:+.2f}% (market).",
              f"If QQQ moves -5%: your book moves about {move / 2 + 1:+.2f}% (market).",
              "What actually happened, not a model — the worst 24-bar window in the observed "
              f"history would have moved this book {as_used:+.2f}% — driven by NVDA"]

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -232,9 +233,10 @@ class TestTheLiveRegisterIsHonest:
         which forgot `consecutive_losses` was also a real trigger, fixed before being trusted),
         while freqtrade's `MaxDrawdown` estimates it from a windowed sum of closed trades'
         cumulative returns — a real, measured proxy whose Pearson correlation with the ground
-        truth is only 0.2998 on a fresh live 320-checkpoint pull. Freqtrade's own real code swept
-        across ten threshold values tops out at 21.99% precision at full recall; ARGUS's real,
-        already-computed decision scores 63.27% precision at the identical 100% recall,
+        truth is only 0.2257 on the frozen 314-checkpoint sample (0.2998 on the first live pull).
+        Freqtrade's own real code swept across ten threshold values tops out at 17.01% precision at
+        full recall; ARGUS's real, already-computed decision scores 56.32% precision at the
+        identical 100% recall,
         Pareto-dominating every one of freqtrade's ten swept thresholds at once. Each addition was
         verified independently here rather than trusted from the register's own `state` field
         alone — `Capability.__post_init__` already refuses to construct an OWNED entry short of
@@ -493,11 +495,11 @@ class TestTheLiveRegisterIsHonest:
         # (data/general_rotation_comparison.json); beating pytaa was beating a weaker rival.
         # 2026-09-26: rToken factor divergence to IMPLEMENTED. Its ablation proof said the ungated
         # divergence's CI excludes zero; its own artefact has it at [-0.0387, +0.0304].
+        # 2026-09-27: cross-sectional factor evaluation to TIED. Its only edge over qlib is a
+        # single-instrument group, which the shared-timestamp panel never produces.
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
-            "Cross-sectional factor evaluation",
             "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
-            "Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal",
             "Per-profile mandate that changes the verdict",
             "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
             "Risk layer proved by domain sweep",
@@ -865,11 +867,13 @@ class TestDemotionsCarryTheirRouteBack:
     def test_every_row_the_gate_demoted_says_so_first_and_names_the_route_back(self) -> None:
         demoted = [c for c in REGISTER
                    if c.blockers and "by the groupwise gate" in c.blockers[0]]
-        assert len(demoted) == 12
+        # twelve on 2026-09-25; numeric grounding on 2026-09-27, once its designed cases were
+        # filed as designed (audit finding 95)
+        assert len(demoted) == 13
         for cap in demoted:
             assert cap.state is State.IMPLEMENTED, cap.name
-            assert cap.blockers[0].startswith(
-                "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate"), cap.name
+            assert re.match(r"RE-GRADED 2026-09-2[57] from OWNED to IMPLEMENTED by the "
+                            r"groupwise gate", cap.blockers[0]), cap.name
             assert "oute back" in cap.blockers[0], cap.name
 
 

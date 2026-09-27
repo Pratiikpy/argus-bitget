@@ -545,7 +545,7 @@ def console_lines(path: Path = REPORT_PATH) -> list[str]:
     first, last = str(sweeps[0].get("at", ""))[:16], str(sweeps[-1].get("at", ""))[:16]
     rate = answered / max(calls, 1)
     lines = [
-        f"Actionable: across {len(sweeps)} sweep(s) from {first}Z to {last}Z, Bitget's two Skill "
+        f"Bottom line: across {len(sweeps)} sweep(s) from {first}Z to {last}Z, Bitget's two Skill "
         f"servers answered {answered} of {calls} calls with data ({rate:.0%}) — "
         + "; ".join(f"{name} {a} of {n}" for name, (a, n, _x) in per.items()) + ".",
     ]

@@ -350,7 +350,13 @@ class TestThePageHoldsUpAtPhoneWidthAndInBothThemes:
         assert "min-width:0" in PAGE.replace(" ", "")
 
     def test_there_is_a_side_gutter_at_every_width(self) -> None:
-        assert "padding:28px 18px 64px" in PAGE
+        """The gutter is the base stylesheet's, which every page appends last; the console's own
+        `.wrap` padding never applied and was removed (audit finding 73)."""
+        from argus.lui.design import BASE_CSS
+
+        assert BASE_CSS in PAGE
+        assert ".wrap { max-width:1080px; margin:0 auto; padding:40px 24px 72px }" in BASE_CSS
+        assert ".wrap { padding:28px 16px 56px }" in BASE_CSS
 
     def test_the_viewport_meta_is_present(self) -> None:
         assert 'name="viewport"' in PAGE and "width=device-width" in PAGE

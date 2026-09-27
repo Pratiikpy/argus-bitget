@@ -48,7 +48,7 @@ def engines(monkeypatch: pytest.MonkeyPatch) -> list[ResearchRequest]:
     def run(question: str, request: ResearchRequest, ledger: Any = None) -> _Answer:
         seen.append(request)
         kind = request.kind.value
-        return _Answer(lines=[f"{kind} reading", f"Actionable: act on the {kind} step"])
+        return _Answer(lines=[f"{kind} reading", f"Bottom line: act on the {kind} step"])
 
     monkeypatch.setattr(task_mod, "run", run)
     monkeypatch.setattr(task_mod, "_price_path", lambda symbol: [])
@@ -62,7 +62,7 @@ def _exposures(calls: list[Any]) -> Any:
 
     def answer(book: Any, proposed: Any = None, **_: Any) -> tuple[list[str], list[Any], dict]:
         calls.append((dict(book), dict(proposed or {})))
-        return (["Actionable: act on the exposure step", "Sector weights of the book now: x."],
+        return (["Bottom line: act on the exposure step", "Sector weights of the book now: x."],
                 [], {"book": dict(book)})
 
     return answer
@@ -360,7 +360,7 @@ def figures(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
                     "execution": {"expected_cost_bps": "10.25", "slices": [
                         {"fraction": "0.6", "style": "near-touch limit", "cost_bps": "6"},
                         {"fraction": "0.4", "style": "market", "cost_bps": "6"}]}}
-        return _Answer(lines=[f"Actionable: act on the {kind} step"], data=data)
+        return _Answer(lines=[f"Bottom line: act on the {kind} step"], data=data)
 
     monkeypatch.setattr(task_mod, "run", run)
     monkeypatch.setattr(task_mod, "_price_path", lambda symbol: [])
@@ -382,8 +382,27 @@ class TestTheVerdictIsComposedFromTheFigures:
         assert call.call == "Add, at 15%"
         assert "17% of the book's risk, inside the 25% budget; 19% is the most" in call.lines[0]
         assert "trimming NVDA to 20% brings it inside" in call.lines[1]
-        assert call.lines[2] == ("Fill it as 60% near-touch limit then 40% market, about 10.2 bps "
-                                 "all in for $15,000.")
+        assert call.lines[2] == ("Fill it as 60% near-touch limit then 40% market for $15,000, "
+                                 "about 10.2 bps all in.")
+
+    def test_the_fill_cost_is_the_live_books_when_the_book_answered(
+        self, figures: dict[str, Any], monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The plan's estimate read 12.8 bps beside a live book that said 8.4 (2026-09-27)."""
+        run = task_mod.run
+
+        def with_book(question: str, request: ResearchRequest, ledger: Any = None) -> _Answer:
+            answer = run(question, request, ledger)
+            if request.kind is ResearchKind.EXECUTION:
+                answer.data["execution"].update(sliced_bps=8.44, single_order_bps=9.21)
+            return answer
+
+        monkeypatch.setattr(task_mod, "run", with_book)
+        call = _verdict()
+        assert call is not None
+        assert call.lines[2] == ("Fill it as 60% near-touch limit then 40% market for $15,000, "
+                                 "about 8.4 bps all in on the live book (one market order: "
+                                 "9.2 bps).")
 
     def test_over_the_budget_is_an_add_smaller_with_the_ceiling(
         self, figures: dict[str, Any]
@@ -426,3 +445,36 @@ class TestTheVerdictIsComposedFromTheFigures:
         assert page.index("<h2>Conclusion</h2>") < page.index("What to do, engine by engine")
         assert "Add, at 15%" in page
         assert as_dict(done)["verdict"]["call"] == "Add, at 15%"
+
+
+class TestTheTaskUsesWhatTheTraderSaidBefore:
+    """Audit finding 55: the task ignored the memory the console keeps, so a trader's stated
+    risk budget and mandate never reached the one page that ends in a verdict."""
+
+    def _memory(self, *statements: str) -> str:
+        import json as _json
+        from dataclasses import asdict
+
+        from argus.lui import memory as mem
+
+        facts = [f for s in statements for f in mem.extract(s)]
+        return _json.dumps([asdict(f) for f in facts])
+
+    def test_a_remembered_budget_sizes_the_impact_step_and_is_said(
+            self, engines: list[ResearchRequest]) -> None:
+        reading = read_question(ASKED)
+        assert isinstance(reading, Reading)
+        task = research_task(reading=reading, asked=ASKED,
+                             memory=self._memory("my risk budget is 15%", "I'm conservative"))
+        impact = _one(engines, ResearchKind.IMPACT)
+        assert impact.budget == pytest.approx(0.15) and impact.budget_stated
+        assert impact.mandate_text == "I'm conservative"
+        step = next(s for s in task.steps if s.title == task_mod.IMPACT_TITLE)
+        assert sum(line.startswith("Remembered:") for line in step.lines) == 2
+
+    def test_no_memory_changes_nothing(self, engines: list[ResearchRequest]) -> None:
+        reading = read_question(ASKED)
+        assert isinstance(reading, Reading)
+        research_task(reading=reading, asked=ASKED)
+        impact = _one(engines, ResearchKind.IMPACT)
+        assert not impact.budget_stated and impact.mandate_text == ""

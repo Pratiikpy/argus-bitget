@@ -766,10 +766,9 @@ _RAN_AT = re.compile(r'"ran_at":\s*"([^"]+)"')
 
 
 def _read_log(path: Path) -> str:
-    raw = path.read_bytes()
-    if raw[:2] in (b"\xff\xfe", b"\xfe\xff"):
-        return raw.decode("utf-16", errors="replace")
-    return raw.decode("utf-8-sig", errors="replace")
+    from argus.eval.cyclecheck import read_log
+
+    return read_log(path)
 
 
 @dataclass(frozen=True, slots=True)

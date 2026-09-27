@@ -132,3 +132,112 @@ class TestTheStatusPage:
         assert time.monotonic() - began < 5
         assert [c.ok for c in checks] == [False]
         assert "no answer within" in checks[0].detail
+
+
+class TestTheResearchPage:
+    def test_the_weight_bars_are_visible_against_the_page(self) -> None:
+        """Finding 71: the money bars were drawn in the hairline colour, about 1.2:1 on white;
+        a chart's marks need 3:1 (WCAG 1.4.11). They take the secondary text colour now."""
+        from argus.lui.task import render_task, unread_task
+
+        page = render_task(unread_task("?", "no question"), "")
+        assert ".chart rect.w, .key.w { fill:var(--dim); background:var(--dim) }" in page
+        assert "fill:var(--line)" not in page
+
+
+class TestTheBrandReceipt:
+    def test_the_receipt_is_a_real_run_not_a_drawing(self) -> None:
+        """Finding 78: /brand showed an engine path, a rival and a ledger hash no answer carries."""
+        import json
+
+        from argus.eval.research_task_record import REPORT_PATH
+        from argus.lui import brand_page
+
+        blob = json.loads(REPORT_PATH.read_text(encoding="utf-8"))
+        page = brand_page.render()
+        assert "seq 412 · 9f2c…a71e</dd>" not in page and "weekend-copilot" not in page
+        assert f"<strong>{blob['task']['verdict']['call']}</strong>" in page
+        assert "data/research_task_example.json" in page
+
+
+class TestTheBaseStylesheet:
+    """Finding 73: every page appends `design.BASE_CSS` after its own rules, so BASE wins a tie,
+    and five pages carried `.wrap`, `h1`, `.sub`, `button` and `.card` values that never applied.
+    The dead values were removed; this keeps a page from restating one BASE overrides."""
+
+    @staticmethod
+    def _rules(css: str) -> dict[str, dict[str, str]]:
+        import re
+
+        css = re.sub(r"@media[^{]*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}", "", css)
+        out: dict[str, dict[str, str]] = {}
+        for selectors, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
+            for selector in selectors.split(","):
+                props = out.setdefault(" ".join(selector.split()), {})
+                for decl in body.split(";"):
+                    if ":" in decl:
+                        name, value = decl.split(":", 1)
+                        props[name.strip()] = value.strip()
+        return out
+
+    def test_no_page_restates_a_value_the_base_overrides(self) -> None:
+        import re
+        from pathlib import Path
+
+        from argus.lui import design
+
+        base = self._rules(design.BASE_CSS)
+        clashes = []
+        for path in sorted(Path(design.__file__).parent.glob("*.py")):
+            source = path.read_text(encoding="utf-8")
+            for block in re.findall(r"<style>(.*?)</style>", source, flags=re.S):
+                if not re.search(r"(\{design\.BASE_CSS\}|__BASE__)\s*$", block):
+                    continue  # BASE first (or absent): the page's own rules win, as written
+                css = block.replace("{{", "{").replace("}}", "}")
+                css = re.sub(r"\{design\.[A-Z_]+\}|__[A-Z]+__", "", css)
+                for selector, props in self._rules(css).items():
+                    for name, value in props.items():
+                        if base.get(selector, {}).get(name, value) != value:
+                            clashes.append(f"{path.name}: {selector} {{ {name}:{value} }}")
+        assert clashes == []
+
+
+class TestTheResearchFormSendsTheSavedBook:
+    """A question asked on /research read the page's visible example book as "your saved book";
+    the form now sends the browser's saved book and memory as their own fields."""
+
+    @pytest.fixture
+    def base_url(self) -> object:
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        yield f"http://127.0.0.1:{server.server_port}"
+        server.shutdown()
+        server.server_close()
+
+    def test_the_saved_field_wins_over_the_visible_book(
+            self, base_url: str, monkeypatch: pytest.MonkeyPatch) -> None:
+        from urllib.parse import urlencode
+
+        from argus.lui import task
+
+        seen: dict[str, str] = {}
+
+        def read(asked: str, saved: str = "") -> str:
+            seen["saved"] = saved
+            return "not read in this test"
+
+        monkeypatch.setattr(task, "read_question", read)
+        body = urlencode({"q": "should I add 15% TSLA?", "saved": "",
+                          "memory": "[]", "book": task.DEFAULT_BOOK}).encode()
+        with urlopen(Request(f"{base_url}/research", data=body), timeout=10) as reply:
+            assert reply.status == 200
+        assert seen["saved"] == ""
+
+    def test_the_page_fills_both_fields_from_this_browser(self) -> None:
+        from argus.lui.task import render_task, unread_task
+
+        page = render_task(unread_task("?", "no question"), "")
+        assert '<input type="hidden" name="saved"><input type="hidden" name="memory">' in page
+        assert "localStorage.getItem('argus.book')" in page
+        assert "localStorage.getItem('argus.memory')" in page

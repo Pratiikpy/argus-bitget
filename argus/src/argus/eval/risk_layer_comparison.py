@@ -46,9 +46,10 @@ matching real freqtrade's GLOBAL-by-default `MaxDrawdown`/`StoplossGuard` scope 
 whole-book `risk.circuit.assess` (equal-capital-split across symbols — see `walk_combined_book`'s
 own docstring).
 
-**First pass, at freqtrade's stated single-pair defaults**: both protections fire on ~90%+ of the
-323 real checkpoints, against a TRUE peak-to-trough drawdown (`Checkpoint.true_drawdown_pct`) that
-never once exceeded 4.11% across the whole 90-day run. **The obvious objection was tested, not
+**First pass, at freqtrade's stated single-pair defaults** (the first live pull, 323 checkpoints;
+the frozen sample the artefact now holds has 314): both protections fire on ~90%+ of them, against
+a TRUE peak-to-trough drawdown (`Checkpoint.true_drawdown_pct`) that never once exceeded 4.11%
+across that 90-day run. **The obvious objection was tested, not
 assumed away**: a knowledgeable freqtrade operator pooling 7 pairs would scale `trade_limit`
 proportionally, not run it unmodified. Re-run with `stoploss_guard`'s `trade_limit` scaled to
 ``10 * num_symbols``: its lock rate drops from ~97% to **9.0%** — that part of the divergence was

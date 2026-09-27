@@ -40,7 +40,7 @@ def test_each_line_family_gets_its_label(line: str, expected: str | None) -> Non
 
 
 def test_missing_wins_over_everything_a_line_also_says() -> None:
-    assert label("Actionable: the quote did not arrive, so there is no gap to measure") \
+    assert label("Bottom line: the quote did not arrive, so there is no gap to measure") \
         == "missing"
 
 

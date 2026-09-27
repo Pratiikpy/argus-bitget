@@ -43,6 +43,22 @@ from argus.lui.trace import all_but, emit, only, traced
 from argus.paper.ledger import Entry, PaperLedger
 from argus.truth.source import Source
 
+LEAD = re.compile(r"^(?:Actionable|Bottom line)(?: \([^)]*\))?:\s*")
+"""An answer's lead line: its takeaway, labelled "Bottom line:" (per name in a multi-name answer,
+"Bottom line (NVDA):"). The label was "Actionable:" until 2026-09-27, when an audit found it on
+leads that were not actions ("NYSE and Nasdaq are shut all day"); it is still read, because
+recorded answers carry it."""
+
+
+def unlead(line: str) -> str:
+    """``line`` with its lead label removed and its first letter capitalised, for a lead that
+    steps down behind another; any other line unchanged."""
+    match = LEAD.match(line)
+    if match is None:
+        return line
+    rest = line[match.end():]
+    return rest[:1].upper() + rest[1:]
+
 
 @dataclass
 class Answer:
@@ -777,7 +793,7 @@ def answer_review(ledger: PaperLedger, question: Question) -> Answer:
     if report.recurring:
         worst, count = report.recurring[0]
         lines.insert(0, (
-            f"Actionable: the flag raised most often is {_DEFECT_WORDS.get(worst, worst)} "
+            f"Bottom line: the flag raised most often is {_DEFECT_WORDS.get(worst, worst)} "
             f"({count} decisions) — check for it first when reading any thesis here."
         ))
         lines.append("Flags by kind: " + "; ".join(
