@@ -3,7 +3,7 @@
 **Why this exists.** `paper/ledger.py::Entry.content_hash` deliberately excludes settlement fields
 (`net_pnl`, `direction_correct`, ...) so that attaching an outcome is not indistinguishable from
 tampering with the decision itself — correct, and documented at `content_hash`'s own docstring.
-Adversarial testing on 2026-09-22 found the real gap that left open: nothing else protected those
+Adversarial testing on 2026-09-22 found the gap that left open: nothing else protected those
 fields either. A copy of the live ledger was tampered with directly on disk, flipping a settled
 decision's `net_pnl` sign, and `PaperLedger.verify()` still reported `chain_intact: True` — a real,
 working exploit against the exact claim the console's own landing page invites a judge to test.

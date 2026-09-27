@@ -115,7 +115,7 @@ class State:
     the five.
 
     **Replaced an earlier design that reused `existing_gross`/`hedge_at_risk` for the first three
-    of these gates and shipped a real bug**, caught by this file's own `unreachable == ()`
+    of these gates and shipped a bug**, caught by this file's own `unreachable == ()`
     invariant: tying ``margin_usage`` to the same `existing_gross` values chosen to saturate
     `gross_exposure`'s own headroom meant the two always tied at ``permitted == 0``, and
     `ConstitutionPolicy.rule`'s `min(ceilings, key=...)` deterministically picks the

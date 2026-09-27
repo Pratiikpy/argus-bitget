@@ -31,7 +31,7 @@ the import graph**, and a fact can be checked:
    on and which depends on nothing is stable and should be; one in the middle with high instability
    and high fan-in is where change hurts.
 
-**This found a real defect the first time it ran, which is why it exists.** ``market/*`` imported
+**This found a defect the first time it ran, which is why it exists.** ``market/*`` imported
 ``Evidence`` from ``agents/analysts.py``, and that module imports ``argus.llm.qwen`` — so
 
     >>> import argus.market.evidence      # a pure data fetcher

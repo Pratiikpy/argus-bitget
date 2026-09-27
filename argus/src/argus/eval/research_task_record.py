@@ -25,8 +25,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from argus.lui.task import TASK_RECORD_PATH
+
 PACKAGE = Path(__file__).resolve().parents[3]
-REPORT_PATH = PACKAGE / "data" / "research_task_example.json"
+REPORT_PATH = TASK_RECORD_PATH
 QUESTION = "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?"
 
 
@@ -44,32 +46,6 @@ def record(question: str = QUESTION) -> dict[str, Any]:
         "task": as_dict(task),
         "data": {step.title: json.loads(json.dumps(step.data, default=str))
                  for step in task.steps},
-    }
-
-
-def headline(blob: dict[str, Any]) -> dict[str, float]:
-    """The figures the verdict rests on, rounded as the page rounds them: sizing in whole
-    percentages, fill costs in basis points to one decimal, the run time in seconds."""
-    from argus.lui.task import EXECUTION_TITLE, IMPACT_TITLE
-
-    sizing = blob["data"][IMPACT_TITLE]["sizing"]
-    execution = blob["data"][EXECUTION_TITLE]["execution"]
-    crowded = sizing.get("crowded") or {}
-
-    def pct(value: Any) -> float:
-        return float(round(float(value) * 100))
-
-    return {
-        "proposed": pct(sizing["proposed"]),
-        "ceiling": pct(sizing["ceiling"]),
-        "budget": pct(sizing["budget"]),
-        "share_after": pct(sizing["share_after"]),
-        "crowded_share": pct(crowded["share"]),
-        "crowded_weight": pct(crowded["weight"]),
-        "crowded_trim_to": pct(crowded["trim_to"]),
-        "seconds": round(float(blob["task"]["seconds"]), 1),
-        "sliced_bps": round(float(execution["sliced_bps"]), 1),
-        "single_order_bps": round(float(execution["single_order_bps"]), 1),
     }
 
 

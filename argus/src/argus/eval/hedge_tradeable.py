@@ -168,7 +168,7 @@ SIGN_AGREEMENT_FLOOR = 0.95
 """Share of rolling windows that must agree with the full-sample sign, for the sample-size-robust
 form of the stability test.
 
-Needed because the borrowed gate has a real weakness, found by running it rather than by reading
+Needed because the borrowed gate has a weakness, found by running it rather than by reading
 it: "zero sign flips and a minimum |correlation| above a floor" is built from two *extreme* order
 statistics, so its strictness grows with how many windows you take. Blackout evaluates roughly five
 rolling windows (twelve weekend rows, ``roll=8``); this module evaluates about 570 of them on the
@@ -238,7 +238,7 @@ class Panel:
     """One aligned block of real hourly closes for the whole tradeable universe.
 
     Aligned by inner join on timestamp, never forward-filled. A forward fill would manufacture a
-    zero change on one leg against a real change on the other, which biases every correlation here
+    zero change on one leg against a change on the other, which biases every correlation here
     toward zero — the same reasoning `market/history.py:fetch_basis` gives for its own inner join.
     """
 

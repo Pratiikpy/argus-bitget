@@ -113,10 +113,11 @@ from typing import Any
 from argus.lui.answer import Answer, Source
 from argus.truth import http
 from argus.truth.bounded import BoundedDict
+from argus.truth.endpoints import BITGET_API
 from argus.truth.paths import DATA_DIR
 
 SECTOR_MAP_PATH = DATA_DIR / "sector_map.json"
-TICKERS_URL = "https://api.bitget.com/api/v2/mix/market/tickers?productType=USDT-FUTURES"
+TICKERS_URL = BITGET_API + "/api/v2/mix/market/tickers?productType=USDT-FUTURES"
 
 WINDOW_DAYS = 252
 """One year of US trading days: long enough that a loading's standard error is a few hundredths,

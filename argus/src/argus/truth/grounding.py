@@ -21,7 +21,7 @@ it came from somewhere. Correctness is the backtest's job and the settlement's j
 weaker, checkable property: no figure in the record is unattributable.
 
 **Ignored by design.** Years, ordinal counts, and the numbers inside identifiers are not claims
-about the market and flagging them would bury the real findings. The exclusions are listed rather
+about the market and flagging them would bury the findings. The exclusions are listed rather
 than inferred, so a reader can disagree with a specific one.
 
 **Three states, not two (added 2026-09-25, item S23).** The check used to be binary: a thesis was
@@ -135,7 +135,7 @@ _ORDINAL = re.compile(r"\b\d+(?:st|nd|rd|th)\b", re.I)
 
 # A time-window label names the period a quantity was measured over; it is not itself a claim about
 # the market. Found on the live ledger: "the 24h change of +4.4bps" contains two numbers, and only
-# one of them is an assertion. Flagging the window would bury the real findings under noise, which
+# one of them is an assertion. Flagging the window would bury the findings under noise, which
 # is how a report trains its reader to ignore it.
 _TIME_WINDOW = re.compile(
     r"\d+\s*(?:h|hr|hrs|hour|hours|d|day|days|m|min|mins|minute|minutes|w|wk|week|weeks|"

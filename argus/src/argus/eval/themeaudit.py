@@ -744,7 +744,7 @@ def j_t2_risk_control() -> Finding:
     # Two different claims, and reporting only the second is what made this probe read as damning.
     # The layer is *proven over its whole input domain* by `eval/riskproof.py` — a sweep, not a
     # sample — and separately *unexercised in production*. A layer that never fires live is untested
-    # in production, which is a real gap; a layer with unreachable rules would be a defect. This
+    # in production, which is a gap; a layer with unreachable rules would be a defect. This
     # says which one we have.
     proof = DATA / "risk_proof.json"
     swept = ""
@@ -798,7 +798,7 @@ def j_t2_architecture() -> Finding:
     """The fourth Track 2 criterion, which had no probe at all until 2026-09-14.
 
     Architecture quality is usually argued. `eval/architecture.py` measures the part of it that is a
-    fact about the import graph, and the first run found a real defect: the market layer reached
+    fact about the import graph, and the first run found a defect: the market layer reached
     into `agents` for a type, so fetching an SEC filing loaded the Qwen client.
     """
     from argus.eval.architecture import audit as architecture_audit

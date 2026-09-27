@@ -42,7 +42,7 @@ line endings).
   the two implementations are the same algorithm, and :func:`run_parity` checks that claim to
   1e-16 rather than asserting it.
 
-**A real defect in Riskfolio-Lib 7.3.0, found by running it, not assumed.** `optimization()` at
+**A defect in Riskfolio-Lib 7.3.0, found by running it, not assumed.** `optimization()` at
 `HCPortfolio.py:1095-1103` calls `self._hierarchical_recursive_bisection(self.clustering, rm=rm,
 rf=rf, linkage=linkage, model=model, upper_bound=..., lower_bound=...)`, but that method's own
 signature at `HCPortfolio.py:522-528` is `(self, Z, rm="MV", rf=0, model="HERC")`. Three of the

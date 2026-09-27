@@ -365,7 +365,7 @@ class Window(Expr):
             # used to sit in front of this whole block and silently shadowed this branch's own
             # `else 0.5` for exactly that case — found by comparing against qlib's real
             # `Rank`, whose pandas-rank convention gives a single-observation window 1.0, not
-            # 0.0, and confirmed as a real gap against this method's own documented intent
+            # 0.0, and confirmed as a gap against this method's own documented intent
             # ("a constant series ranks 0.5") rather than a difference in convention.
             current = vals[-1]
             below = sum(1 for v in vals if v < current)

@@ -37,10 +37,11 @@ from argus.execution.latency import (
     LatencyError,
     LatencyRow,
 )
+from argus.truth.endpoints import BITGET_API
 from argus.truth.paths import DATA_DIR
 
-PUBLIC_TIME_URL = "https://api.bitget.com/api/v2/public/time"
-PUBLIC_TICKER_URL = "https://api.bitget.com/api/v2/mix/market/ticker?symbol=BTCUSDT&productType=usdt-futures"
+PUBLIC_TIME_URL = BITGET_API + "/api/v2/public/time"
+PUBLIC_TICKER_URL = BITGET_API + "/api/v2/mix/market/ticker?symbol=BTCUSDT&productType=usdt-futures"
 DEFAULT_SAMPLES = 30
 
 

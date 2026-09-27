@@ -1350,7 +1350,7 @@ def _status() -> dict[str, Any]:
         age_hours = (datetime.now(UTC) - newest).total_seconds() / 3600.0
 
     # `stale` is derived from the SAME rounded figure this function returns as `age_hours`, not
-    # the raw one — a real bug, found by a test tripping on it, not by inspection: at a raw age
+    # the raw one — a bug, found by a test tripping on it, not by inspection: at a raw age
     # like 12.02h, the unrounded comparison correctly says `stale=True` while the displayed
     # `age_hours` rounds to exactly "12.0", which reads as self-contradictory to any consumer
     # ("12.0 hours old, and the threshold is 12.0, so why is this stale?") — precisely the kind

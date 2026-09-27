@@ -100,7 +100,7 @@ class NettingResult:
 
     @property
     def ghost_headline_hides_a_nonzero_net(self) -> bool:
-        """The real defect: the true net is non-zero (rounds away from $0.00), but the real
+        """The defect: the true net is non-zero (rounds away from $0.00), but the real
         headline floors it to exactly $0.00 anyway."""
         return abs(self.ghost_net_usd) > 0.001 and self.ghost_headline_saved_usd == 0.0
 

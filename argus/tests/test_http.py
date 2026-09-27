@@ -120,3 +120,12 @@ def test_product_code_reads_the_network_only_through_this_module() -> None:
         if re.search(r"\burlopen\(", path.read_text(encoding="utf-8")):
             direct.append(rel)
     assert direct == []
+
+
+def test_the_bitget_host_is_named_once() -> None:
+    """Audit 165: the host was written out in twelve modules; `truth/endpoints.py` names it."""
+    literal = [path.relative_to(SRC).as_posix() for path in sorted(SRC.rglob("*.py"))
+               if not path.relative_to(SRC).as_posix().startswith(("eval/", "vendor/"))
+               and path.name != "endpoints.py"
+               and '"https://api.bitget.com' in path.read_text(encoding="utf-8")]
+    assert literal == []

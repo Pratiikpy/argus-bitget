@@ -13,7 +13,7 @@ from typing import Any
 import pytest
 
 from argus.eval import research_task_record as rec
-from argus.lui.task import EXECUTION_TITLE, IMPACT_TITLE
+from argus.lui.task import EXECUTION_TITLE, IMPACT_TITLE, headline
 
 
 @pytest.fixture(scope="module")
@@ -34,7 +34,7 @@ def test_every_engine_answered_or_said_why_not(blob: dict[str, Any]) -> None:
 
 
 def test_the_headline_is_what_the_verdict_says(blob: dict[str, Any]) -> None:
-    h = rec.headline(blob)
+    h = headline(blob)
     verdict = blob["task"]["verdict"]
     assert verdict["call"] == f"Add, at {h['proposed']:.0f}%"
     first, crowded, fill, *_later = verdict["lines"]
@@ -49,6 +49,6 @@ def test_the_headline_is_what_the_verdict_says(blob: dict[str, Any]) -> None:
 
 def test_the_execution_step_states_the_single_order_figure(blob: dict[str, Any]) -> None:
     """The verdict's one-order cost is the execution step's own first line, not a third figure."""
-    h = rec.headline(blob)
+    h = headline(blob)
     execution = next(s for s in blob["task"]["steps"] if s["title"] == EXECUTION_TITLE)
     assert f"costs about {h['single_order_bps']:.1f}bps" in execution["lines"][0]

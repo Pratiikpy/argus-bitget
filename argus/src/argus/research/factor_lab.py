@@ -523,7 +523,7 @@ class Evaluator:
         ARGUS's lab evaluates a factor on a **single** instrument's bar series, so the natural
         "cross-section at a period" does not exist. Rather than fabricate one, each bar becomes its
         own period with one observation, and the rank correlation is taken across a rolling window
-        of bars instead of across names at an instant. That is a real difference from the
+        of bars instead of across names at an instant. That is a difference from the
         cross-sectional IC in the literature and it is stated rather than glossed: the gates are
         measuring time-series predictive power here, not cross-sectional ranking power.
         """

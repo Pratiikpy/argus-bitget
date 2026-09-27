@@ -54,8 +54,9 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from argus.truth import http
+from argus.truth.endpoints import BITGET_API
 
-BASE = "https://api.bitget.com"
+BASE = BITGET_API
 NEW_YORK = ZoneInfo("America/New_York")
 MARKET_OPEN = clock_time(9, 30)
 MARKET_CLOSE = clock_time(16, 0)

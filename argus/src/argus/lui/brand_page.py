@@ -47,8 +47,8 @@ def _receipt() -> str:
     (`eval/research_task_record.py`): the question, the verdict, the engine and data line of the
     step that sized it, and the file every figure can be checked in."""
     try:
-        from argus.eval.research_task_record import REPORT_PATH, headline
-        from argus.lui.task import IMPACT_TITLE
+        from argus.lui.task import IMPACT_TITLE, headline
+        from argus.lui.task import TASK_RECORD_PATH as REPORT_PATH
 
         blob = json.loads(REPORT_PATH.read_text(encoding="utf-8"))
         step = next(s for s in blob["task"]["steps"] if s["title"] == IMPACT_TITLE)

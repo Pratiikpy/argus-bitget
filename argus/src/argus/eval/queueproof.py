@@ -490,7 +490,7 @@ def paired_interval(better: Scored, worse: Scored) -> tuple[float, float, float]
     """A 95% interval on the per-episode error difference, paired on the same episodes.
 
     Paired because both models saw identical queues: the episode-to-episode variance is enormous and
-    common to both, so an unpaired comparison would drown a real difference in it. The interval is
+    common to both, so an unpaired comparison would drown a difference in it. The interval is
     the normal approximation, which is what 4,000 paired differences support.
     """
     diffs = [w - b for b, w in zip(better.per_episode, worse.per_episode, strict=True)]

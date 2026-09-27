@@ -226,7 +226,7 @@ def score(
     `ruptures.metrics` takes partitions terminated by `n_samples`, and `precision_recall` returns
     `(0, 0)` when the estimate has no interior break at all
     (`ruptures/metrics/precisionrecall.py:32-33`), so an empty answer scores zero rather than
-    raising — which is the behaviour wanted: finding nothing is a real failure mode, not an error.
+    raising — which is the behaviour wanted: finding nothing is a failure mode, not an error.
 
     `mean_distance_to_truth` is added beside them because Hausdorff reports only the worst match and
     an arm can look catastrophic on one boundary while being exact on the other.

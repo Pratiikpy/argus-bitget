@@ -54,8 +54,9 @@ from argus.decision.verdicts import Authorised
 from argus.execution.confirm import StatusReading
 from argus.execution.consent import ConsentRefused, LiveOrderConsent, require_live_consent
 from argus.execution.orders import Order, OrderState
+from argus.truth.endpoints import BITGET_API
 
-BASE_URL = "https://api.bitget.com"
+BASE_URL = BITGET_API
 
 LIVE_PRODUCT_TYPE = "USDT-FUTURES"
 DEMO_PRODUCT_TYPE = "SUSDT-FUTURES"

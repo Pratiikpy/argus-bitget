@@ -396,7 +396,7 @@ class FailureCase:
 
 
 def run_failure_cases(eval_surface_module: Any) -> list[FailureCase]:
-    """Malformed (not malicious) input, both sides — the case the real error handling on each
+    """Malformed (not malicious) input, both sides — the case the error handling on each
     side was actually designed for, distinct from the hostile-but-syntactically-valid payload
     `run_injection_proof` exercises."""
     out: list[FailureCase] = []

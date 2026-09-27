@@ -392,7 +392,7 @@ def _stress_band(symbol: str) -> str | None:
     AnalogDesk's analogue band (15.25) though not significantly. Built from Bitget's daily bars."""
     import statistics
 
-    from argus.eval.analogstress_comparison import NORMAL_80, quantile
+    from argus.desk.analogue import NORMAL_80, quantile
     from argus.market.history import CandleType, fetch_window
 
     try:

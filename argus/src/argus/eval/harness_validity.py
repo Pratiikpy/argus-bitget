@@ -67,7 +67,7 @@ import tempfile
 import threading
 import time
 import traceback
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -172,6 +172,48 @@ class _Guards:
     writes_redirected: list[str] = field(default_factory=list)
     fired: list[str] = field(default_factory=list)
     executed: set[str] = field(default_factory=set)
+    redirected_to: dict[str, Path] = field(default_factory=dict)
+    """Workspace path of each redirected write -> the scratch file that received it."""
+
+
+VOLATILE = frozenset({"measured_at", "generated_at", "written_at", "as_of", "at", "fetched_at",
+                      "elapsed_s", "elapsed_ms", "seconds", "run_seconds", "wall_seconds",
+                      "started_at", "finished_at", "timestamp", "recorded_at", "created_at"})
+"""Keys that record when or how fast a run happened, not what it found: ignored when a rerun is
+compared with the published artefact."""
+
+
+def _stable(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {k: _stable(v) for k, v in value.items() if k not in VOLATILE}
+    if isinstance(value, list):
+        return [_stable(v) for v in value]
+    return value
+
+
+def reproduction(redirected_to: Mapping[str, Path], protected: Path) -> dict[str, str]:
+    """Each JSON artefact a run rewrote, compared with the published file with the time-stamps
+    left out: ``identical``, ``differs``, ``new`` (nothing published yet) or ``unreadable``.
+
+    Until 2026-09-27 the guard proved a writer exists for every cited artefact but never ran one
+    to see whether it reproduces the bytes (audit finding 147). The runs here are the harness
+    canary's own offline baseline runs, so the comparison costs nothing extra."""
+    out: dict[str, str] = {}
+    for rel, scratch in sorted(redirected_to.items()):
+        if not rel.endswith(".json") or "/data/" not in f"/{rel}":
+            continue
+        published = protected / rel
+        if not published.exists():
+            out[rel] = "new"
+            continue
+        try:
+            fresh = json.loads(scratch.read_text(encoding="utf-8"))
+            old = json.loads(published.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            out[rel] = "unreadable"
+            continue
+        out[rel] = "identical" if _stable(fresh) == _stable(old) else "differs"
+    return out
 
 
 def _install_guards(guards: _Guards, scratch: Path) -> None:
@@ -191,7 +233,9 @@ def _install_guards(guards: _Guards, scratch: Path) -> None:
             target = Path(os.fspath(file)).resolve()
             if target.is_relative_to(PROTECTED):
                 redirected = scratch / re.sub(r"[^A-Za-z0-9_.-]", "_", target.as_posix())[-180:]
-                guards.writes_redirected.append(target.relative_to(PROTECTED).as_posix())
+                rel = target.relative_to(PROTECTED).as_posix()
+                guards.writes_redirected.append(rel)
+                guards.redirected_to[rel] = redirected
                 return real_open(redirected, mode, *args, **kwargs)
         return real_open(file, mode, *args, **kwargs)
 
@@ -204,8 +248,15 @@ def _install_guards(guards: _Guards, scratch: Path) -> None:
         def move(src: Any, dst: Any, *a: Any, **k: Any) -> None:
             target = Path(os.fspath(dst)).resolve()
             if target.is_relative_to(PROTECTED):
-                guards.writes_redirected.append(
-                    f"(move refused) {target.relative_to(PROTECTED).as_posix()}")
+                rel = target.relative_to(PROTECTED).as_posix()
+                guards.writes_redirected.append(f"(move refused) {rel}")
+                # an atomic writer's temp file was redirected: its content is the artefact's
+                source = Path(os.fspath(src)).resolve()
+                if source.is_relative_to(PROTECTED):
+                    scratch_copy = guards.redirected_to.get(
+                        source.relative_to(PROTECTED).as_posix())
+                    if scratch_copy is not None:
+                        guards.redirected_to[rel] = scratch_copy
                 return
             real(src, dst, *a, **k)
         return move
@@ -307,6 +358,8 @@ def _child(harness: str, mode: str, targets: Sequence[str], out: Path, *,
         "executed": sorted(r for f in guards.executed if (r := _relative(f)) is not None),
         "sabotaged_functions": sabotaged,
         "fired": sorted(set(guards.fired)),
+        "reproduction": (reproduction(guards.redirected_to, PROTECTED)
+                         if mode == "baseline" and result.get("status") == "ok" else {}),
     })
     with real_open(out, "w", encoding="utf-8") as handle:
         json.dump(result, handle)
@@ -514,7 +567,8 @@ def _summarise(run: HarnessRun) -> dict[str, Any]:
         "capabilities_citing_it": run.claims, "code_under_test": run.under_test,
         "reached": reached,
         "baseline": {k: run.baseline.get(k) for k in (
-            "status", "elapsed_s", "network_attempts", "writes_redirected", "error")},
+            "status", "elapsed_s", "network_attempts", "writes_redirected", "error",
+            "reproduction")},
         "canary": {k: run.canary.get(k) for k in (
             "status", "elapsed_s", "fired_at_import", "sabotaged_functions", "error")}
         | {"fired": len(run.canary.get("fired") or []), "surfaced": run.surfaced()},

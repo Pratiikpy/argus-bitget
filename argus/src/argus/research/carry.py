@@ -66,11 +66,12 @@ from statistics import median
 from typing import Any
 
 from argus.truth import http
+from argus.truth.endpoints import BITGET_API
 from argus.truth.paths import DATA_DIR
 
 REPORT_PATH = DATA_DIR / "carry_study.json"
 
-ENDPOINT = "https://api.bitget.com/api/v3/market/history-fund-rate"
+ENDPOINT = BITGET_API + "/api/v3/market/history-fund-rate"
 MAX_LIMIT = 100
 """The live maximum. The generated catalogue says 200 and the venue answers ``40020`` to it."""
 

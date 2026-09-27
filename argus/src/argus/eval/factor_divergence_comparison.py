@@ -170,7 +170,7 @@ def _bootstrap_mean_ci(
     common to the whole rToken universe); a plain iid standard error would understate the true
     uncertainty, exactly the mistake this project has corrected before (whale-signals, PBO/DSR).
 
-    **A real bug, found by running this on a genuinely small real OOS half-window, not assumed
+    **A bug, found by running this on a genuinely small real OOS half-window, not assumed
     safe.** This guarded on `n < 8` first, well under `optimal_block_length`'s own real minimum
     of `MIN_OBSERVATIONS = 30` — a real 30-day OOS half-window produced exactly 29 real paired
     readings and this function called `optimal_block_length` anyway, which raised `MetricError`
@@ -204,7 +204,7 @@ def _paired_diffs(market_ic: pd.Series, index_ic: pd.Series) -> list[float]:
     """Pair the two real IC series by timestamp VALUE via plain dict lookups, never
     `pandas.Index.intersection`/`.loc[]`.
 
-    **A real bug, found by running this on real irregular data, not assumed safe.** The real,
+    **A bug, found by running this on real irregular data, not assumed safe.** The real,
     vendored `factor_information_coefficient` ends with `ic.asfreq(freq)`, where `freq` comes
     from `factor_data.index.levels[date_idx].freq` — `None` on genuinely irregular real
     timestamps (exactly what Alpha 23's own sparse firing produces here). Confirmed directly

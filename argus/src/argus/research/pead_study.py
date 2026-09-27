@@ -1,6 +1,6 @@
 """Does the already-verified SUE ranking carry forward-return information on this venue?
 
-The zero-settled-trades gap traces to a real finding this project already made and never acted
+The zero-settled-trades gap traces to a finding this project already made and never acted
 on. `eval/hurdle.py` proved the desk's abstention is not fee-driven — break-even directional
 accuracy is 55%, not the near-100% a fee explanation would need. `research/overfitting_study.py`
 then swept 25 systematic session-based variants across all 12 symbols, 300 trials, and found

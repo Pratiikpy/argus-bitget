@@ -66,7 +66,7 @@ def real_basis(symbol: str = "NVDAUSDT") -> tuple[float, float, float]:
     """The live median/p95/max apparent-basis figures this comparison's designed cases are built
     from, read from the study artefact rather than typed in.
 
-    **This is the fix for a real defect, not a style preference.** The three spread values below
+    **This is the fix for a defect, not a style preference.** The three spread values below
     used to be literal floats (1.12, 11.06, 27.01) matching the study's OLD signed-basis
     quantiles. The study (`research/arbitrage_study.py:157`) switched to an absolute basis
     (`apparent = [abs(r.apparent_bps) for r in ...]`) at some point after that; `data/`

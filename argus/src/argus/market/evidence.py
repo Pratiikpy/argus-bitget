@@ -29,7 +29,7 @@ Five sources, in order of trust:
    now works, verified with a real query before writing a line of integration code.
 5. **Reddit**, via ``agent-reach``'s real ``rdt-cli`` backend — same shape as Twitter above (see
    :class:`RedditSource`): opt-in, LIVE ONLY. ``agent-reach doctor`` reported this channel
-   ``status: error`` (a cookie-refresh warning, not a real failure); a direct real query found it
+   ``status: error`` (a cookie-refresh warning, not a failure); a direct real query found it
    working regardless, so the doctor summary was checked against the real thing rather than
    trusted on its own.
 
@@ -635,7 +635,7 @@ class TwitterSource:
     equities is empty ~93% of the time and names the reason: "the free replacements are blocked
     from this network." Re-checked directly on 2026-09-16, not carried forward from that earlier
     finding: `agent-reach doctor --json` now reports Twitter/X `status: ok`, backend `twitter-cli`
-    — a real change in this machine's own network access since that blocker was written, verified
+    — a change in this machine's own network access since that blocker was written, verified
     with a real live query (`twitter search NVDA --json`) returning real, current, per-symbol
     tweets with real engagement metrics and real ISO timestamps.
 
@@ -664,7 +664,7 @@ class TwitterSource:
     ) -> tuple[list[Evidence], list[str]]:
         query = underlying_ticker(symbol)
         try:
-            # A real bug, found by running this on a real tweet, not assumed safe: `text=True`
+            # A bug, found by running this on a real tweet, not assumed safe: `text=True`
             # with no explicit `encoding` decodes with the platform default (cp1252 on Windows),
             # which cannot represent real tweet content carrying emoji or other non-Latin-1
             # characters and crashed the subprocess's own stdout reader thread mid-read, leaving
@@ -728,7 +728,7 @@ class RedditSource:
     """Real social-sentiment text via the `agent-reach` router's real `rdt-cli` backend.
 
     **Found the same way `TwitterSource` was, same day.** `agent-reach doctor --json` reports
-    Reddit `status: error` (a cookie-refresh warning, not a real failure) — read as `"off"` at a
+    Reddit `status: error` (a cookie-refresh warning, not a failure) — read as `"off"` at a
     glance and it would have been wrong. A real, direct query (`rdt search NVDA --json`) returned
     real, current r/wallstreetbets posts with real titles, scores and usernames, so the doctor
     summary was checked against the real thing rather than trusted on its own.

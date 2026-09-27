@@ -1498,7 +1498,7 @@ def run_reproducibility_check(
     """Fetch once, compute twice. Re-fetching would test whether the venue moved, not determinism.
 
     `ruptures.KernelCPD` and `stumpy.fluss` both have stochastic-looking internals (`_iac` samples
-    a beta fit; the kernel solver is iterative) so this is a real question about the baselines, not
+    a beta fit; the kernel solver is iterative) so this is a question about the baselines, not
     only about ARGUS's own arithmetic.
 
     **Wall-clock fields are stripped before comparing, and that is not a convenience.** The first

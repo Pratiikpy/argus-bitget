@@ -307,3 +307,15 @@ def net_edge_bps(gross_edge_bps: Decimal, model: CostModel, *, round_trips: int 
     """
     model.assert_gateable()
     return gross_edge_bps - model.round_trip_bps() * Decimal(round_trips)
+
+
+def default_hurdle_bps(*, deliberation_bps: float = 6.8) -> float:
+    """Commission round trip plus the typical deliberation charge.
+
+    The deliberation term varies with session phase and volatility, so a single number is a
+    representative value and not a constant of nature. 6.8 is the charge a full thinking budget
+    incurs in regular hours at the 45% annualised volatility the desk assumes for a single-name
+    rToken; off-hours it triples. Stated here rather than buried so the sensitivity is visible, and
+    the frontier sweeps well past it in both directions anyway.
+    """
+    return float(CostModel.bitget_perp().round_trip_bps()) + deliberation_bps

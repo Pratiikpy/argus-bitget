@@ -96,6 +96,27 @@ class AnalogueError(RuntimeError):
     """The corpus cannot support the question asked of it."""
 
 
+NORMAL_80 = 1.2815515655446004
+"""The standard normal's 90th percentile: the half-width of a central 80% band in sigmas."""
+BLEND_WEIGHTS = (0.25, 0.5, 0.75)
+SELECTION_SPLIT = "2021-01-01"
+"""Variants are compared on the calibration era only: multipliers fitted before this date,
+Winkler scored after it. The test era is scored once, for the variant chosen here."""
+"""The two-sided 80% multiplier of a normal distribution (its 90th percentile).
+The analogue answer's volatility band and `eval/analogstress_comparison.py` use the same one."""
+
+
+def quantile(values: list[float], p: float) -> float:
+    """Linear interpolation between order statistics (their `quantile`, and numpy's default)."""
+    ordered = sorted(values)
+    n = len(ordered)
+    if n == 0:
+        return math.nan
+    h = (n - 1) * p
+    lo, hi = math.floor(h), math.ceil(h)
+    return ordered[lo] if lo == hi else ordered[lo] + (ordered[hi] - ordered[lo]) * (h - lo)
+
+
 @dataclass(frozen=True)
 class Observation:
     """One historical state and what followed it.

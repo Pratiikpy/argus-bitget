@@ -832,9 +832,9 @@ def earnings_releases(symbol: str, since: date) -> Releases:
 
 def _holidays() -> frozenset[date] | None:
     try:
-        from argus.eval.baselines.lean_market_holidays_loader import load_usa_equity_holidays
+        from argus.truth.clocks import us_equity_holidays
 
-        return load_usa_equity_holidays()
+        return us_equity_holidays()
     except Exception:
         return None
 

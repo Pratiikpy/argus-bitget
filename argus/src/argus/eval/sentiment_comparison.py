@@ -300,7 +300,7 @@ class NarrativeResult:
     def minimal_ablation_is_load_bearing(self) -> bool:
         """The coarser, decisive ablation: with the ENTIRE source-independence framing removed
         (not just one sentence), does the bare classifier flip to actionable on coordinated
-        evidence where the real, instructed analyst did not? Answers the real question this
+        evidence where the real, instructed analyst did not? Answers the question this
         module set out to test: is coordination-discounting a property of the PROMPT
         ARCHITECTURE (source-awareness reasoning generally), not of any single sentence within
         it."""

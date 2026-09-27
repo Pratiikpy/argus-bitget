@@ -26,7 +26,7 @@ The artefact says exactly that, and `REAL_DIMENSIONS` / `DECLARED_DIMENSIONS` ar
 a reader cannot mistake the second for the first.
 
 **It is shaped to be able to fail.** If both profiles reach the same verdict on every real frame,
-the rate is 0.0 and the report says personalisation did not bind — which would be a real finding
+the rate is 0.0 and the report says personalisation did not bind — which would be a finding
 against a criterion we are scored on, and is reported rather than tuned away.
 """
 

@@ -30,9 +30,10 @@ from pathlib import Path
 from typing import Any
 
 from argus.truth import http
+from argus.truth.endpoints import BITGET_API
 from argus.truth.paths import DATA_DIR
 
-BASE = "https://api.bitget.com"
+BASE = BITGET_API
 SNAPSHOT_PATH = DATA_DIR / "crossasset_snapshot.json"
 HOUR_MS = 3_600_000
 PAGE = 200
@@ -136,6 +137,7 @@ def write_snapshot(path: Path = SNAPSHOT_PATH, *, now: datetime | None = None) -
     funding: dict[str, list[tuple[int, float]]] = {}
     fees: dict[str, float] = {}
     slippage: dict[str, list[tuple[float, float]]] = {}
+
     def absent(label: str, symbol: str, exc: Exception) -> None:
         # each input is named when it did not arrive, never invented
         missing[f"{label}:{symbol}"] = f"{type(exc).__name__}: {str(exc)[:120]}"

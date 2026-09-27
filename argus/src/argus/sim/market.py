@@ -87,7 +87,7 @@ class SimulatedSession:
     def step(self, wakeups: int = 1) -> None:
         """Wake every agent, submit what they produce, and **route the fills back to them**.
 
-        The routing is not optional and its absence was a real bug here: without it no agent ever
+        The routing is not optional and its absence was a bug here: without it no agent ever
         learns it was filled, so the market maker's position stays at zero, inventory skew can
         never engage, and `maker_fill_rate` reads 0 for every participant. A simulated market in
         which nobody knows their own position is not a market. ABIDES does this over a message

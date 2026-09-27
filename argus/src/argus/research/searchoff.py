@@ -233,7 +233,7 @@ class Arena:
     spent: int = 0
     refused: int = 0
     """Candidates refused as too expensive to evaluate. Reported, never hidden: a strategy that
-    spends its budget generating untradeable trees has a real defect and this is where it shows."""
+    spends its budget generating untradeable trees has a defect and this is where it shows."""
 
     @property
     def split(self) -> int:

@@ -51,7 +51,7 @@ UNIVERSE: tuple[str, ...] = (
 
 Repeated here rather than imported because there is no module that owns it — the canonical list
 lives in `run_paper_cycle.ps1`'s `--symbols` argument, and `eval/cyclecheck.py` only knows the
-*count* (``EXPECTED_SYMBOLS = 12``). That is a real seam and it is named rather than papered over:
+*count* (``EXPECTED_SYMBOLS = 12``). That is a seam and it is named rather than papered over:
 if the cycle's universe changes, this tuple and that argument drift apart silently.
 """
 

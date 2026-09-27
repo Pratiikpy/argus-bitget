@@ -533,7 +533,7 @@
     {
       "comparison": "claimcheck",
       "question": "a trader's claims about the tape: which hold",
-      "argus": "ARGUS premise check (lui/research._claim_check)",
+      "argus": "ARGUS premise check (lui/research/claims.py::_claim_check)",
       "rival": "MirrorLine getInterpretationChallenge",
       "metric": "share of gradable claims judged correctly (a causal claim also needs its stated cause held back)",
       "lower_is_better": false,
@@ -610,7 +610,7 @@
     }
   ],
   "replay": {
-    "method": "argus.lui.research._claim_check called on each saved sentence with the console's resolver's contract, tape_before's 24h changes and the clock at run_started (console_answers); written to data/h2h_mirrorline/argus_replay.json",
+    "method": "argus.lui.research.claims._claim_check called on each saved sentence with the console's resolver's contract, tape_before's 24h changes and the clock at run_started (console_answers); written to data/h2h_mirrorline/argus_replay.json",
     "scored": "the replay (tape_before)",
     "against_the_recorded_console_run": {
       "claims": 38,

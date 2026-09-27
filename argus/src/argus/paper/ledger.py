@@ -276,7 +276,7 @@ class Entry:
     def settlement_content_hash(self) -> str:
         """Hash over the outcome fields alone — the seal :meth:`content_hash` deliberately omits.
 
-        **Added 2026-09-22, closing a real gap found by adversarial testing.** `content_hash`
+        **Added 2026-09-22, closing a gap found by adversarial testing.** `content_hash`
         excludes ``settled_at``/``exit_price``/``gross_pnl``/``net_pnl``/``direction_correct``/
         ``counterfactual_move_bps`` by design, and that design is correct — see `content_hash`'s
         own docstring. But nothing *else* protected those fields either: a copy of the live ledger
@@ -864,7 +864,7 @@ class PaperLedger:
         so the first break localises the tampering. The anchor catches the other attack: removing
         rows from the end, which leaves the surviving chain valid.
 
-        **Walks `_raw_entries`, not `entries` — a real bug caught before it shipped.** The chain's
+        **Walks `_raw_entries`, not `entries` — a bug caught before it shipped.** The chain's
         prev_hash/content_hash links are in FILE order across every row, decisions and settlement
         seals together; a seal sitting between two decisions makes the later decision's `prev_hash`
         equal the seal's `content_hash`, not the earlier decision's. Walking `entries` (decisions
@@ -928,7 +928,7 @@ class PaperLedger:
         }
 
     def _check_settlement_seals(self) -> tuple[list[int], list[int]]:
-        """``(tampered, unsealed)`` — the check that closes the real gap `content_hash`'s own
+        """``(tampered, unsealed)`` — the check that closes the gap `content_hash`'s own
         docstring names on purpose: settlement fields are excluded from the decision-hash payload,
         so nothing before 2026-09-22 stopped a direct file edit from silently rewriting a settled
         decision's P&L. Found by actually tampering with a copy of the live ledger, not assumed.

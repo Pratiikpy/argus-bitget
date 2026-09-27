@@ -4,7 +4,7 @@
 Before this module, ARGUS's evidence for it was 73 unit tests and a theme-audit probe asserting
 ``len(PHRASES) >= 20``. That probe was citing the wrong half of the interface: `lui/phrasebook.py`
 holds 44 **response templates** in English and Chinese — what the console *says*, not what it
-*understands* — and no measurement existed of how often a real question is understood at all.
+*understands* — and no measurement existed of how often a question is understood at all.
 
 **Unit tests cannot answer this question.** Each one asserts that a phrasing the author already
 thought of reaches the right intent, so the suite grows exactly as wide as the imagination that

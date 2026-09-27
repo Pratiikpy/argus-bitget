@@ -254,7 +254,7 @@ class SentimentAnalyst(Analyst):
     418. Only ``alternative.me`` answered, with a crypto-wide risk-appetite index carried at
     credibility 0.35 and labelled for what it measures — that source is still real and still
     used. **Re-checked 2026-09-16, not carried forward**: ``agent-reach doctor --json`` now
-    reports Twitter/X reachable (``twitter-cli``), a real change in this machine's own network
+    reports Twitter/X reachable (``twitter-cli``), a change in this machine's own network
     access since the note above was written.
     ``market.evidence.TwitterSource`` is wired into the real live desk cycle
     (``paper/runner.py``, opt-in, LIVE ONLY) and a real sweep of the full twelve-symbol rToken

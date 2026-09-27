@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-25T20:43:19+00:00",
+  "generated": "2026-09-27T09:03:13+00:00",
   "target": "rToken price Monday 10:00 ET, predicted from Sunday 19:00 ET (nocturne's own)",
   "baseline_reproduced": {
     "nocturne_published_large_caps": {
@@ -137,7 +137,7 @@
   },
   "failures": {},
   "console_replay": {
-    "method": "lui/research._implied_open_line called at Sunday 20:00 ET per row, its perpetual reader on data/h2h_nocturne/ and its close reader on the rToken's 16:00 ET price (overnight_comparison.console_feed)",
+    "method": "lui/research/quote.py::_implied_open_line called at Sunday 20:00 ET per row, its perpetual reader on data/h2h_nocturne/ and its close reader on the rToken's 16:00 ET price (overnight_comparison.console_feed)",
     "rows_offered": 61,
     "rows_the_console_answered": 61,
     "rows_the_former_formula_answered": 61,
@@ -152,7 +152,7 @@
     {
       "comparison": "void",
       "question": "the rToken's Monday 10:00 ET price from Sunday 19:00",
-      "argus": "ARGUS: the console's implied open (lui/research._implied_open_line), anchored on the rToken's Friday price",
+      "argus": "ARGUS: the console's implied open (lui/research/quote.py::_implied_open_line), anchored on the rToken's Friday price",
       "rival": "nocturne's full fade (its best model)",
       "metric": "mean absolute error of the Sunday-to-Monday return, pct",
       "lower_is_better": true,
@@ -232,12 +232,12 @@
       },
       "errors": [],
       "artefact": "data/void_comparison.json",
-      "created_at": "2026-09-25T20:43:19+00:00"
+      "created_at": "2026-09-27T09:03:13+00:00"
     },
     {
       "comparison": "void",
       "question": "the rToken's Monday 10:00 ET price from Sunday 19:00",
-      "argus": "ARGUS: the console's implied open (lui/research._implied_open_line), anchored on the rToken's Friday price",
+      "argus": "ARGUS: the console's implied open (lui/research/quote.py::_implied_open_line), anchored on the rToken's Friday price",
       "rival": "the Sunday rToken price (no change)",
       "metric": "mean absolute error of the Sunday-to-Monday return, pct",
       "lower_is_better": true,
@@ -317,7 +317,7 @@
       },
       "errors": [],
       "artefact": "data/void_comparison.json",
-      "created_at": "2026-09-25T20:43:19+00:00"
+      "created_at": "2026-09-27T09:03:13+00:00"
     }
   ]
 }

@@ -16,7 +16,7 @@ happens at the edges: vectorbt's real, vendored ``deflated_sharpe_ratio()`` func
 ``var_sharpe`` and returns NaN right back, silently; ARGUS's ``deflated_sharpe`` raises
 ``MetricError`` before ever reaching that computation.
 
-**A real bug this comparison found in ARGUS's own code, fixed the same session.** Before this
+**A bug this comparison found in ARGUS's own code, fixed the same session.** Before this
 module existed, ``deflated_sharpe``'s own guard was ``if variance_of_trials < 0: raise`` — which
 does NOT catch NaN, because ``float('nan') < 0`` is ``False`` in IEEE 754 (the identical
 fails-every-comparison behaviour that makes vectorbt's own gate silent). A caller who computed

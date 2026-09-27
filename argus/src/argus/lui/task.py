@@ -49,12 +49,17 @@ from argus.lui.research import (
     with_book,
 )
 from argus.market.universe import contracts, is_equity
+from argus.truth.paths import DATA_DIR
 
 DEFAULT_NAME = "TSLA"
 DEFAULT_SIZE_PCT = 15.0
 DEFAULT_BOOK = "40% NVDA, 30% MSFT, 30% AAPL"
 DEFAULT_BOOK_VALUE = Decimal("100000")
 """The account size the execution step is sized against when none is stated, said on the page."""
+
+TASK_RECORD_PATH = DATA_DIR / "research_task_example.json"
+"""The kept worked research task: `eval/research_task_record.py` writes it, /brand and the
+documents read it."""
 
 _DISCLAIMER = " This is analysis, not advice — you make the call."
 
@@ -511,6 +516,30 @@ def _price_path(symbol: str) -> list[tuple[Any, float]]:
 
     bars = fetch(symbol, interval="4H", candle_type=CandleType.MARKET, recent=True, limit=180)
     return [(b.ts, float(b.close)) for b in bars]
+
+
+def headline(blob: dict[str, Any]) -> dict[str, float]:
+    """The figures the verdict rests on, rounded as the page rounds them: sizing in whole
+    percentages, fill costs in basis points to one decimal, the run time in seconds."""
+    sizing = blob["data"][IMPACT_TITLE]["sizing"]
+    execution = blob["data"][EXECUTION_TITLE]["execution"]
+    crowded = sizing.get("crowded") or {}
+
+    def pct(value: Any) -> float:
+        return float(round(float(value) * 100))
+
+    return {
+        "proposed": pct(sizing["proposed"]),
+        "ceiling": pct(sizing["ceiling"]),
+        "budget": pct(sizing["budget"]),
+        "share_after": pct(sizing["share_after"]),
+        "crowded_share": pct(crowded["share"]),
+        "crowded_weight": pct(crowded["weight"]),
+        "crowded_trim_to": pct(crowded["trim_to"]),
+        "seconds": round(float(blob["task"]["seconds"]), 1),
+        "sliced_bps": round(float(execution["sliced_bps"]), 1),
+        "single_order_bps": round(float(execution["single_order_bps"]), 1),
+    }
 
 
 def as_dict(task: Task) -> dict[str, Any]:

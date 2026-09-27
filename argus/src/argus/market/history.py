@@ -37,8 +37,9 @@ from enum import StrEnum
 from typing import Any
 
 from argus.truth import http
+from argus.truth.endpoints import BITGET_API
 
-BASE_URL = "https://api.bitget.com"
+BASE_URL = BITGET_API
 HISTORY_PATH = "/api/v3/market/history-candles"
 RECENT_PATH = "/api/v3/market/candles"
 RECENT_LIMIT = 1000

@@ -360,7 +360,8 @@ def kind_routing() -> tuple[Number, ...]:
 
 
 def _task_headline() -> dict[str, float]:
-    from argus.eval.research_task_record import REPORT_PATH, headline
+    from argus.lui.task import TASK_RECORD_PATH as REPORT_PATH
+    from argus.lui.task import headline
 
     return headline(json.loads(REPORT_PATH.read_text(encoding="utf-8")))
 
@@ -1221,7 +1222,7 @@ def disagreements(report: Report) -> list[Disagreement]:
 
     **The hole this closes.** ``at_least`` mode exists for counters that only grow — a document is
     allowed to lag the ledger between edits — and it is the right rule for one document. Applied
-    across several it hid a real defect: the README said 93 decisions, the submission draft said
+    across several it hid a defect: the README said 93 decisions, the submission draft said
     86, and the ledger held 126. Every one passed, because each was at most the live value.
 
     Three documents disagreeing by forty is a defect whatever the mode, and a judge reading two of

@@ -71,8 +71,9 @@ from enum import StrEnum
 from typing import Any
 
 from argus.truth import http
+from argus.truth.endpoints import BITGET_API
 
-INSTRUMENTS_URL = "https://api.bitget.com/api/v3/market/instruments"
+INSTRUMENTS_URL = BITGET_API + "/api/v3/market/instruments"
 PRODUCT_TYPE = "USDT-FUTURES"
 _TIMEOUT = 20
 

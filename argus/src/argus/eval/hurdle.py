@@ -7,7 +7,7 @@ exactly that by re-running the desk on regular-hours frames where the anchor mar
 abstained on all twenty of those too. So the pre-registered hypothesis is refuted: the session
 phase was not the reason.
 
-That leaves the real question, which no amount of further replaying answers: **was abstaining the
+That leaves the question, which no amount of further replaying answers: **was abstaining the
 correct policy?** This module answers it without a single additional model call, because the answer
 does not depend on the desk's opinion. It depends on two things that are already recorded — the
 size of the moves that actually happened, and the size of the hurdle they had to clear.
@@ -53,7 +53,7 @@ from pathlib import Path
 from statistics import fmean, median
 from typing import Any
 
-from argus.cost.model import CostModel
+from argus.cost.model import default_hurdle_bps
 from argus.eval.forecasts import design_effect, intraclass_correlation
 from argus.truth.paths import DATA_DIR
 
@@ -320,18 +320,6 @@ def load_instants(
         *_load(replay_path, source="replay", move_field="realised_bps"),
         *_load(live_path, source="live", move_field="counterfactual_move_bps"),
     ]
-
-
-def default_hurdle_bps(*, deliberation_bps: float = 6.8) -> float:
-    """Commission round trip plus the typical deliberation charge.
-
-    The deliberation term varies with session phase and volatility, so a single number is a
-    representative value and not a constant of nature. 6.8 is the charge a full thinking budget
-    incurs in regular hours at the 45% annualised volatility the desk assumes for a single-name
-    rToken; off-hours it triples. Stated here rather than buried so the sensitivity is visible, and
-    the frontier sweeps well past it in both directions anyway.
-    """
-    return float(CostModel.bitget_perp().round_trip_bps()) + deliberation_bps
 
 
 def build(

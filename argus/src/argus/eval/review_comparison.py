@@ -310,7 +310,7 @@ def run_threshold_ablations() -> tuple[ThresholdAblation, ...]:
 
     # NEVER_FIRES and MIN_FIRINGS: one shared fixture sitting exactly at both gates' boundary —
     # fires 5 of 20 decisions (fire_rate 0.25: real, comfortably above the real 0.0 NEVER_FIRES
-    # floor and below the real 0.9 ALWAYS_FIRES ceiling), every firing catching a real defect
+    # floor and below the real 0.9 ALWAYS_FIRES ceiling), every firing catching a defect
     # (precision 1.0, comfortably above MIN_PRECISION), fired == 5 == MIN_FIRINGS exactly (passes
     # `fired < MIN_FIRINGS` since 5 is not less than 5). Real status is ACTIVE; verified by an
     # assertion below rather than assumed, since a fixture that silently lands somewhere else

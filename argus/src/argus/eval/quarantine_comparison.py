@@ -49,7 +49,7 @@ paraphrases in :data:`PARAPHRASES` that keep the meaning of "ignore your previou
 while changing every word are exactly what a classifier would catch and a lexical detector cannot,
 and ours does not catch them.
 
-**A real defect in the reference, found by running it.** `TaskSuite.check()` returns False for
+**A defect in the reference, found by running it.** `TaskSuite.check()` returns False for
 every user task in all four v1 suites in this environment, and `generate_injections()` gates on it,
 so the documented bulk path raises `ValueError: Suite <name> failed checks`. The per-pair
 `attack()` call underneath it works, and is what the corpus was built with. Recorded because it is

@@ -2869,8 +2869,7 @@ of abstentions whose theses happened to quote a hurdle (2026-09-25 audit)."""
 
 def hurdle_lines() -> tuple[list[str], list[Source]]:
     """The hurdle's definition, from the code that sets it, and its measured test."""
-    from argus.cost.model import CostModel
-    from argus.eval.hurdle import default_hurdle_bps
+    from argus.cost.model import CostModel, default_hurdle_bps
     from argus.lui.answer import desk_notes_path
 
     fee = float(CostModel.bitget_perp().round_trip_bps())
@@ -2885,7 +2884,7 @@ def hurdle_lines() -> tuple[list[str], list[Source]]:
     ]
     sources = [Source(kind="computation", ref="argus.agents.meta_pm (total_hurdle_bps)",
                       detail="round trip + deliberation"),
-               Source(kind="computation", ref="argus.eval.hurdle.default_hurdle_bps",
+               Source(kind="computation", ref="argus.cost.model.default_hurdle_bps",
                       detail=f"{typical:.1f}bps")]
     try:
         report = json.loads((desk_notes_path().parent / "hurdle_frontier.json")

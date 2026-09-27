@@ -49,6 +49,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from argus.desk.analogue import NORMAL_80, quantile
+
 PACKAGE = Path(__file__).resolve().parents[3]
 DATA = PACKAGE / "data"
 REPORT_PATH = DATA / "analogstress_comparison.json"
@@ -89,17 +91,6 @@ def export(horizon: int = 5) -> dict[str, Any]:  # pragma: no cover - runs the r
 
 
 # --- the scorer: AnalogDesk's published protocol, implemented from its description ------------
-
-def quantile(values: list[float], p: float) -> float:
-    """Linear interpolation between order statistics (their `quantile`, and numpy's default)."""
-    ordered = sorted(values)
-    n = len(ordered)
-    if n == 0:
-        return math.nan
-    h = (n - 1) * p
-    lo, hi = math.floor(h), math.ceil(h)
-    return ordered[lo] if lo == hi else ordered[lo] + (ordered[hi] - ordered[lo]) * (h - lo)
-
 
 def conformal_scale(scores: list[float], target: float) -> float:
     """The finite-sample split-conformal multiplier: the ceil((n+1) * target) / n quantile."""
@@ -288,8 +279,6 @@ def run_argus(grid: dict[str, Any]) -> None:
                 row[f"{key}_pit"] = got["pit"]
 
 
-NORMAL_80 = 1.2815515655446004
-"""The standard normal's 90th percentile: the half-width of a central 80% band in sigmas."""
 BLEND_WEIGHTS = (0.25, 0.5, 0.75)
 SELECTION_SPLIT = "2021-01-01"
 """Variants are compared on the calibration era only: multipliers fitted before this date,

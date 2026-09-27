@@ -1,6 +1,6 @@
 """Queue-position fill modelling — ported from hftbacktest (MIT).
 
-Our own competitive assessment records this as a real gap: ARGUS models execution as a *cost*,
+Our own competitive assessment records this as a gap: ARGUS models execution as a *cost*,
 while hftbacktest models it as a *book*. A resting limit order does not fill because the price
 touched it — it fills when the quantity ahead of it in the queue is gone. Ignoring that is how a
 backtest awards itself maker fills it would never have received, and it is the mechanism behind the

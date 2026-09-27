@@ -30,7 +30,7 @@ set. So there are two corpora here and the distinction is load-bearing:
   something.
 
 The gap between the two is a direct estimate of how much the widening generalised versus how much it
-memorised. A large gap is a real finding about our own work and is reported as one.
+memorised. A large gap is a finding about our own work and is reported as one.
 """
 
 from __future__ import annotations

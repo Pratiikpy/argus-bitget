@@ -30,10 +30,11 @@ from decimal import Decimal
 from typing import Any
 
 from argus.truth import http
+from argus.truth.endpoints import BITGET_API
 
 _LOG = logging.getLogger(__name__)
 
-BASE_URL = "https://api.bitget.com"
+BASE_URL = BITGET_API
 
 # Tokenized US equities and index products confirmed live on the futures book. Kept explicit
 # rather than pattern-matched: a regex over ticker names would sweep in FARTCOINUSDT and

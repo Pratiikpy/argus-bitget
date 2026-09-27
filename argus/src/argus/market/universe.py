@@ -39,9 +39,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from argus.truth import http
+from argus.truth.endpoints import BITGET_API
 from argus.truth.paths import DATA_DIR
 
-CONTRACTS_URL = ("https://api.bitget.com/api/v2/mix/market/contracts"
+CONTRACTS_URL = (BITGET_API + "/api/v2/mix/market/contracts"
                  "?productType=USDT-FUTURES")
 SNAPSHOT_PATH = DATA_DIR / "venue_universe.json"
 CACHE_TTL_S = 6 * 3600.0

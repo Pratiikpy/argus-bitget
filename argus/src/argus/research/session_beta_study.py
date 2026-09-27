@@ -185,7 +185,7 @@ def main() -> int:  # pragma: no cover - CLI
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-    from argus.eval.clearance import UNIVERSE
+    from argus.market.bitget import RTOKEN_SYMBOLS as UNIVERSE
     from argus.market.history import CandleType, fetch_range
     from argus.truth.clocks import DualClock
 

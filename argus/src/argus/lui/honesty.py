@@ -56,6 +56,7 @@ from pathlib import Path
 from typing import Any, TypeVar
 
 from argus.truth import http
+from argus.truth.endpoints import BITGET_API
 
 ROOT = Path(__file__).resolve().parents[3]
 LEDGER_PATH = ROOT / "data" / "paper_ledger.jsonl"
@@ -918,7 +919,7 @@ def _unlisted_candidate(text: str, registry: Mapping[str, Any]) -> tuple[str, tu
 
 
 def _spot_symbols() -> frozenset[str]:
-    payload = http.fetch_json("https://api.bitget.com/api/v2/spot/public/symbols", timeout=8.0)
+    payload = http.fetch_json(BITGET_API + "/api/v2/spot/public/symbols", timeout=8.0)
     return frozenset(str(r.get("symbol")) for r in payload.get("data") or [])
 
 

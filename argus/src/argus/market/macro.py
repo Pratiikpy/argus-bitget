@@ -339,7 +339,7 @@ def status(curve: Curve | None, error: str = "", *, now: date | None = None) -> 
     """One line for the feed-health list, so a dark curve is visible rather than absent.
 
     ``now`` exists for the same reason :meth:`Curve.is_stale` and :meth:`Curve.age_days` already
-    take it, and its absence here was a real defect: this function read the wall clock directly,
+    take it, and its absence here was a defect: this function read the wall clock directly,
     so **any test of it was a time bomb**. `tests/test_macro.py` pinned a fixed 2026-09-11 curve
     and asserted the line said ``ok`` — true when written, and it began failing four days later
     when real time moved the fixture past `MAX_AGE_DAYS`. A test that passes only near the date it

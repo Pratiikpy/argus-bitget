@@ -22,16 +22,12 @@ def dual_clock() -> Any:
     still runs and says so: `session_status` names the missing calendar."""
     global _CLOCK
     if _CLOCK is None:
-        from argus.truth.clocks import DualClock
+        from argus.truth.clocks import DualClock, us_equity_holidays
 
         try:
-            from argus.eval.baselines.lean_market_holidays_loader import (
-                load_usa_equity_holidays,
-            )
-
-            _CLOCK = (DualClock(holidays=load_usa_equity_holidays()), True)
+            _CLOCK = (DualClock(holidays=us_equity_holidays()), True)
         except Exception:
-            _CLOCK = (DualClock(), False)
+            _CLOCK = (DualClock(holidays=frozenset()), False)
     return _CLOCK
 
 

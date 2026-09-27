@@ -128,7 +128,7 @@ def summarise(events: list[dict[str, Any]]) -> dict[str, Any]:
     clicks = [e for e in events if e.get("kind") == "feedback"]
     real_asks = [e for e in asks if _real(e)]
     real_ids = {e["id"] for e in real_asks}
-    # a click counts as real when its answer was a real question (the click itself carries the
+    # a click counts as real when its answer was a question (the click itself carries the
     # same flags, but the answer is the better witness: one person, one browser)
     real_clicks = [e for e in clicks if e.get("id") in real_ids and _real(e)]
     days: dict[str, set[str]] = defaultdict(set)
