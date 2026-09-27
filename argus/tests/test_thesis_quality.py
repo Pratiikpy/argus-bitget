@@ -500,6 +500,10 @@ def test_the_published_report_reproduces_from_the_recording() -> None:
     published = json.loads(tq.REPORT_PATH.read_text(encoding="utf-8"))
     again = tq.evaluate(live=False)
     assert again["qwen_calls_made_this_run"] == 0
+    # A different encoder ranks different evidence, so every stage-4 figure would disagree for a
+    # reason that is not a defect in the evaluation; name the cause instead.
+    assert again["s4"]["encoder"] == published["s4"]["encoder"], (
+        "the pinned embedding table is not here: python -m argus.llm.semantic")
     for stage, keys in {
         "s5": ("arms", "ranking_changed_the_committed_answer"),
         "s6": ("after_one_round", "after_two_rounds", "verdict_changed_by_repair"),

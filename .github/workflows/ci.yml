@@ -70,6 +70,13 @@ jobs:
       - name: Surface agreement
         run: python -m argus.eval.surfaces
 
+      # The static embedding table the semantic router and the recorded evaluations rank with,
+      # pinned to the Hub commit they were produced with (`llm/semantic.py`, 30 MB, MIT). The one
+      # download the verify job makes, before the network is refused: without it a clean runner
+      # fell back to the lexical encoder and `thesis_quality` stage 4 replayed a different ranking.
+      - name: Embedding table
+        run: python -m argus.llm.semantic
+
       # The offline suite, with every outbound connection refused (tests/conftest.py). Until
       # 2026-09-27 this step ignored two comparison files and let the rest reach the network; runs
       # with the network blocked found 238 tests in 28 files that still did, many of them skipping

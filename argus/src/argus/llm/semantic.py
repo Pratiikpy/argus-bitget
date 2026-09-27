@@ -59,11 +59,22 @@ from pathlib import Path
 from typing import Any
 
 MODEL_ID = "minishlab/potion-base-8M"
-"""30 MB, MIT, and it loads from a local directory with no network call.
+"""30 MB, MIT, and it loads from :data:`LOCAL_DIR` with no network call once :func:`fetch` has
+put it there.
 
 `potion-base-32M` scores better on MTEB Classification and is 129 MB. The smaller model is chosen
 because the demo bundle is the product: a judge who cannot open the page scores nothing, and the
 measured gap between the two on this corpus did not justify quadrupling the download."""
+
+MODEL_REVISION = "bf8b056651a2c21b8d2565580b8569da283cab23"
+"""The Hub commit every committed ranking was produced with.
+
+Pinned because the repository's ``main`` can move, and a moved table re-ranks every recorded
+evaluation that embeds text (`eval/thesis_quality.py` stage 4 among them) without any file here
+changing."""
+
+LOCAL_DIR = Path(__file__).resolve().parents[3] / "models" / MODEL_ID.split("/")[-1]
+"""Where :func:`fetch` writes the table and :func:`_load` looks first."""
 
 ABSTAIN_THRESHOLD = 0.32
 """Cosine below which the router declines rather than guesses.
@@ -198,8 +209,21 @@ def _load(model_id: str) -> Any:
         from model2vec import StaticModel
     except ImportError as exc:  # pragma: no cover - exercised only without the dependency
         raise RuntimeError(_UNAVAILABLE) from exc
-    local = Path(__file__).resolve().parents[3] / "models" / model_id.split("/")[-1]
+    local = LOCAL_DIR.parent / model_id.split("/")[-1]
     return StaticModel.from_pretrained(str(local) if local.exists() else model_id)
+
+
+def fetch() -> Path:
+    """Download the pinned table into :data:`LOCAL_DIR`, the one step that needs the network.
+
+    CI runs this before the offline suite. Without it a clean runner could not load the table
+    with connections refused, fell back to the lexical encoder, and replayed a recorded evaluation
+    with a different ranking (2026-09-27: `thesis_quality` stage 4 reproduced 0 judged items
+    against the published 5)."""
+    from huggingface_hub import snapshot_download
+
+    snapshot_download(MODEL_ID, revision=MODEL_REVISION, local_dir=LOCAL_DIR)
+    return LOCAL_DIR
 
 
 def available() -> bool:
@@ -217,5 +241,10 @@ def _normalise(vector: Sequence[float]) -> list[float]:
 
 
 __all__ = [
-    "ABSTAIN_THRESHOLD", "MODEL_ID", "Routed", "SemanticRouter", "available",
+    "ABSTAIN_THRESHOLD", "LOCAL_DIR", "MODEL_ID", "MODEL_REVISION", "Routed", "SemanticRouter",
+    "available", "fetch",
 ]
+
+
+if __name__ == "__main__":
+    print(fetch())

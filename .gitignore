@@ -37,3 +37,6 @@ Activity/PROGRESS.md
 # Installed on first use from the lockfile by the crypto_sor comparison; never committed.
 node_modules/
 argus/data/_grammar_comparison_tmp/
+
+# The embedding table `python -m argus.llm.semantic` fetches at a pinned revision; not vendored.
+argus/models/
