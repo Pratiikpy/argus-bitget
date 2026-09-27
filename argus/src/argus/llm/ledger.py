@@ -63,7 +63,9 @@ from pathlib import Path
 from types import FrameType
 from typing import Any
 
-LEDGER_PATH = Path(__file__).resolve().parents[3] / "data" / "qwen_cost_ledger.jsonl"
+from argus.truth.paths import DATA_DIR
+
+LEDGER_PATH = DATA_DIR / "qwen_cost_ledger.jsonl"
 
 _STEP: ContextVar[str] = ContextVar("argus_llm_step", default="")
 _WRITE_LOCK = threading.Lock()

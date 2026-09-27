@@ -39,8 +39,9 @@ from pathlib import Path
 from typing import Any
 
 from argus.risk.gatechain import RECORD_SCHEMA
+from argus.truth.paths import DATA_DIR
 
-DEFAULT_PATH = Path(__file__).resolve().parents[3] / "data" / "risk_records.jsonl"
+DEFAULT_PATH = DATA_DIR / "risk_records.jsonl"
 
 GATE_ONE = "no_exposure"
 NOTHING_BOUND = "none"

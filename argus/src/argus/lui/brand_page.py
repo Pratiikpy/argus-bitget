@@ -59,6 +59,8 @@ def _receipt() -> str:
                 'than a made-up one.</p></div>')
     data = next((line.removeprefix("Data:").strip() for line in step["lines"]
                  if line.startswith("Data:")), "")
+    # "fetched just now" was true when the task ran; on a kept receipt the run's date says when
+    data = data.replace(", fetched just now", "")
     at = datetime.fromisoformat(blob["measured_at"]).strftime("%d %b %H:%M UTC")
     rows = (
         ("Question", blob["task"]["question"]),

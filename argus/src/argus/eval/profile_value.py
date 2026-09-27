@@ -41,15 +41,15 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 from random import Random
 from statistics import fmean, pstdev
 from typing import Any
 
 from argus.desk.personalisation import Outcome, Proposal, judge, standard_profiles
 from argus.eval.incremental import DIRECTION_LONG, DIRECTION_NONE, DIRECTION_SHORT, Instant
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "profile_value.json"
 
 MIN_INSTANTS = 200

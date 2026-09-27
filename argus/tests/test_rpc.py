@@ -341,7 +341,7 @@ class TestReplyCorrelation:
 class TestTheMigratedClientsKeepTheirContracts:
     def test_evidence_status_strings_still_read_right_in_skills(self, server: Server) -> None:
         from argus.market.evidence import BitgetSkillSource
-        from argus.market.skills import Health, _classify
+        from argus.market.skills import Health, classify_reply
 
         source = BitgetSkillSource()
         source.client.url = URL
@@ -349,23 +349,24 @@ class TestTheMigratedClientsKeepTheirContracts:
             "code": -32602, "message": "Unknown tool: x"}})
         payload, status = source.call("x", {})
         assert "protocol error" in status
-        assert _classify(payload, status)[0] is Health.UNAVAILABLE  # was EMPTY before 2026-09-25
+        # was EMPTY before 2026-09-25
+        assert classify_reply(payload, status)[0] is Health.UNAVAILABLE
 
         server.handlers["tools/call"] = lambda b: TimeoutError("slow")
         payload, status = source.call("x", {})
-        assert _classify(payload, status)[0] is Health.TIMEOUT
+        assert classify_reply(payload, status)[0] is Health.TIMEOUT
         assert server.methods().count("tools/call") == 2  # no retry of a timeout here
 
         server.handlers["tools/call"] = _tool_reply({"isError": True, "content": [
             {"type": "text", "text": "Error executing tool cross_asset"}]})
         payload, status = source.call("x", {})
-        assert _classify(payload, status)[0] is Health.TOOL_ERROR
+        assert classify_reply(payload, status)[0] is Health.TOOL_ERROR
 
         server.handlers["tools/call"] = _tool_reply({"content": [
             {"type": "text", "text": json.dumps({"error": "Unknown action: latest"})}]})
         payload, status = source.call("x", {})
         assert "returned no data (upstream refused the request" in status
-        assert _classify(payload, status)[0] is Health.EMPTY
+        assert classify_reply(payload, status)[0] is Health.EMPTY
 
         server.handlers["tools/call"] = _tool_reply({"content": [
             {"type": "text", "text": json.dumps({"value": 44})}]})

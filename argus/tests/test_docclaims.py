@@ -405,3 +405,17 @@ def test_the_retired_phrase_check_finds_one(tmp_path: Path) -> None:
     doc.write_text("ARGUS read the rest, so all 19 are covered.\n", encoding="utf-8")
     (found,) = retired_phrases([doc])
     assert found.startswith("doc.md:1")
+
+
+def test_a_figure_wrapped_across_two_lines_is_still_checked() -> None:
+    """README said "481 have settled as" then, on the next line, "abstentions" while the live count
+    was 705; the claim's literal space could not match the line break, so the gate read the README
+    as never making the claim."""
+    from argus.eval.docclaims import _wrap_tolerant
+
+    pattern = _wrap_tolerant(r"(?P<q>[\d,]+) (?:have settled as abstentions|settled abstentions)")
+    match = re.search(pattern, "and 481 have settled as\n  abstentions. Two rows")
+    assert match is not None and match.group("q") == "481"
+    # A space inside a character class and an optional space keep their meaning.
+    assert re.fullmatch(_wrap_tolerant(r"[a ]+x ?y"), "a a xy")
+    assert re.fullmatch(_wrap_tolerant(r"x ?y"), "x \n y")

@@ -15,7 +15,7 @@
 # hash-committed" in eval/standing.py, whose own baseline field already names this exact mechanism
 # ("serenity-guardrails (Apache-2.0) hash-chained journal with a head anchor") — not a paraphrase
 # of it, the actual code, on the same constructed fixtures ARGUS's own
-# argus.paper.ledger.PaperLedger.verify() sees (project Standing Rule #3).
+# argus.paper.ledger.PaperLedger.verify() sees (the read-before-write rule).
 #
 # This file's own import (`from .guards import GuardError`) is satisfied by the sibling vendored
 # `serenity_guards.py` via a sys.modules shim in `serenity_loader.py`, so this file needed zero

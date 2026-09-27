@@ -1,0 +1,26 @@
+name = "Factor Discovery Agent: hypothesis to tradable factor"
+subtheme = "t2-factordiscovery"
+modules = [
+    "argus/research/searchoff.py",
+    "argus/research/grammar.py",
+    "argus/research/factor_lab.py",
+]
+state = "implemented"
+baseline = """\
+    minihellboy/FactorMiner (arXiv 2602.14670); bigcan/sharpen Crucible; \
+    rookiewu417/FactorZen; QuantaAlpha/QuantaAlpha; microsoft/RD-Agent fin_factor"""
+blockers = [
+    """\
+        What is proven is the safety of the search (the row above). Factor quality — whether the \
+        factors found carry out-of-sample edge after costs — has not been compared with the \
+        systems that lead on it, and no certified factor has been traded (rival review of \
+        2026-09-24)""",
+    """\
+        split-half reliability, 2026-09-25 (data/factor_split_half.json, GoEmotions' split-half \
+        PPCA adapted in research/factor_lab.py): of 96 factor-instrument pairs, 1 reproduces its \
+        payoff across independent halves, and all 19 that pass the cost and out-of-sample gates \
+        fail it. The test is calibrated - 5.2% false passes on noise at a 5% level, 80% power only \
+        for an edge of 62% accuracy or more - so the reading is that no factor in the library has \
+        an edge this test can see, not that none has an edge. Groupwise: the single pass is one \
+        pair (AMZNUSDT, slow_fade)""",
+]

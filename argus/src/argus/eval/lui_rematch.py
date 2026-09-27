@@ -127,11 +127,11 @@ class ArgusRouter:
       `eval/ngrambench.py` score as the deployed router;
     * ``ngram`` — the n-gram model alone (`NgramClassifier.predict`), no patterns;
     * ``console`` — what `lui/server._answer` does with a question the research patterns did not
-      claim (`server.py:846-861` as of 2026-09-25): `classify`, then `reclassify`, then the
-      ``in_domain`` topic gate, which is imported from the server rather than copied. Reported as a
-      secondary arm, never the headline: the gate is ARGUS's own vocabulary list, and it would
-      decline most generic out-of-scope text whichever classifier sat behind it — which is why the
-      same gate is also applied to Rasa (:func:`gated`).
+      claim (`lui/arbiter.py::gate_ledger_reading` since 2026-09-27): `classify`, then
+      `reclassify`, then the ``in_domain`` topic gate, which is imported rather than copied.
+      Reported as a secondary arm, never the headline: the gate is ARGUS's own vocabulary list,
+      and it would decline most generic out-of-scope text whichever classifier sat behind it —
+      which is why the same gate is also applied to Rasa (:func:`gated`).
     """
 
     def __init__(self) -> None:
@@ -140,9 +140,9 @@ class ArgusRouter:
         self.model = NgramClassifier.load(MODEL_FILE)
 
     def predict(self, text: str) -> dict[str, Any]:
+        from argus.lui.arbiter import in_domain
         from argus.lui.ngram import classify_with_fallback, reclassify
         from argus.lui.question import Intent, classify
-        from argus.lui.server import in_domain
 
         reached, source = classify_with_fallback(text, now=AT)
         ranked = self.model.probabilities(text)
@@ -317,8 +317,8 @@ def _bootstrap(diffs: Sequence[float], *, reps: int = 5000, seed: int = 20260926
 
 def report(path: Path = REPORT_PATH) -> dict[str, Any]:
     """Every arm on every suite, the paired comparison on the rows, the costs and the checks."""
+    from argus.lui.arbiter import in_domain
     from argus.lui.ngram import NgramClassifier
-    from argus.lui.server import in_domain
 
     inputs = load()
     texts = all_texts(inputs)

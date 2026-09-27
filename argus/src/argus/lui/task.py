@@ -466,7 +466,21 @@ def verdict(task: Task) -> Verdict | None:
                         f"${float(notional) * float(ceiling) / proposed:,.0f}."
                         if notional and ceiling is not None and proposed > float(ceiling) + 1e-9
                         else "."))
+    if call.startswith("Add, at") and ceiling is not None and proposed < float(ceiling) - 1e-9:
+        lines.append(_invalidation(name, proposed, float(ceiling)))
     return Verdict(call=call, lines=tuple(lines))
+
+
+def _invalidation(name: str, weight: float, ceiling: float) -> str:
+    """When the call stops holding. A weight w drifts to ``w(1+r) / (w(1+r) + 1 - w)`` when the
+    name outruns the rest of the book by r, so it reaches the ceiling c at
+    ``1 + r = c(1 - w) / (w(1 - c))``. Exact for the drift, and only for today's correlations:
+    the ceiling itself moves when they do, which the line says."""
+    outrun = ceiling * (1 - weight) / (weight * (1 - ceiling)) - 1
+    return (f"What would change the call: if {name} outruns the rest of the book by "
+            f"{outrun:.0%}, it drifts past {ceiling:.0%} of the book and back over the budget; "
+            f"trim it to {weight:.0%} then. A jump in its correlation with the book lowers that "
+            f"ceiling, so re-ask after a large move.")
 
 
 def unread_task(asked: str, reason: str) -> Task:

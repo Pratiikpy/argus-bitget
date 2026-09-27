@@ -22,7 +22,8 @@ Candidates, all fed the same hourly bars:
   inputs are reported separately as ``gloaming_shipped_24h``.
 * ``gloaming_ols`` — its ``calibrate_weights`` refit before every night on that symbol's earlier
   nights only (walk-forward; the shipped prior until 10 nights exist, as in its own code).
-* ``argus_perp`` — **the console's own implied open**: `lui/research._implied_open_line` called
+* ``argus_perp`` — **the console's own implied open**: `lui/research/quote.py::_implied_open_line`
+called
   at 09:00 New York with the perpetual's last price then, its gap read back from the sentence it
   prints (the implied price over the last regular close). See "What is scored" below.
 * ``argus_perp_vs_close`` — what the console literally prints: perp(09:00) / stock close - 1,
@@ -171,7 +172,7 @@ def console_feed(hourly: Mapping[str, Series],
     endpoint returns. ``closes`` maps a stock ticker to ``(session day, regular close)``, served
     through `argus.market.equity_history.daily`. Both are module attributes the console looks up
     at call time (``_perp_at_close`` and ``_yahoo_close`` import them inside the function), so
-    nothing in `lui/research.py` is replaced: only where its data comes from. The console's
+    nothing in `lui/research/` is replaced: only where its data comes from. The console's
     instrument registry (`market.universe.contracts`, which ``_implied_open_line`` asks whether a
     name is an equity) is served from its frozen snapshot, so a replay never depends on what
     Bitget lists today. Anything but a bounded hourly window is refused rather than invented, and
@@ -199,7 +200,7 @@ def console_feed(hourly: Mapping[str, Series],
         return [equity_history.Day(day=day, open=close, close=close)
                 for day, close in closes.get(ticker) or []]
 
-    registry, _ = universe._from_snapshot()
+    registry, _ = universe.contracts_from_snapshot()
 
     def contracts() -> dict[str, universe.Contract]:
         return registry
@@ -229,7 +230,7 @@ def console_implied_open(symbol: str, perp_last: float,
     never a silently skipped row."""
     from argus.lui import research
 
-    out = research._implied_open_line(symbol, Decimal(repr(perp_last)), now=now)
+    out = research.quote._implied_open_line(symbol, Decimal(repr(perp_last)), now=now)
     if out is None:
         return None
     text = out[0]
@@ -486,9 +487,10 @@ def _console_replay(all_rows: list[dict[str, Any]],
     mismatched = [r for r in all_rows if r.get("console_anchor") is not None
                   and abs(r["console_anchor"] / r["close"] - 1) > 1e-5]
     return {
-        "method": "lui/research._implied_open_line called per night at 09:00 New York, its "
-                  "market readers pointed at data/h2h_gloaming/inputs.json (console_feed); the "
-                  "gap is the printed implied price over the session's regular close",
+        "method": "lui/research/quote.py::_implied_open_line called per night at 09:00 New "
+                  "York, its market readers pointed at data/h2h_gloaming/inputs.json "
+                  "(console_feed); the gap is the printed implied price over the session's "
+                  "regular close",
         "nights_offered": len(all_rows),
         "nights_the_console_answered": len(all_rows) - len(declined),
         "nights_the_console_declined": [

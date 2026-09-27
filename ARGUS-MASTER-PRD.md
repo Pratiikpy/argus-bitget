@@ -5,6 +5,9 @@
 retractions recorded since. **Read the plan sections as history, not as the entry:** they name
 Agentic Trading (Track 2) as the primary submission; this repository is the team's **Track 3 (AI
 Trading Desk)** entry, and its Track 2 entry is a separate project (t2-sentiment-agent).
+Its research inputs (`research/compendium/`, `TOP2-PER-THEME.md`, `research/CORPUS_CALIBRATION.md`)
+are working notes kept outside this repository; the code-level teardowns it relies on are published
+in `research/architecture/`.
 **Owner:** github.com/Pratiikpy
 **Written:** 2026-09-12
 

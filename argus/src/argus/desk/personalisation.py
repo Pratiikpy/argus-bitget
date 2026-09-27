@@ -29,14 +29,14 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import StrEnum
-from pathlib import Path
 from typing import Any
 
 from argus.desk.mandate import HORIZON_SLACK, Mandate
 from argus.desk.workbench import TraderProfile
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "personalisation.json"
+REPORT_PATH = DATA_DIR / "personalisation.json"
 """Where the demonstration lands. See :func:`main` for why it exists at all."""
 
 _ZERO = Decimal("0")

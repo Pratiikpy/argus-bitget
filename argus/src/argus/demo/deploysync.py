@@ -53,7 +53,7 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     # The research-kind model (`lui/kindmodel.py`): how the hosted console reads a question when no
     # language model is configured. Without it the console falls back to the patterns alone.
     "lui_kind_model.json",
-    # Real Bitget hourly history, frozen on the date it records. `lui/research.py` answers from it
+    # Real Bitget hourly history, frozen on the date it records. `lui/research/` answers from it
     # only when the live fetch cannot finish inside the serverless deadline, and says so in the
     # answer — without it, a slow venue would turn a research question into a refusal.
     "risk_layer_candles_fixture.json",
@@ -97,6 +97,12 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "execution_arena.json",
     # The kept research task, whose real receipt /brand shows (`eval/research_task_record.py`).
     "research_task_example.json",
+    # Read by /status: the console's own calls, recorded and graded (`eval/call_record.py`).
+    "call_record.jsonl",
+    "call_grades.json",
+    "weekend_calls.jsonl",
+    # Read by execution answers: bgc's own dry-run, confirming the Agent Hub preview.
+    "agenthub_preview.json",
 )
 """Artefacts the hosted console's own pages read at request time.
 

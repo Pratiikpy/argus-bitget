@@ -48,13 +48,13 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
 from argus.cost.model import CostModel
 from argus.desk.workbench import Scenario, StressResult, stress_position
 from argus.sim.market import MarketError, exit_cost_bps
 from argus.truth.clocks import SessionPhase
+from argus.truth.paths import DATA_DIR
 
 _ZERO = Decimal("0")
 
@@ -85,7 +85,7 @@ reader can convert back.
 """
 
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "stress_report.json"
+REPORT_PATH = DATA_DIR / "stress_report.json"
 """Where `--save` writes.
 
 **This constant exists because the artefact did not have one.** `data/stress_report.json` is cited
@@ -745,10 +745,10 @@ def default_encoder() -> tuple[Encoder, str]:
     Returns the encoder and its name, so a report can say which one produced its ranking.
     """
     try:
-        from argus.llm.semantic import MODEL_ID, _load, available
+        from argus.llm.semantic import MODEL_ID, available, load_table
 
         if available():
-            model = _load(MODEL_ID)
+            model = load_table(MODEL_ID)
 
             def encode(texts: Sequence[str]) -> list[list[float]]:
                 return [[float(x) for x in row] for row in model.encode(list(texts))]

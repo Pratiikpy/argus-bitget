@@ -82,8 +82,9 @@ from argus.research.eventstudy import (
     study,
 )
 from argus.truth.artefact import write as write_artefact
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 SNAPSHOT_HOURLY = DATA / "eventdriven_rivals_hourly.json.gz"
 REPORT_PATH = DATA / "eventdriven_rivals.json"
 

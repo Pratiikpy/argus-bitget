@@ -40,14 +40,14 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from statistics import median
 from typing import Any
 
 from argus.market.history import CandleType, HistoryError, fetch_range
 from argus.truth.clocks import DualClock, SessionPhase
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "universe_validation.json"
+REPORT_PATH = DATA_DIR / "universe_validation.json"
 
 # Chosen from the observed gap: genuine instruments >= 3.60, impostor 1.43. Any threshold in
 # (1.5, 3.5) separates them identically, so the exact value carries no fitted information.

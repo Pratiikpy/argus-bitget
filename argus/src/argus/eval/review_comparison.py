@@ -42,6 +42,7 @@ from argus.eval.baselines.tradingagents_loader import (
     TradingAgentsBaselineLoadError,
     load_trading_memory_log_class,
 )
+from argus.truth.paths import DATA_DIR
 
 
 class ReviewComparisonError(RuntimeError):
@@ -426,11 +427,10 @@ def render(report: dict[str, Any]) -> str:
 
 if __name__ == "__main__":
     import json
-    from pathlib import Path as _Path
 
     result = main()
     print(render(result))
-    out_path = _Path(__file__).resolve().parents[3] / "data" / "review_comparison.json"
+    out_path = DATA_DIR / "review_comparison.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(f"\nsaved -> {out_path}")

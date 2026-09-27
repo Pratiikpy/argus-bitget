@@ -1,0 +1,141 @@
+name = "Risk layer proved by domain sweep"
+subtheme = "t2-riskcontrol"
+modules = [
+    "argus/eval/riskproof.py",
+    "argus/eval/freqtrade_baseline.py",
+    "argus/eval/risk_layer_comparison.py",
+    "argus/eval/gate_ablation.py",
+    "argus/risk/constitution.py",
+    "argus/desk/book.py",
+    "argus/risk/circuit.py",
+]
+# Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts instead
+# of checking that files existed: failure_cases_documented was claimed here and the
+# artefact recorded nothing about it. An earlier pass already fixed the artefact
+# (data/risk_layer_comparison.json now genuinely records the two arithmetic divergences
+# below) but never flipped this line back — found stale on an AUDIT sweep 2026-09-22 that
+# independently re-ran `verify()` on every proof rather than trusting `conditions_missing`
+# (which only checks a Proof exists per condition, not that it verifies): all thirteen are
+# VERIFIED or ATTESTED, zero UNPROVEN. Restored to OWNED.
+state = "owned"
+baseline = """\
+    nautechsystems/nautilus_trader risk engine, QuantConnect brokerage models, freqtrade's \
+    MaxDrawdown/StoplossGuard/LowProfitPairs/CooldownPeriod protections"""
+blockers = [
+    """\
+        the sweep proves the rules hold over the modelled domain; it does not prove the domain \
+        matches the venue""",
+    """\
+        human takeover, 2026-09-25 (data/pause_drill.json): nine escalated decisions were paused, \
+        their process killed while waiting, and resumed from disk by a fresh process; all nine \
+        resumed to the decision a no-kill run made, state hash unchanged. The model and the human \
+        are scripted: this proves a pause survives a crash, not how a live model revises on resume \
+        or how fast a person answers""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = "Nautilus, QuantConnect, freqtrade and Hummingbot risk paths read"
+artefact = "../research/architecture/riskcontrol-audit.md"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    freqtrade's own protection arithmetic read from source and cited by file:line — \
+    max_drawdown_protection.py, stoploss_guard.py, low_profit_pairs.py, cooldown_period.py, \
+    iprotection.py — not reimplemented from memory"""
+artefact = "src/argus/eval/freqtrade_baseline.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    all four freqtrade protections faithfully ported, each documenting its stated \
+    simplifications and the direction they diverge"""
+test = "test_freqtrade_baseline.py"
+
+[[proofs]]
+condition = "implementation_complete"
+how = """\
+    2,177,280 states swept, zero invariant violations, all 15 gates reachable (nine Foundation \
+    5 dimensions, up from the original five/eight)"""
+artefact = "data/risk_proof.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    ARGUS's circuit breaker and freqtrade's ported protections walked over the SAME real \
+    Bitget trade sequences at two scopes — per-symbol (compare_real_symbols) and whole-book \
+    (compare_combined_book)"""
+artefact = "data/risk_layer_comparison.json"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    314 real trade checkpoints per symbol and 314 on the combined book, over the 7 of 12 \
+    contracts whose strategy runs traded (the other 5 produced no return variance and are \
+    listed in the artefact's symbols_failed)"""
+artefact = "data/risk_layer_comparison.json"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    12bps round trip (CostModel.bitget_perp) applied once per discrete trade, read off \
+    SyntheticTrade.return_pct's own not-cost-adjusted docstring rather than assumed"""
+artefact = "data/risk_layer_comparison.json"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = "chronological IS/OOS split matching engine.py's own 0.35 fraction formula"
+artefact = "data/risk_layer_comparison.json"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    Population RCT (N gate-ablated ConstitutionPolicy variants, live in paper/runner.py, zero \
+    extra LLM cost) plus a per-protection freqtrade ablation with real unique-contribution \
+    shares"""
+test = "test_gate_ablation.py"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    three mutant policies caught by the sweep, plus three hand-built adversarial trade \
+    scenarios against the real comparison, findings reported as found rather than as \
+    hypothesised (one hypothesis was wrong and says so)"""
+test = "test_riskproof.py"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    two genuine arithmetic divergences (windowed-local-peak vs all-time-peak drawdown; \
+    windowed-total vs consecutive-streak loss counting) plus the combined-book finding below, \
+    all documented rather than smoothed over"""
+artefact = "data/risk_layer_comparison.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "the sweep is exhaustive over the declared domain, not sampled"
+test = "test_riskproof.py"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    the 'conservative by design' framing that kept this condition open through 2026-09-15 \
+    (over-triggering could be a deliberate margin, not a defect) is ruled out, not merely \
+    disfavoured, by a measurement-architecture analysis (first run 2026-09-16 on a live pull; \
+    re-run 2026-09-26 on the frozen 90-day sample, 314 checkpoints, after the session clock \
+    learned US holidays): ARGUS's own ladder thresholds directly on the SAME peak-to-trough \
+    equity quantity true_drawdown_pct IS (verified empirically by \
+    argus_measures_ground_truth_directly, not assumed from reading the source), while \
+    freqtrade's MaxDrawdown estimates it from a windowed sum of closed trades' cumulative \
+    returns — a real, measured proxy whose Pearson correlation with the ground truth is only \
+    0.2257 (WEAK; 0.2998 on the 2026-09-16 pull). A threshold moves WHERE on a fixed-quality \
+    signal the line is drawn; it cannot improve the signal's own correlation with the truth. \
+    Swept freqtrade's real max_allowed_drawdown across ten values (0.5% to 20%): its best \
+    achievable precision at full recall is 17.01% — ARGUS's real, already-computed decision \
+    (not a synthetic best case) scores 56.32% precision at the identical 100% recall, \
+    Pareto-dominating EVERY one of freqtrade's ten swept thresholds simultaneously on both \
+    precision and recall (argus_dominates_every_swept_threshold: True). No threshold freqtrade \
+    could choose reaches what ARGUS already achieves, because the gap is in the measurement, \
+    not the calibration."""
+test = "test_risk_layer_comparison.py::TestMeasurementArchitectureAnalysis"

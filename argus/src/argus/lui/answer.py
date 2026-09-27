@@ -36,11 +36,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from argus.eval.performance import evaluate_ledger
 from argus.lui.phrasebook import WINDOW_IN_ZH, WINDOW_LABELS_ZH, Language, t
 from argus.lui.question import TRADED_SYMBOLS, Intent, Question, Window
 from argus.lui.trace import all_but, emit, only, traced
 from argus.paper.ledger import Entry, PaperLedger
+from argus.paper.performance import evaluate_ledger
 from argus.truth.source import Source
 
 LEAD = re.compile(r"^(?:Actionable|Bottom line)(?: \([^)]*\))?:\s*")
@@ -260,7 +260,7 @@ def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
     perf = evaluate_ledger(ledger)
     lines: list[str] = []
     sources = [
-        Source("computation", "argus.eval.performance:evaluate_ledger",
+        Source("computation", "argus.paper.performance:evaluate_ledger",
                f"over {perf.window_days} day(s), {perf.trades} settled trade(s)")
     ]
 
@@ -409,7 +409,7 @@ def _how_it_was_reached(seq: int) -> list[str]:
     import json
 
     try:
-        rows = _notes_path().read_text(encoding="utf-8").splitlines()
+        rows = desk_notes_path().read_text(encoding="utf-8").splitlines()
     except OSError:
         return []
     notes: list[str] = []
@@ -471,10 +471,10 @@ def answer_abstention_why(ledger: PaperLedger, question: Question) -> Answer:
     for entry in rows[-3:]:
         # The ledger stores a thesis bounded at 500 characters, so a long one ends mid-word; it is
         # shown to its last whole sentence (a judge-style pass, 2026-09-25).
-        from argus.lui.research import _sentence_cut
+        from argus.lui.research.text import sentence_cut
 
         lines.append(t("abst.row", lang, seq=entry.seq, symbol=entry.symbol,
-                       thesis=_sentence_cut(entry.thesis or "", 320)))
+                       thesis=sentence_cut(entry.thesis or "", 320)))
     settled = [e for e in rows if e.counterfactual_move_bps is not None]
     lines.append(
         t("abst.settled", lang, count=len(settled)) if settled else t("abst.unsettled", lang)
@@ -700,7 +700,7 @@ def _evidence_lines(seq: int, lang: Language) -> list[str]:
     from 26 Sep 2026 carry the frame's evidence lines; older rows carry only which sources reached
     the decision, and the oldest carry no notes row at all. Each case says which it is."""
     try:
-        text = _notes_path().read_text(encoding="utf-8")
+        text = desk_notes_path().read_text(encoding="utf-8")
     except OSError:
         return [t("ev.unrecorded", lang)]
     row: dict[str, Any] | None = None
@@ -726,7 +726,7 @@ def _evidence_lines(seq: int, lang: Language) -> list[str]:
     return [t("ev.unrecorded", lang)]
 
 
-def _notes_path() -> Path:
+def desk_notes_path() -> Path:
     """The desk's per-decision notes, with the same data-dir override as the risk records."""
     override = os.environ.get("ARGUS_DATA_DIR", "").strip()
     if override:
@@ -761,7 +761,7 @@ def answer_review(ledger: PaperLedger, question: Question) -> Answer:
 
     from argus.desk.review import review
 
-    notes_path, risk_path = _notes_path(), _risk_records_path()
+    notes_path, risk_path = desk_notes_path(), _risk_records_path()
     if not notes_path.exists():
         return _refuse(
             question,

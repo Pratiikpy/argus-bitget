@@ -20,7 +20,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from argus.market.bitget import _get
+from argus.market.bitget import public_get
 
 SOURCE = "Bitget /api/v2/mix/market/account-long-short + position-long-short"
 
@@ -35,7 +35,7 @@ class LongShort:
 
 
 def _series(path: str, symbol: str) -> list[dict[str, Any]]:
-    rows = _get(path, {"symbol": symbol, "period": "1h"}) or []
+    rows = public_get(path, {"symbol": symbol, "period": "1h"}) or []
     return sorted(rows, key=lambda r: int(r.get("ts", 0)))
 
 

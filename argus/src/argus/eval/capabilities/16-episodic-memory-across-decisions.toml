@@ -1,0 +1,158 @@
+name = "Episodic memory across decisions"
+subtheme = "t2-agentic"
+modules = [
+    "argus/agents/recall.py",
+    "argus/eval/recall_comparison.py",
+    "argus/eval/baselines/tradingagents_loader.py",
+    "argus/eval/baselines/tradingagents_memory.py",
+    "argus/eval/baselines/tradingagents_rating.py",
+]
+# Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+# proof now needs a groupwise check on the capability's own artefact, and this
+# row's does not pass it. The reason and the route back are its first blocker.
+state = "implemented"
+baseline = """\
+    TauricResearch/TradingAgents reflection log, which stores a model's prose lesson rather \
+    than a graded outcome"""
+blockers = [
+    """\
+        RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
+        (data/groupwise_audit.json): data/recall_comparison.json holds three designed boundary \
+        cases for the point-in-time guard; no population of recalls is recorded. Route back: \
+        replay recall() over the real ledger's decisions and record, per decision, whether \
+        anything unresolved was visible, by symbol and date.""",
+    """\
+        Only 1 of 31 NVDA decisions is graded so far, so the memory is currently a list of \
+        observations and states no pattern — which is what it should do, and also means the lesson \
+        path has not been exercised on live data""",
+]
+note = """\
+    The advantage over the baseline is falsifiability, not richness: every line is arithmetic \
+    over data/paper_ledger.jsonl and can be recomputed by a reader."""
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = "TradingAgents, RD-Agent, FinMem and LangGraph memory paths read"
+artefact = "../research/architecture/agent-architecture-audit.md"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "rendered in the PM frame before reasoning, not applied to the answer after"
+test = "test_panel_parallel.py::test_the_model_is_shown_the_memory_before_it_decides"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    truncating the future must not change what the past knew: an episode that settles after \
+    the recall instant contributes its decision and not its outcome"""
+test = "test_recall.py"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = "no pattern is stated below 5 graded episodes, matching the calibration floor"
+test = "test_recall.py"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    TradingAgents' actual reflection/memory code read in full: graph/reflection.py \
+    (Reflector.reflect_on_final_decision, an LLM prompt-and-invoke wrapper with no logic of \
+    its own) and agents/utils/memory.py (TradingMemoryLog, 334 lines - the append-only \
+    markdown log, its as_of point-in-time filter, same/cross-ticker retrieval split, and \
+    rotation) plus its sibling agents/utils/rating.py"""
+artefact = "src/argus/eval/baselines/tradingagents_memory.py"
+test = "test_recall_comparison.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    TradingAgents' real TradingMemoryLog vendored verbatim - byte-verified against commit \
+    be952b8eccb49720509af544c6675233bc1f10d0, pinned by SHA256 - and actually executed: real \
+    writes (store_decision), real outcome updates (update_with_outcome), real point-in-time \
+    reads (get_past_context) against a real temp-file markdown log, not a mock or a \
+    description"""
+artefact = "src/argus/eval/baselines/tradingagents_memory.py"
+test = "test_baselines.py::TestTradingAgentsLoaderMakesTheRealCodeRunnable"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    identical fixtures run through both ARGUS's real recall() and TradingAgents' real \
+    TradingMemoryLog across the resolution boundary. Both correctly hide an unresolved outcome \
+    and correctly reveal it once resolved (2 of 3 boundary cases agree exactly); the third \
+    case is a genuine, run-verified granularity divergence, not an agreement failure: ARGUS's \
+    strict < on datetime instants excludes an episode settled at exactly `now`, TradingAgents' \
+    <= on date strings includes an entry resolved exactly on `as_of` - both real, both \
+    intentional, cited to the exact line each does it"""
+test = "test_recall_comparison.py::TestBoundaryCases"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    TradingAgents' real write path costs one LLM call per graded episode \
+    (Reflector.reflect_on_final_decision -> quick_thinking_llm.invoke, read directly at \
+    graph/reflection.py) to produce the prose it stores; ARGUS's lessons() is pure arithmetic \
+    over graded ledger fields - zero tokens, zero model calls, every single time it runs. No \
+    LLM call was made anywhere in this comparison itself (the prose TradingMemoryLog stores is \
+    supplied as a fixed string), matching this project's own hackathon-key budget discipline"""
+artefact = "src/argus/eval/recall_comparison.py"
+test = "test_recall_comparison.py"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    the boundary logic tested here is not fixture-tuned code written only for this comparison: \
+    it is the exact, unmodified argus.agents.recall.recall() already running in production \
+    against the real paper ledger (121 decisions across twelve instruments, cited in this \
+    module's own docstring) - the 'out of sample' evidence is that the same function, not a \
+    variant of it, already carries real load outside the 6 hand-designed fixtures this \
+    comparison adds"""
+test = "test_recall.py"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    ARGUS's MIN_EPISODES_FOR_A_LESSON floor (5), shown load-bearing by patching it down to 4 \
+    on an otherwise-identical 4-episode fixture: with the real floor, lessons() states nothing \
+    (correctly, since 4 < 5); with the floor patched to 4, the same data produces a real \
+    lesson. A first version of this ablation read the patched result AFTER the monkeypatch had \
+    already been restored and silently reported the floor as not load-bearing for the wrong \
+    reason - caught by running it and checking the actual booleans, not assumed correct on \
+    write, fixed the same day (see this module's own history)"""
+test = "test_recall_comparison.py::TestAblation"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    TradingAgents' real get_past_context has no equivalent floor of any kind - verified by \
+    running it on a single episode and confirming it returns content regardless of sample \
+    size, the exact failure mode ARGUS's own floor exists to prevent ('a memory that \
+    generalises from two observations is worse than no memory', this module's own docstring)"""
+test = "test_recall_comparison.py::TestNoFloorCase"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    both systems are deterministic over their stored state - no model, no seed, no simulation \
+    in either's storage/retrieval path (TradingAgents' write path needs an LLM call to PRODUCE \
+    the prose; reading it back is pure parsing). Every fixture in this comparison is \
+    hand-constructed and fixed, not sampled"""
+test = "test_recall_comparison.py"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped explicitly - SCOPE_STATEMENT in eval/recall_comparison.py. Claimed: both systems' \
+    point-in-time guard was run and verified correct on both sides; ARGUS additionally shows \
+    ungraded episodes as context (TradingAgents' real code explicitly filters pending entries \
+    out, read directly) and additionally refuses a pattern below a stated floor (TradingAgents \
+    has none, verified by running it); ARGUS's write path costs zero tokens against \
+    TradingAgents' one LLM call per episode. NOT claimed: that excluding pending entries or \
+    having no floor is a mistake on TradingAgents' part - both are real, working design \
+    choices for a system whose memory is advisory prose re-read by a model that can itself \
+    discount thin evidence, a different premise from ARGUS's structured, falsifiable one. Also \
+    NOT claimed: that ARGUS's design produces BETTER trading decisions - that needs graded \
+    real-world outcomes from both systems on the same decisions, which neither this comparison \
+    nor the project has"""
+artefact = "src/argus/eval/recall_comparison.py"
+test = "test_recall_comparison.py::TestScopeStatement"

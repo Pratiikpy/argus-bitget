@@ -45,9 +45,11 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+from argus.truth.paths import DATA_DIR
+
 BASE = "https://api.bitget.com"
-TAPE_DIR = Path(__file__).resolve().parents[3] / "data" / "arena" / "xa_tape"
-EVENT_CALENDAR = Path(__file__).resolve().parents[3] / "data" / "event_calendar.json"
+TAPE_DIR = DATA_DIR / "arena" / "xa_tape"
+EVENT_CALENDAR = DATA_DIR / "event_calendar.json"
 HOUR_MS = 3_600_000
 PAGE = 200
 

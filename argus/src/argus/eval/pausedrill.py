@@ -65,10 +65,11 @@ from argus.risk.hedgeability import HedgeabilitySurface
 from argus.truth.artefact import write
 from argus.truth.clocks import SessionPhase, SessionState
 from argus.truth.evidence import Evidence
+from argus.truth.paths import DATA_DIR
 
 AT = datetime(2026, 9, 14, 15, 0, tzinfo=UTC)
 TOKEN_PRICE = Decimal("200")
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "pause_drill.json"
+REPORT_PATH = DATA_DIR / "pause_drill.json"
 
 
 class ScriptedModel:

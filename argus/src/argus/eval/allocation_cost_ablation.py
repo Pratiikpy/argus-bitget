@@ -83,7 +83,6 @@ from __future__ import annotations
 import json
 import math
 from collections.abc import Mapping, Sequence
-from pathlib import Path
 from typing import Any
 
 from argus.desk.allocation import (
@@ -102,6 +101,7 @@ from argus.eval.allocation_comparison import (
     BaselineUnavailable,
     load_returns,
 )
+from argus.truth.paths import DATA_DIR
 
 DENSE_TRAIN_BARS = TRAIN_BARS // 2
 """240 bars. The sibling module's *denser* walk-forward is replicated, not its primary one: 24
@@ -663,7 +663,7 @@ def main() -> int:  # pragma: no cover - CLI
     # Cross-check against the sibling module's published artefact if it is on disk. A replication
     # that silently disagreed with the run it claims to replicate would be worse than no
     # replication at all, so the gap is computed and published rather than eyeballed.
-    published = Path(__file__).resolve().parents[3] / "data" / "allocation_comparison.json"
+    published = DATA_DIR / "allocation_comparison.json"
     if published.exists():
         prior = json.loads(published.read_text(encoding="utf-8"))
         dense = prior.get("oos_variance_dense", {}).get("results", {})
@@ -680,7 +680,7 @@ def main() -> int:  # pragma: no cover - CLI
         }
 
     print(render(report))
-    out = Path(__file__).resolve().parents[3] / "data" / "allocation_cost_ablation.json"
+    out = DATA_DIR / "allocation_cost_ablation.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     print(f"\nwritten to {out}")

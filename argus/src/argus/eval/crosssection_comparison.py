@@ -36,6 +36,7 @@ import pandas as pd
 
 from argus.eval.baselines.qlib_loader import QlibBaselineLoadError, load_qlib_baseline
 from argus.research.grammar import CrossRank
+from argus.truth.paths import DATA_DIR
 
 
 class CrossSectionComparisonError(RuntimeError):
@@ -354,13 +355,12 @@ def render(report: dict[str, Any]) -> str:
 
 
 if __name__ == "__main__":
-    from pathlib import Path
 
     from argus.truth.artefact import write as write_artefact
 
     result = main()
     print(render(result))
-    out_path = Path(__file__).resolve().parents[3] / "data" / "crosssection_comparison.json"
+    out_path = DATA_DIR / "crosssection_comparison.json"
     undefined = write_artefact(out_path, result)
     if undefined:
         print(f"\nnon-finite (written as null): {', '.join(undefined)}")

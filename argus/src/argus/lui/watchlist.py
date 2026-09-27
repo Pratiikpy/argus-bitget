@@ -5,12 +5,12 @@ the hosted console "what should I watch this week?" and "what earnings and macro
 watch this week for my book?" and both were refused. Every piece of the answer already existed in
 ARGUS and none of it was reachable by asking: the holdings' report dates
 (:func:`argus.market.bitget_mcp.BitgetDataService.next_earnings`, with Yahoo's calendar as the
-second source, exactly as `lui/research._fundamentals` reads them), the CPI and FOMC schedules
-(`market/calendar.py`), this week's 8-Ks (`market/evidence.EdgarSource`), the MacKinlay event study
-of how each traded name moved on CPI, Fed and its own earnings (`research/event_reactions.py`,
-artefact `data/event_reactions.json`), and the US holiday calendar behind the session clock
-(`lui/research._dual_clock`, QuantConnect Lean's). This module reads them, it does not rebuild
-them.
+second source, exactly as `lui/research/fundamentals.py::_fundamentals` reads them), the CPI and
+FOMC schedules (`market/calendar.py`), this week's 8-Ks (`market/evidence.EdgarSource`), the
+MacKinlay event study of how each traded name moved on CPI, Fed and its own earnings
+(`research/event_reactions.py`, artefact `data/event_reactions.json`), and the US holiday calendar
+behind the session clock (`lui/research/session.py::_dual_clock`, QuantConnect Lean's). This module
+reads them, it does not rebuild them.
 
 **What was read first, and what was taken.** OpenBB's economic calendar
 (`research/repos/OpenBB-upstream/openbb_platform/core/openbb_core/provider/standard_models/
@@ -78,21 +78,19 @@ from zoneinfo import ZoneInfo
 from argus.lui.answer import Source
 from argus.lui.research import (
     FILING_LOOKBACK_DAYS,
-    _dual_clock,
-    _is_equity,
-    _pairs,
-    _raw_number,
-    _strip_budget,
-    _t,
-    _yahoo_summary,
     book_pricing_note,
     parse_book,
     parse_budget,
     research_symbols,
     split_cash,
 )
+from argus.lui.research.fundamentals import raw_number, yahoo_summary
+from argus.lui.research.kinds import bare_symbol
+from argus.lui.research.parse import holding_pairs, is_us_equity, strip_budget
+from argus.lui.research.session import dual_clock
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 MACRO_CALENDAR = DATA / "macro_calendar_2026.json"
 DEFAULT_DAYS = 7
 MAX_DAYS = 31
@@ -374,7 +372,7 @@ def resolve_book(question: str, book_text: str) -> tuple[dict[str, float], float
     equal weights said as assumed), else the saved book, else none. Returns weights, cash, lines."""
     named, notes = research_symbols(question)
     if named:
-        if _pairs(question):
+        if holding_pairs(question):
             book, cash = split_cash(question, parse_book(question))
             return book, cash, [f"Assumed: {n}." for n in notes]
         weight = 1.0 / len(named)
@@ -382,10 +380,10 @@ def resolve_book(question: str, book_text: str) -> tuple[dict[str, float], float
                 [f"Assumed: no weights were stated, so the {len(named)} names asked about are "
                  f"read at {weight:.0%} each."] + [f"Assumed: {n}." for n in notes])
     if book_text.strip():
-        body = _strip_budget(book_text) if parse_budget(book_text) is not None else book_text
+        body = strip_budget(book_text) if parse_budget(book_text) is not None else book_text
         book, cash = split_cash(body, parse_book(body))
         if book:
-            shown = ", ".join([f"{w:.0%} {_t(s)}" for s, w in book.items()]
+            shown = ", ".join([f"{w:.0%} {bare_symbol(s)}" for s, w in book.items()]
                               + ([f"{cash:.0%} cash"] if cash else []))
             return book, cash, [f"Remembered: your saved book — {shown}"
                                 f"{book_pricing_note(body)}."]
@@ -409,7 +407,7 @@ class Report:
 
 def earnings_date(ticker: str, today: date) -> Report | None:
     """The next report on or after ``today``: Bitget's data service first, Yahoo's calendar second
-    — the two sources `lui/research._fundamentals` reads, in its order."""
+    — the two sources `lui/research/fundamentals.py::_fundamentals` reads, in its order."""
     from argus.market.bitget_mcp import shared_service
 
     try:
@@ -422,12 +420,12 @@ def earnings_date(ticker: str, today: date) -> Report | None:
             str(row.get("is_trading_time") or ""), "")
         return Report(ticker, date.fromisoformat(stamp), timing, "Bitget equity calendar")
     try:
-        summary = _yahoo_summary(ticker)
+        summary = yahoo_summary(ticker)
     except Exception:
         return None
     calendar = (summary.get("calendarEvents") or {}).get("earnings") or {}
     for node in calendar.get("earningsDate") or []:
-        raw = _raw_number(node)
+        raw = raw_number(node)
         if raw is None:
             continue
         day = datetime.fromtimestamp(raw, UTC).date()
@@ -458,9 +456,9 @@ def recent_8k(tickers: Sequence[str], since: datetime) -> dict[str, list[Filed]]
 
 def _reactions(path: Path | None) -> dict[str, Any] | None:
     if path is None:
-        from argus.lui.answer import _notes_path
+        from argus.lui.answer import desk_notes_path
 
-        path = _notes_path().parent / "event_reactions.json"
+        path = desk_notes_path().parent / "event_reactions.json"
     try:
         loaded = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -486,7 +484,8 @@ class Event:
 
 
 def _who(touched: Mapping[str, float]) -> str:
-    return ", ".join(f"{_t(s)} {w:.0%}" for s, w in sorted(touched.items(), key=lambda x: -x[1]))
+    return ", ".join(f"{bare_symbol(s)} {w:.0%}"
+                     for s, w in sorted(touched.items(), key=lambda x: -x[1]))
 
 
 def _study(event: Event, report: Mapping[str, Any] | None) -> None:
@@ -507,7 +506,7 @@ def _study(event: Event, report: Mapping[str, Any] | None) -> None:
     measured_any = False
     for symbol, weight in sorted(event.touched.items(), key=lambda x: -x[1]):
         row = rows.get(symbol)
-        ticker = _t(symbol)
+        ticker = bare_symbol(symbol)
         label = {"CPI": "CPI releases", "FOMC": "Fed decisions",
                  "earnings": "its own results releases"}[kind]
         if row is None or row.get("size_ratio") is None:
@@ -541,7 +540,7 @@ def _closed_days(start: datetime, end: datetime) -> list[tuple[date, str]]:
     """Days in the window on which the NYSE is shut, from the session clock and Lean's holidays."""
     from argus.truth.clocks import SessionPhase
 
-    clock, _ = _dual_clock()
+    clock, _ = dual_clock()
     out: list[tuple[date, str]] = []
     day = start.astimezone(NEW_YORK).date()
     last = end.astimezone(NEW_YORK).date()
@@ -594,7 +593,7 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
     moment = now or datetime.now(UTC)
     start, end, stated = window(question, moment, days)
     book, cash, book_lines = resolve_book(question, book_text)
-    equities = [s for s in book if _is_equity(s)]
+    equities = [s for s in book if is_us_equity(s)]
     sources: list[Source] = []
     lines: list[str] = []
 
@@ -617,7 +616,7 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
 
     lookup = earnings_lookup or earnings_date
     filings_of = filings_lookup or recent_8k
-    tickers = [_t(s) for s in equities]
+    tickers = [bare_symbol(s) for s in equities]
     reports: dict[str, Report | None] = {}
     filed: Mapping[str, Sequence[Filed]] = {}
     filings_failed = False
@@ -635,15 +634,15 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
             filings_failed = True
     missing_dates: list[str] = []
     for symbol in equities:
-        report = reports.get(_t(symbol))
+        report = reports.get(bare_symbol(symbol))
         if report is None:
-            missing_dates.append(_t(symbol))
+            missing_dates.append(bare_symbol(symbol))
             continue
         clock_at = {"after the close": time(16, 0), "before the open": time(8, 0)}.get(
             report.timing, time(12, 0))
         at = datetime.combine(report.day, clock_at, NEW_YORK).astimezone(UTC)
         if start.astimezone(NEW_YORK).date() <= report.day <= end.astimezone(NEW_YORK).date():
-            events.append(Event("EARNINGS", at, f"{_t(symbol)} earnings", report.source,
+            events.append(Event("EARNINGS", at, f"{bare_symbol(symbol)} earnings", report.source,
                                 touched={symbol: book[symbol]}, timing=report.timing
                                 + (" (an estimated date)" if report.estimated else "")))
     if tickers:
@@ -668,7 +667,8 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
     # the lead
     if ranked:
         top = ranked[0]
-        what = (f"{_t(next(iter(top.touched)))} reports {top.at.astimezone(NEW_YORK):%a %d %b}"
+        what = (f"{bare_symbol(next(iter(top.touched)))} reports "
+                f"{top.at.astimezone(NEW_YORK):%a %d %b}"
                 + (f" {top.timing}" if top.timing else "") if top.kind == "EARNINGS" else
                 f"{KIND_NAMES[top.kind]} on {top.at:%a %d %b} at {top.at:%H:%M} UTC")
         share = sum(top.touched.values())
@@ -707,7 +707,7 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
         local = event.at.astimezone(NEW_YORK)
         if event.kind == "EARNINGS":
             symbol = next(iter(event.touched))
-            line = (f"Scheduled: {_t(symbol)} earnings {local:%a %d %b}"
+            line = (f"Scheduled: {bare_symbol(symbol)} earnings {local:%a %d %b}"
                     + (f", {event.timing}" if event.timing else ", time of day not published")
                     + f" ({event.source}) — {event.touched[symbol]:.0%} of the book"
                     + ("; the perpetual carries the gap overnight while the stock is shut"
@@ -724,7 +724,7 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
         lines.extend(event.history or [])
 
     if closed:
-        held = ", ".join(_t(s) for s in equities)
+        held = ", ".join(bare_symbol(s) for s in equities)
         lines.append("Session: the US stock market is shut " + "; ".join(_span(closed))
                      + (f" — Bitget's {held} perpetuals keep trading, so they price without "
                         f"their stock and any gap is taken there first." if held else
@@ -747,7 +747,8 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
             found = [f for t in tickers for f in filed.get(t, [])]
             for f in found[:6]:
                 lines.append(f"Filed: {f.ticker} 8-K on {f.day:%a %d %b} ({f.items}) — "
-                             f"{book[next(s for s in equities if _t(s) == f.ticker)]:.0%} of the "
+                             f"{book[next(s for s in equities if bare_symbol(s) == f.ticker)]:.0%}"
+                             " of the "
                              f"book; read it before the week's events.")
             if not found:
                 lines.append(f"No 8-K filed in the last {FILING_LOOKBACK_DAYS} days by "

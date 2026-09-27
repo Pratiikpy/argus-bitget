@@ -52,10 +52,11 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 REPORT_PATH = DATA / "consistency.json"
 
 MIN_RUNS = 3

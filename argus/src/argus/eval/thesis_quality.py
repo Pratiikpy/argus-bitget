@@ -90,8 +90,9 @@ from argus.llm.qwen import Completion, QwenClient, QwenError, Thinking, TokenBud
 from argus.truth.artefact import write as write_artefact
 from argus.truth.clocks import DualClock
 from argus.truth.evidence import Evidence
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 FRAMES_PATH = DATA / "thesis_quality_frames.json"
 RECORDING_PATH = DATA / "thesis_quality_recording.json"
 REPORT_PATH = DATA / "thesis_quality.json"

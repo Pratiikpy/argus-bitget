@@ -32,7 +32,6 @@ from __future__ import annotations
 import argparse
 from collections.abc import Sequence
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 from argus.desk.review import (
@@ -46,8 +45,9 @@ from argus.desk.review import (
     evaluate,
 )
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "review_oos.json"
 
 SPLIT = 0.5

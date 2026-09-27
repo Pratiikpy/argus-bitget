@@ -98,8 +98,9 @@ from argus.eval.abstention_coverage import (
 )
 from argus.eval.observatory import AbstentionOutcome, abstention_quality
 from argus.truth import artefact
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "general_abstention_comparison.json"
 LEDGER_PATH = DATA / "paper_ledger.jsonl"
 

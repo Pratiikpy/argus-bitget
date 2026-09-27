@@ -59,7 +59,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from functools import partial
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Protocol, TypeVar
 
 from argus.market.rpc import (
     LABELS,
@@ -71,8 +71,9 @@ from argus.market.rpc import (
 )
 from argus.market.skills import hollow
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "skill_matrix.json"
+REPORT_PATH = DATA_DIR / "skill_matrix.json"
 HISTORY_PATH = REPORT_PATH.with_name("skill_matrix_history.jsonl")
 """One line per sweep: when, and how many tools answered on each server. A single sweep is a
 snapshot of one moment, and on 2026-09-25 that moment was an outage — every bitget-mcp-server entry
@@ -525,7 +526,7 @@ def load(path: Path = REPORT_PATH) -> dict[str, Any] | None:
 def console_lines(path: Path = REPORT_PATH) -> list[str]:
     """What the research console shows when asked how well the Skills work: the published matrix,
     rendered, with its date — or a plain statement that it has not been run. Integration point for
-    `lui/research.py`; reads a file, never the network."""
+    `lui/research/`; reads a file, never the network."""
     matrix = load(path)
     if matrix is None:
         return ["The Skill-effectiveness matrix has not been run yet "
@@ -573,6 +574,38 @@ def console_lines(path: Path = REPORT_PATH) -> list[str]:
     return lines
 
 
+class _CatalogService(Protocol):
+    def categories(self) -> list[dict[str, Any]]: ...
+    def _call(self, tool: str, arguments: Mapping[str, Any]) -> dict[str, Any]: ...
+
+
+_S = TypeVar("_S", bound=_CatalogService)
+
+
+def discover_catalog(
+    open_service: Callable[[], _S],
+) -> tuple[_S | None, list[tuple[str, Mapping[str, Any]]], str | None]:
+    """Open bitget-mcp-server and list its catalog, or say why it could not be read.
+
+    Until 2026-09-27 one 503 during the handshake or the category listing raised out of
+    :func:`run`, so bitget-signal went unswept too and the sweep left a twelve-hour gap (audit
+    finding 112). A catalog that cannot be read now costs only its own half: the service comes
+    back as None with the reason, and the report names it rather than showing zero entries as if
+    the server had none."""
+    try:
+        service = open_service()
+        catalog: list[tuple[str, Mapping[str, Any]]] = []
+        for category in service.categories():
+            key = str(category.get("key", ""))
+            listing = service._call("guide", {"category": key}).get("structuredContent") or {}
+            for entry in listing.get("entries") or listing.get("items") or []:
+                if isinstance(entry, Mapping) and entry.get("id"):
+                    catalog.append((key, entry))
+    except Exception as exc:
+        return None, [], f"{type(exc).__name__}: {str(exc)[:200]}"
+    return service, catalog, None
+
+
 def run(*, rounds: int = 1, spacing: float = 0.0, timeout: int = TIMEOUT,
         progress: Progress = _quiet) -> dict[str, Any]:
     """Sweep both servers ``rounds`` times, live. Imports the clients here so a test importing
@@ -581,15 +614,8 @@ def run(*, rounds: int = 1, spacing: float = 0.0, timeout: int = TIMEOUT,
     from argus.market.evidence import BitgetSkillSource
 
     signal = BitgetSkillSource()
-    data = BitgetDataService()
+    data, catalog, unreadable = discover_catalog(BitgetDataService)
     signal_negotiation = signal.client.initialize()
-    catalog: list[tuple[str, Mapping[str, Any]]] = []
-    for category in data.categories():
-        key = str(category.get("key", ""))
-        listing = data._call("guide", {"category": key}).get("structuredContent") or {}
-        for entry in listing.get("entries") or listing.get("items") or []:
-            if isinstance(entry, Mapping) and entry.get("id"):
-                catalog.append((key, entry))
     listed = [str(t.get("name")) for t in signal.client.list_tools(timeout=timeout)]
     missing = sorted(set(listed) - {c.tool for c in SIGNAL_CALLS})
     if missing:
@@ -598,15 +624,20 @@ def run(*, rounds: int = 1, spacing: float = 0.0, timeout: int = TIMEOUT,
     rows: dict[str, Row] = {}
     for index in range(rounds):
         sweep_signal(signal, rows, timeout=timeout, progress=progress)
-        sweep_mcp(data.client, catalog, rows, timeout=timeout, progress=progress)
+        if data is not None:
+            sweep_mcp(data.client, catalog, rows, timeout=timeout, progress=progress)
         if index + 1 < rounds and spacing:
             time.sleep(spacing)
-    servers = {
+    servers: dict[str, dict[str, Any]] = {
         SIGNAL_SERVER: {"endpoint": signal.URL, "tools_listed": len(listed),
                         "http_requests": signal.client.calls, **signal_negotiation.as_dict()},
-        MCP_SERVER: {"endpoint": data.client.url, "catalog_entries": len(catalog),
-                     "http_requests": data.client.calls, **data.negotiation.as_dict()},
     }
+    if data is not None:
+        servers[MCP_SERVER] = {"endpoint": data.client.url, "catalog_entries": len(catalog),
+                               "http_requests": data.client.calls,
+                               **data.negotiation.as_dict()}
+    else:
+        servers[MCP_SERVER] = {"catalog_entries": 0, "catalog_unreadable": unreadable}
     return report(list(rows.values()), rounds=rounds, servers=servers,
                   generated_at=datetime.now(UTC).isoformat())
 
@@ -643,8 +674,13 @@ def history_row(matrix: Mapping[str, Any]) -> dict[str, Any]:
                       "upstream_5xx": int(counts.get("upstream_5xx") or 0)}
         for server, counts in (matrix.get("by_server") or {}).items()}
     totals = matrix.get("totals") or {}
-    return {"at": matrix.get("generated_at"), "calls": int(totals.get("calls") or 0),
-            "answered": int(totals.get("answered") or 0), "by_server": by_server}
+    row: dict[str, Any] = {"at": matrix.get("generated_at"),
+                           "calls": int(totals.get("calls") or 0),
+                           "answered": int(totals.get("answered") or 0), "by_server": by_server}
+    unreadable = ((matrix.get("servers") or {}).get(MCP_SERVER) or {}).get("catalog_unreadable")
+    if unreadable:
+        row["mcp_catalog_unreadable"] = unreadable
+    return row
 
 
 def record_history(matrix: Mapping[str, Any], path: Path | None = None) -> None:
@@ -667,6 +703,7 @@ if __name__ == "__main__":  # pragma: no cover
 
 __all__ = [
     "HISTORY_PATH", "REPORT_PATH", "SIGNAL_CALLS", "Attempt", "Row", "SignalCall", "attempt",
-    "classify_result", "console_lines", "entry_forms", "history", "history_row", "legacy_reading",
-    "load", "main", "record_history", "render", "report", "run", "sweep_mcp", "sweep_signal",
+    "classify_result", "console_lines", "discover_catalog", "entry_forms", "history",
+    "history_row", "legacy_reading", "load", "main", "record_history", "render", "report", "run",
+    "sweep_mcp", "sweep_signal",
 ]

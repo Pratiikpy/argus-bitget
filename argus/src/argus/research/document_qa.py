@@ -780,7 +780,7 @@ def research_answer(question: str, ticker: str, model: ChatModel, *,
                     documents: Sequence[Document] | None = None,
                     source: EdgarDocuments | None = None) -> tuple[list[str], list[Source],
                                                                    dict[str, Any]]:
-    """The console's call: ``(lines, sources, data)`` for `lui/research.py`.
+    """The console's call: ``(lines, sources, data)`` for `lui/research/`.
 
     Reads the ticker's latest 10-K, 10-Q and 8-K (with exhibit 99.1) unless ``documents`` is
     given. ``sources`` holds only cited passages; the read-but-uncited ones are in

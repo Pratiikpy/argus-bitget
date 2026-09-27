@@ -67,6 +67,8 @@ from dataclasses import dataclass
 from itertools import pairwise
 from typing import Any
 
+from argus.truth.paths import DATA_DIR
+
 # --- MacKinnon (2010) tables, transcribed from statsmodels/tsa/adfvalues.py ---------------------
 #
 # Only the rows this module can actually reach are kept. `N` is the number of series involved: 1 for
@@ -835,7 +837,6 @@ def main() -> int:  # pragma: no cover - CLI
     import argparse
     import json
     import sys
-    from pathlib import Path
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -873,7 +874,7 @@ def main() -> int:  # pragma: no cover - CLI
         closes, train_fraction=args.train_fraction, lookback=args.lookback,
     )
     print(report.render())
-    out = Path(__file__).resolve().parents[3] / "data" / "cointegration.json"
+    out = DATA_DIR / "cointegration.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8")
     print(f"\nwritten to {out}")

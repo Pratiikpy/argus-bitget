@@ -1,0 +1,180 @@
+name = "Perception layer: what the desk can see"
+subtheme = "t3-datasources"
+modules = [
+    "argus/market/evidence.py",
+    "argus/market/volatility.py",
+    "argus/market/macro.py",
+    "argus/eval/feedlist_comparison.py",
+    "argus/eval/baselines/tradingagents_feedlist_loader.py",
+    "argus/eval/baselines/tradingagents_feedlist_interface.py",
+    "argus/eval/baselines/tradingagents_feedlist_errors.py",
+    "argus/eval/baselines/tradingagents_feedlist_config.py",
+    "argus/eval/baselines/tradingagents_feedlist_default_config.py",
+]
+# Demoted from OWNED on 2026-09-20 when `verify()` began opening the artefacts: the
+# failure_cases_documented proof pointed at data/bitget_skills_health.json, which records
+# a health state per tool and no failure cases. Restored on 2026-09-21 the way that
+# comment demanded — by making an artefact carry the evidence, not by editing the state.
+# `eval/skillreliability.py` calls every tool three times and names all 10 that never
+# answer, each with the service's own error text. `verify()` confirms it; nothing here
+# was loosened.
+# Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+# proof now needs a groupwise check on the capability's own artefact, and this
+# row's does not pass it. The reason and the route back are its first blocker.
+state = "implemented"
+baseline = "OpenBB-finance/OpenBB provider set; TauricResearch/TradingAgents feed list"
+blockers = [
+    """\
+        RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
+        (data/groupwise_audit.json): data/feedlist_comparison.json holds designed vendor-failure \
+        scenarios over the rival's own category list; data/desk_notes.jsonl is free text per \
+        cycle, reduced by the harness to one distinct-source count with no per-cycle value; \
+        data/skill_reliability.json is the upstream service's reliability, audited as context. \
+        Route back: record per live cycle which sources answered and whether gather() returned, by \
+        symbol and day.""",
+    """\
+        The as-of evidence gate is INERT on live data: across 11 live frames it dropped nothing, \
+        so its protection against future-dated evidence is real in code and untested in production \
+        (data/ablations.json). That is a different statement from 'the gate is working'""",
+    """\
+        Per-feed effect is still untested. Ablating a feed changes what a model reasons over, so \
+        it needs the paired protocol and a budget of real cycles; only the deterministic \
+        components have been measured""",
+    """\
+        Bitget's own tool surface is mostly not answering (data/skill_matrix.json, 2026-09-25, one \
+        round, keyless, through market/rpc.py): 3 of 86 tools returned data - technical_analysis, \
+        social_trending and crypto_derivatives, all on bitget-signal (3 of 19) - and all 67 \
+        bitget-mcp-server catalog entries answered 503 upstream. Of the five research Skills, \
+        technical-analysis answered on its one tool and news-briefing on one of three; \
+        macro-analyst, market-intel and sentiment-analyst returned nothing. One round does not \
+        characterise a service""",
+    """\
+        corrupted feeds, 2026-09-25 (data/feedbugged.json, openai/evals' bugged-tools pattern): \
+        with one input corrupted on each of six snapshots (price, 24h change, VIX, SUE, \
+        fear-and-greed, spread), no decision moved and none said a feed was wrong - detection F1 \
+        0.0, 0 of 6 caught, and a wrong line of reasoning injected into the prompt moved one of \
+        six decisions to the wrong direction. That first measurement stays recorded. The \
+        feed-sanity gate (desk/feed_sanity.py, S17) was then built and measured on the same cases \
+        (data/feed_sanity_gate.json): 12 of 12 planted faults caught before the model reads the \
+        frame, 0 false flags on 255 clean items across 12 snapshots, deterministic, no model call""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = "every free source OpenBB and TradingAgents use, counted and probed live"
+artefact = "../research/architecture/datasource-audit.md"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    both real dispatch designs read side by side: TradingAgents' route_to_vendor() \
+    (vendor-chain fallback, raise-vs-degrade split by named category) and ARGUS's gather() \
+    (per-source try/except, always a status line, never a raise) — the actual mechanism each \
+    uses when a live source fails"""
+artefact = "src/argus/eval/feedlist_comparison.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    TradingAgents' real route_to_vendor() executed via the vendored file through a sys.modules \
+    shim, zero source edits, commit be952b8eccb49720509af544c6675233bc1f10d0"""
+artefact = "src/argus/eval/baselines/tradingagents_feedlist_loader.py"
+
+[[proofs]]
+condition = "implementation_complete"
+how = """\
+    13 distinct sources reached the panel on a live cycle; Treasury curve at credibility 1.0, \
+    CBOE VIX at 0.9, crypto risk appetite at 0.35"""
+artefact = "data/desk_notes.jsonl"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    both real systems run on the identical failure shape — a core-equivalent source with every \
+    path broken, and an optional-equivalent source with its one path broken — TradingAgents \
+    raises on the former, ARGUS returns cleanly on both"""
+test = "test_feedlist_comparison.py::TestCoreVsOptionalCategoryHandling"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    every one of TradingAgents' own real category/method pairs swept, not just the two \
+    hand-picked cases: every core category raises when fully broken, every optional category \
+    never does — both confirmed by running the real route_to_vendor() on all of them, not a \
+    sample"""
+test = "test_feedlist_comparison.py::TestSweptCases"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    dispatch overhead measured, not estimated: TradingAgents' route_to_vendor() 22.9us/call, \
+    ARGUS's gather() 2.9us/call — both exclude the network leg itself by design, so this is \
+    pure dispatch cost. First persisted to an artefact 2026-09-21; previously cited the \
+    module's own source only"""
+artefact = "data/feedlist_comparison.json"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    checked against the REAL, live-growing desk-notes log this project's actual decision \
+    cycles wrote — 194 real cycles, 5 distinct sources seen, confirming the synthetic-fixture \
+    status-line shape this comparison exercises is the same shape real production cycles \
+    produce"""
+test = "test_feedlist_comparison.py::TestOutOfSample"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    two ablations: (1) the deterministic panel components replayed over 11 live frames — \
+    analyst selection changes the panel on every one, the as-of gate on none; (2) gather()'s \
+    caught-exception tuple shown load-bearing by running an UNcaught type (ValueError) through \
+    it and confirming it propagates rather than being silently swallowed like the real \
+    OSError/TimeoutError cases are"""
+test = "test_feedlist_comparison.py::TestAblation"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    the SEC agent string is pinned by test after breaking twice: www.sec.gov 403s a bare agent \
+    while data.sec.gov accepts it, so the CIK lookup failed while the submissions feed kept \
+    answering; separately, a genuine structural finding from running both real systems: \
+    TradingAgents' route_to_vendor() raises — can abort the whole perception cycle — when \
+    every configured vendor for a core category fails with a real error; ARGUS's gather() \
+    never raises for any source's failure, core or opt-in, confirmed by running a source that \
+    fails on every call"""
+test = "test_evidence.py::test_the_fallback_carries_a_contact_token"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    every tool that does not answer is named, with the service's own error text attached: 13 \
+    of 19 are recorded down across three separated attempts, carrying envelopes like `Error \
+    executing tool cross_asset` and an explicit upstream ConnectTimeout. Repointed from the \
+    single-sweep artefact on 2026-09-21: that file recorded 6 ok / 10 empty / 3 tool_error one \
+    day and 6 ok / 13 timeout the next, from the same code against the same endpoint, so it \
+    could not distinguish a dead tool from an unlucky call. Repeating the measurement produced \
+    a failure set that is stable rather than whichever error happened to occur: 6 of 19 answer \
+    three for three, all of them technical analysis. (An earlier run read 9, counting three \
+    tools that return only an upstream error envelope as answers; the classifier was corrected \
+    2026-09-26.) The feed-list comparison's SCOPE_STATEMENT still states what is NOT claimed: \
+    not that TradingAgents' raise-on-core-failure design is a defect, only that ARGUS's own \
+    design cannot be aborted by one live source the same way"""
+artefact = "data/skill_reliability.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    the same synthetic failure scenario run twice, both real systems, produces an identical \
+    result each time — confirmed by direct equality check, not assumed from either design \
+    being stateless"""
+test = "test_feedlist_comparison.py::TestReproducibility"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped precisely to what was tested: on the property of whether a single live source's \
+    failure can abort a full perception cycle, ARGUS's real code cannot and TradingAgents' \
+    real code can (for a core category with zero working vendors) — not claimed as a blanket \
+    superiority; the source-count comparison stays with best_implementation_studied's own \
+    artefact"""
+test = "test_feedlist_comparison.py::TestMainAndRender"

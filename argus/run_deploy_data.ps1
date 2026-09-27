@@ -11,6 +11,9 @@ $stamp = Get-Date -Format "yyyy-MM-dd_HHmm"
 New-Item -ItemType Directory -Force "$root\argus\data\deploy_runs" | Out-Null
 $log = "$root\argus\data\deploy_runs\data_$stamp.log"
 "=== ARGUS data-only deploy $stamp ===" | Out-File $log -Encoding utf8
+# Record today's calls and grade those whose horizon has passed, before the record is copied.
+& "$root\argus\.venv\Scripts\python.exe" -m argus.eval.call_record --record --grade 2>&1 |
+  ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
 & "$root\argus\.venv\Scripts\python.exe" -m argus.demo.deploysync --data-only 2>&1 |
   ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
 Set-Location "$root\deploy"

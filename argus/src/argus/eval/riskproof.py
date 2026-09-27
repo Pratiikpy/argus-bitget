@@ -57,8 +57,9 @@ from argus.decision.verdicts import (
 from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface, HedgeCandidate
 from argus.truth.clocks import SessionPhase, SessionState
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "risk_proof.json"
 
 AT = datetime(2026, 9, 14, 15, 0, tzinfo=UTC)
@@ -140,8 +141,9 @@ class State:
     dimension — letting the sweep explore a hedged book with high gross and low net — was
     considered and rejected for this pass: it would triple the domain again on top of the tripling
     this field already caused, for coverage this project's own doctrine does not yet demand
-    (neither gate has a live caller to validate against — see `Activity/PROGRESS.md`). What this
-    single knob does cover: both gates' zero case (``0``), and both gates' cap-straddling cases at
+    (neither gate has a live caller to validate against — see the working log, which is not
+    published). What this single knob does cover: both gates' zero case (``0``), and both gates'
+    cap-straddling cases at
     values chosen so headroom brackets zero for each cap independently (``130000`` sits above
     ``signed``'s 100,000 cap and below ``gross``'s 150,000 cap; ``150000`` sits at ``gross``'s cap
     and further above ``signed``'s).
@@ -617,7 +619,8 @@ def _policy_for(base: ConstitutionPolicy, state: State) -> ConstitutionPolicy:
     All three are injected here exactly as `paper/runner.py` injects ``book_state``/``session_risk``
     live, from the state's own dimensions, so the swept policy is the policy. ``book`` (added
     2026-09-15, for ``gross_exposure``) has no live injection site yet to match, because nothing in
-    the desk constructs a `desk.book.Book` from real fills yet either — see `Activity/PROGRESS.md`.
+    the desk constructs a `desk.book.Book` from real fills yet either — see the working log, which
+    is not published.
     """
     from argus.decision.verdicts import PositionSide
     from argus.desk.book import Book, HedgeLink, Lot, VenueMarginSnapshot

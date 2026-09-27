@@ -72,7 +72,7 @@ and always a console defect.
 **On fitting the benchmark.** The same hand wrote the cases and can read the console, so this is
 pre-registered the way `eval/luibench.py` is: the case list was written and fixed before the first
 run, that run's score is kept in the artefact as ``first_run`` and never overwritten, and a case
-is only ever added, never edited to pass. This builder may not edit `lui/research.py` or
+is only ever added, never edited to pass. This builder may not edit `lui/research/` or
 `lui/server.py`; every defect is listed verbatim in the artefact for whoever can.
 
 **Findings, 2026-09-25** (run ``20260925T160539Z``; every reply is in

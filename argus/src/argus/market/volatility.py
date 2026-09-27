@@ -43,12 +43,13 @@ from pathlib import Path
 from typing import Any
 
 from argus.truth.evidence import Evidence
+from argus.truth.paths import DATA_DIR
 
 QUOTE_URL = "https://cdn.cboe.com/api/global/delayed_quotes/quotes/_VIX.json"
 HISTORY_URL = "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv"
 USER_AGENT = "ARGUS research desk (contact@argus.invalid)"
 
-CACHE_PATH = Path(__file__).resolve().parents[3] / "data" / "vix_history.csv"
+CACHE_PATH = DATA_DIR / "vix_history.csv"
 CACHE_MAX_AGE_DAYS = 7
 """How stale the cached history may be before it is refetched.
 

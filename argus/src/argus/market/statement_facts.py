@@ -67,7 +67,7 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any, Literal
 
-from argus.market.evidence import _UA
+from argus.market.evidence import FEED_USER_AGENT
 
 TIMEOUT = 60
 
@@ -621,7 +621,7 @@ class CompanyFactsSource:
     written there, and later runs read it instead of the network when ``offline`` is set.
     """
 
-    def __init__(self, *, user_agent: str = _UA, snapshot_dir: Path | None = None,
+    def __init__(self, *, user_agent: str = FEED_USER_AGENT, snapshot_dir: Path | None = None,
                  offline: bool = False) -> None:
         self._ua = user_agent
         self._snapshot_dir = snapshot_dir
@@ -749,7 +749,7 @@ class FaceStatementSource:
     number still comes from SEC's XBRL API, the page only says *which* element is the line.
     """
 
-    def __init__(self, *, user_agent: str = _UA, snapshot_dir: Path | None = None,
+    def __init__(self, *, user_agent: str = FEED_USER_AGENT, snapshot_dir: Path | None = None,
                  offline: bool = False) -> None:
         self._ua = user_agent
         self._snapshot_dir = snapshot_dir
@@ -822,7 +822,7 @@ class ConceptSource:
     """One us-gaap element for one company (``companyconcept``), for elements outside
     :func:`all_tags` that a face statement names. Snapshotted like everything else."""
 
-    def __init__(self, *, user_agent: str = _UA, snapshot_dir: Path | None = None,
+    def __init__(self, *, user_agent: str = FEED_USER_AGENT, snapshot_dir: Path | None = None,
                  offline: bool = False) -> None:
         self._ua = user_agent
         self._snapshot_dir = snapshot_dir

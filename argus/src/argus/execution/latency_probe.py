@@ -37,6 +37,7 @@ from argus.execution.latency import (
     LatencyError,
     LatencyRow,
 )
+from argus.truth.paths import DATA_DIR
 
 PUBLIC_TIME_URL = "https://api.bitget.com/api/v2/public/time"
 PUBLIC_TICKER_URL = "https://api.bitget.com/api/v2/mix/market/ticker?symbol=BTCUSDT&productType=usdt-futures"
@@ -199,7 +200,7 @@ def load_rows(path: Path) -> list[LatencyRow]:
 
 
 def main() -> int:
-    out = Path(__file__).resolve().parents[3] / "data" / "latency_probe.json"
+    out = DATA_DIR / "latency_probe.json"
     report = probe()
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2), encoding="utf-8")

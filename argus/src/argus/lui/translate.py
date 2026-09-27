@@ -29,6 +29,8 @@ import threading
 from collections import Counter
 from typing import Any
 
+from argus.truth.bounded import BoundedDict
+
 LANGUAGES: dict[str, str] = {
     "zh": "Simplified Chinese", "es": "Spanish", "pt": "Portuguese", "fr": "French",
     "de": "German", "ja": "Japanese", "ko": "Korean", "vi": "Vietnamese", "zh-Hant":
@@ -118,7 +120,7 @@ def verify(lang: str, lines: list[str], token: str) -> bool:
     return hmac.compare_digest(sign(lang, lines), token or "")
 
 
-_CACHE: dict[str, dict[str, Any]] = {}
+_CACHE: BoundedDict[str, dict[str, Any]] = BoundedDict(512)
 _LOCK = threading.Lock()
 
 

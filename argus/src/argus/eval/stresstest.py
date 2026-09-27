@@ -69,7 +69,6 @@ from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
 from argus.decision.verdicts import Intent, Side, Verdict
@@ -77,8 +76,9 @@ from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface, HedgeCandidate
 from argus.truth.artefact import write
 from argus.truth.clocks import SessionPhase, SessionState
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "stress_test.json"
+REPORT_PATH = DATA_DIR / "stress_test.json"
 
 STARTING_EQUITY = Decimal("10000")
 FAILURE_DRAWDOWN = 0.30

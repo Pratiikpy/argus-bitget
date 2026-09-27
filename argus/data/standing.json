@@ -618,7 +618,7 @@
         },
         {
           "condition": "best_implementation_studied",
-          "how": "three of Standing Rule #3's own named backtest-engine repos checked directly for a cross-sectional (same-timestamp, across-instrument) ranking primitive: qlib has one (CSRankNorm, groups a (datetime, instrument) frame by datetime and ranks within each group \u2014 exactly the baseline this capability names); polakowo/vectorbt's only rank() (signals/accessors.py:1298) ranks consecutive SIGNAL EVENTS through TIME within one series, a different axis entirely, not cross-sectional; QuantConnect/Lean has no match for 'CrossSectional' anywhere in the repository (grepped case-insensitively, zero hits). qlib is not merely cited, it is the only one of the three with the primitive this capability is being measured against",
+          "how": "three of the backtest-engine repos this project reads first checked directly for a cross-sectional (same-timestamp, across-instrument) ranking primitive: qlib has one (CSRankNorm, groups a (datetime, instrument) frame by datetime and ranks within each group \u2014 exactly the baseline this capability names); polakowo/vectorbt's only rank() (signals/accessors.py:1298) ranks consecutive SIGNAL EVENTS through TIME within one series, a different axis entirely, not cross-sectional; QuantConnect/Lean has no match for 'CrossSectional' anywhere in the repository (grepped case-insensitively, zero hits). qlib is not merely cited, it is the only one of the three with the primitive this capability is being measured against",
           "artefact": "",
           "test": "test_crosssection_comparison.py"
         },
@@ -1617,7 +1617,7 @@
         },
         {
           "condition": "costs_included",
-          "how": "the real, measurable cost of each system's structural blind spot, not asserted: across a 19,440-scenario grid stressing every dimension both systems check, ARGUS's Mandate silently allows 8.7% of orders vibe-trading would refuse (its own leverage/exposure/daily-count/funding checks \u2014 by design, ConstitutionPolicy's job, not this capability's); vibe-trading silently allows 10.4% ARGUS would refuse (horizon/hedge/confidence/concurrent-position \u2014 dimensions it has no field for at all). A first version of this grid held three of vibe-trading's limits at non-triggering values by construction and measured a misleading 0% for one side \u2014 caught by running it and reading its own output, fixed, documented in swept_scenarios()'s own docstring",
+          "how": "the real, measurable cost of each system's structural blind spot, not asserted: across a 19,440-scenario grid stressing every dimension both systems check, vibe-trading silently allows 10.4% ARGUS would refuse (horizon/hedge/confidence/concurrent-position \u2014 dimensions it has no field for at all) and ARGUS allows none that vibe-trading refuses. Until 2026-09-27 ARGUS allowed 8.7% (vibe-trading's total-exposure, gross-leverage and daily-count limits, which this register had called ConstitutionPolicy's job although the Constitution carries none of them per trader); those three limits were added to the mandate and the grid re-run (audit 98). A first version of this grid held three of vibe-trading's limits at non-triggering values by construction and measured a misleading 0% for one side \u2014 caught by running it and reading its own output, fixed, documented in swept_scenarios()'s own docstring",
           "artefact": "data/mandate_comparison.json",
           "test": "test_mandate_comparison.py::TestBlindSpotCosts"
         },
@@ -1644,7 +1644,7 @@
         "The divergence rate IS now measured over real frames (eval/profilestudy.py, 2026-09-15) and the answer is weaker than the headline: 84.6% of proposals diverge, but only 1.3% for a reason that turns on a dimension the record supplies. The size and the conceded bad-case loss are declared by the study, because every one of the 231 recorded decisions carries quantity 0 and the log holds no proposed size to read. So 'the mandate binds often enough to matter' is measured, and what it is measured to be is: mostly on inputs we chose.",
         "Only the symbol exclusion separates one real frame from another. Horizon contributes nothing - every horizon the desk has faced (0.0h to 52.0h) sits under even the tighter mandate's 72h ceiling, so the holding-period limit has never once bound on live data.",
         "The study also found that desk/personalisation.judge() had never checked excluded_symbols at all, and reported the conservative mandate's two forbidden instruments as TAKEN. Fixed 2026-09-15. The measurement above is post-fix; any divergence figure quoted before that date was computed with the exclusion inert.",
-        "Same defect shape found again the same day: max_concurrent_positions ('a cap the book must respect', its own docstring) was likewise declared and never enforced in judge() \u2014 Mandate.out_of_mandate already accepted open_positions correctly, judge() simply never supplied one. Fixed 2026-09-15 (judge/diverge/audit now accept an optional desk.book.Book); not yet reflected in the measurement above because no caller passes a live Book yet \u2014 see tests/test_personalisation.py:: TestTheMandateRespectsTheBook for proof against a real Book fixture instead."
+        "Same defect shape found again the same day: max_concurrent_positions ('a cap the book must respect', its own docstring) was likewise declared and never enforced in judge() \u2014 Mandate.out_of_mandate already accepted open_positions correctly, judge() simply never supplied one. Fixed 2026-09-15 (judge/diverge/audit now accept an optional desk.book.Book); not yet reflected in the measurement above because no caller passes a live Book yet \u2014 see tests/test_personalisation.py:: TestTheMandateRespectsTheBook for proof against a real Book fixture instead. The same holds for the exposure, leverage and daily-count limits added 2026-09-27: they bind on the comparison grid and in tests/test_mandate_limits.py, and on the desk's own record only once a caller passes the live book and order count."
       ],
       "note": "",
       "measured_outcomes": []
@@ -3397,7 +3397,7 @@
     {
       "name": "Market sentiment",
       "subtheme": "t2-sentiment",
-      "module": "argus/agents/analysts.py,argus/agents/desk.py,argus/lui/research.py",
+      "module": "argus/agents/analysts.py,argus/agents/desk.py,argus/lui/research/sentiment.py",
       "state": "implemented",
       "baseline": "Santiment crowd-sentiment contrarian signals; Augmento; Bitget's own bitget-signal sentiment-analyst Skill; TauricResearch/TradingAgents v0.4 sentiment analyst; the S2 entry Jfash-cmd/sentinel-bitget-hackathon",
       "conditions_met": [],
@@ -3694,7 +3694,7 @@
     {
       "name": "Order splitting on realised cost vs. Bitget's own TWAP, on a full-depth replay",
       "subtheme": "t3-execassist",
-      "module": "argus/lui/research.py,argus/eval/execution_arena.py",
+      "module": "argus/lui/research/execution.py,argus/eval/execution_arena.py",
       "state": "tied",
       "baseline": "Bitget's native TWAP (equal market slices at a 60-second interval, its published spec), the even eight-slice TWAP every execution tool ships, and trading at once \u2014 replayed on Tardis's full-depth Bitget NVDAUSDT book for 2026-08-01",
       "conditions_met": [
@@ -3816,7 +3816,7 @@
     {
       "name": "A trader's thesis tested on the same input as optic-bitget's desk",
       "subtheme": "t3-personalisation",
-      "module": "argus/lui/research.py",
+      "module": "argus/lui/research/dispatch.py",
       "state": "tied",
       "baseline": "neromtoobad/optic-bitget (Season 2, MIT): evidence table, Bull/Bear debate twice, Judge sampled three times, probability capped to 10-90%, run end to end",
       "conditions_met": [
@@ -3878,7 +3878,7 @@
     {
       "name": "A trader's claims about the tape checked against it, measured against MirrorLine",
       "subtheme": "t3-decisionstress",
-      "module": "argus/lui/research.py, argus/eval/claimcheck_comparison.py",
+      "module": "argus/lui/research/claims.py,argus/eval/claimcheck_comparison.py",
       "state": "tied",
       "baseline": "PinnacleCryptNG/MirrorLine (Season 2, no licence file): its own challenge engine, getInterpretationChallenge, run from its clone on the same sentences",
       "conditions_met": [
@@ -3932,7 +3932,7 @@
       ],
       "blockers": [
         "TIED, and the verdict is the harness's own comparison report (shown under measured, read from data/claimcheck_comparison.json rather than restated here). What the report does not carry: the first run was a clear LOSS - ARGUS gave no verdict on any past-tense causal claim or either session claim - and it is kept in data/h2h_mirrorline/argus_raw_first_run.json",
-        "the harness grades answers recorded from the console on the run morning (data/h2h_mirrorline/argus_raw.json); it does not re-run lui/research._claim_check, so a regression in the console after that morning would not show here until the harness calls it on the saved claims and tape",
+        "the harness grades answers recorded from the console on the run morning (data/h2h_mirrorline/argus_raw.json); it does not re-run lui/research/claims.py::_claim_check, so a regression in the console after that morning would not show here until the harness calls it on the saved claims and tape",
         "MirrorLine still reads claim kinds ARGUS does not: 40-level book depth, liquidity and trade-action language; ARGUS reads funding and the perpetual's premium, which MirrorLine does not"
       ],
       "note": "",
@@ -4015,7 +4015,7 @@
         }
       ],
       "blockers": [
-        "TIED: the first run was a LOSS (ARGUS answered a hedge question); rebuilt, ARGUS prices liquidation at Bitget's live maintenance tier and live funding, reads 1,443 NVDA weekends since 1999 and the perpetual's own path through 57 weekends, while baserate keeps a regime match and a self-grading forecast ledger ARGUS lacks here"
+        "TIED: the first run was a LOSS (ARGUS answered a hedge question); rebuilt, ARGUS prices liquidation at Bitget's live maintenance tier and live funding, reads 1,443 NVDA weekends since 1999 and the perpetual's own path through 57 weekends. Re-run 2026-09-27 (audit finding 27): baserate's trend-and-momentum match, which ARGUS also reads, was scored walk-forward against five other forecasts over 17,044 weekends of 13 stocks; it was barely better than the plain record (pooled pinball 27.84bp against 27.99bp) and worse than the band ARGUS now prints, EWMA-scaled with adaptive conformal coverage (26.37bp, both halves better for all 13 stocks, 79.4% of weekends inside a 10-90 band; data/weekend_quantiles.json). ARGUS keeps its own ledger of those bands from the same day (data/weekend_calls.jsonl), none graded yet. Still TIED: baserate's own forecasts have not been scored on the same weekends, which is the comparison that would settle it"
       ],
       "note": "",
       "measured_outcomes": []
@@ -4023,7 +4023,7 @@
     {
       "name": "Where a stop sits in the noise, measured against Rook's invalidation price",
       "subtheme": "t3-decisionstress",
-      "module": "argus/desk/odds.py, argus/eval/stopquality_comparison.py",
+      "module": "argus/desk/odds.py,argus/eval/stopquality_comparison.py",
       "state": "implemented",
       "baseline": "iamsuperfly/Rook (Season 2, MIT): runDebate (bull/bear + judge) on the hackathon Qwen, long side, 24h, six names, from its clone",
       "conditions_met": [
@@ -4092,7 +4092,7 @@
     {
       "name": "Where a shut stock should open: the perpetual-implied open, against gloaming and nocturne",
       "subtheme": "t3-execassist",
-      "module": "argus/lui/research.py, argus/eval/overnight_comparison.py, argus/eval/void_comparison.py",
+      "module": "argus/lui/research/quote.py,argus/eval/overnight_comparison.py,argus/eval/void_comparison.py",
       "state": "implemented",
       "baseline": "angelraph/gloaming (Season 2, MIT): overnight fair value from index futures, BTC/ETH and the dollar, its own model functions run from its clone; egbujor-emmanuel/nocturne (Season 2, MIT): the weekend reference price, its own observations and walk-forward run from its clone",
       "conditions_met": [
@@ -4166,7 +4166,7 @@
         "IMPLEMENTED, not OWNED. The verdicts are the harnesses' own comparison reports, shown under measured and read from data/overnight_comparison.json and data/void_comparison.json rather than restated here. What the reports do not carry: the perpetual's move was scored over 113 nights and 8 stocks (15 April to 24 September 2026), its direction right 93% of the time; gloaming's shipped inputs missed by 135bps; the lead holds on weekends (31bps against 78bps, recomputed from the harness's rows)",
         "corrected 2026-09-25: this row said the two were level on QQQ. The artefact never did - ARGUS is ahead on all eight stocks, narrowest on QQQ, where gloaming's Nasdaq futures are nearly the same instrument: 12.50 against 14.34bps, 1.84bps ahead, 95% interval -3.59 to -0.29 (per_stock.QQQ, and the comparison report's groups)",
         "groupwise (data/groupwise_audit.json): the overnight lead is carried by no stock and no night and holds in both chronological halves; on nocturne's own rows ARGUS's small lead over the Sunday price is carried by one name (RTSLA) and one weekend (2026-08-07), and nocturne's full fade leads in the first half of the weekends and trails in the second, so neither verdict on that frame is stable",
-        "the estimate scored is the harnesses' own: overnight_comparison.predict's argus_perp and void_comparison's ARGUS column. The console states the same quantity through lui/research._implied_open_line, which neither harness executes; it is covered by its unit test, and the credit stays on the harnesses, where the scored code lives, until they call the console's function",
+        "the estimate scored is the harnesses' own: overnight_comparison.predict's argus_perp and void_comparison's ARGUS column. The console states the same quantity through lui/research/quote.py::_implied_open_line, which neither harness executes; it is covered by its unit test, and the credit stays on the harnesses, where the scored code lives, until they call the console's function",
         "nocturne's reversal is a property of the rToken, not of the stock: on the real Monday open, read at nocturne's own Sunday-evening moment, the perpetual's weekend move carried through (slope +0.83 on 160 stock-weekends) and beat the last regular close its claim names (70bps against 86bps, 95% interval excluding zero)",
         "no costs condition: this is a price estimate, not a trade, so there is no fee to net; adversarial and reproducibility runs not yet recorded"
       ],

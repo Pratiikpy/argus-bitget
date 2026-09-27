@@ -71,7 +71,7 @@ from datetime import UTC, date, datetime, time, timedelta
 from typing import Any, Literal
 from zoneinfo import ZoneInfo
 
-from argus.market.evidence import _UA
+from argus.market.evidence import FEED_USER_AGENT
 from argus.market.fundamentals import ANNUAL_DAYS, CONCEPTS, QUARTER_DAYS
 
 EASTERN = ZoneInfo("America/New_York")
@@ -400,7 +400,7 @@ class PitFundamentals:
         self,
         *,
         fetch_json: FetchJson | None = None,
-        user_agent: str = _UA,
+        user_agent: str = FEED_USER_AGENT,
         clock: Callable[[], datetime] | None = None,
     ) -> None:
         self._ua = user_agent

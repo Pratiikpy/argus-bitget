@@ -152,17 +152,17 @@ def test_the_desk_integrity_read_is_taken_from_its_own_notes(
     (tmp_path / "desk_notes.jsonl").write_text(
         "\n".join(json.dumps(n) for n in notes), encoding="utf-8")
     monkeypatch.setenv("ARGUS_DATA_DIR", str(tmp_path))
-    read = research._desk_integrity_read("NVDAUSDT")
+    read = research.evidence._desk_integrity_read("NVDAUSDT")
     assert read == {"seq": 7, "at": "2026-09-23T19:41:00+00:00", "analysts": 3, "sources": 5,
                     "signal": "bullish", "confidence": 0.40}
-    assert research._desk_integrity_read("COINUSDT") is None
-    assert research._desk_integrity_read("TSLAUSDT") is None
+    assert research.evidence._desk_integrity_read("COINUSDT") is None
+    assert research.evidence._desk_integrity_read("TSLAUSDT") is None
 
 
 def test_the_coordination_test_is_quoted_from_its_artefact(
         monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("ARGUS_DATA_DIR", str(DATA))
-    found = research._coordination_test("NVDAUSDT")
+    found = research.evidence._coordination_test("NVDAUSDT")
     assert found is not None
     text, counts = found
     report = json.loads((DATA / "sentiment_comparison.json").read_text(encoding="utf-8"))
@@ -194,6 +194,6 @@ def test_line_item_questions_reach_the_filings(question: str) -> None:
 def test_an_as_of_date_is_read_in_the_ways_people_write_it() -> None:
     for text in ("as of 1 March 2026", "as of March 1, 2026", "as of 2026-03-01",
                  "as known on 1st March 2026"):
-        when = research._as_of(f"NVDA revenue {text}")
+        when = research.fundamentals._as_of(f"NVDA revenue {text}")
         assert when is not None and (when.year, when.month, when.day) == (2026, 3, 1), text
-    assert research._as_of("NVDA revenue last quarter") is None
+    assert research.fundamentals._as_of("NVDA revenue last quarter") is None

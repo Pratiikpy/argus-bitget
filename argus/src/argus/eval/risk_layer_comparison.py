@@ -30,12 +30,12 @@ once per discrete trade, mirroring how `backtest.engine.run()` charges cost once
 change. Skipping this step would have quietly compared both risk systems against a costless trade
 sequence neither will ever actually see.
 
-**ARGUS's own equity/streak bookkeeping is copied verbatim from `paper/runner.py::_book_state`**
-(lines 171-201, read before writing this), not reinvented: `session_open_equity=equity` (this
-project's live system tracks no separate intraday session baseline either), a peak that only ever
-rises, and `consecutive_losses` that resets to zero on any non-negative outcome. Using a different
-convention here would make this comparison prove something about a system ARGUS does not actually
-run live.
+**ARGUS's own equity/streak bookkeeping is copied verbatim from
+`paper/runner.py::current_book_state`** (read before writing this), not reinvented:
+`session_open_equity=equity` (this project's live system tracks no separate intraday session
+baseline either), a peak that only ever rises, and `consecutive_losses` that resets to zero on any
+non-negative outcome. Using a different convention here would make this comparison prove something
+about a system ARGUS does not actually run live.
 
 **Two scopes, both built — and the second one found a real divergence that survives a fair-use
 challenge only for ONE of the two global protections, not both.** `compare_real_symbols`/
@@ -69,7 +69,7 @@ The other (`max_drawdown`) is real, isolated, and decisively measured — freqtr
 is demonstrably LESS accurate than ARGUS's at the one thing both claim to measure (true portfolio
 drawdown), on this real data. Whether "materially superior" is the right word for a protection
 proven less accurate than the alternative is a judgement call this module states the facts for
-rather than makes unilaterally — see `Activity/PROGRESS.md`'s entry the same day for where that
+rather than makes unilaterally — see the working log's entry the same day for where that
 judgement currently stands.
 
 **Fixed 2026-09-23: the headline number used to drift run to run, and now does not.**
@@ -131,8 +131,9 @@ from argus.risk.circuit import (
 from argus.strategies.session_alpha import VARIANTS
 from argus.strategies.track1_suite import TRACK1_VARIANTS
 from argus.truth import artefact
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "risk_layer_comparison.json"
 TRACK1_STUDY_PATH = DATA / "track1_study.json"
 CANDLES_FIXTURE_PATH = DATA / "risk_layer_candles_fixture.json"
@@ -264,7 +265,7 @@ def walk_trades(
     """The actual same-input comparison: replay one symbol's real trades in close order, judging
     each with both systems against the state that trade's outcome just produced.
 
-    ARGUS's equity/streak bookkeeping matches `paper.runner._book_state` exactly (module
+    ARGUS's equity/streak bookkeeping matches `paper.runner.current_book_state` exactly (module
     docstring); freqtrade's four protections are asked "as of this trade's exit", scanning
     whatever of this symbol's trades already closed by then, precisely as `agents.desk.
     ConstitutionPolicy.rule` and freqtrade's own protections are both asked once per decision

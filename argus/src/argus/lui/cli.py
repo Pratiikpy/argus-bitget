@@ -1,4 +1,4 @@
-"""The desk console — ask ARGUS about its own record, in words.
+"""The console in a terminal — ask ARGUS a research question or about its own record, in words.
 
 Run it with ``python -m argus.lui`` for an interactive session, or pass a question as arguments to
 ask one and exit: ``python -m argus.lui why did you do nothing all weekend``.
@@ -31,7 +31,7 @@ from argus.paper.ledger import PaperLedger
 
 BUDGET_MS: dict[Speed, int] = {Speed.FAST: 500, Speed.MEDIUM: 5_000, Speed.SLOW: 30_000}
 
-BANNER = """ARGUS desk console - ask about the record.
+BANNER = """ARGUS research console - ask a research question or about the record.
 
 Every answer is reconstructed from the hash-chained decision ledger and cites its sources.
 When the record cannot support an answer, you get a refusal and the reason, not a guess.

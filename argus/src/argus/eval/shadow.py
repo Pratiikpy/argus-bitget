@@ -39,13 +39,13 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
-from pathlib import Path
 from statistics import fmean
 from typing import Any
 
 from argus.decision.outcome import DEAD_ZONE_BPS, move_of
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "shadow_record.json"
 
 MIN_GRADED = 20

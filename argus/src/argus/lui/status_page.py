@@ -233,6 +233,33 @@ def sweep_lines(data: Path) -> list[tuple[str, str]]:
                     f"{sources.get('live')} of {sources.get('total')} (SEC EDGAR, FRED, news "
                     f"feeds and others) answered — probed "
                     f"{str(sources.get('probed_at', ''))[:10]}"))
+    calls = _load(data, "call_grades.json")
+    if calls:
+        # The console's own answers, kept before the outcome and graded after it
+        # (`eval/call_record.py`); a record with nothing graded yet says so, not a score.
+        risk, direction = calls.get("risk_graded", 0), calls.get("direction_graded", 0)
+        graded = []
+        if risk:
+            graded.append(f"beta off by {float(calls['mean_beta_error']):.2f} on average over "
+                          f"{risk} call{'s' if risk != 1 else ''} four weeks on")
+        if direction:
+            graded.append(f"direction Brier {float(calls['brier']):.3f} against "
+                          f"{float(calls['brier_base_rate']):.3f} for the plain base rate, "
+                          f"{direction} horizon{'s' if direction != 1 else ''}")
+        out.append(("Our own calls, graded",
+                    f"{calls.get('calls', 0)} answers recorded since "
+                    f"{str(calls.get('first_call') or '')[:10]}, hash-chained; "
+                    + ("; ".join(graded) if graded else "none has reached its horizon yet")
+                    + f" — graded {str(calls.get('graded_at', ''))[:10]}"))
+        weekend = calls.get("weekend") or {}
+        if weekend.get("recorded"):
+            scored = int(weekend.get("graded") or 0)
+            out.append(("Our weekend bands, graded",
+                        f"{weekend['recorded']} weekend bands recorded before the reopen; "
+                        + (f"{scored} graded by Monday's open, {float(weekend['covered']):.0%} "
+                           f"inside their 10-90 band (80% is calibrated)" if scored else
+                           "none graded yet: the first reopen has not printed")
+                        + (f", {weekend['pending']} pending" if weekend.get("pending") else "")))
     return out
 
 

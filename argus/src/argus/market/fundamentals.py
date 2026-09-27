@@ -41,7 +41,7 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
-from argus.market.evidence import _UA, EdgarSource
+from argus.market.evidence import FEED_USER_AGENT, EdgarSource
 from argus.market.sue import MIN_QUARTERS, SueError, read_dated, yoy_window
 from argus.truth.evidence import Evidence
 
@@ -289,7 +289,8 @@ class FundamentalsSource:
 
     CONCEPT_URL = "https://data.sec.gov/api/xbrl/companyconcept/CIK{cik:010d}/us-gaap/{tag}.json"
 
-    def __init__(self, *, user_agent: str = _UA, edgar: EdgarSource | None = None) -> None:
+    def __init__(self, *, user_agent: str = FEED_USER_AGENT,
+                 edgar: EdgarSource | None = None) -> None:
         self._ua = user_agent
         self._edgar = edgar or EdgarSource(user_agent=user_agent)
         self._pit: Any = None

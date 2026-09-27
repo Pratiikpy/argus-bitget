@@ -17,8 +17,8 @@
 # demand, and compares its real fallback/failure behaviour to ARGUS's own
 # `argus.market.evidence.gather()` on the identical scenarios, as the `baseline_reproduced` /
 # `same_input_comparison` evidence for "Perception layer: what the desk can see" in
-# `eval/standing.py`, whose own baseline field already names TradingAgents' feed list (project
-# Standing Rule #3).
+# `eval/standing.py`, whose own baseline field already names TradingAgents' feed list (the
+# read-before-write rule).
 #
 # This file's own imports (`from .alpha_vantage import ...`, `from .config import get_config`,
 # `from .errors import ...`, `from .fred import ...`, `from .polymarket import ...`,

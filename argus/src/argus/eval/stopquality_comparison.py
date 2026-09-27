@@ -23,10 +23,10 @@ with a nearest-rank copy of the rule written here (``_p90_adverse``) while `eval
 credited `desk/odds.py`; the harness-validity canary (`data/harness_validity.json`) found
 ``directional_odds`` never ran, and the harness also fetched its bars live, so it could not be
 re-run offline. Now the fit slice is handed to ``argus.desk.odds.directional_odds`` exactly as
-`lui/research._odds_lines` hands it the console's daily bars for a 24-hour long: closes stamped
-with their close time, each bar's (low, high) as ``extremes``, one bar per window, and the stop
-distance is its ``adverse_p90_bps`` (a linearly interpolated 10th percentile of the worst point on
-the lows). The hurdle passed is the 12bps round trip without funding, which does not enter the
+`lui/research/analogue.py::_odds_lines` hands it the console's daily bars for a 24-hour long: closes
+stamped with their close time, each bar's (low, high) as ``extremes``, one bar per window, and the
+stop distance is its ``adverse_p90_bps`` (a linearly interpolated 10th percentile of the worst point
+on the lows). The hurdle passed is the 12bps round trip without funding, which does not enter the
 adverse measure. The bars are saved once by :func:`collect` (``data/h2h_rook/bars/``) and scored
 from the files; the copy of the old rule is kept only to publish how far it differed
 (``argus_distance_former_copy``). The prospective block records the stops as they stood when Rook
@@ -40,17 +40,18 @@ import itertools
 import json
 import sys
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Any
 
 from argus.truth import artefact
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data" / "h2h_rook"
+DATA = DATA_DIR / "h2h_rook"
 BARS = DATA / "bars"
-REPORT = Path(__file__).resolve().parents[3] / "data" / "stopquality_comparison.json"
+REPORT = DATA_DIR / "stopquality_comparison.json"
 FIT_SHARE = 0.6
 DAYS = 500
-"""The console's own look-back for a daily-horizon odds answer (`lui/research._odds_lines`)."""
+"""The console's own look-back for a daily-horizon odds answer
+(`lui/research/analogue.py::_odds_lines`)."""
 
 Bar = tuple[datetime, float, float, float]
 """(bar open, close, low, high), oldest first."""
@@ -76,10 +77,11 @@ def _p90_adverse(bars: list[tuple[float, float]]) -> float | None:
 def console_stop_distance(bars: list[Bar]) -> float | None:
     """The console's stop distance for a 24-hour long over ``bars``, as a fraction.
 
-    ``argus.desk.odds.directional_odds`` receives what `lui/research._odds_lines` builds from the
-    console's daily bars: each close stamped with its bar's close (open + 1 day), each bar's
-    (low, high) as ``extremes``, one bar per window, side long. Its ``adverse_p90_bps`` is the move
-    against a long that 90% of windows stayed inside; the distance is its magnitude. An exception
+    ``argus.desk.odds.directional_odds`` receives what `lui/research/analogue.py::_odds_lines`
+    builds from the console's daily bars: each close stamped with its bar's close (open + 1 day),
+    each bar's (low, high) as ``extremes``, one bar per window, side long. Its ``adverse_p90_bps``
+    is the move against a long that 90% of windows stayed inside; the distance is its magnitude. An
+    exception
     from the console propagates rather than becoming a missing row."""
     from argus.cost.model import CostModel
     from argus.desk.odds import directional_odds
@@ -169,7 +171,7 @@ def score(*, fetch: Any = None) -> dict[str, Any]:
                   "stop (a long's stop: that day's low at or under prior close x (1 - distance))",
         "argus_stop_is_out_of_sample": True,
         "argus_code": "argus.desk.odds.directional_odds(adverse_p90_bps) on the fit slice, the "
-                      "call lui/research._odds_lines makes for a 24-hour long",
+                      "call lui/research/analogue.py::_odds_lines makes for a 24-hour long",
         "inputs": "data/h2h_rook/*.json (Rook's runs) and data/h2h_rook/bars/ (Bitget 1D market "
                   "candles saved by collect())",
         "rows": rows,

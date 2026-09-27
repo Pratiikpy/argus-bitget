@@ -45,7 +45,6 @@ from __future__ import annotations
 import json
 import time
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 from argus.desk.rotation import (
@@ -59,6 +58,7 @@ from argus.eval.baselines.pytaa_signal_loader import load_signal_module
 from argus.eval.baselines.pytaa_vigilant_allocation_loader import load_vigilant_allocation_module
 from argus.market.bitget import RTOKEN_SYMBOLS
 from argus.market.history import CandleType, fetch_range
+from argus.truth.paths import DATA_DIR
 
 CROSS_ASSET_UNIVERSE: tuple[str, ...] = (
     *RTOKEN_SYMBOLS, "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "XAUUSDT", "XAGUSDT",
@@ -582,7 +582,7 @@ def main() -> int:  # pragma: no cover - CLI
         "scope_statement": SCOPE_STATEMENT,
     }
     print(render(report))
-    out = Path(__file__).resolve().parents[3] / "data" / "rotation_comparison.json"
+    out = DATA_DIR / "rotation_comparison.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     print(f"\nwritten to {out}")

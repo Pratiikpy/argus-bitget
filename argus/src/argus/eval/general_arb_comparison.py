@@ -73,8 +73,9 @@ from argus.research.arbitrage_study import ROUND_TRIP_BPS, Decomposition, decomp
 from argus.research.executable_arb import best_arbitrage, leg_optimum
 from argus.truth.artefact import write as write_artefact
 from argus.truth.clocks import DualClock
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 BOOKS_PATH = DATA / "general_arb_books.json"
 HOLDOUT_PATH = DATA / "general_arb_books_holdout.json"
 WEEKEND_PATH = DATA / "general_arb_books_weekend.json"

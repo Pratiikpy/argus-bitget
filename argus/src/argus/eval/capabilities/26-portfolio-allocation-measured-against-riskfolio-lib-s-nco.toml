@@ -1,0 +1,173 @@
+name = "Portfolio allocation, measured against Riskfolio-Lib's NCO"
+subtheme = "t3-portfolio"
+modules = [
+    "argus/desk/allocation.py",
+]
+state = "tied"
+baseline = """\
+    dcajasn/Riskfolio-Lib 7.3.0 (BSD-3), NCO (Nested Clustered Optimization); cvxportfolio \
+    1.5.1 (GPL-3.0) checked separately for the convex-rebalance path"""
+blockers = [
+    """\
+        Bake-off, 2026-09-26 (eval/nco_bakeoff.py, data/nco_bakeoff.json; every stage ran, López \
+        de Prado's own optPort_nco unmodified in an environment pinned to pandas 2.2.3, which his \
+        code needs). Each family — ARGUS, Riskfolio, skfolio — picked its configuration on the \
+        selection half. On the 20 held-out windows ARGUS's pick (sample minimum variance) beats \
+        Riskfolio's single-linkage NCO and ties Riskfolio's minimum variance and both skfolio NCO \
+        variants: overall TIE. Monte Carlo, 120 draws each: on de Prado's block-diagonal process \
+        every NCO has lower true-variance excess than minimum variance (ARGUS's pick worse in 110 \
+        of 120 against ARGUS's own NCO), and his snippet 7.9 reproduces (NCO lowers weight RMSE \
+        against Markowitz in 100 of 120); on a process calibrated to the real book, Gaussian and \
+        Student-t(4), the order reverses — minimum variance beats every NCO in 88 to 120 of 120 \
+        draws, and his NCO's RMSE is worse than Markowitz's in all 120. NCO's gain is real where \
+        the covariance has block structure and absent on this book, which is why the desk keeps \
+        minimum variance and the grade stays TIED. This closes the unswept-configuration gap named \
+        below.""",
+    """\
+        no_specialist_capability_superior is now a TIE, not a FAIL or a PASS — the state this \
+        project's own vocabulary has a name for. ARGUS's own NCO does not beat Riskfolio's real \
+        NCO (8.203bps vs 8.203bps, ratio 1.0000 on the real walk-forward book): it matches it, \
+        using an ARGUS-owned implementation rather than a dependency on the library. ARGUS's HRP \
+        (the older, simpler allocator, still the module's leaf_order=True default) still loses to \
+        both NCO variants decisively — the tie is specifically ARGUS's own NCO against \
+        Riskfolio's, not a claim that every ARGUS allocator matches every Riskfolio one.""",
+    """\
+        The adversarial-covariance sweep (2026-09-22) is a real, measured, reproducible finding \
+        and it is NOT counted as a win — the near-singular family it tests is genuinely ill-posed \
+        (no ground truth for what a minimum-variance solve should return there), so 'ARGUS refuses \
+        more often' is a documented behavioural difference, not evidence ARGUS's weights are more \
+        correct. What it establishes: Riskfolio's real NCO never refuses across the sweep (0/20) \
+        and flags its own covariance as untrustworthy every time it proceeds anyway (20/20); \
+        ARGUS's nco_weights refuses cleanly on the genuinely singular cases (16/20) rather than \
+        returning a number its own math cannot stand behind. Whether that is better for a real \
+        user is a judgement about what they want from a tool facing bad input — an \
+        always-an-answer library or a sometimes-refuses one — not a fact this sweep alone settles, \
+        which is why the state stays TIED rather than moving to OWNED on the strength of this one \
+        axis.""",
+    """\
+        best_method_studied is not proven beyond reproducing NCO's own default configuration \
+        (MinRisk/MV, Ward linkage, two-diff gap statistic for k): NCO's own clustering \
+        hyperparameters were not swept for sensitivity, so it is not established that the tie is \
+        robust to configuration choices NCO itself exposes.""",
+    """\
+        Answered 2026-09-22 — this capability's own prior blocker asked whether optimal leaf \
+        ordering alone would recover the walk-forward gap before reaching for NCO's own clustering \
+        mechanism. It did not (leaf ordering closed only the smaller HRP-vs-HRP gap), so the \
+        harder thing was built: NCO's real mechanism itself, read from Riskfolio's real source and \
+        reproduced from scratch. What remains open: this is a TIE, not a WIN — the goal (per this \
+        project's own standing instruction to keep trying LOST capabilities until a real \
+        algorithmic idea either flips them or is shown not to) would be an ARGUS allocator that \
+        beats Riskfolio's NCO outright, not only matches it. No such idea has been tried yet.""",
+]
+note = """\
+    Published because `data/allocation_comparison.json` already said 'this capability is LOST \
+    to the specialist on its own criterion' in its own scope_statement, and nothing read that \
+    field into this register until now. Updated twice on 2026-09-22: first, optimal leaf \
+    ordering closed the HRP-vs-HRP gap to floating-point identity but left the NCO loss \
+    essentially unchanged — a real, tested, negative answer to an explicitly open question. \
+    Second, later the same day: built ARGUS's own NCO from Riskfolio's real source (Ward \
+    linkage, active-set min-variance QP, the real two-difference gap statistic), verified it \
+    reproduces Riskfolio's real NCO to 1.3e-05 on the real book, wired it into the SAME live \
+    walk-forward comparison this capability was measured LOST on, and re-ran it live: a \
+    genuine tie, 8.203bps both, ratio 1.0000. LOST -> TIED, on a freshly-run comparison, not a \
+    reinterpretation of the old one. Third update, also 2026-09-22, after the \
+    regime-boundary-detection and LUI capabilities were each closed the same day: this \
+    capability's own adversarial_test condition was still unproven, and `run_failure_cases` — \
+    the existing degenerate-input harness — only ever exercised HRP, which cannot fail this \
+    way (recursive bisection never inverts a matrix). Built `run_adversarial_covariance` (20 \
+    near-singular covariance matrices, real assets cloned at noise levels from exact \
+    duplication to merely ill-conditioned), run against ARGUS's real nco_weights and \
+    Riskfolio's real NCO for the first time. Closes the condition honestly: real, systematic, \
+    reproducible evidence of a genuine failure-mode difference (Riskfolio never refuses and \
+    flags trouble every time it proceeds anyway; ARGUS refuses cleanly on the genuinely \
+    singular cases) — reported as exactly that, not inflated into a claim that ARGUS's weights \
+    are more correct, since there is no ground truth for a near-singular allocation problem to \
+    check either side against."""
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    fixed 2026-09-22, two real gaps closed in sequence. First: \
+    desk/allocation.py:optimal_leaf_order implements the Bar-Joseph/Gifford/Jaakkola (2001) \
+    DP, the same algorithm scipy's real optimal_leaf_ordering implements and Riskfolio calls \
+    by default (verified against real live scipy, 200 random trees plus the real 12-symbol \
+    book); hrp_weights now reproduces Riskfolio's shipped-default HRP to floating-point \
+    identity (~2.9e-16) — but this closed only the ARGUS-vs-Riskfolio-HRP gap, not the \
+    walk-forward loss to NCO, which was the actual open question. Second: read Riskfolio's \
+    real NCO source in full (HCPortfolio.py's _intra_weights/_inter_weights/_opt_w) and built \
+    ARGUS's own desk/allocation.py:nco_weights — real Ward linkage (scipy's Lance-Williams \
+    recurrence, verified against real live scipy, 200 random trees), a real active-set \
+    long-only minimum-variance QP (verified against Riskfolio's real cvxpy solver, 100 random \
+    trials), and the real two-difference gap statistic for cluster count. Reproduces \
+    Riskfolio's real NCO to within 1.3e-05 max weight difference on the real book"""
+artefact = "data/allocation_comparison.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    all twelve allocators (including ARGUS's own NCO, added 2026-09-22) run on the SAME 60-day \
+    hourly Bitget candle history for the SAME 12-symbol rToken universe and the SAME sample \
+    covariance"""
+artefact = "data/allocation_comparison.json"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    paired sign test per allocator vs ARGUS's own HRP, Holm correction across every \
+    comparison; ARGUS's own NCO is compared against Riskfolio's real NCO as a null control \
+    (parity, like the HRP parity-twin check), not scored with a significance test against it, \
+    because the claim is a tie, and a sign test has nothing to say about one. Since 2026-09-26 \
+    also the bake-off's per-window held-out volatilities for every pick: exact sign test, \
+    Wilcoxon signed-rank, stationary-bootstrap 95% interval, Holm across the family"""
+artefact = "data/nco_bakeoff.json"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    argus_hrp_seconds≈0.000706 vs riskfolio_hrp_seconds≈0.0423 vs \
+    cvxportfolio_mpo_seconds_one_solve≈2.589 — ARGUS's HRP still ~60x faster than Riskfolio's \
+    own; ARGUS's own nco_weights is pure Python against Riskfolio's real cvxpy-backed solver, \
+    timed but not yet the decisive number here, since the walk-forward result is a tie on \
+    quality, not a cost trade"""
+artefact = "data/allocation_comparison.json"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    added 2026-09-22: 20 near-singular covariance matrices (a real asset cloned at noise \
+    levels from exact duplication to merely ill-conditioned), run against ARGUS's real \
+    nco_weights and Riskfolio's real NCO. Riskfolio's real NCO refuses/crashes 0/20 times — it \
+    proceeds on every input, including exact duplicates — while flagging internally ('you must \
+    convert self.cov to a positive definite matrix' / a LinAlgWarning on a singular matrix) on \
+    all 20/20 trials it still answers. ARGUS's own nco_weights refuses cleanly \
+    (AllocationError) on 16/20 — the genuinely singular ones. On the 4/20 where both \
+    succeeded, weights diverge meaningfully (mean 8.5pp, worst 16.9pp max difference) — \
+    expected on an ill-posed problem with two different solvers, not a correctness defect on \
+    either side. NOT claimed as an accuracy win: there is no ground truth for a near-singular \
+    minimum-variance problem, only a measured, reproducible difference in whether each side \
+    proceeds and whether proceeding is honest about the covariance being untrustworthy"""
+artefact = "data/allocation_comparison.json"
+test = "test_allocation_comparison.py::TestAdversarialCovariance"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    the bake-off's held-out half: each family picked its configuration on the selection \
+    windows, then all picks were scored on 20 held-out windows none of them saw (ARGUS's pick \
+    beats Riskfolio's single-linkage NCO, ties the rest). The earlier live walk-forward \
+    (data/allocation_comparison.json: ARGUS's NCO and Riskfolio's both 8.203bps, ratio 1.0000) \
+    kept only per-allocator means, so it is not the evidence cited here"""
+artefact = "data/nco_bakeoff.json"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    two_assets_below_min, duplicated_column and zero_variance_column all handled and reported \
+    rather than raising; Riskfolio's HERC/HERC2 raise TypeError on every call in this harness, \
+    run via a documented shim, disclosed rather than silently patched over"""
+artefact = "data/allocation_comparison.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "reproducibility.identical=true across repeated runs on the same fetch"
+artefact = "data/allocation_comparison.json"

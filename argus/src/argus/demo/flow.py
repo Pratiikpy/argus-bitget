@@ -43,7 +43,9 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
-DATA = __import__("pathlib").Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 REPORT_PATH = DATA / "flow_trace.json"
 
 EXECUTED = "EXECUTED"

@@ -37,9 +37,10 @@ from __future__ import annotations
 
 import json
 from functools import lru_cache
-from pathlib import Path
 
-T2S_PATH = Path(__file__).resolve().parents[3] / "data" / "lui_t2s_characters.json"
+from argus.truth.paths import DATA_DIR
+
+T2S_PATH = DATA_DIR / "lui_t2s_characters.json"
 
 _FULLWIDTH = {
     code: code - 0xFEE0 for code in range(0xFF01, 0xFF5F) if chr(code - 0xFEE0).isalnum()

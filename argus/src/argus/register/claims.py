@@ -43,7 +43,9 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 REGISTER_PATH = DATA / "register.jsonl"
 """Append-only. One JSON object per line, each carrying the hash of the line before it."""
 

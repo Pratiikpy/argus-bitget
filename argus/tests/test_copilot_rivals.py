@@ -142,9 +142,9 @@ def test_the_console_quotes_the_measured_record_with_its_losses(
                   "argus_open vs rival_spy": {"wilcoxon_p": 0.0117},
                   "argus_open vs rival_qqq": {"wilcoxon_p": 0.0977}}}}
     (tmp_path / "copilot_rivals.json").write_text(json.dumps(report), encoding="utf-8")
-    monkeypatch.setattr(answer, "_notes_path", lambda: tmp_path / "notes.jsonl")
-    line = research._beta_track_record()
+    monkeypatch.setattr(answer, "desk_notes_path", lambda: tmp_path / "notes.jsonl")
+    line = research.evidence._beta_track_record()
     assert line is not None
     assert "0.24" in line and "0.55" in line and "not significant" in line and "1.0" in line
     (tmp_path / "copilot_rivals.json").write_text("{}", encoding="utf-8")
-    assert research._beta_track_record() is None
+    assert research.evidence._beta_track_record() is None

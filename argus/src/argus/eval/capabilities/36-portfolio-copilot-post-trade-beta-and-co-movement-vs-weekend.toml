@@ -1,0 +1,76 @@
+name = "Portfolio copilot: post-trade beta and co-movement vs. weekend-copilot (S2)"
+subtheme = "t3-portfolio"
+modules = [
+    "argus/desk/portfolio.py",
+    "argus/eval/copilot_rivals.py",
+]
+state = "tied"
+baseline = """\
+    PhiBao/weekend-copilot @461ad820 (MIT) — the S2 entry that answers this sub-theme's exact \
+    question on Bitget rTokens — its risk engine ported line for line and run on its own \
+    native snapshot; 1,800 books over nine monthly origins"""
+blockers = [
+    """\
+        TIED on the pre-registered primary: ARGUS's post-trade beta misses the realised Bitget \
+        daily beta by 0.241 on average against 0.360 for weekend-copilot's method on the same \
+        benchmark, better on 7 of 9 origins, but p = 0.098 — not significant. Against \
+        weekend-copilot as it ships (beta against SPY) ARGUS wins significantly (0.241 against \
+        0.554, 8 of 9 origins, p = 0.012), and it names the holding the new position will move \
+        with most 42% of the time against 35% (chance 26%). Two losses are published with it: \
+        ARGUS does not beat calling every beta 1.0 significantly (0.241 against 0.298, p = 0.20), \
+        and its open-session beta forecasts no better than its blended one. Factor attribution and \
+        the conversational copilot are not yet compared (rival review of 2026-09-24: skfolio with \
+        toraniko factors, Wealthfolio); stress and hedge are the two rows below""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    weekend-copilot's delta.ts, stats.ts, stress.ts, hedge.ts and critic.ts read at source; \
+    chosen by the rival review of 2026-09-24 as the S2 entry to beat on this sub-theme"""
+artefact = "data/copilot_rivals.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    the port reproduces the beta before, beta after and max correlation its own engine printed \
+    for all three of its preset books (max difference 7e-18)"""
+artefact = "data/copilot_rivals.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    both answer the same 1,800 books and proposed adds at the same origins; both are scored on \
+    Bitget daily, native daily and open-session hourly targets"""
+artefact = "data/copilot_rivals.json"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    exact Wilcoxon signed-rank over per-origin mean errors; books inside one origin share a \
+    market path and are averaged before testing"""
+artefact = "data/copilot_rivals.json"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = "every prediction uses data before its origin; every target is the 28 days after it"
+artefact = "data/copilot_rivals.json"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    not significantly better than beta = 1.0; open-session beta no better than blended at \
+    forecasting"""
+artefact = "data/copilot_rivals.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    hash-pinned Bitget snapshot, hash-recorded rival data, fixed seed and pre-registered spec \
+    hash"""
+artefact = "data/copilot_rivals.json"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "the console's own copilot() produced every ARGUS figure"
+artefact = "data/copilot_rivals.json"

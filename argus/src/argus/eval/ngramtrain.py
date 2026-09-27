@@ -52,8 +52,9 @@ from pathlib import Path
 from typing import Any
 
 from argus.lui.ngram import OUT_OF_SCOPE
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 POOL_PATH = DATA / "oblique_pool.json"
 OOS_PATH = DATA / "oblique_out_of_scope.json"
 MODEL_PATH = DATA / "lui_ngram_model.json"

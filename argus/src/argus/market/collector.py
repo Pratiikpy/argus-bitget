@@ -31,6 +31,7 @@ from typing import Any
 
 from argus.market.bitget import RTOKEN_SYMBOLS, Ticker, fetch_rtokens
 from argus.truth.clocks import DualClock
+from argus.truth.paths import DATA_DIR
 
 
 @dataclass(frozen=True, slots=True)
@@ -138,7 +139,7 @@ def main() -> int:
     """
     clock = DualClock()
     rows = snapshot(clock)
-    out = Path(__file__).resolve().parents[3] / "data" / "rtoken_panel.csv"
+    out = DATA_DIR / "rtoken_panel.csv"
     written = append_csv(rows, out)
     summary = session_summary(rows)
     print(json.dumps(summary, indent=2))

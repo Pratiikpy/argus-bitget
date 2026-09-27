@@ -85,8 +85,9 @@ from typing import Any
 import numpy as np
 
 from argus.truth import artefact
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 STRESS_REPORT = DATA / "research_depth_stress.json"
 STRESS_ROWS = DATA / "research_depth_stress_rows.jsonl"
 FANOUT_REPORT = DATA / "research_depth_fanout.json"
@@ -500,7 +501,7 @@ def stress_row(item: Item) -> dict[str, Any]:
         return {**base, "status": "single pass refused", "reason": single.reason}
     shocked = request.shock_on or research.BENCHMARK
     data = research.load((*book, shocked))
-    is_open = research._is_open()
+    is_open = research.session.anchor_is_open()
     shock = request.shock_pct if request.shock_pct not in (None, 0) else -10.0
     inputs = stress_tree.prepare(data.raw, is_open=is_open, weights=book, shocked=shocked,
                                  shock_pct=float(shock), cash=request.cash)

@@ -403,6 +403,26 @@ class TraderProfile:
     min_confidence: float = 0.0
     """Conviction floor. A cautious trader may want more than the desk's own 0.55."""
 
+    # --- three account-level limits Vibe-Trading's mandate carries and this one did not ---
+    #
+    # Added 2026-09-27 (audit finding 98). Run on the same 19,440 scenarios, Vibe-Trading's
+    # `check_mandate` refused 8.7% of orders this mandate allowed, all on total exposure, gross
+    # leverage or the daily order count (`eval/mandate_comparison.py`). The register had called
+    # those `ConstitutionPolicy`'s job; the Constitution carries a flat desk-wide exposure cap and
+    # no leverage or daily-count limit at all, so for a trader's own limits the excuse did not
+    # hold. The semantics are Vibe-Trading's (`enforcement.py`, vendored in eval/baselines):
+    # exposure is gross after the order, netted by symbol; leverage is that over capital.
+
+    max_gross_exposure: Decimal = Decimal("0")
+    """Ceiling on the book's gross notional after this order, netted within each symbol. Zero
+    means no limit."""
+
+    max_gross_leverage: Decimal = Decimal("0")
+    """Ceiling on gross exposure after this order over capital. Zero means no limit."""
+
+    max_trades_per_day: int = 0
+    """Orders this trader places in one UTC day, this one included. Zero means no limit."""
+
     @classmethod
     def conservative(cls) -> TraderProfile:
         return cls(

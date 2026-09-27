@@ -70,10 +70,11 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "queue_proof.json"
+from argus.truth.paths import DATA_DIR
+
+REPORT_PATH = DATA_DIR / "queue_proof.json"
 
 GRID: tuple[tuple[int, int], ...] = (
     (1, 999), (10, 90), (50, 50), (90, 10), (333, 667), (5, 7), (1, 1), (700, 3), (2, 1998),

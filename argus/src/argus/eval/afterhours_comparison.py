@@ -40,7 +40,6 @@ import json
 import time
 from datetime import UTC, date, datetime
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
 from argus.eval.baselines.lean_market_holidays_loader import load_usa_equity_holidays
@@ -54,6 +53,7 @@ from argus.research.gap_study import (
     _median,
 )
 from argus.truth.clocks import DualClock, SessionPhase
+from argus.truth.paths import DATA_DIR
 
 DAYS = 90
 
@@ -281,7 +281,7 @@ def main() -> int:  # pragma: no cover - CLI
         "scope_statement": SCOPE_STATEMENT,
     }
     print(render(report))
-    out = Path(__file__).resolve().parents[3] / "data" / "afterhours_comparison.json"
+    out = DATA_DIR / "afterhours_comparison.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     print(f"\nwritten to {out}")

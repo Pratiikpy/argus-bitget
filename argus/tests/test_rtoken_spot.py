@@ -13,7 +13,8 @@ from datetime import UTC, date, datetime, timedelta
 import pytest
 
 from argus.desk.rtoken_hedge import HedgeUnavailable, overnight_hedge, render
-from argus.lui.research import ResearchKind, _spot_rtoken, detect
+from argus.lui.research import ResearchKind, detect
+from argus.lui.research.parse import _spot_rtoken
 from argus.market.rtoken_spot import (
     close_utc,
     early_closes,

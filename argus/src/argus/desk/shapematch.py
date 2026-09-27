@@ -78,13 +78,13 @@ import random
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from statistics import fmean, median, pstdev
 from typing import Any
 
 from argus.desk.analogue import mmr_order
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "shape_matches.json"
 
 MIN_ANALOGUES = 3

@@ -76,6 +76,7 @@ from argus.execution.guard import (
     not_reached,
 )
 from argus.risk.circuit import Activation, BookState, assess
+from argus.truth.paths import DATA_DIR
 
 OPERATOR_ENV = "ARGUS_RISK_MODE"
 """The operator's switch. Unset or empty is no demand; a mode name demands that mode; anything else
@@ -410,7 +411,7 @@ class ModeNotifier:
         return cls(last_notified=last, default=default)
 
 
-NOTICE_STATE = Path(__file__).resolve().parents[3] / "data" / "risk_mode_notice.json"
+NOTICE_STATE = DATA_DIR / "risk_mode_notice.json"
 """Where the paper cycle keeps the last mode it announced, so a notice fires once per change across
 cycles rather than once per process. letta-code keeps ``lastNotifiedPermissionMode`` in the
 conversation's reminder state (``src/reminders/engine.ts:349,362``); a cycle that runs every two
@@ -444,9 +445,9 @@ def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI
                         help="show the stack as if the venue rules had failed to load")
     args = parser.parse_args(argv)
     from argus.paper.ledger import PaperLedger
-    from argus.paper.runner import LEDGER_PATH, _book_state
+    from argus.paper.runner import LEDGER_PATH, current_book_state
 
-    book = _book_state(PaperLedger(LEDGER_PATH))
+    book = current_book_state(PaperLedger(LEDGER_PATH))
     stack = stack_for_cycle(
         rules_loaded=not args.rules_unavailable, book=book if isinstance(book, BookState) else None,
     )

@@ -1,4 +1,4 @@
-"""`lui/research.py` — the research questions a Track 3 judge types, answered by the desk's engines.
+"""`lui/research/` — the research questions a Track 3 judge types, answered by the desk's engines.
 
 Deterministic throughout: parsing is pure, and every `run()` test answers from the frozen Bitget
 fixture (`data/risk_layer_candles_fixture.json`, real history) with the live fetch forced to fail,
@@ -13,7 +13,9 @@ from typing import Any, ClassVar
 
 import pytest
 
+from argus.desk.portfolio import decompose, rebalance
 from argus.lui import research
+from argus.lui.answer import Source
 from argus.lui.research import (
     DEFAULT_SIZE,
     RISK_BUDGET,
@@ -33,14 +35,14 @@ def frozen_data(monkeypatch: pytest.MonkeyPatch) -> None:
     def _fail(*args: Any, **kwargs: Any) -> Any:
         raise RuntimeError("live fetch disabled in tests")
 
-    monkeypatch.setattr(research, "_fetch_live", _fail)
+    monkeypatch.setattr(research.data, "_fetch_live", _fail)
     monkeypatch.setattr(history, "fetch", _fail)
     # The contract registry answers from its frozen snapshot, so which names resolve cannot
     # change with the venue's listings between runs.
     monkeypatch.setattr(universe, "_fetch_live", _fail)
     monkeypatch.setattr(universe, "_CACHE", None)
     # SEC filings are a live source too; tests that need an earnings surprise supply one.
-    monkeypatch.setattr(research, "_earnings_surprise", lambda ticker: None)
+    monkeypatch.setattr(research.fundamentals, "_earnings_surprise", lambda ticker: None)
     # Three more live sources the answers reach, found by running this file with the network
     # blocked (2026-09-27). The exposures engine runs beside every add question on its own thread,
     # so a Yahoo read from one test was still in flight during the next one.
@@ -49,13 +51,14 @@ def frozen_data(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(exposures, "_yahoo_daily", _fail)
     monkeypatch.setattr(exposures, "_bitget_daily", _fail)
     # Yahoo's consensus and key statistics, read beside the MCP facts in fundamentals answers.
-    monkeypatch.setattr(research, "_yahoo_summary", _fail)
+    monkeypatch.setattr(research.fundamentals, "yahoo_summary", _fail)
     # bitget-mcp-server: no session is opened; TestFundamentals installs its own fake service.
     monkeypatch.setattr(bitget_mcp, "BitgetDataService", _NoService)
     monkeypatch.setattr(bitget_mcp, "_SHARED", None)
     monkeypatch.setattr(bitget_mcp, "_SHARED_FACTORY", None)
     # bitget-signal: the Skill is not asked, so each answer takes its documented mirror path.
-    monkeypatch.setattr(research, "skill_route", _mirror_only)
+    for _module in (research.macro, research.news, research.sentiment):
+        monkeypatch.setattr(_module, "skill_route", _mirror_only)
     # ...and the breaker that marks it down starts empty and is not carried to the next file.
     from argus.lui import skillroute
 
@@ -188,15 +191,15 @@ class TestRunAnswersFromTheEngines:
         req = detect("I hold 50% NVDA and 50% AAPL. What happens if I add 20% TSLA?")
         assert req is not None
         data = research.load(req.symbols)
-        columns = research._open_columns(data.raw, research._is_open())
+        columns = research.riskmath._open_columns(data.raw, research.session.anchor_is_open())
         ceiling = research.max_size_within_budget(add="TSLAUSDT", before=req.book,
                                                   columns=columns)
         assert ceiling is not None
-        at = research.decompose(research.rebalance(req.book, "TSLAUSDT", ceiling), columns)
+        at = decompose(rebalance(req.book, "TSLAUSDT", ceiling), columns)
         assert at is not None and (at.share_of_risk("TSLAUSDT") or 0) <= RISK_BUDGET
         if ceiling < 1.0:
-            above = research.decompose(
-                research.rebalance(req.book, "TSLAUSDT", ceiling + 0.01), columns
+            above = research.book.decompose(
+                research.riskmath.rebalance(req.book, "TSLAUSDT", ceiling + 0.01), columns
             )
             assert above is not None and (above.share_of_risk("TSLAUSDT") or 0) > RISK_BUDGET
 
@@ -366,7 +369,7 @@ def _skills(rsi: float, hist: float) -> Any:
 class TestTechnicals:
     def test_the_figures_are_the_skills_and_named_as_such(
             self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.setattr(research, "_skill_calls", _skills(rsi=75.0, hist=0.5))
+        monkeypatch.setattr(research.technicals, "_skill_calls", _skills(rsi=75.0, hist=0.5))
         answer = run("q", ResearchRequest(kind=ResearchKind.TECHNICALS, symbols=("NVDAUSDT",)))
         assert answer.lines[0].startswith("Bottom line:") and "overbought" in answer.lines[0]
         assert "within 1% of resistance" in answer.lines[0]
@@ -374,8 +377,8 @@ class TestTechnicals:
         assert "bitget-signal" in answer.lines[-1] and "24h ticker" not in answer.lines[-1]
 
     def test_a_neutral_tape_says_neutral(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.setattr(research, "_skill_calls", _skills(rsi=50.0, hist=0.0))
-        lines, _ = research._technicals("NVDAUSDT")
+        monkeypatch.setattr(research.technicals, "_skill_calls", _skills(rsi=50.0, hist=0.0))
+        lines, _ = research.technicals._technicals("NVDAUSDT")
         assert "overbought" not in lines[0] and "oversold" not in lines[0]
 
 
@@ -411,31 +414,31 @@ class TestFundamentals:
     def test_a_stale_consensus_is_withheld_not_quoted(
             self, monkeypatch: pytest.MonkeyPatch) -> None:
         _service(monkeypatch, report=_days_from_today(30), scraped="2018-10-25", holders=3)
-        lines, _ = research._fundamentals("MSFTUSDT")
+        lines, _ = research.fundamentals._fundamentals("MSFTUSDT")
         text = " ".join(lines)
         assert "withheld" in text and "4.2" not in text
 
     def test_a_fresh_consensus_is_quoted(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _service(monkeypatch, report=_days_from_today(30), scraped=_days_from_today(-10),
                  holders=3)
-        lines, _ = research._fundamentals("MSFTUSDT")
+        lines, _ = research.fundamentals._fundamentals("MSFTUSDT")
         assert any("4.2" in line and "30 analysts" in line for line in lines)
 
     def test_a_near_report_leads_the_answer(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _service(monkeypatch, report=_days_from_today(3), scraped="2018-10-25", holders=3)
-        lines, _ = research._fundamentals("NVDAUSDT")
+        lines, _ = research.fundamentals._fundamentals("NVDAUSDT")
         assert lines[0].startswith("Bottom line: NVDA reports in 3 day(s)")
 
     def test_a_past_report_gives_an_estimate_labelled_as_one(
             self, monkeypatch: pytest.MonkeyPatch) -> None:
         _service(monkeypatch, report=_days_from_today(-40), scraped="2018-10-25", holders=3)
-        lines, _ = research._fundamentals("NVDAUSDT")
+        lines, _ = research.fundamentals._fundamentals("NVDAUSDT")
         assert lines[0].startswith("Bottom line:") and "an estimate, not a date" in lines[0]
 
     def test_one_13f_record_is_not_dressed_up_as_a_table(
             self, monkeypatch: pytest.MonkeyPatch) -> None:
         _service(monkeypatch, report=_days_from_today(30), scraped="2018-10-25", holders=1)
-        lines, _ = research._fundamentals("MSFTUSDT")
+        lines, _ = research.fundamentals._fundamentals("MSFTUSDT")
         line = next(x for x in lines if x.startswith("Institutional"))
         assert "one 13F record" in line and "not a full ownership table" in line
 
@@ -453,7 +456,7 @@ class TestAnalogues:
         assert "frozen" in answer.lines[-1]
 
     def test_a_thin_sample_is_called_thin(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.setattr(research, "MIN_INDEPENDENT_EPISODES", 10**6)
+        monkeypatch.setattr(research.analogue, "MIN_INDEPENDENT_EPISODES", 10**6)
         answer = run("q", ResearchRequest(kind=ResearchKind.ANALOGUE, symbols=("COINUSDT",)))
         assert answer.lines[0].startswith("Bottom line: treat this as thin")
         assert not any(line.startswith("Spread of outcomes") for line in answer.lines)
@@ -472,7 +475,7 @@ class TestAnalogues:
                                high=Decimal(101), low=Decimal(99), close=Decimal(100 + i % 3),
                                volume=Decimal(1)) for i in range(300)]
         monkeypatch.setattr(history, "fetch", lambda *a, **k: bars)
-        return research._analogue_data("COINUSDT")
+        return research.analogue._analogue_data("COINUSDT")
 
     def test_live_bars_extend_backwards_with_contiguous_closed_bars(
             self, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -527,19 +530,19 @@ class TestEveryBitgetContract:
         assert any("memecoin" in n for n in req.notes)
 
     def test_a_commodity_has_no_earnings_and_says_so(self) -> None:
-        lines, _ = research._fundamentals("CLUSDT")
+        lines, _ = research.fundamentals._fundamentals("CLUSDT")
         assert lines[0].startswith("Bottom line: CL is a commodity")
 
     def test_crypto_has_no_filings_and_says_so(self) -> None:
-        lines, _ = research._fundamentals("BTCUSDT")
+        lines, _ = research.fundamentals._fundamentals("BTCUSDT")
         assert "crypto contract" in lines[0]
 
     def test_the_session_line_fits_what_the_contract_tracks(self) -> None:
-        assert "US anchor" in research._session_line("NVDAUSDT", anchor_open=False,
+        assert "US anchor" in research.quote._session_line("NVDAUSDT", anchor_open=False,
                                                      us_listed=True)
-        assert "around the clock" in research._session_line("BTCUSDT", anchor_open=False,
+        assert "around the clock" in research.quote._session_line("BTCUSDT", anchor_open=False,
                                                             us_listed=False)
-        gold = research._session_line("XAUUSDT", anchor_open=False, us_listed=True)
+        gold = research.quote._session_line("XAUUSDT", anchor_open=False, us_listed=True)
         assert "US anchor" not in gold and "own trading hours" in gold
 
     def test_a_ticker_collision_is_not_reported_as_a_premium(
@@ -551,10 +554,10 @@ class TestEveryBitgetContract:
         monkeypatch.setattr(bitget_mcp, "BitgetDataService", Colgate)
         # While the market is shut the regular close comes from Yahoo's daily bar; the same
         # collision reaches it, so it is stubbed with the same wrong company's price.
-        monkeypatch.setattr(research, "_shut_close", lambda symbol: 80.0)
+        monkeypatch.setattr(research.anchor, "_shut_close", lambda symbol: 80.0)
         from decimal import Decimal
-        assert research._premium_line("CLUSDT", Decimal("91.08"), False) is None
-        assert research._premium_line("PLTRUSDT", Decimal("186.9"), False) is None
+        assert research.anchor._premium_line("CLUSDT", Decimal("91.08"), False) is None
+        assert research.anchor._premium_line("PLTRUSDT", Decimal("186.9"), False) is None
 
 
 class TestTheSkillsMacdIsCheckedNotTrusted:
@@ -584,11 +587,11 @@ class TestTheSkillsMacdIsCheckedNotTrusted:
         def skill_calls(calls: Any, timeout: int = 10) -> list[tuple[Any, str]]:
             return [({"rsi": 65.0, "period": 14, "timeframe": "4h"} if a["action"] == "rsi"
                      else self.BTC if a["action"] == "macd" else {}, "ok") for _, a in calls]
-        monkeypatch.setattr(research, "_skill_calls", skill_calls)
+        monkeypatch.setattr(research.technicals, "_skill_calls", skill_calls)
         monkeypatch.setattr(skills, "indicators", lambda s: {
             "dif": 1568.0, "dea": 1715.0, "histogram": -147.0, "cross": "", "atr": 900.0,
             "close": 85000.0, "bars": 300.0, "since": "2026-08-04"})
-        lines, _ = research._technicals("BTCUSDT")
+        lines, _ = research.technicals._technicals("BTCUSDT")
         assert "momentum turning down" in lines[0]
         assert not any("golden cross" in line for line in lines)
         assert any(line.startswith("Corrected:") for line in lines)
@@ -606,7 +609,7 @@ class TestComputedTechnicals:
     def test_a_steady_uptrend_reads_overbought_and_rising(
             self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(history, "fetch", lambda *a, **k: self._bars(200))
-        lines, sources = research._technicals_computed("SP500USDT")
+        lines, sources = research.quote._technicals_computed("SP500USDT")
         assert lines[0].startswith("Bottom line: RSI is overbought")
         assert sources[0].kind == "computation"
         assert not any(line.startswith("Short history") for line in lines)
@@ -614,12 +617,12 @@ class TestComputedTechnicals:
     def test_a_young_listing_is_read_with_its_history_stated(
             self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(history, "fetch", lambda *a, **k: self._bars(49))
-        lines, _ = research._technicals_computed("CVXSTOCKUSDT")
+        lines, _ = research.quote._technicals_computed("CVXSTOCKUSDT")
         assert any(line.startswith("Short history: CVX has 49") for line in lines)
 
     def test_too_little_history_is_not_computed(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(history, "fetch", lambda *a, **k: self._bars(20))
-        assert research._technicals_computed("CVXSTOCKUSDT") == ([], [])
+        assert research.quote._technicals_computed("CVXSTOCKUSDT") == ([], [])
 
 
 class TestTheDeskReadsACorrectedMacd:
@@ -651,17 +654,17 @@ class TestTheEarningsSurpriseIsShownWhenFiled:
             self, monkeypatch: pytest.MonkeyPatch) -> None:
         _service(monkeypatch, report=_days_from_today(30), scraped="2018-10-25", holders=3)
         line = ("Earnings surprise: the quarter ending 2026-07-26 was a large beat — SUE +2.84")
-        monkeypatch.setattr(research, "_earnings_surprise", lambda ticker: (
-            line, research.Source(kind="computation", ref="argus.market.sue via SEC XBRL")))
-        lines, sources = research._fundamentals("NVDAUSDT")
+        monkeypatch.setattr(research.fundamentals, "_earnings_surprise", lambda ticker: (
+            line, Source(kind="computation", ref="argus.market.sue via SEC XBRL")))
+        lines, sources = research.fundamentals._fundamentals("NVDAUSDT")
         assert line in lines
         assert any(s.ref == "argus.market.sue via SEC XBRL" for s in sources)
 
     def test_a_commodity_never_asks_the_sec(self, monkeypatch: pytest.MonkeyPatch) -> None:
         def boom(ticker: str) -> None:
             raise AssertionError("SEC queried for a commodity")
-        monkeypatch.setattr(research, "_earnings_surprise", boom)
-        lines, _ = research._fundamentals("CLUSDT")
+        monkeypatch.setattr(research.fundamentals, "_earnings_surprise", boom)
+        lines, _ = research.fundamentals._fundamentals("CLUSDT")
         assert "commodity" in lines[0]
 
 
@@ -685,7 +688,7 @@ class TestASingleNamesProfile:
     def test_moments_match_the_adjusted_estimators(self) -> None:
         """Checked against scipy.stats.skew/kurtosis(bias=False) on live MSTR returns
         (2026-09-23): identical to 15 significant figures."""
-        got = research._moments([0.0, 0.0, 0.0, 1.0, -1.0, 3.0])
+        got = research.riskmath._moments([0.0, 0.0, 0.0, 1.0, -1.0, 3.0])
         assert got is not None
         assert got[0] == pytest.approx(1.3745866, abs=1e-6)
         assert got[1] == pytest.approx(2.3545706, abs=1e-6)
@@ -750,7 +753,7 @@ class TestAnalystPriceTargets:
 
     def test_only_each_firms_latest_view_inside_the_window_counts(self) -> None:
         from datetime import date
-        line = research._price_target_line("NVDA", self.ROWS, {"last_price": 250.0},
+        line = research.fundamentals._price_target_line("NVDA", self.ROWS, {"last_price": 250.0},
                                            date(2026, 9, 23))
         assert line is not None
         assert "3 firms" in line and "median 300" in line and "range 200 to 390" in line
@@ -759,7 +762,8 @@ class TestAnalystPriceTargets:
 
     def test_nothing_recent_is_nothing_said(self) -> None:
         from datetime import date
-        assert research._price_target_line("NVDA", self.ROWS[-1:], {}, date(2026, 9, 23)) is None
+        assert research.fundamentals._price_target_line(
+            "NVDA", self.ROWS[-1:], {}, date(2026, 9, 23)) is None
 
 
 class TestTheBookAsHeld:
@@ -797,19 +801,19 @@ class TestTheBookAsHeld:
 
     def test_equal_risk_weights_equalise_risk(self) -> None:
         data = research.load(("NVDAUSDT", "MSFTUSDT", "AAPLUSDT"))
-        columns = research._open_columns(data.raw, research._is_open())
-        weights = research._equal_risk_weights(("NVDAUSDT", "MSFTUSDT", "AAPLUSDT"), columns)
+        columns = research.riskmath._open_columns(data.raw, research.session.anchor_is_open())
+        weights = research.book._equal_risk_weights(("NVDAUSDT", "MSFTUSDT", "AAPLUSDT"), columns)
         assert weights is not None and sum(weights.values()) == pytest.approx(1.0)
-        risk = research.decompose(weights, columns)
+        risk = research.book.decompose(weights, columns)
         assert risk is not None
         for c in risk.contributions:
             assert c.contribution / risk.volatility == pytest.approx(1 / 3, abs=0.01)
 
     def test_units_and_cash_are_valued_not_counted(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.setattr(research, "_last_price", lambda s: 80_000.0 if s == "BTCUSDT"
+        monkeypatch.setattr(research.parse, "_last_price", lambda s: 80_000.0 if s == "BTCUSDT"
                             else None)
         notes: list[str] = []
-        book, cash = research._value_holdings(
+        book, cash = research.parse._value_holdings(
             {"holdings_usd": {"TSLA": 5000}, "holdings_units": {"BTC": 2}, "cash_usd": 10000},
             notes)
         total = 5000 + 160_000 + 10_000
@@ -819,9 +823,9 @@ class TestTheBookAsHeld:
         assert any("2 BTC valued at $160,000" in n for n in notes)
 
     def test_a_qqq_hedge_that_explains_little_says_so(self) -> None:
-        line = research._hedge_line(0.95, 0.16)
+        line = research.book._hedge_line(0.95, 0.16)
         assert line is not None and "would remove little" in line
-        assert "neutralises" in (research._hedge_line(1.1, 0.56) or "")
+        assert "neutralises" in (research.book._hedge_line(1.1, 0.56) or "")
 
 
 def _ticker(symbol: str, last: str = "100", change: str = "0.01", funding: str = "0.0001") -> Any:
@@ -897,7 +901,7 @@ class TestLeverageArithmetic:
         from argus.market import bitget
         monkeypatch.setattr(bitget, "fetch_tickers", lambda: {"DOGEUSDT": _ticker("DOGEUSDT")})
         monkeypatch.setattr(bitget, "maintenance_margin_rate", lambda symbol, notional: None)
-        lines, _, payload = research._leverage("DOGEUSDT", 20.0, "short")
+        lines, _, payload = research.venue._leverage("DOGEUSDT", 20.0, "short")
         assert payload["liquidation_distance"] == pytest.approx(0.05)
         assert payload["worst_adverse_24h"] == pytest.approx(0.10)
         assert payload["survivable_leverage"] == 10
@@ -906,7 +910,7 @@ class TestLeverageArithmetic:
         # With Bitget's maintenance margin the line moves closer and the survivor count falls:
         # 1/20 - 1% is 4%, and only 1/(10% + 1%) = 9x clears the 10% worst day.
         monkeypatch.setattr(bitget, "maintenance_margin_rate", lambda symbol, notional: 0.01)
-        lines, _, payload = research._leverage("DOGEUSDT", 20.0, "short")
+        lines, _, payload = research.venue._leverage("DOGEUSDT", 20.0, "short")
         assert payload["liquidation_distance"] == pytest.approx(0.04)
         assert payload["survivable_leverage"] == 9
         assert any("1.00% maintenance margin" in line for line in lines)
@@ -914,12 +918,12 @@ class TestLeverageArithmetic:
 
 class TestFundingMeaning:
     def test_a_positive_rate_is_longs_paying_shorts_on_the_contracts_own_interval(self) -> None:
-        line = research._funding_meaning("XAUUSDT", 0.01)
+        line = research.venue._funding_meaning("XAUUSDT", 0.01)
         assert line is not None and "longs pay shorts every 4h" in line
         assert "0.060% of the position a day" in line
 
     def test_a_flat_rate_is_flat(self) -> None:
-        assert "flat" in (research._funding_meaning("BTCUSDT", 0.0) or "")
+        assert "flat" in (research.venue._funding_meaning("BTCUSDT", 0.0) or "")
 
 
 class TestExecutionReadsTheBook:
@@ -937,14 +941,14 @@ class TestExecutionReadsTheBook:
         monkeypatch.setattr(depth, "fetch_orderbook", lambda *a, **k: book)
         plan = plan_execution(symbol="PLTRUSDT", notional=Decimal("2000000"),
                               adv_notional=Decimal("6000000"))
-        lines = research._depth_lines("PLTRUSDT", Decimal("2000000"), Decimal("6000000"), plan,
-                                      "sell $2m of PLTR")
+        lines = research.execution._depth_lines(
+            "PLTRUSDT", Decimal("2000000"), Decimal("6000000"), plan, "sell $2m of PLTR")
         assert lines[0].startswith("Bottom line: in one market order this costs at least")
         assert any("sell side" in line for line in lines)
         assert any("larger than the visible book" in line for line in lines)
         assert any(line.startswith("Schedule:") and "days" in line for line in lines)
         measured: dict[str, float] = {}
-        research._depth_lines("PLTRUSDT", Decimal("2000000"), Decimal("6000000"), plan,
+        research.execution._depth_lines("PLTRUSDT", Decimal("2000000"), Decimal("6000000"), plan,
                               "sell $2m of PLTR", measured=measured)
         assert measured == {}  # a floor is not a cost, so nothing is handed to the verdict
 
@@ -963,8 +967,9 @@ class TestExecutionReadsTheBook:
         plan = plan_execution(symbol="TSLAUSDT", notional=Decimal("15000"),
                               adv_notional=Decimal("1500000"), anchor_asleep=True)
         measured: dict[str, float] = {}
-        lines = research._depth_lines("TSLAUSDT", Decimal("15000"), Decimal("1500000"), plan,
-                                      "buy $15k of TSLA", measured=measured)
+        lines = research.execution._depth_lines(
+            "TSLAUSDT", Decimal("15000"), Decimal("1500000"), plan, "buy $15k of TSLA",
+            measured=measured)
         whole = book.sweep(Decimal("15000"), direction="BUY")
         fee = float(plan.slices[0].expected_cost_bps)
         assert measured["single_order_bps"] == pytest.approx(fee + float(whole.slippage_bps))
@@ -978,13 +983,13 @@ class TestExecutionReadsTheBook:
 class TestMacroAndSentiment:
     def test_macro_reads_fred_and_states_the_curve(self, monkeypatch: pytest.MonkeyPatch) -> None:
         values = {"DGS10": 4.9, "DGS2": 4.7, "DFF": 3.9, "T10YIE": 2.3, "DTWEXBGS": 119.0}
-        monkeypatch.setattr(research, "_fred", lambda sid, days=45: [
+        monkeypatch.setattr(research.macro, "_fred", lambda sid, days=45: [
             ("2026-08-10", values[sid] - 0.1), ("2026-09-22", values[sid])])
-        monkeypatch.setattr(research, "_rate_sensitivity", lambda s: {
+        monkeypatch.setattr(research.macro, "_rate_sensitivity", lambda s: {
             "days": 60, "corr_10y": -0.4, "pct_per_10bp": -1.1, "corr_dollar": -0.3})
         from argus.market import evidence
         monkeypatch.setattr(evidence.RssSource, "headlines", lambda self, k, u: [])
-        lines, _, readings = research._macro(None)
+        lines, _, readings = research.macro._macro(None)
         joined = " ".join(lines)
         assert lines[0].startswith("Bottom line: the 10-year is 4.90%")
         assert "rates have been driving it" in lines[0]
@@ -1002,7 +1007,7 @@ class TestMacroAndSentiment:
         from argus.market import bitget
         monkeypatch.setattr(bitget, "fetch_tickers", lambda: {
             "BTCUSDT": _ticker("BTCUSDT", funding="0.0005")})
-        lines, _, payload = research._sentiment()
+        lines, _, payload = research.sentiment._sentiment()
         assert payload["index"] == 74 and "greed" in lines[0]
         assert any("crowded long" in line for line in lines)
 
@@ -1038,7 +1043,7 @@ class TestSecondRoundOfJudgeQuestions:
 
     def test_a_price_forecast_is_not_a_research_request(self) -> None:
         assert detect("yo where will tsla be by friday closing lol give me a number") is None
-        assert research._PRICE_FORECAST.search("Forecast BTC price for next week")
+        assert research.parse.PRICE_FORECAST.search("Forecast BTC price for next week")
 
     def test_a_conservative_book_is_the_defensive_theme(self) -> None:
         req = detect("I'm a conservative investor with $20k. Build me a portfolio")
@@ -1048,11 +1053,13 @@ class TestSecondRoundOfJudgeQuestions:
         lines = ["Bottom line: NVDA's next report date is not published yet.",
                  "Institutional holders: the source returned one 13F record.",
                  "Analyst price targets, last 90 days (21 firms): median 330."]
-        led = research._lead_with_what_was_asked(lines, "what are analysts' price targets")
+        led = research.fundamentals._lead_with_what_was_asked(
+            lines, "what are analysts' price targets")
         assert led[0].startswith("Bottom line: analyst price targets")
-        led = research._lead_with_what_was_asked(lines, "which 13F funds own NVDA")
+        led = research.fundamentals._lead_with_what_was_asked(lines, "which 13F funds own NVDA")
         assert led[0].startswith("Bottom line: institutional holders")
-        assert research._lead_with_what_was_asked(lines, "when does NVDA report") == lines
+        assert research.fundamentals._lead_with_what_was_asked(
+            lines, "when does NVDA report") == lines
 
     def test_fred_falls_back_to_the_dated_snapshot(self, monkeypatch: pytest.MonkeyPatch,
                                                    tmp_path: Any) -> None:
@@ -1064,12 +1071,12 @@ class TestSecondRoundOfJudgeQuestions:
         snap.write_text(_json.dumps({"generated_at": "2026-09-24T00:00:00+00:00",
                                      "series": {"DGS10": [["2026-09-22", 4.96]]}}),
                         encoding="utf-8")
-        monkeypatch.setattr(research, "_fred_live", unreachable)
-        monkeypatch.setattr(research, "FRED_SNAPSHOT", snap)
-        rows = research._fred("DGS10", days=10_000)
+        monkeypatch.setattr(research.macro, "_fred_live", unreachable)
+        monkeypatch.setattr(research.macro, "FRED_SNAPSHOT", snap)
+        rows = research.macro._fred("DGS10", days=10_000)
         assert rows == [("2026-09-22", 4.96)]
-        assert research._FRED_USED_SNAPSHOT["DGS10"] == "2026-09-24"
-        research._FRED_USED_SNAPSHOT.clear()
+        assert research.macro._FRED_USED_SNAPSHOT["DGS10"] == "2026-09-24"
+        research.macro._FRED_USED_SNAPSHOT.clear()
 
     def test_the_track_record_pattern_cannot_be_relabelled(self) -> None:
         from datetime import UTC, datetime
@@ -1106,13 +1113,13 @@ class TestFredBacksOff:
                                      "series": {"DGS10": [["2026-09-22", 4.96]],
                                                 "DGS2": [["2026-09-22", 4.71]]}}),
                         encoding="utf-8")
-        monkeypatch.setattr(research, "_fred_live", slow_failure)
-        monkeypatch.setattr(research, "FRED_SNAPSHOT", snap)
-        monkeypatch.setattr(research, "_FRED_DOWN_UNTIL", 0.0)
-        research._fred("DGS10", days=10_000)
-        research._fred("DGS2", days=10_000)
+        monkeypatch.setattr(research.macro, "_fred_live", slow_failure)
+        monkeypatch.setattr(research.macro, "FRED_SNAPSHOT", snap)
+        monkeypatch.setattr(research.macro, "_FRED_DOWN_UNTIL", 0.0)
+        research.macro._fred("DGS10", days=10_000)
+        research.macro._fred("DGS2", days=10_000)
         assert calls == ["DGS10"]
-        research._FRED_USED_SNAPSHOT.clear()
+        research.macro._FRED_USED_SNAPSHOT.clear()
 
 
 class TestTheLongRunAnalogue:
@@ -1140,7 +1147,7 @@ class TestTheLongRunAnalogue:
         rng = random.Random(7)
         monkeypatch.setattr(exposures, "closes_for",
                             self._closes(lambda i: rng.gauss(0.0005, 0.02)))
-        lines, sources, data = research._long_run("NVDAUSDT")
+        lines, sources, data = research.analogue._long_run("NVDAUSDT")
         assert lines[0].startswith("Over 5 years of daily closes: NVDA is ")
         assert [r["days"] for r in data["horizons"]] == [1, 5, 20]
         assert "does not measurably change the odds" in lines[-1]
@@ -1154,8 +1161,8 @@ class TestTheLongRunAnalogue:
         # stretch, and every past state like it was followed by a rise.
         monkeypatch.setattr(exposures, "closes_for",
                             self._closes(lambda i: -0.01 if (i // 20) % 2 == 0 else 0.011))
-        lines, _, _ = research._long_run("NVDAUSDT")
+        lines, _, _ = research.analogue._long_run("NVDAUSDT")
         assert "changes the odds at" in lines[-1]
 
     def test_no_daily_history_adds_nothing(self) -> None:
-        assert research._long_run("NVDAUSDT") == ([], [], {})
+        assert research.analogue._long_run("NVDAUSDT") == ([], [], {})

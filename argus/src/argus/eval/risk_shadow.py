@@ -2,7 +2,7 @@
 
 A risk-layer change is the one kind of edit whose mistakes are invisible until they cost money: a
 guard that is quietly looser still lets every test order through, because the tests were written
-for the orders it already allowed. Standing Rule #2 — never guess — therefore needs a concrete form
+for the orders it already allowed. the rule never to guess therefore needs a concrete form
 for risk code, and this is it. Before a change to `execution/guard.py` or `risk/circuit.py` is
 allowed to reach the live cycle, the **old and the new logic rule on the same order stream, side by
 side**, and every ruling that would change is listed, with both rulings.

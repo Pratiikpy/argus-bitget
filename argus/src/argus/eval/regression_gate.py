@@ -98,8 +98,9 @@ from argus.desk.rule_proposer import (
 )
 from argus.eval.reviewoos import SPLIT, split_records
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "rule_proposals.json"
 JOURNAL_REPORT_PATH = DATA / "rule_proposals_journal.json"
 NOTES_PATH = DATA / "desk_notes.jsonl"

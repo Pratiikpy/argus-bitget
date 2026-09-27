@@ -90,6 +90,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from argus.desk.allocation import TAKER_BPS, Trade
+from argus.truth.paths import DATA_DIR
 
 MOMENTUM_HORIZONS: tuple[tuple[int, int], ...] = ((12, 1), (4, 3), (2, 6), (1, 12))
 """(horizon_weight, lag_months) pairs, exactly pytaa's real `Signal.momentum_score`
@@ -609,7 +610,6 @@ def main() -> int:  # pragma: no cover - CLI
     import argparse
     import json
     import sys
-    from pathlib import Path
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -657,7 +657,7 @@ def main() -> int:  # pragma: no cover - CLI
     for trade in plan.trades:
         print(f"  {trade.symbol:12} {trade.weight_before:7.2%} -> {trade.weight_after:7.2%}")
     print(f"\n  {plan.verdict}")
-    out = Path(__file__).resolve().parents[3] / "data" / "rotation.json"
+    out = DATA_DIR / "rotation.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(plan.as_dict(), indent=2), encoding="utf-8")
     print(f"\nwritten to {out}")

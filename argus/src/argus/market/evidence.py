@@ -95,7 +95,7 @@ from argus.truth.evidence import Evidence
 # publishing anyone's address. Set ARGUS_CONTACT_EMAIL in a deployment to be a better citizen.
 # `tests/test_evidence.py` pins the shape so a future edit cannot quietly remove the token again.
 _FALLBACK_CONTACT = "contact@argus.invalid"
-_UA = (
+FEED_USER_AGENT = (
     f"ARGUS research {os.environ.get('ARGUS_CONTACT_EMAIL', '')}".strip()
     if os.environ.get("ARGUS_CONTACT_EMAIL")
     else f"ARGUS research desk ({_FALLBACK_CONTACT})"
@@ -319,7 +319,7 @@ class EdgarSource:
     TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
     SUBMISSIONS_URL = "https://data.sec.gov/submissions/CIK{cik:010d}.json"
 
-    def __init__(self, *, user_agent: str = _UA) -> None:
+    def __init__(self, *, user_agent: str = FEED_USER_AGENT) -> None:
         self._ua = user_agent
         self._ciks: dict[str, int] | None = None
 
@@ -438,7 +438,7 @@ class RssSource:
     """
 
     def __init__(
-        self, feeds: dict[str, tuple[str, str]] | None = None, *, user_agent: str = _UA
+        self, feeds: dict[str, tuple[str, str]] | None = None, *, user_agent: str = FEED_USER_AGENT
     ) -> None:
         self._feeds = feeds if feeds is not None else RSS_FEEDS
         self._ua = user_agent

@@ -67,8 +67,9 @@ from pathlib import Path
 from typing import Any
 
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 INPUTS_PATH = DATA / "lui_rematch_inputs.json"
 
 SEED = 20260925

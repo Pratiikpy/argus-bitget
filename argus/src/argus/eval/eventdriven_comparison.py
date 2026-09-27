@@ -63,12 +63,12 @@ from __future__ import annotations
 import json
 import random
 import time
-from pathlib import Path
 from typing import Any
 
 from argus.eval.baselines.whale_signals_event_study_loader import load_event_study_module
 from argus.market.history import CandleType, fetch_range
 from argus.research.eventstudy import EventStudyError, build_window, returns_from, study
+from argus.truth.paths import DATA_DIR
 
 ESTIMATION_BARS_NEEDED = 605
 """DEFAULT_ESTIMATION_BARS (480) + DEFAULT_GAP_BARS (24) + a small margin, so every sampled
@@ -435,7 +435,7 @@ def main() -> int:  # pragma: no cover - CLI
         "scope_statement": SCOPE_STATEMENT,
     }
     print(render(report))
-    out = Path(__file__).resolve().parents[3] / "data" / "eventdriven_comparison.json"
+    out = DATA_DIR / "eventdriven_comparison.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     print(f"\nwritten to {out}")

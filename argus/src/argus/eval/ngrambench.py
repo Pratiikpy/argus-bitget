@@ -47,8 +47,9 @@ from typing import Any
 
 from argus.lui.ngram import MODEL_PATH, NgramClassifier, available
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 POOL_PATH = DATA / "oblique_pool.json"
 VALIDATION_PATH = DATA / "oblique_validation.json"
 FINAL_PATH = DATA / "oblique_final.json"

@@ -24,12 +24,12 @@ from __future__ import annotations
 import argparse
 import os
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "memory_eval.json"
+REPORT_PATH = DATA_DIR / "memory_eval.json"
 
 STATEMENTS: tuple[tuple[str, str], ...] = (
     ("I can't lose more than 10% of my account", "max_loss"),

@@ -38,12 +38,12 @@ import json
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from decimal import Decimal
-from pathlib import Path
 
 from argus.cost.model import CostModel
 from argus.market.bitget import RTOKEN_SYMBOLS
 from argus.market.history import BasisPoint, fetch_basis
 from argus.truth.clocks import DualClock, SessionPhase
+from argus.truth.paths import DATA_DIR
 
 ROUND_TRIP_BPS = CostModel.bitget_perp().round_trip_bps()
 
@@ -266,7 +266,7 @@ def study(
 
 def main() -> int:
     result = study()
-    out = Path(__file__).resolve().parents[3] / "data" / "gap_study.json"
+    out = DATA_DIR / "gap_study.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(json.dumps(result, indent=2))

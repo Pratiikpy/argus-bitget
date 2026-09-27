@@ -11,7 +11,8 @@ import pytest
 from argus.eval.figurecheck import stated
 from argus.lui import research
 from argus.lui.kindmodel import LocalPlanner, kind_model
-from argus.lui.research import ResearchKind, _pairs, detect
+from argus.lui.research import ResearchKind, detect
+from argus.lui.research.parse import holding_pairs
 from argus.market import history, universe
 
 
@@ -20,7 +21,7 @@ def frozen(monkeypatch: pytest.MonkeyPatch) -> None:
     def _fail(*args: Any, **kwargs: Any) -> Any:
         raise RuntimeError("live fetch disabled in tests")
 
-    monkeypatch.setattr(research, "_fetch_live", _fail)
+    monkeypatch.setattr(research.data, "_fetch_live", _fail)
     monkeypatch.setattr(history, "fetch", _fail)
     monkeypatch.setattr(universe, "_fetch_live", _fail)
     monkeypatch.setattr(universe, "_CACHE", None)
@@ -33,9 +34,9 @@ def test_the_checker_reads_amounts_before_chinese_text() -> None:
 
 
 def test_a_word_between_a_ticker_and_its_weight_is_allowed() -> None:
-    assert [(s, w) for _, s, w in _pairs("holding spy etf 30% of book, adding qqq")] == [
+    assert [(s, w) for _, s, w in holding_pairs("holding spy etf 30% of book, adding qqq")] == [
         ("SPYUSDT", 0.30)]
-    assert [(s, w) for _, s, w in _pairs("NVDA stock 20%, BTC position 25%")] == [
+    assert [(s, w) for _, s, w in holding_pairs("NVDA stock 20%, BTC position 25%")] == [
         ("NVDAUSDT", 0.20), ("BTCUSDT", 0.25)]
 
 
@@ -98,10 +99,10 @@ def test_value_at_risk_is_read_from_daily_history(monkeypatch: pytest.MonkeyPatc
         level *= 0.95 if i % 20 == 19 else 1.001
         closes.append(Bar(i, level))
     monkeypatch.setattr(history, "fetch_window", lambda *a, **k: closes)
-    lines, sources = research._var_lines({}, {"NVDAUSDT": 1.0}, "VaR at 95%")
+    lines, sources = research.riskmath._var_lines({}, {"NVDAUSDT": 1.0}, "VaR at 95%")
     assert lines[0].startswith("Value at risk, 95%, one day: the book at these weights lost "
                                "more than 5.00% on 5% of its 199 past days")
-    assert sources[0].ref == "argus.lui.research._var_lines"
+    assert sources[0].ref == "argus.lui.research.riskmath._var_lines"
 
 
 @pytest.mark.parametrize(("text", "size", "stated_note"), [
@@ -128,7 +129,7 @@ def test_the_multiple_is_applied_once_through_the_kind_model() -> None:
 
 
 def test_a_group_weight_is_split_over_its_named_or_theme_members() -> None:
-    pairs = {s: w for _, s, w in _pairs("currently 60% crypto (btc+eth), 40% tech stocks")}
+    pairs = {s: w for _, s, w in holding_pairs("currently 60% crypto (btc+eth), 40% tech stocks")}
     assert pairs["BTCUSDT"] == pytest.approx(0.30) and pairs["ETHUSDT"] == pytest.approx(0.30)
     assert pairs["NVDAUSDT"] == pytest.approx(0.40 / 6)
     request = detect("currently 60% crypto (btc+eth), 40% tech stocks — adding coin on top, "
@@ -139,7 +140,7 @@ def test_a_group_weight_is_split_over_its_named_or_theme_members() -> None:
 
 
 def test_a_named_weight_is_not_displaced_by_a_group() -> None:
-    pairs = {s: w for _, s, w in _pairs("I hold 40% NVDA, 60% crypto")}
+    pairs = {s: w for _, s, w in holding_pairs("I hold 40% NVDA, 60% crypto")}
     assert pairs["NVDAUSDT"] == pytest.approx(0.40)
     assert sum(pairs.values()) == pytest.approx(1.0)
 
@@ -151,7 +152,7 @@ def test_a_named_weight_is_not_displaced_by_a_group() -> None:
     ("what if the nasdaq drops 10%", None),
 ])
 def test_a_volatility_scenario_is_read(text: str, multiple: float | None) -> None:
-    assert research._vol_multiple(text) == multiple
+    assert research.riskmath._vol_multiple(text) == multiple
 
 
 def test_a_volatility_scenario_scales_the_books_history(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -166,7 +167,7 @@ def test_a_volatility_scenario_scales_the_books_history(monkeypatch: pytest.Monk
         level *= 0.95 if i % 20 == 19 else 1.001
         closes.append(Bar(i, level))
     monkeypatch.setattr(history, "fetch_window", lambda *a, **k: closes)
-    lines, _ = research._var_lines({}, {"NVDAUSDT": 1.0}, "a 2x vol spike", scale=2.0)
+    lines, _ = research.riskmath._var_lines({}, {"NVDAUSDT": 1.0}, "a 2x vol spike", scale=2.0)
     assert "value at risk goes from 5.00% to 10.00%" in lines[0]
     assert "worst day in 199 would have been -10.00% instead of -5.00%" in lines[0]
 

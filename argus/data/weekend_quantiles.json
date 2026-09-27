@@ -1,0 +1,857 @@
+{
+ "generated_at": "2026-09-27T03:30:35+00:00",
+ "method": "* **unconditional** \u2014 the 10th, 50th and 90th percentiles of every earlier weekend's move;\n* **regime-matched** \u2014 the same, over earlier weekends that began in the same trend (20-day\n  average against the 50-day, baserate's 2% band) and five-day momentum tercile as this one:\n  baserate's filter, as `equity_history.matched_record` reads it;\n* **volatility-scaled** \u2014 filtered historical simulation (Barone-Adesi, Giannopoulos and Vosper,\n  1999; the ``bootstrap`` forecast of `arch`'s ARCHModel): each earlier move divided by the\n  stock's trailing 20-day volatility on its Friday, the quantiles of those standardised moves\n  multiplied by this Friday's volatility;\n* **volatility-matched** \u2014 earlier weekends whose Friday volatility sat in the same tercile as\n  this one's, terciles cut on earlier Fridays only.",
+ "summary": {
+  "stocks": 13,
+  "weekends_scored": 17044,
+  "pooled_mean_pinball_bps": {
+   "unconditional": 27.986,
+   "regime_matched": 27.835,
+   "vol_scaled": 26.716,
+   "vol_scaled_ewma": 26.639,
+   "vol_scaled_ewma_conformal": 26.458,
+   "vol_scaled_ewma_adaptive": 26.369,
+   "vol_matched": 27.015
+  },
+  "best_by_stock": {
+   "NVDA": "vol_scaled_ewma_adaptive",
+   "AAPL": "vol_scaled_ewma_adaptive",
+   "MSFT": "vol_scaled_ewma_conformal",
+   "AMZN": "vol_scaled_ewma_adaptive",
+   "GOOGL": "vol_scaled_ewma_conformal",
+   "META": "vol_scaled_ewma",
+   "TSLA": "vol_scaled_ewma_conformal",
+   "COIN": "vol_matched",
+   "MSTR": "vol_scaled_ewma_adaptive",
+   "JPM": "vol_scaled_ewma_adaptive",
+   "XOM": "vol_scaled_ewma_adaptive",
+   "SPY": "vol_scaled_ewma_adaptive",
+   "QQQ": "vol_scaled_ewma_conformal"
+  },
+  "beats_unconditional_in_both_halves": {
+   "regime_matched": 6,
+   "vol_scaled": 12,
+   "vol_scaled_ewma": 13,
+   "vol_scaled_ewma_conformal": 12,
+   "vol_scaled_ewma_adaptive": 13,
+   "vol_matched": 12
+  },
+  "pooled_band_coverage": {
+   "unconditional": 0.7715,
+   "regime_matched": 0.7507,
+   "vol_scaled": 0.7303,
+   "vol_scaled_ewma": 0.7316,
+   "vol_scaled_ewma_conformal": 0.7697,
+   "vol_scaled_ewma_adaptive": 0.7939,
+   "vol_matched": 0.7436
+  }
+ },
+ "results": {
+  "NVDA": {
+   "weekends_scored": 1172,
+   "first": "2004-04-08",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 38.52,
+    "regime_matched": 38.308,
+    "vol_scaled": 37.13,
+    "vol_scaled_ewma": 36.94,
+    "vol_scaled_ewma_conformal": 36.884,
+    "vol_scaled_ewma_adaptive": 36.839,
+    "vol_matched": 37.426
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     33.702,
+     43.338
+    ],
+    "regime_matched": [
+     33.467,
+     43.15
+    ],
+    "vol_scaled": [
+     31.345,
+     42.915
+    ],
+    "vol_scaled_ewma": [
+     31.202,
+     42.679
+    ],
+    "vol_scaled_ewma_conformal": [
+     31.3,
+     42.469
+    ],
+    "vol_scaled_ewma_adaptive": [
+     31.257,
+     42.42
+    ],
+    "vol_matched": [
+     31.849,
+     43.003
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.8422,
+    "regime_matched": 0.8208,
+    "vol_scaled": 0.7705,
+    "vol_scaled_ewma": 0.7628,
+    "vol_scaled_ewma_conformal": 0.7594,
+    "vol_scaled_ewma_adaptive": 0.7892,
+    "vol_matched": 0.7884
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 58,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 50,
+    "vol_scaled_ewma_adaptive": 50,
+    "vol_matched": 0
+   }
+  },
+  "AAPL": {
+   "weekends_scored": 2117,
+   "first": "1986-02-21",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 30.166,
+    "regime_matched": 30.146,
+    "vol_scaled": 29.865,
+    "vol_scaled_ewma": 29.751,
+    "vol_scaled_ewma_conformal": 29.615,
+    "vol_scaled_ewma_adaptive": 29.504,
+    "vol_matched": 29.867
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     30.541,
+     29.792
+    ],
+    "regime_matched": [
+     30.813,
+     29.479
+    ],
+    "vol_scaled": [
+     30.303,
+     29.428
+    ],
+    "vol_scaled_ewma": [
+     30.049,
+     29.454
+    ],
+    "vol_scaled_ewma_conformal": [
+     30.127,
+     29.104
+    ],
+    "vol_scaled_ewma_adaptive": [
+     30.146,
+     28.863
+    ],
+    "vol_matched": [
+     30.41,
+     29.324
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.8011,
+    "regime_matched": 0.7714,
+    "vol_scaled": 0.7317,
+    "vol_scaled_ewma": 0.7359,
+    "vol_scaled_ewma_conformal": 0.7473,
+    "vol_scaled_ewma_adaptive": 0.7983,
+    "vol_matched": 0.7652
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 49,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 50,
+    "vol_scaled_ewma_adaptive": 50,
+    "vol_matched": 0
+   }
+  },
+  "MSFT": {
+   "weekends_scored": 1844,
+   "first": "1991-05-17",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 22.984,
+    "regime_matched": 23.006,
+    "vol_scaled": 22.615,
+    "vol_scaled_ewma": 22.582,
+    "vol_scaled_ewma_conformal": 22.425,
+    "vol_scaled_ewma_adaptive": 22.443,
+    "vol_matched": 22.738
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     24.083,
+     21.884
+    ],
+    "regime_matched": [
+     24.317,
+     21.695
+    ],
+    "vol_scaled": [
+     23.715,
+     21.515
+    ],
+    "vol_scaled_ewma": [
+     23.613,
+     21.551
+    ],
+    "vol_scaled_ewma_conformal": [
+     23.51,
+     21.341
+    ],
+    "vol_scaled_ewma_adaptive": [
+     23.535,
+     21.35
+    ],
+    "vol_matched": [
+     23.788,
+     21.687
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.7798,
+    "regime_matched": 0.7679,
+    "vol_scaled": 0.7142,
+    "vol_scaled_ewma": 0.7153,
+    "vol_scaled_ewma_conformal": 0.7863,
+    "vol_scaled_ewma_adaptive": 0.7961,
+    "vol_matched": 0.744
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 70,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 50,
+    "vol_scaled_ewma_adaptive": 50,
+    "vol_matched": 0
+   }
+  },
+  "AMZN": {
+   "weekends_scored": 1260,
+   "first": "2002-08-02",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 28.023,
+    "regime_matched": 27.752,
+    "vol_scaled": 26.172,
+    "vol_scaled_ewma": 25.996,
+    "vol_scaled_ewma_conformal": 25.977,
+    "vol_scaled_ewma_adaptive": 25.942,
+    "vol_matched": 26.268
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     28.247,
+     27.799
+    ],
+    "regime_matched": [
+     28.066,
+     27.438
+    ],
+    "vol_scaled": [
+     25.462,
+     26.881
+    ],
+    "vol_scaled_ewma": [
+     25.237,
+     26.755
+    ],
+    "vol_scaled_ewma_conformal": [
+     25.308,
+     26.647
+    ],
+    "vol_scaled_ewma_adaptive": [
+     25.309,
+     26.575
+    ],
+    "vol_matched": [
+     25.678,
+     26.858
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.9032,
+    "regime_matched": 0.8667,
+    "vol_scaled": 0.7611,
+    "vol_scaled_ewma": 0.7698,
+    "vol_scaled_ewma_conformal": 0.7675,
+    "vol_scaled_ewma_adaptive": 0.7897,
+    "vol_matched": 0.8103
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 59,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 50,
+    "vol_scaled_ewma_adaptive": 50,
+    "vol_matched": 0
+   }
+  },
+  "GOOGL": {
+   "weekends_scored": 883,
+   "first": "2009-10-23",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 24.095,
+    "regime_matched": 24.109,
+    "vol_scaled": 23.605,
+    "vol_scaled_ewma": 23.505,
+    "vol_scaled_ewma_conformal": 23.465,
+    "vol_scaled_ewma_adaptive": 23.471,
+    "vol_matched": 23.688
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     18.089,
+     30.087
+    ],
+    "regime_matched": [
+     18.094,
+     30.11
+    ],
+    "vol_scaled": [
+     17.813,
+     29.385
+    ],
+    "vol_scaled_ewma": [
+     17.652,
+     29.345
+    ],
+    "vol_scaled_ewma_conformal": [
+     17.694,
+     29.224
+    ],
+    "vol_scaled_ewma_adaptive": [
+     17.687,
+     29.241
+    ],
+    "vol_matched": [
+     17.724,
+     29.639
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.7826,
+    "regime_matched": 0.769,
+    "vol_scaled": 0.7588,
+    "vol_scaled_ewma": 0.7542,
+    "vol_scaled_ewma_conformal": 0.7916,
+    "vol_scaled_ewma_adaptive": 0.786,
+    "vol_matched": 0.7735
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 52,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 50,
+    "vol_scaled_ewma_adaptive": 50,
+    "vol_matched": 0
+   }
+  },
+  "META": {
+   "weekends_scored": 478,
+   "first": "2017-07-28",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 31.009,
+    "regime_matched": 30.953,
+    "vol_scaled": 31.183,
+    "vol_scaled_ewma": 30.773,
+    "vol_scaled_ewma_conformal": 30.851,
+    "vol_scaled_ewma_adaptive": 30.838,
+    "vol_matched": 30.803
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     29.467,
+     32.551
+    ],
+    "regime_matched": [
+     28.972,
+     32.935
+    ],
+    "vol_scaled": [
+     29.483,
+     32.883
+    ],
+    "vol_scaled_ewma": [
+     29.237,
+     32.309
+    ],
+    "vol_scaled_ewma_conformal": [
+     29.149,
+     32.554
+    ],
+    "vol_scaled_ewma_adaptive": [
+     29.132,
+     32.544
+    ],
+    "vol_matched": [
+     29.307,
+     32.299
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.7071,
+    "regime_matched": 0.6946,
+    "vol_scaled": 0.751,
+    "vol_scaled_ewma": 0.7552,
+    "vol_scaled_ewma_conformal": 0.7971,
+    "vol_scaled_ewma_adaptive": 0.7908,
+    "vol_matched": 0.7259
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 52,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 50,
+    "vol_scaled_ewma_adaptive": 50,
+    "vol_matched": 0
+   }
+  },
+  "TSLA": {
+   "weekends_scored": 577,
+   "first": "2015-09-04",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 58.242,
+    "regime_matched": 58.692,
+    "vol_scaled": 55.996,
+    "vol_scaled_ewma": 56.051,
+    "vol_scaled_ewma_conformal": 55.615,
+    "vol_scaled_ewma_adaptive": 55.675,
+    "vol_matched": 57.434
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     54.7,
+     61.771
+    ],
+    "regime_matched": [
+     54.765,
+     62.606
+    ],
+    "vol_scaled": [
+     52.021,
+     59.957
+    ],
+    "vol_scaled_ewma": [
+     51.952,
+     60.135
+    ],
+    "vol_scaled_ewma_conformal": [
+     51.697,
+     59.519
+    ],
+    "vol_scaled_ewma_adaptive": [
+     51.721,
+     59.616
+    ],
+    "vol_matched": [
+     53.834,
+     61.022
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.7175,
+    "regime_matched": 0.7002,
+    "vol_scaled": 0.7435,
+    "vol_scaled_ewma": 0.74,
+    "vol_scaled_ewma_conformal": 0.7903,
+    "vol_scaled_ewma_adaptive": 0.8024,
+    "vol_matched": 0.7279
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 48,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 50,
+    "vol_scaled_ewma_adaptive": 50,
+    "vol_matched": 0
+   }
+  },
+  "COIN": {
+   "weekends_scored": 14,
+   "first": "2026-06-18",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 56.356,
+    "regime_matched": 55.09,
+    "vol_scaled": 53.216,
+    "vol_scaled_ewma": 53.234,
+    "vol_scaled_ewma_conformal": 53.234,
+    "vol_scaled_ewma_adaptive": 53.234,
+    "vol_matched": 53.21
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     51.082,
+     61.63
+    ],
+    "regime_matched": [
+     53.225,
+     56.955
+    ],
+    "vol_scaled": [
+     48.092,
+     58.34
+    ],
+    "vol_scaled_ewma": [
+     48.219,
+     58.25
+    ],
+    "vol_scaled_ewma_conformal": [
+     48.219,
+     58.25
+    ],
+    "vol_scaled_ewma_adaptive": [
+     48.219,
+     58.25
+    ],
+    "vol_matched": [
+     51.777,
+     54.642
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.9286,
+    "regime_matched": 0.8571,
+    "vol_scaled": 0.9286,
+    "vol_scaled_ewma": 0.8571,
+    "vol_scaled_ewma_conformal": 0.8571,
+    "vol_scaled_ewma_adaptive": 0.8571,
+    "vol_matched": 0.7857
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 5,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 14,
+    "vol_scaled_ewma_adaptive": 14,
+    "vol_matched": 0
+   }
+  },
+  "MSTR": {
+   "weekends_scored": 1205,
+   "first": "2003-08-22",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 51.629,
+    "regime_matched": 50.794,
+    "vol_scaled": 45.881,
+    "vol_scaled_ewma": 45.913,
+    "vol_scaled_ewma_conformal": 45.532,
+    "vol_scaled_ewma_adaptive": 44.765,
+    "vol_matched": 46.086
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     30.273,
+     72.95
+    ],
+    "regime_matched": [
+     30.197,
+     71.356
+    ],
+    "vol_scaled": [
+     26.136,
+     65.594
+    ],
+    "vol_scaled_ewma": [
+     25.947,
+     65.846
+    ],
+    "vol_scaled_ewma_conformal": [
+     25.936,
+     65.096
+    ],
+    "vol_scaled_ewma_adaptive": [
+     25.854,
+     63.645
+    ],
+    "vol_matched": [
+     26.472,
+     65.667
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.7892,
+    "regime_matched": 0.7809,
+    "vol_scaled": 0.7344,
+    "vol_scaled_ewma": 0.7295,
+    "vol_scaled_ewma_conformal": 0.7295,
+    "vol_scaled_ewma_adaptive": 0.7842,
+    "vol_matched": 0.766
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 71,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 50,
+    "vol_scaled_ewma_adaptive": 50,
+    "vol_matched": 0
+   }
+  },
+  "JPM": {
+   "weekends_scored": 2156,
+   "first": "1985-05-24",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 26.897,
+    "regime_matched": 26.669,
+    "vol_scaled": 25.447,
+    "vol_scaled_ewma": 25.396,
+    "vol_scaled_ewma_conformal": 25.121,
+    "vol_scaled_ewma_adaptive": 25.084,
+    "vol_matched": 26.16
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     23.74,
+     30.055
+    ],
+    "regime_matched": [
+     23.589,
+     29.748
+    ],
+    "vol_scaled": [
+     22.664,
+     28.229
+    ],
+    "vol_scaled_ewma": [
+     22.581,
+     28.212
+    ],
+    "vol_scaled_ewma_conformal": [
+     22.394,
+     27.848
+    ],
+    "vol_scaled_ewma_adaptive": [
+     22.382,
+     27.786
+    ],
+    "vol_matched": [
+     23.183,
+     29.137
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.737,
+    "regime_matched": 0.7055,
+    "vol_scaled": 0.7217,
+    "vol_scaled_ewma": 0.7194,
+    "vol_scaled_ewma_conformal": 0.7774,
+    "vol_scaled_ewma_adaptive": 0.7987,
+    "vol_matched": 0.7143
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 37,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 50,
+    "vol_scaled_ewma_adaptive": 50,
+    "vol_matched": 0
+   }
+  },
+  "XOM": {
+   "weekends_scored": 2688,
+   "first": "1975-03-14",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 18.968,
+    "regime_matched": 18.983,
+    "vol_scaled": 18.148,
+    "vol_scaled_ewma": 18.094,
+    "vol_scaled_ewma_conformal": 17.774,
+    "vol_scaled_ewma_adaptive": 17.698,
+    "vol_matched": 18.574
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     13.674,
+     24.262
+    ],
+    "regime_matched": [
+     13.794,
+     24.171
+    ],
+    "vol_scaled": [
+     13.312,
+     22.985
+    ],
+    "vol_scaled_ewma": [
+     13.258,
+     22.93
+    ],
+    "vol_scaled_ewma_conformal": [
+     13.163,
+     22.386
+    ],
+    "vol_scaled_ewma_adaptive": [
+     13.107,
+     22.289
+    ],
+    "vol_matched": [
+     13.556,
+     23.593
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.6771,
+    "regime_matched": 0.673,
+    "vol_scaled": 0.6942,
+    "vol_scaled_ewma": 0.702,
+    "vol_scaled_ewma_conformal": 0.776,
+    "vol_scaled_ewma_adaptive": 0.795,
+    "vol_matched": 0.6882
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 43,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 50,
+    "vol_scaled_ewma_adaptive": 50,
+    "vol_matched": 0
+   }
+  },
+  "SPY": {
+   "weekends_scored": 1484,
+   "first": "1998-04-09",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 17.382,
+    "regime_matched": 17.085,
+    "vol_scaled": 16.431,
+    "vol_scaled_ewma": 16.397,
+    "vol_scaled_ewma_conformal": 16.286,
+    "vol_scaled_ewma_adaptive": 16.246,
+    "vol_matched": 16.812
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     18.159,
+     16.604
+    ],
+    "regime_matched": [
+     18.001,
+     16.168
+    ],
+    "vol_scaled": [
+     16.715,
+     16.148
+    ],
+    "vol_scaled_ewma": [
+     16.692,
+     16.103
+    ],
+    "vol_scaled_ewma_conformal": [
+     16.601,
+     15.971
+    ],
+    "vol_scaled_ewma_adaptive": [
+     16.494,
+     15.998
+    ],
+    "vol_matched": [
+     17.285,
+     16.34
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.7487,
+    "regime_matched": 0.723,
+    "vol_scaled": 0.7284,
+    "vol_scaled_ewma": 0.7358,
+    "vol_scaled_ewma_conformal": 0.7628,
+    "vol_scaled_ewma_adaptive": 0.7945,
+    "vol_matched": 0.7257
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 93,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 50,
+    "vol_scaled_ewma_adaptive": 50,
+    "vol_matched": 0
+   }
+  },
+  "QQQ": {
+   "weekends_scored": 1166,
+   "first": "2004-05-21",
+   "last": "2026-09-18",
+   "mean_pinball_bps": {
+    "unconditional": 19.577,
+    "regime_matched": 19.3,
+    "vol_scaled": 18.701,
+    "vol_scaled_ewma": 18.668,
+    "vol_scaled_ewma_conformal": 18.581,
+    "vol_scaled_ewma_adaptive": 18.599,
+    "vol_matched": 18.864
+   },
+   "mean_pinball_bps_by_half": {
+    "unconditional": [
+     17.17,
+     21.985
+    ],
+    "regime_matched": [
+     16.949,
+     21.651
+    ],
+    "vol_scaled": [
+     15.898,
+     21.503
+    ],
+    "vol_scaled_ewma": [
+     15.878,
+     21.458
+    ],
+    "vol_scaled_ewma_conformal": [
+     15.808,
+     21.354
+    ],
+    "vol_scaled_ewma_adaptive": [
+     15.81,
+     21.388
+    ],
+    "vol_matched": [
+     16.143,
+     21.585
+    ]
+   },
+   "band_coverage": {
+    "unconditional": 0.8259,
+    "regime_matched": 0.789,
+    "vol_scaled": 0.7376,
+    "vol_scaled_ewma": 0.7316,
+    "vol_scaled_ewma_conformal": 0.7796,
+    "vol_scaled_ewma_adaptive": 0.7916,
+    "vol_matched": 0.7599
+   },
+   "fallbacks": {
+    "unconditional": 0,
+    "regime_matched": 30,
+    "vol_scaled": 0,
+    "vol_scaled_ewma": 0,
+    "vol_scaled_ewma_conformal": 50,
+    "vol_scaled_ewma_adaptive": 50,
+    "vol_matched": 0
+   }
+  }
+ }
+}

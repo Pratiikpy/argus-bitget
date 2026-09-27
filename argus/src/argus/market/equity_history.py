@@ -19,14 +19,19 @@ they make. ``weekend_only`` keeps the ones that span a Saturday.
 
 from __future__ import annotations
 
+import bisect
 import itertools
 import json
+import math
 import threading
 import time
 import urllib.request
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from typing import Any
+
+from argus.truth.bounded import BoundedDict
 
 CHART = ("https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
          "?period1=0&period2=9999999999&interval=1d")
@@ -57,7 +62,7 @@ class Gap:
     """Reopen over the last close, minus one."""
 
 
-_cache: dict[str, tuple[float, list[Day]]] = {}
+_cache: BoundedDict[str, tuple[float, list[Day]]] = BoundedDict(256)
 _lock = threading.Lock()
 
 
@@ -245,3 +250,152 @@ def matched_record(days: list[Day], gaps: list[Gap], *, side: str) -> Matched | 
     return Matched(state=now, n=len(matched), against_share=hits / len(matched),
                    against_low=low, against_high=high,
                    all_against_share=sum(against_all) / len(against_all), worst=worst)
+
+
+# --- the weekend band: scaled to today's volatility, held to its stated coverage ------------------
+
+EWMA_LAMBDA = 0.94
+"""RiskMetrics' daily decay (J.P. Morgan/Reuters, *RiskMetrics Technical Document*, 1996)."""
+VOL_DAYS = 20
+BAND_QUANTILES = (0.1, 0.5, 0.9)
+BAND_WARMUP = 260
+"""Five years of weekends before the band's coverage is tracked and corrected."""
+CONFORMAL_MIN = 50
+ACI_GAMMA = 0.005
+"""Adaptive conformal inference's step (Gibbs and Candès, NeurIPS 2021): after a miss the band's
+level rises by ``gamma * 0.8``, after a hit it falls by ``gamma * 0.2``."""
+
+
+@dataclass(frozen=True, slots=True)
+class Friday:
+    """What was known at one close, point in time."""
+
+    vol: float
+    trend: str
+    five_day: float
+    ewma_vol: float = 0.0
+    """RiskMetrics' exponentially weighted volatility at the same close."""
+
+
+def quantile(sorted_values: Sequence[float], q: float) -> float:
+    """Linear interpolation between order statistics (numpy's default, type 7)."""
+    if not sorted_values:
+        raise ValueError("no values")
+    pos = q * (len(sorted_values) - 1)
+    lo = math.floor(pos)
+    hi = min(lo + 1, len(sorted_values) - 1)
+    return sorted_values[lo] + (sorted_values[hi] - sorted_values[lo]) * (pos - lo)
+
+
+def fridays(days: Sequence[Day]) -> dict[date, Friday]:
+    """The state on every day with enough history, from closes up to and including that day."""
+    closes = [d.close for d in days]
+    rets = [closes[i] / closes[i - 1] - 1 for i in range(1, len(closes))]
+    ewma: list[float] = []
+    variance = rets[0] ** 2 if rets else 0.0
+    for r in rets:
+        variance = EWMA_LAMBDA * variance + (1 - EWMA_LAMBDA) * r * r
+        ewma.append(math.sqrt(variance))
+    out: dict[date, Friday] = {}
+    for i in range(50, len(days)):
+        window = rets[i - VOL_DAYS:i]
+        mean = sum(window) / len(window)
+        vol = math.sqrt(sum((r - mean) ** 2 for r in window) / (len(window) - 1))
+        sma20 = sum(closes[i - 19:i + 1]) / 20
+        sma50 = sum(closes[i - 49:i + 1]) / 50
+        trend = ("up" if sma20 > sma50 * (1 + TREND_BAND) else
+                 "down" if sma20 < sma50 * (1 - TREND_BAND) else "flat")
+        out[days[i].day] = Friday(vol=vol, trend=trend, five_day=closes[i] / closes[i - 5] - 1,
+                                  ewma_vol=ewma[i - 1])
+    return out
+
+
+Forecast = tuple[float, float, float]
+
+
+def scaled_forecast(standardised: Sequence[float], moves: Sequence[float],
+                    vol: float) -> Forecast:
+    """Filtered historical simulation: the quantiles of earlier moves divided by their own
+    volatility, times today's; with nothing to scale by, the plain record's quantiles."""
+    if not standardised or vol <= 0:
+        return (quantile(moves, 0.1), quantile(moves, 0.5), quantile(moves, 0.9))
+    return (quantile(standardised, 0.1) * vol, quantile(standardised, 0.5) * vol,
+            quantile(standardised, 0.9) * vol)
+
+
+def widened(band: Forecast, vol: float, scores: Sequence[float], level: float) -> Forecast:
+    """The band widened at both ends by the ``level`` quantile of earlier conformity scores
+    (conformalized quantile regression, Romano, Patterson and Candès, NeurIPS 2019)."""
+    if len(scores) < CONFORMAL_MIN or vol <= 0:
+        return band
+    widen = quantile(scores, min(max(level, 0.0), 1.0)) * vol
+    return (band[0] - widen, band[1], band[2] + widen)
+
+
+@dataclass(frozen=True, slots=True)
+class Band:
+    """Where the next reopening should land, and how well such bands have done for this stock."""
+
+    p10: float
+    p50: float
+    p90: float
+    """Moves from Friday's close to Monday's open, as fractions."""
+    ewma_vol: float
+    """The stock's daily volatility at the last close (RiskMetrics EWMA)."""
+    weekends: int
+    since: date
+    tracked: int
+    """Earlier weekends on which the band was forecast out of sample and scored."""
+    covered: float
+    """Share of those that opened inside their own 10-90 band."""
+
+    def as_dict(self) -> dict[str, Any]:
+        return {"p10": self.p10, "p50": self.p50, "p90": self.p90, "ewma_vol": self.ewma_vol,
+                "weekends": self.weekends, "since": self.since.isoformat(),
+                "tracked": self.tracked, "covered": self.covered}
+
+
+def weekend_band(days: Sequence[Day]) -> Band | None:
+    """The next weekend's 10/50/90 band: every earlier weekend scaled to its own Friday's EWMA
+    volatility and rescaled to today's, widened by adaptive conformal inference so that its bands
+    keep covering 80% of what happened when the market drifts.
+
+    Chosen by measurement, not assumed: `eval/weekend_quantiles.py` scored this and five other
+    forecasts walk-forward over 17,044 weekends of 13 stocks (``data/weekend_quantiles.json``,
+    2026-09-27). It had the lowest pooled pinball loss (26.37bp against 27.99bp for the plain
+    record and 27.84bp for baserate's trend-and-momentum match), beat the plain record in both
+    halves of the sample for all 13 stocks, and its 10-90 bands covered 79.4% of weekends against
+    77.2% for the plain record and 75.1% for baserate's match. This function repeats that walk
+    for one stock and returns the forecast for the coming weekend; a test holds it to the
+    evaluation's own arithmetic. None with too little history."""
+    state = fridays(days)
+    if not days or days[-1].day not in state:
+        return None
+    pairs = [(g, state[g.closed]) for g in closure_gaps(list(days)) if g.closed in state]
+    if len(pairs) <= BAND_WARMUP:
+        return None
+    moves: list[float] = []
+    standardised: list[float] = []
+    scores: list[float] = []
+    level = 0.8
+    tracked = covered = 0
+    for index, (gap, friday) in enumerate(pairs):
+        if index >= BAND_WARMUP:
+            band = scaled_forecast(standardised, moves, friday.ewma_vol)
+            adaptive = widened(band, friday.ewma_vol, scores, level)
+            if friday.ewma_vol > 0:
+                bisect.insort(scores, max(band[0] - gap.move, gap.move - band[2])
+                              / friday.ewma_vol)
+            missed = not adaptive[0] <= gap.move <= adaptive[2]
+            if len(scores) > CONFORMAL_MIN:
+                level += ACI_GAMMA * ((1.0 if missed else 0.0) - 0.2)
+            tracked += 1
+            covered += not missed
+        bisect.insort(moves, gap.move)
+        if friday.ewma_vol > 0:
+            bisect.insort(standardised, gap.move / friday.ewma_vol)
+    now = state[days[-1].day]
+    p10, p50, p90 = widened(scaled_forecast(standardised, moves, now.ewma_vol), now.ewma_vol,
+                            scores, level)
+    return Band(p10=p10, p50=p50, p90=p90, ewma_vol=now.ewma_vol, weekends=len(pairs),
+                since=pairs[0][0].closed, tracked=tracked, covered=covered / tracked)

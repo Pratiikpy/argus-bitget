@@ -41,13 +41,27 @@ Crypto (every contract the venue does not flag ``isRwa``) and gold (``XAUUSDT``,
 are named as such. ``SP500USDT`` and ``NDX100USDT`` are looked through SPY's and QQQ's rows.
 
 **Factors — a time-series factor model on traded proxies.** Each holding's daily returns are
-regressed on four factor returns at once, over the last :data:`WINDOW_DAYS` aligned US trading
+regressed on eight factor returns at once, over the last :data:`WINDOW_DAYS` aligned US trading
 days (at least :data:`MIN_OBS`):
 
 * **market** — SPY, the S&P 500 (the console's ``SPYUSDT`` beta, `research._book_beta_line`);
 * **size** — IWM minus SPY: small caps over large, so a negative loading is a large-cap tilt;
 * **momentum** — MTUM (iShares MSCI USA Momentum) minus SPY;
+* **value** — VLUE (iShares MSCI USA Value Factor) minus SPY;
+* **quality** — QUAL (iShares MSCI USA Quality Factor) minus SPY;
+* **low volatility** — USMV (iShares MSCI USA Min Vol Factor) minus SPY;
+* **rates** — IEF, 7-10 year Treasuries: a negative loading is a name that falls as yields rise;
 * **crypto** — Bitget's BTCUSDT.
+
+Until 2026-09-27 there were four (market, size, momentum, crypto), and the audit asked for the
+style and rates factors a risk desk expects (finding 26). They were added only after
+`argus.eval.factor_set_comparison` showed they explain more of the same holdings out of sample,
+not just in it (``data/factor_set_comparison.json``, 2026-09-27): over 13 US names and 273
+aligned days, the mean out-of-sample R² rose from 0.215 to 0.263 and the mean adjusted R² from
+0.319 to 0.369; eight factors predicted the unseen half better for 9 of the 13 (not for MSFT, TSLA,
+AAPL or KO, where the added factors fit noise). Low volatility was significant (|t| ≥ 2) for 8
+names, value 6, quality 5, rates 3 — XOM's rates loading at t -6.4. One split of one window: the
+figure is evidence for the wider set, not a guarantee for every name.
 
 This is the Fama-French/Carhart time-series regression with ETF spreads standing in for the
 academic long-short portfolios, which are published monthly with a lag and so cannot describe a
@@ -63,11 +77,12 @@ of its holdings' loadings, which for least squares on one factor set is the book
 BSD-3) fits the same regression but keeps a factor only if forward stepwise selection admits it at
 p < 0.05 (`forward_regression`, line 354), setting every other loading to exactly zero. Run by
 `argus.eval.exposures_comparison` on the same book and the same returns
-(``data/exposures_comparison.json``, 252 days to 2026-09-25), its loadings equal ours to the
-fourth decimal where it keeps all four factors (MSFT: market 1.2495, size -0.6269 in both); where
-it drops one, it reports "no exposure" for a loading the data merely could not pin down (GOOGL's
-size, -0.27 at t -1.8, becomes 0.00), and the loadings it keeps are refitted without the dropped
-factor, so they absorb it (GOOGL's market beta moves from 1.67 to 1.59). A trader asking "am I
+(``data/exposures_comparison.json``, 252 days to 2026-09-25, eight factors), ARGUS's regression
+equals statsmodels' plain OLS to within 1e-10 on every name, and Riskfolio's stepwise fit drops
+factors on every name. What it drops is not only noise: META's quality loading, 1.67 at t 2.69,
+and its low-volatility loading, -1.08 at t -2.78, both become 0.00, because forward selection
+admits the market and value first and the rest no longer clear the bar one at a time; the market
+beta it keeps is refitted without them and absorbs them (1.09 becomes 1.59). A trader asking "am I
 exposed to X" needs the estimate and its uncertainty, not a zero,
 so ARGUS keeps every factor and prints each loading's t-statistic instead. Its OLS is re-implemented
 here in pure Python because shipped ARGUS code carries no numpy (``pyproject.toml``).
@@ -97,8 +112,10 @@ from pathlib import Path
 from typing import Any
 
 from argus.lui.answer import Answer, Source
+from argus.truth.bounded import BoundedDict
+from argus.truth.paths import DATA_DIR
 
-SECTOR_MAP_PATH = Path(__file__).resolve().parents[3] / "data" / "sector_map.json"
+SECTOR_MAP_PATH = DATA_DIR / "sector_map.json"
 TICKERS_URL = "https://api.bitget.com/api/v2/mix/market/tickers?productType=USDT-FUTURES"
 
 WINDOW_DAYS = 252
@@ -106,7 +123,7 @@ WINDOW_DAYS = 252
 short enough that a company that changed its business two years ago is read as it is now."""
 
 MIN_OBS = 60
-"""Fewer aligned days than this and a four-factor loading is noise; the holding is reported as
+"""Fewer aligned days than this and a factor loading is noise; the holding is reported as
 having too little history rather than given a number."""
 
 PRICE_CHECK_TOLERANCE = 0.15
@@ -116,13 +133,30 @@ instrument: rTokens track their stock within a few percent even off-hours, and a
 
 FETCH_DEADLINE_S = 25.0
 
-FACTORS = ("market", "size", "momentum", "crypto")
+FACTORS = ("market", "size", "momentum", "value", "quality", "low_vol", "rates", "crypto")
 FACTOR_WORDS = {
     "market": "Market beta (S&P 500, SPY)",
     "size": "Size beta (IWM minus SPY; above 0 leans small-cap, below 0 large-cap)",
     "momentum": "Momentum beta (MTUM minus SPY; above 0 leans to recent winners)",
+    "value": "Value beta (VLUE minus SPY; above 0 leans to cheap stocks, below 0 to expensive "
+             "growth)",
+    "quality": "Quality beta (QUAL minus SPY; above 0 leans to profitable, low-debt companies)",
+    "low_vol": "Low-volatility beta (USMV minus SPY; above 0 leans defensive, below 0 to the "
+               "names that swing most)",
+    "rates": "Rates beta (IEF, 7-10 year Treasuries; below 0 the name falls when bond prices "
+             "fall, that is when yields rise)",
     "crypto": "Crypto beta (Bitget BTCUSDT)",
 }
+
+FACTOR_LEGS: dict[str, tuple[str, bool]] = {
+    "market": ("SPY", False), "size": ("IWM", True), "momentum": ("MTUM", True),
+    "value": ("VLUE", True), "quality": ("QUAL", True), "low_vol": ("USMV", True),
+    "rates": ("IEF", False), "crypto": ("BTC", False),
+}
+"""Each factor's series, and whether SPY's return is taken off it. The four style spreads are
+iShares' MSCI USA factor funds, one family, so each is the same index provider's tilt against the
+same market. Widened from four factors on 2026-09-27 (audit finding 26) after a measurement, not
+by default: `eval/factor_set_comparison.py` (``data/factor_set_comparison.json``)."""
 
 YAHOO_TO_GICS: dict[str, str] = {
     "Technology": "Information Technology",
@@ -410,7 +444,7 @@ def freeze_sector_map(path: Path = SECTOR_MAP_PATH, *, workers: int = 4) -> dict
 
 @dataclass(frozen=True)
 class Fit:
-    """One holding's regression on the four factors."""
+    """One holding's regression on the factors."""
 
     loadings: Mapping[str, float]
     t_stats: Mapping[str, float]
@@ -466,18 +500,18 @@ Closes = Mapping[date, float]
 
 def factor_returns(factor_closes: Mapping[str, Closes]
                    ) -> tuple[list[date], dict[str, list[float]]]:
-    """The four factor return series on the dates all four share, closes aligned before returns
-    are taken so a weekend is one return on every series (Friday to Monday)."""
-    spy, iwm, mtum, btc = (factor_closes[k] for k in ("SPY", "IWM", "MTUM", "BTC"))
-    days = sorted(set(spy) & set(iwm) & set(mtum) & set(btc))
+    """The factor return series on the dates every factor series shares, closes aligned before
+    returns are taken so a weekend is one return on every series (Friday to Monday)."""
+    days = sorted(set.intersection(*(set(factor_closes[k]) for k in FACTOR_SERIES)))
+    spy = factor_closes["SPY"]
     out: dict[str, list[float]] = {f: [] for f in FACTORS}
     stamps: list[date] = []
     for before, after in itertools.pairwise(days):
         r_spy = spy[after] / spy[before] - 1.0
-        out["market"].append(r_spy)
-        out["size"].append(iwm[after] / iwm[before] - 1.0 - r_spy)
-        out["momentum"].append(mtum[after] / mtum[before] - 1.0 - r_spy)
-        out["crypto"].append(btc[after] / btc[before] - 1.0)
+        for factor in FACTORS:
+            series, spread = FACTOR_LEGS[factor]
+            leg = factor_closes[series]
+            out[factor].append(leg[after] / leg[before] - 1.0 - (r_spy if spread else 0.0))
         stamps.append(after)
     return stamps, out
 
@@ -485,11 +519,11 @@ def factor_returns(factor_closes: Mapping[str, Closes]
 def fit_holding(closes: Closes, factor_closes: Mapping[str, Closes], *,
                 window: int = WINDOW_DAYS) -> Fit | None:
     """One holding's loadings on the last ``window`` dates it shares with every factor, or None
-    when a factor series is missing: a four-factor fit on three factors is a different model."""
+    when a factor series is missing: a fit on fewer factors is a different model."""
     if any(k not in factor_closes for k in FACTOR_SERIES):
         return None
-    spy, iwm, mtum, btc = (factor_closes[k] for k in ("SPY", "IWM", "MTUM", "BTC"))
-    days = sorted(set(closes) & set(spy) & set(iwm) & set(mtum) & set(btc))[-(window + 1):]
+    days = sorted(set(closes).intersection(*(set(factor_closes[k]) for k in FACTOR_SERIES))
+                  )[-(window + 1):]
     if len(days) - 1 < MIN_OBS:
         return None
     sub = {k: {d: v[d] for d in days} for k, v in factor_closes.items()}
@@ -508,7 +542,7 @@ def fit_holding(closes: Closes, factor_closes: Mapping[str, Closes], *,
 # --- data -------------------------------------------------------------------------------------
 
 
-_BITGET_CACHE: dict[str, tuple[float, dict[date, float]]] = {}
+_BITGET_CACHE: BoundedDict[str, tuple[float, dict[date, float]]] = BoundedDict(512)
 _BITGET_LOCK = threading.Lock()
 CACHE_TTL_S = 6 * 3600.0
 
@@ -567,12 +601,21 @@ def closes_for(symbol: str, rows: Mapping[str, Any] | None = None) -> tuple[dict
 RATE_LIMIT_RETRIES = 2
 """Retries of a Bitget candle page that answered 429, one and then two seconds apart."""
 
-FACTOR_SERIES = ("SPY", "IWM", "MTUM", "BTC")
+FACTOR_SERIES = tuple(dict.fromkeys(series for series, _ in FACTOR_LEGS.values()))
+def _and(words: Sequence[str]) -> str:
+    return ", ".join(words[:-1]) + " and " + words[-1] if len(words) > 1 else "".join(words)
+
+
+_SERIES_WORDS = _and(FACTOR_SERIES)
+_YAHOO_WORDS = _and([k for k in FACTOR_SERIES if k != "BTC"])
+METHOD_WORDS = _and([f"{series} minus SPY" if spread else series
+                     for series, spread in (FACTOR_LEGS[f] for f in FACTORS)])
+"""The regressors in words, as the Method line and the add-to-book answer state them."""
 
 
 def factor_closes() -> dict[str, dict[date, float]]:
-    return {"SPY": _yahoo_daily("SPY"), "IWM": _yahoo_daily("IWM"),
-            "MTUM": _yahoo_daily("MTUM"), "BTC": _bitget_daily("BTCUSDT")}
+    return {k: _bitget_daily("BTCUSDT") if k == "BTC" else _yahoo_daily(k)
+            for k in FACTOR_SERIES}
 
 
 # --- the answer -------------------------------------------------------------------------------
@@ -765,7 +808,7 @@ def exposures_answer(
     # nobody measured (seen 2026-09-26 when the BTC factor series answered 429). The sectors
     # need no prices, so they are still answered; the factor half says why it is absent.
     fitted_any = any(f is not None for f in fits.values())
-    no_factors = ("the factor series (SPY, IWM, MTUM and BTC daily closes) could not be read "
+    no_factors = (f"the factor series ({_SERIES_WORDS} daily closes) could not be read "
                   f"just now ({inputs.missing['factors']})" if "factors" in inputs.missing
                   else "no holding had enough daily closes to fit")
 
@@ -789,18 +832,19 @@ def exposures_answer(
         lead = (f"Bottom line: {trade_words} moves {bucket} from {_pct(sec_b.get(bucket, 0.0))} to "
                 f"{_pct(sec_a.get(bucket, 0.0))} of the book — the biggest sector change — and "
                 f"market beta from {load_b['market']:.2f} to {load_a['market']:.2f}; the largest "
-                f"factor change is {factor} ({_signed(fdelta)}), and the book becomes {direction} "
-                f"spread by name ({eff_b:.1f} → {(eff_a or 0):.1f} effective positions).")
+                f"factor change is {factor.replace('_', ' ')} ({_signed(fdelta)}), and the book "
+                f"becomes {direction} spread by name ({eff_b:.1f} → {(eff_a or 0):.1f} "
+                f"effective positions).")
         if (eff_sec_a or 0) < eff_sec_b and max(sec_a.values(), default=0.0) >= 0.5:
             heavy = max(sec_a.items(), key=lambda kv: kv[1])
             lead += (f" {heavy[0]} would be {_pct(heavy[1])} of the book; size the trade down if "
                      f"that is more than you mean to hold in one sector.")
     else:
-        tilt = max(("size", "momentum", "crypto"), key=lambda f: abs(load_b[f]))
+        tilt = max((f for f in FACTORS if f != "market"), key=lambda f: abs(load_b[f]))
         lead = (f"Bottom line: your book is {_pct(top_b[1])} {top_b[0]}"
                 + (f" across {eff_sec_b:.1f} effective sectors" if len(sec_b) > 1 else "")
                 + f"; its market beta is {load_b['market']:.2f} to the S&P 500 and its largest "
-                  f"style tilt is {tilt} at {_signed(load_b[tilt])}.")
+                  f"style tilt is {tilt.replace('_', ' ')} at {_signed(load_b[tilt])}.")
         if top_b[1] >= 0.5 and len(before) > 1:
             lead += (" Half or more of it rides on one sector, so the names do not diversify "
                      "each other much; a holding from another sector would.")
@@ -843,8 +887,8 @@ def exposures_answer(
             f"Assumed: loadings fitted over the last {WINDOW_DAYS} US trading days available "
             f"({start.isoformat()} to {end.isoformat()}, {n_lo}"
             + (f" to {n_hi}" if n_hi != n_lo else "")
-            + " daily returns per holding), all four factors at once; |t| above 2 is a loading "
-              "the data pins down, below 2 one it cannot tell from zero.")
+            + f" daily returns per holding), all {len(FACTORS)} factors at once; |t| above 2 is "
+              "a loading the data pins down, below 2 one it cannot tell from zero.")
     thin = [s for s in names if fits.get(s) is None and s in inputs.closes]
     lost = [s for s in names if s not in inputs.closes]
     if thin:
@@ -904,21 +948,20 @@ def exposures_answer(
     origins = sorted(set(inputs.origins.values()))
     lines.append(
         f"Data: sectors from data/sector_map.json (Yahoo quoteSummary, frozen {map_date}); "
-        f"factor returns from SPY, IWM and MTUM daily closes (Yahoo) and BTCUSDT daily candles "
+        f"factor returns from {_YAHOO_WORDS} daily closes (Yahoo) and BTCUSDT daily candles "
         f"(Bitget, 16:00 UTC close, four hours before the US close); holdings from "
         + ("; ".join(origins) if origins else "no series that could be read") + ".")
-    lines.append("Method: one least-squares regression per holding of its daily returns on SPY, "
-                 "IWM minus SPY, MTUM minus SPY and BTC together; the book's loading is the "
-                 "weight-sum of its "
-                 "holdings' (argus.lui.exposures).")
+    lines.append(f"Method: one least-squares regression per holding of its daily returns on "
+                 f"{METHOD_WORDS} together; the book's loading is the weight-sum of its "
+                 f"holdings' (argus.lui.exposures).")
 
     sources = [
         Source(kind="computation", ref="argus.lui.exposures.exposures_answer",
-               detail=f"4-factor OLS, {WINDOW_DAYS}d window, weights summed"),
+               detail=f"{len(FACTORS)}-factor OLS, {WINDOW_DAYS}d window, weights summed"),
         Source(kind="computation", ref="data/sector_map.json",
                detail=f"Yahoo quoteSummary sectors, frozen {map_date}"),
         Source(kind="evidence", ref="https://query1.finance.yahoo.com/v8/finance/chart",
-               detail="SPY, IWM, MTUM and the holdings' daily closes"),
+               detail=f"{_YAHOO_WORDS} and the holdings' daily closes"),
         Source(kind="venue", ref="bitget /api/v3/market/candles", detail="BTCUSDT 1D"),
     ]
     data: dict[str, Any] = {
@@ -986,9 +1029,9 @@ def parse(text: str, book_text: str = "") -> tuple[dict[str, float], dict[str, f
     from argus.lui import research
 
     notes: list[str] = []
-    verb = research._ADD_VERB.search(text)
+    verb = research.parse.ADD_VERB.search(text)
     cut = verb.start() if verb is not None else len(text)
-    pairs = research._pairs(text)
+    pairs = research.parse.holding_pairs(text)
     book: dict[str, float] = {}
     proposed: dict[str, float] = {}
     for position, symbol, weight in pairs:

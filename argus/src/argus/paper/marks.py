@@ -43,7 +43,9 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-MARKS_PATH = Path(__file__).resolve().parents[3] / "data" / "refusal_marks.jsonl"
+from argus.truth.paths import DATA_DIR
+
+MARKS_PATH = DATA_DIR / "refusal_marks.jsonl"
 
 MIN_MARK_HOURS = 1.5
 """How old a decision must be before it is marked.

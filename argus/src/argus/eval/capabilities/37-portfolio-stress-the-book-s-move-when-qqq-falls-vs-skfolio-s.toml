@@ -1,0 +1,76 @@
+name = """\
+    Portfolio stress: the book's move when QQQ falls, vs. skfolio's vine copula and Entropy \
+    Pooling"""
+subtheme = "t3-portfolio"
+modules = [
+    "argus/desk/portfolio.py",
+    "argus/eval/copilot_stress.py",
+    "argus/eval/baselines/skfolio_stress.py",
+]
+state = "tied"
+baseline = """\
+    skfolio/skfolio 1.3.1 (BSD-3) VineCopula conditional sampling and EntropyPooling, run \
+    unmodified in their own interpreter on the same Bitget daily history"""
+blockers = [
+    """\
+        TIED on the pre-registered primary: ARGUS's beta stress misses the book's realised move by \
+        0.92 percentage points on average against 1.00 for skfolio's vine and 0.98 for Entropy \
+        Pooling, better on 25 of 39 days, p = 0.095 — not significant. LOST on the tail: ARGUS \
+        states a point and no downside, so skfolio's vine wins the 10% quantile (pinball 0.23 \
+        against 0.43 for ARGUS's point). A residual band added after that run (not pre-registered) \
+        scores 0.24, still behind the vine, and breaches 15.5% of the time against a 10% target. \
+        Entropy Pooling could not answer the one shock larger than anything in its history \
+        (2026-06-05). Absorbed from skfolio the same day: each position's share of the book's CVaR \
+        (historical, 95%), now in every add-to-book answer beside its share of variance, matching \
+        skfolio's own contribution(CVaR) to 3e-13 on 20 books (data/tail_contribution_oracle.json)""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    skfolio's _vine_copula.py:518-595 and _entropy_pooling.py:436-590 read at source; named by \
+    the rival review of 2026-09-24 as the method rival for conditional stress"""
+artefact = "data/copilot_stress.json"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    regular-vine conditional sampling (Dissmann et al. 2013) and Entropy Pooling (Meucci \
+    2008), the two conditional-scenario methods skfolio ships"""
+artefact = "data/copilot_stress.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    every arm gets the same realised QQQUSDT move and the same traded-day history on 39 days \
+    with QQQUSDT down 1% or more, 200 books each"""
+artefact = "data/copilot_stress.json"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    Wilcoxon signed-rank over per-day mean errors; a day a system cannot answer is dropped \
+    from that pair only"""
+artefact = "data/copilot_stress.json"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = "every fit uses only days before the scored day"
+artefact = "data/copilot_stress.json"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    stale weekend closes broke the first run and are removed for every arm; Entropy Pooling \
+    cannot answer a shock beyond its history"""
+artefact = "data/copilot_stress.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "hash-pinned Bitget snapshot, seeded vine, pre-registered spec hash"
+artefact = "data/copilot_stress.json"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "the console's own stress_by_beta produced every ARGUS figure"
+artefact = "data/copilot_stress.json"

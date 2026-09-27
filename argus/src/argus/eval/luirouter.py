@@ -47,7 +47,7 @@ threshold separates them.** `ABSTAIN_THRESHOLD` is fitted to noise.
 
 The router is therefore **not deployed**, and the honest headline for Track 3 is the deterministic
 layer's **23.5% on novel phrasings**. See `eval/obliquebench.py` for the corpora and
-`Activity/PROGRESS.md` for the full working.
+the working log, which is not published for the full working.
 
     python -m argus.eval.luirouter
 """
@@ -57,14 +57,14 @@ from __future__ import annotations
 import argparse
 from collections.abc import Sequence
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 from argus.eval.obliquebench import FRESH, HELDOUT, TUNED, Case
 from argus.llm.semantic import ABSTAIN_THRESHOLD, SemanticRouter, available
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "lui_router.json"
+REPORT_PATH = DATA_DIR / "lui_router.json"
 
 OUT_OF_SCOPE: tuple[str, ...] = (
     "what is the weather in tokyo",

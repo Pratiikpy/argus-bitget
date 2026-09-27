@@ -1,0 +1,160 @@
+name = "Cross-market cointegration with corrected multiple testing"
+subtheme = "t1-crossmarket"
+modules = [
+    "argus/research/cointegration.py",
+    "argus/backtest/validation.py",
+    "argus/eval/cointegration_comparison.py",
+    "argus/eval/baselines/lean_pairs_ranking.py",
+    "argus/eval/baselines/lean_pairs_ranking_loader.py",
+    "argus/eval/general_coint_comparison.py",
+]
+# Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+# proof now needs a groupwise check on the capability's own artefact, and this
+# row's does not pass it. The reason and the route back are its first blocker.
+state = "implemented"
+baseline = "statsmodels adfuller; QuantConnect/Lean pearsonr pair ranking; FinceptTerminal"
+blockers = [
+    """\
+        RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
+        (data/groupwise_audit.json): the statistical proof reads \
+        data/cointegration_comparison.json, a synthetic 190-pair noise panel and designed ADF \
+        cases reduced to counts. The out-of-sample proof passes: data/cointegration.json's 66 real \
+        pairs are broken down pair by pair and none survives the correction. The same study shows, \
+        as context, why the correction matters: the naive in-sample excess over the 5% expected by \
+        chance rests on one pair (NVDAUSDT/QQQUSDT) and turns negative out of sample. Route back: \
+        cite that real 66-pair scan as the statistical evidence; it already passes the gate.""",
+    """\
+        The multiple-testing demonstration constructs genuinely-independent random-walk pairs \
+        rather than measuring the false-positive rate on ARGUS's own real rToken universe — \
+        research/cointegration.py's own real scan() already carries this correction into \
+        production, but the specific 7-of-190 count above is a controlled demonstration, not a \
+        live-universe measurement""",
+    """\
+        General-purpose rivals run 2026-09-26 (eval/general_coint_comparison.py, \
+        data/general_coint_comparison.json): 160 simulated universes (60 null, 60 with planted \
+        cointegration, 40 with broken relationships) and the real 12-rToken universe, scored \
+        against arch's Engle-Granger and Phillips-Ouliaris, statsmodels' coint and five \
+        multiple-testing corrections from statsmodels and SciPy, on the same selection slice. LOSS \
+        for the screen: survivors_fdr, ARGUS's Benjamini-Hochberg screen, does not hold its target \
+        on planted universes (false-discovery rate 18.9% at q 10%), while 128 general pipelines \
+        do. What the desk acts on is the out-of-sample-confirmed set (PairResult.tradeable), which \
+        does hold it (4.2%) at power 0.274; the best general pipeline, arch's Phillips-Ouliaris \
+        with the same correction and the same out-of-sample gate, holds it at 6.1% with power \
+        0.333 (0.021 +/- 0.026 above the screen's power), a difference not tested against the \
+        confirmed set. On the real universe every pipeline finds the same one or two pairs \
+        (NVDAUSDT with QQQUSDT and SQQQUSDT).""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    statsmodels' real adfuller (stattools.py) read and reproduced; Lean's real \
+    PearsonCorrelationPairsTradingAlphaModel and FinceptTerminal's real \
+    statistical_arbitrage.py both read in full \
+    (research/architecture/27-pairs-and-cointegration-teardown.md, file:line throughout), \
+    independently re-verified here against the currently-installed statsmodels 0.15.0 rather \
+    than trusted from the teardown's older environment"""
+artefact = "../research/architecture/27-pairs-and-cointegration-teardown.md"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    three real methods compared: statsmodels' formal ADF/EG test (a null hypothesis and a \
+    p-value); Lean's real correlation-threshold screen (no null, no p-value, no correction for \
+    pairs compared); FinceptTerminal's real full-sample z-score (the scored point is a member \
+    of its own baseline) against ARGUS's real trailing-window zscores() (the scored point \
+    structurally excluded by the slice's own upper bound)"""
+artefact = "src/argus/eval/cointegration_comparison.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    the real, installed statsmodels.tsa.stattools.adfuller imported directly (no vendoring \
+    needed — a real, published library); Lean's real pearsonr-ranking core vendored whole, \
+    byte-hash-pinned (commit 23b735d99a357807dc0df9f4c51d30f05fe0d277); FinceptTerminal's \
+    real, unmodified function run once, locally (AGPL-3.0 with a commercial-use clause — never \
+    vendored), its exact output reproduced by an independent reimplementation built from \
+    reading the source, verified to match before being trusted"""
+test = """\
+    test_baselines.py::TestVendoredFilesHaveNotDrifted::test_lean_pairs_ranking_body_matches_the_pinned_hash"""
+
+[[proofs]]
+condition = "implementation_complete"
+how = "adf/engle_granger/pair_test/scan/zscores all evaluate real series end to end"
+test = "test_cointegration.py"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    ARGUS's real adf() and the real statsmodels adfuller run on identical series across three \
+    shapes (random walk, stationary AR(1), trending); the reimplemented and real \
+    FinceptTerminal formulas verified to agree exactly on identical input before either is \
+    used further; Lean's real ranking core and ARGUS's real benjamini_hochberg/bonferroni run \
+    on the identical 190 constructed, genuinely-uncorrelated pairs"""
+test = "test_cointegration_comparison.py::TestNumericAgreement"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    the multiple-testing exposure is measured across 190 pairs, not one convenient pair, and \
+    lands close to the analytically expected false-positive count (7 observed vs. 9.5 expected \
+    at 5%), confirming the construction genuinely behaves like independent noise rather than \
+    being asserted to"""
+test = "test_cointegration_comparison.py::TestMultipleTestingCorrection"
+
+[[proofs]]
+condition = "costs_included"
+how = "both real per-call costs measured directly, reported without a forced winner"
+test = "test_cointegration_comparison.py::TestCosts"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    ARGUS's real pair_test() fits the hedge ratio in-sample and tests stationarity only on \
+    data the fit never saw — the frozen-ratio design already in production, exercised end to \
+    end by the existing test suite"""
+test = "test_cointegration.py"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    the self-inclusion understatement swept across five window sizes on the identical outlier \
+    magnitude, confirmed to shrink monotonically as the window grows — proving the effect is \
+    the self-inclusion mechanism, not an artefact of one arbitrary window size"""
+test = "test_cointegration_comparison.py::TestWindowSizeAblation"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    a constructed 27-sigma-style outlier scored by FinceptTerminal's real reimplemented \
+    formula understates its own z-score by 82%, verified against their real function's real \
+    output first"""
+test = """\
+    test_cointegration_comparison.py::TestSelfInclusionBias::test_a_designed_outlier_is_understated_by_self_inclusion"""
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = "both real systems' rejection of a too-short series run and compared"
+test = "test_cointegration_comparison.py::TestFailureCases"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "both real systems reproduce identical output on identical input, twice"
+test = "test_cointegration_comparison.py::TestReproducibility"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped explicitly — SCOPE_STATEMENT in eval/cointegration_comparison.py. Claimed: on the \
+    two properties that decide whether a 'cointegrated pair' survives real trading — a \
+    baseline that excludes the point it scores, and a selection corrected for how many pairs \
+    were compared — ARGUS has both by construction and the two real specialists studied have \
+    neither. NOT claimed that FinceptTerminal's code was run inside ARGUS's own repository — \
+    AGPL-3.0 with a commercial clause makes that the wrong posture; only its real output was \
+    used, once, to verify an independent reimplementation. NOT claimed that Lean's whole OOP \
+    alpha model was vendored — only its self-contained ranking computation, which has no \
+    self-reference to the class at all. NOT claimed that correlation is never a legitimate \
+    first screen for a pair — the claim is narrower: whatever screen is used, a fixed \
+    threshold across many candidates has a computable false-positive rate, and only ARGUS's \
+    real code reports it"""
+test = "test_cointegration_comparison.py::TestMainAndRender"

@@ -12,7 +12,7 @@
 # in eval/standing.py, whose own baseline field names "microsoft/qlib, which groups a (datetime,
 # instrument) frame by datetime and ranks within each group" — not a paraphrase of that grouping,
 # qlib's actual code, on the same constructed panels ARGUS's own
-# argus.research.grammar.CrossRank.combine() sees (project Standing Rule #3).
+# argus.research.grammar.CrossRank.combine() sees (the read-before-write rule).
 #
 # This file's own module-level imports (`qlib.utils.data.{zscore,robust_zscore}`,
 # `qlib.constant.EPS`, `qlib.data.dataset.utils.fetch_df_by_index`, `qlib.utils.serial.Serializable`,

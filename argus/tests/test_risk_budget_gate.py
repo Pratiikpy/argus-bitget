@@ -174,9 +174,9 @@ class TestAbsentStateIsNotZeroRisk:
         zero — that is a measurement. Returning ``None`` disabled the position cap on precisely the
         book that has proven nothing, which is the opposite of the caution intended."""
         from argus.paper.ledger import PaperLedger
-        from argus.paper.runner import STARTING_EQUITY, _book_state
+        from argus.paper.runner import STARTING_EQUITY, current_book_state
 
-        state = _book_state(PaperLedger(path=tmp_path / "l.jsonl"))
+        state = current_book_state(PaperLedger(path=tmp_path / "l.jsonl"))
         assert state is not None
         assert state.equity == STARTING_EQUITY
         assert state.total_drawdown == Decimal("0")
@@ -185,7 +185,7 @@ class TestAbsentStateIsNotZeroRisk:
         """Marking an open decision would let an unrealised swing move the breaker before the
         outcome that justifies it exists."""
         from argus.paper.ledger import PaperLedger
-        from argus.paper.runner import STARTING_EQUITY, _book_state
+        from argus.paper.runner import STARTING_EQUITY, current_book_state
 
         ledger = PaperLedger(path=tmp_path / "l.jsonl")
         ledger.record(
@@ -194,7 +194,7 @@ class TestAbsentStateIsNotZeroRisk:
             invalidation=("x",), market_state_hash="a" * 8, approved_intent_hash="b" * 8,
             session_phase="rth", hours_to_discovery=0.0, decided_at=NOW,
         )
-        state = _book_state(ledger)
+        state = current_book_state(ledger)
         assert state.equity == STARTING_EQUITY
         assert state.open_positions == 1
 
@@ -324,7 +324,7 @@ class TestTheWiring:
         from argus.paper import runner
 
         source = inspect.getsource(runner.run_once)
-        assert "book_state=_book_state(ledger)" in source
+        assert "book_state=current_book_state(ledger)" in source
         assert "graded_predictions=_graded_predictions(ledger)" in source
 
     def test_the_policy_calls_both_risk_modules(self) -> None:

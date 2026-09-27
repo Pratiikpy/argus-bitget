@@ -45,8 +45,10 @@ from pathlib import Path
 from statistics import median
 from typing import Any
 
-TAPE_PATH = Path(__file__).resolve().parents[3] / "data" / "book_tape.jsonl"
-CALIBRATION_PATH = Path(__file__).resolve().parents[3] / "data" / "book_calibration.json"
+from argus.truth.paths import DATA_DIR
+
+TAPE_PATH = DATA_DIR / "book_tape.jsonl"
+CALIBRATION_PATH = DATA_DIR / "book_calibration.json"
 
 ENDPOINT = "https://api.bitget.com/api/v3/market/orderbook"
 """Public order book. `agent-sdk/src/generated/catalog.ts:115` — auth "public", isWrite false."""

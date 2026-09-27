@@ -1,0 +1,160 @@
+name = "Cross-sectional factor evaluation"
+subtheme = "t1-alphafactory"
+modules = [
+    "argus/research/panel.py",
+    "argus/research/crosssection.py",
+    "argus/research/grammar.py",
+    "argus/eval/crosssection_comparison.py",
+    "argus/eval/baselines/qlib_loader.py",
+    "argus/eval/baselines/qlib_cs_processor.py",
+]
+# TIED since 2026-09-27 (audit finding 96). The advantage over qlib was one input: a
+# ranking group of a single instrument. build_panel aligns on the timestamps every symbol
+# shares, so in ARGUS's own study every hour holds the whole universe and that input
+# never arises; on everything that does arise the two rank identically.
+state = "tied"
+baseline = """\
+    microsoft/qlib, which groups a (datetime, instrument) frame by datetime and ranks within \
+    each group"""
+blockers = [
+    """\
+        RE-GRADED 2026-09-27 from OWNED to TIED: the two agree exactly on every group of two or \
+        more, and the one input where ARGUS is safer (a single-instrument group, which qlib ranks \
+        1.73) cannot occur in ARGUS's own decisions because the panel is aligned on shared \
+        timestamps. Route back: a real workload where groups shrink - a universe with staggered \
+        listings or halts - measured against qlib's handling of it""",
+    """\
+        Measured and negative. 8 factors over 10 trading rules is 80 trials, run at every phase of \
+        each rebalance cycle for 1,336 backtests: 31 rules are positive before cost, 4 after, 0 \
+        survive either Deflated Sharpe gate, and NOT ONE produces net Sharpes that agree on sign \
+        across its own phases""",
+    """\
+        The phase sweep killed this module's own best result. Phase 0 alone reported +2.28 for a \
+        72-hour cross-sectional reversal; every phase of the same rule on the same data spans \
+        -3.84 to +4.36. The Deflated Sharpe gate cannot see that selection, because phases are not \
+        trials — which is why the sweep exists""",
+]
+note = """\
+    The capability is proven correct and the factors are proven worthless on this universe \
+    over this window. Both halves are the result."""
+
+[[proofs]]
+condition = "best_method_studied"
+how = "all 101 Formulaic Alphas read and scored against our grammar; 46 blocked here"
+artefact = "../research/architecture/alpha101-port.md"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "crossrank and crossscale, aligned on shared timestamps, innermost-first"
+test = "test_panel.py"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    truncating the future must not move a past value — the standard invisible leak in \
+    cross-sectional operators, pinned for rank, scale and the nested case"""
+test = "test_panel.py::test_truncating_the_future_does_not_change_the_past"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    a one-symbol universe and a single-symbol evaluation both raise rather than returning the \
+    neutral 0.5 that would silently change the factor"""
+test = "test_panel.py"
+
+[[proofs]]
+condition = "costs_included"
+how = "charged per unit of weight moved at the venue's own 6bps per side"
+test = "test_crosssection.py::test_the_per_side_rate_comes_from_the_venue_model"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = "80 trials deflated; phases averaged rather than selected; spread published"
+artefact = "data/crosssection_study.json"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = "chronological half-split decay computed for every rule"
+artefact = "data/crosssection_study.json"
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    three of the backtest-engine repos this project reads first checked directly for a \
+    cross-sectional (same-timestamp, across-instrument) ranking primitive: qlib has one \
+    (CSRankNorm, groups a (datetime, instrument) frame by datetime and ranks within each group \
+    — exactly the baseline this capability names); polakowo/vectorbt's only rank() \
+    (signals/accessors.py:1298) ranks consecutive SIGNAL EVENTS through TIME within one \
+    series, a different axis entirely, not cross-sectional; QuantConnect/Lean has no match for \
+    'CrossSectional' anywhere in the repository (grepped case-insensitively, zero hits). qlib \
+    is not merely cited, it is the only one of the three with the primitive this capability is \
+    being measured against"""
+test = "test_crosssection_comparison.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    qlib's real CSRankNorm (qlib/data/dataset/processor.py, the same file this capability's \
+    baseline field names) vendored verbatim — byte-verified against commit \
+    79633dd9506ea689e5400dea0197717b5b3d74b7, pinned by SHA256 so the check survives without \
+    the external clone present — and actually executed via a sys.modules shim satisfying its \
+    own qlib-internal imports with stand-ins that raise NotImplementedError if ever reached, \
+    rather than editing a line of the vendored source. Confirmed correct against its own \
+    docstring's worked example: [1,2,3,4,5] -> [-1.038,-0.346,0.346,1.038,1.73]"""
+artefact = "src/argus/eval/baselines/qlib_cs_processor.py"
+test = "test_baselines.py::TestQlibLoaderMakesTheRealCodeRunnable"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    ARGUS's real CrossRank.combine() and qlib's real CSRankNorm run on 61 identical panels (7 \
+    hand-designed probing ties/extremes/edge sizes, plus a 54-panel deterministic grid over \
+    size x tie-density x spread, none tuned to any specific case) - agree EXACTLY on relative \
+    order on every single one, verified by an argsort-with-tie-groups comparison, not \
+    eyeballed"""
+test = "test_crosssection_comparison.py::TestSweptPanels"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    ARGUS's crossrank has two design choices, each shown independently load-bearing by \
+    comparing the real function against itself with one choice disabled: midrank tie handling \
+    (disabling it changes [5,3,3,1]'s tied pair from 0.5/0.5 to 0.333/0.667) and the n<=1 \
+    neutral guard (disabling it produces NaN via an unguarded /(n-1) rather than 0.5). Both \
+    differ from their real-function counterpart, confirmed programmatically"""
+test = "test_crosssection_comparison.py::TestAblation"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    both functions being compared are pure, deterministic transforms over their input \
+    list/frame - no model, no seed, no simulation on either side. The 61-panel comparison \
+    battery is itertools.product over fixed grids, not RNG-seeded, for the same reason \
+    mandate_comparison's sweep is: a seed's meaning can shift across Python versions and a \
+    hand-picked seed is itself a form of hand-tuning"""
+test = "test_crosssection_comparison.py"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped explicitly - SCOPE_STATEMENT in eval/crosssection_comparison.py. Claimed: on \
+    cross-sectional RANKING specifically, ARGUS and qlib agree exactly on relative order on \
+    every panel tested, and ARGUS carries TWO layers of defense a genuinely single-instrument \
+    universe qlib's vendored code has neither of - CrossRank.combine()'s own defensive 0.5 \
+    fallback if ever called directly, AND research.panel.evaluate_panel's higher-level refusal \
+    (raises rather than silently computing a constant 'factor' - see that module's own \
+    docstring) before combine() would ever be reached that way in real operation; qlib's \
+    CSRankNorm has no equivalent refusal anywhere in the vendored file and, run directly on a \
+    one-row input, produces 1.73 - the transform's own maximum, not a neutral reading. NOT \
+    claimed: that crossrank is a complete substitute for CSRankNorm - qlib's additional \
+    zscore-style rescaling toward unit variance is a real step ARGUS's crossrank does not \
+    perform, by design (CrossScale is ARGUS's own separate portfolio-weight operator, a \
+    different job). Also NOT claimed: that the single-name divergence has material impact on \
+    ARGUS's own real decisions today - RTOKEN_SYMBOLS is a fixed 12-name universe and how \
+    often a real trading day's data actually shrinks a group to one instrument was measured on \
+    2026-09-27: never. build_panel keeps only the timestamps every symbol shares, so each of \
+    the study's 2,159 real hours ranks all 12 names (data/crosssection_study.json, \
+    panel.dropped all 0) - the single-instrument case where the two differ never reaches a \
+    real decision, which is why this row is TIED rather than OWNED"""
+artefact = "src/argus/eval/crosssection_comparison.py"
+test = "test_crosssection_comparison.py::TestScopeStatement"

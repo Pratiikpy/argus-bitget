@@ -210,7 +210,7 @@ _SPEED: dict[Intent, Speed] = {
 # also appear in legitimate questions about past decisions ("why did you sell NVDA") and the
 # question form must not be captured here. The distinguishing feature is the absence of an
 # interrogative: "sell half of that" commands, "why did you sell" asks.
-_ORDER_VERB = re.compile(
+ORDER_VERB = re.compile(
     # A filler word in front does not make an instruction a question: "ok sell half of that",
     # "yeah sell it", "go ahead and sell that" slipped past the refusal (2026-09-25 audit).
     r"^\s*(?:(?:ok(?:ay)?|yeah|yes|yep|sure|alright|right|cool|fine|great|then|now|so|and|just|"
@@ -238,12 +238,12 @@ _ORDER_REQUEST = re.compile(
 """An order asked as a question: "can you place a limit order for me" is an instruction, and
 fell to "I did not recognise that question" because the interrogative guard let it past
 (2026-09-25 audit)."""
-_ORDER_CJK = re.compile(
+ORDER_CJK = re.compile(
     r"(?:帮我|给我|替我|直接)[^?\uff1f]{0,12}(?:下单|买入|卖出|平仓|开仓)|实盘下单")
 """An instruction to trade in Chinese: "PLTR现在能买吗,帮我实盘下单买入" (buy it for me, live)
 was answered as research on the 2026-09-25 blind corpus. The console places no orders in any
 language."""
-_INTERROGATIVE = re.compile(r"^\s*(?:why|what|when|which|who|how|did|do|does|is|are|was|were|can|"
+INTERROGATIVE = re.compile(r"^\s*(?:why|what|when|which|who|how|did|do|does|is|are|was|were|can|"
                             r"could|should|show|list|tell|explain|walk)\b", re.I)
 
 
@@ -265,7 +265,7 @@ the reason; the same instruction in Hindi, Arabic, Russian or Turkish got "I did
 that question" (2026-09-25 audit, round 2) — the console never trades, but a refusal says why."""
 
 
-_PLAN_REQUEST = re.compile(
+PLAN_REQUEST = re.compile(
     r"^\s*(?:(?:pls|please|ok(?:ay)?|now)[\s,]+)*(?:rebalance|re-?weight)\b[^?.]{0,40}\b(?:to|for|"
     r"into|toward)\s+(?:an?\s+)?(?:equal[\s-](?:risk|weight)\w*|risk[\s-]parity|my\s+risk\s+budget|"
     r"the\s+risk\s+budget)"
@@ -280,10 +280,10 @@ round 3). The console still places nothing; it states the weights."""
 
 def is_order_instruction(raw: str) -> bool:
     """An instruction to trade, in any of the forms the console refuses."""
-    if _PLAN_REQUEST.match(raw):
+    if PLAN_REQUEST.match(raw):
         return False
-    return bool((_ORDER_VERB.match(raw) and not _INTERROGATIVE.match(raw))
-                or _ORDER_CJK.search(raw) or _ORDER_REQUEST.search(raw)
+    return bool((ORDER_VERB.match(raw) and not INTERROGATIVE.match(raw))
+                or ORDER_CJK.search(raw) or _ORDER_REQUEST.search(raw)
                 or _ORDER_INTL.search(raw))
 
 
@@ -1183,7 +1183,7 @@ def classify(
                 "this console reads the decision record; it does not place, change or cancel "
                 "orders"
             ),
-            matched=_ORDER_VERB.pattern,
+            matched=ORDER_VERB.pattern,
         )
 
     seq_match = _SEQ.search(raw) or _SEQ_ZH.search(raw)

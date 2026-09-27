@@ -16,9 +16,10 @@ from typing import Any
 import pytest
 
 from argus.lui import research
+from argus.lui.arbiter import in_domain
 from argus.lui.question import Intent, classify
-from argus.lui.research import ResearchKind, _detect
-from argus.lui.server import in_domain
+from argus.lui.research import ResearchKind
+from argus.lui.research.parse import read_request
 from argus.market import history, universe
 
 
@@ -27,17 +28,17 @@ def frozen_data(monkeypatch: pytest.MonkeyPatch) -> None:
     def _fail(*args: Any, **kwargs: Any) -> Any:
         raise RuntimeError("live fetch disabled in tests")
 
-    monkeypatch.setattr(research, "_fetch_live", _fail)
+    monkeypatch.setattr(research.data, "_fetch_live", _fail)
     monkeypatch.setattr(history, "fetch", _fail)
     monkeypatch.setattr(universe, "_fetch_live", _fail)
     monkeypatch.setattr(universe, "_CACHE", None)
     # No live price either: an amount in shares or coins is left unpriced unless a test pins
     # prices itself (TestHoldingsStatedAsAmounts does).
-    monkeypatch.setattr(research, "_last_price", lambda symbol: None)
+    monkeypatch.setattr(research.parse, "_last_price", lambda symbol: None)
 
 
 def _kind(text: str) -> str | None:
-    request = _detect(text)
+    request = read_request(text)
     return None if request is None else str(request.kind)
 
 
@@ -90,7 +91,7 @@ class TestChinese:
         from datetime import UTC, datetime
 
         text = "PLTR现在能买吗,帮我实盘下单买入"
-        assert _detect(text) is None
+        assert read_request(text) is None
         assert classify(text, now=datetime.now(UTC)).intent is Intent.ORDER
 
 
@@ -106,13 +107,14 @@ class TestAShockOnANamedInstrument:
     ])
     def test_the_subject_and_size_are_read(self, text: str, subject: str | None,
                                            shock: float) -> None:
-        request = _detect(text)
+        request = read_request(text)
         assert request is not None and request.kind is ResearchKind.STRESS
         assert request.shock_on == subject
         assert request.shock_pct == shock
 
     def test_a_shock_percentage_is_not_a_holding_weight(self) -> None:
-        request = _detect("I hold 40% NVDA 60% MSFT; oil -20% shock, how does that hit my book")
+        request = read_request(
+            "I hold 40% NVDA 60% MSFT; oil -20% shock, how does that hit my book")
         assert request is not None
         assert dict(request.book) == {"NVDAUSDT": 0.4, "MSFTUSDT": 0.6}
         assert request.shock_on == "CLUSDT"
@@ -146,8 +148,8 @@ class TestEnglishPhrasings:
     def test_the_kind_is_read(self, text: str, kind: str) -> None:
         assert _kind(text) == kind
 
-    def test_an_order_on_an_unknown_ticker_is_still_not_research(self) -> None:
-        assert _detect("Execute a purchase of 5,000 shares of ZYXQ on my behalf at market "
+    def test_an_order_on_an_unknown_ticker_is_stillnot_research(self) -> None:
+        assert read_request("Execute a purchase of 5,000 shares of ZYXQ on my behalf at market "
                        "open.") is None
 
 
@@ -160,14 +162,14 @@ class TestChinesePercentHoldings:
         "我持有英伟达50%和苹果50%，加仓特斯拉20%风险会怎样",
     ])
     def test_the_book_and_the_add_are_read_in_either_order(self, asked: str) -> None:
-        request = _detect(asked)
+        request = read_request(asked)
         assert request is not None and request.kind is ResearchKind.IMPACT
         assert request.symbols[0] == "TSLAUSDT"
         assert request.book == pytest.approx({"NVDAUSDT": 0.5, "AAPLUSDT": 0.5})
         assert request.size == pytest.approx(0.2)
 
     def test_a_three_name_book_separated_by_the_chinese_comma(self) -> None:
-        request = _detect("我持有40%英伟达、30%微软、30%苹果，再买入15%特斯拉合适吗")
+        request = read_request("我持有40%英伟达、30%微软、30%苹果，再买入15%特斯拉合适吗")
         assert request is not None and request.kind is ResearchKind.IMPACT
         assert request.book == pytest.approx(
             {"NVDAUSDT": 0.4, "MSFTUSDT": 0.3, "AAPLUSDT": 0.3})
@@ -176,7 +178,7 @@ class TestChinesePercentHoldings:
     def test_a_figure_belongs_to_the_name_it_touches(self) -> None:
         """"英伟达50%和苹果50%": the first 50% is NVIDIA's, never read as a weight on 苹果 across
         the 和 between them."""
-        request = _detect("我持有英伟达50%和苹果50%，加仓特斯拉20%风险会怎样")
+        request = read_request("我持有英伟达50%和苹果50%，加仓特斯拉20%风险会怎样")
         assert request is not None and set(request.book) == {"NVDAUSDT", "AAPLUSDT"}
 
 
@@ -185,50 +187,50 @@ class TestHoldingsStatedAsAmounts:
     def prices(self, monkeypatch: pytest.MonkeyPatch) -> None:
         table = {"AAPLUSDT": 200.0, "TSLAUSDT": 400.0, "NVDAUSDT": 100.0, "BTCUSDT": 60000.0,
                  "ETHUSDT": 3000.0}
-        monkeypatch.setattr(research, "_last_price", table.get)
+        monkeypatch.setattr(research.parse, "_last_price", table.get)
 
     def test_share_counts_in_chinese_become_weights_by_value(self) -> None:
-        request = _detect("我持有200股苹果和50股特斯拉,现在加仓英伟达合适吗?")
+        request = read_request("我持有200股苹果和50股特斯拉,现在加仓英伟达合适吗?")
         assert request is not None and request.kind is ResearchKind.IMPACT
         assert request.symbols[0] == "NVDAUSDT"
         # 200 x 200 = 40,000 of AAPL against 50 x 400 = 20,000 of TSLA.
         assert request.book == pytest.approx({"AAPLUSDT": 2 / 3, "TSLAUSDT": 1 / 3})
 
     def test_shares_and_dollars_mix(self) -> None:
-        request = _detect("I hold 100 shares of AAPL and $20k in TSLA, should I add NVDA?")
+        request = read_request("I hold 100 shares of AAPL and $20k in TSLA, should I add NVDA?")
         assert request is not None
         assert request.book == pytest.approx({"AAPLUSDT": 0.5, "TSLAUSDT": 0.5})
 
     def test_coin_amounts_feed_a_stress(self) -> None:
-        request = _detect("I have 2 BTC and 20 ETH, what if bitcoin drops 20%, how bad is my "
+        request = read_request("I have 2 BTC and 20 ETH, what if bitcoin drops 20%, how bad is my "
                           "portfolio")
         assert request is not None and request.kind is ResearchKind.STRESS
         assert request.book == pytest.approx({"BTCUSDT": 2 / 3, "ETHUSDT": 1 / 3})
         assert request.shock_pct == -20.0
 
     def test_an_order_size_is_not_a_holding(self) -> None:
-        request = _detect("sell 500 shares mstr without tanking the price, how")
+        request = read_request("sell 500 shares mstr without tanking the price, how")
         assert request is not None and request.kind is ResearchKind.EXECUTION
         assert not request.book
 
 
 class TestEitherReaderCanSayNotResearch:
     def test_the_language_models_confident_none_is_binding(self) -> None:
-        from argus.lui.server import _not_research
+        from argus.lui.arbiter import not_research
 
         audit = {"model": {"kind": "none", "confidence": 0.95, "why": "a price forecast"}}
-        assert _not_research(audit) == ("refuse", 0.95)
+        assert not_research(audit) == ("refuse", 0.95)
 
     def test_an_unsure_language_model_is_not(self) -> None:
-        from argus.lui.server import _not_research
+        from argus.lui.arbiter import not_research
 
-        assert _not_research({"model": {"kind": "none", "confidence": 0.5}}) is None
-        assert _not_research({"model": {"kind": "quote", "confidence": 0.99}}) is None
+        assert not_research({"model": {"kind": "none", "confidence": 0.5}}) is None
+        assert not_research({"model": {"kind": "quote", "confidence": 0.99}}) is None
 
     def test_the_kind_models_verdict_is_read_from_its_audit_line(self) -> None:
-        from argus.lui.server import _not_research
+        from argus.lui.arbiter import not_research
 
-        assert _not_research({"model": {"why": "kind model: record at 0.41"}}) == ("record", 0.41)
+        assert not_research({"model": {"why": "kind model: record at 0.41"}}) == ("record", 0.41)
 
     @pytest.mark.parametrize("text", [
         "what will gold price be exactly one year from now",
@@ -236,9 +238,9 @@ class TestEitherReaderCanSayNotResearch:
         "give me the exact price of BTC two months from now",
     ])
     def test_forecast_phrasings_are_forecasts(self, text: str) -> None:
-        from argus.lui.research import _PRICE_FORECAST
+        from argus.lui.research.parse import PRICE_FORECAST
 
-        assert _PRICE_FORECAST.search(text)
+        assert PRICE_FORECAST.search(text)
 
 
 def test_the_status_page_reports_the_measured_understanding(tmp_path: Any) -> None:
@@ -267,9 +269,9 @@ class TestTheJudgePass:
         assert request is not None and pattern_reading_wins(request, text)
 
     def test_a_dated_price_question_is_a_forecast(self) -> None:
-        from argus.lui.research import _PRICE_FORECAST
+        from argus.lui.research.parse import PRICE_FORECAST
 
-        assert _PRICE_FORECAST.search("what will BTC be next Friday")
+        assert PRICE_FORECAST.search("what will BTC be next Friday")
 
     @pytest.mark.parametrize(("question", "rsi", "start"), [
         ("is TSLA overbought", "63.4", "Bottom line: No — TSLA is not overbought"),
@@ -278,7 +280,7 @@ class TestTheJudgePass:
     ])
     def test_the_overbought_question_gets_a_yes_or_no(self, question: str, rsi: str,
                                                       start: str) -> None:
-        from argus.lui.research import _answer_the_state_asked
+        from argus.lui.research.technicals import _answer_the_state_asked
 
         symbol = "NVDAUSDT" if "英伟达" in question else "TSLAUSDT"
         lines = ["Bottom line: momentum turning down.", f"RSI(14, 4h) {rsi} — neutral."]
@@ -287,9 +289,9 @@ class TestTheJudgePass:
         assert len(out) == 2
 
     def test_a_semicolon_inside_brackets_is_not_a_sentence_end(self) -> None:
-        from argus.lui.research import _sentence_cut
+        from argus.lui.research.text import sentence_cut
 
         text = ("Stand aside: the social feed is chatter with nothing time-sensitive; the macro "
                 "backdrop (VIX 14.81, normal regime; F&G 71; nothing scheduled) gives no edge "
                 "either, and the anchor market is asleep for a long stretch of the weekend") * 2
-        assert not _sentence_cut(text, 200).endswith("F&G 71;")
+        assert not sentence_cut(text, 200).endswith("F&G 71;")

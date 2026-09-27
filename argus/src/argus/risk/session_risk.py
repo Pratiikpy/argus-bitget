@@ -54,6 +54,7 @@ from statistics import median
 from typing import Any
 
 from argus.truth.clocks import DualClock, SessionPhase
+from argus.truth.paths import DATA_DIR
 
 MIN_BARS_PER_PHASE = 30
 """Fewest observations before a phase's volatility is reported.
@@ -73,7 +74,7 @@ anecdote and the throttle falls back to the phase volatilities alone.
 STALE_AFTER_HOURS = 36
 """Same rule as `risk/effectiveness.py`: past this a measurement counts as absent, not as weaker."""
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "session_risk.json"
+REPORT_PATH = DATA_DIR / "session_risk.json"
 
 
 class SessionRiskError(ValueError):

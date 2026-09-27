@@ -48,7 +48,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-ANCHOR_DIR = Path(__file__).resolve().parents[3] / "data" / "anchors"
+from argus.truth.paths import DATA_DIR
+
+ANCHOR_DIR = DATA_DIR / "anchors"
 
 CALENDARS: tuple[str, ...] = (
     "https://a.pool.opentimestamps.org",

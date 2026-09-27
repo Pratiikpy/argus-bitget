@@ -68,15 +68,16 @@ def _offline() -> Iterator[None]:
         del text, prior, ledger, started, classified_by, audit
         raise _Routed("research:" + str(request.kind))
 
-    saved = (research._fetch_live, history.fetch, universe._fetch_live, server._research_payload)
-    research._fetch_live = refuse
+    saved = (research.data._fetch_live, history.fetch, universe._fetch_live,
+             server._research_payload)
+    research.data._fetch_live = refuse
     history.fetch = refuse
     universe._fetch_live = refuse
     server._research_payload = reached
     try:
         yield
     finally:
-        (research._fetch_live, history.fetch, universe._fetch_live,
+        (research.data._fetch_live, history.fetch, universe._fetch_live,
          server._research_payload) = saved
 
 

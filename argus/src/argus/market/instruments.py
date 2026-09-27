@@ -1,7 +1,7 @@
 """The Instrument Master — declared identity, not inferred behaviour.
 
-Foundation 1 of the product architecture (`Activity/08_TRADING_OS_PLAN.md` §3). An external review
-of this project named the exact failure this module closes:
+Foundation 1 of the product architecture (the product plan, which is not published). An external
+review of this project named the exact failure this module closes:
 
     "Behavioral 'session attenuation' is not proof of legal instrument identity... a beta estimated
     in one regime is not a contract specification."

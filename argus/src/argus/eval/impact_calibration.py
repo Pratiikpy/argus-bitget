@@ -36,10 +36,11 @@ import statistics
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from itertools import pairwise
-from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 DEPTH_PATH = DATA / "depth.json"
 REPORT_PATH = DATA / "impact_calibration.json"
 SIGMA_DAYS = 30

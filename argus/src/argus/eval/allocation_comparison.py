@@ -107,7 +107,6 @@ import time
 from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from datetime import datetime
-from pathlib import Path
 from statistics import fmean
 from typing import Any
 
@@ -123,6 +122,7 @@ from argus.desk.allocation import (
 from argus.desk.portfolio import covariance_matrix, returns
 from argus.market.bitget import RTOKEN_SYMBOLS
 from argus.market.history import CandleType, fetch_range
+from argus.truth.paths import DATA_DIR
 
 DAYS = 60
 """A 60-day hourly window, the same length `desk/allocation.py`'s own CLI defaults to."""
@@ -1386,7 +1386,7 @@ def main() -> int:  # pragma: no cover - CLI
         "scope_statement": SCOPE_STATEMENT,
     }
     print(render(report))
-    out = Path(__file__).resolve().parents[3] / "data" / "allocation_comparison.json"
+    out = DATA_DIR / "allocation_comparison.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     print(f"\nwritten to {out}")

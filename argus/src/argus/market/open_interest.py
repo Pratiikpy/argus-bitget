@@ -32,6 +32,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from argus.truth.paths import DATA_DIR
+
 MIN_VOLUME_USDT = 1_000_000.0
 HISTORY_HOURS = 24
 WINDOW_HOURS = 3
@@ -40,7 +42,7 @@ WINDOW_HOURS = 3
 
 def _history_path() -> Path:
     override = os.environ.get("ARGUS_DATA_DIR", "").strip()
-    base = Path(override) if override else Path(__file__).resolve().parents[3] / "data"
+    base = Path(override) if override else DATA_DIR
     return base / "open_interest_history.jsonl"
 
 
@@ -65,9 +67,9 @@ class Reading:
 def snapshot(fetch: Any = None) -> dict[str, dict[str, float]]:
     """Every USDT perpetual's holding, last price, 24h USDT volume and funding, in one call."""
     if fetch is None:
-        from argus.market.bitget import _get
+        from argus.market.bitget import public_get
 
-        rows = _get("/api/v2/mix/market/tickers", {"productType": "usdt-futures"}) or []
+        rows = public_get("/api/v2/mix/market/tickers", {"productType": "usdt-futures"}) or []
     else:
         rows = fetch()
     out: dict[str, dict[str, float]] = {}

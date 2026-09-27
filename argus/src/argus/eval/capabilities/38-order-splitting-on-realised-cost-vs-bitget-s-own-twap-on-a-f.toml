@@ -1,0 +1,45 @@
+name = "Order splitting on realised cost vs. Bitget's own TWAP, on a full-depth replay"
+subtheme = "t3-execassist"
+modules = [
+    "argus/lui/research/execution.py",
+    "argus/eval/execution_arena.py",
+]
+state = "tied"
+baseline = """\
+    Bitget's native TWAP (equal market slices at a 60-second interval, its published spec), \
+    the even eight-slice TWAP every execution tool ships, and trading at once — replayed on \
+    Tardis's full-depth Bitget NVDAUSDT book for 2026-08-01"""
+blockers = [
+    """\
+        LOST first, then TIED. The schedule the console printed — Almgren-Chriss in hourly \
+        children — cost 12.2bps with fees on a $100k parent against 6.9bps for Bitget's own \
+        60-second TWAP, dearer on all 80 parents: on this book the cadence, not the shape, decides \
+        the cost. The same trajectory cut into one-minute children costs 6.9bps, a hundredth of a \
+        point from Bitget's TWAP (dearer on 54 of 80 parents), while its shortfall spreads 6% less \
+        (9.0 against 9.6bps standard deviation) — the trade-off Almgren-Chriss exists to make. The \
+        console now tells the trader to send one-minute children. One Saturday of one perpetual, \
+        taker children only, no impact beyond the visible book: the forward tape \
+        (market/ws_tape.py) and passive arms come next""",
+]
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    every arm walks the same rebuilt book at the same instants; 80 parents per size, buy and \
+    sell, $5k to $250k"""
+artefact = "data/execution_arena.json"
+
+[[proofs]]
+condition = "costs_included"
+how = "Bitget's 0.06% taker fee on every child"
+artefact = "data/execution_arena.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "deterministic replay of a hash-recorded event file"
+artefact = "data/execution_arena.json"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = "the console's hourly schedule lost to Bitget's TWAP on every parent"
+artefact = "data/execution_arena.json"

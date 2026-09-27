@@ -1,0 +1,159 @@
+name = "Typed factor grammar with no execution surface"
+subtheme = "t1-alphafactory"
+modules = [
+    "argus/research/grammar.py",
+    "argus/eval/grammar_comparison.py",
+    "argus/eval/baselines/qlib_expression_base.py",
+    "argus/eval/baselines/qlib_expression_ops.py",
+    "argus/eval/baselines/qlib_expression_loader.py",
+    "argus/eval/baselines/qlib_eval_surface.py",
+    "argus/eval/baselines/qlib_eval_surface_loader.py",
+    "argus/research/grammar_text.py",
+    "argus/research/grammar_series.py",
+    "argus/eval/general_grammar_comparison.py",
+    "argus/eval/baselines/general_grammar_rivals.py",
+]
+# Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+# proof now needs a groupwise check on the capability's own artefact, and this
+# row's does not pass it. The reason and the route back are its first blocker.
+state = "implemented"
+baseline = "microsoft/qlib real expression engine (qlib/data/base.py, ops.py, data.py, utils)"
+blockers = [
+    """\
+        RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
+        (data/groupwise_audit.json): the real-market half of the parity claim, \
+        data/grammar_comparison.json's 37 swept lookbacks, is one instrument (NVDAUSDT): the whole \
+        headline is one symbol. Route back: sweep the real-market rank parity over the rToken \
+        universe and record each case with its symbol.""",
+    """\
+        Still narrower than Qlib: ~30 of the 101 Formulaic Alphas need an `open` price and a \
+        further handful need `vwap` and `adv20`, none of which this grammar carries \
+        (research/architecture/alpha101-port.md)""",
+    """\
+        The nine expanded factors are measured but not proven: six of twelve symbols are now won \
+        by one of them and two clear the candidates-only DSR gate, while the all-trials gate — the \
+        honest one — still reports 0 of 12""",
+    """\
+        General-purpose rivals run 2026-09-26 (data/general_grammar_comparison.json). LOST on \
+        speed to Polars: 14.5x to 187x faster than the columnar grammar_series path on the 7 \
+        shipped factors it can express. TIED with Google CEL on static type checking (10 of 10 \
+        each; Polars catches 2 statically and is silent on 3). Duplicate identity: normal_form 8 \
+        of 8 against SymPy's 7 of 8, the extra pair a symmetric rolling correlation SymPy sees \
+        only as an uninterpreted function. The cost bound refuses at the same nesting depth as \
+        CEL's 10,000-iteration budget; the CEL half of that recording is NOT VERIFIED by a rerun.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    RD-Agent, Alpha Jungle, Qlib and the 101 Formulaic Alphas read for operators \
+    (factor-discovery-audit.md); qlib's real expression engine additionally read in full and \
+    vendored — base.py (Expression/ExpressionOps/Feature), ops.py (1681 lines, every real \
+    Rolling/PairRolling operator incl. Rank/Mean/Std/Corr), and the field-parsing path \
+    (utils/__init__.py's parse_field, data.py's ExpressionProvider) an earlier review wrongly \
+    marked unvendorable — corrected 2026-09-16, see qlib_expression_base.py's own header"""
+artefact = "../research/architecture/factor-discovery-audit.md"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    both real methods run and compared: ARGUS's typed dataclass grammar (Window/Corr, \
+    validated at construction) vs. qlib's real string-expression engine (parse_field's regex \
+    rewrite -> eval()) — the structural difference that produces the adversarial finding below \
+    is a property of the two DESIGNS, confirmed by running both, not inferred from either's \
+    docs"""
+artefact = "src/argus/eval/grammar_comparison.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    qlib's real Mean/Std/Rank/Corr operators and real \
+    ExpressionProvider.get_expression_instance() run unmodified, byte-hash-pinned against the \
+    vendored source (qlib_expression_base.py/_ops.py/_eval_surface.py, commit \
+    79633dd9506ea689e5400dea0197717b5b3d74b7)"""
+test = "test_baselines.py::TestVendoredFilesHaveNotDrifted"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "Window/Corr's full OPS vocabulary (mean/std/rank/argmax/.../slope) evaluates"
+test = "test_grammar.py"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    mean/std/corr run on an identical fixed series (diff 0.0/0.0/1.11e-16); rank run on five \
+    designed cases isolating ties/constant/single-observation, plus swept across every \
+    lookback a real captured NVDAUSDT book-tape series supports — both systems, same input, \
+    every case"""
+test = "test_grammar_comparison.py::TestOperatorAgreement"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    rank swept across 15 real-market lookbacks (not one convenient case), finding both \
+    agreement and divergence, not a cherry-picked direction"""
+test = "test_grammar_comparison.py::TestSweptRealMarketSeries"
+
+[[proofs]]
+condition = "costs_included"
+how = "both real per-call costs measured directly (ARGUS Window vs. qlib Mean.load)"
+test = "test_grammar_comparison.py::TestCosts"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    rank comparison additionally run on data/book_tape.jsonl — real captured L2 book \
+    snapshots, not built from any of the five designed in-sample cases"""
+test = "test_grammar_comparison.py::TestSweptRealMarketSeries"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    the AST scan itself is shown sensitive, not vacuous: run against a counterfactual \
+    Window.evaluate that dispatches via eval() (never touching the real grammar.py), \
+    confirming the scan DOES flag eval() when genuinely present rather than always reporting \
+    clean"""
+test = """\
+    test_grammar_comparison.py::TestExecutionSurface::test_the_scan_is_sensitive_not_vacuous"""
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    the grammar cannot reach attributes or call arbitrary code, pinned by test \
+    (test_grammar.py); separately, qlib's real ExpressionProvider IS shown reachable to \
+    arbitrary code — a crafted field string run through its real, unmodified \
+    get_expression_instance() executes a nested eval('1+1'), returning 2, a live CWE-95 in \
+    real Microsoft-maintained code"""
+test = "test_grammar_comparison.py::TestExecutionSurface"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    both sides' real handling of MALFORMED (not malicious) input run: ARGUS rejects an unknown \
+    op at Window construction, before evaluate() is ever reachable; qlib's real \
+    SyntaxError/NameError handler cleanly catches three malformed field strings — the \
+    vulnerability is narrower and worse than malformed input: a syntactically VALID expression \
+    no handler is positioned to catch"""
+test = "test_grammar_comparison.py::TestFailureCases"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    every expression has a canonical form, so a factor cannot be paid for twice \
+    (test_grammar.py); separately, both real comparison functions run twice on identical input \
+    and agree bit-for-bit"""
+test = "test_grammar_comparison.py::TestReproducibility"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped explicitly — SCOPE_STATEMENT in eval/grammar_comparison.py. Claimed: on numeric \
+    fidelity, ARGUS matches qlib's real mean/std/corr to float precision and diverges from its \
+    real rank only by a named, algebraically explained convention (not a bug); on execution \
+    surface, ARGUS's grammar structurally cannot reach eval/exec anywhere (AST-verified), \
+    while qlib's real code can and, run here, does. NOT claimed: that qlib's Rank convention \
+    is wrong, or that every qlib field string is exploitable (malformed syntax IS caught \
+    cleanly). NOT claimed: that this closes the vocabulary-breadth gap in the blockers below — \
+    that is a separate axis (which fields the grammar can express), untouched by this \
+    comparison"""
+test = "test_grammar_comparison.py::TestMainAndRender"

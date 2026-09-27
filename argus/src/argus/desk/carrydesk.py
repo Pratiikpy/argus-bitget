@@ -33,7 +33,6 @@ import math
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
 from argus.decision.verdicts import (
@@ -44,8 +43,9 @@ from argus.decision.verdicts import (
 )
 from argus.risk.gatechain import CHAIN, FIRED, PASSED, UNREACHED
 from argus.truth.clocks import SessionState
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "carry_desk.json"
+REPORT_PATH = DATA_DIR / "carry_desk.json"
 
 WILSON_Z = 1.96
 """95%. The same z the Fisher interval in `risk/effectiveness.py` uses, so two confidence

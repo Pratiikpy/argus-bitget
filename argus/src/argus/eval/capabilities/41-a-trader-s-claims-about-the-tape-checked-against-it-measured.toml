@@ -1,0 +1,65 @@
+name = "A trader's claims about the tape checked against it, measured against MirrorLine"
+subtheme = "t3-decisionstress"
+# Credit moved 2026-09-25 from `argus/lui/research/` to the harness. The harness grades
+# answers recorded from the console's premise check on the run morning, and never executed
+# `lui/research/claims.py::_claim_check` (the sabotage canary replaced 179 functions of
+# lui/research/ and none fired). Since 2026-09-26 it calls `_claim_check` on the saved
+# claims and tape (`data/h2h_mirrorline/argus_replay.json` matches the recorded run on all
+# 38 claims), so the console's code is what is scored and the credit names it again.
+modules = [
+    "argus/lui/research/claims.py",
+    "argus/eval/claimcheck_comparison.py",
+]
+state = "tied"
+baseline = """\
+    PinnacleCryptNG/MirrorLine (Season 2, no licence file): its own challenge engine, \
+    getInterpretationChallenge, run from its clone on the same sentences"""
+blockers = [
+    """\
+        TIED, and the verdict is the harness's own comparison report (shown under measured, read \
+        from data/claimcheck_comparison.json rather than restated here). What the report does not \
+        carry: the first run was a clear LOSS - ARGUS gave no verdict on any past-tense causal \
+        claim or either session claim - and it is kept in \
+        data/h2h_mirrorline/argus_raw_first_run.json""",
+    """\
+        the harness grades answers recorded from the console on the run morning \
+        (data/h2h_mirrorline/argus_raw.json); it does not re-run \
+        lui/research/claims.py::_claim_check, so a regression in the console after that morning \
+        would not show here until the harness calls it on the saved claims and tape""",
+    """\
+        MirrorLine still reads claim kinds ARGUS does not: 40-level book depth, liquidity and \
+        trade-action language; ARGUS reads funding and the perpetual's premium, which MirrorLine \
+        does not""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    MirrorLine's claim rules read in source (lib/challenge/rules.ts, engine.ts): direction, \
+    causation, session, reference tape, liquidity, depth, freshness, trade action; rebuilt \
+    from behaviour, no code taken"""
+artefact = "data/claimcheck_comparison.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = "MirrorLine's engine run live on 38 claims across nine rTokens, raw output kept"
+artefact = "data/claimcheck_comparison.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    the same 38 sentences through both desks the same morning, the tape captured before and \
+    after; near-zero days reported apart rather than graded"""
+artefact = "data/claimcheck_comparison.json"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "direction, past-tense cause and session claims, tested"
+test = "test_claim_check.py::test_a_past_tense_claim_with_a_cause_is_read"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    the first run was a loss (ARGUS read 18 of 38, MirrorLine 38) and is kept; the claim kinds \
+    only one desk reads are named"""
+artefact = "data/claimcheck_comparison.json"

@@ -284,7 +284,7 @@ class TestEventCalendar:
 
 
 def test_a_hedge_that_is_paid_to_hold_says_so() -> None:
-    from argus.lui.research import _hedge_cost_text
+    from argus.lui.research.book import _hedge_cost_text
 
     assert "pays about 13.0bps more" in _hedge_cost_text(-13.0)
     assert "about 9.5bps to put on" in _hedge_cost_text(9.5)
@@ -297,7 +297,7 @@ def test_one_insider_filing_reads_as_one(monkeypatch: pytest.MonkeyPatch) -> Non
     from types import SimpleNamespace
 
     import argus.market.insider as insider
-    from argus.lui.research import _ownership_flow
+    from argus.lui.research.fundamentals import _ownership_flow
 
     def trade(code: str, acquired: bool) -> SimpleNamespace:
         return SimpleNamespace(code=code, acquired=acquired, pre_arranged=False,

@@ -1,0 +1,146 @@
+name = "Path-shape matching with a calibrated null"
+subtheme = "t3-decisionstress"
+modules = [
+    "argus/desk/shapematch.py",
+    "argus/eval/shapematch_comparison.py",
+    "argus/eval/baselines/stumpy_squared_distance.py",
+    "argus/eval/baselines/stumpy_squared_distance_loader.py",
+]
+# Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+# proof now needs a groupwise check on the capability's own artefact, and this
+# row's does not pass it. The reason and the route back are its first blocker.
+state = "implemented"
+baseline = "TDAmeritrade/stumpy real matrix-profile distance and matrix-profile self-join"
+blockers = [
+    """\
+        RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
+        (data/groupwise_audit.json): data/shapematch_comparison.json holds three designed distance \
+        cases and query sweeps over one constructed series, kept as counts. Route back: measure \
+        the exclusion-zone divergence and the look-ahead per real query across names and dates; \
+        the AnalogDesk grid's 2,698 test queries are that population.""",
+    """\
+        The exclusion-zone divergence rate is measured on a series constructed to isolate the \
+        effect (high persistence, chosen so shifted windows are near-duplicates) — the rate on \
+        real market series, which are noisier, has not itself been measured, and may be materially \
+        lower""",
+    """\
+        retrieval diversity, 2026-09-25 (data/retrieval_diversity.json): a LOSS for the path \
+        matcher - MMR at lambda 0.9, the best on 2019-2022, scores 16.42 Winkler against 16.40 \
+        without it on 2023-2026 (Diebold-Mariano p = 0.028); find()'s default stays nearest-first, \
+        and diversity is available only when asked for""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    STUMPY's real _calculate_squared_distance (core.py) and stump() self-join read and, for \
+    the scalar distance function, vendored whole, byte-hash-pinned; ARGUS's own \
+    desk/shapematch.py already cited STUMPY by file:line and derived its distance formula \
+    algebraically before this comparison ran anything, including a self-caught bug (a wrong \
+    '2.0' threshold guess, corrected to the derived '1.0' after reading the real source)"""
+artefact = "src/argus/eval/baselines/stumpy_squared_distance.py"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    both real methods compared: STUMPY's general-purpose matrix profile (naive self-join, m/4 \
+    exclusion default, no significance testing, not built for a point-in-time trading \
+    question) vs. ARGUS's real find() (causal-by-construction candidate generation, \
+    full-window exclusion, shuffled-return null calibration before a precedent is ever \
+    claimed)"""
+artefact = "src/argus/eval/shapematch_comparison.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    STUMPY's real _calculate_squared_distance run genuinely JIT-compiled (numba CPUDispatcher, \
+    not a stub), byte-hash-pinned against the vendored source (commit \
+    e4caf8a7ba519d1ba04796cd06aa78d91e9ca6ee); the real, published stumpy PyPI package's own \
+    stump() run directly, unmodified, not vendored (same posture as the finBERT baseline)"""
+test = "test_baselines.py::TestVendoredFilesHaveNotDrifted"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "distance/znormalise/find/shuffled_closes all evaluate real bars end to end"
+test = "test_shapematch.py"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    both real distance functions fed the identical five scalar inputs (computed the ordinary \
+    way from the same z-normalised windows) on a general case and both constant-window edge \
+    cases; both real search functions run on the identical causally-truncated series for every \
+    swept query point"""
+test = "test_shapematch_comparison.py::TestNumericAgreement"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    the exclusion-zone divergence is a measured rate across many real, swept query points (not \
+    one convenient case), and the look-ahead check counts every interior query point in a real \
+    self-join, not a hand-picked one"""
+test = "test_shapematch_comparison.py::TestExclusionZoneWidth"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    both real costs measured directly and reported without forcing a winner — STUMPY's real \
+    numba-JIT'd scalar function is faster per call than ARGUS's pure-Python one once warm, \
+    reported honestly rather than omitted because it favours the baseline"""
+test = "test_shapematch_comparison.py::TestCosts"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    the exclusion-zone sweep and look-ahead check run on a series constructed specifically to \
+    isolate the property under test, distinct from the general and edge-case \
+    distance-agreement inputs — the finding is not read off the same data point that motivated \
+    it"""
+test = "test_shapematch_comparison.py::TestLookAhead"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    a scan-genuinely-searched-files test (test_the_scan_actually_searched_real_files) caught a \
+    real path bug in this comparison's own first draft — the significance scan was silently \
+    reporting 'zero matches' against a directory that did not exist, which would have shipped \
+    a vacuous negative finding — fixed and re-verified before being trusted"""
+test = """\
+    test_shapematch_comparison.py::TestSignificanceScan::test_the_scan_actually_searched_real_files"""
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    STUMPY's real, default stump() self-join is shown to return a look-ahead neighbour (index \
+    after the query) for real interior query points on a real series, run not inferred from \
+    its docs"""
+test = """\
+    test_shapematch_comparison.py::TestLookAhead::test_stumpys_real_naive_self_join_leaks_the_future"""
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    the exclusion-zone sweep's own worked example names both systems' real picks (STUMPY's \
+    temporally-adjacent one vs. ARGUS's correctly-excluded one) side by side, not just a \
+    pass/fail count"""
+test = """\
+    test_shapematch_comparison.py::TestExclusionZoneWidth::test_a_real_measured_share_of_causal_queries_diverge"""
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "both real systems reproduce identical output on identical input, twice"
+test = "test_shapematch_comparison.py::TestReproducibility"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped explicitly — SCOPE_STATEMENT in eval/shapematch_comparison.py. Claimed: on the two \
+    properties that decide whether a retrieved precedent can be trusted for a point-in-time \
+    trading decision — causality and distinguishability from chance — ARGUS's real find() has \
+    both by construction and STUMPY's real default stump() call has neither. NOT claimed that \
+    STUMPY is a defective library — general-purpose matrix-profile search computing neighbours \
+    in both directions is its documented, intended behaviour, and avoiding look-ahead when \
+    applying it to a trading question is the caller's burden, which is exactly the gap ARGUS's \
+    own specialised find() closes. NOT claimed that STUMPY should have built-in significance \
+    testing — outside its stated scope, not an omission."""
+test = "test_shapematch_comparison.py::TestMainAndRender"

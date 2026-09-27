@@ -56,6 +56,7 @@ from argus.eval.baselines.lean_pairs_ranking_loader import (
     load_pairs_ranking_module,
 )
 from argus.research.cointegration import ADFResult, CointegrationError, adf
+from argus.truth.paths import DATA_DIR
 
 _LEAN_ALPHAS_DIR = (
     Path(__file__).resolve().parents[4] / "research" / "repos" / "Lean-upstream"
@@ -555,7 +556,7 @@ if __name__ == "__main__":
 
     result = main()
     print(render(result))
-    out_path = Path(__file__).resolve().parents[3] / "data" / "cointegration_comparison.json"
+    out_path = DATA_DIR / "cointegration_comparison.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(f"\nsaved -> {out_path}")

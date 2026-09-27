@@ -31,15 +31,15 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from itertools import pairwise
-from pathlib import Path
 from statistics import fmean
 from typing import Any
 
 from argus.backtest.dependence import bootstrap_sharpe, hac_sharpe, optimal_block_length
 from argus.backtest.metrics import MetricError
 from argus.eval.incremental import BASELINES, DIRECTION_NONE, Instant, Policy
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "venue_rules.json"
 
 MIN_INSTANTS = 200

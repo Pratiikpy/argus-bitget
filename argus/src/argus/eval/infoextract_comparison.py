@@ -52,10 +52,10 @@ from __future__ import annotations
 import json
 import time
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from argus.market.fundamentals import FundamentalsSource, parse_concept
+from argus.truth.paths import DATA_DIR
 
 AT = datetime(2026, 9, 22, tzinfo=UTC)
 
@@ -251,7 +251,7 @@ def main() -> int:  # pragma: no cover - CLI
         "scope_statement": SCOPE_STATEMENT,
     }
     print(render(report))
-    out = Path(__file__).resolve().parents[3] / "data" / "infoextract_comparison.json"
+    out = DATA_DIR / "infoextract_comparison.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     print(f"\nwritten to {out}")

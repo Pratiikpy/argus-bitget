@@ -95,7 +95,7 @@ def _frozen_contract_list_when_blocked(_block_network_when_asked: None) -> None:
         return
     from argus.market import universe
 
-    found, frozen_on = universe._from_snapshot()
+    found, frozen_on = universe.contracts_from_snapshot()
     # A stamp in the future keeps the cache fresh for the whole session.
     universe._CACHE = (time.monotonic() + 10 * 365 * 86400, found, f"frozen {frozen_on}")
 

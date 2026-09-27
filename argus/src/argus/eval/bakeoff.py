@@ -30,7 +30,6 @@ import json
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
 from argus.agents.meta_pm import MarketFrame, MetaPM
@@ -40,6 +39,7 @@ from argus.llm.provider import Provider, available, build
 from argus.llm.qwen import QwenError
 from argus.market.bitget import fetch_rtokens
 from argus.truth.clocks import DualClock
+from argus.truth.paths import DATA_DIR
 
 SYMBOL = "NVDAUSDT"
 
@@ -173,7 +173,7 @@ def main() -> int:
     args = parser.parse_args()
 
     result = run(replays=args.replays)
-    out = Path(__file__).resolve().parents[3] / "data" / "bakeoff.json"
+    out = DATA_DIR / "bakeoff.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2, default=str), encoding="utf-8")
 

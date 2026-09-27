@@ -15,7 +15,7 @@ on the same answers, rather than asserting that one is better:
 * **producer coverage** — content lines whose producing step the trace found at all, labelled or
   not; the rest were composed inline by a function too big to declare.
 * **the worklist** — engines that made lines and declared nothing, by line count: where an
-  ``emit(lines, label)`` at the line site in `lui/research.py` would move lines from inferred to
+  ``emit(lines, label)`` at the line site in `lui/research/` would move lines from inferred to
   recorded.
 * **overhead** — seconds per answer with the recorder wired in and without it, on a fixed subset.
 
@@ -54,8 +54,9 @@ from pathlib import Path
 from typing import Any
 
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "trace_audit.json"
 CORPORA = ("lui_final_heldout_2026-09-25.jsonl", "lui_heldout_corpus_2026-09-25.jsonl",
            "lui_blind_corpus_2026-09-25.jsonl")
@@ -261,7 +262,7 @@ def audit(limit: int | None = None) -> dict[str, Any]:
             "run of this audit is not done",
             "a declaration is written by reading the engine's code; the disagreements list is "
             "where it should be checked, and it is published in full",
-            "lines composed inline by lui/research.py's large functions have no producing step "
+            "lines composed inline by lui/research/'s large functions have no producing step "
             "of their own and keep the wording label; the worklist counts them by engine",
         ],
     }

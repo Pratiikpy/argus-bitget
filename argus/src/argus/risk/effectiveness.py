@@ -52,6 +52,8 @@ from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
+from argus.truth.paths import DATA_DIR
+
 MIN_PAIRS = 60
 """Fewest change-pairs before an effectiveness estimate is reported at all.
 
@@ -259,7 +261,7 @@ def measure(
 
 # --- the stored measurement the live path reads --------------------------------------------------
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "hedge_effectiveness.json"
+REPORT_PATH = DATA_DIR / "hedge_effectiveness.json"
 
 
 def load(path: Path | None = None) -> dict[tuple[str, str], HedgeEffectiveness]:

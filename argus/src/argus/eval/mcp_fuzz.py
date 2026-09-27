@@ -47,8 +47,9 @@ from pathlib import Path
 from typing import Any
 
 from argus.truth import artefact
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "mcp_fuzz.json"
+REPORT_PATH = DATA_DIR / "mcp_fuzz.json"
 
 REFLECTION_LIMIT = 16_384
 """Bytes. The largest honest error reply here is a few hundred; sixteen kilobytes is generous."""

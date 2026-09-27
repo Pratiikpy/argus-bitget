@@ -74,6 +74,7 @@ from typing import Any, Protocol
 
 from argus.agents.quarantine import inspect, withholds
 from argus.eval.quarantine_comparison import load_corpus, v1_inspect
+from argus.truth.paths import DATA_DIR
 
 _ARGUS_ROOT = Path(__file__).resolve().parents[3]
 _REPO_ROOT = _ARGUS_ROOT.parent
@@ -158,7 +159,7 @@ def verify_heldout_against_clone() -> dict[str, Any]:
     }
 
 
-SNAPSHOT_PATH = Path(__file__).resolve().parents[3] / "data" / "quarantine_pre_rewrite.py.txt"
+SNAPSHOT_PATH = DATA_DIR / "quarantine_pre_rewrite.py.txt"
 """The pre-rewrite detector, archived here rather than read out of `deploy/`.
 
 **`deploy/api/argus/agents/quarantine.py` was the witness and `argus.demo.deploysync` overwrote

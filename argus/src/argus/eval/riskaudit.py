@@ -36,7 +36,9 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "risk_audit.json"
+from argus.truth.paths import DATA_DIR
+
+REPORT_PATH = DATA_DIR / "risk_audit.json"
 """Where the report is written.
 
 It had none. This module answers Track 2's judged line *"risk control layer effectiveness"*
@@ -299,7 +301,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     from argus.paper.ledger import PaperLedger
 
-    root = Path(__file__).resolve().parents[3] / "data"
+    root = DATA_DIR
     parser = argparse.ArgumentParser(description="Audit the risk layer over the decision record.")
     parser.add_argument("--records", type=Path, default=root / "risk_records.jsonl")
     parser.add_argument("--ledger", type=Path, default=root / "paper_ledger.jsonl")

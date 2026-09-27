@@ -33,14 +33,14 @@ import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
 from argus.backtest.engine import Bar
 from argus.research.factor_lab import PRIMITIVES
 from argus.research.overfit import MIN_OBSERVATIONS, Observation, OverfitReport, run_all
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "overfit_gates.json"
 
 FEE_BPS = 12.0

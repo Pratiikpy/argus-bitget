@@ -13,6 +13,7 @@ from typing import Any
 import pytest
 
 from argus.lui import research
+from argus.lui.answer import Source
 from argus.market import bitget, universe
 from argus.market.bitget import Ticker
 from argus.research import carry
@@ -41,8 +42,8 @@ def venue(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
 def test_cheap_funding_that_is_dear_for_this_contract_does_not_hold(venue: dict[str, Any]) -> None:
     venue["tickers"] = {"MSTRUSDT": _ticker("MSTRUSDT", "0.000395")}
     venue["history"] = [0.0] * 90 + [1.0] * 10
-    lines, sources = research._claim_check("Long MSTR perp into earnings — funding looks cheap",
-                                           "MSTRUSDT") or ([], [])
+    lines, sources = research.claims._claim_check(
+        "Long MSTR perp into earnings — funding looks cheap", "MSTRUSDT") or ([], [])
     assert lines[0].startswith("Your premise that funding looks cheap: does not hold.")
     assert "+0.0395% per 8h" in lines[0] and "43.3% a year" in lines[0]
     assert "higher than 100% of its last 100 settlements" in lines[0]
@@ -52,7 +53,8 @@ def test_cheap_funding_that_is_dear_for_this_contract_does_not_hold(venue: dict[
 def test_high_funding_that_is_below_its_usual_does_not_hold(venue: dict[str, Any]) -> None:
     venue["tickers"] = {"MSTRUSDT": _ticker("MSTRUSDT", "0.00004")}
     venue["history"] = [0.64] * 80 + [0.1] * 20
-    lines, _ = research._claim_check("MSTR funding is high, fade it?", "MSTRUSDT") or ([], [])
+    lines, _ = (research.claims._claim_check("MSTR funding is high, fade it?", "MSTRUSDT")
+                or ([], []))
     assert "funding looks high: does not hold" in lines[0]
 
 
@@ -62,41 +64,47 @@ def test_zero_funding_gets_one_verdict_whatever_the_ties(venue: dict[str, Any]) 
         # Two contracts both at zero, one with more negative settlements, got "holds" and
         # "unclear" on the same run before the rule stopped depending on tied ranks.
         venue["history"] = history
-        lines, _ = research._claim_check("cheap funding on MSTR, go long?", "MSTRUSDT") or ([], [])
+        lines, _ = (research.claims._claim_check("cheap funding on MSTR, go long?", "MSTRUSDT")
+                    or ([], []))
         assert "holds in absolute terms — a long pays nothing" in lines[0]
-        lines, _ = research._claim_check("is MSTR funding expensive?", "MSTRUSDT") or ([], [])
+        lines, _ = (research.claims._claim_check("is MSTR funding expensive?", "MSTRUSDT")
+                    or ([], []))
         assert "does not hold — the rate is at or below this contract's usual" in lines[0]
 
 
 def test_a_rate_in_the_middle_of_its_history_is_unclear(venue: dict[str, Any]) -> None:
     venue["tickers"] = {"MSTRUSDT": _ticker("MSTRUSDT", "0.00005")}
     venue["history"] = [0.2] * 40 + [0.5] * 20 + [0.8] * 40
-    lines, _ = research._claim_check("MSTR funding looks cheap", "MSTRUSDT") or ([], [])
+    lines, _ = research.claims._claim_check("MSTR funding looks cheap", "MSTRUSDT") or ([], [])
     assert "unclear — the rate is ordinary for this contract" in lines[0]
 
 
 def test_missing_data_says_so_instead_of_judging(venue: dict[str, Any]) -> None:
-    lines, _ = research._claim_check("funding looks cheap on MSTR", "MSTRUSDT") or ([], [])
+    lines, _ = research.claims._claim_check("funding looks cheap on MSTR", "MSTRUSDT") or ([], [])
     assert "not checkable" in lines[0]
     venue["tickers"] = {"MSTRUSDT": _ticker("MSTRUSDT", "0.0001")}
-    lines, _ = research._claim_check("funding looks cheap on MSTR", "MSTRUSDT") or ([], [])
+    lines, _ = research.claims._claim_check("funding looks cheap on MSTR", "MSTRUSDT") or ([], [])
     assert "unclear — the contract's settlement history did not arrive" in lines[0]
 
 
 def test_a_premium_claim_is_checked_against_the_stock(
         venue: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> None:
     venue["tickers"] = {"NVDAUSDT": _ticker("NVDAUSDT", "0", last="225.0")}
-    monkeypatch.setattr(research, "_premium_line", lambda s, last, open_: (
-        "Versus the stock: NVDA 224.6 → the perpetual trades at a 17.8bps discount (both live).",
-        research.Source(kind="venue", ref="bitget-mcp-server quote", detail="NVDA")))
-    lines, _ = research._claim_check("the NVDA perp trades at a premium, short it?",
+    for _module in (research.anchor, research.claims, research.dispatch,
+                    research.evidence, research.venue):
+        monkeypatch.setattr(_module, "_premium_line", lambda s, last, open_: (
+            "Versus the stock: NVDA 224.6 → the perpetual trades at a 17.8bps discount "
+            "(both live).",
+            Source(kind="venue", ref="bitget-mcp-server quote", detail="NVDA")))
+    lines, _ = research.claims._claim_check("the NVDA perp trades at a premium, short it?",
                                      "NVDAUSDT") or ([], [])
     assert lines[0].startswith("Your premise that the contract trades at a premium: does not hold")
 
 
 def test_a_question_with_no_premise_is_left_alone() -> None:
-    assert research._claim_check("what are NVDA's earnings expectations?", "NVDAUSDT") is None
-    assert research._claim_check("funding history for BTC", "BTCUSDT") is None
+    assert research.claims._claim_check(
+        "what are NVDA's earnings expectations?", "NVDAUSDT") is None
+    assert research.claims._claim_check("funding history for BTC", "BTCUSDT") is None
 
 
 def _moved(symbol: str, change: str) -> Ticker:
@@ -114,13 +122,13 @@ def _moved(symbol: str, change: str) -> Ticker:
 def test_a_claimed_move_is_checked_against_the_day(
         venue: dict[str, Any], text: str, change: str, verdict: str) -> None:
     venue["tickers"] = {"TSLAUSDT": _moved("TSLAUSDT", change)}
-    lines, _ = research._claim_check(text, "TSLAUSDT") or ([], [])
+    lines, _ = research.claims._claim_check(text, "TSLAUSDT") or ([], [])
     assert verdict in lines[0]
 
 
 def test_a_stated_cause_is_never_confirmed_by_the_price(venue: dict[str, Any]) -> None:
     venue["tickers"] = {"NVDAUSDT": _moved("NVDAUSDT", "0.03")}
-    lines, _ = research._claim_check("NVDA is up today because of AI earnings, right?",
+    lines, _ = research.claims._claim_check("NVDA is up today because of AI earnings, right?",
                                      "NVDAUSDT") or ([], [])
     assert lines[0].startswith("Your premise that NVDA is up: holds")
     assert "not something a price can confirm" in lines[0]
@@ -128,8 +136,8 @@ def test_a_stated_cause_is_never_confirmed_by_the_price(venue: dict[str, Any]) -
 
 def test_a_future_direction_is_not_read_as_a_move_that_happened(venue: dict[str, Any]) -> None:
     venue["tickers"] = {"NVDAUSDT": _moved("NVDAUSDT", "0.03")}
-    assert research._claim_check("will NVDA go down tomorrow?", "NVDAUSDT") is None
-    assert research._claim_check("is NVDA going to drop next week", "NVDAUSDT") is None
+    assert research.claims._claim_check("will NVDA go down tomorrow?", "NVDAUSDT") is None
+    assert research.claims._claim_check("is NVDA going to drop next week", "NVDAUSDT") is None
 
 
 @pytest.mark.parametrize(("text", "change", "verdict"), [
@@ -140,21 +148,21 @@ def test_a_past_tense_claim_with_a_cause_is_read(
         venue: dict[str, Any], text: str, change: str, verdict: str) -> None:
     # MirrorLine read these and ARGUS did not, on the first head-to-head run (2026-09-25).
     venue["tickers"] = {"METAUSDT": _moved("METAUSDT", change)}
-    lines, _ = research._claim_check(text, "METAUSDT") or ([], [])
+    lines, _ = research.claims._claim_check(text, "METAUSDT") or ([], [])
     assert verdict in lines[0] and "not something a price can confirm" in lines[0]
 
 
 def test_a_scenario_is_not_a_claim_about_the_tape(venue: dict[str, Any]) -> None:
     venue["tickers"] = {"NVDAUSDT": _moved("NVDAUSDT", "0.03")}
-    assert research._claim_check("If NVDA dropped 10% what happens to my book?",
+    assert research.claims._claim_check("If NVDA dropped 10% what happens to my book?",
                                  "NVDAUSDT") is None
 
 
 def test_a_session_claim_is_checked_against_the_clock(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(research, "_anchor_open_now", lambda: False)
-    lines, _ = research._claim_check("The US stock market is open right now", "") or ([], [])
+    monkeypatch.setattr(research.claims, "_anchor_open_now", lambda: False)
+    lines, _ = research.claims._claim_check("The US stock market is open right now", "") or ([], [])
     assert lines[0].startswith("Your premise that the US market is open: does not hold")
-    lines, _ = research._claim_check("NVDA is trading after hours", "") or ([], [])
+    lines, _ = research.claims._claim_check("NVDA is trading after hours", "") or ([], [])
     assert "holds" in lines[0]
 
 
@@ -184,13 +192,13 @@ def test_a_liquidity_claim_is_measured_on_the_live_book(
     from argus.market import depth
 
     monkeypatch.setattr(depth, "fetch_orderbook", lambda symbol, **_: book)
-    lines, _ = research._claim_check(text, "NVDAUSDT") or ([], [])
+    lines, _ = research.claims._claim_check(text, "NVDAUSDT") or ([], [])
     assert lines[0].startswith(verdict)
 
 
 def test_a_funding_premise_in_chinese_is_read(venue: dict[str, Any]) -> None:
     venue["tickers"] = {"MSTRUSDT": _ticker("MSTRUSDT", "0.000395")}
     venue["history"] = [0.0] * 90 + [1.0] * 10
-    lines, _ = research._claim_check("微策略的资金费率贵"
+    lines, _ = research.claims._claim_check("微策略的资金费率贵"
                                      "吗", "MSTRUSDT") or ([], [])
     assert lines[0].startswith("Your premise that funding looks expensive: holds")

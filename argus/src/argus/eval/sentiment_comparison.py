@@ -45,15 +45,15 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Any
 
 from argus.agents.analysts import Analyst, AnalystView, SentimentAnalyst
 from argus.eval.baselines.finbert_loader import FinbertClassifier, load_finbert
 from argus.llm.base import ChatModel
 from argus.truth.evidence import Evidence
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "sentiment_comparison.json"
 
 _COORDINATION_INSTRUCTION = (

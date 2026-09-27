@@ -52,6 +52,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+from argus.truth.paths import DATA_DIR
+
 _BASELINES_DIR = Path(__file__).resolve().parent
 _SHIM_MARKER = "_argus_rdagent_factor_shim"
 
@@ -158,11 +160,11 @@ def load_factor_module() -> tuple[ModuleType, ModuleType]:
     # (4) RD_AGENT_SETTINGS: workspace_path is real (a temp dir under the scratch data folder);
     # cache_with_pickle=False deliberately takes the real decorator's own real fast-exit branch.
     settings_ns = types.SimpleNamespace(
-        workspace_path=Path(__file__).resolve().parents[4] / "data" / "_rdagent_workspace_tmp",
+        workspace_path=DATA_DIR / "_rdagent_workspace_tmp",
         cache_with_pickle=False,
         use_file_lock=False,
         pickle_cache_folder_path_str=str(
-            Path(__file__).resolve().parents[4] / "data" / "_rdagent_pickle_cache_tmp"
+            DATA_DIR / "_rdagent_pickle_cache_tmp"
         ),
     )
     _shim_leaf("rdagent.core.conf", RD_AGENT_SETTINGS=settings_ns)

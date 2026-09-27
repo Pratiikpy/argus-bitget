@@ -257,9 +257,10 @@ def schema_errors(schema: Mapping[str, Any], value: Any, path: str = "") -> list
 
 
 def _symbol(name: str) -> str:
-    from argus.lui.research import _resolve
+    from argus.lui.research.parse import resolve_name
 
-    hit = _resolve(str(name).strip(), trust_case=False) or _resolve(str(name).strip().upper())
+    hit = (resolve_name(str(name).strip(), trust_case=False)
+           or resolve_name(str(name).strip().upper()))
     if hit is None:
         raise ToolError(f"{name!r} is not a contract Bitget lists")
     return hit[0]
@@ -309,7 +310,8 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
     """Run one tool. Returns (text, is_error)."""
     from decimal import Decimal
 
-    from argus.lui.research import ResearchKind, ResearchRequest, _shock_subject
+    from argus.lui.research import ResearchKind, ResearchRequest
+    from argus.lui.research.parse import shock_subject
 
     if name == "argus_ask":
         from argus.lui import server
@@ -351,7 +353,7 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         shocked = args.get("shocked")
         subject = None
         if shocked:
-            subject = _shock_subject(f"if {shocked} drops", set(book))
+            subject = shock_subject(f"if {shocked} drops", set(book))
             if subject is None and str(shocked).lower() not in ("nasdaq", "qqq", "market"):
                 subject = _symbol(str(shocked))
         shock = args.get("shock_percent")
@@ -372,9 +374,9 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         result = _run(request, f"how should I split a ${usd} order in {symbol}")
         return _answer_text(result), result["refused"]
     if name == "argus_scoreboard":
-        from argus.lui.answer import _notes_path
+        from argus.lui.answer import desk_notes_path
 
-        path = _notes_path().parent / "standing.json"
+        path = desk_notes_path().parent / "standing.json"
         data = json.loads(path.read_text(encoding="utf-8"))
         rows = [f"{c['state'].upper():12} {c['subtheme']:22} {c['name']} — vs {c['baseline'][:90]}"
                 for c in data.get("capabilities", [])]

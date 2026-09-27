@@ -38,9 +38,11 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
+from argus.truth.paths import DATA_DIR
+
 CONTRACTS_URL = ("https://api.bitget.com/api/v2/mix/market/contracts"
                  "?productType=USDT-FUTURES")
-SNAPSHOT_PATH = Path(__file__).resolve().parents[3] / "data" / "venue_universe.json"
+SNAPSHOT_PATH = DATA_DIR / "venue_universe.json"
 CACHE_TTL_S = 6 * 3600.0
 FETCH_TIMEOUT_S = 6.0
 
@@ -57,6 +59,11 @@ class Contract:
     funding_hours: int | None = None
     """Hours between funding settlements (``fundInterval``): 8 on most contracts, 4 on 377 of them
     including gold, 1 on two (2026-09-24). Needed to turn a per-interval rate into a daily cost."""
+    size_step: str | None = None
+    """``sizeMultiplier``: the step an order quantity must be a multiple of (0.01 for NVDAUSDT),
+    as the venue's string. None from the frozen snapshot, which predates it."""
+    min_qty: str | None = None
+    """``minTradeNum``: the smallest quantity the venue accepts."""
 
     @property
     def name(self) -> str:
@@ -201,7 +208,11 @@ def _parse(rows: list[dict[str, object]]) -> dict[str, Contract]:
         except ValueError:
             hours = None
         out[symbol] = Contract(symbol=symbol, rwa=str(row.get("isRwa")) == "YES",
-                               funding_hours=hours)
+                               funding_hours=hours,
+                               size_step=str(row["sizeMultiplier"]) if row.get("sizeMultiplier")
+                               else None,
+                               min_qty=str(row["minTradeNum"]) if row.get("minTradeNum")
+                               else None)
     return out
 
 
@@ -217,11 +228,18 @@ def _fetch_live() -> dict[str, Contract]:
     return contracts
 
 
-def _from_snapshot() -> tuple[dict[str, Contract], str]:
+def contracts_from_snapshot() -> tuple[dict[str, Contract], str]:
     snap = json.loads(SNAPSHOT_PATH.read_text(encoding="utf-8"))
     contracts = {s: Contract(symbol=s, rwa=bool(v["rwa"]), funding_hours=v.get("funding_hours"))
                  for s, v in snap.get("contracts", {}).items()}
     return contracts, str(snap.get("generated_at", "an unrecorded date"))[:10]
+
+
+def cached_contracts() -> Mapping[str, Contract] | None:
+    """The contract list this process already read, or None before the first read. Never fetches:
+    for callers that must not wait on the venue to decide something small (`lui/honesty.py`)."""
+    cached = _CACHE
+    return None if cached is None else cached[1]
 
 
 def contracts() -> Mapping[str, Contract]:
@@ -233,7 +251,7 @@ def contracts() -> Mapping[str, Contract]:
     try:
         found, origin = _fetch_live(), "live"
     except (OSError, ValueError, RuntimeError, urllib.error.URLError):
-        found, frozen_on = _from_snapshot()
+        found, frozen_on = contracts_from_snapshot()
         origin = f"frozen {frozen_on}"
     with _LOCK:
         # A frozen registry is retried sooner than a live one: it is a stopgap, not an answer.

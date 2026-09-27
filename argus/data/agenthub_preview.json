@@ -1,0 +1,67 @@
+{
+ "recorded_at": "2026-09-27T03:56:20+00:00",
+ "cli": "@bitget-ai/bitget-agent-cli@3.0.0",
+ "all_match": true,
+ "orders": [
+  {
+   "command": "bgc order --action place --category USDT-FUTURES --symbol NVDAUSDT --side buy --orderType market --qty 0.1 --paper-trading --dry-run",
+   "ours": {
+    "category": "USDT-FUTURES",
+    "symbol": "NVDAUSDT",
+    "side": "buy",
+    "orderType": "market",
+    "qty": "0.1"
+   },
+   "bgc": {
+    "category": "USDT-FUTURES",
+    "symbol": "NVDAUSDT",
+    "side": "buy",
+    "orderType": "market",
+    "qty": "0.1"
+   },
+   "path": "/api/v3/trade/place-order",
+   "dry_run": true,
+   "match": true
+  },
+  {
+   "command": "bgc order --action place --category USDT-FUTURES --symbol TSLAUSDT --side sell --orderType market --qty 0.05 --paper-trading --dry-run",
+   "ours": {
+    "category": "USDT-FUTURES",
+    "symbol": "TSLAUSDT",
+    "side": "sell",
+    "orderType": "market",
+    "qty": "0.05"
+   },
+   "bgc": {
+    "category": "USDT-FUTURES",
+    "symbol": "TSLAUSDT",
+    "side": "sell",
+    "orderType": "market",
+    "qty": "0.05"
+   },
+   "path": "/api/v3/trade/place-order",
+   "dry_run": true,
+   "match": true
+  },
+  {
+   "command": "bgc order --action place --category USDT-FUTURES --symbol BTCUSDT --side buy --orderType market --qty 0.001 --paper-trading --dry-run",
+   "ours": {
+    "category": "USDT-FUTURES",
+    "symbol": "BTCUSDT",
+    "side": "buy",
+    "orderType": "market",
+    "qty": "0.001"
+   },
+   "bgc": {
+    "category": "USDT-FUTURES",
+    "symbol": "BTCUSDT",
+    "side": "buy",
+    "orderType": "market",
+    "qty": "0.001"
+   },
+   "path": "/api/v3/trade/place-order",
+   "dry_run": true,
+   "match": true
+  }
+ ]
+}

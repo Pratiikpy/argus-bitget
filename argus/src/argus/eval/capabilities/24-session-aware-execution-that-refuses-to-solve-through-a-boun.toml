@@ -1,0 +1,166 @@
+name = "Session-aware execution that refuses to solve through a boundary"
+subtheme = "t3-execution"
+modules = [
+    "argus/execution/schedule.py",
+    "argus/execution/guard.py",
+    "argus/eval/schedule_comparison.py",
+    "argus/desk/session_schedule.py",
+]
+# Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts instead
+# of checking that files existed: ablation and same_input_comparison were claimed here
+# and the artefact recorded nothing about either. An earlier pass already fixed the
+# artefact but never flipped this line back — found stale on an AUDIT sweep 2026-09-22
+# that independently re-ran `verify()` on every proof rather than trusting
+# `conditions_missing` (which only checks a Proof exists per condition, not that it
+# verifies): all thirteen are VERIFIED or ATTESTED, zero UNPROVEN. Restored to OWNED.
+state = "implemented"
+baseline = """\
+    nkaz001/hftbacktest queue model; Bitget's own instrument rules; Almgren & Chriss (2000) \
+    closed-form optimum vs nautechsystems/nautilus_trader's real TwapAlgorithm as the field's \
+    stated default"""
+blockers = [
+    """\
+        RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: Almgren-Chriss minimises its own \
+        mean-variance objective by construction, so beating TWAP on that objective proves the \
+        algebra, not execution quality. The rivals that lead Execution Assistance (PACE; \
+        TradeMaster's order-execution agents; the S2 entries \
+        zz-0816/bitget-s2-execution-aware-alpha and Ritapossible/Egress; Bitget's native \
+        TWAP/Iceberg) have not been run on the same fills (rival review of 2026-09-24). OWNED \
+        returns only when they are.""",
+    """\
+        no live fills exist to compare against, so execution realism is argued from the venue's \
+        rules rather than measured against our own fills — the thirteen conditions are about a \
+        valid experiment, and a live-fills comparison remains a further, separate strengthening \
+        this capability does not yet have, named here so OWNED is not read as 'nothing more could \
+        ever be measured'""",
+    """\
+        guard self-check, 2026-09-25 (data/guard_selfcheck.json, mle-bench's same-code-path \
+        validation): over 190,944 swept orders the read-only would_pass() agreed with \
+        validate().allowed on every one and never consumed a rate-limit slot, where a check that \
+        records as it checks would have spent the window's last slot. A constructed sweep, not \
+        live orders""",
+    """\
+        desk/session_schedule.py, a time-varying Almgren-Chriss solver that refuses segments it \
+        has not measured, with its calendar checked against LEAN for 2025-2027, is complete and \
+        tested (tests/test_session_schedule.py). eval/session_arena.py, the same-fills comparison \
+        against PACE, Egress, zz-0816 and Bitget TWAP, has never run: Tardis answered 403 on \
+        2026-09-26 and the PACE arm needs Qwen. The rivals are still not run on the same fills.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = "hftbacktest and Nautilus execution paths read for fill realism"
+artefact = "../research/architecture/riskcontrol-audit.md"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    Almgren & Chriss (2000) read and transcribed in the module's own notation \
+    (permanent/temporary impact, kappa, the closed-form sinh trajectory); \
+    nautechsystems/nautilus_trader's real TwapAlgorithm (crates/trading/src/algorithm/twap.rs) \
+    read to confirm TWAP is genuine field practice, not a strawman"""
+artefact = "src/argus/eval/schedule_comparison.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    execution.schedule.twap() reproduces TWAP's even-division schedule; verified it is the \
+    exact risk_aversion=0 special case of the same closed-form trajectory() function, not a \
+    separately-coded approximation"""
+test = "test_schedule.py"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "787 live instruments loaded; precision, notional, band, balance and rate"
+test = "test_guard.py"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    trajectory() called twice on the IDENTICAL real ImpactParameters — once at the caller's \
+    risk_aversion, once at 0 — after finding that calling twap() directly scores the straight \
+    line under a fictional zero-impact market"""
+artefact = "data/schedule_comparison.json"
+test = "test_schedule_comparison.py"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    162 real (quantity, horizon, impact regime, risk_aversion) points swept, not a handful of \
+    convenient values"""
+artefact = "data/schedule_comparison.json"
+test = "test_schedule_comparison.py::TestSweepAndReport"
+
+[[proofs]]
+condition = "costs_included"
+how = "the venue's own published fee confirms the 12bps round-trip model"
+test = "test_guard.py"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    ablating Almgren-Chriss's own risk-aversion term (lambda -> 0) IS the TWAP comparison \
+    itself, stated as such rather than run as a padded second experiment — verified exactly \
+    (risk_aversion=0 reproduces is_twap=True on every swept point) and by convergence \
+    (risk_aversion=1e-6 front-loads within 0.00001 of TWAP's exact 0.5)"""
+artefact = "data/schedule_comparison.json"
+test = "test_schedule_comparison.py::TestSweepAndReport"
+
+[[proofs]]
+condition = "adversarial_test"
+how = "quantities quantise down, never up, so rounding can never enlarge an order"
+test = "test_guard.py"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    three real cases found by reading and then by testing, not assumed away: (1) Nautilus's \
+    real TWAP floors each child order and schedules the shortfall as an extra slice \
+    (twap.rs:220-309) — ARGUS's Trajectory did not, closed by \
+    execution.schedule.quantise_trajectory; (2) Nautilus never schedules a slice below the \
+    venue's tradeable minimum, merging it forward instead (twap.rs's own \
+    '..._below_size_increment'/'..._below_min_quantity' tests) — also closed, with a \
+    `min_order_qty` parameter; (3) the FIRST version of the fix for (1) had its own real bug, \
+    caught by these tests rather than by inspection — flooring each slice independently before \
+    carrying anything forward silently discarded each slice's own fractional remainder, so an \
+    extreme schedule emitted 18 zero-quantity 'slices' that still summed correctly but were \
+    not real orders. Fixed by tracking the running RAW cumulative total instead of \
+    pre-truncated per-slice values"""
+artefact = "src/argus/execution/schedule.py"
+test = "test_schedule.py::TestQuantiseTrajectory"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    pure closed-form Decimal arithmetic, no seed, no simulation — the identical inputs produce \
+    the identical trajectory by construction"""
+test = "test_schedule.py"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped precisely: this compares the SCHEDULING decision (which quantity trades when) \
+    against Nautilus's real TwapAlgorithm on the same question, not against its full \
+    1,494-line order-execution/timer/cache infrastructure (a different concern, living in \
+    ARGUS's own execution/orders.py and paper/runner.py). On that scoped question, both real \
+    gaps found by reading Nautilus's source are now closed and verified: quantise_trajectory \
+    preserved every total across 324 real schedules from the same sweep \
+    (data/schedule_comparison.json, 0 failures, 14 that genuinely needed the sub-minimum merge \
+    — not a grid too easy to exercise it), and the closed-form optimum itself never lost to \
+    the field's own stated default across the identical 162-point sweep"""
+artefact = "data/schedule_comparison.json"
+test = "test_schedule_comparison.py::TestVerifyQuantisation"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    an earlier version of this register entry called this condition a template-fit that does \
+    not apply to a closed-form optimum — wrong, and corrected rather than left standing: sigma \
+    is a REAL, market-observed quantity, not a free theoretical choice, and \
+    out_of_sample_test/out_of_sample_sweep estimate it from a chronologically split (never \
+    random) real window, hold gamma/eta/epsilon fixed by design, and check AC's advantage over \
+    TWAP holds against BOTH real, genuinely different volatility regimes. Run against all 12 \
+    real rTokens: held on 12 of 12, real in-sample/out-of-sample volatility ratios ranging \
+    0.55 to 1.12 across symbols — not a near-1.0 split that would have proven nothing"""
+artefact = "data/schedule_comparison.json"
+test = "test_schedule_comparison.py::TestOosResult"

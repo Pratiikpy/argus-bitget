@@ -102,8 +102,9 @@ from argus.llm.qwen import Completion, QwenClient, QwenError, Thinking, TokenBud
 from argus.proof.autonomy import AutonomyProof
 from argus.truth.artefact import write
 from argus.truth.clocks import SessionPhase, SessionState
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 SNAPSHOTS_PATH = DATA / "robustness_snapshots.json"
 BASELINE_PATH = DATA / "robustness_baseline.json"
 REPORT_PATH = DATA / "perturbation_robustness.json"
@@ -914,7 +915,7 @@ def report(baseline: Baseline, cells: Sequence[Cell], *, requests: int,
 def summary(data: Path = DATA) -> dict[str, Any]:
     """The three robustness results as console lines, read from the artefacts and never recomputed.
 
-    The integration point for the research console (`lui/research.py` / `lui/server.py`, owned
+    The integration point for the research console (`lui/research/` / `lui/server.py`, owned
     elsewhere): each line quotes a measured before/worst pair or says the eval has not run. An
     absent artefact is reported as absent, never as a pass.
     """

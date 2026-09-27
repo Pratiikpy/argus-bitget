@@ -33,9 +33,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from argus.truth.paths import DATA_DIR
+
 WORKSPACE = Path(__file__).resolve().parents[4]
 RESEARCH = WORKSPACE / "research"
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "corpus_claims.json"
+REPORT_PATH = DATA_DIR / "corpus_claims.json"
 
 CORPUS_DIRS = (
     "repos",

@@ -38,10 +38,11 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
 from math import sqrt
-from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 REPORT_PATH = DATA / "degradation.json"
 
 DEFAULT_IN_SAMPLE_FRACTION = 0.7

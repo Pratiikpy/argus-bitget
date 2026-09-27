@@ -595,8 +595,18 @@ class TestTheLiveRegisterIsHonest:
         """Closing a capability gap is not the same as the capability paying off, and the
         register must not let the first read as the second."""
         cap = next(c for c in REGISTER if c.name == "Cross-sectional factor evaluation")
-        assert any("NOT ONE" in b or "0 survive" in b for b in cap.blockers)
-        assert any("1,336 backtests" in b for b in cap.blockers)
+        # Every figure the blocker quotes is read from the study that produced it, so the
+        # sentence cannot outlive a re-run that changes it (audit finding 146).
+        data = Path(__file__).resolve().parents[1] / "data"
+        study = json.loads((data / "crosssection_study.json").read_text(encoding="utf-8"))
+        head = study["headline"]
+        assert head["survived_dsr_all_trials"] == 0
+        assert head["profitable_and_phase_consistent"] == 0
+        quoted = (f"{study['trials']} trials, run at every phase of each rebalance cycle for "
+                  f"{study['backtests_run']:,} backtests: {head['positive_mean_gross_sharpe']} "
+                  f"rules are positive before cost, {head['positive_mean_net_sharpe']} after, "
+                  f"{head['survived_dsr_all_trials']} survive either Deflated Sharpe gate")
+        assert any(quoted in " ".join(b.split()) for b in cap.blockers), quoted
 
     def test_capability_names_are_unique(self) -> None:
         names = [c.name for c in REGISTER]
@@ -930,7 +940,7 @@ class TestTheEvaluatorSpineFindingsAreApplied:
         claims = (harnesses / "claimcheck_comparison.py").read_text(encoding="utf-8")
         if "desk/odds.py" in self._row("Where a stop sits").module:
             assert "directional_odds" in stop
-        if "lui/research.py" in self._row("A trader's claims").module:
+        if "lui/research/" in self._row("A trader's claims").module:
             assert "_claim_check" in claims
 
     @pytest.mark.parametrize("artefact", [

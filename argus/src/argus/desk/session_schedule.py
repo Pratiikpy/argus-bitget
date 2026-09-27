@@ -10,8 +10,8 @@ study has not produced a published artefact yet, so no size of the change is cla
 VERIFIED). Almgren & Chriss (2000) derive the optimal schedule *assuming the parameters are
 constant over the horizon*. `execution/schedule.py` ports that closed form exactly and could only
 flag a crossed boundary (``Trajectory.crosses_session_boundary``, set by the caller); the console
-(`lui/research._optimal_schedule`) truncates the schedule at the first boundary and tells the
-trader to plan the rest later. Both avoid the wrong answer. Neither gives the right one.
+(`lui/research/execution.py::_optimal_schedule`) truncates the schedule at the first boundary and
+tells the trader to plan the rest later. Both avoid the wrong answer. Neither gives the right one.
 
 **What this module does instead.** The discrete Almgren-Chriss objective with *time-varying*
 parameters is still a convex quadratic in the holdings, and its first-order conditions are still a

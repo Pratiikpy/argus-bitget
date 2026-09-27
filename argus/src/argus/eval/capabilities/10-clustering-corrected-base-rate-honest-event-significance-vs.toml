@@ -1,0 +1,180 @@
+name = "Clustering-corrected, base-rate-honest event significance vs. a fixed-null test"
+subtheme = "t2-event"
+modules = [
+    "argus/research/eventstudy.py",
+    "argus/eval/eventdriven_comparison.py",
+    "argus/eval/baselines/whale_signals_event_study.py",
+    "argus/eval/baselines/whale_signals_event_study_loader.py",
+    "argus/eval/eventdriven_agents.py",
+    "argus/eval/eventdriven_rivals.py",
+    "argus/eval/baselines/eventdriven_agents_loader.py",
+    "argus/eval/baselines/vibe_trading_eventstudy.py",
+    "argus/eval/baselines/vibe_trading_eventstudy_loader.py",
+]
+state = "implemented"
+baseline = "whale-signals real fixed-null hit-rate test (compute_hit_rates/compute_base_rate)"
+blockers = [
+    """\
+        RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: whale-signals tests one significance \
+        method; the Event-Driven Agent sub-theme asks for event -> decision -> trade, and the \
+        rivals that do that (JohnboscoE/slimon and Ritapossible/Ballast, both S2 entries with \
+        executed demo orders; HKUDS/Vibe-Trading's event skill; TauricResearch/TradingAgents; \
+        Nicholas-03/trading-bot) had not been run on the same input; all but TradingAgents were on \
+        2026-09-26 (the last blocker). Two defects found in the same review: the EventAnalyst \
+        prompt never asked for `chain_falsifiers`, so 0 of 138 recorded chains carried one and \
+        every link graded UNSUPPORTED, and the chain's event field held the price line in 138 of \
+        138 (rival review of 2026-09-24). Both are fixed in code (agents/analysts.py asks for the \
+        falsifiers and takes the event from news, a filing or a print, never the price line); \
+        re-measuring them on newly recorded chains is still to do.""",
+    """\
+        The placebo events are constructed (real timestamps, zero true edge by construction), not \
+        whale-signals' own real 646,442-transaction Dune dataset, which needs a paid API key this \
+        project does not have — their own already-published real results \
+        (results/published_yearly_edges.csv in the cloned repo) independently show the same \
+        qualitative pattern (tiny, sign-flipping year-over-year edges) but were not re-run here. \
+        The false-positive rate measured is specific to this real 90-day ETHUSDT window's own \
+        drift and will vary with the window and period tested""",
+    """\
+        Run 2026-09-26 (eval/eventdriven_agents.py, data/eventdriven_agents.json): slimon's own \
+        perception replayed unmodified reproduces 1,690 of the 1,739 events its agent logged \
+        (recall 0.972). On its 95-day, 12-name event stream, gated on one half and traded on the \
+        other at a 12bps hurdle, ARGUS, Vibe-Trading's BMP and whale-signals all abstain (0 \
+        trades). Ballast's pooled t trades 795 times for -14,483bps (day-clustered t -1.87); \
+        follow-all and fade-all lose 30,174 and 40,002bps. ARGUS beats Ballast and the no-gate \
+        baselines and TIES Vibe-Trading and whale-signals. slimon's own LLM opens average -6.24bps \
+        (14 scored). Nicholas-03's hard-catalyst gate passes 33 of 1,448 headlines with no \
+        measurable separation in move size (1.72x +/- 0.29 against 1.58x +/- 0.06). Under \
+        clustered placebo events (eval/eventdriven_rivals.py, data/eventdriven_rivals.json) \
+        ARGUS's four-test verdict rejects 0.5-3%, Vibe BMP 10.5-15% and Ballast 14.5-33.5%. \
+        TradingAgents was not run.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    whale-signals' real src/analysis/event_study.py read in full — \
+    compute_event_returns/compute_hit_rates/compute_conditioned_hit_rates/compute_base_rate/walk_forward_by_year \
+    — confirming compute_hit_rates is the real significance layer (a scipy.stats.binomtest \
+    against a fixed 50% null) and that compute_base_rate, defined in the SAME real file, is \
+    never passed into it; ARGUS's own existing research/eventstudy.py \
+    (Patell/BMP/Corrado-rank/generalised-sign, Kolari-Pynnonen clustering correction, already \
+    teardown-compared against research/architecture/eventedge.md) read again specifically for \
+    this comparison"""
+artefact = "src/argus/eval/baselines/whale_signals_event_study.py"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    two real methods compared: whale-signals' real raw forward-return hit rate tested against \
+    a FIXED 50% null, no market-model adjustment, no clustering correction anywhere in the \
+    file (confirmed by exhaustive grep) vs. ARGUS's real market-model abnormal-return test \
+    (asset regressed on a real market proxy) with four independent significance tests and a \
+    real, measured cross-sectional clustering deflation applied to every parametric one"""
+artefact = "src/argus/research/eventstudy.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    whale-signals' real compute_hit_rates/compute_base_rate run unmodified, byte-hash-pinned \
+    against the vendored source (commit 6be10a598c9319aa6b64bf517618eac2dd2ec2f5)"""
+test = """\
+    test_baselines.py::TestVendoredFilesHaveNotDrifted::test_whale_signals_event_study_body_matches_the_pinned_hash"""
+
+[[proofs]]
+condition = "implementation_complete"
+how = """\
+    run_base_rate_case/run_false_positive_sweep/run_null_ablation evaluate real ARGUS-fetched \
+    ETHUSDT/BTCUSDT candle history end to end through both real systems"""
+test = "test_eventdriven_comparison.py"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    both real systems scored on the same real, live Bitget ETHUSDT/BTCUSDT hourly candle \
+    history, with placebo whale-event timestamps drawn from the same real series, carrying \
+    zero true informational edge by construction — the real 24h base rate (measured live, \
+    whale-signals' own real function) departs from 50%, and the two real significance tests \
+    reach independent, sometimes opposite, verdicts on the identical placebo draw"""
+test = "test_eventdriven_comparison.py::TestBaseRateCase"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    swept across many independent placebo draws (not one convenient case): whale-signals' real \
+    fixed-null test calls a false-positive rate far above the nominal 5% significant 'smart \
+    money' on genuinely uninformed events, while ARGUS's four-test full-agreement rate stays \
+    near or below nominal on the identical draws"""
+test = "test_eventdriven_comparison.py::TestFalsePositiveSweep"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    real wall-clock cost measured on both real sides on the same real data — whale-signals' \
+    single binomial test vs. ARGUS's real market-model fit plus four statistical tests and a \
+    real O(n^2) cross-sectional clustering correlation, both numbers reported plainly with the \
+    reason for the gap stated rather than hidden"""
+test = "test_eventdriven_comparison.py::TestCosts"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    the false-positive-rate sweep is itself the out-of-sample evidence: each of the swept \
+    placebo draws is an independent real sample never used to design the comparison's \
+    mechanism, and the elevated whale-signals rate holds across all of them, not just the \
+    single hand-picked design case"""
+test = """\
+    test_eventdriven_comparison.py::TestFalsePositiveSweep::test_whale_signals_false_positive_rate_exceeds_nominal"""
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    a real, run ablation re-tests the SAME real placebo hit counts against a sweep of assumed \
+    null probabilities (0.50, 0.55, the real measured base rate, 0.60) using the same real \
+    scipy.stats.binomtest whale-signals' own code calls internally — testing at the real \
+    measured rate produces a materially lower false-positive rate than testing at the fixed \
+    0.50 whale-signals actually uses, isolating the wrong fixed null as the actual mechanism \
+    rather than assuming it (the stricter claim that the true rate is the exact minimum among \
+    every swept candidate was tried first and found, by running it repeatedly, not to hold \
+    reliably against real serial-correlation variance in the overlapping return windows — the \
+    directional claim does)"""
+test = "test_eventdriven_comparison.py::TestNullAblation"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    the real 30-event minimum threshold whale-signals' own code hardcodes tested on both sides \
+    of the boundary (29 vs. 30) — at 29 the real function silently skips the category \
+    (printed, no exception); at 30 it is computed"""
+test = """\
+    test_eventdriven_comparison.py::TestFailureCases::test_twenty_nine_events_is_silently_skipped"""
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    two real, measured silent-behaviour shapes found by running whale-signals' real code, not \
+    assumed: a category below the real n=30 minimum is silently skipped rather than flagged, \
+    and an all-False condition mask silently returns exactly 0.5 — a real 'no data' state \
+    masquerading as 'base rate is exactly random'"""
+test = "test_eventdriven_comparison.py::TestFailureCases"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    the real base-rate comparison run twice on the same seed produces byte-identical JSON \
+    output"""
+test = "test_eventdriven_comparison.py::TestReproducibility"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped explicitly — SCOPE_STATEMENT in eval/eventdriven_comparison.py. Claimed: on \
+    significance-testing methodology for event-driven hit-rate claims, ARGUS's existing \
+    clustering-corrected, non-fixed-null machinery does not share the measured false-positive \
+    inflation whale-signals' real fixed-null test shows on real market data. NOT claimed \
+    whale-signals' raw arithmetic is wrong, or that the two systems measure the same effect — \
+    a raw hit-rate test and a market-relative abnormal-return test can and do disagree in \
+    either direction on identical input. NOT claimed whale-signals' own real, published \
+    646,442-transaction results were reproduced — the real Dune dataset needs a paid API key \
+    this project does not have; their real significance-testing CODE was run instead, on \
+    ARGUS's own real candle history with constructed placebo events"""
+test = "test_eventdriven_comparison.py::TestMain"

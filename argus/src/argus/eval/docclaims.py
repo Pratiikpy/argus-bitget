@@ -316,6 +316,22 @@ def source_files() -> int:
     return sum(1 for _ in SRC.rglob("*.py"))
 
 
+def mypy_files() -> int:
+    """What ``mypy --strict`` checks: every source file but the vendored ones, which
+    ``[tool.mypy] exclude`` leaves verbatim. Quoted as "clean on N source files", and until
+    2026-09-27 compared with `source_files`, three higher than anything mypy ever read."""
+    return sum(1 for p in SRC.rglob("*.py") if "vendor" not in p.relative_to(SRC).parts)
+
+
+def packages() -> int:
+    """``argus`` itself and every sub-package under it."""
+    return 1 + sum(1 for d in SRC.iterdir() if (d / "__init__.py").exists())
+
+
+def data_files() -> int:
+    return sum(1 for p in DATA.rglob("*") if p.is_file() and "__pycache__" not in p.parts)
+
+
 def memory_effect() -> tuple[Number, Number]:
     """Two-session memory tasks, and how many answers the remembered facts changed.
 
@@ -350,10 +366,11 @@ def _task_headline() -> dict[str, float]:
 
 
 def task_sizing() -> tuple[Number, ...]:
-    """The worked research task's size ceiling, risk budget, proposed size and risk share
-    (`eval/research_task_record.py`; audit finding 99)."""
+    """The worked research task's proposed size, its risk share, the risk budget and the size
+    ceiling, in the order the draft states them (`eval/research_task_record.py`; audit finding
+    99)."""
     h = _task_headline()
-    return h["ceiling"], h["budget"], h["proposed"], h["share_after"]
+    return h["proposed"], h["share_after"], h["budget"], h["ceiling"]
 
 
 def task_crowding() -> tuple[Number, ...]:
@@ -608,6 +625,21 @@ def reliable_skill_tools() -> tuple[Number, Number]:
     return int(blob["by_verdict"].get("reliable", 0)), int(blob["tools"])
 
 
+def weekend_band_coverage() -> tuple[Number, Number]:
+    """The shipped weekend band's out-of-sample coverage (percent) and the weekends scored
+    (`eval/weekend_quantiles.py`, the adaptive arm `equity_history.weekend_band` repeats)."""
+    blob = _json("weekend_quantiles.json")["summary"]
+    return (round(100 * float(blob["pooled_band_coverage"]["vol_scaled_ewma_adaptive"])),
+            int(blob["weekends_scored"]))
+
+
+def factor_set_wins() -> tuple[Number, Number]:
+    """Names the eight-factor model predicted better out of sample, and names fitted
+    (`eval/factor_set_comparison.py`)."""
+    blob = _json("factor_set_comparison.json")["summary"]
+    return int(blob["eight_better_out_of_sample"]), int(blob["of"])
+
+
 def answering_data_entries() -> tuple[Number, Number]:
     """Bitget data-catalog entries that return rows, and the total called."""
     blob = _json("data_coverage.json")
@@ -730,8 +762,17 @@ CLAIMS: tuple[Claim, ...] = (
     # itself.
     Claim("tests_passing", r"(?P<q>\d{1,3},\d{3}|\d{4,}) tests(?: passing| collected)?",
           tests_collected, ("readme", "public-readme", "submission", "explained"), mode="at_least"),
-    Claim("source_files", r"strict\W{0,3}clean (?:on|across) (?P<q>\d+) (?:source )?files",
-          source_files, ("readme", "public-readme", "submission", "explained")),
+    Claim("source_files",
+          r"strict\W{0,3}clean (?:on|across) (?:the )?(?:\*\*)?(?P<q>\d+) (?:source )?files",
+          mypy_files, ("readme", "public-readme", "submission", "explained", "architecture")),
+    # The stats rows of ARGUS-ARCHITECTURE and ARGUS-EXPLAINED were typed by hand and read 327
+    # files, 484 files and 147 modules at once against a live 498 (audit finding 33).
+    Claim("source_tree",
+          r"(?P<q1>\d+)(?:\*\*)? (?:source )?files(?:\*\*)?,? (?:across )?(?:\*\*)?"
+          r"(?P<q2>\d+)(?:\*\*)? packages",
+          lambda: (source_files(), packages()), ("explained", "architecture")),
+    Claim("data_files", r"(?P<q>\d+)(?:\*\*)? files under `argus/data/`",
+          data_files, ("explained", "architecture"), mode="lagging"),
     # Registered 2026-09-27 with tests for both evaluators (audit finding 137).
     Claim("memory_effect",
           r"Measured on (?P<q1>\d+) two-session tasks: (?P<q2>\d+) answers changed by memory",
@@ -745,15 +786,15 @@ CLAIMS: tuple[Claim, ...] = (
           r"\s+and\s+(?P<q5>\d+)/(?P<q6>\d+)",
           kind_routing, ("submission",)),
     Claim("task_sizing",
-          r"up to (?P<q1>\d+)% keeps TSLA under (?P<q2>\d+)% of book risk; at\s+(?P<q3>\d+)% it "
-          r"carries (?P<q4>\d+)%",
+          r"at (?P<q1>\d+)% TSLA carries (?P<q2>\d+)% of the book's risk, inside a (?P<q3>\d+)% "
+          r"budget \((?P<q4>\d+)% is the most",
           task_sizing, ("submission",)),
     Claim("task_crowding",
-          r"NVDA\s+still carries (?P<q1>\d+)% of the risk on (?P<q2>\d+)% of the weight",
+          r"NVDA still carries (?P<q1>\d+)% of the risk on (?P<q2>\d+)% of the money",
           task_crowding, ("submission",)),
     Claim("task_fill_cost",
-          r"costs about (?P<q1>\d+\.\d) bps all in on\s+the live book, against "
-          r"(?P<q2>\d+\.\d) bps for one market order",
+          r"about (?P<q1>\d+\.\d) bps all in on the live book \(one market order: "
+          r"(?P<q2>\d+\.\d) bps\)",
           task_fill_cost, ("submission",)),
     # `falsifiable claims about` was added after README:163 was found quoting 36 against a live 156
     # — the sentence had drifted by 120 claims and matched no pattern, so the gate never saw it.
@@ -839,6 +880,15 @@ CLAIMS: tuple[Claim, ...] = (
           reliable_skill_tools, ("submission",)),
     Claim("answering_data_entries", r"(?P<q1>\d+) of (?P<q2>\d+) answer, and",
           answering_data_entries, ("submission",)),
+    Claim("weekend_band_coverage",
+          r"which covered (?P<q1>\d+)% of (?P<q2>[\d,]+) weekends out of sample",
+          weekend_band_coverage, ("public-readme",)),
+    Claim("factor_set_wins",
+          r"the eight explained (?P<q1>\d+) of (?P<q2>\d+) names better out of sample",
+          factor_set_wins, ("public-readme",)),
+    Claim("answering_data_entries_readme",
+          r"(?P<q1>\d+) of (?P<q2>\d+) catalog entries answer in the latest sweep",
+          answering_data_entries, ("public-readme",)),
     Claim("governed_failure_rates",
           r"failure rate is (?P<q1>[\d.]+)% ungoverned against (?P<q2>[\d.]+)% governed",
           governed_failure_rates, ("submission",)),
@@ -997,7 +1047,8 @@ CLAIMS: tuple[Claim, ...] = (
               "profitable_and_phase_consistent"],
           ("explained",)),
     Claim("overfit_noise_primitives",
-          r"(?P<q>\w+) (?:of eight (?:factors|primitives) are noise|are indistinguishable from)",
+          r"(?P<q>\w+) (?:of (?:our )?eight (?:vetted )?(?:factors|primitives) "
+          r"(?:are noise|are indistinguishable from)|are indistinguishable from)",
           lambda: overfit_counts()[1], ("readme", "explained")),
 )
 
@@ -1011,6 +1062,37 @@ def _groups(match: re.Match[str]) -> tuple[str, ...]:
     named = match.groupdict()
     keys = sorted(k for k in named if re.fullmatch(r"q\d*", k))
     return tuple(named[k] for k in keys if named[k] is not None)
+
+
+def _wrap_tolerant(pattern: str) -> str:
+    """The claim's pattern with every literal space outside a character class widened to any run
+    of whitespace, so a figure the prose wraps across two lines is still found.
+
+    README carried "481 have settled as\\n  abstentions" while the live count was 705, and the
+    gate never saw it: the pattern's space could not match the line break, so the claim read as
+    ABSENT from that document rather than STALE. `retired_phrases` already matched across wraps;
+    the claims did not. A space followed by a quantifier (``" ?"``) keeps its meaning, because the
+    widened space is a group: ``(?:\\s+)?``."""
+    out: list[str] = []
+    in_class = escaped = False
+    for char in pattern:
+        if escaped:
+            out.append(char)
+            escaped = False
+        elif char == "\\":
+            out.append(char)
+            escaped = True
+        elif in_class:
+            out.append(char)
+            in_class = char != "]"
+        elif char == "[":
+            out.append(char)
+            in_class = True
+        elif char == " ":
+            out.append(r"(?:\s+)")
+        else:
+            out.append(char)
+    return "".join(out)
 
 
 def _line_of(text: str, offset: int) -> int:
@@ -1054,7 +1136,7 @@ def audit(
                 report.findings.append(Finding(claim.name, doc, None, (), live_tuple, "ABSENT",
                                                "document not found"))
                 continue
-            matches = list(re.finditer(claim.pattern, text, claim.flags))
+            matches = list(re.finditer(_wrap_tolerant(claim.pattern), text, claim.flags))
             if not matches:
                 # Silence means "this document never made the claim" only if it never did.
                 # See SEEN_PATH: once it has, the same silence means the sentence was removed.

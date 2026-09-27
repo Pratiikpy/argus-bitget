@@ -173,6 +173,10 @@ def source_name(url: str, body: bytes | None = None) -> str:
 
 
 _original: Callable[..., Any] | None = None
+_install_lock = threading.Lock()
+"""Held while the wrapper is installed: two threads installing at once could otherwise each
+read ``urlopen`` before the other replaced it, and the second would keep the first's wrapper as
+the "original" it calls, which then calls itself (audit finding 160)."""
 
 
 def _observed(url: Any, *args: Any, **kwargs: Any) -> Any:
@@ -281,6 +285,7 @@ class _Teed:
 def install() -> None:
     """Wrap ``urllib.request.urlopen`` once. Outside a recording the wrapper only passes through."""
     global _original
-    if _original is None:
-        _original = urllib.request.urlopen
-        urllib.request.urlopen = _observed
+    with _install_lock:
+        if _original is None:
+            _original = urllib.request.urlopen
+            urllib.request.urlopen = _observed

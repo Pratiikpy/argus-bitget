@@ -52,8 +52,9 @@ from argus.risk.calibration import (
     expected_calibration_error,
     reliability_curve,
 )
+from argus.truth.paths import DATA_DIR
 
-OUT_PATH = Path(__file__).resolve().parents[3] / "data" / "policy_forecasts.json"
+OUT_PATH = DATA_DIR / "policy_forecasts.json"
 
 WINDOW = 168
 """Bars of realised history used to estimate the next bar's move distribution. One week of hours.

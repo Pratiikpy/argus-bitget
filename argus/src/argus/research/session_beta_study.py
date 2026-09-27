@@ -24,13 +24,13 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from argus.desk.portfolio import Session, leverage_consistency, session_betas
 from argus.market.instruments import LeverageCheck
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "session_beta.json"
 
 BENCHMARK = "QQQUSDT"

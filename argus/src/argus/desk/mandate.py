@@ -51,7 +51,7 @@ guess with another) was left for whoever checks a fourth.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
@@ -97,12 +97,20 @@ class Mandate:
         hedge_available: bool | None = None,
         confidence: float | None = None,
         open_positions: int | None = None,
+        side: str = "buy",
+        positions: Mapping[str, Decimal] | None = None,
+        trades_today: int | None = None,
     ) -> tuple[str, ...]:
         """Every reason this trade does not belong to this trader. Empty means it does.
 
         The later arguments default to ``None`` meaning "not supplied", which is different from
         "supplied and fine": a caller that cannot say whether a hedge exists must not have that
         read as a hedge existing. Only a supplied value can produce a breach.
+
+        ``positions`` is the book as signed notional by symbol (long positive); with ``side``,
+        it gives the gross exposure after the order the way Vibe-Trading's ``check_mandate``
+        computes it (``_post_trade_gross_exposure``): the order is netted into its own symbol, and
+        the absolute values are summed.
         """
         reasons: list[str] = []
         if not self.permits_horizon(horizon_hours):
@@ -138,6 +146,34 @@ class Mandate:
             reasons.append(
                 f"{open_positions} position(s) already open, at this mandate's cap of "
                 f"{self.profile.max_concurrent_positions}"
+            )
+        if positions is not None:
+            book = {k: Decimal(v) for k, v in positions.items()}
+            signed = notional if side == "buy" else -notional
+            book[symbol] = book.get(symbol, Decimal(0)) + signed
+            gross = sum((abs(v) for v in book.values()), Decimal(0))
+            cap = self.profile.max_gross_exposure
+            if cap > 0 and gross > cap:
+                reasons.append(
+                    f"gross exposure after this order would be {gross}, above this mandate's "
+                    f"{cap} ceiling"
+                )
+            leverage_cap = self.profile.max_gross_leverage
+            if leverage_cap > 0 and self.profile.capital > 0:
+                leverage = gross / self.profile.capital
+                if leverage > leverage_cap:
+                    reasons.append(
+                        f"gross leverage after this order would be {leverage:.2f}x, above this "
+                        f"mandate's {leverage_cap}x"
+                    )
+        if (
+            self.profile.max_trades_per_day
+            and trades_today is not None
+            and trades_today + 1 > self.profile.max_trades_per_day
+        ):
+            reasons.append(
+                f"this would be order {trades_today + 1} today, over this mandate's "
+                f"{self.profile.max_trades_per_day} a day"
             )
         return tuple(reasons)
 

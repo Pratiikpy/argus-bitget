@@ -21,14 +21,14 @@ from __future__ import annotations
 import json
 import sys
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from argus.market.bitget import RTOKEN_SYMBOLS
 from argus.market.evidence import BitgetSkillSource
 from argus.market.skills import indicators, macd_fields
+from argus.truth.paths import DATA_DIR
 
-OUT = Path(__file__).resolve().parents[3] / "data" / "skill_macd_check.json"
+OUT = DATA_DIR / "skill_macd_check.json"
 SYMBOLS: tuple[str, ...] = (*RTOKEN_SYMBOLS, "BTCUSDT", "ETHUSDT")
 DIF_AGREEMENT = 0.02
 """Relative gap within which the two MACD lines count as the same reading (bar alignment and the

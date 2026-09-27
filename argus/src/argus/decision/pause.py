@@ -130,6 +130,7 @@ from typing import Any, Protocol
 from argus.decision.escalation import Escalation, TakeoverRate, takeover_rate
 from argus.decision.verdicts import Intent, Side, Verdict
 from argus.proof.autonomy import hash_intent
+from argus.truth.paths import DATA_DIR
 
 PAUSE_FORMAT = "argus-pause/1"
 """Written into every persisted file. A reader meeting another format refuses, never guesses."""
@@ -137,7 +138,7 @@ PAUSE_FORMAT = "argus-pause/1"
 DEFAULT_ANSWER_WINDOW = timedelta(minutes=30)
 """How long a proposal stays answerable. A policy choice, stated as one — see the module doc."""
 
-DEFAULT_ROOT = Path(__file__).resolve().parents[3] / "data" / "pauses"
+DEFAULT_ROOT = DATA_DIR / "pauses"
 """``argus/data/pauses``: one directory per request under ``requests/``, one ``events.jsonl``."""
 
 

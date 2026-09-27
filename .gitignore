@@ -40,3 +40,9 @@ argus/data/_grammar_comparison_tmp/
 
 # The embedding table `python -m argus.llm.semantic` fetches at a pinned revision; not vendored.
 argus/models/
+
+# Coverage output (CI uploads it as an artefact; never committed)
+coverage.xml
+.coverage
+.coverage.*
+htmlcov/

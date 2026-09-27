@@ -1,0 +1,309 @@
+{
+ "generated_at": "2026-09-27T03:09:28+00:00",
+ "method": "each name's daily returns regressed by least squares on the four factors the exposures answer used until 2026-09-27 and on the eight it uses now; adjusted R2 over the whole sample, and out-of-sample R2 of a fit on the first half scored on the second half against that half's own mean",
+ "factors": {
+  "four": [
+   "market",
+   "size",
+   "momentum",
+   "crypto"
+  ],
+  "eight": [
+   "market",
+   "size",
+   "momentum",
+   "value",
+   "quality",
+   "low_vol",
+   "rates",
+   "crypto"
+  ]
+ },
+ "summary": {
+  "names_fitted": 13,
+  "mean_adjusted_r2": {
+   "four": 0.3193,
+   "eight": 0.3691
+  },
+  "mean_out_of_sample_r2": {
+   "four": 0.2151,
+   "eight": 0.2625
+  },
+  "eight_better_out_of_sample": 9,
+  "of": 13,
+  "added_factor_significant": {
+   "value": 6,
+   "quality": 5,
+   "low_vol": 8,
+   "rates": 3
+  }
+ },
+ "results": {
+  "MSFTUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.2881,
+    "out_of_sample_r2": 0.2363
+   },
+   "eight": {
+    "adjusted_r2": 0.3119,
+    "out_of_sample_r2": 0.1952
+   },
+   "added_t": {
+    "value": -3.18,
+    "quality": -0.83,
+    "low_vol": 1.01,
+    "rates": -1.67
+   },
+   "origin": "MSFT daily closes (Yahoo)"
+  },
+  "METAUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.2364,
+    "out_of_sample_r2": 0.0826
+   },
+   "eight": {
+    "adjusted_r2": 0.2767,
+    "out_of_sample_r2": 0.1899
+   },
+   "added_t": {
+    "value": -2.38,
+    "quality": 2.71,
+    "low_vol": -2.92,
+    "rates": 0.43
+   },
+   "origin": "META daily closes (Yahoo)"
+  },
+  "GOOGLUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.3436,
+    "out_of_sample_r2": 0.3857
+   },
+   "eight": {
+    "adjusted_r2": 0.4082,
+    "out_of_sample_r2": 0.4519
+   },
+   "added_t": {
+    "value": -2.31,
+    "quality": -1.52,
+    "low_vol": -3.48,
+    "rates": 2.32
+   },
+   "origin": "GOOGL daily closes (Yahoo)"
+  },
+  "NVDAUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.4639,
+    "out_of_sample_r2": 0.2534
+   },
+   "eight": {
+    "adjusted_r2": 0.5381,
+    "out_of_sample_r2": 0.3469
+   },
+   "added_t": {
+    "value": -2.46,
+    "quality": -1.35,
+    "low_vol": -4.66,
+    "rates": -1.05
+   },
+   "origin": "NVDA daily closes (Yahoo)"
+  },
+  "TSLAUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.376,
+    "out_of_sample_r2": 0.2957
+   },
+   "eight": {
+    "adjusted_r2": 0.4079,
+    "out_of_sample_r2": 0.2814
+   },
+   "added_t": {
+    "value": -0.89,
+    "quality": -2.74,
+    "low_vol": -1.71,
+    "rates": -0.43
+   },
+   "origin": "TSLA daily closes (Yahoo)"
+  },
+  "AAPLUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.2447,
+    "out_of_sample_r2": 0.1161
+   },
+   "eight": {
+    "adjusted_r2": 0.2496,
+    "out_of_sample_r2": 0.0765
+   },
+   "added_t": {
+    "value": 0.39,
+    "quality": 1.61,
+    "low_vol": -2.05,
+    "rates": -0.52
+   },
+   "origin": "AAPL daily closes (Yahoo)"
+  },
+  "AMZNUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.3554,
+    "out_of_sample_r2": 0.3494
+   },
+   "eight": {
+    "adjusted_r2": 0.3997,
+    "out_of_sample_r2": 0.387
+   },
+   "added_t": {
+    "value": -1.32,
+    "quality": -1.38,
+    "low_vol": -3.43,
+    "rates": 0.31
+   },
+   "origin": "AMZN daily closes (Yahoo)"
+  },
+  "COINUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.5043,
+    "out_of_sample_r2": 0.3605
+   },
+   "eight": {
+    "adjusted_r2": 0.519,
+    "out_of_sample_r2": 0.3948
+   },
+   "added_t": {
+    "value": -1.36,
+    "quality": -2.44,
+    "low_vol": 2.14,
+    "rates": -1.96
+   },
+   "origin": "COIN daily closes (Yahoo)"
+  },
+  "MSTRUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.522,
+    "out_of_sample_r2": 0.4773
+   },
+   "eight": {
+    "adjusted_r2": 0.5298,
+    "out_of_sample_r2": 0.505
+   },
+   "added_t": {
+    "value": -1.79,
+    "quality": -1.96,
+    "low_vol": 1.05,
+    "rates": -1.22
+   },
+   "origin": "MSTR daily closes (Yahoo)"
+  },
+  "HOODUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.3977,
+    "out_of_sample_r2": 0.1132
+   },
+   "eight": {
+    "adjusted_r2": 0.4539,
+    "out_of_sample_r2": 0.3326
+   },
+   "added_t": {
+    "value": -4.68,
+    "quality": -2.8,
+    "low_vol": 0.69,
+    "rates": -0.45
+   },
+   "origin": "HOOD daily closes (Yahoo)"
+  },
+  "JPMUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.2287,
+    "out_of_sample_r2": 0.0922
+   },
+   "eight": {
+    "adjusted_r2": 0.2347,
+    "out_of_sample_r2": 0.1352
+   },
+   "added_t": {
+    "value": -1.25,
+    "quality": 1.0,
+    "low_vol": 0.43,
+    "rates": -1.89
+   },
+   "origin": "JPM daily closes (Yahoo)"
+  },
+  "XOMUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.067,
+    "out_of_sample_r2": -0.0371
+   },
+   "eight": {
+    "adjusted_r2": 0.2086,
+    "out_of_sample_r2": 0.1311
+   },
+   "added_t": {
+    "value": 1.45,
+    "quality": -1.16,
+    "low_vol": 3.58,
+    "rates": -6.36
+   },
+   "origin": "XOM daily closes (Yahoo)"
+  },
+  "JNJUSDT": {
+   "error": "closes unreadable (HistoryError)"
+  },
+  "KOUSDT": {
+   "n": 273,
+   "start": "2025-08-26",
+   "end": "2026-09-25",
+   "four": {
+    "adjusted_r2": 0.1234,
+    "out_of_sample_r2": 0.0715
+   },
+   "eight": {
+    "adjusted_r2": 0.2601,
+    "out_of_sample_r2": -0.0151
+   },
+   "added_t": {
+    "value": 2.61,
+    "quality": 2.81,
+    "low_vol": 3.63,
+    "rates": 2.29
+   },
+   "origin": "KO daily closes (Yahoo)"
+  },
+  "PGUSDT": {
+   "error": "closes unreadable (HistoryError)"
+  }
+ }
+}

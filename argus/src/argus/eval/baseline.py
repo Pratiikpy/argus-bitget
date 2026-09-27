@@ -30,6 +30,8 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import Any, Protocol
 
+from argus.truth.paths import DATA_DIR
+
 
 class Verdict(StrEnum):
     """How the desk did against holding its own picks."""
@@ -263,7 +265,7 @@ def main() -> int:
 
     from argus.paper.ledger import PaperLedger
 
-    root = Path(__file__).resolve().parents[3] / "data"
+    root = DATA_DIR
     parser = argparse.ArgumentParser(
         description="Compare the desk against buy-and-hold of its own picks."
     )

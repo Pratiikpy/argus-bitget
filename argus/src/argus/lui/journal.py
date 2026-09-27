@@ -47,12 +47,13 @@ trade, counts the recurring habits, and says plainly when a handful of trades is
 * The console's own engines, reused rather than copied: the session calendar with Lean's US
   holidays (`truth/clocks.py`, `eval/baselines/lean_market_holidays_loader.py`), the daily-close
   sources `research._daily_closes` chooses (Yahoo split-adjusted closes for a stock, Bitget daily
-  candles otherwise; `research.py:6900-6919`), the earnings release times from SEC EDGAR 8-K item
-  2.02 acceptance (`research/event_reactions.earnings_releases`, `market/evidence.EdgarSource`), and
-  the window distribution of `desk/odds.directional_odds` for "was this move inside the name's
-  ordinary noise at that horizon". EDGAR's ``acceptanceDateTime`` was checked to be true UTC on
-  NVDA's six 2.02 filings (2026-09-26: 20:21 UTC in daylight-saving months, 21:31 in winter, both
-  16:2x-16:3x New York), so a release is placed before or after the close from its own time.
+  candles otherwise; `lui/research/quote.py::_daily_closes`), the earnings release times from SEC
+  EDGAR 8-K item 2.02 acceptance (`research/event_reactions.earnings_releases`,
+  `market/evidence.EdgarSource`), and the window distribution of `desk/odds.directional_odds` for
+  "was this move inside the name's ordinary noise at that horizon". EDGAR's ``acceptanceDateTime``
+  was checked to be true UTC on NVDA's six 2.02 filings (2026-09-26: 20:21 UTC in daylight-saving
+  months, 21:31 in winter, both 16:2x-16:3x New York), so a release is placed before or after the
+  close from its own time.
 * `eval/regression_gate.journal_review` is called, unchanged, when a pasted journal is large and
   timed enough for it (:data:`GATE_MIN_TRADES` graded trades, every one with timestamps): the
   held-out rule gate then says which habits survive out of sample. Below that it is not run,
@@ -81,6 +82,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from argus.lui.answer import Source
+from argus.lui.research.parse import is_us_equity
 from argus.lui.trace import every, traced
 
 NEW_YORK = ZoneInfo("America/New_York")
@@ -343,7 +345,7 @@ def _resolve_word(word: str) -> str | None:
     """A word in a trade statement to a listed contract, by the console's own reader: the twelve
     stock perpetuals and their company names in any case, any other ticker in capitals, a full
     ``...USDT`` symbol, and the common coins in lower case (a journal line carries a price, which is
-    the market cue `research._LOWERCASE_CRYPTO` asks for)."""
+    the market cue `research.parse.LOWERCASE_CRYPTO` asks for)."""
     from argus.lui import research
     from argus.market import universe
 
@@ -358,11 +360,12 @@ def _resolve_word(word: str) -> str | None:
     if token.upper() in _NOT_SYMBOL:
         return None
     upper = token.upper()
-    if not token.isupper() and (upper in _CRYPTO_LOWER or upper in research._LOWERCASE_CRYPTO):
+    if not token.isupper() and (upper in _CRYPTO_LOWER
+                                or upper in research.parse.LOWERCASE_CRYPTO):
         found = universe.resolve(upper)
         return found[0] if found else None
     try:
-        found = research._resolve(token)
+        found = research.parse.resolve_name(token)
     except Exception:
         return None
     return found[0] if found else None
@@ -771,9 +774,9 @@ def pair(legs: Sequence[Leg]) -> tuple[list[Trade], list[str], list[str]]:
 
 
 def _short(symbol: str) -> str:
-    from argus.lui.research import _t
+    from argus.lui.research.kinds import bare_symbol
 
-    return _t(symbol)
+    return bare_symbol(symbol)
 
 
 # --- market facts per trade -----------------------------------------------------------------------
@@ -785,7 +788,7 @@ Releases = tuple[list[datetime], str]
 
 
 def _is_equity(symbol: str) -> bool:
-    from argus.lui.research import _is_equity as equity
+    from argus.lui.research.parse import is_us_equity as equity
 
     try:
         return bool(equity(symbol))
@@ -796,9 +799,9 @@ def _is_equity(symbol: str) -> bool:
 
 
 def daily_history(symbol: str) -> History:
-    """The closes `research._daily_closes` would read (`research.py:6900-6919`), with their dates:
-    a stock's split-adjusted closes from Yahoo, else Bitget's daily candles."""
-    if _is_equity(symbol):
+    """The closes `lui/research/quote.py::_daily_closes` would read, with their dates: a
+    stock's split-adjusted closes from Yahoo, else Bitget's daily candles."""
+    if is_us_equity(symbol):
         from argus.market import equity_history
 
         try:
@@ -834,6 +837,31 @@ def _holidays() -> frozenset[date] | None:
         return load_usa_equity_holidays()
     except Exception:
         return None
+
+
+def holidays() -> frozenset[date] | None:
+    """The US equity holiday calendar, or None when it cannot be read."""
+    return _holidays()
+
+
+def next_report_date(symbol: str) -> date | None:
+    """The name's next earnings date: Bitget's data service first, Yahoo's earnings calendar when
+    it does not answer, as the fundamentals answer reads them (`research.py`)."""
+    ticker = _short(symbol)
+    try:
+        from argus.market.bitget_mcp import shared_service
+
+        found = shared_service().next_earnings(ticker)
+        if isinstance(found, dict) and found.get("report_date"):
+            return date.fromisoformat(str(found["report_date"])[:10])
+    except Exception:
+        pass
+    from argus.lui.research.fundamentals import yahoo_summary
+
+    summary = yahoo_summary(ticker)
+    calendar = (summary.get("calendarEvents") or {}).get("earnings") or {}
+    stamps = sorted(str(d.get("fmt")) for d in calendar.get("earningsDate") or [] if d.get("fmt"))
+    return date.fromisoformat(stamps[0][:10]) if stamps else None
 
 
 def _trading_day(d: date, holidays: frozenset[date]) -> bool:
@@ -919,6 +947,81 @@ def check_trade(trade: Trade, history: History | None, releases: Releases | None
             out.prior_move_pct = 100.0 * last
             out.chased = out.prior_rank <= LARGE_DAY_SHARE
     return out
+
+
+# --- the checklist, run again on a later entry ----------------------------------------------------
+
+def retest(key: str, symbol: str, side: str, *, today: date, horizon_days: int,
+           history: Callable[[str], History] | None = daily_history,
+           next_report: Callable[[str], date | None] | None = None,
+           holidays: frozenset[date] | None = None) -> str | None:
+    """What one remembered check (a :class:`Pattern` key) says about entering ``symbol`` on
+    ``side`` today for ``horizon_days``, measured the way :func:`check_trade` measured the habit
+    on the trader's own trades; None when a question cannot test it (sizing after a loss needs
+    the next trade's size and the last one's result, which a question does not carry).
+
+    The checklist a review printed said "run it before every entry" and nothing ever ran it
+    (audit finding 56). A check that cannot be read is said to be unread, never passed."""
+    equity = _is_equity(symbol)
+    name = _short(symbol)
+    if key == f"repeat_{symbol}":
+        return (f"{name} is the name your review found you lose on repeatedly: write what is "
+                f"different about this entry before placing it")
+    if key == "earnings_losers":
+        if not equity:
+            return None
+        report = None
+        if next_report is not None:
+            try:
+                report = next_report(symbol)
+            except Exception:
+                report = None
+        if report is None:
+            return f"{name}'s next report date could not be read, so this check is not passed"
+        days = (report - today).days
+        if 0 <= days <= horizon_days:
+            return (f"{name} reports on {report.isoformat()}, {days} day(s) away, inside your "
+                    f"{horizon_days}-day hold: decide now whether to hold through it, at a size "
+                    f"you can take the gap on")
+        return f"{name}'s next report ({report.isoformat()}) is after your {horizon_days}-day hold"
+    if key == "closure_losers":
+        if not equity:
+            return None
+        if holidays is None:
+            return "the US holiday calendar could not be read, so this check is not passed"
+        span = [today + timedelta(days=k) for k in range(1, horizon_days + 1)]
+        closed = [d for d in span if not _trading_day(d, holidays)]
+        if not closed:
+            return f"a {horizon_days}-day hold crosses no closed US session"
+        return (f"a {horizon_days}-day hold crosses {len(closed)} closed US day(s), the first "
+                f"{closed[0].isoformat()}, when {name} does not trade and the perpetual does: "
+                f"size it to survive that gap")
+    if key not in ("chasing", "stop_inside_noise", "loss_beyond_noise"):
+        return None
+    try:
+        closes = sorted(history(symbol)[0]) if history is not None else []
+    except Exception:
+        closes = []
+    before = [c for c in closes if c[0] < today][-HISTORY_SESSIONS:]
+    if key == "chasing":
+        if len(before) < RANK_SESSIONS // 2:
+            return f"{name}'s daily history could not be read, so this check is not passed"
+        moves = [before[i][1] / before[i - 1][1] - 1.0 for i in range(1, len(before))]
+        last, past = moves[-1], moves[-RANK_SESSIONS - 1:-1]
+        rank = (sum(1 for m in past if m >= last) if side == "long"
+                else sum(1 for m in past if m <= last)) / len(past)
+        if rank <= LARGE_DAY_SHARE:
+            return (f"{name}'s last session ({before[-1][0].isoformat()}, {last:+.1%}) was one "
+                    f"of its largest {'up' if side == 'long' else 'down'} days of the past year "
+                    f"(top {rank:.0%}): wait one session, or enter at half size")
+        return (f"{name}'s last session moved {last:+.1%}, not one of its large days: this "
+                f"check passes")
+    sessions = max(1, round(horizon_days * 5 / 7))
+    band = _band(before, sessions) if len(before) >= 60 else None
+    if band is None:
+        return f"{name}'s ordinary range could not be measured, so this check is not passed"
+    return (f"{name}'s ordinary {BAND} range over {sessions} session(s) is {band[0]:+.1f}% to "
+            f"{band[1]:+.1f}%: a stop inside it is noise, a move past it means the idea was wrong")
 
 
 # --- patterns -------------------------------------------------------------------------------------
@@ -1245,7 +1348,8 @@ def checklist_lines(patterns: Sequence[Pattern]) -> list[str]:
     """The reusable checklist: one check per habit found, in the order of what it cost."""
     if not patterns:
         return []
-    out = ["Checklist, from your own trades (run it before every entry):"]
+    out = ["Checklist, from your own trades (kept in this browser, and run again when you next "
+           "ask about adding a name or executing an order):"]
     for n, p in enumerate(patterns, start=1):
         out.append(f"{n}. {p.check} (from {len(p.members)} of {p.of} trades)")
     return out
@@ -1431,11 +1535,14 @@ __all__ = [
     "daily_history",
     "earnings_releases",
     "find_patterns",
+    "holidays",
+    "next_report_date",
     "pair",
     "parse_fills",
     "parse_text",
     "reaction_day",
     "read_journal",
+    "retest",
     "review_requested",
     "review_trades",
 ]

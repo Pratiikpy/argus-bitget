@@ -18,8 +18,9 @@ well-known), ten for dialogue responses (``src/responsegen/feedback.py:20-38``).
 
 1. **Every axis names the desk's own measurement of it**, so the model's score and the checker's
    figure sit side by side in the record (:func:`pairs`, :func:`pair_note`) — the "checkable pair"
-   the harvest asked for (`Activity/17_HARVEST_CHECKLIST.md`, Part 2). Self-Refine's rubric has no
-   external counterpart for any of its dimensions; its authors grade final quality with a separate
+   the harvest asked for (the pattern-harvest checklist, not published, Part 2). Self-Refine's
+   rubric has no external counterpart for any of its dimensions; its authors grade final quality
+   with a separate
    judge or metric (``src/sentiment_reversal/gpt4_eval.py``, ``src/pie/pie_eval.py``), which is a
    tacit admission that a self-score is not a measurement. Here the pairing makes that admission
    testable per decision.

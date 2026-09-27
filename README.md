@@ -1,5 +1,7 @@
 # ARGUS
 
+[![CI](https://github.com/Pratiikpy/argus-bitget/actions/workflows/ci.yml/badge.svg)](https://github.com/Pratiikpy/argus-bitget/actions/workflows/ci.yml)
+
 **A research desk for Bitget's tokenized US stocks. Ask in plain language; every number is
 computed from live data and names its source.**
 
@@ -38,7 +40,11 @@ Open the console and ask any of these. Each one exercises something different.
 | Ask | What it shows |
 |---|---|
 | *I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?* | Your book's risk before and after, sized to a risk budget, a hedge, stress cases, and how far to trust the beta — scored against weekend-copilot, an S2 rival answering the same question. |
-| *How should I split a $50k order in NVDA?* | An execution schedule priced on the live order book, measured against Bitget's own TWAP on a full-depth replay. |
+| *How should I split a $50k order in NVDA?* | An execution schedule priced on the live order book, measured against Bitget's own TWAP on a full-depth replay, and the first child written as the Agent Hub `bgc --dry-run` command that previews it without sending. |
+| *What are my sector and factor exposures if I add 10% XOM?* | Sectors, industries and eight factor betas with their t-statistics — market, size, momentum, value, quality, low volatility, rates and crypto, widened from four after the eight explained 9 of 13 names better out of sample. |
+| *Long rNVDA over the weekend at 3x* | The stock's weekends since 1999, a band for Monday's open scaled to its volatility now, which covered 79% of 17,044 weekends out of sample against an 80% target, and the perpetual's own path to the liquidation line. |
+| *Review my trades: bought NVDA at 188, sold at 176 …* | Your habits across the trades and a checklist, kept and run again the next time you ask about adding a name. |
+| *What's trending right now?* | The coins drawing the crowd, checked against Bitget's board: listed or not, the 24-hour move, the funding rate. Also: *top DeFi protocols by TVL*, *how much is ETH gas*. |
 | *How does NVDA react to CPI?* | An event study over past releases, with the tests that say whether the reaction is real. |
 | *Is the hype on NVDA real?* | Headlines grouped into stories, so five outlets repeating one article count once. |
 | *I hold NVDA r-token overnight — how do I hedge it?* | The spot rToken hedged with the same company's perpetual, tested on held-out nights. |
@@ -72,6 +78,22 @@ translated line is checked against the English — a line whose figures do not m
 The same desk answers in Telegram at [@argusbitgetbot](https://t.me/argusbitgetbot): `/book` saves
 your holdings for the chat, and orders are refused there as everywhere.
 
+**Run your own.** Like OpenClaw or Hermes Agent, the desk also runs as your own Telegram bot, on
+your machine, with your token — nothing of yours passes through our servers:
+
+```bash
+pip install -e argus                                  # or: uv sync --frozen, in argus/
+argus-bot setup --token <token from @BotFather>       # checks it, keeps it in ~/.argus
+argus-bot run                                         # long polling: no server, no public URL
+```
+
+Message your bot once and approve the code it gives you (`argus-bot pairing approve <CODE>`): you
+become its owner, and a stranger gets a code and nothing else until you approve them too
+(`--policy allowlist --allow <id>` locks it to named user ids instead). Your book, what you told
+the desk and your alerts stay in `~/.argus` across restarts, and alerts fire while it runs:
+`/watch NVDA below 170`, `/watch MSTR funding 0.05%`. No model key is needed; the desk reads
+questions with its own classifier.
+
 **Who it is for:** a trader holding Bitget's tokenized US equities who wants a second desk that
 shows its work. **What it is not:** a signal service. No strategy here has cleared its own
 deflation gate, and the console says so.
@@ -88,39 +110,32 @@ all thirteen conditions: the rival's best implementation read and reproduced, a 
 comparison with costs, out-of-sample, ablation, an adversarial test, documented failure cases and
 reproducibility.
 
-The register got stricter on 2026-09-25, 26 and 27, and the OWNED count fell from 20 to 8, then to 6, then to 4. A proof that rests on a
-population figure must now survive a per-group check — by symbol and by half of the sample — and 12
-capabilities went back to IMPLEMENTED: five because their headline was carried by one symbol or
-flipped between halves, seven because their proof is a designed case set the new check cannot
-grade, which needs its own construction test before it can count again. Each row names its route
-back (`data/standing.json`). One more went to TIED the same day: breadth rotation had beaten
-pytaa, which silently drops weight, but a general-purpose validator (pandera with pydantic)
-configured to the same contract handles the same 36 cases, so a margin over the specialist was
-not a margin over the best tool for the job. A sixth, rToken factor divergence against Alphalens, went to IMPLEMENTED when its statement was rewritten from the computed intervals, which include zero. On 2026-09-27 cross-sectional ranking went to TIED with qlib: the two rank identically, and the one input where ARGUS was safer, a single-instrument group, never reaches a decision, because every hour of the panel holds all 12 names. Numeric decision grounding went back to IMPLEMENTED the same day: its twelve cases were fabrications the author chose, which the gate had filed as a population, and a general pydantic range check was never run against them.
+The register got stricter on 2026-09-25, 26 and 27, and the OWNED count fell from 20 to 8, then
+to 6, then to 4. A proof that rests on a population figure must now survive a per-group check, by
+symbol and by half of the sample, and 12 capabilities went back to IMPLEMENTED: five because their
+headline was carried by one symbol or flipped between halves, seven because their proof is a
+designed case set. Breadth rotation went to TIED: it beat pytaa, but a general-purpose validator
+(pandera with pydantic) configured to the same contract handles the same 36 cases. rToken factor
+divergence went to IMPLEMENTED when its statement was rewritten from intervals that include zero.
+On 2026-09-27 cross-sectional ranking went to TIED with qlib (the one input where ARGUS was safer,
+a one-name group, never reaches a decision), and numeric decision grounding went back to
+IMPLEMENTED (its twelve cases were fabrications the author chose, and a general pydantic range
+check was never run against them). Each row names its route back (`data/standing.json`).
 
-Losses are published the moment they are found. Two were found and closed on 2026-09-24: Bitget's
-own 60-second TWAP beat the schedule the console printed (6.9 against 12.2bps on a $100k order),
-and the S2 entry Ballast hedged an rToken holder's nights far better than ARGUS's index hedge.
-Both now tie, and both losses stay on [`/wrong`](https://deploy-topaz-seven-64.vercel.app/wrong).
-Two more S2 desks were run on the same input on 2026-09-25. MirrorLine checks a trader's claims
-about the tape: on the first run ARGUS gave a verdict on 18 of 38 claims to MirrorLine's 38, the
-fix went in the same morning, and the re-run tied at 30 of 30 gradable claims. optic-bitget debates
-a thesis with a model judge: it abstained on two of three theses for want of earnings and
-positioning data that ARGUS answered, while it still gives one synthesised call ARGUS does not — a
-tie, with the losing half named. baserate prices a leveraged weekend hold: ARGUS first answered a
-different question, then was rebuilt to read 1,443 NVDA weekends since 1999, the perpetual's own
-path through each weekend and Bitget's live margin tier — a tie, since baserate still matches the
-current regime to past weekends. Rook ends each thesis with an invalidation price: on six names its
-stops sat 0.1-1.7% away and ordinary movement reached them on 62% of held-out days, against 11%
-for ARGUS's measured stop, fitted out of sample — ahead on that one measure, six names, one run.
-Two desks estimate where a stock should open while the US market is shut. gloaming blends index
-futures, crypto and the dollar; over 113 nights and 8 stocks its best variant missed the next
-open by 81bps on average, against 30bps for ARGUS's reading of the stock's own perpetual (93% of
-directions right) and 90bps for assuming no gap — level only on QQQ. nocturne fades the rToken's
-weekend move back to Friday's price; on its own question (the rToken's Monday 10:00 price) its
-reproduced walk-forward and ARGUS came out level, 1.92% against 2.07%. But on the stock's real
-Monday open, read at nocturne's Sunday-evening moment, the perpetual's weekend move carried
-through (slope +0.83, 160 stock-weekends) rather than reversing, and beat Friday's close.
+Losses are published the moment they are found, on
+[`/wrong`](https://deploy-topaz-seven-64.vercel.app/wrong). Rivals run on the same input:
+
+| Rival | What it does | Result |
+|---|---|---|
+| Bitget's 60-second TWAP | slices an order | beat the console's schedule (6.9 against 12.2bps on $100k) on 2026-09-24; now a tie |
+| Ballast (S2) | hedges an rToken holder's nights | beat ARGUS's index hedge on 2026-09-24; now a tie |
+| MirrorLine (S2) | checks a trader's claims about the tape | first run 18 of 38 verdicts to its 38; fixed the same morning, re-run tied at 30 of 30 gradable claims |
+| optic-bitget (S2) | debates a thesis with a model judge | abstained on two of three theses for want of earnings and positioning data ARGUS answered; still gives one synthesised call ARGUS does not: a tie |
+| baserate (S2) | prices a leveraged weekend hold | ARGUS rebuilt to read 1,443 NVDA weekends since 1999 and Bitget's live margin tier; its regime match scored worse than ARGUS's volatility-scaled band over 17,044 weekends, but baserate's own forecasts are not yet scored on the same weekends: a tie |
+| Rook (S2) | ends each thesis with an invalidation price | its stops, 0.1-1.7% away, were reached on 62% of held-out days against 11% for ARGUS's fitted stop: ahead on that measure, six names, one run |
+| gloaming (S2) | estimates the open while the US market is shut | missed by 81bps over 113 nights and 8 stocks against 30bps for ARGUS (93% of directions right) and 90bps for no gap; level only on QQQ |
+| nocturne (S2) | fades the rToken's weekend move | level on its own question (1.92% against 2.07%); on the stock's real Monday open the weekend move carried through (slope +0.83, 160 stock-weekends) |
+
 The full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.vercel.app/proof).
 
 ---
@@ -131,7 +146,7 @@ The full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.v
 |---|---|---|
 | Public market API (v3) | Candles, tickers, 50-level books, funding — every price and cost in the console | Answering, checked live on `/status` |
 | Order-book websocket (`books5`, trades) | Execution replay and the order-splitting comparison | Recorded locally, RFC 6455 client |
-| `bitget-mcp-server` | US fundamentals, 13F holders, analyst estimates, earnings calendar, the stock behind each rToken | 37 of 67 catalog entries answered on 25 Sep; none since its upstream began answering 503 (checked 26 Sep, `data/data_coverage.json`) |
+| `bitget-mcp-server` | US fundamentals, 13F holders, analyst estimates, earnings calendar, the stock behind each rToken | 37 of 67 catalog entries answered on 25 Sep, before its upstream began answering 503; 0 of 67 catalog entries answer in the latest sweep (`data/data_coverage.json`, dated inside and on `/status`) |
 | `bitget-signal` Skills | The console asks the Skill first for technicals (MACD corrected against Bitget's own candles), crypto sentiment and the rates curve, and checks BTC against `crypto_derivatives` | 2 of bitget-signal's 19 tools answered all three attempts on 2026-09-26 (crypto_derivatives, technical_analysis), from 1 of its 5 Skills (technical-analysis) plus 1 tool no SKILL.md names; when a Skill is silent the answer names the public source it read instead |
 
 When a Skill's hosted server fails, ARGUS reads the source that Skill names (alternative.me,
@@ -158,12 +173,13 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 9,419 tests collected
+pytest -q                       # 9,674 tests collected
 ```
 
-Nothing above needs a credential. The full run took 1h16m from a fresh GitHub clone on
-2026-09-24 — 6,457 passed, 85 skipped, 0 failed; tests that need a rival's source cloned beside
-the repository skip and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
+Nothing above needs a credential. On 2026-09-27, with every outbound connection refused, 9,109
+passed, 72 skipped and 0 failed in 30 minutes; the 238 tests that read a live venue, feed or model
+run apart (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
+and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
 a test that reaches the network shows itself.
 
 | | |
@@ -180,8 +196,8 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **9,419 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 484 source files** |
+| Tests | **9,674 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 513 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 4 of 44 capabilities are OWNED against a named rival, and `/proof` says which |
@@ -227,6 +243,9 @@ ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · A
 
 ## Licence
 
-MIT. Components ported from other projects cite their source file and line in the docstring;
-everything copied is MIT, BSD or Apache licensed, and anything under a restrictive licence was
-rebuilt from its described behaviour rather than copied.
+MIT. Components ported from other projects cite their source file in the docstring, and each
+source's licence, with what was taken from it, is in `argus/licenses/`. Everything copied into the
+product is MIT, BSD or Apache licensed; one evaluation baseline, vectorbt's deflated-Sharpe code, is
+Apache-2.0 with the Commons Clause, runs only as a rival in `eval/` and must be dropped before any
+commercial redistribution. Anything under a copyleft licence was rebuilt from its described
+behaviour rather than copied.

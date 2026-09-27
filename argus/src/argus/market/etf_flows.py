@@ -32,7 +32,9 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 FLOWS_PATH = DATA / "etf_flows.json"
 SECRETS = Path(__file__).resolve().parents[4] / ".secrets" / "sosovalue.env"
 BASE = "https://openapi.sosovalue.com/openapi/v1"

@@ -42,14 +42,14 @@ import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
 from argus.agents.meta_pm import THINKING_MS
 from argus.eval.baselines.latencybench_reimpl import linear_decay_price
 from argus.execution.latency import latency_slippage_bps
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "deliberation_comparison.json"
 
 REFERENCE_AVERAGE_PRICE = 100.0

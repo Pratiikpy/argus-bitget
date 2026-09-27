@@ -44,8 +44,9 @@ from argus.execution.guard import (
     would_pass,
 )
 from argus.truth import artefact
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "guard_selfcheck.json"
+REPORT_PATH = DATA_DIR / "guard_selfcheck.json"
 
 NOW = 1_000.0
 """A fixed clock, so a rate-window state means the same thing on every run."""

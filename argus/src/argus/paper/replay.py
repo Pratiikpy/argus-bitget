@@ -49,8 +49,9 @@ from pathlib import Path
 from typing import Any
 
 from argus.truth.evidence import Evidence
+from argus.truth.paths import DATA_DIR
 
-REPLAY_PATH = Path(__file__).resolve().parents[3] / "data" / "replay_ledger.jsonl"
+REPLAY_PATH = DATA_DIR / "replay_ledger.jsonl"
 
 HOLD_HOURS = 24
 """Matches the live protocol's hold window. A replay on a different horizon would not test the

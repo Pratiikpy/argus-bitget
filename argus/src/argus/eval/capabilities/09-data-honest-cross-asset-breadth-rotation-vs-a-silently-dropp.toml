@@ -1,0 +1,158 @@
+name = "Data-honest cross-asset breadth rotation vs. a silently-dropping reference"
+subtheme = "t1-rotation"
+modules = [
+    "argus/desk/rotation.py",
+    "argus/eval/rotation_comparison.py",
+    "argus/eval/baselines/pytaa_vigilant_allocation.py",
+    "argus/eval/baselines/pytaa_vigilant_allocation_loader.py",
+    "argus/eval/baselines/pytaa_signal.py",
+    "argus/eval/baselines/pytaa_signal_loader.py",
+    "argus/eval/general_rotation_comparison.py",
+    "argus/eval/baselines/argus_rotation_pre_contract.py",
+]
+state = "tied"
+baseline = "pytaa real VAA breadth rule (vigilant_allocation) + Signal.momentum_score"
+blockers = [
+    """\
+        RE-GRADED 2026-09-26 from OWNED to TIED: the rival it beat, pytaa, is the reference that \
+        silently drops weight, and the best general-purpose tool for the same job does not. On 36 \
+        byte-identical cases from a frozen real Bitget corpus \
+        (data/general_rotation_comparison.json), pandera with pydantic, configured to the same \
+        contract, handles 36 of 36, as ARGUS does; pandera alone and Great Expectations 33 (silent \
+        on an empty safe set, a NaN step and an asset in both sets); raw pytaa 11. ARGUS is faster \
+        (4.7ms a call against 484ms and 2.9s), which is not material at a monthly rebalance. The \
+        ablation holds: the rotation.py that predates the 2026-09-25 contract, byte-pinned, \
+        handles 20 of 36 with 14 silent accepts. Also found: pytaa bins by business month-end and \
+        ARGUS by calendar month, so on real BTCUSDT the two scores agree exactly only when no \
+        anchor month ends on a weekend and otherwise differ by up to 0.25; the 2026-09-15 \
+        floating-point agreement holds only on weekday-ending anchors. OWNED returns only with a \
+        margin over the configured general validator that matters to a trader.""",
+    """\
+        Every real instrument in this comparison's universe has at most ~13-14 months of real \
+        Bitget listing history today, so the agreement measured here cannot yet be re-checked \
+        across a genuinely disjoint historical time window on the same instrument — only across a \
+        wider set of instruments at the same point in time. The rotation rule's own forecasting \
+        value (does breadth momentum actually predict anything on this real universe) is \
+        explicitly out of scope — this comparison measures data-availability and failure-mode \
+        handling only""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    pytaa's real strategy/signals.py and backtest/positions.py read in full — \
+    Signal.classic_momentum/momentum_score/sma_crossover/protective_momentum_score and \
+    vigilant_allocation/kipnis_allocation/aqr_trend_allocation — confirming \
+    vigilant_allocation is the real, published (Keller & Keuning 2017 SSRN 2543979), \
+    self-contained breadth rule matching the handbook's own 'risk-on/off rotation (US stocks \
+    <-> Crypto <-> commodities)' framing for this exact sub-theme"""
+artefact = "src/argus/eval/baselines/pytaa_vigilant_allocation.py"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    two real methods compared: pytaa's real weighted four-horizon momentum score plus discrete \
+    safe/risk breadth switch (pandas, no transaction cost or minimum-history guard anywhere in \
+    either function) vs. ARGUS's pure-Python reimplementation (src/ carries no pandas \
+    dependency) of the exact same published formula, with a hard refusal below the real \
+    formula's own minimum history and turnover priced at the real 6bps taker rate"""
+artefact = "src/argus/desk/rotation.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    pytaa's real vigilant_allocation and Signal.__init__/classic_momentum/momentum_score run \
+    unmodified, byte-hash-pinned against the vendored source (commit \
+    317ad1c6618def4e1dc0fb9879050c6f9f2f026c)"""
+test = """\
+    test_baselines.py::TestVendoredFilesHaveNotDrifted::test_pytaa_vigilant_allocation_body_matches_the_pinned_hash"""
+
+[[proofs]]
+condition = "implementation_complete"
+how = """\
+    momentum_score/breadth_allocation/propose_rotation/RotationPlan evaluate real monthly \
+    closes end to end, including the CLI in rotation.py's own main() against live Bitget \
+    history"""
+test = "test_rotation.py"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    both real systems scored on ARGUS's actual, live Bitget cross-asset candle history — \
+    tokenized US equities, real crypto majors, a real gold token, all confirmed live on the \
+    same public futures book — agreeing to floating-point identity everywhere both are defined \
+    (BTCUSDT/ETHUSDT/NVDAUSDT: 0.7445517502236605/1.6932445870638801/0.40376760986359983 on \
+    both sides, to the last representable digit, 2026-09-15)"""
+test = "test_rotation_comparison.py::TestBaselineReproduced"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    checked across the full real universe this comparison can reach — the four design symbols \
+    plus fourteen further real held-out symbols (the remaining rTokens, three more crypto \
+    majors, silver) — not one convenient instrument"""
+test = "test_rotation_comparison.py::TestOOSWiderUniverse"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    real wall-clock cost measured on both real sides on the same real data — pandas \
+    Signal.momentum_score() vs. ARGUS's pure-Python momentum_score(), measured at roughly 2ms \
+    vs. under a microsecond per call, both numbers reported plainly"""
+test = "test_rotation_comparison.py::TestCosts"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    the fourteen held-out real symbols beyond the four the module was designed against all \
+    agree; SCOPE_STATEMENT states explicitly why a disjoint in-sample/out-of-sample *time* \
+    split was not attempted instead — every real instrument's Bitget listing history is \
+    currently only ~13 months deep, which is short of what a split would need on either side"""
+test = "test_rotation_comparison.py::TestOOSWiderUniverse"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    a real, run sweep of the negative-score count (0 to 4, safe asset held at its real, \
+    measured NaN condition) found and confirmed a closed form: the real reference's vanished \
+    fraction equals exactly min(1, step * is_neg) at every swept point, reaching 100% vanished \
+    at full flight-to-safety — the exact moment the breadth signal is loudest"""
+test = "test_rotation_comparison.py::TestMissingWeightSweep"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    the minimum-history boundary itself tested on both real sides at 12, 13 and 14 monthly \
+    points — confirms 13 is the exact threshold, not off by one in either direction, and that \
+    an empty safe_assets list or an all-NaN input do not raise in the real reference either, \
+    each producing its own distinct silent-failure shape"""
+test = "test_rotation_comparison.py::TestBoundaryCheck"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    three distinct real silent-failure shapes found by running the real reference, not \
+    assumed: a NaN safe-asset score drops exactly its intended weight share; an empty \
+    safe_assets list still reserves and then silently drops a phantom safe share; an all-NaN \
+    input returns a silent all-zero book with no exception and no warning at all"""
+test = "test_rotation_comparison.py::TestFailureCases"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "the real baseline-reproduced comparison run twice produces byte-identical JSON output"
+test = "test_rotation_comparison.py::TestReproducibility"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped explicitly — SCOPE_STATEMENT in eval/rotation_comparison.py. Claimed: on \
+    data-availability and failure-mode handling for a breadth rotation rule computed on \
+    ARGUS's own real, short-history cross-asset universe, ARGUS's implementation refuses \
+    cleanly where the real reference silently loses part or all of the intended allocation. \
+    NOT claimed the rotation rule itself has a validated forecasting edge or backtest Sharpe — \
+    cross-asset rotation is directional by construction and no return claim is made here. NOT \
+    claimed pytaa is broken as a monthly-rebalanced-ETF tool — the failure modes measured are \
+    specific to feeding it assets whose real listing history is shorter than its own formula's \
+    minimum lookback, a condition ARGUS's own live universe currently meets and a traditional \
+    ETF universe normally would not"""
+test = "test_rotation_comparison.py::TestMain"

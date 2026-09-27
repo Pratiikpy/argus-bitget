@@ -1,127 +1,113 @@
 {
-  "total": 85,
-  "checked": 85,
-  "ok": 84,
+  "total": 103,
+  "checked": 97,
+  "ok": 97,
   "lagging": 0,
-  "stale": 1,
-  "absent": 64,
+  "stale": 0,
+  "absent": 61,
   "deleted": 0,
-  "unchecked": 0,
+  "unchecked": 6,
   "findings": [
     {
       "claim": "tests_passing",
       "doc": "readme",
-      "line": 49,
+      "line": 55,
       "quoted": [
-        "9,419"
+        "9,674"
       ],
-      "live": [
-        9419
-      ],
-      "status": "OK",
-      "excerpt": "9,419 tests collected"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "9,674 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 161,
+      "line": 176,
       "quoted": [
-        "9,419"
+        "9,674"
       ],
-      "live": [
-        9419
-      ],
-      "status": "OK",
-      "excerpt": "9,419 tests collected"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "9,674 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 183,
+      "line": 199,
       "quoted": [
-        "9,419"
+        "9,674"
       ],
-      "live": [
-        9419
-      ],
-      "status": "OK",
-      "excerpt": "9,419 tests collected"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "9,674 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "submission",
       "line": null,
       "quoted": [],
-      "live": [
-        9419
-      ],
+      "live": null,
       "status": "ABSENT",
       "excerpt": "document not found"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
-      "line": 709,
+      "line": 714,
       "quoted": [
-        "9,419"
+        "9,674"
       ],
-      "live": [
-        9419
-      ],
-      "status": "OK",
-      "excerpt": "9,419 tests"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "9,674 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
-      "line": 1764,
+      "line": 1769,
       "quoted": [
-        "9,419"
+        "9,674"
       ],
-      "live": [
-        9419
-      ],
-      "status": "OK",
-      "excerpt": "9,419 tests collected"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "9,674 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
-      "line": 2013,
+      "line": 2418,
       "quoted": [
-        "9,419"
+        "9,674"
       ],
-      "live": [
-        9419
-      ],
-      "status": "OK",
-      "excerpt": "9,419 tests collected"
+      "live": null,
+      "status": "UNCHECKED",
+      "excerpt": "9,674 tests collected"
     },
     {
       "claim": "source_files",
       "doc": "readme",
-      "line": 49,
+      "line": 55,
       "quoted": [
-        "484"
+        "513"
       ],
       "live": [
-        484
+        513
       ],
       "status": "OK",
-      "excerpt": "strict clean on 484 source files"
+      "excerpt": "strict clean on 513 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
-      "line": 184,
+      "line": 200,
       "quoted": [
-        "484"
+        "513"
       ],
       "live": [
-        484
+        513
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 484 source files"
+      "excerpt": "strict` clean on 513 source files"
     },
     {
       "claim": "source_files",
@@ -129,7 +115,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        484
+        513
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -137,20 +123,130 @@
     {
       "claim": "source_files",
       "doc": "explained",
-      "line": 2010,
+      "line": 1770,
       "quoted": [
-        "484"
+        "513"
       ],
       "live": [
-        484
+        513
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 484 source files"
+      "excerpt": "strict` clean on **513 source files"
+    },
+    {
+      "claim": "source_files",
+      "doc": "explained",
+      "line": 2415,
+      "quoted": [
+        "513"
+      ],
+      "live": [
+        513
+      ],
+      "status": "OK",
+      "excerpt": "strict` clean on 513 source files"
+    },
+    {
+      "claim": "source_files",
+      "doc": "architecture",
+      "line": 14,
+      "quoted": [
+        "513"
+      ],
+      "live": [
+        513
+      ],
+      "status": "OK",
+      "excerpt": "strict` clean on the 513 files"
+    },
+    {
+      "claim": "source_tree",
+      "doc": "explained",
+      "line": 1767,
+      "quoted": [
+        "516",
+        "20"
+      ],
+      "live": [
+        516,
+        20
+      ],
+      "status": "OK",
+      "excerpt": "516** files across **20 packages"
+    },
+    {
+      "claim": "source_tree",
+      "doc": "explained",
+      "line": 2415,
+      "quoted": [
+        "516",
+        "20"
+      ],
+      "live": [
+        516,
+        20
+      ],
+      "status": "OK",
+      "excerpt": "516 files, 20 packages"
+    },
+    {
+      "claim": "source_tree",
+      "doc": "architecture",
+      "line": 11,
+      "quoted": [
+        "516",
+        "20"
+      ],
+      "live": [
+        516,
+        20
+      ],
+      "status": "OK",
+      "excerpt": "516 source files**, 20 packages"
+    },
+    {
+      "claim": "data_files",
+      "doc": "explained",
+      "line": 1771,
+      "quoted": [
+        "688"
+      ],
+      "live": [
+        688
+      ],
+      "status": "OK",
+      "excerpt": "688** files under `argus/data/`"
+    },
+    {
+      "claim": "data_files",
+      "doc": "explained",
+      "line": 2420,
+      "quoted": [
+        "688"
+      ],
+      "live": [
+        688
+      ],
+      "status": "OK",
+      "excerpt": "688 files under `argus/data/`"
+    },
+    {
+      "claim": "data_files",
+      "doc": "architecture",
+      "line": 15,
+      "quoted": [
+        "688"
+      ],
+      "live": [
+        688
+      ],
+      "status": "OK",
+      "excerpt": "688** files under `argus/data/`"
     },
     {
       "claim": "memory_effect",
       "doc": "public-readme",
-      "line": 65,
+      "line": 71,
       "quoted": [
         "20",
         "20"
@@ -198,10 +294,10 @@
       "line": null,
       "quoted": [],
       "live": [
-        19.0,
-        25.0,
         15.0,
-        18.0
+        18.0,
+        25.0,
+        19.0
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -224,8 +320,8 @@
       "line": null,
       "quoted": [],
       "live": [
-        8.4,
-        9.1
+        7.1,
+        7.6
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -246,7 +342,7 @@
     {
       "claim": "register_claims",
       "doc": "readme",
-      "line": 159,
+      "line": 165,
       "quoted": [
         "291"
       ],
@@ -281,7 +377,7 @@
     {
       "claim": "register_claims",
       "doc": "explained",
-      "line": 1874,
+      "line": 2011,
       "quoted": [
         "291"
       ],
@@ -290,6 +386,19 @@
       ],
       "status": "OK",
       "excerpt": "291 claims across"
+    },
+    {
+      "claim": "register_claims",
+      "doc": "explained",
+      "line": 3029,
+      "quoted": [
+        "291"
+      ],
+      "live": [
+        291
+      ],
+      "status": "OK",
+      "excerpt": "291 falsifiable claims about"
     },
     {
       "claim": "register_claims",
@@ -333,7 +442,7 @@
     {
       "claim": "refusal_accuracy_2h",
       "doc": "readme",
-      "line": 157,
+      "line": 163,
       "quoted": [
         "224",
         "380"
@@ -348,7 +457,7 @@
     {
       "claim": "refusal_accuracy_2h",
       "doc": "public-readme",
-      "line": 206,
+      "line": 222,
       "quoted": [
         "224",
         "380"
@@ -363,7 +472,7 @@
     {
       "claim": "refusal_forgone_2h",
       "doc": "readme",
-      "line": 157,
+      "line": 163,
       "quoted": [
         "-6.9"
       ],
@@ -376,7 +485,7 @@
     {
       "claim": "refusal_forgone_2h",
       "doc": "public-readme",
-      "line": 208,
+      "line": 224,
       "quoted": [
         "-6.9"
       ],
@@ -389,7 +498,7 @@
     {
       "claim": "standing_owned",
       "doc": "readme",
-      "line": 261,
+      "line": 267,
       "quoted": [
         "4",
         "44"
@@ -404,7 +513,7 @@
     {
       "claim": "standing_owned",
       "doc": "readme",
-      "line": 432,
+      "line": 438,
       "quoted": [
         "4",
         "44"
@@ -419,7 +528,7 @@
     {
       "claim": "standing_owned",
       "doc": "public-readme",
-      "line": 86,
+      "line": 108,
       "quoted": [
         "4",
         "44"
@@ -434,7 +543,7 @@
     {
       "claim": "standing_owned",
       "doc": "public-readme",
-      "line": 187,
+      "line": 203,
       "quoted": [
         "4",
         "44"
@@ -461,14 +570,47 @@
     {
       "claim": "standing_owned",
       "doc": "explained",
-      "line": null,
-      "quoted": [],
+      "line": 683,
+      "quoted": [
+        "4",
+        "44"
+      ],
       "live": [
         4,
         44
       ],
-      "status": "ABSENT",
-      "excerpt": ""
+      "status": "OK",
+      "excerpt": "4 of 44 capabilities are OWNED"
+    },
+    {
+      "claim": "standing_owned",
+      "doc": "explained",
+      "line": 1382,
+      "quoted": [
+        "4",
+        "44"
+      ],
+      "live": [
+        4,
+        44
+      ],
+      "status": "OK",
+      "excerpt": "4 of 44 capabilities are OWNED"
+    },
+    {
+      "claim": "standing_owned",
+      "doc": "explained",
+      "line": 2447,
+      "quoted": [
+        "4",
+        "44"
+      ],
+      "live": [
+        4,
+        44
+      ],
+      "status": "OK",
+      "excerpt": "4 of 44 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -488,7 +630,7 @@
     {
       "claim": "standing_tied",
       "doc": "readme",
-      "line": 432,
+      "line": 438,
       "quoted": [
         "13"
       ],
@@ -501,7 +643,7 @@
     {
       "claim": "standing_tied",
       "doc": "public-readme",
-      "line": 86,
+      "line": 108,
       "quoted": [
         "13"
       ],
@@ -525,7 +667,7 @@
     {
       "claim": "standing_tied",
       "doc": "explained",
-      "line": 2043,
+      "line": 2448,
       "quoted": [
         "13"
       ],
@@ -538,7 +680,7 @@
     {
       "claim": "standing_tied",
       "doc": "explained",
-      "line": 2301,
+      "line": 2706,
       "quoted": [
         "13"
       ],
@@ -562,7 +704,7 @@
     {
       "claim": "standing_implemented",
       "doc": "readme",
-      "line": 432,
+      "line": 438,
       "quoted": [
         "26"
       ],
@@ -575,7 +717,7 @@
     {
       "claim": "standing_implemented",
       "doc": "public-readme",
-      "line": 86,
+      "line": 108,
       "quoted": [
         "26"
       ],
@@ -599,7 +741,7 @@
     {
       "claim": "standing_implemented",
       "doc": "explained",
-      "line": 2043,
+      "line": 2448,
       "quoted": [
         "26"
       ],
@@ -612,15 +754,15 @@
     {
       "claim": "standing_implemented",
       "doc": "explained",
-      "line": 2301,
+      "line": 2706,
       "quoted": [
-        "25"
+        "26"
       ],
       "live": [
         26
       ],
-      "status": "STALE",
-      "excerpt": "25 are IMPLEMENTED"
+      "status": "OK",
+      "excerpt": "26 are IMPLEMENTED"
     },
     {
       "claim": "standing_implemented",
@@ -636,7 +778,7 @@
     {
       "claim": "standing_lost",
       "doc": "readme",
-      "line": 432,
+      "line": 438,
       "quoted": [
         "1"
       ],
@@ -649,7 +791,7 @@
     {
       "claim": "standing_lost",
       "doc": "public-readme",
-      "line": 86,
+      "line": 108,
       "quoted": [
         "1"
       ],
@@ -673,7 +815,7 @@
     {
       "claim": "standing_lost",
       "doc": "explained",
-      "line": 2043,
+      "line": 2448,
       "quoted": [
         "1"
       ],
@@ -686,7 +828,7 @@
     {
       "claim": "standing_lost",
       "doc": "explained",
-      "line": 2301,
+      "line": 2706,
       "quoted": [
         "1"
       ],
@@ -807,7 +949,7 @@
     {
       "claim": "standing_states_zh",
       "doc": "public-readme",
-      "line": 222,
+      "line": 238,
       "quoted": [
         "4",
         "13",
@@ -893,6 +1035,51 @@
       "excerpt": "document not found"
     },
     {
+      "claim": "weekend_band_coverage",
+      "doc": "public-readme",
+      "line": 45,
+      "quoted": [
+        "79",
+        "17,044"
+      ],
+      "live": [
+        79,
+        17044
+      ],
+      "status": "OK",
+      "excerpt": "which covered 79% of 17,044 weekends out of sample"
+    },
+    {
+      "claim": "factor_set_wins",
+      "doc": "public-readme",
+      "line": 44,
+      "quoted": [
+        "9",
+        "13"
+      ],
+      "live": [
+        9,
+        13
+      ],
+      "status": "OK",
+      "excerpt": "the eight explained 9 of 13 names better out of sample"
+    },
+    {
+      "claim": "answering_data_entries_readme",
+      "doc": "public-readme",
+      "line": 149,
+      "quoted": [
+        "0",
+        "67"
+      ],
+      "live": [
+        0,
+        67
+      ],
+      "status": "OK",
+      "excerpt": "0 of 67 catalog entries answer in the latest sweep"
+    },
+    {
       "claim": "governed_failure_rates",
       "doc": "submission",
       "line": null,
@@ -907,7 +1094,7 @@
     {
       "claim": "settled_trades",
       "doc": "readme",
-      "line": 52,
+      "line": 58,
       "quoted": [
         "0"
       ],
@@ -942,37 +1129,37 @@
     {
       "claim": "anchors_confirmed",
       "doc": "readme",
-      "line": 159,
+      "line": 165,
       "quoted": [
-        "38",
-        "68"
+        "76",
+        "76"
       ],
       "live": [
-        38,
-        68
+        76,
+        76
       ],
       "status": "OK",
-      "excerpt": "38 of the 68 proofs carry a Bitcoin"
+      "excerpt": "76 of the 76 proofs carry a Bitcoin"
     },
     {
       "claim": "anchors_confirmed",
       "doc": "explained",
-      "line": 2613,
+      "line": 3018,
       "quoted": [
-        "38",
-        "68"
+        "76",
+        "76"
       ],
       "live": [
-        38,
-        68
+        76,
+        76
       ],
       "status": "OK",
-      "excerpt": "38 of the 68 carry a Bitcoin"
+      "excerpt": "76 of the 76 carry a Bitcoin"
     },
     {
       "claim": "ledger_decisions",
       "doc": "readme",
-      "line": 51,
+      "line": 57,
       "quoted": [
         "750"
       ],
@@ -1007,7 +1194,7 @@
     {
       "claim": "modules_importable",
       "doc": "readme",
-      "line": 50,
+      "line": 56,
       "quoted": [
         "152",
         "152"
@@ -1022,7 +1209,7 @@
     {
       "claim": "modules_importable",
       "doc": "public-readme",
-      "line": 186,
+      "line": 202,
       "quoted": [
         "152",
         "152"
@@ -1049,7 +1236,7 @@
     {
       "claim": "subthemes",
       "doc": "readme",
-      "line": 50,
+      "line": 56,
       "quoted": [
         "18",
         "18"
@@ -1064,7 +1251,7 @@
     {
       "claim": "subthemes",
       "doc": "public-readme",
-      "line": 187,
+      "line": 203,
       "quoted": [
         "18",
         "18"
@@ -1091,7 +1278,7 @@
     {
       "claim": "ledger_entries",
       "doc": "readme",
-      "line": 51,
+      "line": 57,
       "quoted": [
         "750"
       ],
@@ -1104,7 +1291,7 @@
     {
       "claim": "ledger_entries",
       "doc": "readme",
-      "line": 216,
+      "line": 222,
       "quoted": [
         "750"
       ],
@@ -1128,7 +1315,7 @@
     {
       "claim": "ledger_entries",
       "doc": "explained",
-      "line": 1196,
+      "line": 1201,
       "quoted": [
         "750"
       ],
@@ -1141,13 +1328,15 @@
     {
       "claim": "settled_abstentions",
       "doc": "readme",
-      "line": null,
-      "quoted": [],
+      "line": 222,
+      "quoted": [
+        "705"
+      ],
       "live": [
         705
       ],
-      "status": "ABSENT",
-      "excerpt": ""
+      "status": "OK",
+      "excerpt": "705 have settled as abstentions"
     },
     {
       "claim": "settled_abstentions",
@@ -1163,7 +1352,7 @@
     {
       "claim": "settled_abstentions",
       "doc": "explained",
-      "line": 1196,
+      "line": 1201,
       "quoted": [
         "705"
       ],
@@ -1176,7 +1365,7 @@
     {
       "claim": "leans_recorded",
       "doc": "readme",
-      "line": 227,
+      "line": 233,
       "quoted": [
         "583"
       ],
@@ -1211,7 +1400,7 @@
     {
       "claim": "t1_beat_buy_and_hold",
       "doc": "explained",
-      "line": 1612,
+      "line": 1617,
       "quoted": [
         "12"
       ],
@@ -1235,7 +1424,7 @@
     {
       "claim": "t1_dsr_candidates",
       "doc": "explained",
-      "line": 1622,
+      "line": 1627,
       "quoted": [
         "2"
       ],
@@ -1248,7 +1437,7 @@
     {
       "claim": "t1_rolling_scorable",
       "doc": "explained",
-      "line": 1636,
+      "line": 1641,
       "quoted": [
         "1,107",
         "2,129"
@@ -1263,7 +1452,7 @@
     {
       "claim": "t1_rolling_scorable_worst",
       "doc": "explained",
-      "line": 1638,
+      "line": 1643,
       "quoted": [
         "308"
       ],
@@ -1276,7 +1465,7 @@
     {
       "claim": "t1_dsr_survivors",
       "doc": "explained",
-      "line": 2929,
+      "line": 3334,
       "quoted": [
         "Zero"
       ],
@@ -1300,7 +1489,7 @@
     {
       "claim": "t1_oos_breaches",
       "doc": "explained",
-      "line": 1658,
+      "line": 1663,
       "quoted": [
         "8"
       ],
@@ -1335,7 +1524,7 @@
     {
       "claim": "arbitrage_monetisable",
       "doc": "explained",
-      "line": 1502,
+      "line": 1507,
       "quoted": [
         "4.58"
       ],
@@ -1359,7 +1548,7 @@
     {
       "claim": "weekend_continuation",
       "doc": "explained",
-      "line": 1529,
+      "line": 1534,
       "quoted": [
         "57.7"
       ],
@@ -1383,7 +1572,7 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "readme",
-      "line": 205,
+      "line": 211,
       "quoted": [
         "10",
         "11"
@@ -1410,7 +1599,7 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "explained",
-      "line": 522,
+      "line": 527,
       "quoted": [
         "10",
         "11"
@@ -1425,7 +1614,7 @@
     {
       "claim": "session_beta_higher_open",
       "doc": "explained",
-      "line": 1559,
+      "line": 1564,
       "quoted": [
         "10",
         "11"
@@ -1452,7 +1641,7 @@
     {
       "claim": "aapl_beta_open",
       "doc": "readme",
-      "line": 205,
+      "line": 211,
       "quoted": [
         "0.68"
       ],
@@ -1498,7 +1687,7 @@
     {
       "claim": "aapl_beta_shut",
       "doc": "readme",
-      "line": 205,
+      "line": 211,
       "quoted": [
         "0.105"
       ],
@@ -1566,7 +1755,7 @@
     {
       "claim": "hurdle_symbols_clearing_rth",
       "doc": "explained",
-      "line": 1211,
+      "line": 1216,
       "quoted": [
         "eleven"
       ],
@@ -1590,7 +1779,7 @@
     {
       "claim": "hurdle_clearing_range",
       "doc": "readme",
-      "line": 232,
+      "line": 238,
       "quoted": [
         "61",
         "89"
@@ -1617,7 +1806,7 @@
     {
       "claim": "hurdle_clearing_range",
       "doc": "explained",
-      "line": 1210,
+      "line": 1215,
       "quoted": [
         "61",
         "89"
@@ -1666,7 +1855,7 @@
     {
       "claim": "teardowns",
       "doc": "readme",
-      "line": 354,
+      "line": 360,
       "quoted": [
         "56"
       ],
@@ -1679,7 +1868,7 @@
     {
       "claim": "teardowns",
       "doc": "explained",
-      "line": 620,
+      "line": 625,
       "quoted": [
         "56"
       ],
@@ -1692,7 +1881,7 @@
     {
       "claim": "teardowns",
       "doc": "prd",
-      "line": 471,
+      "line": 474,
       "quoted": [
         "56"
       ],
@@ -1705,7 +1894,7 @@
     {
       "claim": "pbo_range",
       "doc": "explained",
-      "line": 2025,
+      "line": 2430,
       "quoted": [
         "0.11",
         "0.77"
@@ -1720,7 +1909,7 @@
     {
       "claim": "pbo_worst",
       "doc": "explained",
-      "line": 2249,
+      "line": 2654,
       "quoted": [
         "0.77"
       ],
@@ -1733,7 +1922,7 @@
     {
       "claim": "fdr_trials",
       "doc": "explained",
-      "line": 2217,
+      "line": 2622,
       "quoted": [
         "0",
         "300"
@@ -1748,7 +1937,7 @@
     {
       "claim": "mintrl_range",
       "doc": "explained",
-      "line": 2027,
+      "line": 2432,
       "quoted": [
         "0.47",
         "3.52"
@@ -1763,7 +1952,7 @@
     {
       "claim": "brier_index",
       "doc": "explained",
-      "line": 2022,
+      "line": 2427,
       "quoted": [
         "51.8"
       ],
@@ -1776,7 +1965,7 @@
     {
       "claim": "brier_index",
       "doc": "explained",
-      "line": 2103,
+      "line": 2508,
       "quoted": [
         "51.8"
       ],
@@ -1789,7 +1978,7 @@
     {
       "claim": "skill_vs_climatology",
       "doc": "explained",
-      "line": 2105,
+      "line": 2510,
       "quoted": [
         "6.8"
       ],
@@ -1802,7 +1991,7 @@
     {
       "claim": "hurdle_break_even",
       "doc": "explained",
-      "line": 2293,
+      "line": 2698,
       "quoted": [
         "55.0"
       ],
@@ -1815,7 +2004,7 @@
     {
       "claim": "hurdle_median_move",
       "doc": "explained",
-      "line": 2291,
+      "line": 2696,
       "quoted": [
         "103"
       ],
@@ -1828,7 +2017,7 @@
     {
       "claim": "xs_trials",
       "doc": "explained",
-      "line": 1732,
+      "line": 1737,
       "quoted": [
         "80"
       ],
@@ -1841,7 +2030,7 @@
     {
       "claim": "xs_backtests",
       "doc": "explained",
-      "line": 1733,
+      "line": 1738,
       "quoted": [
         "1,336"
       ],
@@ -1854,7 +2043,7 @@
     {
       "claim": "xs_positive_gross",
       "doc": "explained",
-      "line": 1734,
+      "line": 1739,
       "quoted": [
         "31"
       ],
@@ -1867,7 +2056,7 @@
     {
       "claim": "xs_positive_net",
       "doc": "explained",
-      "line": 1735,
+      "line": 1740,
       "quoted": [
         "4"
       ],
@@ -1880,7 +2069,7 @@
     {
       "claim": "xs_phase_agreement",
       "doc": "explained",
-      "line": 1737,
+      "line": 1742,
       "quoted": [
         "0"
       ],
@@ -1893,18 +2082,20 @@
     {
       "claim": "overfit_noise_primitives",
       "doc": "readme",
-      "line": null,
-      "quoted": [],
+      "line": 10,
+      "quoted": [
+        "8"
+      ],
       "live": [
         8
       ],
-      "status": "ABSENT",
-      "excerpt": ""
+      "status": "OK",
+      "excerpt": "8 are indistinguishable from"
     },
     {
       "claim": "overfit_noise_primitives",
       "doc": "explained",
-      "line": 610,
+      "line": 615,
       "quoted": [
         "eight"
       ],
@@ -1913,6 +2104,19 @@
       ],
       "status": "OK",
       "excerpt": "eight are indistinguishable from"
+    },
+    {
+      "claim": "overfit_noise_primitives",
+      "doc": "explained",
+      "line": 1108,
+      "quoted": [
+        "eight"
+      ],
+      "live": [
+        8
+      ],
+      "status": "OK",
+      "excerpt": "eight of our eight primitives are indistinguishable from"
     }
   ]
 }

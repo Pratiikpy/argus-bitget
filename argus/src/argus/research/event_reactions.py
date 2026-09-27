@@ -54,8 +54,9 @@ from argus.research.eventstudy import (
     build_window,
     study,
 )
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "event_reactions.json"
 CPI_ARCHIVE = "https://www.bls.gov/bls/news-release/cpi.htm"
 READER = "https://r.jina.ai/"

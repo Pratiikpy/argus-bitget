@@ -41,7 +41,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-from argus.market.evidence import _UA, EdgarSource
+from argus.market.evidence import FEED_USER_AGENT, EdgarSource
 from argus.truth.evidence import Evidence
 
 MAX_DOCUMENT_BYTES = 2_000_000
@@ -330,7 +330,8 @@ class InsiderSource:
 
     ARCHIVE = "https://www.sec.gov/Archives/edgar/data/{cik}/{accession}/"
 
-    def __init__(self, *, user_agent: str = _UA, edgar: EdgarSource | None = None) -> None:
+    def __init__(self, *, user_agent: str = FEED_USER_AGENT,
+                 edgar: EdgarSource | None = None) -> None:
         self._ua = user_agent
         self._edgar = edgar or EdgarSource(user_agent=user_agent)
 

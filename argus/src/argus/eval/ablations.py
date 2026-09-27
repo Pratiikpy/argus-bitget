@@ -37,8 +37,9 @@ from argus.market.bitget import RTOKEN_SYMBOLS
 from argus.market.evidence import gather
 from argus.truth.clocks import DualClock
 from argus.truth.evidence import Evidence
+from argus.truth.paths import DATA_DIR
 
-OUT_PATH = Path(__file__).resolve().parents[3] / "data" / "ablations.json"
+OUT_PATH = DATA_DIR / "ablations.json"
 
 LOOKBACK = timedelta(days=14)
 """How far back evidence is gathered for each frame. Matches the desk's own cycle window."""

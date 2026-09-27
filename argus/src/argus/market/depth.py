@@ -49,7 +49,8 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
-from argus.market.bitget import BitgetError, _dec, _get
+from argus.market.bitget import BitgetError, _dec, public_get
+from argus.truth.paths import DATA_DIR
 
 MAX_LEVELS = 200
 """The venue's own cap (`catalog.ts:115`: "Level Default: 5. Maximum: 200")."""
@@ -259,7 +260,7 @@ def fetch_orderbook(
     """
     if limit < 1:
         raise DepthError("limit must be at least one level")
-    payload = _get(
+    payload = public_get(
         "/api/v3/market/orderbook",
         {"category": category, "symbol": symbol.upper(), "limit": str(min(limit, MAX_LEVELS))},
     )
@@ -336,7 +337,6 @@ def impact_check(
 def main() -> int:  # pragma: no cover - CLI
     import argparse
     import sys
-    from pathlib import Path
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -385,7 +385,7 @@ def main() -> int:  # pragma: no cover - CLI
     if not rows:
         print("\nno book was readable; nothing written")
         return 1
-    out = Path(__file__).resolve().parents[3] / "data" / "depth.json"
+    out = DATA_DIR / "depth.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(
         json.dumps(

@@ -18,10 +18,11 @@ from __future__ import annotations
 
 import json
 import re
-from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 REPORT = DATA / "figurecheck.json"
 CORPORA = ("lui_final_heldout_2026-09-25.jsonl", "lui_heldout_corpus_2026-09-25.jsonl",
            "lui_blind_corpus_2026-09-25.jsonl")
@@ -79,14 +80,9 @@ def _accounted(kind: str, value: float, held: set[float]) -> bool:
 
 def run() -> dict[str, Any]:
     from argus.lui.kindmodel import LocalPlanner, kind_model
-    from argus.lui.research import (
-        _VAR,
-        _VAR_LEVEL,
-        _vol_multiple,
-        detect,
-        pattern_reading_wins,
-        plan_with_model,
-    )
+    from argus.lui.research import detect, pattern_reading_wins, plan_with_model
+    from argus.lui.research.parse import _VAR
+    from argus.lui.research.riskmath import _VAR_LEVEL, _vol_multiple
 
     model = kind_model()
     planner = LocalPlanner(model) if model is not None else None

@@ -106,7 +106,6 @@ import time
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from argus.eval.baselines.blackout_hedges_loader import (
@@ -123,6 +122,7 @@ from argus.risk.effectiveness import (
     measure,
 )
 from argus.truth.clocks import DualClock
+from argus.truth.paths import DATA_DIR
 
 CRYPTO_HEDGES: tuple[str, ...] = ("BTCUSDT", "ETHUSDT")
 """The only deep instruments still quoting when the anchor equity market is shut. Blackout's
@@ -189,7 +189,7 @@ its contiguous runs have a median length of 4 hours, so a 24-change rolling wind
 sit inside one, and every stability estimate would be a statement about the overnight gaps between
 pre-market sessions rather than about pre-market itself."""
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "hedge_tradeable.json"
+REPORT_PATH = DATA_DIR / "hedge_tradeable.json"
 
 
 class TradeableError(RuntimeError):

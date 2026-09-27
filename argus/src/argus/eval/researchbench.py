@@ -1,6 +1,6 @@
 """RESEARCH-BENCH: does the console understand the research questions a trader actually types?
 
-`lui/research.py` turns a question like *"what would adding 20% TSLA do to my risk?"* into a request
+`lui/research/` turns a question like *"what would adding 20% TSLA do to my risk?"* into a request
 the desk's engines answer. Whether that works cannot be judged from phrasings its author wrote,
 because an author writes the phrasings their parser already expects — this project has been caught
 by that exact gap before (`eval/obliquebench.py`: 95% on the author's corpus, 9.5% on a held-out
@@ -61,8 +61,9 @@ from argus.lui.research import (
     worth_asking_the_model,
 )
 from argus.truth import artefact
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 CORPORA = (DATA / "research_bench_corpus_a.json", DATA / "research_bench_corpus_b.json",
            DATA / "research_bench_corpus_c.json", DATA / "research_bench_corpus_d.json")
 REPORT_PATH = DATA / "research_bench.json"

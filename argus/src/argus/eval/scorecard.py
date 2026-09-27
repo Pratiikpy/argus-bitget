@@ -24,7 +24,6 @@ import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
 from argus.eval.episodes import summarise
@@ -37,6 +36,7 @@ from argus.risk.calibration import (
     expected_calibration_error,
     reliability_curve,
 )
+from argus.truth.paths import DATA_DIR
 
 ROUND_TRIP_BPS = Decimal("12")
 
@@ -290,7 +290,7 @@ def main() -> int:
     ledger = PaperLedger(path=LEDGER_PATH)
     result = scorecard(ledger, coverage=True)
 
-    out = Path(__file__).resolve().parents[3] / "data" / "scorecard.json"
+    out = DATA_DIR / "scorecard.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2, default=str), encoding="utf-8")
 

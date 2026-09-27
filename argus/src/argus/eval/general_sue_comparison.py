@@ -51,12 +51,11 @@ from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from decimal import Decimal, localcontext
-from pathlib import Path
 from typing import Any
 
 import numpy as np
 
-from argus.market.evidence import _UA
+from argus.market.evidence import FEED_USER_AGENT
 from argus.market.fundamentals import FundamentalsSource
 from argus.market.sue import (
     MAX_DELTA_SPAN_DAYS,
@@ -69,8 +68,9 @@ from argus.market.sue import (
     yoy_window,
 )
 from argus.truth import artefact
+from argus.truth.paths import DATA_DIR
 
-ARTEFACT = Path(__file__).resolve().parents[3] / "data" / "general_sue_comparison.json"
+ARTEFACT = DATA_DIR / "general_sue_comparison.json"
 
 FRAMES_URL = (
     "https://data.sec.gov/api/xbrl/frames/us-gaap/EarningsPerShareDiluted/USD-per-shares/"
@@ -133,7 +133,7 @@ Panel = dict[str, list[Point]]
 
 def _get_json(url: str) -> dict[str, Any]:
     request = urllib.request.Request(
-        url, headers={"User-Agent": _UA, "Accept": "application/json"}
+        url, headers={"User-Agent": FEED_USER_AGENT, "Accept": "application/json"}
     )
     with urllib.request.urlopen(request, timeout=60) as response:
         body: bytes = response.read()

@@ -13,8 +13,9 @@ PACKAGE = Path(__file__).resolve().parents[1]
 SRC = PACKAGE / "src" / "argus"
 # Where catalog names appear without being read by an answer: the constant itself (cut out below),
 # the harnesses that sweep the whole catalog, and bitget-signal's Skill list (its tool names
-# overlap the catalog).
-EXCLUDED = {SRC / "market" / "skills.py"}
+# overlap the catalog). The trending answer names bitget-signal's crypto_market tool, not the
+# catalog entry of the same name.
+EXCLUDED = {SRC / "market" / "skills.py", SRC / "lui" / "trending.py"}
 CONSTANT = re.compile(r"ANSWER_ENTRIES: tuple\[str, \.\.\.\] = \(.*?\n\)", re.S)
 
 

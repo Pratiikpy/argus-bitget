@@ -32,8 +32,9 @@ from pathlib import Path
 from typing import Any
 
 from argus.paper.ledger import PaperLedger
+from argus.truth.paths import DATA_DIR
 
-DEFAULT_PATH = Path(__file__).resolve().parents[3] / "data" / "paper_ledger.jsonl"
+DEFAULT_PATH = DATA_DIR / "paper_ledger.jsonl"
 
 
 class MigrationError(RuntimeError):

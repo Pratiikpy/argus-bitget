@@ -89,8 +89,9 @@ from typing import Any
 from argus.llm.qwen import Completion, QwenError, Thinking, Usage, extract_json_object
 from argus.research import document_qa as dq
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 CORPUS = DATA / "document_qa_corpus"
 MANIFEST = CORPUS / "manifest.json"
 RESPONSES = DATA / "document_qa_responses.json"

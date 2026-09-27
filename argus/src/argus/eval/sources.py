@@ -33,10 +33,11 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
-from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 REPORT_PATH = DATA / "source_health.json"
 
 TIMEOUT_NOTE = "each probe runs the module's own fetch, so a parse failure counts as a failure"

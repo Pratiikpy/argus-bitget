@@ -49,10 +49,11 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 from math import isfinite, sqrt
-from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 REPORT_PATH = DATA / "forecastbench_restatement.json"
 
 BINS = 10

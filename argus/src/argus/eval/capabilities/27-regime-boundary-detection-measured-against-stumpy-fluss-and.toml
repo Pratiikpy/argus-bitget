@@ -1,0 +1,142 @@
+name = "Regime-boundary detection, measured against stumpy FLUSS and ruptures"
+subtheme = "t3-decisionstress"
+modules = [
+    "argus/desk/regime.py",
+]
+state = "tied"
+baseline = """\
+    TDAmeritrade/stumpy (stump+fluss, real public API); deepcharles/ruptures \
+    (Pelt/KernelCPD/Dynp); the incumbent two-line volatility rule in \
+    strategies/track1_suite.py's own rotation_regime_switch"""
+blockers = [
+    """\
+        no_specialist_capability_superior is a genuine TIE, not a PASS: FLUSS, ARGUS's ORIGINAL \
+        tool for this job, still loses to ruptures decisively and this is not softened by anything \
+        below — mean F1 0.443 vs 0.975 (1 win/89 losses/10 ties, sign-test p=1.5e-25), mean \
+        Hausdorff 111.9 bars vs 5.4, an order of magnitude worse localisation. What moved the \
+        capability's OVERALL verdict from LOST to TIED is a SECOND, different ARGUS tool \
+        (exact_partition, desk/regime.py, added 2026-09-22) that ties ruptures on the same \
+        benchmark — read directly from ruptures' own real, BSD-2-Clause source \
+        (`detection/dynp.py`, `costs/costl2.py`) after Finding 8 showed the gap was a \
+        method-family mismatch (a shape-based nearest-neighbour heuristic vs an exact \
+        cost-minimising partition) rather than a tunable parameter. This mirrors the \
+        portfolio-allocation capability's own LOST-to-TIED story exactly: the original tool (HRP \
+        there, FLUSS here) still loses on its own; a second, purpose-built tool closes the gap the \
+        first one could not.""",
+    """\
+        The tie itself is fragile in the same specific sense the LUI capability's is, though the \
+        underlying numbers are closer: with only 1 discordant trial out of 100 paired comparisons, \
+        the sign test (p=1.0) cannot distinguish 'genuinely tied' from 'genuinely tiny real edge, \
+        underpowered to detect' — the nominal F1 (0.98 vs 0.975) and Hausdorff (4.23 vs 5.41) both \
+        favour ARGUS, but neither difference clears significance on this sample, so this register \
+        reports a tie rather than a win from a single data point. Checked, not assumed: \
+        `ruptures.Dynp(model='l2')` reproduces byte-identical breakpoints to ARGUS's own \
+        exact_partition on 120/120 independent trials \
+        (tests/test_regime.py::TestExactPartitionMatchesRealRuptures), and separately matches \
+        `ruptures.KernelCPD(kernel='rbf')` — the rival this benchmark actually scores — exactly on \
+        10/10 trials, so the near-tie is not an artefact of comparing against the wrong ruptures \
+        algorithm.""",
+    """\
+        exact_partition is only tested in the ORACLE-COUNT setting used throughout Finding 8 — \
+        given the TRUE number of breakpoints, matching the fixed-count design both FLUSS and \
+        KernelCPD are budgeted under. Deploying it on real, unlabelled market data (where the true \
+        count is never known in advance, the setting FLUSS actually runs in) would need a \
+        penalty-driven breakpoint-count selection — e.g. a BIC-style rule, matching what \
+        `ruptures.Pelt` itself does — and that selection has not been built or tested. This is why \
+        FLUSS is kept, not replaced: it remains ARGUS's only tool for the unknown-count case this \
+        capability's real deployment actually faces.""",
+    """\
+        best_implementation_studied and best_method_studied are not proven beyond the base \
+        FLUSS/Pelt/KernelCPD/Dynp calls run here — no sweep of ruptures' own penalty selection or \
+        stumpy's exclusion-zone parameter has been run to check whether FLUSS's own loss is a \
+        property of the method or of this one configuration of it.""",
+    """\
+        On the QQQ/TQQQ/-3x family (the ground-truth-free, real-market test), ruptures' boundaries \
+        still spread far less than FLUSS's or stumpy's, which the scope statement reads as \
+        ruptures being MORE coherent under leverage — this front is untouched by the 2026-09-22 \
+        addition and stands as originally measured.""",
+]
+note = """\
+    Published because `data/regime_comparison.json`'s own who_wins field already read \
+    'baseline — ruptures is more coherent... stumpy is bit-identical and faster... FLUSS shows \
+    no measurable edge over the two-line incumbent', and nothing read that field into this \
+    register until now. The artefact carried a stale 337x / 5.61s timing figure from before a \
+    code fix that already read 310x / 5.25s; regenerated on 2026-09-21, it now reads ~306x / \
+    4.72s. The small further drift between 310x and 306x across the two regenerations is \
+    ordinary wall-clock variance in a timing measurement, not a second stale figure. Updated \
+    2026-09-22 (same day, second update): Finding 8 first sharpened the loss (FLUSS decisively \
+    loses to ruptures on real ground truth, p=1.5e-25, while genuinely beating stumpy, \
+    p=5.6e-17) — then, rather than stopping at a sharpened loss, `ruptures/detection/dynp.py` \
+    and `ruptures/costs/costl2.py` were read in full (BSD-2-Clause, permissive) to understand \
+    WHY FLUSS loses, and a second ARGUS segmenter (exact_partition — an exact L2 dynamic \
+    program, the textbook-correct tool for pw_constant's piecewise-constant-mean generative \
+    process) was built, verified to reproduce ruptures' own real Dynp exactly (120/120 trials) \
+    and to match KernelCPD's rbf-kernel result on the same data (10/10 trials), then wired \
+    into the SAME Finding-8 benchmark that measured the loss. Result: a genuine tie on the \
+    same 100 trials (mean F1 0.98 vs 0.975, 1 win/0 losses/99 ties). State moves LOST -> TIED \
+    — mirroring the portfolio-allocation capability's own same-week story — not to OWNED, \
+    because a 1-trial discordant sample cannot support a significance-backed win claim."""
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    ARGUS's offline FLUSS, real stumpy, real ruptures and the real incumbent rule all run on \
+    the SAME 60-day hourly Bitget market series for all 12 rTokens, plus all FOUR budgeted \
+    methods (FLUSS, stumpy, ruptures, and ARGUS's second segmenter exact_partition added \
+    2026-09-22) run on the SAME 100 synthetic trials (ruptures.pw_constant, 25 seeds x 4 noise \
+    levels) with KNOWN injected changepoints — Finding 8, extended the same day it first ran"""
+artefact = "data/regime_comparison.json"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    one-sided binomial test of novelty rate against the incumbent's own coverage as the null \
+    (66.9%): FLUSS's own-run novelty rate scores non-significant against that null on every \
+    run to date. Paired sign test of per-trial F1 against KNOWN synthetic changepoints \
+    (ruptures.metrics.precision_recall at margin=WINDOW) across 100 trials: FLUSS loses to \
+    ruptures decisively (mean F1 0.443 vs 0.975, 1 win/89 losses/10 ties, p=1.5e-25) and beats \
+    stumpy significantly (mean F1 0.443 vs 0.330, 55 wins/0 losses/45 ties, p=5.6e-17). \
+    ARGUS's second segmenter, exact_partition, TIES ruptures on the identical 100 trials (mean \
+    F1 0.98 vs 0.975, 1 win/0 losses/99 ties, sign-test p=1.0 — literally cannot reject 'no \
+    difference' with one discordant trial, so reported as a tie, not rounded up from a \
+    nominally higher mean)"""
+artefact = "data/regime_comparison.json"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    argus_seconds=5.25 vs stumpy_seconds_warm=0.017 vs ruptures_pelt_seconds=0.43 on the same \
+    1,439-bar symbol; FLUSS measured ~306x slower than warm stumpy for a bit-identical matrix \
+    profile (16,992 windows, zero disagreements). exact_partition measured separately at ~24ms \
+    per 400-bar synthetic trial (pure-Python bottom-up DP with O(1) prefix-sum cost lookups) — \
+    faster than FLUSS despite being the exact, not approximate, tool"""
+artefact = "data/regime_comparison.json"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    a flat curve: stumpy fabricates a boundary and repeats the same index on it, ARGUS's FLUSS \
+    refuses to report one at all — the one adversarial input in this comparison where ARGUS is \
+    the more conservative system, published beside the loss rather than let it soften the \
+    headline"""
+artefact = "data/regime_comparison.json"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    first-half/second-half split of the 60-day window, novelty and agreement rates recomputed \
+    independently on each half against the same incumbent-flip null rather than carried over \
+    from the full-window number. Separately, the exact_partition tie is checked by noise level \
+    rather than only in aggregate: F1=1.000 both sides at noise 0.5/1.0, and ARGUS nominally \
+    ahead at the hardest level tested (noise=4.0: F1 0.920 vs 0.900, Hausdorff 13.04 vs 17.68) \
+    — not one lucky aggregate trial"""
+artefact = "data/regime_comparison.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    reproducibility.identical=true; timing fields are excluded from the identity check by name \
+    rather than the check being loosened silently. Separately, exact_partition itself is a \
+    deterministic dynamic program with no internal randomness — unlike the LUI classifier head \
+    rebuilt the same week, no seeding was needed for reproducibility here"""
+artefact = "data/regime_comparison.json"

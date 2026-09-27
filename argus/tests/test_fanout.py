@@ -11,7 +11,8 @@ import pytest
 
 from argus.lui import fanout
 from argus.lui.answer import Answer, Source
-from argus.lui.research import ResearchKind, ResearchRequest, _question
+from argus.lui.research import ResearchKind, ResearchRequest
+from argus.lui.research.text import _question
 
 K = ResearchKind
 CLASSES = {"NVDAUSDT": "equity", "BTCUSDT": "crypto", "XAUUSDT": "commodity",

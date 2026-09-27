@@ -1,0 +1,170 @@
+name = "LUI intent routing, measured against Rasa's real DIET classifier"
+subtheme = "t3-lui"
+modules = [
+    "argus/lui/ngram.py",
+    "argus/eval/lui_rematch.py",
+    "argus/eval/lui_rematch_inputs.py",
+]
+state = "tied"
+baseline = "RasaHQ/rasa 3.6.21 (Apache-2.0), DIET classifier, default pipeline config"
+blockers = [
+    """\
+        no_specialist_capability_superior is a genuine TIE on the headline metric, not a PASS: \
+        Rasa's DIET classifier still scores higher on raw sealed accuracy (81.91% vs ARGUS's \
+        79.52%, 240/293 vs 233/293) — the gap did not close to zero, it closed from \
+        clearly-significant (p=0.0014) to comfortably-not-significant (p=0.2649, well clear of \
+        this project's p<0.05 bar, not sitting near it). That is 'not proven to be a loss', which \
+        is a weaker and more honest claim than 'proven equal' — but unlike the SVM-only rebuild's \
+        p=0.0576 (close enough to 0.05 that a handful of different discordant predictions could \
+        have flipped the call), this margin is no longer fragile in that specific sense.""",
+    """\
+        The one front ARGUS is not just tied on but ahead on, and it is real and separately \
+        significant: out-of-scope refusal. ARGUS declines 13 of 14 probes against Rasa's 6, a \
+        strict superset, p=0.0156, unchanged by the OOS-rebalancing rebuild. This is not averaged \
+        into the accuracy verdict — the two findings measure different things, per this module's \
+        own scope_statement, which refuses to let either soften the other.""",
+    """\
+        adversarial_test and out_of_sample_test are not proven: single seed, one training run per \
+        Rasa config, no variance estimate for either system. The 14-probe out-of-scope set is too \
+        small to carry the safety claim alone — Wilson CIs are wide ([0.69, 0.99] vs [0.21, 0.67]) \
+        even where the paired test is significant; a held-out set of 200-500 probes is the obvious \
+        next build and was not done here. Separately: LinearSVC's liblinear solver is not \
+        deterministic without a fixed random_state on this small, wide problem (314 rows after \
+        rebalancing, ~13k features) — checked directly, 5 unseeded fits produced 5 different \
+        weight hashes — so `argus.eval.ngramtrain.fit` pins `random_state=20260921` and the sealed \
+        numbers above are for that exact, reproducible artefact, not for 'whichever fit came out \
+        best'.""",
+    """\
+        Root cause, read from the confusion rather than assumed, and now genuinely closed rather \
+        than merely sharpened: the 2026-09-22 RIVAL LENS pass tested (not assumed) the \
+        class-imbalance hypothesis this entry previously left untried. Dev-CV only, no sealed \
+        spend for the test itself: downsampling the 60 Chinese out-of-scope negatives to 40 \
+        (matching English, `training_rows()`'s existing 40 EN) cut the rate at which held-out \
+        Chinese in-scope questions are wrongly refused as out-of-scope from 14.2% to 8.4% (66/465 \
+        to 39/465 across 5-seed x 5-fold CV), paired McNemar b=28 (current wrong, balanced right) \
+        vs c=1 (reverse), p<0.0001, with no cost to overall CV accuracy (78.5% to 78.7%). \
+        Implemented as `ngramtrain.balance_oos_by_language` (seed `OOS_BALANCE_SEED=20260922`, its \
+        own seed independent of the pool-split and fit seeds), retrained, and re-scored against \
+        sealed once — the legitimate one-read-per-rebuild this project's own established pattern \
+        allows (data/oblique_sealed.json's docstring: 'read exactly once' per model, not per \
+        session; the SVM head-swap earlier already used this same pattern once). Result: sealed \
+        accuracy rose 77.82% to 79.52% and the McNemar margin against Rasa widened from borderline \
+        (p=0.0576) to comfortable (p=0.2649). Still not a win — Rasa's point estimate remains \
+        higher — but the untried lever this entry named is untried no longer, and it worked. The \
+        other named lever (a separate binary OOS gate ahead of intent routing) remains untried and \
+        is the next one to reach for if a future session wants to move this from TIED to a real \
+        win.""",
+    """\
+        the console's MCP surface, 2026-09-25 (data/mcp_fuzz.json, data/mcp_sdk_comparison.json): \
+        the hand-rolled lui/mcp_server.py answered all 145 cases of an authored wire-fuzz corpus \
+        cleanly - no unstructured exception, no schema-invalid argument reaching an engine - \
+        against 46 before that day's hardening; the official MCP SDK 2.2.0 server, on the same \
+        corpus and oracle, answered 57 cleanly and let 96 calls reach an engine. An authored \
+        corpus, not traffic, and the server is not the router this row measures""",
+    """\
+        Rematch run 2026-09-26 (eval/lui_rematch.py, data/lui_rematch.json; Rasa 3.6.21 trained on \
+        the same 314 rows, five seeds of its shipped default pipeline and four of the 2026-09-21 \
+        one, each run checked against its own digest and the frozen inputs). Held out (578 rows): \
+        ARGUS 464, Rasa 462-483 (mean 477.2), a paired difference of -2.3 points with a 95% \
+        interval of -4.9 to +0.4: a tie, leaning Rasa. Sealed (293): 233 against a mean of 235.4, \
+        a tie. Out of scope: ARGUS declines 518 of 672 MASSIVE utterances against Rasa's 307 \
+        (+31.4 points), and ties on CLINC150 (669 against 682 of 963) and on 120 hard negatives. \
+        Perturbed held-out rows: ARGUS better on full-width (+61 points), Traditional Chinese \
+        (+17.6) and polite wrapping (+5.9); Rasa better with the punctuation removed (-4.8) and \
+        with two typos (-3.7). ARGUS answers in 0.42 ms (median) against 8.6 ms, from a 1.6 MB \
+        model loaded in 0.03 s against 46 MB in 11.7 s. Rasa's seed-1 repeat reproduced its \
+        predictions but read Rasa's training cache, so a cold retrain is not shown to reproduce \
+        them. Figures regenerated the same day after the record-routing and domain-gate changes; \
+        the wider domain gate costs the console 2 MASSIVE and 4 CLINC declines.""",
+]
+note = """\
+    **2026-09-22, two rebuilds this date.** First, the classifier head: dev-half 5-fold CV (10 \
+    fold-split seeds) found `LinearSVC(C=5.0, class_weight='balanced')` beats the multinomial \
+    logistic head this shipped with on every seed (mean 76.71% vs 72.28%); a calibrated \
+    variant (`CalibratedClassifierCV`) also won but less (75.36%) and needs k-fold machinery \
+    the plain margin does not. `lui/ngram.py`'s pure-Python scorer needed zero code changes — \
+    it was already generic linear-scores-then-softmax. The abstention threshold was re-derived \
+    by the same rule that set the old 0.20 (lowest threshold beating the pattern layer on both \
+    axes in out-of-fold CV), landing at 0.15. Word-level TF-IDF features stacked onto the \
+    character n-grams were tried and hurt (73.35% to 66.77%/66.16% on dev CV) — a real, \
+    tested, negative finding, not silently dropped. Second, same date, the RIVAL LENS pass: \
+    out-of-scope training-set language balance (see the blockers entry above for the full \
+    evidence) — the first rebuild's own root-cause note had named this lever and left it \
+    untried; this pass tried it, on dev-CV evidence only, then spent the one legitimate \
+    sealed-read to confirm 77.82% to 79.52% for real. Latency and deployability were measured \
+    once, before either rebuild (ARGUS ~66x faster median response, ~375x faster cold start, a \
+    stdlib-only bundle vs Rasa's 1.9GB TensorFlow venv needing Python<=3.10), reported as an \
+    unreproduced finding from the agent that ran the original comparison rather than \
+    re-measured inside eval/lui_comparison.py, so no Proof above cites them."""
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    RasaHQ/rasa chosen because bounded-domain conversational intent understanding is its \
+    primary purpose, not a framework with chat bolted on; it is the OSS NLU engine the \
+    benchmarking literature treats as a baseline, and DIET has a published paper (Bunk et al., \
+    arXiv 2004.09936). ConvLab-3 rejected for granularity (a full TOD pipeline, NLU is one \
+    swappable module); snips-nlu rejected as unmaintained since Jan 2020 despite correct \
+    granularity, per the standing rule to take the harder candidate. No finance-specific \
+    permissively-licensed conversational NLU system was found to exist — only datasets \
+    (BANKING77, CLINC150)."""
+artefact = "data/lui_comparison.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    Rasa trained once, 2026-09-21, on ARGUS's own training_rows() as it stood that day (334 \
+    rows, all 9 labels incl. out_of_scope) and scored on the identical sealed split; \
+    reproduced independently from the vendored predictions before this module existed \
+    (217/251/293 argus, 240/291/293 rasa, matching to 4 decimal places). Rasa's side is a \
+    fixed, dated snapshot (`rasa_diet_sealed_predictions.json`'s own `trained_and_scored` \
+    field) and is not retrained when ARGUS's training data changes — by design, per \
+    same_input_comparison below; the 314-row count after the 2026-09-22 OOS-rebalancing \
+    rebuild describes ARGUS's live side only, not this baseline."""
+artefact = "data/lui_comparison.json"
+test = "test_lui_comparison.py::TestVendoredReference"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    both systems scored on the identical 293-row sealed split and the identical 14 \
+    out-of-scope probes; ARGUS's side runs live through the exact console function \
+    (classify_with_fallback), never vendored — so the 2026-09-22 classifier-head rebuild \
+    changed this comparison's result automatically, on the next run, with no change to the \
+    comparison module itself"""
+artefact = "data/lui_comparison.json"
+test = "test_lui_comparison.py::TestSealedComparison"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    McNemar's exact test (Dietterich 1998) on paired predictions, re-run after the 2026-09-22 \
+    OOS-rebalancing rebuild: sealed accuracy p=0.2649 (11 argus-only vs 18 rasa-only correct) \
+    — comfortably not significant, down from the SVM-only rebuild's already-not-significant \
+    p=0.0576, and from p=0.0014 before either rebuild. Out-of-scope p=0.0156 (7 argus-only vs \
+    0 rasa-only declined) — unchanged and still significant."""
+artefact = "data/lui_comparison.json"
+test = "test_lui_comparison.py::TestMcnemarExact"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    ARGUS's abstention threshold removed entirely (raw top-1 from probabilities(), no \
+    suppression): accuracy rises to 82.25% (241/293) — fractionally ABOVE Rasa's 81.91% \
+    (240/293). Not claimed as a win: this is a different, unsafe configuration (no refusal at \
+    all), not the deployed one, and is reported to show the remaining gap is now caution \
+    rather than capability, not to launder it into a headline number."""
+artefact = "data/lui_comparison.json"
+test = "test_lui_comparison.py::TestAblationWithoutThreshold"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    Rasa's 8 out-of-scope leaks named with routed intent and confidence (e.g. 'who won the \
+    world cup' -> performance at confidence 1.0, saturated — no threshold would rescue it); \
+    ARGUS's 1 remaining leak ('sing me a song') is a strict subset of Rasa's 8, unchanged by \
+    the OOS-rebalancing rebuild — that rebuild targets in-scope questions wrongly refused, a \
+    different failure direction from genuinely-OOS questions wrongly answered, and the two do \
+    not move together"""
+artefact = "data/lui_comparison.json"
+test = "test_lui_comparison.py::TestOosComparison"

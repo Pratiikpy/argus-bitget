@@ -25,13 +25,13 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
 from math import comb, sqrt
-from pathlib import Path
 from typing import Any
 
 from argus.market.bitget import RTOKEN_SYMBOLS
 from argus.market.history import fetch_basis
 from argus.research.gap_study import ClosedSession, _closed_sessions
 from argus.truth.clocks import DualClock, SessionPhase
+from argus.truth.paths import DATA_DIR
 
 
 def binomial_p_value(successes: int, trials: int, p_null: float = 0.5) -> float:
@@ -178,7 +178,7 @@ def study(*, days: int = 90) -> dict[str, Any]:
 
 def main() -> int:
     result = study()
-    out = Path(__file__).resolve().parents[3] / "data" / "weekend_significance.json"
+    out = DATA_DIR / "weekend_significance.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(json.dumps(result, indent=2))

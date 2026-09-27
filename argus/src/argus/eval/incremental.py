@@ -48,14 +48,14 @@ import json
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from statistics import fmean, pstdev
 from typing import Any
 
 from argus.eval.ablation import sign_test
 from argus.eval.forecasts import design_effect, intraclass_correlation
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "incremental_value.json"
 
 MIN_INSTANTS = 20

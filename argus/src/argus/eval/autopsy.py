@@ -98,7 +98,6 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from statistics import fmean, median
 from typing import Any
 
@@ -113,8 +112,9 @@ from argus.risk.gatechain import (
     UNREACHED,
     Gate,
 )
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "abstention_autopsy.json"
 
 

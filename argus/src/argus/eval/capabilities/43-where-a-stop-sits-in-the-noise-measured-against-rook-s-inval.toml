@@ -1,0 +1,67 @@
+name = "Where a stop sits in the noise, measured against Rook's invalidation price"
+subtheme = "t3-decisionstress"
+# Credit moved 2026-09-25 from `argus/desk/odds.py` to the harness. The distance the
+# harness scores is its own `_p90_adverse` (stopquality_comparison.py:43-48, a nearest-rank
+# 90th percentile of prior-close-to-low drops on daily bars); desk/odds.py's
+# `directional_odds` computes `adverse_p90_bps` with an interpolated quantile over the
+# answer's own horizon (desk/odds.py:195). The harness used to compute ARGUS's distance
+# with its own copy (`_p90_adverse`) and never import desk/odds.py. Since 2026-09-26 it
+# calls `desk.odds.directional_odds` on daily bars saved once (`data/h2h_rook/bars/`), so
+# it runs offline and scores the desk's own code: 0.109 against Rook's 0.625 (the old
+# copy gave 0.111 against 0.624). The credit names that code again.
+modules = [
+    "argus/desk/odds.py",
+    "argus/eval/stopquality_comparison.py",
+]
+state = "implemented"
+baseline = """\
+    iamsuperfly/Rook (Season 2, MIT): runDebate (bull/bear + judge) on the hackathon Qwen, \
+    long side, 24h, six names, from its clone"""
+blockers = [
+    """\
+        ahead on the one metric measured, not OWNED: ordinary movement reached Rook's stops on 62% \
+        of held-out days on average (28% to 87% by name) and ARGUS's out-of-sample stop on 11% (8% \
+        to 17%), lower on all six names — but six names and one run, and Rook's price marks where \
+        its thesis is wrong rather than where noise ends, so the comparison says how often each \
+        line is hit by chance, not which desk trades better""",
+    """\
+        prospective check pending: both stops were recorded at the run and are graded on the next \
+        24 hours""",
+    """\
+        the distance scored is the harness's own nearest-rank percentile, not the console's \
+        desk/odds.py, and the harness needs the network to run (it fetches the daily bars live and \
+        saves none), so the comparison cannot be reproduced offline. Both close the same way: \
+        score() taking the saved bars and calling desk.odds.directional_odds for ARGUS's distance""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    Rook's invalidation logic read (lib/desk/invalidation.ts: model proposal, overridden by \
+    the 24h low, SMA20 or 1% when on the wrong side)"""
+artefact = "data/stopquality_comparison.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = "Rook's own runDebate executed on six names, outputs kept in data/h2h_rook/"
+artefact = "data/stopquality_comparison.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = "both stops scored on the same held-out 40% of each name's Bitget daily bars"
+artefact = "data/stopquality_comparison.json"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = "ARGUS's distance fitted on the first 60% of history, scored on the last 40%"
+artefact = "data/stopquality_comparison.json"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "the adverse-excursion measure, tested"
+test = "test_odds.py::test_the_stop_line_reads_the_bars_lows_and_highs_not_the_closes"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = "six names, one run; Rook's line is a thesis invalidation, not a noise stop"
+artefact = "data/stopquality_comparison.json"

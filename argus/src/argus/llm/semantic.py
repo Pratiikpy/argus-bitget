@@ -141,7 +141,7 @@ class SemanticRouter:
         if not examples:
             raise ValueError("a router with no labelled examples cannot route anything")
         self._threshold = threshold
-        self._model = model if model is not None else _load(model_id)
+        self._model = model if model is not None else load_table(model_id)
         self._labels: list[str] = sorted({label for _, label in examples})
         vectors = self._embed([text for text, _ in examples])
         index = {label: i for i, label in enumerate(self._labels)}
@@ -198,7 +198,7 @@ class SemanticRouter:
 
 
 @lru_cache(maxsize=2)
-def _load(model_id: str) -> Any:
+def load_table(model_id: str) -> Any:
     """The static model, loaded once per process.
 
     Cached because a console answers many questions and the table is immutable. Raises rather than

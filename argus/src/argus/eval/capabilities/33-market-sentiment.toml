@@ -1,0 +1,19 @@
+name = "Market sentiment"
+subtheme = "t2-sentiment"
+modules = [
+    "argus/agents/analysts.py",
+    "argus/agents/desk.py",
+    "argus/lui/research/sentiment.py",
+]
+state = "implemented"
+baseline = """\
+    Santiment crowd-sentiment contrarian signals; Augmento; Bitget's own bitget-signal \
+    sentiment-analyst Skill; TauricResearch/TradingAgents v0.4 sentiment analyst; the S2 entry \
+    Jfash-cmd/sentinel-bitget-hackathon"""
+blockers = [
+    """\
+        The sub-theme asks how real-time social sentiment becomes a position signal. What is \
+        proven is narrower (the integrity row above: coordinated posting does not move the desk's \
+        analyst). The desk has opened no position from a sentiment read, and the rivals that lead \
+        the sub-theme have not been run on the same input (rival review of 2026-09-24)""",
+]

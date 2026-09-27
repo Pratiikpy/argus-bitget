@@ -49,6 +49,7 @@ from typing import Any
 
 from argus.execution.latency import DecisionLatency, LatencyError, thinking_budget_cost_bps
 from argus.market.volatility import fetch as fetch_vix
+from argus.truth.paths import DATA_DIR
 
 # ARGUS's own three real, bake-off-measured thinking budgets (same figures
 # eval/deliberation_comparison.py's own module docstring cites: OFF=3,000ms, LOW=8,000ms,
@@ -230,7 +231,7 @@ def main() -> int:  # pragma: no cover - CLI
         "scope_statement": SCOPE_STATEMENT,
     }
     print(render(report))
-    out = Path(__file__).resolve().parents[3] / "data" / "execassist_comparison.json"
+    out = DATA_DIR / "execassist_comparison.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     print(f"\nwritten to {out}")

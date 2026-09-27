@@ -61,7 +61,6 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
-from pathlib import Path
 from typing import Any
 
 from argus.backtest.engine import Bar, run
@@ -73,6 +72,7 @@ from argus.backtest.metrics import (
 from argus.cost.model import CostModel
 from argus.research.overfit import Observation, Outcome, OverfitReport, run_all
 from argus.truth.clocks import DualClock, SessionPhase
+from argus.truth.paths import DATA_DIR
 
 
 class Lifecycle(StrEnum):
@@ -797,7 +797,7 @@ def main() -> int:
         for c in candles
     ]
 
-    root = Path(__file__).resolve().parents[3] / "data"
+    root = DATA_DIR
     memory_path = root / "factor_memory.json"
     memory = FactorMemory.load(memory_path)
     lab = FactorLab(evaluator=Evaluator(bars), memory=memory)

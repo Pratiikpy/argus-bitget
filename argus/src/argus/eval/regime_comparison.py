@@ -243,6 +243,7 @@ from argus.market.bitget import RTOKEN_SYMBOLS
 from argus.market.history import CandleType, fetch_range
 from argus.strategies.track1_suite import rotation_regime_switch
 from argus.truth.artefact import sanitise
+from argus.truth.paths import DATA_DIR
 
 
 class RegimeComparisonError(RuntimeError):
@@ -300,7 +301,7 @@ this project has been caught by before. Backoff is 4s, 8s, 16s; a symbol that st
 named in `failures` rather than retried forever.
 """
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 CANDLES_FIXTURE_PATH = DATA / "regime_candles_fixture.json"
 """Frozen once, real Bitget history — see `freeze_regime_candles` and `fetch_universe`'s own
 `frozen` parameter. Fixed 2026-09-23 after `test_boundaries_mostly_land_within_one_window_of_
@@ -1781,7 +1782,7 @@ def main() -> int:  # pragma: no cover - CLI
         "scope_statement": SCOPE_STATEMENT,
     }
     print(render(report))
-    out = Path(__file__).resolve().parents[3] / "data" / "regime_comparison.json"
+    out = DATA_DIR / "regime_comparison.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     # Two passes, deliberately: `default=str` first, exactly as before, catches whatever numpy
     # scalar (an int64 from ruptures/stumpy, most likely) would otherwise raise inside plain

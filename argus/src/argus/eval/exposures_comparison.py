@@ -23,10 +23,11 @@ from pathlib import Path
 from typing import Any
 
 from argus.lui import exposures as ex
+from argus.truth.paths import DATA_DIR
 
 RISKFOLIO = (Path(__file__).resolve().parents[4] / "research" / "repos-t2" / "dcajasn~riskfolio-lib"
              / "riskfolio" / "src" / "ParamsEstimation.py")
-OUT = Path(__file__).resolve().parents[3] / "data" / "exposures_comparison.json"
+OUT = DATA_DIR / "exposures_comparison.json"
 BOOK = {"MSFTUSDT": 0.4, "METAUSDT": 0.3, "GOOGLUSDT": 0.3, "NVDAUSDT": 0.0, "BTCUSDT": 0.0,
         "XAUUSDT": 0.0}
 """The audit's book, plus the names a trade on it would add; each is fitted on its own."""
@@ -50,6 +51,13 @@ def main() -> int:
 
     rows = ex.sector_map()["rows"]
     inputs = ex.fetch_inputs(list(BOOK), rows)
+    missing = [k for k in ex.FACTOR_SERIES if k not in inputs.factors]
+    if missing:
+        # A comparison without every factor series is a different model; say why and stop, rather
+        # than raise a KeyError on the first holding (seen 2026-09-27 on a failed fetch).
+        print(f"factor series unreadable: {', '.join(missing)} "
+              f"({inputs.missing.get('factors', 'no detail')}); nothing written", file=sys.stderr)
+        return 1
     functions = _riskfolio_functions()
     results: dict[str, Any] = {}
     for symbol in BOOK:
@@ -58,14 +66,14 @@ def main() -> int:
             results[symbol] = {"error": inputs.missing.get(symbol, "no closes")}
             continue
         f = inputs.factors
-        days = sorted(set(closes) & set(f["SPY"]) & set(f["IWM"]) & set(f["MTUM"])
-                      & set(f["BTC"]))[-(ex.WINDOW_DAYS + 1):]
+        days = sorted(set(closes).intersection(*(set(f[k]) for k in ex.FACTOR_SERIES))
+                      )[-(ex.WINDOW_DAYS + 1):]
         sub = {k: {d: v[d] for d in days} for k, v in f.items()}
         _, factors = ex.factor_returns(sub)
         y = [closes[b] / closes[a] - 1.0 for a, b in itertools.pairwise(days)]
         fitted = ex.ols(y, [factors[k] for k in ex.FACTORS])
         if fitted is None:
-            # Too few shared days to fit four factors: recorded for this symbol, as a missing
+            # Too few shared days to fit the factors: recorded for this symbol, as a missing
             # series is, instead of an assertion ending the whole report (tests, 2026-09-27).
             results[symbol] = {"error": f"{len(y)} daily returns, too few to fit "
                                         f"{len(ex.FACTORS)} factors"}
@@ -76,8 +84,13 @@ def main() -> int:
         full = functions["loadings_matrix"](x, frame, feature_selection="stepwise",
                                             stepwise="Forward", criterion="pvalue",
                                             threshold=0.05)
+        import statsmodels.api as sm
+
+        plain = sm.OLS(frame[symbol], sm.add_constant(x)).fit().params
         results[symbol] = {
             "n": len(y),
+            "statsmodels_ols_max_abs_diff": round(max(
+                abs(float(plain[k]) - coef[i + 1]) for i, k in enumerate(ex.FACTORS)), 10),
             "argus": {k: round(coef[i + 1], 4) for i, k in enumerate(ex.FACTORS)},
             "argus_t": {k: round(coef[i + 1] / ses[i + 1], 2) for i, k in enumerate(ex.FACTORS)},
             "argus_r2": round(r2, 3),
@@ -88,7 +101,7 @@ def main() -> int:
                for s, r in results.items() if "argus" in r}
     report = {
         "generated_at": datetime.now(UTC).isoformat(),
-        "method": "same daily returns, same four factors; ARGUS OLS keeps all four, Riskfolio-Lib "
+        "method": "same daily returns, same factors; ARGUS OLS keeps every factor, Riskfolio-Lib "
                   "loadings_matrix(feature_selection='stepwise', stepwise='Forward', "
                   "criterion='pvalue', threshold=0.05) keeps those forward selection admits",
         "riskfolio_source": "research/repos-t2/dcajasn~riskfolio-lib/riskfolio/src/"

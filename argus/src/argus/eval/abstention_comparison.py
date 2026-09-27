@@ -34,13 +34,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
 from argus.eval.baselines.ghostledger_reimpl import bucket_from_marks, headline_saved_usd
 from argus.eval.observatory import AbstentionOutcome, abstention_quality
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "abstention_comparison.json"
 
 BPS_PER_DOLLAR_PER_UNIT_NOTIONAL = 1.0

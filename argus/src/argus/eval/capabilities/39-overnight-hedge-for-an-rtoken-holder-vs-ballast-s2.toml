@@ -1,0 +1,56 @@
+name = "Overnight hedge for an rToken holder vs. Ballast (S2)"
+subtheme = "t3-portfolio"
+modules = [
+    "argus/market/rtoken_spot.py",
+    "argus/desk/rtoken_hedge.py",
+    "argus/eval/copilot_hedge.py",
+]
+state = "tied"
+baseline = """\
+    Ritapossible/Ballast @5cf6759 (MIT) — an S2 entry — run unmodified; its README figures \
+    reproduced (held-out R2 0.981 -> 0.997, tail cut 86.5% -> 95.1%, 12/12)"""
+blockers = [
+    """\
+        TIED, and parity is the ceiling: ARGUS's console and Ballast fit the same slope, so on \
+        Ballast's held-out nights both remove 99.7% of an rToken holder's overnight variance \
+        (median of 11 names, largest per-name gap 0.0). The first run of this comparison, the same \
+        day, was a clean LOSS and is kept on the record: ARGUS modelled Bitget's stock perpetuals \
+        and not the spot rTokens, so the best hedge it could offer an RTSLAUSDT holder was its \
+        QQQUSDT index leg, which removed 10.1% and lost on all 11 names (p = 0.001). \
+        market/rtoken_spot.py (Ballast's pairing rule, calendar and overnight return, MIT, \
+        reproducing its nights to 0.0) and desk/rtoken_hedge.py were built from that loss""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    Ballast's universe.py, overnight.py, stats.py, costs.py, research/hedge_study.py and \
+    oos.py read at source"""
+artefact = "data/copilot_hedge.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = "hedge_study.py and oos.py run unmodified; every README figure checked matched"
+artefact = "data/copilot_hedge.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = "both scored on Ballast's own per-night series, 11 names, its 70/30 split"
+artefact = "data/copilot_hedge.json"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = "ratios fitted on the first 70% of nights, never refitted"
+artefact = "data/copilot_hedge.json"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    the first run was a clean loss (index hedge 10.1% against 99.7%), published before the \
+    rebuild"""
+artefact = "data/copilot_hedge.json"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "the console's own overnight_hedge produced ARGUS's figures"
+artefact = "data/copilot_hedge.json"

@@ -23,7 +23,7 @@ literature would nominate this candidate, not a guess dressed up as one.
 (`research.sue.MIN_QUARTERS`) gets a real SUE reading, dated by the real SEC filing date
 (`Fact.filed` — point-in-time by construction, never the fiscal-period end). Events are pooled
 across anchors: a single-name result is not a result here, the same lesson this project already
-paid for once (`CLAUDE.md`: single-symbol trend "looked strong only because one instrument
+paid for once (the project's notes: single-symbol trend "looked strong only because one instrument
 produced the whole return"). A long-short rule — long positive SUE, short negative, the sign the
 PEAD literature itself predicts rather than one fit to this sample — is tested at several holding
 periods, each one "trial" in exactly the sense `research.track1_study` already counts trials: the
@@ -56,7 +56,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
-from pathlib import Path
 from typing import Any
 
 from argus.backtest.metrics import MetricError, Performance, deflated_sharpe, evaluate
@@ -70,8 +69,9 @@ from argus.market.bitget import ANCHOR_OF, fetch_rtokens
 from argus.market.fundamentals import FundamentalsSource
 from argus.market.history import Candle, fetch_range
 from argus.market.sue import MIN_QUARTERS, SueError, read_dated, yoy_window
+from argus.truth.paths import DATA_DIR
 
-STUDY_PATH = Path(__file__).resolve().parents[3] / "data" / "pead_study.json"
+STUDY_PATH = DATA_DIR / "pead_study.json"
 
 HOLD_HOURS: tuple[int, ...] = (24, 72, 120, 240)
 """Holding periods swept, in hours. Each is one deflated-Sharpe trial. Capped at 240h (10 days):

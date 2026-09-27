@@ -55,8 +55,9 @@ from typing import Any
 
 from argus.cost.model import CostModel
 from argus.eval.forecasts import design_effect, intraclass_correlation
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPLAY_PATH = DATA / "replay_ledger.jsonl"
 LIVE_PATH = DATA / "paper_ledger.jsonl"
 REPORT_PATH = DATA / "hurdle_frontier.json"

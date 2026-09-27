@@ -37,7 +37,6 @@ record either way.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from pathlib import Path
 from typing import Any
 
 from argus.desk.allocation import TAKER_BPS, hrp_weights, optimize_trade
@@ -52,8 +51,9 @@ from argus.eval.allocation_comparison import (
     load_returns,
 )
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "allocation_agreement.json"
+REPORT_PATH = DATA_DIR / "allocation_agreement.json"
 
 NO_TRADE_TURNOVER = 0.01
 """Below this one-way turnover the convex program has decided not to move the book.

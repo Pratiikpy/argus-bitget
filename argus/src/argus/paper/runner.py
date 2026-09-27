@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import sys
 from collections.abc import Collection, Sequence
 from datetime import UTC, datetime, timedelta
@@ -106,8 +107,11 @@ from argus.risk.hedgeability import (
 from argus.risk.session_risk import lookup as session_lookup
 from argus.truth.clocks import DualClock, SessionState
 from argus.truth.evidence import Evidence
+from argus.truth.paths import DATA_DIR
 
-LEDGER_PATH = Path(__file__).resolve().parents[3] / "data" / "paper_ledger.jsonl"
+_LOG = logging.getLogger(__name__)
+
+LEDGER_PATH = DATA_DIR / "paper_ledger.jsonl"
 
 SKILL_HEALTH_PATH = LEDGER_PATH.with_name("bitget_skills_health.json")
 """Last measured health of Bitget's official Skill tools.
@@ -208,10 +212,10 @@ def _write_notes(
                 "evidence": list(evidence),
             }) + "\n")
     except OSError as exc:  # pragma: no cover - disk failure
-        print(f"could not write desk notes for seq {seq}: {exc}", file=sys.stderr)
+        _LOG.error("could not write desk notes for seq %s: %s", seq, exc)
 
 
-def _book_state(ledger: PaperLedger) -> object:
+def current_book_state(ledger: PaperLedger) -> object:
     """The book as the risk layer judges it: the **realised** equity curve.
 
     **This returned ``None`` on an empty ledger for one revision, and that was over-cautious.** The
@@ -308,7 +312,7 @@ def _write_chain(seq: int, symbol: str, run: DeskRun) -> None:
         # into the real ledger directory while asserting against a temporary one.
         chains.write(run.causal_chain, seq=seq, symbol=symbol, path=chains.CHAINS_PATH)
     except OSError as exc:  # pragma: no cover - filesystem
-        print(f"could not write causal chain for seq {seq}: {exc}", file=sys.stderr)
+        _LOG.error("could not write causal chain for seq %s: %s", seq, exc)
 
 
 def _grade_chains(outcomes: dict[int, tuple[float, datetime]]) -> int:
@@ -330,7 +334,7 @@ def _grade_chains(outcomes: dict[int, tuple[float, datetime]]) -> int:
         after = chains.grade_pending(stored, outcomes, path=path)
         return len([r for r in after if r.graded]) - before
     except OSError as exc:  # pragma: no cover - filesystem
-        print(f"could not grade causal chains: {exc}", file=sys.stderr)
+        _LOG.error("could not grade causal chains: %s", exc)
         return 0
 
 
@@ -387,7 +391,7 @@ def _write_risk_record(seq: int, symbol: str, at: datetime, run: DeskRun) -> Non
                 },
             }) + "\n")
     except OSError as exc:  # pragma: no cover - disk failure
-        print(f"could not write risk record for seq {seq}: {exc}", file=sys.stderr)
+        _LOG.error("could not write risk record for seq %s: %s", seq, exc)
 
 
 def _executable_spread_bps(
@@ -957,7 +961,7 @@ def run_once(
     # The named risk mode this cycle runs under, built once from what the cycle already knows: the
     # venue rules loaded or not, and the book the circuit breaker judges (`execution/modes.py`). The
     # change notice is written only when the mode differs from the last cycle's.
-    cycle_book = _book_state(ledger)
+    cycle_book = current_book_state(ledger)
     mode_stack = stack_for_cycle(rules_loaded=guard is not None, rules_detail=guard_note,
                                  book=cycle_book if isinstance(cycle_book, BookState) else None)
     mode_notice = persisted_notice(mode_stack, notice_path(ledger_path))
@@ -1112,7 +1116,7 @@ def run_once(
         # UNREACHED rather than as passed.
         active_policy = ConstitutionPolicy(
             session_risk=session_lookup(symbol),
-            book_state=_book_state(ledger),
+            book_state=current_book_state(ledger),
             graded_predictions=_graded_predictions(ledger),
         )
         # Enough left for this symbol's debate AND for every symbol still to come at its base cost.
@@ -1354,7 +1358,7 @@ def main() -> int:
 
     if args.verify or args.report:
         ledger = PaperLedger(path=LEDGER_PATH)
-        from argus.eval.performance import ledger_performance
+        from argus.paper.performance import ledger_performance
 
         payload = ledger.verify() if args.verify else ledger_performance(ledger)
         print(json.dumps(payload, indent=2, default=str))

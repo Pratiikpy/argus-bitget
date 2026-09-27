@@ -1,0 +1,213 @@
+name = "Per-profile mandate that changes the verdict"
+subtheme = "t3-personalisation"
+modules = [
+    "argus/desk/mandate.py",
+    "argus/desk/workbench.py",
+    "argus/desk/personalisation.py",
+    "argus/agents/desk.py",
+    "argus/agents/meta_pm.py",
+    "argus/eval/mandate_comparison.py",
+    "argus/eval/baselines/loader.py",
+    "argus/eval/baselines/vibe_trading_enforcement.py",
+    "argus/eval/baselines/vibe_trading_mandate_model.py",
+]
+state = "owned"
+baseline = """\
+    hkuds/vibe-trading agent/src/live/enforcement.py:458-609, the only one of 16 systems with \
+    a per-user mandate that changes a verdict on identical state and is tested"""
+blockers = [
+    """\
+        The divergence rate IS now measured over real frames (eval/profilestudy.py, 2026-09-15) \
+        and the answer is weaker than the headline: 84.6% of proposals diverge, but only 1.3% for \
+        a reason that turns on a dimension the record supplies. The size and the conceded bad-case \
+        loss are declared by the study, because every one of the 231 recorded decisions carries \
+        quantity 0 and the log holds no proposed size to read. So 'the mandate binds often enough \
+        to matter' is measured, and what it is measured to be is: mostly on inputs we chose.""",
+    """\
+        Only the symbol exclusion separates one real frame from another. Horizon contributes \
+        nothing - every horizon the desk has faced (0.0h to 52.0h) sits under even the tighter \
+        mandate's 72h ceiling, so the holding-period limit has never once bound on live data.""",
+    """\
+        The study also found that desk/personalisation.judge() had never checked excluded_symbols \
+        at all, and reported the conservative mandate's two forbidden instruments as TAKEN. Fixed \
+        2026-09-15. The measurement above is post-fix; any divergence figure quoted before that \
+        date was computed with the exclusion inert.""",
+    """\
+        Same defect shape found again the same day: max_concurrent_positions ('a cap the book must \
+        respect', its own docstring) was likewise declared and never enforced in judge() — \
+        Mandate.out_of_mandate already accepted open_positions correctly, judge() simply never \
+        supplied one. Fixed 2026-09-15 (judge/diverge/audit now accept an optional \
+        desk.book.Book); not yet reflected in the measurement above because no caller passes a \
+        live Book yet — see tests/test_personalisation.py:: TestTheMandateRespectsTheBook for \
+        proof against a real Book fixture instead. The same holds for the exposure, leverage and \
+        daily-count limits added 2026-09-27: they bind on the comparison grid and in \
+        tests/test_mandate_limits.py, and on the desk's own record only once a caller passes the \
+        live book and order count.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = "16 systems read; only vibe-trading diverges on identical state with tests"
+artefact = "../research/architecture/personalisation-audit.md"
+
+[[proofs]]
+condition = "implementation_complete"
+how = """\
+    the mandate is rendered before reasoning, not applied as a resize afterwards \
+    (agents/desk.py's mandate_block, read inside MarketFrame.to_prompt_block()). Extended \
+    2026-09-15: order_evidence() existed, was tested, and was never called by anything outside \
+    its own test — found by grepping the whole src tree for its two callers and getting zero \
+    hits, wired into agents/desk.py the same day so the PM's evidence list is genuinely \
+    ordered by what this trader prefers, not just the mandate line alone"""
+test = "test_mandate.py"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    two profiles, one market frame, different verdicts (intra-ARGUS). Extended 2026-09-15 with \
+    a cross-system same-input comparison: 11 designed + 19,440 swept scenarios run through \
+    both ARGUS's real Mandate.out_of_mandate() and vibe-trading's real, vendored \
+    check_mandate() on identical inputs — eval/mandate_comparison.py"""
+test = "test_personalisation.py"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    the desk reports when personalisation did NOT bind, which vibe-trading omits. Four more, \
+    specific to this capability's own build, 2026-09-15: two fabricated citations in this \
+    project's own prior work caught and corrected (a mandate-injection mechanism attributed to \
+    a real vibe-trading file that does not contain it; an evidence-ordering function \
+    attributed to a vibe-trading path that does not exist), dead code found and fixed \
+    (order_evidence()/frame_for() built, tested, never wired — see implementation_complete), \
+    and a self-caught measurement bug (an early sweep held three of vibe-trading's own limits \
+    at non-triggering values, understating its coverage — see costs_included)"""
+test = "test_personalisation.py"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    measured over every distinct (symbol, horizon) the desk actually faced - 195 frames from \
+    231 recorded decisions - and decomposed, because the pooled headline was an artefact: the \
+    first run read 83.3% and every rung came back at exactly 0% or 100%, so the real frames \
+    moved nothing. Reported as 84.6% headline against 1.3% attributable to a real dimension, \
+    with 1 of 6 declared rungs discriminating"""
+artefact = "data/profile_divergence.json"
+test = "test_profilestudy.py"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    two structural-invariant edge cases, not a happy path: `book=None` (no book supplied) must \
+    never be read as zero positions open, and a profile with max_concurrent_positions=0 \
+    (aggressive — unlimited) must never be stopped by any book size, however large — a naive \
+    implementation could conflate either"""
+test = """\
+    test_personalisation.py::TestTheMandateRespectsTheBook::test_no_book_leaves_the_cap_inert"""
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    judge()/diverge()/audit() are pure Decimal arithmetic over the profile's own limits — no \
+    model, no seed, no simulation; the module's own docstring states this is deliberate (a \
+    model grading its own decisions is a failure documented elsewhere in this project). The \
+    cross-system comparison shares the same property and adds another: mandate_comparison.py's \
+    19,440-scenario grid is itertools.product over fixed value tuples, not RNG-seeded — a \
+    seed's meaning can shift across Python versions, and every combination is generated the \
+    same way whether or not it breaches anything, which a hand-picked seed value could not \
+    promise. Runs in ~1 second, no network, same output every run"""
+test = "test_personalisation.py"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    vibe-trading's check_mandate() read whole (enforcement.py, all 797 lines, not the 458-609 \
+    slice alone) plus sdk_order_gate.py (185 lines), advisory/__init__.py, \
+    propose_mandate_tool.py and mandate/model.py in full. This corrected two FABRICATED \
+    citations a prior pass of this project had carried since 2026-09-13 — a mandate-injection \
+    mechanism attributed to sdk_order_gate.py:62-182 that the real file (re-read in full) does \
+    not contain, and an order_evidence() function attributed to agent/src/agent/mandate.py, a \
+    path confirmed not to exist by listing agent/src/agent/ directly. Also checked directly \
+    (not assumed): agno-agi/investment-team's teams/coordinate_team.py, fetched verbatim via \
+    `gh api`, 63 lines total, no context/ directory, no per-agent mandate; and \
+    TauricResearch/TradingAgents' risk-analysis layer (fixed debate personas, not a real \
+    trader's own constraints, per the existing research/architecture/tradingagents.md:729 \
+    teardown). See research/architecture/personalisation-audit.md's correction notice"""
+artefact = "../research/architecture/personalisation-audit.md"
+test = "test_mandate_comparison.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    vibe-trading's real check_mandate(), OrderIntent, \
+    Mandate/HardCaps/UniverseConstraint/ConsentMeta vendored verbatim (byte-verified against \
+    commit 8452a8448f947dfa1d5fe55b582f1944d4d9b696 with diff, pinned by SHA256 hash so the \
+    check survives without the external clone present) and actually executed — not paraphrased \
+    — via a sys.modules import shim that edits zero lines of their source. Confirmed correct \
+    on two hand-checked calls: a clean order returns ALLOW, an over-levered order returns the \
+    exact real breach (kind=quantitative, limit=max_leverage, attempted_value=5.0)"""
+artefact = "src/argus/eval/baselines/vibe_trading_enforcement.py"
+test = "test_baselines.py"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    the real, measurable cost of each system's structural blind spot, not asserted: across a \
+    19,440-scenario grid stressing every dimension both systems check, vibe-trading silently \
+    allows 10.4% ARGUS would refuse (horizon/hedge/confidence/concurrent-position — dimensions \
+    it has no field for at all) and ARGUS allows none that vibe-trading refuses. Until \
+    2026-09-27 ARGUS allowed 8.7% (vibe-trading's total-exposure, gross-leverage and \
+    daily-count limits, which this register had called ConstitutionPolicy's job although the \
+    Constitution carries none of them per trader); those three limits were added to the \
+    mandate and the grid re-run (audit 98). A first version of this grid held three of \
+    vibe-trading's limits at non-triggering values by construction and measured a misleading \
+    0% for one side — caught by running it and reading its own output, fixed, documented in \
+    swept_scenarios()'s own docstring"""
+artefact = "data/mandate_comparison.json"
+test = "test_mandate_comparison.py::TestBlindSpotCosts"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    nothing here is a fitted parameter, so there is no train/test split in the sense the \
+    execution-scheduling capability's OOS test uses — the analogous honest split for a \
+    rule-based gate is between scenarios hand-built to sit exactly on a boundary (11 designed \
+    scenarios, one per checked dimension, each verified to match this module's own stated \
+    intent before being trusted) and a 19,440-scenario deterministic grid that was never tuned \
+    to hit any specific limit. The pattern found on the 11 held on the grid too: every \
+    overlapping dimension (exclude-list, notional) agrees on both; every ARGUS-only and \
+    vibe-trading-only dimension shows up as a real, sized blind spot rather than a hand-picked \
+    example"""
+test = "test_mandate_comparison.py::TestSweptScenarios"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    10 checks (6 ARGUS: horizon, position-notional-pct, excluded-symbol, hedge-required, \
+    confidence-floor, concurrent-positions; 4 vibe-trading: leverage, daily-trade-count, \
+    total-exposure, exclude-list), each as a tripped/cleared pair on an otherwise-identical \
+    scenario — every single one independently flips its own system's verdict and only its own \
+    system's, confirmed programmatically (check_is_load_bearing == True for all 10), not \
+    eyeballed"""
+test = "test_mandate_comparison.py::TestAblation"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped explicitly, not claimed whole — SCOPE_STATEMENT in eval/mandate_comparison.py. \
+    Claimed: within what Mandate actually covers (horizon, position-size-pct, exclusion, \
+    hedge, confidence, concurrent-cap) AND reaching the reasoning layer before a thesis is \
+    written, no studied specialist is superior — verified vibe-trading has no \
+    reasoning-injection mechanism anywhere in its repository (see best_method_studied), and \
+    its check_mandate() structurally cannot represent 5 of ARGUS's 6 dimensions. NOT claimed: \
+    that Mandate is a complete risk gate — vibe-trading's leverage/exposure/daily-count checks \
+    have no Mandate equivalent BY DESIGN (risk.constitution.ConstitutionPolicy's job — class \
+    in risk/constitution.py, its rule() gate logic in the same file, both confirmed before \
+    this claim was written — a separate already-registered capability), not an unaddressed \
+    gap. Also excluded from this claim: the CFA IPS standard, which the register's own \
+    baseline field already scopes this comparison away from ('systems... that changed a \
+    verdict on identical state and is tested') — a professional checklist with no executable \
+    implementation to run is not a specialist SYSTEM this capability competes against \
+    operationally, and saying so here is the same disclosure this condition asks for \
+    elsewhere, not a silent omission"""
+artefact = "src/argus/eval/mandate_comparison.py"
+test = "test_mandate_comparison.py::TestScopeStatement"

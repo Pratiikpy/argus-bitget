@@ -18,7 +18,7 @@ def frozen(monkeypatch: pytest.MonkeyPatch) -> None:
     def _fail(*args: Any, **kwargs: Any) -> Any:
         raise RuntimeError("live fetch disabled in tests")
 
-    monkeypatch.setattr(research, "_fetch_live", _fail)
+    monkeypatch.setattr(research.data, "_fetch_live", _fail)
     monkeypatch.setattr(history, "fetch", _fail)
     monkeypatch.setattr(universe, "_fetch_live", _fail)
     monkeypatch.setattr(universe, "_CACHE", None)
@@ -29,6 +29,10 @@ class _Fixed(KindModel):
 
     def __init__(self, label: str | None, confidence: float = 0.9) -> None:
         self._label, self._confidence = label, confidence
+
+    @property
+    def threshold(self) -> float:
+        return 0.5
 
     def predict(self, text: str) -> tuple[str | None, float]:
         return self._label, self._confidence
@@ -132,3 +136,19 @@ def test_a_failing_language_model_falls_back_to_the_kind_model(
     assert payload["intent"] == "research"
     assert payload["routing"].get("fallback_from", "").startswith("planner unavailable")
     assert "kind model" in str((payload["routing"].get("model") or {}).get("why", ""))
+
+
+def test_the_models_probability_reaches_the_plan_on_the_plans_scale() -> None:
+    """Audit finding 159: every accepted reading used to be reported as 1.0."""
+    from argus.lui.kindmodel import plan_confidence
+
+    floor = research.MIN_PLAN_CONFIDENCE
+    assert plan_confidence(0.5, 0.5, floor) == pytest.approx(floor)
+    assert plan_confidence(1.0, 0.5, floor) == pytest.approx(1.0)
+    assert plan_confidence(0.49, 0.5, floor) == 0.0
+    assert plan_confidence(0.6, 0.5, floor) < plan_confidence(0.9, 0.5, floor)
+    low = LocalPlanner(_Fixed("quote", 0.55)).complete_json(
+        [{"role": "user", "content": "where is NVDA trading"}])
+    high = LocalPlanner(_Fixed("quote", 0.95)).complete_json(
+        [{"role": "user", "content": "where is NVDA trading"}])
+    assert floor <= low["confidence"] < high["confidence"] < 1.0

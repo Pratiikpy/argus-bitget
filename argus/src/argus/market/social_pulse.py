@@ -74,8 +74,9 @@ from argus.truth.novelty import (
     NoveltyReport,
     cluster,
 )
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 PULSE_PATH = DATA / "social_pulse.json"
 PER_CHANNEL = 30
 """Posts asked of each platform per name. Enough for a story to repeat, few enough that a sweep

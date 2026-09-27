@@ -49,13 +49,13 @@ import time
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
-from argus.market.skills import DEFAULT_TIMEOUT, PROBES, Health, Probe, _classify
+from argus.market.skills import DEFAULT_TIMEOUT, PROBES, Health, Probe, classify_reply
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "skill_reliability.json"
+REPORT_PATH = DATA_DIR / "skill_reliability.json"
 
 ATTEMPTS = 3
 """Calls per tool. Three is the minimum that can distinguish always / sometimes / never.
@@ -161,7 +161,7 @@ def measure(
             # Reading the status alone counted a call that returned only an upstream error
             # envelope ("...: ok" with {"error": ""}) as answered: on 2026-09-26 that made three
             # tools "reliable" that the health sweep, minutes earlier, correctly found empty.
-            health, detail = _classify(payload, status)
+            health, detail = classify_reply(payload, status)
             if health is Health.OK:
                 row.answered += 1
             else:

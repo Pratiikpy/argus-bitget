@@ -31,13 +31,13 @@ import time
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from argus.market.bitget_mcp import BitgetDataService, BitgetMcpError, underlying_of
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "data_coverage.json"
+REPORT_PATH = DATA_DIR / "data_coverage.json"
 
 PROBE_SYMBOL = "NVDAUSDT"
 """One of the twelve rTokens. Its anchor is NVDA, which is liquid enough that an empty result is a

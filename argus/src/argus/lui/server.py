@@ -1,4 +1,4 @@
-"""The demo surface — the desk console over HTTP.
+"""The demo surface — the research workbench's console over HTTP.
 
 ``python -m argus.lui.server`` serves the console on http://127.0.0.1:8765.
 
@@ -24,8 +24,11 @@ from __future__ import annotations
 
 import contextvars
 import json
+import logging
 import os
 import re
+import threading
+import uuid
 from dataclasses import replace
 from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -35,22 +38,18 @@ from urllib.parse import parse_qs, urlparse
 
 from argus.lui import design
 from argus.lui.answer import Answer, answer, unlead
+from argus.lui.arbiter import arbitrate, gate_ledger_reading
 from argus.lui.cli import BUDGET_MS
-from argus.lui.kindmodel import LocalPlanner, kind_model
 from argus.lui.ngram import reclassify
 from argus.lui.provenance import labels as provenance_labels
-from argus.lui.question import TRADED_SYMBOLS, Conversation, Intent, classify
+from argus.lui.question import Conversation, Intent, classify
 from argus.lui.research import (
-    _PRICE_FORECAST,
     BARE_FOLLOW,
     ResearchKind,
     ResearchRequest,
     about_the_desk,
     about_the_record,
     follow_up,
-    pattern_reading_wins,
-    plan_with_model,
-    price_forecast_asked,
     research_symbols,
     resolved_previous,
     with_book,
@@ -58,8 +57,10 @@ from argus.lui.research import (
 )
 from argus.lui.research import detect as detect_research
 from argus.lui.research import run as run_research
+from argus.lui.research.parse import PRICE_FORECAST
 from argus.lui.router import Router, build_router, route
 from argus.paper.ledger import PaperLedger
+from argus.truth.bounded import BoundedDict
 
 HOST = "127.0.0.1"
 PORT = 8765
@@ -252,7 +253,8 @@ function saveMemory() {
   try { localStorage.setItem('argus.memory', JSON.stringify(memory)); } catch (e) {}
   memEl.hidden = !memory.length;
   memEl.innerHTML = memory.length ? '<span>Remembered:</span>' + memory.map((f, i) =>
-    `<span class="fact">${esc0(f.text)}<button data-i="${i}" title="forget this" ` +
+    `<span class="fact">${esc0((f.kind === 'check' ? 'Checklist: ' : '') + f.text)}` +
+      `<button data-i="${i}" title="forget this" ` +
       `aria-label="forget: ${esc0(f.text).replace(/"/g, '&quot;')}">&times;</button>` +
     `</span>`).join('') : '';
 }
@@ -285,7 +287,7 @@ const PV = {
   memory: 'something you told the console earlier, kept in this browser',
   missing: 'could not be read or checked'};
 const pv = t => t ? `<span class="pv pv-${t}" title="${PV[t]}">${t}</span>` : '';
-const lineClass = l => /^(Actionable|Bottom line)(?: \([^)]*\))?:/.test(l) ? 'line act'
+const lineClass = l => /^(Actionable|Bottom line)(?: \\([^)]*\\))?:/.test(l) ? 'line act'
   : l.startsWith('Hedge:') ? 'line hedge'
   : (l.startsWith('Assumed:') || l.startsWith('Data:')) ? 'line fine' : 'line';
 
@@ -583,6 +585,12 @@ def handle_ask(
     finally:
         _MEMORY.reset(token)
     by = str(payload.get("classified_by") or "")
+    if by == "journal":
+        # A review's checklist is kept, so the next entry the trader asks about is checked
+        # against it (`memory.checklist_lines`); a later review replaces it.
+        checks = mem.checks_from(payload.get("data"), now)
+        if checks:
+            facts = mem.merge_checks(facts, checks)
     if new and (payload.get("refused") or by.startswith("declined") or by == "ngram"):
         payload.update(lines=mem.acknowledgement(new), refused=False, reason="",
                        classified_by="memory", sources=[])
@@ -646,17 +654,23 @@ def _answer(
     reviewed = review_trades(text, now=clock)
     if reviewed is not None:
         return engine_payload(*reviewed, by="journal")
+    from argus.lui.trending import asks_for_trending, trending
+
+    if asks_for_trending(text):
+        return engine_payload(*trending(text), by="trending")
+    from argus.lui import onchain
+
+    if onchain.asks_for_tvl(text):
+        return engine_payload(*onchain.tvl(text), by="defi-tvl")
+    if onchain.asks_for_gas(text):
+        return engine_payload(*onchain.gas(text), by="eth-gas")
     if asks_for_watchlist(text):
         return engine_payload(*watchlist(text, book, now=clock), by="watchlist")
     exposed = exposures_mod.answer(text, book)
     if exposed is not None:
         return engine_payload(exposed.lines, exposed.sources, exposed.data, by="exposures")
-    from argus.lui.research import (
-        _SESSION_CLAIM,
-        SESSION_QUESTION,
-        _session_claim_line,
-        session_status,
-    )
+    from argus.lui.research import SESSION_QUESTION, session_status
+    from argus.lui.research.claims import SESSION_CLAIM, session_claim_line
 
     if SESSION_QUESTION.search(text) and not research_symbols(text)[0]:
         # "Is the US market open right now?" names no instrument; it is answered from the
@@ -669,9 +683,9 @@ def _answer(
         holiday = holiday_line(text, clock)
         if holiday is not None:
             lines = [holiday, *(line.replace("Bottom line: ", "", 1) for line in lines)]
-        claimed = _SESSION_CLAIM.search(text) if not text.rstrip().endswith("?") else None
+        claimed = SESSION_CLAIM.search(text) if not text.rstrip().endswith("?") else None
         if claimed is not None:
-            lines = [_session_claim_line(claimed), *lines]
+            lines = [session_claim_line(claimed), *lines]
         note = _language_note(text)
         if note:
             lines = [note, *lines]
@@ -684,10 +698,10 @@ def _answer(
         HURDLE_QUESTION,
         IMPLIED_OPEN_QUESTION,
         MY_BOOK_QUESTION,
-        _is_an_order,
         hurdle_lines,
         saved_book_lines,
     )
+    from argus.lui.research.parse import is_an_order
 
     if HURDLE_QUESTION.search(text) and not research_symbols(text)[0]:
         q = classify(text, now=clock, conversation=conversation)
@@ -709,7 +723,7 @@ def _answer(
                        matched=MY_BOOK_QUESTION.pattern, turns=[*prior, text][-12:])
         return payload
     opening = research_symbols(text)[0]
-    if opening and IMPLIED_OPEN_QUESTION.search(text) and not _is_an_order(text):
+    if opening and IMPLIED_OPEN_QUESTION.search(text) and not is_an_order(text):
         # "Where will NVDA open?" and "what is TSLA worth right now?" have one measured answer,
         # the perpetual-implied open (`eval/overnight_comparison.py`), and are read here, before
         # the model: on 2026-09-25 the model declined the first and sent the second to the desk's
@@ -847,96 +861,15 @@ def _answer(
     model = (_model_for(visitor) if worth_asking_the_model(text, now=clock) and not desk_first
              else None)
     instruction = classify(text, now=clock, conversation=conversation).intent is Intent.ORDER
-    if model is None and not instruction and not desk_first:
-        # **No language model: the trained kind model reads the question instead.** It fills the
-        # same slot and goes through the same validation (`plan_with_model`), deciding only which
-        # engine answers; names, weights and the shock are read from the text by the pattern
-        # extractors. On the 2026-09-25 held-out set (200 questions, a writer who never saw this
-        # repository, twelve languages) it read 88.5% correctly where the patterns alone read
-        # 63.5% (`eval/kindtrain.py`). It costs no token, so every question is shown to it.
-        local = kind_model()
-        model = LocalPlanner(local) if local is not None else None
-    if model is not None:
-        planned, audit = plan_with_model(text, model)
-        if planned is not None and price_forecast_asked(text):
-            # A price asked for a future time is refused whatever engine the model picked; it
-            # read "比特币明年这个时候准确价格是多少" as a portfolio question (held-out corpus).
-            planned, audit = None, {**audit, "detail": "a price forecast; refused below"}
-        if (planned is None and not isinstance(model, LocalPlanner)
-                and str(audit.get("detail", "")).startswith("planner unavailable")):
-            # **A failed language-model call falls back to the kind model, not to the patterns.**
-            # Scoring the blind set with Qwen reading first (2026-09-25) read 58.8% against the kind
-            # model's 81.7%: under load some Qwen calls errored, and each error dropped the question
-            # to the patterns alone. On the live site that is every question asked while the model
-            # is rate-limited or down.
-            local = kind_model()
-            if local is not None:
-                planned, local_audit = plan_with_model(text, LocalPlanner(local))
-                audit = {**local_audit, "fallback_from": audit.get("detail")}
-        planned = with_book(planned, book, text)
-        patterned = detect_research(text)
-        # A spot rToken holding is a field the model's plan does not carry, so a model reading of
-        # the same kind still loses it: "I hold RNVDAUSDT, protect it over the weekend" came back
-        # as a hedge of nothing and was refused on the live console (2026-09-24).
-        if (planned is not None and planned.kind is ResearchKind.LEVERAGE
-                and not _LEVERAGE_WORDS.search(text)):
-            # The hosted model read "Long MSTR perp into earnings — funding looks cheap" as a 10x
-            # leverage question (live, 2026-09-25): "perp" is not leverage. With no multiple,
-            # margin or liquidation named, the leverage engine has nothing it was asked.
-            planned = with_book(patterned, book, text) if patterned is not None else None
-            audit = {**audit, "detail": "a leverage reading with no leverage named was dropped"}
-        if (planned is not None and patterned is not None
-                and planned.kind is ResearchKind.IMPACT and patterned.kind is ResearchKind.IMPACT
-                and planned.symbols and patterned.symbols
-                and planned.symbols[0] in planned.book
-                and patterned.symbols[0] not in planned.book):
-            # The hosted model read "nvda 40%, msft 20%, cash rest — want to add 5k of coin" as
-            # adding bitcoin, named no candidate it could resolve, and the plan fell back to a
-            # name already held — so the answer was about adding NVDA (live, 2026-09-25). When the
-            # model's add is a holding and the patterns found a name outside the book, theirs is
-            # the add that was asked about.
-            planned = with_book(patterned, book, text)
-            audit = {**audit, "detail": "the model's add was a holding; the patterns' add kept"}
-        if (patterned is not None and pattern_reading_wins(patterned, text)
-                and (planned is None or planned.kind is not patterned.kind
-                     or (patterned.spot is not None and planned.spot != patterned.spot)
-                     or planned.horizon_hours != patterned.horizon_hours
-                     or planned.target != patterned.target
-                     or planned.resize_by != patterned.resize_by
-                     or planned.shock_pct != patterned.shock_pct
-                     or planned.shock_on != patterned.shock_on
-                     or planned.leverage != patterned.leverage
-                     or (patterned.notional is not None
-                         and planned.notional != patterned.notional)
-                     or (planned.kind is ResearchKind.IMPACT
-                         and planned.symbols[:1] != patterned.symbols[:1]))):
-            # The model read "order book depth on NVDA" as a quote and "who is selling NVDA" as
-            # a news question (2026-09-24). Where the patterns name the one engine that answers
-            # the question, their reading stands.
-            planned = with_book(patterned, book, text)
-            audit = {**audit, "detail": "the patterns' specific reading kept over the model's"}
-        if planned is not None:
-            return _research_payload(text, prior, planned, ledger, started, "research-model",
-                                     audit)
-    # **The kind model's "not research" is binding on the research patterns.** Told a question is
-    # off-topic, a trade instruction or a price forecast ("what will gold be a year from now"),
-    # the patterns still found a price word and quoted it; told it is about the desk's record
-    # ("the rationale logged for skipping SPY"), they found a ticker and sized a position. Where
-    # the patterns name the one engine that answers exactly (`pattern_reading_wins`) they still
-    # stand, as they do over the language model.
-    kind_said = _not_research(audit)
-    patterned_only = None if desk_first else detect_research(text)
-    if kind_said is not None and (patterned_only is None
-                                  or kind_said[1] >= BINDING_KIND_CONFIDENCE):
-        # Binding only when the patterns found nothing, or when the model is sure: "could you
-        # tell me the current price of silver" is refused by the model at 0.19 — it has learnt
-        # that price questions are often forecasts — and the patterns' quote is the right answer.
-        request = (with_book(patterned_only, book, text)
-                   if pattern_reading_wins(patterned_only, text) else None)
-    else:
-        kind_said = None
-        request = with_book(patterned_only, book, text)
-    if request is None and price_forecast_asked(text) and research_symbols(text)[0]:
+    # Which reader's request answers the question — the planner's, the patterns', or neither — is
+    # decided by the rules in `lui/arbiter.py`, each named there with the incident that made it.
+    reading = arbitrate(text, book=book, model=model, instruction=instruction,
+                        desk_first=desk_first, audit=audit)
+    audit = reading.audit
+    if reading.via in ("research-model", "research-patterns") and reading.request is not None:
+        return _research_payload(text, prior, reading.request, ledger, started, reading.via,
+                                 audit)
+    if reading.via == "forecast-refusal":
         # A price forecast is refused plainly and pointed at what the console can say instead.
         # Before, "forecast BTC price for next week" was refused as "BTC is not one of the desk's
         # twelve rTokens", which answers a question nobody asked.
@@ -954,27 +887,9 @@ def _answer(
         payload["budget_ms"] = BUDGET_MS[q.speed]
         payload["routing"] = audit
         payload["classified_by"] = "forecast-refusal"
-        payload["matched"] = _PRICE_FORECAST.pattern
+        payload["matched"] = PRICE_FORECAST.pattern
         payload["turns"] = [*prior, text][-12:]
         return payload
-    is_order = classify(text, now=clock, conversation=conversation).intent is Intent.ORDER
-    if (request is None and not about_the_record(text) and not desk_first and not is_order
-            and kind_said is None):
-        # A question that names a listed contract the desk does not trade, in words no research
-        # kind recognises ("give me a thesis on Solana for a conservative investor"), used to fall
-        # through to the ledger and come back as the latest decision on an unrelated rToken. The
-        # ledger has nothing on such a name; its risk profile is the honest answer, said as such.
-        named = [s for s in research_symbols(text)[0] if s not in TRADED_SYMBOLS]
-        if named:
-            request = ResearchRequest(
-                kind=ResearchKind.IMPACT, symbols=(named[0],),
-                notes=("no specific research question was recognised, so this is the name's risk "
-                       "profile — ask for its technicals, news, earnings or what it does to your "
-                       "book for more",))
-    if request is not None:
-        audit = {**audit, "detail": "recognised by the research patterns"}
-        return _research_payload(text, prior, request, ledger, started, "research-patterns",
-                                 audit)
 
     question = classify(text, now=clock, conversation=conversation)
     # **The n-gram model sits between the patterns and the router, and it is what a judge meets.**
@@ -984,39 +899,10 @@ def _answer(
     # step the same corpus reads 80.9% correct and 35 errors. It costs one JSON file and no
     # dependency; see `eval/ngrambench.py`.
     question, classified_by = reclassify(question)
-    if (classified_by == "ngram" or (classified_by == "patterns" and not prior)) and not in_domain(
-            text) and question.intent is not Intent.ORDER and not desk_first:
-        # An order is refused as an order whatever language it is in; "अभी 1 बिटकॉइन खरीद लो" was
-        # recognised as an order and then declined as off-topic (2026-09-25 audit, round 2).
-        # **The n-gram layer only knows wording, so it needs a topic gate.** It answers with a
-        # class for any text at all, and on the 2026-09-25 blind corpus "who won the lakers game
-        # last night" reached `decision_why` at 0.19 and was answered with a decision, as were a
-        # CV review and "explain quantum computing" (which the hand-written patterns claimed on
-        # the one word "explain"). A question with no market, trading or desk word in it is not a
-        # question about the record. A follow-up ("explain that") is exempt: it inherits the topic
-        # of the turn before it.
-        question = replace(question, intent=Intent.UNKNOWN,
-                           reason="nothing in the question is about markets or the desk's record")
-        classified_by = "declined-off-topic"
-    # **A confident "unrelated" from the model overrules the n-gram layer's guess.** The n-gram
-    # layer has no notion of topic, only of wording, and "tell me a joke about NVDA" reached
-    # `decision_why` and was answered with a decision's thesis. The planner above already read the
-    # question; when it said, with confidence, that the question is neither research nor about the
-    # desk's record, the n-gram guess is withdrawn and the question goes to the refusal. The
-    # hand-written patterns are never overruled this way — only the statistical layer is.
-    model_view = (audit.get("model") or {}) if isinstance(audit, dict) else {}
-    try:
-        model_confidence = float(model_view.get("confidence") or 0.0)
-    except (TypeError, ValueError):
-        model_confidence = 0.0
-    if (
-        classified_by == "ngram"
-        and str(model_view.get("kind", "")).lower() == "none"
-        and model_confidence >= UNRELATED_CONFIDENCE
-    ):
-        question = replace(question, intent=Intent.UNKNOWN,
-                           reason="the model read this as unrelated to research or the record")
-        classified_by = "declined-by-model"
+    # The n-gram layer's guess passes two gates (`lui/arbiter.py`): a topic gate, and a
+    # confident "unrelated" from the planner that already read the question.
+    question, classified_by = gate_ledger_reading(
+        question, classified_by, text, prior=prior, audit=audit, desk_first=desk_first)
     question, routing = route(
         question, client=_model_for(visitor), now=clock, conversation=conversation
     )
@@ -1038,80 +924,9 @@ def _answer(
     return payload
 
 
-BINDING_KIND_CONFIDENCE = 0.25
-"""The kind model's "refuse" or "record" overrules a research reading the patterns found only at
-or above this confidence. Below it, a pattern reading stands."""
 
 
-def _kind_verdict(why: str) -> tuple[str, float] | None:
-    """("refuse" | "record", confidence) from the local planner's audit line, else None."""
-    match = re.match(r"kind model: (refuse|record) at ([0-9.]+)", why)
-    return None if match is None else (match.group(1), float(match.group(2)))
 
-
-def _not_research(audit: Any) -> tuple[str, float] | None:
-    """Either reader's confident verdict that a question is not a research question.
-
-    The kind model says so in its audit line; the language model says so as ``kind: none`` or
-    ``kind: record`` with a confidence. Found on the live console (2026-09-25): Qwen read "what will
-    gold price be exactly one year from now" as a price forecast at 0.95 — correctly — and the
-    name-only fallback still answered it as a risk profile of gold."""
-    view = (audit.get("model") or {}) if isinstance(audit, dict) else {}
-    local = _kind_verdict(str(view.get("why") or ""))
-    if local is not None:
-        return local
-    kind = str(view.get("kind") or "").strip().lower()
-    try:
-        confidence = float(view.get("confidence") or 0.0)
-    except (TypeError, ValueError):
-        confidence = 0.0
-    if kind in ("none", "record") and confidence >= UNRELATED_CONFIDENCE:
-        return ("refuse" if kind == "none" else "record"), confidence
-    return None
-
-
-_DOMAIN = re.compile(
-    r"\b(?:trad\w*|decision\w*|decid\w*|desk|positions?|holding\w*|risk\w*|sharpe|sortino|"
-    r"drawdown|pnl|p&l|profit\w*|loss\w*|lose|lost|losing|money|returns?|orders?|fills?|filled|"
-    r"log|ledger|record|calibrat\w*|confiden\w*|abstain\w*|abstention|pass(?:ed|es)?|skip\w*|"
-    r"nothing|evidence|sources?|thesis|signals?|strateg\w*|model|hash\w*|tamper\w*|anchor\w*|"
-    r"block\w*|kernel|guard\w*|weekend|sessions?|hours|market\w*|prices?|stocks?|shares?|"
-    r"crypto\w*|coins?|bitcoin|hedg\w*|portfolio|book|fees?|costs?|win\s+rate|exposure|"
-    r"leverage|long|short|buy\w*|sell\w*|bought|sold|calls?|bets?|accura\w*|wrong|right|"
-    r"perform\w*|history|past|latest|recent|last\s+(?:call|decision|trade|week|month)|why|"
-    r"rtokens?|perp\w*|futures|equit\w*|index|nasdaq|volatil\w*|beta|you|your|yours|"
-    r"up\s+or\s+down|in\s+the\s+(?:red|green|black)|overall|certain\w*|outcomes?|"
-    r"audit\w*|entries|logged|rewrit\w*|modifi\w*|retroactiv\w*|holiday|inaction|"
-    r"sidelines?|informat\w*|data\s+points?|recap|activity|tickers?|authentic\w*|conviction|"
-    r"overconfiden\w*|minutes?|pre[\s-]?market|after[\s-]?hours|inputs?|indicators?)\b|"
-    r"交易|决策|决定|操作|仓位|持仓|风险|收益|盈亏|亏损|盈利|赚|亏|胜率|表现|订单|市场|价格|策略|对冲|"
-    r"股票|币|夏普|回撤|记录|账本|日志|修改|篡改|验证|加密|置信|确信|依据|判断|消息|信息|观望|平仓|"
-    r"开仓|做空|做多|收盘|开盘|休市|盘前|盘后|时段|把握|信心|自信|参考|指标|敞口|删改|手脚|"
-    r"为什么|理由|证据|校准|你", re.I)
-"""Words that make a question about markets or the desk. Deliberately wide — it exists to stop
-the n-gram layer answering chit-chat, not to judge a trading question."""
-
-
-_LEVERAGE_WORDS = re.compile(r"\b\d+(?:\.\d+)?\s*x\b|\bleverag\w*|\bliquidat\w*|\bmargin\b|"
-                             r"\u6760\u6746|\u7206\u4ed3|\u500d", re.I)
-"""What makes a question about leverage: a multiple, the word, liquidation or margin, or the
-Chinese for leverage, liquidation and "times"."""
-
-
-def in_domain(text: str) -> bool:
-    if research_symbols(text)[0]:
-        return True
-    hit = _DOMAIN.search(text)
-    if hit is None:
-        return False
-    # "you" alone is not a desk word: "can you review my resume" is not about the record. It
-    # counts only with a second domain word or when the question is addressed to the desk's
-    # conduct ("why did you ...", "what did you ...").
-    words = {m.group(0).lower() for m in _DOMAIN.finditer(text)}
-    if words <= {"you", "your", "yours", "你"}:
-        return bool(re.search(r"\b(?:why|what|when|how)\s+(?:did|do|have|were)\s+you\b", text,
-                              re.I))
-    return True
 
 
 def _research_payload(
@@ -1204,9 +1019,6 @@ def offer_translation(payload: dict[str, Any], text: str) -> None:
     payload["translate"] = {"lang": lang, "skip": skip, "token": translate.sign(lang, body)}
 
 
-UNRELATED_CONFIDENCE = 0.8
-"""How sure the planner must be that a question is unrelated before its view overrules the n-gram
-layer. High on purpose: withdrawing a guess that was right costs a real answer."""
 
 MODEL_CALLS_PER_VISITOR_PER_HOUR = 30
 """How many model-assisted questions one visitor may ask per hour, per server instance.
@@ -1247,6 +1059,8 @@ _FILING_Q = re.compile(
 "10k" alone is not one: "dca into eth with 10k" is an amount (held-out blind corpus)."""
 
 _TRACE_READY = False
+_TRACE_LOCK = threading.Lock()
+"""The first questions can arrive on several threads at once; one instruments, the rest wait."""
 
 
 def _traced() -> bool:
@@ -1260,10 +1074,12 @@ def _traced() -> bool:
     if os.environ.get("ARGUS_TRACE", "1") == "0":
         return False
     if not _TRACE_READY:
-        from argus.lui import trace
+        with _TRACE_LOCK:
+            if not _TRACE_READY:
+                from argus.lui import trace
 
-        trace.instrument()
-        _TRACE_READY = True
+                trace.instrument()
+                _TRACE_READY = True
     return True
 
 
@@ -1273,7 +1089,7 @@ _SKILLS_Q = re.compile(
     r"\bbitget-(?:signal|mcp)\b|\bwhich\s+bitget\s+(?:tools|skills|data\s+sources)\b", re.I)
 """A question about how well Bitget's own Skills and data server answer (`eval/skill_matrix.py`)."""
 
-_FILINGS: dict[str, tuple[float, list[Any]]] = {}
+_FILINGS: BoundedDict[str, tuple[float, list[Any]]] = BoundedDict(256)
 """Filings read this process, by ticker, with when they were read: one EDGAR read serves every
 question about that company for an hour (a read takes 5-20 s)."""
 
@@ -1474,6 +1290,22 @@ def _next_scheduled_cycle(now: datetime) -> datetime:
             if slot > now:
                 return slot
     raise AssertionError("unreachable: a slot exists within two days")
+
+
+LOG = logging.getLogger("argus.lui.server")
+
+
+def server_error(exc: BaseException, path: str) -> bytes:
+    """The body of a 500: the error's class and an incident id, never its message.
+
+    Until 2026-09-27 the body carried ``str(exc)[:200]`` (audit finding 162), and an exception's
+    message can hold a URL with its query, a local path or a value read from a request. The full
+    traceback goes to the server log under the same id, so an incident a visitor reports can still
+    be found."""
+    incident = uuid.uuid4().hex[:12]
+    LOG.error("incident %s on %s", incident, path, exc_info=exc)
+    return json.dumps({"error": type(exc).__name__, "incident": incident,
+                       "detail": "the server logged this failure under the incident id"}).encode()
 
 
 def _status() -> dict[str, Any]:
@@ -1736,9 +1568,7 @@ class Handler(BaseHTTPRequestHandler):
                 fields.update(form)
                 self._research_route(fields)
             except Exception as exc:
-                self._send(json.dumps({"error": type(exc).__name__,
-                                       "detail": str(exc)[:200]}).encode(),
-                           "application/json", 500)
+                self._send(server_error(exc, path), "application/json", 500)
             return
         if path in ("/ask", "/translate", "/feedback"):
             body = self._body()
@@ -1750,9 +1580,7 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 self._answer_route(path, form)
             except Exception as exc:  # the same honest 500 the GET routes give
-                self._send(json.dumps({"error": type(exc).__name__,
-                                       "detail": str(exc)[:200]}).encode(),
-                           "application/json", 500)
+                self._send(server_error(exc, path), "application/json", 500)
             return
         if path == "/telegram":
             from argus.lui.telegram_bot import handle_webhook
@@ -1925,8 +1753,7 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(error_page(500, path, type(exc).__name__).encode(),
                            "text/html; charset=utf-8", 500)
                 return
-            self._send(json.dumps({"error": type(exc).__name__, "detail": str(exc)[:200]}).encode(),
-                       "application/json", 500)
+            self._send(server_error(exc, path), "application/json", 500)
 
     def _wants_html(self) -> bool:
         """A browser asks for text/html; an API client, curl or the MCP client does not, and keeps
@@ -2006,7 +1833,7 @@ def error_page(status: int, path: str, failure: str = "") -> str:
 
 def serve(host: str = HOST, port: int = PORT) -> None:
     ledger = PaperLedger(path=_ledger_path())
-    print(f"ARGUS desk console -> http://{host}:{port}")
+    print(f"ARGUS research console -> http://{host}:{port}")
     print(f"ledger: {len(ledger.entries)} decision(s), chain "
           f"{'intact' if ledger.verify()['chain_intact'] else 'BROKEN'}")
     print("Ctrl-C to stop.")
@@ -2016,7 +1843,7 @@ def serve(host: str = HOST, port: int = PORT) -> None:
 def main(argv: list[str] | None = None) -> int:
     import argparse
 
-    parser = argparse.ArgumentParser(description="Serve the ARGUS desk console.")
+    parser = argparse.ArgumentParser(description="Serve the ARGUS research console.")
     parser.add_argument("--host", default=HOST, help="bind address (default: loopback only)")
     parser.add_argument("--port", type=int, default=PORT)
     args = parser.parse_args(argv)

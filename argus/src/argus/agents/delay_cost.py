@@ -10,7 +10,7 @@ source:
 
 * **the depth multiplier is in the wrong term.** A thin book is crossed further — that is
   slippage — but how far the price drifts while the model thinks is volatility's alone, the same
-  double count `lui/research.py::_waiting_cost` already refuses;
+  double count `lui/research/execution.py::_waiting_cost` already refuses;
 * **it cannot tell a calm minute from a busy one**, because the only input it varies with is the
   session.
 

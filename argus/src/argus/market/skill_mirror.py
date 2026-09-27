@@ -56,6 +56,7 @@ from typing import Any
 
 from argus.market.skills import PROBES, Health, Probe, SkillReport, hollow
 from argus.truth.evidence import Evidence
+from argus.truth.paths import DATA_DIR
 
 USER_AGENT = "Mozilla/5.0 (ARGUS research desk)"
 """Yahoo's ``query2`` answers 429 to a bare client and 200 to a browser-shaped User-Agent
@@ -144,7 +145,7 @@ def taker_ratio(args: Mapping[str, Any]) -> dict[str, Any]:
 
 def fred_series(series: str, *, days: int = 400) -> list[tuple[date, float]]:
     """A FRED series as (date, value), missing observations ('.') dropped. Keyless CSV endpoint,
-    the one ``argus.lui.research.FRED_CSV`` already uses."""
+    the one ``argus.lui.research.macro.FRED_CSV`` already uses."""
     start = (datetime.now(UTC).date() - timedelta(days=days)).isoformat()
     text = _get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series}&cosd={start}")
     out: list[tuple[date, float]] = []
@@ -346,7 +347,7 @@ def tvl_rank(args: Mapping[str, Any]) -> dict[str, Any]:
                      and r.get("category") != "CEX"),
                     key=lambda r: -float(r["tvl"]))[:limit]
     return {"protocols": [{"name": r.get("name"), "category": r.get("category"),
-                           "tvl_usd": round(float(r["tvl"])),
+                           "symbol": r.get("symbol"), "tvl_usd": round(float(r["tvl"])),
                            "change_1d_pct": r.get("change_1d")} for r in ranked]}
 
 
@@ -378,7 +379,8 @@ def trending(_: Mapping[str, Any]) -> dict[str, Any]:
     if not coins:
         raise MirrorError("CoinGecko returned no trending coins")
     return {"trending": [{"id": c.get("id"), "symbol": c.get("symbol"), "name": c.get("name"),
-                          "market_cap_rank": c.get("market_cap_rank")} for c in coins[:10]]}
+                          "market_cap_rank": c.get("market_cap_rank"),
+                          "price_usd": (c.get("data") or {}).get("price")} for c in coins[:10]]}
 
 
 # --- the table ------------------------------------------------------------------------------
@@ -569,7 +571,7 @@ def main(argv: list[str] | None = None) -> int:
     from argus.market.evidence import BitgetSkillSource
     from argus.market.skills import DEFAULT_TIMEOUT, probe
 
-    root = Path(__file__).resolve().parents[3] / "data"
+    root = DATA_DIR
     parser = argparse.ArgumentParser(description="Bitget Skill sweep with upstream mirrors.")
     parser.add_argument("--symbol", default="NVDAUSDT")
     parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT)

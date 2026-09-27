@@ -9,7 +9,7 @@ study_v2.py`), and its walk-forward test prefers that full fade to every fitted 
 
 ARGUS reads the stock's perpetual instead. The perpetual trades through the weekend on a much
 deeper book than the rToken, and the console's implied open is the stock's last close carried by
-the perpetual's move since (`lui/research.py::_implied_open_line`).
+the perpetual's move since (`lui/research/quote.py::_implied_open_line`).
 
 **Same input, same moments, same scorer.** nocturne's own `core.observations()` builds every
 (symbol, weekend) record from its own hourly rToken bars: ``pf`` Friday 15:00 ET, ``pv`` Sunday
@@ -25,16 +25,16 @@ over its weekends; the rows scored are the ones where both desks have a price.
 **The ARGUS column is the console's own line (changed 2026-09-26).** Until then this module
 computed ``pf * (1 + move) / pv - 1`` itself while `eval/standing.py` credited the console, and the
 harness-validity canary (`data/harness_validity.json`) found the console never ran at scoring
-time. Now every row calls `lui/research._implied_open_line` at Sunday 20:00 ET (the close of the
-bar nocturne reads at 19:00) with the perpetual's price then, through
+time. Now every row calls `lui/research/quote.py::_implied_open_line` at Sunday 20:00 ET (the close
+of the bar nocturne reads at 19:00) with the perpetual's price then, through
 `eval/overnight_comparison.console_feed`: the console's perpetual reader gets the saved Bitget bars
 in ``data/h2h_nocturne/``, and its regular-close reader gets, for every session day, the rToken's
-own price at 16:00 ET read by nocturne's ``near`` — the anchor this column has always used (a
-Yahoo close is not in nocturne's data, and would add the rToken's basis to a target stated in
-rToken prices). The session clock that picks which close to carry (a holiday Friday carries
-Thursday's), the exact close-bar selection and the arithmetic are the console's. The implied
-price is printed to the cent and read back from the sentence; the former in-module formula is
-kept as ``console_replay``'s comparison so any difference is on the record.
+own price at 16:00 ET read by nocturne's ``near`` — the anchor this column has always used (a Yahoo
+close is not in nocturne's data, and would add the rToken's basis to a target stated in rToken
+prices). The session clock that picks which close to carry (a holiday Friday carries Thursday's),
+the exact close-bar selection and the arithmetic are the console's. The implied price is printed to
+the cent and read back from the sentence; the former in-module formula is kept as
+``console_replay``'s comparison so any difference is on the record.
 
 **Runs without the clone (2026-09-26).** nocturne's two modules the harness imports are vendored
 verbatim under ``argus/vendor/nocturne`` with its MIT licence (byte-identical to the clone at
@@ -275,9 +275,9 @@ def _console_replay(preds: list[dict[str, Any]]) -> dict[str, Any]:
     both = [p for p in preds if p["ARGUS"] is not None and p["ARGUS_formula"] is not None]
     diffs = [abs(p["ARGUS"] - p["ARGUS_formula"]) * 1e4 for p in both]
     return {
-        "method": "lui/research._implied_open_line called at Sunday 20:00 ET per row, its "
-                  "perpetual reader on data/h2h_nocturne/ and its close reader on the rToken's "
-                  "16:00 ET price (overnight_comparison.console_feed)",
+        "method": "lui/research/quote.py::_implied_open_line called at Sunday 20:00 ET per "
+                  "row, its perpetual reader on data/h2h_nocturne/ and its close reader on the "
+                  "rToken's 16:00 ET price (overnight_comparison.console_feed)",
         "rows_offered": len(preds),
         "rows_the_console_answered": sum(p["ARGUS"] is not None for p in preds),
         "rows_the_former_formula_answered": sum(p["ARGUS_formula"] is not None for p in preds),
@@ -385,7 +385,7 @@ def comparison_reports(report: dict[str, Any]) -> list[ComparisonReport]:
         block = paired[("ARGUS", rival)]
         out.append(finalise(ComparisonReport(
             comparison="void", question="the rToken's Monday 10:00 ET price from Sunday 19:00",
-            argus="ARGUS: the console's implied open (lui/research._implied_open_line), "
+            argus="ARGUS: the console's implied open (lui/research/quote.py::_implied_open_line), "
                   "anchored on the rToken's Friday price",
             rival=label, metric="mean absolute error of the Sunday-to-Monday return, pct",
             lower_is_better=True, argus_score=summary["ARGUS"]["mae_pct"],

@@ -1,0 +1,163 @@
+name = "Deliberation priced as a trading cost"
+subtheme = "t2-agentic"
+modules = [
+    "argus/agents/meta_pm.py",
+    "argus/execution/latency.py",
+    "argus/eval/deliberation_comparison.py",
+    "argus/eval/baselines/latencybench_reimpl.py",
+    "argus/agents/delay_cost.py",
+    "argus/eval/general_delib_comparison.py",
+]
+# Restored to OWNED 2026-09-22. Was demoted on 2026-09-20 when `verify()` began opening
+# artefacts instead of checking that files existed: reproducibility_proven was claimed and
+# the artefact recorded nothing about it. Both compared functions are pure and
+# deterministic (no LLM call anywhere in this module — an earlier note in this project's
+# own memory wrongly filed this capability as Qwen-key-blocked; it never needed one),
+# so reproducibility was not a plausible assumption to leave unproven — it was run.
+# `check_reproducibility()` added to `deliberation_comparison.py`: both comparisons run
+# twice, JSON-compared for byte identity. All 13 conditions now verify.
+# Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+# proof now needs a groupwise check on the capability's own artefact, and this
+# row's does not pass it. The reason and the route back are its first blocker.
+state = "implemented"
+baseline = """\
+    HaoKang-Timmy/LatencySensitiveBench (arxiv 2505.19481, NeurIPS 2025) — found 2026-09-16 by \
+    a fresh, targeted search after the original 88-repo corpus survey found nothing; the ONE \
+    real exception to 'every harness treats latency as free'"""
+blockers = [
+    """\
+        RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
+        (data/groupwise_audit.json): its statistical and out-of-sample evidence is \
+        data/deliberation_comparison.json, a 17-point delay sweep and three thinking-budget tiers \
+        through two pure functions - a property of the formulas, with no population of decisions \
+        to break down by symbol or date - and a source file. Route back: price deliberation on \
+        real desk decisions and record, per decision, the stated charge beside the realised \
+        slippage, by symbol and date.""",
+    """\
+        the deliberation charge is real and enforced in code, but its effect on realised P&L \
+        outcomes (does pricing it in change which decisions get made, and do those decisions \
+        perform better) has not itself been measured — this OWNED finding is about the model's \
+        mathematical soundness relative to the one real named specialist, not about realised \
+        trading impact""",
+    """\
+        LOSS, measured 2026-09-26 and NOT VERIFIED here: eval/general_delib_comparison.py rescored \
+        the production charge on 23,003 decision instants (the forward tape of 2026-09-24 and \
+        Tardis Bitget-futures quotes for 2026-09-01 and 2026-08-01) against the realised mid move \
+        at 3, 8 and 40 seconds. Mean squared error: production 10.85 / 28.16 / 135.56 against a \
+        trailing empirical estimator 0.96 / 2.30 / 10.08 and trailing realised volatility 1.00 / \
+        2.34 / 9.99, significant under a paired block bootstrap at every horizon; production's \
+        rank correlation with the realised move is negative (-0.43 to -0.48). Its depth multiplier \
+        points the wrong way: off-hours moves are 0.48x (extended), 0.32x (overnight) and 0.22x \
+        (weekend) of regular hours, where it charges 2x, 3x and 3x. The report \
+        (data/general_delib_comparison.json) was not written, because the Chronos-2 arm stopped at \
+        512 of 23,003 instants, and the Tardis quotes it read are no longer on this machine \
+        (Tardis answers 403 from this network), so the figures stand on the run's log only. \
+        agents/delay_cost.py, the estimator that replaces the charge, is not yet wired into \
+        meta_pm.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    88 corpus repos read for a priced deliberation budget (none prices it), plus a fresh \
+    targeted search 2026-09-16 that found the one real exception: LatencySensitiveBench's \
+    TradingEnv.py, read in full"""
+artefact = "../research/architecture/_CONSOLIDATED-LEDGER.md"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    both real methods read and compared: ARGUS's sqrt(delay) random-walk expected-displacement \
+    model (execution/latency.py) vs LatencySensitiveBench's \
+    linear-interpolation-to-average-price-with-a-cap model (TradingEnv.py:74-92) — genuinely \
+    different assumed price processes"""
+artefact = "src/argus/eval/deliberation_comparison.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    no license to vendor the real file under (gh repo view: licenseInfo=null), so an \
+    independent clean-room reimplementation of the same described idea was verified against \
+    reference output vectors computed by running LatencySensitiveBench's own real, unmodified \
+    method once locally — six (input, output) pairs pinned and matched exactly"""
+test = "test_deliberation_comparison.py::TestLinearDecayMatchesTheRealReferenceVectors"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "THINKING_MS and DEPTH_MULTIPLIER feed the hurdle the PM must clear"
+test = "test_meta_pm.py"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    both real cost functions called on the identical delay values — including ARGUS's own \
+    three real, bake-off-measured THINKING_MS delays (3s/8s/40s), not synthetic numbers picked \
+    to favour either side"""
+test = "test_deliberation_comparison.py::TestThinkingBudgetCases"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    both real functions run across a 17-point delay sweep from 0 to 120 seconds, not one \
+    convenient case; boundedness and unboundedness confirmed across the whole swept range, not \
+    just the three thinking-budget points"""
+test = "test_deliberation_comparison.py::TestSweptComparison"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    the deliberation charge is added to the fee hurdle, not reported beside it; separately, \
+    both real comparison functions' own call overhead measured directly, not estimated"""
+test = "test_cost.py"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    the decisive comparison runs on ARGUS's own real production THINKING_MS values (the actual \
+    bake-off-measured wall-clock this project runs live), not values chosen for the comparison"""
+artefact = "src/argus/agents/meta_pm.py"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    widening the baseline's real decay_window parameter from 1.5s to 60s (still finite, just \
+    larger) restores its ability to distinguish ARGUS's three real delays — confirming the \
+    collapse is caused by the SPECIFIC 1.5s cap value stated in their own code, not by having \
+    a cap at all"""
+test = "test_deliberation_comparison.py::TestAblation"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    the decisive real finding: run on ARGUS's own three real thinking-budget delays \
+    (3s/8s/40s), the baseline's real formula reports the IDENTICAL cost for all three (each \
+    exceeds its 1.5s cap), while ARGUS's own real formula reports three distinct, correctly \
+    ordered costs on the identical delays"""
+test = """\
+    test_deliberation_comparison.py::TestThinkingBudgetCases::test_the_decisive_finding_holds_on_the_real_run"""
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    SCOPE_STATEMENT states in writing what is NOT claimed: that LatencySensitiveBench's model \
+    is wrong for the delay range ITS OWN benchmark targets (likely sub-2-second, classical HFT \
+    latency), only that it cannot distinguish ARGUS's own real, much longer LLM-inference \
+    delays"""
+artefact = "src/argus/eval/deliberation_comparison.py"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    both real functions are pure and deterministic — the same delay input always produces the \
+    same bps output, confirmed by running the full comparison twice and diffing the saved JSON \
+    artefact"""
+artefact = "data/deliberation_comparison.json"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped precisely: on the property of distinguishing DIFFERENT real LLM inference delays in \
+    the range ARGUS actually operates at (seconds to tens of seconds), ARGUS's sqrt(t) model \
+    can and the baseline's real linear-capped model cannot, by construction — not a claim that \
+    the baseline is poorly designed for the shorter delay range its own paper targets"""
+test = "test_deliberation_comparison.py::TestThinkingBudgetCases"

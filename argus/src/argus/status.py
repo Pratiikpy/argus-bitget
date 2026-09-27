@@ -12,7 +12,9 @@ import os
 from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[2] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 
 MODULES = (
     "argus.truth.clocks", "argus.truth.facts", "argus.cost.model",

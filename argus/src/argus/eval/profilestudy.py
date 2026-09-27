@@ -48,8 +48,9 @@ from argus.desk.personalisation import (
     standard_profiles,
 )
 from argus.desk.workbench import TraderProfile
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 LEDGER_PATH = DATA / "paper_ledger.jsonl"
 REPORT_PATH = DATA / "profile_divergence.json"
 

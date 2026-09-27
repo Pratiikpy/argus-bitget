@@ -41,12 +41,12 @@ import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 
 from argus.cost.model import CostModel
 from argus.market.bitget import RTOKEN_SYMBOLS
 from argus.market.history import BasisPoint, fetch_basis
 from argus.truth.clocks import DualClock, SessionPhase
+from argus.truth.paths import DATA_DIR
 
 ROUND_TRIP_BPS = CostModel.bitget_perp().round_trip_bps()
 
@@ -210,7 +210,7 @@ def study(symbols: tuple[str, ...] = RTOKEN_SYMBOLS, *, days: int = 90) -> dict[
 
 def main() -> int:
     result = study()
-    out = Path(__file__).resolve().parents[3] / "data" / "arbitrage_study.json"
+    out = DATA_DIR / "arbitrage_study.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2), encoding="utf-8")
 

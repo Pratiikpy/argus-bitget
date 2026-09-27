@@ -11,10 +11,11 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 SOURCE = DATA / "stopquality_comparison.json"
 REPORT = DATA / "stopquality_prospective.json"
 HORIZON = timedelta(hours=24)

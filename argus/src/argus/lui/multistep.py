@@ -33,6 +33,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from argus.lui.answer import LEAD
+from argus.lui.research.kinds import bare_symbol
 from argus.truth.coverage import ContextPool
 
 MAX_PARTS = 4
@@ -161,7 +162,6 @@ def answer(question: str, found: list[Part], run: Any) -> tuple[list[str], list[
     """Run each part (in parallel, up to :data:`MAX_PARTS`) with ``run(text, request)`` and
     compose one answer: a lead naming the parts, each part's own lead, then each part in full.
     Returns (lines, sources, parts that could not be answered)."""
-    from argus.lui.research import _t
 
     budget = found[:MAX_PARTS]
     # A context-carrying pool: a plain ThreadPoolExecutor starts each part with an empty context,
@@ -179,7 +179,8 @@ def answer(question: str, found: list[Part], run: Any) -> tuple[list[str], list[
                     else "no answer")
         lead = LEAD.sub("", lead, count=1)
         leads.append(f"{number}. {lead[:1].upper()}{lead[1:]}")
-        carried = (f" (read as {_t(part.inherited)})" if part.inherited.endswith("USDT") else
+        carried = (f" (read as {bare_symbol(part.inherited)})"
+                   if part.inherited.endswith("USDT") else
                    f" (read with {part.inherited})" if part.inherited else "")
         body.append(f"Part {number} — “{part.text}”{carried}:")
         # one bold lead per answer: a part's own lead is already listed above, so it is plain here

@@ -178,3 +178,40 @@ def test_a_name_shared_by_both_servers_stays_two_rows() -> None:
     assert len(rows) == 20
     assert {r.server for r in rows.values() if r.tool == "crypto_market"} == {
         sm.SIGNAL_SERVER, sm.MCP_SERVER}
+
+
+class TestAnUnreadableCatalogCostsOnlyItsOwnHalf:
+    """Audit finding 112: one 503 while listing the catalog used to end the whole sweep."""
+
+    def test_a_failed_handshake_is_named(self) -> None:
+        def refuse() -> Any:
+            raise RpcError(ErrorKind.UPSTREAM_5XX, "503 Service Unavailable", http_status=503)
+
+        service, catalog, why = sm.discover_catalog(refuse)
+        assert service is None and catalog == []
+        assert why is not None and why.startswith("RpcError: ") and "503" in why
+
+    def test_a_failed_listing_is_named_and_a_good_one_is_read(self) -> None:
+        class Service:
+            def __init__(self, fail: bool) -> None:
+                self.fail = fail
+
+            def categories(self) -> list[dict[str, Any]]:
+                return [{"key": "equity"}]
+
+            def _call(self, tool: str, arguments: Mapping[str, Any]) -> dict[str, Any]:
+                if self.fail:
+                    raise TimeoutError("guide timed out")
+                return {"structuredContent": {"entries": [{"id": "quote"}, {"name": "no id"}]}}
+
+        assert sm.discover_catalog(lambda: Service(True))[1:] == (
+            [], "TimeoutError: guide timed out")
+        service, catalog, why = sm.discover_catalog(lambda: Service(False))
+        assert service is not None and why is None
+        assert catalog == [("equity", {"id": "quote"})]
+
+    def test_the_history_row_keeps_the_reason(self) -> None:
+        matrix = {"generated_at": "2026-09-27T00:00:00+00:00", "totals": {"calls": 19},
+                  "by_server": {}, "servers": {sm.MCP_SERVER: {
+                      "catalog_entries": 0, "catalog_unreadable": "RpcError: 503"}}}
+        assert sm.history_row(matrix)["mcp_catalog_unreadable"] == "RpcError: 503"

@@ -43,7 +43,6 @@ import random
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from pathlib import Path
 from statistics import fmean
 from typing import Any
 
@@ -59,8 +58,9 @@ from argus.research.grammar import (
     UnOp,
     Window,
 )
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "search_bakeoff.json"
 SWEEP_PATH = DATA / "search_sweep.json"
 

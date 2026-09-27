@@ -1,0 +1,201 @@
+name = "Queue-position modelling ported from hftbacktest and measured against it"
+subtheme = "t2-execution"
+modules = [
+    "argus/execution/queue.py",
+    "argus/eval/l3queue.py",
+    "argus/eval/l3feeds.py",
+    "argus/eval/realqueue.py",
+]
+state = "implemented"
+baseline = "nkaz001/hftbacktest, backtest/models/queue.rs"
+blockers = [
+    """\
+        no_specialist_capability_superior is NOT established, and it is the thirteenth. The gap is \
+        narrower than this entry used to claim, and the correction is recorded rather than quietly \
+        applied: it previously read 'hftbacktest validates this model against recorded real market \
+        data including market-by-order feeds', and that overstates the baseline. Read at source: \
+        examples/Level-3 Backtesting.ipynb cell 6 builds L2 from L3 'for the purpose of comparing \
+        backtesting results between Level-3 and Level-2', so it is a backtest-against-backtest \
+        comparison, not a comparison with observed fills; cell 13 concedes 'it is still crucial to \
+        validate backtesting results against live trading results'; and \
+        docs/debugging_backtesting_and_live_discrepancies.rst:24-27 hands live validation to the \
+        user. No script, test or notebook in that repo measures queue-model error against real \
+        observed fills.""",
+    """\
+        So the real remaining difference, stated exactly: both systems score a probability model \
+        against a ground truth they hold, and neither validates against live fills. Theirs is real \
+        CME market-by-order data (DataBento, paid, glbx-mdp3-*.mbo.dbn.zst); ours is a simulator \
+        whose attribution rule we stated and sweep. Real ground truth beats constructed ground \
+        truth, so the condition still fails — but on the quality of the reference book, not on a \
+        live-fill validation that neither side has.""",
+    """\
+        That difference cannot be closed with crypto data by either party. \
+        docs/order_fill.rst:97-99: 'If an exchange doesn't provide Market-By-Order, you have to \
+        guess it by modeling. HftBacktest currently only supports Market-By-Price that is most \
+        crypto exchanges provide.' Bitget is no exception — its own SDK catalogue lists 16 market \
+        endpoints (agent-sdk/src/generated/catalog.ts), the deepest being getOrderbook at L2 with \
+        at most 200 levels, plus a public tape; there is no order-level feed and the SDK carries \
+        no websocket at all. Which side of a resting order a cancellation came from is not \
+        recoverable from L2 at any sample rate.""",
+    """\
+        Two routes remain, and both are outside code: real CME MBO data through a paid vendor, \
+        which would let our port run hftbacktest's own protocol on their own class of reference \
+        data; or our own orders resting in a real book, which is elapsed time and the project \
+        owner's decision, not more building.""",
+    """\
+        2026-09-22: the code side of the first route is built, AND has now been run against real \
+        CME data — not a paid purchase, DataBento's own public GitHub SDK fixtures plus a \
+        substantial real sample from `nautechsystems/nautilus_trader`'s (LGPL-3.0) own public \
+        DataBento-adapter test fixtures: a full 2023-12-25 GLBX.MDP3 MBO session for ESH4, 68,756 \
+        real events, no account needed, downloaded and run, not vendored into this repo. Result, \
+        honestly mixed rather than a clean win: on that session (1,366 real episodes), \
+        LogProbability2 beats hftbacktest's own shipped default (PowerProbability n=1) \
+        significantly (paired 95% CI [0.012, 0.018] on queue_error, 0.047 vs 0.062) and beats the \
+        best naive ablation significantly too. A SECOND real file — a 2-second GLBX.MDP3 burst, \
+        non-holiday, 13,795 events but only 10 non-Add — gives the OPPOSITE ranking: the naive \
+        'every cancel is behind you' ablation wins outright. Likely explanation: a 2-second window \
+        has almost no genuine queue churn to model, so the simplest assumption wins by having \
+        nothing to be wrong about — but that reading is not confirmed, only offered, because the \
+        file is too data-poor to support much beyond 'not the same answer as the full day'. A \
+        THIRD file from the same source turned out to be a single-instant full-book snapshot \
+        (8,725 Adds at one identical microsecond, no real activity) — checked, found degenerate, \
+        excluded rather than scored. Neither usable file, nor both together, is the \
+        deliberately-chosen, statistically adequate real-trading-day sample this capability's own \
+        bar calls for: one is a Christmas-Day session, the other a two-second burst nobody chose \
+        for representativeness. This is real, run, honest evidence — and it is not enough to claim \
+        `no_specialist_capability_superior` is settled, so the state stays IMPLEMENTED rather than \
+        promoted on a preliminary, sample-disagreeing result. What would close it: a real vendor \
+        purchase of a deliberately-chosen, ordinary (non-holiday) trading day — still the owner's \
+        account-creation step, not a code gap; DataBento's `metadata.get_cost` can quote the exact \
+        price the moment a key exists.""",
+    """\
+        2026-09-26: the corrected real-MBO replay (eval/l3queue.py, pinned by \
+        tests/test_l3queue.py) on ESH4 2023-12-25 gives 1,454 synthetic orders and 0 inconsistent \
+        levels. hftbacktest's shipped default LogProbQueueFunc2 has a queue error of 0.0772; \
+        PowerProbQueueFunc3 with n=3 beats it by 0.0046 (5-minute cluster bootstrap interval \
+        -0.0084 to -0.0007). These supersede data/mbo_queue_proof.json, made before the \
+        double-count fix, and are themselves superseded by the run below: they were measured \
+        before the replay kept a filled order's feed open.""",
+    """\
+        hftbacktest's own engine run against the replay, 2026-09-26 (eval/hftbacktest_run.py, \
+        data/hftbacktest_run.json; hftbacktest 2.4.4 from PyPI in its own environment, the file \
+        converted by hftbacktest's databento converter, 1,438 orders). L3: hftbacktest's L3 FIFO \
+        engine and ARGUS's truth replay agree on every order, with the same fill timestamp on all \
+        1,130 fills. L2: the first run put ARGUS's port 8 to 29 points of fill agreement behind \
+        the engine on the same models; the cause was ARGUS's replay closing an order's L2 feed \
+        when the truth filled it, so a model that fills a few events later was scored as a miss — \
+        a bias against every model ARGUS scores, its own included. Fixed in eval/l3queue.py; the \
+        port now matches the engine exactly on four models and within one point on the rest (0.935 \
+        to 0.949). On the corrected replay PowerProbQueueFunc3 n=3 has the lowest queue error \
+        (0.0474) and the shipped default LogProbQueueFunc2 is next (0.0481). Engine parity is a \
+        reproduction of the rival, not a win over it.""",
+]
+note = """\
+    Twelve of thirteen. The book recorder is running so the simulator's parameters stop being \
+    ours — and as of 2026-09-15 that calibration is read per elapsed-time horizon rather than \
+    pooled, which moved the near-touch turnover figure the book actually supports from 71.3% \
+    to 24.0% at the horizon nearest the per-event timescale (data/book_calibration.json). That \
+    narrows the gap; it does not close it. Updated 2026-09-22, twice the same day. First: the \
+    real-MBO replay path (eval/mbo_queueproof.py) built and tested against the real \
+    databento_dbn schema, ready to run, no real data read yet. Second, same day: found and \
+    used a real, account-free data source (nautilus_trader's own public DataBento-adapter test \
+    fixtures, real CME sessions, not DataBento's paid archive) and actually ran the comparison \
+    — data/mbo_queue_proof.json now carries a real result. It is a genuine, significant win \
+    for hftbacktest's own probability approach on one real session, genuinely contradicted by \
+    a second, thinner real session, and openly reported as both rather than the flattering \
+    half alone. The state stays IMPLEMENTED: a preliminary, two-sample, sample-disagreeing \
+    result on a holiday session and a two-second burst is real evidence, not yet the settled \
+    comparison this condition needs — and saying so plainly is the honest use of what was \
+    found, not a reason to round it up."""
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    queue.rs:44-330 read in full; the five probability functions transcribed and the ProbQueue \
+    update rule quoted in the port's own docstring"""
+artefact = "../research/architecture/_CONSOLIDATED-LEDGER.md"
+test = "test_queueproof.py::TestReproduction"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    prob() is P(a cancellation came from behind), not P(fill) — read off queue.rs:183-204 \
+    after a first draft scored the wrong quantity"""
+test = "test_queueproof.py::TestTheGroundTruthIsGroundTruth"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    8 model/parameter combinations reproduce the Rust formulas to 1.1e-16 on 9 (front, back) \
+    pairs spanning both extremes"""
+artefact = "data/queue_proof.json"
+test = "test_queueproof.py::TestReproduction"
+
+[[proofs]]
+condition = "implementation_complete"
+how = """\
+    all five probability functions, RiskAdverse, ProbQueue and the L3 FIFO queue, including \
+    the cum_trade_qty double-count guard and the min() clamp"""
+test = "test_queue.py"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    every model sees byte-identical episodes and the identical L2 view of them; the \
+    reproduction grid is shared between ours and the transcribed reference"""
+artefact = "data/queue_proof.json"
+test = "test_queueproof.py::TestTheAblation"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    paired 95% interval on per-episode error differences; a win needs the whole interval above \
+    zero, and a zero-centred pair is pinned as a non-win"""
+test = "test_queueproof.py::TestTheStatistics"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    fill overstatement converted at the 4bps gap between our own MAKER_BPS and TAKER_BPS; one \
+    regime is won on accuracy and lost on cost, and says so"""
+artefact = "data/queue_proof.json"
+test = "test_queueproof.py::TestCosts"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    the in-sample winner is carried over to unseen seeds rather than rechosen, so the \
+    selection is not re-run as part of the test; 3 of 5 regimes survive"""
+artefact = "data/queue_proof.json"
+test = "test_queueproof.py::TestTheHeldOutRun"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    the probability function is replaced by four constants (always behind, always ahead, coin, \
+    trades-only); it beats the best of them in 3 of 5 regimes"""
+artefact = "data/queue_proof.json"
+test = "test_queueproof.py::TestTheAblation"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    a front-sticky queue that replenishes behind — the model loses it, and the loss is the \
+    reported result rather than a tuned-away one"""
+artefact = "data/queue_proof.json"
+test = "test_queueproof.py::TestTheHarnessCanReportALoss"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    2 of 5 regimes are losses, both named in the verdict; plus the finding that the most \
+    accurate model is not the cheapest"""
+artefact = "data/queue_proof.json"
+test = "test_queueproof.py::TestTheHarnessCanReportALoss"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    pure Python, one seeded generator, no wall clock in the scoring path; the same seed \
+    reproduces episodes and scores exactly"""
+test = "test_queueproof.py::TestReproducibility"

@@ -9,7 +9,7 @@ from typing import Any
 import pytest
 
 from argus.lui import skillroute
-from argus.lui.research import _skill_btc_line, _skill_fear_greed
+from argus.lui.research.evidence import _skill_btc_line, _skill_fear_greed
 from argus.market.skills import Health
 
 

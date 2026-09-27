@@ -36,9 +36,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from argus.truth.paths import DATA_DIR
+
 DETERMINISTIC_NAMES = ("truth", "cost", "risk", "decision", "backtest")
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "theme_audit.json"
 
 RUNS = "RUNS"

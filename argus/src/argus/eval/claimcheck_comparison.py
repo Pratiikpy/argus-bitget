@@ -4,8 +4,8 @@ MirrorLine (PinnacleCryptNG, a Season 2 desk; no licence file, so nothing of its
 is built for one job: take what a trader asserts about a Bitget rToken — "rNVDA is up", "it rallied
 because of earnings", "the US market is closed" — and mark each claim supported, challenged or
 unsupported against a Bitget evidence pack, never letting a price confirm a stated cause. ARGUS's
-premise check (`lui/research._claim_check`) does the same inside a research answer. This module
-scores both on one set of sentences asked the same morning.
+premise check (`lui/research/claims.py::_claim_check`) does the same inside a research answer. This
+module scores both on one set of sentences asked the same morning.
 
 **How it was run** (`data/h2h_mirrorline/`): MirrorLine's own ``getInterpretationChallenge`` from
 its clone, through a ten-line runner that passes each sentence as the thesis; ARGUS through
@@ -25,7 +25,7 @@ were run again; this module scores whichever run its artefacts hold and says whi
 
 **What is scored for ARGUS (changed 2026-09-26).** Until then this module graded the console
 answers recorded in ``argus_raw.json`` while `eval/standing.py` credited
-`lui/research._claim_check`,
+`lui/research/claims.py::_claim_check`,
 and the harness-validity canary (`data/harness_validity.json`) found that function never ran at
 scoring time — a regression in it would have left this verdict standing. Now the harness calls
 ``_claim_check`` itself on every saved sentence (:func:`console_answers`): the contract is the one
@@ -42,19 +42,22 @@ the contract the planner would have named.
 from __future__ import annotations
 
 import contextlib
+import importlib
 import json
+import pkgutil
 import re
 from collections.abc import Iterator, Mapping
 from datetime import datetime, tzinfo
 from decimal import Decimal
-from pathlib import Path
+from types import ModuleType
 from typing import Any, Self
 
 from argus.eval.compare import ComparisonReport, finalise, sign_test, sign_test_outcome
 from argus.truth import artefact
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data" / "h2h_mirrorline"
-REPORT = Path(__file__).resolve().parents[3] / "data" / "claimcheck_comparison.json"
+DATA = DATA_DIR / "h2h_mirrorline"
+REPORT = DATA_DIR / "claimcheck_comparison.json"
 FLAT_PCT = 0.30
 
 
@@ -108,10 +111,11 @@ def _mirror_verdict(result: dict[str, Any], kind: str) -> tuple[str | None, bool
 def _replayed(tape_reading: Mapping[str, float], instant: datetime) -> Iterator[None]:
     """The console's live inputs, pinned to what was recorded: `market.bitget.fetch_tickers`
     returns one :class:`~argus.market.bitget.Ticker` per perpetual in the tape, carrying its
-    recorded 24-hour change, and the clock `lui/research` reads (``research.datetime``) stands at
-    ``instant``. The tape recorded changes only, so every price field is zero; no claim in this
-    set reads a price (none names funding, a premium or the book), and a claim that did would be
-    judged on a zero rather than on a live quote — the set is checked for that in the tests.
+    recorded 24-hour change, and the clock `lui/research/` reads (each module's ``datetime``)
+    stands at ``instant``. The tape recorded changes only, so every price field is zero; no claim
+    in this set reads a price (none names funding, a premium or the book), and a claim that did
+    would be judged on a zero rather than on a live quote — the set is checked for that in the
+    tests.
     Both are restored however the block exits."""
     from argus.lui import research
     from argus.market import bitget
@@ -130,17 +134,27 @@ def _replayed(tape_reading: Mapping[str, float], instant: datetime) -> Iterator[
     def fetch_tickers(*_a: Any, **_k: Any) -> dict[str, bitget.Ticker]:
         return dict(tickers)
 
-    # ``datetime`` is a module global of `lui/research` (``from datetime import datetime``), so
-    # the frozen clock is set in the module's namespace for the block and put back after it.
-    namespace = vars(research)
-    real_tickers, real_clock = bitget.fetch_tickers, namespace["datetime"]
+    # ``datetime`` is a module global of every `lui/research/` module that reads the clock
+    # (``from datetime import datetime``), so the frozen clock is set in each of their namespaces
+    # for the block and put back after it. One module held them all until 2026-09-27.
+    namespaces = [vars(module) for module in _research_modules(research)
+                  if vars(module).get("datetime") is datetime]
+    real_tickers = bitget.fetch_tickers
     bitget.fetch_tickers = fetch_tickers
-    namespace["datetime"] = Frozen
+    for namespace in namespaces:
+        namespace["datetime"] = Frozen
     try:
         yield
     finally:
         bitget.fetch_tickers = real_tickers
-        namespace["datetime"] = real_clock
+        for namespace in namespaces:
+            namespace["datetime"] = datetime
+
+
+def _research_modules(package: ModuleType) -> list[ModuleType]:
+    """Every module of the `lui/research/` package, imported."""
+    return [importlib.import_module(f"{package.__name__}.{info.name}")
+            for info in pkgutil.iter_modules(package.__path__)]
 
 
 def console_answers(claims: Mapping[str, list[str]], tape: Mapping[str, Any], *,
@@ -159,7 +173,7 @@ def console_answers(claims: Mapping[str, list[str]], tape: Mapping[str, Any], *,
             for sentence in sentences:
                 symbols, _ = research.research_symbols(sentence)
                 symbol = symbols[0] if symbols else ""
-                checked = research._claim_check(sentence, symbol)
+                checked = research.claims._claim_check(sentence, symbol)
                 answers.append({"claim": sentence, "symbol": symbol,
                                 "lines": list(checked[0]) if checked else []})
             out[name] = answers
@@ -193,7 +207,7 @@ def score() -> dict[str, Any]:
     after = console_answers(claims, tape, reading="tape_after")
     report = grade(claims, tape, argus, mirror, us_open=session_open_at_start(tape))
     report["replay"] = {
-        "method": "argus.lui.research._claim_check called on each saved sentence with the "
+        "method": "argus.lui.research.claims._claim_check called on each saved sentence with the "
                   "console's resolver's contract, tape_before's 24h changes and the clock at "
                   "run_started (console_answers); written to data/h2h_mirrorline/"
                   "argus_replay.json",
@@ -304,7 +318,7 @@ def comparison_reports(report: dict[str, Any]) -> list[ComparisonReport]:
     n = report["graded"]
     return [finalise(ComparisonReport(
         comparison="claimcheck", question="a trader's claims about the tape: which hold",
-        argus="ARGUS premise check (lui/research._claim_check)",
+        argus="ARGUS premise check (lui/research/claims.py::_claim_check)",
         rival="MirrorLine getInterpretationChallenge", metric="share of gradable claims judged "
         "correctly (a causal claim also needs its stated cause held back)",
         lower_is_better=False, argus_score=report["argus_correct"] / n if n else None,

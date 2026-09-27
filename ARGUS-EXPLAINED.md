@@ -55,7 +55,7 @@ it. Where we found our own mistakes, they are in here too.
   - [Part 18 — The six Track 1 sub-themes, one by one](#part-18--the-six-track-1-sub-themes-one-by-one)
   - [Part 19 — The Track 1 result, in full and without softening](#part-19--the-track-1-result-in-full-and-without-softening)
 - **[PART D — One product: the complete architecture](#part-d--one-product-the-complete-architecture)**
-  - [Part 20 — The seventeen packages, every module named](#part-20--the-seventeen-packages-every-module-named)
+  - [Part 20 — The packages, every module named](#part-20--the-packages-every-module-named)
   - [Part 21 — The seven layers, and the rule that holds them](#part-21--the-seven-layers-and-the-rule-that-holds-them)
   - [Part 22 — One decision, end to end](#part-22--one-decision-end-to-end)
   - [Part 23 — What the system writes, and who reads it](#part-23--what-the-system-writes-and-who-reads-it)
@@ -127,8 +127,13 @@ decision was taken, why the desk stood aside, the evidence behind a decision, ca
 integrity, open positions, session state, market price, a list of decisions, an order instruction,
 unsupported, ambiguous, and unknown.
 
-**There is no AI model on this path.** Sorting the question is plain, deterministic code. This is a
-deliberate choice and it is worth explaining, because it looks backwards for an "AI workbench":
+**Two paths, and only one of them uses a model.** A question about the desk's own record is sorted
+by plain, deterministic code, with no model on the path. A research question (a name, a book, a
+size) is read on the hosted console by Qwen first, thinking off, into a structured request whose
+every name is checked against Bitget's contract list; when the model is not configured or does not
+answer, a trained classifier and the patterns read it instead. On neither path does a model write
+a number. The record path's choice is deliberate and worth explaining, because it looks backwards
+for an "AI workbench":
 
 - It is **instant**. The answer comes back in milliseconds, not seconds.
 - It is **repeatable**. The same question always gets the same answer. A model would not guarantee
@@ -203,7 +208,7 @@ candles and compare. Across 6 symbols, **all 6 agree**, and the largest disagree
 out of 100. That check is in `argus/data/skill_crosscheck.json`. It is the difference between
 integrating a data source and trusting one.
 
-**Two real bugs were found doing this**, both in our own code:
+**Two bugs were found doing this**, both in our own code:
 
 1. Every call was sent with the same request ID. The protocol uses that ID to match an answer to its
    question, so with one ID for everything there was nothing to match on — and a test showed one
@@ -226,7 +231,7 @@ If you type an order, it is refused by name:
 ```
 
 This is not a filter on the output. "Order" is one of the 14 question kinds, checked **before**
-anything else. That ordering was added because of a real failure found by testing: the phrase
+anything else. That ordering was added because of a failure found by testing: the phrase
 "sell half of that" matched the word "sell" in the decision-explanation pattern, and the console
 started explaining a past decision instead of refusing an instruction. Now the order check runs
 first and cannot be reached around.
@@ -449,7 +454,7 @@ properties taken from reading real execution engines, not invented:
   passive slice is priced through a simulated fill — the real blend of patient fills and chasing.
   If you do not, passive slices are quoted at the **expensive taker rate**, not the cheap maker rate.
 
-That last one is deliberate and it fixed a real bug. Our own backtest once counted a cheap maker fee
+That last one is deliberate and it fixed a bug. Our own backtest once counted a cheap maker fee
 on a slice labelled "passive limit" without ever checking it would fill. **An unevidenced maker fee
 is the single most common way an execution plan flatters itself.**
 
@@ -601,7 +606,7 @@ numbers: a fact of 0.0203 quoted as "2%" or as "203bps" both resolve correctly.
 This found a real false alarm in our own system. The checker flagged "+0.24%" as unsupported when it
 was the 24-hour change the market data had supplied as 0.0024. The checking function had always
 accepted a list of evidence values for exactly this — and nothing was passing them. A checker that
-cries wolf on correct writing is worse than no checker, because the next real finding gets ignored.
+cries wolf on correct writing is worse than no checker, because the next finding gets ignored.
 
 **2. Claims are checked, not just numbers** — the decision-41 case described earlier.
 
@@ -675,7 +680,7 @@ A judge should not have to discover these.
   to it — rather than the earlier and false "no hedge placeable".
 - **No usage data.** This has not been put in front of traders yet. The plan is ten supervised
   sessions measuring whether the risk-share figure changes the ticket.
-- **Superiority is claimed only where a named competitor was run on the same input.** 6 of 44
+- **Superiority is claimed only where a named competitor was run on the same input.** 4 of 44
   capabilities are OWNED under that rule; the rest are TIED, IMPLEMENTED or LOST and are called that, and
   every comparison we lost is published on `/wrong`. On 2026-09-24 seven earlier OWNED grades were
   withdrawn because the rival they beat does not lead its sub-theme; they stay IMPLEMENTED until
@@ -706,7 +711,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 9,419 tests
+pytest                    # 9,674 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1100,8 +1105,8 @@ anyone adds an outcome-carrying field to what the proposer sees, and a test that
 a telltale number and asserts it appears nowhere in the proposer's view. Run twice on live bars, the
 first run scored eight primitives and the second scored none and suppressed eight.
 
-**The honest result, published.** Over 2,159 real hourly NVDA bars: **four of our eight primitives
-are indistinguishable from randomly shuffled data. The four that pass every gate still lose money
+**The honest result, published.** Over 2,159 real hourly NVDA bars: **eight of our eight primitives
+are indistinguishable from randomly shuffled data, none clears every gate, and all eight lose money
 after the 12bps round trip.** Statistical structure and tradeable edge are different things, and on
 this venue the difference is the fee. That is a real negative result on real data and it is in
 `argus/data/overfit_gates.json`.
@@ -1127,7 +1132,7 @@ every hash after it. Settlement fields are deliberately excluded from that hash,
 attaching an outcome later does not invalidate the chain — and also why a settled outcome can never
 rewrite the decision it settles.
 
-**That exclusion was tested adversarially, and it found a real gap.** Excluding settlement fields
+**That exclusion was tested adversarially, and it found a gap.** Excluding settlement fields
 from the decision's own hash is correct — but on 2026-09-22 we copied the live ledger, edited a
 settled decision's P&L directly in the file (bypassing the code path entirely, exactly what a
 compromised host or a malicious insider with file access would do), and the chain still verified as
@@ -1311,7 +1316,7 @@ What we think makes it good, and what we know makes it weak:
   is the normal state of this venue for 65 hours a week.
 - **Point-in-time retrieval is enforced by the interface**, not by discipline. The evidence store has
   no "latest" and no default; a query without an as-of date is a type error. This is a direct
-  response to two real defects we found by reading FinMem and FinAgent, both of which *intended*
+  response to two defects we found by reading FinMem and FinAgent, both of which *intended*
   point-in-time retrieval and failed because forgetting the filter was possible.
 - **Seventeen defects found by running, not reading.** They are all recorded in the master plan, with
   the fix. We think a system whose builders can list sixteen things they got wrong is more
@@ -1374,7 +1379,7 @@ route to it — is now what the layer sees.
 - **One model, no ensemble, no adversarial overturn.**
 - **"Owned" is a conjunction, not a score.** An owned capability needs a reproduced baseline, a
   same-input comparison, an out-of-sample test, an ablation and an adversarial test, among thirteen
-  conditions. On 2026-09-12 zero met that bar; the register now reads 20 of 38 capabilities are
+  conditions. On 2026-09-12 zero met that bar; the register now reads 4 of 44 capabilities are
   OWNED, each re-derived from its artefacts by `eval/standing.py`, never from prose.
 
 ---
@@ -1759,11 +1764,11 @@ takes, and every artefact the system writes.
 
 | | |
 |---|---|
-| Source modules | **327** files across **21 packages**, 130,470 lines |
+| Source modules | **516** files across **20 packages** (2026-09-27) |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **224 files**, **9,419 tests collected** |
-| Type and lint | `ruff` clean, `mypy --strict` clean on **327 source files** |
-| Artefacts written | **162** files under `argus/data/` |
+| Test files / tests | **353 files**, **9,674 tests collected** |
+| Type and lint | `ruff` clean, `mypy --strict` clean on **513 source files** |
+| Artefacts written | **688** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
 
@@ -1774,15 +1779,28 @@ checked against it numerically rather than trusted.
 
 ---
 
-## Part 20 — The seventeen packages, every module named
+## Part 20 — The packages, every module named
 
-### `truth/` — what time is it, and what did we know? (3 modules)
+### `truth/` — what time is it, and what did we know? (11 modules)
 
 | module | what it holds |
 |---|---|
 | `clocks` | The **dual clock**. The token's never stops; the anchor stock's has four phases — regular, extended, overnight, weekend — plus holidays. Everything downstream asks this which session it is in and how many hours remain until genuine price discovery. |
 | `facts` | Point-in-time fact store. **Every fact carries five times**: when it happened, when it was published, when we ingested it, when it became available to us, and a revision number so a restatement supersedes rather than overwrites. A query without an as-of date is a type error. There is no "latest". |
 | `evidence` | The `Evidence` type itself, extracted here so `market/*` can produce evidence without transitively importing the model client. |
+
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `artefact` | Writing an artefact that something other than Python can read. |
+| `bounded` | A dictionary that never grows past a fixed number of entries. |
+| `coverage` | Which sources an answer reached, and which did not answer — counted at the transport. |
+| `failures` | How a call to a source failed, and what a failed reply looks like. |
+| `grounding` | Numeric grounding — every figure in a thesis must resolve to something that produced it. |
+| `novelty` | Six headlines, or one headline six times? |
+| `paths` | Where the package's data lives, named once. |
+| `source` | Where a fact came from, recorded so a reader can go and check it. |
 
 ### `cost/` — the model with no zero-fee constructor (1 module)
 
@@ -1793,13 +1811,20 @@ which stamps it so that `assert_gateable()` refuses to let it justify a decision
 the single most common defect across the systems we tore down, so it is prevented structurally
 rather than by review.
 
-### `decision/` — the vocabulary a decision is written in (2 modules)
+### `decision/` — the vocabulary a decision is written in (4 modules)
 
 `verdicts` — `Intent`, `Verdict`, `ConstitutionVerdict`, and `apply_constraint`, the one function
 through which the risk layer may narrow an intent. `escalation` — when a decision must go to a
 human instead of an order.
 
-### `risk/` — the layer that may only reduce (5 modules)
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `outcome` | What followed a decision: the move, where the number came from, and when it is no direction. |
+| `pause` | A durable, typed human-in-the-loop pause: the desk stops, asks, and continues from that point. |
+
+### `risk/` — the layer that may only reduce (9 modules)
 
 | module | what it does |
 |---|---|
@@ -1809,7 +1834,16 @@ human instead of an order.
 | `effectiveness` | **Ederington hedging effectiveness measured from the venue's own series**, per session phase, with a Fisher confidence bound. This replaced three constants that had been typed into `hedgeability` with no sample behind them. |
 | `session_risk` | Per-phase volatility and the **reopen jump**, and the volatility-targeting throttle that follows from them. |
 
-### `market/` — everything that fetches (14 modules)
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `calibration` | Probabilistic calibration: does a stated confidence mean what it says? |
+| `certify` | Certifying every risk gate from its written specification — a second implementation, not a rerun. |
+| `constitution` | The Constitution: the desk's deterministic risk rules, applied in code and never in a prompt. |
+| `gatechain` | The Constitution's gate chain and the risk record's vocabulary. |
+
+### `market/` — everything that fetches (37 modules)
 
 `bitget` (tickers, funding), `history` (candles, index, premium, basis), `depth` (**live L2 order
 book**, sweep cost by size), `markout` (**adverse selection** from the public fills feed),
@@ -1817,7 +1851,35 @@ book**, sweep cost by size), `markout` (**adverse selection** from the public fi
 Skills), `insider` (Form 4), `fundamentals` (XBRL, point-in-time, restatements resolved),
 `estimates` (analyst consensus), `macro` (Treasury curve), `collector`, `validation`.
 
-### `agents/` — the model-facing layer (15 modules)
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `abuse` | Is a post abusive? |
+| `bitget_mcp` | Bitget's own US-equity data service, read through its MCP endpoint — and no key is needed. |
+| `bitget_positioning` | Positioning and mood from Bitget's own data service, for the answers that were missing them. |
+| `calendar` | The scheduled macro events a trader hedges around: US CPI releases and FOMC decisions. |
+| `earnings_release` | What management reported and guided, read from the company's own earnings release. |
+| `equity_history` | A US stock's own daily history since listing, and the gaps across the hours it does not trade. |
+| `etf_flows` | Money actually arriving in the US spot bitcoin and ether ETFs, and Strategy's bitcoin buying. |
+| `instruments` | The Instrument Master — declared identity, not inferred behaviour. |
+| `liquidity_profile` | When a contract is liquid: its traded value by hour of day, on weekdays against weekends. |
+| `long_short` | Bitget's own long/short ratios for any USDT perpetual, read from its public market API. |
+| `open_interest` | Open interest: how much of a contract is held open, set against its own trading and the market. |
+| `pit` | Point-in-time SEC facts, gated to the second EDGAR accepted the filing — not to its date. |
+| `prediction` | What prediction markets price about a name: Polymarket's open markets, read keyless. |
+| `rpc` | One JSON-RPC client for every MCP server ARGUS reads, and a taxonomy that says what broke. |
+| `rtoken_spot` | Bitget's spot rTokens, their same-company stock perpetuals, and the nights between sessions. |
+| `skill_mirror` | When Bitget's research Skills go dark, read the sources they read. |
+| `social_pulse` | What the crowd on X and Reddit is saying about each name — collected here, served anywhere. |
+| `statement_facts` | Annual statement line items from SEC XBRL, read **as reported in one 10-K**. |
+| `stories` | Headlines grouped into stories, so repetition is counted once. |
+| `sue` | Standardized Unexpected Earnings (SUE) — cross-sectional earnings surprise, refusing rather than silently going infinite. |
+| `universe` | Every contract Bitget lists on its USDT-futures book, and the names people call them by. |
+| `vader` | VADER, unmodified, from the copy vendored in ``argus/vendor/vader`` or a clone. |
+| `ws_tape` | A forward tape of Bitget's public order books and trades, recorded to disk as it happens. |
+
+### `agents/` — the model-facing layer (16 modules)
 
 | module | role |
 |---|---|
@@ -1831,32 +1893,88 @@ Skills), `insider` (Form 4), `fundamentals` (XBRL, point-in-time, restatements r
 | `causality`, `recall`, `earnings`, `mandate` | Causal chains, memory across decisions, earnings reads, per-profile mandate injection. |
 | `quarantine` | **Untrusted third-party text screened and spotlit before the model reads it.** |
 
-### `execution/` — orders and the realism around them (9 modules)
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `circuit` | The trajectory circuit-breaker, and the retry policy every external call goes through. |
+| `delay_cost` | What deliberating costs, read from the book the desk is about to trade — not from a constant. |
+| `entitygate` | Entity grounding — every instrument a thesis names must appear in the evidence it cites. |
+| `rubric` | A named-rubric self-score, logged beside the desk's own measurement of the same axes. |
+
+### `execution/` — orders and the realism around them (16 modules)
 
 `orders` (state machine, 15 states, read from Nautilus rather than invented), `bitget_client`,
 `guard` (the venue's own published rules, fetched), `preflight`, `queue` (queue-position fills,
 ported from hftbacktest), `passive`, `latency` + `latency_probe` (measured, not assumed),
 `schedule`.
 
-### `paper/` — the record (7 modules)
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `batch` | Batch writes with a per-item fallback that reports exactly which items failed, and why. |
+| `confirm` | Fill confirmation: neither the order-status response nor the position is trusted on its own. |
+| `consent` | The consent gate: no order that can spend real money leaves ARGUS without a per-run token. |
+| `grounded_ids` | Show a model short ids for orders and positions, and accept back only the ids it was shown. |
+| `legs` | Multi-leg order coordination — the second of two small execution-plumbing gaps the product plan names as blocking Cross-Asset Execution Agent (Track 2) and arbitrage feasibility (Track 1): *"no idempotency, no… |
+| `modes` | Named risk modes and the precedence stack that picks one — the desk's posture, made legible. |
+| `review` | Pre-trade review for an order somebody else is about to place. |
+
+### `paper/` — the record (12 modules)
 
 `runner` (the live cycle), `ledger` (**hash-chained**, append-only), `chains`, `anchor` (head
 anchoring so truncation is detectable), `protocol`, `replay`, `repair`.
 
-### `backtest/`, `sim/`, `strategies/` — the engine (9 modules)
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `corrections` | Ledger rows known to be wrong, and why — recorded rather than deleted. |
+| `marks` | Short-horizon marks — the observation that makes a refusal gradeable. |
+| `migrate_settlement_seals` | Backfill settlement seals for decisions settled before the seal mechanism existed. |
+| `performance` | Paper-trading performance — the three numbers Track 2 is actually scored on. |
+| `venue` | The paper ledger as a venue: an order record and a position record, read back from disk. |
+
+### `backtest/`, `sim/`, `strategies/` — the engine (11 modules)
 
 `backtest.engine`, `backtest.metrics`, `backtest.validation` (purged CV, embargo, Benjamini–Hochberg,
 Bonferroni), `backtest.dependence`. `sim.book` (multi-level matching, rebuilt from ABIDES),
 `sim.market`, `sim.agents`. `strategies.track1_suite`, `strategies.session_alpha`.
 
-### `research/` — the studies and the statistics (14 modules)
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `backtest/snooping` | Hansen's SPA and Romano-Wolf's StepM — a trial-corrected discovery gate that keeps its power. |
+| `backtest/stepm` | Romano-Wolf StepM on Hansen's SPA — which of K correlated strategies beat a benchmark, family-wise. |
+
+### `research/` — the studies and the statistics (27 modules)
 
 `cointegration` (**ADF, Engle–Granger, MacKinnon tables, OU half-life — reproduces statsmodels to
 1e-12**), `overfit` + `overfitting_study` (CPCV, deflated Sharpe, PBO), `significance`,
 `crosssection`, `eventstudy`, `factor_lab` + `memory` (remembers every hypothesis and refuses to pay
 for one twice), `grammar`, `searchoff`, `panel`, `gap_study`, `arbitrage_study`, `track1_study`.
 
-### `desk/` — the research and portfolio tools (13 modules)
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `carry` | Funding carry — the one subject where ARGUS is allowed to hold a position. |
+| `discovery_gate` | The trial-corrected gate for a `searchoff` pool: which searched factors beat flat, trials paid. |
+| `document_qa` | Question-answering over a company's own filings, with the citation enforced in code. |
+| `event_reactions` | How each traded name has reacted to CPI releases, Fed decisions and its own earnings. |
+| `executable_arb` | Net executable arbitrage across two real order books: the exact optimum, not a flat estimate. |
+| `factor_divergence` | rToken factor divergence — does a real, published factor behave differently computed on the rToken's own traded price than on its native-stock reference? |
+| `filing_qa` | Answer a numeric question about a 10-K from SEC's own XBRL — or say exactly why not. |
+| `grammar_series` | Evaluate a factor over a whole series at once: each node once, shared subtrees once. |
+| `grammar_text` | Text in, typed tree out: a parser for the factor grammar, and a normal form for its identity. |
+| `leveraged_decay` | What a daily-rebalanced leveraged fund loses when its index goes nowhere. |
+| `overfit_gates` | Every vetted primitive through the four anti-overfit gates, then through the fee. |
+| `pead_study` | Does the already-verified SUE ranking carry forward-return information on this venue? |
+| `session_beta_study` | Beta to the index, split by whether the anchor market was open — measured, then written down. |
+
+### `desk/` — the research and portfolio tools (27 modules)
 
 `research` (the orchestrator: evidence → expectation gap → analogue → path shape → cointegration →
 allocation → beta → portfolio → diversification → stress → cost), `portfolio`, `allocation`
@@ -1865,7 +1983,26 @@ allocation → beta → portfolio → diversification → stress → cost), `por
 (**FLUSS segmentation**), `stress`, `expectation`, `workbench`, `review`, `rootcause`,
 `personalisation`.
 
-### `register/` — claims committed before their outcomes (3 modules)
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `book` | Foundation 3 — the real portfolio. |
+| `carrydesk` | The carry desk — the first proposal in ARGUS's history that reaches gate two. |
+| `crossasset` | Cross-asset hedge routing: hedge only the risk and carry the allocation did not sign up for. |
+| `execution` | Cross-asset execution — choosing which leg to hedge through, by real total cost. |
+| `feed_sanity` | The feed-sanity gate: a deterministic check on every figure before the Meta-PM reads it. |
+| `mandate` | Mandate injection — the same evidence, two traders, two defensible answers. |
+| `nco_ensemble` | Nested Clustered Optimization with the estimation step taken seriously. |
+| `odds` | How often a contract finished higher over a horizon: the answer to "will X be higher?" that is measured rather than predicted. |
+| `rotation` | Cross-asset breadth-momentum rotation — switching between risk and safety by asset class. |
+| `rtoken_hedge` | The overnight hedge for a spot rToken holder: short the same company's stock perpetual. |
+| `rule_lifecycle` | The back half of a review rule's life: probation, confirmation, and retirement. |
+| `rule_proposer` | Review rules written from failure contrasts — the generator the review was missing. |
+| `session_schedule` | Session-aware execution: a schedule that knows where the anchor market opens and closes, solves each side of that boundary with that side's own liquidity and volatility, and refuses to solve at all when it has not… |
+| `stress_tree` | Second-order stress: a bounded, recursive tree of scenarios grown from the shock a trader asked. |
+
+### `register/` — claims committed before their outcomes (5 modules)
 
 `claims` — the `Claim` schema, the refuse-at-registration validator, and the hash chain.
 `resolve` — the auto-resolver and the scoreboard, structurally unable to answer early.
@@ -1874,7 +2011,14 @@ allocation → beta → portfolio → diversification → stress → cost), `por
 Live: **291 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
 2026-09-14. The resolver runs on every scheduled cycle.
 
-### `eval/` — thirty-three ways to be wrong in public (33 modules)
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `anchorcheck` | Count what the anchor proofs actually attest, by reading them rather than by trusting a sentence. |
+| `cadence` | The cadence — continuous registration, so the record is never a frozen batch. |
+
+### `eval/` — every way we test ourselves in public (247 modules)
 
 The largest package in the system, and deliberately so. `themeaudit`, `standing`, `leakage`
 (**memorisation instrument with a sensitivity control**), `docclaims` (**every number in these
@@ -1886,12 +2030,273 @@ documents checked against its artefact**), `riskproof`, `forecasts` + `forecastb
 `profile_value`, `cyclecheck`, `performance`, `baseline`, `selfaudit`, `episodes`, `sources`,
 `scorecard`, `bakeoff`, `collect`.
 
-### `lui/`, `demo/`, `llm/`, `proof/`, `status` (14 modules)
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `abstention_comparison` | ARGUS's real abstention-quality scoring vs. |
+| `abstention_coverage` | Does the desk abstain on the right calls? |
+| `afterhours_comparison` | Same-input comparison: `argus.research.gap_study` vs QuantConnect's real Pre-Holiday Effect. |
+| `allocation_agreement` | Does ARGUS's break-even heuristic reproduce a convex optimiser's rebalance decision — or does it only agree where nothing could have disagreed? |
+| `allocation_comparison` | Same-input comparison: ARGUS's own HRP allocator against the two specialist libraries that were named as better, already cloned in this project's own corpus, and never once run. |
+| `allocation_cost_ablation` | Adversarial re-test of `eval/allocation_comparison.py`'s headline, by running the three things that comparison itself listed as NOT VERIFIED and whose answers could overturn its verdict. |
+| `allocation_snapshot` | A frozen, hashed copy of the hourly rToken return history every allocation bake-off reads. |
+| `analogstress_comparison` | Decision Stress Testing, head to head: ARGUS against AnalogDesk on AnalogDesk's own test. |
+| `arbitrage_comparison` | ARGUS's cost-aware arbitrage decomposition vs. |
+| `artefactkind` | Deterministic, or re-measured? |
+| `baselines/alphalens_ic` | Vendored, verbatim, unmodified below each marker. |
+| `baselines/alphalens_ic_loader` | Make the vendored `alphalens_ic.py` (Alphalens' real Information Coefficient computation) importable and runnable. |
+| `baselines/arch_spa_stepm` | Vendored EXCERPT of Kevin Sheppard's `arch` package. |
+| `baselines/argus_rotation_pre_contract` | Cross-asset breadth-momentum rotation — switching between risk and safety by asset class. |
+| `baselines/ballast_stats` | Minimal statistics helpers. |
+| `baselines/blackout_hedges_loader` | Import Blackout Desk's real `src/blackout/hedges.py` from a local clone, without vendoring it. |
+| `baselines/crypto_sor_loader` | Run the real, vendored crypto_sor `CompositeOrderBook.newOrder()` via a real Node/ts-node subprocess. |
+| `baselines/eventdriven_agents_loader` | Import two unlicensed Season-2-era event-driven trading agents from local clones, unmodified. |
+| `baselines/finbert_loader` | Loads the REAL, published `ProsusAI/finbert` inference model — not vendored source. |
+| `baselines/general_grammar_rivals` | Runs the general-purpose rivals of the factor grammar on the comparison's corpus. |
+| `baselines/ghostledger_reimpl` | An independent, clean-room reimplementation of AutonomousTradeAgents' "Ghost P&L" abstention ledger aggregation — NOT vendored, because there is no license to vendor under. |
+| `baselines/gloaming_fairvalue` | Gloaming's core thesis, as code: while NYSE is closed there is no direct arbitrage pressure holding an rToken's on-chain price to its real-share value. |
+| `baselines/latencybench_reimpl` | An independent, clean-room reimplementation of LatencySensitiveBench's linear price-decay model — NOT vendored, because there is no license to vendor under. |
+| `baselines/lean_market_holidays_loader` | Load the vendored US equity market holiday calendar (`truth/data/us_equity_holidays.json`, until 2026-09-26 `eval/baselines/lean_market_holidays_usa.json`) — the holiday dates from QuantConnect/Lean's own… |
+| `baselines/lean_pairs_ranking` | Vendored verbatim from `QuantConnect/Lean`, `Algorithm.Framework/Alphas/PearsonCorrelationPairsTradingAlphaModel.py`; unmodified below its provenance header. |
+| `baselines/lean_pairs_ranking_loader` | Make the vendored `lean_pairs_ranking.py` (Lean's real pearsonr-ranking excerpt) importable. |
+| `baselines/loader` | Make the vendored Vibe-Trading files importable without editing a line of them. |
+| `baselines/maxme_arbitrer` | Vendored verbatim from `maxme/bitcoin-arbitrage`, `arbitrage/arbitrer.py`; unmodified below its provenance header. |
+| `baselines/maxme_arbitrer_loader` | Make the vendored `maxme_arbitrer.py` (maxme/bitcoin-arbitrage's real profit-detection core) importable and CALLABLE without editing it. |
+| `baselines/pytaa_signal` | Vendored verbatim from `oronimbus/tactical-asset-allocation`, `src/pytaa/strategy/signals.py`; unmodified below its provenance header. |
+| `baselines/pytaa_signal_loader` | Make the vendored `pytaa_signal.py` (pytaa's real `Signal` momentum class) importable. |
+| `baselines/pytaa_vigilant_allocation` | Vendored verbatim from `oronimbus/tactical-asset-allocation`, `src/pytaa/backtest/positions.py`; unmodified below its provenance header. |
+| `baselines/pytaa_vigilant_allocation_loader` | Make the vendored `pytaa_vigilant_allocation.py` (pytaa's real VAA breadth rule) importable. |
+| `baselines/qlib_cs_processor` | Vendored verbatim from `microsoft/qlib`, `qlib/data/dataset/processor.py`; unmodified below its provenance header. |
+| `baselines/qlib_eval_surface` | Vendored verbatim from `microsoft/qlib`; unmodified below its provenance header. |
+| `baselines/qlib_eval_surface_loader` | Make the vendored `qlib_eval_surface.py` (qlib's real `parse_field` + `ExpressionProvider`) importable and CALLABLE without editing a line of it. |
+| `baselines/qlib_expression_base` | Vendored verbatim from `microsoft/qlib`, `qlib/data/base.py`; unmodified below its provenance header. |
+| `baselines/qlib_expression_loader` | Make the vendored qlib expression engine (`qlib_expression_base.py` + `qlib_expression_ops.py`) importable and CALLABLE without editing a line of either — including the deferred cache import inside… |
+| `baselines/qlib_expression_ops` | Vendored verbatim from `microsoft/qlib`, `qlib/data/ops.py`; unmodified below its provenance header. |
+| `baselines/qlib_loader` | Make the vendored qlib cross-sectional processor importable without editing a line of it. |
+| `baselines/quantconnect_preholiday_decision` | Vendored verbatim from `QuantConnect/Tutorials`, `"04`; unmodified below its provenance header. |
+| `baselines/quantconnect_preholiday_loader` | Run the real, vendored QuantConnect Pre-Holiday Effect decision snippet (`quantconnect_preholiday_decision.py`). |
+| `baselines/quantconnect_sue` | Vendored verbatim from `QuantConnect/Tutorials`, `"04`; unmodified below its provenance header. |
+| `baselines/quantconnect_sue_loader` | Make the vendored `quantconnect_sue.py` (QuantConnect's real SUE factor computation) importable. |
+| `baselines/rdagent_cache_utils` | Vendored verbatim from `microsoft/RD-Agent`; unmodified below its provenance header. |
+| `baselines/rdagent_costeer_task` | Vendored verbatim from `microsoft/RD-Agent`, `rdagent/components/coder/CoSTEER/task.py`; unmodified below its provenance header. |
+| `baselines/rdagent_exception` | Vendored verbatim from `microsoft/RD-Agent`, `rdagent/core/exception.py`; unmodified below its provenance header. |
+| `baselines/rdagent_experiment` | Vendored verbatim from `microsoft/RD-Agent`, `rdagent/core/experiment.py`; unmodified below its provenance header. |
+| `baselines/rdagent_factor` | Vendored verbatim from `microsoft/RD-Agent`, `rdagent/components/coder/factor_coder/factor.py`; unmodified below its provenance header. |
+| `baselines/rdagent_factor_loader` | Make the vendored RD-Agent factor-execution path (`rdagent_experiment.py`/`rdagent_factor.py`/`rdagent_costeer_task.py`/`rdagent_exception.py`/ `rdagent_cache_utils.py`) importable and CALLABLE without editing a line… |
+| `baselines/selective_rivals_runner` | Runs the two general-purpose selective-prediction evaluators on ARGUS's frozen abstention input. |
+| `baselines/serenity_guards` | Fail-closed operational guards. |
+| `baselines/serenity_journal` | Hash-chained, truncation-evident JSONL journal. |
+| `baselines/serenity_loader` | Make the vendored serenity-guardrails journal importable without editing a line of it. |
+| `baselines/skfolio_stress` | skfolio's conditional stress engines, run unmodified, for `eval/copilot_stress.py`. |
+| `baselines/stumpy_squared_distance` | Vendored verbatim from `TDAmeritrade/stumpy`, `stumpy/core.py`; unmodified below its provenance header. |
+| `baselines/stumpy_squared_distance_loader` | Make the vendored `stumpy_squared_distance.py` (STUMPY's real `_calculate_squared_distance`) importable and CALLABLE without editing it. |
+| `baselines/tradingagents_feedlist_config` | Vendored verbatim from `TauricResearch/TradingAgents`, `tradingagents/dataflows/config.py`; unmodified below its provenance header. |
+| `baselines/tradingagents_feedlist_default_config` | Vendored verbatim from `TauricResearch/TradingAgents`, `tradingagents/default_config.py`; unmodified below its provenance header. |
+| `baselines/tradingagents_feedlist_errors` | Vendor data-error taxonomy. |
+| `baselines/tradingagents_feedlist_interface` | Vendored verbatim from `TauricResearch/TradingAgents`, `tradingagents/dataflows/interface.py`; unmodified below its provenance header. |
+| `baselines/tradingagents_feedlist_loader` | Make the vendored TradingAgents data-vendor router importable without editing a line of it. |
+| `baselines/tradingagents_loader` | Make the vendored TradingAgents memory log importable without editing a line of it. |
+| `baselines/tradingagents_memory` | Append-only markdown decision log for TradingAgents. |
+| `baselines/tradingagents_rating` | Shared 5-tier rating vocabulary and a deterministic heuristic parser. |
+| `baselines/tradingagents_trader` | Pydantic schemas used by agents that produce structured output. |
+| `baselines/tradingagents_trader_loader` | Make the vendored `tradingagents_trader.py` (TradingAgents' real `TraderProposal`) importable. |
+| `baselines/vectorbt_dsr_metrics` | Other metrics that are not compiled with Numba. |
+| `baselines/vectorbt_loader` | Make the vendored vectorbt DSR metrics importable without editing a line of them. |
+| `baselines/vibe_trading_enforcement` | Pre-trade mandate enforcement (SPEC.md Mandate Enforcement §5–§6). |
+| `baselines/vibe_trading_eventstudy` | Event study: abnormal returns around a dated corporate or macro event. |
+| `baselines/vibe_trading_eventstudy_loader` | Load the two vendored event-significance baselines, re-checking their bytes on every load. |
+| `baselines/vibe_trading_mandate_model` | Mandate data model — the immutable bounded-autonomy contract. |
+| `baselines/whale_signals_event_study` | Vendored verbatim from `zty05070242/whale-signals`, `src/analysis/event_study.py`; unmodified below its provenance header. |
+| `baselines/whale_signals_event_study_loader` | Make the vendored `whale_signals_event_study.py` (whale-signals' real hit-rate significance test) importable. |
+| `baselines/xa_rivals/_proto` | Line protocol shared by the Python rival runners (one JSON object per line on stdin/stdout). |
+| `baselines/xa_rivals/crossfire_runner` | Crossfire (CryptoCT01/Crossfire @7a3bdfa) in the XA arena — its own keyless decision path. |
+| `baselines/xa_rivals/omni_runner` | Omni (Jayanng/Omni @c50d566, MIT) in the XA arena — its own keyless governance cycle. |
+| `baselines/xa_rivals/triad_runner` | Triad (danielamodu/Triad @d70c67b) in the XA arena — its own keyless tick. |
+| `bookcalib` | Book calibration — the queue experiment's parameters, measured instead of invented. |
+| `call_record` | The console's own calls, recorded before the outcome and graded after it. |
+| `circuit_replay` | The trajectory breaker, replayed over the recorded ledger and over injected faults. |
+| `claimcheck_comparison` | A trader's claims about the tape, checked by ARGUS and by MirrorLine on the same sentences. |
+| `clearance` | How often a two-hour move clears the round trip — measured per symbol, per session. |
+| `cointegration_comparison` | ARGUS's pairs-trading statistics vs. |
+| `compare` | The report every head-to-head emits, whatever happened: the reporting half of the eval spine. |
+| `copilot_hedge` | Portfolio Copilot hedge, head to head: ARGUS against Ballast (S2) on an rToken holder's night. |
+| `copilot_rivals` | Portfolio Copilot, head to head: ARGUS against weekend-copilot on the numbers a copilot states. |
+| `copilot_stress` | Portfolio Copilot stress, head to head: "if QQQ falls this much, what does my book do?" Every ARGUS add-to-book answer prints the sentence "if QQQ falls 5%, the book moves about -6.2% through beta alone"… |
+| `corpusclaim` | The universal negatives, with the search that supports them — runnable by anyone. |
+| `crosssection_comparison` | ARGUS's ``CrossRank`` vs. |
+| `datacoverage` | How much of Bitget's own data surface actually answers — counted by calling every entry. |
+| `decision_primitives` | S23 decision-quality primitives, each measured on the record rather than asserted. |
+| `deliberation_comparison` | ARGUS's real deliberation-cost model vs. |
+| `document_qa_eval` | Does `research/document_qa.py` keep only claims its citations carry? |
+| `dsr_comparison` | ARGUS's ``deflated_sharpe`` vs. |
+| `earnings_comparison` | Same-input comparison: `argus.market.sue` vs QuantConnect's real, vendored SUE factor. |
+| `evaluators` | Many small evaluators, combined with AND, cheapest first: the grading half of the eval spine. |
+| `eventdriven_agents` | Event -> decision -> trade: a real S2 Event-Driven agent's own events, gated four ways, traded. |
+| `eventdriven_comparison` | Same-input comparison: `argus.research.eventstudy` vs whale-signals' real fixed-null hit-rate test. |
+| `eventdriven_rivals` | Event significance when events cluster: ARGUS against the event-study specialists, same events. |
+| `execassist_comparison` | Same-task comparison: ARGUS's real `DecisionLatency`/`thinking_budget_cost_bps` vs hftbacktest's real `LatencyModel` — the T3 "Execution Assistance" sub-theme ("after trader decision, how does AI handle order… |
+| `execution_arena` | Execution Assistance, head to head: how an order is split, scored on a book nobody fitted on. |
+| `execution_comparison` | Same-input comparison: `argus.desk.execution` vs crypto_sor's real, vendored composite router. |
+| `execution_truth` | Execution truth, measured: injected venue faults must be caught, recorded history must not be. |
+| `explainability_comparison` | Same-input comparison: `argus.truth.grounding.check` vs TradingAgents' real, unmodified `TraderProposal` — the T2 judging criterion "decision explainability" put to a concrete test: when a trading decision states a… |
+| `exposures_comparison` | ARGUS's factor loadings against Riskfolio-Lib's ``loadings_matrix``, same book, same returns. |
+| `factor_divergence_comparison` | Same-input comparison: does a real, published factor behave differently on the rToken's own traded price than on its native-stock reference? |
+| `factor_set_comparison` | Four factors or eight: which set explains a holding's daily returns better, out of sample. |
+| `factor_split_half` | The split-half reliability gate, measured: planted factors first, then every live primitive. |
+| `feed_sanity_gate` | The feed-sanity gate, measured on the S3 corrupted-feed cases and on every clean snapshot. |
+| `feedbugged` | One wrong number in the feed, one wrong step in an upstream argument: what does the desk do? |
+| `feedlist_comparison` | ARGUS's evidence gathering vs. |
+| `figurecheck` | Every number a question states should reach the request built from it. |
+| `financebench_xbrl` | Numeric 10-K questions answered from SEC XBRL, on FinanceBench's own questions, against FinanceBench's own human-graded models on the same questions. |
+| `freqtrade_baseline` | Faithful ports of `freqtrade`'s risk protections — the named-specialist baseline for Foundation 5's risk-control dimension, reproduced rather than asserted (the goal's own OWNED bar: "a run comparison against the… |
+| `freshness` | Is this artefact older than the record it was computed from? |
+| `gate_ablation` | Population RCT (Track 2 §13.7a) — does each Constitution gate earn its place, measured. |
+| `general_abstention_comparison` | ARGUS's abstention scoring vs. |
+| `general_arb_comparison` | Net executable arbitrage against the general-purpose tool for the same job: an LP solver. |
+| `general_coint_comparison` | Pairwise cointegration screening with false-discovery control: ARGUS vs. |
+| `general_delib_comparison` | Deliberation cost, refereed by the market: ARGUS's charge against general-purpose forecasters. |
+| `general_factorsafety_comparison` | Factor-discovery safety against the best *general-purpose* systems for the two things it does. |
+| `general_grammar_comparison` | The factor grammar against the best *general-purpose* systems for what it actually does. |
+| `general_overfitgates_comparison` | ARGUS's overfitting gates against the general-purpose tools built to stop a NaN reaching a gate. |
+| `general_rotation_comparison` | General-purpose rival: the data-honest breadth rotation against general data-validation tools. |
+| `general_sue_comparison` | General-purpose rivals for the SUE capability, run on the same real SEC EPS. |
+| `grammar_comparison` | ARGUS's typed factor grammar vs. |
+| `groupwise` | Groupwise — no headline travels without its breakdown by symbol, date and regime. |
+| `groupwise_audit` | Groupwise audit — every artefact the capability register cites, broken down by its groups. |
+| `guard_selfcheck` | Does the self-check say exactly what enforcement does? |
+| `harness_validity` | Does each comparison harness actually run the code it is cited for? |
+| `hedge_tradeable` | Same-input comparison: can this desk actually hedge, measured on instruments it can trade? |
+| `hftbacktest_import` | Importing hftbacktest from ``HFTBACKTEST_SITE`` without making it an ARGUS dependency. |
+| `hftbacktest_numba` | The numba-compiled half of `eval/hftbacktest_run.py`: hftbacktest's own L3-to-L2 converter and the scheduled strategy both engines run. |
+| `hftbacktest_run` | Run hftbacktest itself — the rival, unmodified — on the same real events ARGUS replays. |
+| `honesty_eval` | HONESTY-EVAL — `lui/honesty.py` graded by the infeasibility bench's own grader, and its false positives. |
+| `impact_calibration` | Calibrate the square-root impact law on Bitget's own order books. |
+| `infeasibilitybench` | INFEASIBILITY-BENCH (S19) — does the console know when it cannot honestly answer, and say why? |
+| `infoextract_comparison` | Same-task comparison: `argus.market.fundamentals.FundamentalsSource` vs FinanceBench's real, published measurement of LLM financial-filing numeric extraction — the T3 "Information Extraction" sub-theme put to the… |
+| `journal_comparison` | ARGUS's hash-chained ledger vs. |
+| `kind_routing` | Which engine the console sends a free-form question to, scored on three blind question sets. |
+| `kindtrain` | Fit the console's research-kind model: which engine a free-form question needs. |
+| `l3feeds` | Real market-by-order feeds, normalised into :class:`argus.eval.l3queue.L3Event`. |
+| `l3queue` | Queue-position truth from real market-by-order feeds, replayed the way hftbacktest replays it. |
+| `lui_comparison` | ARGUS's deployed LUI cascade vs. |
+| `lui_rematch` | ARGUS's intent router against Rasa's real DIET classifier: the rematch the first one owed. |
+| `lui_rematch_inputs` | The frozen inputs for the LUI rematch against Rasa's DIET classifier, built once and committed. |
+| `luirouter` | Measuring the console the way the literature measures one, instead of inventing a word. |
+| `mandate_comparison` | ARGUS's ``Mandate`` vs. |
+| `mbo_queueproof` | The queue model's thirteenth condition, against a real market-by-order feed. |
+| `mcp_fuzz` | Fuzzing the MCP server's wire: malformed JSON, broken envelopes, hostile names and arguments. |
+| `mcp_sdk_comparison` | The official MCP Python SDK against the hand-rolled server, on the same fuzz corpus. |
+| `memory_eval` | Does the console's memory change later answers, and only when it should? |
+| `metaeval` | Who grades the grader? |
+| `migrate_risk_records` | Convert risk records from schema 1 to schema 2 — and refuse to guess where it cannot tell. |
+| `multistep_eval` | Does the console split a multi-part question into its parts, and leave single questions whole? |
+| `nco_bakeoff` | Can ARGUS's allocator beat Nested Clustered Optimization -- every serious implementation of it, tuned as well as it can be -- on a half of the history nothing was tuned on? |
+| `ngrambench` | Three layers of the console, scored on corpora none of them was tuned against. |
+| `ngramtrain` | Fit the console's character-n-gram intent model and export it as dependency-free JSON. |
+| `obliquebench` | OBLIQUE-BENCH: what the console understands **with no model key**, which is what a judge meets. |
+| `overnight_comparison` | What is the stock worth before it opens: gloaming's overnight fair value against the perpetual. |
+| `pausedrill` | The pause drill: kill the desk while it waits for a human, resume it, and compare. |
+| `perturbations` | Same evidence, said differently: does the decision survive? |
+| `pit_rivals` | Point-in-time SEC fundamentals: ARGUS against three agent toolkits, on the same frozen filings. |
+| `profilestudy` | Profile divergence, measured over the frames the desk actually faced. |
+| `provenance_audit` | How much of an answer the per-line provenance labels cover, and whether they still say what a person checked them to say. |
+| `quarantine_comparison` | Same-input comparison: ARGUS's prompt-injection quarantine against AgentDojo's own attacks. |
+| `quarantine_generalisation` | Adversarial audit of `eval/quarantine_comparison.py`: does 302 of 302 mean anything? |
+| `queueproof` | The queue model's case for OWNED — run, not asserted. |
+| `rdagent_comparison` | ARGUS's typed factor search vs. |
+| `realqueue` | Scoring queue models against real market-by-order truth, and the rival they are measured against. |
+| `recall_comparison` | ARGUS's episodic ``recall`` vs. |
+| `record_routing` | How well the console routes questions about the desk's own record, on blind question sets. |
+| `refusal` | Refusal Alpha — is standing aside a judgement, or is it paralysis? |
+| `regime_comparison` | Regime detection, run against its two real references and against the two-line rule it claims to beat — and it loses to both, on numbers this module produced rather than asserted. |
+| `regime_groundtruth_audit` | Adversarial audit of `eval/regime_comparison.py`: the ground-truth test it said was impossible, and the placebo control its one referee needed. |
+| `regression_gate` | A proposed review rule is admitted only if it fixes its case and breaks nothing that worked. |
+| `replay_harness` | Teacher forcing and a human baseline on the paper runner: proving the harness, not the model. |
+| `research_depth` | S24 research depth, measured: the scenario tree and the research fan-out against the single pass. |
+| `research_task_record` | The worked research task the submission quotes, run live and kept, so its figures have a source. |
+| `researchbench` | RESEARCH-BENCH: does the console understand the research questions a trader actually types? |
+| `retrieval_diversity` | Diversity-aware analogue retrieval, re-proved on the test the capability already stands on. |
+| `review_comparison` | ARGUS's rule-lifecycle ``review`` vs. |
+| `review_rivals` | Review & Self-Evolution against the specialists that lead it — their code, our decisions. |
+| `reviewoos` | Does a rule learned from past defects still catch the next ones? |
+| `risk_certify` | Is the risk layer right? |
+| `risk_layer_comparison` | The real run comparison Track 2's OWNED bar actually asks for — ARGUS's own circuit breaker (`risk/circuit.py`) against every ported freqtrade protection (`eval/freqtrade_baseline.py`), walked over REAL discrete… |
+| `risk_shadow` | Shadow evaluation: before a risk rule changes, replay the recorded orders through old and new. |
+| `rogue` | What the risk layer is worth, measured by building the agent that makes it fire. |
+| `rotation_comparison` | Same-input comparison: `argus.desk.rotation` vs pytaa's real, vendored VAA breadth rule. |
+| `routerbench` | ROUTER-BENCH: what does the routing confidence floor actually buy? |
+| `schedule_comparison` | Almgren-Chriss vs the field's own stated default (TWAP) — the run comparison Track 3's Execution Assistance sub-theme needs, on the paper `execution/schedule.py` already reproduces. |
+| `sentiment_comparison` | ARGUS's sentiment-integrity analyst vs. |
+| `sentiment_tweeteval` | ARGUS's sentiment reading on TweetEval, with TweetEval's own metric — and the crowd read's abuse screen checked against TweetEval's hate and offensive test sets. |
+| `session_arena` | Session boundaries, head to head: the schedulers that lead Execution Assistance, run on the same full-depth Bitget books across the US open and close, against ARGUS's session-aware schedule. |
+| `shapematch_comparison` | ARGUS's path-shape retrieval vs. |
+| `skill_matrix` | The Skill-effectiveness matrix: every keyless Bitget tool, called, and every failure named. |
+| `skillmacd` | Bitget's technical-analysis Skill MACD, checked against MACD recomputed from Bitget's candles. |
+| `skillreliability` | Is a data source *reliable*, or did it merely answer the one time we asked? |
+| `sourceaudit` | Data sources: how many, and what each one was actually worth. |
+| `stopquality_comparison` | Where to put the stop: Rook's invalidation price against ARGUS's measured stop distance. |
+| `stopquality_prospective` | The stops recorded at the Rook head-to-head, graded on what the market then did. |
+| `stresstest` | Adaptive stress testing: search for the **most probable** market path that breaks the mandate. |
+| `surfaces` | Do our surfaces agree with each other? |
+| `thesis_quality` | Thesis quality — four mechanisms from the 40-repo study, each measured on a desk replay. |
+| `trace_audit` | How much of an answer's per-line provenance the live trace decides, against the wording rules. |
+| `usage_report` | Who used the hosted console, what they asked it to do, and whether it did it. |
+| `vocab_stress` | Rename the company, keep the numbers: does the decision depend on who it is about? |
+| `void_comparison` | The weekend reference price: nocturne's "fade the void" against ARGUS's perpetual-implied price. |
+| `weekend_quantiles` | Which forecast of a weekend gap is best: unconditional, regime-matched, or volatility-scaled? |
+| `workbench_comparison` | Same-task comparison: ARGUS's research workbench vs OpenBB — the T3 "Personalized Research Workbench" sub-theme ("how to build a customized workbench with a clear thesis") put to the one property a research workbench… |
+| `xa_arena` | XA arena: ARGUS's cross-asset hedge router against the systems that lead the sub-theme. |
+| `xa_tape` | XA-TAPE: the one frozen input every cross-asset contestant is run on. |
+
+### `lui/`, `demo/`, `llm/`, `proof/`, `status` (50 modules)
 
 `lui.*` — the language user interface: `question`, `answer`, `router`, `phrasebook`, `server`, `cli`.
 `demo.flow` (event → decision → execution in one trace), `demo.cockpit` (the evidence page).
 `llm.qwen` (dependency-free client), `llm.provider`, `llm.base`. `proof.autonomy`. `status` — the
 runtime self-check.
+
+Also in this package, each described by the first sentence of its own docstring:
+
+| module | what it holds |
+|---|---|
+| `lui/__main__` | Entry point: ``python -m argus.lui``. |
+| `lui/agent_page` | ``/agent`` — the Track 2 agent's paper run, read live from its own public record. |
+| `lui/agenthub` | The exact Agent Hub order an execution answer's first child would be, checked against Agent Hub. |
+| `lui/brand_page` | ``/brand`` — the ARGUS identity, rendered from the tokens every page uses. |
+| `lui/corrections_page` | What we got wrong — assembled from the artefacts, never from memory. |
+| `lui/design` | The ARGUS identity, in one place: tokens, type, the mark, the nav, the receipt. |
+| `lui/exposures` | Book exposures — sector, industry and factor — before and after a proposed trade. |
+| `lui/fanout` | One research question, read by several independent researchers and merged with their citations. |
+| `lui/honesty` | Honest answers to questions no console can answer as asked — and the true reason, said plainly. |
+| `lui/journal` | A review of the trader's OWN trades: what each one did, the habits they share, and a checklist. |
+| `lui/kindmodel` | The research-kind model at runtime, and a planner that lets it stand in for the language model. |
+| `lui/materials_page` | ``/materials`` — every deliverable of the Track 3 entry on one page, each link live. |
+| `lui/mcp_server` | ARGUS as a Model Context Protocol server: the research desk, callable by any AI agent. |
+| `lui/memory` | What a trader has told the console, kept across sessions and used in every later answer. |
+| `lui/multistep` | A question with several parts, answered part by part, each by the engine that owns it. |
+| `lui/ngram` | Character-n-gram intent classification, in pure Python, for the console a judge actually meets. |
+| `lui/normalise` | Fold the character variants a bilingual console receives onto the forms its layers were built on. |
+| `lui/onchain` | Two on-chain questions a crypto trader asks: where the DeFi money sits, and what gas costs now. |
+| `lui/proof_page` | Every comparison against a named rival, grouped by the sub-theme Bitget names, with a way in. |
+| `lui/provenance` | Where each line of an answer comes from, said on the line. |
+| `lui/research` | Research questions — the part of the console a Track 3 judge actually types. |
+| `lui/selfhost` | Run your own ARGUS in Telegram: your bot, your token, your machine. |
+| `lui/skillroute` | A bitget-signal Skill first, the source it names second, and every answer says which one spoke. |
+| `lui/status_page` | The record and its sources, checked now — the status page a person opens. |
+| `lui/task` | One complete research task, run live: question to actionable insight, every step by its engine. |
+| `lui/telegram_bot` | The console in Telegram: the same questions and engines, answered where traders already are. |
+| `lui/trace` | The live Thought / Action / Observation trace — the explanation of record for an answer. |
+| `lui/translate` | An answer in the reader's language, with every figure locked to the English it came from. |
+| `lui/trending` | What the crowd is looking at right now, and which of it a Bitget trader can actually trade. |
+| `lui/usage` | Anonymous usage events: how many people asked, what the console did, and whether it helped. |
+| `lui/watch` | Alerts: a trader names a level, and the desk says when the market reaches it. |
+| `lui/watchlist` | The week ahead for a book: what is scheduled, what it touches, and how the names moved on it. |
+| `demo/deploysync` | Refresh the deployed console from the working tree — a command, not a copy-paste. |
+| `llm/cache` | Exact-match prompt cache — one primitive for "this exact question was already asked". |
+| `llm/idmap` | Identifier remapping — a model can only hand back an id it was shown. |
+| `llm/ledger` | Per-step Qwen cost ledger: every model call, what it cost, and which part of ARGUS asked. |
+| `llm/semantic` | A meaning-based intent router that ships in the repository and calls nothing. |
 
 ---
 
@@ -2007,12 +2412,12 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 327 files, 21 packages, 130,470 lines; `mypy --strict` clean on 484 source files |
+| Source modules | 516 files, 20 packages; `mypy --strict` clean on 513 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 9,419 tests collected, `ruff` clean |
+| Tests | 9,674 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
-| Artefacts on disk | 66, every one produced by running something |
+| Artefacts on disk | 688 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
 | Competitor entries read at source | 5, each cloned and verified or refuted |
 | Live data sources reaching a decision | 15 |
@@ -2039,7 +2444,7 @@ source is a build failure, not a typo.
 That last row is the one to read twice. An *owned* capability needs a reproduced baseline, a
 same-input comparison, an out-of-sample test, an ablation and an adversarial test — thirteen
 conditions in all, enforced in code by `argus/eval/standing.py`, which raises at import if anything
-claims OWNED without them. It read zero when this table was first written; today 6 of 44
+claims OWNED without them. It read zero when this table was first written; today 4 of 44
 capabilities are OWNED, 13 are TIED, 26 are IMPLEMENTED and 1 is LOST. It read 20 until the
 per-group check of 2026-09-25 withdrew twelve, 8 until a general-purpose validator tied
 breadth rotation on 2026-09-26, and 7 until rToken factor divergence was re-graded IMPLEMENTED
@@ -2069,7 +2474,7 @@ competitor's repository is not ours to grade in public.
 One entry was ahead of ours on explaining each decision, and that is why the external anchor below
 exists.
 
-Two real gaps came out of that, and both are closed:
+Two gaps came out of that, and both are closed:
 
 1. **Nobody in the field had a commitment they could not rewrite — including us.** The protocol
    commitment is now submitted to four independent OpenTimestamps calendars, Bitcoin-backed, and
@@ -2463,7 +2868,7 @@ transformer detector was not taken; ours is six structural patterns that report 
 fired**, because a record saying "quarantined" without saying what it saw cannot be audited.
 
 **Calibrated against 49 evidence items fetched live from our own feed: 0 false positives, 0 misses on
-9 attacks** — and that corpus caught a real defect, a rule that fired on *"analysts please note the
+9 attacks** — and that corpus caught a defect, a rule that fired on *"analysts please note the
 long-term outlook"*. The corpus is committed, so a future rule that starts redacting real headlines
 fails in the suite rather than in production.
 
@@ -2497,7 +2902,7 @@ direction*, so overlap is the precondition for leakage, not proof of it.
 
 Six of the ten **found nothing**, and say so: no shape precedent, no cointegrated pair, no
 session-driven reason to size down at a 24-hour horizon, no trustworthy markout yet, no change to the
-cost model, no clean window for historical evaluation. Two found a real defect in our own code that
+cost model, no clean window for historical evaluation. Two found a defect in our own code that
 had been shipped and passing tests. Two found something actionable — the allocator and the depth
 measurement.
 
@@ -2610,7 +3015,7 @@ and anchored. That opening head is `bc36478291a06bc3`, submitted to four indepen
 calendars: `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The `.ots` proofs
 are in `argus/data/anchors/`, and anyone can verify them with the reference OpenTimestamps client
-without our cooperation. **38 of the 68 carry a Bitcoin block-header attestation** (blocks
+without our cooperation. **76 of the 76 carry a Bitcoin block-header attestation** (blocks
 966,822–967,736); the other 18 are still calendar-pending, which is what a proof honestly
 says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-counts both.
 
@@ -2621,8 +3026,8 @@ says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-c
 > were upgraded against their calendars and rewritten in the standard format. Nothing committed
 > changed; upgrading only appends the path from our digest to a block header.
 
-Each scheduled cycle appends and re-anchors, so the register grows: it now holds **156 falsifiable
-claims about all twelve stock perpetuals**, head `51cacf4a30ce4503`. The opening figures above are kept as
+Each scheduled cycle appends and re-anchors, so the register grows: it now holds **291 falsifiable
+claims about all twelve stock perpetuals**, head `41f21e5d743cbb46`. The opening figures above are kept as
 the dated historical record — a register that quietly restates its own opening head would be
 defeating its own purpose — and `eval/docclaims.py` checks the live count on every run.
 

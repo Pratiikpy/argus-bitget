@@ -315,15 +315,15 @@ class TestTheSecUserAgent:
     def test_the_default_agent_carries_no_bare_domain(self) -> None:
         from argus.market import evidence
 
-        assert "github.com" not in evidence._UA
-        assert "://" not in evidence._UA
+        assert "github.com" not in evidence.FEED_USER_AGENT
+        assert "://" not in evidence.FEED_USER_AGENT
 
     def test_it_still_identifies_the_requester(self) -> None:
         """SEC rejects anonymous clients; an empty agent would 403 for a different reason."""
         from argus.market import evidence
 
-        assert evidence._UA.strip()
-        assert "argus" in evidence._UA.lower()
+        assert evidence.FEED_USER_AGENT.strip()
+        assert "argus" in evidence.FEED_USER_AGENT.lower()
 
     def test_a_contact_from_the_environment_is_used_when_present(
         self, monkeypatch: pytest.MonkeyPatch
@@ -336,8 +336,8 @@ class TestTheSecUserAgent:
 
         reloaded = importlib.reload(evidence)
         try:
-            assert "someone@example.com" in reloaded._UA
-            assert "://" not in reloaded._UA
+            assert "someone@example.com" in reloaded.FEED_USER_AGENT
+            assert "://" not in reloaded.FEED_USER_AGENT
         finally:
             monkeypatch.delenv("ARGUS_CONTACT_EMAIL", raising=False)
             importlib.reload(evidence)
@@ -355,15 +355,15 @@ class TestTheUserAgentSecActuallyAccepts:
     def test_the_fallback_carries_a_contact_token(self) -> None:
         import argus.market.evidence as ev
 
-        assert "@" in ev._UA, ev._UA
+        assert "@" in ev.FEED_USER_AGENT, ev.FEED_USER_AGENT
 
     def test_the_fallback_carries_no_domain_url(self) -> None:
         """SEC's filter rejects an agent containing a bare domain, which is how it broke the
         first time."""
         import argus.market.evidence as ev
 
-        assert "://" not in ev._UA
-        assert "github.com" not in ev._UA
+        assert "://" not in ev.FEED_USER_AGENT
+        assert "github.com" not in ev.FEED_USER_AGENT
 
     def test_the_fallback_address_is_a_reserved_domain(self) -> None:
         """RFC 2606 reserves .invalid, so the fallback names nobody and can receive no mail."""

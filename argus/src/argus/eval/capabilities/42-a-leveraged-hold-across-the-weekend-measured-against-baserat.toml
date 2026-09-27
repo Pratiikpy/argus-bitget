@@ -1,0 +1,50 @@
+name = "A leveraged hold across the weekend, measured against baserate"
+subtheme = "t3-decisionstress"
+modules = [
+    "argus/market/equity_history.py",
+]
+state = "tied"
+baseline = """\
+    Jayanng/baserate (Season 2, proprietary): its own trade parser and dossier builder on its \
+    pinned replay fixtures, 1,227 NVDA weekends"""
+blockers = [
+    """\
+        TIED: the first run was a LOSS (ARGUS answered a hedge question); rebuilt, ARGUS prices \
+        liquidation at Bitget's live maintenance tier and live funding, reads 1,443 NVDA weekends \
+        since 1999 and the perpetual's own path through 57 weekends. Re-run 2026-09-27 (audit \
+        finding 27): baserate's trend-and-momentum match, which ARGUS also reads, was scored \
+        walk-forward against five other forecasts over 17,044 weekends of 13 stocks; it was barely \
+        better than the plain record (pooled pinball 27.84bp against 27.99bp) and worse than the \
+        band ARGUS now prints, EWMA-scaled with adaptive conformal coverage (26.37bp, both halves \
+        better for all 13 stocks, 79.4% of weekends inside a 10-90 band; \
+        data/weekend_quantiles.json). ARGUS keeps its own ledger of those bands from the same day \
+        (data/weekend_calls.jsonl), none graded yet. Still TIED: baserate's own forecasts have not \
+        been scored on the same weekends, which is the comparison that would settle it""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    baserate's parser, dossier builder, base-rate engine and fixtures read; its weekend move \
+    found to run Friday close to Monday CLOSE"""
+artefact = "data/h2h_baserate/summary.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = "baserate's buildDossier run from its clone on the same sentence"
+artefact = "data/h2h_baserate/summary.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = "'long rNVDA over the weekend at 3x with 5,000 USDT' through both desks"
+artefact = "data/h2h_baserate/summary.json"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "split-adjusted stock weekends, closures only, read from the position's side"
+test = "test_equity_history.py::test_a_split_weekend_is_not_a_crash"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = "the first run answered a different question; no regime-conditioned record"
+artefact = "data/h2h_baserate/summary.json"

@@ -51,6 +51,7 @@ from statistics import median
 from typing import Any
 
 from argus.desk.shapematch import znormalise
+from argus.truth.paths import DATA_DIR
 
 MIN_BARS = 240
 """Fewest bars before a segmentation is attempted.
@@ -498,7 +499,6 @@ def segment(
 def main() -> int:  # pragma: no cover - CLI
     import argparse
     import sys
-    from pathlib import Path
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -520,7 +520,7 @@ def main() -> int:  # pragma: no cover - CLI
         regimes=args.regimes,
     )
     print(report.render())
-    out = Path(__file__).resolve().parents[3] / "data" / "regimes.json"
+    out = DATA_DIR / "regimes.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8")
     print(f"\nwritten to {out}")

@@ -70,8 +70,9 @@ from argus.desk.crossasset import (
 )
 from argus.eval.xa_tape import HOUR_MS, Tape, load, tape_digest
 from argus.truth import artefact
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "xa_arena.json"
+REPORT_PATH = DATA_DIR / "xa_arena.json"
 RUNNER_DIR = Path(__file__).resolve().parent / "baselines" / "xa_rivals"
 
 START_NAV = 100_000.0

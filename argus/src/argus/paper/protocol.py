@@ -63,8 +63,9 @@ from typing import Any
 from argus.decision.verdicts import Verdict
 from argus.market.bitget import RTOKEN_SYMBOLS
 from argus.truth.clocks import SessionPhase
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 PROTOCOL_PATH = DATA / "protocol_commitments.jsonl"
 """Append-only. One JSON object per commitment, newest last."""
 

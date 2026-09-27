@@ -28,6 +28,7 @@ exception.
 from __future__ import annotations
 
 import json
+import logging
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from itertools import pairwise
@@ -42,6 +43,8 @@ from argus.register.claims import (
     register,
     verify_chain,
 )
+
+_LOG = logging.getLogger(__name__)
 
 CLAIMANT = "argus"
 SOURCE = "bitget:1H:market"
@@ -108,7 +111,7 @@ def build_batch(
             if float(a.close) > 0
         ]
         if len(moves) < 24:
-            print(f"  {symbol}: only {len(moves)} bars; no claim registered")
+            _LOG.warning("%s: only %d bars; no claim registered", symbol, len(moves))
             continue
         moves.sort()
         median_hourly = moves[len(moves) // 2]

@@ -25,74 +25,100 @@ defaults:
 
 jobs:
   verify:
-    name: lint · types · tests · documentation gate
-    runs-on: ubuntu-latest
+    name: lint · types · tests · documentation gate (${{ matrix.os }})
+    # Both systems the work is done on: the workspace is Windows, the hosted console is Linux, and
+    # until 2026-09-27 only Linux ran here, so a path or encoding fault on Windows reached a
+    # reader before it reached CI (audit finding 149).
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     # The suite takes about an hour; a job still running at twice that is stuck, not slow.
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
+      # The committed uv.lock, exactly. An unconstrained pip install tested whatever the index
+      # served that day, which is not the dependency set any published result was produced with.
+      - uses: astral-sh/setup-uv@v10.2.0
         with:
           python-version: "3.11"
-          cache: pip
+          enable-cache: true
 
       - name: Install
-        run: pip install -e ".[dev]"
+        run: uv sync --frozen --extra dev
 
       - name: Lint
-        run: python -m ruff check src tests
+        run: uv run --frozen python -m ruff check src tests
 
       - name: Types
-        run: python -m mypy --strict src
+        run: uv run --frozen python -m mypy --strict src
 
       # Every module must import. A package that type-checks but cannot be loaded is not shippable,
       # and `argus.status` resolves the sub-theme map by import rather than by reading a list.
       - name: Modules and sub-theme coverage
-        run: python -m argus.status
+        run: uv run --frozen python -m argus.status
 
       # The capability register raises at import if an OWNED entry carries fewer than its thirteen
       # conditions, so simply importing it is the check. Regenerating the artefact here keeps the
       # published `data/standing.json` from drifting behind the source the way it did on
       # 2026-09-20, when the artefact said 0 owned and the register said 23.
       - name: Capability register
-        run: python -m argus.eval.standing
+        run: uv run --frozen python -m argus.eval.standing
 
       # The anchor proofs, read as bytes rather than trusted as a sentence. Fails only if a proof
       # cannot be parsed by the reference OpenTimestamps format; calendar-pending is not a failure.
       - name: Anchor proofs
-        run: python -m argus.register.anchorcheck
+        run: uv run --frozen python -m argus.register.anchorcheck
 
       # Do two readings of the same fact agree? `docclaims` checks every figure against its own
       # source and cannot catch this: on 2026-09-21 the console reported 2 trades while the README
       # reported 0, and BOTH were reading their own source correctly. A per-surface check never
       # asks whether the surfaces agree with each other.
       - name: Surface agreement
-        run: python -m argus.eval.surfaces
+        run: uv run --frozen python -m argus.eval.surfaces
 
       # The static embedding table the semantic router and the recorded evaluations rank with,
       # pinned to the Hub commit they were produced with (`llm/semantic.py`, 30 MB, MIT). The one
       # download the verify job makes, before the network is refused: without it a clean runner
       # fell back to the lexical encoder and `thesis_quality` stage 4 replayed a different ranking.
       - name: Embedding table
-        run: python -m argus.llm.semantic
+        run: uv run --frozen python -m argus.llm.semantic
 
       # The offline suite, with every outbound connection refused (tests/conftest.py). Until
       # 2026-09-27 this step ignored two comparison files and let the rest reach the network; runs
       # with the network blocked found 238 tests in 28 files that still did, many of them skipping
       # quietly after the refusal. Those carry `@pytest.mark.network` and run in `live`; anything
       # unmarked that attempts a connection now fails here, whatever it does with the error.
-      # `-rs` prints why each skipped test skipped, and `--durations` names the slowest.
+      # `-rs` prints why each skipped test skipped, and `--durations` names the slowest. No `-q`:
+      # pyproject's addopts already has one, and a second makes pytest print no summary line, so
+      # the log never said how many tests passed. Line and branch coverage is measured on every
+      # run and kept as an artefact (audit finding 145); pytest-cov had been a dev dependency that
+      # nothing called.
       - name: Tests
         env:
           ARGUS_BLOCK_NETWORK: "1"
-        run: python -m pytest -q -p no:randomly -m "not network" -rs --durations=25
+        # Coverage on Linux only: the figure does not depend on the system, and tracing roughly
+        # doubles a run that the slower Windows runner already takes longest on.
+        run: >-
+          uv run --frozen python -m pytest -p no:randomly -m "not network" -rs --durations=25
+          ${{ matrix.os == 'ubuntu-latest' && '--cov=argus --cov-branch
+          --cov-report=term:skip-covered --cov-report=xml' || '' }}
+
+      - name: Coverage report
+        if: ${{ !cancelled() && matrix.os == 'ubuntu-latest' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage
+          path: argus/coverage.xml
+          if-no-files-found: warn
 
       # Last, because it is the one that catches the others lying. Exits non-zero if any number
       # quoted in the READMEs, the submission draft or ARGUS-EXPLAINED has drifted from the
       # artefact that produces it.
       - name: Documentation gate
-        run: python -m argus.eval.docclaims --tests
+        run: uv run --frozen python -m argus.eval.docclaims --tests
 
   live:
     name: live venue checks (advisory)
@@ -101,11 +127,11 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: astral-sh/setup-uv@v10.2.0
         with:
           python-version: "3.11"
-          cache: pip
+          enable-cache: true
       - name: Install
-        run: pip install -e ".[dev]"
+        run: uv sync --frozen --extra dev
       - name: Network-bound tests
-        run: python -m pytest -q -p no:randomly -m network
+        run: uv run --frozen python -m pytest -p no:randomly -m network

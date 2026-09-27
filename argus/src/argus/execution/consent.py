@@ -54,6 +54,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from argus.truth.paths import DATA_DIR
+
 CONSENT_ENV = "ARGUS_LIVE_ORDER_CONSENT"
 """Where :func:`grant_live_consent` looks for the token when none is passed explicitly."""
 
@@ -63,7 +65,7 @@ CONSENT_PREFIX = "I-ACCEPT-REAL-MONEY-ORDERS-FOR-RUN"
 DEFAULT_LIFETIME = timedelta(minutes=15)
 """How long a grant stays valid. A policy choice, stated as one; long enough for one live run."""
 
-SPENT_PATH = Path(__file__).resolve().parents[3] / "data" / "live_consent_spent.jsonl"
+SPENT_PATH = DATA_DIR / "live_consent_spent.jsonl"
 """Append-only record of every run id whose consent was granted. A spent run id is refused."""
 
 _GRANT = object()

@@ -67,7 +67,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 REPORT_PATH = DATA / "lui_comparison.json"
 RASA_PREDICTIONS_PATH = (
     Path(__file__).resolve().parent / "baselines" / "rasa_diet_sealed_predictions.json"

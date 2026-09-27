@@ -1,0 +1,159 @@
+name = """\
+    Factor-discovery safety: no execution surface and trial-corrected selection, vs. RD-Agent"""
+subtheme = "t2-factordiscovery"
+modules = [
+    "argus/research/searchoff.py",
+    "argus/research/grammar.py",
+    "argus/eval/rdagent_comparison.py",
+    "argus/eval/baselines/rdagent_experiment.py",
+    "argus/eval/baselines/rdagent_factor.py",
+    "argus/eval/baselines/rdagent_costeer_task.py",
+    "argus/eval/baselines/rdagent_exception.py",
+    "argus/eval/baselines/rdagent_cache_utils.py",
+    "argus/eval/baselines/rdagent_factor_loader.py",
+]
+# Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+# proof now needs a groupwise check on the capability's own artefact, and this
+# row's does not pass it. The reason and the route back are its first blocker.
+state = "implemented"
+baseline = "microsoft/RD-Agent real factor-implementation pipeline (FBWorkspace, factor_coder)"
+blockers = [
+    """\
+        RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
+        (data/groupwise_audit.json): data/rdagent_comparison.json holds an injection proof, a \
+        400-trial pool on one symbol reduced to one deflated probability, and a five-point \
+        trial-count sweep; no per-trial or per-symbol record exists for a groupwise check to run \
+        on. Route back: keep the trial pool per candidate and run the correction on several \
+        symbols, recording each.""",
+    """\
+        The trial-count-correction finding runs ARGUS's real DSR gate on ARGUS's own real trial \
+        pool, not on a real end-to-end run of RD-Agent's own LLM loop (which would need many real \
+        paid LLM calls to accumulate enough proposed hypotheses to matter) — the claim is that \
+        RD-Agent's real accept/reject code has no equivalent gate, verified by reading it, not \
+        that RD-Agent's own search was shown producing an actual false discovery in this \
+        comparison""",
+    """\
+        The CODER step — the LLM call that writes a factor.py implementation in the first place, \
+        upstream of the execute() step this comparison starts at, plus the iterative CoSTEER \
+        code-fixing loop around it — is neither vendored nor run here""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    RD-Agent's real factor-discovery loop read in full — \
+    scenarios/qlib/proposal/factor_proposal.py, components/coder/factor_coder/factor.py, \
+    core/experiment.py's FBWorkspace, scenarios/qlib/developer/feedback.py — and the execution \
+    path (FBWorkspace + FactorFBWorkspace) vendored whole, byte-hash-pinned"""
+artefact = "src/argus/eval/baselines/rdagent_factor.py"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    both real methods compared: RD-Agent's single LLM-driven hypothesis stream, with an LLM \
+    reading its own qlib backtest metrics as text and voting 'Replace Best Result: yes/no' \
+    (feedback.py's own real code); ARGUS's five fixed-budget algorithmic strategies \
+    (research/searchoff.py) with a hard-coded in-sample-pick/out-of-sample-score separation no \
+    LLM judgment call can quietly skip"""
+artefact = "src/argus/eval/rdagent_comparison.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    RD-Agent's real FBWorkspace/FactorFBWorkspace run unmodified, byte-hash-pinned against the \
+    vendored source (commit 32b3d395e73d9db5eee3fe9063d69aec0fdc83bd)"""
+test = "test_baselines.py::TestVendoredFilesHaveNotDrifted"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "all five search strategies plus the shared budgeted Arena evaluate real bars"
+test = "test_searchoff.py"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    the identical crafted, attacker-shaped factor.py payload construct is put to both real \
+    systems: RD-Agent's real execute() accepts and runs it; ARGUS's grammar has no code-shaped \
+    input surface to accept it at all, by construction (AST-verified, zero \
+    eval/exec/subprocess calls); separately, ARGUS's real deflated_sharpe() is run on ARGUS's \
+    own real 400-trial pool from the same real NVDAUSDT bars research/searchoff.py's own \
+    published Track 1 finding already uses"""
+test = "test_rdagent_comparison.py::TestExecutionSurface"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    the real 400-trial search_random pass — not a hand-picked convenient case — and a 5-point \
+    trial-count sweep (1/5/25/100/400) on the identical observed value, confirming the \
+    correction responds to trial count rather than being a fixed penalty"""
+test = "test_rdagent_comparison.py::TestTrialCountCorrection"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    both real costs measured directly and reported as genuinely NOT comparable on one axis, \
+    not force-fit into a single winner: RD-Agent's real fixed subprocess-spawn floor vs. \
+    ARGUS's real computation-bound, no-subprocess grammar evaluation — measured on real \
+    ~1487-bar NVDAUSDT data, ARGUS's own number is the LARGER of the two, the opposite of what \
+    a smaller synthetic fixture shows, reported honestly rather than the more flattering \
+    number kept"""
+test = "test_rdagent_comparison.py::TestCosts"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    the real trial pool's best candidate is explicitly the IN-SAMPLE half (Arena.split, \
+    65/35), the exact quantity a naive accept/reject rule would report as if validated — \
+    deflated_sharpe exists precisely to refuse trusting it uncorrected"""
+test = "test_rdagent_comparison.py::TestTrialCountCorrection"
+
+[[proofs]]
+condition = "ablation"
+how = "trials swept 1->400 on the same observed value; probability strictly falls"
+test = """\
+    test_rdagent_comparison.py::TestTrialCountCorrection::test_more_trials_on_the_same_observed_value_deflates_the_probability_further"""
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    a crafted factor.py payload run through RD-Agent's real, unmodified \
+    FactorFBWorkspace.execute() writes a marker file this test checks for from OUTSIDE the \
+    subprocess — genuine host-level execution of code this module never edited, not an \
+    assertion from reading the subprocess.check_output line alone"""
+test = """\
+    test_rdagent_comparison.py::TestExecutionSurface::test_the_injection_payload_actually_executes_through_unmodified_rdagent_code"""
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    both sides' real handling of a crashing/malformed input run: RD-Agent's real \
+    CustomRuntimeError handler catches a factor.py that raises cleanly; ARGUS rejects an \
+    unknown search-grammar op at Window construction, before a search loop is even reachable"""
+test = "test_rdagent_comparison.py::TestFailureCases"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    the same seed reproduces the identical real trial pool bit-for-bit; separately, the six \
+    vendored RD-Agent files are hash-pinned so they cannot silently drift from the cited \
+    commit"""
+test = "test_rdagent_comparison.py::TestReproducibility"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped explicitly — SCOPE_STATEMENT in eval/rdagent_comparison.py. Claimed: on execution \
+    surface, ARGUS's grammar structurally cannot execute code while RD-Agent's real code \
+    demonstrably can and does; on trial-count correction, RD-Agent's real accept/reject \
+    mechanism has no analogue anywhere in its source (exhaustive grep for \
+    deflation/multiple-testing/PBO/FDR terms, zero matches) while ARGUS's real DSR gate \
+    refuses the exact 'discovery' a real 400-trial run of its own search would otherwise \
+    report. NOT claimed: that RD-Agent's factor-implementation CODER (the LLM step upstream of \
+    the execute() call this comparison starts at) is unsound — not vendored or run here. NOT \
+    claimed: that RD-Agent's qlib backtest metrics are not out-of-sample — the real \
+    conf_combined_factors.yaml template DOES define train/valid/test date ranges; the gap is \
+    narrower: the SAME test window is reused as the acceptance bar across an unbounded number \
+    of loop iterations with nothing correcting for how many were tried. NOT claimed that \
+    ARGUS's own search finds better factors — research/searchoff.py's own published Track 1 \
+    result is 0 of 12 symbols surviving the all-trials DSR gate too"""
+test = "test_rdagent_comparison.py::TestMainAndRender"

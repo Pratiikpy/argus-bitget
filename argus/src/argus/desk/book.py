@@ -1,7 +1,7 @@
 """Foundation 3 — the real portfolio. Positions, account state, and reconciliation.
 
 **The gap this closes.** Named the single biggest structural gap in the product plan
-(`Activity/08_TRADING_OS_PLAN.md`, "Foundation 3"): `desk/portfolio.py` computes risk from
+(the product plan, which is not published, "Foundation 3"): `desk/portfolio.py` computes risk from
 caller-supplied *weights*, `risk/circuit.py`'s `BookState` carries only scalar equity/drawdown
 figures, and nothing anywhere stores an actual position. Every proposal has therefore been
 evaluated against an assumed book, never a real one. This module is the book.
@@ -482,7 +482,8 @@ class Book:
     that invents a number. **Not yet wired anywhere**: nothing calls :meth:`apply_fill` from
     `execution.orders.OrderBook`'s fill events, and `desk.portfolio.assess` still takes
     caller-supplied weights rather than :meth:`weights`/:meth:`gross_weights` below. This class
-    exists and is tested; the desk does not consume it yet — see `Activity/PROGRESS.md`.
+    exists and is tested; the desk does not consume it yet — see the working log, which is not
+    published.
     """
 
     def __init__(self) -> None:

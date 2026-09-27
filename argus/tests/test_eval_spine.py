@@ -309,9 +309,10 @@ def test_a_real_canary_run_is_offline_and_never_rewrites_a_published_artefact() 
 
 
 @pytest.mark.parametrize(("harness", "module", "function"), [
-    ("claimcheck_comparison", "argus/lui/research.py", "argus.lui.research."),
+    ("claimcheck_comparison", "argus/lui/research/claims.py", "argus.lui.research.claims."),
     ("stopquality_comparison", "argus/desk/odds.py", "argus.desk.odds.directional_odds"),
-    ("void_comparison", "argus/lui/research.py", "argus.lui.research._implied_open_line"),
+    ("void_comparison", "argus/lui/research/quote.py",
+     "argus.lui.research.quote._implied_open_line"),
 ])
 def test_the_harness_runs_the_console_code_and_a_sabotaged_console_surfaces(
         harness: str, module: str, function: str) -> None:

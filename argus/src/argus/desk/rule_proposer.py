@@ -46,7 +46,7 @@ target case and breaks no previously-correct decision on the replayed record.
   compared with something that cannot win.
 
 **Where it runs.** On ARGUS's own decisions (desk notes joined to the ledger's decision-time
-fields), and — the gap the plan itself names (`Activity/08_TRADING_OS_PLAN.md:530`: the review
+fields), and — the gap the plan itself names (the product plan, which is not published: the review
 looks at ARGUS's decisions, not the trader's) — on **a trader's own journal**. ARGUS had no
 structure for a trader's logged decisions: `lui/memory.py` keeps a trader's stated facts in their
 own browser and never sees an outcome, and `desk/personalisation.py` judges proposals against a

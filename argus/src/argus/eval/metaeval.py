@@ -104,7 +104,8 @@ JUDGES: tuple[Judge, ...] = (
           "which kind of question a trader asked, when the patterns cannot tell",
           "one console intent, or none",
           "24 routings in data/router_bench.json, each beside the corpus author's expected intent"),
-    Judge("research_planner", "argus/lui/research.py", "argus/lui/research.py:3108",
+    Judge("research_planner", "argus/lui/research/parse.py",
+          "argus/lui/research/parse.py::plan_with_model",
           "which research engine a free-text question needs, and its inputs",
           "one ResearchKind, or none / record",
           "none per item: data/lui_final_heldout_report.json keeps only per-language totals"),
@@ -159,7 +160,7 @@ NOT_JUDGES: Mapping[str, str] = {
                                                  "cache is measured, the model is not graded",
     "argus/eval/session_arena.py:678": "the rival execution desk (PACE) run as the subject of a "
                                        "comparison, not a grader — held back from publication, "
-                                       "unreviewed (Activity/18_READINESS_BACKLOG.md)",
+                                       "unreviewed (the readiness backlog)",
 }
 """``complete_json`` call sites that are not judges, with the reason: the register is complete."""
 

@@ -10,13 +10,9 @@ import pytest
 
 from argus.lui.answer import Answer
 from argus.lui.question import classify
-from argus.lui.research import (
-    ResearchKind,
-    ResearchRequest,
-    _honest_data_line,
-    _idea_request,
-    with_book,
-)
+from argus.lui.research import ResearchKind, ResearchRequest, with_book
+from argus.lui.research.dispatch import _honest_data_line
+from argus.lui.research.parse import _idea_request
 from argus.truth.coverage import Record
 
 
@@ -79,7 +75,7 @@ def test_a_server_that_answered_keeps_its_credit() -> None:
 
 
 def test_an_as_of_answer_keeps_nothing_it_could_not_have_known() -> None:
-    from argus.lui.research import _point_in_time
+    from argus.lui.research.dispatch import _point_in_time
 
     answer = _answer([
         "Bottom line: NVDA's net income for the quarter ending 26 Oct 2025 was $31.91bn.",
@@ -117,8 +113,9 @@ def test_a_hedge_leg_without_history_does_not_sink_the_answer(
             raise PortfolioError("SMHUSDT is not in the frozen history either")
         return real(symbols, **kwargs)
 
-    monkeypatch.setattr(research, "load", load)
-    lines, _sources, _data = research._hedge_plan({"AAPLUSDT": 1.0}, Decimal(10_000),
+    for _module in (research.book, research.data, research.dispatch, research.news):
+        monkeypatch.setattr(_module, "load", load)
+    lines, _sources, _data = research.book._hedge_plan({"AAPLUSDT": 1.0}, Decimal(10_000),
                                                   "best way to hedge a long AAPL book")
     assert lines and not any("SMH" in line and "beta" in line for line in lines)
 
@@ -147,11 +144,14 @@ def test_a_ticker_outage_does_not_raise_out_of_the_hedge_plan(
     def no_book(*args: Any, **kwargs: Any) -> Any:
         raise depth.DepthError("no book")
 
-    monkeypatch.setattr(research, "load", load)
-    monkeypatch.setattr(research, "_is_equity", lambda symbol: True)  # reads the live list
+    for _module in (research.book, research.data, research.dispatch, research.news):
+        monkeypatch.setattr(_module, "load", load)
+    for _module in (research.book, research.dispatch, research.execution, research.news,
+                    research.parse, research.quote, research.sentiment, research.venue):
+        monkeypatch.setattr(_module, "is_us_equity", lambda symbol: True)  # reads the live list
     monkeypatch.setattr(bitget, "fetch_tickers", refuse)
     monkeypatch.setattr(depth, "fetch_orderbook", no_book)
-    assert research._hedge_plan({"AAPLUSDT": 1.0}, Decimal(10_000),
+    assert research.book._hedge_plan({"AAPLUSDT": 1.0}, Decimal(10_000),
                                 "best way to hedge a long AAPL book") == ([], [], {})
 
 

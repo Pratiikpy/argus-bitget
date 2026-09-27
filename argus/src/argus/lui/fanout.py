@@ -1,7 +1,7 @@
 """One research question, read by several independent researchers and merged with their citations.
 
 **What a single pass leaves out.** The console answers a research question with the one engine its
-kind names (`lui/research.py`): "what's the news on NVDA" is read by the news engine, and that is
+kind names (`lui/research/`): "what's the news on NVDA" is read by the news engine, and that is
 the answer. The same trader's honest next reads — where NVDA stands technically, what its company
 reports next and what the analysts expect, how it reacts to a CPI print, what its own history did
 from a state like this — are each one engine away and never run. `lui/multistep.py` splits a
@@ -94,9 +94,10 @@ the Skills are slow, and is the number the evaluation measured."""
 DEFAULT_CONCURRENCY = MAX_UNITS
 """Units in flight at once: every unit, so none waits in a queue behind a slow one. The burst
 Bitget's candle endpoint refuses with HTTP 429 is already throttled where the calls are made
-(`lui/research._FETCH_SLOTS`, three in flight across the whole process), so a second cap here
-would only serialise units that do not touch that endpoint. The first live run used three and one
-unit of every four waited for a slot; the figures in ``data/research_depth_fanout.json`` are from
+(`lui/research/data.py::_FETCH_SLOTS`, three in flight across the whole process), so a second cap
+here would only serialise units that do not touch that endpoint. The first live run used three and
+one unit of every four waited for a slot; the figures in ``data/research_depth_fanout.json`` are
+from
 the run with this setting."""
 
 DEADLINE_S = 25.0
@@ -208,7 +209,7 @@ def asset_class(symbol: str) -> str:
 def _eligible(kind: ResearchKind, symbol: str, has_book: bool,
               classify: Callable[[str], str]) -> bool:
     """Whether ``kind``'s engine can answer for ``symbol`` at all, read from the engines' own
-    refusals in `lui/research.py`: no earnings, consensus or 13F for a non-equity
+    refusals in `lui/research/`: no earnings, consensus or 13F for a non-equity
     (``_fundamentals``); an event study only for the twelve names the desk trades
     (``_event_reaction``); the crowd read is crypto's fear and greed index and funding
     (``_sentiment``); a book researcher needs a book."""

@@ -16,12 +16,12 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "multistep_eval.json"
 CORPORA = ("lui_final_heldout_2026-09-25.jsonl", "lui_heldout_corpus_2026-09-25.jsonl",
            "lui_blind_corpus_2026-09-25.jsonl")
@@ -71,7 +71,7 @@ breaker runs that engine once over both clauses).
 First run, 2026-09-25, before any fix: 18/25 split correctly and 3/680 single held-out questions
 split by mistake. Three of the seven misses were this set's own labelling (a single-label row
 scored as "not split", which is the behaviour the label means); the rest were fixed in
-`lui/multistep.py` and `lui/research.py`, and one row was reworded ("how does that affect BTC"
+`lui/multistep.py` and `lui/research/`, and one row was reworded ("how does that affect BTC"
 became "how does BTC react to that") when pronoun-led clauses were made to elaborate the clause
 before them. The figures this module reports now are therefore not held out."""
 

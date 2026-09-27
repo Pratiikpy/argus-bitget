@@ -27,7 +27,9 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 SNAPSHOT = DATA / "event_calendar.json"
 CPI_URL = "https://www.bls.gov/schedule/news_release/cpi.htm"
 FOMC_URL = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"

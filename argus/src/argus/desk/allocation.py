@@ -53,6 +53,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
+from argus.truth.paths import DATA_DIR
+
 MIN_ASSETS = 3
 """Below this HRP degenerates to inverse-variance weighting, which is a different method.
 
@@ -919,7 +921,6 @@ def main() -> int:  # pragma: no cover - CLI
     import argparse
     import json
     import sys
-    from pathlib import Path
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -991,7 +992,7 @@ def main() -> int:  # pragma: no cover - CLI
         if before is not None and after is not None:
             print(f"\n  diversification ratio {before:.3f} -> {after:.3f}")
     print(f"\n  {plan.verdict}")
-    out = Path(__file__).resolve().parents[3] / "data" / "allocation.json"
+    out = DATA_DIR / "allocation.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(plan.as_dict(), indent=2), encoding="utf-8")
     print(f"\nwritten to {out}")

@@ -36,13 +36,14 @@ replacement for both.
 from __future__ import annotations
 
 import itertools
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal
 from typing import Any
 
 from argus.desk.mandate import Mandate
 from argus.desk.workbench import TraderProfile
 from argus.eval.baselines.loader import BaselineLoadError, VibeTradingSymbols, load_baseline
+from argus.truth.paths import DATA_DIR
 
 _HUNDRED = Decimal("100")
 
@@ -101,7 +102,7 @@ class ComparisonResult:
     vibe_trading: SideVerdict
 
     @property
-    def agree_on_allow(self) -> bool:
+    def agree_on_verdict(self) -> bool:
         """Both sides reached the same allow/refuse verdict, for whatever reason each has."""
         return self.argus.allowed == self.vibe_trading.allowed
 
@@ -118,15 +119,35 @@ class ComparisonResult:
             "scenario": self.scenario_name,
             "argus": self.argus.as_dict(),
             "vibe_trading": self.vibe_trading.as_dict(),
-            "agree_on_allow": self.agree_on_allow,
+            "agree_on_verdict": self.agree_on_verdict,
             "only_argus_refuses": self.only_argus_refuses,
             "only_vibe_trading_refuses": self.only_vibe_trading_refuses,
         }
 
 
+def _signed_book(rows: tuple[dict[str, Any], ...]) -> dict[str, Decimal]:
+    """The scenario's positions as signed notional by symbol, long positive: quantity times
+    price, the reading Vibe-Trading's ``_position_signed_market_value`` gives the same rows."""
+    book: dict[str, Decimal] = {}
+    for row in rows:
+        value = Decimal(str(row["quantity"])) * Decimal(str(row["price"]))
+        book[str(row["symbol"])] = book.get(str(row["symbol"]), Decimal(0)) + value
+    return book
+
+
 def run_argus(scenario: Scenario) -> SideVerdict:
-    """Run the scenario through ARGUS's real ``Mandate.out_of_mandate`` — no reimplementation."""
-    mandate = Mandate(profile=scenario.profile)
+    """Run the scenario through ARGUS's real ``Mandate.out_of_mandate`` — no reimplementation.
+
+    The trader's account-level limits (total exposure, gross leverage, orders a day) are the
+    scenario's, the same numbers Vibe-Trading's mandate is built with: both desks judge one
+    trader with one set of limits. Until 2026-09-27 ARGUS's mandate had no such fields."""
+    profile = replace(
+        scenario.profile,
+        max_gross_exposure=Decimal(str(scenario.max_total_exposure_usd)),
+        max_gross_leverage=Decimal(str(scenario.max_leverage)),
+        max_trades_per_day=scenario.max_trades_per_day,
+    )
+    mandate = Mandate(profile=profile)
     reasons = mandate.out_of_mandate(
         horizon_hours=scenario.thesis_horizon_hours,
         notional=scenario.notional_usd,
@@ -134,6 +155,9 @@ def run_argus(scenario: Scenario) -> SideVerdict:
         hedge_available=scenario.hedge_available,
         confidence=scenario.confidence,
         open_positions=scenario.open_positions,
+        side=scenario.side,
+        positions=_signed_book(scenario.existing_positions),
+        trades_today=scenario.daily_count,
     )
     return SideVerdict(allowed=not reasons, reasons=reasons)
 
@@ -287,7 +311,7 @@ def designed_scenarios() -> tuple[Scenario, ...]:
             open_positions=3,
         ),
         Scenario(
-            name="leverage_breach_vibe_trading_only",
+            name="leverage_breach_both_should_refuse",
             profile=aggressive,
             symbol="NVDAUSDT",
             side="buy",
@@ -296,7 +320,7 @@ def designed_scenarios() -> tuple[Scenario, ...]:
             max_leverage=0.01,
         ),
         Scenario(
-            name="daily_count_breach_vibe_trading_only",
+            name="daily_count_breach_both_should_refuse",
             profile=aggressive,
             symbol="NVDAUSDT",
             side="buy",
@@ -306,7 +330,7 @@ def designed_scenarios() -> tuple[Scenario, ...]:
             daily_count=3,
         ),
         Scenario(
-            name="total_exposure_breach_vibe_trading_only",
+            name="total_exposure_breach_both_should_refuse",
             profile=aggressive,
             symbol="NVDAUSDT",
             side="buy",
@@ -338,11 +362,16 @@ _EXPECTED_DESIGNED = {
     "hedge_unavailable_argus_only": (False, True),
     "confidence_floor_argus_only": (False, True),
     "concurrent_positions_cap_argus_only": (False, True),
-    "leverage_breach_vibe_trading_only": (True, False),
-    "daily_count_breach_vibe_trading_only": (True, False),
-    "total_exposure_breach_vibe_trading_only": (True, False),
+    "leverage_breach_both_should_refuse": (False, False),
+    "daily_count_breach_both_should_refuse": (False, False),
+    "total_exposure_breach_both_should_refuse": (False, False),
     "funding_ceiling_defense_in_depth_vibe_trading_only": (True, False),
 }
+# The three `*_both_should_refuse` leverage, daily-count and total-exposure scenarios were
+# `*_vibe_trading_only` until 2026-09-27, when ARGUS's mandate gained those limits (audit 98).
+# The funding ceiling stays Vibe-Trading's alone on purpose: it refuses any buy whose book would
+# exceed the account's cash, a rule for an unlevered stock account; a perpetual trader states a
+# leverage limit instead, which is the check above.
 """(argus_allowed, vibe_trading_allowed) this module's own design intends for each scenario.
 
 Checked by :func:`run_designed` against what actually happened — a scenario that does not match its
@@ -465,11 +494,11 @@ def swept_scenarios() -> tuple[Scenario, ...]:
 @dataclass(frozen=True)
 class SweepSummary:
     total: int
-    agree_on_allow: int
+    agree_on_verdict: int
     only_argus_refuses: int
     only_vibe_trading_refuses: int
     both_refuse: int
-    """Distinct from ``agree_on_allow``: specifically both-refuse, not both-allow."""
+    """The refusing half of ``agree_on_verdict``; the rest of it is both-allow."""
     argus_reasons_seen: tuple[str, ...]
     """Which of ARGUS's own reason-templates fired at least once in the sweep, by keyword."""
     vibe_trading_limits_seen: tuple[str, ...]
@@ -478,7 +507,7 @@ class SweepSummary:
     def as_dict(self) -> dict[str, Any]:
         return {
             "total": self.total,
-            "agree_on_allow": self.agree_on_allow,
+            "agree_on_verdict": self.agree_on_verdict,
             "only_argus_refuses": self.only_argus_refuses,
             "only_vibe_trading_refuses": self.only_vibe_trading_refuses,
             "both_refuse": self.both_refuse,
@@ -494,6 +523,9 @@ _ARGUS_REASON_KEYWORDS = (
     "unhedgeable exposure",  # hedge
     "confidence",  # confidence floor
     "already open",  # concurrent positions
+    "gross exposure after",  # total exposure (added 2026-09-27)
+    "gross leverage after",  # gross leverage (added 2026-09-27)
+    "a day",  # orders a day (added 2026-09-27)
 )
 _VIBE_LIMIT_KEYWORDS = (
     "max_order_notional_usd", "max_total_exposure_usd", "max_leverage",
@@ -509,7 +541,7 @@ def run_sweep(baseline: VibeTradingSymbols) -> tuple[tuple[ComparisonResult, ...
     vibe_reasons_all = " | ".join(r for res in results for r in res.vibe_trading.reasons)
     summary = SweepSummary(
         total=len(results),
-        agree_on_allow=sum(1 for r in results if r.agree_on_allow),
+        agree_on_verdict=sum(1 for r in results if r.agree_on_verdict),
         only_argus_refuses=sum(1 for r in results if r.only_argus_refuses),
         only_vibe_trading_refuses=sum(1 for r in results if r.only_vibe_trading_refuses),
         both_refuse=sum(
@@ -718,28 +750,26 @@ def blind_spot_costs(results: tuple[ComparisonResult, ...]) -> BlindSpotCosts:
 # =============================================================================================
 
 SCOPE_STATEMENT = """\
-Claimed: within the scope `desk.mandate.Mandate` actually covers — per-trader personalisation \
-that changes a decision (holding horizon, position size as a percentage of THIS trader's capital, \
-a hard per-symbol exclusion list, hedge-availability refusal, a confidence floor, a concurrent-\
-position cap) AND reaches the reasoning layer before a thesis is written (`agents/desk.py`'s \
-`mandate_block` + `ordered_evidence`, read inside `MarketFrame.to_prompt_block()`) — no studied \
-specialist capability is superior. Vibe-Trading's `check_mandate()` has no representation for \
-four of ARGUS's six dimensions (only the exclude-list and a notional cap overlap) and, verified \
-directly across every file in its repository that could plausibly carry it, no mechanism \
-anywhere that reaches an LLM's reasoning at all — see `eval/baselines/` and `research/\
-architecture/personalisation-audit.md`'s correction notice for what was checked.
+Claimed: within the scope `desk.mandate.Mandate` covers — per-trader limits that change a decision \
+(holding horizon, position size as a percentage of THIS trader's capital, a hard per-symbol \
+exclusion list, hedge-availability refusal, a confidence floor, a concurrent-position cap, and \
+since 2026-09-27 the trader's own gross-exposure ceiling, gross-leverage ceiling and orders a day) \
+AND reaches the reasoning layer before a thesis is written (`agents/desk.py`'s `mandate_block` + \
+`ordered_evidence`, read inside `MarketFrame.to_prompt_block()`) — no studied specialist \
+capability is superior. On the 19,440-scenario grid ARGUS refuses every order Vibe-Trading's \
+`check_mandate()` refuses, and Vibe-Trading allows 10.4% that ARGUS refuses: it has no \
+representation for horizon, hedge availability, a confidence floor or a concurrent-position cap, \
+and, verified directly across every file in its repository that could plausibly carry it, no \
+mechanism that reaches an LLM's reasoning at all — see `eval/baselines/` and \
+`research/architecture/personalisation-audit.md`'s correction notice for what was checked.
 
-NOT claimed: that ARGUS's Mandate is a complete pre-trade risk gate. Vibe-Trading's leverage, \
-total-exposure, daily-trade-count, instrument/asset-class allowlist and funding-ceiling checks \
-have no ARGUS equivalent INSIDE `desk.mandate.Mandate` — by design, not oversight: \
-portfolio-wide leverage and gross/signed exposure are `risk.constitution.ConstitutionPolicy`'s job \
-(`max_gross_exposure_notional` / `max_signed_exposure_notional`, `risk/constitution.py`, gate \
-logic in its `rule()`), a separate, already-built ARGUS capability this \
-module does not re-litigate. Whether splitting \
-"whose trade is this" from "how much risk can the book carry" across two modules is better \
-architecture than Vibe-Trading's one bundled gate is a real, currently open question — not decided \
-here, and not needed to be, since the scope of THIS capability's claim is the personalisation \
-dimension alone, stated plainly rather than smuggled in as "wins everything.\"
+NOT claimed: that ARGUS's Mandate is a complete pre-trade risk gate. Vibe-Trading's \
+instrument/asset-class allowlist and its funding ceiling (no buy past the account's cash, a rule \
+for an unlevered stock account) have no equivalent in `desk.mandate.Mandate`; the desk-wide caps \
+that bind whoever the trader is — `max_gross_exposure_notional` / `max_signed_exposure_notional` \
+— are `risk.constitution.ConstitutionPolicy`'s job (`risk/constitution.py`, gate logic in its \
+`rule()`), a separate ARGUS capability this module does not re-litigate. The grid measures the \
+dimensions both systems check; it is not a claim about checks neither one has.
 """
 
 
@@ -779,7 +809,7 @@ def render(report: dict[str, Any]) -> str:
     )
     s = report["sweep_summary"]
     lines.append(
-        f"sweep: {s['total']} scenario(s), agree {s['agree_on_allow']}, "
+        f"sweep: {s['total']} scenario(s), agree {s['agree_on_verdict']}, "
         f"only-ARGUS-refuses {s['only_argus_refuses']}, "
         f"only-Vibe-Trading-refuses {s['only_vibe_trading_refuses']}, "
         f"both-refuse {s['both_refuse']}"
@@ -803,11 +833,10 @@ def render(report: dict[str, Any]) -> str:
 
 if __name__ == "__main__":
     import json
-    from pathlib import Path
 
     result = main()
     print(render(result))
-    out_path = Path(__file__).resolve().parents[3] / "data" / "mandate_comparison.json"
+    out_path = DATA_DIR / "mandate_comparison.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(f"\nsaved -> {out_path}")

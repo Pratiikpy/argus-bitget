@@ -28,6 +28,7 @@ import argparse
 import hmac
 import html
 import json
+import logging
 import os
 import time
 import urllib.parse
@@ -35,6 +36,8 @@ import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
+
+_LOG = logging.getLogger(__name__)
 
 API = "https://api.telegram.org/bot{token}/{method}"
 CONSOLE = "https://deploy-topaz-seven-64.vercel.app/"
@@ -56,7 +59,9 @@ HELP = (
     "• 英伟达的资金费率贵吗？\n\n"  # noqa: RUF001 - a real Chinese question
     "/book 40% NVDA, 30% MSFT, 30% AAPL — save your holdings for portfolio questions\n"
     "/book — show them · /memory — what you told the desk · /clear — forget this chat's "
-    "history, book and memory"
+    "history, book, memory and watches\n"
+    "/watch NVDA below 170 · /watch BTC above 100000 · /watch MSTR funding 0.05% — a message "
+    "when it trades there · /watches — list them · /unwatch 1 — remove one"
 )
 
 
@@ -175,9 +180,11 @@ def format_answer(payload: dict[str, Any], question: str, book: str,
 
 
 def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
-                  ask: Ask = _default_ask, now: float | None = None) -> list[tuple[int, str]]:
+                  ask: Ask = _default_ask, now: float | None = None,
+                  watches: Any = None) -> list[tuple[int, str]]:
     """Replies for one update, as (chat_id, html_text) pairs. Updates that are not a text message
-    from a chat (edits, joins, stickers) get no reply."""
+    from a chat (edits, joins, stickers) get no reply. ``watches`` is the always-on bot's
+    `lui/watch.WatchStore`; the webhook passes none, because nothing there outlives a call."""
     message = update.get("message") or {}
     chat = message.get("chat") or {}
     text = str(message.get("text") or "").strip()
@@ -192,8 +199,12 @@ def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
         return [(chat_id, HELP)]
     if command == "/clear":
         states[chat_id] = ChatState(asked_at=state.asked_at)
-        return [(chat_id, "Forgotten: this chat's earlier questions, its saved book and "
-                          "everything it told the desk.")]
+        if watches is not None:
+            watches.clear(chat_id)
+        return [(chat_id, "Forgotten: this chat's earlier questions, its saved book, everything "
+                          "it told the desk and its watches.")]
+    if command in ("/watch", "/watches", "/unwatch"):
+        return [(chat_id, _watch_command(command, rest, chat_id, watches))]
     if command == "/book":
         if rest.strip():
             state.book = rest.strip()[:300]
@@ -210,8 +221,8 @@ def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
             if facts else "Nothing remembered yet. Tell me, for example: I can't lose more "
                           "than 10%, or I'm a swing trader.")]
     if command.startswith("/"):
-        return [(chat_id, "I only know /start, /help, /book, /memory and /clear — anything "
-                          "else, just ask it as a question.")]
+        return [(chat_id, "I only know /start, /help, /book, /memory, /watch, /watches, "
+                          "/unwatch and /clear — anything else, just ask it as a question.")]
     state.asked_at = [t for t in state.asked_at if clock - t < 3600.0]
     if len(state.asked_at) >= HOURLY_LIMIT:
         return [(chat_id, f"That is {HOURLY_LIMIT} questions this hour from this chat, the same "
@@ -230,6 +241,39 @@ def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
     if payload.get("translate"):
         PENDING[chat_id] = (payload, text[:500], state.book)
     return [(chat_id, part) for part in split_message(format_answer(payload, text, state.book))]
+
+
+def _watch_command(command: str, rest: str, chat_id: int, watches: Any) -> str:
+    """The reply to /watch, /watches or /unwatch (`lui/watch.py`)."""
+    from argus.lui import watch
+
+    if watches is None:
+        return ("Watches need the always-on bot: this one answers through short-lived calls that "
+                "keep nothing between messages, so a watch set here could never fire. Ask the "
+                "question instead, or use the console.")
+    if command == "/watches":
+        mine = watches.for_chat(chat_id)
+        if not mine:
+            return "No watches. Set one: /watch NVDA below 170"
+        return "Your watches: " + "; ".join(
+            f"{n}. {html.escape(w.describe())}" for n, w in enumerate(mine, start=1)) + (
+            ". /unwatch 1 removes the first.")
+    if command == "/unwatch":
+        try:
+            gone = watches.remove(chat_id, int(rest.strip()))
+        except ValueError:
+            gone = None
+        return (f"Removed: {html.escape(gone.describe())}." if gone is not None else
+                "Say which, by its number in /watches: /unwatch 1")
+    parsed = watch.parse(rest)
+    if isinstance(parsed, str):
+        return html.escape(parsed)
+    added = watches.add(chat_id, *parsed)
+    if isinstance(added, str):
+        return html.escape(added)
+    return (f"Watching {html.escape(added.describe())}. Bitget's board is checked every "
+            f"{watch.SWEEP_SECONDS:.0f} seconds; you get one message when it trades there, and "
+            f"the watch is then removed.")
 
 
 PENDING: dict[int, tuple[dict[str, Any], str, str]] = {}
@@ -349,15 +393,22 @@ def handle_webhook(body: bytes, secret_header: str | None, *,
 def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - network loop
     """Long polling: no public URL, one process, chat state held for its lifetime. Deletes any
     registered webhook first, because Telegram refuses getUpdates while one is set."""
+    from argus.lui.watch import SWEEP_SECONDS, WatchStore
+
     _call(token, "deleteWebhook", {"drop_pending_updates": False})
     states: dict[int, ChatState] = {}
+    store = WatchStore()
+    swept = 0.0
     offset = 0
     while True:
+        if time.monotonic() - swept >= SWEEP_SECONDS:
+            swept = time.monotonic()
+            _sweep_watches(token, store)
         try:
             updates = _call(token, "getUpdates", {"offset": offset, "timeout": 50,
                                                   "allowed_updates": ["message"]})
         except Exception as exc:
-            print(f"getUpdates failed ({type(exc).__name__}); retrying in 5s", flush=True)
+            _LOG.warning("getUpdates failed (%s); retrying in 5s", type(exc).__name__)
             time.sleep(5)
             continue
         for update in updates:
@@ -366,7 +417,7 @@ def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - 
             chat = ((update.get("message") or {}).get("chat") or {}).get("id")
             if isinstance(chat, int):
                 recall_book(token, chat, states)
-            for chat_id, text in handle_update(update, states, ask=ask):
+            for chat_id, text in handle_update(update, states, ask=ask, watches=store):
                 try:
                     last[chat_id] = send(token, chat_id, text)
                     remember_book(token, chat_id, last[chat_id], text)
@@ -377,6 +428,23 @@ def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - 
                     follow_up(token, chat_id, message_id)
                 except Exception as exc:
                     print(f"translation follow-up failed ({type(exc).__name__})", flush=True)
+
+
+def _sweep_watches(token: str, store: Any) -> None:  # pragma: no cover - network
+    """One pass of `lui/watch.sweep` over Bitget's ticker board; each alert is sent once."""
+    from argus.lui.watch import sweep
+    from argus.market.bitget import fetch_tickers
+
+    try:
+        board = fetch_tickers()
+    except Exception as exc:
+        _LOG.warning("watch sweep: tickers unreadable (%s)", type(exc).__name__)
+        return
+    for chat_id, text in sweep(store, board):
+        try:
+            send(token, chat_id, html.escape(text))
+        except Exception as exc:
+            print(f"watch alert not sent ({type(exc).__name__})", flush=True)
 
 
 def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI
@@ -401,6 +469,8 @@ def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI
         _call(token, "setMyCommands", {"commands": [
             {"command": "help", "description": "what the desk answers"},
             {"command": "book", "description": "save or show your holdings"},
+            {"command": "watch", "description": "a message when a level trades"},
+            {"command": "watches", "description": "list your watches"},
             {"command": "clear", "description": "forget this chat's history and book"}]})
         print("webhook registered")
         return 0

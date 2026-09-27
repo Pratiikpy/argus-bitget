@@ -41,6 +41,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from argus.truth.evidence import Evidence
+from argus.truth.paths import DATA_DIR
 
 RSI_AGREEMENT_POINTS = 5.0
 """How far the Skill's RSI may sit from our own before the cross-check calls it a disagreement.
@@ -173,7 +174,7 @@ PROBES: tuple[Probe, ...] = (
 )
 
 
-def _classify(payload: Any, status: str) -> tuple[Health, str]:
+def classify_reply(payload: Any, status: str) -> tuple[Health, str]:
     """Turn one call's outcome into a state that cannot be mistaken for market information."""
     low = status.lower()
     if "tool reported an error" in low:
@@ -397,7 +398,7 @@ def probe(
     results: list[ToolHealth] = []
     for item in probes:
         payload, status = client.call(item.tool, item.for_symbol(symbol), timeout=timeout)
-        health, detail = _classify(payload, status)
+        health, detail = classify_reply(payload, status)
         results.append(ToolHealth(
             probe=item, health=health, detail=detail,
             payload=payload if health.answered else None, checked_at=stamp,
@@ -650,7 +651,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT)
     parser.add_argument(
         "--out", type=Path,
-        default=Path(__file__).resolve().parents[3] / "data" / "bitget_skills_health.json",
+        default=DATA_DIR / "bitget_skills_health.json",
     )
     args = parser.parse_args(argv)
 

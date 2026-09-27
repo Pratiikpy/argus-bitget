@@ -19,7 +19,7 @@ def frozen(monkeypatch: pytest.MonkeyPatch) -> None:
     def _fail(*args: Any, **kwargs: Any) -> Any:
         raise RuntimeError("live fetch disabled in tests")
 
-    monkeypatch.setattr(research, "_fetch_live", _fail)
+    monkeypatch.setattr(research.data, "_fetch_live", _fail)
     monkeypatch.setattr(history, "fetch", _fail)
     monkeypatch.setattr(universe, "_fetch_live", _fail)
     monkeypatch.setattr(universe, "_CACHE", None)

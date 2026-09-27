@@ -59,8 +59,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from argus.truth.paths import DATA_DIR
+
 SOURCE = Path(__file__).resolve().parents[1]
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "architecture.json"
 
 DETERMINISTIC = ("truth", "cost", "risk", "decision", "backtest")

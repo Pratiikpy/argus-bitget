@@ -69,10 +69,11 @@ from argus.eval.baselines.qlib_expression_loader import (
     make_synthetic_leaf,
 )
 from argus.research.grammar import Corr, CrossContext, Expr, Field, GrammarError, Kind, Ref, Window
+from argus.truth.paths import DATA_DIR
 
 _GRAMMAR_SRC = Path(__file__).resolve().parents[1] / "research" / "grammar.py"
 _EVAL_SURFACE_SRC = Path(__file__).resolve().parent / "baselines" / "qlib_eval_surface.py"
-_BOOK_TAPE_PATH = Path(__file__).resolve().parents[3] / "data" / "book_tape.jsonl"
+_BOOK_TAPE_PATH = DATA_DIR / "book_tape.jsonl"
 
 
 class GrammarComparisonError(RuntimeError):
@@ -594,7 +595,7 @@ def main(*, tmp_dir: Path | None = None) -> dict[str, Any]:
     injection = run_injection_proof(eval_surface_module)
     failure_cases = run_failure_cases(eval_surface_module)
 
-    scratch = tmp_dir or (Path(__file__).resolve().parents[3] / "data" / "_grammar_comparison_tmp")
+    scratch = tmp_dir or (DATA_DIR / "_grammar_comparison_tmp")
     scratch.mkdir(parents=True, exist_ok=True)
     ablation = run_scan_sensitivity_ablation(scratch)
 
@@ -673,7 +674,7 @@ if __name__ == "__main__":
 
     result = main()
     print(render(result))
-    out_path = Path(__file__).resolve().parents[3] / "data" / "grammar_comparison.json"
+    out_path = DATA_DIR / "grammar_comparison.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(f"\nsaved -> {out_path}")

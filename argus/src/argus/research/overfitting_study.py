@@ -39,7 +39,6 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from argus.backtest.engine import Bar, run
@@ -60,8 +59,9 @@ from argus.cost.model import CostModel
 from argus.market.bitget import RTOKEN_SYMBOLS
 from argus.market.history import CandleType, fetch_range
 from argus.research.track1_study import ALL_VARIANTS, CONTROLS
+from argus.truth.paths import DATA_DIR
 
-STUDY_PATH = Path(__file__).resolve().parents[3] / "data" / "overfitting_study.json"
+STUDY_PATH = DATA_DIR / "overfitting_study.json"
 
 GROUPS = 8
 """Blocks the series is cut into. Eight gives C(8,4) = 70 balanced splits, every one evaluated."""

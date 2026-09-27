@@ -1,7 +1,7 @@
 """Population RCT (Track 2 §13.7a) — does each Constitution gate earn its place, measured.
 
-The plan's own table entry (`Activity/08_TRADING_OS_PLAN.md`) names this: *"N gate-ablated ARGUS
-variants trading the identical book in parallel"*, scored on risk-violation rate and
+The plan's own table entry (the product plan, which is not published) names this: *"N gate-ablated
+ARGUS variants trading the identical book in parallel"*, scored on risk-violation rate and
 incremental-value-over-baseline, *as a controlled experiment*. `risk_proof.json`
 (`eval/riskproof.py`) proves the eight Foundation 5 gates are internally consistent over a swept
 state space; it does not compare against a variant missing one of them, which is what
@@ -57,6 +57,7 @@ from argus.risk.constitution import (
 )
 from argus.risk.hedgeability import HedgeabilitySurface
 from argus.truth.clocks import SessionState
+from argus.truth.paths import DATA_DIR
 
 
 @dataclass(frozen=True, slots=True)
@@ -134,7 +135,7 @@ def _quantity_of(ruling: Any) -> Decimal:
     return ruling_.resulting_intent.quantity
 
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "population_rct.json"
+REPORT_PATH = DATA_DIR / "population_rct.json"
 """Where :func:`main` writes. Matches `eval/riskproof.py`'s `REPORT_PATH` convention."""
 
 

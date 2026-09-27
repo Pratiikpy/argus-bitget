@@ -43,13 +43,13 @@ import os
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from argus.lui.question import Intent, classify
 from argus.lui.router import MIN_CONFIDENCE, ROUTABLE_FROM, Router, route
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "router_bench.json"
 
 FLOORS: tuple[float, ...] = (0.0, 0.3, 0.4, 0.5, 0.55, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0)

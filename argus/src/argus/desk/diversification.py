@@ -37,8 +37,9 @@ import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
+
+from argus.truth.paths import DATA_DIR
 
 MAX_SWEEPS = 100
 """Cyclic Jacobi sweeps before giving up. Ten is usually plenty for a twelve-name book."""
@@ -471,7 +472,7 @@ def suggest_hedges(
     return scored[:limit]
 
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "diversification.json"
+REPORT_PATH = DATA_DIR / "diversification.json"
 """Where `--save` writes.
 
 **This module had no entry point at all.** `README.md` quoted four specific figures from it —

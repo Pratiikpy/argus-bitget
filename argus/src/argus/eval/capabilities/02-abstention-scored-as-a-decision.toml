@@ -1,0 +1,151 @@
+name = "Abstention scored as a decision"
+subtheme = "t2-riskcontrol"
+modules = [
+    "argus/paper/ledger.py",
+    "argus/eval/observatory.py",
+    "argus/eval/abstention_comparison.py",
+    "argus/eval/baselines/ghostledger_reimpl.py",
+    "argus/eval/abstention_coverage.py",
+    "argus/eval/general_abstention_comparison.py",
+    "argus/eval/baselines/selective_rivals_runner.py",
+]
+# Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+# proof now needs a groupwise check on the capability's own artefact, and this
+# row's does not pass it. The reason and the route back are its first blocker.
+state = "implemented"
+baseline = """\
+    insaneamogh/AutonomousTradeAgents 'Ghost P&L' ledger — found 2026-09-16 by a fresh, \
+    targeted search after the original corpus survey found nothing in the wider corpus"""
+blockers = [
+    """\
+        RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
+        (data/groupwise_audit.json): data/abstention_comparison.json holds three designed netting \
+        cases and a twelve-point ratio sweep, not a population of real abstentions scored against \
+        the rival's floor. The live ledger is audited only as context, because this row claims the \
+        scoring is honest, not that abstaining paid; the audit records that the ledger's \
+        abstention value is carried by one symbol and that its two chronological halves disagree \
+        in sign. Route back: score the rival's floored headline against ARGUS's net on the real \
+        ledger's abstentions, per symbol and week.""",
+    """\
+        the abstention record is large and the traded record is small, so abstention quality is \
+        measured far better than trade quality""",
+    """\
+        General-purpose rivals run 2026-09-26 on the real record \
+        (data/general_abstention_comparison.json): 470 settled leans scored with fd-shifts \
+        c4467aec and torch-uncertainty 3f82fe5d, run unmodified through \
+        eval/baselines/selective_rivals_runner.py and reproduced exactly on an independent rerun. \
+        LOSS for the earlier abstention_quality: it returns the same output for a perfect, a \
+        random and an inverted gate, which fd-shifts orders (AURC 0.177 / 0.489 / 0.868). \
+        eval/abstention_coverage.py adopts fd-shifts' method and ties it on every shared quantity \
+        (largest difference 3.4e-15), adding the loss priced in bps (fd-shifts' 50%-risk working \
+        point loses 3,344bps), None instead of a ValueError, and a day-clustered interval (ICC \
+        0.121, design effect 5.6). The run also found the scorecard grading by side instead of \
+        lean (-2,824bps became +2,381bps once fixed). The desk shows no detectable ranking skill, \
+        and the sign of the abstention value is not established (day interval about -30,800 to \
+        +28,600bps).""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    the wider corpus read for a counterfactual-abstention record and found nothing; a fresh \
+    targeted search found the one real exception — AutonomousTradeAgents' 'Refusal Ledger', \
+    read in full (ghost_service.py, 538 lines)"""
+artefact = "src/argus/eval/baselines/ghostledger_reimpl.py"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    both real methods read and compared: ARGUS's settle_abstention records a single \
+    counterfactual move at settlement, scored via abstention_quality's \
+    avoided_loss/missed_gain/total_value split; AutonomousTradeAgents' GhostBucket marks every \
+    vetoed/declined proposal to market over a trading-day horizon with the identical split \
+    PLUS a separate 'headline' saved_usd/missed_usd number"""
+artefact = "src/argus/eval/abstention_comparison.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    no license to vendor under (gh repo view: licenseInfo=null), so an independent clean-room \
+    reimplementation of the aggregation was verified against reference output computed by \
+    running their own real, unmodified _bucket_from_rows once locally on their own documented \
+    example — matched exactly (net=$2179.00, loss_avoided=$30788.00, upside_blocked=$32967.00, \
+    headline saved_usd=$0.00)"""
+test = "test_abstention_comparison.py::TestGhostLedgerMatchesTheRealReferenceOutput"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "settle_abstention records counterfactual_move_bps against the live tape"
+test = "test_ledger.py"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    both real systems scored on the structurally identical adversarial scenario — a large \
+    avoided loss and a large blocked/missed upside that roughly offset — including the EXACT \
+    dollar figures ($30,788 / $32,967) the baseline's own code comment names"""
+test = "test_abstention_comparison.py::TestNettingCases"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    swept across twelve ratios of avoided-loss to blocked-upside from 0 (pure loss) to 2.0 \
+    (upside dominates), not one convenient case — confirming the real defect fires exactly \
+    where the net crosses near zero and nowhere else"""
+test = "test_abstention_comparison.py::TestSweptRatios"
+
+[[proofs]]
+condition = "costs_included"
+how = "both real comparison functions' call overhead measured directly"
+test = "test_abstention_comparison.py::TestCosts"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    the reference scenario is AutonomousTradeAgents' OWN documented production incident (a \
+    real, dated example from their own code comment), not a fixture invented for this \
+    comparison"""
+artefact = "src/argus/eval/baselines/ghostledger_reimpl.py"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    isolates the exact mechanism: the real bucket's own unfloored net (ghost_pnl) already \
+    carries the correct $2,179 answer — the ablation confirms the defect is specifically the \
+    max(0.0, -net) floor applied afterward, not the underlying aggregation"""
+test = "test_abstention_comparison.py::TestAblation"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    the decisive real finding: AutonomousTradeAgents' real headline saved_usd computation \
+    produces exactly $0.00 on their own real, documented example — not a fixed historical bug, \
+    still live in build_ghost_summary (ghost_service.py:278) — while ARGUS's real \
+    abstention_quality() reports the true, unfloored net on the identical scenario shape"""
+test = """\
+    test_abstention_comparison.py::TestNettingCases::test_the_documented_case_reproduces_the_real_defect"""
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    SCOPE_STATEMENT states in writing what is NOT claimed: that AutonomousTradeAgents' overall \
+    design is unsound (it is not — only the one headline computation), or that ARGUS's \
+    calendar-hour settlement horizon matches or beats their trading-day-aware one, since the \
+    two systems trade genuinely different-calendar venues"""
+artefact = "src/argus/eval/abstention_comparison.py"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "the ledger is hash-chained; any entry can be recomputed from its predecessor"
+artefact = "data/paper_ledger.jsonl"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped precisely to the one property tested: on reporting a true, unfloored net value for \
+    a two-sided abstention record, ARGUS's real abstention_quality() has no equivalent of the \
+    named specialist's real, still-live headline-flooring defect — not a claim that ARGUS's \
+    abstention scoring is otherwise more complete (their trading-day-aware horizon and \
+    partial-mark visibility are real, useful properties this comparison does not attempt to \
+    beat)"""
+test = "test_abstention_comparison.py::TestNettingCases"

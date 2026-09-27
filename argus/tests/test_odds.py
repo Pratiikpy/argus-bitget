@@ -9,7 +9,8 @@ import pytest
 
 from argus.desk.odds import directional_odds
 from argus.lui import research
-from argus.lui.research import ResearchKind, _detect, _horizon, pattern_reading_wins
+from argus.lui.research import ResearchKind, pattern_reading_wins
+from argus.lui.research.parse import _horizon, read_request
 from argus.market import history, universe
 from argus.risk.calibration import wilson
 
@@ -21,7 +22,7 @@ def frozen(monkeypatch: pytest.MonkeyPatch) -> None:
     def _fail(*args: Any, **kwargs: Any) -> Any:
         raise RuntimeError("live fetch disabled in tests")
 
-    monkeypatch.setattr(research, "_fetch_live", _fail)
+    monkeypatch.setattr(research.data, "_fetch_live", _fail)
     monkeypatch.setattr(history, "fetch", _fail)
     monkeypatch.setattr(universe, "_fetch_live", _fail)
     monkeypatch.setattr(universe, "_CACHE", None)
@@ -78,7 +79,7 @@ def test_too_little_history_is_none_not_a_number() -> None:
 ])
 def test_a_directional_question_becomes_a_record_at_its_horizon(
         text: str, hours: int, weekend: bool, side: str) -> None:
-    request = _detect(text)
+    request = read_request(text)
     assert request is not None and request.kind is ResearchKind.ANALOGUE
     assert (request.horizon_hours, request.weekend, request.side) == (hours, weekend, side)
     assert pattern_reading_wins(request, text)
@@ -88,7 +89,7 @@ def test_a_directional_question_becomes_a_record_at_its_horizon(
     "what will BTC be next week", "where will NVDA trade tomorrow", "predict SOL for next week",
 ])
 def test_a_price_level_is_still_not_answered_as_a_direction(text: str) -> None:
-    request = _detect(text)
+    request = read_request(text)
     assert request is None or request.horizon_hours is None
 
 

@@ -42,8 +42,9 @@ from datetime import UTC, datetime
 from statistics import fmean, median
 from typing import Any
 
-from argus.market.bitget import BitgetError, _dec, _get
+from argus.market.bitget import BitgetError, _dec, public_get
 from argus.market.depth import DepthError, fetch_orderbook
+from argus.truth.paths import DATA_DIR
 
 HORIZONS_SECONDS: tuple[int, ...] = (5, 15, 30, 60)
 """Markout horizons. Short by the standards of an equity desk and long by a market maker's.
@@ -213,7 +214,7 @@ class MarkoutReport:
 
 def fetch_prints(symbol: str, *, limit: int = 100, category: str = "USDT-FUTURES") -> list[Print]:
     """The venue's recent public fills. Sorted oldest first, because the feed is not."""
-    rows = _get(
+    rows = public_get(
         "/api/v3/market/fills",
         {"category": category, "symbol": symbol.upper(), "limit": str(limit)},
     )
@@ -329,7 +330,6 @@ def collect(
 def main() -> int:  # pragma: no cover - CLI
     import argparse
     import sys
-    from pathlib import Path
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -354,7 +354,7 @@ def main() -> int:  # pragma: no cover - CLI
     )
     print()
     print(report.render())
-    out = Path(__file__).resolve().parents[3] / "data" / "markout.json"
+    out = DATA_DIR / "markout.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8")
     print(f"\nwritten to {out}")

@@ -37,7 +37,7 @@ def test_the_headline_is_what_the_verdict_says(blob: dict[str, Any]) -> None:
     h = rec.headline(blob)
     verdict = blob["task"]["verdict"]
     assert verdict["call"] == f"Add, at {h['proposed']:.0f}%"
-    first, crowded, fill = verdict["lines"]
+    first, crowded, fill, *_later = verdict["lines"]
     assert (f"carry {h['share_after']:.0f}% of the book's risk, inside the {h['budget']:.0f}% "
             f"budget; {h['ceiling']:.0f}% is the most") in first
     assert (f"NVDA carries {h['crowded_share']:.0f}% of the risk at "

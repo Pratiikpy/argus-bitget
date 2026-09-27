@@ -1,0 +1,54 @@
+name = "A trader's thesis tested on the same input as optic-bitget's desk"
+subtheme = "t3-personalisation"
+modules = [
+    "argus/lui/research/dispatch.py",
+]
+state = "tied"
+baseline = """\
+    neromtoobad/optic-bitget (Season 2, MIT): evidence table, Bull/Bear debate twice, Judge \
+    sampled three times, probability capped to 10-90%, run end to end"""
+blockers = [
+    """\
+        TIED: optic abstained on two of three theses because its earnings and positioning rows \
+        errored, and ARGUS answered exactly those rows (report date, targets, surprise, 13F, Form \
+        4) plus a premise verdict measured against the contract's own settlements, with no model \
+        spend against about 97,500 Qwen tokens. optic still gives one synthesised call with a \
+        probability, which ARGUS does not""",
+    """\
+        no outcome grading: whether each thesis held needs its horizon to pass, so neither desk's \
+        call is scored yet""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    optic-bitget's desk read in source (src/desk/index.ts, evidence.ts, judge.ts, \
+    src/lenses/prediction.ts) and its Polymarket selection rules taken for \
+    market/prediction.py"""
+artefact = "data/h2h_optic/summary.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    optic's own runDesk executed on three theses, outputs kept verbatim; its code unchanged \
+    except an environment-gated LLM endpoint so it could run on the hackathon Qwen"""
+artefact = "data/h2h_optic/summary.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    the same three sentences ('Long MSTR/NVDA/TSLA perp into earnings — funding looks cheap') \
+    through both desks the same morning"""
+artefact = "data/h2h_optic/summary.json"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "the premise check found by this comparison, and tested"
+test = "test_claim_check.py::test_cheap_funding_that_is_dear_for_this_contract_does_not_hold"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    optic still leads on a single synthesised call; two ARGUS defects the run exposed; two \
+    gaps closed afterwards and not re-measured"""
+artefact = "data/h2h_optic/summary.json"

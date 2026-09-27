@@ -65,7 +65,6 @@ import random
 import time
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -87,6 +86,7 @@ from argus.research.factor_divergence import (
     symbol_series,
 )
 from argus.research.grammar import Delay, Field, Ref
+from argus.truth.paths import DATA_DIR
 
 DAYS = 90
 OOS_DAYS = 60
@@ -603,7 +603,7 @@ def main() -> int:  # pragma: no cover - CLI
     }
     report["scope_statement"] = scope_statement(report["ablation"])
     print(render(report))
-    out = Path(__file__).resolve().parents[3] / "data" / "factor_divergence_comparison.json"
+    out = DATA_DIR / "factor_divergence_comparison.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     print(f"\nwritten to {out}")

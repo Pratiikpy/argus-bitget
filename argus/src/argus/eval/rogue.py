@@ -44,7 +44,6 @@ from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
 from argus.decision.verdicts import Intent, Side, Verdict
@@ -52,8 +51,9 @@ from argus.risk.constitution import ConstitutionPolicy
 from argus.risk.hedgeability import HedgeabilitySurface, HedgeCandidate
 from argus.truth.artefact import write
 from argus.truth.clocks import SessionPhase, SessionState
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "rogue_value.json"
+REPORT_PATH = DATA_DIR / "rogue_value.json"
 
 STARTING_EQUITY = Decimal("10000")
 """The account the rogue is let loose on. A round number; every result scales with it."""

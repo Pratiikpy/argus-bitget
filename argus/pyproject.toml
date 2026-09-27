@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "argus"
-version = "0.1.0"
-description = "Evidence-driven autonomous trading governor for 24/7 tokenized equity markets"
+version = "0.2.0"
+description = "A research workbench for Bitget traders: what a trade does to your own book, every figure computed from live data and sourced"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -28,6 +28,9 @@ dependencies = [
     # reproducible rather than becoming a claim in a document nobody can check.
     "model2vec>=0.9",
 ]
+
+[project.scripts]
+argus-bot = "argus.lui.selfhost:main"
 
 [project.optional-dependencies]
 dev = [

@@ -29,7 +29,6 @@ import random
 import sys
 from collections.abc import Sequence
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from argus.backtest.engine import Bar
@@ -46,8 +45,9 @@ from argus.research.factor_lab import (
     reliable_components,
     split_half,
 )
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "factor_split_half.json"
 
 SYMBOLS = ("NVDAUSDT", "TSLAUSDT", "AAPLUSDT", "MSFTUSDT", "METAUSDT", "GOOGLUSDT", "AMZNUSDT",

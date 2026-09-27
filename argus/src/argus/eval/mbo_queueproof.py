@@ -77,8 +77,9 @@ from typing import Any
 
 from argus.eval.queueproof import OUR_QTY, Episode, Observation, score
 from argus.execution.queue import L3FIFOQueue, L3Order
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "mbo_queue_proof.json"
+REPORT_PATH = DATA_DIR / "mbo_queue_proof.json"
 
 PRICE_SCALE = Decimal("1e-9")
 """DBN's fixed-price convention: `price` is an integer in units of 1e-9. Confirmed directly

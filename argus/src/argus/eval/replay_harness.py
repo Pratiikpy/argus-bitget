@@ -103,8 +103,9 @@ from typing import Any
 
 from argus.eval.trace_audit import offline
 from argus.truth.artefact import write
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "replay_harness.json"
 CANDLES_PATH = DATA / "risk_layer_candles_fixture.json"
 INSTRUMENTS_PATH = DATA / "replay_instruments_2026-09-25.json"

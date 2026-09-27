@@ -32,7 +32,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from argus.lui.answer import Source
-from argus.market.skills import PROBES, Health, _classify
+from argus.market.skills import PROBES, Health, classify_reply
 from argus.truth.coverage import ContextPool
 
 SKILL_WAIT_S = 8.0
@@ -158,7 +158,7 @@ def route(tool: str, action: str, args: Mapping[str, Any] | None = None, *,
         mirror_job = pool.submit(mirror, ident, call_args)
         try:
             payload, status = skill_job.result(timeout=wait + 2.0)
-            skill_health, skill_detail = _classify(payload, status)
+            skill_health, skill_detail = classify_reply(payload, status)
         except Exception as exc:  # the Skill's own timeout, or ours around it
             payload, skill_health = None, Health.TIMEOUT
             skill_detail = f"bitget:{tool}: no answer within {wait:.0f}s ({type(exc).__name__})"

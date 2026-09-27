@@ -9,7 +9,9 @@ import pytest
 from argus.desk.portfolio import PortfolioError, rebalance, resize
 from argus.lui import research
 from argus.lui.kindmodel import LocalPlanner, kind_model
-from argus.lui.research import ResearchKind, _detect, _resize, _resolve_resize, pattern_reading_wins
+from argus.lui.research import ResearchKind, pattern_reading_wins
+from argus.lui.research.parse import _resize, read_request
+from argus.lui.research.riskmath import _resolve_resize
 from argus.market import history, universe
 
 
@@ -18,7 +20,7 @@ def frozen(monkeypatch: pytest.MonkeyPatch) -> None:
     def _fail(*args: Any, **kwargs: Any) -> Any:
         raise RuntimeError("live fetch disabled in tests")
 
-    monkeypatch.setattr(research, "_fetch_live", _fail)
+    monkeypatch.setattr(research.data, "_fetch_live", _fail)
     monkeypatch.setattr(history, "fetch", _fail)
     monkeypatch.setattr(universe, "_fetch_live", _fail)
     monkeypatch.setattr(universe, "_CACHE", None)
@@ -61,12 +63,12 @@ def test_resize_phrasings_are_read(text: str, expected: tuple[Any, ...]) -> None
     "keep any name under 15% of my risk",
 ])
 def test_adds_and_shocks_are_not_resizes(text: str) -> None:
-    request = _detect(text)
+    request = read_request(text)
     assert request is None or (request.target is None and request.resize_by is None)
 
 
 def test_a_resize_request_wins_over_the_models_reading() -> None:
-    request = _detect("trimming my TSLA weight to 10% of book — is that enough")
+    request = read_request("trimming my TSLA weight to 10% of book — is that enough")
     assert request is not None and request.kind is ResearchKind.IMPACT
     assert request.target == pytest.approx(0.1)
     assert pattern_reading_wins(request, "trimming my TSLA weight to 10% of book")

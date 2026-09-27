@@ -71,8 +71,9 @@ from argus.research.eventstudy import (
     returns_from,
     study,
 )
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 SNAPSHOT_5M = DATA / "eventdriven_rivals_5m.json.gz"
 REPORT_PATH = DATA / "eventdriven_agents.json"
 CHAINS_PATH = DATA / "causal_chains.jsonl"

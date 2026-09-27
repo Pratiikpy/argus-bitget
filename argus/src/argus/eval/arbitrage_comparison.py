@@ -38,7 +38,6 @@ import random
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
-from pathlib import Path
 from typing import Any
 
 from argus.eval.baselines.maxme_arbitrer_loader import (
@@ -48,8 +47,9 @@ from argus.eval.baselines.maxme_arbitrer_loader import (
 from argus.market.history import BasisPoint
 from argus.research.arbitrage_study import ROUND_TRIP_BPS, Decomposition, decompose
 from argus.truth.clocks import DualClock
+from argus.truth.paths import DATA_DIR
 
-_STUDY_PATH = Path(__file__).resolve().parents[3] / "data" / "arbitrage_study.json"
+_STUDY_PATH = DATA_DIR / "arbitrage_study.json"
 
 
 class RealBasisUnavailableError(RuntimeError):
@@ -573,7 +573,7 @@ if __name__ == "__main__":
 
     result = main()
     print(render(result))
-    out_path = Path(__file__).resolve().parents[3] / "data" / "arbitrage_comparison.json"
+    out_path = DATA_DIR / "arbitrage_comparison.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(f"\nsaved -> {out_path}")

@@ -98,8 +98,9 @@ from typing import Any, Protocol, cast
 
 from argus.market import abuse, social_pulse
 from argus.market.abuse import DEFAULT_SCREEN, AbuseScreen
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "sentiment_tweeteval.json"
 DEFAULT_TWEETEVAL = (Path(__file__).resolve().parents[5] / "mypr" / "08_sentiment_and_events"
                      / "tweeteval" / "datasets")

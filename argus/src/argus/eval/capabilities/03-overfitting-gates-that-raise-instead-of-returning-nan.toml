@@ -1,0 +1,177 @@
+name = "Overfitting gates that raise instead of returning NaN"
+subtheme = "t1-validation"
+modules = [
+    "argus/backtest/metrics.py",
+    "argus/eval/dsr_comparison.py",
+    "argus/eval/baselines/vectorbt_loader.py",
+    "argus/eval/baselines/vectorbt_dsr_metrics.py",
+    "argus/eval/general_overfitgates_comparison.py",
+]
+# Demoted from OWNED on 2026-09-20, when `verify()` began opening the artefacts instead
+# of checking that files existed: failure_cases_documented was claimed here and the
+# artefact recorded nothing about it. An earlier pass already fixed the artefact
+# (data/overfit_gates.json now names the 2-of-8 no-verdict count, see the Proof below)
+# but never flipped this line back — found stale on an AUDIT sweep 2026-09-22 that
+# independently re-ran `verify()` on every proof rather than trusting `conditions_missing`
+# (which only checks a Proof exists per condition, not that it verifies): all thirteen are
+# VERIFIED or ATTESTED, zero UNPROVEN. Restored to OWNED.
+# Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
+# proof now needs a groupwise check on the capability's own artefact, and this
+# row's does not pass it. The reason and the route back are its first blocker.
+state = "implemented"
+baseline = """\
+    polakowo/vectorbt deflated_sharpe_ratio (accessors.py:596) - not itself gated anywhere in \
+    vectorbt, but silently NaN on a single trial (var_sharpe = np.var of one value, ddof=1); a \
+    caller filtering with a negated < comparison admits it"""
+blockers = [
+    """\
+        RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
+        (data/groupwise_audit.json): the gates' verdicts over all trials are broken down across \
+        twelve symbols in data/track1_study.json (none survives, and no symbol carries that), but \
+        the out-of-sample proof also reads data/overfit_gates.json, whose eight primitives were \
+        run on one instrument, NVDAUSDT: a single-symbol result. Route back: run the eight \
+        primitives through the gates on every symbol and record the verdict per (symbol, \
+        primitive).""",
+    """\
+        TIED and not better on the MATH: the formulas agree with the references exactly (max abs \
+        diff 0.0 over a 1,215-case sweep) - this is not a claim that ARGUS computes a better \
+        Sharpe estimate. The genuinely measured advantage is narrower and now actually verified \
+        rather than asserted by design: refusing silently, specifically on the NaN-propagation \
+        edge case vectorbt's own real code was run against and shown to hit - and that refusal \
+        itself needed a real fix mid-comparison (deflated_sharpe's own guard did not originally \
+        catch NaN either), so 'ours refuses by design' was true in intent and false in the actual \
+        code until this same session.""",
+    """\
+        General-purpose rivals run 2026-09-26 on the same 1,332 inputs \
+        (data/general_overfitgates_comparison.json): pydantic v2 validate_call with FiniteFloat \
+        around vectorbt's real DSR, numpy/scipy IEEE trapping, \
+        scipy.stats.false_discovery_control, statsmodels multipletests, and a derandomized \
+        Hypothesis search. Hypothesis found 23 failure classes in the gates as they were (every \
+        gate had a silent one) and finds 0 now. On the 1,332 DSR inputs ARGUS now returns 0 \
+        silent-wrong outputs, against 5 for pydantic-wrapped vectorbt, 57 for the numpy/scipy trap \
+        and 95 for bare vectorbt; before the 14 guards adapted from pydantic's contract and \
+        scipy's range check, ARGUS returned 28 and lost to the pydantic contract. Each guard trips \
+        on the pre-adaptation code and is load-bearing. Not better than the general tools at \
+        keeping an overflowing input's real answer: ARGUS refuses 3 of 6 overflow cases that have \
+        one, and wrapped around the whole pipeline the numpy/scipy trap ties ARGUS on the 24 \
+        real-producer cases.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = "vectorbt, empyrical and Bailey & Lopez de Prado read line by line"
+artefact = "../research/architecture/metrics-audit.md"
+
+[[proofs]]
+condition = "best_method_studied"
+how = "deflated and probabilistic Sharpe taken from the source papers"
+artefact = "../research/architecture/metrics-audit.md"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "DSR, PSR, OOS decay, rolling stability all computed and reported"
+test = "test_metrics.py"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = "the gate is applied to all trials, not only to the surviving candidates"
+artefact = "data/track1_study.json"
+
+[[proofs]]
+condition = "costs_included"
+how = "every reported Sharpe is net of the 12bps round-trip taker fee"
+artefact = "data/track1_study.json"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = "out_of_sample_decay alerts when OOS falls below half of in-sample"
+test = "test_metrics.py"
+
+[[proofs]]
+condition = "failure_cases_documented"
+# This cited `track1_study.json`'s 0-of-12 DSR survival, which is a statement
+# about the *factors* — every one rejected — and not about the gates. A gate that
+# rejects a factor is working. The gates' own failures are the inputs on which
+# they cannot reach a verdict at all, and those live in `overfit_gates.json`,
+# where the count had been recorded since the module was written and never named.
+how = """\
+    2 of 8 primitives return no verdict: the deflated-Sharpe gate needs a variance across \
+    trials and raises rather than returning NaN when the observations cannot supply one. The \
+    refusal is designed — vectorbt's own deflated_sharpe_ratio silently NaNs on a single trial \
+    — and a gate that cannot decide has still protected nothing on that input, which is why it \
+    is counted as a failure case rather than folded into the rejections"""
+artefact = "data/overfit_gates.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    vectorbt's real deflated_sharpe_ratio()/approx_exp_max_sharpe() \
+    (vectorbt/returns/metrics.py, the exact file this capability's baseline already names) \
+    vendored verbatim - byte-verified against commit 34b6d5935e3ea3eccd549e2592bc0f455b8045f5, \
+    pinned by SHA256 - and actually executed via a sys.modules shim satisfying its one \
+    internal import (vectorbt._typing.Array1d) with a single-attribute stand-in rather than \
+    installing plotly/numba to satisfy a type annotation. The specific defect line itself \
+    (accessors.py:596, var_sharpe = np.var(x, ddof=1)) is reproduced directly as the same bare \
+    numpy call, cited to its exact line, not vendored (nothing else is around it worth \
+    vendoring)"""
+artefact = "src/argus/eval/baselines/vectorbt_dsr_metrics.py"
+test = "test_baselines.py::TestVectorbtLoaderMakesTheRealCodeRunnable"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    ARGUS's real deflated_sharpe and vectorbt's real deflated_sharpe_ratio run on 1,220 \
+    identical inputs (5 hand-designed + a 1,215-case deterministic grid over observed x n x \
+    trials x variance x skew x kurtosis) - agree EXACTLY (max abs diff across the whole sweep: \
+    0.0) on every valid input, confirmed by running both real functions, not asserted from the \
+    formula's own resemblance on paper"""
+test = "test_dsr_comparison.py::TestSweptCases"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    the two NaN-input guards this comparison's own findings added to backtest/metrics.py, each \
+    confirmed independently load-bearing: deflated_sharpe's variance_of_trials NaN check and \
+    probabilistic_sharpe's observed/benchmark NaN check both raise on a tripped (NaN) case and \
+    both pass through cleanly on an otherwise-identical cleared (finite) case, verified \
+    programmatically"""
+test = "test_dsr_comparison.py::TestAblation"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    a real bug this comparison found in ARGUS's OWN code, not the baseline's: \
+    deflated_sharpe's pre-existing guard was `variance_of_trials < 0`, which does not catch \
+    NaN (float('nan') < 0 is False in IEEE 754) - the identical fails-every-comparison shape \
+    that makes vectorbt's own gate silent. A caller computing variance the way vectorbt's \
+    accessor does (np.var(x, ddof=1) on one trial) and passing it straight into ARGUS's own \
+    function would have gotten a silent NaN back. probabilistic_sharpe (deflated_sharpe's own \
+    single-trial reduction) had the identical gap independently. Both fixed the same session \
+    this was found, verified by re-running the exact failing case after the fix"""
+test = "test_metrics.py::TestDeflatedSharpe::test_nan_variance_is_refused"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    both functions are pure, deterministic transforms - no model, no seed, no simulation on \
+    either side. The 1,215-case sweep is itertools.product over fixed grids, not RNG-seeded, \
+    same reasoning as every other sweep in this project: a seed's meaning can shift across \
+    Python versions"""
+test = "test_dsr_comparison.py"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped explicitly - SCOPE_STATEMENT in eval/dsr_comparison.py. Claimed: the two \
+    implementations compute the identical published formula (verified over 1,220 real-run \
+    cases, not assumed from reading), and ARGUS's gate refuses exactly where vectorbt's real \
+    code would go silently NaN - now genuinely true after this comparison's own finding was \
+    fixed, not merely asserted by design. NOT claimed: that this was already true before the \
+    fix - the pre-existing guard shared vectorbt's own blind spot until this comparison found \
+    it. Also NOT claimed: that vectorbt is a worse DSR implementation in general - the formula \
+    itself is identical and correct on every valid input; the only measured difference is \
+    input validation at the edges, and vectorbt genuinely has none anywhere in the package for \
+    this specific function (grepped directly: no >/< comparison against deflated_sharpe_ratio \
+    anywhere in the repository)"""
+artefact = "src/argus/eval/dsr_comparison.py"
+test = "test_dsr_comparison.py::TestScopeStatement"

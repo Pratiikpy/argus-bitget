@@ -1,6 +1,6 @@
 """Verbatim third-party baselines, vendored for reproducible same-input comparison.
 
-Standing Rule #3 (project ``CLAUDE.md``) requires reading the best implementation before writing
+The read-before-write rule requires reading the best implementation before writing
 our own, and ``eval/standing.py``'s ``baseline_reproduced`` condition requires the comparison to
 run the baseline, not a paraphrase of it. A description of a competitor's behaviour is a claim;
 running the competitor's own code on the same input is evidence.

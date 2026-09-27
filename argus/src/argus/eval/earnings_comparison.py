@@ -44,12 +44,12 @@ import time
 import warnings
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from argus.eval.baselines.quantconnect_sue_loader import load_sue_module
 from argus.market.fundamentals import FundamentalsSource
 from argus.market.sue import MIN_QUARTERS, SueError, rank_universe, read
+from argus.truth.paths import DATA_DIR
 
 ANCHORS: tuple[str, ...] = (
     "NVDA", "TSLA", "AAPL", "MSFT", "META", "GOOGL", "AMZN", "COIN", "MSTR",
@@ -351,7 +351,7 @@ def main() -> int:  # pragma: no cover - CLI
         "scope_statement": SCOPE_STATEMENT,
     }
     print(render(report))
-    out = Path(__file__).resolve().parents[3] / "data" / "earnings_comparison.json"
+    out = DATA_DIR / "earnings_comparison.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     print(f"\nwritten to {out}")

@@ -21,7 +21,7 @@ premise of this system — and it is now checkable rather than asserted.
 from __future__ import annotations
 
 import json
-import sys
+import logging
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -29,6 +29,8 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
+
+_LOG = logging.getLogger(__name__)
 
 BASE_URL = "https://api.bitget.com"
 
@@ -103,7 +105,7 @@ class Ticker:
         return ANCHOR_OF.get(self.symbol)
 
 
-def _get(path: str, params: dict[str, str] | None = None, *, timeout: float = 30.0) -> Any:
+def public_get(path: str, params: dict[str, str] | None = None, *, timeout: float = 30.0) -> Any:
     url = f"{BASE_URL}{path}"
     if params:
         url = f"{url}?{urllib.parse.urlencode(params)}"
@@ -130,7 +132,7 @@ def maintenance_margin_rate(symbol: str, notional: float) -> float | None:
     2026-09-25). None when the table does not answer, and callers then say the distance is before
     maintenance margin rather than assume a rate."""
     try:
-        rows = _get("/api/v2/mix/market/query-position-lever",
+        rows = public_get("/api/v2/mix/market/query-position-lever",
                     {"symbol": symbol, "productType": "USDT-FUTURES"}, timeout=10.0)
     except BitgetError:
         return None
@@ -199,7 +201,7 @@ def _price(value: Any, *, field: str, symbol: str) -> Decimal:
 def fetch_tickers(product_type: str = "usdt-futures") -> dict[str, Ticker]:
     """Every ticker on the book, keyed by symbol. One call, no credentials."""
     now = datetime.now(UTC)
-    rows = _get("/api/v2/mix/market/tickers", {"productType": product_type}) or []
+    rows = public_get("/api/v2/mix/market/tickers", {"productType": product_type}) or []
     out: dict[str, Ticker] = {}
     for row in rows:
         symbol = row.get("symbol", "")
@@ -224,8 +226,8 @@ def fetch_tickers(product_type: str = "usdt-futures") -> dict[str, Ticker]:
             # One unpriceable instrument must not cost the other eleven their cycle, and it must
             # not be silently absent either. It is omitted from the result — callers already treat
             # a missing symbol as "no data for this name", which is exactly what happened — and the
-            # reason is printed so a venue that stops quoting something is visible in the log.
-            print(f"ticker omitted: {exc}", file=sys.stderr)
+            # reason is logged so a venue that stops quoting something is visible in the log.
+            _LOG.warning("ticker omitted: %s", exc)
     return out
 
 
@@ -245,7 +247,7 @@ def fetch_candles(
     Converted here rather than at the call site so that no downstream module ever parses a price
     out of a string — a small rule with a large payoff in an arithmetic-sensitive system.
     """
-    rows = _get(
+    rows = public_get(
         "/api/v2/mix/market/candles",
         {
             "symbol": symbol,

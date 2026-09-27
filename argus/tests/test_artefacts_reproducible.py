@@ -32,15 +32,27 @@ SRC = ARGUS / "src" / "argus"
 
 DOCS = (
     ARGUS / "README.md",
+    WORKSPACE / "README.md",
     WORKSPACE / "ARGUS-EXPLAINED.md",
     WORKSPACE / "ARGUS-ARCHITECTURE.md",
+    WORKSPACE / "SUBMISSION-DRAFT.md",
 )
+"""Every document a reader is sent to. The repository's front page and the submission text were
+added on 2026-09-27 (audit finding 147): they cite more artefacts than the three above, and a
+guard that skipped them guarded the documents fewest people read. A document the checkout does
+not carry (the submission draft is not published) is skipped, not failed."""
 
 # **`jsonl` before `json`, and it matters.** Regex alternation is ordered, so `(?:json|jsonl)`
 # matches the `json` prefix of `register.jsonl` and silently reports a `register.json` that has
 # never existed. This guard reported exactly that phantom on its first run.
-CITATION = re.compile(r"data/([A-Za-z0-9_]+\.(?:jsonl|json))\b")
-WRITE = re.compile(r"write_text|json\.dump|\.open\(\s*[\"']w")
+# `data/` as the package's data directory, not the tail of another path:
+# "truth/data/us_equity_holidays.json" is a file inside the package, and reading it as
+# `data/us_equity_holidays.json` reported a dead link that was not one (2026-09-27).
+CITATION = re.compile(r"(?<![\w.-]/)(?:argus/)?data/([A-Za-z0-9_]+\.(?:jsonl|json))\b")
+# `truth/artefact.write` is the project's own atomic writer; a module that writes only through it
+# was invisible to this guard until 2026-09-27, when widening DOCS reported two of them as orphans.
+WRITE = re.compile(r"write_text|json\.dump|\.open\(\s*[\"']w"
+                   r"|from argus\.truth\.artefact import[^\n]*\bwrite\b|artefact\.write\(")
 
 NOT_PRODUCED_HERE = {
     # Append-only logs written by the live cycle rather than by a regenerating command. Re-running
@@ -126,6 +138,7 @@ class TestEveryCitedArtefactCanBeRebuilt:
         missed one: it teaches a reader to ignore this test."""
         assert CITATION.findall("see data/register.jsonl for the chain") == ["register.jsonl"]
         assert CITATION.findall("see data/track1_study.json here") == ["track1_study.json"]
+        assert CITATION.findall("argus/data/a.json and truth/data/b.json") == ["a.json"]
 
     def test_every_cited_artefact_actually_exists_on_disk(self) -> None:
         """A citation to a file that was never written is a dead link in the evidence trail."""

@@ -384,6 +384,9 @@ class TestTheVerdictIsComposedFromTheFigures:
         assert "trimming NVDA to 20% brings it inside" in call.lines[1]
         assert call.lines[2] == ("Fill it as 60% near-touch limit then 40% market for $15,000, "
                                  "about 10.2 bps all in.")
+        # 15% drifts to 19% when TSLA outruns the rest by 0.19*0.85/(0.15*0.81) - 1 = 32.9%.
+        assert call.lines[3].startswith("What would change the call: if TSLA outruns the rest "
+                                        "of the book by 33%, it drifts past 19%")
 
     def test_the_fill_cost_is_the_live_books_when_the_book_answered(
         self, figures: dict[str, Any], monkeypatch: pytest.MonkeyPatch

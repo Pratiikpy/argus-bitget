@@ -97,43 +97,47 @@ def test_the_console_states_the_implied_open_with_its_record(
                                     "zero": 71.7, "argus_perp_direction_hit_rate": 1.0,
                                     "argus_perp_vs_best_gloaming": {"verdict": "not separable"}}}}
     (tmp_path / "overnight_comparison.json").write_text(json.dumps(report), "utf-8")
-    monkeypatch.setattr(answer, "_notes_path", lambda: tmp_path / "notes.json")
+    monkeypatch.setattr(answer, "desk_notes_path", lambda: tmp_path / "notes.json")
     close = datetime(2026, 9, 24, 20, tzinfo=UTC)
-    monkeypatch.setattr(research, "_last_regular_close", lambda now: close)
-    monkeypatch.setattr(research, "_yahoo_close", lambda symbol, at: 200.0)
+    for _module in (research.anchor, research.quote):
+        monkeypatch.setattr(_module, "_last_regular_close", lambda now: close)
+    for _module in (research.anchor, research.quote):
+        monkeypatch.setattr(_module, "_yahoo_close", lambda symbol, at: 200.0)
     monkeypatch.setattr(history, "fetch", lambda *a, **k: [history.Candle(
         ts=close - timedelta(hours=1), open=Decimal(1), high=Decimal(1), low=Decimal(1),
         close=Decimal("100"), volume=Decimal(0))])
 
-    line, source = research._implied_open_line("NVDAUSDT", Decimal("101"))
+    line, source = research.quote._implied_open_line("NVDAUSDT", Decimal("101"))
     assert "moved +1.00% since the Thu 20:00 UTC close" in line
     assert "near 202.00 at the next open (last close 200)" in line
     assert "on 88 nights across 1 stocks, the open was missed by 30bps" in line
     assert source.ref == "argus.eval.overnight_comparison"
 
-    tied, _ = research._implied_open_line("QQQUSDT", Decimal("101"))
+    tied, _ = research.quote._implied_open_line("QQQUSDT", Decimal("101"))
     assert "QQQ on 88 nights" in tied and "(a difference too small to call)" in tied
-    assert research._implied_open_line("BTCUSDT", Decimal("101")) is None
+    assert research.quote._implied_open_line("BTCUSDT", Decimal("101")) is None
 
 
 def test_no_close_bar_means_no_line(monkeypatch: pytest.MonkeyPatch) -> None:
     from argus.lui import research
     from argus.market import history
 
-    monkeypatch.setattr(research, "_last_regular_close",
-                        lambda now: datetime(2026, 9, 24, 20, tzinfo=UTC))
-    monkeypatch.setattr(research, "_yahoo_close", lambda symbol, at: 200.0)
+    for _module in (research.anchor, research.quote):
+        monkeypatch.setattr(_module, "_last_regular_close",
+                            lambda now: datetime(2026, 9, 24, 20, tzinfo=UTC))
+    for _module in (research.anchor, research.quote):
+        monkeypatch.setattr(_module, "_yahoo_close", lambda symbol, at: 200.0)
     monkeypatch.setattr(history, "fetch", lambda *a, **k: [])
-    assert research._implied_open_line("NVDAUSDT", Decimal("101")) is None
+    assert research.quote._implied_open_line("NVDAUSDT", Decimal("101")) is None
 
 
 def test_the_last_regular_close_skips_weekends_and_holidays() -> None:
     from argus.lui import research
 
     saturday = datetime(2026, 9, 26, 12, tzinfo=UTC)
-    assert research._last_regular_close(saturday) == datetime(2026, 9, 25, 20, tzinfo=UTC)
+    assert research.anchor._last_regular_close(saturday) == datetime(2026, 9, 25, 20, tzinfo=UTC)
     thanksgiving_evening = datetime(2026, 11, 26, 23, tzinfo=UTC)
-    assert research._last_regular_close(thanksgiving_evening) == datetime(
+    assert research.anchor._last_regular_close(thanksgiving_evening) == datetime(
         2026, 11, 25, 21, tzinfo=UTC)
 
 
@@ -201,11 +205,13 @@ def test_while_shut_only_the_regular_close_is_used(monkeypatch: pytest.MonkeyPat
     """An extended-hours quote is not a close: without the daily bar there is no line."""
     from argus.lui import research
 
-    monkeypatch.setattr(research, "_last_regular_close",
-                        lambda now: datetime(2026, 9, 24, 20, tzinfo=UTC))
-    monkeypatch.setattr(research, "_yahoo_close", lambda symbol, at: None)
-    monkeypatch.setattr(research, "_stock_last", lambda symbol, service: 226.36)
-    assert research._implied_open_line("NVDAUSDT", Decimal("226.5")) is None
+    for _module in (research.anchor, research.quote):
+        monkeypatch.setattr(_module, "_last_regular_close",
+                            lambda now: datetime(2026, 9, 24, 20, tzinfo=UTC))
+    for _module in (research.anchor, research.quote):
+        monkeypatch.setattr(_module, "_yahoo_close", lambda symbol, at: None)
+    monkeypatch.setattr(research.anchor, "_stock_last", lambda symbol, service: 226.36)
+    assert research.quote._implied_open_line("NVDAUSDT", Decimal("226.5")) is None
 
 
 def test_the_scored_argus_estimate_is_the_consoles_printed_implied_open(
@@ -223,7 +229,8 @@ def test_the_scored_argus_estimate_is_the_consoles_printed_implied_open(
     def broken(*_a: Any, **_k: Any) -> Any:
         raise RuntimeError("console broken")
 
-    monkeypatch.setattr(research, "_implied_open_line", broken)
+    for _module in (research.dispatch, research.quote):
+        monkeypatch.setattr(_module, "_implied_open_line", broken)
     with pytest.raises(RuntimeError, match="console broken"):
         oc.score(_inputs())
 
@@ -261,13 +268,14 @@ def test_claimcheck_grades_the_consoles_own_premise_check(
     # No claim in the set reads a price, so the zeroed price fields of the replayed tape are safe.
     for sentences in claims.values():
         for sentence in sentences:
-            assert not research._FUNDING_CLAIM.search(sentence)
-            assert not research._PREMIUM_CLAIM.search(sentence)
-            assert not research._LIQUIDITY_CLAIM.search(sentence)
+            assert not research.claims._FUNDING_CLAIM.search(sentence)
+            assert not research.claims._PREMIUM_CLAIM.search(sentence)
+            assert not research.claims._LIQUIDITY_CLAIM.search(sentence)
 
     def broken(*_a: Any, **_k: Any) -> Any:
         raise RuntimeError("console broken")
 
-    monkeypatch.setattr(research, "_claim_check", broken)
+    for _module in (research.claims, research.dispatch):
+        monkeypatch.setattr(_module, "_claim_check", broken)
     with pytest.raises(RuntimeError, match="console broken"):
         cc.console_answers(claims, tape)

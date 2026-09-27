@@ -1,6 +1,6 @@
 """Second-order stress: a bounded, recursive tree of scenarios grown from the shock a trader asked.
 
-**What the one-pass answer leaves out.** The console's stress answer (`lui/research.py`, the STRESS
+**What the one-pass answer leaves out.** The console's stress answer (`lui/research/`, the STRESS
 branch of ``_run``) makes one pass over the book: the stated shock through each holding's beta, a
 hedge sized to that beta, and the realised worst 24-hour window. Every line answers the question
 that was asked. None of them asks the next question, which is the one a risk review asks of every
@@ -37,7 +37,7 @@ reach it because it has not computed the result yet.
   ``breadth`` query-and-goal pairs at every level (``generate_search_queries``, ``:259-290``).
   A stress angle here has to be *computed* by one of the desk's engines, and an angle a model
   invents has no engine to compute it — its figure would be the model's, which the console never
-  allows (`lui/research.py`'s docstring: the model never says a number). The teardown left this
+  allows (`lui/research/`'s docstring: the model never says a number). The teardown left this
   open (`research/mypr-teardowns/gpt_researcher.md`, open questions) and it is closed this way on
   purpose: the tree is auditable, every run of it on the same history is identical, and it costs
   no token.
@@ -132,7 +132,7 @@ raise it."""
 
 HEDGE_BETA_FLOOR = 0.2
 """The book beta below which no beta hedge is tested. The same threshold the one-pass answer uses
-before it recommends a hedge against a non-benchmark instrument (`lui/research.py`, STRESS
+before it recommends a hedge against a non-benchmark instrument (`lui/research/`, STRESS
 branch), so the tree tests the hedge exactly when the answer would suggest one."""
 
 LOSS_SHARE_MARGIN = 0.02
@@ -168,7 +168,8 @@ class StressTreeError(RuntimeError):
 
 
 def _ticker(symbol: str) -> str:
-    """NVDA, not NVDAUSDT; CVX, not CVXSTOCKUSDT — `lui/research._t`, restated for the desk."""
+    """NVDA, not NVDAUSDT; CVX, not CVXSTOCKUSDT — `lui/research/kinds.py::_t`, restated for the
+    desk."""
     base = symbol.removesuffix("USDT")
     return base.removesuffix("STOCK") if base.endswith("STOCK") and len(base) > 5 else base
 
@@ -875,14 +876,15 @@ def book_worst_window(
     """The worst realised window of the book *as stated*, for the one-pass answer's line.
 
     Found by the recomputation in `eval/research_depth.py` (2026-09-25): the STRESS branch of
-    `lui/research._run` takes its "What actually happened" figure from ``copilot(add=<first name>,
-    before=<the rest>, size=<its weight>)``, and `desk/portfolio.rebalance` scales ``before`` by
-    ``1 - size`` — so a 50/50 QQQ and TSLA book is replayed as QQQ 50%, TSLA 25%. On the 61 live
-    stress questions that made 28 of the 28 multi-name realised-window figures wrong (one book
-    stated -2.01% where the book as asked lost -4.01%), and every one of the 28 matched the
-    rebalanced weights exactly. This is the same :func:`~argus.desk.portfolio.worst_window` over
-    the same :func:`~argus.desk.portfolio.align`, on the weights the trader gave; the tree's
-    ``realised_window`` node reads it the same way, so the two lines of one answer agree.
+    `lui/research/dispatch.py::_run` takes its "What actually happened" figure from
+    ``copilot(add=<first name>, before=<the rest>, size=<its weight>)``, and
+    `desk/portfolio.rebalance` scales ``before`` by ``1 - size`` — so a 50/50 QQQ and TSLA book is
+    replayed as QQQ 50%, TSLA 25%. On the 61 live stress questions that made 28 of the 28 multi-name
+    realised-window figures wrong (one book stated -2.01% where the book as asked lost -4.01%), and
+    every one of the 28 matched the rebalanced weights exactly. This is the same
+    :func:`~argus.desk.portfolio.worst_window` over the same :func:`~argus.desk.portfolio.align`, on
+    the weights the trader gave; the tree's ``realised_window`` node reads it the same way, so the
+    two lines of one answer agree.
     """
     _, columns = align(raw)
     held = {s: float(w) for s, w in book.items() if float(w) != 0.0 and s in columns}
@@ -903,10 +905,10 @@ def research_lines(
     """The console's call: the tree for a stress question, as answer lines, sources and payload.
 
     ``raw``, ``is_open``, the book and the shocked instrument are exactly what the STRESS branch of
-    `lui/research._run` already holds. A question with no stated shock is grown from -10%, the
-    larger of the two standard shocks that branch shows, and the head line says which shock it
-    grew from. Returns empty lines (and says why in the payload) when no tree can be grown, so the
-    one-pass answer stands alone rather than failing.
+    `lui/research/dispatch.py::_run` already holds. A question with no stated shock is grown from
+    -10%, the larger of the two standard shocks that branch shows, and the head line says which
+    shock it grew from. Returns empty lines (and says why in the payload) when no tree can be grown,
+    so the one-pass answer stands alone rather than failing.
     """
     from argus.truth.source import Source
 
@@ -950,7 +952,7 @@ def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI over l
     book = _parse_book(args.book)
     data = research.load((*book, args.on))
     lines, _sources, payload = research_lines(
-        raw=data.raw, is_open=research._is_open(), book=book, shocked=args.on,
+        raw=data.raw, is_open=research.session.anchor_is_open(), book=book, shocked=args.on,
         shock_pct=args.shock, cash=args.cash, provenance=data.provenance)
     for line in lines or [f"no tree: {payload.get('reason')}"]:
         print(line)

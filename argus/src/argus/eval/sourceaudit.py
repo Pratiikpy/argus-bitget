@@ -36,7 +36,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 REPORT_PATH = DATA / "source_audit.json"
 
 NOTES_PATH = DATA / "desk_notes.jsonl"

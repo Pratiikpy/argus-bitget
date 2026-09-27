@@ -49,7 +49,9 @@ from opentimestamps.core.timestamp import (  # type: ignore[import-untyped]
     Timestamp,
 )
 
-ANCHOR_DIR = Path(__file__).resolve().parents[3] / "data" / "anchors"
+from argus.truth.paths import DATA_DIR
+
+ANCHOR_DIR = DATA_DIR / "anchors"
 REPORT_PATH = ANCHOR_DIR.parent / "anchor_check.json"
 
 

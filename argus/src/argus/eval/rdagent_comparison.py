@@ -63,6 +63,7 @@ from argus.research.searchoff import (
     Arena,
     search_random,
 )
+from argus.truth.paths import DATA_DIR
 
 _RDAGENT_EXPERIMENT_SRC = (
     Path(__file__).resolve().parent / "baselines" / "rdagent_experiment.py"
@@ -586,7 +587,7 @@ if __name__ == "__main__":
 
     result = main()
     print(render(result))
-    out_path = Path(__file__).resolve().parents[3] / "data" / "rdagent_comparison.json"
+    out_path = DATA_DIR / "rdagent_comparison.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(f"\nsaved -> {out_path}")

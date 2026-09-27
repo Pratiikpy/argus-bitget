@@ -1,0 +1,154 @@
+name = "Point-in-time correctness vs. OpenBB's real, ungated live-API agent"
+subtheme = "t3-workbench"
+modules = [
+    "argus/market/evidence.py",
+    "argus/market/fundamentals.py",
+    "argus/eval/workbench_comparison.py",
+]
+state = "implemented"
+baseline = """\
+    OpenBB's real, published agent (openbb-finance/openbb-agents) and data platform \
+    (openbb-finance/OpenBBTerminal), both read in full and neither vendored"""
+blockers = [
+    """\
+        RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: openbb-agents is an archived 2024 \
+        repository. Run on the same 619 questions since (2026-09-26, eval/pit_rivals.py, \
+        data/pit_rivals.json, each scored from its own output): OpenBB's ODP (openbb_core, 7/493 \
+        right), HKUDS/Vibe-Trading's point-in-time series (343/619, 236 leaks) and research tool \
+        (9/619), ginlix-ai/LangAlpha (10/619) and TraderAlice/OpenAlice (10/619); ARGUS 619/619, 0 \
+        leaks. The S2 entry Abd00lmalik/Lumen-Terminal cannot be asked: its only fundamentals path \
+        returns a trailing-twelve-month total with no period. Not run end to end: \
+        openbb-mcp-server (it serves ODP's own FastAPI routes as MCP tools, \
+        openbb_mcp_server/app/app.py:348, so its numbers are the ODP output scored above) and \
+        Agent Rita (no fetcher of its own; it reads OpenBB Workspace widgets and needs a Workspace \
+        account). OWNED returns only when both are run.""",
+    """\
+        OpenBB genuinely wins on raw data-source breadth (32 real providers, 21 keyless, vs \
+        ARGUS's 12 live-verified) — closing that gap is a separate, already-named, unimplemented \
+        improvement (BLS employment data, Fama-French factors, CFTC positioning — \
+        research/audit/a2-openbb.md's own prior recommendation), not addressed by this capability. \
+        Neither OpenBB repository was run end to end (the Platform's real fetchers mostly need \
+        paid API keys this project does not have, and the Agents repo needs an OpenAI key for its \
+        LLM calls) — this comparison instead reads both real repos' source directly, which is \
+        sufficient to establish the structural absence of point-in-time gating without needing \
+        either live run""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    OpenBB's real openbb_agents/agent.py, tools.py, chains.py, prompts.py read in full: a \
+    subquestion-decomposition + FAISS tool-search + function-calling loop, three real LLM \
+    calls per query, tool access filtered by which API credentials are set — and OpenBB \
+    Platform's real 32-provider directory listing (openbb_platform/providers/*) re-counted \
+    from source, not trusted from an earlier note"""
+artefact = "src/argus/eval/workbench_comparison.py"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    two real methods on the identical task class: OpenBB's real agent reads whatever a live \
+    API returns at call time, no temporal concept anywhere; ARGUS's real as_of-gated fetchers \
+    (market/evidence.py, market/fundamentals.py) — already existing, exercised elsewhere, \
+    reused here — refuse anything whose own real timestamp is after a stated cutoff"""
+artefact = "src/argus/market/fundamentals.py"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    OpenBB Agents' real source (commit 1cfee33dc8443a9507698fc13c2c4eba88a03211, no LICENSE \
+    file so grepped not vendored) exhaustively searched for \
+    as_of/point-in-time/look-ahead/historical_date/backtest/cutoff: zero matches across every \
+    real .py file, re-run fresh the day this ran rather than trusted from an earlier read"""
+test = "test_workbench_comparison.py::TestOpenbbSourceRead"
+
+[[proofs]]
+condition = "implementation_complete"
+how = """\
+    as_of gating already existed on every real ARGUS source — SEC filings, RSS, \
+    Twitter/Reddit, XBRL facts — before this comparison; this capability adds the rival \
+    measurement, not a stub"""
+test = "test_fundamentals.py"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    the identical scenario put to both real systems: a research query anchored to a historical \
+    point in time. ARGUS's real fetcher accepts it and returns only what was knowable then, \
+    verified on real live SEC data; OpenBB's real agent source has no code path that could \
+    even accept such a query, confirmed by exhaustive grep of its own real files rather than \
+    assumed"""
+test = "test_workbench_comparison.py::TestPointInTimeComparison"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    619 questions (ten tickers' 10-Q/10-K filings since 2017, one hour before and after each \
+    acceptance), every rival paired with ARGUS question by question: exact McNemar p below \
+    1e-80 against each of the six rival arms, no question any rival answered that ARGUS \
+    missed; ARGUS right-rate Wilson 95% interval 0.994-1.0; groupwise by ticker and side"""
+artefact = "data/pit_rivals.json"
+test = "test_pit.py::TestTheCommittedRun"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    OpenBB's real agent needs three real LLM calls per query (documented from its own real \
+    source, not run — no OpenAI key on this machine); ARGUS's real as_of-gated fetch is \
+    measured wall-clock on a real, live, keyless API call"""
+test = "test_workbench_comparison.py::TestCosts"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    the gate was built on one filing (NVDA's 10-Q accepted 2026-08-26 20:36 UTC); held out, \
+    the nine tickers never looked at while building it: 553/553 right, 0 leaks, and every \
+    rival arm still loses paired (held_out in data/pit_rivals.json)"""
+artefact = "data/pit_rivals.json"
+test = "test_pit.py::TestTheCommittedRun"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    isolates the exact mechanism: ARGUS's resolver re-run with each rival's gate and supersede \
+    rule on the same 619 questions (mechanism_ablation in data/pit_rivals.json) — the \
+    filed-date gate alone leaks on 199 and hides 51 filings dated the next business day; \
+    keep-first alone serves the stale value on restated quarters. The acceptance second is the \
+    load-bearing boundary: NVDA's 10-Q dated 2026-08-26, accepted 20:36 UTC, is withheld at \
+    midnight and at 19:36 and visible at 21:36"""
+test = """\
+    test_workbench_comparison.py::TestFailureCases::test_the_boundary_is_the_acceptance_second"""
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    the gate tested at the sharpest boundary there is: one hour either side of the second \
+    EDGAR accepted a real filing, plus midnight of its filed day — the cutoff a filed-date \
+    gate gets wrong; and 29 restated quarters asked an hour after the restatement, where a \
+    keep-first rival serves the old number"""
+test = "test_pit.py"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    found by running it, 2026-09-26: the gate this row first shipped compared filed dates, so \
+    it showed an evening 10-Q from midnight of its filed day — the test asserted that leak as \
+    correct. Replaced with the acceptance-second gate (market/pit.py); rows EDGAR's index \
+    cannot date are bounded to 22:00 New York on their filed day, erring late, and say so in \
+    the status"""
+test = "test_workbench_comparison.py::TestFailureCases"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "the same real ticker/concept/as_of fetched twice returns the same real value"
+test = "test_workbench_comparison.py::TestReproducibility"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped explicitly — SCOPE_STATEMENT in eval/workbench_comparison.py. Claimed: ARGUS's \
+    structural point-in-time gating has no OpenBB equivalent. NOT claimed OpenBB's agent is \
+    broken for its own stated purpose — point-in-time gating is not a feature it claims. NOT \
+    claimed ARGUS's data-source breadth is competitive with OpenBB's — it genuinely is not (32 \
+    real providers vs 12), reported honestly rather than omitted"""
+test = "test_workbench_comparison.py::TestMain"

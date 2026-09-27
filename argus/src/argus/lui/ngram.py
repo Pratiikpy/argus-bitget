@@ -61,8 +61,9 @@ from pathlib import Path
 from typing import Any
 
 from argus.lui.normalise import fold
+from argus.truth.paths import DATA_DIR
 
-MODEL_PATH = Path(__file__).resolve().parents[3] / "data" / "lui_ngram_model.json"
+MODEL_PATH = DATA_DIR / "lui_ngram_model.json"
 
 OUT_OF_SCOPE = "out_of_scope"
 """The label for "not a question this console answers".

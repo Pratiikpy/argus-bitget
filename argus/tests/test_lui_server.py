@@ -21,6 +21,7 @@ import threading
 from collections.abc import Iterator
 from datetime import UTC, datetime
 from http.server import ThreadingHTTPServer
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -121,11 +122,44 @@ class TestTheDemoStarts:
         assert body.decode().rstrip().endswith("</html>")
         assert int(headers["Content-Length"]) == len(body)
 
-    def test_status_reports_the_real_chain_state(self, base_url: str) -> None:
-        _, body, _ = _get(base_url + "/status")
-        payload = json.loads(body)
-        assert isinstance(payload["entries"], int)
-        assert isinstance(payload["chain_intact"], bool)
+    def test_status_reports_the_real_chain_state(
+        self, base_url: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """A ledger with known contents, read through the endpoint: the count, the newest
+        decision and the chain's state must be that ledger's, and an edit to a past decision must
+        turn the reading to broken. Until 2026-09-27 this test asked only that the fields had the
+        right types, which a hard-coded ``{"entries": 0, "chain_intact": true}`` passed (audit
+        finding 146)."""
+        from datetime import timedelta
+        from decimal import Decimal
+
+        from argus.lui import server
+        from argus.paper.ledger import PaperLedger
+
+        path = tmp_path / "paper.jsonl"
+        ledger = PaperLedger(path=path)
+        start = datetime(2026, 9, 21, 14, tzinfo=UTC)
+        for n in range(3):
+            ledger.record(
+                symbol="NVDAUSDT", verdict="trade", side="BUY", quantity=Decimal("10"),
+                entry_price=Decimal("180"), stated_confidence=0.6, thesis="test thesis",
+                invalidation=("test invalidation",), market_state_hash="a" * 8,
+                approved_intent_hash="b" * 8, session_phase="weekend",
+                hours_to_discovery=30.0, decided_at=start + timedelta(hours=n))
+        monkeypatch.setattr(server, "_ledger_path", lambda: path)
+
+        payload = json.loads(_get(base_url + "/status")[1])
+        assert payload["entries"] == 3
+        assert payload["chain_intact"] is True
+        assert payload["newest_decision_at"] == (start + timedelta(hours=2)).isoformat()
+        assert payload["stale"] is True
+
+        rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+        rows[0]["thesis"] = "a thesis written after the fact"
+        path.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
+        tampered = json.loads(_get(base_url + "/status")[1])
+        assert tampered["entries"] == 3
+        assert tampered["chain_intact"] is False
 
 
 class TestTheAskEndpoint:
@@ -555,3 +589,16 @@ class TestAModelReadingIsHeldToTheWords:
                    "idea?", [])
         assert seen and seen[0].kind is research.ResearchKind.IMPACT
         assert seen[0].symbols[0] == "COINUSDT"
+
+
+def test_a_500_names_the_error_class_and_an_incident_but_never_its_message(
+        caplog: pytest.LogCaptureFixture) -> None:
+    """Audit finding 162: the body carried ``str(exc)``, which can hold a URL with its query or
+    a local path. The message now goes to the server log only, under the id the body gives."""
+    from argus.lui.server import server_error
+
+    with caplog.at_level("ERROR", logger="argus.lui.server"):
+        body = json.loads(server_error(ValueError("https://x.test/?token=s3cret"), "/ask"))
+    assert body["error"] == "ValueError"
+    assert "s3cret" not in json.dumps(body)
+    assert body["incident"] in caplog.text and "s3cret" in caplog.text

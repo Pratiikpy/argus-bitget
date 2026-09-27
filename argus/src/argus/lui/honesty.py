@@ -22,11 +22,11 @@ back to the plain true reason rather than a number from nothing.
 * ``others_positions`` — a named institution's or other users' live positions. Not public; 13F
   filings (quarterly, delayed) and Bitget's aggregate long/short split are, and are offered.
 * ``order_instruction`` — handled by :func:`order_prefix`, which reuses the console's own order
-  classifier (`lui/question.is_order_instruction`, `lui/research._is_an_order`, the Chinese
-  ORDER patterns) and adds the three imperatives the bench found it missed. The console's analysis
-  of such an order is kept; the prefix says nothing was sent above it.
+  classifier (`lui/question.is_order_instruction`, `lui/research/parse.py::is_an_order`, the
+  Chinese ORDER patterns) and adds the three imperatives the bench found it missed. The console's
+  analysis of such an order is kept; the prefix says nothing was sent above it.
 * ``future_price`` — extends `lui/research.price_forecast_asked` with the six phrasings it missed
-  (listed at :data:`_FUTURE_EXTRA`), keeping its `_PAST_PREDICTION` exclusion.
+  (listed at :data:`_FUTURE_EXTRA`), keeping its `PAST_PREDICTION` exclusion.
 * ``before_data`` — the desk's record before its first decision (read from the ledger), and a
   price on a past date, answered from Yahoo daily (stocks) or Bitget daily candles (perps), with
   the day the history starts named when the date is before it.
@@ -36,7 +36,7 @@ back to the plain true reason rather than a number from nothing.
   (live when the answer is built, frozen or cached during detection), with the count checked.
 * ``ambiguous`` — no resolvable name and nothing earlier to refer to: asks which one.
 
-**Why a separate module.** `lui/research.py` and `lui/server.py` belong to other builders; this
+**Why a separate module.** `lui/research/` and `lui/server.py` belong to other builders; this
 module is called from `lui/server._answer` (see the report in ``data/honesty_eval.json``).
 """
 
@@ -97,11 +97,11 @@ def _registry() -> Mapping[str, Any]:
     `market/universe.contracts` already cached in this process, else its frozen snapshot."""
     from argus.market import universe
 
-    cached = universe._CACHE
+    cached = universe.cached_contracts()
     if cached is not None:
-        return cached[1]
+        return cached
     try:
-        return universe._from_snapshot()[0]
+        return universe.contracts_from_snapshot()[0]
     except (OSError, ValueError, KeyError):
         return {}
 
@@ -201,23 +201,23 @@ def order_prefix(text: str) -> str | None:
 
     Detection reuses the console's own classifier — `lui/question.is_order_instruction` (the
     English, request, Chinese-helper and ten-language forms), the Chinese ORDER patterns in
-    `lui/question._CHINESE_COMPILED`, and `lui/research._is_an_order` — and adds only
+    `lui/question._CHINESE_COMPILED`, and `lui/research/parse.py::is_an_order` — and adds only
     :data:`_ORDER_EXTRA`. A question ("how should I split a $50k order in NVDA") is not an order.
     """
     from argus.lui.normalise import fold
     from argus.lui.question import _CHINESE_COMPILED, Intent, is_order_instruction
-    from argus.lui.research import _is_an_order
+    from argus.lui.research.parse import is_an_order
 
     raw = fold(text).strip()
     if not raw or re.search(r"\?|？|\bhow\b|\bshould\b|\bwhat\b|\bwhich\b|\bshow\s+me\b|"
                             r"\b(?:and|then)\s+(?:show|tell|give)\b|\bresulting\b|"
                             r"怎么|怎样|如何|应该|是否|要不要|吗|呢|影响|什么|哪", raw, re.I):
-        return None  # a question about an order, or a request for its analysis (`_is_an_order`)
+        return None  # a question about an order, or a request for its analysis (`is_an_order`)
     if re.match(r"^\s*(?:please\s+|pls\s+)?hedge\b", raw, re.I):
         # a hedge request is answered as a hedge analysis (`research._IMPERATIVE_HEDGE`)
         return None
     chinese = any(i is Intent.ORDER and p.search(raw) for p, i in _CHINESE_COMPILED)
-    if not (is_order_instruction(raw) or _is_an_order(raw) or chinese
+    if not (is_order_instruction(raw) or is_an_order(raw) or chinese
             or _ORDER_EXTRA.search(raw)):
         return None
     if chinese or re.search(r"[一-鿿]", raw):
@@ -231,7 +231,8 @@ def order_prefix(text: str) -> str | None:
 
 _FUTURE_EXTRA = re.compile(
     # fut-01 "what will NVDA close at next Friday", fut-08 "what will AAPL trade at right after
-    # its next earnings": `research._PRICE_FORECAST` knows "be worth/at/trading", not these verbs.
+    # its next earnings": `research.parse.PRICE_FORECAST` knows "be worth/at/trading", not these
+    # verbs.
     r"\bwhat\s+will\s+(?:[\w&.$'’-]+\s+){1,4}(?:close|open|trade|settle|end|finish|print|"
     r"sit)\s+(?:at|on|the)\b"
     # fut-03 "what price will TSLA reach in 2030".
@@ -258,20 +259,21 @@ _NOT_A_FORECAST = re.compile(
     r"\b(?:past|previous|earlier|its|your|their|the\s+desk'?s?|desk'?s)\s+(?:\w+\s+)?"
     r"predictions?\b|\bcalibrat\w*|\bprediction\s+(?:accuracy|record|track)", re.I)
 """About predictions already made: "the calibration accuracy of this desk's past predictions"
-matched `research._PRICE_FORECAST` on its bare "predict" (held-out corpus)."""
+matched `research.parse.PRICE_FORECAST` on its bare "predict" (held-out corpus)."""
 
 
 def future_price_asked(text: str) -> bool:
     """`research.price_forecast_asked`, widened by :data:`_FUTURE_EXTRA`, with the same
-    `_PAST_PREDICTION` exclusion (whether a pattern predicted anything; analysts' targets) and
+    `PAST_PREDICTION` exclusion (whether a pattern predicted anything; analysts' targets) and
     :data:`_NOT_A_FORECAST`."""
-    from argus.lui.research import _PAST_PREDICTION, price_forecast_asked
+    from argus.lui.research import price_forecast_asked
+    from argus.lui.research.parse import PAST_PREDICTION
 
     if _NOT_A_FORECAST.search(text):
         return False
     if price_forecast_asked(text):
         return True
-    return bool(_FUTURE_EXTRA.search(text)) and not _PAST_PREDICTION.search(text)
+    return bool(_FUTURE_EXTRA.search(text)) and not PAST_PREDICTION.search(text)
 
 
 def _future_lines(text: str, names: Sequence[str]) -> list[str]:

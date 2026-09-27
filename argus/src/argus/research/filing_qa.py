@@ -53,7 +53,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Literal
 
-from argus.market.evidence import _UA
+from argus.market.evidence import FEED_USER_AGENT
 from argus.market.statement_facts import (
     COMPONENTS,
     Anchor,
@@ -500,7 +500,7 @@ class CompanyResolver:
     delisted (Activision Blizzard, Foot Locker), whose filings are still on EDGAR.
     """
 
-    def __init__(self, *, user_agent: str = _UA, snapshot: Path | None = None,
+    def __init__(self, *, user_agent: str = FEED_USER_AGENT, snapshot: Path | None = None,
                  offline: bool = False) -> None:
         self._ua = user_agent
         self._snapshot = snapshot

@@ -1,8 +1,9 @@
 """S23 decision-quality primitives, each measured on the record rather than asserted.
 
 Six primitives landed together on 2026-09-25 (``research/mypr-teardowns/_SYNTHESIS.md`` harvest,
-item S23 of ``Activity/17_HARVEST_CHECKLIST.md``). None of them is allowed to claim an improvement
-on the strength of its mechanism. This module measures each against the record that already exists
+item S23 of the pattern-harvest checklist, not published). None of them is allowed to claim an
+improvement on the strength of its mechanism. This module measures each against the record that
+already exists
 and writes ``data/decision_primitives.json`` — ties, losses and "cannot be measured on this record"
 included, each with the reason.
 
@@ -88,8 +89,9 @@ from argus.truth.grounding import (
     extract,
     nearest,
 )
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 NOTES_PATH = DATA / "desk_notes.jsonl"
 LEDGER_PATH = DATA / "paper_ledger.jsonl"
 CHAINS_PATH = DATA / "causal_chains.jsonl"

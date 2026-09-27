@@ -99,8 +99,9 @@ def test_a_bigger_move_without_a_direction_says_size_not_direction(
         "size_ratio": 1.6, "verdict": "NO EFFECT ESTABLISHED across 9 event(s).",
         "tests": {"patell": {"adjusted_p_value": 0.41}}, "dates": ["2025-11-13", "2025-12-18"]}])
     monkeypatch.setenv("ARGUS_DATA_DIR", str(tmp_path))
-    monkeypatch.setattr(research, "_event_lines", lambda *a, **k: ([], None))
-    lines, sources = research._event_reaction("NVDAUSDT", "how does NVDA react to CPI")
+    for _module in (research.book, research.macro, research.riskmath):
+        monkeypatch.setattr(_module, "_event_lines", lambda *a, **k: ([], None))
+    lines, sources = research.book._event_reaction("NVDAUSDT", "how does NVDA react to CPI")
     assert lines[0].startswith("Bottom line: expect a bigger move than usual, not a direction")
     assert "1.6x its ordinary 24 hours" in lines[0]
     assert "no reliable direction" in lines[1]
@@ -112,7 +113,7 @@ def test_a_fund_has_no_earnings_to_react_to(tmp_path: Path,
     _report(tmp_path, [{"symbol": "QQQUSDT", "kind": "CPI", "events": 5, "average_car_bps": 1.0,
                         "size_ratio": 0.4, "verdict": "NO EFFECT", "tests": {}, "dates": []}])
     monkeypatch.setenv("ARGUS_DATA_DIR", str(tmp_path))
-    lines, _ = research._event_reaction("QQQUSDT", "how does QQQ trade after earnings")
+    lines, _ = research.book._event_reaction("QQQUSDT", "how does QQQ trade after earnings")
     assert lines == ["QQQ files no earnings of its own, so there is no earnings reaction to "
                      "measure; ask how it reacts to CPI or Fed decisions."]
 
@@ -138,8 +139,8 @@ def _candles(monkeypatch: pytest.MonkeyPatch, step: float = 0.003) -> None:
 def test_the_schedule_is_the_almgren_chriss_optimum_priced_against_an_even_split(
         monkeypatch: pytest.MonkeyPatch) -> None:
     _candles(monkeypatch)
-    monkeypatch.setattr(research, "_session_change", lambda start, hours: None)
-    lines = research._optimal_schedule("NVDAUSDT", Decimal(200_000), Decimal(20_000_000),
+    monkeypatch.setattr(research.execution, "_session_change", lambda start, hours: None)
+    lines = research.execution._optimal_schedule("NVDAUSDT", Decimal(200_000), Decimal(20_000_000),
                                        _book(), 6.0, 3.0, False)
     assert lines[0].startswith("Schedule (Almgren-Chriss optimum, inventory decaying e-fold")
     assert "for an even split" in lines[0] and "live book" in lines[0]
@@ -154,11 +155,11 @@ def test_the_schedule_is_the_almgren_chriss_optimum_priced_against_an_even_split
 
 def test_urgency_front_loads_harder(monkeypatch: pytest.MonkeyPatch) -> None:
     _candles(monkeypatch)
-    monkeypatch.setattr(research, "_session_change", lambda start, hours: None)
+    monkeypatch.setattr(research.execution, "_session_change", lambda start, hours: None)
 
     def first(urgent: bool) -> int:
-        line = research._optimal_schedule("NVDAUSDT", Decimal(200_000), Decimal(20_000_000),
-                                          _book(), 6.0, 3.0, urgent)[0]
+        line = research.execution._optimal_schedule(
+            "NVDAUSDT", Decimal(200_000), Decimal(20_000_000), _book(), 6.0, 3.0, urgent)[0]
         return int(line.split("trade ", 1)[1].split("%", 1)[0])
 
     assert first(True) > first(False)
@@ -166,9 +167,9 @@ def test_urgency_front_loads_harder(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_the_schedule_stops_at_the_session_boundary(monkeypatch: pytest.MonkeyPatch) -> None:
     _candles(monkeypatch)
-    monkeypatch.setattr(research, "_session_change", lambda start, hours: (2, "opens"))
-    lines = research._optimal_schedule("NVDAUSDT", Decimal(1_000_000), Decimal(20_000_000),
-                                       _book(), 6.0, 12.0, False)
+    monkeypatch.setattr(research.execution, "_session_change", lambda start, hours: (2, "opens"))
+    lines = research.execution._optimal_schedule(
+        "NVDAUSDT", Decimal(1_000_000), Decimal(20_000_000), _book(), 6.0, 12.0, False)
     session = next(line for line in lines if line.startswith("Session:"))
     assert "opens in about 2 hour(s)" in session
     assert "plan the remaining" in session
@@ -176,7 +177,7 @@ def test_the_schedule_stops_at_the_session_boundary(monkeypatch: pytest.MonkeyPa
 
 
 def test_waiting_cost_is_volatility_over_the_square_root_of_time() -> None:
-    line = research._waiting_cost([0.0025, -0.0025] * 24)
+    line = research.execution._waiting_cost([0.0025, -0.0025] * 24)
     one = float(line.split("expected ", 1)[1].split("bps", 1)[0])
     ten = float(line.split(", ", 1)[1].split("bps", 1)[0])
     assert one == pytest.approx(25 / math.sqrt(60), abs=0.1)
@@ -190,7 +191,7 @@ def test_the_analogue_answer_carries_the_path_match_and_its_null() -> None:
     fixture = Path(__file__).resolve().parents[1] / "data" / "risk_layer_candles_fixture.json"
     rows = json.loads(fixture.read_text(encoding="utf-8"))["candles"]["COINUSDT"]
     closes = [(datetime.fromisoformat(t), float(c)) for t, c in rows]
-    found = research._shape_line(closes, "COINUSDT", 90)
+    found = research.analogue._shape_line(closes, "COINUSDT", 90)
     assert found is not None
     text, payload = found
     assert text.startswith("Path match")
@@ -233,7 +234,7 @@ def _falling(symbol: str, drop: float) -> dict[str, dict[datetime, float]]:
 
 def test_two_mandates_disagree_on_the_identical_trade() -> None:
     raw = _falling("COINUSDT", -0.10)
-    lines = research._mandate_lines("COINUSDT", 0.10, raw, "I'm an aggressive trader")
+    lines = research.parse._mandate_lines("COINUSDT", 0.10, raw, "I'm an aggressive trader")
     assert lines[0].startswith("Bottom line: for your mandate (aggressive event trader")
     assert "yes to a 10% ($10,000) COIN position" in lines[0]
     assert lines[1].startswith("The same trade under a conservative income mandate: no")
@@ -241,13 +242,13 @@ def test_two_mandates_disagree_on_the_identical_trade() -> None:
 
 
 def test_the_bad_case_is_the_names_own_worst_day() -> None:
-    worst = research._worst_day_pct("COINUSDT", _falling("COINUSDT", -0.12))
+    worst = research.parse._worst_day_pct("COINUSDT", _falling("COINUSDT", -0.12))
     assert Decimal("11") < worst < Decimal("12")
 
 
 def test_a_resize_prints_money_not_bare_decimals() -> None:
     raw = _falling("COINUSDT", -0.05)
-    lines = research._mandate_lines("COINUSDT", 0.30, raw, "aggressive trader")
+    lines = research.parse._mandate_lines("COINUSDT", 0.30, raw, "aggressive trader")
     assert "but at $25,000 rather than the 30% ($30,000) COIN position asked" in lines[0]
     assert "30000" not in lines[0] and "$100,000 of capital" in lines[0]
 
@@ -295,17 +296,17 @@ def test_the_stress_band_uses_the_frozen_head_to_head_scale() -> None:
 
 
 def test_a_long_thesis_is_cut_at_a_sentence_never_mid_clause() -> None:
-    from argus.lui.research import _sentence_cut
+    from argus.lui.research.text import sentence_cut
 
     short_first = ("General mandate: nothing applies. TSLA shows mild bullish momentum (price "
                    "above all MAs, RSI 65.9, strong Q2 beat) but the forward consensus "
                    "revisions are heavily negative (4 up / 15 down current quarter, 3 up / 12 "
                    "down next), so the setup does not clear the bar. More text follows here.")
-    out = _sentence_cut(short_first)
+    out = sentence_cut(short_first)
     assert out.endswith("clear the bar.") and "…" not in out and "..." not in out
     many = "Short one. " + "Second sentence runs on here. " * 12
-    assert _sentence_cut(many).endswith(".") and len(_sentence_cut(many)) <= 240
+    assert sentence_cut(many).endswith(".") and len(sentence_cut(many)) <= 240
     endless = "word " * 200
-    assert _sentence_cut(endless).endswith("…")
+    assert sentence_cut(endless).endswith("…")
     clipped = "No specific constraint applies. Revisions are negative (4 up / 15 down, 3..."
-    assert _sentence_cut(clipped) == "No specific constraint applies."
+    assert sentence_cut(clipped) == "No specific constraint applies."

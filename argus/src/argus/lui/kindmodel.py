@@ -1,7 +1,8 @@
 """The research-kind model at runtime, and a planner that lets it stand in for the language model.
 
-`eval/kindtrain.py` fits a character n-gram linear model over fourteen classes — the thirteen
-research kinds, ``record`` and ``refuse`` — and exports it as JSON. Scoring reuses
+`eval/kindtrain.py` fits a character n-gram linear model over the research kinds it has training
+questions for, ``record`` and ``refuse`` (fourteen labels in the shipped file), and exports it as
+JSON. Scoring reuses
 `lui/ngram.NgramClassifier` (stdlib only), so the deployed bundle gains no dependency.
 
 **How it is used.** The console already has a validated path for a model's reading of a question:
@@ -19,8 +20,9 @@ from pathlib import Path
 from typing import Any
 
 from argus.lui.ngram import NgramClassifier
+from argus.truth.paths import DATA_DIR
 
-MODEL_PATH = Path(__file__).resolve().parents[3] / "data" / "lui_kind_model.json"
+MODEL_PATH = DATA_DIR / "lui_kind_model.json"
 REFUSE = "refuse"
 RECORD = "record"
 
@@ -63,6 +65,22 @@ def kind_model() -> KindModel | None:
     return _CACHED
 
 
+def plan_confidence(probability: float, threshold: float, floor: float) -> float:
+    """The model's own probability, placed on the plan's scale.
+
+    The kind model clears its own cross-validated ``threshold``; `research.plan_with_model` has a
+    separate ``floor`` written for a language model's self-reported confidence. Until 2026-09-27
+    every reading that cleared the model's threshold was reported as 1.0 (audit finding 159), so a
+    label at 0.41 and one at 0.99 looked the same downstream. The map is linear and keeps both
+    gates: the model's threshold lands exactly on the plan's floor, certainty on 1.0, and the order
+    of any two readings is kept."""
+    if probability < threshold:
+        return 0.0
+    if threshold >= 1.0:
+        return 1.0
+    return floor + (1.0 - floor) * (probability - threshold) / (1.0 - threshold)
+
+
 class LocalPlanner:
     """A drop-in for the language-model router's ``complete_json``, answered by :class:`KindModel`
     and the pattern extractors. It never invents a number: every figure it returns was read from
@@ -76,18 +94,19 @@ class LocalPlanner:
 
         text = next((m["content"] for m in reversed(messages) if m.get("role") == "user"), "")
         label, confidence = self._model.predict(text)
+        scaled = plan_confidence(confidence, self._model.threshold, research.MIN_PLAN_CONFIDENCE)
         if label is None:
             return {"kind": "none", "confidence": 0.0, "why": "below the kind model's threshold"}
         if label in (REFUSE, RECORD):
-            # Full confidence because the model already cleared its own threshold; the console's
-            # "declined by the model" rule reads this field on the same terms as the LLM's.
+            # The console's "declined by the model" rule reads this field on the same terms as the
+            # LLM's; the model's own probability, on the plan's scale (`plan_confidence`).
             return {"kind": "none" if label == REFUSE else "record",
-                    "confidence": 1.0, "why": f"kind model: {label} at {confidence:.2f}"}
+                    "confidence": scaled, "why": f"kind model: {label} at {confidence:.2f}"}
         # A percentage beside a shock word or signed ("a -10% NVDA shock", "qqq -10% scenario")
         # is the shock, not a holding weight; the patterns draw the same line
         # (`research._named_shock_request`).
-        pairs = [(pos, symbol, weight) for pos, symbol, weight in research._pairs(text)
-                 if not research._SHOCK_WEIGHT.search(text[max(0, pos - 2): pos + 16])
+        pairs = [(pos, symbol, weight) for pos, symbol, weight in research.parse.holding_pairs(text)
+                 if not research.parse.SHOCK_WEIGHT.search(text[max(0, pos - 2): pos + 16])
                  and not text[max(0, pos - 1): pos + 1].startswith("-")]
         holdings: dict[str, float] = {}
         for _pos, symbol, weight in pairs:
@@ -96,9 +115,9 @@ class LocalPlanner:
         candidate = next((s for s in named if s not in holdings), named[0] if named else None)
         plan: dict[str, Any] = {
             "kind": label,
-            # The plan passes `plan_with_model`'s confidence floor only because the kind model
-            # already cleared its own, CV-chosen threshold; its softmax is on a different scale.
-            "confidence": 1.0,
+            # The kind model's probability on the plan's scale: its CV-chosen threshold lands on
+            # `plan_with_model`'s floor, so a reading the model accepts is never refused for scale.
+            "confidence": scaled,
             "why": f"kind model: {label} at {confidence:.2f}",
             "names": named,
             "holdings": holdings,
@@ -107,7 +126,7 @@ class LocalPlanner:
             plan["candidate"] = candidate
         # The raw reading, before cash and leverage adjustments: `plan_with_model` applies those
         # to the plan once, and taking them here too applied a 3x multiple twice (90% for 10%).
-        patterned = research._detect(text)
+        patterned = research.parse.read_request(text)
         if (patterned is not None and patterned.size_stated and patterned.symbols
                 and patterned.kind is research.ResearchKind.IMPACT
                 and (patterned.symbols[0] == candidate or patterned.symbols[0] in holdings)):
@@ -121,7 +140,7 @@ class LocalPlanner:
             # Telegram bot's own help examples, 2026-09-25). The patterns' size reading is exact.
             plan["size_percent"] = patterned.size * 100.0
             holdings.pop(candidate, None)
-        notional = research._parse_notional(text)
+        notional = research.parse.parse_notional(text)
         if label == "execution" and notional is not None:
             plan["order_usd"] = str(notional)
         # The shock is a percentage that is not a holding weight: "I hold 50% BTC, 30% ETH, how
@@ -130,7 +149,7 @@ class LocalPlanner:
         shock = next(iter(research.shock_numbers(text, sorted(weights), near=16)), None)
         if label == "stress" and shock is not None:
             value = abs(float(shock.group(1)))
-            down = research._DOWN_WORDS.search(text) or shock.group(1).startswith("-")
+            down = research.parse.DOWN_WORDS.search(text) or shock.group(1).startswith("-")
             plan["shock_percent"] = -value if down else value
         return plan
 

@@ -43,8 +43,9 @@ from typing import Any
 
 from argus.eval import mcp_fuzz
 from argus.truth import artefact
+from argus.truth.paths import DATA_DIR
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "mcp_sdk_comparison.json"
+REPORT_PATH = DATA_DIR / "mcp_sdk_comparison.json"
 
 BEFORE_HARDENING: dict[str, Any] = {
     "measured": "2026-09-25, same corpus and oracle, against lui/mcp_server.py as it stood "

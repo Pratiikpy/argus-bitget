@@ -7,7 +7,8 @@ from typing import Any
 
 import pytest
 
-from argus.lui.research import ResearchKind, _detect
+from argus.lui.research import ResearchKind
+from argus.lui.research.parse import read_request
 from argus.market import equity_history as eh
 
 
@@ -64,14 +65,14 @@ def test_too_little_history_is_an_error_not_an_answer() -> None:
 ])
 def test_a_leveraged_hold_across_a_closure_is_a_leverage_question(
         text: str, symbol: str, leverage: float, side: str, weekend: bool) -> None:
-    request = _detect(text)
+    request = read_request(text)
     assert request is not None and request.kind is ResearchKind.LEVERAGE
     assert (request.symbols[0], request.leverage, request.side, request.weekend) == (
         symbol, leverage, side, weekend)
 
 
 def test_a_hedge_request_on_a_spot_token_is_still_a_hedge() -> None:
-    request = _detect("I hold RNVDAUSDT, protect it over the weekend")
+    request = read_request("I hold RNVDAUSDT, protect it over the weekend")
     assert request is not None and request.kind is ResearchKind.HEDGE
 
 

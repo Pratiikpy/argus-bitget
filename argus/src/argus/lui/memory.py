@@ -32,10 +32,19 @@ from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from typing import Any
 
+from argus.lui.research.kinds import bare_symbol
+
 MAX_FACTS = 40
 MAX_TEXT = 200
 
-KINDS = ("budget", "max_loss", "horizon", "style", "capital", "thesis", "avoid")
+KINDS = ("budget", "max_loss", "horizon", "style", "capital", "thesis", "avoid", "check")
+"""``check`` is one line of the checklist a review of the trader's own trades wrote
+(`lui/journal.py`): its subject is the habit's key, its text the check. It is kept so the check is
+run again on a later entry (:func:`after`), which the review promised and nothing did until
+2026-09-27 (audit finding 56)."""
+
+DEFAULT_CHECK_DAYS = 5
+"""The hold a checklist is tested over when the trader has stated none: one trading week."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -153,6 +162,23 @@ def extract(question: str, now: datetime | None = None,
         if named:
             add("avoid", named[0], "avoid", m.group(0))
     return facts
+
+
+def checks_from(data: Any, now: datetime | None = None) -> list[Fact]:
+    """The checklist of a trade review's ``data`` (`journal.review_trades`) as facts to keep; a
+    new review replaces the old checklist line by line, and a habit it no longer finds is dropped
+    by :func:`merge_checks`."""
+    journal = (data or {}).get("journal") if isinstance(data, dict) else None
+    patterns = (journal or {}).get("patterns") or []
+    day = (now or datetime.now(UTC)).date().isoformat()
+    return [Fact(kind="check", subject=str(p["key"])[:24], value=str(p.get("count", "")),
+                 text=str(p["check"])[:MAX_TEXT], at=day)
+            for p in patterns if isinstance(p, dict) and p.get("key") and p.get("check")]
+
+
+def merge_checks(old: list[Fact], checks: list[Fact]) -> list[Fact]:
+    """A new review's checklist in place of the last one's, the other facts kept."""
+    return merge([f for f in old if f.kind != "check"], checks)
 
 
 def parse(raw: str | None) -> list[Fact]:
@@ -281,11 +307,11 @@ def _apply_mandate(request: Any, facts: list[Fact], question: str) -> tuple[Any,
 
 
 def after(lines: list[str], request: Any, facts: list[Fact],
-          price_now: Any = None) -> list[str]:
+          price_now: Any = None, *, tester: Any = None) -> list[str]:
     """Lines an answer gains from memory once it is computed: a stated loss limit set against the
     loss the answer found, a thesis beside the name it is about, and a name the trader said they
-    avoid."""
-    from argus.lui.research import _t
+    avoid, and the kept checklist run on the entry being weighed."""
+    from argus.lui.research.kinds import bare_symbol
 
     extra: list[str] = []
     limit = get(facts, "max_loss")
@@ -309,12 +335,58 @@ def after(lines: list[str], request: Any, facts: list[Fact],
                     now = float(price_now(symbol))
                 except Exception:
                     now = None
-            extra.append(thesis_line(thesis, _t(symbol), now))
+            extra.append(thesis_line(thesis, bare_symbol(symbol), now))
         avoid = get(facts, "avoid", symbol)
         if avoid is not None:
-            extra.append(remembered_line(avoid, f"{_t(symbol)} is a name you said you stay out "
-                                                f"of"))
+            extra.append(remembered_line(
+                avoid, f"{bare_symbol(symbol)} is a name you said you stay out of"))
+    extra.extend(checklist_lines(request, facts, tester=tester))
     return extra
+
+
+def checklist_lines(request: Any, facts: list[Fact], *, tester: Any = None,
+                    today: Any = None) -> list[str]:
+    """The kept checklist, run on the entry this question asks about: each check that a question
+    can test, with what it finds now; the rest listed as reminders, said to be untested.
+
+    Run only where an entry is being weighed (adding a name to a book, executing an order), on the
+    first name the question names, over the trader's remembered holding period or, failing one,
+    :data:`DEFAULT_CHECK_DAYS`. ``tester`` is ``journal.retest``'s signature, injected in tests."""
+    from argus.lui.research import ResearchKind
+
+    checks = [f for f in facts if f.kind == "check"]
+    symbols = getattr(request, "symbols", ())
+    if not checks or not symbols or getattr(request, "kind", None) not in (
+            ResearchKind.IMPACT, ResearchKind.EXECUTION):
+        return []
+    from datetime import date as date_type
+
+    from argus.lui import journal
+
+    symbol = symbols[0]
+    side = str(getattr(request, "side", "long") or "long")
+    horizon = get(facts, "horizon")
+    days = max(1, int(horizon.value) // 24) if horizon is not None else DEFAULT_CHECK_DAYS
+    day = today if isinstance(today, date_type) else datetime.now(UTC).date()
+    run = tester or (lambda key: journal.retest(
+        key, symbol, side, today=day, horizon_days=days,
+        next_report=journal.next_report_date, holidays=journal.holidays()))
+    held = ("your remembered " if horizon is not None else "a default ") + f"{days}-day hold"
+    out = [f"Your checklist, from your trade review on {checks[0].at}, run on this "
+           f"{bare_symbol(symbol)} {'buy' if side == 'long' else 'sell'} over {held}:"]
+    untested: list[str] = []
+    for fact in checks:
+        try:
+            found = run(fact.subject)
+        except Exception as exc:  # a check that cannot run is said so, never passed
+            found = f"could not be run ({type(exc).__name__}), so it is not passed"
+        if found is None:
+            untested.append(fact.text)
+        else:
+            out.append(f"Checklist: {fact.text} Now: {found}.")
+    if untested:
+        out.append("Not testable from a question, kept as reminders: " + " ".join(untested))
+    return out
 
 
 def _span(hours: int) -> str:
@@ -333,5 +405,22 @@ def acknowledgement(new: list[Fact]) -> list[str]:
             f"the list under your book."]
 
 
-__all__ = ["KINDS", "MAX_FACTS", "Fact", "acknowledgement", "after", "apply", "dumps", "extract",
-           "get", "merge", "parse", "remembered_line", "thesis_line"]
+__all__ = [
+    "DEFAULT_CHECK_DAYS",
+    "KINDS",
+    "MAX_FACTS",
+    "Fact",
+    "acknowledgement",
+    "after",
+    "apply",
+    "checklist_lines",
+    "checks_from",
+    "dumps",
+    "extract",
+    "get",
+    "merge",
+    "merge_checks",
+    "parse",
+    "remembered_line",
+    "thesis_line",
+]

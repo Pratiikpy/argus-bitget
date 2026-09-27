@@ -135,8 +135,9 @@ class DeskRun:
     extra LLM spend, no LLM stochasticity as a confound between variants (`agents.desk.
     TradingDesk.run`'s own comment explains why). Empty when the caller passes no variants, which
     is every caller today: this field exists so the RCT harness (not yet built — see
-    `Activity/PROGRESS.md`) has something real to read once it exists, without another round of
-    the "the mechanism exists but nothing calls it" gap this project keeps finding and closing.
+    the working log, which is not published) has something real to read once it exists, without
+    another round of the "the mechanism exists but nothing calls it" gap this project keeps finding
+    and closing.
     """
 
     order: Order | None = None

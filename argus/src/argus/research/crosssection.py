@@ -77,8 +77,9 @@ from argus.research.grammar import (
     Window,
 )
 from argus.research.panel import Panel, build_panel, evaluate_panel
+from argus.truth.paths import DATA_DIR
 
-OUT_PATH = Path(__file__).resolve().parents[3] / "data" / "crosssection_study.json"
+OUT_PATH = DATA_DIR / "crosssection_study.json"
 
 MIN_BARS = 200
 """Below this a Sharpe is a rumour. Same floor as the single-symbol study, for the same reason."""

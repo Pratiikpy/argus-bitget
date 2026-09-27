@@ -218,14 +218,14 @@ def performance_panel() -> Panel:
     returns each figure as ``float | None`` **and** carries a stated reason for every one it
     withholds. One source of truth, so the demo and the artefact cannot disagree.
     """
-    from argus.eval.performance import evaluate_ledger
     from argus.paper.ledger import PaperLedger
+    from argus.paper.performance import evaluate_ledger
     from argus.paper.runner import LEDGER_PATH
 
     if not LEDGER_PATH.exists():
         return _absent("Sharpe · drawdown · win rate", "track 2 · judged", "paper_ledger.jsonl")
     perf = evaluate_ledger(PaperLedger(path=LEDGER_PATH))
-    source = "argus.eval.performance:evaluate_ledger"
+    source = "argus.paper.performance:evaluate_ledger"
 
     # The reason a figure is missing is worth more to a judge than the blank itself, so it is
     # rendered beside the metric rather than collapsed into one sentence at the bottom.

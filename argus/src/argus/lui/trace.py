@@ -379,42 +379,51 @@ def by_kind(kinds: Mapping[str, str]) -> Declaration:
 
 
 DECLARED: dict[str, tuple[Declaration, str]] = {
-    "argus.lui.research._impact_lines": (
+    "argus.lui.research.book._impact_lines": (
         last("record", "computed"),
-        "research.py:5814-5942. Every line is arithmetic on the copilot's report for this answer "
+        "lui/research/book.py::_impact_lines. Every line is arithmetic on the copilot's report for "
+        "this answer "
         "(beta, risk share, the risk budget, beta stress, the hedge line); the final line, always "
         "appended last (`lines.append(worst)`), is the realised worst window from history, which "
         "the reviewed convention files as a record."),
-    "argus.lui.research._distribution_line": (
+    "argus.lui.research.venue._distribution_line": (
         every("computed"),
-        "research.py:3663. The return distribution's moments, computed from the candles now."),
-    "argus.lui.research._hedge_line": (
-        every("computed"), "research.py:5791. A hedge ratio from the book's beta."),
-    "argus.lui.research._desk_view": (
+        "lui/research/venue.py::_distribution_line. The return distribution's moments, computed "
+        "from the candles now."),
+    "argus.lui.research.book._hedge_line": (
+        every("computed"),
+        "lui/research/book.py::_hedge_line. A hedge ratio from the book's beta."),
+    "argus.lui.research.riskmath._desk_view": (
         every("desk"),
-        "research.py:3857-3875. The desk's last ledger row on the name, quoted, or the statement "
+        "lui/research/riskmath.py::_desk_view. The desk's last ledger row on the name, quoted, or "
+        "the statement "
         "that the desk's record holds none (the desk does not trade it, or has not decided it)."),
-    "argus.lui.research._beta_track_record": (
+    "argus.lui.research.evidence._beta_track_record": (
         every("record"),
-        "research.py:4777. Read from data/copilot_rivals.json and copilot_stress.json, past runs."),
-    "argus.lui.research._coordination_test": (
+        "lui/research/evidence.py::_beta_track_record. Read from data/copilot_rivals.json and "
+        "copilot_stress.json, past runs."),
+    "argus.lui.research.evidence._coordination_test": (
         every("record"),
-        "research.py:4812. Read from data/sentiment_comparison.json, a dated past test."),
-    "argus.lui.research._event_lines": (
+        "lui/research/evidence.py::_coordination_test. Read from data/sentiment_comparison.json, a "
+        "dated past test."),
+    "argus.lui.research.riskmath._event_lines": (
         every("live"),
-        "research.py:5605-5625. The next CPI and FOMC dates from the BLS and Federal Reserve "
+        "lui/research/riskmath.py::_event_lines. The next CPI and FOMC dates from the BLS and "
+        "Federal Reserve "
         "schedules, read from the snapshot `market/calendar.upcoming` keeps and stated with the "
         "date it was read — the convention the wording rules follow for a dated reading. The "
         "step's own source list shows no network read at answer time; a reader sees that too."),
-    "argus.lui.research._flow_lines": (
+    "argus.lui.research.evidence._flow_lines": (
         every("live"),
-        "research.py:4847 and market/etf_flows.py:154-184. Dated ETF-flow and treasury-purchase "
+        "lui/research/evidence.py::_flow_lines and market/etf_flows.py:154-184. Dated ETF-flow and "
+        "treasury-purchase "
         "readings from SoSoValue, read from the latest data/etf_flows.json snapshot and each "
         "stated with its date (the wording rules' convention for a dated reading); the step's "
         "source list shows no network read at answer time."),
-    "argus.lui.research._run": (
+    "argus.lui.research.dispatch._run": (
         by_kind({"compare": "computed"}),
-        "research.py:9514-9573, the COMPARE branch: per-name realised vol, session beta, beta "
+        "lui/research/dispatch.py::_run, the COMPARE branch: per-name realised vol, session beta, "
+        "beta "
         "stress and worst window, the pair's correlation and the lead ranking them, all computed "
         "from the candles for this answer. Other kinds mix computed, record and missing lines in "
         "the same branch and declare nothing."),
@@ -655,9 +664,10 @@ def _wrap(fn: F, engine: str, declared: Declaration | None, declared_by: str) ->
 
 # --- wiring the console --------------------------------------------------------------------------
 
-CONSOLE_MODULES = ("argus.lui.research", "argus.lui.answer", "argus.lui.multistep",
-                   "argus.lui.memory")
-"""Every module-level function in these becomes a step, except :data:`NOT_ENGINES`."""
+CONSOLE_MODULES = ("argus.lui.answer", "argus.lui.multistep", "argus.lui.memory")
+"""Every module-level function in these becomes a step, except :data:`NOT_ENGINES`, when
+:func:`instrument` runs. The research engines are not listed: each `lui/research/` module wraps
+its own at import (:func:`trace_module`)."""
 
 SERVER_NAMES = ("answer", "run_research", "_research_payload", "_language_note")
 """Names `lui/server.py` holds that answer a question; wrapped where server holds them, because
@@ -665,19 +675,38 @@ it imported ``answer`` and ``run_research`` by name."""
 
 NOT_ENGINES = frozenset({
     # display transforms: they re-emit lines another step made
-    "_t", "_clean", "_sentence_cut", "_lead_with", "_lead_with_what_was_asked",
+    "_t", "bare_symbol", "clean_line", "sentence_cut", "_lead_with", "_lead_with_what_was_asked",
     "_answer_the_state_asked", "_fundamentals_focus",
     # parsers of the question's words, called hundreds of times per answer; none reads a source
     # or returns an answer line
-    "research_symbols", "_resolve", "_resolve_any", "_read", "_number", "_pairs", "_group_pairs",
-    "_amount_pairs", "_is_equity", "_is_fx", "_horizon", "_theme", "_period_days",
-    "_strip_budget", "_resize", "_shouting", "_normalise", "_spot_rtoken", "_is_an_order",
-    "_is_equity_or_traded", "_horizon_words", "parse_budget", "_parse_notional", "_group_note",
+    "research_symbols", "resolve_name", "_resolve_any", "_read", "_number", "holding_pairs",
+    "_group_pairs", "_amount_pairs", "is_us_equity", "_is_fx", "_horizon", "_theme", "_period_days",
+    "strip_budget", "_resize", "_shouting", "_normalise", "_spot_rtoken", "is_an_order",
+    "_is_equity_or_traded", "_horizon_words", "parse_budget", "parse_notional", "_group_note",
     "shock_numbers", "split_cash", "unread_holdings", "hedge_instruments", "rtoken_named",
     "may_name_a_contract", "worth_asking_the_model", "price_forecast_asked", "about_the_record",
     "daily_technicals_asked", "hold_cost_question", "leveraged_fund_asked", "_vol_multiple",
     "_stated_move_size", "_states_holdings", "parse_book",
 })
+
+
+def trace_module(namespace: dict[str, Any]) -> None:
+    """Make every engine a module defines a step, at the module's own import.
+
+    Called as the last line of each `lui/research/` module with ``globals()``. Wrapping where a
+    function is defined, once, replaced patching module attributes on the first traced question
+    (:func:`instrument`), which worked only while every engine lived in the one module that
+    patched it: when `lui/research.py` became a package (2026-09-27), a sibling module holding a
+    reference taken by ``from ... import`` would have kept calling the unwrapped function, and
+    that answer's steps would have gone missing without an error (audit findings 157 and 160).
+    Imports resolve after the defining module has run, so every caller gets the wrapped function.
+    Outside a recording the wrapper costs one context-variable read."""
+    module = namespace["__name__"]
+    for attr, fn in list(namespace.items()):
+        if inspect.isfunction(fn) and fn.__module__ == module and attr not in NOT_ENGINES:
+            qualified = f"{module}.{attr}"
+            declared, why = DECLARED.get(qualified, (None, ""))
+            namespace[attr] = _wrap(fn, qualified, declared, why and f"DECLARED: {why}")
 
 
 def _module(name: str) -> ModuleType:
@@ -814,9 +843,9 @@ def display(line: str) -> str:
     transforms are applied to both sides, using the console's own ``_clean``."""
     global _CLEAN
     if _CLEAN is None:
-        from argus.lui.research import _clean
+        from argus.lui.research.text import clean_line
 
-        _CLEAN = _clean
+        _CLEAN = clean_line
     cleaned = _CLEAN(_NUMBERED.sub("", _LEAD.sub("", line.strip()))).strip()
     return cleaned[:1].upper() + cleaned[1:]
 

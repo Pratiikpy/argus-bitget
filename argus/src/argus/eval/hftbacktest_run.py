@@ -54,6 +54,7 @@ from argus.eval.l3queue import (
     ReplayConfig,
     TruthReplay,
 )
+from argus.truth.paths import DATA_DIR
 
 EXCH_EVENT = 1 << 31
 LOCAL_EVENT = 1 << 30
@@ -155,7 +156,7 @@ def argus_truth(
 
 # --- the run: both engines on the same file, the same orders ------------------------------------
 
-ARTEFACT = Path(__file__).resolve().parents[3] / "data" / "hftbacktest_run.json"
+ARTEFACT = DATA_DIR / "hftbacktest_run.json"
 ES_TICK = 0.25
 ES_LOT = 1.0
 

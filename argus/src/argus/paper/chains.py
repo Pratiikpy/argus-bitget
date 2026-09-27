@@ -39,8 +39,9 @@ from pathlib import Path
 from typing import Any
 
 from argus.agents.causality import CausalChain, Link, LinkGrade, grade_magnitude
+from argus.truth.paths import DATA_DIR
 
-CHAINS_PATH = Path(__file__).resolve().parents[3] / "data" / "causal_chains.jsonl"
+CHAINS_PATH = DATA_DIR / "causal_chains.jsonl"
 """Beside the ledger, never inside it.
 
 An :class:`~argus.paper.ledger.Entry` is a decision and its shape is hashed; appending a grade to

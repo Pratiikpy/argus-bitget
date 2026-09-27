@@ -42,7 +42,9 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 TRAIN_FILES = (*(DATA / f"lui_kind_train_{k}.jsonl" for k in "ABCDE"),
                DATA / "lui_blind_corpus_2026-09-25.jsonl",
                # Scored once as held-out (88.5%), then used to fix the plumbing: now training data.

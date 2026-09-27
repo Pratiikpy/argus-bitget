@@ -32,10 +32,10 @@ def pinned_prices(monkeypatch: pytest.MonkeyPatch) -> Iterator[list[int]]:
         calls[0] += 1
         return dict(PRICES)
 
-    monkeypatch.setattr(research, "_last_prices", prices)
-    research._PRICED.clear()
+    monkeypatch.setattr(research.parse, "_last_prices", prices)
+    research.parse._PRICED.clear()
     yield calls
-    research._PRICED.clear()
+    research.parse._PRICED.clear()
 
 
 def book(text: str) -> tuple[dict[str, float], float]:
@@ -95,8 +95,8 @@ class TestWhatDidNotChange:
 class TestNothingIsSilent:
     def test_an_unpriceable_count_is_left_out_and_said(self, monkeypatch: pytest.MonkeyPatch
                                                        ) -> None:
-        monkeypatch.setattr(research, "_last_prices", lambda: {})
-        research._PRICED.clear()
+        monkeypatch.setattr(research.parse, "_last_prices", lambda: {})
+        research.parse._PRICED.clear()
         # stated amounts that cannot be priced leave the book empty, never equal weight
         assert parse_book("long 2 NVDAUSDT, long 1 TSLAUSDT") == {}
         priced = priced_book("long 2 NVDAUSDT, long 1 TSLAUSDT")

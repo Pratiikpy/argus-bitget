@@ -53,6 +53,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
+from argus.truth.paths import DATA_DIR
+
 WIDE_MULTIPLIERS: tuple[float, ...] = (0.5, 0.7, 1.4, 2.0)
 """`vr_C_api.py` ``MULTS`` — recall against a random guess."""
 
@@ -72,7 +74,7 @@ SIGNIFICANCE = 0.05
 
 LETTERS = "ABCDE"
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "leakage.json"
+REPORT_PATH = DATA_DIR / "leakage.json"
 """Where the measurement is stored, and where :func:`check_window` reads it from.
 
 Module level rather than built inside the CLI: the gate has to find the same file the run

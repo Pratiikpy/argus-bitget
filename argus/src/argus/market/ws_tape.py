@@ -39,6 +39,7 @@ import base64
 import contextlib
 import gzip
 import json
+import logging
 import os
 import shutil
 import socket
@@ -50,6 +51,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from argus.truth.paths import DATA_DIR
+
+_LOG = logging.getLogger(__name__)
+
 HOST = "ws.bitget.com"
 PATH = "/v3/ws/public"
 STOCKS = ("NVDA", "TSLA", "AAPL", "MSFT", "META", "GOOGL", "AMZN", "COIN", "MSTR", "QQQ")
@@ -59,7 +64,7 @@ BOOK_SPACING = 0.25
 """Seconds between kept five-level snapshots of one symbol."""
 PING_EVERY = 20.0
 MIN_FREE_GB = 3.0
-TAPE_DIR = Path(__file__).resolve().parents[3] / "data" / "tape"
+TAPE_DIR = DATA_DIR / "tape"
 
 
 class Closed(ConnectionError):
@@ -214,7 +219,7 @@ def record(symbols: Sequence[str], directory: Path = TAPE_DIR,
             if free_gb(directory) < MIN_FREE_GB:
                 handle.write(json.dumps({"t": arrived, "argus_event": "stopped_low_disk"}) + "\n")
                 handle.close()
-                print(f"stopped: under {MIN_FREE_GB} GB free on the tape's drive")
+                _LOG.warning("stopped: under %s GB free on the tape's drive", MIN_FREE_GB)
                 return
         handle.write(json.dumps({"t": round(arrived, 3), "m": message}) + "\n")
 

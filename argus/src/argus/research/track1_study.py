@@ -53,8 +53,9 @@ from argus.market.history import CandleType, fetch_range
 from argus.research.grammar import EXPANDED, as_signal_fn
 from argus.strategies.session_alpha import VARIANTS
 from argus.strategies.track1_suite import SUBTHEME_OF, TRACK1_VARIANTS
+from argus.truth.paths import DATA_DIR
 
-OVERFIT_STUDY_PATH = Path(__file__).resolve().parents[3] / "data" / "overfitting_study.json"
+OVERFIT_STUDY_PATH = DATA_DIR / "overfitting_study.json"
 """Where `overfitting_study.py` writes. Read here, never re-derived — see `_pbo_cross_check`."""
 
 # Variants that were genuine deployment candidates. `closure_momentum` and `closure_reversion`
@@ -360,7 +361,7 @@ def study(symbols: tuple[str, ...] = RTOKEN_SYMBOLS, *, days: int = 90) -> dict[
 
 def main() -> int:
     result = study()
-    out = Path(__file__).resolve().parents[3] / "data" / "track1_study.json"
+    out = DATA_DIR / "track1_study.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2), encoding="utf-8")
 

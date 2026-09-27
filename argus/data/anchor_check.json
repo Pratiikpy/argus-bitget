@@ -1,12 +1,12 @@
 {
-  "total": 68,
-  "readable": 68,
+  "total": 76,
+  "readable": 76,
   "unreadable": 0,
-  "confirmed_on_bitcoin": 38,
-  "calendar_pending": 30,
+  "confirmed_on_bitcoin": 76,
+  "calendar_pending": 0,
   "bitcoin_block_range": [
     966822,
-    967736
+    968752
   ],
   "sound": true,
   "anchors": [
@@ -48,6 +48,50 @@
       "readable": true,
       "bitcoin_blocks": [
         967122
+      ],
+      "pending_calendars": [
+        "https://finney.calendar.eternitywall.com"
+      ],
+      "error": ""
+    },
+    {
+      "path": "0d8e40e0d3a4f5e1-0.ots",
+      "readable": true,
+      "bitcoin_blocks": [
+        968575
+      ],
+      "pending_calendars": [
+        "https://alice.btc.calendar.opentimestamps.org"
+      ],
+      "error": ""
+    },
+    {
+      "path": "0d8e40e0d3a4f5e1-1.ots",
+      "readable": true,
+      "bitcoin_blocks": [
+        968575
+      ],
+      "pending_calendars": [
+        "https://bob.btc.calendar.opentimestamps.org"
+      ],
+      "error": ""
+    },
+    {
+      "path": "0d8e40e0d3a4f5e1-2.ots",
+      "readable": true,
+      "bitcoin_blocks": [
+        968575
+      ],
+      "pending_calendars": [
+        "https://alice.btc.calendar.opentimestamps.org"
+      ],
+      "error": ""
+    },
+    {
+      "path": "0d8e40e0d3a4f5e1-3.ots",
+      "readable": true,
+      "bitcoin_blocks": [
+        968581
       ],
       "pending_calendars": [
         "https://finney.calendar.eternitywall.com"
@@ -101,7 +145,9 @@
     {
       "path": "3d6772d58ad30309-0.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967812
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -121,7 +167,9 @@
     {
       "path": "3d6772d58ad30309-2.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967812
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -141,7 +189,9 @@
     {
       "path": "62981e13108cbea3-0.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967815
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -161,7 +211,9 @@
     {
       "path": "62981e13108cbea3-2.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967815
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -181,7 +233,9 @@
     {
       "path": "6ef202e3ce5b2599-0.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967815
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -201,7 +255,9 @@
     {
       "path": "6ef202e3ce5b2599-2.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967815
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -221,7 +277,9 @@
     {
       "path": "78f20994e4744fab-0.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968021
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -230,7 +288,9 @@
     {
       "path": "78f20994e4744fab-1.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968031
+      ],
       "pending_calendars": [
         "https://bob.btc.calendar.opentimestamps.org"
       ],
@@ -239,7 +299,9 @@
     {
       "path": "78f20994e4744fab-2.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968021
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -248,7 +310,9 @@
     {
       "path": "78f20994e4744fab-3.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968040
+      ],
       "pending_calendars": [
         "https://finney.calendar.eternitywall.com"
       ],
@@ -301,7 +365,9 @@
     {
       "path": "8e07961f491262b5-0.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967812
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -321,7 +387,9 @@
     {
       "path": "8e07961f491262b5-2.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967812
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -341,7 +409,9 @@
     {
       "path": "983d096198b4c0f9-0.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968293
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -350,7 +420,9 @@
     {
       "path": "983d096198b4c0f9-1.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968293
+      ],
       "pending_calendars": [
         "https://bob.btc.calendar.opentimestamps.org"
       ],
@@ -359,7 +431,9 @@
     {
       "path": "983d096198b4c0f9-2.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968293
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -368,7 +442,9 @@
     {
       "path": "983d096198b4c0f9-3.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968305
+      ],
       "pending_calendars": [
         "https://finney.calendar.eternitywall.com"
       ],
@@ -421,7 +497,9 @@
     {
       "path": "ad4844b9cdb4e477-0.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967821
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -441,7 +519,9 @@
     {
       "path": "ad4844b9cdb4e477-2.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967821
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -505,7 +585,9 @@
     {
       "path": "c2247d49be89d68b-0.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968170
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -514,7 +596,9 @@
     {
       "path": "c2247d49be89d68b-1.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968188
+      ],
       "pending_calendars": [
         "https://bob.btc.calendar.opentimestamps.org"
       ],
@@ -523,7 +607,9 @@
     {
       "path": "c2247d49be89d68b-2.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968170
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -532,7 +618,9 @@
     {
       "path": "c2247d49be89d68b-3.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968184
+      ],
       "pending_calendars": [
         "https://finney.calendar.eternitywall.com"
       ],
@@ -541,7 +629,9 @@
     {
       "path": "c8a9170077e25ba0-0.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968422
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -550,7 +640,9 @@
     {
       "path": "c8a9170077e25ba0-1.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968424
+      ],
       "pending_calendars": [
         "https://bob.btc.calendar.opentimestamps.org"
       ],
@@ -559,7 +651,9 @@
     {
       "path": "c8a9170077e25ba0-2.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968422
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -568,7 +662,9 @@
     {
       "path": "c8a9170077e25ba0-3.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        968453
+      ],
       "pending_calendars": [
         "https://finney.calendar.eternitywall.com"
       ],
@@ -665,7 +761,9 @@
     {
       "path": "f9c6f4cae94c2b7d-0.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967859
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -674,7 +772,9 @@
     {
       "path": "f9c6f4cae94c2b7d-1.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967860
+      ],
       "pending_calendars": [
         "https://bob.btc.calendar.opentimestamps.org"
       ],
@@ -683,7 +783,9 @@
     {
       "path": "f9c6f4cae94c2b7d-2.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967859
+      ],
       "pending_calendars": [
         "https://alice.btc.calendar.opentimestamps.org"
       ],
@@ -692,7 +794,53 @@
     {
       "path": "f9c6f4cae94c2b7d-3.ots",
       "readable": true,
-      "bitcoin_blocks": [],
+      "bitcoin_blocks": [
+        967860
+      ],
+      "pending_calendars": [
+        "https://finney.calendar.eternitywall.com"
+      ],
+      "error": ""
+    },
+    {
+      "path": "fb949ce0fa47eb83-0.ots",
+      "readable": true,
+      "bitcoin_blocks": [
+        968728
+      ],
+      "pending_calendars": [
+        "https://alice.btc.calendar.opentimestamps.org"
+      ],
+      "error": ""
+    },
+    {
+      "path": "fb949ce0fa47eb83-1.ots",
+      "readable": true,
+      "bitcoin_blocks": [
+        968733
+      ],
+      "pending_calendars": [
+        "https://bob.btc.calendar.opentimestamps.org"
+      ],
+      "error": ""
+    },
+    {
+      "path": "fb949ce0fa47eb83-2.ots",
+      "readable": true,
+      "bitcoin_blocks": [
+        968728
+      ],
+      "pending_calendars": [
+        "https://alice.btc.calendar.opentimestamps.org"
+      ],
+      "error": ""
+    },
+    {
+      "path": "fb949ce0fa47eb83-3.ots",
+      "readable": true,
+      "bitcoin_blocks": [
+        968752
+      ],
       "pending_calendars": [
         "https://finney.calendar.eternitywall.com"
       ],

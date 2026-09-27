@@ -64,11 +64,12 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from statistics import median
 from typing import Any
 
-REPORT_PATH = Path(__file__).resolve().parents[3] / "data" / "carry_study.json"
+from argus.truth.paths import DATA_DIR
+
+REPORT_PATH = DATA_DIR / "carry_study.json"
 
 ENDPOINT = "https://api.bitget.com/api/v3/market/history-fund-rate"
 MAX_LIMIT = 100

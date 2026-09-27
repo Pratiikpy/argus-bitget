@@ -117,7 +117,7 @@ class TestDesignedScenarios:
     ) -> None:
         clean = next(s for s in designed_scenarios() if s.name == "clean_allow")
         result = compare(clean, baseline)
-        assert result.agree_on_allow
+        assert result.agree_on_verdict
         assert not result.only_argus_refuses
         assert not result.only_vibe_trading_refuses
 
@@ -145,15 +145,20 @@ class TestSweptScenarios:
         ):
             assert expected in summary.vibe_trading_limits_seen, summary.vibe_trading_limits_seen
 
-    def test_the_sweep_produces_disagreements_in_both_directions(
+    def test_argus_misses_nothing_vibe_trading_catches_on_a_grid_that_trips_every_limit(
         self, baseline: VibeTradingSymbols
     ) -> None:
-        """Both systems must have SOME non-trivial blind spot on this grid — a sweep where only
-        one side ever disagrees is either a genuinely lopsided pair of systems or, as it was
-        before the fix above, an under-stressed grid. Real, run numbers, not asserted equal."""
-        results, _ = run_sweep(baseline)
+        """Until 2026-09-27 each side had a blind spot here: ARGUS allowed 8.7% of orders
+        Vibe-Trading refused, all on total exposure, gross leverage or the daily count. With those
+        three limits in ARGUS's mandate it misses none. A zero is only evidence if the grid
+        actually trips Vibe-Trading's limits, so that is asserted beside it: every one of its four
+        limit kinds fires somewhere, and Vibe-Trading still misses what ARGUS alone checks."""
+        results, summary = run_sweep(baseline)
+        assert not any(r.only_vibe_trading_refuses for r in results)
         assert any(r.only_argus_refuses for r in results)
-        assert any(r.only_vibe_trading_refuses for r in results)
+        assert set(summary.vibe_trading_limits_seen) >= {
+            "max_order_notional_usd", "max_total_exposure_usd", "max_leverage",
+            "max_trades_per_day"}
 
 
 class TestAblation:

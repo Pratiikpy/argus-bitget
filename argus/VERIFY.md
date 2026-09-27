@@ -1,19 +1,21 @@
 # Verify our claims yourself
 
-Every "ARGUS beats X" claim in this repository is checked against that rival's own real, installed
-source code — never asserted, never simulated. `eval/standing.py` enforces 13 conditions before any
+Every "ARGUS beats X" claim in this repository is checked by running that rival's own code, or a
+port of it cited by file:line, on the same input — never asserted. `eval/standing.py` enforces 13 conditions before any
 claim can be marked OWNED, the binding one being: *the named baseline was actually reproduced and the
 comparison actually run.* This file exists because that machinery being self-administered is itself
 a real, named weakness (see the register, `data/standing.json`) — the fix is not to assert harder, it
 is to make re-running the comparison yourself take one command.
 
-No API key is required for anything below. All three pull real, live, public market data. Two of the
-three (#1, #3) run a real, installed, invoked copy of the named rival's own package — nothing there
-is mocked, cached, or pre-computed for this page. **#2 is different and is labelled as such below**:
-it compares against a faithful port of freqtrade's real protections, read from freqtrade's own
-source and cited by file:line, not an installed invocation of freqtrade itself — an earlier version
-of this page called it "installed," which was wrong and is corrected here (found 2026-09-23 by an
-independent adversarial re-check of this exact page, the day it was written).
+No API key is required for anything below. Each section names its state in the register
+(`data/standing.json`): three of the four OWNED rows are here (#2, #4, #5) and two TIED ones
+(#1, #3), because a tie reproduced is worth as much to a reader as a win. #1 and #3 run an
+installed copy of the rival's package; #4 and #5 run the rival's own file, vendored unmodified and
+hash-pinned by a test; **#2 is different and is labelled as such below**: it compares against a
+faithful port of freqtrade's protections, cited by file:line, not an installed invocation of
+freqtrade itself. #1 and #2 read frozen real Bitget history, #5 reads live SEC filings, #4 needs no
+data at all, and #3 scores on synthetic series with known changepoints, because only a synthetic
+series has a ground truth to score against.
 
 ```
 git clone https://github.com/Pratiikpy/argus-bitget.git
@@ -25,7 +27,7 @@ pip install -e ".[dev]"
 The package lives in `argus/`; the repository root has no `pyproject.toml`, so every command below
 runs from `argus-bitget/argus`.
 
-## 1. Portfolio allocation vs Riskfolio-Lib's real NCO (≈2 minutes)
+## 1. Portfolio allocation vs Riskfolio-Lib's real NCO — TIED (≈2 minutes)
 
 ```
 python -m argus.eval.allocation_comparison
@@ -37,8 +39,7 @@ data, two independent window setups.
 
 **What to expect:** a line reading `ARGUS's own NCO vs Riskfolio's real NCO: <X> vs <X> bps (ratio
 1.0000)` — the *ratio* ties to four decimal places; the raw bps values themselves typically agree to
-three (e.g. 7.9688 vs 7.9687), not four — stated precisely here after an independent re-check found
-the original "four decimal places" wording mildly overstated it. Not circular: ARGUS's allocator
+three (e.g. 7.9688 vs 7.9687), not four. Not circular: ARGUS's allocator
 (`desk/allocation.py`) imports neither riskfolio nor cvxportfolio anywhere — it is a from-scratch
 Ward-linkage clustering and a hand-rolled active-set QP, independently verified against Riskfolio's
 real installed `HCPortfolio` on a frozen fixture (`tests/data/allocation_fixture.json`) at max weight
@@ -47,7 +48,7 @@ tie once optimal leaf ordering was reproduced from Riskfolio's own source and wi
 module's own docstring for the full history, including a real crash in Riskfolio's own DBHT
 clustering option (unrelated to the NCO claim, already documented, not something this repo caused).
 
-## 2. Risk-control precision vs freqtrade's real drawdown protections (≈1 minute)
+## 2. Risk-control precision vs freqtrade's real drawdown protections — OWNED (≈1 minute)
 
 ```
 python -m argus.eval.risk_layer_comparison
@@ -88,7 +89,7 @@ not the identical decimal.
 only affects `--live` and `--freeze-fixture`; if a couple of symbols fail to fetch, wait a minute
 and re-run. It does not affect the headline result, which does not depend on any single symbol.*
 
-## 3. Session-boundary changepoint detection vs ruptures (≈10–25 minutes — real compute, not a hang; measured 9 and 20+ minutes on two machines)
+## 3. Session-boundary changepoint detection vs ruptures — TIED (≈10–25 minutes — real compute, not a hang; measured 9 and 20+ minutes on two machines)
 
 ```
 python -m argus.eval.regime_comparison
@@ -103,6 +104,44 @@ changepoints. This one is genuinely slow — it's a real matrix-profile-scale co
 directly from ruptures' own BSD-2-Clause source ties it (1 win / 0 losses / 99 ties). Both results
 are reported, not just the one that flatters us.
 
+## 4. Per-trader mandate vs Vibe-Trading's real `check_mandate` — OWNED (≈5 seconds)
+
+```
+python -m argus.eval.mandate_comparison
+```
+
+**What you're checking:** ARGUS's `Mandate.out_of_mandate()` (`desk/mandate.py`) against
+Vibe-Trading's own `check_mandate()` (`hkuds/vibe-trading`, `agent/src/live/enforcement.py`),
+vendored unmodified, on 11 designed scenarios and a 19,440-scenario grid of order size, exposure,
+leverage, open positions and orders per day.
+
+**What to expect:** `blind spots on the sweep: ARGUS misses 0/19440 (0.0%) that Vibe-Trading would
+catch; Vibe-Trading misses 2025/19440 (10.4%) that ARGUS would catch`, and `ablation: 10 check(s),
+all independently load-bearing: True`. The run is deterministic, so the figures are identical every
+time. What not to over-read: the 2,025 are orders ARGUS refuses for reasons Vibe-Trading's mandate
+does not model — a stated confidence below the trader's floor, a thesis that needs longer than the
+trader holds, too many positions already open, exposure the mandate cannot hedge — not cases where
+Vibe-Trading applied its own limits wrongly.
+
+## 5. Earnings-surprise ranking vs QuantConnect's real SUE factor — OWNED (≈35 seconds)
+
+```
+python -m argus.eval.earnings_comparison
+```
+
+**What you're checking:** ARGUS's standardised-unexpected-earnings ranking (`market/sue.py`) against
+QuantConnect's own `FineSelectionAndSueSorting` computation, vendored unmodified, on the same live
+SEC EDGAR quarterly EPS for nine companies, plus a constructed company whose earnings grow in a
+straight line.
+
+**What to expect:** `baseline reproduced: 9/9 real anchors agree exactly`, then
+`linear-growth case: real SUE=inf (infinite=True) argus_refused=True` and `real top =
+CONSTRUCTED_LINEAR ... argus excludes it = True`. The win is exactly that: when the surprise's
+standard deviation is zero, QuantConnect's factor divides by it and ranks the company first on an
+infinite score (numpy prints the `divide by zero` warning you will see), while ARGUS refuses to rank
+it and says why. On ordinary companies the two agree to floating-point identity. Needs network
+access to SEC EDGAR; no key.
+
 ## What this deliberately does not include
 
 `eval/sentiment_comparison.py` (vs ProsusAI/finBERT) is a real, OWNED comparison but needs a metered
@@ -111,7 +150,7 @@ output is committed at `data/sentiment_comparison.json` if you want to read the 
 of reproducing it.
 
 The full register — every capability with its named rival, its state and the artefact behind it —
-is `data/standing.json`, rendered on `/proof`, with every loss on `/wrong`. This page is three of
+is `data/standing.json`, rendered on `/proof`, with every loss on `/wrong`. This page is five of
 those comparisons, chosen because they need nothing from us to re-run.
 
 ## Found something wrong?

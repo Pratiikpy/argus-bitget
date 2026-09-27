@@ -61,6 +61,7 @@ from argus.eval.baselines.stumpy_squared_distance_loader import (
     StumpySquaredDistanceLoadError,
     load_squared_distance_module,
 )
+from argus.truth.paths import DATA_DIR
 
 _STUMPY_SOURCE = (
     Path(__file__).resolve().parents[4] / "research" / "repos-themed"
@@ -515,7 +516,7 @@ if __name__ == "__main__":
 
     result = main()
     print(render(result))
-    out_path = Path(__file__).resolve().parents[3] / "data" / "shapematch_comparison.json"
+    out_path = DATA_DIR / "shapematch_comparison.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(f"\nsaved -> {out_path}")

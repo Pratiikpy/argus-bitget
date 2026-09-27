@@ -14,10 +14,10 @@
 # factor grammar with no execution surface" in eval/standing.py, whose own baseline field names
 # "microsoft/RD-Agent and Qlib expression handlers" — not a paraphrase of qlib's expression
 # engine, its actual code, on the same constructed numeric series ARGUS's own
-# argus.research.grammar.Window/Ref/Corr sees (project Standing Rule #3).
+# argus.research.grammar.Window/Ref/Corr sees (the read-before-write rule).
 #
 # **This file was read once before, in an earlier session, and wrongly marked unvendorable** —
-# `Activity/PROGRESS.md`'s "ABANDONED PATH" entry from that session claimed `Expression.load()`
+# the working log's "ABANDONED PATH" entry from that session claimed `Expression.load()`
 # "imports `.cache` which unconditionally imports redis_lock". Re-read closely here: `from .cache
 # import H` (line ~184, `# pylint: disable=C0415`) is a DEFERRED import inside the `.load()`
 # method body, not a module-level import — so importing this file at all never touches

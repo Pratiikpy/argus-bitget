@@ -15,7 +15,7 @@
 # whose own baseline field already names this exact mechanism ("TauricResearch/TradingAgents
 # reflection log, which stores a model's prose lesson rather than a graded outcome") — not a
 # paraphrase of it, the actual code, on the same constructed fixtures ARGUS's own
-# argus.agents.recall.recall() sees (project Standing Rule #3).
+# argus.agents.recall.recall() sees (the read-before-write rule).
 #
 # This file's own import (`from tradingagents.agents.utils.rating import parse_rating`) is
 # satisfied by the sibling vendored `tradingagents_rating.py` via a sys.modules shim in

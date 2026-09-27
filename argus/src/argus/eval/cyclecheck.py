@@ -34,7 +34,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+from argus.truth.paths import DATA_DIR
+
+DATA = DATA_DIR
 RUNS_DIR = DATA / "paper_runs"
 REPORT_PATH = DATA / "cycle_check.json"
 

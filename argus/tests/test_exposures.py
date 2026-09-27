@@ -112,27 +112,34 @@ def _walk(returns: list[float], start: float = 100.0) -> list[float]:
     return out
 
 
+RAW = ("mkt", "smb", "mom", "val", "qual", "lowvol", "rates", "btc")
+"""One raw return series per factor, in :data:`argus.lui.exposures.FACTORS` order."""
+
+
 def _synthetic(n: int = 300, seed: int = 3) -> tuple[list[date], dict[str, list[float]]]:
     rng = random.Random(seed)
     days = [date(2025, 1, 1) + timedelta(days=i) for i in range(n + 1)]
-    f = {k: [rng.gauss(0, 0.01) for _ in range(n)] for k in ("mkt", "smb", "mom", "btc")}
+    f = {k: [rng.gauss(0, 0.01) for _ in range(n)] for k in RAW}
     return days, f
 
 
 def _factor_closes(days: list[date], f: dict[str, list[float]]) -> dict[str, dict[date, float]]:
-    spy = _walk(f["mkt"])
-    iwm = _walk([m + s for m, s in zip(f["mkt"], f["smb"], strict=True)])
-    mtum = _walk([m + s for m, s in zip(f["mkt"], f["mom"], strict=True)])
-    btc = _walk(f["btc"], 80_000.0)
-    return {k: dict(zip(days, v, strict=True))
-            for k, v in (("SPY", spy), ("IWM", iwm), ("MTUM", mtum), ("BTC", btc))}
+    def spread(key: str) -> list[float]:
+        return _walk([m + s for m, s in zip(f["mkt"], f[key], strict=True)])
+
+    series = {"SPY": _walk(f["mkt"]), "IWM": spread("smb"), "MTUM": spread("mom"),
+              "VLUE": spread("val"), "QUAL": spread("qual"), "USMV": spread("lowvol"),
+              "IEF": _walk(f["rates"]), "BTC": _walk(f["btc"], 80_000.0)}
+    return {k: dict(zip(days, v, strict=True)) for k, v in series.items()}
 
 
-def _asset(days: list[date], f: dict[str, list[float]], b: tuple[float, float, float, float],
+def _asset(days: list[date], f: dict[str, list[float]], b: tuple[float, ...],
            noise: float = 0.001, seed: int = 11) -> dict[date, float]:
+    """``b`` is either (market, size, momentum, crypto) or one loading per factor."""
+    loads = (*b[:3], 0.0, 0.0, 0.0, 0.0, b[3]) if len(b) == 4 else b
     rng = random.Random(seed)
-    rets = [b[0] * f["mkt"][t] + b[1] * f["smb"][t] + b[2] * f["mom"][t] + b[3] * f["btc"][t]
-            + rng.gauss(0, noise) for t in range(len(f["mkt"]))]
+    rets = [sum(w * f[k][t] for w, k in zip(loads, RAW, strict=True)) + rng.gauss(0, noise)
+            for t in range(len(f["mkt"]))]
     return dict(zip(days, _walk(rets), strict=True))
 
 
@@ -147,7 +154,18 @@ def test_fit_holding_recovers_loadings_over_the_window() -> None:
     assert abs(fit.loadings["size"] + 0.5) < 0.03
     assert abs(fit.loadings["momentum"] - 0.3) < 0.03
     assert abs(fit.loadings["crypto"] - 0.05) < 0.02
+    assert all(abs(fit.loadings[k]) < 0.03 for k in ("value", "quality", "low_vol", "rates"))
     assert fit.t_stats["market"] > 20
+
+
+def test_fit_holding_recovers_the_style_and_rates_loadings() -> None:
+    """The four factors added on 2026-09-27 (audit finding 26) are recovered like the first."""
+    days, f = _synthetic(seed=9)
+    closes = _asset(days, f, (1.0, 0.0, 0.0, 0.4, -0.3, 0.6, -0.8, 0.0))
+    fit = ex.fit_holding(closes, _factor_closes(days, f))
+    assert fit is not None
+    for factor, want in (("value", 0.4), ("quality", -0.3), ("low_vol", 0.6), ("rates", -0.8)):
+        assert abs(fit.loadings[factor] - want) < 0.03, factor
 
 
 def test_too_little_history_gives_no_loading() -> None:

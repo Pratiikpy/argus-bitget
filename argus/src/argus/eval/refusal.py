@@ -109,8 +109,9 @@ from typing import Any
 
 from argus.paper.marks import Mark, read_marks
 from argus.truth import artefact
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "refusal_alpha.json"
 REASONS_PATH = DATA / "refusal_reasons.json"
 LEDGER_PATH = DATA / "paper_ledger.jsonl"

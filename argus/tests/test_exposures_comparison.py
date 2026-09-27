@@ -43,9 +43,13 @@ def _hand_built_inputs() -> ex.Inputs:
     iwm = {d[0]: filler, d[1]: filler, d[2]: 100.0, d[3]: 103.0, d[4]: 101.97, d[5]: 104.0094}
     mtum = {d[0]: filler, d[1]: filler, d[2]: 100.0, d[3]: 100.0, d[4]: 100.0, d[5]: 103.0}
     btc = {d[0]: filler, d[1]: filler, d[2]: 100.0, d[3]: 105.0, d[4]: 101.85, d[5]: 105.924}
+    # the style funds move with SPY exactly (a zero spread) and IEF is flat, so the added factor
+    # columns are known zeros and the four above keep their hand-worked values
+    ief = {day: 100.0 for day in d}
     return ex.Inputs(
         closes={"AAAUSDT": aaa},
-        factors={"SPY": spy, "IWM": iwm, "MTUM": mtum, "BTC": btc},
+        factors={"SPY": spy, "IWM": iwm, "MTUM": mtum, "VLUE": dict(spy), "QUAL": dict(spy),
+                 "USMV": dict(spy), "IEF": ief, "BTC": btc},
         origins={"AAAUSDT": "test daily closes"},
         missing={"BBBUSDT": "ConnectionError"},
     )
@@ -55,10 +59,9 @@ def _fake_loadings_matrix(x: Any, frame: Any, **kwargs: Any) -> Any:
     import pandas as pd
 
     symbol = frame.columns[0]
-    # market and crypto survive forward selection; size and momentum are zeroed out.
-    return pd.DataFrame(
-        {"market": [1.4], "size": [0.0], "momentum": [0.0], "crypto": [0.03]}, index=[symbol],
-    )
+    # market and crypto survive forward selection; every other factor is zeroed out.
+    kept = {"market": 1.4, "crypto": 0.03}
+    return pd.DataFrame({k: [kept.get(k, 0.0)] for k in ex.FACTORS}, index=[symbol])
 
 
 def test_main_pins_the_window_the_return_series_and_the_report_rounding(
@@ -81,7 +84,8 @@ def test_main_pins_the_window_the_return_series_and_the_report_rounding(
         y: list[float], xs: list[list[float]],
     ) -> tuple[list[float], list[float], float]:
         calls.append((list(y), [list(x) for x in xs]))
-        return [0.001, 1.5, -0.6, 0.2, 0.05], [0.0005, 0.5, 0.3, 0.2, 0.1], 0.75
+        return ([0.001, 1.5, -0.6, 0.2, 0.0, 0.0, 0.0, 0.0, 0.05],
+                [0.0005, 0.5, 0.3, 0.2, 1.0, 1.0, 1.0, 1.0, 0.1], 0.75)
 
     monkeypatch.setattr(ex, "ols", fake_ols)
 
@@ -94,22 +98,25 @@ def test_main_pins_the_window_the_return_series_and_the_report_rounding(
     assert xs[0] == pytest.approx([0.01, -0.02, 0.03])  # market: SPY's own return
     assert xs[1] == pytest.approx([0.02, 0.01, -0.01])  # size: IWM minus SPY
     assert xs[2] == pytest.approx([-0.01, 0.02, 0.0])  # momentum: MTUM minus SPY
-    assert xs[3] == pytest.approx([0.05, -0.03, 0.04])  # crypto: BTC's own return
+    assert xs[3:7] == [pytest.approx([0.0, 0.0, 0.0])] * 4  # value, quality, low vol, rates
+    assert xs[7] == pytest.approx([0.05, -0.03, 0.04])  # crypto: BTC's own return
 
     report = json.loads(out_path.read_text(encoding="utf-8"))
     aaa = report["results"]["AAAUSDT"]
     assert aaa["n"] == 3
+    zero = {"value": 0.0, "quality": 0.0, "low_vol": 0.0, "rates": 0.0}
     assert aaa["argus"] == pytest.approx(
-        {"market": 1.5, "size": -0.6, "momentum": 0.2, "crypto": 0.05},
+        {"market": 1.5, "size": -0.6, "momentum": 0.2, **zero, "crypto": 0.05},
     )
     assert aaa["argus_t"] == pytest.approx({"market": 3.0, "size": -2.0, "momentum": 1.0,
-                                            "crypto": 0.5})
+                                            **zero, "crypto": 0.5})
     assert aaa["argus_r2"] == pytest.approx(0.75)
     assert aaa["riskfolio_stepwise"] == pytest.approx(
-        {"market": 1.4, "size": 0.0, "momentum": 0.0, "crypto": 0.03},
+        {"market": 1.4, "size": 0.0, "momentum": 0.0, **zero, "crypto": 0.03},
     )
     assert report["results"]["BBBUSDT"] == {"error": "ConnectionError"}
-    assert report["riskfolio_zeroed"] == {"AAAUSDT": ["size", "momentum"]}
+    assert report["riskfolio_zeroed"] == {
+        "AAAUSDT": ["size", "momentum", "value", "quality", "low_vol", "rates"]}
     assert "BBBUSDT" not in report["riskfolio_zeroed"]
 
 

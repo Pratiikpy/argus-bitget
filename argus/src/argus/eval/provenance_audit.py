@@ -25,9 +25,10 @@ from pathlib import Path
 from typing import Any
 
 from argus.lui.provenance import _META, label
+from argus.truth.paths import DATA_DIR
 
-SAMPLE = Path(__file__).resolve().parents[3] / "data" / "provenance_sample.json"
-REPORT = Path(__file__).resolve().parents[3] / "data" / "provenance_audit.json"
+SAMPLE = DATA_DIR / "provenance_sample.json"
+REPORT = DATA_DIR / "provenance_audit.json"
 
 
 def audit(sample: Path = SAMPLE) -> dict[str, Any]:

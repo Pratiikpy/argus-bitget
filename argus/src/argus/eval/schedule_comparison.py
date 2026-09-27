@@ -68,8 +68,9 @@ from argus.execution.schedule import (
     quantise_trajectory,
     trajectory,
 )
+from argus.truth.paths import DATA_DIR
 
-DATA = Path(__file__).resolve().parents[3] / "data"
+DATA = DATA_DIR
 REPORT_PATH = DATA / "schedule_comparison.json"
 
 _ZERO = Decimal("0")
