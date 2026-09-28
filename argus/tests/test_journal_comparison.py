@@ -99,12 +99,12 @@ class TestAblation:
             assert result.hashing_parsed_content_is_robust is True
             assert result.the_design_choice_is_load_bearing is True
         else:
-            # Both flags require `disk_bytes_contain_crlf` (see `run_ablation`), which is honestly
-            # False here — there is no CRLF on POSIX and so nothing to demonstrate the ablation
-            # with. The design choice's load-bearing-ness is NOT VERIFIED on this platform, not
-            # false — it simply has no case to exercise it, exactly as `SCOPE_STATEMENT` says.
+            # ARGUS's side now rewrites its file to CRLF itself, so its robustness is shown on
+            # every platform. serenity's side still depends on POSIX text mode, which writes no
+            # CRLF, so its fragility has no case to exercise here: NOT VERIFIED on this platform,
+            # not false, exactly as `SCOPE_STATEMENT` says — and so is the ablation as a whole.
             assert result.hashing_raw_disk_bytes_is_fragile is False
-            assert result.hashing_parsed_content_is_robust is False
+            assert result.hashing_parsed_content_is_robust is True
             assert result.the_design_choice_is_load_bearing is False
 
 
